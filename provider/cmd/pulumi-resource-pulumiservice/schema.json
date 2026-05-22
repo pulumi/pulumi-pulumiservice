@@ -5178,15 +5178,19 @@
       "properties": {
         "environment": {
           "type": "string",
-          "description": "Environment name."
+          "description": "Environment name.",
+          "replaceOnChanges": true
         },
         "organization": {
           "type": "string",
-          "description": "Organization name."
+          "description": "Organization name.",
+          "replaceOnChanges": true
         },
         "project": {
           "type": "string",
-          "description": "Project name."
+          "description": "Project name.",
+          "default": "default",
+          "replaceOnChanges": true
         },
         "revision": {
           "type": "integer",
@@ -5194,12 +5198,12 @@
         },
         "tagName": {
           "type": "string",
-          "description": "Tag name."
+          "description": "Tag name.",
+          "replaceOnChanges": true
         }
       },
       "required": [
         "organization",
-        "project",
         "environment",
         "tagName",
         "revision"
@@ -5207,16 +5211,19 @@
       "inputProperties": {
         "environment": {
           "type": "string",
-          "description": "Environment name."
+          "description": "Environment name.",
+          "replaceOnChanges": true
         },
         "organization": {
           "type": "string",
-          "description": "Organization name."
+          "description": "Organization name.",
+          "replaceOnChanges": true
         },
         "project": {
           "type": "string",
           "description": "Project name.",
-          "default": "default"
+          "default": "default",
+          "replaceOnChanges": true
         },
         "revision": {
           "type": "integer",
@@ -5224,7 +5231,8 @@
         },
         "tagName": {
           "type": "string",
-          "description": "Tag name."
+          "description": "Tag name.",
+          "replaceOnChanges": true
         }
       },
       "requiredInputs": [

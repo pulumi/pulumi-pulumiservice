@@ -11,6 +11,8 @@ import com.pulumi.pulumiservice.EnvironmentVersionTagArgs;
 import com.pulumi.pulumiservice.Utilities;
 import java.lang.Integer;
 import java.lang.String;
+import java.util.List;
+import java.util.Optional;
 import javax.annotation.Nullable;
 
 /**
@@ -52,14 +54,14 @@ public class EnvironmentVersionTag extends com.pulumi.resources.CustomResource {
      * 
      */
     @Export(name="project", refs={String.class}, tree="[0]")
-    private Output<String> project;
+    private Output</* @Nullable */ String> project;
 
     /**
      * @return Project name.
      * 
      */
-    public Output<String> project() {
-        return this.project;
+    public Output<Optional<String>> project() {
+        return Codegen.optional(this.project);
     }
     /**
      * Revision number.
@@ -129,6 +131,12 @@ public class EnvironmentVersionTag extends com.pulumi.resources.CustomResource {
     private static com.pulumi.resources.CustomResourceOptions makeResourceOptions(@Nullable com.pulumi.resources.CustomResourceOptions options, @Nullable Output<java.lang.String> id) {
         var defaultOptions = com.pulumi.resources.CustomResourceOptions.builder()
             .version(Utilities.getVersion())
+            .replaceOnChanges(List.of(
+                "environment",
+                "organization",
+                "project",
+                "tagName"
+            ))
             .build();
         return com.pulumi.resources.CustomResourceOptions.merge(defaultOptions, options, id);
     }

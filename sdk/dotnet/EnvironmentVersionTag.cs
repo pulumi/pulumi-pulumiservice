@@ -31,7 +31,7 @@ namespace Pulumi.PulumiService
         /// Project name.
         /// </summary>
         [Output("project")]
-        public Output<string> Project { get; private set; } = null!;
+        public Output<string?> Project { get; private set; } = null!;
 
         /// <summary>
         /// Revision number.
@@ -68,6 +68,13 @@ namespace Pulumi.PulumiService
             var defaultOptions = new CustomResourceOptions
             {
                 Version = Utilities.Version,
+                ReplaceOnChanges =
+                {
+                    "environment",
+                    "organization",
+                    "project",
+                    "tagName",
+                },
             };
             var merged = CustomResourceOptions.Merge(defaultOptions, options);
             // Override the ID if one was specified for consistency with other language SDKs.

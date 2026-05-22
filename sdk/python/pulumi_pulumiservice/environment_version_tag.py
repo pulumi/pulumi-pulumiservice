@@ -181,6 +181,8 @@ class EnvironmentVersionTag(pulumi.CustomResource):
             if tag_name is None and not opts.urn:
                 raise TypeError("Missing required property 'tag_name'")
             __props__.__dict__["tag_name"] = tag_name
+        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["environment", "organization", "project", "tagName"])
+        opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(EnvironmentVersionTag, __self__).__init__(
             'pulumiservice:index:EnvironmentVersionTag',
             resource_name,
@@ -228,7 +230,7 @@ class EnvironmentVersionTag(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter
-    def project(self) -> pulumi.Output[_builtins.str]:
+    def project(self) -> pulumi.Output[Optional[_builtins.str]]:
         """
         Project name.
         """

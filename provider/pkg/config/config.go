@@ -5,8 +5,11 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"runtime"
 	"time"
 
+	esc_client "github.com/pulumi/esc/cmd/esc/cli/client"
+	"github.com/pulumi/esc/cmd/esc/cli/version"
 	p "github.com/pulumi/pulumi-go-provider"
 	"github.com/pulumi/pulumi-go-provider/infer"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/workspace"
@@ -30,12 +33,31 @@ func GetClient(ctx context.Context) Client {
 	return infer.GetConfig[Config](ctx).client
 }
 
-type mockClientKey struct{}
+// GetEscClient returns the upstream ESC client. Resources that operate on
+// ESC-served endpoints (e.g. environment revision tags) use this in lieu of
+// the pulumiapi.Client surface.
+func GetEscClient(ctx context.Context) esc_client.Client {
+	if v := ctx.Value(mockEscClientKey{}); v != nil {
+		return v.(esc_client.Client)
+	}
+	return infer.GetConfig[Config](ctx).escClient
+}
+
+type (
+	mockClientKey    struct{}
+	mockEscClientKey struct{}
+)
 
 // WithMockClient injects a client into the context for testing. This should only be used
 // for testing.
 func WithMockClient(ctx context.Context, client Client) context.Context {
 	return context.WithValue(ctx, mockClientKey{}, client)
+}
+
+// WithMockEscClient injects an ESC client into the context for testing. This
+// should only be used for testing.
+func WithMockEscClient(ctx context.Context, client esc_client.Client) context.Context {
+	return context.WithValue(ctx, mockEscClientKey{}, client)
 }
 
 var ErrAccessTokenNotFound = fmt.Errorf("pulumi access token not found")
@@ -75,7 +97,8 @@ type Config struct {
 	AccessToken string `pulumi:"accessToken,optional" provider:"secret"`
 	APIURL      string `pulumi:"apiUrl,optional"`
 
-	client *pulumiapi.Client
+	client    *pulumiapi.Client
+	escClient esc_client.Client
 }
 
 func (c *Config) Annotate(a infer.Annotator) {
@@ -120,7 +143,16 @@ func (c *Config) Configure(context.Context) error {
 	c.client, err = pulumiapi.NewClient(&http.Client{
 		Timeout: 60 * time.Second,
 	}, c.AccessToken, c.APIURL)
-	return err
+	if err != nil {
+		return err
+	}
+	c.escClient = esc_client.New(
+		fmt.Sprintf("provider-pulumiservice/1 (%s; %s)", version.Version, runtime.GOOS),
+		c.APIURL,
+		c.AccessToken,
+		false,
+	)
+	return nil
 }
 
 func (*Config) Diff(_ context.Context, req infer.DiffRequest[*Config, *Config]) (infer.DiffResponse, error) {

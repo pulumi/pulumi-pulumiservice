@@ -45,7 +45,7 @@ export class EnvironmentVersionTag extends pulumi.CustomResource {
     /**
      * Project name.
      */
-    declare public readonly project: pulumi.Output<string>;
+    declare public readonly project: pulumi.Output<string | undefined>;
     /**
      * Revision number.
      */
@@ -91,6 +91,8 @@ export class EnvironmentVersionTag extends pulumi.CustomResource {
             resourceInputs["tagName"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
+        const replaceOnChanges = { replaceOnChanges: ["environment", "organization", "project", "tagName"] };
+        opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(EnvironmentVersionTag.__pulumiType, name, resourceInputs, opts);
     }
 }
