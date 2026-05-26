@@ -18,7 +18,7 @@ PULUMI_MISSING_DOCS_ERROR := false
 
 # Override during CI using `make [TARGET] PROVIDER_VERSION=""` or by setting a PROVIDER_VERSION environment variable
 # Local & branch builds will just used this fixed default version unless specified
-PROVIDER_VERSION ?= 2.0.0-alpha.0+dev
+PROVIDER_VERSION ?= 1.0.0-alpha.0+dev
 
 # Check version doesn't start with a "v" - this is a common mistake
 ifeq ($(shell echo $(PROVIDER_VERSION) | cut -c1),v)
@@ -145,20 +145,12 @@ build_java: .make/build_java
 .make/generate_java: | mise_env
 	PULUMI_HOME=$(GEN_PULUMI_HOME) PULUMI_CONVERT_EXAMPLES_CACHE_DIR=$(GEN_PULUMI_CONVERT_EXAMPLES_CACHE_DIR) pulumi package gen-sdk provider/cmd/$(PROVIDER)/schema.json --version ${PROVIDER_VERSION} --language java --out sdk/
 	printf "module fake_java_module // Exclude this directory from Go tools\n\ngo 1.17\n" > sdk/java/go.mod
-	# Patch two pulumi-java-gen template bugs that otherwise break gradle build:
-	# 1. settings.gradle ships an `include("lib")` for a subproject that doesn't exist on disk.
-	# 2. build.gradle inlines the package description (multi-line, with backticks) into a
-	#    Groovy single-quoted-style string literal without escaping the newlines.
-	# Both patches are idempotent on subsequent regenerations.
-	sed -i.bak '/^include("lib")$$/d' sdk/java/settings.gradle && rm -f sdk/java/settings.gradle.bak
-	perl -i -0pe 's/description = "[^"]*"/description = "Pulumi Service Provider for Pulumi Cloud."/s' sdk/java/build.gradle
 	@touch $@
 .make/build_java: PACKAGE_VERSION := $(PROVIDER_VERSION)
 .make/build_java: .make/generate_java
 	cd sdk/java/ && \
 		gradle --console=plain build && \
-		gradle --console=plain javadoc && \
-		gradle --console=plain publishToMavenLocal
+		gradle --console=plain javadoc
 	@touch $@
 .PHONY: generate_java build_java
 
@@ -237,7 +229,9 @@ lint.fix: upstream
 	exit $$LINT_EXIT
 
 .PHONY: lint lint.fix
-build_provider_cmd = cd provider && GOOS=$(1) GOARCH=$(2) CGO_ENABLED=0 go build $(PULUMI_PROVIDER_BUILD_PARALLELISM) -o "$(3)" -ldflags "$(LDFLAGS)" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(PROVIDER)
+build_provider_cmd = set -x; \
+cd provider && GOOS=$(1) GOARCH=$(2) go mod download && \
+GOOS=$(1) GOARCH=$(2) CGO_ENABLED=0 go build -v $(PULUMI_PROVIDER_BUILD_PARALLELISM) -o "$(3)" -ldflags "$(LDFLAGS)" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(PROVIDER)
 
 provider: bin/$(PROVIDER)
 
@@ -246,14 +240,8 @@ provider: bin/$(PROVIDER)
 # To create a release ready binary, you should use `make provider`.
 provider_no_deps:
 	$(call build_provider_cmd,$(shell go env GOOS),$(shell go env GOARCH),$(WORKING_DIR)/bin/$(PROVIDER))
-# Provider sources: Go files under provider/{cmd,pkg} plus the OpenAPI spec
-# and per-resource metadata that get embedded into the binary at build time.
-# Excludes provider/tools/* — those compile into separate codegen binaries.
-PROVIDER_SOURCES := $(shell find provider/cmd provider/pkg -name '*.go') \
-                    provider/pkg/cloud/spec.json \
-                    provider/pkg/cloud/metadata.json \
-                    go.mod go.sum
-bin/$(PROVIDER): $(PROVIDER_SOURCES)
+# New approach: No schema dependency (schema depends on provider instead)
+bin/$(PROVIDER):
 	$(call build_provider_cmd,$(shell go env GOOS),$(shell go env GOARCH),$(WORKING_DIR)/bin/$(PROVIDER))
 .PHONY: provider provider_no_deps
 
