@@ -37,6 +37,7 @@ Ideally, every change should include unit tests, and every new resource a matchi
 You should also test changes manually using a Pulumi program that uses the updated SDKs. Here are some language-specific hints:
 
 ### .NET
+
 - To import generated Nuget package, use this command inside your Pulumi program
   - `dotnet add package Pulumi.PulumiService -s {your path}/pulumi-pulumiservice/sdk/dotnet/bin/Debug/ -v X.XX.XX`
 
@@ -54,12 +55,25 @@ Please ensure that you nest your branches under a unique identifier such as your
 
 ## Creating a Release
 
-This section is for Pulumi employees only. 
+This section is for Pulumi employees only.
 
 To release a new version of the provider, follow steps below:
+
 - Trigger a release in #release-ops
 - Github Actions will automatically build, test and then publish the new release to all the various package managers
 - Once that is done, you will see your version in [Releases](https://github.com/pulumi/pulumi-pulumiservice/releases)
+
+## Releasing the API Surface
+
+This section is for Pulumi employees only.
+
+Resources under the `pulumiservice:api:*` namespace ship via an auto-tag workflow rather than `#release-ops`. To cut a release:
+
+1. Open a PR with the changes you want to ship.
+2. Add the `auto-release` label.
+3. Include a `Release-Version: vX.Y.Z` marker anywhere in the PR body. Markdown emphasis is stripped before matching, so `**Release-Version: v1.2.3**` works.
+4. Merge to `main`. [`tag-v1-release.yml`](./.github/workflows/tag-v1-release.yml) (job `tag-api-release`) extracts the version, verifies the tag doesn't already exist, and pushes it from a GitHub App installation token.
+5. The tag push triggers `release.yml` (stable) or `prerelease.yml` (pre-release). For stable tags, a `finalize` job waits for the GitHub release to be created, marks it `--latest`, and dispatches a docs rebuild to `pulumi/registry`.
 
 ## Getting Help
 
