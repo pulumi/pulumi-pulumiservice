@@ -15,6 +15,7 @@
 package pulumiapi
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"fmt"
@@ -24,6 +25,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/pulumi/pulumi/sdk/v3/go/common/apitype"
 )
 
 type PolicyPackClient interface {
@@ -36,10 +39,10 @@ type PolicyPackClient interface {
 }
 
 type CreatePolicyPackRequest struct {
-	Name        string   `json:"name"`
-	DisplayName string   `json:"displayName,omitempty"`
-	VersionTag  string   `json:"versionTag,omitempty"`
-	Policies    []Policy `json:"policies"`
+	Name        string           `json:"name"`
+	DisplayName string           `json:"displayName,omitempty"`
+	VersionTag  string           `json:"versionTag,omitempty"`
+	Policies    []apitype.Policy `json:"policies"`
 }
 
 type CreatePolicyPackResponse struct {
@@ -61,28 +64,7 @@ type PolicyPackDetail struct {
 	Version     int                    `json:"version"`
 	VersionTag  string                 `json:"versionTag,omitempty"`
 	Config      map[string]interface{} `json:"config,omitempty"`
-	Policies    []Policy               `json:"policies,omitempty"`
-}
-
-type PolicyComplianceFramework struct {
-	Name          string `json:"name,omitempty"`
-	Version       string `json:"version,omitempty"`
-	Reference     string `json:"reference,omitempty"`
-	Specification string `json:"specification,omitempty"`
-}
-
-type Policy struct {
-	Name             string                     `json:"name"`
-	DisplayName      string                     `json:"displayName,omitempty"`
-	Description      string                     `json:"description,omitempty"`
-	EnforcementLevel string                     `json:"enforcementLevel,omitempty"`
-	Message          string                     `json:"message,omitempty"`
-	ConfigSchema     map[string]interface{}     `json:"configSchema,omitempty"`
-	Severity         string                     `json:"severity,omitempty"`
-	Framework        *PolicyComplianceFramework `json:"framework,omitempty"`
-	Tags             []string                   `json:"tags,omitempty"`
-	RemediationSteps string                     `json:"remediationSteps,omitempty"`
-	URL              string                     `json:"url,omitempty"`
+	Policies    []apitype.Policy       `json:"policies,omitempty"`
 }
 
 type listPolicyPacksResponse struct {
@@ -196,21 +178,12 @@ func (c *Client) PublishPolicyPack(
 		_ = c.DeletePolicyPackVersion(cleanupCtx, orgName, req.Name, req.VersionTag)
 	}()
 
-	putReq, err := http.NewRequestWithContext(ctx, http.MethodPut, resp.UploadURI, archive)
-	if err != nil {
-		return 0, fmt.Errorf("build upload request: %w", err)
+	body, readErr := io.ReadAll(archive)
+	if readErr != nil {
+		return 0, fmt.Errorf("read policy pack archive: %w", readErr)
 	}
-	for k, v := range resp.RequiredHeaders {
-		putReq.Header.Set(k, v)
-	}
-	putResp, err := c.httpClient.Do(putReq)
-	if err != nil {
-		return 0, fmt.Errorf("upload policy pack archive: %w", err)
-	}
-	defer putResp.Body.Close()
-	if putResp.StatusCode >= 300 {
-		body, _ := io.ReadAll(io.LimitReader(putResp.Body, 4096))
-		return 0, fmt.Errorf("upload failed with status %d: %s", putResp.StatusCode, strings.TrimSpace(string(body)))
+	if err = c.uploadToSignedURL(ctx, resp.UploadURI, resp.RequiredHeaders, body); err != nil {
+		return 0, err
 	}
 
 	completePath := path.Join(
@@ -220,6 +193,63 @@ func (c *Client) PublishPolicyPack(
 		return 0, fmt.Errorf("signal publish completion: %w", err)
 	}
 	return resp.Version, nil
+}
+
+// uploadToSignedURL PUTs the archive to the pre-signed URL the Cloud returned.
+// We retry on transient failures (network errors and 5xx) because signed-URL
+// uploads run against blob storage, not our API, and flakes shouldn't burn
+// the whole publish.
+func (c *Client) uploadToSignedURL(
+	ctx context.Context,
+	uploadURI string,
+	headers map[string]string,
+	body []byte,
+) error {
+	const maxAttempts = 3
+	var lastErr error
+	for attempt := 1; attempt <= maxAttempts; attempt++ {
+		req, err := http.NewRequestWithContext(ctx, http.MethodPut, uploadURI, bytes.NewReader(body))
+		if err != nil {
+			return fmt.Errorf("build upload request: %w", err)
+		}
+		for k, v := range headers {
+			req.Header.Set(k, v)
+		}
+		resp, err := c.httpClient.Do(req)
+		if err != nil {
+			lastErr = fmt.Errorf("upload policy pack archive: %w", err)
+			if !sleepForRetry(ctx, attempt) {
+				return lastErr
+			}
+			continue
+		}
+		respBody, _ := io.ReadAll(io.LimitReader(resp.Body, 4096))
+		_ = resp.Body.Close()
+		if resp.StatusCode < 300 {
+			return nil
+		}
+		lastErr = fmt.Errorf("upload failed with status %d: %s",
+			resp.StatusCode, strings.TrimSpace(string(respBody)))
+		if resp.StatusCode < 500 || !sleepForRetry(ctx, attempt) {
+			return lastErr
+		}
+	}
+	return lastErr
+}
+
+// sleepForRetry waits before the next retry attempt and returns false if no
+// further attempts should be made (context canceled, or attempts exhausted).
+func sleepForRetry(ctx context.Context, attempt int) bool {
+	if attempt >= 3 {
+		return false
+	}
+	delay := time.Duration(attempt) * 500 * time.Millisecond
+	select {
+	case <-ctx.Done():
+		return false
+	case <-time.After(delay):
+		return true
+	}
 }
 
 func (c *Client) DeletePolicyPackVersion(ctx context.Context, orgName, policyPackName, versionTag string) error {

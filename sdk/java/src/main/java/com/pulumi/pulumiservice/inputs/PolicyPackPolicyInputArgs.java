@@ -6,8 +6,10 @@ package com.pulumi.pulumiservice.inputs;
 import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
 import com.pulumi.exceptions.MissingRequiredPropertyException;
+import com.pulumi.pulumiservice.inputs.PolicyPackComplianceFrameworkInputArgs;
 import java.lang.Object;
 import java.lang.String;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -48,18 +50,33 @@ public final class PolicyPackPolicyInputArgs extends com.pulumi.resources.Resour
     }
 
     /**
-     * One of: advisory, mandatory, disabled.
+     * One of: advisory, mandatory, remediate, disabled.
      * 
      */
     @Import(name="enforcementLevel")
     private @Nullable Output<String> enforcementLevel;
 
     /**
-     * @return One of: advisory, mandatory, disabled.
+     * @return One of: advisory, mandatory, remediate, disabled.
      * 
      */
     public Optional<Output<String>> enforcementLevel() {
         return Optional.ofNullable(this.enforcementLevel);
+    }
+
+    /**
+     * Compliance framework this policy belongs to.
+     * 
+     */
+    @Import(name="framework")
+    private @Nullable Output<PolicyPackComplianceFrameworkInputArgs> framework;
+
+    /**
+     * @return Compliance framework this policy belongs to.
+     * 
+     */
+    public Optional<Output<PolicyPackComplianceFrameworkInputArgs>> framework() {
+        return Optional.ofNullable(this.framework);
     }
 
     @Import(name="message")
@@ -84,6 +101,66 @@ public final class PolicyPackPolicyInputArgs extends com.pulumi.resources.Resour
         return this.name;
     }
 
+    /**
+     * Description of steps to remediate a violation.
+     * 
+     */
+    @Import(name="remediationSteps")
+    private @Nullable Output<String> remediationSteps;
+
+    /**
+     * @return Description of steps to remediate a violation.
+     * 
+     */
+    public Optional<Output<String>> remediationSteps() {
+        return Optional.ofNullable(this.remediationSteps);
+    }
+
+    /**
+     * Severity level: low, medium, high, or critical.
+     * 
+     */
+    @Import(name="severity")
+    private @Nullable Output<String> severity;
+
+    /**
+     * @return Severity level: low, medium, high, or critical.
+     * 
+     */
+    public Optional<Output<String>> severity() {
+        return Optional.ofNullable(this.severity);
+    }
+
+    /**
+     * Tags associated with the policy.
+     * 
+     */
+    @Import(name="tags")
+    private @Nullable Output<List<String>> tags;
+
+    /**
+     * @return Tags associated with the policy.
+     * 
+     */
+    public Optional<Output<List<String>>> tags() {
+        return Optional.ofNullable(this.tags);
+    }
+
+    /**
+     * URL with more information about the policy.
+     * 
+     */
+    @Import(name="url")
+    private @Nullable Output<String> url;
+
+    /**
+     * @return URL with more information about the policy.
+     * 
+     */
+    public Optional<Output<String>> url() {
+        return Optional.ofNullable(this.url);
+    }
+
     private PolicyPackPolicyInputArgs() {}
 
     private PolicyPackPolicyInputArgs(PolicyPackPolicyInputArgs $) {
@@ -91,8 +168,13 @@ public final class PolicyPackPolicyInputArgs extends com.pulumi.resources.Resour
         this.description = $.description;
         this.displayName = $.displayName;
         this.enforcementLevel = $.enforcementLevel;
+        this.framework = $.framework;
         this.message = $.message;
         this.name = $.name;
+        this.remediationSteps = $.remediationSteps;
+        this.severity = $.severity;
+        this.tags = $.tags;
+        this.url = $.url;
     }
 
     public static Builder builder() {
@@ -153,7 +235,7 @@ public final class PolicyPackPolicyInputArgs extends com.pulumi.resources.Resour
         }
 
         /**
-         * @param enforcementLevel One of: advisory, mandatory, disabled.
+         * @param enforcementLevel One of: advisory, mandatory, remediate, disabled.
          * 
          * @return builder
          * 
@@ -164,13 +246,34 @@ public final class PolicyPackPolicyInputArgs extends com.pulumi.resources.Resour
         }
 
         /**
-         * @param enforcementLevel One of: advisory, mandatory, disabled.
+         * @param enforcementLevel One of: advisory, mandatory, remediate, disabled.
          * 
          * @return builder
          * 
          */
         public Builder enforcementLevel(String enforcementLevel) {
             return enforcementLevel(Output.of(enforcementLevel));
+        }
+
+        /**
+         * @param framework Compliance framework this policy belongs to.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder framework(@Nullable Output<PolicyPackComplianceFrameworkInputArgs> framework) {
+            $.framework = framework;
+            return this;
+        }
+
+        /**
+         * @param framework Compliance framework this policy belongs to.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder framework(PolicyPackComplianceFrameworkInputArgs framework) {
+            return framework(Output.of(framework));
         }
 
         public Builder message(@Nullable Output<String> message) {
@@ -201,6 +304,100 @@ public final class PolicyPackPolicyInputArgs extends com.pulumi.resources.Resour
          */
         public Builder name(String name) {
             return name(Output.of(name));
+        }
+
+        /**
+         * @param remediationSteps Description of steps to remediate a violation.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder remediationSteps(@Nullable Output<String> remediationSteps) {
+            $.remediationSteps = remediationSteps;
+            return this;
+        }
+
+        /**
+         * @param remediationSteps Description of steps to remediate a violation.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder remediationSteps(String remediationSteps) {
+            return remediationSteps(Output.of(remediationSteps));
+        }
+
+        /**
+         * @param severity Severity level: low, medium, high, or critical.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder severity(@Nullable Output<String> severity) {
+            $.severity = severity;
+            return this;
+        }
+
+        /**
+         * @param severity Severity level: low, medium, high, or critical.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder severity(String severity) {
+            return severity(Output.of(severity));
+        }
+
+        /**
+         * @param tags Tags associated with the policy.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder tags(@Nullable Output<List<String>> tags) {
+            $.tags = tags;
+            return this;
+        }
+
+        /**
+         * @param tags Tags associated with the policy.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder tags(List<String> tags) {
+            return tags(Output.of(tags));
+        }
+
+        /**
+         * @param tags Tags associated with the policy.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder tags(String... tags) {
+            return tags(List.of(tags));
+        }
+
+        /**
+         * @param url URL with more information about the policy.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder url(@Nullable Output<String> url) {
+            $.url = url;
+            return this;
+        }
+
+        /**
+         * @param url URL with more information about the policy.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder url(String url) {
+            return url(Output.of(url));
         }
 
         public PolicyPackPolicyInputArgs build() {

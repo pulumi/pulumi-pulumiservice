@@ -41,6 +41,7 @@ import (
 	"github.com/pulumi/pulumi-go-provider/middleware/rpc"
 	"github.com/pulumi/pulumi/pkg/v3/codegen/schema"
 	"github.com/pulumi/pulumi/pkg/v3/resource/provider"
+	"github.com/pulumi/pulumi/sdk/v3/go/common/apitype"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/tokens"
@@ -715,13 +716,13 @@ func convertPolicyPackDetailToProperties(pack *pulumiapi.PolicyPackDetail) resou
 				policyProps["description"] = resource.NewStringProperty(policy.Description)
 			}
 			if policy.EnforcementLevel != "" {
-				policyProps["enforcementLevel"] = resource.NewStringProperty(policy.EnforcementLevel)
+				policyProps["enforcementLevel"] = resource.NewStringProperty(string(policy.EnforcementLevel))
 			}
 			if policy.Message != "" {
 				policyProps["message"] = resource.NewStringProperty(policy.Message)
 			}
 			if policy.ConfigSchema != nil {
-				policyProps["configSchema"] = resource.NewObjectProperty(convertMapToPropertyMap(policy.ConfigSchema))
+				policyProps["configSchema"] = resource.NewObjectProperty(convertConfigSchemaToPropertyMap(policy.ConfigSchema))
 			}
 			policies[i] = resource.NewObjectProperty(policyProps)
 		}
@@ -735,6 +736,35 @@ func convertMapToPropertyMap(m map[string]interface{}) resource.PropertyMap {
 	props := resource.PropertyMap{}
 	for k, v := range m {
 		props[resource.PropertyKey(k)] = convertInterfaceToPropertyValue(v)
+	}
+	return props
+}
+
+func convertConfigSchemaToPropertyMap(cs *apitype.PolicyConfigSchema) resource.PropertyMap {
+	props := resource.PropertyMap{}
+	if cs.Type != "" {
+		props["type"] = resource.NewStringProperty(string(cs.Type))
+	}
+	if len(cs.Required) > 0 {
+		required := make([]resource.PropertyValue, len(cs.Required))
+		for i, r := range cs.Required {
+			required[i] = resource.NewStringProperty(r)
+		}
+		props["required"] = resource.NewArrayProperty(required)
+	}
+	if len(cs.Properties) > 0 {
+		properties := resource.PropertyMap{}
+		for name, raw := range cs.Properties {
+			if raw == nil {
+				continue
+			}
+			var decoded any
+			if err := json.Unmarshal(*raw, &decoded); err != nil {
+				continue
+			}
+			properties[resource.PropertyKey(name)] = convertInterfaceToPropertyValue(decoded)
+		}
+		props["properties"] = resource.NewObjectProperty(properties)
 	}
 	return props
 }

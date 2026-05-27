@@ -51,13 +51,6 @@ func NewPolicyPack(ctx *pulumi.Context,
 	if args.VersionTag == nil {
 		return nil, errors.New("invalid value for required argument 'VersionTag'")
 	}
-	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
-		"displayName",
-		"name",
-		"organization",
-		"versionTag",
-	})
-	opts = append(opts, replaceOnChanges)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource PolicyPack
 	err := ctx.RegisterResource("pulumiservice:index:PolicyPack", name, args, &resource, opts...)

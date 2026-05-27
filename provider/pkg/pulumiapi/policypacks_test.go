@@ -22,10 +22,13 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"strings"
+	"sync/atomic"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/pulumi/pulumi/sdk/v3/go/common/apitype"
 )
 
 const policyPacksPath = "/api/orgs/anOrg/policypacks"
@@ -208,7 +211,7 @@ func TestPublishPolicyPack_HappyPath(t *testing.T) {
 	version, err := c.PublishPolicyPack(ctx, "anOrg", CreatePolicyPackRequest{
 		Name:       "alpha",
 		VersionTag: "1.0.0",
-		Policies:   []Policy{{Name: "rule"}},
+		Policies:   []apitype.Policy{{Name: "rule"}},
 	}, bytes.NewReader(archive))
 	require.NoError(t, err)
 	assert.Equal(t, 7, version)
@@ -281,6 +284,48 @@ func TestPublishPolicyPack_CleanupUsesDetachedContext(t *testing.T) {
 	}, strings.NewReader("payload"))
 	require.Error(t, err)
 	assert.True(t, cleanupHit, "cleanup should run even when caller context is canceled")
+}
+
+func TestUploadToSignedURL_Retries5xx(t *testing.T) {
+	var attempts atomic.Int32
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodPut, r.Method)
+		assert.Equal(t, "value", r.Header.Get("X-Required"))
+		body, _ := io.ReadAll(r.Body)
+		assert.Equal(t, []byte("payload"), body)
+		if attempts.Add(1) == 1 {
+			w.WriteHeader(http.StatusBadGateway)
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+	}))
+	t.Cleanup(server.Close)
+
+	c, err := NewClient(&http.Client{}, "tok", server.URL)
+	require.NoError(t, err)
+
+	err = c.uploadToSignedURL(ctx, server.URL+"/upload",
+		map[string]string{"X-Required": "value"}, []byte("payload"))
+	require.NoError(t, err)
+	assert.EqualValues(t, 2, attempts.Load(), "expected one retry after the first 5xx")
+}
+
+func TestUploadToSignedURL_DoesNotRetry4xx(t *testing.T) {
+	var attempts atomic.Int32
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		attempts.Add(1)
+		w.WriteHeader(http.StatusBadRequest)
+		_, _ = w.Write([]byte("nope"))
+	}))
+	t.Cleanup(server.Close)
+
+	c, err := NewClient(&http.Client{}, "tok", server.URL)
+	require.NoError(t, err)
+
+	err = c.uploadToSignedURL(ctx, server.URL+"/upload", nil, []byte("payload"))
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "upload failed")
+	assert.EqualValues(t, 1, attempts.Load(), "4xx should not retry")
 }
 
 func TestPublishPolicyPack_InputValidation(t *testing.T) {

@@ -40,6 +40,7 @@ __all__ = [
     'OrganizationMemberInfo',
     'PolicyGroupPolicyPackReference',
     'PolicyGroupStackReference',
+    'PolicyPackComplianceFrameworkInput',
     'PolicyPackPolicyInput',
     'RoleScopeInfo',
     'TemplateSourceDestination',
@@ -1645,6 +1646,60 @@ class PolicyGroupStackReference(dict):
 
 
 @pulumi.output_type
+class PolicyPackComplianceFrameworkInput(dict):
+    def __init__(__self__, *,
+                 name: _builtins.str,
+                 reference: Optional[_builtins.str] = None,
+                 specification: Optional[_builtins.str] = None,
+                 version: Optional[_builtins.str] = None):
+        """
+        :param _builtins.str name: Compliance framework name (e.g. "PCI-DSS", "SOC2").
+        :param _builtins.str reference: Reference to the framework (e.g. a control ID).
+        :param _builtins.str specification: Free-form specification text.
+        :param _builtins.str version: Compliance framework version.
+        """
+        pulumi.set(__self__, "name", name)
+        if reference is not None:
+            pulumi.set(__self__, "reference", reference)
+        if specification is not None:
+            pulumi.set(__self__, "specification", specification)
+        if version is not None:
+            pulumi.set(__self__, "version", version)
+
+    @_builtins.property
+    @pulumi.getter
+    def name(self) -> _builtins.str:
+        """
+        Compliance framework name (e.g. "PCI-DSS", "SOC2").
+        """
+        return pulumi.get(self, "name")
+
+    @_builtins.property
+    @pulumi.getter
+    def reference(self) -> Optional[_builtins.str]:
+        """
+        Reference to the framework (e.g. a control ID).
+        """
+        return pulumi.get(self, "reference")
+
+    @_builtins.property
+    @pulumi.getter
+    def specification(self) -> Optional[_builtins.str]:
+        """
+        Free-form specification text.
+        """
+        return pulumi.get(self, "specification")
+
+    @_builtins.property
+    @pulumi.getter
+    def version(self) -> Optional[_builtins.str]:
+        """
+        Compliance framework version.
+        """
+        return pulumi.get(self, "version")
+
+
+@pulumi.output_type
 class PolicyPackPolicyInput(dict):
     @staticmethod
     def __key_warning(key: str):
@@ -1655,6 +1710,8 @@ class PolicyPackPolicyInput(dict):
             suggest = "display_name"
         elif key == "enforcementLevel":
             suggest = "enforcement_level"
+        elif key == "remediationSteps":
+            suggest = "remediation_steps"
 
         if suggest:
             pulumi.log.warn(f"Key '{key}' not found in PolicyPackPolicyInput. Access the value via the '{suggest}' property getter instead.")
@@ -1673,11 +1730,21 @@ class PolicyPackPolicyInput(dict):
                  description: Optional[_builtins.str] = None,
                  display_name: Optional[_builtins.str] = None,
                  enforcement_level: Optional[_builtins.str] = None,
-                 message: Optional[_builtins.str] = None):
+                 framework: Optional['outputs.PolicyPackComplianceFrameworkInput'] = None,
+                 message: Optional[_builtins.str] = None,
+                 remediation_steps: Optional[_builtins.str] = None,
+                 severity: Optional[_builtins.str] = None,
+                 tags: Optional[Sequence[_builtins.str]] = None,
+                 url: Optional[_builtins.str] = None):
         """
         :param _builtins.str name: Unique policy name within the pack.
         :param Mapping[str, Any] config_schema: JSON Schema (properties/required/type) for the policy's runtime config. Values are supplied per-policy via the PolicyGroup's policyPacks[].config map.
-        :param _builtins.str enforcement_level: One of: advisory, mandatory, disabled.
+        :param _builtins.str enforcement_level: One of: advisory, mandatory, remediate, disabled.
+        :param 'PolicyPackComplianceFrameworkInput' framework: Compliance framework this policy belongs to.
+        :param _builtins.str remediation_steps: Description of steps to remediate a violation.
+        :param _builtins.str severity: Severity level: low, medium, high, or critical.
+        :param Sequence[_builtins.str] tags: Tags associated with the policy.
+        :param _builtins.str url: URL with more information about the policy.
         """
         pulumi.set(__self__, "name", name)
         if config_schema is not None:
@@ -1688,8 +1755,18 @@ class PolicyPackPolicyInput(dict):
             pulumi.set(__self__, "display_name", display_name)
         if enforcement_level is not None:
             pulumi.set(__self__, "enforcement_level", enforcement_level)
+        if framework is not None:
+            pulumi.set(__self__, "framework", framework)
         if message is not None:
             pulumi.set(__self__, "message", message)
+        if remediation_steps is not None:
+            pulumi.set(__self__, "remediation_steps", remediation_steps)
+        if severity is not None:
+            pulumi.set(__self__, "severity", severity)
+        if tags is not None:
+            pulumi.set(__self__, "tags", tags)
+        if url is not None:
+            pulumi.set(__self__, "url", url)
 
     @_builtins.property
     @pulumi.getter
@@ -1721,14 +1798,54 @@ class PolicyPackPolicyInput(dict):
     @pulumi.getter(name="enforcementLevel")
     def enforcement_level(self) -> Optional[_builtins.str]:
         """
-        One of: advisory, mandatory, disabled.
+        One of: advisory, mandatory, remediate, disabled.
         """
         return pulumi.get(self, "enforcement_level")
 
     @_builtins.property
     @pulumi.getter
+    def framework(self) -> Optional['outputs.PolicyPackComplianceFrameworkInput']:
+        """
+        Compliance framework this policy belongs to.
+        """
+        return pulumi.get(self, "framework")
+
+    @_builtins.property
+    @pulumi.getter
     def message(self) -> Optional[_builtins.str]:
         return pulumi.get(self, "message")
+
+    @_builtins.property
+    @pulumi.getter(name="remediationSteps")
+    def remediation_steps(self) -> Optional[_builtins.str]:
+        """
+        Description of steps to remediate a violation.
+        """
+        return pulumi.get(self, "remediation_steps")
+
+    @_builtins.property
+    @pulumi.getter
+    def severity(self) -> Optional[_builtins.str]:
+        """
+        Severity level: low, medium, high, or critical.
+        """
+        return pulumi.get(self, "severity")
+
+    @_builtins.property
+    @pulumi.getter
+    def tags(self) -> Optional[Sequence[_builtins.str]]:
+        """
+        Tags associated with the policy.
+        """
+        return pulumi.get(self, "tags")
+
+    @_builtins.property
+    @pulumi.getter
+    def url(self) -> Optional[_builtins.str]:
+        """
+        URL with more information about the policy.
+        """
+        return pulumi.get(self, "url")
 
 
 @pulumi.output_type

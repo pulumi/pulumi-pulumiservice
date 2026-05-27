@@ -20,12 +20,14 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"reflect"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/pulumi/pulumi-go-provider/infer"
+	"github.com/pulumi/pulumi/sdk/v3/go/common/apitype"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
@@ -69,8 +71,9 @@ func (c *PolicyPackClientMock) ListPolicyPacks(
 func writePolicySource(t *testing.T) string {
 	t.Helper()
 	dir := t.TempDir()
-	require.NoError(t, os.WriteFile(filepath.Join(dir, "PulumiPolicy.yaml"), []byte("runtime: nodejs\n"), 0o600))
-	require.NoError(t, os.WriteFile(filepath.Join(dir, "index.js"), []byte("// policy\n"), 0o600))
+	// Non-nodejs runtime so packagePolicyPackArchive uses archive.TGZ (no npm shell-out).
+	require.NoError(t, os.WriteFile(filepath.Join(dir, "PulumiPolicy.yaml"), []byte("runtime: python\n"), 0o600))
+	require.NoError(t, os.WriteFile(filepath.Join(dir, "__main__.py"), []byte("# policy\n"), 0o600))
 	return dir
 }
 
@@ -119,33 +122,43 @@ func TestToAPIPolicies(t *testing.T) {
 			Description:      "block secret literals",
 			EnforcementLevel: "mandatory",
 			Message:          "remove the secret",
-			ConfigSchema:     map[string]any{"type": "object"},
+			ConfigSchema:     map[string]any{"type": "object", "required": []string{"k"}},
+			Severity:         "high",
+			Framework: &PolicyPackComplianceFrameworkInput{
+				Name:    "PCI-DSS",
+				Version: "4.0",
+			},
+			Tags:             []string{"secrets", "security"},
+			RemediationSteps: "remove secret literals",
+			URL:              "https://example.com/policies/no-secrets",
 		},
 		{Name: "minimal"},
 	}
 	got := toAPIPolicies(in)
 	require.Len(t, got, 2)
-	assert.Equal(t, pulumiapi.Policy{
-		Name:             "no-secrets",
-		DisplayName:      "No Secrets",
-		Description:      "block secret literals",
-		EnforcementLevel: "mandatory",
-		Message:          "remove the secret",
-		ConfigSchema:     map[string]any{"type": "object"},
-	}, got[0])
+	first := got[0]
+	assert.Equal(t, "no-secrets", first.Name)
+	assert.Equal(t, "No Secrets", first.DisplayName)
+	assert.Equal(t, apitype.EnforcementLevel("mandatory"), first.EnforcementLevel)
+	assert.Equal(t, apitype.PolicySeverity("high"), first.Severity)
+	require.NotNil(t, first.ConfigSchema)
+	assert.Equal(t, apitype.Object, first.ConfigSchema.Type)
+	assert.Equal(t, []string{"k"}, first.ConfigSchema.Required)
+	require.NotNil(t, first.Framework)
+	assert.Equal(t, "PCI-DSS", first.Framework.Name)
+	assert.Equal(t, []string{"secrets", "security"}, first.Tags)
+	assert.Equal(t, "remove secret literals", first.RemediationSteps)
+	assert.Equal(t, "https://example.com/policies/no-secrets", first.URL)
 	assert.Equal(t, "minimal", got[1].Name)
 }
 
-func TestPoliciesEqual(t *testing.T) {
+func TestPoliciesNormalizedDeepEqual(t *testing.T) {
 	a := []PolicyPackPolicyInput{{Name: "a", EnforcementLevel: "advisory"}}
 	b := []PolicyPackPolicyInput{{Name: "a", EnforcementLevel: "advisory"}}
-	assert.True(t, policiesEqual(a, b))
+	assert.True(t, reflect.DeepEqual(a, b))
 
 	b[0].EnforcementLevel = "mandatory"
-	assert.False(t, policiesEqual(a, b))
-
-	assert.True(t, policiesEqual(nil, nil))
-	assert.False(t, policiesEqual(a, nil))
+	assert.False(t, reflect.DeepEqual(a, b))
 }
 
 func TestConvertAnalyzerConfigSchema(t *testing.T) {
@@ -229,7 +242,9 @@ func TestPolicyPack_Create_HappyPath(t *testing.T) {
 	assert.Equal(t, "1.0.0", capturedReq.VersionTag)
 	require.Len(t, capturedReq.Policies, 1)
 	// normalizeConfigSchema should have defaulted type=object
-	assert.Equal(t, "object", capturedReq.Policies[0].ConfigSchema["type"])
+	require.NotNil(t, capturedReq.Policies[0].ConfigSchema)
+	assert.Equal(t, apitype.Object, capturedReq.Policies[0].ConfigSchema.Type)
+	assert.Equal(t, []string{"k"}, capturedReq.Policies[0].ConfigSchema.Required)
 }
 
 func TestPolicyPack_Create_PublishError(t *testing.T) {
@@ -271,7 +286,7 @@ func TestPolicyPack_Create_TarballError(t *testing.T) {
 
 func TestPolicyPack_Diff_NoChanges(t *testing.T) {
 	dir := writePolicySource(t)
-	_, hash, err := tarballDirectory(dir)
+	hash, err := hashPolicyPackSource(dir)
 	require.NoError(t, err)
 
 	state := PolicyPackState{
@@ -315,7 +330,7 @@ func TestPolicyPack_Diff_ReplacesOnContentChange(t *testing.T) {
 
 func TestPolicyPack_Diff_ReplacesOnIdentityChange(t *testing.T) {
 	dir := writePolicySource(t)
-	_, hash, err := tarballDirectory(dir)
+	hash, err := hashPolicyPackSource(dir)
 	require.NoError(t, err)
 
 	state := PolicyPackState{

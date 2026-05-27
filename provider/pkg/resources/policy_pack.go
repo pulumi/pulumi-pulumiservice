@@ -17,19 +17,29 @@ package resources
 import (
 	"bytes"
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
+	"encoding/json"
 	"fmt"
 	"io"
+	"io/fs"
+	"os"
 	"path"
 	"path/filepath"
 	"reflect"
+	"regexp"
 	"strings"
 
 	p "github.com/pulumi/pulumi-go-provider"
 	"github.com/pulumi/pulumi-go-provider/infer"
+	"github.com/pulumi/pulumi/sdk/v3/go/common/apitype"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/diag"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/diag/colors"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/tokens"
+	"github.com/pulumi/pulumi/sdk/v3/go/common/util/archive"
+	"github.com/pulumi/pulumi/sdk/v3/go/common/workspace"
+	"github.com/pulumi/pulumi/sdk/v3/nodejs/npm"
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
@@ -42,6 +52,7 @@ var (
 	_ infer.CustomDelete[PolicyPackState]                  = &PolicyPack{}
 	_ infer.CustomRead[PolicyPackInput, PolicyPackState]   = &PolicyPack{}
 	_ infer.CustomDiff[PolicyPackInput, PolicyPackState]   = &PolicyPack{}
+	_ infer.CustomCheck[PolicyPackInput]                   = &PolicyPack{}
 )
 
 func (*PolicyPack) Annotate(a infer.Annotator) {
@@ -50,27 +61,51 @@ func (*PolicyPack) Annotate(a infer.Annotator) {
 	a.SetToken("index", "PolicyPack")
 }
 
+type PolicyPackComplianceFrameworkInput struct {
+	Name          string `pulumi:"name"`
+	Version       string `pulumi:"version,optional"`
+	Reference     string `pulumi:"reference,optional"`
+	Specification string `pulumi:"specification,optional"`
+}
+
+func (f *PolicyPackComplianceFrameworkInput) Annotate(a infer.Annotator) {
+	a.Describe(&f.Name, "Compliance framework name (e.g. \"PCI-DSS\", \"SOC2\").")
+	a.Describe(&f.Version, "Compliance framework version.")
+	a.Describe(&f.Reference, "Reference to the framework (e.g. a control ID).")
+	a.Describe(&f.Specification, "Free-form specification text.")
+}
+
 type PolicyPackPolicyInput struct {
-	Name             string         `pulumi:"name"`
-	DisplayName      string         `pulumi:"displayName,optional"`
-	Description      string         `pulumi:"description,optional"`
-	EnforcementLevel string         `pulumi:"enforcementLevel,optional"`
-	Message          string         `pulumi:"message,optional"`
-	ConfigSchema     map[string]any `pulumi:"configSchema,optional"`
+	Name             string                              `pulumi:"name"`
+	DisplayName      string                              `pulumi:"displayName,optional"`
+	Description      string                              `pulumi:"description,optional"`
+	EnforcementLevel string                              `pulumi:"enforcementLevel,optional"`
+	Message          string                              `pulumi:"message,optional"`
+	ConfigSchema     map[string]any                      `pulumi:"configSchema,optional"`
+	Severity         string                              `pulumi:"severity,optional"`
+	Framework        *PolicyPackComplianceFrameworkInput `pulumi:"framework,optional"`
+	Tags             []string                            `pulumi:"tags,optional"`
+	RemediationSteps string                              `pulumi:"remediationSteps,optional"`
+	URL              string                              `pulumi:"url,optional"`
 }
 
 func (i *PolicyPackPolicyInput) Annotate(a infer.Annotator) {
 	a.Describe(&i.Name, "Unique policy name within the pack.")
-	a.Describe(&i.EnforcementLevel, "One of: advisory, mandatory, disabled.")
+	a.Describe(&i.EnforcementLevel, "One of: advisory, mandatory, remediate, disabled.")
 	a.Describe(&i.ConfigSchema, "JSON Schema (properties/required/type) for the policy's runtime config. "+
 		"Values are supplied per-policy via the PolicyGroup's policyPacks[].config map.")
+	a.Describe(&i.Severity, "Severity level: low, medium, high, or critical.")
+	a.Describe(&i.Framework, "Compliance framework this policy belongs to.")
+	a.Describe(&i.Tags, "Tags associated with the policy.")
+	a.Describe(&i.RemediationSteps, "Description of steps to remediate a violation.")
+	a.Describe(&i.URL, "URL with more information about the policy.")
 }
 
 type PolicyPackInput struct {
-	Organization string                  `pulumi:"organization" provider:"replaceOnChanges"`
-	Name         string                  `pulumi:"name"         provider:"replaceOnChanges"`
-	DisplayName  string                  `pulumi:"displayName,optional" provider:"replaceOnChanges"`
-	VersionTag   string                  `pulumi:"versionTag"   provider:"replaceOnChanges"`
+	Organization string                  `pulumi:"organization"`
+	Name         string                  `pulumi:"name"`
+	DisplayName  string                  `pulumi:"displayName,optional"`
+	VersionTag   string                  `pulumi:"versionTag"`
 	SourcePath   string                  `pulumi:"sourcePath"`
 	Policies     []PolicyPackPolicyInput `pulumi:"policies,optional"`
 }
@@ -93,6 +128,29 @@ type PolicyPackState struct {
 	ContentHash string `pulumi:"contentHash"`
 }
 
+// Mirrors the regex Pulumi Cloud enforces server-side; we validate up front so
+// bad tags surface as actionable errors rather than opaque 400s.
+var versionTagRegex = regexp.MustCompile(`^[a-zA-Z0-9-_.]{1,100}$`)
+
+func (*PolicyPack) Check(
+	ctx context.Context, req infer.CheckRequest,
+) (infer.CheckResponse[PolicyPackInput], error) {
+	inputs, failures, err := infer.DefaultCheck[PolicyPackInput](ctx, req.NewInputs)
+	if err != nil {
+		return infer.CheckResponse[PolicyPackInput]{Inputs: inputs, Failures: failures}, err
+	}
+	if tag := inputs.VersionTag; tag != "" && !versionTagRegex.MatchString(tag) {
+		failures = append(failures, p.CheckFailure{
+			Property: "versionTag",
+			Reason: fmt.Sprintf(
+				"%q is not a valid policy pack version tag (must match %s)",
+				tag, versionTagRegex.String(),
+			),
+		})
+	}
+	return infer.CheckResponse[PolicyPackInput]{Inputs: inputs, Failures: failures}, nil
+}
+
 func (*PolicyPack) Create(
 	ctx context.Context,
 	req infer.CreateRequest[PolicyPackInput],
@@ -110,9 +168,13 @@ func (*PolicyPack) Create(
 		}, nil
 	}
 
-	archive, hash, err := tarballDirectory(in.SourcePath)
+	tarball, err := packagePolicyPackArchive(ctx, in.SourcePath)
 	if err != nil {
 		return infer.CreateResponse[PolicyPackState]{}, fmt.Errorf("package policy pack: %w", err)
+	}
+	hash, err := hashPolicyPackSource(in.SourcePath)
+	if err != nil {
+		return infer.CreateResponse[PolicyPackState]{}, fmt.Errorf("hash policy pack source: %w", err)
 	}
 
 	apiReq := pulumiapi.CreatePolicyPackRequest{
@@ -121,7 +183,7 @@ func (*PolicyPack) Create(
 		VersionTag:  in.VersionTag,
 		Policies:    toAPIPolicies(in.Policies),
 	}
-	version, err := config.GetClient(ctx).PublishPolicyPack(ctx, in.Organization, apiReq, bytes.NewReader(archive))
+	version, err := config.GetClient(ctx).PublishPolicyPack(ctx, in.Organization, apiReq, bytes.NewReader(tarball))
 	if err != nil {
 		return infer.CreateResponse[PolicyPackState]{}, fmt.Errorf("publish policy pack %q: %w", in.Name, err)
 	}
@@ -136,6 +198,10 @@ func (*PolicyPack) Create(
 	}, nil
 }
 
+// Versions are immutable on Pulumi Cloud — any input change requires a replace.
+// PolicyPack doesn't implement CustomUpdate, so infer would already force-replace
+// on every input change. CustomDiff exists solely so we can layer SourcePath
+// content drift on top of the default input comparison.
 func (*PolicyPack) Diff(
 	_ context.Context,
 	req infer.DiffRequest[PolicyPackInput, PolicyPackState],
@@ -155,23 +221,22 @@ func (*PolicyPack) Diff(
 	if req.Inputs.DisplayName != req.State.DisplayName {
 		add("displayName", p.UpdateReplace)
 	}
-	// Inline policies diff explicitly; introspected ones rely on the content hash below
-	// (re-running the analyzer on every preview is too expensive).
 	if len(req.Inputs.Policies) > 0 {
 		inResolved := make([]PolicyPackPolicyInput, len(req.Inputs.Policies))
 		copy(inResolved, req.Inputs.Policies)
 		for i := range inResolved {
 			inResolved[i].ConfigSchema = normalizeConfigSchema(inResolved[i].ConfigSchema)
 		}
-		if !policiesEqual(inResolved, req.State.Policies) {
+		if !reflect.DeepEqual(inResolved, req.State.Policies) {
 			add("policies", p.UpdateReplace)
 		}
 	}
 
-	// Content drift triggers a replace, since published versions are immutable.
-	if _, hash, err := tarballDirectory(req.Inputs.SourcePath); err != nil {
-		return infer.DiffResponse{}, fmt.Errorf("compute policy pack hash: %w", err)
-	} else if hash != req.State.ContentHash {
+	hash, err := hashPolicyPackSource(req.Inputs.SourcePath)
+	if err != nil {
+		return infer.DiffResponse{}, fmt.Errorf("hash policy pack source: %w", err)
+	}
+	if hash != req.State.ContentHash {
 		add("sourcePath", p.UpdateReplace)
 	}
 
@@ -185,7 +250,6 @@ func (*PolicyPack) Delete(
 	ctx context.Context,
 	req infer.DeleteRequest[PolicyPackState],
 ) (infer.DeleteResponse, error) {
-	// Delete only this version; the pack may have other versions managed elsewhere.
 	err := config.GetClient(ctx).DeletePolicyPackVersion(
 		ctx, req.State.Organization, req.State.Name, req.State.VersionTag,
 	)
@@ -239,7 +303,6 @@ func (*PolicyPack) Read(
 	inputs.Name = name
 	inputs.VersionTag = versionTag
 	inputs.DisplayName = matched.DisplayName
-	// Don't re-introspect on refresh; state already holds what the cloud has.
 	if len(req.Inputs.Policies) == 0 {
 		inputs.Policies = req.State.Policies
 	}
@@ -292,14 +355,19 @@ func introspectPolicyPack(ctx context.Context, sourcePath string) ([]PolicyPackP
 		return nil, fmt.Errorf("get analyzer info: %w", err)
 	}
 	out := make([]PolicyPackPolicyInput, len(info.Policies))
-	for i, p := range info.Policies {
+	for i, pol := range info.Policies {
 		out[i] = PolicyPackPolicyInput{
-			Name:             p.Name,
-			DisplayName:      p.DisplayName,
-			Description:      p.Description,
-			EnforcementLevel: string(p.EnforcementLevel),
-			Message:          p.Message,
-			ConfigSchema:     convertAnalyzerConfigSchema(p.ConfigSchema),
+			Name:             pol.Name,
+			DisplayName:      pol.DisplayName,
+			Description:      pol.Description,
+			EnforcementLevel: string(pol.EnforcementLevel),
+			Message:          pol.Message,
+			ConfigSchema:     convertAnalyzerConfigSchema(pol.ConfigSchema),
+			Severity:         string(pol.Severity),
+			Framework:        convertAnalyzerFramework(pol.Framework),
+			Tags:             append([]string(nil), pol.Tags...),
+			RemediationSteps: pol.RemediationSteps,
+			URL:              pol.URL,
 		}
 	}
 	return out, nil
@@ -323,6 +391,18 @@ func convertAnalyzerConfigSchema(s *plugin.AnalyzerPolicyConfigSchema) map[strin
 	return out
 }
 
+func convertAnalyzerFramework(f *plugin.AnalyzerPolicyComplianceFramework) *PolicyPackComplianceFrameworkInput {
+	if f == nil {
+		return nil
+	}
+	return &PolicyPackComplianceFrameworkInput{
+		Name:          f.Name,
+		Version:       f.Version,
+		Reference:     f.Reference,
+		Specification: f.Specification,
+	}
+}
+
 // Cloud accepts type:"" on publish but later 500s on config validation; default it here.
 func normalizeConfigSchema(cs map[string]any) map[string]any {
 	if len(cs) == 0 {
@@ -339,23 +419,69 @@ func normalizeConfigSchema(cs map[string]any) map[string]any {
 	return out
 }
 
-func toAPIPolicies(ps []PolicyPackPolicyInput) []pulumiapi.Policy {
-	out := make([]pulumiapi.Policy, len(ps))
-	for i, p := range ps {
-		out[i] = pulumiapi.Policy{
-			Name:             p.Name,
-			DisplayName:      p.DisplayName,
-			Description:      p.Description,
-			EnforcementLevel: p.EnforcementLevel,
-			Message:          p.Message,
-			ConfigSchema:     p.ConfigSchema,
+func toAPIPolicies(ps []PolicyPackPolicyInput) []apitype.Policy {
+	out := make([]apitype.Policy, len(ps))
+	for i, pol := range ps {
+		out[i] = apitype.Policy{
+			Name:             pol.Name,
+			DisplayName:      pol.DisplayName,
+			Description:      pol.Description,
+			EnforcementLevel: apitype.EnforcementLevel(pol.EnforcementLevel),
+			Message:          pol.Message,
+			ConfigSchema:     toAPIConfigSchema(pol.ConfigSchema),
+			Severity:         apitype.PolicySeverity(pol.Severity),
+			Framework:        toAPIFramework(pol.Framework),
+			Tags:             append([]string(nil), pol.Tags...),
+			RemediationSteps: pol.RemediationSteps,
+			URL:              pol.URL,
 		}
 	}
 	return out
 }
 
-func policiesEqual(a, b []PolicyPackPolicyInput) bool {
-	return reflect.DeepEqual(a, b)
+func toAPIConfigSchema(cs map[string]any) *apitype.PolicyConfigSchema {
+	if len(cs) == 0 {
+		return nil
+	}
+	out := &apitype.PolicyConfigSchema{Type: apitype.Object}
+	if t, ok := cs["type"].(string); ok && t != "" {
+		out.Type = apitype.JSONSchemaType(t)
+	}
+	if req, ok := cs["required"].([]string); ok {
+		out.Required = append([]string(nil), req...)
+	} else if reqAny, ok := cs["required"].([]any); ok {
+		for _, v := range reqAny {
+			if s, ok := v.(string); ok {
+				out.Required = append(out.Required, s)
+			}
+		}
+	}
+	if props, ok := cs["properties"].(map[string]any); ok && len(props) > 0 {
+		out.Properties = make(map[string]*json.RawMessage, len(props))
+		for name, v := range props {
+			raw, err := json.Marshal(v)
+			if err != nil {
+				// A non-marshalable value would already have been rejected by
+				// the engine before we get here, so this is effectively unreachable.
+				continue
+			}
+			msg := json.RawMessage(raw)
+			out.Properties[name] = &msg
+		}
+	}
+	return out
+}
+
+func toAPIFramework(f *PolicyPackComplianceFrameworkInput) *apitype.PolicyComplianceFramework {
+	if f == nil {
+		return nil
+	}
+	return &apitype.PolicyComplianceFramework{
+		Name:          f.Name,
+		Version:       f.Version,
+		Reference:     f.Reference,
+		Specification: f.Specification,
+	}
 }
 
 func policyPackID(org, name, versionTag string) string {
@@ -368,4 +494,102 @@ func splitPolicyPackID(id string) (string, string, string, error) {
 		return "", "", "", fmt.Errorf("%q is invalid, must be organization/name/versionTag", id)
 	}
 	return parts[0], parts[1], parts[2], nil
+}
+
+// packagePolicyPackArchive matches `pulumi policy publish`: shell out to the
+// user's package manager for nodejs (so .npmignore / package.json:files /
+// lockfiles are honored), or fall back to archive.TGZ for everything else.
+// Both layouts put files under a `package/` prefix — the Cloud's policy-execution
+// sandbox unpacks and reads `package/PulumiPolicy.yaml`, so the prefix is
+// load-bearing.
+func packagePolicyPackArchive(ctx context.Context, sourcePath string) ([]byte, error) {
+	info, err := os.Stat(sourcePath)
+	if err != nil {
+		return nil, fmt.Errorf("stat %q: %w", sourcePath, err)
+	}
+	if !info.IsDir() {
+		return nil, fmt.Errorf("%q is not a directory", sourcePath)
+	}
+
+	pulumiPolicyPath, err := workspace.DetectPolicyPackPathAt(sourcePath)
+	if err != nil {
+		return nil, fmt.Errorf("detect PulumiPolicy file in %q: %w", sourcePath, err)
+	}
+	if pulumiPolicyPath == "" {
+		return nil, fmt.Errorf("%q is missing a PulumiPolicy.yaml", sourcePath)
+	}
+	pack, err := workspace.LoadPolicyPack(pulumiPolicyPath)
+	if err != nil {
+		return nil, fmt.Errorf("load PulumiPolicy: %w", err)
+	}
+
+	if strings.EqualFold(pack.Runtime.Name(), "nodejs") {
+		tarball, err := npm.Pack(ctx, npm.AutoPackageManager, sourcePath, io.Discard)
+		if err != nil {
+			return nil, fmt.Errorf("npm pack: %w", err)
+		}
+		return tarball, nil
+	}
+	tarball, err := archive.TGZ(sourcePath, "package", true)
+	if err != nil {
+		return nil, fmt.Errorf("create .tgz: %w", err)
+	}
+	return tarball, nil
+}
+
+// hashPolicyPackSource produces a deterministic content fingerprint of the
+// source directory. We use it for drift detection in Diff, separate from the
+// upload tarball — re-running `npm pack` on every preview would shell out to
+// npm, which is too expensive for a hot path.
+func hashPolicyPackSource(sourcePath string) (string, error) {
+	hasher := sha256.New()
+	err := filepath.WalkDir(sourcePath, func(p string, d fs.DirEntry, walkErr error) error {
+		if walkErr != nil {
+			return walkErr
+		}
+		rel, err := filepath.Rel(sourcePath, p)
+		if err != nil {
+			return err
+		}
+		if rel == "." {
+			return nil
+		}
+		base := d.Name()
+		// Skip the same heavy/transient directories the canonical tarball excludes,
+		// plus node_modules which isn't always in .gitignore but is never user content.
+		if base == "node_modules" || base == ".git" || base == ".pulumi" {
+			if d.IsDir() {
+				return filepath.SkipDir
+			}
+			return nil
+		}
+		fi, err := d.Info()
+		if err != nil {
+			return err
+		}
+		fmt.Fprintf(hasher, "%s\x00%d\x00", filepath.ToSlash(rel), fi.Mode())
+		switch {
+		case fi.Mode()&os.ModeSymlink != 0:
+			target, err := os.Readlink(p)
+			if err != nil {
+				return fmt.Errorf("read symlink %q: %w", rel, err)
+			}
+			hasher.Write([]byte(target))
+		case fi.Mode().IsRegular():
+			f, err := os.Open(p)
+			if err != nil {
+				return err
+			}
+			_, err = io.Copy(hasher, f)
+			_ = f.Close()
+			if err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+	if err != nil {
+		return "", err
+	}
+	return hex.EncodeToString(hasher.Sum(nil)), nil
 }

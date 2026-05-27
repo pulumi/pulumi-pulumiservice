@@ -31,10 +31,16 @@ namespace Pulumi.PulumiService.Inputs
         public Input<string>? DisplayName { get; set; }
 
         /// <summary>
-        /// One of: advisory, mandatory, disabled.
+        /// One of: advisory, mandatory, remediate, disabled.
         /// </summary>
         [Input("enforcementLevel")]
         public Input<string>? EnforcementLevel { get; set; }
+
+        /// <summary>
+        /// Compliance framework this policy belongs to.
+        /// </summary>
+        [Input("framework")]
+        public Input<Inputs.PolicyPackComplianceFrameworkInputArgs>? Framework { get; set; }
 
         [Input("message")]
         public Input<string>? Message { get; set; }
@@ -44,6 +50,36 @@ namespace Pulumi.PulumiService.Inputs
         /// </summary>
         [Input("name", required: true)]
         public Input<string> Name { get; set; } = null!;
+
+        /// <summary>
+        /// Description of steps to remediate a violation.
+        /// </summary>
+        [Input("remediationSteps")]
+        public Input<string>? RemediationSteps { get; set; }
+
+        /// <summary>
+        /// Severity level: low, medium, high, or critical.
+        /// </summary>
+        [Input("severity")]
+        public Input<string>? Severity { get; set; }
+
+        [Input("tags")]
+        private InputList<string>? _tags;
+
+        /// <summary>
+        /// Tags associated with the policy.
+        /// </summary>
+        public InputList<string> Tags
+        {
+            get => _tags ?? (_tags = new InputList<string>());
+            set => _tags = value;
+        }
+
+        /// <summary>
+        /// URL with more information about the policy.
+        /// </summary>
+        [Input("url")]
+        public Input<string>? Url { get; set; }
 
         public PolicyPackPolicyInputArgs()
         {

@@ -595,16 +595,14 @@ func (p *PulumiServicePolicyGroupResource) Create(req *pulumirpc.CreateRequest) 
 		})
 	}
 
-	// Same workaround as Update: serialize ops into single-op requests to
-	// dodge the cloud's reorder + upsert-by-name bug. Create today is
-	// adds-only and works batched, but staying consistent keeps the failure
-	// modes uniform.
-	for i := range batchReqs {
+	// Create is adds-only, so the cloud's reorder/upsert-by-name bug doesn't
+	// apply here — batch the whole thing in a single request.
+	if len(batchReqs) > 0 {
 		err = p.Client.BatchUpdatePolicyGroup(
 			ctx,
 			inputsPolicyGroup.OrganizationName,
 			inputsPolicyGroup.Name,
-			batchReqs[i:i+1],
+			batchReqs,
 		)
 		if err != nil {
 			return nil, partialErrorPolicyGroup(

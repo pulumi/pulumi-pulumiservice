@@ -58,6 +58,8 @@ __all__ = [
     'PolicyGroupPolicyPackReferenceInputArgsDict',
     'PolicyGroupStackReferenceArgs',
     'PolicyGroupStackReferenceArgsDict',
+    'PolicyPackComplianceFrameworkInputArgs',
+    'PolicyPackComplianceFrameworkInputArgsDict',
     'PolicyPackPolicyInputArgs',
     'PolicyPackPolicyInputArgsDict',
     'TemplateSourceDestinationArgs',
@@ -626,11 +628,11 @@ class DeploymentSettingsGitSourceGitAuthArgsDict(TypedDict):
     """
     Git source settings for a deployment.
     """
-    basic_auth: NotRequired[pulumi.Input[Optional['DeploymentSettingsGitAuthBasicAuthArgs']]]
+    basic_auth: NotRequired[pulumi.Input[Optional['DeploymentSettingsGitAuthBasicAuthArgsDict']]]
     """
     Basic auth for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined.
     """
-    ssh_auth: NotRequired[pulumi.Input[Optional['DeploymentSettingsGitAuthSSHAuthArgs']]]
+    ssh_auth: NotRequired[pulumi.Input[Optional['DeploymentSettingsGitAuthSSHAuthArgsDict']]]
     """
     SSH auth for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined.
     """
@@ -688,7 +690,7 @@ class DeploymentSettingsGitSourceArgsDict(TypedDict):
     """
     The commit to deploy. One of either `branch` or `commit` must be specified.
     """
-    git_auth: NotRequired[pulumi.Input[Optional['DeploymentSettingsGitSourceGitAuthArgs']]]
+    git_auth: NotRequired[pulumi.Input[Optional['DeploymentSettingsGitSourceGitAuthArgsDict']]]
     """
     Git authentication configuration for this deployment. Should not be specified if there are `gitHub` settings for this deployment.
     """
@@ -918,11 +920,11 @@ class DeploymentSettingsOperationContextArgsDict(TypedDict):
     """
     Environment variables to set for the deployment.
     """
-    oidc: NotRequired[pulumi.Input[Optional['OperationContextOIDCArgs']]]
+    oidc: NotRequired[pulumi.Input[Optional['OperationContextOIDCArgsDict']]]
     """
     OIDC configuration to use during the deployment.
     """
-    options: NotRequired[pulumi.Input[Optional['OperationContextOptionsArgs']]]
+    options: NotRequired[pulumi.Input[Optional['OperationContextOptionsArgsDict']]]
     """
     Options to override default behavior during the deployment.
     """
@@ -1008,7 +1010,7 @@ class DeploymentSettingsSourceContextArgsDict(TypedDict):
     """
     Settings related to the source of the deployment.
     """
-    git: NotRequired[pulumi.Input[Optional['DeploymentSettingsGitSourceArgs']]]
+    git: NotRequired[pulumi.Input[Optional['DeploymentSettingsGitSourceArgsDict']]]
     """
     Git source settings for a deployment.
     """
@@ -1478,15 +1480,15 @@ class GCPOIDCConfigurationArgs:
 
 
 class OperationContextOIDCArgsDict(TypedDict):
-    aws: NotRequired[pulumi.Input[Optional['AWSOIDCConfigurationArgs']]]
+    aws: NotRequired[pulumi.Input[Optional['AWSOIDCConfigurationArgsDict']]]
     """
     AWS-specific OIDC configuration.
     """
-    azure: NotRequired[pulumi.Input[Optional['AzureOIDCConfigurationArgs']]]
+    azure: NotRequired[pulumi.Input[Optional['AzureOIDCConfigurationArgsDict']]]
     """
     Azure-specific OIDC configuration.
     """
-    gcp: NotRequired[pulumi.Input[Optional['GCPOIDCConfigurationArgs']]]
+    gcp: NotRequired[pulumi.Input[Optional['GCPOIDCConfigurationArgsDict']]]
     """
     GCP-specific OIDC configuration.
     """
@@ -1780,6 +1782,94 @@ class PolicyGroupStackReferenceArgs:
         pulumi.set(self, "routing_project", value)
 
 
+class PolicyPackComplianceFrameworkInputArgsDict(TypedDict):
+    name: pulumi.Input[_builtins.str]
+    """
+    Compliance framework name (e.g. "PCI-DSS", "SOC2").
+    """
+    reference: NotRequired[pulumi.Input[Optional[_builtins.str]]]
+    """
+    Reference to the framework (e.g. a control ID).
+    """
+    specification: NotRequired[pulumi.Input[Optional[_builtins.str]]]
+    """
+    Free-form specification text.
+    """
+    version: NotRequired[pulumi.Input[Optional[_builtins.str]]]
+    """
+    Compliance framework version.
+    """
+
+@pulumi.input_type
+class PolicyPackComplianceFrameworkInputArgs:
+    def __init__(__self__, *,
+                 name: pulumi.Input[_builtins.str],
+                 reference: pulumi.Input[Optional[_builtins.str]] = None,
+                 specification: pulumi.Input[Optional[_builtins.str]] = None,
+                 version: pulumi.Input[Optional[_builtins.str]] = None):
+        """
+        :param pulumi.Input[_builtins.str] name: Compliance framework name (e.g. "PCI-DSS", "SOC2").
+        :param pulumi.Input[_builtins.str] reference: Reference to the framework (e.g. a control ID).
+        :param pulumi.Input[_builtins.str] specification: Free-form specification text.
+        :param pulumi.Input[_builtins.str] version: Compliance framework version.
+        """
+        pulumi.set(__self__, "name", name)
+        if reference is not None:
+            pulumi.set(__self__, "reference", reference)
+        if specification is not None:
+            pulumi.set(__self__, "specification", specification)
+        if version is not None:
+            pulumi.set(__self__, "version", version)
+
+    @_builtins.property
+    @pulumi.getter
+    def name(self) -> pulumi.Input[_builtins.str]:
+        """
+        Compliance framework name (e.g. "PCI-DSS", "SOC2").
+        """
+        return pulumi.get(self, "name")
+
+    @name.setter
+    def name(self, value: pulumi.Input[_builtins.str]):
+        pulumi.set(self, "name", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def reference(self) -> pulumi.Input[Optional[_builtins.str]]:
+        """
+        Reference to the framework (e.g. a control ID).
+        """
+        return pulumi.get(self, "reference")
+
+    @reference.setter
+    def reference(self, value: pulumi.Input[Optional[_builtins.str]]):
+        pulumi.set(self, "reference", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def specification(self) -> pulumi.Input[Optional[_builtins.str]]:
+        """
+        Free-form specification text.
+        """
+        return pulumi.get(self, "specification")
+
+    @specification.setter
+    def specification(self, value: pulumi.Input[Optional[_builtins.str]]):
+        pulumi.set(self, "specification", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def version(self) -> pulumi.Input[Optional[_builtins.str]]:
+        """
+        Compliance framework version.
+        """
+        return pulumi.get(self, "version")
+
+    @version.setter
+    def version(self, value: pulumi.Input[Optional[_builtins.str]]):
+        pulumi.set(self, "version", value)
+
+
 class PolicyPackPolicyInputArgsDict(TypedDict):
     name: pulumi.Input[_builtins.str]
     """
@@ -1793,9 +1883,29 @@ class PolicyPackPolicyInputArgsDict(TypedDict):
     display_name: NotRequired[pulumi.Input[Optional[_builtins.str]]]
     enforcement_level: NotRequired[pulumi.Input[Optional[_builtins.str]]]
     """
-    One of: advisory, mandatory, disabled.
+    One of: advisory, mandatory, remediate, disabled.
+    """
+    framework: NotRequired[pulumi.Input[Optional['PolicyPackComplianceFrameworkInputArgsDict']]]
+    """
+    Compliance framework this policy belongs to.
     """
     message: NotRequired[pulumi.Input[Optional[_builtins.str]]]
+    remediation_steps: NotRequired[pulumi.Input[Optional[_builtins.str]]]
+    """
+    Description of steps to remediate a violation.
+    """
+    severity: NotRequired[pulumi.Input[Optional[_builtins.str]]]
+    """
+    Severity level: low, medium, high, or critical.
+    """
+    tags: NotRequired[pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]]]
+    """
+    Tags associated with the policy.
+    """
+    url: NotRequired[pulumi.Input[Optional[_builtins.str]]]
+    """
+    URL with more information about the policy.
+    """
 
 @pulumi.input_type
 class PolicyPackPolicyInputArgs:
@@ -1805,11 +1915,21 @@ class PolicyPackPolicyInputArgs:
                  description: pulumi.Input[Optional[_builtins.str]] = None,
                  display_name: pulumi.Input[Optional[_builtins.str]] = None,
                  enforcement_level: pulumi.Input[Optional[_builtins.str]] = None,
-                 message: pulumi.Input[Optional[_builtins.str]] = None):
+                 framework: pulumi.Input[Optional['PolicyPackComplianceFrameworkInputArgs']] = None,
+                 message: pulumi.Input[Optional[_builtins.str]] = None,
+                 remediation_steps: pulumi.Input[Optional[_builtins.str]] = None,
+                 severity: pulumi.Input[Optional[_builtins.str]] = None,
+                 tags: pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]] = None,
+                 url: pulumi.Input[Optional[_builtins.str]] = None):
         """
         :param pulumi.Input[_builtins.str] name: Unique policy name within the pack.
         :param pulumi.Input[Mapping[str, Any]] config_schema: JSON Schema (properties/required/type) for the policy's runtime config. Values are supplied per-policy via the PolicyGroup's policyPacks[].config map.
-        :param pulumi.Input[_builtins.str] enforcement_level: One of: advisory, mandatory, disabled.
+        :param pulumi.Input[_builtins.str] enforcement_level: One of: advisory, mandatory, remediate, disabled.
+        :param pulumi.Input['PolicyPackComplianceFrameworkInputArgs'] framework: Compliance framework this policy belongs to.
+        :param pulumi.Input[_builtins.str] remediation_steps: Description of steps to remediate a violation.
+        :param pulumi.Input[_builtins.str] severity: Severity level: low, medium, high, or critical.
+        :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] tags: Tags associated with the policy.
+        :param pulumi.Input[_builtins.str] url: URL with more information about the policy.
         """
         pulumi.set(__self__, "name", name)
         if config_schema is not None:
@@ -1820,8 +1940,18 @@ class PolicyPackPolicyInputArgs:
             pulumi.set(__self__, "display_name", display_name)
         if enforcement_level is not None:
             pulumi.set(__self__, "enforcement_level", enforcement_level)
+        if framework is not None:
+            pulumi.set(__self__, "framework", framework)
         if message is not None:
             pulumi.set(__self__, "message", message)
+        if remediation_steps is not None:
+            pulumi.set(__self__, "remediation_steps", remediation_steps)
+        if severity is not None:
+            pulumi.set(__self__, "severity", severity)
+        if tags is not None:
+            pulumi.set(__self__, "tags", tags)
+        if url is not None:
+            pulumi.set(__self__, "url", url)
 
     @_builtins.property
     @pulumi.getter
@@ -1869,7 +1999,7 @@ class PolicyPackPolicyInputArgs:
     @pulumi.getter(name="enforcementLevel")
     def enforcement_level(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
-        One of: advisory, mandatory, disabled.
+        One of: advisory, mandatory, remediate, disabled.
         """
         return pulumi.get(self, "enforcement_level")
 
@@ -1879,12 +2009,72 @@ class PolicyPackPolicyInputArgs:
 
     @_builtins.property
     @pulumi.getter
+    def framework(self) -> pulumi.Input[Optional['PolicyPackComplianceFrameworkInputArgs']]:
+        """
+        Compliance framework this policy belongs to.
+        """
+        return pulumi.get(self, "framework")
+
+    @framework.setter
+    def framework(self, value: pulumi.Input[Optional['PolicyPackComplianceFrameworkInputArgs']]):
+        pulumi.set(self, "framework", value)
+
+    @_builtins.property
+    @pulumi.getter
     def message(self) -> pulumi.Input[Optional[_builtins.str]]:
         return pulumi.get(self, "message")
 
     @message.setter
     def message(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "message", value)
+
+    @_builtins.property
+    @pulumi.getter(name="remediationSteps")
+    def remediation_steps(self) -> pulumi.Input[Optional[_builtins.str]]:
+        """
+        Description of steps to remediate a violation.
+        """
+        return pulumi.get(self, "remediation_steps")
+
+    @remediation_steps.setter
+    def remediation_steps(self, value: pulumi.Input[Optional[_builtins.str]]):
+        pulumi.set(self, "remediation_steps", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def severity(self) -> pulumi.Input[Optional[_builtins.str]]:
+        """
+        Severity level: low, medium, high, or critical.
+        """
+        return pulumi.get(self, "severity")
+
+    @severity.setter
+    def severity(self, value: pulumi.Input[Optional[_builtins.str]]):
+        pulumi.set(self, "severity", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def tags(self) -> pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]]:
+        """
+        Tags associated with the policy.
+        """
+        return pulumi.get(self, "tags")
+
+    @tags.setter
+    def tags(self, value: pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]]):
+        pulumi.set(self, "tags", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def url(self) -> pulumi.Input[Optional[_builtins.str]]:
+        """
+        URL with more information about the policy.
+        """
+        return pulumi.get(self, "url")
+
+    @url.setter
+    def url(self, value: pulumi.Input[Optional[_builtins.str]]):
+        pulumi.set(self, "url", value)
 
 
 class TemplateSourceDestinationArgsDict(TypedDict):

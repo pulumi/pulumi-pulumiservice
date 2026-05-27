@@ -20,14 +20,34 @@ namespace Pulumi.PulumiService.Outputs
         public readonly string? Description;
         public readonly string? DisplayName;
         /// <summary>
-        /// One of: advisory, mandatory, disabled.
+        /// One of: advisory, mandatory, remediate, disabled.
         /// </summary>
         public readonly string? EnforcementLevel;
+        /// <summary>
+        /// Compliance framework this policy belongs to.
+        /// </summary>
+        public readonly Outputs.PolicyPackComplianceFrameworkInput? Framework;
         public readonly string? Message;
         /// <summary>
         /// Unique policy name within the pack.
         /// </summary>
         public readonly string Name;
+        /// <summary>
+        /// Description of steps to remediate a violation.
+        /// </summary>
+        public readonly string? RemediationSteps;
+        /// <summary>
+        /// Severity level: low, medium, high, or critical.
+        /// </summary>
+        public readonly string? Severity;
+        /// <summary>
+        /// Tags associated with the policy.
+        /// </summary>
+        public readonly ImmutableArray<string> Tags;
+        /// <summary>
+        /// URL with more information about the policy.
+        /// </summary>
+        public readonly string? Url;
 
         [OutputConstructor]
         private PolicyPackPolicyInput(
@@ -39,16 +59,31 @@ namespace Pulumi.PulumiService.Outputs
 
             string? enforcementLevel,
 
+            Outputs.PolicyPackComplianceFrameworkInput? framework,
+
             string? message,
 
-            string name)
+            string name,
+
+            string? remediationSteps,
+
+            string? severity,
+
+            ImmutableArray<string> tags,
+
+            string? url)
         {
             ConfigSchema = configSchema;
             Description = description;
             DisplayName = displayName;
             EnforcementLevel = enforcementLevel;
+            Framework = framework;
             Message = message;
             Name = name;
+            RemediationSteps = remediationSteps;
+            Severity = severity;
+            Tags = tags;
+            Url = url;
         }
     }
 }

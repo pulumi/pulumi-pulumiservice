@@ -434,6 +434,25 @@ export interface PolicyGroupStackReferenceArgs {
     routingProject: pulumi.Input<string>;
 }
 
+export interface PolicyPackComplianceFrameworkInputArgs {
+    /**
+     * Compliance framework name (e.g. "PCI-DSS", "SOC2").
+     */
+    name: pulumi.Input<string>;
+    /**
+     * Reference to the framework (e.g. a control ID).
+     */
+    reference?: pulumi.Input<string | undefined>;
+    /**
+     * Free-form specification text.
+     */
+    specification?: pulumi.Input<string | undefined>;
+    /**
+     * Compliance framework version.
+     */
+    version?: pulumi.Input<string | undefined>;
+}
+
 export interface PolicyPackPolicyInputArgs {
     /**
      * JSON Schema (properties/required/type) for the policy's runtime config. Values are supplied per-policy via the PolicyGroup's policyPacks[].config map.
@@ -442,14 +461,34 @@ export interface PolicyPackPolicyInputArgs {
     description?: pulumi.Input<string | undefined>;
     displayName?: pulumi.Input<string | undefined>;
     /**
-     * One of: advisory, mandatory, disabled.
+     * One of: advisory, mandatory, remediate, disabled.
      */
     enforcementLevel?: pulumi.Input<string | undefined>;
+    /**
+     * Compliance framework this policy belongs to.
+     */
+    framework?: pulumi.Input<inputs.PolicyPackComplianceFrameworkInputArgs | undefined>;
     message?: pulumi.Input<string | undefined>;
     /**
      * Unique policy name within the pack.
      */
     name: pulumi.Input<string>;
+    /**
+     * Description of steps to remediate a violation.
+     */
+    remediationSteps?: pulumi.Input<string | undefined>;
+    /**
+     * Severity level: low, medium, high, or critical.
+     */
+    severity?: pulumi.Input<string | undefined>;
+    /**
+     * Tags associated with the policy.
+     */
+    tags?: pulumi.Input<pulumi.Input<string>[] | undefined>;
+    /**
+     * URL with more information about the policy.
+     */
+    url?: pulumi.Input<string | undefined>;
 }
 
 export interface TemplateSourceDestinationArgs {

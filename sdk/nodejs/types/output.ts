@@ -509,6 +509,25 @@ export interface PolicyGroupStackReference {
     routingProject: string;
 }
 
+export interface PolicyPackComplianceFrameworkInput {
+    /**
+     * Compliance framework name (e.g. "PCI-DSS", "SOC2").
+     */
+    name: string;
+    /**
+     * Reference to the framework (e.g. a control ID).
+     */
+    reference?: string;
+    /**
+     * Free-form specification text.
+     */
+    specification?: string;
+    /**
+     * Compliance framework version.
+     */
+    version?: string;
+}
+
 export interface PolicyPackPolicyInput {
     /**
      * JSON Schema (properties/required/type) for the policy's runtime config. Values are supplied per-policy via the PolicyGroup's policyPacks[].config map.
@@ -517,14 +536,34 @@ export interface PolicyPackPolicyInput {
     description?: string;
     displayName?: string;
     /**
-     * One of: advisory, mandatory, disabled.
+     * One of: advisory, mandatory, remediate, disabled.
      */
     enforcementLevel?: string;
+    /**
+     * Compliance framework this policy belongs to.
+     */
+    framework?: outputs.PolicyPackComplianceFrameworkInput;
     message?: string;
     /**
      * Unique policy name within the pack.
      */
     name: string;
+    /**
+     * Description of steps to remediate a violation.
+     */
+    remediationSteps?: string;
+    /**
+     * Severity level: low, medium, high, or critical.
+     */
+    severity?: string;
+    /**
+     * Tags associated with the policy.
+     */
+    tags?: string[];
+    /**
+     * URL with more information about the policy.
+     */
+    url?: string;
 }
 
 export interface RoleScopeInfo {

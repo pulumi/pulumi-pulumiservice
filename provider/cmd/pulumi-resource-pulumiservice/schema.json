@@ -806,6 +806,30 @@
         "routingProject"
       ]
     },
+    "pulumiservice:index:PolicyPackComplianceFrameworkInput": {
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Compliance framework name (e.g. \"PCI-DSS\", \"SOC2\")."
+        },
+        "reference": {
+          "type": "string",
+          "description": "Reference to the framework (e.g. a control ID)."
+        },
+        "specification": {
+          "type": "string",
+          "description": "Free-form specification text."
+        },
+        "version": {
+          "type": "string",
+          "description": "Compliance framework version."
+        }
+      },
+      "type": "object",
+      "required": [
+        "name"
+      ]
+    },
     "pulumiservice:index:PolicyPackPolicyInput": {
       "properties": {
         "configSchema": {
@@ -823,7 +847,11 @@
         },
         "enforcementLevel": {
           "type": "string",
-          "description": "One of: advisory, mandatory, disabled."
+          "description": "One of: advisory, mandatory, remediate, disabled."
+        },
+        "framework": {
+          "$ref": "#/types/pulumiservice:index:PolicyPackComplianceFrameworkInput",
+          "description": "Compliance framework this policy belongs to."
         },
         "message": {
           "type": "string"
@@ -831,6 +859,25 @@
         "name": {
           "type": "string",
           "description": "Unique policy name within the pack."
+        },
+        "remediationSteps": {
+          "type": "string",
+          "description": "Description of steps to remediate a violation."
+        },
+        "severity": {
+          "type": "string",
+          "description": "Severity level: low, medium, high, or critical."
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Tags associated with the policy."
+        },
+        "url": {
+          "type": "string",
+          "description": "URL with more information about the policy."
         }
       },
       "type": "object",
@@ -5778,18 +5825,15 @@
         },
         "displayName": {
           "type": "string",
-          "description": "Optional display name. Changing it requires a new versionTag (policy pack versions are immutable in Pulumi Cloud).",
-          "replaceOnChanges": true
+          "description": "Optional display name. Changing it requires a new versionTag (policy pack versions are immutable in Pulumi Cloud)."
         },
         "name": {
           "type": "string",
-          "description": "Policy pack name (unique within the org).",
-          "replaceOnChanges": true
+          "description": "Policy pack name (unique within the org)."
         },
         "organization": {
           "type": "string",
-          "description": "Organization name.",
-          "replaceOnChanges": true
+          "description": "Organization name."
         },
         "policies": {
           "type": "array",
@@ -5807,8 +5851,7 @@
         },
         "versionTag": {
           "type": "string",
-          "description": "Semantic version tag (e.g. \"1.0.0\"). Versions are immutable; change to publish a new version.",
-          "replaceOnChanges": true
+          "description": "Semantic version tag (e.g. \"1.0.0\"). Versions are immutable; change to publish a new version."
         }
       },
       "required": [
@@ -5822,18 +5865,15 @@
       "inputProperties": {
         "displayName": {
           "type": "string",
-          "description": "Optional display name. Changing it requires a new versionTag (policy pack versions are immutable in Pulumi Cloud).",
-          "replaceOnChanges": true
+          "description": "Optional display name. Changing it requires a new versionTag (policy pack versions are immutable in Pulumi Cloud)."
         },
         "name": {
           "type": "string",
-          "description": "Policy pack name (unique within the org).",
-          "replaceOnChanges": true
+          "description": "Policy pack name (unique within the org)."
         },
         "organization": {
           "type": "string",
-          "description": "Organization name.",
-          "replaceOnChanges": true
+          "description": "Organization name."
         },
         "policies": {
           "type": "array",
@@ -5848,8 +5888,7 @@
         },
         "versionTag": {
           "type": "string",
-          "description": "Semantic version tag (e.g. \"1.0.0\"). Versions are immutable; change to publish a new version.",
-          "replaceOnChanges": true
+          "description": "Semantic version tag (e.g. \"1.0.0\"). Versions are immutable; change to publish a new version."
         }
       },
       "requiredInputs": [

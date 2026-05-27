@@ -5,8 +5,10 @@ package com.pulumi.pulumiservice.outputs;
 
 import com.pulumi.core.annotations.CustomType;
 import com.pulumi.exceptions.MissingRequiredPropertyException;
+import com.pulumi.pulumiservice.outputs.PolicyPackComplianceFrameworkInput;
 import java.lang.Object;
 import java.lang.String;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -22,16 +24,41 @@ public final class PolicyPackPolicyInput {
     private @Nullable String description;
     private @Nullable String displayName;
     /**
-     * @return One of: advisory, mandatory, disabled.
+     * @return One of: advisory, mandatory, remediate, disabled.
      * 
      */
     private @Nullable String enforcementLevel;
+    /**
+     * @return Compliance framework this policy belongs to.
+     * 
+     */
+    private @Nullable PolicyPackComplianceFrameworkInput framework;
     private @Nullable String message;
     /**
      * @return Unique policy name within the pack.
      * 
      */
     private String name;
+    /**
+     * @return Description of steps to remediate a violation.
+     * 
+     */
+    private @Nullable String remediationSteps;
+    /**
+     * @return Severity level: low, medium, high, or critical.
+     * 
+     */
+    private @Nullable String severity;
+    /**
+     * @return Tags associated with the policy.
+     * 
+     */
+    private @Nullable List<String> tags;
+    /**
+     * @return URL with more information about the policy.
+     * 
+     */
+    private @Nullable String url;
 
     private PolicyPackPolicyInput() {}
     /**
@@ -48,11 +75,18 @@ public final class PolicyPackPolicyInput {
         return Optional.ofNullable(this.displayName);
     }
     /**
-     * @return One of: advisory, mandatory, disabled.
+     * @return One of: advisory, mandatory, remediate, disabled.
      * 
      */
     public Optional<String> enforcementLevel() {
         return Optional.ofNullable(this.enforcementLevel);
+    }
+    /**
+     * @return Compliance framework this policy belongs to.
+     * 
+     */
+    public Optional<PolicyPackComplianceFrameworkInput> framework() {
+        return Optional.ofNullable(this.framework);
     }
     public Optional<String> message() {
         return Optional.ofNullable(this.message);
@@ -63,6 +97,34 @@ public final class PolicyPackPolicyInput {
      */
     public String name() {
         return this.name;
+    }
+    /**
+     * @return Description of steps to remediate a violation.
+     * 
+     */
+    public Optional<String> remediationSteps() {
+        return Optional.ofNullable(this.remediationSteps);
+    }
+    /**
+     * @return Severity level: low, medium, high, or critical.
+     * 
+     */
+    public Optional<String> severity() {
+        return Optional.ofNullable(this.severity);
+    }
+    /**
+     * @return Tags associated with the policy.
+     * 
+     */
+    public List<String> tags() {
+        return this.tags == null ? List.of() : this.tags;
+    }
+    /**
+     * @return URL with more information about the policy.
+     * 
+     */
+    public Optional<String> url() {
+        return Optional.ofNullable(this.url);
     }
 
     public static Builder builder() {
@@ -78,8 +140,13 @@ public final class PolicyPackPolicyInput {
         private @Nullable String description;
         private @Nullable String displayName;
         private @Nullable String enforcementLevel;
+        private @Nullable PolicyPackComplianceFrameworkInput framework;
         private @Nullable String message;
         private String name;
+        private @Nullable String remediationSteps;
+        private @Nullable String severity;
+        private @Nullable List<String> tags;
+        private @Nullable String url;
         public Builder() {}
         public Builder(PolicyPackPolicyInput defaults) {
     	      Objects.requireNonNull(defaults);
@@ -87,8 +154,13 @@ public final class PolicyPackPolicyInput {
     	      this.description = defaults.description;
     	      this.displayName = defaults.displayName;
     	      this.enforcementLevel = defaults.enforcementLevel;
+    	      this.framework = defaults.framework;
     	      this.message = defaults.message;
     	      this.name = defaults.name;
+    	      this.remediationSteps = defaults.remediationSteps;
+    	      this.severity = defaults.severity;
+    	      this.tags = defaults.tags;
+    	      this.url = defaults.url;
         }
 
         @CustomType.Setter
@@ -116,6 +188,12 @@ public final class PolicyPackPolicyInput {
             return this;
         }
         @CustomType.Setter
+        public Builder framework(@Nullable PolicyPackComplianceFrameworkInput framework) {
+
+            this.framework = framework;
+            return this;
+        }
+        @CustomType.Setter
         public Builder message(@Nullable String message) {
 
             this.message = message;
@@ -129,14 +207,46 @@ public final class PolicyPackPolicyInput {
             this.name = name;
             return this;
         }
+        @CustomType.Setter
+        public Builder remediationSteps(@Nullable String remediationSteps) {
+
+            this.remediationSteps = remediationSteps;
+            return this;
+        }
+        @CustomType.Setter
+        public Builder severity(@Nullable String severity) {
+
+            this.severity = severity;
+            return this;
+        }
+        @CustomType.Setter
+        public Builder tags(@Nullable List<String> tags) {
+
+            this.tags = tags;
+            return this;
+        }
+        public Builder tags(String... tags) {
+            return tags(List.of(tags));
+        }
+        @CustomType.Setter
+        public Builder url(@Nullable String url) {
+
+            this.url = url;
+            return this;
+        }
         public PolicyPackPolicyInput build() {
             final var _resultValue = new PolicyPackPolicyInput();
             _resultValue.configSchema = configSchema;
             _resultValue.description = description;
             _resultValue.displayName = displayName;
             _resultValue.enforcementLevel = enforcementLevel;
+            _resultValue.framework = framework;
             _resultValue.message = message;
             _resultValue.name = name;
+            _resultValue.remediationSteps = remediationSteps;
+            _resultValue.severity = severity;
+            _resultValue.tags = tags;
+            _resultValue.url = url;
             return _resultValue;
         }
     }
