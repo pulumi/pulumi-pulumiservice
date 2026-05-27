@@ -1132,7 +1132,7 @@ func TestPolicyGroup_Create(t *testing.T) {
 					return nil
 				},
 				batchUpdatePolicyGroupFunc: func(_ context.Context, _, _ string, reqs []pulumiapi.UpdatePolicyGroupRequest) error {
-					capturedReqs = reqs
+					capturedReqs = append(capturedReqs, reqs...)
 					return nil
 				},
 				getPolicyGroupFunc: func() (*pulumiapi.PolicyGroup, error) {
@@ -1165,7 +1165,7 @@ func TestPolicyGroup_Create(t *testing.T) {
 					return nil
 				},
 				batchUpdatePolicyGroupFunc: func(_ context.Context, _, _ string, reqs []pulumiapi.UpdatePolicyGroupRequest) error {
-					capturedReqs = reqs
+					capturedReqs = append(capturedReqs, reqs...)
 					return nil
 				},
 				getPolicyGroupFunc: func() (*pulumiapi.PolicyGroup, error) {
@@ -1196,7 +1196,7 @@ func TestPolicyGroup_Create(t *testing.T) {
 					return nil
 				},
 				batchUpdatePolicyGroupFunc: func(_ context.Context, _, _ string, reqs []pulumiapi.UpdatePolicyGroupRequest) error {
-					capturedReqs = reqs
+					capturedReqs = append(capturedReqs, reqs...)
 					return nil
 				},
 				getPolicyGroupFunc: func() (*pulumiapi.PolicyGroup, error) {
@@ -1340,7 +1340,7 @@ func TestPolicyGroup_Update(t *testing.T) {
 		provider := PulumiServicePolicyGroupResource{
 			Client: &PolicyGroupClientMock{
 				batchUpdatePolicyGroupFunc: func(_ context.Context, _, _ string, reqs []pulumiapi.UpdatePolicyGroupRequest) error {
-					capturedReqs = reqs
+					capturedReqs = append(capturedReqs, reqs...)
 					return nil
 				},
 				getPolicyGroupFunc: func() (*pulumiapi.PolicyGroup, error) {
@@ -1371,7 +1371,7 @@ func TestPolicyGroup_Update(t *testing.T) {
 		provider := PulumiServicePolicyGroupResource{
 			Client: &PolicyGroupClientMock{
 				batchUpdatePolicyGroupFunc: func(_ context.Context, _, _ string, reqs []pulumiapi.UpdatePolicyGroupRequest) error {
-					capturedReqs = reqs
+					capturedReqs = append(capturedReqs, reqs...)
 					return nil
 				},
 				getPolicyGroupFunc: func() (*pulumiapi.PolicyGroup, error) {
@@ -1402,7 +1402,7 @@ func TestPolicyGroup_Update(t *testing.T) {
 		provider := PulumiServicePolicyGroupResource{
 			Client: &PolicyGroupClientMock{
 				batchUpdatePolicyGroupFunc: func(_ context.Context, _, _ string, reqs []pulumiapi.UpdatePolicyGroupRequest) error {
-					capturedReqs = reqs
+					capturedReqs = append(capturedReqs, reqs...)
 					return nil
 				},
 				getPolicyGroupFunc: func() (*pulumiapi.PolicyGroup, error) {
@@ -1445,7 +1445,7 @@ func TestPolicyGroup_Update(t *testing.T) {
 		provider := PulumiServicePolicyGroupResource{
 			Client: &PolicyGroupClientMock{
 				batchUpdatePolicyGroupFunc: func(_ context.Context, _, _ string, reqs []pulumiapi.UpdatePolicyGroupRequest) error {
-					capturedReqs = reqs
+					capturedReqs = append(capturedReqs, reqs...)
 					return nil
 				},
 				getPolicyGroupFunc: func() (*pulumiapi.PolicyGroup, error) {
@@ -1475,7 +1475,7 @@ func TestPolicyGroup_Update(t *testing.T) {
 		provider := PulumiServicePolicyGroupResource{
 			Client: &PolicyGroupClientMock{
 				batchUpdatePolicyGroupFunc: func(_ context.Context, _, _ string, reqs []pulumiapi.UpdatePolicyGroupRequest) error {
-					capturedReqs = reqs
+					capturedReqs = append(capturedReqs, reqs...)
 					return nil
 				},
 				getPolicyGroupFunc: func() (*pulumiapi.PolicyGroup, error) {
@@ -1506,7 +1506,7 @@ func TestPolicyGroup_Update(t *testing.T) {
 		provider := PulumiServicePolicyGroupResource{
 			Client: &PolicyGroupClientMock{
 				batchUpdatePolicyGroupFunc: func(_ context.Context, _, _ string, reqs []pulumiapi.UpdatePolicyGroupRequest) error {
-					capturedReqs = reqs
+					capturedReqs = append(capturedReqs, reqs...)
 					return nil
 				},
 				getPolicyGroupFunc: func() (*pulumiapi.PolicyGroup, error) {

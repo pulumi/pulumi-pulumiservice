@@ -477,6 +477,18 @@ func TestYamlPolicyGroupsExample(t *testing.T) {
 	})
 }
 
+func TestYamlPolicyPackExample(t *testing.T) {
+	test := pulumitest.NewPulumiTest(t,
+		filepath.Join(getCwd(t), "yaml-policy-pack"),
+		inMemoryProvider(),
+		opttest.UseAmbientBackend(),
+		opttest.StackName(randomStackName()),
+	)
+	test.SetConfig(t, "digits", generateRandomFiveDigits())
+	test.SetConfig(t, "organizationName", getOrgName())
+	runPulumiTest(t, test)
+}
+
 func TestYamlPolicyGroupsAccountsExample(t *testing.T) {
 	cwd := getCwd(t)
 	digits := generateRandomFiveDigits()

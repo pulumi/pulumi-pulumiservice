@@ -1,4 +1,4 @@
-// Copyright 2016-2025, Pulumi Corporation.
+// Copyright 2016-2026, Pulumi Corporation.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,15 +18,34 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"path"
 	"strconv"
+	"strings"
+	"time"
 )
 
 type PolicyPackClient interface {
 	ListPolicyPacks(ctx context.Context, orgName string) ([]PolicyPackWithVersions, error)
 	GetPolicyPack(ctx context.Context, orgName string, policyPackName string, version int) (*PolicyPackDetail, error)
 	GetLatestPolicyPack(ctx context.Context, orgName string, policyPackName string) (*PolicyPackDetail, error)
+	PublishPolicyPack(ctx context.Context, orgName string, req CreatePolicyPackRequest, archive io.Reader) (int, error)
+	DeletePolicyPack(ctx context.Context, orgName, policyPackName string) error
+	DeletePolicyPackVersion(ctx context.Context, orgName, policyPackName, versionTag string) error
+}
+
+type CreatePolicyPackRequest struct {
+	Name        string   `json:"name"`
+	DisplayName string   `json:"displayName,omitempty"`
+	VersionTag  string   `json:"versionTag,omitempty"`
+	Policies    []Policy `json:"policies"`
+}
+
+type CreatePolicyPackResponse struct {
+	Version         int               `json:"version"`
+	UploadURI       string            `json:"uploadURI"`
+	RequiredHeaders map[string]string `json:"requiredHeaders,omitempty"`
 }
 
 type PolicyPackWithVersions struct {
@@ -140,4 +159,102 @@ func (c *Client) GetLatestPolicyPack(
 	}
 
 	return &policyPack, nil
+}
+
+func (c *Client) PublishPolicyPack(
+	ctx context.Context,
+	orgName string,
+	req CreatePolicyPackRequest,
+	archive io.Reader,
+) (version int, err error) {
+	if orgName == "" {
+		return 0, errors.New("empty orgName")
+	}
+	if req.Name == "" {
+		return 0, errors.New("empty policy pack name")
+	}
+	if req.VersionTag == "" {
+		return 0, errors.New("empty versionTag")
+	}
+
+	var resp CreatePolicyPackResponse
+	apiPath := path.Join("orgs", orgName, "policypacks")
+	if _, err = c.do(ctx, http.MethodPost, apiPath, req, &resp); err != nil {
+		return 0, fmt.Errorf("publish policy pack metadata: %w", err)
+	}
+
+	// Metadata POST reserves versionTag in the cloud. If upload or complete
+	// fails, the version is orphaned and the next retry hits 409 — so roll it
+	// back on the way out. Detached context: caller's ctx may be the reason
+	// we're failing.
+	defer func() {
+		if err == nil {
+			return
+		}
+		cleanupCtx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		defer cancel()
+		_ = c.DeletePolicyPackVersion(cleanupCtx, orgName, req.Name, req.VersionTag)
+	}()
+
+	putReq, err := http.NewRequestWithContext(ctx, http.MethodPut, resp.UploadURI, archive)
+	if err != nil {
+		return 0, fmt.Errorf("build upload request: %w", err)
+	}
+	for k, v := range resp.RequiredHeaders {
+		putReq.Header.Set(k, v)
+	}
+	putResp, err := c.httpClient.Do(putReq)
+	if err != nil {
+		return 0, fmt.Errorf("upload policy pack archive: %w", err)
+	}
+	defer putResp.Body.Close()
+	if putResp.StatusCode >= 300 {
+		body, _ := io.ReadAll(io.LimitReader(putResp.Body, 4096))
+		return 0, fmt.Errorf("upload failed with status %d: %s", putResp.StatusCode, strings.TrimSpace(string(body)))
+	}
+
+	completePath := path.Join(
+		"orgs", orgName, "policypacks", req.Name, "versions", req.VersionTag, "complete",
+	)
+	if _, err = c.do(ctx, http.MethodPost, completePath, nil, nil); err != nil {
+		return 0, fmt.Errorf("signal publish completion: %w", err)
+	}
+	return resp.Version, nil
+}
+
+func (c *Client) DeletePolicyPackVersion(ctx context.Context, orgName, policyPackName, versionTag string) error {
+	if orgName == "" {
+		return errors.New("empty orgName")
+	}
+	if policyPackName == "" {
+		return errors.New("empty policy pack name")
+	}
+	if versionTag == "" {
+		return errors.New("empty versionTag")
+	}
+	apiPath := path.Join("orgs", orgName, "policypacks", policyPackName, "versions", versionTag)
+	if _, err := c.do(ctx, http.MethodDelete, apiPath, nil, nil); err != nil {
+		if GetErrorStatusCode(err) == http.StatusNotFound {
+			return nil
+		}
+		return fmt.Errorf("delete policy pack version: %w", err)
+	}
+	return nil
+}
+
+func (c *Client) DeletePolicyPack(ctx context.Context, orgName, policyPackName string) error {
+	if orgName == "" {
+		return errors.New("empty orgName")
+	}
+	if policyPackName == "" {
+		return errors.New("empty policy pack name")
+	}
+	apiPath := path.Join("orgs", orgName, "policypacks", policyPackName)
+	if _, err := c.do(ctx, http.MethodDelete, apiPath, nil, nil); err != nil {
+		if GetErrorStatusCode(err) == http.StatusNotFound {
+			return nil
+		}
+		return fmt.Errorf("delete policy pack: %w", err)
+	}
+	return nil
 }

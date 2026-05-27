@@ -40,6 +40,7 @@ __all__ = [
     'OrganizationMemberInfo',
     'PolicyGroupPolicyPackReference',
     'PolicyGroupStackReference',
+    'PolicyPackPolicyInput',
     'RoleScopeInfo',
     'TemplateSourceDestination',
 ]
@@ -1641,6 +1642,93 @@ class PolicyGroupStackReference(dict):
         The routing project name (also known as project name).
         """
         return pulumi.get(self, "routing_project")
+
+
+@pulumi.output_type
+class PolicyPackPolicyInput(dict):
+    @staticmethod
+    def __key_warning(key: str):
+        suggest = None
+        if key == "configSchema":
+            suggest = "config_schema"
+        elif key == "displayName":
+            suggest = "display_name"
+        elif key == "enforcementLevel":
+            suggest = "enforcement_level"
+
+        if suggest:
+            pulumi.log.warn(f"Key '{key}' not found in PolicyPackPolicyInput. Access the value via the '{suggest}' property getter instead.")
+
+    def __getitem__(self, key: str) -> Any:
+        PolicyPackPolicyInput.__key_warning(key)
+        return super().__getitem__(key)
+
+    def get(self, key: str, default = None) -> Any:
+        PolicyPackPolicyInput.__key_warning(key)
+        return super().get(key, default)
+
+    def __init__(__self__, *,
+                 name: _builtins.str,
+                 config_schema: Optional[Mapping[str, Any]] = None,
+                 description: Optional[_builtins.str] = None,
+                 display_name: Optional[_builtins.str] = None,
+                 enforcement_level: Optional[_builtins.str] = None,
+                 message: Optional[_builtins.str] = None):
+        """
+        :param _builtins.str name: Unique policy name within the pack.
+        :param Mapping[str, Any] config_schema: JSON Schema (properties/required/type) for the policy's runtime config. Values are supplied per-policy via the PolicyGroup's policyPacks[].config map.
+        :param _builtins.str enforcement_level: One of: advisory, mandatory, disabled.
+        """
+        pulumi.set(__self__, "name", name)
+        if config_schema is not None:
+            pulumi.set(__self__, "config_schema", config_schema)
+        if description is not None:
+            pulumi.set(__self__, "description", description)
+        if display_name is not None:
+            pulumi.set(__self__, "display_name", display_name)
+        if enforcement_level is not None:
+            pulumi.set(__self__, "enforcement_level", enforcement_level)
+        if message is not None:
+            pulumi.set(__self__, "message", message)
+
+    @_builtins.property
+    @pulumi.getter
+    def name(self) -> _builtins.str:
+        """
+        Unique policy name within the pack.
+        """
+        return pulumi.get(self, "name")
+
+    @_builtins.property
+    @pulumi.getter(name="configSchema")
+    def config_schema(self) -> Optional[Mapping[str, Any]]:
+        """
+        JSON Schema (properties/required/type) for the policy's runtime config. Values are supplied per-policy via the PolicyGroup's policyPacks[].config map.
+        """
+        return pulumi.get(self, "config_schema")
+
+    @_builtins.property
+    @pulumi.getter
+    def description(self) -> Optional[_builtins.str]:
+        return pulumi.get(self, "description")
+
+    @_builtins.property
+    @pulumi.getter(name="displayName")
+    def display_name(self) -> Optional[_builtins.str]:
+        return pulumi.get(self, "display_name")
+
+    @_builtins.property
+    @pulumi.getter(name="enforcementLevel")
+    def enforcement_level(self) -> Optional[_builtins.str]:
+        """
+        One of: advisory, mandatory, disabled.
+        """
+        return pulumi.get(self, "enforcement_level")
+
+    @_builtins.property
+    @pulumi.getter
+    def message(self) -> Optional[_builtins.str]:
+        return pulumi.get(self, "message")
 
 
 @pulumi.output_type

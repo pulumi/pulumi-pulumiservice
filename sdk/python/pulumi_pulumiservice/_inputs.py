@@ -58,6 +58,8 @@ __all__ = [
     'PolicyGroupPolicyPackReferenceInputArgsDict',
     'PolicyGroupStackReferenceArgs',
     'PolicyGroupStackReferenceArgsDict',
+    'PolicyPackPolicyInputArgs',
+    'PolicyPackPolicyInputArgsDict',
     'TemplateSourceDestinationArgs',
     'TemplateSourceDestinationArgsDict',
 ]
@@ -624,11 +626,11 @@ class DeploymentSettingsGitSourceGitAuthArgsDict(TypedDict):
     """
     Git source settings for a deployment.
     """
-    basic_auth: NotRequired[pulumi.Input[Optional['DeploymentSettingsGitAuthBasicAuthArgs']]]
+    basic_auth: NotRequired[pulumi.Input[Optional['DeploymentSettingsGitAuthBasicAuthArgsDict']]]
     """
     Basic auth for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined.
     """
-    ssh_auth: NotRequired[pulumi.Input[Optional['DeploymentSettingsGitAuthSSHAuthArgs']]]
+    ssh_auth: NotRequired[pulumi.Input[Optional['DeploymentSettingsGitAuthSSHAuthArgsDict']]]
     """
     SSH auth for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined.
     """
@@ -686,7 +688,7 @@ class DeploymentSettingsGitSourceArgsDict(TypedDict):
     """
     The commit to deploy. One of either `branch` or `commit` must be specified.
     """
-    git_auth: NotRequired[pulumi.Input[Optional['DeploymentSettingsGitSourceGitAuthArgs']]]
+    git_auth: NotRequired[pulumi.Input[Optional['DeploymentSettingsGitSourceGitAuthArgsDict']]]
     """
     Git authentication configuration for this deployment. Should not be specified if there are `gitHub` settings for this deployment.
     """
@@ -916,11 +918,11 @@ class DeploymentSettingsOperationContextArgsDict(TypedDict):
     """
     Environment variables to set for the deployment.
     """
-    oidc: NotRequired[pulumi.Input[Optional['OperationContextOIDCArgs']]]
+    oidc: NotRequired[pulumi.Input[Optional['OperationContextOIDCArgsDict']]]
     """
     OIDC configuration to use during the deployment.
     """
-    options: NotRequired[pulumi.Input[Optional['OperationContextOptionsArgs']]]
+    options: NotRequired[pulumi.Input[Optional['OperationContextOptionsArgsDict']]]
     """
     Options to override default behavior during the deployment.
     """
@@ -1006,7 +1008,7 @@ class DeploymentSettingsSourceContextArgsDict(TypedDict):
     """
     Settings related to the source of the deployment.
     """
-    git: NotRequired[pulumi.Input[Optional['DeploymentSettingsGitSourceArgs']]]
+    git: NotRequired[pulumi.Input[Optional['DeploymentSettingsGitSourceArgsDict']]]
     """
     Git source settings for a deployment.
     """
@@ -1476,15 +1478,15 @@ class GCPOIDCConfigurationArgs:
 
 
 class OperationContextOIDCArgsDict(TypedDict):
-    aws: NotRequired[pulumi.Input[Optional['AWSOIDCConfigurationArgs']]]
+    aws: NotRequired[pulumi.Input[Optional['AWSOIDCConfigurationArgsDict']]]
     """
     AWS-specific OIDC configuration.
     """
-    azure: NotRequired[pulumi.Input[Optional['AzureOIDCConfigurationArgs']]]
+    azure: NotRequired[pulumi.Input[Optional['AzureOIDCConfigurationArgsDict']]]
     """
     Azure-specific OIDC configuration.
     """
-    gcp: NotRequired[pulumi.Input[Optional['GCPOIDCConfigurationArgs']]]
+    gcp: NotRequired[pulumi.Input[Optional['GCPOIDCConfigurationArgsDict']]]
     """
     GCP-specific OIDC configuration.
     """
@@ -1776,6 +1778,113 @@ class PolicyGroupStackReferenceArgs:
     @routing_project.setter
     def routing_project(self, value: pulumi.Input[_builtins.str]):
         pulumi.set(self, "routing_project", value)
+
+
+class PolicyPackPolicyInputArgsDict(TypedDict):
+    name: pulumi.Input[_builtins.str]
+    """
+    Unique policy name within the pack.
+    """
+    config_schema: NotRequired[pulumi.Input[Optional[Mapping[str, Any]]]]
+    """
+    JSON Schema (properties/required/type) for the policy's runtime config. Values are supplied per-policy via the PolicyGroup's policyPacks[].config map.
+    """
+    description: NotRequired[pulumi.Input[Optional[_builtins.str]]]
+    display_name: NotRequired[pulumi.Input[Optional[_builtins.str]]]
+    enforcement_level: NotRequired[pulumi.Input[Optional[_builtins.str]]]
+    """
+    One of: advisory, mandatory, disabled.
+    """
+    message: NotRequired[pulumi.Input[Optional[_builtins.str]]]
+
+@pulumi.input_type
+class PolicyPackPolicyInputArgs:
+    def __init__(__self__, *,
+                 name: pulumi.Input[_builtins.str],
+                 config_schema: pulumi.Input[Optional[Mapping[str, Any]]] = None,
+                 description: pulumi.Input[Optional[_builtins.str]] = None,
+                 display_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 enforcement_level: pulumi.Input[Optional[_builtins.str]] = None,
+                 message: pulumi.Input[Optional[_builtins.str]] = None):
+        """
+        :param pulumi.Input[_builtins.str] name: Unique policy name within the pack.
+        :param pulumi.Input[Mapping[str, Any]] config_schema: JSON Schema (properties/required/type) for the policy's runtime config. Values are supplied per-policy via the PolicyGroup's policyPacks[].config map.
+        :param pulumi.Input[_builtins.str] enforcement_level: One of: advisory, mandatory, disabled.
+        """
+        pulumi.set(__self__, "name", name)
+        if config_schema is not None:
+            pulumi.set(__self__, "config_schema", config_schema)
+        if description is not None:
+            pulumi.set(__self__, "description", description)
+        if display_name is not None:
+            pulumi.set(__self__, "display_name", display_name)
+        if enforcement_level is not None:
+            pulumi.set(__self__, "enforcement_level", enforcement_level)
+        if message is not None:
+            pulumi.set(__self__, "message", message)
+
+    @_builtins.property
+    @pulumi.getter
+    def name(self) -> pulumi.Input[_builtins.str]:
+        """
+        Unique policy name within the pack.
+        """
+        return pulumi.get(self, "name")
+
+    @name.setter
+    def name(self, value: pulumi.Input[_builtins.str]):
+        pulumi.set(self, "name", value)
+
+    @_builtins.property
+    @pulumi.getter(name="configSchema")
+    def config_schema(self) -> pulumi.Input[Optional[Mapping[str, Any]]]:
+        """
+        JSON Schema (properties/required/type) for the policy's runtime config. Values are supplied per-policy via the PolicyGroup's policyPacks[].config map.
+        """
+        return pulumi.get(self, "config_schema")
+
+    @config_schema.setter
+    def config_schema(self, value: pulumi.Input[Optional[Mapping[str, Any]]]):
+        pulumi.set(self, "config_schema", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def description(self) -> pulumi.Input[Optional[_builtins.str]]:
+        return pulumi.get(self, "description")
+
+    @description.setter
+    def description(self, value: pulumi.Input[Optional[_builtins.str]]):
+        pulumi.set(self, "description", value)
+
+    @_builtins.property
+    @pulumi.getter(name="displayName")
+    def display_name(self) -> pulumi.Input[Optional[_builtins.str]]:
+        return pulumi.get(self, "display_name")
+
+    @display_name.setter
+    def display_name(self, value: pulumi.Input[Optional[_builtins.str]]):
+        pulumi.set(self, "display_name", value)
+
+    @_builtins.property
+    @pulumi.getter(name="enforcementLevel")
+    def enforcement_level(self) -> pulumi.Input[Optional[_builtins.str]]:
+        """
+        One of: advisory, mandatory, disabled.
+        """
+        return pulumi.get(self, "enforcement_level")
+
+    @enforcement_level.setter
+    def enforcement_level(self, value: pulumi.Input[Optional[_builtins.str]]):
+        pulumi.set(self, "enforcement_level", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def message(self) -> pulumi.Input[Optional[_builtins.str]]:
+        return pulumi.get(self, "message")
+
+    @message.setter
+    def message(self, value: pulumi.Input[Optional[_builtins.str]]):
+        pulumi.set(self, "message", value)
 
 
 class TemplateSourceDestinationArgsDict(TypedDict):

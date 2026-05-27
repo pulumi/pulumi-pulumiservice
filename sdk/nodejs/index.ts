@@ -145,6 +145,11 @@ export type PolicyGroup = import("./policyGroup").PolicyGroup;
 export const PolicyGroup: typeof import("./policyGroup").PolicyGroup = null as any;
 utilities.lazyLoad(exports, ["PolicyGroup"], () => require("./policyGroup"));
 
+export { PolicyPackArgs } from "./policyPack";
+export type PolicyPack = import("./policyPack").PolicyPack;
+export const PolicyPack: typeof import("./policyPack").PolicyPack = null as any;
+utilities.lazyLoad(exports, ["PolicyPack"], () => require("./policyPack"));
+
 export { ProviderArgs } from "./provider";
 export type Provider = import("./provider").Provider;
 export const Provider: typeof import("./provider").Provider = null as any;
@@ -254,6 +259,8 @@ const _module = {
                 return new OrganizationRole(name, <any>undefined, { urn })
             case "pulumiservice:index:PolicyGroup":
                 return new PolicyGroup(name, <any>undefined, { urn })
+            case "pulumiservice:index:PolicyPack":
+                return new PolicyPack(name, <any>undefined, { urn })
             case "pulumiservice:index:Stack":
                 return new Stack(name, <any>undefined, { urn })
             case "pulumiservice:index:StackTag":

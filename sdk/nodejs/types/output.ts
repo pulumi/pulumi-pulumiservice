@@ -509,6 +509,24 @@ export interface PolicyGroupStackReference {
     routingProject: string;
 }
 
+export interface PolicyPackPolicyInput {
+    /**
+     * JSON Schema (properties/required/type) for the policy's runtime config. Values are supplied per-policy via the PolicyGroup's policyPacks[].config map.
+     */
+    configSchema?: {[key: string]: any};
+    description?: string;
+    displayName?: string;
+    /**
+     * One of: advisory, mandatory, disabled.
+     */
+    enforcementLevel?: string;
+    message?: string;
+    /**
+     * Unique policy name within the pack.
+     */
+    name: string;
+}
+
 export interface RoleScopeInfo {
     /**
      * Human-readable description of what the scope grants.

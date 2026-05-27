@@ -1,0 +1,56 @@
+name: yaml-policy-pack-example
+runtime: yaml
+description: Publish a Policy Pack via the Pulumi Service provider.
+
+config:
+  organizationName:
+    type: string
+    default: service-provider-test-org
+  digits:
+    type: string
+  versionTag:
+    type: string
+    default: "1.0.0"
+
+resources:
+  pack:
+    type: pulumiservice:PolicyPack
+    properties:
+      organization: ${organizationName}
+      name: example-pack-${digits}
+      displayName: Example Pack
+      versionTag: ${versionTag}
+      # sourcePath must be absolute; ${pulumi.cwd} resolves to the program directory.
+      sourcePath: ${pulumi.cwd}/policy-pack
+      # `policies` is supplied inline here so the provider skips introspecting
+      # the pack via the language analyzer plugin — convenient for YAML programs
+      # that don't want a Node toolchain on the publishing machine.
+      policies:
+        - name: no-public-buckets
+          description: Disallow public S3 buckets.
+          enforcementLevel: mandatory
+        - name: required-bucket-tag
+          description: S3 buckets must have a configurable tag key.
+          enforcementLevel: advisory
+          configSchema:
+            type: object
+            properties:
+              tagKey:
+                type: string
+                default: owner
+            required:
+              - tagKey
+
+  group:
+    type: pulumiservice:PolicyGroup
+    properties:
+      organizationName: ${organizationName}
+      name: example-group-${digits}
+      policyPacks:
+        - name: ${pack.name}
+          versionTag: ${pack.versionTag}
+
+outputs:
+  policyPackVersion: ${pack.version}
+  policyPackHash: ${pack.contentHash}
+  policyGroupName: ${group.name}

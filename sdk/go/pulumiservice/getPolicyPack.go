@@ -12,9 +12,9 @@ import (
 )
 
 // Get details about a specific version of a policy pack.
-func GetPolicyPack(ctx *pulumi.Context, args *GetPolicyPackArgs, opts ...pulumi.InvokeOption) (*GetPolicyPackResult, error) {
+func LookupPolicyPack(ctx *pulumi.Context, args *LookupPolicyPackArgs, opts ...pulumi.InvokeOption) (*LookupPolicyPackResult, error) {
 	opts = internal.PkgInvokeDefaultOpts(opts)
-	var rv GetPolicyPackResult
+	var rv LookupPolicyPackResult
 	err := ctx.Invoke("pulumiservice:index:getPolicyPack", args, &rv, opts...)
 	if err != nil {
 		return nil, err
@@ -22,7 +22,7 @@ func GetPolicyPack(ctx *pulumi.Context, args *GetPolicyPackArgs, opts ...pulumi.
 	return &rv, nil
 }
 
-type GetPolicyPackArgs struct {
+type LookupPolicyPackArgs struct {
 	// The name of the Pulumi organization.
 	OrganizationName string `pulumi:"organizationName"`
 	// The name of the policy pack.
@@ -31,7 +31,7 @@ type GetPolicyPackArgs struct {
 	Version *int `pulumi:"version"`
 }
 
-type GetPolicyPackResult struct {
+type LookupPolicyPackResult struct {
 	// Configuration for the policy pack.
 	Config map[string]interface{} `pulumi:"config"`
 	// The display name of the policy pack.
@@ -46,16 +46,16 @@ type GetPolicyPackResult struct {
 	VersionTag *string `pulumi:"versionTag"`
 }
 
-func GetPolicyPackOutput(ctx *pulumi.Context, args GetPolicyPackOutputArgs, opts ...pulumi.InvokeOption) GetPolicyPackResultOutput {
+func LookupPolicyPackOutput(ctx *pulumi.Context, args LookupPolicyPackOutputArgs, opts ...pulumi.InvokeOption) LookupPolicyPackResultOutput {
 	return pulumi.ToOutputWithContext(ctx.Context(), args).
-		ApplyT(func(v interface{}) (GetPolicyPackResultOutput, error) {
-			args := v.(GetPolicyPackArgs)
+		ApplyT(func(v interface{}) (LookupPolicyPackResultOutput, error) {
+			args := v.(LookupPolicyPackArgs)
 			options := pulumi.InvokeOutputOptions{InvokeOptions: internal.PkgInvokeDefaultOpts(opts)}
-			return ctx.InvokeOutput("pulumiservice:index:getPolicyPack", args, GetPolicyPackResultOutput{}, options).(GetPolicyPackResultOutput), nil
-		}).(GetPolicyPackResultOutput)
+			return ctx.InvokeOutput("pulumiservice:index:getPolicyPack", args, LookupPolicyPackResultOutput{}, options).(LookupPolicyPackResultOutput), nil
+		}).(LookupPolicyPackResultOutput)
 }
 
-type GetPolicyPackOutputArgs struct {
+type LookupPolicyPackOutputArgs struct {
 	// The name of the Pulumi organization.
 	OrganizationName pulumi.StringInput `pulumi:"organizationName"`
 	// The name of the policy pack.
@@ -64,54 +64,54 @@ type GetPolicyPackOutputArgs struct {
 	Version pulumi.IntPtrInput `pulumi:"version"`
 }
 
-func (GetPolicyPackOutputArgs) ElementType() reflect.Type {
-	return reflect.TypeOf((*GetPolicyPackArgs)(nil)).Elem()
+func (LookupPolicyPackOutputArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*LookupPolicyPackArgs)(nil)).Elem()
 }
 
-type GetPolicyPackResultOutput struct{ *pulumi.OutputState }
+type LookupPolicyPackResultOutput struct{ *pulumi.OutputState }
 
-func (GetPolicyPackResultOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((*GetPolicyPackResult)(nil)).Elem()
+func (LookupPolicyPackResultOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*LookupPolicyPackResult)(nil)).Elem()
 }
 
-func (o GetPolicyPackResultOutput) ToGetPolicyPackResultOutput() GetPolicyPackResultOutput {
+func (o LookupPolicyPackResultOutput) ToLookupPolicyPackResultOutput() LookupPolicyPackResultOutput {
 	return o
 }
 
-func (o GetPolicyPackResultOutput) ToGetPolicyPackResultOutputWithContext(ctx context.Context) GetPolicyPackResultOutput {
+func (o LookupPolicyPackResultOutput) ToLookupPolicyPackResultOutputWithContext(ctx context.Context) LookupPolicyPackResultOutput {
 	return o
 }
 
 // Configuration for the policy pack.
-func (o GetPolicyPackResultOutput) Config() pulumi.MapOutput {
-	return o.ApplyT(func(v GetPolicyPackResult) map[string]interface{} { return v.Config }).(pulumi.MapOutput)
+func (o LookupPolicyPackResultOutput) Config() pulumi.MapOutput {
+	return o.ApplyT(func(v LookupPolicyPackResult) map[string]interface{} { return v.Config }).(pulumi.MapOutput)
 }
 
 // The display name of the policy pack.
-func (o GetPolicyPackResultOutput) DisplayName() pulumi.StringOutput {
-	return o.ApplyT(func(v GetPolicyPackResult) string { return v.DisplayName }).(pulumi.StringOutput)
+func (o LookupPolicyPackResultOutput) DisplayName() pulumi.StringOutput {
+	return o.ApplyT(func(v LookupPolicyPackResult) string { return v.DisplayName }).(pulumi.StringOutput)
 }
 
 // The name of the policy pack.
-func (o GetPolicyPackResultOutput) Name() pulumi.StringOutput {
-	return o.ApplyT(func(v GetPolicyPackResult) string { return v.Name }).(pulumi.StringOutput)
+func (o LookupPolicyPackResultOutput) Name() pulumi.StringOutput {
+	return o.ApplyT(func(v LookupPolicyPackResult) string { return v.Name }).(pulumi.StringOutput)
 }
 
 // List of policies in this pack.
-func (o GetPolicyPackResultOutput) Policies() pulumi.StringMapArrayOutput {
-	return o.ApplyT(func(v GetPolicyPackResult) []map[string]string { return v.Policies }).(pulumi.StringMapArrayOutput)
+func (o LookupPolicyPackResultOutput) Policies() pulumi.StringMapArrayOutput {
+	return o.ApplyT(func(v LookupPolicyPackResult) []map[string]string { return v.Policies }).(pulumi.StringMapArrayOutput)
 }
 
 // The version number.
-func (o GetPolicyPackResultOutput) Version() pulumi.IntOutput {
-	return o.ApplyT(func(v GetPolicyPackResult) int { return v.Version }).(pulumi.IntOutput)
+func (o LookupPolicyPackResultOutput) Version() pulumi.IntOutput {
+	return o.ApplyT(func(v LookupPolicyPackResult) int { return v.Version }).(pulumi.IntOutput)
 }
 
 // The version tag (if any).
-func (o GetPolicyPackResultOutput) VersionTag() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v GetPolicyPackResult) *string { return v.VersionTag }).(pulumi.StringPtrOutput)
+func (o LookupPolicyPackResultOutput) VersionTag() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v LookupPolicyPackResult) *string { return v.VersionTag }).(pulumi.StringPtrOutput)
 }
 
 func init() {
-	pulumi.RegisterOutputType(GetPolicyPackResultOutput{})
+	pulumi.RegisterOutputType(LookupPolicyPackResultOutput{})
 }

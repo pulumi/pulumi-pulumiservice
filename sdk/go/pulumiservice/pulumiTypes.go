@@ -3791,6 +3791,139 @@ func (o PolicyGroupStackReferenceArrayOutput) Index(i pulumi.IntInput) PolicyGro
 	}).(PolicyGroupStackReferenceOutput)
 }
 
+type PolicyPackPolicyInput struct {
+	// JSON Schema (properties/required/type) for the policy's runtime config. Values are supplied per-policy via the PolicyGroup's policyPacks[].config map.
+	ConfigSchema map[string]interface{} `pulumi:"configSchema"`
+	Description  *string                `pulumi:"description"`
+	DisplayName  *string                `pulumi:"displayName"`
+	// One of: advisory, mandatory, disabled.
+	EnforcementLevel *string `pulumi:"enforcementLevel"`
+	Message          *string `pulumi:"message"`
+	// Unique policy name within the pack.
+	Name string `pulumi:"name"`
+}
+
+// PolicyPackPolicyInputInput is an input type that accepts PolicyPackPolicyInputArgs and PolicyPackPolicyInputOutput values.
+// You can construct a concrete instance of `PolicyPackPolicyInputInput` via:
+//
+//	PolicyPackPolicyInputArgs{...}
+type PolicyPackPolicyInputInput interface {
+	pulumi.Input
+
+	ToPolicyPackPolicyInputOutput() PolicyPackPolicyInputOutput
+	ToPolicyPackPolicyInputOutputWithContext(context.Context) PolicyPackPolicyInputOutput
+}
+
+type PolicyPackPolicyInputArgs struct {
+	// JSON Schema (properties/required/type) for the policy's runtime config. Values are supplied per-policy via the PolicyGroup's policyPacks[].config map.
+	ConfigSchema pulumi.MapInput       `pulumi:"configSchema"`
+	Description  pulumi.StringPtrInput `pulumi:"description"`
+	DisplayName  pulumi.StringPtrInput `pulumi:"displayName"`
+	// One of: advisory, mandatory, disabled.
+	EnforcementLevel pulumi.StringPtrInput `pulumi:"enforcementLevel"`
+	Message          pulumi.StringPtrInput `pulumi:"message"`
+	// Unique policy name within the pack.
+	Name pulumi.StringInput `pulumi:"name"`
+}
+
+func (PolicyPackPolicyInputArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*PolicyPackPolicyInput)(nil)).Elem()
+}
+
+func (i PolicyPackPolicyInputArgs) ToPolicyPackPolicyInputOutput() PolicyPackPolicyInputOutput {
+	return i.ToPolicyPackPolicyInputOutputWithContext(context.Background())
+}
+
+func (i PolicyPackPolicyInputArgs) ToPolicyPackPolicyInputOutputWithContext(ctx context.Context) PolicyPackPolicyInputOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(PolicyPackPolicyInputOutput)
+}
+
+// PolicyPackPolicyInputArrayInput is an input type that accepts PolicyPackPolicyInputArray and PolicyPackPolicyInputArrayOutput values.
+// You can construct a concrete instance of `PolicyPackPolicyInputArrayInput` via:
+//
+//	PolicyPackPolicyInputArray{ PolicyPackPolicyInputArgs{...} }
+type PolicyPackPolicyInputArrayInput interface {
+	pulumi.Input
+
+	ToPolicyPackPolicyInputArrayOutput() PolicyPackPolicyInputArrayOutput
+	ToPolicyPackPolicyInputArrayOutputWithContext(context.Context) PolicyPackPolicyInputArrayOutput
+}
+
+type PolicyPackPolicyInputArray []PolicyPackPolicyInputInput
+
+func (PolicyPackPolicyInputArray) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]PolicyPackPolicyInput)(nil)).Elem()
+}
+
+func (i PolicyPackPolicyInputArray) ToPolicyPackPolicyInputArrayOutput() PolicyPackPolicyInputArrayOutput {
+	return i.ToPolicyPackPolicyInputArrayOutputWithContext(context.Background())
+}
+
+func (i PolicyPackPolicyInputArray) ToPolicyPackPolicyInputArrayOutputWithContext(ctx context.Context) PolicyPackPolicyInputArrayOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(PolicyPackPolicyInputArrayOutput)
+}
+
+type PolicyPackPolicyInputOutput struct{ *pulumi.OutputState }
+
+func (PolicyPackPolicyInputOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*PolicyPackPolicyInput)(nil)).Elem()
+}
+
+func (o PolicyPackPolicyInputOutput) ToPolicyPackPolicyInputOutput() PolicyPackPolicyInputOutput {
+	return o
+}
+
+func (o PolicyPackPolicyInputOutput) ToPolicyPackPolicyInputOutputWithContext(ctx context.Context) PolicyPackPolicyInputOutput {
+	return o
+}
+
+// JSON Schema (properties/required/type) for the policy's runtime config. Values are supplied per-policy via the PolicyGroup's policyPacks[].config map.
+func (o PolicyPackPolicyInputOutput) ConfigSchema() pulumi.MapOutput {
+	return o.ApplyT(func(v PolicyPackPolicyInput) map[string]interface{} { return v.ConfigSchema }).(pulumi.MapOutput)
+}
+
+func (o PolicyPackPolicyInputOutput) Description() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v PolicyPackPolicyInput) *string { return v.Description }).(pulumi.StringPtrOutput)
+}
+
+func (o PolicyPackPolicyInputOutput) DisplayName() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v PolicyPackPolicyInput) *string { return v.DisplayName }).(pulumi.StringPtrOutput)
+}
+
+// One of: advisory, mandatory, disabled.
+func (o PolicyPackPolicyInputOutput) EnforcementLevel() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v PolicyPackPolicyInput) *string { return v.EnforcementLevel }).(pulumi.StringPtrOutput)
+}
+
+func (o PolicyPackPolicyInputOutput) Message() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v PolicyPackPolicyInput) *string { return v.Message }).(pulumi.StringPtrOutput)
+}
+
+// Unique policy name within the pack.
+func (o PolicyPackPolicyInputOutput) Name() pulumi.StringOutput {
+	return o.ApplyT(func(v PolicyPackPolicyInput) string { return v.Name }).(pulumi.StringOutput)
+}
+
+type PolicyPackPolicyInputArrayOutput struct{ *pulumi.OutputState }
+
+func (PolicyPackPolicyInputArrayOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]PolicyPackPolicyInput)(nil)).Elem()
+}
+
+func (o PolicyPackPolicyInputArrayOutput) ToPolicyPackPolicyInputArrayOutput() PolicyPackPolicyInputArrayOutput {
+	return o
+}
+
+func (o PolicyPackPolicyInputArrayOutput) ToPolicyPackPolicyInputArrayOutputWithContext(ctx context.Context) PolicyPackPolicyInputArrayOutput {
+	return o
+}
+
+func (o PolicyPackPolicyInputArrayOutput) Index(i pulumi.IntInput) PolicyPackPolicyInputOutput {
+	return pulumi.All(o, i).ApplyT(func(vs []interface{}) PolicyPackPolicyInput {
+		return vs[0].([]PolicyPackPolicyInput)[vs[1].(int)]
+	}).(PolicyPackPolicyInputOutput)
+}
+
 type RoleScopeInfo struct {
 	// Human-readable description of what the scope grants.
 	Description string `pulumi:"description"`
@@ -4034,6 +4167,8 @@ func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*PolicyGroupPolicyPackReferenceInputTypeArrayInput)(nil)).Elem(), PolicyGroupPolicyPackReferenceInputTypeArray{})
 	pulumi.RegisterInputType(reflect.TypeOf((*PolicyGroupStackReferenceInput)(nil)).Elem(), PolicyGroupStackReferenceArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*PolicyGroupStackReferenceArrayInput)(nil)).Elem(), PolicyGroupStackReferenceArray{})
+	pulumi.RegisterInputType(reflect.TypeOf((*PolicyPackPolicyInputInput)(nil)).Elem(), PolicyPackPolicyInputArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*PolicyPackPolicyInputArrayInput)(nil)).Elem(), PolicyPackPolicyInputArray{})
 	pulumi.RegisterInputType(reflect.TypeOf((*TemplateSourceDestinationInput)(nil)).Elem(), TemplateSourceDestinationArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*TemplateSourceDestinationPtrInput)(nil)).Elem(), TemplateSourceDestinationArgs{})
 	pulumi.RegisterOutputType(AWSOIDCConfigurationOutput{})
@@ -4082,6 +4217,8 @@ func init() {
 	pulumi.RegisterOutputType(PolicyGroupPolicyPackReferenceInputTypeArrayOutput{})
 	pulumi.RegisterOutputType(PolicyGroupStackReferenceOutput{})
 	pulumi.RegisterOutputType(PolicyGroupStackReferenceArrayOutput{})
+	pulumi.RegisterOutputType(PolicyPackPolicyInputOutput{})
+	pulumi.RegisterOutputType(PolicyPackPolicyInputArrayOutput{})
 	pulumi.RegisterOutputType(RoleScopeInfoOutput{})
 	pulumi.RegisterOutputType(RoleScopeInfoArrayOutput{})
 	pulumi.RegisterOutputType(TemplateSourceDestinationOutput{})

@@ -434,6 +434,24 @@ export interface PolicyGroupStackReferenceArgs {
     routingProject: pulumi.Input<string>;
 }
 
+export interface PolicyPackPolicyInputArgs {
+    /**
+     * JSON Schema (properties/required/type) for the policy's runtime config. Values are supplied per-policy via the PolicyGroup's policyPacks[].config map.
+     */
+    configSchema?: pulumi.Input<{[key: string]: any} | undefined>;
+    description?: pulumi.Input<string | undefined>;
+    displayName?: pulumi.Input<string | undefined>;
+    /**
+     * One of: advisory, mandatory, disabled.
+     */
+    enforcementLevel?: pulumi.Input<string | undefined>;
+    message?: pulumi.Input<string | undefined>;
+    /**
+     * Unique policy name within the pack.
+     */
+    name: pulumi.Input<string>;
+}
+
 export interface TemplateSourceDestinationArgs {
     /**
      * Destination URL that gets filled in on new project creation.

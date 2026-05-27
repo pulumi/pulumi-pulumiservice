@@ -17,8 +17,10 @@ package resources
 import (
 	"context"
 	"fmt"
+	"reflect"
 	"slices"
 	"strings"
+	"time"
 
 	"google.golang.org/grpc/codes"
 	pbempty "google.golang.org/protobuf/types/known/emptypb"
@@ -479,11 +481,37 @@ func (p *PulumiServicePolicyGroupResource) Update(req *pulumirpc.UpdateRequest) 
 		}
 	}
 
-	// Send all updates in a single batch request
-	if len(batchReqs) > 0 {
-		err = p.Client.BatchUpdatePolicyGroup(ctx, policyGroupNew.OrganizationName, policyGroupNew.Name, batchReqs)
+	policyGroupID := fmt.Sprintf("%s/%s", policyGroupNew.OrganizationName, policyGroupNew.Name)
+	for i := range batchReqs {
+		err = p.Client.BatchUpdatePolicyGroup(
+			ctx, policyGroupNew.OrganizationName, policyGroupNew.Name, batchReqs[i:i+1],
+		)
 		if err != nil {
-			return nil, fmt.Errorf("failed to update policy group: %w", err)
+			// Earlier ops have mutated the cloud — fetch the real state for the
+			// checkpoint. Detach ctx so a cancellation that caused the failure
+			// doesn't also kill the read (which would force the fallback path).
+			readCtx, cancel := context.WithTimeout(context.WithoutCancel(ctx), 30*time.Second)
+			actual := policyGroupNew
+			if pg, getErr := p.Client.GetPolicyGroup(
+				readCtx, policyGroupNew.OrganizationName, policyGroupNew.Name,
+			); getErr == nil && pg != nil {
+				actual = PulumiServicePolicyGroupInput{
+					Name:             pg.Name,
+					OrganizationName: policyGroupNew.OrganizationName,
+					Stacks:           pg.Stacks,
+					Accounts:         pg.Accounts,
+					PolicyPacks:      pg.AppliedPolicyPacks,
+					EntityType:       pg.EntityType,
+					Mode:             pg.Mode,
+				}
+			}
+			cancel()
+			return nil, partialErrorPolicyGroup(
+				policyGroupID,
+				fmt.Errorf("failed to update policy group: %w", err),
+				actual,
+				policyGroupNew,
+			)
 		}
 	}
 
@@ -567,13 +595,16 @@ func (p *PulumiServicePolicyGroupResource) Create(req *pulumirpc.CreateRequest) 
 		})
 	}
 
-	// Send all adds in a single batch request
-	if len(batchReqs) > 0 {
+	// Same workaround as Update: serialize ops into single-op requests to
+	// dodge the cloud's reorder + upsert-by-name bug. Create today is
+	// adds-only and works batched, but staying consistent keeps the failure
+	// modes uniform.
+	for i := range batchReqs {
 		err = p.Client.BatchUpdatePolicyGroup(
 			ctx,
 			inputsPolicyGroup.OrganizationName,
 			inputsPolicyGroup.Name,
-			batchReqs,
+			batchReqs[i:i+1],
 		)
 		if err != nil {
 			return nil, partialErrorPolicyGroup(
@@ -668,7 +699,15 @@ func comparePolicyPacks(i, j pulumiapi.PolicyPackMetadata) int {
 }
 
 func policyPacksEq(x, y pulumiapi.PolicyPackMetadata) bool {
-	return x.Name == y.Name && x.VersionTag == y.VersionTag
+	if x.Name != y.Name || x.VersionTag != y.VersionTag {
+		return false
+	}
+	// nil and empty map are equivalent for diff purposes — both mean "no config".
+	xc, yc := x.Config, y.Config
+	if len(xc) == 0 && len(yc) == 0 {
+		return true
+	}
+	return reflect.DeepEqual(xc, yc)
 }
 
 func containsPolicyPack(packs []pulumiapi.PolicyPackMetadata, target pulumiapi.PolicyPackMetadata) bool {

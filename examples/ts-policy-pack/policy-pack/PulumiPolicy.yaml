@@ -1,0 +1,2 @@
+runtime: nodejs
+description: Example policy pack used by the ts-policy-pack provider example.
