@@ -15,6 +15,11 @@ env:
 
   PULUMI_TEST_OWNER: service-provider-test-org
   PULUMI_TEST_USE_SERVICE: true
+
+  # Insights example tests assume an AWS role via Pulumi Cloud OIDC; the role
+  # ARN comes from the infra/test-aws-oidc stack. Sourced here so it survives
+  # workflow regeneration (the tests hard-fail when it is unset).
+  PULUMI_TEST_AWS_INSIGHTS_ROLE_ARN: ${{ steps.esc-secrets.outputs.PULUMI_TEST_AWS_INSIGHTS_ROLE_ARN }}
 providerDefaultBranch: main
 template: generic
 shards: 6
