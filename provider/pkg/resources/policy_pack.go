@@ -155,7 +155,8 @@ func (*PolicyPack) Diff(
 	if req.Inputs.DisplayName != req.State.DisplayName {
 		add("displayName", p.UpdateReplace)
 	}
-	// Inline policies diff explicitly; introspected ones rely on the content hash below (re-running the analyzer on every preview is too expensive).
+	// Inline policies diff explicitly; introspected ones rely on the content hash below
+	// (re-running the analyzer on every preview is too expensive).
 	if len(req.Inputs.Policies) > 0 {
 		inResolved := make([]PolicyPackPolicyInput, len(req.Inputs.Policies))
 		copy(inResolved, req.Inputs.Policies)
