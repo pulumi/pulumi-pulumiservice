@@ -628,11 +628,11 @@ class DeploymentSettingsGitSourceGitAuthArgsDict(TypedDict):
     """
     Git source settings for a deployment.
     """
-    basic_auth: NotRequired[pulumi.Input[Optional['DeploymentSettingsGitAuthBasicAuthArgsDict']]]
+    basic_auth: NotRequired[pulumi.Input[Optional['DeploymentSettingsGitAuthBasicAuthArgs']]]
     """
     Basic auth for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined.
     """
-    ssh_auth: NotRequired[pulumi.Input[Optional['DeploymentSettingsGitAuthSSHAuthArgsDict']]]
+    ssh_auth: NotRequired[pulumi.Input[Optional['DeploymentSettingsGitAuthSSHAuthArgs']]]
     """
     SSH auth for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined.
     """
@@ -690,7 +690,7 @@ class DeploymentSettingsGitSourceArgsDict(TypedDict):
     """
     The commit to deploy. One of either `branch` or `commit` must be specified.
     """
-    git_auth: NotRequired[pulumi.Input[Optional['DeploymentSettingsGitSourceGitAuthArgsDict']]]
+    git_auth: NotRequired[pulumi.Input[Optional['DeploymentSettingsGitSourceGitAuthArgs']]]
     """
     Git authentication configuration for this deployment. Should not be specified if there are `gitHub` settings for this deployment.
     """
@@ -920,11 +920,11 @@ class DeploymentSettingsOperationContextArgsDict(TypedDict):
     """
     Environment variables to set for the deployment.
     """
-    oidc: NotRequired[pulumi.Input[Optional['OperationContextOIDCArgsDict']]]
+    oidc: NotRequired[pulumi.Input[Optional['OperationContextOIDCArgs']]]
     """
     OIDC configuration to use during the deployment.
     """
-    options: NotRequired[pulumi.Input[Optional['OperationContextOptionsArgsDict']]]
+    options: NotRequired[pulumi.Input[Optional['OperationContextOptionsArgs']]]
     """
     Options to override default behavior during the deployment.
     """
@@ -1010,7 +1010,7 @@ class DeploymentSettingsSourceContextArgsDict(TypedDict):
     """
     Settings related to the source of the deployment.
     """
-    git: NotRequired[pulumi.Input[Optional['DeploymentSettingsGitSourceArgsDict']]]
+    git: NotRequired[pulumi.Input[Optional['DeploymentSettingsGitSourceArgs']]]
     """
     Git source settings for a deployment.
     """
@@ -1480,15 +1480,15 @@ class GCPOIDCConfigurationArgs:
 
 
 class OperationContextOIDCArgsDict(TypedDict):
-    aws: NotRequired[pulumi.Input[Optional['AWSOIDCConfigurationArgsDict']]]
+    aws: NotRequired[pulumi.Input[Optional['AWSOIDCConfigurationArgs']]]
     """
     AWS-specific OIDC configuration.
     """
-    azure: NotRequired[pulumi.Input[Optional['AzureOIDCConfigurationArgsDict']]]
+    azure: NotRequired[pulumi.Input[Optional['AzureOIDCConfigurationArgs']]]
     """
     Azure-specific OIDC configuration.
     """
-    gcp: NotRequired[pulumi.Input[Optional['GCPOIDCConfigurationArgsDict']]]
+    gcp: NotRequired[pulumi.Input[Optional['GCPOIDCConfigurationArgs']]]
     """
     GCP-specific OIDC configuration.
     """
@@ -1885,7 +1885,7 @@ class PolicyPackPolicyInputArgsDict(TypedDict):
     """
     One of: advisory, mandatory, remediate, disabled.
     """
-    framework: NotRequired[pulumi.Input[Optional['PolicyPackComplianceFrameworkInputArgsDict']]]
+    framework: NotRequired[pulumi.Input[Optional['PolicyPackComplianceFrameworkInputArgs']]]
     """
     Compliance framework this policy belongs to.
     """
