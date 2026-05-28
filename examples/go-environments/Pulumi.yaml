@@ -1,3 +1,0 @@
-name: go-teams
-runtime: go
-description: A minimal pulumi service environments example
