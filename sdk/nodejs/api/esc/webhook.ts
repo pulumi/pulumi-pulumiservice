@@ -64,9 +64,9 @@ export class Webhook extends pulumi.CustomResource {
      */
     declare public /*out*/ readonly hasSecret: pulumi.Output<boolean>;
     /**
-     * The unique identifier name for the webhook within its scope.
+     * The unique identifier name for the webhook within its scope. Optional on creation; if omitted, the service generates a short random name. Always populated in responses.
      */
-    declare public readonly name: pulumi.Output<string>;
+    declare public readonly name: pulumi.Output<string | undefined>;
     /**
      * The organization that owns this webhook.
      */
@@ -112,9 +112,6 @@ export class Webhook extends pulumi.CustomResource {
             }
             if (args?.envName === undefined && !opts.urn) {
                 throw new Error("Missing required property 'envName'");
-            }
-            if (args?.name === undefined && !opts.urn) {
-                throw new Error("Missing required property 'name'");
             }
             if (args?.organizationName === undefined && !opts.urn) {
                 throw new Error("Missing required property 'organizationName'");
@@ -191,9 +188,9 @@ export interface WebhookArgs {
      */
     groups?: pulumi.Input<pulumi.Input<string>[] | undefined>;
     /**
-     * The unique identifier name for the webhook within its scope.
+     * The unique identifier name for the webhook within its scope. Optional on creation; if omitted, the service generates a short random name. Always populated in responses.
      */
-    name: pulumi.Input<string>;
+    name?: pulumi.Input<string | undefined>;
     /**
      * The organization that owns this webhook.
      */

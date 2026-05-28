@@ -2414,7 +2414,7 @@
         },
         "name": {
           "type": "string",
-          "description": "The unique identifier name for the webhook within its scope."
+          "description": "The unique identifier name for the webhook within its scope. Optional on creation; if omitted, the service generates a short random name. Always populated in responses."
         },
         "organizationName": {
           "type": "string",
@@ -2448,7 +2448,6 @@
         "active",
         "displayName",
         "hasSecret",
-        "name",
         "organizationName",
         "payloadUrl",
         "secretCiphertext"
@@ -2488,7 +2487,7 @@
         },
         "name": {
           "type": "string",
-          "description": "The unique identifier name for the webhook within its scope.",
+          "description": "The unique identifier name for the webhook within its scope. Optional on creation; if omitted, the service generates a short random name. Always populated in responses.",
           "replaceOnChanges": true,
           "willReplaceOnChanges": true
         },
@@ -2522,7 +2521,6 @@
         "active",
         "displayName",
         "envName",
-        "name",
         "organizationName",
         "payloadUrl",
         "projectName"
@@ -3450,15 +3448,15 @@
       ]
     },
     "pulumiservice:api/stacks:Config": {
-      "description": "Updates the service-managed configuration for a stack. The request body may include the ESC environment reference, secrets provider type, encrypted key, and encryption salt. If stack configuration is returned by the API, it is used in place of the local stack config file (e.g. Pulumi.[stack].yaml). Returns the updated configuration object. Returns 400 if the environment reference is invalid or not found.",
+      "description": "Updates the service-managed configuration for a stack. The request body sets the ESC environment reference that points the stack at a service-backed configuration. If stack configuration is returned by the API, it is used in place of the local stack config file (e.g. Pulumi.[stack].yaml). Returns the updated configuration object. Returns 400 if the environment reference is invalid or not found. The 'secretsProvider', 'encryptedKey', and 'encryptionSalt' fields are deprecated; new callers should omit them.",
       "properties": {
         "encryptedKey": {
           "type": "string",
-          "description": "The KMS-encrypted ciphertext for the data key used for secrets encryption. Only used for cloud-based secrets providers."
+          "description": "Deprecated: this field is no longer used by the service. Stacks that use a service-backed configuration store all config (including secrets) in ESC, which uses its own encryption. New callers should omit this field."
         },
         "encryptionSalt": {
           "type": "string",
-          "description": "The stack's base64-encoded encryption salt. Only used for passphrase-based secrets providers."
+          "description": "Deprecated: this field is no longer used by the service. Stacks that use a service-backed configuration store all config (including secrets) in ESC, which uses its own encryption. New callers should omit this field."
         },
         "environment": {
           "type": "string",
@@ -3466,7 +3464,7 @@
         },
         "secretsProvider": {
           "type": "string",
-          "description": "The stack's secrets provider.",
+          "description": "Deprecated: this field is no longer used by the service. Stacks that use a service-backed configuration store all config (including secrets) in ESC, which uses its own encryption. New callers should omit this field.",
           "secret": true
         }
       },
@@ -3477,11 +3475,11 @@
       "inputProperties": {
         "encryptedKey": {
           "type": "string",
-          "description": "The KMS-encrypted ciphertext for the data key used for secrets encryption. Only used for cloud-based secrets providers."
+          "description": "Deprecated: this field is no longer used by the service. Stacks that use a service-backed configuration store all config (including secrets) in ESC, which uses its own encryption. New callers should omit this field."
         },
         "encryptionSalt": {
           "type": "string",
-          "description": "The stack's base64-encoded encryption salt. Only used for passphrase-based secrets providers."
+          "description": "Deprecated: this field is no longer used by the service. Stacks that use a service-backed configuration store all config (including secrets) in ESC, which uses its own encryption. New callers should omit this field."
         },
         "environment": {
           "type": "string",
@@ -3501,7 +3499,7 @@
         },
         "secretsProvider": {
           "type": "string",
-          "description": "The stack's secrets provider.",
+          "description": "Deprecated: this field is no longer used by the service. Stacks that use a service-backed configuration store all config (including secrets) in ESC, which uses its own encryption. New callers should omit this field.",
           "secret": true
         },
         "stackName": {
@@ -3692,7 +3690,7 @@
         },
         "name": {
           "type": "string",
-          "description": "The unique identifier name for the webhook within its scope."
+          "description": "The unique identifier name for the webhook within its scope. Optional on creation; if omitted, the service generates a short random name. Always populated in responses."
         },
         "organizationName": {
           "type": "string",
@@ -3726,7 +3724,6 @@
         "active",
         "displayName",
         "hasSecret",
-        "name",
         "organizationName",
         "payloadUrl",
         "secretCiphertext"
@@ -3764,7 +3761,7 @@
         },
         "name": {
           "type": "string",
-          "description": "The unique identifier name for the webhook within its scope.",
+          "description": "The unique identifier name for the webhook within its scope. Optional on creation; if omitted, the service generates a short random name. Always populated in responses.",
           "replaceOnChanges": true,
           "willReplaceOnChanges": true
         },
@@ -3799,7 +3796,6 @@
       "requiredInputs": [
         "active",
         "displayName",
-        "name",
         "organizationName",
         "payloadUrl",
         "projectName",
@@ -4329,6 +4325,13 @@
           "type": "string",
           "description": "**Deprecated:** Use `fgaRole` instead. The member's built-in role within the organization. For members assigned a custom role, this is the closest built-in projection (`member`, `admin`, or `billingManager`) and may lose detail; `fgaRole` is authoritative."
         },
+        "teams": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Deprecated. Use GetOrganizationMemberTeams to list teams."
+        },
         "user": {
           "$ref": "pulumi.json#/Any",
           "description": "The user information for this organization member."
@@ -4411,7 +4414,7 @@
         },
         "name": {
           "type": "string",
-          "description": "The unique identifier name for the webhook within its scope."
+          "description": "The unique identifier name for the webhook within its scope. Optional on creation; if omitted, the service generates a short random name. Always populated in responses."
         },
         "organizationName": {
           "type": "string",
@@ -4445,7 +4448,6 @@
         "active",
         "displayName",
         "hasSecret",
-        "name",
         "organizationName",
         "payloadUrl",
         "secretCiphertext"
@@ -4483,7 +4485,7 @@
         },
         "name": {
           "type": "string",
-          "description": "The unique identifier name for the webhook within its scope.",
+          "description": "The unique identifier name for the webhook within its scope. Optional on creation; if omitted, the service generates a short random name. Always populated in responses.",
           "replaceOnChanges": true,
           "willReplaceOnChanges": true
         },
@@ -4514,7 +4516,6 @@
       "requiredInputs": [
         "active",
         "displayName",
-        "name",
         "organizationName",
         "payloadUrl"
       ]

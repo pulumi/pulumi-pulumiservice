@@ -39,8 +39,8 @@ type Webhook struct {
 	// HasSecret is true if the webhook has a secret. This is used to determine whether
 	// to show that there is a secret in the UI.
 	HasSecret pulumi.BoolOutput `pulumi:"hasSecret"`
-	// The unique identifier name for the webhook within its scope.
-	Name pulumi.StringOutput `pulumi:"name"`
+	// The unique identifier name for the webhook within its scope. Optional on creation; if omitted, the service generates a short random name. Always populated in responses.
+	Name pulumi.StringPtrOutput `pulumi:"name"`
 	// The organization that owns this webhook.
 	OrganizationName pulumi.StringOutput `pulumi:"organizationName"`
 	// The URL to which webhook payloads are delivered.
@@ -68,9 +68,6 @@ func NewWebhook(ctx *pulumi.Context,
 	}
 	if args.DisplayName == nil {
 		return nil, errors.New("invalid value for required argument 'DisplayName'")
-	}
-	if args.Name == nil {
-		return nil, errors.New("invalid value for required argument 'Name'")
 	}
 	if args.OrganizationName == nil {
 		return nil, errors.New("invalid value for required argument 'OrganizationName'")
@@ -138,8 +135,8 @@ type webhookArgs struct {
 	Format *string `pulumi:"format"`
 	// Event groups this webhook subscribes to (e.g., 'stacks', 'deployments').
 	Groups []string `pulumi:"groups"`
-	// The unique identifier name for the webhook within its scope.
-	Name string `pulumi:"name"`
+	// The unique identifier name for the webhook within its scope. Optional on creation; if omitted, the service generates a short random name. Always populated in responses.
+	Name *string `pulumi:"name"`
 	// The organization that owns this webhook.
 	OrganizationName string `pulumi:"organizationName"`
 	// The URL to which webhook payloads are delivered.
@@ -166,8 +163,8 @@ type WebhookArgs struct {
 	Format pulumi.StringPtrInput
 	// Event groups this webhook subscribes to (e.g., 'stacks', 'deployments').
 	Groups pulumi.StringArrayInput
-	// The unique identifier name for the webhook within its scope.
-	Name pulumi.StringInput
+	// The unique identifier name for the webhook within its scope. Optional on creation; if omitted, the service generates a short random name. Always populated in responses.
+	Name pulumi.StringPtrInput
 	// The organization that owns this webhook.
 	OrganizationName pulumi.StringInput
 	// The URL to which webhook payloads are delivered.
@@ -303,9 +300,9 @@ func (o WebhookOutput) HasSecret() pulumi.BoolOutput {
 	return o.ApplyT(func(v *Webhook) pulumi.BoolOutput { return v.HasSecret }).(pulumi.BoolOutput)
 }
 
-// The unique identifier name for the webhook within its scope.
-func (o WebhookOutput) Name() pulumi.StringOutput {
-	return o.ApplyT(func(v *Webhook) pulumi.StringOutput { return v.Name }).(pulumi.StringOutput)
+// The unique identifier name for the webhook within its scope. Optional on creation; if omitted, the service generates a short random name. Always populated in responses.
+func (o WebhookOutput) Name() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *Webhook) pulumi.StringPtrOutput { return v.Name }).(pulumi.StringPtrOutput)
 }
 
 // The organization that owns this webhook.

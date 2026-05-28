@@ -33,9 +33,9 @@ class ConfigArgs:
         :param pulumi.Input[_builtins.str] org_name: The organization name
         :param pulumi.Input[_builtins.str] project_name: The project name
         :param pulumi.Input[_builtins.str] stack_name: The stack name
-        :param pulumi.Input[_builtins.str] encrypted_key: The KMS-encrypted ciphertext for the data key used for secrets encryption. Only used for cloud-based secrets providers.
-        :param pulumi.Input[_builtins.str] encryption_salt: The stack's base64-encoded encryption salt. Only used for passphrase-based secrets providers.
-        :param pulumi.Input[_builtins.str] secrets_provider: The stack's secrets provider.
+        :param pulumi.Input[_builtins.str] encrypted_key: Deprecated: this field is no longer used by the service. Stacks that use a service-backed configuration store all config (including secrets) in ESC, which uses its own encryption. New callers should omit this field.
+        :param pulumi.Input[_builtins.str] encryption_salt: Deprecated: this field is no longer used by the service. Stacks that use a service-backed configuration store all config (including secrets) in ESC, which uses its own encryption. New callers should omit this field.
+        :param pulumi.Input[_builtins.str] secrets_provider: Deprecated: this field is no longer used by the service. Stacks that use a service-backed configuration store all config (including secrets) in ESC, which uses its own encryption. New callers should omit this field.
         """
         pulumi.set(__self__, "environment", environment)
         pulumi.set(__self__, "org_name", org_name)
@@ -100,7 +100,7 @@ class ConfigArgs:
     @pulumi.getter(name="encryptedKey")
     def encrypted_key(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
-        The KMS-encrypted ciphertext for the data key used for secrets encryption. Only used for cloud-based secrets providers.
+        Deprecated: this field is no longer used by the service. Stacks that use a service-backed configuration store all config (including secrets) in ESC, which uses its own encryption. New callers should omit this field.
         """
         return pulumi.get(self, "encrypted_key")
 
@@ -112,7 +112,7 @@ class ConfigArgs:
     @pulumi.getter(name="encryptionSalt")
     def encryption_salt(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
-        The stack's base64-encoded encryption salt. Only used for passphrase-based secrets providers.
+        Deprecated: this field is no longer used by the service. Stacks that use a service-backed configuration store all config (including secrets) in ESC, which uses its own encryption. New callers should omit this field.
         """
         return pulumi.get(self, "encryption_salt")
 
@@ -124,7 +124,7 @@ class ConfigArgs:
     @pulumi.getter(name="secretsProvider")
     def secrets_provider(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
-        The stack's secrets provider.
+        Deprecated: this field is no longer used by the service. Stacks that use a service-backed configuration store all config (including secrets) in ESC, which uses its own encryption. New callers should omit this field.
         """
         return pulumi.get(self, "secrets_provider")
 
@@ -148,17 +148,17 @@ class Config(pulumi.CustomResource):
                  stack_name: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         """
-        Updates the service-managed configuration for a stack. The request body may include the ESC environment reference, secrets provider type, encrypted key, and encryption salt. If stack configuration is returned by the API, it is used in place of the local stack config file (e.g. Pulumi.[stack].yaml). Returns the updated configuration object. Returns 400 if the environment reference is invalid or not found.
+        Updates the service-managed configuration for a stack. The request body sets the ESC environment reference that points the stack at a service-backed configuration. If stack configuration is returned by the API, it is used in place of the local stack config file (e.g. Pulumi.[stack].yaml). Returns the updated configuration object. Returns 400 if the environment reference is invalid or not found. The 'secretsProvider', 'encryptedKey', and 'encryptionSalt' fields are deprecated; new callers should omit them.
 
 
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
-        :param pulumi.Input[_builtins.str] encrypted_key: The KMS-encrypted ciphertext for the data key used for secrets encryption. Only used for cloud-based secrets providers.
-        :param pulumi.Input[_builtins.str] encryption_salt: The stack's base64-encoded encryption salt. Only used for passphrase-based secrets providers.
+        :param pulumi.Input[_builtins.str] encrypted_key: Deprecated: this field is no longer used by the service. Stacks that use a service-backed configuration store all config (including secrets) in ESC, which uses its own encryption. New callers should omit this field.
+        :param pulumi.Input[_builtins.str] encryption_salt: Deprecated: this field is no longer used by the service. Stacks that use a service-backed configuration store all config (including secrets) in ESC, which uses its own encryption. New callers should omit this field.
         :param pulumi.Input[_builtins.str] environment: Reference to ESC environment to use as stack configuration.
         :param pulumi.Input[_builtins.str] org_name: The organization name
         :param pulumi.Input[_builtins.str] project_name: The project name
-        :param pulumi.Input[_builtins.str] secrets_provider: The stack's secrets provider.
+        :param pulumi.Input[_builtins.str] secrets_provider: Deprecated: this field is no longer used by the service. Stacks that use a service-backed configuration store all config (including secrets) in ESC, which uses its own encryption. New callers should omit this field.
         :param pulumi.Input[_builtins.str] stack_name: The stack name
         """
         ...
@@ -168,7 +168,7 @@ class Config(pulumi.CustomResource):
                  args: ConfigArgs,
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
-        Updates the service-managed configuration for a stack. The request body may include the ESC environment reference, secrets provider type, encrypted key, and encryption salt. If stack configuration is returned by the API, it is used in place of the local stack config file (e.g. Pulumi.[stack].yaml). Returns the updated configuration object. Returns 400 if the environment reference is invalid or not found.
+        Updates the service-managed configuration for a stack. The request body sets the ESC environment reference that points the stack at a service-backed configuration. If stack configuration is returned by the API, it is used in place of the local stack config file (e.g. Pulumi.[stack].yaml). Returns the updated configuration object. Returns 400 if the environment reference is invalid or not found. The 'secretsProvider', 'encryptedKey', and 'encryptionSalt' fields are deprecated; new callers should omit them.
 
 
         :param str resource_name: The name of the resource.
@@ -251,7 +251,7 @@ class Config(pulumi.CustomResource):
     @pulumi.getter(name="encryptedKey")
     def encrypted_key(self) -> pulumi.Output[Optional[_builtins.str]]:
         """
-        The KMS-encrypted ciphertext for the data key used for secrets encryption. Only used for cloud-based secrets providers.
+        Deprecated: this field is no longer used by the service. Stacks that use a service-backed configuration store all config (including secrets) in ESC, which uses its own encryption. New callers should omit this field.
         """
         return pulumi.get(self, "encrypted_key")
 
@@ -259,7 +259,7 @@ class Config(pulumi.CustomResource):
     @pulumi.getter(name="encryptionSalt")
     def encryption_salt(self) -> pulumi.Output[Optional[_builtins.str]]:
         """
-        The stack's base64-encoded encryption salt. Only used for passphrase-based secrets providers.
+        Deprecated: this field is no longer used by the service. Stacks that use a service-backed configuration store all config (including secrets) in ESC, which uses its own encryption. New callers should omit this field.
         """
         return pulumi.get(self, "encryption_salt")
 
@@ -275,7 +275,7 @@ class Config(pulumi.CustomResource):
     @pulumi.getter(name="secretsProvider")
     def secrets_provider(self) -> pulumi.Output[Optional[_builtins.str]]:
         """
-        The stack's secrets provider.
+        Deprecated: this field is no longer used by the service. Stacks that use a service-backed configuration store all config (including secrets) in ESC, which uses its own encryption. New callers should omit this field.
         """
         return pulumi.get(self, "secrets_provider")
 

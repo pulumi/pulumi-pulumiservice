@@ -10,19 +10,19 @@ using Pulumi.Serialization;
 namespace Pulumi.PulumiService.Api.Stacks
 {
     /// <summary>
-    /// Updates the service-managed configuration for a stack. The request body may include the ESC environment reference, secrets provider type, encrypted key, and encryption salt. If stack configuration is returned by the API, it is used in place of the local stack config file (e.g. Pulumi.[stack].yaml). Returns the updated configuration object. Returns 400 if the environment reference is invalid or not found.
+    /// Updates the service-managed configuration for a stack. The request body sets the ESC environment reference that points the stack at a service-backed configuration. If stack configuration is returned by the API, it is used in place of the local stack config file (e.g. Pulumi.[stack].yaml). Returns the updated configuration object. Returns 400 if the environment reference is invalid or not found. The 'secretsProvider', 'encryptedKey', and 'encryptionSalt' fields are deprecated; new callers should omit them.
     /// </summary>
     [PulumiServiceResourceType("pulumiservice:api/stacks:Config")]
     public partial class Config : global::Pulumi.CustomResource
     {
         /// <summary>
-        /// The KMS-encrypted ciphertext for the data key used for secrets encryption. Only used for cloud-based secrets providers.
+        /// Deprecated: this field is no longer used by the service. Stacks that use a service-backed configuration store all config (including secrets) in ESC, which uses its own encryption. New callers should omit this field.
         /// </summary>
         [Output("encryptedKey")]
         public Output<string?> EncryptedKey { get; private set; } = null!;
 
         /// <summary>
-        /// The stack's base64-encoded encryption salt. Only used for passphrase-based secrets providers.
+        /// Deprecated: this field is no longer used by the service. Stacks that use a service-backed configuration store all config (including secrets) in ESC, which uses its own encryption. New callers should omit this field.
         /// </summary>
         [Output("encryptionSalt")]
         public Output<string?> EncryptionSalt { get; private set; } = null!;
@@ -34,7 +34,7 @@ namespace Pulumi.PulumiService.Api.Stacks
         public Output<string> Environment { get; private set; } = null!;
 
         /// <summary>
-        /// The stack's secrets provider.
+        /// Deprecated: this field is no longer used by the service. Stacks that use a service-backed configuration store all config (including secrets) in ESC, which uses its own encryption. New callers should omit this field.
         /// </summary>
         [Output("secretsProvider")]
         public Output<string?> SecretsProvider { get; private set; } = null!;
@@ -89,13 +89,13 @@ namespace Pulumi.PulumiService.Api.Stacks
     public sealed class ConfigArgs : global::Pulumi.ResourceArgs
     {
         /// <summary>
-        /// The KMS-encrypted ciphertext for the data key used for secrets encryption. Only used for cloud-based secrets providers.
+        /// Deprecated: this field is no longer used by the service. Stacks that use a service-backed configuration store all config (including secrets) in ESC, which uses its own encryption. New callers should omit this field.
         /// </summary>
         [Input("encryptedKey")]
         public Input<string>? EncryptedKey { get; set; }
 
         /// <summary>
-        /// The stack's base64-encoded encryption salt. Only used for passphrase-based secrets providers.
+        /// Deprecated: this field is no longer used by the service. Stacks that use a service-backed configuration store all config (including secrets) in ESC, which uses its own encryption. New callers should omit this field.
         /// </summary>
         [Input("encryptionSalt")]
         public Input<string>? EncryptionSalt { get; set; }
@@ -122,7 +122,7 @@ namespace Pulumi.PulumiService.Api.Stacks
         private Input<string>? _secretsProvider;
 
         /// <summary>
-        /// The stack's secrets provider.
+        /// Deprecated: this field is no longer used by the service. Stacks that use a service-backed configuration store all config (including secrets) in ESC, which uses its own encryption. New callers should omit this field.
         /// </summary>
         public Input<string>? SecretsProvider
         {

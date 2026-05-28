@@ -65,10 +65,10 @@ namespace Pulumi.PulumiService.Api
         public Output<bool> HasSecret { get; private set; } = null!;
 
         /// <summary>
-        /// The unique identifier name for the webhook within its scope.
+        /// The unique identifier name for the webhook within its scope. Optional on creation; if omitted, the service generates a short random name. Always populated in responses.
         /// </summary>
         [Output("name")]
-        public Output<string> Name { get; private set; } = null!;
+        public Output<string?> Name { get; private set; } = null!;
 
         /// <summary>
         /// The organization that owns this webhook.
@@ -207,10 +207,10 @@ namespace Pulumi.PulumiService.Api
         }
 
         /// <summary>
-        /// The unique identifier name for the webhook within its scope.
+        /// The unique identifier name for the webhook within its scope. Optional on creation; if omitted, the service generates a short random name. Always populated in responses.
         /// </summary>
-        [Input("name", required: true)]
-        public Input<string> Name { get; set; } = null!;
+        [Input("name")]
+        public Input<string>? Name { get; set; }
 
         /// <summary>
         /// The organization that owns this webhook.

@@ -130,18 +130,18 @@ public class Webhook extends com.pulumi.resources.CustomResource {
         return this.hasSecret;
     }
     /**
-     * The unique identifier name for the webhook within its scope.
+     * The unique identifier name for the webhook within its scope. Optional on creation; if omitted, the service generates a short random name. Always populated in responses.
      * 
      */
     @Export(name="name", refs={String.class}, tree="[0]")
-    private Output<String> name;
+    private Output</* @Nullable */ String> name;
 
     /**
-     * @return The unique identifier name for the webhook within its scope.
+     * @return The unique identifier name for the webhook within its scope. Optional on creation; if omitted, the service generates a short random name. Always populated in responses.
      * 
      */
-    public Output<String> name() {
-        return this.name;
+    public Output<Optional<String>> name() {
+        return Codegen.optional(this.name);
     }
     /**
      * The organization that owns this webhook.
