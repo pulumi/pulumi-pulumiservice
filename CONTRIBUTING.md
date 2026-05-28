@@ -67,13 +67,18 @@ To release a new version of the provider, follow steps below:
 
 This section is for Pulumi employees only.
 
-Resources under the `pulumiservice:api:*` namespace ship via an auto-tag workflow rather than `#release-ops`. To cut a release:
+Resources under the `pulumiservice:api:*` namespace ship via an auto-tag workflow rather than `#release-ops`. A release has two phases: refresh the spec to open a release PR, then merge that PR to tag and publish.
 
-1. Open a PR with the changes you want to ship.
-2. Add the `auto-release` label.
-3. Include a `Release-Version: vX.Y.Z` marker anywhere in the PR body. Markdown emphasis is stripped before matching, so `**Release-Version: v1.2.3**` works.
-4. Merge to `main`. [`tag-v1-release.yml`](./.github/workflows/tag-v1-release.yml) (job `tag-api-release`) extracts the version, verifies the tag doesn't already exist, and pushes it from a GitHub App installation token.
-5. The tag push triggers `release.yml` (stable) or `prerelease.yml` (pre-release). For stable tags, a `finalize` job waits for the GitHub release to be created, marks it `--latest`, and dispatches a docs rebuild to `pulumi/registry`.
+### Refresh the spec and open the release PR
+
+1. Run the [`refresh-api-spec`](./.github/workflows/refresh-v1-spec.yml) workflow, passing the `version` to release.
+2. It opens a PR from `auto/refresh-api-spec` with the `auto-release` label and `Release-Version:` marker already set. CI runs automatically; work through the reviewer checklist in the PR body.
+
+### Tag and publish
+
+1. Merge the PR to `main`.
+2. [`tag-api-release`](./.github/workflows/tag-v1-release.yml) reads the marker and pushes the release tag.
+3. The tag triggers `release.yml` to build and publish; a `finalize` job then marks the release `--latest` and triggers a docs rebuild in `pulumi/registry`.
 
 ## Getting Help
 
