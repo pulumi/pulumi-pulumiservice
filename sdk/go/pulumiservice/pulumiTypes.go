@@ -3791,6 +3791,378 @@ func (o PolicyGroupStackReferenceArrayOutput) Index(i pulumi.IntInput) PolicyGro
 	}).(PolicyGroupStackReferenceOutput)
 }
 
+type PolicyPackComplianceFrameworkInput struct {
+	// Compliance framework name (e.g. "PCI-DSS", "SOC2").
+	Name string `pulumi:"name"`
+	// Reference to the framework (e.g. a control ID).
+	Reference *string `pulumi:"reference"`
+	// Free-form specification text.
+	Specification *string `pulumi:"specification"`
+	// Compliance framework version.
+	Version *string `pulumi:"version"`
+}
+
+// PolicyPackComplianceFrameworkInputInput is an input type that accepts PolicyPackComplianceFrameworkInputArgs and PolicyPackComplianceFrameworkInputOutput values.
+// You can construct a concrete instance of `PolicyPackComplianceFrameworkInputInput` via:
+//
+//	PolicyPackComplianceFrameworkInputArgs{...}
+type PolicyPackComplianceFrameworkInputInput interface {
+	pulumi.Input
+
+	ToPolicyPackComplianceFrameworkInputOutput() PolicyPackComplianceFrameworkInputOutput
+	ToPolicyPackComplianceFrameworkInputOutputWithContext(context.Context) PolicyPackComplianceFrameworkInputOutput
+}
+
+type PolicyPackComplianceFrameworkInputArgs struct {
+	// Compliance framework name (e.g. "PCI-DSS", "SOC2").
+	Name pulumi.StringInput `pulumi:"name"`
+	// Reference to the framework (e.g. a control ID).
+	Reference pulumi.StringPtrInput `pulumi:"reference"`
+	// Free-form specification text.
+	Specification pulumi.StringPtrInput `pulumi:"specification"`
+	// Compliance framework version.
+	Version pulumi.StringPtrInput `pulumi:"version"`
+}
+
+func (PolicyPackComplianceFrameworkInputArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*PolicyPackComplianceFrameworkInput)(nil)).Elem()
+}
+
+func (i PolicyPackComplianceFrameworkInputArgs) ToPolicyPackComplianceFrameworkInputOutput() PolicyPackComplianceFrameworkInputOutput {
+	return i.ToPolicyPackComplianceFrameworkInputOutputWithContext(context.Background())
+}
+
+func (i PolicyPackComplianceFrameworkInputArgs) ToPolicyPackComplianceFrameworkInputOutputWithContext(ctx context.Context) PolicyPackComplianceFrameworkInputOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(PolicyPackComplianceFrameworkInputOutput)
+}
+
+func (i PolicyPackComplianceFrameworkInputArgs) ToPolicyPackComplianceFrameworkInputPtrOutput() PolicyPackComplianceFrameworkInputPtrOutput {
+	return i.ToPolicyPackComplianceFrameworkInputPtrOutputWithContext(context.Background())
+}
+
+func (i PolicyPackComplianceFrameworkInputArgs) ToPolicyPackComplianceFrameworkInputPtrOutputWithContext(ctx context.Context) PolicyPackComplianceFrameworkInputPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(PolicyPackComplianceFrameworkInputOutput).ToPolicyPackComplianceFrameworkInputPtrOutputWithContext(ctx)
+}
+
+// PolicyPackComplianceFrameworkInputPtrInput is an input type that accepts PolicyPackComplianceFrameworkInputArgs, PolicyPackComplianceFrameworkInputPtr and PolicyPackComplianceFrameworkInputPtrOutput values.
+// You can construct a concrete instance of `PolicyPackComplianceFrameworkInputPtrInput` via:
+//
+//	        PolicyPackComplianceFrameworkInputArgs{...}
+//
+//	or:
+//
+//	        nil
+type PolicyPackComplianceFrameworkInputPtrInput interface {
+	pulumi.Input
+
+	ToPolicyPackComplianceFrameworkInputPtrOutput() PolicyPackComplianceFrameworkInputPtrOutput
+	ToPolicyPackComplianceFrameworkInputPtrOutputWithContext(context.Context) PolicyPackComplianceFrameworkInputPtrOutput
+}
+
+type policyPackComplianceFrameworkInputPtrType PolicyPackComplianceFrameworkInputArgs
+
+func PolicyPackComplianceFrameworkInputPtr(v *PolicyPackComplianceFrameworkInputArgs) PolicyPackComplianceFrameworkInputPtrInput {
+	return (*policyPackComplianceFrameworkInputPtrType)(v)
+}
+
+func (*policyPackComplianceFrameworkInputPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**PolicyPackComplianceFrameworkInput)(nil)).Elem()
+}
+
+func (i *policyPackComplianceFrameworkInputPtrType) ToPolicyPackComplianceFrameworkInputPtrOutput() PolicyPackComplianceFrameworkInputPtrOutput {
+	return i.ToPolicyPackComplianceFrameworkInputPtrOutputWithContext(context.Background())
+}
+
+func (i *policyPackComplianceFrameworkInputPtrType) ToPolicyPackComplianceFrameworkInputPtrOutputWithContext(ctx context.Context) PolicyPackComplianceFrameworkInputPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(PolicyPackComplianceFrameworkInputPtrOutput)
+}
+
+type PolicyPackComplianceFrameworkInputOutput struct{ *pulumi.OutputState }
+
+func (PolicyPackComplianceFrameworkInputOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*PolicyPackComplianceFrameworkInput)(nil)).Elem()
+}
+
+func (o PolicyPackComplianceFrameworkInputOutput) ToPolicyPackComplianceFrameworkInputOutput() PolicyPackComplianceFrameworkInputOutput {
+	return o
+}
+
+func (o PolicyPackComplianceFrameworkInputOutput) ToPolicyPackComplianceFrameworkInputOutputWithContext(ctx context.Context) PolicyPackComplianceFrameworkInputOutput {
+	return o
+}
+
+func (o PolicyPackComplianceFrameworkInputOutput) ToPolicyPackComplianceFrameworkInputPtrOutput() PolicyPackComplianceFrameworkInputPtrOutput {
+	return o.ToPolicyPackComplianceFrameworkInputPtrOutputWithContext(context.Background())
+}
+
+func (o PolicyPackComplianceFrameworkInputOutput) ToPolicyPackComplianceFrameworkInputPtrOutputWithContext(ctx context.Context) PolicyPackComplianceFrameworkInputPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v PolicyPackComplianceFrameworkInput) *PolicyPackComplianceFrameworkInput {
+		return &v
+	}).(PolicyPackComplianceFrameworkInputPtrOutput)
+}
+
+// Compliance framework name (e.g. "PCI-DSS", "SOC2").
+func (o PolicyPackComplianceFrameworkInputOutput) Name() pulumi.StringOutput {
+	return o.ApplyT(func(v PolicyPackComplianceFrameworkInput) string { return v.Name }).(pulumi.StringOutput)
+}
+
+// Reference to the framework (e.g. a control ID).
+func (o PolicyPackComplianceFrameworkInputOutput) Reference() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v PolicyPackComplianceFrameworkInput) *string { return v.Reference }).(pulumi.StringPtrOutput)
+}
+
+// Free-form specification text.
+func (o PolicyPackComplianceFrameworkInputOutput) Specification() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v PolicyPackComplianceFrameworkInput) *string { return v.Specification }).(pulumi.StringPtrOutput)
+}
+
+// Compliance framework version.
+func (o PolicyPackComplianceFrameworkInputOutput) Version() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v PolicyPackComplianceFrameworkInput) *string { return v.Version }).(pulumi.StringPtrOutput)
+}
+
+type PolicyPackComplianceFrameworkInputPtrOutput struct{ *pulumi.OutputState }
+
+func (PolicyPackComplianceFrameworkInputPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**PolicyPackComplianceFrameworkInput)(nil)).Elem()
+}
+
+func (o PolicyPackComplianceFrameworkInputPtrOutput) ToPolicyPackComplianceFrameworkInputPtrOutput() PolicyPackComplianceFrameworkInputPtrOutput {
+	return o
+}
+
+func (o PolicyPackComplianceFrameworkInputPtrOutput) ToPolicyPackComplianceFrameworkInputPtrOutputWithContext(ctx context.Context) PolicyPackComplianceFrameworkInputPtrOutput {
+	return o
+}
+
+func (o PolicyPackComplianceFrameworkInputPtrOutput) Elem() PolicyPackComplianceFrameworkInputOutput {
+	return o.ApplyT(func(v *PolicyPackComplianceFrameworkInput) PolicyPackComplianceFrameworkInput {
+		if v != nil {
+			return *v
+		}
+		var ret PolicyPackComplianceFrameworkInput
+		return ret
+	}).(PolicyPackComplianceFrameworkInputOutput)
+}
+
+// Compliance framework name (e.g. "PCI-DSS", "SOC2").
+func (o PolicyPackComplianceFrameworkInputPtrOutput) Name() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *PolicyPackComplianceFrameworkInput) *string {
+		if v == nil {
+			return nil
+		}
+		return &v.Name
+	}).(pulumi.StringPtrOutput)
+}
+
+// Reference to the framework (e.g. a control ID).
+func (o PolicyPackComplianceFrameworkInputPtrOutput) Reference() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *PolicyPackComplianceFrameworkInput) *string {
+		if v == nil {
+			return nil
+		}
+		return v.Reference
+	}).(pulumi.StringPtrOutput)
+}
+
+// Free-form specification text.
+func (o PolicyPackComplianceFrameworkInputPtrOutput) Specification() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *PolicyPackComplianceFrameworkInput) *string {
+		if v == nil {
+			return nil
+		}
+		return v.Specification
+	}).(pulumi.StringPtrOutput)
+}
+
+// Compliance framework version.
+func (o PolicyPackComplianceFrameworkInputPtrOutput) Version() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *PolicyPackComplianceFrameworkInput) *string {
+		if v == nil {
+			return nil
+		}
+		return v.Version
+	}).(pulumi.StringPtrOutput)
+}
+
+type PolicyPackPolicyInput struct {
+	// JSON Schema (properties/required/type) for the policy's runtime config. Values are supplied per-policy via the PolicyGroup's policyPacks[].config map.
+	ConfigSchema map[string]interface{} `pulumi:"configSchema"`
+	Description  *string                `pulumi:"description"`
+	DisplayName  *string                `pulumi:"displayName"`
+	// One of: advisory, mandatory, remediate, disabled.
+	EnforcementLevel *string `pulumi:"enforcementLevel"`
+	// Compliance framework this policy belongs to.
+	Framework *PolicyPackComplianceFrameworkInput `pulumi:"framework"`
+	Message   *string                             `pulumi:"message"`
+	// Unique policy name within the pack.
+	Name string `pulumi:"name"`
+	// Description of steps to remediate a violation.
+	RemediationSteps *string `pulumi:"remediationSteps"`
+	// Severity level: low, medium, high, or critical.
+	Severity *string `pulumi:"severity"`
+	// Tags associated with the policy.
+	Tags []string `pulumi:"tags"`
+	// URL with more information about the policy.
+	Url *string `pulumi:"url"`
+}
+
+// PolicyPackPolicyInputInput is an input type that accepts PolicyPackPolicyInputArgs and PolicyPackPolicyInputOutput values.
+// You can construct a concrete instance of `PolicyPackPolicyInputInput` via:
+//
+//	PolicyPackPolicyInputArgs{...}
+type PolicyPackPolicyInputInput interface {
+	pulumi.Input
+
+	ToPolicyPackPolicyInputOutput() PolicyPackPolicyInputOutput
+	ToPolicyPackPolicyInputOutputWithContext(context.Context) PolicyPackPolicyInputOutput
+}
+
+type PolicyPackPolicyInputArgs struct {
+	// JSON Schema (properties/required/type) for the policy's runtime config. Values are supplied per-policy via the PolicyGroup's policyPacks[].config map.
+	ConfigSchema pulumi.MapInput       `pulumi:"configSchema"`
+	Description  pulumi.StringPtrInput `pulumi:"description"`
+	DisplayName  pulumi.StringPtrInput `pulumi:"displayName"`
+	// One of: advisory, mandatory, remediate, disabled.
+	EnforcementLevel pulumi.StringPtrInput `pulumi:"enforcementLevel"`
+	// Compliance framework this policy belongs to.
+	Framework PolicyPackComplianceFrameworkInputPtrInput `pulumi:"framework"`
+	Message   pulumi.StringPtrInput                      `pulumi:"message"`
+	// Unique policy name within the pack.
+	Name pulumi.StringInput `pulumi:"name"`
+	// Description of steps to remediate a violation.
+	RemediationSteps pulumi.StringPtrInput `pulumi:"remediationSteps"`
+	// Severity level: low, medium, high, or critical.
+	Severity pulumi.StringPtrInput `pulumi:"severity"`
+	// Tags associated with the policy.
+	Tags pulumi.StringArrayInput `pulumi:"tags"`
+	// URL with more information about the policy.
+	Url pulumi.StringPtrInput `pulumi:"url"`
+}
+
+func (PolicyPackPolicyInputArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*PolicyPackPolicyInput)(nil)).Elem()
+}
+
+func (i PolicyPackPolicyInputArgs) ToPolicyPackPolicyInputOutput() PolicyPackPolicyInputOutput {
+	return i.ToPolicyPackPolicyInputOutputWithContext(context.Background())
+}
+
+func (i PolicyPackPolicyInputArgs) ToPolicyPackPolicyInputOutputWithContext(ctx context.Context) PolicyPackPolicyInputOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(PolicyPackPolicyInputOutput)
+}
+
+// PolicyPackPolicyInputArrayInput is an input type that accepts PolicyPackPolicyInputArray and PolicyPackPolicyInputArrayOutput values.
+// You can construct a concrete instance of `PolicyPackPolicyInputArrayInput` via:
+//
+//	PolicyPackPolicyInputArray{ PolicyPackPolicyInputArgs{...} }
+type PolicyPackPolicyInputArrayInput interface {
+	pulumi.Input
+
+	ToPolicyPackPolicyInputArrayOutput() PolicyPackPolicyInputArrayOutput
+	ToPolicyPackPolicyInputArrayOutputWithContext(context.Context) PolicyPackPolicyInputArrayOutput
+}
+
+type PolicyPackPolicyInputArray []PolicyPackPolicyInputInput
+
+func (PolicyPackPolicyInputArray) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]PolicyPackPolicyInput)(nil)).Elem()
+}
+
+func (i PolicyPackPolicyInputArray) ToPolicyPackPolicyInputArrayOutput() PolicyPackPolicyInputArrayOutput {
+	return i.ToPolicyPackPolicyInputArrayOutputWithContext(context.Background())
+}
+
+func (i PolicyPackPolicyInputArray) ToPolicyPackPolicyInputArrayOutputWithContext(ctx context.Context) PolicyPackPolicyInputArrayOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(PolicyPackPolicyInputArrayOutput)
+}
+
+type PolicyPackPolicyInputOutput struct{ *pulumi.OutputState }
+
+func (PolicyPackPolicyInputOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*PolicyPackPolicyInput)(nil)).Elem()
+}
+
+func (o PolicyPackPolicyInputOutput) ToPolicyPackPolicyInputOutput() PolicyPackPolicyInputOutput {
+	return o
+}
+
+func (o PolicyPackPolicyInputOutput) ToPolicyPackPolicyInputOutputWithContext(ctx context.Context) PolicyPackPolicyInputOutput {
+	return o
+}
+
+// JSON Schema (properties/required/type) for the policy's runtime config. Values are supplied per-policy via the PolicyGroup's policyPacks[].config map.
+func (o PolicyPackPolicyInputOutput) ConfigSchema() pulumi.MapOutput {
+	return o.ApplyT(func(v PolicyPackPolicyInput) map[string]interface{} { return v.ConfigSchema }).(pulumi.MapOutput)
+}
+
+func (o PolicyPackPolicyInputOutput) Description() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v PolicyPackPolicyInput) *string { return v.Description }).(pulumi.StringPtrOutput)
+}
+
+func (o PolicyPackPolicyInputOutput) DisplayName() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v PolicyPackPolicyInput) *string { return v.DisplayName }).(pulumi.StringPtrOutput)
+}
+
+// One of: advisory, mandatory, remediate, disabled.
+func (o PolicyPackPolicyInputOutput) EnforcementLevel() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v PolicyPackPolicyInput) *string { return v.EnforcementLevel }).(pulumi.StringPtrOutput)
+}
+
+// Compliance framework this policy belongs to.
+func (o PolicyPackPolicyInputOutput) Framework() PolicyPackComplianceFrameworkInputPtrOutput {
+	return o.ApplyT(func(v PolicyPackPolicyInput) *PolicyPackComplianceFrameworkInput { return v.Framework }).(PolicyPackComplianceFrameworkInputPtrOutput)
+}
+
+func (o PolicyPackPolicyInputOutput) Message() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v PolicyPackPolicyInput) *string { return v.Message }).(pulumi.StringPtrOutput)
+}
+
+// Unique policy name within the pack.
+func (o PolicyPackPolicyInputOutput) Name() pulumi.StringOutput {
+	return o.ApplyT(func(v PolicyPackPolicyInput) string { return v.Name }).(pulumi.StringOutput)
+}
+
+// Description of steps to remediate a violation.
+func (o PolicyPackPolicyInputOutput) RemediationSteps() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v PolicyPackPolicyInput) *string { return v.RemediationSteps }).(pulumi.StringPtrOutput)
+}
+
+// Severity level: low, medium, high, or critical.
+func (o PolicyPackPolicyInputOutput) Severity() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v PolicyPackPolicyInput) *string { return v.Severity }).(pulumi.StringPtrOutput)
+}
+
+// Tags associated with the policy.
+func (o PolicyPackPolicyInputOutput) Tags() pulumi.StringArrayOutput {
+	return o.ApplyT(func(v PolicyPackPolicyInput) []string { return v.Tags }).(pulumi.StringArrayOutput)
+}
+
+// URL with more information about the policy.
+func (o PolicyPackPolicyInputOutput) Url() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v PolicyPackPolicyInput) *string { return v.Url }).(pulumi.StringPtrOutput)
+}
+
+type PolicyPackPolicyInputArrayOutput struct{ *pulumi.OutputState }
+
+func (PolicyPackPolicyInputArrayOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]PolicyPackPolicyInput)(nil)).Elem()
+}
+
+func (o PolicyPackPolicyInputArrayOutput) ToPolicyPackPolicyInputArrayOutput() PolicyPackPolicyInputArrayOutput {
+	return o
+}
+
+func (o PolicyPackPolicyInputArrayOutput) ToPolicyPackPolicyInputArrayOutputWithContext(ctx context.Context) PolicyPackPolicyInputArrayOutput {
+	return o
+}
+
+func (o PolicyPackPolicyInputArrayOutput) Index(i pulumi.IntInput) PolicyPackPolicyInputOutput {
+	return pulumi.All(o, i).ApplyT(func(vs []interface{}) PolicyPackPolicyInput {
+		return vs[0].([]PolicyPackPolicyInput)[vs[1].(int)]
+	}).(PolicyPackPolicyInputOutput)
+}
+
 type RoleScopeInfo struct {
 	// Human-readable description of what the scope grants.
 	Description string `pulumi:"description"`
@@ -4034,6 +4406,10 @@ func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*PolicyGroupPolicyPackReferenceInputTypeArrayInput)(nil)).Elem(), PolicyGroupPolicyPackReferenceInputTypeArray{})
 	pulumi.RegisterInputType(reflect.TypeOf((*PolicyGroupStackReferenceInput)(nil)).Elem(), PolicyGroupStackReferenceArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*PolicyGroupStackReferenceArrayInput)(nil)).Elem(), PolicyGroupStackReferenceArray{})
+	pulumi.RegisterInputType(reflect.TypeOf((*PolicyPackComplianceFrameworkInputInput)(nil)).Elem(), PolicyPackComplianceFrameworkInputArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*PolicyPackComplianceFrameworkInputPtrInput)(nil)).Elem(), PolicyPackComplianceFrameworkInputArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*PolicyPackPolicyInputInput)(nil)).Elem(), PolicyPackPolicyInputArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*PolicyPackPolicyInputArrayInput)(nil)).Elem(), PolicyPackPolicyInputArray{})
 	pulumi.RegisterInputType(reflect.TypeOf((*TemplateSourceDestinationInput)(nil)).Elem(), TemplateSourceDestinationArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*TemplateSourceDestinationPtrInput)(nil)).Elem(), TemplateSourceDestinationArgs{})
 	pulumi.RegisterOutputType(AWSOIDCConfigurationOutput{})
@@ -4082,6 +4458,10 @@ func init() {
 	pulumi.RegisterOutputType(PolicyGroupPolicyPackReferenceInputTypeArrayOutput{})
 	pulumi.RegisterOutputType(PolicyGroupStackReferenceOutput{})
 	pulumi.RegisterOutputType(PolicyGroupStackReferenceArrayOutput{})
+	pulumi.RegisterOutputType(PolicyPackComplianceFrameworkInputOutput{})
+	pulumi.RegisterOutputType(PolicyPackComplianceFrameworkInputPtrOutput{})
+	pulumi.RegisterOutputType(PolicyPackPolicyInputOutput{})
+	pulumi.RegisterOutputType(PolicyPackPolicyInputArrayOutput{})
 	pulumi.RegisterOutputType(RoleScopeInfoOutput{})
 	pulumi.RegisterOutputType(RoleScopeInfoArrayOutput{})
 	pulumi.RegisterOutputType(TemplateSourceDestinationOutput{})

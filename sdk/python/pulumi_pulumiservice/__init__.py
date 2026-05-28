@@ -35,6 +35,7 @@ from .org_access_token import *
 from .organization_member import *
 from .organization_role import *
 from .policy_group import *
+from .policy_pack import *
 from .provider import *
 from .stack import *
 from .stack_tag import *
@@ -203,6 +204,7 @@ _utilities.register(
    "pulumiservice:index:OrganizationMember": "OrganizationMember",
    "pulumiservice:index:OrganizationRole": "OrganizationRole",
    "pulumiservice:index:PolicyGroup": "PolicyGroup",
+   "pulumiservice:index:PolicyPack": "PolicyPack",
    "pulumiservice:index:Stack": "Stack",
    "pulumiservice:index:StackTag": "StackTag",
    "pulumiservice:index:StackTags": "StackTags",

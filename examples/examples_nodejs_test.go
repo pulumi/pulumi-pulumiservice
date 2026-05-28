@@ -169,6 +169,21 @@ func TestNodejsApprovalRulesExample(t *testing.T) {
 	runPulumiTest(t, test)
 }
 
+func TestNodejsPolicyPackExample(t *testing.T) {
+	exampleDir := filepath.Join(getCwd(t), "ts-policy-pack")
+	yarnInstall(t, filepath.Join(exampleDir, "policy-pack"))
+	test := pulumitest.NewPulumiTest(t,
+		exampleDir,
+		inMemoryProvider(),
+		opttest.UseAmbientBackend(),
+		opttest.YarnLink("@pulumi/pulumiservice"),
+		opttest.StackName(randomStackName()),
+	)
+	test.SetConfig(t, "digits", generateRandomFiveDigits())
+	test.SetConfig(t, "organizationName", getOrgName())
+	runPulumiTest(t, test)
+}
+
 func TestNodejsInsightsAccountInvokesExample(t *testing.T) {
 	digits := generateRandomFiveDigits()
 	test := pulumitest.NewPulumiTest(t,

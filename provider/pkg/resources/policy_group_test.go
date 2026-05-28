@@ -16,6 +16,7 @@ package resources
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"testing"
 
@@ -1132,7 +1133,7 @@ func TestPolicyGroup_Create(t *testing.T) {
 					return nil
 				},
 				batchUpdatePolicyGroupFunc: func(_ context.Context, _, _ string, reqs []pulumiapi.UpdatePolicyGroupRequest) error {
-					capturedReqs = reqs
+					capturedReqs = append(capturedReqs, reqs...)
 					return nil
 				},
 				getPolicyGroupFunc: func() (*pulumiapi.PolicyGroup, error) {
@@ -1165,7 +1166,7 @@ func TestPolicyGroup_Create(t *testing.T) {
 					return nil
 				},
 				batchUpdatePolicyGroupFunc: func(_ context.Context, _, _ string, reqs []pulumiapi.UpdatePolicyGroupRequest) error {
-					capturedReqs = reqs
+					capturedReqs = append(capturedReqs, reqs...)
 					return nil
 				},
 				getPolicyGroupFunc: func() (*pulumiapi.PolicyGroup, error) {
@@ -1196,7 +1197,7 @@ func TestPolicyGroup_Create(t *testing.T) {
 					return nil
 				},
 				batchUpdatePolicyGroupFunc: func(_ context.Context, _, _ string, reqs []pulumiapi.UpdatePolicyGroupRequest) error {
-					capturedReqs = reqs
+					capturedReqs = append(capturedReqs, reqs...)
 					return nil
 				},
 				getPolicyGroupFunc: func() (*pulumiapi.PolicyGroup, error) {
@@ -1340,7 +1341,7 @@ func TestPolicyGroup_Update(t *testing.T) {
 		provider := PulumiServicePolicyGroupResource{
 			Client: &PolicyGroupClientMock{
 				batchUpdatePolicyGroupFunc: func(_ context.Context, _, _ string, reqs []pulumiapi.UpdatePolicyGroupRequest) error {
-					capturedReqs = reqs
+					capturedReqs = append(capturedReqs, reqs...)
 					return nil
 				},
 				getPolicyGroupFunc: func() (*pulumiapi.PolicyGroup, error) {
@@ -1371,7 +1372,7 @@ func TestPolicyGroup_Update(t *testing.T) {
 		provider := PulumiServicePolicyGroupResource{
 			Client: &PolicyGroupClientMock{
 				batchUpdatePolicyGroupFunc: func(_ context.Context, _, _ string, reqs []pulumiapi.UpdatePolicyGroupRequest) error {
-					capturedReqs = reqs
+					capturedReqs = append(capturedReqs, reqs...)
 					return nil
 				},
 				getPolicyGroupFunc: func() (*pulumiapi.PolicyGroup, error) {
@@ -1402,7 +1403,7 @@ func TestPolicyGroup_Update(t *testing.T) {
 		provider := PulumiServicePolicyGroupResource{
 			Client: &PolicyGroupClientMock{
 				batchUpdatePolicyGroupFunc: func(_ context.Context, _, _ string, reqs []pulumiapi.UpdatePolicyGroupRequest) error {
-					capturedReqs = reqs
+					capturedReqs = append(capturedReqs, reqs...)
 					return nil
 				},
 				getPolicyGroupFunc: func() (*pulumiapi.PolicyGroup, error) {
@@ -1445,7 +1446,7 @@ func TestPolicyGroup_Update(t *testing.T) {
 		provider := PulumiServicePolicyGroupResource{
 			Client: &PolicyGroupClientMock{
 				batchUpdatePolicyGroupFunc: func(_ context.Context, _, _ string, reqs []pulumiapi.UpdatePolicyGroupRequest) error {
-					capturedReqs = reqs
+					capturedReqs = append(capturedReqs, reqs...)
 					return nil
 				},
 				getPolicyGroupFunc: func() (*pulumiapi.PolicyGroup, error) {
@@ -1475,7 +1476,7 @@ func TestPolicyGroup_Update(t *testing.T) {
 		provider := PulumiServicePolicyGroupResource{
 			Client: &PolicyGroupClientMock{
 				batchUpdatePolicyGroupFunc: func(_ context.Context, _, _ string, reqs []pulumiapi.UpdatePolicyGroupRequest) error {
-					capturedReqs = reqs
+					capturedReqs = append(capturedReqs, reqs...)
 					return nil
 				},
 				getPolicyGroupFunc: func() (*pulumiapi.PolicyGroup, error) {
@@ -1506,7 +1507,7 @@ func TestPolicyGroup_Update(t *testing.T) {
 		provider := PulumiServicePolicyGroupResource{
 			Client: &PolicyGroupClientMock{
 				batchUpdatePolicyGroupFunc: func(_ context.Context, _, _ string, reqs []pulumiapi.UpdatePolicyGroupRequest) error {
-					capturedReqs = reqs
+					capturedReqs = append(capturedReqs, reqs...)
 					return nil
 				},
 				getPolicyGroupFunc: func() (*pulumiapi.PolicyGroup, error) {
@@ -1651,6 +1652,45 @@ func TestPolicyGroup_Update(t *testing.T) {
 		assert.Contains(t, accountNames, parentAccount)
 		assert.Contains(t, accountNames, childAccount)
 	})
+}
+
+func TestPolicyGroup_Update_PartialFailureSurfacesActualState(t *testing.T) {
+	pp1 := policyPackRef{name: "policy-pack-1", version: 1, versionTag: "1.0.0"}
+	pp2 := policyPackRef{name: "policy-pack-2", version: 1, versionTag: "1.0.0"}
+	stack1 := stackRef{name: "stack-1", project: "project-1"}
+
+	// First batched single-op call (remove pp1) succeeds; second (add pp2) fails.
+	// The handler should hit GetPolicyGroup to report the post-failure state.
+	var calls int
+	provider := PulumiServicePolicyGroupResource{
+		Client: &PolicyGroupClientMock{
+			batchUpdatePolicyGroupFunc: func(_ context.Context, _, _ string, _ []pulumiapi.UpdatePolicyGroupRequest) error {
+				calls++
+				if calls == 1 {
+					return nil
+				}
+				return errors.New("backend reorder/upsert bug fired")
+			},
+			getPolicyGroupFunc: func() (*pulumiapi.PolicyGroup, error) {
+				// pp1 removed but pp2 not yet added — actual state diverges from desired.
+				return newMockPolicyGroup().withStacks(stack1).build(), nil
+			},
+		},
+	}
+
+	req := &pulumirpc.UpdateRequest{
+		Id:   testPolicyGroupID,
+		Urn:  testPolicyGroupURN,
+		Olds: newPolicyGroupInput().withStacks(stack1).withPolicyPacks(pp1).buildStruct(t),
+		News: newPolicyGroupInput().withStacks(stack1).withPolicyPacks(pp2).buildStruct(t),
+	}
+
+	resp, err := provider.Update(req)
+	require.Error(t, err, "should surface the partial failure")
+	assert.Nil(t, resp)
+	// The error should be wrapped via partialErrorPolicyGroup, which embeds the
+	// actual cloud-side state so the engine can checkpoint correctly.
+	assert.Contains(t, err.Error(), "failed to update policy group")
 }
 
 // Test the refactored PolicyGroup serialization with complex policy pack configs

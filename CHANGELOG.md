@@ -27,6 +27,7 @@
 
 ### Improvements
 
+- Added `PolicyPack` resource for publishing policy packs to Pulumi Cloud directly from a Pulumi program. The source directory is tarballed and uploaded on Create; the pack's policy metadata is auto-extracted by running its language analyzer plugin (matching `pulumi policy publish` behavior) and may be overridden inline.
 - The provider now honors `PULUMI_API` as a fallback when `PULUMI_BACKEND_URL` is unset. Without this fallback, a workflow that sets only `PULUMI_API` (e.g. logging into a non-prod backend) would silently dial `api.pulumi.com` and the non-prod token would 401. `PULUMI_BACKEND_URL` still wins when both are set.
 - `pulumiservice:api:*` resources: path parameters are now input-only and recovered from the resource ID, removing the redundant echo in resource state outputs. Program-owned identity fields no longer occupy the cloud-owned output namespace.
 - Added the `pulumiservice:api:*` resource namespace **(Preview)**, an OpenAPI-driven layer covering Stacks, Teams, Tokens, Webhooks, ESC Environments, Deployment Settings, OIDC Issuers, Roles, Policy Groups/Packs, VCS Integrations, and related Pulumi Cloud resources. Existing `pulumiservice:index:*` resources continue to work unchanged; api resources are accessed under `pulumiservice.api.*` in user code. Resource shape and module layout may change before GA.

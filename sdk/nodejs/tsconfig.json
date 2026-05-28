@@ -104,6 +104,7 @@
         "organizationMember.ts",
         "organizationRole.ts",
         "policyGroup.ts",
+        "policyPack.ts",
         "provider.ts",
         "stack.ts",
         "stackTag.ts",

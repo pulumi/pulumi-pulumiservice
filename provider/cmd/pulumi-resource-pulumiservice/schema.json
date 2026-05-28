@@ -806,6 +806,85 @@
         "routingProject"
       ]
     },
+    "pulumiservice:index:PolicyPackComplianceFrameworkInput": {
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Compliance framework name (e.g. \"PCI-DSS\", \"SOC2\")."
+        },
+        "reference": {
+          "type": "string",
+          "description": "Reference to the framework (e.g. a control ID)."
+        },
+        "specification": {
+          "type": "string",
+          "description": "Free-form specification text."
+        },
+        "version": {
+          "type": "string",
+          "description": "Compliance framework version."
+        }
+      },
+      "type": "object",
+      "required": [
+        "name"
+      ]
+    },
+    "pulumiservice:index:PolicyPackPolicyInput": {
+      "properties": {
+        "configSchema": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "pulumi.json#/Any"
+          },
+          "description": "JSON Schema (properties/required/type) for the policy's runtime config. Values are supplied per-policy via the PolicyGroup's policyPacks[].config map."
+        },
+        "description": {
+          "type": "string"
+        },
+        "displayName": {
+          "type": "string"
+        },
+        "enforcementLevel": {
+          "type": "string",
+          "description": "One of: advisory, mandatory, remediate, disabled."
+        },
+        "framework": {
+          "$ref": "#/types/pulumiservice:index:PolicyPackComplianceFrameworkInput",
+          "description": "Compliance framework this policy belongs to."
+        },
+        "message": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string",
+          "description": "Unique policy name within the pack."
+        },
+        "remediationSteps": {
+          "type": "string",
+          "description": "Description of steps to remediate a violation."
+        },
+        "severity": {
+          "type": "string",
+          "description": "Severity level: low, medium, high, or critical."
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Tags associated with the policy."
+        },
+        "url": {
+          "type": "string",
+          "description": "URL with more information about the policy."
+        }
+      },
+      "type": "object",
+      "required": [
+        "name"
+      ]
+    },
     "pulumiservice:index:PulumiOperation": {
       "type": "string",
       "enum": [
@@ -5736,6 +5815,87 @@
       "requiredInputs": [
         "name",
         "organizationName"
+      ]
+    },
+    "pulumiservice:index:PolicyPack": {
+      "description": "A Policy Pack published to Pulumi Cloud. The source directory is tarballed and uploaded on Create; changing source content publishes a new version (replace).",
+      "properties": {
+        "contentHash": {
+          "type": "string"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Optional display name. Changing it requires a new versionTag (policy pack versions are immutable in Pulumi Cloud)."
+        },
+        "name": {
+          "type": "string",
+          "description": "Policy pack name (unique within the org)."
+        },
+        "organization": {
+          "type": "string",
+          "description": "Organization name."
+        },
+        "policies": {
+          "type": "array",
+          "items": {
+            "$ref": "#/types/pulumiservice:index:PolicyPackPolicyInput"
+          },
+          "description": "Metadata for each policy in the pack."
+        },
+        "sourcePath": {
+          "type": "string",
+          "description": "Path to the directory containing the policy pack source. The directory is tarballed and uploaded."
+        },
+        "version": {
+          "type": "integer"
+        },
+        "versionTag": {
+          "type": "string",
+          "description": "Semantic version tag (e.g. \"1.0.0\"). Versions are immutable; change to publish a new version."
+        }
+      },
+      "required": [
+        "organization",
+        "name",
+        "versionTag",
+        "sourcePath",
+        "version",
+        "contentHash"
+      ],
+      "inputProperties": {
+        "displayName": {
+          "type": "string",
+          "description": "Optional display name. Changing it requires a new versionTag (policy pack versions are immutable in Pulumi Cloud)."
+        },
+        "name": {
+          "type": "string",
+          "description": "Policy pack name (unique within the org)."
+        },
+        "organization": {
+          "type": "string",
+          "description": "Organization name."
+        },
+        "policies": {
+          "type": "array",
+          "items": {
+            "$ref": "#/types/pulumiservice:index:PolicyPackPolicyInput"
+          },
+          "description": "Metadata for each policy in the pack."
+        },
+        "sourcePath": {
+          "type": "string",
+          "description": "Path to the directory containing the policy pack source. The directory is tarballed and uploaded."
+        },
+        "versionTag": {
+          "type": "string",
+          "description": "Semantic version tag (e.g. \"1.0.0\"). Versions are immutable; change to publish a new version."
+        }
+      },
+      "requiredInputs": [
+        "organization",
+        "name",
+        "versionTag",
+        "sourcePath"
       ]
     },
     "pulumiservice:index:Stack": {

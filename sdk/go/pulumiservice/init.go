@@ -51,6 +51,8 @@ func (m *module) Construct(ctx *pulumi.Context, name, typ, urn string) (r pulumi
 		r = &OrganizationRole{}
 	case "pulumiservice:index:PolicyGroup":
 		r = &PolicyGroup{}
+	case "pulumiservice:index:PolicyPack":
+		r = &PolicyPack{}
 	case "pulumiservice:index:Stack":
 		r = &Stack{}
 	case "pulumiservice:index:StackTag":

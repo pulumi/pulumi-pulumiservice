@@ -2,6 +2,7 @@ package examples
 
 import (
 	"os"
+	"os/exec"
 	"testing"
 
 	"github.com/pulumi/providertest/providers"
@@ -38,6 +39,18 @@ func inMemoryProvider() opttest.Option {
 		return psp.MakeProvider(nil, "pulumiservice", "1.0.0")
 	}
 	return opttest.AttachProviderServer("pulumiservice", provider)
+}
+
+// yarnInstall runs `yarn install` in dir. The PolicyPack provider boots the
+// pack's language analyzer to introspect policies, which needs the pack's
+// runtime deps installed (same prerequisite as `pulumi policy publish`).
+func yarnInstall(t *testing.T, dir string) {
+	t.Helper()
+	cmd := exec.Command("yarn", "install", "--non-interactive")
+	cmd.Dir = dir
+	if out, err := cmd.CombinedOutput(); err != nil {
+		t.Fatalf("yarn install in %s failed: %v\n%s", dir, err, out)
+	}
 }
 
 // runPulumiTest performs the same basic steps as
