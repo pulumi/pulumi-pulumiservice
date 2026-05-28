@@ -12,6 +12,7 @@ import com.pulumi.pulumiservice.api.OrganizationMemberArgs;
 import java.lang.Boolean;
 import java.lang.Object;
 import java.lang.String;
+import java.util.List;
 import java.util.Optional;
 import javax.annotation.Nullable;
 
@@ -94,6 +95,20 @@ public class OrganizationMember extends com.pulumi.resources.CustomResource {
      */
     public Output<String> role() {
         return this.role;
+    }
+    /**
+     * Deprecated. Use GetOrganizationMemberTeams to list teams.
+     * 
+     */
+    @Export(name="teams", refs={List.class,String.class}, tree="[0,1]")
+    private Output</* @Nullable */ List<String>> teams;
+
+    /**
+     * @return Deprecated. Use GetOrganizationMemberTeams to list teams.
+     * 
+     */
+    public Output<Optional<List<String>>> teams() {
+        return Codegen.optional(this.teams);
     }
     /**
      * The user information for this organization member.

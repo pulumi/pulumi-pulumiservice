@@ -30,6 +30,8 @@ type OrganizationMember struct {
 	Links pulumi.AnyOutput `pulumi:"links"`
 	// **Deprecated:** Use `fgaRole` instead. The member's built-in role within the organization. For members assigned a custom role, this is the closest built-in projection (`member`, `admin`, or `billingManager`) and may lose detail; `fgaRole` is authoritative.
 	Role pulumi.StringOutput `pulumi:"role"`
+	// Deprecated. Use GetOrganizationMemberTeams to list teams.
+	Teams pulumi.StringArrayOutput `pulumi:"teams"`
 	// The user information for this organization member.
 	User pulumi.AnyOutput `pulumi:"user"`
 	// VirtualAdmin indicates that the member does not have admin access on the
@@ -214,6 +216,11 @@ func (o OrganizationMemberOutput) Links() pulumi.AnyOutput {
 // **Deprecated:** Use `fgaRole` instead. The member's built-in role within the organization. For members assigned a custom role, this is the closest built-in projection (`member`, `admin`, or `billingManager`) and may lose detail; `fgaRole` is authoritative.
 func (o OrganizationMemberOutput) Role() pulumi.StringOutput {
 	return o.ApplyT(func(v *OrganizationMember) pulumi.StringOutput { return v.Role }).(pulumi.StringOutput)
+}
+
+// Deprecated. Use GetOrganizationMemberTeams to list teams.
+func (o OrganizationMemberOutput) Teams() pulumi.StringArrayOutput {
+	return o.ApplyT(func(v *OrganizationMember) pulumi.StringArrayOutput { return v.Teams }).(pulumi.StringArrayOutput)
 }
 
 // The user information for this organization member.

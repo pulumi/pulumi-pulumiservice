@@ -59,6 +59,10 @@ export class OrganizationMember extends pulumi.CustomResource {
      */
     declare public readonly role: pulumi.Output<string>;
     /**
+     * Deprecated. Use GetOrganizationMemberTeams to list teams.
+     */
+    declare public /*out*/ readonly teams: pulumi.Output<string[] | undefined>;
+    /**
      * The user information for this organization member.
      */
     declare public /*out*/ readonly user: pulumi.Output<any>;
@@ -95,6 +99,7 @@ export class OrganizationMember extends pulumi.CustomResource {
             resourceInputs["fgaRole"] = undefined /*out*/;
             resourceInputs["knownToPulumi"] = undefined /*out*/;
             resourceInputs["links"] = undefined /*out*/;
+            resourceInputs["teams"] = undefined /*out*/;
             resourceInputs["user"] = undefined /*out*/;
             resourceInputs["virtualAdmin"] = undefined /*out*/;
         } else {
@@ -103,6 +108,7 @@ export class OrganizationMember extends pulumi.CustomResource {
             resourceInputs["knownToPulumi"] = undefined /*out*/;
             resourceInputs["links"] = undefined /*out*/;
             resourceInputs["role"] = undefined /*out*/;
+            resourceInputs["teams"] = undefined /*out*/;
             resourceInputs["user"] = undefined /*out*/;
             resourceInputs["virtualAdmin"] = undefined /*out*/;
         }

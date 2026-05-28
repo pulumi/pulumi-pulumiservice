@@ -12,17 +12,17 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
-// Updates the service-managed configuration for a stack. The request body may include the ESC environment reference, secrets provider type, encrypted key, and encryption salt. If stack configuration is returned by the API, it is used in place of the local stack config file (e.g. Pulumi.[stack].yaml). Returns the updated configuration object. Returns 400 if the environment reference is invalid or not found.
+// Updates the service-managed configuration for a stack. The request body sets the ESC environment reference that points the stack at a service-backed configuration. If stack configuration is returned by the API, it is used in place of the local stack config file (e.g. Pulumi.[stack].yaml). Returns the updated configuration object. Returns 400 if the environment reference is invalid or not found. The 'secretsProvider', 'encryptedKey', and 'encryptionSalt' fields are deprecated; new callers should omit them.
 type Config struct {
 	pulumi.CustomResourceState
 
-	// The KMS-encrypted ciphertext for the data key used for secrets encryption. Only used for cloud-based secrets providers.
+	// Deprecated: this field is no longer used by the service. Stacks that use a service-backed configuration store all config (including secrets) in ESC, which uses its own encryption. New callers should omit this field.
 	EncryptedKey pulumi.StringPtrOutput `pulumi:"encryptedKey"`
-	// The stack's base64-encoded encryption salt. Only used for passphrase-based secrets providers.
+	// Deprecated: this field is no longer used by the service. Stacks that use a service-backed configuration store all config (including secrets) in ESC, which uses its own encryption. New callers should omit this field.
 	EncryptionSalt pulumi.StringPtrOutput `pulumi:"encryptionSalt"`
 	// Reference to ESC environment to use as stack configuration.
 	Environment pulumi.StringOutput `pulumi:"environment"`
-	// The stack's secrets provider.
+	// Deprecated: this field is no longer used by the service. Stacks that use a service-backed configuration store all config (including secrets) in ESC, which uses its own encryption. New callers should omit this field.
 	SecretsProvider pulumi.StringPtrOutput `pulumi:"secretsProvider"`
 }
 
@@ -85,9 +85,9 @@ func (ConfigState) ElementType() reflect.Type {
 }
 
 type configArgs struct {
-	// The KMS-encrypted ciphertext for the data key used for secrets encryption. Only used for cloud-based secrets providers.
+	// Deprecated: this field is no longer used by the service. Stacks that use a service-backed configuration store all config (including secrets) in ESC, which uses its own encryption. New callers should omit this field.
 	EncryptedKey *string `pulumi:"encryptedKey"`
-	// The stack's base64-encoded encryption salt. Only used for passphrase-based secrets providers.
+	// Deprecated: this field is no longer used by the service. Stacks that use a service-backed configuration store all config (including secrets) in ESC, which uses its own encryption. New callers should omit this field.
 	EncryptionSalt *string `pulumi:"encryptionSalt"`
 	// Reference to ESC environment to use as stack configuration.
 	Environment string `pulumi:"environment"`
@@ -95,7 +95,7 @@ type configArgs struct {
 	OrgName string `pulumi:"orgName"`
 	// The project name
 	ProjectName string `pulumi:"projectName"`
-	// The stack's secrets provider.
+	// Deprecated: this field is no longer used by the service. Stacks that use a service-backed configuration store all config (including secrets) in ESC, which uses its own encryption. New callers should omit this field.
 	SecretsProvider *string `pulumi:"secretsProvider"`
 	// The stack name
 	StackName string `pulumi:"stackName"`
@@ -103,9 +103,9 @@ type configArgs struct {
 
 // The set of arguments for constructing a Config resource.
 type ConfigArgs struct {
-	// The KMS-encrypted ciphertext for the data key used for secrets encryption. Only used for cloud-based secrets providers.
+	// Deprecated: this field is no longer used by the service. Stacks that use a service-backed configuration store all config (including secrets) in ESC, which uses its own encryption. New callers should omit this field.
 	EncryptedKey pulumi.StringPtrInput
-	// The stack's base64-encoded encryption salt. Only used for passphrase-based secrets providers.
+	// Deprecated: this field is no longer used by the service. Stacks that use a service-backed configuration store all config (including secrets) in ESC, which uses its own encryption. New callers should omit this field.
 	EncryptionSalt pulumi.StringPtrInput
 	// Reference to ESC environment to use as stack configuration.
 	Environment pulumi.StringInput
@@ -113,7 +113,7 @@ type ConfigArgs struct {
 	OrgName pulumi.StringInput
 	// The project name
 	ProjectName pulumi.StringInput
-	// The stack's secrets provider.
+	// Deprecated: this field is no longer used by the service. Stacks that use a service-backed configuration store all config (including secrets) in ESC, which uses its own encryption. New callers should omit this field.
 	SecretsProvider pulumi.StringPtrInput
 	// The stack name
 	StackName pulumi.StringInput
@@ -206,12 +206,12 @@ func (o ConfigOutput) ToConfigOutputWithContext(ctx context.Context) ConfigOutpu
 	return o
 }
 
-// The KMS-encrypted ciphertext for the data key used for secrets encryption. Only used for cloud-based secrets providers.
+// Deprecated: this field is no longer used by the service. Stacks that use a service-backed configuration store all config (including secrets) in ESC, which uses its own encryption. New callers should omit this field.
 func (o ConfigOutput) EncryptedKey() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *Config) pulumi.StringPtrOutput { return v.EncryptedKey }).(pulumi.StringPtrOutput)
 }
 
-// The stack's base64-encoded encryption salt. Only used for passphrase-based secrets providers.
+// Deprecated: this field is no longer used by the service. Stacks that use a service-backed configuration store all config (including secrets) in ESC, which uses its own encryption. New callers should omit this field.
 func (o ConfigOutput) EncryptionSalt() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *Config) pulumi.StringPtrOutput { return v.EncryptionSalt }).(pulumi.StringPtrOutput)
 }
@@ -221,7 +221,7 @@ func (o ConfigOutput) Environment() pulumi.StringOutput {
 	return o.ApplyT(func(v *Config) pulumi.StringOutput { return v.Environment }).(pulumi.StringOutput)
 }
 
-// The stack's secrets provider.
+// Deprecated: this field is no longer used by the service. Stacks that use a service-backed configuration store all config (including secrets) in ESC, which uses its own encryption. New callers should omit this field.
 func (o ConfigOutput) SecretsProvider() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *Config) pulumi.StringPtrOutput { return v.SecretsProvider }).(pulumi.StringPtrOutput)
 }

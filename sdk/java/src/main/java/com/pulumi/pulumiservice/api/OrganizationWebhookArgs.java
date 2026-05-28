@@ -109,18 +109,18 @@ public final class OrganizationWebhookArgs extends com.pulumi.resources.Resource
     }
 
     /**
-     * The unique identifier name for the webhook within its scope.
+     * The unique identifier name for the webhook within its scope. Optional on creation; if omitted, the service generates a short random name. Always populated in responses.
      * 
      */
-    @Import(name="name", required=true)
-    private Output<String> name;
+    @Import(name="name")
+    private @Nullable Output<String> name;
 
     /**
-     * @return The unique identifier name for the webhook within its scope.
+     * @return The unique identifier name for the webhook within its scope. Optional on creation; if omitted, the service generates a short random name. Always populated in responses.
      * 
      */
-    public Output<String> name() {
-        return this.name;
+    public Optional<Output<String>> name() {
+        return Optional.ofNullable(this.name);
     }
 
     /**
@@ -380,18 +380,18 @@ public final class OrganizationWebhookArgs extends com.pulumi.resources.Resource
         }
 
         /**
-         * @param name The unique identifier name for the webhook within its scope.
+         * @param name The unique identifier name for the webhook within its scope. Optional on creation; if omitted, the service generates a short random name. Always populated in responses.
          * 
          * @return builder
          * 
          */
-        public Builder name(Output<String> name) {
+        public Builder name(@Nullable Output<String> name) {
             $.name = name;
             return this;
         }
 
         /**
-         * @param name The unique identifier name for the webhook within its scope.
+         * @param name The unique identifier name for the webhook within its scope. Optional on creation; if omitted, the service generates a short random name. Always populated in responses.
          * 
          * @return builder
          * 
@@ -511,9 +511,6 @@ public final class OrganizationWebhookArgs extends com.pulumi.resources.Resource
             }
             if ($.displayName == null) {
                 throw new MissingRequiredPropertyException("OrganizationWebhookArgs", "displayName");
-            }
-            if ($.name == null) {
-                throw new MissingRequiredPropertyException("OrganizationWebhookArgs", "name");
             }
             if ($.organizationName == null) {
                 throw new MissingRequiredPropertyException("OrganizationWebhookArgs", "organizationName");

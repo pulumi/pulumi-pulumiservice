@@ -5,7 +5,7 @@ import * as pulumi from "@pulumi/pulumi";
 import * as utilities from "../../utilities";
 
 /**
- * Updates the service-managed configuration for a stack. The request body may include the ESC environment reference, secrets provider type, encrypted key, and encryption salt. If stack configuration is returned by the API, it is used in place of the local stack config file (e.g. Pulumi.[stack].yaml). Returns the updated configuration object. Returns 400 if the environment reference is invalid or not found.
+ * Updates the service-managed configuration for a stack. The request body sets the ESC environment reference that points the stack at a service-backed configuration. If stack configuration is returned by the API, it is used in place of the local stack config file (e.g. Pulumi.[stack].yaml). Returns the updated configuration object. Returns 400 if the environment reference is invalid or not found. The 'secretsProvider', 'encryptedKey', and 'encryptionSalt' fields are deprecated; new callers should omit them.
  */
 export class Config extends pulumi.CustomResource {
     /**
@@ -35,11 +35,11 @@ export class Config extends pulumi.CustomResource {
     }
 
     /**
-     * The KMS-encrypted ciphertext for the data key used for secrets encryption. Only used for cloud-based secrets providers.
+     * Deprecated: this field is no longer used by the service. Stacks that use a service-backed configuration store all config (including secrets) in ESC, which uses its own encryption. New callers should omit this field.
      */
     declare public readonly encryptedKey: pulumi.Output<string | undefined>;
     /**
-     * The stack's base64-encoded encryption salt. Only used for passphrase-based secrets providers.
+     * Deprecated: this field is no longer used by the service. Stacks that use a service-backed configuration store all config (including secrets) in ESC, which uses its own encryption. New callers should omit this field.
      */
     declare public readonly encryptionSalt: pulumi.Output<string | undefined>;
     /**
@@ -47,7 +47,7 @@ export class Config extends pulumi.CustomResource {
      */
     declare public readonly environment: pulumi.Output<string>;
     /**
-     * The stack's secrets provider.
+     * Deprecated: this field is no longer used by the service. Stacks that use a service-backed configuration store all config (including secrets) in ESC, which uses its own encryption. New callers should omit this field.
      */
     declare public readonly secretsProvider: pulumi.Output<string | undefined>;
 
@@ -99,11 +99,11 @@ export class Config extends pulumi.CustomResource {
  */
 export interface ConfigArgs {
     /**
-     * The KMS-encrypted ciphertext for the data key used for secrets encryption. Only used for cloud-based secrets providers.
+     * Deprecated: this field is no longer used by the service. Stacks that use a service-backed configuration store all config (including secrets) in ESC, which uses its own encryption. New callers should omit this field.
      */
     encryptedKey?: pulumi.Input<string | undefined>;
     /**
-     * The stack's base64-encoded encryption salt. Only used for passphrase-based secrets providers.
+     * Deprecated: this field is no longer used by the service. Stacks that use a service-backed configuration store all config (including secrets) in ESC, which uses its own encryption. New callers should omit this field.
      */
     encryptionSalt?: pulumi.Input<string | undefined>;
     /**
@@ -119,7 +119,7 @@ export interface ConfigArgs {
      */
     projectName: pulumi.Input<string>;
     /**
-     * The stack's secrets provider.
+     * Deprecated: this field is no longer used by the service. Stacks that use a service-backed configuration store all config (including secrets) in ESC, which uses its own encryption. New callers should omit this field.
      */
     secretsProvider?: pulumi.Input<string | undefined>;
     /**

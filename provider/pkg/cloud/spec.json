@@ -410,6 +410,33 @@
         ],
         "type": "object"
       },
+      "AgentAccountSummary": {
+        "description": "Identity and metadata for an agent's Pulumi account, returned as part of AgentClaimResponse so the claiming user can confirm which agent they are taking over.",
+        "properties": {
+          "createdAt": {
+            "description": "When the agent account was created (i.e. when /api/agents/signup ran).",
+            "format": "date-time",
+            "type": "string",
+            "x-order": 3
+          },
+          "login": {
+            "description": "The agent user's Pulumi login (e.g. \"agent-abc123\"). This is what pulumi whoami returns while the agent's access token is in use.",
+            "type": "string",
+            "x-order": 1
+          },
+          "orgName": {
+            "description": "Slug of the agent's individual organization. This appears in the <org>/<project>/<stack> identity of any stack the agent created.",
+            "type": "string",
+            "x-order": 2
+          }
+        },
+        "required": [
+          "createdAt",
+          "login",
+          "orgName"
+        ],
+        "type": "object"
+      },
       "AgentBackendEvent": {
         "description": "An event sent from the agent backend to the client during an agent task execution.",
         "discriminator": {
@@ -966,6 +993,98 @@
             "type": "object"
           }
         ]
+      },
+      "AgentClaimRequest": {
+        "description": "Details for claiming the resources created by an agent account.",
+        "properties": {
+          "claimToken": {
+            "description": "The opaque single-use claim token embedded in the claim URL the agent surfaces to its human. Returned by /api/agents/signup as part of the claim URL.",
+            "type": "string",
+            "x-order": 1
+          },
+          "conflictsResolution": {
+            "description": "Renaming instructions for the entities flagged in the response's conflicts list. Failures cannot be resolved this way.",
+            "items": {
+              "$ref": "#/components/schemas/TransferEntity"
+            },
+            "type": "array",
+            "x-order": 2
+          }
+        },
+        "required": [
+          "claimToken"
+        ],
+        "type": "object"
+      },
+      "AgentClaimResponse": {
+        "description": "Describes an agent account being claimed: the agent itself, the inventory of Pulumi entities it owns in the source organization, and the conflicts or failures that prevent the claim from completing. Preview and commit share this shape so the UI can render the same view for both.",
+        "properties": {
+          "agent": {
+            "$ref": "#/components/schemas/AgentAccountSummary",
+            "description": "Identity and metadata for the agent account being claimed.",
+            "x-order": 1
+          },
+          "claimExpiresAt": {
+            "description": "When the claim window closes. After this time the claim token expires and the claim cannot complete.",
+            "format": "date-time",
+            "type": "string",
+            "x-order": 5
+          },
+          "conflicts": {
+            "description": "Name collisions with the destination organization that the client can resolve by supplying conflictsResolution in a follow-up request. Both preview and a blocked commit return 200 with this body populated; the commit does not mutate state when any conflict is present.",
+            "items": {
+              "$ref": "#/components/schemas/TransferEntity"
+            },
+            "type": "array",
+            "x-order": 3
+          },
+          "entities": {
+            "description": "Inventory of Pulumi entities owned by the agent in the source organization. If the claim completes, these transfer to the destination organization. A non-empty conflicts or failures list prevents the claim from completing.",
+            "items": {
+              "$ref": "#/components/schemas/TransferEntity"
+            },
+            "type": "array",
+            "x-order": 2
+          },
+          "failures": {
+            "description": "Entities the service cannot transfer (e.g. ESC environments and Insights accounts at launch, which have no transfer primitive yet). Unlike conflicts, failures are not user-resolvable.",
+            "items": {
+              "$ref": "#/components/schemas/TransferEntityFailure"
+            },
+            "type": "array",
+            "x-order": 4
+          },
+          "transferToken": {
+            "description": "On successful start of a claim, the token needed to check for progress.",
+            "type": "string",
+            "x-order": 6
+          }
+        },
+        "required": [
+          "agent",
+          "claimExpiresAt",
+          "conflicts",
+          "entities",
+          "failures"
+        ],
+        "type": "object"
+      },
+      "AgentClaimsStatus": {
+        "description": "Status of recent agent claims for an organization, keyed by claim identifier.",
+        "properties": {
+          "claims": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/AgentClaimResponse"
+            },
+            "description": "The set of recent agent claims.",
+            "type": "object",
+            "x-order": 1
+          }
+        },
+        "required": [
+          "claims"
+        ],
+        "type": "object"
       },
       "AgentConsoleEvent": {
         "description": "A console event in an agent task conversation, either a user input or an agent response.",
@@ -4870,12 +4989,14 @@
         "description": "StackConfig describes the configuration of a stack from Pulumi Cloud.",
         "properties": {
           "encryptedKey": {
-            "description": "The KMS-encrypted ciphertext for the data key used for secrets encryption. Only used for cloud-based secrets providers.",
+            "deprecated": true,
+            "description": "Deprecated: this field is no longer used by the service. Stacks that use a service-backed configuration store all config (including secrets) in ESC, which uses its own encryption. New callers should omit this field.",
             "type": "string",
             "x-order": 3
           },
           "encryptionSalt": {
-            "description": "The stack's base64-encoded encryption salt. Only used for passphrase-based secrets providers.",
+            "deprecated": true,
+            "description": "Deprecated: this field is no longer used by the service. Stacks that use a service-backed configuration store all config (including secrets) in ESC, which uses its own encryption. New callers should omit this field.",
             "type": "string",
             "x-order": 4
           },
@@ -4885,7 +5006,8 @@
             "x-order": 1
           },
           "secretsProvider": {
-            "description": "The stack's secrets provider.",
+            "deprecated": true,
+            "description": "Deprecated: this field is no longer used by the service. Stacks that use a service-backed configuration store all config (including secrets) in ESC, which uses its own encryption. New callers should omit this field.",
             "type": "string",
             "x-order": 2
           }
@@ -13469,6 +13591,20 @@
         ],
         "type": "object"
       },
+      "GetOrganizationMemberTeamsResponse": {
+        "description": "GetOrganizationMemberTeamsResponse lists all teams a user has access to.",
+        "properties": {
+          "teams": {
+            "description": "The names of teams this member belongs to within the organization.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "x-order": 1
+          }
+        },
+        "type": "object"
+      },
       "GetPackageDocsResponse": {
         "description": "API documentation for a single resource or function.",
         "properties": {
@@ -18183,7 +18319,7 @@
           "driftRemediationEnabled": {
             "description": "Whether drift remediation (auto-remediate via pulumi up --refresh) is enabled.",
             "type": "boolean",
-            "x-order": 59
+            "x-order": 60
           },
           "environmentRevisionTagsEnabled": {
             "description": "Whether environment revision tags are enabled.",
@@ -18233,7 +18369,7 @@
           "expandedPolicyEnforcementLevelsEnabled": {
             "description": "Whether expanded policy enforcement levels (including the Remediate level) are enabled.",
             "type": "boolean",
-            "x-order": 60
+            "x-order": 61
           },
           "fixDriftWithNeoEnabled": {
             "description": "Whether fixing drift with Neo is enabled.",
@@ -18283,7 +18419,7 @@
           "machineTokensEnabled": {
             "description": "Whether machine tokens (organization access tokens) are enabled.",
             "type": "boolean",
-            "x-order": 61
+            "x-order": 62
           },
           "neoPlanModeEnabled": {
             "description": "Whether Neo plan mode is enabled.",
@@ -18304,6 +18440,11 @@
             "description": "Whether Copilot task sharing is enabled.",
             "type": "boolean",
             "x-order": 43
+          },
+          "neoTokenMeteringEnabled": {
+            "description": "Whether the Neo Token usage page under Billing & usage is enabled.",
+            "type": "boolean",
+            "x-order": 66
           },
           "nlpSearchEnabled": {
             "description": "Whether natural language search is enabled.",
@@ -18348,7 +18489,7 @@
           "samlSsoEnabled": {
             "description": "Whether SAML SSO configuration is enabled.",
             "type": "boolean",
-            "x-order": 62
+            "x-order": 63
           },
           "scimEnabled": {
             "description": "Whether SCIM provisioning is enabled.",
@@ -18373,12 +18514,22 @@
           "teamMemberRoleManagementEnabled": {
             "description": "Whether team member role management (assigning custom roles per team member) is enabled.",
             "type": "boolean",
-            "x-order": 63
+            "x-order": 64
+          },
+          "teamsEnabled": {
+            "description": "Whether team management (creating and assigning teams) is enabled.",
+            "type": "boolean",
+            "x-order": 65
           },
           "themingEnabled": {
             "description": "Whether UI theming is enabled.",
             "type": "boolean",
             "x-order": 41
+          },
+          "universalSearchEnabled": {
+            "description": "Whether universal search is enabled.",
+            "type": "boolean",
+            "x-order": 59
           },
           "webhooksEnabled": {
             "description": "Whether webhooks are enabled for the organization.",
@@ -18505,6 +18656,15 @@
               ],
               "enumTypeName": "OrganizationRole"
             }
+          },
+          "teams": {
+            "deprecated": true,
+            "description": "Deprecated. Use GetOrganizationMemberTeams to list teams.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "x-order": 8
           },
           "user": {
             "$ref": "#/components/schemas/UserInfo",
@@ -25813,6 +25973,243 @@
         ],
         "type": "object"
       },
+      "TransferEntity": {
+        "description": "Base class for entities that need to be transferred between organizations.",
+        "discriminator": {
+          "mapping": {
+            "TransferEntityEnvironment": "#/components/schemas/TransferEntityEnvironment",
+            "TransferEntityEnvironmentRename": "#/components/schemas/TransferEntityEnvironmentRename",
+            "TransferEntityInsightsAccount": "#/components/schemas/TransferEntityInsightsAccount",
+            "TransferEntityInsightsAccountRename": "#/components/schemas/TransferEntityInsightsAccountRename",
+            "TransferEntityRegistryPackage": "#/components/schemas/TransferEntityRegistryPackage",
+            "TransferEntityRegistryPackageRename": "#/components/schemas/TransferEntityRegistryPackageRename",
+            "TransferEntityStack": "#/components/schemas/TransferEntityStack",
+            "TransferEntityStackRename": "#/components/schemas/TransferEntityStackRename"
+          },
+          "propertyName": "kind"
+        },
+        "properties": {
+          "kind": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind"
+        ],
+        "type": "object"
+      },
+      "TransferEntityEnvironment": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/TransferEntity"
+          },
+          {
+            "description": "Reference to an ESC environment involved in a transfer.",
+            "properties": {
+              "environmentName": {
+                "description": "The environment name.",
+                "type": "string",
+                "x-order": 2
+              },
+              "projectName": {
+                "description": "The project the environment belongs to.",
+                "type": "string",
+                "x-order": 1
+              }
+            },
+            "required": [
+              "environmentName",
+              "projectName"
+            ],
+            "type": "object"
+          }
+        ]
+      },
+      "TransferEntityEnvironmentRename": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/TransferEntityEnvironment"
+          },
+          {
+            "description": "Reference to an ESC environment involved in a transfer.",
+            "properties": {
+              "renameAs": {
+                "$ref": "#/components/schemas/TransferEntityEnvironment",
+                "description": "Rename information for ESC environment.",
+                "x-order": 1
+              }
+            },
+            "required": [
+              "renameAs"
+            ],
+            "type": "object"
+          }
+        ]
+      },
+      "TransferEntityFailure": {
+        "description": "Describes an entity the service cannot transfer. Unlike a conflict (which the client can resolve via conflictsResolution), a failure is a service-side limitation.",
+        "properties": {
+          "entity": {
+            "$ref": "#/components/schemas/TransferEntity",
+            "description": "The reference of the entity that cannot be transferred.",
+            "x-order": 1
+          },
+          "failureDetails": {
+            "description": "Service-side reason the entity cannot be transferred.",
+            "type": "string",
+            "x-order": 2
+          }
+        },
+        "required": [
+          "entity",
+          "failureDetails"
+        ],
+        "type": "object"
+      },
+      "TransferEntityInsightsAccount": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/TransferEntity"
+          },
+          {
+            "description": "Reference to an Insights Account involved in a transfer.",
+            "properties": {
+              "name": {
+                "description": "The Insights account name.",
+                "type": "string",
+                "x-order": 1
+              }
+            },
+            "required": [
+              "name"
+            ],
+            "type": "object"
+          }
+        ]
+      },
+      "TransferEntityInsightsAccountRename": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/TransferEntityInsightsAccount"
+          },
+          {
+            "description": "Reference to an Insights Account involved in a transfer.",
+            "properties": {
+              "renameAs": {
+                "$ref": "#/components/schemas/TransferEntityInsightsAccount",
+                "description": "Renamed information for Insights account.",
+                "x-order": 1
+              }
+            },
+            "required": [
+              "renameAs"
+            ],
+            "type": "object"
+          }
+        ]
+      },
+      "TransferEntityRegistryPackage": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/TransferEntity"
+          },
+          {
+            "description": "Reference to a registry package involved in a transfer.",
+            "properties": {
+              "name": {
+                "description": "The package name.",
+                "type": "string",
+                "x-order": 3
+              },
+              "publisher": {
+                "description": "The package publisher.",
+                "type": "string",
+                "x-order": 2
+              },
+              "source": {
+                "description": "The package source (e.g. pulumi, opentofu).",
+                "type": "string",
+                "x-order": 1
+              }
+            },
+            "required": [
+              "name",
+              "publisher",
+              "source"
+            ],
+            "type": "object"
+          }
+        ]
+      },
+      "TransferEntityRegistryPackageRename": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/TransferEntityRegistryPackage"
+          },
+          {
+            "description": "Reference to a registry package involved in a transfer.",
+            "properties": {
+              "renameAs": {
+                "$ref": "#/components/schemas/TransferEntityRegistryPackage",
+                "description": "Rename information for registry package.",
+                "x-order": 1
+              }
+            },
+            "required": [
+              "renameAs"
+            ],
+            "type": "object"
+          }
+        ]
+      },
+      "TransferEntityStack": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/TransferEntity"
+          },
+          {
+            "description": "Reference to a stack involved in a transfer.",
+            "properties": {
+              "projectName": {
+                "description": "The project the colliding stack belongs to.",
+                "type": "string",
+                "x-order": 1
+              },
+              "stackName": {
+                "description": "The colliding stack name.",
+                "type": "string",
+                "x-order": 2
+              }
+            },
+            "required": [
+              "projectName",
+              "stackName"
+            ],
+            "type": "object"
+          }
+        ]
+      },
+      "TransferEntityStackRename": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/TransferEntityStack"
+          },
+          {
+            "description": "Reference to a stack involved in a transfer.",
+            "properties": {
+              "renameAs": {
+                "$ref": "#/components/schemas/TransferEntityStack",
+                "description": "Rename information for stack.",
+                "x-order": 1
+              }
+            },
+            "required": [
+              "renameAs"
+            ],
+            "type": "object"
+          }
+        ]
+      },
       "TransferStackRequest": {
         "description": "TransferStackRequest request object for `transferring` ownership of a stack between two organizations.",
         "properties": {
@@ -27534,7 +27931,7 @@
             "x-order": 12
           },
           "name": {
-            "description": "The unique identifier name for the webhook within its scope.",
+            "description": "The unique identifier name for the webhook within its scope. Optional on creation; if omitted, the service generates a short random name. Always populated in responses.",
             "type": "string",
             "x-order": 5
           },
@@ -27567,7 +27964,6 @@
         "required": [
           "active",
           "displayName",
-          "name",
           "organizationName",
           "payloadUrl"
         ],
@@ -28314,6 +28710,147 @@
           }
         },
         "summary": "Signup",
+        "tags": [
+          "AI Agents"
+        ],
+        "x-pulumi-route-property": {
+          "Visibility": "Preview"
+        }
+      }
+    },
+    "/api/agents/signup/validate/{claimToken}": {
+      "get": {
+        "description": "Verifies the claim token is still valid. It returns the details about the agent and the resources it created",
+        "operationId": "SignupValidate",
+        "parameters": [
+          {
+            "description": "The claim token generated by the Agent Signup",
+            "in": "path",
+            "name": "claimToken",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentClaimResponse"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "Claim token is unknown, expired, or already canceled"
+          }
+        },
+        "summary": "SignupValidate",
+        "tags": [
+          "AI Agents"
+        ],
+        "x-pulumi-route-property": {
+          "Visibility": "Preview"
+        }
+      }
+    },
+    "/api/agents/{orgName}/claim": {
+      "post": {
+        "description": "Previews the agent claim (dryRun=true) or starts its commit. The response shape is identical in both cases. Commit transfers the agent's stacks to the destination organization, soft-deletes the agent's organization, and soft-deletes the agent's access token. If there are unresolved conflicts or failures, it returns them and does not perform any state mutations.",
+        "operationId": "Claim",
+        "parameters": [
+          {
+            "description": "The organization name",
+            "in": "path",
+            "name": "orgName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "If set, perform a dry run without committing changes",
+            "in": "query",
+            "name": "dryRun",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AgentClaimRequest"
+              }
+            }
+          },
+          "x-originalParamName": "body"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentClaimResponse"
+                }
+              }
+            },
+            "description": "OK (preview, successful commit, or commit blocked); inspect conflicts and failures to distinguish"
+          },
+          "400": {
+            "description": "Missing claimToken or unsupported conflictsResolution"
+          },
+          "403": {
+            "description": "Caller has no role in the destination organization, or is the agent itself"
+          },
+          "404": {
+            "description": "Claim token is unknown, expired, or already canceled"
+          }
+        },
+        "summary": "Claim",
+        "tags": [
+          "AI Agents"
+        ],
+        "x-pulumi-route-property": {
+          "Visibility": "Preview"
+        }
+      }
+    },
+    "/api/agents/{orgName}/claim/status": {
+      "get": {
+        "description": "Fetches details from recent agent claims.",
+        "operationId": "ClaimStatus",
+        "parameters": [
+          {
+            "description": "The organization name",
+            "in": "path",
+            "name": "orgName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentClaimsStatus"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "403": {
+            "description": "Caller has no role in the destination organization, or is the agent itself"
+          }
+        },
+        "summary": "ClaimStatus",
         "tags": [
           "AI Agents"
         ],
@@ -39463,6 +40000,51 @@
           }
         },
         "summary": "SetSoleOrganizationAdmin",
+        "tags": [
+          "Organizations"
+        ]
+      }
+    },
+    "/api/orgs/{orgName}/members/{user}/teams": {
+      "get": {
+        "description": "Lists the teams a user belongs to within an organization. Returns display names for Pulumi-managed teams and teams synced from a backend identity provider.",
+        "operationId": "GetOrganizationMemberTeams",
+        "parameters": [
+          {
+            "description": "The organization name",
+            "in": "path",
+            "name": "orgName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The user's login name",
+            "in": "path",
+            "name": "user",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetOrganizationMemberTeamsResponse"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "description": "invalid query parameter"
+          }
+        },
+        "summary": "GetOrganizationMemberTeams",
         "tags": [
           "Organizations"
         ]
@@ -53565,7 +54147,7 @@
     },
     "/api/stacks/{orgName}/{projectName}/{stackName}/config": {
       "delete": {
-        "description": "Removes the service-managed configuration for a stack, including the secrets provider settings, encrypted key, encryption salt, and ESC environment reference. If stack configuration is returned by the API, it is used in place of the local stack config file (e.g. Pulumi.[stack].yaml). Deleting the config causes the CLI to fall back to the local config file. Returns 204 with no content on success.",
+        "description": "Removes the service-managed configuration for a stack — the ESC environment reference that points the stack at a service-backed configuration. If stack configuration is returned by the API, it is used in place of the local stack config file (e.g. Pulumi.[stack].yaml). Deleting the config causes the CLI to fall back to the local config file. Returns 204 with no content on success.",
         "operationId": "DeleteStackConfig",
         "parameters": [
           {
@@ -53608,7 +54190,7 @@
         ]
       },
       "get": {
-        "description": "Retrieves the service-managed configuration for a stack. The response includes the ESC environment reference, secrets provider type, encrypted key, and encryption salt. If stack configuration is returned by the API, it is used in place of the local stack config file (e.g. Pulumi.[stack].yaml). Returns 404 if no service-managed configuration exists for the stack.",
+        "description": "Retrieves the service-managed configuration for a stack. The response includes the ESC environment reference that points the stack at a service-backed configuration. If stack configuration is returned by the API, it is used in place of the local stack config file (e.g. Pulumi.[stack].yaml). Returns 404 if no service-managed configuration exists for the stack. The 'secretsProvider', 'encryptedKey', and 'encryptionSalt' fields are deprecated and should be ignored by new callers; they may carry legacy values from existing rows but no longer reflect any service behavior.",
         "operationId": "GetStackConfig",
         "parameters": [
           {
@@ -53661,7 +54243,7 @@
         ]
       },
       "put": {
-        "description": "Updates the service-managed configuration for a stack. The request body may include the ESC environment reference, secrets provider type, encrypted key, and encryption salt. If stack configuration is returned by the API, it is used in place of the local stack config file (e.g. Pulumi.[stack].yaml). Returns the updated configuration object. Returns 400 if the environment reference is invalid or not found.",
+        "description": "Updates the service-managed configuration for a stack. The request body sets the ESC environment reference that points the stack at a service-backed configuration. If stack configuration is returned by the API, it is used in place of the local stack config file (e.g. Pulumi.[stack].yaml). Returns the updated configuration object. Returns 400 if the environment reference is invalid or not found. The 'secretsProvider', 'encryptedKey', and 'encryptionSalt' fields are deprecated; new callers should omit them.",
         "operationId": "UpdateStackConfig",
         "parameters": [
           {

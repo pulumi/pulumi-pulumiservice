@@ -15,34 +15,34 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 
 /**
- * Updates the service-managed configuration for a stack. The request body may include the ESC environment reference, secrets provider type, encrypted key, and encryption salt. If stack configuration is returned by the API, it is used in place of the local stack config file (e.g. Pulumi.[stack].yaml). Returns the updated configuration object. Returns 400 if the environment reference is invalid or not found.
+ * Updates the service-managed configuration for a stack. The request body sets the ESC environment reference that points the stack at a service-backed configuration. If stack configuration is returned by the API, it is used in place of the local stack config file (e.g. Pulumi.[stack].yaml). Returns the updated configuration object. Returns 400 if the environment reference is invalid or not found. The &#39;secretsProvider&#39;, &#39;encryptedKey&#39;, and &#39;encryptionSalt&#39; fields are deprecated; new callers should omit them.
  * 
  */
 @ResourceType(type="pulumiservice:api/stacks:Config")
 public class Config extends com.pulumi.resources.CustomResource {
     /**
-     * The KMS-encrypted ciphertext for the data key used for secrets encryption. Only used for cloud-based secrets providers.
+     * Deprecated: this field is no longer used by the service. Stacks that use a service-backed configuration store all config (including secrets) in ESC, which uses its own encryption. New callers should omit this field.
      * 
      */
     @Export(name="encryptedKey", refs={String.class}, tree="[0]")
     private Output</* @Nullable */ String> encryptedKey;
 
     /**
-     * @return The KMS-encrypted ciphertext for the data key used for secrets encryption. Only used for cloud-based secrets providers.
+     * @return Deprecated: this field is no longer used by the service. Stacks that use a service-backed configuration store all config (including secrets) in ESC, which uses its own encryption. New callers should omit this field.
      * 
      */
     public Output<Optional<String>> encryptedKey() {
         return Codegen.optional(this.encryptedKey);
     }
     /**
-     * The stack&#39;s base64-encoded encryption salt. Only used for passphrase-based secrets providers.
+     * Deprecated: this field is no longer used by the service. Stacks that use a service-backed configuration store all config (including secrets) in ESC, which uses its own encryption. New callers should omit this field.
      * 
      */
     @Export(name="encryptionSalt", refs={String.class}, tree="[0]")
     private Output</* @Nullable */ String> encryptionSalt;
 
     /**
-     * @return The stack&#39;s base64-encoded encryption salt. Only used for passphrase-based secrets providers.
+     * @return Deprecated: this field is no longer used by the service. Stacks that use a service-backed configuration store all config (including secrets) in ESC, which uses its own encryption. New callers should omit this field.
      * 
      */
     public Output<Optional<String>> encryptionSalt() {
@@ -63,14 +63,14 @@ public class Config extends com.pulumi.resources.CustomResource {
         return this.environment;
     }
     /**
-     * The stack&#39;s secrets provider.
+     * Deprecated: this field is no longer used by the service. Stacks that use a service-backed configuration store all config (including secrets) in ESC, which uses its own encryption. New callers should omit this field.
      * 
      */
     @Export(name="secretsProvider", refs={String.class}, tree="[0]")
     private Output</* @Nullable */ String> secretsProvider;
 
     /**
-     * @return The stack&#39;s secrets provider.
+     * @return Deprecated: this field is no longer used by the service. Stacks that use a service-backed configuration store all config (including secrets) in ESC, which uses its own encryption. New callers should omit this field.
      * 
      */
     public Output<Optional<String>> secretsProvider() {

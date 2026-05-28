@@ -50,6 +50,12 @@ namespace Pulumi.PulumiService.Api
         public Output<string> Role { get; private set; } = null!;
 
         /// <summary>
+        /// Deprecated. Use GetOrganizationMemberTeams to list teams.
+        /// </summary>
+        [Output("teams")]
+        public Output<ImmutableArray<string>> Teams { get; private set; } = null!;
+
+        /// <summary>
         /// The user information for this organization member.
         /// </summary>
         [Output("user")]

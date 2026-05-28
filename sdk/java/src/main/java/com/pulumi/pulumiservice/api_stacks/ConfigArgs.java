@@ -17,14 +17,14 @@ public final class ConfigArgs extends com.pulumi.resources.ResourceArgs {
     public static final ConfigArgs Empty = new ConfigArgs();
 
     /**
-     * The KMS-encrypted ciphertext for the data key used for secrets encryption. Only used for cloud-based secrets providers.
+     * Deprecated: this field is no longer used by the service. Stacks that use a service-backed configuration store all config (including secrets) in ESC, which uses its own encryption. New callers should omit this field.
      * 
      */
     @Import(name="encryptedKey")
     private @Nullable Output<String> encryptedKey;
 
     /**
-     * @return The KMS-encrypted ciphertext for the data key used for secrets encryption. Only used for cloud-based secrets providers.
+     * @return Deprecated: this field is no longer used by the service. Stacks that use a service-backed configuration store all config (including secrets) in ESC, which uses its own encryption. New callers should omit this field.
      * 
      */
     public Optional<Output<String>> encryptedKey() {
@@ -32,14 +32,14 @@ public final class ConfigArgs extends com.pulumi.resources.ResourceArgs {
     }
 
     /**
-     * The stack&#39;s base64-encoded encryption salt. Only used for passphrase-based secrets providers.
+     * Deprecated: this field is no longer used by the service. Stacks that use a service-backed configuration store all config (including secrets) in ESC, which uses its own encryption. New callers should omit this field.
      * 
      */
     @Import(name="encryptionSalt")
     private @Nullable Output<String> encryptionSalt;
 
     /**
-     * @return The stack&#39;s base64-encoded encryption salt. Only used for passphrase-based secrets providers.
+     * @return Deprecated: this field is no longer used by the service. Stacks that use a service-backed configuration store all config (including secrets) in ESC, which uses its own encryption. New callers should omit this field.
      * 
      */
     public Optional<Output<String>> encryptionSalt() {
@@ -92,14 +92,14 @@ public final class ConfigArgs extends com.pulumi.resources.ResourceArgs {
     }
 
     /**
-     * The stack&#39;s secrets provider.
+     * Deprecated: this field is no longer used by the service. Stacks that use a service-backed configuration store all config (including secrets) in ESC, which uses its own encryption. New callers should omit this field.
      * 
      */
     @Import(name="secretsProvider")
     private @Nullable Output<String> secretsProvider;
 
     /**
-     * @return The stack&#39;s secrets provider.
+     * @return Deprecated: this field is no longer used by the service. Stacks that use a service-backed configuration store all config (including secrets) in ESC, which uses its own encryption. New callers should omit this field.
      * 
      */
     public Optional<Output<String>> secretsProvider() {
@@ -152,7 +152,7 @@ public final class ConfigArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param encryptedKey The KMS-encrypted ciphertext for the data key used for secrets encryption. Only used for cloud-based secrets providers.
+         * @param encryptedKey Deprecated: this field is no longer used by the service. Stacks that use a service-backed configuration store all config (including secrets) in ESC, which uses its own encryption. New callers should omit this field.
          * 
          * @return builder
          * 
@@ -163,7 +163,7 @@ public final class ConfigArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param encryptedKey The KMS-encrypted ciphertext for the data key used for secrets encryption. Only used for cloud-based secrets providers.
+         * @param encryptedKey Deprecated: this field is no longer used by the service. Stacks that use a service-backed configuration store all config (including secrets) in ESC, which uses its own encryption. New callers should omit this field.
          * 
          * @return builder
          * 
@@ -173,7 +173,7 @@ public final class ConfigArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param encryptionSalt The stack&#39;s base64-encoded encryption salt. Only used for passphrase-based secrets providers.
+         * @param encryptionSalt Deprecated: this field is no longer used by the service. Stacks that use a service-backed configuration store all config (including secrets) in ESC, which uses its own encryption. New callers should omit this field.
          * 
          * @return builder
          * 
@@ -184,7 +184,7 @@ public final class ConfigArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param encryptionSalt The stack&#39;s base64-encoded encryption salt. Only used for passphrase-based secrets providers.
+         * @param encryptionSalt Deprecated: this field is no longer used by the service. Stacks that use a service-backed configuration store all config (including secrets) in ESC, which uses its own encryption. New callers should omit this field.
          * 
          * @return builder
          * 
@@ -257,7 +257,7 @@ public final class ConfigArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param secretsProvider The stack&#39;s secrets provider.
+         * @param secretsProvider Deprecated: this field is no longer used by the service. Stacks that use a service-backed configuration store all config (including secrets) in ESC, which uses its own encryption. New callers should omit this field.
          * 
          * @return builder
          * 
@@ -268,7 +268,7 @@ public final class ConfigArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param secretsProvider The stack&#39;s secrets provider.
+         * @param secretsProvider Deprecated: this field is no longer used by the service. Stacks that use a service-backed configuration store all config (including secrets) in ESC, which uses its own encryption. New callers should omit this field.
          * 
          * @return builder
          * 

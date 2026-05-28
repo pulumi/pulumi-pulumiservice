@@ -148,6 +148,7 @@ class OrganizationMember(pulumi.CustomResource):
             __props__.__dict__["fga_role"] = None
             __props__.__dict__["known_to_pulumi"] = None
             __props__.__dict__["links"] = None
+            __props__.__dict__["teams"] = None
             __props__.__dict__["user"] = None
             __props__.__dict__["virtual_admin"] = None
         super(OrganizationMember, __self__).__init__(
@@ -177,6 +178,7 @@ class OrganizationMember(pulumi.CustomResource):
         __props__.__dict__["known_to_pulumi"] = None
         __props__.__dict__["links"] = None
         __props__.__dict__["role"] = None
+        __props__.__dict__["teams"] = None
         __props__.__dict__["user"] = None
         __props__.__dict__["virtual_admin"] = None
         return OrganizationMember(resource_name, opts=opts, __props__=__props__)
@@ -220,6 +222,14 @@ class OrganizationMember(pulumi.CustomResource):
         **Deprecated:** Use `fgaRole` instead. The member's built-in role within the organization. For members assigned a custom role, this is the closest built-in projection (`member`, `admin`, or `billingManager`) and may lose detail; `fgaRole` is authoritative.
         """
         return pulumi.get(self, "role")
+
+    @_builtins.property
+    @pulumi.getter
+    def teams(self) -> pulumi.Output[Optional[Sequence[_builtins.str]]]:
+        """
+        Deprecated. Use GetOrganizationMemberTeams to list teams.
+        """
+        return pulumi.get(self, "teams")
 
     @_builtins.property
     @pulumi.getter
