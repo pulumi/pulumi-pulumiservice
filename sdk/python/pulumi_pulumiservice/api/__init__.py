@@ -13,6 +13,8 @@ from .org_template_collection import *
 from .organization_member import *
 from .organization_webhook import *
 from .policy_group import *
+from .policy_group_insights_account_attachment import *
+from .policy_group_stack_attachment import *
 from .role import *
 
 # Make subpackages available:

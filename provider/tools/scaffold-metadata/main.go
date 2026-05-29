@@ -44,6 +44,12 @@ import (
 // pathParamPattern matches "{name}" placeholders in OpenAPI path strings.
 var pathParamPattern = regexp.MustCompile(`\{([^/{}]+)\}`)
 
+// OpenAPI schema "type" discriminator values.
+const (
+	typeArray  = "array"
+	typeString = "string"
+)
+
 // unorderedFieldNames is the heuristic set of Pulumi-side field names that the
 // scaffolder treats as set-like by default. Conservative — fields here have
 // names that strongly imply order-insensitivity (tag lists, scope lists,
@@ -222,6 +228,54 @@ func main() {
 		doc.Resources[tok] = merged
 	}
 
+	// Attachment pass: any resource whose update op carries symmetric
+	// add<X>/remove<X> body fields (an imperative membership edge) gets a
+	// synthesized attachment resource per pair. Spec-wide and parent-agnostic
+	attachmentTokens := map[string]bool{}
+	attachAdded, attachChanged, attachSkipped := 0, 0, 0
+	for _, tok := range slices.Sorted(maps.Keys(candidates)) {
+		if excluded[tok] {
+			continue
+		}
+		ops := candidates[tok]
+		updOp, readOp := opOrNil(parsedSpec, ops.Update), opOrNil(parsedSpec, ops.Read)
+		if updOp == nil || readOp == nil {
+			continue
+		}
+		parentToken := deriveToken(doc.Package, tok, modules[tok])
+		pairs, skips := detectAttachmentPairs(parsedSpec, updOp, readOp)
+		attachSkipped += skips
+		for _, pair := range pairs {
+			atTok := tok + pair.EdgeStem + "Attachment"
+			if excluded[atTok] {
+				continue
+			}
+			_, existed := doc.Resources[atTok]
+			merged, changed, err := mergeAttachment(doc.Resources[atTok], attachmentDerivation{
+				Token:           parentToken + pair.EdgeStem + "Attachment",
+				MutationOp:      ops.Update,
+				ReadOp:          ops.Read,
+				AddField:        pair.AddField,
+				RemoveField:     pair.RemoveField,
+				MembershipField: pair.MembershipField,
+				MatchKey:        pair.MatchKey,
+				IDFormat:        attachmentIDFormat(updOp, pair.MatchKey),
+			})
+			if err != nil {
+				fail("merge attachment %s: %v", atTok, err)
+			}
+			doc.Resources[atTok] = merged
+			attachmentTokens[atTok] = true
+			if !existed {
+				added++
+				attachAdded++
+			} else if changed {
+				updated++
+				attachChanged++
+			}
+		}
+	}
+
 	// Tokens that survived in metadata.json but didn't make it into candidates
 	// are reported as orphans — typically a spec change or heuristic miss.
 	var orphans []string
@@ -229,7 +283,7 @@ func main() {
 		if _, ok := candidates[tok]; ok {
 			continue
 		}
-		if excluded[tok] {
+		if excluded[tok] || attachmentTokens[tok] {
 			continue
 		}
 		orphans = append(orphans, tok)
@@ -248,6 +302,8 @@ func main() {
 	fmt.Fprintf(os.Stderr, "  excluded (_excluded):      %d\n", len(excluded))
 	fmt.Fprintf(os.Stderr, "  deprecated (kept):         %d\n", len(stats.deprecated))
 	fmt.Fprintf(os.Stderr, "  skipped (no Create+Read|Delete): %d\n", len(stats.skipped))
+	fmt.Fprintf(os.Stderr, "  attachment resources emitted: %d new, %d updated (add/remove pairs skipped: %d)\n",
+		attachAdded, attachChanged, attachSkipped)
 	if len(orphans) > 0 {
 		fmt.Fprintf(os.Stderr, "  orphans (in metadata.json, not derived from spec): %d\n", len(orphans))
 		for _, o := range orphans {
@@ -688,6 +744,341 @@ func requestHasField(spec *rest.Spec, op *rest.Operation, field string) bool {
 	}
 	_, has := flattenedProps(spec, op.RequestRef)[field]
 	return has
+}
+
+// --- Attachment detection ------------------------------------------------
+//
+// An attachment edge is an imperative membership pattern: an update op whose
+// request body carries paired add<X>/remove<X> fields of the same type, where
+// that type also appears as a list in the read op's response. The pair becomes
+// a synthesized attachment resource (Create=add<X>, Delete=remove<X>,
+// Read=membership test). This is parent-agnostic — it fires on any resource
+// in the spec that matches the shape, not just PolicyGroup.
+
+type attachmentPair struct {
+	EdgeStem        string   // CamelCase stem, e.g. "Stack" from "addStack"
+	AddField        string   // "addStack"
+	RemoveField     string   // "removeStack"
+	MembershipField string   // read-response list field, matched by element type
+	MatchKey        []string // edge fields identifying one element (sorted)
+}
+
+type attachmentDerivation struct {
+	Token           string
+	MutationOp      string
+	ReadOp          string
+	AddField        string
+	RemoveField     string
+	MembershipField string
+	MatchKey        []string
+	IDFormat        string
+}
+
+// detectAttachmentPairs scans an update op's request body for symmetric
+// add/remove field pairs and returns the ones that resolve to a clean edge.
+// The second return is the count of near-miss pairs deliberately skipped
+// (logged to stderr) so partial coverage is never silent.
+func detectAttachmentPairs(spec *rest.Spec, updOp, readOp *rest.Operation) ([]attachmentPair, int) {
+	body := flattenedProps(spec, updOp.RequestRef)
+	resp := flattenedProps(spec, readOp.ResponseRef)
+
+	addFields := make([]string, 0, len(body))
+	for k := range body {
+		if _, ok := attachmentStem(k, "add"); ok {
+			addFields = append(addFields, k)
+		}
+	}
+	sort.Strings(addFields)
+
+	var pairs []attachmentPair
+	skipped := 0
+	for _, addField := range addFields {
+		stem, _ := attachmentStem(addField, "add")
+		removeField := "remove" + stem
+		if _, ok := body[removeField]; !ok {
+			continue // not a paired add/remove; not an edge at all
+		}
+		addRef, removeRef := refOf(body[addField]), refOf(body[removeField])
+		if addRef == "" || addRef != removeRef {
+			fmt.Fprintf(os.Stderr, "  attachment skip %s on %s: add/remove types differ\n", stem, updOp.ID)
+			skipped++
+			continue
+		}
+		// Resolve the membership list + the fields that identify one element.
+		// Two shapes, both derived from the spec — no hand-tuning per resource:
+		//   object: the read response has a list whose element type IS the add
+		//     type, and that type is a flat all-required-string identity (e.g.
+		//     stacks -> AppPulumiStackReference{name,routingProject}).
+		//   scalar: no such typed list, but the add type carries a `name` and
+		//     the response has a lone []string list holding those names (e.g.
+		//     accounts -> []string). The spec types these membership lists as
+		//     bare strings, so the link is by-name, not by-$ref.
+		var membership string
+		var matchKey []string
+		if m := findListFieldByItemRef(resp, addRef); m != "" {
+			mk, ok := pureStringIdentity(spec, addRef)
+			if !ok {
+				fmt.Fprintf(os.Stderr, "  attachment skip %s on %s: edge type isn't a flat all-required-string identity\n",
+					stem, updOp.ID)
+				skipped++
+				continue
+			}
+			membership, matchKey = m, mk
+		} else if nameField := stringField(spec, addRef, "name"); nameField != "" {
+			if scalarList := findLoneScalarList(resp); scalarList != "" {
+				membership, matchKey = scalarList, []string{nameField}
+			}
+		}
+		if membership == "" {
+			fmt.Fprintf(os.Stderr, "  attachment skip %s on %s: no membership list in %s matches the edge\n",
+				stem, updOp.ID, readOp.ID)
+			skipped++
+			continue
+		}
+		// An edge field sharing a parent path-param name can't round-trip: the
+		// path value would shadow the edge value in both body and match.
+		if clash := pathParamClash(updOp, matchKey); clash != "" {
+			fmt.Fprintf(os.Stderr, "  attachment skip %s on %s: edge field %q collides with a path parameter\n",
+				stem, updOp.ID, clash)
+			skipped++
+			continue
+		}
+		pairs = append(pairs, attachmentPair{
+			EdgeStem:        stem,
+			AddField:        addField,
+			RemoveField:     removeField,
+			MembershipField: membership,
+			MatchKey:        matchKey,
+		})
+	}
+	return pairs, skipped
+}
+
+// stringField returns field if ref's schema declares it as a string property,
+// else "". Used to find the scalar edge identity (an account's `name`).
+func stringField(spec *rest.Spec, ref, field string) string {
+	sch, ok := spec.ResolveSchema(ref)
+	if !ok {
+		return ""
+	}
+	props, ok := sch["properties"].(map[string]any)
+	if !ok {
+		return ""
+	}
+	p, ok := props[field].(map[string]any)
+	if !ok {
+		return ""
+	}
+	if t, _ := p["type"].(string); t == typeString {
+		return field
+	}
+	return ""
+}
+
+// findLoneScalarList returns the name of the response's single []string list,
+// or "" when there are zero or several (ambiguous → defer). Sorted iteration
+// keeps the choice deterministic.
+func findLoneScalarList(props map[string]any) string {
+	found := ""
+	for _, name := range slices.Sorted(maps.Keys(props)) {
+		m, ok := props[name].(map[string]any)
+		if !ok {
+			continue
+		}
+		if t, _ := m["type"].(string); t != typeArray {
+			continue
+		}
+		items, ok := m["items"].(map[string]any)
+		if !ok {
+			continue
+		}
+		if _, hasRef := items["$ref"]; hasRef {
+			continue
+		}
+		if it, _ := items["type"].(string); it == typeString {
+			if found != "" {
+				return "" // ambiguous
+			}
+			found = name
+		}
+	}
+	return found
+}
+
+// pathParamClash returns the first edge field whose name matches one of the
+// mutation op's path parameters, or "" when there's no collision.
+func pathParamClash(op *rest.Operation, edgeFields []string) string {
+	params := map[string]bool{}
+	for _, pp := range pathParamsOf(op) {
+		params[pp] = true
+	}
+	for _, f := range edgeFields {
+		if params[f] {
+			return f
+		}
+	}
+	return ""
+}
+
+// attachmentStem returns the CamelCase remainder after prefix, requiring the
+// next char to be uppercase so "addStack" matches but "address" doesn't.
+func attachmentStem(field, prefix string) (string, bool) {
+	if !strings.HasPrefix(field, prefix) {
+		return "", false
+	}
+	rest := field[len(prefix):]
+	if rest == "" || !unicode.IsUpper(rune(rest[0])) {
+		return "", false
+	}
+	return rest, true
+}
+
+func refOf(prop any) string {
+	m, ok := prop.(map[string]any)
+	if !ok {
+		return ""
+	}
+	r, _ := m["$ref"].(string)
+	return r
+}
+
+// findListFieldByItemRef returns the name of the array property whose element
+// $ref equals ref. Matched by type, not name (addPolicyPack → appliedPolicyPacks,
+// not policyPacks). Sorted iteration keeps the choice deterministic.
+func findListFieldByItemRef(props map[string]any, ref string) string {
+	for _, name := range slices.Sorted(maps.Keys(props)) {
+		m, ok := props[name].(map[string]any)
+		if !ok {
+			continue
+		}
+		if t, _ := m["type"].(string); t != typeArray {
+			continue
+		}
+		items, ok := m["items"].(map[string]any)
+		if !ok {
+			continue
+		}
+		if r, _ := items["$ref"].(string); r == ref {
+			return name
+		}
+	}
+	return ""
+}
+
+// pureStringIdentity returns the sorted field names of ref's schema iff it is a
+// flat object whose every property is a required string — i.e. the whole object
+// is the edge's identity, so it round-trips cleanly through an idFormat and a
+// membership match. Anything with optional or non-string fields (e.g. a policy
+// pack carrying config) is rejected for auto-emit and left for curation.
+func pureStringIdentity(spec *rest.Spec, ref string) ([]string, bool) {
+	sch, ok := spec.ResolveSchema(ref)
+	if !ok {
+		return nil, false
+	}
+	if _, hasAllOf := sch["allOf"]; hasAllOf {
+		return nil, false
+	}
+	props, ok := sch["properties"].(map[string]any)
+	if !ok || len(props) == 0 {
+		return nil, false
+	}
+	required := map[string]bool{}
+	if rr, ok := sch["required"].([]any); ok {
+		for _, r := range rr {
+			if s, ok := r.(string); ok {
+				required[s] = true
+			}
+		}
+	}
+	if len(required) != len(props) {
+		return nil, false
+	}
+	keys := make([]string, 0, len(props))
+	for k, v := range props {
+		if !required[k] {
+			return nil, false
+		}
+		vm, ok := v.(map[string]any)
+		if !ok {
+			return nil, false
+		}
+		if t, _ := vm["type"].(string); t != typeString {
+			return nil, false
+		}
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	return keys, true
+}
+
+// attachmentIDFormat builds the composite ID template: the mutation op's path
+// params (parent identity) followed by the edge's MatchKey fields. Attachments
+// carry no renames, so wire names are used verbatim.
+func attachmentIDFormat(updOp *rest.Operation, matchKey []string) string {
+	var parts []string
+	for _, m := range pathParamPattern.FindAllStringSubmatch(updOp.Path, -1) {
+		parts = append(parts, "{"+m[1]+"}")
+	}
+	for _, k := range matchKey {
+		parts = append(parts, "{"+k+"}")
+	}
+	return strings.Join(parts, "/")
+}
+
+// mergeAttachment layers a derived attachment descriptor onto an existing
+// entry: the attachment block is replaced wholesale (derived), while token,
+// idFormat, and deleteBeforeReplace follow write-if-absent so hand edits stick.
+func mergeAttachment(existing json.RawMessage, d attachmentDerivation) (json.RawMessage, bool, error) {
+	var entry map[string]any
+	if len(existing) > 0 {
+		if err := json.Unmarshal(existing, &entry); err != nil {
+			return nil, false, err
+		}
+	}
+	if entry == nil {
+		entry = map[string]any{}
+	}
+
+	matchKey := make([]any, len(d.MatchKey))
+	for i, k := range d.MatchKey {
+		matchKey[i] = k
+	}
+	newAtt := map[string]any{
+		"mutationOp":      d.MutationOp,
+		"readOp":          d.ReadOp,
+		"addField":        d.AddField,
+		"removeField":     d.RemoveField,
+		"membershipField": d.MembershipField,
+		"matchKey":        matchKey,
+	}
+	prevAtt, _ := json.Marshal(entry["attachment"])
+	curAtt, _ := json.Marshal(newAtt)
+	changed := string(prevAtt) != string(curAtt)
+	entry["attachment"] = newAtt
+
+	if _, has := entry["token"]; !has {
+		entry["token"] = d.Token
+	}
+	if d.IDFormat != "" {
+		if existing, has := entry["idFormat"].(string); has {
+			if existing != d.IDFormat {
+				fmt.Fprintf(os.Stderr,
+					"  INFO: idFormat pinned at %q; heuristic now suggests %q (preserving pin)\n",
+					existing, d.IDFormat)
+			}
+		} else {
+			entry["idFormat"] = d.IDFormat
+		}
+	}
+	if _, has := entry["deleteBeforeReplace"]; !has {
+		entry["deleteBeforeReplace"] = true
+	}
+
+	encoded, err := encodeStable(entry)
+	if err != nil {
+		return nil, false, err
+	}
+	return encoded, changed, nil
 }
 
 // inferOutputsExclude flags response-body envelope fields that collide with

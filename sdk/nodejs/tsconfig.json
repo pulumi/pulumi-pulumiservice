@@ -59,6 +59,8 @@
         "api/organizationMember.ts",
         "api/organizationWebhook.ts",
         "api/policyGroup.ts",
+        "api/policyGroupInsightsAccountAttachment.ts",
+        "api/policyGroupStackAttachment.ts",
         "api/role.ts",
         "api/services/index.ts",
         "api/services/item.ts",

@@ -80,10 +80,47 @@ type ResourceMeta struct {
 	// falls back to the create op's description.
 	Description string `json:"description,omitempty"`
 
+	// Attachment, when set, marks this entry as an attachment resource: a
+	// single membership edge managed through one imperative mutation op
+	// whose request body carries paired add/remove fields. The default 1:1
+	// CRUD path doesn't apply; Create/Read/Delete take the attachment branch.
+	Attachment *AttachmentMeta `json:"attachment,omitempty"`
+
 	// TODO
 	// Examples are PCL snippets rendered as `## Example Usage` blocks.
 	// SDK codegen runs `pulumi convert` per target language at gen time.
 	Examples []string `json:"examples,omitempty"`
+}
+
+// AttachmentMeta describes a membership edge whose lifecycle maps onto a
+// single mutation op with paired add/remove body fields (e.g. UpdatePolicyGroup
+// with addStack/removeStack). Create sends {AddField: <edge>}, Delete sends
+// {RemoveField: <edge>}, and Read GETs the parent via ReadOp and checks whether
+// the edge appears in the MembershipField list. This is the imperative-API shape
+// that the generic 1:1 CRUD machinery can't model; it's detected from the spec
+// by scaffold-metadata, not hand-written per resource.
+type AttachmentMeta struct {
+	// MutationOp is the operationId used for both Create (with AddField) and
+	// Delete (with RemoveField).
+	MutationOp string `json:"mutationOp"`
+
+	// AddField / RemoveField are the request-body field names the edge is
+	// nested under for Create and Delete respectively.
+	AddField    string `json:"addField"`
+	RemoveField string `json:"removeField"`
+
+	// ReadOp is the parent GET operationId. MembershipField names the list
+	// field in its response that holds the edges.
+	ReadOp          string `json:"readOp"`
+	MembershipField string `json:"membershipField"`
+
+	// MatchKey names the edge fields (wire-side) that identify one membership
+	// element within MembershipField. Read matches an element when every
+	// MatchKey field equals the corresponding resource input. When the
+	// membership elements are scalars (e.g. a list of names rather than
+	// objects), MatchKey names exactly one field, compared directly to each
+	// scalar element.
+	MatchKey []string `json:"matchKey"`
 }
 
 // Operations names the operationIds for each CRUD verb.

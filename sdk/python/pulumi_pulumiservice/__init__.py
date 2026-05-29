@@ -76,6 +76,8 @@ _utilities.register(
    "pulumiservice:api:OrganizationMember": "OrganizationMember",
    "pulumiservice:api:OrganizationWebhook": "OrganizationWebhook",
    "pulumiservice:api:PolicyGroup": "PolicyGroup",
+   "pulumiservice:api:PolicyGroupInsightsAccountAttachment": "PolicyGroupInsightsAccountAttachment",
+   "pulumiservice:api:PolicyGroupStackAttachment": "PolicyGroupStackAttachment",
    "pulumiservice:api:Role": "Role"
   }
  },

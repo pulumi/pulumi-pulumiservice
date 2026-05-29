@@ -99,6 +99,17 @@ var apiCases = []apiCase{
 		FullE2E: true, // create=NewPolicyGroup, update=BatchUpdatePolicyGroup
 	},
 	{
+		Name:    "policy-group-stack-attachment",
+		Config:  policyGroupStackAttachmentConfig,
+		FullE2E: true, // create=addStack, delete=removeStack, read=membership check
+	},
+	{
+		Name:           "policy-group-account-attachment",
+		Config:         policyGroupAccountAttachmentConfig,
+		PreviewOnlyAll: true, // Insights account creation needs real cloud creds in the ESC env.
+		SkipLang:       yamlOnlyLangs("policy-group-account-attachment example is yaml-only"),
+	},
+	{
 		Name:    "environments",
 		Config:  environmentsConfig,
 		FullE2E: true,
@@ -717,6 +728,26 @@ func policyGroupsConfig() map[string]string {
 	return map[string]string{
 		"organizationName": ServiceProviderTestOrg,
 		"groupName":        "api-pg-" + generateRandomFiveDigits(),
+	}
+}
+
+func policyGroupStackAttachmentConfig() map[string]string {
+	suffix := generateRandomFiveDigits()
+	return map[string]string{
+		"organizationName": ServiceProviderTestOrg,
+		"groupName":        "api-pg-attach-" + suffix,
+		"projectName":      "api-pg-attach-proj-" + suffix,
+		"stackName":        "dev-" + suffix,
+	}
+}
+
+func policyGroupAccountAttachmentConfig() map[string]string {
+	suffix := generateRandomFiveDigits()
+	return map[string]string{
+		"organizationName":    ServiceProviderTestOrg,
+		"groupName":           "api-pg-acct-grp-" + suffix,
+		"accountSuffix":       suffix,
+		"insightsEnvironment": "insights/credentials",
 	}
 }
 
