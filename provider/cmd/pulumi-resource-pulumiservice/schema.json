@@ -4606,6 +4606,112 @@
         "orgName"
       ]
     },
+    "pulumiservice:api:PolicyGroupInsightsAccountAttachment": {
+      "description": "Manages a single membership edge through UpdatePolicyGroup (addInsightsAccount / removeInsightsAccount).",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name"
+        },
+        "policyGroup": {
+          "type": "string",
+          "description": "The policy group name"
+        }
+      },
+      "type": "object",
+      "required": [
+        "name",
+        "orgName",
+        "policyGroup"
+      ],
+      "inputProperties": {
+        "name": {
+          "type": "string",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "policyGroup": {
+          "type": "string",
+          "description": "The policy group name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        }
+      },
+      "requiredInputs": [
+        "name",
+        "orgName",
+        "policyGroup"
+      ]
+    },
+    "pulumiservice:api:PolicyGroupStackAttachment": {
+      "description": "Manages a single membership edge through UpdatePolicyGroup (addStack / removeStack).",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name"
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name"
+        },
+        "policyGroup": {
+          "type": "string",
+          "description": "The policy group name"
+        },
+        "routingProject": {
+          "type": "string",
+          "description": "The routing project"
+        }
+      },
+      "type": "object",
+      "required": [
+        "name",
+        "orgName",
+        "policyGroup",
+        "routingProject"
+      ],
+      "inputProperties": {
+        "name": {
+          "type": "string",
+          "description": "The name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "policyGroup": {
+          "type": "string",
+          "description": "The policy group name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "routingProject": {
+          "type": "string",
+          "description": "The routing project",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        }
+      },
+      "requiredInputs": [
+        "name",
+        "orgName",
+        "policyGroup",
+        "routingProject"
+      ]
+    },
     "pulumiservice:api:Role": {
       "description": "Creates a new custom role for an organization. Custom roles define fine-grained permission sets that can be assigned to organization members and teams, enabling precise access control beyond the built-in admin and member roles. Optionally, an associated policy and role binding can be created alongside the role. Role definitions are subject to two limits: a permission descriptor group may contain at most 500 entries (each directly-specified entity counts as one entry), and the total serialized size of the role definition may not exceed 1 MB. Exceeding either limit returns a 400 error. If you need to grant access to more than 500 individually listed resources, use tag-based (ABAC) rules instead.",
       "properties": {

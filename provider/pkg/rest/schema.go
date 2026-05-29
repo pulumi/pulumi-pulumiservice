@@ -53,6 +53,9 @@ func BuildSchema(spec *Spec, metadata *Metadata, pkg string) (*schema.PackageSpe
 }
 
 func buildResource(spec *Spec, _ *Metadata, _ string, rm ResourceMeta) (*schema.ResourceSpec, error) {
+	if rm.Attachment != nil {
+		return buildAttachmentResource(spec, rm)
+	}
 	createID := rm.Operations.Create
 	readID := rm.Operations.Read
 	if createID == "" {
@@ -197,6 +200,184 @@ func buildResource(spec *Spec, _ *Metadata, _ string, rm ResourceMeta) (*schema.
 		rs.Aliases = append(rs.Aliases, schema.AliasSpec{Type: alias})
 	}
 	return rs, nil
+}
+
+// buildAttachmentResource generates the schema for an attachment resource:
+// inputs are the mutation op's parent path params plus the edge fields (the
+// AddField's object schema), all replace-on-change. Outputs mirror inputs,
+// matching what Read reconstructs from the parent's membership list.
+func buildAttachmentResource(spec *Spec, rm ResourceMeta) (*schema.ResourceSpec, error) {
+	am := rm.Attachment
+	mut, ok := spec.Op(am.MutationOp)
+	if !ok {
+		return nil, fmt.Errorf("attachment.mutationOp %q not found in spec", am.MutationOp)
+	}
+	if _, ok := spec.Op(am.ReadOp); am.ReadOp != "" && !ok {
+		return nil, fmt.Errorf("attachment.readOp %q not found in spec", am.ReadOp)
+	}
+	if rm.IDFormat == "" {
+		return nil, fmt.Errorf("idFormat is required for attachment resources")
+	}
+
+	props := map[string]schema.PropertySpec{}
+	required := map[string]bool{}
+
+	// Parent path params (URL identity → replace-on-change).
+	for _, pp := range mut.Parameters {
+		if pp.In != inPath {
+			continue
+		}
+		name := pulumiName(pp.Name, rm.Renames)
+		ps := schema.PropertySpec{
+			TypeSpec:             schema.TypeSpec{Type: defaultParamType(pp.SchemaType)},
+			Description:          pp.Description,
+			WillReplaceOnChanges: true,
+			ReplaceOnChanges:     true,
+		}
+		applyFieldMeta(&ps, rm.Fields[name], true)
+		props[name] = ps
+		required[name] = true
+	}
+
+	// Edge inputs depend on the membership shape (derived from the spec):
+	//   object membership -> the AddField type's properties (e.g. a stack
+	//     reference's name + routingProject).
+	//   scalar membership ([]string) -> just the MatchKey field(s); the
+	//     membership list carries bare identifiers (e.g. an account name), and
+	//     the API consumes only that field even when the spec types the add
+	//     field as a fuller object.
+	var edgeProps map[string]any
+	var edgeRequired []string
+	if attachmentMembershipIsScalar(spec, am) {
+		edgeProps = map[string]any{}
+		for _, k := range am.MatchKey {
+			edgeProps[k] = map[string]any{"type": "string"}
+		}
+		edgeRequired = am.MatchKey
+	} else {
+		ep, er, e := attachmentEdgeSchema(spec, mut, am.AddField)
+		if e != nil {
+			return nil, e
+		}
+		edgeProps, edgeRequired = ep, er
+	}
+	for k, raw := range edgeProps {
+		name := pulumiName(k, rm.Renames)
+		ps := openAPIToProperty(raw)
+		ps.WillReplaceOnChanges = true
+		ps.ReplaceOnChanges = true
+		applyFieldMeta(&ps, rm.Fields[name], false)
+		if looksSecret(name) {
+			ps.Secret = true
+		}
+		props[name] = ps
+	}
+	for _, rr := range edgeRequired {
+		required[pulumiName(rr, rm.Renames)] = true
+	}
+
+	for fieldName := range rm.Fields {
+		if _, ok := props[fieldName]; !ok {
+			return nil, fmt.Errorf("metadata.fields[%q] does not match any input or output field", fieldName)
+		}
+	}
+
+	desc := rm.Description
+	if desc == "" {
+		desc = fmt.Sprintf("Manages a single membership edge through %s (%s / %s).",
+			am.MutationOp, am.AddField, am.RemoveField)
+	}
+	if len(rm.Examples) > 0 {
+		desc = appendExamples(desc, rm.Examples)
+	}
+
+	// Outputs mirror inputs (Read returns the path params + edge fields).
+	outputs := make(map[string]schema.PropertySpec, len(props))
+	for k, v := range props {
+		out := v
+		out.WillReplaceOnChanges = false
+		out.ReplaceOnChanges = false
+		outputs[k] = out
+	}
+
+	rs := &schema.ResourceSpec{
+		ObjectTypeSpec: schema.ObjectTypeSpec{
+			Type:        "object",
+			Description: desc,
+			Properties:  outputs,
+			Required:    sortedKeys(required),
+		},
+		InputProperties: props,
+		RequiredInputs:  sortedKeys(required),
+	}
+	for _, alias := range rm.Aliases {
+		rs.Aliases = append(rs.Aliases, schema.AliasSpec{Type: alias})
+	}
+	return rs, nil
+}
+
+// attachmentMembershipIsScalar reports whether the read op's MembershipField is
+// a list of scalars (e.g. []string) rather than objects — the signal that the
+// edge is identified by a single bare value (an account name) instead of an
+// object reference.
+func attachmentMembershipIsScalar(spec *Spec, am *AttachmentMeta) bool {
+	read, ok := spec.Op(am.ReadOp)
+	if !ok || read.ResponseRef == "" {
+		return false
+	}
+	props, _, err := flattenObjectSchema(spec, read.ResponseRef)
+	if err != nil {
+		return false
+	}
+	field, ok := props[am.MembershipField].(map[string]any)
+	if !ok {
+		return false
+	}
+	items, ok := field["items"].(map[string]any)
+	if !ok {
+		return false
+	}
+	if _, hasRef := items["$ref"]; hasRef {
+		return false
+	}
+	t, _ := items["type"].(string)
+	return t != "" && t != "object"
+}
+
+// attachmentEdgeSchema returns the properties and required fields of the edge:
+// the AddField in the mutation op's request body, dereferenced if it's a $ref
+// (the common case, e.g. addStack → AppPulumiStackReference).
+func attachmentEdgeSchema(spec *Spec, mut *Operation, addField string) (map[string]any, []string, error) {
+	bodyProps, _, err := flattenObjectSchema(spec, mut.RequestRef)
+	if err != nil {
+		return nil, nil, fmt.Errorf("attachment edge: request body: %w", err)
+	}
+	raw, ok := bodyProps[addField]
+	if !ok {
+		return nil, nil, fmt.Errorf("attachment edge: addField %q not in %s request body", addField, mut.ID)
+	}
+	fieldMap, ok := raw.(map[string]any)
+	if !ok {
+		return nil, nil, fmt.Errorf("attachment edge: addField %q is not an object schema", addField)
+	}
+	if ref, ok := fieldMap["$ref"].(string); ok {
+		return flattenObjectSchema(spec, ref)
+	}
+	props := map[string]any{}
+	if pp, ok := fieldMap["properties"].(map[string]any); ok {
+		for k, v := range pp {
+			props[k] = v
+		}
+	}
+	var req []string
+	if rr, ok := fieldMap["required"].([]any); ok {
+		for _, x := range rr {
+			if s, ok := x.(string); ok {
+				req = append(req, s)
+			}
+		}
+	}
+	return props, req, nil
 }
 
 func hasYamlBody(op *Operation) bool {

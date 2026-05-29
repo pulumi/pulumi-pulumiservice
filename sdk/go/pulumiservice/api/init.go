@@ -35,6 +35,10 @@ func (m *module) Construct(ctx *pulumi.Context, name, typ, urn string) (r pulumi
 		r = &OrganizationWebhook{}
 	case "pulumiservice:api:PolicyGroup":
 		r = &PolicyGroup{}
+	case "pulumiservice:api:PolicyGroupInsightsAccountAttachment":
+		r = &PolicyGroupInsightsAccountAttachment{}
+	case "pulumiservice:api:PolicyGroupStackAttachment":
+		r = &PolicyGroupStackAttachment{}
 	case "pulumiservice:api:Role":
 		r = &Role{}
 	default:

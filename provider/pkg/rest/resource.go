@@ -113,6 +113,11 @@ func (r *Resource) resolveOp(verb, id string) (*Operation, error) {
 // Check normalizes user inputs to suppress spurious diffs: enum case-folding,
 // set-like array sorting (Unordered), and autoName generation.
 func (r *Resource) Check(_ context.Context, req p.CheckRequest) (p.CheckResponse, error) {
+	if r.meta.Attachment != nil {
+		// Attachments have no create op to normalize against; their edge inputs
+		// pass through untouched (enum folding/autoname don't apply).
+		return p.CheckResponse{Inputs: req.Inputs}, nil
+	}
 	op, _ := r.spec.Op(r.meta.Operations.Create)
 	if op == nil {
 		return p.CheckResponse{Inputs: req.Inputs}, nil
@@ -249,6 +254,9 @@ func flattenedRequestProperties(spec *Spec, op *Operation) map[string]any {
 // DetailedDiff the engine never triggers replace, so the replace semantics
 // must be spelled out here.
 func (r *Resource) Diff(_ context.Context, req p.DiffRequest) (p.DiffResponse, error) {
+	if r.meta.Attachment != nil {
+		return r.diffAttachment(req), nil
+	}
 	if mapEqual(req.OldInputs, req.Inputs) {
 		return p.DiffResponse{}, nil
 	}
@@ -329,6 +337,9 @@ func deleteKind(replace bool) p.DiffKind {
 // return a sparse body, so without read-after-create downstream resources
 // referencing read-only outputs would fail to converge until refresh.
 func (r *Resource) Create(ctx context.Context, req p.CreateRequest) (p.CreateResponse, error) {
+	if r.meta.Attachment != nil {
+		return r.createAttachment(ctx, req)
+	}
 	if req.DryRun {
 		return p.CreateResponse{Properties: req.Properties}, nil
 	}
@@ -554,6 +565,9 @@ func hasPathParams(op *Operation) bool {
 //
 // EmitOnCreate fields are preserved from prior state.
 func (r *Resource) Read(ctx context.Context, req p.ReadRequest) (p.ReadResponse, error) {
+	if r.meta.Attachment != nil {
+		return r.readAttachment(ctx, req)
+	}
 	parsed := r.parseIDIntoInputs(req.ID, req.Inputs)
 	source := mergeMaps(parsed, req.Properties)
 	returnedInputs := req.Inputs
@@ -616,6 +630,11 @@ func (r *Resource) preserveEmitOnCreate(newState, oldState property.Map) propert
 // Without a read op, fall back to merging prior state under the update
 // response so fields the update endpoint didn't echo aren't dropped.
 func (r *Resource) Update(ctx context.Context, req p.UpdateRequest) (p.UpdateResponse, error) {
+	if r.meta.Attachment != nil {
+		// Every attachment input is replace-on-change, so Diff always replaces
+		// and the engine never calls Update; reaching here is a contract break.
+		return p.UpdateResponse{}, fmt.Errorf("attachment resources are replace-only and have no update path")
+	}
 	op, err := r.resolveOp("update", r.meta.Operations.Update)
 	if err != nil {
 		return p.UpdateResponse{}, err
@@ -654,6 +673,9 @@ func (r *Resource) Update(ctx context.Context, req p.UpdateRequest) (p.UpdateRes
 // resource benefits without per-resource metadata or scaffolder support;
 // the underlying Pulumi Cloud endpoints are uniformly idempotent on this.
 func (r *Resource) Delete(ctx context.Context, req p.DeleteRequest) error {
+	if r.meta.Attachment != nil {
+		return r.deleteAttachment(ctx, req)
+	}
 	op, err := r.resolveOp("delete", r.meta.Operations.Delete)
 	if err != nil {
 		return err
@@ -691,11 +713,6 @@ func (r *Resource) execAndDecode(
 func (r *Resource) execAndDecodeSplit(
 	ctx context.Context, op *Operation, urlSrc, bodySrc property.Map,
 ) ([]byte, property.Map, error) {
-	transport, err := resolveTransport(ctx)
-	if err != nil {
-		return nil, property.Map{}, err
-	}
-
 	url, err := r.buildURL(op, urlSrc)
 	if err != nil {
 		return nil, property.Map{}, err
@@ -719,6 +736,21 @@ func (r *Resource) execAndDecodeSplit(
 			body = bytes.NewReader(bodyJSON)
 			contentType = contentJSON
 		}
+	}
+
+	return r.roundTrip(ctx, op, url, body, contentType)
+}
+
+// roundTrip performs the HTTP request against url with an already-built body
+// and decodes the response into state. Split out from execAndDecodeSplit so
+// the attachment path can supply a hand-shaped body without going through the
+// schema-driven buildRequestBody.
+func (r *Resource) roundTrip(
+	ctx context.Context, op *Operation, url string, body io.Reader, contentType string,
+) ([]byte, property.Map, error) {
+	transport, err := resolveTransport(ctx)
+	if err != nil {
+		return nil, property.Map{}, err
 	}
 
 	httpReq, err := http.NewRequestWithContext(ctx, op.Method, url, body)

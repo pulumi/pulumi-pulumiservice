@@ -40,6 +40,16 @@ export type PolicyGroup = import("./policyGroup").PolicyGroup;
 export const PolicyGroup: typeof import("./policyGroup").PolicyGroup = null as any;
 utilities.lazyLoad(exports, ["PolicyGroup"], () => require("./policyGroup"));
 
+export { PolicyGroupInsightsAccountAttachmentArgs } from "./policyGroupInsightsAccountAttachment";
+export type PolicyGroupInsightsAccountAttachment = import("./policyGroupInsightsAccountAttachment").PolicyGroupInsightsAccountAttachment;
+export const PolicyGroupInsightsAccountAttachment: typeof import("./policyGroupInsightsAccountAttachment").PolicyGroupInsightsAccountAttachment = null as any;
+utilities.lazyLoad(exports, ["PolicyGroupInsightsAccountAttachment"], () => require("./policyGroupInsightsAccountAttachment"));
+
+export { PolicyGroupStackAttachmentArgs } from "./policyGroupStackAttachment";
+export type PolicyGroupStackAttachment = import("./policyGroupStackAttachment").PolicyGroupStackAttachment;
+export const PolicyGroupStackAttachment: typeof import("./policyGroupStackAttachment").PolicyGroupStackAttachment = null as any;
+utilities.lazyLoad(exports, ["PolicyGroupStackAttachment"], () => require("./policyGroupStackAttachment"));
+
 export { RoleArgs } from "./role";
 export type Role = import("./role").Role;
 export const Role: typeof import("./role").Role = null as any;
@@ -89,6 +99,10 @@ const _module = {
                 return new OrganizationWebhook(name, <any>undefined, { urn })
             case "pulumiservice:api:PolicyGroup":
                 return new PolicyGroup(name, <any>undefined, { urn })
+            case "pulumiservice:api:PolicyGroupInsightsAccountAttachment":
+                return new PolicyGroupInsightsAccountAttachment(name, <any>undefined, { urn })
+            case "pulumiservice:api:PolicyGroupStackAttachment":
+                return new PolicyGroupStackAttachment(name, <any>undefined, { urn })
             case "pulumiservice:api:Role":
                 return new Role(name, <any>undefined, { urn })
             default:

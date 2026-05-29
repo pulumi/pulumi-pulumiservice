@@ -365,6 +365,37 @@
       },
       "token": "pulumiservice:api:PolicyGroup"
     },
+    "pulumiservice:api:PolicyGroupInsightsAccountAttachment": {
+      "attachment": {
+        "addField": "addInsightsAccount",
+        "matchKey": [
+          "name"
+        ],
+        "membershipField": "accounts",
+        "mutationOp": "UpdatePolicyGroup",
+        "readOp": "GetPolicyGroup",
+        "removeField": "removeInsightsAccount"
+      },
+      "deleteBeforeReplace": true,
+      "idFormat": "{orgName}/{policyGroup}/{name}",
+      "token": "pulumiservice:api:PolicyGroupInsightsAccountAttachment"
+    },
+    "pulumiservice:api:PolicyGroupStackAttachment": {
+      "attachment": {
+        "addField": "addStack",
+        "matchKey": [
+          "name",
+          "routingProject"
+        ],
+        "membershipField": "stacks",
+        "mutationOp": "UpdatePolicyGroup",
+        "readOp": "GetPolicyGroup",
+        "removeField": "removeStack"
+      },
+      "deleteBeforeReplace": true,
+      "idFormat": "{orgName}/{policyGroup}/{name}/{routingProject}",
+      "token": "pulumiservice:api:PolicyGroupStackAttachment"
+    },
     "pulumiservice:api:RevisionTag_esc_environments": {
       "deleteBeforeReplace": true,
       "idFormat": "{orgName}/{projectName}/{envName}/{name}",
