@@ -371,6 +371,8 @@ func runApiCase(t *testing.T, ex apiCase, lang string) {
 		// so pulumi creates a uv-managed venv (uv ignores PEP 668, which
 		// otherwise blocks pip's bootstrap on Homebrew Python).
 		setPythonToolchainUv(t, workdir)
+	case "java":
+		pinJavaSdkVersion(t, workdir)
 	}
 
 	opts := []opttest.Option{
@@ -469,9 +471,12 @@ func skipLangReason(t *testing.T, lang string) string {
 			return "local Pulumi.PulumiService (sdk/dotnet) not built; run `make build_dotnet`"
 		}
 	case "java":
-		// Local sdk/java is published to ~/.m2 by `make build_java`.
+		// sdk/java is built by `make build_java` and published to ~/.m2 by
+		// `make install_java_sdk`; pinJavaSdkVersion then pins the example pom to
+		// that exact local version (the [0.0.0,) range alone can't discover a
+		// gradle-published local build on a fresh ~/.m2 and falls back to Central).
 		if _, err := os.Stat(filepath.Join(root, "sdk", "java", "build", "libs")); err != nil {
-			return "local pulumiservice java sdk not built; run `make build_java`"
+			return "local pulumiservice java sdk not built; run `make build_java install_java_sdk`"
 		}
 		// We need a JDK matching the toolchain version in the regenerated
 		// build.gradle (currently 17). gradle finds it via `org.gradle.java.home`
@@ -552,6 +557,48 @@ func injectGoSdkRequire(t *testing.T, workdir, root string) {
 	cmd.Dir = workdir
 	if out, err := cmd.CombinedOutput(); err != nil {
 		t.Fatalf("inject go sdk require/replace: %v\n%s", err, string(out))
+	}
+}
+
+// pinJavaSdkVersion rewrites the example pom's pulumiservice version range
+// [0.0.0,) to the exact locally-built version published to ~/.m2 by
+// `make install_java_sdk`. An exact version resolves straight from the local
+// repo; the range otherwise falls back to the highest released version on
+// Central, because gradle's publishToMavenLocal doesn't write the group
+// metadata that range discovery needs on a fresh ~/.m2. Parallels how go and
+// csharp inject local SDK references.
+func pinJavaSdkVersion(t *testing.T, workdir string) {
+	t.Helper()
+	home, err := os.UserHomeDir()
+	if err != nil {
+		t.Fatalf("user home: %v", err)
+	}
+	base := filepath.Join(home, ".m2", "repository", "com", "pulumi", "pulumiservice")
+	entries, err := os.ReadDir(base)
+	if err != nil {
+		t.Fatalf("read %s (run `make build_java install_java_sdk`): %v", base, err)
+	}
+	var version string
+	for _, e := range entries {
+		// Local dev builds carry a +dev build-metadata suffix; releases don't.
+		if e.IsDir() && strings.Contains(e.Name(), "+dev") && e.Name() > version {
+			version = e.Name()
+		}
+	}
+	if version == "" {
+		t.Fatalf("no locally-published pulumiservice +dev build under %s; run `make install_java_sdk`", base)
+	}
+	pomPath := filepath.Join(workdir, "pom.xml")
+	data, err := os.ReadFile(pomPath)
+	if err != nil {
+		t.Fatalf("read pom: %v", err)
+	}
+	out := strings.Replace(string(data), "[0.0.0,)", version, 1)
+	if out == string(data) {
+		t.Fatalf("pulumiservice version range [0.0.0,) not found in %s", pomPath)
+	}
+	if err := os.WriteFile(pomPath, []byte(out), 0o644); err != nil {
+		t.Fatalf("write pom: %v", err)
 	}
 }
 
