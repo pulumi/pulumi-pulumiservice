@@ -469,9 +469,11 @@ func skipLangReason(t *testing.T, lang string) string {
 			return "local Pulumi.PulumiService (sdk/dotnet) not built; run `make build_dotnet`"
 		}
 	case "java":
-		// Local sdk/java is published to ~/.m2 by `make build_java`.
+		// sdk/java is built by `make build_java` and published to ~/.m2 by
+		// `make install_java_sdk`; the example pom's [0.0.0,) range then resolves
+		// the local 2.0.0-alpha.0+dev build over any released version on Central.
 		if _, err := os.Stat(filepath.Join(root, "sdk", "java", "build", "libs")); err != nil {
-			return "local pulumiservice java sdk not built; run `make build_java`"
+			return "local pulumiservice java sdk not built; run `make build_java install_java_sdk`"
 		}
 		// We need a JDK matching the toolchain version in the regenerated
 		// build.gradle (currently 17). gradle finds it via `org.gradle.java.home`
