@@ -72,7 +72,7 @@ Resources under the `pulumiservice:api:*` namespace ship via an auto-tag workflo
 1. Open a PR with the changes you want to ship.
 2. Add the `auto-release` label.
 3. Include a `Release-Version: vX.Y.Z` marker anywhere in the PR body. Markdown emphasis is stripped before matching, so `**Release-Version: v1.2.3**` works.
-4. Merge to `main`. [`tag-v1-release.yml`](./.github/workflows/tag-v1-release.yml) (job `tag-api-release`) extracts the version, verifies the tag doesn't already exist, and pushes it from a GitHub App installation token.
+4. Merge to `main`. [`pulumiservice-tag-api-release.yml`](./.github/workflows/pulumiservice-tag-api-release.yml) (job `tag-api-release`) extracts the version, verifies the tag doesn't already exist, and pushes it from a GitHub App installation token.
 5. The tag push triggers `release.yml` (stable) or `prerelease.yml` (pre-release). For stable tags, a `finalize` job waits for the GitHub release to be created, marks it `--latest`, and dispatches a docs rebuild to `pulumi/registry`.
 
 ## Getting Help
