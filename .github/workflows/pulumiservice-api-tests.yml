@@ -108,7 +108,7 @@ jobs:
               make build_dotnet
               ;;
             java)
-              make build_java
+              make build_java install_java_sdk
               ;;
           esac
 
