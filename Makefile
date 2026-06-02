@@ -206,10 +206,7 @@ install_dotnet_sdk: .make/install_dotnet_sdk
 	; fi
 	@touch $@
 install_go_sdk:
-install_java_sdk: .make/install_java_sdk
-.make/install_java_sdk: .make/build_java
-	cd sdk/java/ && gradle --console=plain publishToMavenLocal
-	@touch $@
+install_java_sdk:
 install_nodejs_sdk: .make/install_nodejs_sdk
 .make/install_nodejs_sdk: .make/build_nodejs
 	yarn link --cwd $(WORKING_DIR)/sdk/nodejs/bin
