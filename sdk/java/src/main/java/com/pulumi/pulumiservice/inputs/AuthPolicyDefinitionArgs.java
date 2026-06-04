@@ -37,14 +37,14 @@ public final class AuthPolicyDefinitionArgs extends com.pulumi.resources.Resourc
     }
 
     /**
-     * The rule type of this policy definition
+     * The rule type of this policy definition.
      * 
      */
     @Import(name="decision", required=true)
     private Output<AuthPolicyDecision> decision;
 
     /**
-     * @return The rule type of this policy definition
+     * @return The rule type of this policy definition.
      * 
      */
     public Output<AuthPolicyDecision> decision() {
@@ -97,14 +97,14 @@ public final class AuthPolicyDefinitionArgs extends com.pulumi.resources.Resourc
     }
 
     /**
-     * The token type for this policy definition
+     * The token type for this policy definition.
      * 
      */
     @Import(name="tokenType", required=true)
     private Output<AuthPolicyTokenType> tokenType;
 
     /**
-     * @return The token type for this policy definition
+     * @return The token type for this policy definition.
      * 
      */
     public Output<AuthPolicyTokenType> tokenType() {
@@ -188,7 +188,7 @@ public final class AuthPolicyDefinitionArgs extends com.pulumi.resources.Resourc
         }
 
         /**
-         * @param decision The rule type of this policy definition
+         * @param decision The rule type of this policy definition.
          * 
          * @return builder
          * 
@@ -199,7 +199,7 @@ public final class AuthPolicyDefinitionArgs extends com.pulumi.resources.Resourc
         }
 
         /**
-         * @param decision The rule type of this policy definition
+         * @param decision The rule type of this policy definition.
          * 
          * @return builder
          * 
@@ -272,7 +272,7 @@ public final class AuthPolicyDefinitionArgs extends com.pulumi.resources.Resourc
         }
 
         /**
-         * @param tokenType The token type for this policy definition
+         * @param tokenType The token type for this policy definition.
          * 
          * @return builder
          * 
@@ -283,7 +283,7 @@ public final class AuthPolicyDefinitionArgs extends com.pulumi.resources.Resourc
         }
 
         /**
-         * @param tokenType The token type for this policy definition
+         * @param tokenType The token type for this policy definition.
          * 
          * @return builder
          * 

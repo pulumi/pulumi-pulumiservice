@@ -1,3 +1,17 @@
+// Copyright 2026, Pulumi Corporation.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//	http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package resources
 
 import (
@@ -5,417 +19,339 @@ import (
 	"fmt"
 	"strings"
 
-	pbempty "google.golang.org/protobuf/types/known/emptypb"
-	"google.golang.org/protobuf/types/known/structpb"
+	"github.com/pulumi/pulumi-go-provider/infer"
 
-	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
-	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
-	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
-
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
-	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 )
 
-type PulumiServiceOidcIssuerResource struct {
-	Client pulumiapi.OidcClient
+type OidcIssuer struct{}
+
+var (
+	_ infer.CustomCreate[OidcIssuerInput, OidcIssuerState] = &OidcIssuer{}
+	_ infer.CustomUpdate[OidcIssuerInput, OidcIssuerState] = &OidcIssuer{}
+	_ infer.CustomDelete[OidcIssuerState]                  = &OidcIssuer{}
+	_ infer.CustomRead[OidcIssuerInput, OidcIssuerState]   = &OidcIssuer{}
+)
+
+func (*OidcIssuer) Annotate(a infer.Annotator) {
+	a.Describe(&OidcIssuer{}, "Register an OIDC Provider to establish a trust relationship between third-party "+
+		"systems like GitHub Actions and Pulumi Cloud, obviating the need to store a hard-coded Pulumi Cloud token "+
+		"in systems that need to run Pulumi commands or consume Pulumi Cloud APIs. Instead of a hard-coded, static "+
+		"token that must be manually rotated, trusted systems are granted temporary Pulumi Cloud tokens on an "+
+		"as-needed basis, which is more secure than static tokens.")
+	a.SetToken("index", "OidcIssuer")
 }
 
+// AuthPolicyDecision is the rule type of a policy definition.
 type AuthPolicyDecision string
 
 const (
-	AuthPolicyDecisionAllow = AuthPolicyDecision("allow")
-	AuthPolicyDecisionDeny  = AuthPolicyDecision("deny")
+	AuthPolicyDecisionDeny  AuthPolicyDecision = "deny"
+	AuthPolicyDecisionAllow AuthPolicyDecision = "allow"
 )
 
+func (AuthPolicyDecision) Values() []infer.EnumValue[AuthPolicyDecision] {
+	return []infer.EnumValue[AuthPolicyDecision]{
+		{Value: AuthPolicyDecisionDeny, Description: "A deny rule for Oidc Issuer Policy."},
+		{Value: AuthPolicyDecisionAllow, Description: "An allow rule for Oidc Issuer Policy."},
+	}
+}
+
+// AuthPolicyTokenType is the token type for a policy definition.
 type AuthPolicyTokenType string
 
 const (
-	AuthPolicyTokenTypeOrganization     = AuthPolicyTokenType("organization")
-	AuthPolicyTokenTypePersonal         = AuthPolicyTokenType("personal")
-	AuthPolicyTokenTypeTeam             = AuthPolicyTokenType("team")
-	AuthPolicyTokenTypeDeploymentRunner = AuthPolicyTokenType("runner")
+	AuthPolicyTokenTypePersonal         AuthPolicyTokenType = "personal"
+	AuthPolicyTokenTypeTeam             AuthPolicyTokenType = "team"
+	AuthPolicyTokenTypeOrganization     AuthPolicyTokenType = "organization"
+	AuthPolicyTokenTypeDeploymentRunner AuthPolicyTokenType = "runner"
 )
 
+func (AuthPolicyTokenType) Values() []infer.EnumValue[AuthPolicyTokenType] {
+	return []infer.EnumValue[AuthPolicyTokenType]{
+		{Value: AuthPolicyTokenTypePersonal, Description: "Personal Pulumi token. Requires userLogin field to be filled."},
+		{Value: AuthPolicyTokenTypeTeam, Description: "Team Pulumi token. Requires teamName field to be filled."},
+		{
+			Value:       AuthPolicyTokenTypeOrganization,
+			Description: "Organization Pulumi token. Requires authorizedPermissions field to be filled.",
+		},
+		{
+			Value:       AuthPolicyTokenTypeDeploymentRunner,
+			Description: "Deployment Runner Pulumi token. Requires runnerID field to be filled.",
+		},
+	}
+}
+
+// AuthPolicyPermissionLevel is the permission level for an organization token.
 type AuthPolicyPermissionLevel string
 
 const (
-	AuthPolicyPermissionLevelStandard = AuthPolicyPermissionLevel("standard")
-	AuthPolicyPermissionLevelAdmin    = AuthPolicyPermissionLevel("admin")
+	AuthPolicyPermissionLevelStandard AuthPolicyPermissionLevel = "standard"
+	AuthPolicyPermissionLevelAdmin    AuthPolicyPermissionLevel = "admin"
 )
 
-type PulumiServiceAuthPolicyDefinition struct {
-	Decision              AuthPolicyDecision
-	TokenType             AuthPolicyTokenType
-	TeamName              *string
-	UserLogin             *string
-	RunnerID              *string
-	AuthorizedPermissions []AuthPolicyPermissionLevel
-	Rules                 map[string]string
+func (AuthPolicyPermissionLevel) Values() []infer.EnumValue[AuthPolicyPermissionLevel] {
+	return []infer.EnumValue[AuthPolicyPermissionLevel]{
+		{Value: AuthPolicyPermissionLevelStandard, Description: "Standard level of permissions."},
+		{Value: AuthPolicyPermissionLevelAdmin, Description: "Admin level of permissions."},
+	}
 }
 
-type PulumiServiceOidcIssuerInput struct {
-	Organization         string
-	Name                 string
-	URL                  string
-	MaxExpirationSeconds *int64
-	Thumbprints          []string
-	Policies             []PulumiServiceAuthPolicyDefinition
+// AuthPolicyDefinition is a single auth policy entry attached to an OIDC issuer.
+type AuthPolicyDefinition struct {
+	Decision              AuthPolicyDecision          `pulumi:"decision"`
+	TokenType             AuthPolicyTokenType         `pulumi:"tokenType"`
+	TeamName              *string                     `pulumi:"teamName,optional"`
+	UserLogin             *string                     `pulumi:"userLogin,optional"`
+	RunnerID              *string                     `pulumi:"runnerID,optional"`
+	AuthorizedPermissions []AuthPolicyPermissionLevel `pulumi:"authorizedPermissions,optional"`
+	Rules                 map[string]string           `pulumi:"rules"`
 }
 
-type PulumiServiceOidcIssuerProperties struct {
-	PulumiServiceOidcIssuerInput
+func (p *AuthPolicyDefinition) Annotate(a infer.Annotator) {
+	a.Describe(&p.Decision, "The rule type of this policy definition.")
+	a.Describe(&p.TokenType, "The token type for this policy definition.")
+	a.Describe(&p.TeamName, "The team name for team tokens.")
+	a.Describe(&p.UserLogin, "The user login for personal tokens.")
+	a.Describe(&p.RunnerID, "The runner ID for deployment runner tokens.")
+	a.Describe(&p.AuthorizedPermissions, "The permission level for organization tokens.")
+	a.Describe(&p.Rules, "OIDC rules to set for this policy.")
 }
 
-func GenerateOidcIssuerProperties(
-	input PulumiServiceOidcIssuerInput,
-	issuer *pulumiapi.OidcIssuerRegistrationResponse,
-	authPolicy *pulumiapi.AuthPolicy,
-) (outputs *structpb.Struct, inputs *structpb.Struct, err error) {
-	inputMap := input.toPropertyMap()
+type OidcIssuerInput struct {
+	Organization         string                 `pulumi:"organization" provider:"replaceOnChanges"`
+	Name                 string                 `pulumi:"name"`
+	URL                  string                 `pulumi:"url"          provider:"replaceOnChanges"`
+	MaxExpirationSeconds *int64                 `pulumi:"maxExpirationSeconds,optional"`
+	Thumbprints          []string               `pulumi:"thumbprints,optional"`
+	Policies             []AuthPolicyDefinition `pulumi:"policies,optional"`
+}
 
-	outputMap := inputMap
-	outputMap["thumbprints"] = resource.NewPropertyValue(issuer.Thumbprints)
-	outputMap["policies"] = apiPoliciesToPropertyValue(authPolicy.Definition)
+const (
+	thumbprintsDescription = "The thumbprints of issuer's TLS certificates. By default, Pulumi will store the " +
+		"thumbprint of the certificate used to serve the OpenID configuration. If the provider uses multiple " +
+		"certificates to serve content, it is required to manually configure these."
+	policiesDescription = "The auth policies for this Oidc Issuer."
+)
 
-	inputs, err = plugin.MarshalProperties(inputMap, util.StandardMarshal)
+func (i *OidcIssuerInput) Annotate(a infer.Annotator) {
+	a.Describe(&i.Organization, "Organization name.")
+	a.Describe(&i.Name, "Issuer name.")
+	a.Describe(&i.URL, "The OIDC issuer URL.")
+	a.Describe(
+		&i.MaxExpirationSeconds,
+		"The maximum duration of the Pulumi access token working after an exchange, specified in seconds.",
+	)
+	a.Describe(&i.Thumbprints, thumbprintsDescription)
+	a.Describe(&i.Policies, policiesDescription)
+}
+
+type OidcIssuerState struct {
+	OidcIssuerInput
+	// thumbprints and policies are optional to supply but always present in
+	// the API response, so they are required outputs. Shadowing the embedded
+	// optional input fields with required ones keeps the inputs permissive
+	// while restoring the non-optional output types.
+	Thumbprints []string               `pulumi:"thumbprints"`
+	Policies    []AuthPolicyDefinition `pulumi:"policies"`
+}
+
+// Annotate describes the shadowing output fields. It overrides the Annotate
+// method promoted from the embedded OidcIssuerInput, which would otherwise run
+// against OidcIssuerState and reference the shadowed embedded fields that are
+// no longer visible, panicking the annotator.
+func (s *OidcIssuerState) Annotate(a infer.Annotator) {
+	a.Describe(&s.Thumbprints, thumbprintsDescription)
+	a.Describe(&s.Policies, policiesDescription)
+}
+
+// newOidcIssuerState builds the state from a set of inputs, populating the
+// required output fields that shadow their optional input counterparts.
+func newOidcIssuerState(input OidcIssuerInput) OidcIssuerState {
+	return OidcIssuerState{
+		OidcIssuerInput: input,
+		Thumbprints:     input.Thumbprints,
+		Policies:        input.Policies,
+	}
+}
+
+func (*OidcIssuer) Create(
+	ctx context.Context,
+	req infer.CreateRequest[OidcIssuerInput],
+) (infer.CreateResponse[OidcIssuerState], error) {
+	if req.DryRun {
+		return infer.CreateResponse[OidcIssuerState]{
+			Output: newOidcIssuerState(req.Inputs),
+		}, nil
+	}
+
+	client := config.GetClient(ctx)
+	registerResponse, err := client.RegisterOidcIssuer(ctx, req.Inputs.Organization, req.Inputs.toCreateRequest())
 	if err != nil {
-		return nil, nil, err
-	}
-
-	outputs, err = plugin.MarshalProperties(outputMap, util.StandardMarshal)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	return outputs, inputs, err
-}
-
-func (oir *PulumiServiceOidcIssuerResource) ToPulumiServiceOidcIssuerInput(
-	inputMap resource.PropertyMap,
-) PulumiServiceOidcIssuerInput {
-	input := PulumiServiceOidcIssuerInput{}
-
-	input.Organization = inputMap["organization"].StringValue()
-	input.Name = inputMap["name"].StringValue()
-	input.URL = inputMap["url"].StringValue()
-	if inputMap["maxExpirationSeconds"].HasValue() {
-		seconds := int64(inputMap["maxExpirationSeconds"].NumberValue())
-		input.MaxExpirationSeconds = &seconds
-	}
-	if inputMap["thumbprints"].HasValue() {
-		thumbprints := []string{}
-		for _, thumb := range inputMap["thumbprints"].ArrayValue() {
-			thumbprints = append(thumbprints, thumb.StringValue())
-		}
-		input.Thumbprints = thumbprints
-	}
-	if inputMap["policies"].HasValue() {
-		policies := []PulumiServiceAuthPolicyDefinition{}
-		for _, policy := range inputMap["policies"].ArrayValue() {
-			policies = append(policies, propertyMapToPolicy(policy.ObjectValue()))
-		}
-		input.Policies = policies
-	}
-
-	return input
-}
-
-func (oir *PulumiServiceOidcIssuerResource) Name() string {
-	return "pulumiservice:index:OidcIssuer"
-}
-
-func (oir *PulumiServiceOidcIssuerResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-	replaceProperties := map[string]bool{
-		"organization": true,
-		"url":          true,
-	}
-
-	return util.StandardDiff(req, replaceProperties)
-}
-
-func (oir *PulumiServiceOidcIssuerResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
-	ctx := context.Background()
-	organization, issuerID, err := splitIssuerID(req.Id)
-	if err != nil {
-		return nil, err
-	}
-
-	err = oir.Client.DeleteOidcIssuer(ctx, *organization, *issuerID)
-	if err != nil {
-		return nil, err
-	}
-
-	return &pbempty.Empty{}, nil
-}
-
-func (oir *PulumiServiceOidcIssuerResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
-	ctx := context.Background()
-	inputMap, err := plugin.UnmarshalProperties(req.GetProperties(), util.StandardUnmarshal)
-	if err != nil {
-		return nil, err
-	}
-
-	// Create OIDC Issuer itself
-	input := oir.ToPulumiServiceOidcIssuerInput(inputMap)
-	registerResponse, err := oir.Client.RegisterOidcIssuer(ctx, input.Organization, input.toCreateRequest())
-	if err != nil {
-		return nil, fmt.Errorf("error creating oidc issuer '%s': %s", input.Name, err.Error())
-	}
-
-	// Retrieve policy ID
-	authPolicy, err := oir.Client.GetAuthPolicies(ctx, input.Organization, registerResponse.ID)
-	if err != nil {
-		return nil, fmt.Errorf(
-			"error retrieving auth policies for oidc issuer '%s': %s",
-			registerResponse.ID,
-			err.Error(),
+		return infer.CreateResponse[OidcIssuerState]{}, fmt.Errorf(
+			"error creating oidc issuer %q: %w", req.Inputs.Name, err,
 		)
 	}
 
-	// If user has provided policies, update with those, otherwise use the default one
-	if len(input.Policies) > 0 {
-		request := policiesToAPIRequest(input.Policies)
-		authPolicy, err = oir.Client.UpdateAuthPolicies(ctx, input.Organization, authPolicy.ID, request)
-		if err != nil {
-			// To prevent resource being stuck in limbo, best-effort delete the issuer if policies were invalid
-			_ = oir.Client.DeleteOidcIssuer(ctx, input.Organization, registerResponse.ID)
+	authPolicy, err := client.GetAuthPolicies(ctx, req.Inputs.Organization, registerResponse.ID)
+	if err != nil {
+		return infer.CreateResponse[OidcIssuerState]{}, fmt.Errorf(
+			"error retrieving auth policies for oidc issuer %q: %w", registerResponse.ID, err,
+		)
+	}
 
-			return nil, fmt.Errorf(
-				"error updating auth policies for oidc issuer '%s': %s",
-				registerResponse.ID,
-				err.Error(),
+	if len(req.Inputs.Policies) > 0 {
+		request := policiesToAPIRequest(req.Inputs.Policies)
+		authPolicy, err = client.UpdateAuthPolicies(ctx, req.Inputs.Organization, authPolicy.ID, request)
+		if err != nil {
+			// Best-effort cleanup to avoid leaving the issuer in limbo when
+			// the user-supplied policies are rejected by the API.
+			_ = client.DeleteOidcIssuer(ctx, req.Inputs.Organization, registerResponse.ID)
+			return infer.CreateResponse[OidcIssuerState]{}, fmt.Errorf(
+				"error updating auth policies for oidc issuer %q: %w", registerResponse.ID, err,
 			)
 		}
 	}
 
-	outputProperties, _, err := GenerateOidcIssuerProperties(input, registerResponse, authPolicy)
-	if err != nil {
-		return nil, err
-	}
-
-	return &pulumirpc.CreateResponse{
-		Id:         fmt.Sprintf("%s/%s", input.Organization, registerResponse.ID),
-		Properties: outputProperties,
+	state := oidcIssuerStateFromAPI(req.Inputs.Organization, *registerResponse, authPolicy)
+	return infer.CreateResponse[OidcIssuerState]{
+		ID:     oidcIssuerID(req.Inputs.Organization, registerResponse.ID),
+		Output: state,
 	}, nil
 }
 
-func (oir *PulumiServiceOidcIssuerResource) Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
-	// This conversion to and from is needed to sort policies on input
-	inputMap, err := plugin.UnmarshalProperties(req.GetNews(), util.StandardUnmarshal)
-	if err != nil {
-		return nil, err
-	}
-	input := oir.ToPulumiServiceOidcIssuerInput(inputMap)
-	inputs, err := plugin.MarshalProperties(input.toPropertyMap(), util.StandardMarshal)
-	if err != nil {
-		return nil, err
-	}
-	return &pulumirpc.CheckResponse{Inputs: inputs, Failures: nil}, nil
-}
-
-func (oir *PulumiServiceOidcIssuerResource) Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
-	ctx := context.Background()
-	inputMap, err := plugin.UnmarshalProperties(req.GetNews(), util.StandardUnmarshal)
-	if err != nil {
-		return nil, err
+func (*OidcIssuer) Update(
+	ctx context.Context,
+	req infer.UpdateRequest[OidcIssuerInput, OidcIssuerState],
+) (infer.UpdateResponse[OidcIssuerState], error) {
+	if req.DryRun {
+		return infer.UpdateResponse[OidcIssuerState]{
+			Output: newOidcIssuerState(req.Inputs),
+		}, nil
 	}
 
-	_, issuerID, err := splitIssuerID(req.Id)
+	_, issuerID, err := splitOidcIssuerID(req.ID)
 	if err != nil {
-		return nil, err
+		return infer.UpdateResponse[OidcIssuerState]{}, err
 	}
 
-	// Update OIDC Issuer itself
-	input := oir.ToPulumiServiceOidcIssuerInput(inputMap)
-	updateResponse, err := oir.Client.UpdateOidcIssuer(ctx, input.Organization, *issuerID, input.toUpdateRequest())
+	client := config.GetClient(ctx)
+	updateResponse, err := client.UpdateOidcIssuer(
+		ctx, req.Inputs.Organization, issuerID, req.Inputs.toUpdateRequest(),
+	)
 	if err != nil {
-		return nil, fmt.Errorf("error creating oidc issuer '%s': %s", input.Name, err.Error())
+		return infer.UpdateResponse[OidcIssuerState]{}, fmt.Errorf(
+			"error updating oidc issuer %q: %w", req.Inputs.Name, err,
+		)
 	}
 
-	// Retrieve policy ID
-	authPolicy, err := oir.Client.GetAuthPolicies(ctx, input.Organization, *issuerID)
+	authPolicy, err := client.GetAuthPolicies(ctx, req.Inputs.Organization, issuerID)
 	if err != nil {
-		return nil, fmt.Errorf("error retrieving auth policies for oidc issuer '%s': %s", *issuerID, err.Error())
+		return infer.UpdateResponse[OidcIssuerState]{}, fmt.Errorf(
+			"error retrieving auth policies for oidc issuer %q: %w", issuerID, err,
+		)
 	}
 
-	// If user has provided policies, update with those, otherwise use the default one
-	if len(input.Policies) > 0 {
-		request := policiesToAPIRequest(input.Policies)
-		authPolicy, err = oir.Client.UpdateAuthPolicies(ctx, input.Organization, authPolicy.ID, request)
+	if len(req.Inputs.Policies) > 0 {
+		request := policiesToAPIRequest(req.Inputs.Policies)
+		authPolicy, err = client.UpdateAuthPolicies(ctx, req.Inputs.Organization, authPolicy.ID, request)
 		if err != nil {
-			return nil, fmt.Errorf("error updating auth policies for oidc issuer '%s': %s", *issuerID, err.Error())
+			return infer.UpdateResponse[OidcIssuerState]{}, fmt.Errorf(
+				"error updating auth policies for oidc issuer %q: %w", issuerID, err,
+			)
 		}
 	}
 
-	outputProperties, _, err := GenerateOidcIssuerProperties(input, updateResponse, authPolicy)
-	if err != nil {
-		return nil, err
-	}
-
-	return &pulumirpc.UpdateResponse{
-		Properties: outputProperties,
-	}, nil
+	state := oidcIssuerStateFromAPI(req.Inputs.Organization, *updateResponse, authPolicy)
+	return infer.UpdateResponse[OidcIssuerState]{Output: state}, nil
 }
 
-func (oir *PulumiServiceOidcIssuerResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
-	ctx := context.Background()
-
-	organization, issuerID, err := splitIssuerID(req.Id)
+func (*OidcIssuer) Delete(
+	ctx context.Context,
+	req infer.DeleteRequest[OidcIssuerState],
+) (infer.DeleteResponse, error) {
+	orgName, issuerID, err := splitOidcIssuerID(req.ID)
 	if err != nil {
-		return nil, err
+		return infer.DeleteResponse{}, err
+	}
+	return infer.DeleteResponse{}, config.GetClient(ctx).DeleteOidcIssuer(ctx, orgName, issuerID)
+}
+
+func (*OidcIssuer) Read(
+	ctx context.Context,
+	req infer.ReadRequest[OidcIssuerInput, OidcIssuerState],
+) (infer.ReadResponse[OidcIssuerInput, OidcIssuerState], error) {
+	orgName, issuerID, err := splitOidcIssuerID(req.ID)
+	if err != nil {
+		return infer.ReadResponse[OidcIssuerInput, OidcIssuerState]{}, err
 	}
 
-	readResponse, err := oir.Client.GetOidcIssuer(ctx, *organization, *issuerID)
+	client := config.GetClient(ctx)
+	readResponse, err := client.GetOidcIssuer(ctx, orgName, issuerID)
 	if err != nil {
-		return nil, err
+		return infer.ReadResponse[OidcIssuerInput, OidcIssuerState]{}, fmt.Errorf(
+			"failed to read oidc issuer (%q): %w", req.ID, err,
+		)
 	}
 	if readResponse == nil {
-		return &pulumirpc.ReadResponse{}, nil
+		return infer.ReadResponse[OidcIssuerInput, OidcIssuerState]{}, nil
 	}
 
-	authPolicy, err := oir.Client.GetAuthPolicies(ctx, *organization, *issuerID)
+	authPolicy, err := client.GetAuthPolicies(ctx, orgName, issuerID)
 	if err != nil {
-		return nil, fmt.Errorf("error retrieving auth policies for oidc issuer '%s': %s", *issuerID, err.Error())
+		return infer.ReadResponse[OidcIssuerInput, OidcIssuerState]{}, fmt.Errorf(
+			"error retrieving auth policies for oidc issuer %q: %w", issuerID, err,
+		)
 	}
 
-	input := PulumiServiceOidcIssuerInput{
-		Organization:         *organization,
-		Name:                 readResponse.Name,
-		URL:                  readResponse.URL,
-		MaxExpirationSeconds: readResponse.MaxExpiration,
-		Thumbprints:          readResponse.Thumbprints,
-		Policies:             apiPoliciesToInputs(authPolicy.Definition),
-	}
-
-	outputProperties, inputs, err := GenerateOidcIssuerProperties(input, readResponse, authPolicy)
-	if err != nil {
-		return nil, err
-	}
-
-	return &pulumirpc.ReadResponse{
-		Id:         req.GetId(),
-		Properties: outputProperties,
-		Inputs:     inputs,
+	state := oidcIssuerStateFromAPI(orgName, *readResponse, authPolicy)
+	return infer.ReadResponse[OidcIssuerInput, OidcIssuerState]{
+		ID:     req.ID,
+		Inputs: state.OidcIssuerInput,
+		State:  state,
 	}, nil
 }
 
-func (input PulumiServiceOidcIssuerInput) toPropertyMap() resource.PropertyMap {
-	inputMap := resource.PropertyMap{}
-	inputMap["organization"] = resource.NewPropertyValue(input.Organization)
-	inputMap["name"] = resource.NewPropertyValue(input.Name)
-	inputMap["url"] = resource.NewPropertyValue(input.URL)
-	if input.MaxExpirationSeconds != nil {
-		inputMap["maxExpirationSeconds"] = resource.NewPropertyValue(input.MaxExpirationSeconds)
+// oidcIssuerStateFromAPI builds an OidcIssuerState from a successful API
+// response. The ordering of policies returned by the API is preserved as-is.
+func oidcIssuerStateFromAPI(
+	organization string,
+	issuer pulumiapi.OidcIssuerRegistrationResponse,
+	authPolicy *pulumiapi.AuthPolicy,
+) OidcIssuerState {
+	input := OidcIssuerInput{
+		Organization:         organization,
+		Name:                 issuer.Name,
+		URL:                  issuer.URL,
+		MaxExpirationSeconds: issuer.MaxExpiration,
+		Thumbprints:          issuer.Thumbprints,
 	}
-	if len(input.Thumbprints) > 0 {
-		inputMap["thumbprints"] = resource.NewPropertyValue(input.Thumbprints)
+	if authPolicy != nil {
+		input.Policies = apiPoliciesToInputs(authPolicy.Definition)
 	}
-	if len(input.Policies) > 0 {
-		policyValues := []resource.PropertyValue{}
-		for _, policy := range input.Policies {
-			propertyMap := policy.toPropertyMap()
-			policyValues = append(policyValues, resource.NewObjectProperty(propertyMap))
-		}
-		inputMap["policies"] = resource.NewArrayProperty(policyValues)
-	}
-	return inputMap
+	return newOidcIssuerState(input)
 }
 
-func (policy PulumiServiceAuthPolicyDefinition) toPropertyMap() resource.PropertyMap {
-	propertyMap := resource.PropertyMap{}
-	propertyMap["decision"] = resource.NewPropertyValue(policy.Decision)
-	propertyMap["tokenType"] = resource.NewPropertyValue(policy.TokenType)
-	if policy.TeamName != nil {
-		propertyMap["teamName"] = resource.NewPropertyValue(policy.TeamName)
-	}
-	if policy.UserLogin != nil {
-		propertyMap["userLogin"] = resource.NewPropertyValue(policy.UserLogin)
-	}
-	if policy.RunnerID != nil {
-		propertyMap["runnerID"] = resource.NewPropertyValue(policy.RunnerID)
-	}
-	if len(policy.AuthorizedPermissions) > 0 {
-		propertyMap["authorizedPermissions"] = resource.NewPropertyValue(policy.AuthorizedPermissions)
-	}
-	propertyMap["rules"] = resource.NewPropertyValue(policy.Rules)
-
-	return propertyMap
-}
-
-func apiPoliciesToPropertyValue(apiPolicies []*pulumiapi.AuthPolicyDefinition) resource.PropertyValue {
-	policyValues := []resource.PropertyValue{}
-	for _, policy := range apiPoliciesToInputs(apiPolicies) {
-		propertyMap := policy.toPropertyMap()
-		policyValues = append(policyValues, resource.NewObjectProperty(propertyMap))
-	}
-	return resource.NewArrayProperty(policyValues)
-}
-
-func (input *PulumiServiceOidcIssuerInput) toCreateRequest() pulumiapi.OidcIssuerRegistrationRequest {
+func (i *OidcIssuerInput) toCreateRequest() pulumiapi.OidcIssuerRegistrationRequest {
 	return pulumiapi.OidcIssuerRegistrationRequest{
-		Name:          input.Name,
-		URL:           input.URL,
-		Thumbprints:   input.Thumbprints,
-		MaxExpiration: input.MaxExpirationSeconds,
+		Name:          i.Name,
+		URL:           i.URL,
+		Thumbprints:   i.Thumbprints,
+		MaxExpiration: i.MaxExpirationSeconds,
 	}
 }
 
-func (input *PulumiServiceOidcIssuerInput) toUpdateRequest() pulumiapi.OidcIssuerUpdateRequest {
+func (i *OidcIssuerInput) toUpdateRequest() pulumiapi.OidcIssuerUpdateRequest {
 	return pulumiapi.OidcIssuerUpdateRequest{
-		Name:          &input.Name,
-		Thumbprints:   &input.Thumbprints,
-		MaxExpiration: input.MaxExpirationSeconds,
+		Name:          &i.Name,
+		Thumbprints:   &i.Thumbprints,
+		MaxExpiration: i.MaxExpirationSeconds,
 	}
 }
 
-func propertyMapToPolicy(policyObject resource.PropertyMap) PulumiServiceAuthPolicyDefinition {
-	var teamName *string
-	if policyObject["teamName"].HasValue() {
-		value := policyObject["teamName"].StringValue()
-		teamName = &value
-	}
-
-	var userLogin *string
-	if policyObject["userLogin"].HasValue() {
-		value := policyObject["userLogin"].StringValue()
-		userLogin = &value
-	}
-
-	var runnerID *string
-	if policyObject["runnerID"].HasValue() {
-		value := policyObject["runnerID"].StringValue()
-		runnerID = &value
-	}
-
-	authorizedPermissions := []AuthPolicyPermissionLevel{}
-	if policyObject["authorizedPermissions"].HasValue() {
-		for _, permission := range policyObject["authorizedPermissions"].ArrayValue() {
-			authorizedPermissions = append(authorizedPermissions, AuthPolicyPermissionLevel(permission.StringValue()))
-		}
-	}
-
-	rules := map[string]string{}
-	if policyObject["rules"].HasValue() {
-		for k, v := range policyObject["rules"].ObjectValue() {
-			key := string(k)
-			rules[key] = v.StringValue()
-		}
-	}
-
-	return PulumiServiceAuthPolicyDefinition{
-		Decision:              AuthPolicyDecision(policyObject["decision"].StringValue()),
-		TokenType:             AuthPolicyTokenType(policyObject["tokenType"].StringValue()),
-		TeamName:              teamName,
-		UserLogin:             userLogin,
-		RunnerID:              runnerID,
-		AuthorizedPermissions: authorizedPermissions,
-		Rules:                 rules,
-	}
-}
-
-func policiesToAPIRequest(policies []PulumiServiceAuthPolicyDefinition) pulumiapi.AuthPolicyUpdateRequest {
-	apiPolicies := []pulumiapi.AuthPolicyDefinition{}
-
+func policiesToAPIRequest(policies []AuthPolicyDefinition) pulumiapi.AuthPolicyUpdateRequest {
+	apiPolicies := make([]pulumiapi.AuthPolicyDefinition, 0, len(policies))
 	for _, policy := range policies {
 		apiPolicies = append(apiPolicies, pulumiapi.AuthPolicyDefinition{
 			Decision:              string(policy.Decision),
@@ -427,52 +363,58 @@ func policiesToAPIRequest(policies []PulumiServiceAuthPolicyDefinition) pulumiap
 			Rules:                 policy.Rules,
 		})
 	}
-
-	return pulumiapi.AuthPolicyUpdateRequest{
-		Definition: apiPolicies,
-	}
+	return pulumiapi.AuthPolicyUpdateRequest{Definition: apiPolicies}
 }
 
-func apiPoliciesToInputs(policies []*pulumiapi.AuthPolicyDefinition) []PulumiServiceAuthPolicyDefinition {
-	inputPolicies := []PulumiServiceAuthPolicyDefinition{}
+func apiPoliciesToInputs(policies []*pulumiapi.AuthPolicyDefinition) []AuthPolicyDefinition {
+	if len(policies) == 0 {
+		return nil
+	}
+	result := make([]AuthPolicyDefinition, 0, len(policies))
 	for _, policy := range policies {
-		inputPolicies = append(inputPolicies, apiPolicyToInput(*policy))
+		if policy == nil {
+			continue
+		}
+		result = append(result, AuthPolicyDefinition{
+			Decision:              AuthPolicyDecision(policy.Decision),
+			TokenType:             AuthPolicyTokenType(policy.TokenType),
+			TeamName:              policy.TeamName,
+			UserLogin:             policy.UserLogin,
+			RunnerID:              policy.RunnerID,
+			AuthorizedPermissions: permissionsToInput(policy.AuthorizedPermissions),
+			Rules:                 policy.Rules,
+		})
 	}
-	return inputPolicies
-}
-
-func apiPolicyToInput(policy pulumiapi.AuthPolicyDefinition) PulumiServiceAuthPolicyDefinition {
-	return PulumiServiceAuthPolicyDefinition{
-		Decision:              AuthPolicyDecision(policy.Decision),
-		TokenType:             AuthPolicyTokenType(policy.TokenType),
-		TeamName:              policy.TeamName,
-		UserLogin:             policy.UserLogin,
-		RunnerID:              policy.RunnerID,
-		AuthorizedPermissions: permissionsToInput(policy.AuthorizedPermissions),
-		Rules:                 policy.Rules,
-	}
+	return result
 }
 
 func permissionsToAPI(permissions []AuthPolicyPermissionLevel) []string {
-	apiPermissions := []string{}
+	out := make([]string, 0, len(permissions))
 	for _, permission := range permissions {
-		apiPermissions = append(apiPermissions, string(permission))
+		out = append(out, string(permission))
 	}
-	return apiPermissions
+	return out
 }
 
 func permissionsToInput(permissions []string) []AuthPolicyPermissionLevel {
-	inputPermissions := []AuthPolicyPermissionLevel{}
-	for _, permission := range permissions {
-		inputPermissions = append(inputPermissions, AuthPolicyPermissionLevel(permission))
+	if len(permissions) == 0 {
+		return nil
 	}
-	return inputPermissions
+	out := make([]AuthPolicyPermissionLevel, 0, len(permissions))
+	for _, permission := range permissions {
+		out = append(out, AuthPolicyPermissionLevel(permission))
+	}
+	return out
 }
 
-func splitIssuerID(id string) (organization *string, issuerID *string, err error) {
+func oidcIssuerID(organization, issuerID string) string {
+	return fmt.Sprintf("%s/%s", organization, issuerID)
+}
+
+func splitOidcIssuerID(id string) (organization, issuerID string, err error) {
 	splitID := strings.Split(id, "/")
 	if len(splitID) != 2 {
-		return nil, nil, fmt.Errorf("error splitting resource id '%s'", id)
+		return "", "", fmt.Errorf("error splitting resource id %q", id)
 	}
-	return &splitID[0], &splitID[1], nil
+	return splitID[0], splitID[1], nil
 }

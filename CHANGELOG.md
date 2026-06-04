@@ -47,6 +47,7 @@
 
 ### Bug Fixes
 
+- Fixed `OidcIssuer` panicking during `pulumi preview` when its `url` input was an unknown value, such as another resource's output. The provider read the unknown input as a concrete string during `Check` and crashed; previews now complete and resolve `url` as computed. [#831](https://github.com/pulumi/pulumi-pulumiservice/pull/831)
 - Fixed `AgentPool.agentPoolId` output never being populated. The provider previously wrote the value under a state key that did not match the schema, so `pool.agentPoolId` was always undefined. Existing stacks pick up the correct value on the next `pulumi refresh`.
 - Fixed TeamEnvironmentPermission spurious replacement on upgrade from 0.29.2 caused by the optional `maxOpenDuration` field being serialized as an empty string in Check and Read [#751](https://github.com/pulumi/pulumi-pulumiservice/issues/751)
 - Fixed TeamEnvironmentPermission panic when `maxOpenDuration` was supplied as a non-string value; `Check` now returns a `CheckFailure` at preview instead of crashing during apply [#751](https://github.com/pulumi/pulumi-pulumiservice/issues/751)

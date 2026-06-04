@@ -163,7 +163,7 @@
         },
         "decision": {
           "$ref": "#/types/pulumiservice:index:AuthPolicyDecision",
-          "description": "The rule type of this policy definition"
+          "description": "The rule type of this policy definition."
         },
         "rules": {
           "type": "object",
@@ -182,7 +182,7 @@
         },
         "tokenType": {
           "$ref": "#/types/pulumiservice:index:AuthPolicyTokenType",
-          "description": "The token type for this policy definition"
+          "description": "The token type for this policy definition."
         },
         "userLogin": {
           "type": "string",
@@ -5556,7 +5556,7 @@
           "items": {
             "$ref": "#/types/pulumiservice:index:AuthPolicyDefinition"
           },
-          "description": "The authorization policies for this Oidc Issuer."
+          "description": "The auth policies for this Oidc Issuer."
         },
         "thumbprints": {
           "type": "array",

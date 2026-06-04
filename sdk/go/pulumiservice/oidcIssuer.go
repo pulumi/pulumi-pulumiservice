@@ -22,7 +22,7 @@ type OidcIssuer struct {
 	Name pulumi.StringOutput `pulumi:"name"`
 	// Organization name.
 	Organization pulumi.StringOutput `pulumi:"organization"`
-	// The authorization policies for this Oidc Issuer.
+	// The auth policies for this Oidc Issuer.
 	Policies AuthPolicyDefinitionArrayOutput `pulumi:"policies"`
 	// The thumbprints of issuer's TLS certificates. By default, Pulumi will store the thumbprint of the certificate used to serve the OpenID configuration. If the provider uses multiple certificates to serve content, it is required to manually configure these.
 	Thumbprints pulumi.StringArrayOutput `pulumi:"thumbprints"`
@@ -216,7 +216,7 @@ func (o OidcIssuerOutput) Organization() pulumi.StringOutput {
 	return o.ApplyT(func(v *OidcIssuer) pulumi.StringOutput { return v.Organization }).(pulumi.StringOutput)
 }
 
-// The authorization policies for this Oidc Issuer.
+// The auth policies for this Oidc Issuer.
 func (o OidcIssuerOutput) Policies() AuthPolicyDefinitionArrayOutput {
 	return o.ApplyT(func(v *OidcIssuer) AuthPolicyDefinitionArrayOutput { return v.Policies }).(AuthPolicyDefinitionArrayOutput)
 }

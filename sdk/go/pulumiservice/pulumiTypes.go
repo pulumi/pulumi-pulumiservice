@@ -289,7 +289,7 @@ func (o ApprovalRuleConfigOutput) RequireReapprovalOnChange() pulumi.BoolOutput 
 type AuthPolicyDefinition struct {
 	// The permission level for organization tokens.
 	AuthorizedPermissions []AuthPolicyPermissionLevel `pulumi:"authorizedPermissions"`
-	// The rule type of this policy definition
+	// The rule type of this policy definition.
 	Decision AuthPolicyDecision `pulumi:"decision"`
 	// OIDC rules to set for this policy.
 	Rules map[string]string `pulumi:"rules"`
@@ -297,7 +297,7 @@ type AuthPolicyDefinition struct {
 	RunnerID *string `pulumi:"runnerID"`
 	// The team name for team tokens.
 	TeamName *string `pulumi:"teamName"`
-	// The token type for this policy definition
+	// The token type for this policy definition.
 	TokenType AuthPolicyTokenType `pulumi:"tokenType"`
 	// The user login for personal tokens.
 	UserLogin *string `pulumi:"userLogin"`
@@ -317,7 +317,7 @@ type AuthPolicyDefinitionInput interface {
 type AuthPolicyDefinitionArgs struct {
 	// The permission level for organization tokens.
 	AuthorizedPermissions AuthPolicyPermissionLevelArrayInput `pulumi:"authorizedPermissions"`
-	// The rule type of this policy definition
+	// The rule type of this policy definition.
 	Decision AuthPolicyDecisionInput `pulumi:"decision"`
 	// OIDC rules to set for this policy.
 	Rules pulumi.StringMapInput `pulumi:"rules"`
@@ -325,7 +325,7 @@ type AuthPolicyDefinitionArgs struct {
 	RunnerID pulumi.StringPtrInput `pulumi:"runnerID"`
 	// The team name for team tokens.
 	TeamName pulumi.StringPtrInput `pulumi:"teamName"`
-	// The token type for this policy definition
+	// The token type for this policy definition.
 	TokenType AuthPolicyTokenTypeInput `pulumi:"tokenType"`
 	// The user login for personal tokens.
 	UserLogin pulumi.StringPtrInput `pulumi:"userLogin"`
@@ -387,7 +387,7 @@ func (o AuthPolicyDefinitionOutput) AuthorizedPermissions() AuthPolicyPermission
 	return o.ApplyT(func(v AuthPolicyDefinition) []AuthPolicyPermissionLevel { return v.AuthorizedPermissions }).(AuthPolicyPermissionLevelArrayOutput)
 }
 
-// The rule type of this policy definition
+// The rule type of this policy definition.
 func (o AuthPolicyDefinitionOutput) Decision() AuthPolicyDecisionOutput {
 	return o.ApplyT(func(v AuthPolicyDefinition) AuthPolicyDecision { return v.Decision }).(AuthPolicyDecisionOutput)
 }
@@ -407,7 +407,7 @@ func (o AuthPolicyDefinitionOutput) TeamName() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v AuthPolicyDefinition) *string { return v.TeamName }).(pulumi.StringPtrOutput)
 }
 
-// The token type for this policy definition
+// The token type for this policy definition.
 func (o AuthPolicyDefinitionOutput) TokenType() AuthPolicyTokenTypeOutput {
 	return o.ApplyT(func(v AuthPolicyDefinition) AuthPolicyTokenType { return v.TokenType }).(AuthPolicyTokenTypeOutput)
 }

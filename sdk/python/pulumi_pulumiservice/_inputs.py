@@ -241,7 +241,7 @@ class ApprovalRuleConfigArgs:
 class AuthPolicyDefinitionArgsDict(TypedDict):
     decision: pulumi.Input['AuthPolicyDecision']
     """
-    The rule type of this policy definition
+    The rule type of this policy definition.
     """
     rules: pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]
     """
@@ -249,7 +249,7 @@ class AuthPolicyDefinitionArgsDict(TypedDict):
     """
     token_type: pulumi.Input['AuthPolicyTokenType']
     """
-    The token type for this policy definition
+    The token type for this policy definition.
     """
     authorized_permissions: NotRequired[pulumi.Input[Optional[Sequence[pulumi.Input['AuthPolicyPermissionLevel']]]]]
     """
@@ -279,9 +279,9 @@ class AuthPolicyDefinitionArgs:
                  team_name: pulumi.Input[Optional[_builtins.str]] = None,
                  user_login: pulumi.Input[Optional[_builtins.str]] = None):
         """
-        :param pulumi.Input['AuthPolicyDecision'] decision: The rule type of this policy definition
+        :param pulumi.Input['AuthPolicyDecision'] decision: The rule type of this policy definition.
         :param pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]] rules: OIDC rules to set for this policy.
-        :param pulumi.Input['AuthPolicyTokenType'] token_type: The token type for this policy definition
+        :param pulumi.Input['AuthPolicyTokenType'] token_type: The token type for this policy definition.
         :param pulumi.Input[Sequence[pulumi.Input['AuthPolicyPermissionLevel']]] authorized_permissions: The permission level for organization tokens.
         :param pulumi.Input[_builtins.str] runner_id: The runner ID for deployment runner tokens.
         :param pulumi.Input[_builtins.str] team_name: The team name for team tokens.
@@ -303,7 +303,7 @@ class AuthPolicyDefinitionArgs:
     @pulumi.getter
     def decision(self) -> pulumi.Input['AuthPolicyDecision']:
         """
-        The rule type of this policy definition
+        The rule type of this policy definition.
         """
         return pulumi.get(self, "decision")
 
@@ -327,7 +327,7 @@ class AuthPolicyDefinitionArgs:
     @pulumi.getter(name="tokenType")
     def token_type(self) -> pulumi.Input['AuthPolicyTokenType']:
         """
-        The token type for this policy definition
+        The token type for this policy definition.
         """
         return pulumi.get(self, "token_type")
 

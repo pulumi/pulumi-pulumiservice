@@ -25,7 +25,7 @@ namespace Pulumi.PulumiService.Inputs
         }
 
         /// <summary>
-        /// The rule type of this policy definition
+        /// The rule type of this policy definition.
         /// </summary>
         [Input("decision", required: true)]
         public Input<Pulumi.PulumiService.AuthPolicyDecision> Decision { get; set; } = null!;
@@ -55,7 +55,7 @@ namespace Pulumi.PulumiService.Inputs
         public Input<string>? TeamName { get; set; }
 
         /// <summary>
-        /// The token type for this policy definition
+        /// The token type for this policy definition.
         /// </summary>
         [Input("tokenType", required: true)]
         public Input<Pulumi.PulumiService.AuthPolicyTokenType> TokenType { get; set; } = null!;
