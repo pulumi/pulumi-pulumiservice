@@ -81,6 +81,7 @@ type Client interface {
 	pulumiapi.MemberClient
 	pulumiapi.OidcClient
 	pulumiapi.OrgAccessTokenClient
+	pulumiapi.PolicyGroupClient
 	pulumiapi.PolicyPackClient
 	pulumiapi.RoleClient
 	pulumiapi.StackClient
