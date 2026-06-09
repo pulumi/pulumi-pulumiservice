@@ -20,7 +20,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"runtime"
 	"strings"
 	"sync/atomic"
 	"time"
@@ -31,8 +30,6 @@ import (
 	"google.golang.org/grpc/status"
 	pbempty "google.golang.org/protobuf/types/known/emptypb"
 
-	esc_client "github.com/pulumi/esc/cmd/esc/cli/client"
-	"github.com/pulumi/esc/cmd/esc/cli/version"
 	p "github.com/pulumi/pulumi-go-provider"
 	"github.com/pulumi/pulumi-go-provider/infer"
 	mw "github.com/pulumi/pulumi-go-provider/middleware"
@@ -140,6 +137,7 @@ func MakeProvider(host *provider.HostClient, name, version string) (pulumirpc.Re
 			infer.Resource(&resources.AgentPool{}),
 			infer.Resource(&resources.DeploymentSchedule{}),
 			infer.Resource(&resources.DriftSchedule{}),
+			infer.Resource(&resources.Environment{}),
 			infer.Resource(&resources.EnvironmentRotationSchedule{}),
 			infer.Resource(&resources.EnvironmentVersionTag{}),
 			infer.Resource(&resources.InsightsAccount{}),
@@ -394,13 +392,6 @@ func (k *pulumiserviceProvider) Configure(
 		return transport, nil
 	})
 
-	escClient := esc_client.New(
-		fmt.Sprintf("provider-pulumiservice/1 (%s; %s)", version.Version, runtime.GOOS),
-		*url,
-		*token,
-		false,
-	)
-
 	// Store the client for use in Invoke functions
 	k.client = client
 
@@ -413,10 +404,6 @@ func (k *pulumiserviceProvider) Configure(
 		},
 		&resources.PulumiServiceDeploymentSettingsResource{
 			Client: client,
-		},
-		&resources.PulumiServiceEnvironmentResource{
-			Client:         escClient,
-			MetadataClient: client,
 		},
 		&resources.PulumiServiceApprovalRuleResource{
 			Client: client,
