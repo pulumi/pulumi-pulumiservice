@@ -70,6 +70,9 @@ namespace Pulumi.PulumiService
                 Version = Utilities.Version,
                 ReplaceOnChanges =
                 {
+                    "environmentIdentifier.name",
+                    "environmentIdentifier.organization",
+                    "environmentIdentifier.project",
                     "name",
                 },
             };

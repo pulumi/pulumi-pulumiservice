@@ -81,9 +81,9 @@ func (RbacPermission) Values() []infer.EnumValue[RbacPermission] {
 
 // EnvironmentIdentifier identifies the environment an approval rule applies to.
 type EnvironmentIdentifier struct {
-	Organization string `pulumi:"organization"`
-	Project      string `pulumi:"project"`
-	Name         string `pulumi:"name"`
+	Organization string `pulumi:"organization" provider:"replaceOnChanges"`
+	Project      string `pulumi:"project"      provider:"replaceOnChanges"`
+	Name         string `pulumi:"name"         provider:"replaceOnChanges"`
 }
 
 func (e *EnvironmentIdentifier) Annotate(a infer.Annotator) {

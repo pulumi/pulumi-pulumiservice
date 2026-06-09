@@ -181,7 +181,7 @@ class ApprovalRule(pulumi.CustomResource):
             if target_action_types is None and not opts.urn:
                 raise TypeError("Missing required property 'target_action_types'")
             __props__.__dict__["target_action_types"] = target_action_types
-        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["name"])
+        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["environmentIdentifier.name", "environmentIdentifier.organization", "environmentIdentifier.project", "name"])
         opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(ApprovalRule, __self__).__init__(
             'pulumiservice:index:ApprovalRule',

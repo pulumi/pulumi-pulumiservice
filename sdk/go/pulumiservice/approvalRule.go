@@ -51,6 +51,9 @@ func NewApprovalRule(ctx *pulumi.Context,
 		return nil, errors.New("invalid value for required argument 'TargetActionTypes'")
 	}
 	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
+		"environmentIdentifier.name",
+		"environmentIdentifier.organization",
+		"environmentIdentifier.project",
 		"name",
 	})
 	opts = append(opts, replaceOnChanges)

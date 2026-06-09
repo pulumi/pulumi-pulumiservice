@@ -523,15 +523,18 @@
       "properties": {
         "name": {
           "type": "string",
-          "description": "The environment name."
+          "description": "The environment name.",
+          "replaceOnChanges": true
         },
         "organization": {
           "type": "string",
-          "description": "The organization name."
+          "description": "The organization name.",
+          "replaceOnChanges": true
         },
         "project": {
           "type": "string",
-          "description": "The project name."
+          "description": "The project name.",
+          "replaceOnChanges": true
         }
       },
       "type": "object",

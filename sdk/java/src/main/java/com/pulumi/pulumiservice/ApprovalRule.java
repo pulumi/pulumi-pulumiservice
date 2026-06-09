@@ -134,6 +134,9 @@ public class ApprovalRule extends com.pulumi.resources.CustomResource {
         var defaultOptions = com.pulumi.resources.CustomResourceOptions.builder()
             .version(Utilities.getVersion())
             .replaceOnChanges(List.of(
+                "environmentIdentifier.name",
+                "environmentIdentifier.organization",
+                "environmentIdentifier.project",
                 "name"
             ))
             .build();

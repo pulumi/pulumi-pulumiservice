@@ -97,7 +97,7 @@ export class ApprovalRule extends pulumi.CustomResource {
             resourceInputs["targetActionTypes"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
-        const replaceOnChanges = { replaceOnChanges: ["name"] };
+        const replaceOnChanges = { replaceOnChanges: ["environmentIdentifier.name", "environmentIdentifier.organization", "environmentIdentifier.project", "name"] };
         opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(ApprovalRule.__pulumiType, name, resourceInputs, opts);
     }
