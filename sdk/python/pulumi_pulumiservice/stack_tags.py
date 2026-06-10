@@ -165,6 +165,8 @@ class StackTags(pulumi.CustomResource):
             if tags is None and not opts.urn:
                 raise TypeError("Missing required property 'tags'")
             __props__.__dict__["tags"] = tags
+        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["organization", "project", "stack"])
+        opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(StackTags, __self__).__init__(
             'pulumiservice:index:StackTags',
             resource_name,

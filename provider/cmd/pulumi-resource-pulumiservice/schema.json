@@ -6142,15 +6142,18 @@
       "properties": {
         "organization": {
           "type": "string",
-          "description": "Organization name."
+          "description": "Organization name.",
+          "replaceOnChanges": true
         },
         "project": {
           "type": "string",
-          "description": "Project name."
+          "description": "Project name.",
+          "replaceOnChanges": true
         },
         "stack": {
           "type": "string",
-          "description": "Stack name."
+          "description": "Stack name.",
+          "replaceOnChanges": true
         },
         "tags": {
           "type": "object",
@@ -6170,17 +6173,17 @@
         "organization": {
           "type": "string",
           "description": "Organization name.",
-          "willReplaceOnChanges": true
+          "replaceOnChanges": true
         },
         "project": {
           "type": "string",
           "description": "Project name.",
-          "willReplaceOnChanges": true
+          "replaceOnChanges": true
         },
         "stack": {
           "type": "string",
           "description": "Stack name.",
-          "willReplaceOnChanges": true
+          "replaceOnChanges": true
         },
         "tags": {
           "type": "object",
