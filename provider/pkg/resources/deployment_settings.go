@@ -722,12 +722,14 @@ func gitAuthFromAPI(
 	return out
 }
 
-// secretValueOrPrev prefers a plaintext value (from create/update flow) but otherwise falls back
-// to the previously-recorded plaintext from state, so refresh on an unchanged secret does not
-// erase it. When neither is available, we return the ciphertext-as-string.
+// secretValueOrPrev reconciles a value returned by the Pulumi Cloud API with the
+// previously-recorded plaintext from state. Non-secret values are echoed back as plaintext and
+// are authoritative — using them surfaces out-of-band edits as drift. Secret values come back as
+// ciphertext (`{"secret": "<ciphertext>"}` decodes to Secret=true with the ciphertext in Value),
+// which carries no usable plaintext, so the known plaintext from state is kept instead. Only when
+// no prior plaintext exists (import) is the ciphertext surfaced as-is.
 func secretValueOrPrev(api pulumiapi.SecretValue, prev string) string {
-	if api.Value != "" && !api.Secret && prev != "" {
-		// Ciphertext value returned by Pulumi Cloud; prefer the known plaintext from state.
+	if api.Secret && prev != "" {
 		return prev
 	}
 	if api.Value != "" {
