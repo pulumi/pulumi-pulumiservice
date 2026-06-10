@@ -40,7 +40,7 @@ class WebhookArgs:
         :param pulumi.Input[_builtins.str] payload_url: URL to send request to.
         :param pulumi.Input[_builtins.str] environment_name: Name of the environment. Only specified if this is an environment webhook.
         :param pulumi.Input[Sequence[pulumi.Input['WebhookFilters']]] filters: Optional set of filters to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#filters) for more information.
-        :param pulumi.Input['WebhookFormat'] format: Format of the webhook payload. Can be either `raw` or `slack`. Defaults to `raw`.
+        :param pulumi.Input['WebhookFormat'] format: Format of the webhook payload. Can be either `raw`, `slack`, `ms_teams` or `pulumi_deployments`. Defaults to `raw`.
         :param pulumi.Input[Sequence[pulumi.Input['WebhookGroup']]] groups: Optional set of filter groups to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#groups) for more information.
         :param pulumi.Input[_builtins.str] project_name: Name of the project. Only specified if this is a stack or environment webhook.
         :param pulumi.Input[_builtins.str] secret: Optional. secret used as the HMAC key. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#headers) for more information.
@@ -143,7 +143,7 @@ class WebhookArgs:
     @pulumi.getter
     def format(self) -> pulumi.Input[Optional['WebhookFormat']]:
         """
-        Format of the webhook payload. Can be either `raw` or `slack`. Defaults to `raw`.
+        Format of the webhook payload. Can be either `raw`, `slack`, `ms_teams` or `pulumi_deployments`. Defaults to `raw`.
         """
         return pulumi.get(self, "format")
 
@@ -236,7 +236,7 @@ class Webhook(pulumi.CustomResource):
         :param pulumi.Input[_builtins.str] display_name: The friendly name displayed in the Pulumi Cloud.
         :param pulumi.Input[_builtins.str] environment_name: Name of the environment. Only specified if this is an environment webhook.
         :param pulumi.Input[Sequence[pulumi.Input['WebhookFilters']]] filters: Optional set of filters to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#filters) for more information.
-        :param pulumi.Input['WebhookFormat'] format: Format of the webhook payload. Can be either `raw` or `slack`. Defaults to `raw`.
+        :param pulumi.Input['WebhookFormat'] format: Format of the webhook payload. Can be either `raw`, `slack`, `ms_teams` or `pulumi_deployments`. Defaults to `raw`.
         :param pulumi.Input[Sequence[pulumi.Input['WebhookGroup']]] groups: Optional set of filter groups to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#groups) for more information.
         :param pulumi.Input[_builtins.str] organization_name: Name of the organization.
         :param pulumi.Input[_builtins.str] payload_url: URL to send request to.
@@ -321,6 +321,8 @@ class Webhook(pulumi.CustomResource):
             __props__.__dict__["name"] = None
         secret_opts = pulumi.ResourceOptions(additional_secret_outputs=["secret"])
         opts = pulumi.ResourceOptions.merge(opts, secret_opts)
+        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["environmentName", "organizationName", "projectName", "stackName"])
+        opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(Webhook, __self__).__init__(
             'pulumiservice:index:Webhook',
             resource_name,
@@ -449,7 +451,7 @@ class Webhook(pulumi.CustomResource):
     @pulumi.getter(name="stackName")
     def stack_name(self) -> pulumi.Output[Optional[_builtins.str]]:
         """
-        Name of the stack. Only specified if this is a stack webhook.
+        Name of the stack. Only needed if this is a stack webhook.
         """
         return pulumi.get(self, "stack_name")
 

@@ -6689,7 +6689,8 @@
         },
         "environmentName": {
           "type": "string",
-          "description": "Name of the environment. Only specified if this is an environment webhook."
+          "description": "Name of the environment. Only specified if this is an environment webhook.",
+          "replaceOnChanges": true
         },
         "filters": {
           "type": "array",
@@ -6700,7 +6701,8 @@
         },
         "format": {
           "$ref": "#/types/pulumiservice:index:WebhookFormat",
-          "description": "Format of the webhook payload. Can be either `raw`, `slack`, `ms_teams` or `pulumi_deployments`. Defaults to `raw`."
+          "description": "Format of the webhook payload. Can be either `raw`, `slack`, `ms_teams` or `pulumi_deployments`. Defaults to `raw`.",
+          "default": "raw"
         },
         "groups": {
           "type": "array",
@@ -6715,7 +6717,8 @@
         },
         "organizationName": {
           "type": "string",
-          "description": "Name of the organization."
+          "description": "Name of the organization.",
+          "replaceOnChanges": true
         },
         "payloadUrl": {
           "type": "string",
@@ -6723,7 +6726,8 @@
         },
         "projectName": {
           "type": "string",
-          "description": "Name of the project. Only specified if this is a stack or environment webhook."
+          "description": "Name of the project. Only specified if this is a stack or environment webhook.",
+          "replaceOnChanges": true
         },
         "secret": {
           "type": "string",
@@ -6732,16 +6736,17 @@
         },
         "stackName": {
           "type": "string",
-          "description": "Name of the stack. Only specified if this is a stack webhook."
+          "description": "Name of the stack. Only needed if this is a stack webhook.",
+          "replaceOnChanges": true
         }
       },
       "required": [
         "active",
         "displayName",
-        "organizationName",
         "payloadUrl",
-        "name",
-        "format"
+        "organizationName",
+        "format",
+        "name"
       ],
       "inputProperties": {
         "active": {
@@ -6754,7 +6759,8 @@
         },
         "environmentName": {
           "type": "string",
-          "description": "Name of the environment. Only specified if this is an environment webhook."
+          "description": "Name of the environment. Only specified if this is an environment webhook.",
+          "replaceOnChanges": true
         },
         "filters": {
           "type": "array",
@@ -6765,7 +6771,7 @@
         },
         "format": {
           "$ref": "#/types/pulumiservice:index:WebhookFormat",
-          "description": "Format of the webhook payload. Can be either `raw` or `slack`. Defaults to `raw`.",
+          "description": "Format of the webhook payload. Can be either `raw`, `slack`, `ms_teams` or `pulumi_deployments`. Defaults to `raw`.",
           "default": "raw"
         },
         "groups": {
@@ -6778,7 +6784,7 @@
         "organizationName": {
           "type": "string",
           "description": "Name of the organization.",
-          "willReplaceOnChanges": true
+          "replaceOnChanges": true
         },
         "payloadUrl": {
           "type": "string",
@@ -6786,7 +6792,8 @@
         },
         "projectName": {
           "type": "string",
-          "description": "Name of the project. Only specified if this is a stack or environment webhook."
+          "description": "Name of the project. Only specified if this is a stack or environment webhook.",
+          "replaceOnChanges": true
         },
         "secret": {
           "type": "string",
@@ -6795,14 +6802,15 @@
         },
         "stackName": {
           "type": "string",
-          "description": "Name of the stack. Only needed if this is a stack webhook."
+          "description": "Name of the stack. Only needed if this is a stack webhook.",
+          "replaceOnChanges": true
         }
       },
       "requiredInputs": [
         "active",
         "displayName",
-        "organizationName",
-        "payloadUrl"
+        "payloadUrl",
+        "organizationName"
       ]
     }
   },

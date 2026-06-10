@@ -111,8 +111,8 @@ cd examples && go test -v -run TestYamlStackTagsPluralExample -tags yaml -timeou
 ### Copyright Headers
 
 **IMPORTANT**: All new files must have correct copyright year ranges:
-- In 2025: Use `// Copyright 2016-2025, Pulumi Corporation.`
-- In 2026: Use `// Copyright 2016-2026, Pulumi Corporation.`
+- In 2025: Use `// Copyright 2025, Pulumi Corporation.`
+- In 2026: Use `// Copyright 2026, Pulumi Corporation.`
 - General rule: Always use current year as the end year for new files
 
 ### CHANGELOG Updates

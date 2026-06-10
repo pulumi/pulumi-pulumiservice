@@ -1,3 +1,17 @@
+// Copyright 2026, Pulumi Corporation.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//	http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package resources
 
 import (
@@ -5,538 +19,636 @@ import (
 	"fmt"
 	"strings"
 
-	pbempty "google.golang.org/protobuf/types/known/emptypb"
+	p "github.com/pulumi/pulumi-go-provider"
+	"github.com/pulumi/pulumi-go-provider/infer"
 
-	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
-	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
-	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
-
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
-	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 )
 
-// Not the best to create a second source of truth here, but this will likely not change for years
-var defaultWebhookGroups = map[string][]string{
-	"organization": {"deployments", "environments", "stacks"},
-	"stack":        {"deployments", "stacks"},
-	"environment":  {"environments"},
+// defaultWebhookGroups maps a webhook scope (organization/stack/environment)
+// to the default set of event-group subscriptions applied when the user has
+// not provided either `filters` or `groups`.
+var defaultWebhookGroups = map[string][]WebhookGroup{
+	"organization": {WebhookGroupDeployments, WebhookGroupEnvironments, WebhookGroupStacks},
+	"stack":        {WebhookGroupDeployments, WebhookGroupStacks},
+	"environment":  {WebhookGroupEnvironments},
 }
 
-type PulumiServiceWebhookResource struct {
-	Client pulumiapi.WebhookClient
+// WebhookFormat is the wire format of webhook payloads.
+type WebhookFormat string
+
+const (
+	WebhookFormatRaw               WebhookFormat = "raw"
+	WebhookFormatSlack             WebhookFormat = "slack"
+	WebhookFormatPulumiDeployments WebhookFormat = "pulumi_deployments"
+	WebhookFormatMicrosoftTeams    WebhookFormat = "ms_teams"
+)
+
+func (WebhookFormat) Values() []infer.EnumValue[WebhookFormat] {
+	return []infer.EnumValue[WebhookFormat]{
+		{Value: WebhookFormatRaw, Description: "The default webhook format."},
+		{
+			Value:       WebhookFormatSlack,
+			Description: "Messages formatted for consumption by Slack incoming webhooks.",
+		},
+		{
+			Name:        "PulumiDeployments",
+			Value:       WebhookFormatPulumiDeployments,
+			Description: "Initiate deployments on a stack from a Pulumi Cloud webhook.",
+		},
+		{
+			Name:        "MicrosoftTeams",
+			Value:       WebhookFormatMicrosoftTeams,
+			Description: "Messages formatted for consumption by Microsoft Teams incoming webhooks.",
+		},
+	}
 }
 
-type PulumiServiceWebhookInput struct {
-	Active           bool
-	DisplayName      string
-	PayloadURL       string
-	Secret           *pulumiapi.SecretValue
-	OrganizationName string
-	ProjectName      *string
-	StackName        *string
-	EnvironmentName  *string
-	Format           *string
-	Filters          []string
-	Groups           []string
+// WebhookGroup is a high-level bundle of webhook event filters.
+type WebhookGroup string
+
+const (
+	WebhookGroupStacks       WebhookGroup = "stacks"
+	WebhookGroupDeployments  WebhookGroup = "deployments"
+	WebhookGroupEnvironments WebhookGroup = "environments"
+)
+
+func (WebhookGroup) Values() []infer.EnumValue[WebhookGroup] {
+	return []infer.EnumValue[WebhookGroup]{
+		{Name: "Stacks", Value: WebhookGroupStacks, Description: "A group of webhooks containing all stack events."},
+		{
+			Name:        "Deployments",
+			Value:       WebhookGroupDeployments,
+			Description: "A group of webhooks containing all deployment events.",
+		},
+		{
+			Name:        "Environments",
+			Value:       WebhookGroupEnvironments,
+			Description: "A group of webhooks containing all environment events.",
+		},
+	}
 }
 
-type PulumiServiceWebhookProperties struct {
-	PulumiServiceWebhookInput
-	Name string
+// WebhookFilters is the set of fine-grained event filters that may be
+// subscribed to.
+type WebhookFilters string
+
+const (
+	WebhookFilterStackCreated               WebhookFilters = "stack_created"
+	WebhookFilterStackDeleted               WebhookFilters = "stack_deleted"
+	WebhookFilterUpdateSucceeded            WebhookFilters = "update_succeeded"
+	WebhookFilterUpdateFailed               WebhookFilters = "update_failed"
+	WebhookFilterPreviewSucceeded           WebhookFilters = "preview_succeeded"
+	WebhookFilterPreviewFailed              WebhookFilters = "preview_failed"
+	WebhookFilterDestroySucceeded           WebhookFilters = "destroy_succeeded"
+	WebhookFilterDestroyFailed              WebhookFilters = "destroy_failed"
+	WebhookFilterRefreshSucceeded           WebhookFilters = "refresh_succeeded"
+	WebhookFilterRefreshFailed              WebhookFilters = "refresh_failed"
+	WebhookFilterDeploymentQueued           WebhookFilters = "deployment_queued"
+	WebhookFilterDeploymentStarted          WebhookFilters = "deployment_started"
+	WebhookFilterDeploymentSucceeded        WebhookFilters = "deployment_succeeded"
+	WebhookFilterDeploymentFailed           WebhookFilters = "deployment_failed"
+	WebhookFilterDriftDetected              WebhookFilters = "drift_detected"
+	WebhookFilterDriftDetectionSucceeded    WebhookFilters = "drift_detection_succeeded"
+	WebhookFilterDriftDetectionFailed       WebhookFilters = "drift_detection_failed"
+	WebhookFilterDriftRemediationSucceeded  WebhookFilters = "drift_remediation_succeeded"
+	WebhookFilterDriftRemediationFailed     WebhookFilters = "drift_remediation_failed"
+	WebhookFilterEnvironmentCreated         WebhookFilters = "environment_created"
+	WebhookFilterEnvironmentDeleted         WebhookFilters = "environment_deleted"
+	WebhookFilterEnvironmentRevisionCreated WebhookFilters = "environment_revision_created"
+	WebhookFilterEnvRevisionRetracted       WebhookFilters = "environment_revision_retracted"
+	WebhookFilterEnvRevisionTagCreated      WebhookFilters = "environment_revision_tag_created"
+	WebhookFilterEnvRevisionTagDeleted      WebhookFilters = "environment_revision_tag_deleted"
+	WebhookFilterEnvRevisionTagUpdated      WebhookFilters = "environment_revision_tag_updated"
+	WebhookFilterEnvironmentTagCreated      WebhookFilters = "environment_tag_created"
+	WebhookFilterEnvironmentTagDeleted      WebhookFilters = "environment_tag_deleted"
+	WebhookFilterEnvironmentTagUpdated      WebhookFilters = "environment_tag_updated"
+	WebhookFilterImportedEnvironmentChanged WebhookFilters = "imported_environment_changed"
+)
+
+func (WebhookFilters) Values() []infer.EnumValue[WebhookFilters] {
+	return []infer.EnumValue[WebhookFilters]{
+		{
+			Name:        "StackCreated",
+			Value:       WebhookFilterStackCreated,
+			Description: "Trigger a webhook when a stack is created. Only valid for org webhooks.",
+		},
+		{
+			Name:        "StackDeleted",
+			Value:       WebhookFilterStackDeleted,
+			Description: "Trigger a webhook when a stack is deleted. Only valid for org webhooks.",
+		},
+		{
+			Name:        "UpdateSucceeded",
+			Value:       WebhookFilterUpdateSucceeded,
+			Description: "Trigger a webhook when a stack update succeeds.",
+		},
+		{
+			Name:        "UpdateFailed",
+			Value:       WebhookFilterUpdateFailed,
+			Description: "Trigger a webhook when a stack update fails.",
+		},
+		{
+			Name:        "PreviewSucceeded",
+			Value:       WebhookFilterPreviewSucceeded,
+			Description: "Trigger a webhook when a stack preview succeeds.",
+		},
+		{
+			Name:        "PreviewFailed",
+			Value:       WebhookFilterPreviewFailed,
+			Description: "Trigger a webhook when a stack preview fails.",
+		},
+		{
+			Name:        "DestroySucceeded",
+			Value:       WebhookFilterDestroySucceeded,
+			Description: "Trigger a webhook when a stack destroy succeeds.",
+		},
+		{
+			Name:        "DestroyFailed",
+			Value:       WebhookFilterDestroyFailed,
+			Description: "Trigger a webhook when a stack destroy fails.",
+		},
+		{
+			Name:        "RefreshSucceeded",
+			Value:       WebhookFilterRefreshSucceeded,
+			Description: "Trigger a webhook when a stack refresh succeeds.",
+		},
+		{
+			Name:        "RefreshFailed",
+			Value:       WebhookFilterRefreshFailed,
+			Description: "Trigger a webhook when a stack refresh fails.",
+		},
+		{
+			Name:        "DeploymentQueued",
+			Value:       WebhookFilterDeploymentQueued,
+			Description: "Trigger a webhook when a deployment is queued.",
+		},
+		{
+			Name:        "DeploymentStarted",
+			Value:       WebhookFilterDeploymentStarted,
+			Description: "Trigger a webhook when a deployment starts running.",
+		},
+		{
+			Name:        "DeploymentSucceeded",
+			Value:       WebhookFilterDeploymentSucceeded,
+			Description: "Trigger a webhook when a deployment succeeds.",
+		},
+		{
+			Name:        "DeploymentFailed",
+			Value:       WebhookFilterDeploymentFailed,
+			Description: "Trigger a webhook when a deployment fails.",
+		},
+		{
+			Name:        "DriftDetected",
+			Value:       WebhookFilterDriftDetected,
+			Description: "Trigger a webhook when drift is detected.",
+		},
+		{
+			Name:  "DriftDetectionSucceeded",
+			Value: WebhookFilterDriftDetectionSucceeded,
+			Description: "Trigger a webhook when a drift detection run succeeds, " +
+				"regardless of whether drift is detected.",
+		},
+		{
+			Name:        "DriftDetectionFailed",
+			Value:       WebhookFilterDriftDetectionFailed,
+			Description: "Trigger a webhook when a drift detection run fails.",
+		},
+		{
+			Name:        "DriftRemediationSucceeded",
+			Value:       WebhookFilterDriftRemediationSucceeded,
+			Description: "Trigger a webhook when a drift remediation run succeeds.",
+		},
+		{
+			Name:        "DriftRemediationFailed",
+			Value:       WebhookFilterDriftRemediationFailed,
+			Description: "Trigger a webhook when a drift remediation run fails.",
+		},
+		{
+			Name:        "EnvironmentCreated",
+			Value:       WebhookFilterEnvironmentCreated,
+			Description: "Trigger a webhook when a new environment is created.",
+		},
+		{
+			Name:        "EnvironmentDeleted",
+			Value:       WebhookFilterEnvironmentDeleted,
+			Description: "Trigger a webhook when an environment is deleted.",
+		},
+		{
+			Name:        "EnvironmentRevisionCreated",
+			Value:       WebhookFilterEnvironmentRevisionCreated,
+			Description: "Trigger a webhook when a new revision is created on an environment.",
+		},
+		{
+			Name:        "EnvironmentRevisionRetracted",
+			Value:       WebhookFilterEnvRevisionRetracted,
+			Description: "Trigger a webhook when a revision is retracted on an environment.",
+		},
+		{
+			Name:        "EnvironmentRevisionTagCreated",
+			Value:       WebhookFilterEnvRevisionTagCreated,
+			Description: "Trigger a webhook when a revision tag is created on an environment.",
+		},
+		{
+			Name:        "EnvironmentRevisionTagDeleted",
+			Value:       WebhookFilterEnvRevisionTagDeleted,
+			Description: "Trigger a webhook when a revision tag is deleted on an environment.",
+		},
+		{
+			Name:        "EnvironmentRevisionTagUpdated",
+			Value:       WebhookFilterEnvRevisionTagUpdated,
+			Description: "Trigger a webhook when a revision tag is updated on an environment.",
+		},
+		{
+			Name:        "EnvironmentTagCreated",
+			Value:       WebhookFilterEnvironmentTagCreated,
+			Description: "Trigger a webhook when an environment tag is created.",
+		},
+		{
+			Name:        "EnvironmentTagDeleted",
+			Value:       WebhookFilterEnvironmentTagDeleted,
+			Description: "Trigger a webhook when an environment tag is deleted.",
+		},
+		{
+			Name:        "EnvironmentTagUpdated",
+			Value:       WebhookFilterEnvironmentTagUpdated,
+			Description: "Trigger a webhook when an environment tag is updated.",
+		},
+		{
+			Name:        "ImportedEnvironmentChanged",
+			Value:       WebhookFilterImportedEnvironmentChanged,
+			Description: "Trigger a webhook when an imported environment has changed.",
+		},
+	}
 }
 
-func (i *PulumiServiceWebhookInput) ToPropertyMap(
-	plaintextSecret *pulumiapi.SecretValue,
-	cipherSecret *pulumiapi.SecretValue,
-	isInput bool,
-) resource.PropertyMap {
-	createMode := plaintextSecret != nil && cipherSecret == nil
-	mergeMode := plaintextSecret != nil && cipherSecret != nil
+type Webhook struct{}
 
-	pm := resource.PropertyMap{}
-	pm["active"] = resource.NewPropertyValue(i.Active)
-	pm["displayName"] = resource.NewPropertyValue(i.DisplayName)
-	pm["payloadUrl"] = resource.NewPropertyValue(i.PayloadURL)
-	pm["organizationName"] = resource.NewPropertyValue(i.OrganizationName)
+var (
+	_ infer.CustomCheck[WebhookInput]                = &Webhook{}
+	_ infer.CustomCreate[WebhookInput, WebhookState] = &Webhook{}
+	_ infer.CustomUpdate[WebhookInput, WebhookState] = &Webhook{}
+	_ infer.CustomDelete[WebhookState]               = &Webhook{}
+	_ infer.CustomRead[WebhookInput, WebhookState]   = &Webhook{}
+)
 
-	if i.ProjectName != nil {
-		pm["projectName"] = resource.NewPropertyValue(*i.ProjectName)
-	}
-	if i.StackName != nil {
-		pm["stackName"] = resource.NewPropertyValue(*i.StackName)
-	}
-	if i.EnvironmentName != nil {
-		pm["environmentName"] = resource.NewPropertyValue(*i.EnvironmentName)
-	}
-	if i.Format != nil {
-		pm["format"] = resource.NewPropertyValue(*i.Format)
-	}
-	if len(i.Filters) > 0 {
-		pm["filters"] = resource.NewPropertyValue(i.Filters)
-	}
-	if len(i.Groups) > 0 {
-		pm["groups"] = resource.NewPropertyValue(i.Groups)
-	}
-
-	if i.Secret != nil {
-		if mergeMode {
-			util.MergeSecretValueStrict(pm, "secret", *i.Secret, plaintextSecret, cipherSecret, isInput)
-		} else if createMode {
-			util.CreateSecretValue(pm, "secret", *i.Secret, *plaintextSecret, isInput)
-		} else {
-			util.ImportSecretValue(pm, "secret", *i.Secret, isInput)
-		}
-	}
-
-	return pm
+func (*Webhook) Annotate(a infer.Annotator) {
+	a.Describe(&Webhook{},
+		"Pulumi Webhooks allow you to notify external services of events happening within your Pulumi "+
+			"organization or stack. For example, you can trigger a notification whenever a stack is updated. "+
+			"Whenever an event occurs, Pulumi will send an HTTP POST request to all registered webhooks. The "+
+			"webhook can then be used to emit some notification, start running integration tests, or even "+
+			"update additional stacks.\n\n### Import\n\nPulumi webhooks can be imported using the `id`, which "+
+			"for webhooks is `{org}/{project}/{stack}/{webhook-name}` e.g.,\n\n```sh\n $ pulumi import "+
+			"pulumiservice:index:Webhook my_webhook my-org/my-project/my-stack/4b0d0671\n```\n\n")
+	a.SetToken("index", "Webhook")
 }
 
-func (i *PulumiServiceWebhookProperties) ToPropertyMap(
-	plaintextSecret *pulumiapi.SecretValue,
-	cipherSecret *pulumiapi.SecretValue,
-	isInput bool,
-) resource.PropertyMap {
-	pm := i.PulumiServiceWebhookInput.ToPropertyMap(plaintextSecret, cipherSecret, isInput)
-
-	if !isInput {
-		pm["name"] = resource.NewPropertyValue(i.Name)
-	}
-
-	return pm
+type WebhookInput struct {
+	Active           bool             `pulumi:"active"`
+	DisplayName      string           `pulumi:"displayName"`
+	PayloadURL       string           `pulumi:"payloadUrl"`
+	Secret           *string          `pulumi:"secret,optional"          provider:"secret"`
+	OrganizationName string           `pulumi:"organizationName"         provider:"replaceOnChanges"`
+	ProjectName      *string          `pulumi:"projectName,optional"     provider:"replaceOnChanges"`
+	StackName        *string          `pulumi:"stackName,optional"       provider:"replaceOnChanges"`
+	EnvironmentName  *string          `pulumi:"environmentName,optional" provider:"replaceOnChanges"`
+	Format           *WebhookFormat   `pulumi:"format,optional"`
+	Filters          []WebhookFilters `pulumi:"filters,optional"`
+	Groups           []WebhookGroup   `pulumi:"groups,optional"`
 }
 
-func (wh *PulumiServiceWebhookResource) ToPulumiServiceWebhookProperties(
-	propMap resource.PropertyMap,
-) PulumiServiceWebhookProperties {
-	props := PulumiServiceWebhookProperties{}
-
-	props.DisplayName = util.GetSecretOrStringValue(propMap["displayName"])
-	props.PayloadURL = util.GetSecretOrStringValue(propMap["payloadUrl"])
-	props.OrganizationName = util.GetSecretOrStringValue(propMap["organizationName"])
-	props.ProjectName = util.GetSecretOrStringNullableValue(propMap["projectName"])
-	props.StackName = util.GetSecretOrStringNullableValue(propMap["stackName"])
-	props.EnvironmentName = util.GetSecretOrStringNullableValue(propMap["environmentName"])
-	props.Format = util.GetSecretOrStringNullableValue(propMap["format"])
-	props.Name = util.GetSecretOrStringValue(propMap["name"])
-
-	if propMap["active"].HasValue() && propMap["active"].IsBool() {
-		props.Active = propMap["active"].BoolValue()
-	}
-
-	if propMap["filters"].HasValue() && propMap["filters"].IsArray() {
-		filtersInput := propMap["filters"].ArrayValue()
-		filters := make([]string, len(filtersInput))
-
-		for i, v := range filtersInput {
-			filters[i] = util.GetSecretOrStringValue(v)
-		}
-
-		props.Filters = filters
-	}
-
-	if propMap["groups"].HasValue() && propMap["groups"].IsArray() {
-		groupsInput := propMap["groups"].ArrayValue()
-		groups := make([]string, len(groupsInput))
-
-		for i, v := range groupsInput {
-			groups[i] = util.GetSecretOrStringValue(v)
-		}
-
-		props.Groups = groups
-	}
-
-	if propMap["secret"].HasValue() || propMap["secretCipher"].HasValue() {
-		props.Secret = &pulumiapi.SecretValue{
-			Secret: true,
-			Value:  util.GetSecretOrStringValue(propMap["secret"]),
-		}
-	}
-
-	return props
-}
-
-func (wh *PulumiServiceWebhookResource) Name() string {
-	return "pulumiservice:index:Webhook"
-}
-
-func (wh *PulumiServiceWebhookResource) Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
-	news, err := plugin.UnmarshalProperties(
-		req.GetNews(),
-		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true, KeepSecrets: true},
+func (i *WebhookInput) Annotate(a infer.Annotator) {
+	a.Describe(&i.Active, "Indicates whether this webhook is enabled or not.")
+	a.Describe(&i.DisplayName, "The friendly name displayed in the Pulumi Cloud.")
+	a.Describe(&i.PayloadURL, "URL to send request to.")
+	a.Describe(
+		&i.Secret,
+		"Optional. secret used as the HMAC key. See [webhook docs]"+
+			"(https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#headers) for more information.",
 	)
+	a.Describe(&i.OrganizationName, "Name of the organization.")
+	a.Describe(&i.ProjectName, "Name of the project. Only specified if this is a stack or environment webhook.")
+	a.Describe(&i.StackName, "Name of the stack. Only needed if this is a stack webhook.")
+	a.Describe(&i.EnvironmentName, "Name of the environment. Only specified if this is an environment webhook.")
+	a.Describe(
+		&i.Format,
+		"Format of the webhook payload. Can be either `raw`, `slack`, `ms_teams` or `pulumi_deployments`. "+
+			"Defaults to `raw`.",
+	)
+	a.SetDefault(&i.Format, WebhookFormatRaw)
+	a.Describe(
+		&i.Filters,
+		"Optional set of filters to apply to the webhook. See [webhook docs]"+
+			"(https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#filters) for more information.",
+	)
+	a.Describe(
+		&i.Groups,
+		"Optional set of filter groups to apply to the webhook. See [webhook docs]"+
+			"(https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#groups) for more information.",
+	)
+}
+
+type WebhookState struct {
+	WebhookInput
+	// Format shadows the optional WebhookInput.Format so the output is marked
+	// required: it always has a value (the input defaults to `raw`), so on the
+	// output side it is never absent.
+	//
+	// TODO[github.com/pulumi/pulumi-go-provider/issues/537]: once infer marks
+	// defaulted inputs as required outputs, drop this field and populate the
+	// embedded WebhookInput.Format directly.
+	Format WebhookFormat `pulumi:"format"`
+	Name   string        `pulumi:"name"`
+}
+
+func (s *WebhookState) Annotate(a infer.Annotator) {
+	a.Describe(
+		&s.Format,
+		"Format of the webhook payload. Can be either `raw`, `slack`, `ms_teams` or `pulumi_deployments`. "+
+			"Defaults to `raw`.",
+	)
+	a.Describe(&s.Name, "Webhook identifier generated by Pulumi Cloud.")
+}
+
+// Check validates webhook scope (organization/stack/environment) inputs and
+// applies default groups when neither filters nor groups are configured.
+func (*Webhook) Check(
+	ctx context.Context, req infer.CheckRequest,
+) (infer.CheckResponse[WebhookInput], error) {
+	i, failures, err := infer.DefaultCheck[WebhookInput](ctx, req.NewInputs)
 	if err != nil {
-		return nil, err
+		return infer.CheckResponse[WebhookInput]{}, err
 	}
 
-	var failures []*pulumirpc.CheckFailure
-	for _, p := range []resource.PropertyKey{"organizationName", "payloadUrl", "displayName", "active"} {
-		if !news[(p)].HasValue() {
-			failures = append(failures, &pulumirpc.CheckFailure{
-				Reason:   fmt.Sprintf("missing required property '%s'", p),
-				Property: string(p),
-			})
-		}
-	}
+	hasProject := i.ProjectName != nil
+	hasStack := i.StackName != nil
+	hasEnv := i.EnvironmentName != nil
 
-	if news["stackName"].HasValue() && !news["projectName"].HasValue() {
-		failures = append(failures, &pulumirpc.CheckFailure{
+	if hasStack && !hasProject {
+		failures = append(failures, p.CheckFailure{
+			Property: "projectName",
 			Reason:   "projectName and stackName must both be specified for stack webhooks",
-			Property: "projectName",
 		})
 	}
-	if news["environmentName"].HasValue() && !news["projectName"].HasValue() {
-		failures = append(failures, &pulumirpc.CheckFailure{
+	if hasEnv && !hasProject {
+		failures = append(failures, p.CheckFailure{
+			Property: "projectName",
 			Reason:   "projectName and environmentName must both be specified for environment webhooks",
-			Property: "projectName",
 		})
 	}
-	if news["environmentName"].HasValue() && news["stackName"].HasValue() {
-		failures = append(failures, &pulumirpc.CheckFailure{
+	if hasEnv && hasStack {
+		failures = append(failures, p.CheckFailure{
+			Property: "stackName",
 			Reason: "stackName needs to be empty if this is meant to be an environment webhook; " +
 				"environmentName needs to be empty if this is meant to be a stack webhook",
-			Property: "stackName",
 		})
 	}
-	if news["projectName"].HasValue() && !news["stackName"].HasValue() && !news["environmentName"].HasValue() {
-		failures = append(failures, &pulumirpc.CheckFailure{
+	if hasProject && !hasStack && !hasEnv {
+		failures = append(failures, p.CheckFailure{
+			Property: "projectName",
 			Reason: "projectName needs to be empty if this is meant to be an organization webhook; " +
 				"otherwise provide stackName for stack webhook or environmentName for environment webhook",
-			Property: "projectName",
 		})
 	}
 
-	// if the format is not specified, default to raw
-	// this should work automatically because we have set the default in the schema,
-	// but it isn't respected by the yaml provider
-	// https://github.com/pulumi/pulumi-yaml/issues/458
-	if !news["format"].HasValue() {
-		news["format"] = resource.NewPropertyValue("raw")
-	}
-
-	// if neither filters nor groups are specified, set default groups
-	if !news["filters"].HasValue() && !news["groups"].HasValue() {
-		var groups []string
-		if news["stackName"].HasValue() {
-			groups = defaultWebhookGroups["stack"]
-		} else if news["environmentName"].HasValue() {
-			groups = defaultWebhookGroups["environment"]
-		} else {
-			groups = defaultWebhookGroups["organization"]
+	// If neither filters nor groups are specified, apply the scope-appropriate
+	// default group set. This matches legacy provider behavior.
+	if len(i.Filters) == 0 && len(i.Groups) == 0 {
+		scope := "organization"
+		if hasStack {
+			scope = "stack"
+		} else if hasEnv {
+			scope = "environment"
 		}
-
-		var groupProps []resource.PropertyValue
-		for _, group := range groups {
-			groupProps = append(groupProps, resource.NewStringProperty(group))
-		}
-
-		news["groups"] = resource.NewArrayProperty(groupProps)
+		i.Groups = append([]WebhookGroup(nil), defaultWebhookGroups[scope]...)
 	}
 
-	inputNews, err := plugin.MarshalProperties(
-		news,
-		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true, KeepSecrets: true},
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	return &pulumirpc.CheckResponse{Inputs: inputNews, Failures: failures}, nil
+	return infer.CheckResponse[WebhookInput]{Inputs: i, Failures: failures}, nil
 }
 
-func (wh *PulumiServiceWebhookResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
-	ctx := context.Background()
-	inputMap, err := plugin.UnmarshalProperties(
-		req.GetProperties(),
-		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true, KeepSecrets: true},
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	inputProps := wh.ToPulumiServiceWebhookProperties(inputMap)
-
-	var secretStr *string
-	if inputProps.Secret != nil {
-		secretStr = &inputProps.Secret.Value
-	}
-
-	request := pulumiapi.WebhookRequest{
-		OrganizationName: inputProps.OrganizationName,
-		ProjectName:      inputProps.ProjectName,
-		StackName:        inputProps.StackName,
-		EnvironmentName:  inputProps.EnvironmentName,
-		DisplayName:      inputProps.DisplayName,
-		PayloadURL:       inputProps.PayloadURL,
-		Secret:           secretStr,
-		Active:           inputProps.Active,
-		Format:           inputProps.Format,
-		Filters:          inputProps.Filters,
-		Groups:           inputProps.Groups,
-	}
-	webhook, err := wh.Client.CreateWebhook(ctx, request)
-	if err != nil {
-		return nil, err
-	}
-	props := inputProps
-	props.Name = webhook.Name
-	if secretStr != nil && webhook.HasSecret {
-		props.Secret.Value = webhook.SecretCiphertext
-	}
-
-	properties, err := plugin.MarshalProperties(
-		props.ToPropertyMap(inputProps.Secret, nil, false),
-		plugin.MarshalOptions{
-			KeepUnknowns: true,
-			SkipNulls:    true,
-		},
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	return &pulumirpc.CreateResponse{
-		Id:         generateWebhookID(props.PulumiServiceWebhookInput, *webhook),
-		Properties: properties,
-	}, nil
-}
-
-func (wh *PulumiServiceWebhookResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-	olds, err := plugin.UnmarshalProperties(
-		req.GetOldInputs(),
-		plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true},
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	news, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
-	if err != nil {
-		return nil, err
-	}
-
-	// previous versions of the provider used "__inputs" key to store inputs in output properties
-	// to maintain backwards compatibility, we still need to handle this case
-	// so we just lift up those values to the top level
-	if oldInputs, ok := olds["__inputs"]; ok && oldInputs.IsObject() {
-		for k, v := range oldInputs.ObjectValue() {
-			olds[k] = v
-		}
-	}
-
-	diffs := olds.Diff(news)
-	if diffs == nil {
-		return &pulumirpc.DiffResponse{
-			Changes: pulumirpc.DiffResponse_DIFF_NONE,
+func (*Webhook) Create(
+	ctx context.Context, req infer.CreateRequest[WebhookInput],
+) (infer.CreateResponse[WebhookState], error) {
+	if req.DryRun {
+		return infer.CreateResponse[WebhookState]{
+			Output: WebhookState{WebhookInput: req.Inputs, Format: *req.Inputs.Format},
 		}, nil
 	}
 
-	dd := plugin.NewDetailedDiffFromObjectDiff(diffs, false)
-
-	detailedDiffs := map[string]*pulumirpc.PropertyDiff{}
-	replaceProperties := map[string]bool{
-		"organizationName": true,
-		"projectName":      true,
-		"stackName":        true,
-		"environmentName":  true,
-	}
-	for k, v := range dd {
-		if _, ok := replaceProperties[k]; ok {
-			v.Kind = v.Kind.AsReplace()
-		}
-		detailedDiffs[k] = &pulumirpc.PropertyDiff{
-			Kind:      pulumirpc.PropertyDiff_Kind(v.Kind), //nolint:gosec // safe conversion from plugin.DiffKind
-			InputDiff: v.InputDiff,
-		}
+	apiReq := toWebhookRequest(req.Inputs)
+	webhook, err := config.GetClient(ctx).CreateWebhook(ctx, apiReq)
+	if err != nil {
+		return infer.CreateResponse[WebhookState]{}, fmt.Errorf(
+			"error creating webhook %q: %w", req.Inputs.DisplayName, err,
+		)
 	}
 
-	changes := pulumirpc.DiffResponse_DIFF_NONE
-	if len(detailedDiffs) > 0 {
-		changes = pulumirpc.DiffResponse_DIFF_SOME
-	}
-	return &pulumirpc.DiffResponse{
-		Changes:         changes,
-		DetailedDiff:    detailedDiffs,
-		HasDetailedDiff: true,
+	return infer.CreateResponse[WebhookState]{
+		ID: generateWebhookID(req.Inputs, webhook.Name),
+		Output: WebhookState{
+			WebhookInput: req.Inputs,
+			Format:       *req.Inputs.Format,
+			Name:         webhook.Name,
+		},
 	}, nil
 }
 
-func (wh *PulumiServiceWebhookResource) Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
-	inputMap, err := plugin.UnmarshalProperties(
-		req.GetNews(),
-		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true},
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	inputProps := wh.ToPulumiServiceWebhookProperties(inputMap)
-
-	hookID, err := splitWebhookID(req.GetId())
-	if err != nil {
-		return nil, fmt.Errorf("invalid resource id: %v", err)
-	}
-
-	var secretStr *string
-	if inputProps.Secret != nil {
-		secretStr = &inputProps.Secret.Value
+func (*Webhook) Update(
+	ctx context.Context, req infer.UpdateRequest[WebhookInput, WebhookState],
+) (infer.UpdateResponse[WebhookState], error) {
+	if req.DryRun {
+		return infer.UpdateResponse[WebhookState]{
+			Output: WebhookState{
+				WebhookInput: req.Inputs,
+				Format:       *req.Inputs.Format,
+				Name:         req.State.Name,
+			},
+		}, nil
 	}
 
 	updateReq := pulumiapi.UpdateWebhookRequest{
-		WebhookRequest: pulumiapi.WebhookRequest{
-			OrganizationName: inputProps.OrganizationName,
-			ProjectName:      inputProps.ProjectName,
-			StackName:        inputProps.StackName,
-			EnvironmentName:  inputProps.EnvironmentName,
-			DisplayName:      inputProps.DisplayName,
-			PayloadURL:       inputProps.PayloadURL,
-			Secret:           secretStr,
-			Active:           inputProps.Active,
-			Format:           inputProps.Format,
-			Filters:          inputProps.Filters,
-			Groups:           inputProps.Groups,
-		},
-		Name: hookID.webhookName,
+		WebhookRequest: toWebhookRequest(req.Inputs),
+		Name:           req.State.Name,
 	}
-	webhook, err := wh.Client.UpdateWebhook(context.Background(), updateReq)
+	if _, err := config.GetClient(ctx).UpdateWebhook(ctx, updateReq); err != nil {
+		return infer.UpdateResponse[WebhookState]{}, fmt.Errorf(
+			"error updating webhook %q: %w", req.State.Name, err,
+		)
+	}
+	return infer.UpdateResponse[WebhookState]{
+		Output: WebhookState{
+			WebhookInput: req.Inputs,
+			Format:       *req.Inputs.Format,
+			Name:         req.State.Name,
+		},
+	}, nil
+}
+
+func (*Webhook) Delete(
+	ctx context.Context, req infer.DeleteRequest[WebhookState],
+) (infer.DeleteResponse, error) {
+	hookID, err := splitWebhookID(req.ID)
 	if err != nil {
-		return nil, err
+		return infer.DeleteResponse{}, err
 	}
-	props := inputProps
+	return infer.DeleteResponse{}, config.GetClient(ctx).DeleteWebhook(
+		ctx,
+		hookID.organizationName,
+		hookID.projectName,
+		hookID.stackName,
+		hookID.environmentName,
+		hookID.webhookName,
+	)
+}
 
-	if secretStr != nil && webhook.HasSecret {
-		props.Secret.Value = webhook.SecretCiphertext
+func (*Webhook) Read(
+	ctx context.Context, req infer.ReadRequest[WebhookInput, WebhookState],
+) (infer.ReadResponse[WebhookInput, WebhookState], error) {
+	hookID, err := splitWebhookID(req.ID)
+	if err != nil {
+		return infer.ReadResponse[WebhookInput, WebhookState]{}, err
 	}
 
-	properties, err := plugin.MarshalProperties(
-		props.ToPropertyMap(inputProps.Secret, nil, false),
-		plugin.MarshalOptions{
-			KeepUnknowns: true,
-			SkipNulls:    true,
-			KeepSecrets:  true,
-		},
+	webhook, err := config.GetClient(ctx).GetWebhook(
+		ctx,
+		hookID.organizationName,
+		hookID.projectName,
+		hookID.stackName,
+		hookID.environmentName,
+		hookID.webhookName,
 	)
 	if err != nil {
-		return nil, err
+		return infer.ReadResponse[WebhookInput, WebhookState]{}, fmt.Errorf(
+			"failed to read webhook %q: %w", req.ID, err,
+		)
 	}
-	return &pulumirpc.UpdateResponse{
-		Properties: properties,
-	}, nil
-
-}
-
-func (wh *PulumiServiceWebhookResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
-	hookID, err := splitWebhookID(req.Id)
-	if err != nil {
-		return nil, err
-	}
-
-	err = wh.Client.DeleteWebhook(context.Background(), hookID.organizationName,
-		hookID.projectName, hookID.stackName, hookID.environmentName, hookID.webhookName)
-
-	return &pbempty.Empty{}, err
-}
-
-func (wh *PulumiServiceWebhookResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
-	hookID, err := splitWebhookID(req.Id)
-	if err != nil {
-		return nil, err
-	}
-	webhook, err := wh.Client.GetWebhook(context.Background(),
-		hookID.organizationName, hookID.projectName, hookID.stackName, hookID.environmentName, hookID.webhookName)
-	if err != nil {
-		return nil, err
-	}
-
 	if webhook == nil {
-		return &pulumirpc.ReadResponse{}, nil
+		return infer.ReadResponse[WebhookInput, WebhookState]{}, nil
 	}
 
-	var secret *pulumiapi.SecretValue
-	if webhook.HasSecret {
-		secret = &pulumiapi.SecretValue{
-			Value:  webhook.SecretCiphertext,
-			Secret: true,
-		}
+	format := WebhookFormat(webhook.Format)
+	inputs := WebhookInput{
+		Active:           webhook.Active,
+		DisplayName:      webhook.DisplayName,
+		PayloadURL:       webhook.PayloadURL,
+		OrganizationName: hookID.organizationName,
+		ProjectName:      hookID.projectName,
+		StackName:        hookID.stackName,
+		EnvironmentName:  hookID.environmentName,
+		Format:           &format,
+		Filters:          toWebhookFilters(webhook.Filters),
+		Groups:           toWebhookGroups(webhook.Groups),
+		// The API never returns the plaintext secret. Preserve the value
+		// previously persisted in state so refresh does not erase it.
+		Secret: req.State.Secret,
 	}
 
-	retrievedProperties := PulumiServiceWebhookProperties{
-		PulumiServiceWebhookInput: PulumiServiceWebhookInput{
-			Active:           webhook.Active,
-			DisplayName:      webhook.DisplayName,
-			PayloadURL:       webhook.PayloadURL,
-			Secret:           secret,
-			Format:           &webhook.Format,
-			Filters:          webhook.Filters,
-			Groups:           webhook.Groups,
-			OrganizationName: hookID.organizationName,
-			ProjectName:      hookID.projectName,
-			StackName:        hookID.stackName,
-			EnvironmentName:  hookID.environmentName,
+	return infer.ReadResponse[WebhookInput, WebhookState]{
+		ID:     req.ID,
+		Inputs: inputs,
+		State: WebhookState{
+			WebhookInput: inputs,
+			Format:       format,
+			Name:         webhook.Name,
 		},
-		Name: webhook.Name,
-	}
-
-	var plaintextSecret *pulumiapi.SecretValue
-	var ciphertextSecret *pulumiapi.SecretValue
-	propertyMap, err := plugin.UnmarshalProperties(
-		req.GetProperties(),
-		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true, KeepSecrets: true},
-	)
-	if err != nil {
-		return nil, err
-	}
-	inputMap, err := plugin.UnmarshalProperties(
-		req.GetInputs(),
-		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true, KeepSecrets: true},
-	)
-	if err != nil {
-		return nil, err
-	}
-	if propertyMap["secret"].HasValue() {
-		plaintextSecret = wh.ToPulumiServiceWebhookProperties(inputMap).Secret
-		ciphertextSecret = wh.ToPulumiServiceWebhookProperties(propertyMap).Secret
-	}
-
-	properties, err := plugin.MarshalProperties(
-		retrievedProperties.ToPropertyMap(plaintextSecret, ciphertextSecret, false),
-		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true, KeepSecrets: true},
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	inputs, err := plugin.MarshalProperties(
-		retrievedProperties.ToPropertyMap(plaintextSecret, ciphertextSecret, true),
-		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true, KeepSecrets: true},
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	return &pulumirpc.ReadResponse{
-		Id:         req.Id,
-		Properties: properties,
-		Inputs:     inputs,
 	}, nil
 }
 
-func generateWebhookID(input PulumiServiceWebhookInput, webhook pulumiapi.Webhook) string {
-	if input.ProjectName != nil && input.StackName != nil {
-		return fmt.Sprintf("%s/%s/%s/%s", input.OrganizationName, *input.ProjectName, *input.StackName,
-			webhook.Name)
-	} else if input.ProjectName != nil && input.EnvironmentName != nil {
-		// This is not ideal, but inserting "environment" string to distinguish from stack webhooks
-		return fmt.Sprintf("%s/environment/%s/%s/%s", input.OrganizationName, *input.ProjectName, *input.EnvironmentName,
-			webhook.Name)
+// toWebhookRequest builds a pulumiapi request from infer inputs.
+func toWebhookRequest(i WebhookInput) pulumiapi.WebhookRequest {
+	req := pulumiapi.WebhookRequest{
+		OrganizationName: i.OrganizationName,
+		ProjectName:      i.ProjectName,
+		StackName:        i.StackName,
+		EnvironmentName:  i.EnvironmentName,
+		DisplayName:      i.DisplayName,
+		PayloadURL:       i.PayloadURL,
+		Secret:           i.Secret,
+		Active:           i.Active,
+		Filters:          fromWebhookFilters(i.Filters),
+		Groups:           fromWebhookGroups(i.Groups),
 	}
-	return fmt.Sprintf("%s/%s", input.OrganizationName, webhook.Name)
+	if i.Format != nil {
+		s := string(*i.Format)
+		req.Format = &s
+	}
+	return req
+}
+
+func toWebhookFilters(in []string) []WebhookFilters {
+	if len(in) == 0 {
+		return nil
+	}
+	out := make([]WebhookFilters, len(in))
+	for idx, v := range in {
+		out[idx] = WebhookFilters(v)
+	}
+	return out
+}
+
+func fromWebhookFilters(in []WebhookFilters) []string {
+	if len(in) == 0 {
+		return nil
+	}
+	out := make([]string, len(in))
+	for idx, v := range in {
+		out[idx] = string(v)
+	}
+	return out
+}
+
+func toWebhookGroups(in []string) []WebhookGroup {
+	if len(in) == 0 {
+		return nil
+	}
+	out := make([]WebhookGroup, len(in))
+	for idx, v := range in {
+		out[idx] = WebhookGroup(v)
+	}
+	return out
+}
+
+func fromWebhookGroups(in []WebhookGroup) []string {
+	if len(in) == 0 {
+		return nil
+	}
+	out := make([]string, len(in))
+	for idx, v := range in {
+		out[idx] = string(v)
+	}
+	return out
+}
+
+func generateWebhookID(input WebhookInput, webhookName string) string {
+	if input.ProjectName != nil && input.StackName != nil {
+		return fmt.Sprintf("%s/%s/%s/%s", input.OrganizationName, *input.ProjectName, *input.StackName, webhookName)
+	}
+	if input.ProjectName != nil && input.EnvironmentName != nil {
+		// The "environment" segment disambiguates this from stack webhooks,
+		// which also have four slash-separated parts.
+		return fmt.Sprintf(
+			"%s/environment/%s/%s/%s",
+			input.OrganizationName, *input.ProjectName, *input.EnvironmentName, webhookName,
+		)
+	}
+	return fmt.Sprintf("%s/%s", input.OrganizationName, webhookName)
+}
+
+type webhookID struct {
+	organizationName string
+	projectName      *string
+	stackName        *string
+	environmentName  *string
+	webhookName      string
 }
 
 func splitWebhookID(id string) (*webhookID, error) {
-	// format:
-	// organization/project/stack/webhookName (stack webhook)
-	// organization/webhookName (org webhook)
-	// organization/environment/projectName/environmentName/webhookName (environment webhook)
+	// Accepted formats:
+	//   organization/webhookName                                       (org)
+	//   organization/project/stack/webhookName                         (stack)
+	//   organization/environment/project/environmentName/webhookName   (env)
 	s := strings.Split(id, "/")
 	switch len(s) {
 	case 2:
@@ -561,12 +673,4 @@ func splitWebhookID(id string) (*webhookID, error) {
 	default:
 		return nil, fmt.Errorf("%q is not a valid webhook ID", id)
 	}
-}
-
-type webhookID struct {
-	organizationName string
-	projectName      *string
-	stackName        *string
-	environmentName  *string
-	webhookName      string
 }
