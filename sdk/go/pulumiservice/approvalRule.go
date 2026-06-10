@@ -22,7 +22,7 @@ type ApprovalRule struct {
 	Enabled pulumi.BoolOutput `pulumi:"enabled"`
 	// The environment this rule applies to.
 	EnvironmentIdentifier EnvironmentIdentifierOutput `pulumi:"environmentIdentifier"`
-	// Name of the approval rule.
+	// The name of the approval rule.
 	Name pulumi.StringOutput `pulumi:"name"`
 	// The type of action this rule applies to.
 	TargetActionTypes TargetActionTypeArrayOutput `pulumi:"targetActionTypes"`
@@ -50,6 +50,13 @@ func NewApprovalRule(ctx *pulumi.Context,
 	if args.TargetActionTypes == nil {
 		return nil, errors.New("invalid value for required argument 'TargetActionTypes'")
 	}
+	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
+		"environmentIdentifier.name",
+		"environmentIdentifier.organization",
+		"environmentIdentifier.project",
+		"name",
+	})
+	opts = append(opts, replaceOnChanges)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource ApprovalRule
 	err := ctx.RegisterResource("pulumiservice:index:ApprovalRule", name, args, &resource, opts...)
@@ -211,7 +218,7 @@ func (o ApprovalRuleOutput) EnvironmentIdentifier() EnvironmentIdentifierOutput 
 	return o.ApplyT(func(v *ApprovalRule) EnvironmentIdentifierOutput { return v.EnvironmentIdentifier }).(EnvironmentIdentifierOutput)
 }
 
-// Name of the approval rule.
+// The name of the approval rule.
 func (o ApprovalRuleOutput) Name() pulumi.StringOutput {
 	return o.ApplyT(func(v *ApprovalRule) pulumi.StringOutput { return v.Name }).(pulumi.StringOutput)
 }

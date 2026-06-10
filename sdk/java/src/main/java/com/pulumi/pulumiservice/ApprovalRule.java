@@ -66,14 +66,14 @@ public class ApprovalRule extends com.pulumi.resources.CustomResource {
         return this.environmentIdentifier;
     }
     /**
-     * Name of the approval rule.
+     * The name of the approval rule.
      * 
      */
     @Export(name="name", refs={String.class}, tree="[0]")
     private Output<String> name;
 
     /**
-     * @return Name of the approval rule.
+     * @return The name of the approval rule.
      * 
      */
     public Output<String> name() {
@@ -133,6 +133,12 @@ public class ApprovalRule extends com.pulumi.resources.CustomResource {
     private static com.pulumi.resources.CustomResourceOptions makeResourceOptions(@Nullable com.pulumi.resources.CustomResourceOptions options, @Nullable Output<java.lang.String> id) {
         var defaultOptions = com.pulumi.resources.CustomResourceOptions.builder()
             .version(Utilities.getVersion())
+            .replaceOnChanges(List.of(
+                "environmentIdentifier.name",
+                "environmentIdentifier.organization",
+                "environmentIdentifier.project",
+                "name"
+            ))
             .build();
         return com.pulumi.resources.CustomResourceOptions.merge(defaultOptions, options, id);
     }
