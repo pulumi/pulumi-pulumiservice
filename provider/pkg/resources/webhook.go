@@ -95,36 +95,38 @@ func (WebhookGroup) Values() []infer.EnumValue[WebhookGroup] {
 type WebhookFilters string
 
 const (
-	WebhookFilterStackCreated               WebhookFilters = "stack_created"
-	WebhookFilterStackDeleted               WebhookFilters = "stack_deleted"
-	WebhookFilterUpdateSucceeded            WebhookFilters = "update_succeeded"
-	WebhookFilterUpdateFailed               WebhookFilters = "update_failed"
-	WebhookFilterPreviewSucceeded           WebhookFilters = "preview_succeeded"
-	WebhookFilterPreviewFailed              WebhookFilters = "preview_failed"
-	WebhookFilterDestroySucceeded           WebhookFilters = "destroy_succeeded"
-	WebhookFilterDestroyFailed              WebhookFilters = "destroy_failed"
-	WebhookFilterRefreshSucceeded           WebhookFilters = "refresh_succeeded"
-	WebhookFilterRefreshFailed              WebhookFilters = "refresh_failed"
-	WebhookFilterDeploymentQueued           WebhookFilters = "deployment_queued"
-	WebhookFilterDeploymentStarted          WebhookFilters = "deployment_started"
-	WebhookFilterDeploymentSucceeded        WebhookFilters = "deployment_succeeded"
-	WebhookFilterDeploymentFailed           WebhookFilters = "deployment_failed"
-	WebhookFilterDriftDetected              WebhookFilters = "drift_detected"
-	WebhookFilterDriftDetectionSucceeded    WebhookFilters = "drift_detection_succeeded"
-	WebhookFilterDriftDetectionFailed       WebhookFilters = "drift_detection_failed"
-	WebhookFilterDriftRemediationSucceeded  WebhookFilters = "drift_remediation_succeeded"
-	WebhookFilterDriftRemediationFailed     WebhookFilters = "drift_remediation_failed"
-	WebhookFilterEnvironmentCreated         WebhookFilters = "environment_created"
-	WebhookFilterEnvironmentDeleted         WebhookFilters = "environment_deleted"
-	WebhookFilterEnvironmentRevisionCreated WebhookFilters = "environment_revision_created"
-	WebhookFilterEnvRevisionRetracted       WebhookFilters = "environment_revision_retracted"
-	WebhookFilterEnvRevisionTagCreated      WebhookFilters = "environment_revision_tag_created"
-	WebhookFilterEnvRevisionTagDeleted      WebhookFilters = "environment_revision_tag_deleted"
-	WebhookFilterEnvRevisionTagUpdated      WebhookFilters = "environment_revision_tag_updated"
-	WebhookFilterEnvironmentTagCreated      WebhookFilters = "environment_tag_created"
-	WebhookFilterEnvironmentTagDeleted      WebhookFilters = "environment_tag_deleted"
-	WebhookFilterEnvironmentTagUpdated      WebhookFilters = "environment_tag_updated"
-	WebhookFilterImportedEnvironmentChanged WebhookFilters = "imported_environment_changed"
+	WebhookFilterStackCreated                 WebhookFilters = "stack_created"
+	WebhookFilterStackDeleted                 WebhookFilters = "stack_deleted"
+	WebhookFilterUpdateSucceeded              WebhookFilters = "update_succeeded"
+	WebhookFilterUpdateFailed                 WebhookFilters = "update_failed"
+	WebhookFilterPreviewSucceeded             WebhookFilters = "preview_succeeded"
+	WebhookFilterPreviewFailed                WebhookFilters = "preview_failed"
+	WebhookFilterDestroySucceeded             WebhookFilters = "destroy_succeeded"
+	WebhookFilterDestroyFailed                WebhookFilters = "destroy_failed"
+	WebhookFilterRefreshSucceeded             WebhookFilters = "refresh_succeeded"
+	WebhookFilterRefreshFailed                WebhookFilters = "refresh_failed"
+	WebhookFilterDeploymentQueued             WebhookFilters = "deployment_queued"
+	WebhookFilterDeploymentStarted            WebhookFilters = "deployment_started"
+	WebhookFilterDeploymentSucceeded          WebhookFilters = "deployment_succeeded"
+	WebhookFilterDeploymentFailed             WebhookFilters = "deployment_failed"
+	WebhookFilterDriftDetected                WebhookFilters = "drift_detected"
+	WebhookFilterDriftDetectionSucceeded      WebhookFilters = "drift_detection_succeeded"
+	WebhookFilterDriftDetectionFailed         WebhookFilters = "drift_detection_failed"
+	WebhookFilterDriftRemediationSucceeded    WebhookFilters = "drift_remediation_succeeded"
+	WebhookFilterDriftRemediationFailed       WebhookFilters = "drift_remediation_failed"
+	WebhookFilterEnvironmentCreated           WebhookFilters = "environment_created"
+	WebhookFilterEnvironmentDeleted           WebhookFilters = "environment_deleted"
+	WebhookFilterEnvironmentRevisionCreated   WebhookFilters = "environment_revision_created"
+	WebhookFilterEnvRevisionRetracted         WebhookFilters = "environment_revision_retracted"
+	WebhookFilterEnvRevisionTagCreated        WebhookFilters = "environment_revision_tag_created"
+	WebhookFilterEnvRevisionTagDeleted        WebhookFilters = "environment_revision_tag_deleted"
+	WebhookFilterEnvRevisionTagUpdated        WebhookFilters = "environment_revision_tag_updated"
+	WebhookFilterEnvironmentTagCreated        WebhookFilters = "environment_tag_created"
+	WebhookFilterEnvironmentTagDeleted        WebhookFilters = "environment_tag_deleted"
+	WebhookFilterEnvironmentTagUpdated        WebhookFilters = "environment_tag_updated"
+	WebhookFilterImportedEnvironmentChanged   WebhookFilters = "imported_environment_changed"
+	WebhookFilterEnvironmentRotationSucceeded WebhookFilters = "environment_rotation_succeeded"
+	WebhookFilterEnvironmentRotationFailed    WebhookFilters = "environment_rotation_failed"
 )
 
 func (WebhookFilters) Values() []infer.EnumValue[WebhookFilters] {
@@ -279,6 +281,16 @@ func (WebhookFilters) Values() []infer.EnumValue[WebhookFilters] {
 			Name:        "ImportedEnvironmentChanged",
 			Value:       WebhookFilterImportedEnvironmentChanged,
 			Description: "Trigger a webhook when an imported environment has changed.",
+		},
+		{
+			Name:        "EnvironmentRotationSucceeded",
+			Value:       WebhookFilterEnvironmentRotationSucceeded,
+			Description: "Trigger a webhook when an environment rotation succeeds.",
+		},
+		{
+			Name:        "EnvironmentRotationFailed",
+			Value:       WebhookFilterEnvironmentRotationFailed,
+			Description: "Trigger a webhook when an environment rotation fails.",
 		},
 	}
 }

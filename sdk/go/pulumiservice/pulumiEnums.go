@@ -1881,6 +1881,10 @@ const (
 	WebhookFiltersEnvironmentTagUpdated = WebhookFilters("environment_tag_updated")
 	// Trigger a webhook when an imported environment has changed.
 	WebhookFiltersImportedEnvironmentChanged = WebhookFilters("imported_environment_changed")
+	// Trigger a webhook when an environment rotation succeeds.
+	WebhookFiltersEnvironmentRotationSucceeded = WebhookFilters("environment_rotation_succeeded")
+	// Trigger a webhook when an environment rotation fails.
+	WebhookFiltersEnvironmentRotationFailed = WebhookFilters("environment_rotation_failed")
 )
 
 func (WebhookFilters) ElementType() reflect.Type {
@@ -2035,6 +2039,8 @@ func (o WebhookFiltersPtrOutput) ToStringPtrOutputWithContext(ctx context.Contex
 //	WebhookFiltersEnvironmentTagDeleted
 //	WebhookFiltersEnvironmentTagUpdated
 //	WebhookFiltersImportedEnvironmentChanged
+//	WebhookFiltersEnvironmentRotationSucceeded
+//	WebhookFiltersEnvironmentRotationFailed
 type WebhookFiltersInput interface {
 	pulumi.Input
 
