@@ -13,8 +13,6 @@ The Pulumi Service Provider (PSP) is built on top of the [Pulumi Cloud REST API]
 
 For a full list of supported resources, visit the [Pulumi Registry](https://www.pulumi.com/registry/packages/pulumiservice/). For the REST API reference documentation, visit [Pulumi Cloud API Documentation](https://www.pulumi.com/docs/pulumi-cloud/reference/cloud-rest-api/).
 
-For now, PSP is in public preview, but we're working on releasing v1.0 in the near future.
-
 ## Installing
 
 This package is available in many languages in the standard packaging formats.
