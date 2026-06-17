@@ -497,3 +497,1187 @@ export interface TemplateSourceDestinationArgs {
      */
     url?: pulumi.Input<string | undefined>;
 }
+export namespace api {
+    /**
+     * A simple struct representing the metadata needed to add an item via user-facing information.
+     */
+    export interface AddServiceItemArgs {
+        /**
+         * the name (including any namespacing) of the item
+         */
+        name: pulumi.Input<string>;
+        /**
+         * the type of the item to add
+         */
+        type: pulumi.Input<string>;
+    }
+
+    /**
+     * Represents agent entity.
+     */
+    export interface AgentEntityArgs {
+        type: pulumi.Input<string>;
+    }
+
+    /**
+     * Represents agent entity diff.
+     */
+    export interface AgentEntityDiffArgs {
+        /**
+         * Entities to add to the Agent's context.
+         * Entities must be valid, and will be automatically deleted if they are invalid.
+         */
+        add?: pulumi.Input<pulumi.Input<inputs.api.AgentEntityArgs>[] | undefined>;
+        /**
+         * Entities to remove from the Agent's context.
+         */
+        remove?: pulumi.Input<pulumi.Input<inputs.api.AgentEntityArgs>[] | undefined>;
+    }
+
+    /**
+     * A reference to an integration enabled for an agent task. Structured as an object (rather than a bare string) so additional fields like instance name or scope can be added later without breaking the wire format.
+     */
+    export interface AgentTaskIntegrationRefArgs {
+        /**
+         * The catalog integration ID (e.g. 'honeycomb', 'datadog').
+         */
+        id: pulumi.Input<string>;
+    }
+
+    export interface AgentUserEventMessageArgs {
+        /**
+         * Slash Commands the user selected when creating their message.
+         */
+        commands?: pulumi.Input<{[key: string]: any} | undefined>;
+        /**
+         * The exact natural language instruction from the user.
+         */
+        content: pulumi.Input<string>;
+        /**
+         * Entities to add or remove from the agent.
+         */
+        entity_diff?: pulumi.Input<inputs.api.AgentEntityDiffArgs | undefined>;
+        /**
+         * Optional Pulumi Cloud page the user has the Neo pane open on at the moment they sent this event. Persisted with the event so cold-start replay can reproduce per-turn page context exactly. Omitted by clients with no concept of a current page (CLI, scheduled tasks, Slack, GitHub triggers, API consumers).
+         */
+        pageContext?: pulumi.Input<inputs.api.PageContextArgs | undefined>;
+        /**
+         * When the event occurred.
+         */
+        timestamp: pulumi.Input<string>;
+        type: pulumi.Input<string>;
+    }
+
+    /**
+     * StackConfig describes the configuration of a stack from Pulumi Cloud.
+     */
+    export interface AppStackConfigArgs {
+        /**
+         * Deprecated: this field is no longer used by the service. Stacks that use a service-backed configuration store all config (including secrets) in ESC, which uses its own encryption. New callers should omit this field.
+         */
+        encryptedKey?: pulumi.Input<string | undefined>;
+        /**
+         * Deprecated: this field is no longer used by the service. Stacks that use a service-backed configuration store all config (including secrets) in ESC, which uses its own encryption. New callers should omit this field.
+         */
+        encryptionSalt?: pulumi.Input<string | undefined>;
+        /**
+         * Reference to ESC environment to use as stack configuration.
+         */
+        environment: pulumi.Input<string>;
+        /**
+         * Deprecated: this field is no longer used by the service. Stacks that use a service-backed configuration store all config (including secrets) in ESC, which uses its own encryption. New callers should omit this field.
+         */
+        secretsProvider?: pulumi.Input<string | undefined>;
+    }
+
+    /**
+     * UntypedDeployment contains an inner, untyped deployment structure.
+     */
+    export interface AppUntypedDeploymentArgs {
+        /**
+         * The opaque Pulumi deployment payload. Treated as a raw JSON value so the contents are preserved verbatim across client and server versions.
+         */
+        deployment?: pulumi.Input<{[key: string]: any} | undefined>;
+        /**
+         * An optional list of features used by this deployment. The CLI will error when reading a deployment that uses a feature that is not supported by that version of the CLI. Only honored when `version` is 4 or greater.
+         */
+        features?: pulumi.Input<pulumi.Input<string>[] | undefined>;
+        /**
+         * The schema version of the encoded deployment.
+         */
+        version?: pulumi.Input<number | undefined>;
+    }
+
+    /**
+     * AuditLogsExportS3Config describes how a Pulumi organization's audit log data can be exported to S3.
+     */
+    export interface AuditLogsExportS3ConfigArgs {
+        /**
+         * ARN of the IAM role that Pulumi will assume to write to the S3 bucket.
+         */
+        iamRoleArn: pulumi.Input<string>;
+        /**
+         * Name of the S3 bucket to export audit logs to.
+         */
+        s3BucketName: pulumi.Input<string>;
+        /**
+         * Optional path prefix within the S3 bucket for exported log files.
+         */
+        s3PathPrefix?: pulumi.Input<string | undefined>;
+    }
+
+    /**
+     * A single rule within an authentication policy, specifying access decisions for a token type.
+     */
+    export interface AuthPolicyDefinitionArgs {
+        /**
+         * The set of permissions granted when this rule matches.
+         */
+        authorizedPermissions: pulumi.Input<pulumi.Input<string>[]>;
+        /**
+         * The access decision for matching tokens (e.g. 'allow', 'deny').
+         */
+        decision: pulumi.Input<string>;
+        /**
+         * Role ID filter. When set, this rule only applies to tokens with this role.
+         */
+        roleID?: pulumi.Input<string | undefined>;
+        /**
+         * Additional rule conditions as key-value pairs.
+         */
+        rules: pulumi.Input<{[key: string]: any}>;
+        /**
+         * Runner ID filter. When set, this rule only applies to tokens for this deployment runner.
+         */
+        runnerID?: pulumi.Input<string | undefined>;
+        /**
+         * Team name filter. When set, this rule only applies to tokens belonging to this team.
+         */
+        teamName?: pulumi.Input<string | undefined>;
+        /**
+         * The type of token this rule applies to (e.g. 'personal', 'org', 'team').
+         */
+        tokenType: pulumi.Input<string>;
+        /**
+         * User login filter. When set, this rule only applies to tokens belonging to this user.
+         */
+        userLogin?: pulumi.Input<string | undefined>;
+    }
+
+    /**
+     * Request body for basic auth.
+     */
+    export interface BasicAuthRequestArgs {
+        /**
+         * The password
+         */
+        password?: pulumi.Input<inputs.api.SecretValueArgs | undefined>;
+        /**
+         * The user name
+         */
+        userName?: pulumi.Input<inputs.api.SecretValueArgs | undefined>;
+    }
+
+    /**
+     * Reference to a CLI integration instance, addressed by (catalogId, name) — the same scheme used by the connect/disconnect endpoints. Structured as an object rather than a bare 'catalogId/name' string so additional fields (e.g. scope) can be added later without a wire break, and so the encoding is unambiguous regardless of characters that may appear in the instance name.
+     */
+    export interface CLIIntegrationRefArgs {
+        /**
+         * The CLI catalog entry ID (e.g. 'aws').
+         */
+        catalogId: pulumi.Input<string>;
+        /**
+         * The user-chosen instance name. Unique within the (org, catalogId) pair.
+         */
+        name: pulumi.Input<string>;
+    }
+
+    /**
+     * Request body for updating deployment build cache options.
+     */
+    export interface CacheOptionsRequestArgs {
+        /**
+         * Whether build caching should be enabled for deployments on this stack.
+         */
+        enable?: pulumi.Input<boolean | undefined>;
+    }
+
+    /**
+     * Input specification for change gate rule - contains minimal identifiers for API requests
+     */
+    export interface ChangeGateRuleInputArgs {
+        ruleType: pulumi.Input<string>;
+    }
+
+    /**
+     * Input specification for change gate target - contains minimal identifiers for API requests
+     */
+    export interface ChangeGateTargetInputArgs {
+        /**
+         * The action types this gate targets (currently only supports single action)
+         */
+        actionTypes: pulumi.Input<pulumi.Input<string>[]>;
+        /**
+         * The entity type this gate targets
+         */
+        entityType: pulumi.Input<string>;
+        /**
+         * The qualified name of the entity this gate targets (e.g., 'project/env')
+         */
+        qualifiedName?: pulumi.Input<string | undefined>;
+    }
+
+    export interface CreateDeploymentRequestArgs {
+        /**
+         * The identifier of the agent pool to use for deployments.
+         */
+        agentPoolID?: pulumi.Input<string | undefined>;
+        /**
+         * Cache options for the deployment.
+         */
+        cacheOptions?: pulumi.Input<inputs.api.CacheOptionsRequestArgs | undefined>;
+        /**
+         * The executor context defining the execution environment.
+         */
+        executorContext?: pulumi.Input<inputs.api.ExecutorSettingsRequestArgs | undefined>;
+        /**
+         * GitHub-specific deployment settings
+         */
+        gitHub?: pulumi.Input<inputs.api.DeploymentSettingsGitHubRequestArgs | undefined>;
+        /**
+         * Whether this deployment should inherit the stack's deployment settings. Defaults to true.
+         */
+        inheritSettings?: pulumi.Input<boolean | undefined>;
+        /**
+         * The Pulumi operation to perform.
+         */
+        operation?: pulumi.Input<string | undefined>;
+        /**
+         * The operation context defining pre-run and post-run commands and environment variables.
+         */
+        operationContext?: pulumi.Input<inputs.api.OperationContextRequestArgs | undefined>;
+        /**
+         * The source context defining where the source code is located.
+         */
+        sourceContext?: pulumi.Input<inputs.api.SourceContextRequestArgs | undefined>;
+        /**
+         * A tag to identify the deployment settings configuration.
+         */
+        tag?: pulumi.Input<string | undefined>;
+        /**
+         * VCS provider settings
+         */
+        vcs?: pulumi.Input<inputs.api.DeploymentSettingsVCSArgs | undefined>;
+    }
+
+    /**
+     * CreateEnvironmentSecretRotationScheduleRequest defines the request payload that is expected when
+     * creating a new environment secret rotation schedule.
+     */
+    export interface CreateEnvironmentSecretRotationScheduleRequestArgs {
+        /**
+         * Environment Path specifies a path to a rotated secret to be updated
+         * Leave the field blank to rotate ALL rotated secrets in an environment
+         */
+        environmentPath: pulumi.Input<string>;
+    }
+
+    /**
+     * DeploymentRoleRequest represents a request to create or update a deployment role.
+     */
+    export interface DeploymentRoleRequestArgs {
+        /**
+         * The default identifier to assign to this role.
+         */
+        defaultIdentifier?: pulumi.Input<string | undefined>;
+        /**
+         * The unique identifier of the deployment role.
+         */
+        id?: pulumi.Input<string | undefined>;
+        /**
+         * The name of the deployment role.
+         */
+        name?: pulumi.Input<string | undefined>;
+    }
+
+    /**
+     * DeploymentSettingsGitHubRequest is the request body for updating GitHub-specific deployment settings.
+     */
+    export interface DeploymentSettingsGitHubRequestArgs {
+        /**
+         * Whether to automatically deploy commits pushed to the target branch.
+         */
+        deployCommits?: pulumi.Input<boolean | undefined>;
+        /**
+         * The pull request number to deploy, if targeting a specific pull request.
+         */
+        deployPullRequest?: pulumi.Input<number | undefined>;
+        /**
+         * The GitHub App installation ID.
+         */
+        installationId?: pulumi.Input<string | undefined>;
+        /**
+         * The list of file paths to filter deployment triggers.
+         */
+        paths?: pulumi.Input<pulumi.Input<string>[] | undefined>;
+        /**
+         * Whether to automatically preview pull requests.
+         */
+        previewPullRequests?: pulumi.Input<boolean | undefined>;
+        /**
+         * Whether to use a pull request template for deployment previews.
+         */
+        pullRequestTemplate: pulumi.Input<boolean>;
+        /**
+         * The GitHub repository in the format owner/repo.
+         */
+        repository?: pulumi.Input<string | undefined>;
+        /**
+         * Gates review stack creation. When set, only pull requests carrying a matching label (exact, case-sensitive) create a review stack.
+         */
+        reviewStackLabels?: pulumi.Input<pulumi.Input<string>[] | undefined>;
+    }
+
+    /**
+     * DeploymentSettingsVCS contains VCS provider deployment settings.
+     */
+    export interface DeploymentSettingsVCSArgs {
+        /**
+         * Whether to deploy all commits to the default branch
+         */
+        deployCommits?: pulumi.Input<boolean | undefined>;
+        /**
+         * Specific pull request number to deploy (overrides automatic deployment)
+         */
+        deployPullRequest?: pulumi.Input<number | undefined>;
+        /**
+         * VCS installation/integration ID linking to the VCS provider
+         */
+        installationId?: pulumi.Input<string | undefined>;
+        /**
+         * Paths within the repository that trigger deployments when changed
+         */
+        paths?: pulumi.Input<pulumi.Input<string>[] | undefined>;
+        /**
+         * Whether to create preview deployments for pull requests
+         */
+        previewPullRequests?: pulumi.Input<boolean | undefined>;
+        provider: pulumi.Input<string>;
+        /**
+         * Whether to use pull request templates for deployment PRs
+         */
+        pullRequestTemplate?: pulumi.Input<boolean | undefined>;
+        /**
+         * The VCS repository reference (format varies by provider)
+         */
+        repository?: pulumi.Input<string | undefined>;
+    }
+
+    /**
+     * DockerImageCredentialsRequest is the request body for specifying Docker registry credentials.
+     */
+    export interface DockerImageCredentialsRequestArgs {
+        /**
+         * The password for authenticating with the Docker registry.
+         */
+        password?: pulumi.Input<inputs.api.SecretValueArgs | undefined>;
+        /**
+         * The username for authenticating with the Docker registry.
+         */
+        username?: pulumi.Input<string | undefined>;
+    }
+
+    /**
+     * DockerImageRequest is the request body for specifying a Docker image and its credentials.
+     */
+    export interface DockerImageRequestArgs {
+        /**
+         * The credentials needed to pull the Docker image.
+         */
+        credentials?: pulumi.Input<inputs.api.DockerImageCredentialsRequestArgs | undefined>;
+        /**
+         * The Docker image reference (e.g. registry/image:tag).
+         */
+        reference?: pulumi.Input<string | undefined>;
+    }
+
+    /**
+     * ExecutorSettingsRequest is the request body for configuring the execution environment settings.
+     */
+    export interface ExecutorSettingsRequestArgs {
+        /**
+         * The Docker image to use for the execution environment.
+         */
+        executorImage?: pulumi.Input<inputs.api.DockerImageRequestArgs | undefined>;
+        /**
+         * The root path for the executor binary and working directory.
+         */
+        executorRootPath?: pulumi.Input<string | undefined>;
+    }
+
+    /**
+     * Request body for configuring git authentication options.
+     */
+    export interface GitAuthConfigRequestArgs {
+        /**
+         * Personal access token for git authentication
+         */
+        accessToken?: pulumi.Input<inputs.api.SecretValueArgs | undefined>;
+        /**
+         * Basic authentication configuration
+         */
+        basicAuth?: pulumi.Input<inputs.api.BasicAuthRequestArgs | undefined>;
+        /**
+         * SSH authentication configuration
+         */
+        sshAuth?: pulumi.Input<inputs.api.SSHAuthRequestArgs | undefined>;
+    }
+
+    /**
+     * A JSON Web Key (JWK) as defined by RFC 7517.
+     */
+    export interface JSONWebKeyArgs {
+        /**
+         * The 'alg' parameter: the algorithm intended for use with this key (e.g. RS256, ES256).
+         */
+        Algorithm: pulumi.Input<string>;
+        /**
+         * The SHA-1 thumbprint of the X.509 certificate
+         */
+        CertificateThumbprintSHA1: pulumi.Input<pulumi.Input<string>[]>;
+        /**
+         * The SHA-256 thumbprint of the X.509 certificate
+         */
+        CertificateThumbprintSHA256: pulumi.Input<pulumi.Input<string>[]>;
+        /**
+         * The X.509 certificate chain
+         */
+        Certificates: pulumi.Input<pulumi.Input<inputs.api.X509CertificateArgs>[]>;
+        /**
+         * The URL for the X.509 certificate chain
+         */
+        CertificatesURL: pulumi.Input<inputs.api.NetURLArgs>;
+        /**
+         * The cryptographic key material. Structure depends on the key type (RSA, EC, etc.).
+         */
+        Key: pulumi.Input<{[key: string]: any}>;
+        /**
+         * The 'kid' parameter: a unique identifier for the key.
+         */
+        KeyID: pulumi.Input<string>;
+        /**
+         * The 'use' parameter: 'sig' for signing or 'enc' for encryption.
+         */
+        Use: pulumi.Input<string>;
+    }
+
+    /**
+     * A JSON Web Key Set (JWKS) as defined by RFC 7517.
+     */
+    export interface JSONWebKeySetArgs {
+        /**
+         * The set of JSON Web Keys
+         */
+        keys: pulumi.Input<pulumi.Input<inputs.api.JSONWebKeyArgs>[]>;
+    }
+
+    /**
+     * NetIPNet represents an IP network with an address and subnet mask.
+     */
+    export interface NetIPNetArgs {
+        /**
+         * The IP address of the network.
+         */
+        IP: pulumi.Input<pulumi.Input<string>[]>;
+        /**
+         * The subnet mask of the network.
+         */
+        Mask: pulumi.Input<pulumi.Input<string>[]>;
+    }
+
+    /**
+     * NetURL represents a parsed URL (Uniform Resource Locator).
+     */
+    export interface NetURLArgs {
+        /**
+         * Whether to force a trailing question mark even if the query is empty.
+         */
+        ForceQuery: pulumi.Input<boolean>;
+        /**
+         * The URL fragment (without the leading hash).
+         */
+        Fragment: pulumi.Input<string>;
+        /**
+         * The host or host:port of the URL.
+         */
+        Host: pulumi.Input<string>;
+        /**
+         * Whether to omit the host in the URL string.
+         */
+        OmitHost: pulumi.Input<boolean>;
+        /**
+         * The opaque data of the URL.
+         */
+        Opaque: pulumi.Input<string>;
+        /**
+         * The path of the URL.
+         */
+        Path: pulumi.Input<string>;
+        /**
+         * The encoded fragment hint.
+         */
+        RawFragment: pulumi.Input<string>;
+        /**
+         * The encoded path hint, used when the path contains escaped characters.
+         */
+        RawPath: pulumi.Input<string>;
+        /**
+         * The encoded query string, without the leading question mark.
+         */
+        RawQuery: pulumi.Input<string>;
+        /**
+         * The URL scheme (e.g. https, http).
+         */
+        Scheme: pulumi.Input<string>;
+        /**
+         * The user information associated with the URL.
+         */
+        User: pulumi.Input<string>;
+    }
+
+    /**
+     * Request body for updating the AWS OIDC configuration of an operation context.
+     */
+    export interface OperationContextAWSOIDCConfigurationRequestArgs {
+        /**
+         * Duration of the assume-role session.
+         */
+        duration?: pulumi.Input<string | undefined>;
+        /**
+         * Optional set of IAM policy ARNs that further restrict the assume-role session.
+         */
+        policyArns?: pulumi.Input<pulumi.Input<string>[] | undefined>;
+        /**
+         * The ARN of the role to assume using the OIDC token.
+         */
+        roleArn?: pulumi.Input<string | undefined>;
+        /**
+         * The name of the assume-role session.
+         */
+        sessionName?: pulumi.Input<string | undefined>;
+    }
+
+    /**
+     * Request body for updating the Azure OIDC configuration of an operation context.
+     */
+    export interface OperationContextAzureOIDCConfigurationRequestArgs {
+        /**
+         * The client ID of the federated workload identity.
+         */
+        clientId?: pulumi.Input<string | undefined>;
+        /**
+         * The subscription ID of the federated workload identity.
+         */
+        subscriptionId?: pulumi.Input<string | undefined>;
+        /**
+         * The tenant ID of the federated workload identity.
+         */
+        tenantId?: pulumi.Input<string | undefined>;
+    }
+
+    /**
+     * Request body for updating the GCP OIDC configuration of an operation context.
+     */
+    export interface OperationContextGCPOIDCConfigurationRequestArgs {
+        /**
+         * The numerical ID of the GCP project.
+         */
+        projectId?: pulumi.Input<string | undefined>;
+        /**
+         * The ID of the identity provider associated with the workload pool.
+         */
+        providerId?: pulumi.Input<string | undefined>;
+        /**
+         * The region of the GCP project.
+         */
+        region?: pulumi.Input<string | undefined>;
+        /**
+         * The email address of the service account to use.
+         */
+        serviceAccount?: pulumi.Input<string | undefined>;
+        /**
+         * The lifetime of the temporary credentials.
+         */
+        tokenLifetime?: pulumi.Input<string | undefined>;
+        /**
+         * The ID of the workload pool to use.
+         */
+        workloadPoolId?: pulumi.Input<string | undefined>;
+    }
+
+    /**
+     * Request body for updating the OIDC configuration of an operation context.
+     */
+    export interface OperationContextOIDCConfigurationRequestArgs {
+        /**
+         * AWS-specific OIDC configuration.
+         */
+        aws?: pulumi.Input<inputs.api.OperationContextAWSOIDCConfigurationRequestArgs | undefined>;
+        /**
+         * Azure-specific OIDC configuration.
+         */
+        azure?: pulumi.Input<inputs.api.OperationContextAzureOIDCConfigurationRequestArgs | undefined>;
+        /**
+         * GCP-specific OIDC configuration.
+         */
+        gcp?: pulumi.Input<inputs.api.OperationContextGCPOIDCConfigurationRequestArgs | undefined>;
+    }
+
+    /**
+     * Request body for updating operation context options.
+     */
+    export interface OperationContextOptionsRequestArgs {
+        /**
+         * Whether the stack should be deleted after it is destroyed.
+         */
+        deleteAfterDestroy?: pulumi.Input<boolean | undefined>;
+        /**
+         * Whether a detect-drift operation should be followed by a remediate-drift step if drift is detected.
+         */
+        remediateIfDriftDetected?: pulumi.Input<boolean | undefined>;
+        /**
+         * The shell to use when running commands.
+         */
+        shell?: pulumi.Input<string | undefined>;
+        /**
+         * Whether to skip the default dependency installation step.
+         */
+        skipInstallDependencies?: pulumi.Input<boolean | undefined>;
+        /**
+         * Whether to skip queued intermediate deployments.
+         */
+        skipIntermediateDeployments?: pulumi.Input<boolean | undefined>;
+    }
+
+    /**
+     * Request body for updating an operation context.
+     */
+    export interface OperationContextRequestArgs {
+        /**
+         * Environment variables to apply during execution.
+         */
+        environmentVariables?: pulumi.Input<{[key: string]: any} | undefined>;
+        /**
+         * The OIDC configuration for the operation.
+         */
+        oidc?: pulumi.Input<inputs.api.OperationContextOIDCConfigurationRequestArgs | undefined>;
+        /**
+         * The Pulumi operation to perform (e.g. update, preview, destroy).
+         */
+        operation?: pulumi.Input<string | undefined>;
+        /**
+         * Options to specify or override default behavior.
+         */
+        options?: pulumi.Input<inputs.api.OperationContextOptionsRequestArgs | undefined>;
+        /**
+         * Optional list of commands to run before Pulumi is invoked.
+         */
+        preRunCommands?: pulumi.Input<pulumi.Input<string>[] | undefined>;
+        /**
+         * The deployment role to assume for the operation.
+         */
+        role?: pulumi.Input<inputs.api.DeploymentRoleRequestArgs | undefined>;
+    }
+
+    /**
+     * Describes the Pulumi Cloud page the user has the Neo pane open on. Sent on every Neo prompt request (initial creation and follow-ups) so the agent's system prompt can reference the user's current location. The schema is intentionally generic: `path` is the raw URL, `params` carries route path parameters extracted by the client, and `kind` is an optional stable label set by the route definition (in console2 via `data: { pageContextKind: ... }`) for cases where the agent should special-case the page. New pages flow through automatically — only routes that need stable agent treatment must declare a `kind`.
+     */
+    export interface PageContextArgs {
+        /**
+         * Optional stable label declared by the route, used by the agent to phrase the user's location in its system prompt or branch on well-known pages. Examples: 'stack-update', 'environment', 'neo-task'. Routes without a declared kind leave this null; the agent falls back to the path and params.
+         */
+        kind?: pulumi.Input<string | undefined>;
+        /**
+         * Route path parameters extracted from the matched Angular route, keyed by parameter name (e.g. {'organization': 'myorg', 'project': 'myapp', 'stack': 'prod', 'version': '47'}). Empty for routes with no path parameters.
+         */
+        params?: pulumi.Input<{[key: string]: any} | undefined>;
+        /**
+         * Raw URL path of the page the user is viewing (e.g. '/myorg/myapp/prod/updates/47'). Always populated.
+         */
+        path?: pulumi.Input<string | undefined>;
+    }
+
+    /**
+     * Base type for permission descriptors.
+     */
+    export interface PermissionDescriptorArgs {
+        __type: pulumi.Input<string>;
+    }
+
+    /**
+     * PkixAttributeTypeAndValue represents an ASN.1 attribute type and value pair.
+     */
+    export interface PkixAttributeTypeAndValueArgs {
+        /**
+         * The ASN.1 object identifier of the attribute type.
+         */
+        Type: pulumi.Input<string>;
+        /**
+         * The value of the attribute.
+         */
+        Value: pulumi.Input<{[key: string]: any}>;
+    }
+
+    /**
+     * PkixExtension represents an X.509 certificate extension.
+     */
+    export interface PkixExtensionArgs {
+        /**
+         * Whether this extension is critical.
+         */
+        Critical: pulumi.Input<boolean>;
+        /**
+         * The ASN.1 object identifier of the extension.
+         */
+        Id: pulumi.Input<string>;
+        /**
+         * The raw extension value.
+         */
+        Value: pulumi.Input<pulumi.Input<string>[]>;
+    }
+
+    /**
+     * PkixName represents an X.509 distinguished name (DN).
+     */
+    export interface PkixNameArgs {
+        /**
+         * The common name (CN) of the distinguished name.
+         */
+        CommonName: pulumi.Input<string>;
+        /**
+         * The country names in the distinguished name.
+         */
+        Country: pulumi.Input<pulumi.Input<string>[]>;
+        /**
+         * Additional attribute type and value pairs to include in the distinguished name.
+         */
+        ExtraNames: pulumi.Input<pulumi.Input<inputs.api.PkixAttributeTypeAndValueArgs>[]>;
+        /**
+         * The locality (city) names in the distinguished name.
+         */
+        Locality: pulumi.Input<pulumi.Input<string>[]>;
+        /**
+         * The parsed attribute type and value pairs of the distinguished name.
+         */
+        Names: pulumi.Input<pulumi.Input<inputs.api.PkixAttributeTypeAndValueArgs>[]>;
+        /**
+         * The organization names in the distinguished name.
+         */
+        Organization: pulumi.Input<pulumi.Input<string>[]>;
+        /**
+         * The organizational unit names in the distinguished name.
+         */
+        OrganizationalUnit: pulumi.Input<pulumi.Input<string>[]>;
+        /**
+         * The postal codes in the distinguished name.
+         */
+        PostalCode: pulumi.Input<pulumi.Input<string>[]>;
+        /**
+         * The state or province names in the distinguished name.
+         */
+        Province: pulumi.Input<pulumi.Input<string>[]>;
+        /**
+         * The serial number of the distinguished name.
+         */
+        SerialNumber: pulumi.Input<string>;
+        /**
+         * The street addresses in the distinguished name.
+         */
+        StreetAddress: pulumi.Input<pulumi.Input<string>[]>;
+    }
+
+    /**
+     * Request to configure SSH-based authentication for git operations.
+     */
+    export interface SSHAuthRequestArgs {
+        /**
+         * An optional password for the SSH private key.
+         */
+        password?: pulumi.Input<inputs.api.SecretValueArgs | undefined>;
+        /**
+         * The SSH private key for authentication.
+         */
+        sshPrivateKey?: pulumi.Input<inputs.api.SecretValueArgs | undefined>;
+    }
+
+    /**
+     * A SecretValue describes a secret value on the wire. The JSON representation is an object with a required 'secret' field containing the plaintext and an optional 'ciphertext' field containing the encrypted representation.
+     */
+    export interface SecretValueArgs {
+        /**
+         * The encrypted representation of the secret value.
+         */
+        ciphertext?: pulumi.Input<pulumi.Input<string>[] | undefined>;
+        /**
+         * The secret value in plaintext.
+         */
+        secret: pulumi.Input<string>;
+    }
+
+    /**
+     * A property that the service will show in it's metadata.
+     */
+    export interface ServicePropertyArgs {
+        /**
+         * the name of the property
+         */
+        key: pulumi.Input<string>;
+        /**
+         * the position of the property
+         */
+        order: pulumi.Input<number>;
+        /**
+         * the type of the property
+         */
+        type: pulumi.Input<string>;
+        /**
+         * the value of the property
+         */
+        value: pulumi.Input<string>;
+    }
+
+    /**
+     * Request to configure a git-based source context.
+     */
+    export interface SourceContextGitRequestArgs {
+        /**
+         * The branch to use from the repository. Mutually exclusive with `commit`.
+         */
+        branch?: pulumi.Input<string | undefined>;
+        /**
+         * The commit hash to deploy. Mutually exclusive with `branch`.
+         */
+        commit?: pulumi.Input<string | undefined>;
+        /**
+         * Git authentication configuration.
+         */
+        gitAuth?: pulumi.Input<inputs.api.GitAuthConfigRequestArgs | undefined>;
+        /**
+         * The subdirectory within the repository where Pulumi.yaml is located.
+         */
+        repoDir?: pulumi.Input<string | undefined>;
+        /**
+         * The URL of the git repository.
+         */
+        repoUrl?: pulumi.Input<string | undefined>;
+    }
+
+    /**
+     * Request to configure a Mercurial-based source context.
+     */
+    export interface SourceContextHgRequestArgs {
+        /**
+         * The branch to use from the repository.
+         */
+        branch?: pulumi.Input<string | undefined>;
+        /**
+         * Mercurial authentication configuration.
+         */
+        hgAuth?: pulumi.Input<inputs.api.GitAuthConfigRequestArgs | undefined>;
+        /**
+         * The subdirectory within the repository where Pulumi.yaml is located.
+         */
+        repoDir?: pulumi.Input<string | undefined>;
+        /**
+         * The URL of the Mercurial repository.
+         */
+        repoUrl?: pulumi.Input<string | undefined>;
+        /**
+         * The changeset hash to check out.
+         */
+        revision?: pulumi.Input<string | undefined>;
+    }
+
+    /**
+     * Request to configure a source context: git-based, Mercurial-based, or template-based. Only one may be specified.
+     */
+    export interface SourceContextRequestArgs {
+        /**
+         * Git-based source context configuration.
+         */
+        git?: pulumi.Input<inputs.api.SourceContextGitRequestArgs | undefined>;
+        /**
+         * Mercurial-based source context configuration.
+         */
+        hg?: pulumi.Input<inputs.api.SourceContextHgRequestArgs | undefined>;
+        /**
+         * Template-based source context configuration.
+         */
+        template?: pulumi.Input<inputs.api.SourceContextTemplateRequestArgs | undefined>;
+    }
+
+    /**
+     * Request to configure a template-based source context.
+     */
+    export interface SourceContextTemplateRequestArgs {
+        /**
+         * Git authentication configuration for accessing the template source.
+         */
+        gitAuth?: pulumi.Input<inputs.api.GitAuthConfigRequestArgs | undefined>;
+        /**
+         * The URL of the template source. Supports two URL schemes:
+         *
+         * **Registry-backed templates** use the `registry://` scheme with the format:
+         * `registry://templates/source/publisher/name[@version]`
+         *
+         * - `source`: The template source identifier (e.g., the registry source name)
+         * - `publisher`: The organization or user that published the template
+         * - `name`: The template name
+         * - `version`: Optional semver version (e.g., `1.0.0`). If omitted, defaults to the latest version
+         *
+         * Example: `registry://templates/pulumi/acme-corp/aws-vpc@2.1.0`
+         *
+         * **VCS-backed templates** use standard VCS URLs (GitHub, GitLab, Azure DevOps, etc.):
+         * `https://github.com/org/repo`
+         */
+        sourceUrl?: pulumi.Input<string | undefined>;
+    }
+
+    /**
+     * TemplateDestination describes the destination for a template.
+     */
+    export interface TemplateDestinationArgs {
+        /**
+         * The destination URL.
+         */
+        url: pulumi.Input<string>;
+    }
+
+    /**
+     * X509Certificate represents an X.509 certificate.
+     */
+    export interface X509CertificateArgs {
+        /**
+         * The authority key identifier extension value.
+         */
+        AuthorityKeyId: pulumi.Input<pulumi.Input<string>[]>;
+        /**
+         * Whether the basic constraints extension is valid.
+         */
+        BasicConstraintsValid: pulumi.Input<boolean>;
+        /**
+         * CRL distribution point URLs.
+         */
+        CRLDistributionPoints: pulumi.Input<pulumi.Input<string>[]>;
+        /**
+         * DNS names from the subject alternative name extension.
+         */
+        DNSNames: pulumi.Input<pulumi.Input<string>[]>;
+        /**
+         * Email addresses from the subject alternative name extension.
+         */
+        EmailAddresses: pulumi.Input<pulumi.Input<string>[]>;
+        /**
+         * Excluded DNS domain names from the name constraints extension.
+         */
+        ExcludedDNSDomains: pulumi.Input<pulumi.Input<string>[]>;
+        /**
+         * Excluded email addresses from the name constraints extension.
+         */
+        ExcludedEmailAddresses: pulumi.Input<pulumi.Input<string>[]>;
+        /**
+         * Excluded IP ranges from the name constraints extension.
+         */
+        ExcludedIPRanges: pulumi.Input<pulumi.Input<inputs.api.NetIPNetArgs>[]>;
+        /**
+         * Excluded URI domains from the name constraints extension.
+         */
+        ExcludedURIDomains: pulumi.Input<pulumi.Input<string>[]>;
+        /**
+         * Extended key usage values.
+         */
+        ExtKeyUsage: pulumi.Input<pulumi.Input<number>[]>;
+        /**
+         * The certificate extensions.
+         */
+        Extensions: pulumi.Input<pulumi.Input<inputs.api.PkixExtensionArgs>[]>;
+        /**
+         * Additional extensions to add to the certificate.
+         */
+        ExtraExtensions: pulumi.Input<pulumi.Input<inputs.api.PkixExtensionArgs>[]>;
+        /**
+         * IP addresses from the subject alternative name extension.
+         */
+        IPAddresses: pulumi.Input<pulumi.Input<pulumi.Input<string>[]>[]>;
+        /**
+         * The inhibit any-policy constraint value.
+         */
+        InhibitAnyPolicy: pulumi.Input<number>;
+        /**
+         * Whether InhibitAnyPolicy was explicitly set to zero.
+         */
+        InhibitAnyPolicyZero: pulumi.Input<boolean>;
+        /**
+         * The inhibit policy mapping constraint value.
+         */
+        InhibitPolicyMapping: pulumi.Input<number>;
+        /**
+         * Whether InhibitPolicyMapping was explicitly set to zero.
+         */
+        InhibitPolicyMappingZero: pulumi.Input<boolean>;
+        /**
+         * Whether the certificate is a CA certificate.
+         */
+        IsCA: pulumi.Input<boolean>;
+        /**
+         * The certificate issuer distinguished name.
+         */
+        Issuer: pulumi.Input<inputs.api.PkixNameArgs>;
+        /**
+         * Issuing certificate URLs from the authority information access extension.
+         */
+        IssuingCertificateURL: pulumi.Input<pulumi.Input<string>[]>;
+        /**
+         * Bitfield of key usage flags.
+         */
+        KeyUsage: pulumi.Input<number>;
+        /**
+         * Maximum number of intermediate CAs allowed in the path.
+         */
+        MaxPathLen: pulumi.Input<number>;
+        /**
+         * Whether MaxPathLen was explicitly set to zero.
+         */
+        MaxPathLenZero: pulumi.Input<boolean>;
+        /**
+         * The end of the certificate validity period.
+         */
+        NotAfter: pulumi.Input<string>;
+        /**
+         * The start of the certificate validity period.
+         */
+        NotBefore: pulumi.Input<string>;
+        /**
+         * OCSP server URLs from the authority information access extension.
+         */
+        OCSPServer: pulumi.Input<pulumi.Input<string>[]>;
+        /**
+         * Permitted DNS domain names from the name constraints extension.
+         */
+        PermittedDNSDomains: pulumi.Input<pulumi.Input<string>[]>;
+        /**
+         * Whether the name constraints are marked critical.
+         */
+        PermittedDNSDomainsCritical: pulumi.Input<boolean>;
+        /**
+         * Permitted email addresses from the name constraints extension.
+         */
+        PermittedEmailAddresses: pulumi.Input<pulumi.Input<string>[]>;
+        /**
+         * Permitted IP ranges from the name constraints extension.
+         */
+        PermittedIPRanges: pulumi.Input<pulumi.Input<inputs.api.NetIPNetArgs>[]>;
+        /**
+         * Permitted URI domains from the name constraints extension.
+         */
+        PermittedURIDomains: pulumi.Input<pulumi.Input<string>[]>;
+        /**
+         * Certificate policies.
+         */
+        Policies: pulumi.Input<pulumi.Input<string>[]>;
+        /**
+         * Certificate policy OIDs.
+         */
+        PolicyIdentifiers: pulumi.Input<pulumi.Input<string>[]>;
+        /**
+         * Policy mappings from the policy mapping extension.
+         */
+        PolicyMappings: pulumi.Input<pulumi.Input<inputs.api.X509PolicyMappingArgs>[]>;
+        /**
+         * The public key contained in the certificate.
+         */
+        PublicKey: pulumi.Input<{[key: string]: any}>;
+        /**
+         * The public key algorithm identifier.
+         */
+        PublicKeyAlgorithm: pulumi.Input<number>;
+        /**
+         * The raw ASN.1 DER encoded certificate.
+         */
+        Raw: pulumi.Input<pulumi.Input<string>[]>;
+        /**
+         * The raw ASN.1 DER encoded issuer.
+         */
+        RawIssuer: pulumi.Input<pulumi.Input<string>[]>;
+        /**
+         * The raw ASN.1 DER encoded subject.
+         */
+        RawSubject: pulumi.Input<pulumi.Input<string>[]>;
+        /**
+         * The raw ASN.1 DER encoded SubjectPublicKeyInfo.
+         */
+        RawSubjectPublicKeyInfo: pulumi.Input<pulumi.Input<string>[]>;
+        /**
+         * The raw ASN.1 DER encoded TBSCertificate.
+         */
+        RawTBSCertificate: pulumi.Input<pulumi.Input<string>[]>;
+        /**
+         * The require explicit policy constraint value.
+         */
+        RequireExplicitPolicy: pulumi.Input<number>;
+        /**
+         * Whether RequireExplicitPolicy was explicitly set to zero.
+         */
+        RequireExplicitPolicyZero: pulumi.Input<boolean>;
+        /**
+         * The certificate serial number.
+         */
+        SerialNumber: pulumi.Input<number>;
+        /**
+         * The certificate signature.
+         */
+        Signature: pulumi.Input<pulumi.Input<string>[]>;
+        /**
+         * The signature algorithm identifier.
+         */
+        SignatureAlgorithm: pulumi.Input<number>;
+        /**
+         * The certificate subject distinguished name.
+         */
+        Subject: pulumi.Input<inputs.api.PkixNameArgs>;
+        /**
+         * The subject key identifier extension value.
+         */
+        SubjectKeyId: pulumi.Input<pulumi.Input<string>[]>;
+        /**
+         * URIs from the subject alternative name extension.
+         */
+        URIs: pulumi.Input<pulumi.Input<inputs.api.NetURLArgs>[]>;
+        /**
+         * Critical extensions that were not handled during parsing.
+         */
+        UnhandledCriticalExtensions: pulumi.Input<pulumi.Input<string>[]>;
+        /**
+         * Unknown extended key usage OIDs.
+         */
+        UnknownExtKeyUsage: pulumi.Input<pulumi.Input<string>[]>;
+        /**
+         * The X.509 certificate version.
+         */
+        Version: pulumi.Input<number>;
+    }
+
+    /**
+     * X509PolicyMapping represents a mapping between issuer and subject domain policies in an X.509 certificate.
+     */
+    export interface X509PolicyMappingArgs {
+        /**
+         * The OID of the issuer domain policy.
+         */
+        IssuerDomainPolicy: pulumi.Input<string>;
+        /**
+         * The OID of the subject domain policy.
+         */
+        SubjectDomainPolicy: pulumi.Input<string>;
+    }
+}

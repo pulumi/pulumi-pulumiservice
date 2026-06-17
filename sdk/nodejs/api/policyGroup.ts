@@ -2,6 +2,9 @@
 // *** Do not edit by hand unless you're certain you know what you are doing! ***
 
 import * as pulumi from "@pulumi/pulumi";
+import * as inputs from "../types/input";
+import * as outputs from "../types/output";
+import * as enums from "../types/enums";
 import * as utilities from "../utilities";
 
 /**
@@ -45,7 +48,7 @@ export class PolicyGroup extends pulumi.CustomResource {
     /**
      * List of policy packs that are applied to this policy group.
      */
-    declare public /*out*/ readonly appliedPolicyPacks: pulumi.Output<any[]>;
+    declare public /*out*/ readonly appliedPolicyPacks: pulumi.Output<outputs.api.AppPolicyPackMetadata[]>;
     /**
      * The type of entities this policy group applies to (stacks or accounts).
      */
@@ -65,7 +68,7 @@ export class PolicyGroup extends pulumi.CustomResource {
     /**
      * List of stacks that are members of this policy group.
      */
-    declare public /*out*/ readonly stacks: pulumi.Output<any[]>;
+    declare public /*out*/ readonly stacks: pulumi.Output<outputs.api.AppPulumiStackReference[]>;
 
     /**
      * Create a PolicyGroup resource with the given unique name, arguments, and options.

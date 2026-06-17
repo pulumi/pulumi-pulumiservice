@@ -8,6 +8,7 @@ import (
 	"reflect"
 
 	"errors"
+	"github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/api"
 	"github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/internal"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
@@ -20,9 +21,9 @@ type Item struct {
 	// items. Will be nil once all items have been returned.
 	ContinuationToken pulumi.StringPtrOutput `pulumi:"continuationToken"`
 	// The list of service items
-	Items pulumi.ArrayOutput `pulumi:"items"`
+	Items api.ServiceItemArrayOutput `pulumi:"items"`
 	// The service details
-	Service pulumi.AnyOutput `pulumi:"service"`
+	Service api.ServiceOutput `pulumi:"service"`
 }
 
 // NewItem registers a new resource with the given unique name, arguments, and options.
@@ -81,7 +82,7 @@ func (ItemState) ElementType() reflect.Type {
 
 type itemArgs struct {
 	// List of items
-	Items []interface{} `pulumi:"items"`
+	Items []api.AddServiceItem `pulumi:"items"`
 	// The organization name
 	OrgName string `pulumi:"orgName"`
 	// The owner name
@@ -95,7 +96,7 @@ type itemArgs struct {
 // The set of arguments for constructing a Item resource.
 type ItemArgs struct {
 	// List of items
-	Items pulumi.ArrayInput
+	Items api.AddServiceItemArrayInput
 	// The organization name
 	OrgName pulumi.StringInput
 	// The owner name
@@ -200,13 +201,13 @@ func (o ItemOutput) ContinuationToken() pulumi.StringPtrOutput {
 }
 
 // The list of service items
-func (o ItemOutput) Items() pulumi.ArrayOutput {
-	return o.ApplyT(func(v *Item) pulumi.ArrayOutput { return v.Items }).(pulumi.ArrayOutput)
+func (o ItemOutput) Items() api.ServiceItemArrayOutput {
+	return o.ApplyT(func(v *Item) api.ServiceItemArrayOutput { return v.Items }).(api.ServiceItemArrayOutput)
 }
 
 // The service details
-func (o ItemOutput) Service() pulumi.AnyOutput {
-	return o.ApplyT(func(v *Item) pulumi.AnyOutput { return v.Service }).(pulumi.AnyOutput)
+func (o ItemOutput) Service() api.ServiceOutput {
+	return o.ApplyT(func(v *Item) api.ServiceOutput { return v.Service }).(api.ServiceOutput)
 }
 
 type ItemArrayOutput struct{ *pulumi.OutputState }

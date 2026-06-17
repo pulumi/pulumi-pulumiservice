@@ -25,25 +25,25 @@ namespace Pulumi.PulumiService.Api.Deployments
         /// Cache options for the deployment.
         /// </summary>
         [Output("cacheOptions")]
-        public Output<object?> CacheOptions { get; private set; } = null!;
+        public Output<Pulumi.PulumiService.Api.Outputs.CacheOptions?> CacheOptions { get; private set; } = null!;
 
         /// <summary>
         /// The executor context defining the execution environment.
         /// </summary>
         [Output("executorContext")]
-        public Output<object?> ExecutorContext { get; private set; } = null!;
+        public Output<Pulumi.PulumiService.Api.Outputs.ExecutorContext?> ExecutorContext { get; private set; } = null!;
 
         /// <summary>
         /// GitHub-specific deployment settings
         /// </summary>
         [Output("gitHub")]
-        public Output<object?> GitHub { get; private set; } = null!;
+        public Output<Pulumi.PulumiService.Api.Outputs.DeploymentSettingsGitHub?> GitHub { get; private set; } = null!;
 
         /// <summary>
         /// The operation context defining pre-run and post-run commands and environment variables.
         /// </summary>
         [Output("operationContext")]
-        public Output<object?> OperationContext { get; private set; } = null!;
+        public Output<Pulumi.PulumiService.Api.Outputs.OperationContext?> OperationContext { get; private set; } = null!;
 
         /// <summary>
         /// The source from which the deployment settings were created.
@@ -55,7 +55,7 @@ namespace Pulumi.PulumiService.Api.Deployments
         /// The source context defining where the source code is located.
         /// </summary>
         [Output("sourceContext")]
-        public Output<object?> SourceContext { get; private set; } = null!;
+        public Output<Pulumi.PulumiService.Api.Outputs.SourceContext?> SourceContext { get; private set; } = null!;
 
         /// <summary>
         /// A tag to identify the deployment settings configuration.
@@ -67,7 +67,7 @@ namespace Pulumi.PulumiService.Api.Deployments
         /// VCS provider settings
         /// </summary>
         [Output("vcs")]
-        public Output<object?> Vcs { get; private set; } = null!;
+        public Output<Pulumi.PulumiService.Api.Outputs.DeploymentSettingsVCS?> Vcs { get; private set; } = null!;
 
         /// <summary>
         /// The version of the deployment settings.
@@ -130,25 +130,25 @@ namespace Pulumi.PulumiService.Api.Deployments
         /// Cache options for the deployment.
         /// </summary>
         [Input("cacheOptions")]
-        public Input<object>? CacheOptions { get; set; }
+        public Input<Pulumi.PulumiService.Api.Inputs.CacheOptionsRequestArgs>? CacheOptions { get; set; }
 
         /// <summary>
         /// The executor context defining the execution environment.
         /// </summary>
         [Input("executorContext")]
-        public Input<object>? ExecutorContext { get; set; }
+        public Input<Pulumi.PulumiService.Api.Inputs.ExecutorSettingsRequestArgs>? ExecutorContext { get; set; }
 
         /// <summary>
         /// GitHub-specific deployment settings
         /// </summary>
         [Input("gitHub")]
-        public Input<object>? GitHub { get; set; }
+        public Input<Pulumi.PulumiService.Api.Inputs.DeploymentSettingsGitHubRequestArgs>? GitHub { get; set; }
 
         /// <summary>
         /// The operation context defining pre-run and post-run commands and environment variables.
         /// </summary>
         [Input("operationContext")]
-        public Input<object>? OperationContext { get; set; }
+        public Input<Pulumi.PulumiService.Api.Inputs.OperationContextRequestArgs>? OperationContext { get; set; }
 
         /// <summary>
         /// The organization name
@@ -166,7 +166,7 @@ namespace Pulumi.PulumiService.Api.Deployments
         /// The source context defining where the source code is located.
         /// </summary>
         [Input("sourceContext")]
-        public Input<object>? SourceContext { get; set; }
+        public Input<Pulumi.PulumiService.Api.Inputs.SourceContextRequestArgs>? SourceContext { get; set; }
 
         /// <summary>
         /// The stack name
@@ -184,7 +184,7 @@ namespace Pulumi.PulumiService.Api.Deployments
         /// VCS provider settings
         /// </summary>
         [Input("vcs")]
-        public Input<object>? Vcs { get; set; }
+        public Input<Pulumi.PulumiService.Api.Inputs.DeploymentSettingsVCSArgs>? Vcs { get; set; }
 
         public SettingsArgs()
         {

@@ -23,7 +23,7 @@ type DefaultOrganization struct {
 	// service is on an expiring trial and not free tier, with possible recommendations
 	// on how to configure their default org locally.
 	// Can be possibly empty.
-	Messages pulumi.ArrayOutput `pulumi:"Messages"`
+	Messages AppMessageArrayOutput `pulumi:"Messages"`
 }
 
 // NewDefaultOrganization registers a new resource with the given unique name, arguments, and options.
@@ -176,8 +176,8 @@ func (o DefaultOrganizationOutput) GitHubLogin() pulumi.StringOutput {
 // service is on an expiring trial and not free tier, with possible recommendations
 // on how to configure their default org locally.
 // Can be possibly empty.
-func (o DefaultOrganizationOutput) Messages() pulumi.ArrayOutput {
-	return o.ApplyT(func(v *DefaultOrganization) pulumi.ArrayOutput { return v.Messages }).(pulumi.ArrayOutput)
+func (o DefaultOrganizationOutput) Messages() AppMessageArrayOutput {
+	return o.ApplyT(func(v *DefaultOrganization) AppMessageArrayOutput { return v.Messages }).(AppMessageArrayOutput)
 }
 
 type DefaultOrganizationArrayOutput struct{ *pulumi.OutputState }

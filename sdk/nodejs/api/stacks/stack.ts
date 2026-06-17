@@ -2,6 +2,9 @@
 // *** Do not edit by hand unless you're certain you know what you are doing! ***
 
 import * as pulumi from "@pulumi/pulumi";
+import * as inputs from "../../types/input";
+import * as outputs from "../../types/output";
+import * as enums from "../../types/enums";
 import * as utilities from "../../utilities";
 
 /**
@@ -48,11 +51,11 @@ export class Stack extends pulumi.CustomResource {
      * Optional cloud-persisted stack configuration.
      * If set, then the stack's configuration is loaded from the cloud and not a file on disk.
      */
-    declare public readonly config: pulumi.Output<any | undefined>;
+    declare public readonly config: pulumi.Output<outputs.api.AppStackConfig | undefined>;
     /**
      * CurrentOperation provides information about a stack operation in-progress, as applicable.
      */
-    declare public /*out*/ readonly currentOperation: pulumi.Output<any | undefined>;
+    declare public /*out*/ readonly currentOperation: pulumi.Output<outputs.api.AppOperationStatus | undefined>;
     /**
      * The organization name
      */
@@ -126,7 +129,7 @@ export interface StackArgs {
     /**
      * The configuration for the new stack.
      */
-    config?: any | undefined;
+    config?: pulumi.Input<inputs.api.AppStackConfigArgs | undefined>;
     /**
      * The organization name
      */
@@ -142,7 +145,7 @@ export interface StackArgs {
     /**
      * An optional state to initialize the stack with.
      */
-    state?: any | undefined;
+    state?: pulumi.Input<inputs.api.AppUntypedDeploymentArgs | undefined>;
     /**
      * An optional set of tags to apply to the stack.
      */

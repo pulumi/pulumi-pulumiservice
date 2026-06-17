@@ -8,10 +8,11 @@ import com.pulumi.core.annotations.Export;
 import com.pulumi.core.annotations.ResourceType;
 import com.pulumi.core.internal.Codegen;
 import com.pulumi.pulumiservice.Utilities;
+import com.pulumi.pulumiservice.api.outputs.GitLabAppOrganization;
+import com.pulumi.pulumiservice.api.outputs.User;
 import com.pulumi.pulumiservice.api_integrations.GitLabIntegrationArgs;
 import java.lang.Boolean;
 import java.lang.Integer;
-import java.lang.Object;
 import java.lang.String;
 import java.util.List;
 import java.util.Optional;
@@ -27,14 +28,14 @@ public class GitLabIntegration extends com.pulumi.resources.CustomResource {
      * The Pulumi user whose GitLab authentication token is being used, if applicable.
      * 
      */
-    @Export(name="authUser", refs={Object.class}, tree="[0]")
-    private Output</* @Nullable */ Object> authUser;
+    @Export(name="authUser", refs={User.class}, tree="[0]")
+    private Output</* @Nullable */ User> authUser;
 
     /**
      * @return The Pulumi user whose GitLab authentication token is being used, if applicable.
      * 
      */
-    public Output<Optional<Object>> authUser() {
+    public Output<Optional<User>> authUser() {
         return Codegen.optional(this.authUser);
     }
     /**
@@ -111,14 +112,14 @@ public class GitLabIntegration extends com.pulumi.resources.CustomResource {
      * Metadata about the GitLab group linked to this integration.
      * 
      */
-    @Export(name="gitLabOrg", refs={Object.class}, tree="[0]")
-    private Output</* @Nullable */ Object> gitLabOrg;
+    @Export(name="gitLabOrg", refs={GitLabAppOrganization.class}, tree="[0]")
+    private Output</* @Nullable */ GitLabAppOrganization> gitLabOrg;
 
     /**
      * @return Metadata about the GitLab group linked to this integration.
      * 
      */
-    public Output<Optional<Object>> gitLabOrg() {
+    public Output<Optional<GitLabAppOrganization>> gitLabOrg() {
         return Codegen.optional(this.gitLabOrg);
     }
     /**

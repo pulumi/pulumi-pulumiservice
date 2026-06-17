@@ -13,6 +13,7 @@ if sys.version_info >= (3, 11):
 else:
     from typing_extensions import NotRequired, TypedDict, TypeAlias
 from ... import _utilities
+from ... import api as _api
 
 __all__ = ['AccountArgs', 'Account']
 
@@ -301,7 +302,7 @@ class Account(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter(name="ownedBy")
-    def owned_by(self) -> pulumi.Output[Any]:
+    def owned_by(self) -> pulumi.Output['_api.outputs.UserInfo']:
         """
         The user with ownership of this Insights account
         """
@@ -342,7 +343,7 @@ class Account(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter(name="scanStatus")
-    def scan_status(self) -> pulumi.Output[Optional[Any]]:
+    def scan_status(self) -> pulumi.Output[Optional['_api.outputs.ScanStatus']]:
         """
         Status of the last discovery scan for this account.
         """

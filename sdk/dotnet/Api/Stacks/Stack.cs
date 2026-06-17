@@ -32,13 +32,13 @@ namespace Pulumi.PulumiService.Api.Stacks
         /// If set, then the stack's configuration is loaded from the cloud and not a file on disk.
         /// </summary>
         [Output("config")]
-        public Output<object?> Config { get; private set; } = null!;
+        public Output<Pulumi.PulumiService.Api.Outputs.AppStackConfig?> Config { get; private set; } = null!;
 
         /// <summary>
         /// CurrentOperation provides information about a stack operation in-progress, as applicable.
         /// </summary>
         [Output("currentOperation")]
-        public Output<object?> CurrentOperation { get; private set; } = null!;
+        public Output<Pulumi.PulumiService.Api.Outputs.AppOperationStatus?> CurrentOperation { get; private set; } = null!;
 
         /// <summary>
         /// The organization name
@@ -119,7 +119,7 @@ namespace Pulumi.PulumiService.Api.Stacks
         /// The configuration for the new stack.
         /// </summary>
         [Input("config")]
-        public Input<object>? Config { get; set; }
+        public Input<Pulumi.PulumiService.Api.Inputs.AppStackConfigArgs>? Config { get; set; }
 
         /// <summary>
         /// The organization name
@@ -143,7 +143,7 @@ namespace Pulumi.PulumiService.Api.Stacks
         /// An optional state to initialize the stack with.
         /// </summary>
         [Input("state")]
-        public Input<object>? State { get; set; }
+        public Input<Pulumi.PulumiService.Api.Inputs.AppUntypedDeploymentArgs>? State { get; set; }
 
         [Input("tags")]
         private InputMap<object>? _tags;

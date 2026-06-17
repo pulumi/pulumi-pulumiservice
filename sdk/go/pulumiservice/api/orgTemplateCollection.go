@@ -17,7 +17,7 @@ type OrgTemplateCollection struct {
 	pulumi.CustomResourceState
 
 	// Deprecated - use destinationURL instead.
-	Destination pulumi.AnyOutput `pulumi:"destination"`
+	Destination TemplateDestinationPtrOutput `pulumi:"destination"`
 	// The destination URL for the template source.
 	DestinationURL pulumi.StringPtrOutput `pulumi:"destinationURL"`
 	// An error message if the template source is invalid. Omitted or empty when the source is valid.
@@ -82,7 +82,7 @@ func (OrgTemplateCollectionState) ElementType() reflect.Type {
 
 type orgTemplateCollectionArgs struct {
 	// deprecated - use DestinationURL instead
-	Destination interface{} `pulumi:"destination"`
+	Destination *TemplateDestination `pulumi:"destination"`
 	// The destination URL for the template source.
 	DestinationURL *string `pulumi:"destinationURL"`
 	// The name of the template source.
@@ -96,7 +96,7 @@ type orgTemplateCollectionArgs struct {
 // The set of arguments for constructing a OrgTemplateCollection resource.
 type OrgTemplateCollectionArgs struct {
 	// deprecated - use DestinationURL instead
-	Destination pulumi.Input
+	Destination TemplateDestinationPtrInput
 	// The destination URL for the template source.
 	DestinationURL pulumi.StringPtrInput
 	// The name of the template source.
@@ -195,8 +195,8 @@ func (o OrgTemplateCollectionOutput) ToOrgTemplateCollectionOutputWithContext(ct
 }
 
 // Deprecated - use destinationURL instead.
-func (o OrgTemplateCollectionOutput) Destination() pulumi.AnyOutput {
-	return o.ApplyT(func(v *OrgTemplateCollection) pulumi.AnyOutput { return v.Destination }).(pulumi.AnyOutput)
+func (o OrgTemplateCollectionOutput) Destination() TemplateDestinationPtrOutput {
+	return o.ApplyT(func(v *OrgTemplateCollection) TemplateDestinationPtrOutput { return v.Destination }).(TemplateDestinationPtrOutput)
 }
 
 // The destination URL for the template source.

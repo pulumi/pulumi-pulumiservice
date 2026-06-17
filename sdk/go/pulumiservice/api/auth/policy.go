@@ -8,6 +8,7 @@ import (
 	"reflect"
 
 	"errors"
+	"github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/api"
 	"github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/internal"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
@@ -34,7 +35,7 @@ type Policy struct {
 	// The last modification timestamp
 	Modified pulumi.StringPtrOutput `pulumi:"modified"`
 	// List of policies
-	Policies pulumi.ArrayOutput `pulumi:"policies"`
+	Policies api.AuthPolicyDefinitionArrayOutput `pulumi:"policies"`
 	// The version number
 	Version pulumi.IntOutput `pulumi:"version"`
 }
@@ -93,7 +94,7 @@ type policyArgs struct {
 	// The organization name
 	OrgName string `pulumi:"orgName"`
 	// List of policies
-	Policies []interface{} `pulumi:"policies"`
+	Policies []api.AuthPolicyDefinition `pulumi:"policies"`
 	// The policy identifier
 	PolicyId string `pulumi:"policyId"`
 }
@@ -105,7 +106,7 @@ type PolicyArgs struct {
 	// The organization name
 	OrgName pulumi.StringInput
 	// List of policies
-	Policies pulumi.ArrayInput
+	Policies api.AuthPolicyDefinitionArrayInput
 	// The policy identifier
 	PolicyId pulumi.StringInput
 }
@@ -213,8 +214,8 @@ func (o PolicyOutput) Modified() pulumi.StringPtrOutput {
 }
 
 // List of policies
-func (o PolicyOutput) Policies() pulumi.ArrayOutput {
-	return o.ApplyT(func(v *Policy) pulumi.ArrayOutput { return v.Policies }).(pulumi.ArrayOutput)
+func (o PolicyOutput) Policies() api.AuthPolicyDefinitionArrayOutput {
+	return o.ApplyT(func(v *Policy) api.AuthPolicyDefinitionArrayOutput { return v.Policies }).(api.AuthPolicyDefinitionArrayOutput)
 }
 
 // The version number

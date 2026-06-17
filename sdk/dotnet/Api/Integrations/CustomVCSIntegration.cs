@@ -55,7 +55,7 @@ namespace Pulumi.PulumiService.Api.Integrations
         /// List of repositories configured on this integration
         /// </summary>
         [Output("repositories")]
-        public Output<ImmutableArray<object>> Repositories { get; private set; } = null!;
+        public Output<ImmutableArray<Pulumi.PulumiService.Api.Outputs.CustomVCSRepository>> Repositories { get; private set; } = null!;
 
         /// <summary>
         /// Version control system type

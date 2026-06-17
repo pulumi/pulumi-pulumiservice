@@ -2,6 +2,9 @@
 // *** Do not edit by hand unless you're certain you know what you are doing! ***
 
 import * as pulumi from "@pulumi/pulumi";
+import * as inputs from "../../types/input";
+import * as outputs from "../../types/output";
+import * as enums from "../../types/enums";
 import * as utilities from "../../utilities";
 
 /**
@@ -61,7 +64,7 @@ export class CustomVCSIntegration extends pulumi.CustomResource {
     /**
      * List of repositories configured on this integration
      */
-    declare public /*out*/ readonly repositories: pulumi.Output<any[] | undefined>;
+    declare public /*out*/ readonly repositories: pulumi.Output<outputs.api.CustomVCSRepository[] | undefined>;
     /**
      * Version control system type
      */

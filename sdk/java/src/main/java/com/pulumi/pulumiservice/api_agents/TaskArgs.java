@@ -6,8 +6,10 @@ package com.pulumi.pulumiservice.api_agents;
 import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
 import com.pulumi.exceptions.MissingRequiredPropertyException;
+import com.pulumi.pulumiservice.api.inputs.AgentTaskIntegrationRefArgs;
+import com.pulumi.pulumiservice.api.inputs.AgentUserEventMessageArgs;
+import com.pulumi.pulumiservice.api.inputs.CLIIntegrationRefArgs;
 import java.lang.Boolean;
-import java.lang.Object;
 import java.lang.String;
 import java.util.List;
 import java.util.Objects;
@@ -39,13 +41,13 @@ public final class TaskArgs extends com.pulumi.resources.ResourceArgs {
      * 
      */
     @Import(name="cliIntegrations")
-    private @Nullable Output<List<Object>> cliIntegrations;
+    private @Nullable Output<List<CLIIntegrationRefArgs>> cliIntegrations;
 
     /**
      * @return Optional filter for CLI integrations to enable for this task. Semantics: omitted/null → enable all CLI integrations connected for the org; empty list → explicit opt-out (no CLI integrations for this task); populated list → whitelist by (catalogId, name) of the configured instances to enable. Entries with missing or unknown catalogId, missing name, or referencing a (catalogId, name) pair that is not connected for the organization are rejected with a 400 response. catalogId matching is case-insensitive.
      * 
      */
-    public Optional<Output<List<Object>>> cliIntegrations() {
+    public Optional<Output<List<CLIIntegrationRefArgs>>> cliIntegrations() {
         return Optional.ofNullable(this.cliIntegrations);
     }
 
@@ -54,13 +56,13 @@ public final class TaskArgs extends com.pulumi.resources.ResourceArgs {
      * 
      */
     @Import(name="enabledIntegrations")
-    private @Nullable Output<List<Object>> enabledIntegrations;
+    private @Nullable Output<List<AgentTaskIntegrationRefArgs>> enabledIntegrations;
 
     /**
      * @return Optional list of integrations to enable for this task. Semantics: omitted/null → inherit all org-enabled integrations; empty list → explicit opt-out (no integration credentials for this task); populated list → whitelist of specific integrations by ID. Modeled as an object array rather than a bare string array so multi-instance support (instance_name, scope, etc.) can be added later without a wire break.
      * 
      */
-    public Optional<Output<List<Object>>> enabledIntegrations() {
+    public Optional<Output<List<AgentTaskIntegrationRefArgs>>> enabledIntegrations() {
         return Optional.ofNullable(this.enabledIntegrations);
     }
 
@@ -69,13 +71,13 @@ public final class TaskArgs extends com.pulumi.resources.ResourceArgs {
      * 
      */
     @Import(name="message")
-    private @Nullable Output<Object> message;
+    private @Nullable Output<AgentUserEventMessageArgs> message;
 
     /**
      * @return The message content
      * 
      */
-    public Optional<Output<Object>> message() {
+    public Optional<Output<AgentUserEventMessageArgs>> message() {
         return Optional.ofNullable(this.message);
     }
 
@@ -229,7 +231,7 @@ public final class TaskArgs extends com.pulumi.resources.ResourceArgs {
          * @return builder
          * 
          */
-        public Builder cliIntegrations(@Nullable Output<List<Object>> cliIntegrations) {
+        public Builder cliIntegrations(@Nullable Output<List<CLIIntegrationRefArgs>> cliIntegrations) {
             $.cliIntegrations = cliIntegrations;
             return this;
         }
@@ -240,7 +242,7 @@ public final class TaskArgs extends com.pulumi.resources.ResourceArgs {
          * @return builder
          * 
          */
-        public Builder cliIntegrations(List<Object> cliIntegrations) {
+        public Builder cliIntegrations(List<CLIIntegrationRefArgs> cliIntegrations) {
             return cliIntegrations(Output.of(cliIntegrations));
         }
 
@@ -250,7 +252,7 @@ public final class TaskArgs extends com.pulumi.resources.ResourceArgs {
          * @return builder
          * 
          */
-        public Builder cliIntegrations(Object... cliIntegrations) {
+        public Builder cliIntegrations(CLIIntegrationRefArgs... cliIntegrations) {
             return cliIntegrations(List.of(cliIntegrations));
         }
 
@@ -260,7 +262,7 @@ public final class TaskArgs extends com.pulumi.resources.ResourceArgs {
          * @return builder
          * 
          */
-        public Builder enabledIntegrations(@Nullable Output<List<Object>> enabledIntegrations) {
+        public Builder enabledIntegrations(@Nullable Output<List<AgentTaskIntegrationRefArgs>> enabledIntegrations) {
             $.enabledIntegrations = enabledIntegrations;
             return this;
         }
@@ -271,7 +273,7 @@ public final class TaskArgs extends com.pulumi.resources.ResourceArgs {
          * @return builder
          * 
          */
-        public Builder enabledIntegrations(List<Object> enabledIntegrations) {
+        public Builder enabledIntegrations(List<AgentTaskIntegrationRefArgs> enabledIntegrations) {
             return enabledIntegrations(Output.of(enabledIntegrations));
         }
 
@@ -281,7 +283,7 @@ public final class TaskArgs extends com.pulumi.resources.ResourceArgs {
          * @return builder
          * 
          */
-        public Builder enabledIntegrations(Object... enabledIntegrations) {
+        public Builder enabledIntegrations(AgentTaskIntegrationRefArgs... enabledIntegrations) {
             return enabledIntegrations(List.of(enabledIntegrations));
         }
 
@@ -291,7 +293,7 @@ public final class TaskArgs extends com.pulumi.resources.ResourceArgs {
          * @return builder
          * 
          */
-        public Builder message(@Nullable Output<Object> message) {
+        public Builder message(@Nullable Output<AgentUserEventMessageArgs> message) {
             $.message = message;
             return this;
         }
@@ -302,7 +304,7 @@ public final class TaskArgs extends com.pulumi.resources.ResourceArgs {
          * @return builder
          * 
          */
-        public Builder message(Object message) {
+        public Builder message(AgentUserEventMessageArgs message) {
             return message(Output.of(message));
         }
 

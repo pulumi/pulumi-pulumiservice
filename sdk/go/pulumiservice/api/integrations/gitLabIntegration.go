@@ -8,6 +8,7 @@ import (
 	"reflect"
 
 	"errors"
+	"github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/api"
 	"github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/internal"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
@@ -17,7 +18,7 @@ type GitLabIntegration struct {
 	pulumi.CustomResourceState
 
 	// The Pulumi user whose GitLab authentication token is being used, if applicable.
-	AuthUser pulumi.AnyOutput `pulumi:"authUser"`
+	AuthUser api.UserPtrOutput `pulumi:"authUser"`
 	// The URL of the GitLab group's avatar image.
 	AvatarUrl pulumi.StringPtrOutput `pulumi:"avatarUrl"`
 	// Whether detailed property-level diffs are disabled for PR comments.
@@ -29,7 +30,7 @@ type GitLabIntegration struct {
 	// The GitLab group ID linked to this integration.
 	GitLabGroupId pulumi.IntOutput `pulumi:"gitLabGroupId"`
 	// Metadata about the GitLab group linked to this integration.
-	GitLabOrg pulumi.AnyOutput `pulumi:"gitLabOrg"`
+	GitLabOrg api.GitLabAppOrganizationPtrOutput `pulumi:"gitLabOrg"`
 	// The expiration date of the group access token, if one is being used for authentication.
 	GroupAccessTokenExpiration pulumi.StringPtrOutput `pulumi:"groupAccessTokenExpiration"`
 	// The display name of the GitLab group.
@@ -206,8 +207,8 @@ func (o GitLabIntegrationOutput) ToGitLabIntegrationOutputWithContext(ctx contex
 }
 
 // The Pulumi user whose GitLab authentication token is being used, if applicable.
-func (o GitLabIntegrationOutput) AuthUser() pulumi.AnyOutput {
-	return o.ApplyT(func(v *GitLabIntegration) pulumi.AnyOutput { return v.AuthUser }).(pulumi.AnyOutput)
+func (o GitLabIntegrationOutput) AuthUser() api.UserPtrOutput {
+	return o.ApplyT(func(v *GitLabIntegration) api.UserPtrOutput { return v.AuthUser }).(api.UserPtrOutput)
 }
 
 // The URL of the GitLab group's avatar image.
@@ -236,8 +237,8 @@ func (o GitLabIntegrationOutput) GitLabGroupId() pulumi.IntOutput {
 }
 
 // Metadata about the GitLab group linked to this integration.
-func (o GitLabIntegrationOutput) GitLabOrg() pulumi.AnyOutput {
-	return o.ApplyT(func(v *GitLabIntegration) pulumi.AnyOutput { return v.GitLabOrg }).(pulumi.AnyOutput)
+func (o GitLabIntegrationOutput) GitLabOrg() api.GitLabAppOrganizationPtrOutput {
+	return o.ApplyT(func(v *GitLabIntegration) api.GitLabAppOrganizationPtrOutput { return v.GitLabOrg }).(api.GitLabAppOrganizationPtrOutput)
 }
 
 // The expiration date of the group access token, if one is being used for authentication.

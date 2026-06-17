@@ -8,6 +8,7 @@ import (
 	"reflect"
 
 	"errors"
+	"github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/api"
 	"github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/internal"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
@@ -19,7 +20,7 @@ type BitBucketIntegration struct {
 	// The authentication type used: 'workspace_token', 'user_token', or 'pat'.
 	AuthType pulumi.StringPtrOutput `pulumi:"authType"`
 	// The user whose BitBucket OAuth token is being used for authentication, if user-based auth is configured.
-	AuthUser pulumi.AnyOutput `pulumi:"authUser"`
+	AuthUser api.UserPtrOutput `pulumi:"authUser"`
 	// URL of the BitBucket workspace avatar image.
 	AvatarUrl pulumi.StringPtrOutput `pulumi:"avatarUrl"`
 	// Whether detailed property-level diffs are disabled for PR comments.
@@ -205,8 +206,8 @@ func (o BitBucketIntegrationOutput) AuthType() pulumi.StringPtrOutput {
 }
 
 // The user whose BitBucket OAuth token is being used for authentication, if user-based auth is configured.
-func (o BitBucketIntegrationOutput) AuthUser() pulumi.AnyOutput {
-	return o.ApplyT(func(v *BitBucketIntegration) pulumi.AnyOutput { return v.AuthUser }).(pulumi.AnyOutput)
+func (o BitBucketIntegrationOutput) AuthUser() api.UserPtrOutput {
+	return o.ApplyT(func(v *BitBucketIntegration) api.UserPtrOutput { return v.AuthUser }).(api.UserPtrOutput)
 }
 
 // URL of the BitBucket workspace avatar image.

@@ -55,13 +55,13 @@ namespace Pulumi.PulumiService.Api.Agents
         /// Information about the user who created this task.
         /// </summary>
         [Output("createdBy")]
-        public Output<object> CreatedBy { get; private set; } = null!;
+        public Output<Pulumi.PulumiService.Api.Outputs.UserInfo> CreatedBy { get; private set; } = null!;
 
         /// <summary>
         /// Pulumi entities (stacks, projects, etc.) that provide context for the agent.
         /// </summary>
         [Output("entities")]
-        public Output<ImmutableArray<object>> Entities { get; private set; } = null!;
+        public Output<ImmutableArray<Pulumi.PulumiService.Api.Outputs.AgentEntity>> Entities { get; private set; } = null!;
 
         /// <summary>
         /// Whether this task is shared with other org members.
@@ -193,26 +193,26 @@ namespace Pulumi.PulumiService.Api.Agents
         public Input<string>? ApprovalMode { get; set; }
 
         [Input("cliIntegrations")]
-        private InputList<object>? _cliIntegrations;
+        private InputList<Pulumi.PulumiService.Api.Inputs.CLIIntegrationRefArgs>? _cliIntegrations;
 
         /// <summary>
         /// Optional filter for CLI integrations to enable for this task. Semantics: omitted/null → enable all CLI integrations connected for the org; empty list → explicit opt-out (no CLI integrations for this task); populated list → whitelist by (catalogId, name) of the configured instances to enable. Entries with missing or unknown catalogId, missing name, or referencing a (catalogId, name) pair that is not connected for the organization are rejected with a 400 response. catalogId matching is case-insensitive.
         /// </summary>
-        public InputList<object> CliIntegrations
+        public InputList<Pulumi.PulumiService.Api.Inputs.CLIIntegrationRefArgs> CliIntegrations
         {
-            get => _cliIntegrations ?? (_cliIntegrations = new InputList<object>());
+            get => _cliIntegrations ?? (_cliIntegrations = new InputList<Pulumi.PulumiService.Api.Inputs.CLIIntegrationRefArgs>());
             set => _cliIntegrations = value;
         }
 
         [Input("enabledIntegrations")]
-        private InputList<object>? _enabledIntegrations;
+        private InputList<Pulumi.PulumiService.Api.Inputs.AgentTaskIntegrationRefArgs>? _enabledIntegrations;
 
         /// <summary>
         /// Optional list of integrations to enable for this task. Semantics: omitted/null → inherit all org-enabled integrations; empty list → explicit opt-out (no integration credentials for this task); populated list → whitelist of specific integrations by ID. Modeled as an object array rather than a bare string array so multi-instance support (instance_name, scope, etc.) can be added later without a wire break.
         /// </summary>
-        public InputList<object> EnabledIntegrations
+        public InputList<Pulumi.PulumiService.Api.Inputs.AgentTaskIntegrationRefArgs> EnabledIntegrations
         {
-            get => _enabledIntegrations ?? (_enabledIntegrations = new InputList<object>());
+            get => _enabledIntegrations ?? (_enabledIntegrations = new InputList<Pulumi.PulumiService.Api.Inputs.AgentTaskIntegrationRefArgs>());
             set => _enabledIntegrations = value;
         }
 
@@ -220,7 +220,7 @@ namespace Pulumi.PulumiService.Api.Agents
         /// The message content
         /// </summary>
         [Input("message")]
-        public Input<object>? Message { get; set; }
+        public Input<Pulumi.PulumiService.Api.Inputs.AgentUserEventMessageArgs>? Message { get; set; }
 
         /// <summary>
         /// The organization name

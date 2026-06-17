@@ -8,6 +8,7 @@ import (
 	"reflect"
 
 	"errors"
+	"github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/api"
 	"github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/internal"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
@@ -23,7 +24,7 @@ type OidcIssuer struct {
 	// The unique identifier of the registered OIDC issuer.
 	IssuerId pulumi.StringOutput `pulumi:"issuerId"`
 	// The JSON Web Key Set for the OIDC issuer.
-	Jwks pulumi.AnyOutput `pulumi:"jwks"`
+	Jwks api.JSONWebKeySetPtrOutput `pulumi:"jwks"`
 	// The ISO 8601 timestamp when the OIDC issuer was last used for token exchange.
 	LastUsed pulumi.StringPtrOutput `pulumi:"lastUsed"`
 	// The maximum token expiration time in seconds.
@@ -90,7 +91,7 @@ type oidcIssuerArgs struct {
 	// The OIDC issuer identifier
 	IssuerId *string `pulumi:"issuerId"`
 	// The JSON Web Key Set for the OIDC issuer.
-	Jwks interface{} `pulumi:"jwks"`
+	Jwks *api.JSONWebKeySet `pulumi:"jwks"`
 	// The maximum token expiration time in seconds.
 	MaxExpiration *int `pulumi:"maxExpiration"`
 	// The display name of the OIDC issuer.
@@ -108,7 +109,7 @@ type OidcIssuerArgs struct {
 	// The OIDC issuer identifier
 	IssuerId pulumi.StringPtrInput
 	// The JSON Web Key Set for the OIDC issuer.
-	Jwks pulumi.Input
+	Jwks api.JSONWebKeySetPtrInput
 	// The maximum token expiration time in seconds.
 	MaxExpiration pulumi.IntPtrInput
 	// The display name of the OIDC issuer.
@@ -224,8 +225,8 @@ func (o OidcIssuerOutput) IssuerId() pulumi.StringOutput {
 }
 
 // The JSON Web Key Set for the OIDC issuer.
-func (o OidcIssuerOutput) Jwks() pulumi.AnyOutput {
-	return o.ApplyT(func(v *OidcIssuer) pulumi.AnyOutput { return v.Jwks }).(pulumi.AnyOutput)
+func (o OidcIssuerOutput) Jwks() api.JSONWebKeySetPtrOutput {
+	return o.ApplyT(func(v *OidcIssuer) api.JSONWebKeySetPtrOutput { return v.Jwks }).(api.JSONWebKeySetPtrOutput)
 }
 
 // The ISO 8601 timestamp when the OIDC issuer was last used for token exchange.

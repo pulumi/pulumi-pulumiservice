@@ -32,7 +32,7 @@ namespace Pulumi.PulumiService.Api.Insights
         /// The user with ownership of this Insights account
         /// </summary>
         [Output("ownedBy")]
-        public Output<object> OwnedBy { get; private set; } = null!;
+        public Output<Pulumi.PulumiService.Api.Outputs.UserInfo> OwnedBy { get; private set; } = null!;
 
         /// <summary>
         /// The cloud provider for the account (e.g., aws, gcp, azure-native).
@@ -63,7 +63,7 @@ namespace Pulumi.PulumiService.Api.Insights
         /// Status of the last discovery scan for this account.
         /// </summary>
         [Output("scanStatus")]
-        public Output<object?> ScanStatus { get; private set; } = null!;
+        public Output<Pulumi.PulumiService.Api.Outputs.ScanStatus?> ScanStatus { get; private set; } = null!;
 
         /// <summary>
         /// If true, the account is scheduled for recurring discovery.

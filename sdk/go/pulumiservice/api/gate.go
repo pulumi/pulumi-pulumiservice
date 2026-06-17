@@ -23,9 +23,9 @@ type Gate struct {
 	// Name of the change gate
 	Name pulumi.StringOutput `pulumi:"name"`
 	// Rule configuration for the gate
-	Rule pulumi.AnyOutput `pulumi:"rule"`
+	Rule ChangeGateRuleOutputOutput `pulumi:"rule"`
 	// Target configuration for the gate
-	Target pulumi.AnyOutput `pulumi:"target"`
+	Target ChangeGateTargetOutputOutput `pulumi:"target"`
 }
 
 // NewGate registers a new resource with the given unique name, arguments, and options.
@@ -92,9 +92,9 @@ type gateArgs struct {
 	// The organization name
 	OrgName string `pulumi:"orgName"`
 	// Rule configuration for the gate
-	Rule interface{} `pulumi:"rule"`
+	Rule ChangeGateRuleInput `pulumi:"rule"`
 	// Target configuration for the gate
-	Target interface{} `pulumi:"target"`
+	Target ChangeGateTargetInput `pulumi:"target"`
 }
 
 // The set of arguments for constructing a Gate resource.
@@ -108,9 +108,9 @@ type GateArgs struct {
 	// The organization name
 	OrgName pulumi.StringInput
 	// Rule configuration for the gate
-	Rule pulumi.Input
+	Rule ChangeGateRuleInputInput
 	// Target configuration for the gate
-	Target pulumi.Input
+	Target ChangeGateTargetInputInput
 }
 
 func (GateArgs) ElementType() reflect.Type {
@@ -216,13 +216,13 @@ func (o GateOutput) Name() pulumi.StringOutput {
 }
 
 // Rule configuration for the gate
-func (o GateOutput) Rule() pulumi.AnyOutput {
-	return o.ApplyT(func(v *Gate) pulumi.AnyOutput { return v.Rule }).(pulumi.AnyOutput)
+func (o GateOutput) Rule() ChangeGateRuleOutputOutput {
+	return o.ApplyT(func(v *Gate) ChangeGateRuleOutputOutput { return v.Rule }).(ChangeGateRuleOutputOutput)
 }
 
 // Target configuration for the gate
-func (o GateOutput) Target() pulumi.AnyOutput {
-	return o.ApplyT(func(v *Gate) pulumi.AnyOutput { return v.Target }).(pulumi.AnyOutput)
+func (o GateOutput) Target() ChangeGateTargetOutputOutput {
+	return o.ApplyT(func(v *Gate) ChangeGateTargetOutputOutput { return v.Target }).(ChangeGateTargetOutputOutput)
 }
 
 type GateArrayOutput struct{ *pulumi.OutputState }

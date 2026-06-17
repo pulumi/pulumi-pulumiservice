@@ -8,8 +8,8 @@ import com.pulumi.core.annotations.Export;
 import com.pulumi.core.annotations.ResourceType;
 import com.pulumi.core.internal.Codegen;
 import com.pulumi.pulumiservice.Utilities;
+import com.pulumi.pulumiservice.api.outputs.CustomVCSRepository;
 import com.pulumi.pulumiservice.api_integrations.CustomVCSIntegrationArgs;
-import java.lang.Object;
 import java.lang.String;
 import java.util.List;
 import java.util.Optional;
@@ -109,14 +109,14 @@ public class CustomVCSIntegration extends com.pulumi.resources.CustomResource {
      * List of repositories configured on this integration
      * 
      */
-    @Export(name="repositories", refs={List.class,Object.class}, tree="[0,1]")
-    private Output</* @Nullable */ List<Object>> repositories;
+    @Export(name="repositories", refs={List.class,CustomVCSRepository.class}, tree="[0,1]")
+    private Output</* @Nullable */ List<CustomVCSRepository>> repositories;
 
     /**
      * @return List of repositories configured on this integration
      * 
      */
-    public Output<Optional<List<Object>>> repositories() {
+    public Output<Optional<List<CustomVCSRepository>>> repositories() {
         return Codegen.optional(this.repositories);
     }
     /**

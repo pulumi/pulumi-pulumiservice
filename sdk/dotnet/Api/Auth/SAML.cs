@@ -38,7 +38,7 @@ namespace Pulumi.PulumiService.Api.Auth
         /// The Pulumi organization.
         /// </summary>
         [Output("organization")]
-        public Output<object> Organization { get; private set; } = null!;
+        public Output<Pulumi.PulumiService.Api.Outputs.Organization> Organization { get; private set; } = null!;
 
         /// <summary>
         /// The SSO URL for the identity provider.

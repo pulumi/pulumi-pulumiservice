@@ -8,6 +8,7 @@ import (
 	"reflect"
 
 	"errors"
+	"github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/api"
 	"github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/internal"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
@@ -18,13 +19,13 @@ type Team struct {
 	pulumi.CustomResourceState
 
 	// The list of account permissions granted to the team.
-	Accounts pulumi.ArrayOutput `pulumi:"accounts"`
+	Accounts api.TeamAccountPermissionArrayOutput `pulumi:"accounts"`
 	// A free-form text description of the team's purpose.
 	Description pulumi.StringOutput `pulumi:"description"`
 	// The human-readable display name shown in the UI.
 	DisplayName pulumi.StringOutput `pulumi:"displayName"`
 	// The list of environment settings for the team.
-	Environments pulumi.ArrayOutput `pulumi:"environments"`
+	Environments api.TeamEnvironmentSettingsArrayOutput `pulumi:"environments"`
 	// The kind of team (e.g., pulumi or GitHub-backed).
 	Kind pulumi.StringOutput `pulumi:"kind"`
 	// ListMembersError is the error message if an error was encountered whilst trying to
@@ -32,14 +33,14 @@ type Team struct {
 	// and if Members itself is an empty slice.
 	ListMembersError pulumi.StringPtrOutput `pulumi:"listMembersError"`
 	// The list of team members.
-	Members pulumi.ArrayOutput `pulumi:"members"`
+	Members api.TeamMemberInfoArrayOutput `pulumi:"members"`
 	// The unique identifier name of the team within the organization.
 	Name pulumi.StringOutput `pulumi:"name"`
 	// RoleIDs are the IDs of the FGA roles assigned to the team, if any.
 	// Currently only one role per team is supported.
 	RoleIds pulumi.StringArrayOutput `pulumi:"roleIds"`
 	// The list of stack permissions granted to the team.
-	Stacks pulumi.ArrayOutput `pulumi:"stacks"`
+	Stacks api.TeamStackPermissionArrayOutput `pulumi:"stacks"`
 	// UserRole is the calling user's role on the given team.
 	UserRole pulumi.StringPtrOutput `pulumi:"userRole"`
 }
@@ -206,8 +207,8 @@ func (o TeamOutput) ToTeamOutputWithContext(ctx context.Context) TeamOutput {
 }
 
 // The list of account permissions granted to the team.
-func (o TeamOutput) Accounts() pulumi.ArrayOutput {
-	return o.ApplyT(func(v *Team) pulumi.ArrayOutput { return v.Accounts }).(pulumi.ArrayOutput)
+func (o TeamOutput) Accounts() api.TeamAccountPermissionArrayOutput {
+	return o.ApplyT(func(v *Team) api.TeamAccountPermissionArrayOutput { return v.Accounts }).(api.TeamAccountPermissionArrayOutput)
 }
 
 // A free-form text description of the team's purpose.
@@ -221,8 +222,8 @@ func (o TeamOutput) DisplayName() pulumi.StringOutput {
 }
 
 // The list of environment settings for the team.
-func (o TeamOutput) Environments() pulumi.ArrayOutput {
-	return o.ApplyT(func(v *Team) pulumi.ArrayOutput { return v.Environments }).(pulumi.ArrayOutput)
+func (o TeamOutput) Environments() api.TeamEnvironmentSettingsArrayOutput {
+	return o.ApplyT(func(v *Team) api.TeamEnvironmentSettingsArrayOutput { return v.Environments }).(api.TeamEnvironmentSettingsArrayOutput)
 }
 
 // The kind of team (e.g., pulumi or GitHub-backed).
@@ -238,8 +239,8 @@ func (o TeamOutput) ListMembersError() pulumi.StringPtrOutput {
 }
 
 // The list of team members.
-func (o TeamOutput) Members() pulumi.ArrayOutput {
-	return o.ApplyT(func(v *Team) pulumi.ArrayOutput { return v.Members }).(pulumi.ArrayOutput)
+func (o TeamOutput) Members() api.TeamMemberInfoArrayOutput {
+	return o.ApplyT(func(v *Team) api.TeamMemberInfoArrayOutput { return v.Members }).(api.TeamMemberInfoArrayOutput)
 }
 
 // The unique identifier name of the team within the organization.
@@ -254,8 +255,8 @@ func (o TeamOutput) RoleIds() pulumi.StringArrayOutput {
 }
 
 // The list of stack permissions granted to the team.
-func (o TeamOutput) Stacks() pulumi.ArrayOutput {
-	return o.ApplyT(func(v *Team) pulumi.ArrayOutput { return v.Stacks }).(pulumi.ArrayOutput)
+func (o TeamOutput) Stacks() api.TeamStackPermissionArrayOutput {
+	return o.ApplyT(func(v *Team) api.TeamStackPermissionArrayOutput { return v.Stacks }).(api.TeamStackPermissionArrayOutput)
 }
 
 // UserRole is the calling user's role on the given team.

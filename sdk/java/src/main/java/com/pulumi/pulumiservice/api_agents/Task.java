@@ -8,10 +8,11 @@ import com.pulumi.core.annotations.Export;
 import com.pulumi.core.annotations.ResourceType;
 import com.pulumi.core.internal.Codegen;
 import com.pulumi.pulumiservice.Utilities;
+import com.pulumi.pulumiservice.api.outputs.AgentEntity;
+import com.pulumi.pulumiservice.api.outputs.UserInfo;
 import com.pulumi.pulumiservice.api_agents.TaskArgs;
 import java.lang.Boolean;
 import java.lang.Integer;
-import java.lang.Object;
 import java.lang.String;
 import java.util.List;
 import java.util.Optional;
@@ -111,28 +112,28 @@ public class Task extends com.pulumi.resources.CustomResource {
      * Information about the user who created this task.
      * 
      */
-    @Export(name="createdBy", refs={Object.class}, tree="[0]")
-    private Output<Object> createdBy;
+    @Export(name="createdBy", refs={UserInfo.class}, tree="[0]")
+    private Output<UserInfo> createdBy;
 
     /**
      * @return Information about the user who created this task.
      * 
      */
-    public Output<Object> createdBy() {
+    public Output<UserInfo> createdBy() {
         return this.createdBy;
     }
     /**
      * Pulumi entities (stacks, projects, etc.) that provide context for the agent.
      * 
      */
-    @Export(name="entities", refs={List.class,Object.class}, tree="[0,1]")
-    private Output<List<Object>> entities;
+    @Export(name="entities", refs={List.class,AgentEntity.class}, tree="[0,1]")
+    private Output<List<AgentEntity>> entities;
 
     /**
      * @return Pulumi entities (stacks, projects, etc.) that provide context for the agent.
      * 
      */
-    public Output<List<Object>> entities() {
+    public Output<List<AgentEntity>> entities() {
         return this.entities;
     }
     /**

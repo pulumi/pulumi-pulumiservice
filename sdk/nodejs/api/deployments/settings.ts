@@ -2,6 +2,9 @@
 // *** Do not edit by hand unless you're certain you know what you are doing! ***
 
 import * as pulumi from "@pulumi/pulumi";
+import * as inputs from "../../types/input";
+import * as outputs from "../../types/output";
+import * as enums from "../../types/enums";
 import * as utilities from "../../utilities";
 
 /**
@@ -41,19 +44,19 @@ export class Settings extends pulumi.CustomResource {
     /**
      * Cache options for the deployment.
      */
-    declare public readonly cacheOptions: pulumi.Output<any | undefined>;
+    declare public readonly cacheOptions: pulumi.Output<outputs.api.CacheOptions | undefined>;
     /**
      * The executor context defining the execution environment.
      */
-    declare public readonly executorContext: pulumi.Output<any | undefined>;
+    declare public readonly executorContext: pulumi.Output<outputs.api.ExecutorContext | undefined>;
     /**
      * GitHub-specific deployment settings
      */
-    declare public readonly gitHub: pulumi.Output<any | undefined>;
+    declare public readonly gitHub: pulumi.Output<outputs.api.DeploymentSettingsGitHub | undefined>;
     /**
      * The operation context defining pre-run and post-run commands and environment variables.
      */
-    declare public readonly operationContext: pulumi.Output<any | undefined>;
+    declare public readonly operationContext: pulumi.Output<outputs.api.OperationContext | undefined>;
     /**
      * The source from which the deployment settings were created.
      */
@@ -61,7 +64,7 @@ export class Settings extends pulumi.CustomResource {
     /**
      * The source context defining where the source code is located.
      */
-    declare public readonly sourceContext: pulumi.Output<any | undefined>;
+    declare public readonly sourceContext: pulumi.Output<outputs.api.SourceContext | undefined>;
     /**
      * A tag to identify the deployment settings configuration.
      */
@@ -69,7 +72,7 @@ export class Settings extends pulumi.CustomResource {
     /**
      * VCS provider settings
      */
-    declare public readonly vcs: pulumi.Output<any | undefined>;
+    declare public readonly vcs: pulumi.Output<outputs.api.DeploymentSettingsVCS | undefined>;
     /**
      * The version of the deployment settings.
      */
@@ -136,19 +139,19 @@ export interface SettingsArgs {
     /**
      * Cache options for the deployment.
      */
-    cacheOptions?: any | undefined;
+    cacheOptions?: pulumi.Input<inputs.api.CacheOptionsRequestArgs | undefined>;
     /**
      * The executor context defining the execution environment.
      */
-    executorContext?: any | undefined;
+    executorContext?: pulumi.Input<inputs.api.ExecutorSettingsRequestArgs | undefined>;
     /**
      * GitHub-specific deployment settings
      */
-    gitHub?: any | undefined;
+    gitHub?: pulumi.Input<inputs.api.DeploymentSettingsGitHubRequestArgs | undefined>;
     /**
      * The operation context defining pre-run and post-run commands and environment variables.
      */
-    operationContext?: any | undefined;
+    operationContext?: pulumi.Input<inputs.api.OperationContextRequestArgs | undefined>;
     /**
      * The organization name
      */
@@ -160,7 +163,7 @@ export interface SettingsArgs {
     /**
      * The source context defining where the source code is located.
      */
-    sourceContext?: any | undefined;
+    sourceContext?: pulumi.Input<inputs.api.SourceContextRequestArgs | undefined>;
     /**
      * The stack name
      */
@@ -172,5 +175,5 @@ export interface SettingsArgs {
     /**
      * VCS provider settings
      */
-    vcs?: any | undefined;
+    vcs?: pulumi.Input<inputs.api.DeploymentSettingsVCSArgs | undefined>;
 }

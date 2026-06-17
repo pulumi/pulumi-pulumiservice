@@ -81,6 +81,3178 @@
     }
   },
   "types": {
+    "pulumiservice:api:AddServiceItem": {
+      "description": "A simple struct representing the metadata needed to add an item via user-facing information.",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "the name (including any namespacing) of the item"
+        },
+        "type": {
+          "type": "string",
+          "description": "the type of the item to add"
+        }
+      },
+      "type": "object",
+      "required": [
+        "name",
+        "type"
+      ]
+    },
+    "pulumiservice:api:AgentEntity": {
+      "description": "Represents agent entity.",
+      "properties": {
+        "type": {
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "required": [
+        "type"
+      ]
+    },
+    "pulumiservice:api:AgentEntityDiff": {
+      "description": "Represents agent entity diff.",
+      "properties": {
+        "add": {
+          "type": "array",
+          "items": {
+            "$ref": "#/types/pulumiservice:api:AgentEntity"
+          },
+          "description": "Entities to add to the Agent's context.\nEntities must be valid, and will be automatically deleted if they are invalid."
+        },
+        "remove": {
+          "type": "array",
+          "items": {
+            "$ref": "#/types/pulumiservice:api:AgentEntity"
+          },
+          "description": "Entities to remove from the Agent's context."
+        }
+      },
+      "type": "object"
+    },
+    "pulumiservice:api:AgentTaskIntegrationRef": {
+      "description": "A reference to an integration enabled for an agent task. Structured as an object (rather than a bare string) so additional fields like instance name or scope can be added later without breaking the wire format.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The catalog integration ID (e.g. 'honeycomb', 'datadog')."
+        }
+      },
+      "type": "object",
+      "required": [
+        "id"
+      ]
+    },
+    "pulumiservice:api:AgentUserEventMessage": {
+      "properties": {
+        "commands": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "pulumi.json#/Any"
+          },
+          "description": "Slash Commands the user selected when creating their message."
+        },
+        "content": {
+          "type": "string",
+          "description": "The exact natural language instruction from the user."
+        },
+        "entity_diff": {
+          "$ref": "#/types/pulumiservice:api:AgentEntityDiff",
+          "description": "Entities to add or remove from the agent."
+        },
+        "pageContext": {
+          "$ref": "#/types/pulumiservice:api:PageContext",
+          "description": "Optional Pulumi Cloud page the user has the Neo pane open on at the moment they sent this event. Persisted with the event so cold-start replay can reproduce per-turn page context exactly. Omitted by clients with no concept of a current page (CLI, scheduled tasks, Slack, GitHub triggers, API consumers)."
+        },
+        "timestamp": {
+          "type": "string",
+          "description": "When the event occurred."
+        },
+        "type": {
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "required": [
+        "content",
+        "timestamp",
+        "type"
+      ]
+    },
+    "pulumiservice:api:AppMessage": {
+      "description": "Message is a message from the backend to be displayed to the user.",
+      "properties": {
+        "message": {
+          "type": "string",
+          "description": "Message is the message to display to the user."
+        },
+        "severity": {
+          "type": "string",
+          "description": "Severity is the severity of the message."
+        }
+      },
+      "type": "object",
+      "required": [
+        "message"
+      ]
+    },
+    "pulumiservice:api:AppOperationStatus": {
+      "description": "OperationStatus describes the state of an operation being performed on a Pulumi stack.",
+      "properties": {
+        "author": {
+          "type": "string",
+          "description": "The login of the user who initiated this operation."
+        },
+        "kind": {
+          "type": "string",
+          "description": "The type of operation in progress (e.g. 'update', 'preview', 'destroy', 'refresh')."
+        },
+        "started": {
+          "type": "integer",
+          "description": "Unix epoch timestamp (seconds) when the operation started."
+        }
+      },
+      "type": "object",
+      "required": [
+        "author",
+        "kind",
+        "started"
+      ]
+    },
+    "pulumiservice:api:AppPolicyPackMetadata": {
+      "description": "PolicyPackMetadata is the metadata of a Policy Pack.",
+      "properties": {
+        "config": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "pulumi.json#/Any"
+          },
+          "description": "The configuration that is to be passed to the Policy Pack. This\nmap ties Policies with their configuration."
+        },
+        "displayName": {
+          "type": "string",
+          "description": "The display name"
+        },
+        "environments": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "References to ESC environments to use for this policy pack."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name"
+        },
+        "version": {
+          "type": "integer",
+          "description": "The version number"
+        },
+        "versionTag": {
+          "type": "string",
+          "description": "The version tag"
+        }
+      },
+      "type": "object",
+      "required": [
+        "displayName",
+        "name",
+        "version",
+        "versionTag"
+      ]
+    },
+    "pulumiservice:api:AppPulumiStackReference": {
+      "description": "PulumiStackReference contains the StackName and ProjectName of the stack.",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name"
+        },
+        "routingProject": {
+          "type": "string",
+          "description": "The routing project"
+        }
+      },
+      "type": "object",
+      "required": [
+        "name",
+        "routingProject"
+      ]
+    },
+    "pulumiservice:api:AppStackConfig": {
+      "description": "StackConfig describes the configuration of a stack from Pulumi Cloud.",
+      "properties": {
+        "encryptedKey": {
+          "type": "string",
+          "description": "Deprecated: this field is no longer used by the service. Stacks that use a service-backed configuration store all config (including secrets) in ESC, which uses its own encryption. New callers should omit this field."
+        },
+        "encryptionSalt": {
+          "type": "string",
+          "description": "Deprecated: this field is no longer used by the service. Stacks that use a service-backed configuration store all config (including secrets) in ESC, which uses its own encryption. New callers should omit this field."
+        },
+        "environment": {
+          "type": "string",
+          "description": "Reference to ESC environment to use as stack configuration."
+        },
+        "secretsProvider": {
+          "type": "string",
+          "description": "Deprecated: this field is no longer used by the service. Stacks that use a service-backed configuration store all config (including secrets) in ESC, which uses its own encryption. New callers should omit this field."
+        }
+      },
+      "type": "object",
+      "required": [
+        "environment"
+      ]
+    },
+    "pulumiservice:api:AppUntypedDeployment": {
+      "description": "UntypedDeployment contains an inner, untyped deployment structure.",
+      "properties": {
+        "deployment": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "pulumi.json#/Any"
+          },
+          "description": "The opaque Pulumi deployment payload. Treated as a raw JSON value so the contents are preserved verbatim across client and server versions."
+        },
+        "features": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "An optional list of features used by this deployment. The CLI will error when reading a deployment that uses a feature that is not supported by that version of the CLI. Only honored when `version` is 4 or greater."
+        },
+        "version": {
+          "type": "integer",
+          "description": "The schema version of the encoded deployment."
+        }
+      },
+      "type": "object"
+    },
+    "pulumiservice:api:AuditLogExportResult": {
+      "description": "AuditLogExportResult is the result of an audit log export or attempt to test access.",
+      "properties": {
+        "message": {
+          "type": "string",
+          "description": "If the last result was successful, message will be \"\".\nAny other value is a user-facing error message."
+        },
+        "timestamp": {
+          "type": "integer",
+          "description": "The timestamp"
+        }
+      },
+      "type": "object",
+      "required": [
+        "message",
+        "timestamp"
+      ]
+    },
+    "pulumiservice:api:AuditLogsExportS3Config": {
+      "description": "AuditLogsExportS3Config describes how a Pulumi organization's audit log data can be exported to S3.",
+      "properties": {
+        "iamRoleArn": {
+          "type": "string",
+          "description": "ARN of the IAM role that Pulumi will assume to write to the S3 bucket."
+        },
+        "s3BucketName": {
+          "type": "string",
+          "description": "Name of the S3 bucket to export audit logs to."
+        },
+        "s3PathPrefix": {
+          "type": "string",
+          "description": "Optional path prefix within the S3 bucket for exported log files."
+        }
+      },
+      "type": "object",
+      "required": [
+        "iamRoleArn",
+        "s3BucketName"
+      ]
+    },
+    "pulumiservice:api:AuthPolicyDefinition": {
+      "description": "A single rule within an authentication policy, specifying access decisions for a token type.",
+      "properties": {
+        "authorizedPermissions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The set of permissions granted when this rule matches."
+        },
+        "decision": {
+          "type": "string",
+          "description": "The access decision for matching tokens (e.g. 'allow', 'deny')."
+        },
+        "roleID": {
+          "type": "string",
+          "description": "Role ID filter. When set, this rule only applies to tokens with this role."
+        },
+        "rules": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "pulumi.json#/Any"
+          },
+          "description": "Additional rule conditions as key-value pairs."
+        },
+        "runnerID": {
+          "type": "string",
+          "description": "Runner ID filter. When set, this rule only applies to tokens for this deployment runner."
+        },
+        "teamName": {
+          "type": "string",
+          "description": "Team name filter. When set, this rule only applies to tokens belonging to this team."
+        },
+        "tokenType": {
+          "type": "string",
+          "description": "The type of token this rule applies to (e.g. 'personal', 'org', 'team')."
+        },
+        "userLogin": {
+          "type": "string",
+          "description": "User login filter. When set, this rule only applies to tokens belonging to this user."
+        }
+      },
+      "type": "object",
+      "required": [
+        "authorizedPermissions",
+        "decision",
+        "rules",
+        "tokenType"
+      ]
+    },
+    "pulumiservice:api:AzureDevOpsOrganization": {
+      "description": "Metadata about an Azure DevOps organization, including its name, URL, and permission status.",
+      "properties": {
+        "accountUrl": {
+          "type": "string",
+          "description": "The account URL for the organization (e.g., https://dev.azure.com/myorg)"
+        },
+        "hasRequiredPermissions": {
+          "type": "boolean",
+          "description": "Whether the current user has the required permissions"
+        },
+        "id": {
+          "type": "string",
+          "description": "The unique ID of the organization"
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the organization"
+        }
+      },
+      "type": "object",
+      "required": [
+        "name"
+      ]
+    },
+    "pulumiservice:api:AzureDevOpsProject": {
+      "description": "Metadata about an Azure DevOps project within an organization.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique ID of the project"
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the project"
+        }
+      },
+      "type": "object",
+      "required": [
+        "id",
+        "name"
+      ]
+    },
+    "pulumiservice:api:BasicAuth": {
+      "description": "BasicAuth configures git authentication through basic auth —\ni.e. username and password. Both UserName and Password are required.",
+      "properties": {
+        "password": {
+          "$ref": "#/types/pulumiservice:api:SecretValue",
+          "description": "The password"
+        },
+        "userName": {
+          "$ref": "#/types/pulumiservice:api:SecretValue",
+          "description": "The user name"
+        }
+      },
+      "type": "object",
+      "required": [
+        "password",
+        "userName"
+      ]
+    },
+    "pulumiservice:api:BasicAuthRequest": {
+      "description": "Request body for basic auth.",
+      "properties": {
+        "password": {
+          "$ref": "#/types/pulumiservice:api:SecretValue",
+          "description": "The password"
+        },
+        "userName": {
+          "$ref": "#/types/pulumiservice:api:SecretValue",
+          "description": "The user name"
+        }
+      },
+      "type": "object"
+    },
+    "pulumiservice:api:CLIIntegrationRef": {
+      "description": "Reference to a CLI integration instance, addressed by (catalogId, name) — the same scheme used by the connect/disconnect endpoints. Structured as an object rather than a bare 'catalogId/name' string so additional fields (e.g. scope) can be added later without a wire break, and so the encoding is unambiguous regardless of characters that may appear in the instance name.",
+      "properties": {
+        "catalogId": {
+          "type": "string",
+          "description": "The CLI catalog entry ID (e.g. 'aws')."
+        },
+        "name": {
+          "type": "string",
+          "description": "The user-chosen instance name. Unique within the (org, catalogId) pair."
+        }
+      },
+      "type": "object",
+      "required": [
+        "catalogId",
+        "name"
+      ]
+    },
+    "pulumiservice:api:CacheOptions": {
+      "description": "Configuration options for deployment build caching.",
+      "properties": {
+        "enable": {
+          "type": "boolean",
+          "description": "Whether build caching is enabled for deployments on this stack."
+        }
+      },
+      "type": "object",
+      "required": [
+        "enable"
+      ]
+    },
+    "pulumiservice:api:CacheOptionsRequest": {
+      "description": "Request body for updating deployment build cache options.",
+      "properties": {
+        "enable": {
+          "type": "boolean",
+          "description": "Whether build caching should be enabled for deployments on this stack."
+        }
+      },
+      "type": "object"
+    },
+    "pulumiservice:api:ChangeGateRuleInput": {
+      "description": "Input specification for change gate rule - contains minimal identifiers for API requests",
+      "properties": {
+        "ruleType": {
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "required": [
+        "ruleType"
+      ]
+    },
+    "pulumiservice:api:ChangeGateRuleOutput": {
+      "description": "Output representation of change gate rule - contains full details for API responses",
+      "properties": {
+        "ruleType": {
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "required": [
+        "ruleType"
+      ]
+    },
+    "pulumiservice:api:ChangeGateTargetInput": {
+      "description": "Input specification for change gate target - contains minimal identifiers for API requests",
+      "properties": {
+        "actionTypes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The action types this gate targets (currently only supports single action)"
+        },
+        "entityType": {
+          "type": "string",
+          "description": "The entity type this gate targets"
+        },
+        "qualifiedName": {
+          "type": "string",
+          "description": "The qualified name of the entity this gate targets (e.g., 'project/env')"
+        }
+      },
+      "type": "object",
+      "required": [
+        "actionTypes",
+        "entityType"
+      ]
+    },
+    "pulumiservice:api:ChangeGateTargetOutput": {
+      "description": "Output representation of change gate target - contains full details for API responses",
+      "properties": {
+        "actionTypes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The action types this gate targets"
+        },
+        "entityInfo": {
+          "$ref": "#/types/pulumiservice:api:TargetEntity",
+          "description": "Populated details about the target entity"
+        },
+        "entityType": {
+          "type": "string",
+          "description": "The entity type this gate targets"
+        },
+        "qualifiedName": {
+          "type": "string",
+          "description": "The qualified name of the entity this gate targets (e.g., 'project/env')"
+        }
+      },
+      "type": "object",
+      "required": [
+        "actionTypes",
+        "entityType"
+      ]
+    },
+    "pulumiservice:api:CreateDeploymentRequest": {
+      "properties": {
+        "agentPoolID": {
+          "type": "string",
+          "description": "The identifier of the agent pool to use for deployments."
+        },
+        "cacheOptions": {
+          "$ref": "#/types/pulumiservice:api:CacheOptionsRequest",
+          "description": "Cache options for the deployment."
+        },
+        "executorContext": {
+          "$ref": "#/types/pulumiservice:api:ExecutorSettingsRequest",
+          "description": "The executor context defining the execution environment."
+        },
+        "gitHub": {
+          "$ref": "#/types/pulumiservice:api:DeploymentSettingsGitHubRequest",
+          "description": "GitHub-specific deployment settings"
+        },
+        "inheritSettings": {
+          "type": "boolean",
+          "description": "Whether this deployment should inherit the stack's deployment settings. Defaults to true."
+        },
+        "operation": {
+          "type": "string",
+          "description": "The Pulumi operation to perform."
+        },
+        "operationContext": {
+          "$ref": "#/types/pulumiservice:api:OperationContextRequest",
+          "description": "The operation context defining pre-run and post-run commands and environment variables."
+        },
+        "sourceContext": {
+          "$ref": "#/types/pulumiservice:api:SourceContextRequest",
+          "description": "The source context defining where the source code is located."
+        },
+        "tag": {
+          "type": "string",
+          "description": "A tag to identify the deployment settings configuration."
+        },
+        "vcs": {
+          "$ref": "#/types/pulumiservice:api:DeploymentSettingsVCS",
+          "description": "VCS provider settings"
+        }
+      },
+      "type": "object"
+    },
+    "pulumiservice:api:CreateEnvironmentSecretRotationScheduleRequest": {
+      "description": "CreateEnvironmentSecretRotationScheduleRequest defines the request payload that is expected when\ncreating a new environment secret rotation schedule.",
+      "properties": {
+        "environmentPath": {
+          "type": "string",
+          "description": "Environment Path specifies a path to a rotated secret to be updated\nLeave the field blank to rotate ALL rotated secrets in an environment"
+        }
+      },
+      "type": "object",
+      "required": [
+        "environmentPath"
+      ]
+    },
+    "pulumiservice:api:CustomVCSRepository": {
+      "description": "A repository configured on a custom VCS integration. Each repository is identified by its name, which is joined with the integration's base URL to form the full clone URL.",
+      "properties": {
+        "displayName": {
+          "type": "string",
+          "description": "Human-readable display name for the repository. If not provided, the name is used for display purposes."
+        },
+        "name": {
+          "type": "string",
+          "description": "Repository name or path, joined with the integration's base URL to form the clone URL (e.g. 'myrepo' or 'subgroup/myrepo')"
+        }
+      },
+      "type": "object",
+      "required": [
+        "name"
+      ]
+    },
+    "pulumiservice:api:DeploymentAgentMetadata": {
+      "description": "DeploymentAgentMetadata contains metadata about a deployment agent, including version, platform, and connectivity information.",
+      "properties": {
+        "hostname": {
+          "type": "string",
+          "description": "The hostname of the machine running the agent."
+        },
+        "ip": {
+          "type": "string",
+          "description": "The IP address of the agent."
+        },
+        "lastSeen": {
+          "type": "integer",
+          "description": "The Unix timestamp when the agent was last seen."
+        },
+        "pid": {
+          "type": "string",
+          "description": "The process ID of the agent."
+        },
+        "platform": {
+          "type": "string",
+          "description": "The platform the agent is running on."
+        },
+        "status": {
+          "type": "string",
+          "description": "The current status of the deployment agent."
+        },
+        "version": {
+          "type": "string",
+          "description": "The version of the deployment agent."
+        }
+      },
+      "type": "object",
+      "required": [
+        "hostname",
+        "ip",
+        "lastSeen",
+        "pid",
+        "platform",
+        "status",
+        "version"
+      ]
+    },
+    "pulumiservice:api:DeploymentRole": {
+      "description": "DeploymentRole represents a role used for Pulumi Deployments access control.",
+      "properties": {
+        "defaultIdentifier": {
+          "type": "string",
+          "description": "The default identifier associated with this role."
+        },
+        "id": {
+          "type": "string",
+          "description": "The unique identifier of the deployment role."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the deployment role."
+        }
+      },
+      "type": "object",
+      "required": [
+        "id"
+      ]
+    },
+    "pulumiservice:api:DeploymentRoleRequest": {
+      "description": "DeploymentRoleRequest represents a request to create or update a deployment role.",
+      "properties": {
+        "defaultIdentifier": {
+          "type": "string",
+          "description": "The default identifier to assign to this role."
+        },
+        "id": {
+          "type": "string",
+          "description": "The unique identifier of the deployment role."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the deployment role."
+        }
+      },
+      "type": "object"
+    },
+    "pulumiservice:api:DeploymentSettingsGitHub": {
+      "description": "DeploymentSettingsGitHub contains GitHub-specific configuration for Pulumi Deployments.",
+      "properties": {
+        "deployCommits": {
+          "type": "boolean",
+          "description": "Whether to automatically deploy commits pushed to the target branch."
+        },
+        "deployPullRequest": {
+          "type": "integer",
+          "description": "The pull request number to deploy, if targeting a specific pull request."
+        },
+        "installationId": {
+          "type": "string",
+          "description": "The GitHub App installation ID."
+        },
+        "paths": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The list of file paths to filter deployment triggers."
+        },
+        "previewPullRequests": {
+          "type": "boolean",
+          "description": "Whether to automatically preview pull requests."
+        },
+        "pullRequestTemplate": {
+          "type": "boolean",
+          "description": "Whether to use a pull request template for deployment previews."
+        },
+        "repository": {
+          "type": "string",
+          "description": "The GitHub repository in the format owner/repo."
+        },
+        "reviewStackLabels": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Gates review stack creation. When set, only pull requests carrying a matching label (exact, case-sensitive) create a review stack."
+        }
+      },
+      "type": "object"
+    },
+    "pulumiservice:api:DeploymentSettingsGitHubRequest": {
+      "description": "DeploymentSettingsGitHubRequest is the request body for updating GitHub-specific deployment settings.",
+      "properties": {
+        "deployCommits": {
+          "type": "boolean",
+          "description": "Whether to automatically deploy commits pushed to the target branch."
+        },
+        "deployPullRequest": {
+          "type": "integer",
+          "description": "The pull request number to deploy, if targeting a specific pull request."
+        },
+        "installationId": {
+          "type": "string",
+          "description": "The GitHub App installation ID."
+        },
+        "paths": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The list of file paths to filter deployment triggers."
+        },
+        "previewPullRequests": {
+          "type": "boolean",
+          "description": "Whether to automatically preview pull requests."
+        },
+        "pullRequestTemplate": {
+          "type": "boolean",
+          "description": "Whether to use a pull request template for deployment previews."
+        },
+        "repository": {
+          "type": "string",
+          "description": "The GitHub repository in the format owner/repo."
+        },
+        "reviewStackLabels": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Gates review stack creation. When set, only pull requests carrying a matching label (exact, case-sensitive) create a review stack."
+        }
+      },
+      "type": "object",
+      "required": [
+        "pullRequestTemplate"
+      ]
+    },
+    "pulumiservice:api:DeploymentSettingsVCS": {
+      "description": "DeploymentSettingsVCS contains VCS provider deployment settings.",
+      "properties": {
+        "deployCommits": {
+          "type": "boolean",
+          "description": "Whether to deploy all commits to the default branch"
+        },
+        "deployPullRequest": {
+          "type": "integer",
+          "description": "Specific pull request number to deploy (overrides automatic deployment)"
+        },
+        "installationId": {
+          "type": "string",
+          "description": "VCS installation/integration ID linking to the VCS provider"
+        },
+        "paths": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Paths within the repository that trigger deployments when changed"
+        },
+        "previewPullRequests": {
+          "type": "boolean",
+          "description": "Whether to create preview deployments for pull requests"
+        },
+        "provider": {
+          "type": "string"
+        },
+        "pullRequestTemplate": {
+          "type": "boolean",
+          "description": "Whether to use pull request templates for deployment PRs"
+        },
+        "repository": {
+          "type": "string",
+          "description": "The VCS repository reference (format varies by provider)"
+        }
+      },
+      "type": "object",
+      "required": [
+        "provider"
+      ]
+    },
+    "pulumiservice:api:DockerImage": {
+      "description": "A DockerImage describes a Docker image reference + optional credentials for use with aa job definition.",
+      "properties": {
+        "credentials": {
+          "$ref": "#/types/pulumiservice:api:DockerImageCredentials",
+          "description": "The credentials needed to pull the Docker image."
+        },
+        "isDefault": {
+          "type": "boolean",
+          "description": "IsDefault indicates to the workflow runner that it should use its build-in default image if available\nand ignore the specified reference."
+        },
+        "reference": {
+          "type": "string",
+          "description": "The Docker image reference (e.g. registry/image:tag)."
+        }
+      },
+      "type": "object",
+      "required": [
+        "reference"
+      ]
+    },
+    "pulumiservice:api:DockerImageCredentials": {
+      "description": "DockerImageCredentials describes the credentials needed to access a Docker repository.",
+      "properties": {
+        "password": {
+          "$ref": "#/types/pulumiservice:api:SecretValue",
+          "description": "The password for authenticating with the Docker registry."
+        },
+        "username": {
+          "type": "string",
+          "description": "The username for authenticating with the Docker registry."
+        }
+      },
+      "type": "object",
+      "required": [
+        "password",
+        "username"
+      ]
+    },
+    "pulumiservice:api:DockerImageCredentialsRequest": {
+      "description": "DockerImageCredentialsRequest is the request body for specifying Docker registry credentials.",
+      "properties": {
+        "password": {
+          "$ref": "#/types/pulumiservice:api:SecretValue",
+          "description": "The password for authenticating with the Docker registry."
+        },
+        "username": {
+          "type": "string",
+          "description": "The username for authenticating with the Docker registry."
+        }
+      },
+      "type": "object"
+    },
+    "pulumiservice:api:DockerImageRequest": {
+      "description": "DockerImageRequest is the request body for specifying a Docker image and its credentials.",
+      "properties": {
+        "credentials": {
+          "$ref": "#/types/pulumiservice:api:DockerImageCredentialsRequest",
+          "description": "The credentials needed to pull the Docker image."
+        },
+        "reference": {
+          "type": "string",
+          "description": "The Docker image reference (e.g. registry/image:tag)."
+        }
+      },
+      "type": "object"
+    },
+    "pulumiservice:api:ExecutorContext": {
+      "description": "ExecutorContext defines the execution environment for a deployment, including the Docker image to use.",
+      "properties": {
+        "executorImage": {
+          "$ref": "#/types/pulumiservice:api:DockerImage",
+          "description": "Defines the image that the pulumi operations should run in."
+        },
+        "executorRootPath": {
+          "type": "string",
+          "description": "Defines the root path for the executor binary and working directory."
+        }
+      },
+      "type": "object"
+    },
+    "pulumiservice:api:ExecutorSettingsRequest": {
+      "description": "ExecutorSettingsRequest is the request body for configuring the execution environment settings.",
+      "properties": {
+        "executorImage": {
+          "$ref": "#/types/pulumiservice:api:DockerImageRequest",
+          "description": "The Docker image to use for the execution environment."
+        },
+        "executorRootPath": {
+          "type": "string",
+          "description": "The root path for the executor binary and working directory."
+        }
+      },
+      "type": "object"
+    },
+    "pulumiservice:api:FGARole": {
+      "description": "A role assigned to an organization member, identified by ID and name. The role may be a built-in role or a custom role.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique identifier of the role."
+        },
+        "modifiedAt": {
+          "type": "string",
+          "description": "The timestamp when the role was last modified."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the role."
+        }
+      },
+      "type": "object",
+      "required": [
+        "id",
+        "modifiedAt",
+        "name"
+      ]
+    },
+    "pulumiservice:api:GitAuthConfig": {
+      "description": "GitAuthConfig specifies git authentication configuration options.\nThere are 3 different authentication options:\n- Personal access token\n- SSH private key (and its optional password)\n- Basic auth username and password\nOnly 1 authentication mode is valid.",
+      "properties": {
+        "accessToken": {
+          "$ref": "#/types/pulumiservice:api:SecretValue",
+          "description": "Personal access token for git authentication"
+        },
+        "basicAuth": {
+          "$ref": "#/types/pulumiservice:api:BasicAuth",
+          "description": "Basic auth username and password configuration"
+        },
+        "sshAuth": {
+          "$ref": "#/types/pulumiservice:api:SSHAuth",
+          "description": "SSH private key authentication configuration"
+        }
+      },
+      "type": "object"
+    },
+    "pulumiservice:api:GitAuthConfigRequest": {
+      "description": "Request body for configuring git authentication options.",
+      "properties": {
+        "accessToken": {
+          "$ref": "#/types/pulumiservice:api:SecretValue",
+          "description": "Personal access token for git authentication"
+        },
+        "basicAuth": {
+          "$ref": "#/types/pulumiservice:api:BasicAuthRequest",
+          "description": "Basic authentication configuration"
+        },
+        "sshAuth": {
+          "$ref": "#/types/pulumiservice:api:SSHAuthRequest",
+          "description": "SSH authentication configuration"
+        }
+      },
+      "type": "object"
+    },
+    "pulumiservice:api:GitHubAppPermissionRequirement": {
+      "description": "GitHubAppPermissionRequirement represents a single GitHub App permission requirement for Neo agents.",
+      "properties": {
+        "actual": {
+          "type": "string",
+          "description": "The actual permission level from the installation."
+        },
+        "isSufficient": {
+          "type": "boolean",
+          "description": "Whether the actual permission level satisfies the required level. This is always precomputed from checking that actual satisfies required."
+        },
+        "name": {
+          "type": "string",
+          "description": "The permission name (e.g., 'Checks', 'Contents')."
+        },
+        "reason": {
+          "type": "string",
+          "description": "Explanation of why this permission is needed."
+        },
+        "required": {
+          "type": "string",
+          "description": "The required permission level."
+        }
+      },
+      "type": "object",
+      "required": [
+        "actual",
+        "isSufficient",
+        "name",
+        "reason",
+        "required"
+      ]
+    },
+    "pulumiservice:api:GitHubAppURLs": {
+      "description": "GitHubAppURLs contains links that should be used to properly account for\nthings like installation IDs, org names, etc. when installing and\nconfiguring the app.",
+      "properties": {
+        "configurationUrl": {
+          "type": "string",
+          "description": "URL to configure the GitHub App installation"
+        },
+        "installationUrl": {
+          "type": "string",
+          "description": "URL to install the GitHub App"
+        },
+        "permissionsUrl": {
+          "type": "string",
+          "description": "URL to manage the GitHub App permissions"
+        },
+        "stateParam": {
+          "type": "string",
+          "description": "OAuth state parameter for CSRF protection"
+        }
+      },
+      "type": "object",
+      "required": [
+        "configurationUrl",
+        "installationUrl",
+        "permissionsUrl",
+        "stateParam"
+      ]
+    },
+    "pulumiservice:api:GitLabAppOrganization": {
+      "description": "Metadata about a GitLab organization linked to a Pulumi organization.",
+      "properties": {
+        "avatarURL": {
+          "type": "string",
+          "description": "The URL of the organization's avatar image"
+        },
+        "hasRequiredPermissions": {
+          "type": "boolean",
+          "description": "Whether the integration has the required permissions"
+        },
+        "id": {
+          "type": "integer",
+          "description": "The GitLab group or organization ID"
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the GitLab organization"
+        }
+      },
+      "type": "object",
+      "required": [
+        "avatarURL",
+        "hasRequiredPermissions",
+        "id",
+        "name"
+      ]
+    },
+    "pulumiservice:api:JSONWebKey": {
+      "description": "A JSON Web Key (JWK) as defined by RFC 7517.",
+      "properties": {
+        "Algorithm": {
+          "type": "string",
+          "description": "The 'alg' parameter: the algorithm intended for use with this key (e.g. RS256, ES256)."
+        },
+        "CertificateThumbprintSHA1": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The SHA-1 thumbprint of the X.509 certificate"
+        },
+        "CertificateThumbprintSHA256": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The SHA-256 thumbprint of the X.509 certificate"
+        },
+        "Certificates": {
+          "type": "array",
+          "items": {
+            "$ref": "#/types/pulumiservice:api:X509Certificate"
+          },
+          "description": "The X.509 certificate chain"
+        },
+        "CertificatesURL": {
+          "$ref": "#/types/pulumiservice:api:NetURL",
+          "description": "The URL for the X.509 certificate chain"
+        },
+        "Key": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "pulumi.json#/Any"
+          },
+          "description": "The cryptographic key material. Structure depends on the key type (RSA, EC, etc.)."
+        },
+        "KeyID": {
+          "type": "string",
+          "description": "The 'kid' parameter: a unique identifier for the key."
+        },
+        "Use": {
+          "type": "string",
+          "description": "The 'use' parameter: 'sig' for signing or 'enc' for encryption."
+        }
+      },
+      "type": "object",
+      "required": [
+        "Algorithm",
+        "CertificateThumbprintSHA1",
+        "CertificateThumbprintSHA256",
+        "Certificates",
+        "CertificatesURL",
+        "Key",
+        "KeyID",
+        "Use"
+      ]
+    },
+    "pulumiservice:api:JSONWebKeySet": {
+      "description": "A JSON Web Key Set (JWKS) as defined by RFC 7517.",
+      "properties": {
+        "keys": {
+          "type": "array",
+          "items": {
+            "$ref": "#/types/pulumiservice:api:JSONWebKey"
+          },
+          "description": "The set of JSON Web Keys"
+        }
+      },
+      "type": "object",
+      "required": [
+        "keys"
+      ]
+    },
+    "pulumiservice:api:JobRun": {
+      "description": "JobRun contains information about a job run.",
+      "properties": {
+        "lastUpdated": {
+          "type": "string",
+          "description": "When the job was last updated"
+        },
+        "started": {
+          "type": "string",
+          "description": "When the job started running"
+        },
+        "status": {
+          "type": "string",
+          "description": "The current status of the job run"
+        },
+        "steps": {
+          "type": "array",
+          "items": {
+            "$ref": "#/types/pulumiservice:api:StepRun"
+          },
+          "description": "The list of step runs within this job"
+        },
+        "timeout": {
+          "type": "integer",
+          "description": "The timeout duration for the job in nanoseconds (Go time.Duration)."
+        },
+        "worker": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "pulumi.json#/Any"
+          },
+          "description": "Information about the worker executing this job"
+        }
+      },
+      "type": "object",
+      "required": [
+        "status",
+        "steps",
+        "timeout"
+      ]
+    },
+    "pulumiservice:api:MemberLinks": {
+      "description": "MemberLinks contains hypermedia links related to an organization member.",
+      "properties": {
+        "self": {
+          "type": "string",
+          "description": "A self-referencing hypermedia link (URL) to this member resource."
+        }
+      },
+      "type": "object"
+    },
+    "pulumiservice:api:NetIPNet": {
+      "description": "NetIPNet represents an IP network with an address and subnet mask.",
+      "properties": {
+        "IP": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The IP address of the network."
+        },
+        "Mask": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The subnet mask of the network."
+        }
+      },
+      "type": "object",
+      "required": [
+        "IP",
+        "Mask"
+      ]
+    },
+    "pulumiservice:api:NetURL": {
+      "description": "NetURL represents a parsed URL (Uniform Resource Locator).",
+      "properties": {
+        "ForceQuery": {
+          "type": "boolean",
+          "description": "Whether to force a trailing question mark even if the query is empty."
+        },
+        "Fragment": {
+          "type": "string",
+          "description": "The URL fragment (without the leading hash)."
+        },
+        "Host": {
+          "type": "string",
+          "description": "The host or host:port of the URL."
+        },
+        "OmitHost": {
+          "type": "boolean",
+          "description": "Whether to omit the host in the URL string."
+        },
+        "Opaque": {
+          "type": "string",
+          "description": "The opaque data of the URL."
+        },
+        "Path": {
+          "type": "string",
+          "description": "The path of the URL."
+        },
+        "RawFragment": {
+          "type": "string",
+          "description": "The encoded fragment hint."
+        },
+        "RawPath": {
+          "type": "string",
+          "description": "The encoded path hint, used when the path contains escaped characters."
+        },
+        "RawQuery": {
+          "type": "string",
+          "description": "The encoded query string, without the leading question mark."
+        },
+        "Scheme": {
+          "type": "string",
+          "description": "The URL scheme (e.g. https, http)."
+        },
+        "User": {
+          "type": "string",
+          "description": "The user information associated with the URL."
+        }
+      },
+      "type": "object",
+      "required": [
+        "ForceQuery",
+        "Fragment",
+        "Host",
+        "OmitHost",
+        "Opaque",
+        "Path",
+        "RawFragment",
+        "RawPath",
+        "RawQuery",
+        "Scheme",
+        "User"
+      ]
+    },
+    "pulumiservice:api:OperationContext": {
+      "description": "OperationContext describes what to do.",
+      "properties": {
+        "environmentVariables": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "pulumi.json#/Any"
+          },
+          "description": "EnvironmentVariables contains environment variables to be applied during the execution."
+        },
+        "oidc": {
+          "$ref": "#/types/pulumiservice:api:OperationContextOIDCConfiguration",
+          "description": "OIDC contains the OIDC configuration for the operation."
+        },
+        "operation": {
+          "type": "string",
+          "description": "The Pulumi operation to perform (e.g. update, preview, refresh, destroy)."
+        },
+        "options": {
+          "$ref": "#/types/pulumiservice:api:OperationContextOptions",
+          "description": "Options is a bag of settings to specify or override default behavior"
+        },
+        "preRunCommands": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "PreRunCommands is an optional list of arbitrary commands to run before Pulumi is invoked.\nref: https://github.com/pulumi/pulumi/issues/9397"
+        },
+        "role": {
+          "$ref": "#/types/pulumiservice:api:DeploymentRole",
+          "description": "Role defines the deployment role to assume for the operation."
+        }
+      },
+      "type": "object"
+    },
+    "pulumiservice:api:OperationContextAWSOIDCConfiguration": {
+      "description": "OperationContextAWSOIDCConfiguration contains information about how to exchange an OIDC token for temporary AWS\ncredentials in the form of an assume-role session.\nSee https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-idp_oidc.html for details on creating an\nappropriately-configured IAM role.",
+      "properties": {
+        "duration": {
+          "type": "string",
+          "description": "Duration is the duration of the assume-role session."
+        },
+        "policyArns": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "PolicyARNs is an optional set of IAM policy ARNs that further restrict the assume-role session."
+        },
+        "roleArn": {
+          "type": "string",
+          "description": "The ARN of the role to assume using the OIDC token."
+        },
+        "sessionName": {
+          "type": "string",
+          "description": "The name of the assume-role session, sent to AWS STS as RoleSessionName. Supports ${var} placeholders for ${organization.name}, ${project.name}, ${stack.name}, ${operation}, ${deployment.version}, and ${deployment.id}. Recommended: include ${deployment.version} so each run is traceable in AWS CloudTrail (for example, 'pulumi-${deployment.version}'). AWS caps RoleSessionName at 64 characters; if a rendered template would exceed that, the name variables (organization, project, stack) are truncated to fit while ${operation}, ${deployment.version}, and ${deployment.id} are preserved."
+        }
+      },
+      "type": "object",
+      "required": [
+        "roleArn",
+        "sessionName"
+      ]
+    },
+    "pulumiservice:api:OperationContextAWSOIDCConfigurationRequest": {
+      "description": "Request body for updating the AWS OIDC configuration of an operation context.",
+      "properties": {
+        "duration": {
+          "type": "string",
+          "description": "Duration of the assume-role session."
+        },
+        "policyArns": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Optional set of IAM policy ARNs that further restrict the assume-role session."
+        },
+        "roleArn": {
+          "type": "string",
+          "description": "The ARN of the role to assume using the OIDC token."
+        },
+        "sessionName": {
+          "type": "string",
+          "description": "The name of the assume-role session."
+        }
+      },
+      "type": "object"
+    },
+    "pulumiservice:api:OperationContextAzureOIDCConfiguration": {
+      "description": "OperationContextAzureOIDCConfiguration contains information about how to exchange an OIDC token for temporary Azure\ncredentials in the form of a federated workload identity.\nSee https://learn.microsoft.com/en-us/azure/active-directory/develop/workload-identity-federation-create-trust?pivots=identity-wif-apps-methods-azp\nfor details on how to create an appropriately-configured identity.",
+      "properties": {
+        "clientId": {
+          "type": "string",
+          "description": "ClientID is the client ID of the federated workload identity."
+        },
+        "subscriptionId": {
+          "type": "string",
+          "description": "SubscriptionID is the subscription ID of the federated workload identity."
+        },
+        "tenantId": {
+          "type": "string",
+          "description": "TenantID is the tenant ID of the federated workload identity."
+        }
+      },
+      "type": "object"
+    },
+    "pulumiservice:api:OperationContextAzureOIDCConfigurationRequest": {
+      "description": "Request body for updating the Azure OIDC configuration of an operation context.",
+      "properties": {
+        "clientId": {
+          "type": "string",
+          "description": "The client ID of the federated workload identity."
+        },
+        "subscriptionId": {
+          "type": "string",
+          "description": "The subscription ID of the federated workload identity."
+        },
+        "tenantId": {
+          "type": "string",
+          "description": "The tenant ID of the federated workload identity."
+        }
+      },
+      "type": "object"
+    },
+    "pulumiservice:api:OperationContextGCPOIDCConfiguration": {
+      "description": "OperationContextGCPOIDCConfiguration contains information about how to exchange an OIDC token for temporary GCP\ncredentials in the form of a service account connected to a workload identity pool.\nSee https://cloud.google.com/iam/docs/configuring-workload-identity-federation for details on how to create an\nappropriately-configured workload identity pool and service account.",
+      "properties": {
+        "projectId": {
+          "type": "string",
+          "description": "ProjectID is the numerical ID of the GCP project."
+        },
+        "providerId": {
+          "type": "string",
+          "description": "ProviderID is the ID of the identity provider associated with the workload pool."
+        },
+        "region": {
+          "type": "string",
+          "description": "Region is the region of the GCP project."
+        },
+        "serviceAccount": {
+          "type": "string",
+          "description": "ServiceAccount is the email address of the service account to use."
+        },
+        "tokenLifetime": {
+          "type": "string",
+          "description": "TokenLifetime is the lifetime of the temporary credentials."
+        },
+        "workloadPoolId": {
+          "type": "string",
+          "description": "WorkloadPoolID is the ID of the workload pool to use."
+        }
+      },
+      "type": "object",
+      "required": [
+        "projectId",
+        "providerId",
+        "serviceAccount",
+        "workloadPoolId"
+      ]
+    },
+    "pulumiservice:api:OperationContextGCPOIDCConfigurationRequest": {
+      "description": "Request body for updating the GCP OIDC configuration of an operation context.",
+      "properties": {
+        "projectId": {
+          "type": "string",
+          "description": "The numerical ID of the GCP project."
+        },
+        "providerId": {
+          "type": "string",
+          "description": "The ID of the identity provider associated with the workload pool."
+        },
+        "region": {
+          "type": "string",
+          "description": "The region of the GCP project."
+        },
+        "serviceAccount": {
+          "type": "string",
+          "description": "The email address of the service account to use."
+        },
+        "tokenLifetime": {
+          "type": "string",
+          "description": "The lifetime of the temporary credentials."
+        },
+        "workloadPoolId": {
+          "type": "string",
+          "description": "The ID of the workload pool to use."
+        }
+      },
+      "type": "object"
+    },
+    "pulumiservice:api:OperationContextOIDCConfiguration": {
+      "description": "OperationContextOIDCConfiguration contains configuration for automatically fetching temporary credentials from cloud\nproviders using the OIDC token issued by the service.",
+      "properties": {
+        "aws": {
+          "$ref": "#/types/pulumiservice:api:OperationContextAWSOIDCConfiguration",
+          "description": "AWS contains AWS-specific configuration."
+        },
+        "azure": {
+          "$ref": "#/types/pulumiservice:api:OperationContextAzureOIDCConfiguration",
+          "description": "Azure contains Azure-specific configuration."
+        },
+        "gcp": {
+          "$ref": "#/types/pulumiservice:api:OperationContextGCPOIDCConfiguration",
+          "description": "GCP contains GCP-specific configuration."
+        }
+      },
+      "type": "object"
+    },
+    "pulumiservice:api:OperationContextOIDCConfigurationRequest": {
+      "description": "Request body for updating the OIDC configuration of an operation context.",
+      "properties": {
+        "aws": {
+          "$ref": "#/types/pulumiservice:api:OperationContextAWSOIDCConfigurationRequest",
+          "description": "AWS-specific OIDC configuration."
+        },
+        "azure": {
+          "$ref": "#/types/pulumiservice:api:OperationContextAzureOIDCConfigurationRequest",
+          "description": "Azure-specific OIDC configuration."
+        },
+        "gcp": {
+          "$ref": "#/types/pulumiservice:api:OperationContextGCPOIDCConfigurationRequest",
+          "description": "GCP-specific OIDC configuration."
+        }
+      },
+      "type": "object"
+    },
+    "pulumiservice:api:OperationContextOptions": {
+      "description": "OperationContextOptions is a bag of settings to specify or override default behavior in a deployment",
+      "properties": {
+        "deleteAfterDestroy": {
+          "type": "boolean",
+          "description": "DeleteAfterDestroy sets whether the stack should be deleted after it is destroyed."
+        },
+        "remediateIfDriftDetected": {
+          "type": "boolean",
+          "description": "RemediateIfDriftDetected sets whether a detect-drift operation should be followed by remediate-drift step\nif drift is detected."
+        },
+        "shell": {
+          "type": "string",
+          "description": "Shell indicates the shell to use when running commands."
+        },
+        "skipInstallDependencies": {
+          "type": "boolean",
+          "description": "SkipInstallDependencies sets whether to skip the default dependency installation step. Defaults to false."
+        },
+        "skipIntermediateDeployments": {
+          "type": "boolean",
+          "description": "SkipIntermediateDeployments sets whether to skip queued intermediate deployments. Defaults to false."
+        }
+      },
+      "type": "object"
+    },
+    "pulumiservice:api:OperationContextOptionsRequest": {
+      "description": "Request body for updating operation context options.",
+      "properties": {
+        "deleteAfterDestroy": {
+          "type": "boolean",
+          "description": "Whether the stack should be deleted after it is destroyed."
+        },
+        "remediateIfDriftDetected": {
+          "type": "boolean",
+          "description": "Whether a detect-drift operation should be followed by a remediate-drift step if drift is detected."
+        },
+        "shell": {
+          "type": "string",
+          "description": "The shell to use when running commands."
+        },
+        "skipInstallDependencies": {
+          "type": "boolean",
+          "description": "Whether to skip the default dependency installation step."
+        },
+        "skipIntermediateDeployments": {
+          "type": "boolean",
+          "description": "Whether to skip queued intermediate deployments."
+        }
+      },
+      "type": "object"
+    },
+    "pulumiservice:api:OperationContextRequest": {
+      "description": "Request body for updating an operation context.",
+      "properties": {
+        "environmentVariables": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "pulumi.json#/Any"
+          },
+          "description": "Environment variables to apply during execution."
+        },
+        "oidc": {
+          "$ref": "#/types/pulumiservice:api:OperationContextOIDCConfigurationRequest",
+          "description": "The OIDC configuration for the operation."
+        },
+        "operation": {
+          "type": "string",
+          "description": "The Pulumi operation to perform (e.g. update, preview, destroy)."
+        },
+        "options": {
+          "$ref": "#/types/pulumiservice:api:OperationContextOptionsRequest",
+          "description": "Options to specify or override default behavior."
+        },
+        "preRunCommands": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Optional list of commands to run before Pulumi is invoked."
+        },
+        "role": {
+          "$ref": "#/types/pulumiservice:api:DeploymentRoleRequest",
+          "description": "The deployment role to assume for the operation."
+        }
+      },
+      "type": "object"
+    },
+    "pulumiservice:api:Organization": {
+      "description": "Organization represents a Pulumi organization.",
+      "properties": {
+        "avatarUrl": {
+          "type": "string",
+          "description": "The URL of the organization's avatar image."
+        },
+        "githubLogin": {
+          "type": "string",
+          "description": "The GitHub login associated with the organization."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the organization."
+        },
+        "repos": {
+          "type": "array",
+          "items": {
+            "$ref": "#/types/pulumiservice:api:PulumiRepository"
+          },
+          "description": "The repositories belonging to the organization."
+        }
+      },
+      "type": "object",
+      "required": [
+        "avatarUrl",
+        "githubLogin",
+        "name",
+        "repos"
+      ]
+    },
+    "pulumiservice:api:OrganizationSummaryWithRole": {
+      "properties": {
+        "avatarUrl": {
+          "type": "string",
+          "description": "The URL of the organization's avatar image."
+        },
+        "email": {
+          "type": "string",
+          "description": "IMPORTANT: The email address of the user is only included on a few admin-only APIs.\nFor nearly all APIs that return a UserInfo object, this will not be provided.\nconsidered sensitive information."
+        },
+        "githubLogin": {
+          "type": "string",
+          "description": "The GitHub login associated with the organization."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the organization."
+        },
+        "role": {
+          "type": "string",
+          "description": "The role of the user within this organization."
+        }
+      },
+      "type": "object",
+      "required": [
+        "avatarUrl",
+        "githubLogin",
+        "name",
+        "role"
+      ]
+    },
+    "pulumiservice:api:PageContext": {
+      "description": "Describes the Pulumi Cloud page the user has the Neo pane open on. Sent on every Neo prompt request (initial creation and follow-ups) so the agent's system prompt can reference the user's current location. The schema is intentionally generic: `path` is the raw URL, `params` carries route path parameters extracted by the client, and `kind` is an optional stable label set by the route definition (in console2 via `data: { pageContextKind: ... }`) for cases where the agent should special-case the page. New pages flow through automatically — only routes that need stable agent treatment must declare a `kind`.",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "description": "Optional stable label declared by the route, used by the agent to phrase the user's location in its system prompt or branch on well-known pages. Examples: 'stack-update', 'environment', 'neo-task'. Routes without a declared kind leave this null; the agent falls back to the path and params."
+        },
+        "params": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "pulumi.json#/Any"
+          },
+          "description": "Route path parameters extracted from the matched Angular route, keyed by parameter name (e.g. {'organization': 'myorg', 'project': 'myapp', 'stack': 'prod', 'version': '47'}). Empty for routes with no path parameters."
+        },
+        "path": {
+          "type": "string",
+          "description": "Raw URL path of the page the user is viewing (e.g. '/myorg/myapp/prod/updates/47'). Always populated."
+        }
+      },
+      "type": "object"
+    },
+    "pulumiservice:api:PermissionDescriptor": {
+      "description": "Base type for permission descriptors.",
+      "properties": {
+        "__type": {
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "required": [
+        "__type"
+      ]
+    },
+    "pulumiservice:api:PkixAttributeTypeAndValue": {
+      "description": "PkixAttributeTypeAndValue represents an ASN.1 attribute type and value pair.",
+      "properties": {
+        "Type": {
+          "type": "string",
+          "description": "The ASN.1 object identifier of the attribute type."
+        },
+        "Value": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "pulumi.json#/Any"
+          },
+          "description": "The value of the attribute."
+        }
+      },
+      "type": "object",
+      "required": [
+        "Type",
+        "Value"
+      ]
+    },
+    "pulumiservice:api:PkixExtension": {
+      "description": "PkixExtension represents an X.509 certificate extension.",
+      "properties": {
+        "Critical": {
+          "type": "boolean",
+          "description": "Whether this extension is critical."
+        },
+        "Id": {
+          "type": "string",
+          "description": "The ASN.1 object identifier of the extension."
+        },
+        "Value": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The raw extension value."
+        }
+      },
+      "type": "object",
+      "required": [
+        "Critical",
+        "Id",
+        "Value"
+      ]
+    },
+    "pulumiservice:api:PkixName": {
+      "description": "PkixName represents an X.509 distinguished name (DN).",
+      "properties": {
+        "CommonName": {
+          "type": "string",
+          "description": "The common name (CN) of the distinguished name."
+        },
+        "Country": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The country names in the distinguished name."
+        },
+        "ExtraNames": {
+          "type": "array",
+          "items": {
+            "$ref": "#/types/pulumiservice:api:PkixAttributeTypeAndValue"
+          },
+          "description": "Additional attribute type and value pairs to include in the distinguished name."
+        },
+        "Locality": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The locality (city) names in the distinguished name."
+        },
+        "Names": {
+          "type": "array",
+          "items": {
+            "$ref": "#/types/pulumiservice:api:PkixAttributeTypeAndValue"
+          },
+          "description": "The parsed attribute type and value pairs of the distinguished name."
+        },
+        "Organization": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The organization names in the distinguished name."
+        },
+        "OrganizationalUnit": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The organizational unit names in the distinguished name."
+        },
+        "PostalCode": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The postal codes in the distinguished name."
+        },
+        "Province": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The state or province names in the distinguished name."
+        },
+        "SerialNumber": {
+          "type": "string",
+          "description": "The serial number of the distinguished name."
+        },
+        "StreetAddress": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The street addresses in the distinguished name."
+        }
+      },
+      "type": "object",
+      "required": [
+        "CommonName",
+        "Country",
+        "ExtraNames",
+        "Locality",
+        "Names",
+        "Organization",
+        "OrganizationalUnit",
+        "PostalCode",
+        "Province",
+        "SerialNumber",
+        "StreetAddress"
+      ]
+    },
+    "pulumiservice:api:PulumiProject": {
+      "description": "PulumiProject describes a grouping of Pulumi stacks. It is based on Pulumi.yaml,\nbut is specific to the Pulumi Service.",
+      "properties": {
+        "description": {
+          "type": "string",
+          "description": "The project description from Pulumi.yaml."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the project."
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The name of the organization that owns this project."
+        },
+        "repoName": {
+          "type": "string",
+          "description": "The repository name this project belongs to."
+        },
+        "runtime": {
+          "type": "string",
+          "description": "Optional tags from Pulumi.yaml."
+        },
+        "settings": {
+          "$ref": "#/types/pulumiservice:api:PulumiProjectSettings",
+          "description": "Optional project-level settings."
+        },
+        "stacks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/types/pulumiservice:api:PulumiStack"
+          },
+          "description": "The stacks belonging to this project."
+        }
+      },
+      "type": "object",
+      "required": [
+        "name",
+        "orgName",
+        "repoName",
+        "stacks"
+      ]
+    },
+    "pulumiservice:api:PulumiProjectSettings": {
+      "description": "PulumiProjectSettings contains the settings for a Pulumi project, including source and destination paths.",
+      "properties": {
+        "addStacksDisabledReason": {
+          "type": "string",
+          "description": "An optional reason for disabling new stacks.\nIf `CanAddStacks` is false there may be additional context provided\nvia this field such that the user can determine why they cannot add\nnew stacks. For example, the organization has hit their max stack quota\nor the project's source and/or destination no longer exist."
+        },
+        "canAddStacks": {
+          "type": "boolean",
+          "description": "A flag denoting if the user can add stacks to the project.\nThis flag might be false if the organization has hit their max stack quota\nor if the project's source and/or destination no longer exist."
+        },
+        "destination": {
+          "type": "string",
+          "description": "A path to the destination"
+        },
+        "source": {
+          "type": "string",
+          "description": "A path to the source of a project"
+        }
+      },
+      "type": "object",
+      "required": [
+        "canAddStacks",
+        "destination",
+        "source"
+      ]
+    },
+    "pulumiservice:api:PulumiRepository": {
+      "description": "PulumiRepository is a grouping of \"Projects\". We also return a subset of the organization's\nVCS repo with the same name, should it exist.",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the repository."
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The name of the organization that owns this repository."
+        },
+        "projects": {
+          "type": "array",
+          "items": {
+            "$ref": "#/types/pulumiservice:api:PulumiProject"
+          },
+          "description": "The projects within this repository."
+        },
+        "vcsInfo": {
+          "$ref": "#/types/pulumiservice:api:VCSInfo",
+          "description": "Version control system information for the repository."
+        }
+      },
+      "type": "object",
+      "required": [
+        "name",
+        "orgName",
+        "projects"
+      ]
+    },
+    "pulumiservice:api:PulumiStack": {
+      "description": "PulumiStack contains a name and some information for the frontend to construct a route to the details page. The\ncustom routing parameters are here to help land the new identity model in an iterative fashion and long term will\nbe removed.",
+      "properties": {
+        "driftDetected": {
+          "type": "boolean",
+          "description": "Whether the last drift detection run found differences between the desired and actual state."
+        },
+        "hasDeploymentSettings": {
+          "type": "boolean",
+          "description": "Whether the stack has Pulumi Deployments settings configured (source, OIDC, etc.)."
+        },
+        "lastUpdate": {
+          "$ref": "#/types/pulumiservice:api:UpdateSummary",
+          "description": "Summary of the last update to the stack. nil if never updated."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the stack."
+        },
+        "programId": {
+          "type": "string",
+          "description": "Unique identifier for the stack."
+        },
+        "protectedByPolicy": {
+          "type": "boolean",
+          "description": "If true, the stack has at least one Policy Pack enforced."
+        },
+        "routingProject": {
+          "type": "string",
+          "description": "The project name used for routing to the stack details page."
+        },
+        "routingRepo": {
+          "type": "string",
+          "description": "The repository name used for routing to the stack details page."
+        },
+        "tags": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "pulumi.json#/Any"
+          },
+          "description": "Tags associated with the stack as key-value pairs."
+        }
+      },
+      "type": "object",
+      "required": [
+        "driftDetected",
+        "hasDeploymentSettings",
+        "name",
+        "programId",
+        "protectedByPolicy",
+        "routingProject",
+        "routingRepo"
+      ]
+    },
+    "pulumiservice:api:SSHAuth": {
+      "description": "SSHAuth configures ssh-based auth for git authentication.\nSSHPrivateKey is required but password is optional.",
+      "properties": {
+        "password": {
+          "$ref": "#/types/pulumiservice:api:SecretValue",
+          "description": "An optional password or passphrase for the SSH private key."
+        },
+        "sshPrivateKey": {
+          "$ref": "#/types/pulumiservice:api:SecretValue",
+          "description": "The SSH private key used for authentication."
+        }
+      },
+      "type": "object",
+      "required": [
+        "sshPrivateKey"
+      ]
+    },
+    "pulumiservice:api:SSHAuthRequest": {
+      "description": "Request to configure SSH-based authentication for git operations.",
+      "properties": {
+        "password": {
+          "$ref": "#/types/pulumiservice:api:SecretValue",
+          "description": "An optional password for the SSH private key."
+        },
+        "sshPrivateKey": {
+          "$ref": "#/types/pulumiservice:api:SecretValue",
+          "description": "The SSH private key for authentication."
+        }
+      },
+      "type": "object"
+    },
+    "pulumiservice:api:ScanStatus": {
+      "properties": {
+        "accountName": {
+          "type": "string",
+          "description": "The name of the insights account associated with this scan."
+        },
+        "finishedAt": {
+          "type": "string",
+          "description": "The time the workflow run finished, if completed."
+        },
+        "id": {
+          "type": "string",
+          "description": "The unique identifier of the workflow run."
+        },
+        "jobTimeout": {
+          "type": "string",
+          "description": "The timeout for jobs in the workflow run."
+        },
+        "jobs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/types/pulumiservice:api:JobRun"
+          },
+          "description": "The list of job runs within the workflow."
+        },
+        "lastUpdatedAt": {
+          "type": "string",
+          "description": "The time the workflow run was last updated."
+        },
+        "orgId": {
+          "type": "string",
+          "description": "The organization ID."
+        },
+        "resourceCount": {
+          "type": "integer",
+          "description": "The number of resources discovered by this scan."
+        },
+        "startedAt": {
+          "type": "string",
+          "description": "The time the workflow run started."
+        },
+        "status": {
+          "type": "string",
+          "description": "The current status of the workflow run."
+        },
+        "userId": {
+          "type": "string",
+          "description": "The user ID who initiated the workflow run."
+        }
+      },
+      "type": "object",
+      "required": [
+        "finishedAt",
+        "id",
+        "jobTimeout",
+        "lastUpdatedAt",
+        "orgId",
+        "startedAt",
+        "status",
+        "userId"
+      ]
+    },
+    "pulumiservice:api:SecretValue": {
+      "description": "A SecretValue describes a secret value on the wire. The JSON representation is an object with a required 'secret' field containing the plaintext and an optional 'ciphertext' field containing the encrypted representation.",
+      "properties": {
+        "ciphertext": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The encrypted representation of the secret value."
+        },
+        "secret": {
+          "type": "string",
+          "description": "The secret value in plaintext."
+        }
+      },
+      "type": "object",
+      "required": [
+        "secret"
+      ]
+    },
+    "pulumiservice:api:Service": {
+      "description": "A service is a Pulumi construct that aggregates items and additional metadata\nthat can be accessed by the service's members.",
+      "properties": {
+        "created": {
+          "type": "string",
+          "description": "the time the service was create"
+        },
+        "description": {
+          "type": "string",
+          "description": "an optional description of the service"
+        },
+        "itemCountSummary": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "pulumi.json#/Any"
+          },
+          "description": "item types to their count within the service based on the current user's permissions"
+        },
+        "members": {
+          "type": "array",
+          "items": {
+            "$ref": "#/types/pulumiservice:api:ServiceMember"
+          },
+          "description": "a list of members that have access to the service"
+        },
+        "name": {
+          "type": "string",
+          "description": "the name of the service"
+        },
+        "organizationName": {
+          "type": "string",
+          "description": "the name of the organization this service belongs to"
+        },
+        "owner": {
+          "$ref": "#/types/pulumiservice:api:ServiceMember",
+          "description": "the owner of the service"
+        },
+        "properties": {
+          "type": "array",
+          "items": {
+            "$ref": "#/types/pulumiservice:api:ServiceProperty"
+          },
+          "description": "an optional list of properties set on the service"
+        }
+      },
+      "type": "object",
+      "required": [
+        "description",
+        "itemCountSummary",
+        "members",
+        "name",
+        "organizationName",
+        "owner",
+        "properties"
+      ]
+    },
+    "pulumiservice:api:ServiceItem": {
+      "description": "An item within a service.",
+      "properties": {
+        "addedByUser": {
+          "$ref": "#/types/pulumiservice:api:ServiceMember",
+          "description": "who added the item reference to the service - this will always be a user"
+        },
+        "cloudCount": {
+          "type": "integer",
+          "description": "how many Pulumi cloud measured primitives are within this item"
+        },
+        "created": {
+          "type": "string",
+          "description": "timestamp of when the item was  created"
+        },
+        "lastUpdate": {
+          "$ref": "#/types/pulumiservice:api:ServiceItemUpdate",
+          "description": "when did the last update occur to this item, if any"
+        },
+        "name": {
+          "type": "string",
+          "description": "the name (including any namespacing) of the item"
+        },
+        "organizationName": {
+          "type": "string",
+          "description": "the name of the organization this item belongs to"
+        },
+        "type": {
+          "type": "string",
+          "description": "the type of the item"
+        },
+        "version": {
+          "type": "string",
+          "description": "optional field if the item has versioning"
+        }
+      },
+      "type": "object",
+      "required": [
+        "cloudCount",
+        "created",
+        "name",
+        "organizationName",
+        "type"
+      ]
+    },
+    "pulumiservice:api:ServiceItemUpdate": {
+      "description": "An update that the item may have in it's history.",
+      "properties": {
+        "message": {
+          "type": "string",
+          "description": "the message to show alongside the timestamp"
+        },
+        "success": {
+          "type": "boolean",
+          "description": "used to toggle a status icon for the update"
+        },
+        "timestamp": {
+          "type": "string",
+          "description": "the timestamp of the last update"
+        }
+      },
+      "type": "object",
+      "required": [
+        "message",
+        "timestamp"
+      ]
+    },
+    "pulumiservice:api:ServiceMember": {
+      "description": "A service member is either a direct user or a indirect user representation\nthat allows them to access and mutate a service.",
+      "properties": {
+        "avatarUrl": {
+          "type": "string",
+          "description": "an optional avatar URL for the member"
+        },
+        "name": {
+          "type": "string",
+          "description": "the login name of the member within Pulumi"
+        },
+        "type": {
+          "type": "string",
+          "description": "the type of the member (e.g. team / user)"
+        }
+      },
+      "type": "object",
+      "required": [
+        "avatarUrl",
+        "name",
+        "type"
+      ]
+    },
+    "pulumiservice:api:ServiceProperty": {
+      "description": "A property that the service will show in it's metadata.",
+      "properties": {
+        "key": {
+          "type": "string",
+          "description": "the name of the property"
+        },
+        "order": {
+          "type": "integer",
+          "description": "the position of the property"
+        },
+        "type": {
+          "type": "string",
+          "description": "the type of the property"
+        },
+        "value": {
+          "type": "string",
+          "description": "the value of the property"
+        }
+      },
+      "type": "object",
+      "required": [
+        "key",
+        "order",
+        "type",
+        "value"
+      ]
+    },
+    "pulumiservice:api:SourceContext": {
+      "description": "SourceContext describes some source code, and how to obtain it.",
+      "properties": {
+        "git": {
+          "$ref": "#/types/pulumiservice:api:SourceContextGit",
+          "description": "Git-based source context for obtaining source code from a repository."
+        },
+        "hg": {
+          "$ref": "#/types/pulumiservice:api:SourceContextHg",
+          "description": "Mercurial-based source context for obtaining source code from a repository."
+        },
+        "template": {
+          "$ref": "#/types/pulumiservice:api:SourceContextTemplate",
+          "description": "Template-based source context for obtaining source code from a template URL."
+        }
+      },
+      "type": "object"
+    },
+    "pulumiservice:api:SourceContextGit": {
+      "description": "Git-based source context for obtaining source code from a repository.",
+      "properties": {
+        "branch": {
+          "type": "string",
+          "description": "The branch to use from the repository."
+        },
+        "commit": {
+          "type": "string",
+          "description": "(optional) Commit is the hash of the commit to deploy. If used, HEAD will be in detached mode. This\nis mutually exclusive with the Branch setting. Either value needs to be specified."
+        },
+        "gitAuth": {
+          "$ref": "#/types/pulumiservice:api:GitAuthConfig",
+          "description": "(optional) GitAuth allows configuring git authentication options\nThere are 3 different authentication options:\n  * SSH private key (and its optional password)\n  * Personal access token\n  * Basic auth username and password\nOnly one authentication mode will be considered if more than one option is specified,\nwith ssh private key/password preferred first, then personal access token, and finally\nbasic auth credentials."
+        },
+        "repoDir": {
+          "type": "string",
+          "description": "(optional) RepoDir is the directory to work from in the project's source repository\nwhere Pulumi.yaml is located. It is used in case Pulumi.yaml is not\nin the project source root."
+        },
+        "repoUrl": {
+          "type": "string",
+          "description": "The URL of the git repository."
+        }
+      },
+      "type": "object"
+    },
+    "pulumiservice:api:SourceContextGitRequest": {
+      "description": "Request to configure a git-based source context.",
+      "properties": {
+        "branch": {
+          "type": "string",
+          "description": "The branch to use from the repository. Mutually exclusive with `commit`."
+        },
+        "commit": {
+          "type": "string",
+          "description": "The commit hash to deploy. Mutually exclusive with `branch`."
+        },
+        "gitAuth": {
+          "$ref": "#/types/pulumiservice:api:GitAuthConfigRequest",
+          "description": "Git authentication configuration."
+        },
+        "repoDir": {
+          "type": "string",
+          "description": "The subdirectory within the repository where Pulumi.yaml is located."
+        },
+        "repoUrl": {
+          "type": "string",
+          "description": "The URL of the git repository."
+        }
+      },
+      "type": "object"
+    },
+    "pulumiservice:api:SourceContextHg": {
+      "description": "Mercurial-based source context for obtaining source code from a repository.",
+      "properties": {
+        "branch": {
+          "type": "string",
+          "description": "The branch to use from the repository."
+        },
+        "hgAuth": {
+          "$ref": "#/types/pulumiservice:api:GitAuthConfig",
+          "description": "(optional) HgAuth allows configuring Mercurial authentication options.\nThere are 3 different authentication options:\n  * SSH private key (and its optional password)\n  * Personal access token\n  * Basic auth username and password\nOnly one authentication mode will be considered if more than one option is specified,\nwith ssh private key/password preferred first, then personal access token, and finally\nbasic auth credentials."
+        },
+        "repoDir": {
+          "type": "string",
+          "description": "(optional) RepoDir is the directory to work from in the project's source repository\nwhere Pulumi.yaml is located. It is used in case Pulumi.yaml is not\nin the project source root."
+        },
+        "repoUrl": {
+          "type": "string",
+          "description": "The URL of the Mercurial repository."
+        },
+        "revision": {
+          "type": "string",
+          "description": "(optional) Revision is the changeset hash to check out. If used, the working directory\nwill be updated to this specific revision. This is mutually exclusive with the Branch setting.\nEither value needs to be specified."
+        }
+      },
+      "type": "object"
+    },
+    "pulumiservice:api:SourceContextHgRequest": {
+      "description": "Request to configure a Mercurial-based source context.",
+      "properties": {
+        "branch": {
+          "type": "string",
+          "description": "The branch to use from the repository."
+        },
+        "hgAuth": {
+          "$ref": "#/types/pulumiservice:api:GitAuthConfigRequest",
+          "description": "Mercurial authentication configuration."
+        },
+        "repoDir": {
+          "type": "string",
+          "description": "The subdirectory within the repository where Pulumi.yaml is located."
+        },
+        "repoUrl": {
+          "type": "string",
+          "description": "The URL of the Mercurial repository."
+        },
+        "revision": {
+          "type": "string",
+          "description": "The changeset hash to check out."
+        }
+      },
+      "type": "object"
+    },
+    "pulumiservice:api:SourceContextRequest": {
+      "description": "Request to configure a source context: git-based, Mercurial-based, or template-based. Only one may be specified.",
+      "properties": {
+        "git": {
+          "$ref": "#/types/pulumiservice:api:SourceContextGitRequest",
+          "description": "Git-based source context configuration."
+        },
+        "hg": {
+          "$ref": "#/types/pulumiservice:api:SourceContextHgRequest",
+          "description": "Mercurial-based source context configuration."
+        },
+        "template": {
+          "$ref": "#/types/pulumiservice:api:SourceContextTemplateRequest",
+          "description": "Template-based source context configuration."
+        }
+      },
+      "type": "object"
+    },
+    "pulumiservice:api:SourceContextTemplate": {
+      "description": "Template-based source context for obtaining source code from a template URL.",
+      "properties": {
+        "gitAuth": {
+          "$ref": "#/types/pulumiservice:api:GitAuthConfig",
+          "description": "GitAuth allows configuring git authentication options\nThe only authentication option is personal access token as of now."
+        },
+        "sourceUrl": {
+          "type": "string",
+          "description": "The URL of the template source. Supports two URL schemes:\n\n**Registry-backed templates** use the `registry://` scheme with the format:\n`registry://templates/source/publisher/name[@version]`\n\n- `source`: The template source identifier (e.g., the registry source name)\n- `publisher`: The organization or user that published the template\n- `name`: The template name\n- `version`: Optional semver version (e.g., `1.0.0`). If omitted, defaults to the latest version\n\nExample: `registry://templates/pulumi/acme-corp/aws-vpc@2.1.0`\n\n**VCS-backed templates** use standard VCS URLs (GitHub, GitLab, Azure DevOps, etc.):\n`https://github.com/org/repo`"
+        }
+      },
+      "type": "object"
+    },
+    "pulumiservice:api:SourceContextTemplateRequest": {
+      "description": "Request to configure a template-based source context.",
+      "properties": {
+        "gitAuth": {
+          "$ref": "#/types/pulumiservice:api:GitAuthConfigRequest",
+          "description": "Git authentication configuration for accessing the template source."
+        },
+        "sourceUrl": {
+          "type": "string",
+          "description": "The URL of the template source. Supports two URL schemes:\n\n**Registry-backed templates** use the `registry://` scheme with the format:\n`registry://templates/source/publisher/name[@version]`\n\n- `source`: The template source identifier (e.g., the registry source name)\n- `publisher`: The organization or user that published the template\n- `name`: The template name\n- `version`: Optional semver version (e.g., `1.0.0`). If omitted, defaults to the latest version\n\nExample: `registry://templates/pulumi/acme-corp/aws-vpc@2.1.0`\n\n**VCS-backed templates** use standard VCS URLs (GitHub, GitLab, Azure DevOps, etc.):\n`https://github.com/org/repo`"
+        }
+      },
+      "type": "object"
+    },
+    "pulumiservice:api:StepRun": {
+      "description": "StepRun contains information about a step run.",
+      "properties": {
+        "lastUpdated": {
+          "type": "string",
+          "description": "The timestamp when the step was last updated."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the step."
+        },
+        "started": {
+          "type": "string",
+          "description": "The timestamp when the step started."
+        },
+        "status": {
+          "type": "string",
+          "description": "The current status of the step."
+        }
+      },
+      "type": "object",
+      "required": [
+        "name",
+        "status"
+      ]
+    },
+    "pulumiservice:api:TargetEntity": {
+      "description": "TargetEntity contains populated details about the targeted entity for a change request or gate",
+      "properties": {
+        "entityType": {
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "required": [
+        "entityType"
+      ]
+    },
+    "pulumiservice:api:TeamAccountPermission": {
+      "description": "TeamAccountPermission is the permission team membership grants to an account.",
+      "properties": {
+        "accountName": {
+          "type": "string",
+          "description": "The Insights account name."
+        },
+        "permission": {
+          "type": "integer",
+          "description": "The permission level the team has on this Insights account."
+        },
+        "permissionSetName": {
+          "type": "string",
+          "description": "Display name of the permission set for this account, when available. Enables read-only entity access UI without requiring RoleRead."
+        }
+      },
+      "type": "object",
+      "required": [
+        "accountName",
+        "permission"
+      ]
+    },
+    "pulumiservice:api:TeamEnvironmentSettings": {
+      "description": "TeamEnvironmentSettings contains additional settings a team applies to an environment.",
+      "properties": {
+        "envName": {
+          "type": "string",
+          "description": "The environment within the project."
+        },
+        "maxOpenDuration": {
+          "type": "string",
+          "description": "The maximum duration an environment session can remain open, as a Go duration string (e.g. \"1h30m\")."
+        },
+        "permission": {
+          "type": "string",
+          "description": "The permission level the team has on this environment."
+        },
+        "permissionSetName": {
+          "type": "string",
+          "description": "Display name of the permission set for this environment, when available. Enables read-only entity access UI without requiring RoleRead."
+        },
+        "projectName": {
+          "type": "string",
+          "description": "The project containing the environment."
+        }
+      },
+      "type": "object",
+      "required": [
+        "envName",
+        "permission",
+        "projectName"
+      ]
+    },
+    "pulumiservice:api:TeamMemberInfo": {
+      "properties": {
+        "avatarUrl": {
+          "type": "string",
+          "description": "The URL of the user's avatar image."
+        },
+        "email": {
+          "type": "string",
+          "description": "IMPORTANT: The email address of the user is only included on a few admin-only APIs.\nFor nearly all APIs that return a UserInfo object, this will not be provided.\nconsidered sensitive information."
+        },
+        "githubLogin": {
+          "type": "string",
+          "description": "The user's login name."
+        },
+        "name": {
+          "type": "string",
+          "description": "The user's display name."
+        },
+        "role": {
+          "type": "string",
+          "description": "The member's role within the team."
+        }
+      },
+      "type": "object",
+      "required": [
+        "avatarUrl",
+        "githubLogin",
+        "name",
+        "role"
+      ]
+    },
+    "pulumiservice:api:TeamStackPermission": {
+      "description": "TeamStackPermission is the permission team membership grants to a stack.",
+      "properties": {
+        "permission": {
+          "type": "integer",
+          "description": "The permission level the team has on this stack (e.g., read, write, admin)."
+        },
+        "permissionSetName": {
+          "type": "string",
+          "description": "Display name of the permission set for this stack, when available. Enables read-only entity access UI without requiring RoleRead."
+        },
+        "projectName": {
+          "type": "string",
+          "description": "The project containing the stack."
+        },
+        "stackName": {
+          "type": "string",
+          "description": "The stack within the project."
+        }
+      },
+      "type": "object",
+      "required": [
+        "permission",
+        "projectName",
+        "stackName"
+      ]
+    },
+    "pulumiservice:api:TemplateDestination": {
+      "description": "TemplateDestination describes the destination for a template.",
+      "properties": {
+        "url": {
+          "type": "string",
+          "description": "The destination URL."
+        }
+      },
+      "type": "object",
+      "required": [
+        "url"
+      ]
+    },
+    "pulumiservice:api:TokenInfo": {
+      "description": "TokenInfo contains metadata about an access token.",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the access token."
+        },
+        "organization": {
+          "type": "string",
+          "description": "The organization the token is scoped to, if any."
+        },
+        "team": {
+          "type": "string",
+          "description": "The team the token is scoped to, if any."
+        }
+      },
+      "type": "object",
+      "required": [
+        "name",
+        "organization",
+        "team"
+      ]
+    },
+    "pulumiservice:api:UpdateSummary": {
+      "description": "UpdateSummary contains a subset of the update data found in apitype.UpdateInfo.",
+      "properties": {
+        "endTime": {
+          "type": "integer",
+          "description": "The end time of the update as a Unix timestamp."
+        },
+        "resourceCount": {
+          "type": "integer",
+          "description": "ResourceCount is the current resource count for the update. Note that it\ndoesn't reflect the Stack's current resource count, only that particular\nupdate. (So the UpdateSummary for the same Stack will be different.)"
+        },
+        "result": {
+          "type": "string",
+          "description": "The result of the update."
+        },
+        "startTime": {
+          "type": "integer",
+          "description": "The start time of the update as a Unix timestamp."
+        }
+      },
+      "type": "object",
+      "required": [
+        "endTime",
+        "resourceCount",
+        "result",
+        "startTime"
+      ]
+    },
+    "pulumiservice:api:User": {
+      "description": "User represents a Pulumi user.  This structure contains the full, private information that will be used only for\nan authenticated user.  As a result, sensitive information (like email) is permitted.",
+      "properties": {
+        "avatarUrl": {
+          "type": "string",
+          "description": "The URL of the user's avatar image."
+        },
+        "email": {
+          "type": "string",
+          "description": "The user's email address."
+        },
+        "githubLogin": {
+          "type": "string",
+          "description": "The user's login name (originally from GitHub)."
+        },
+        "hasMFA": {
+          "type": "boolean",
+          "description": "Whether the user has multi-factor authentication enabled."
+        },
+        "id": {
+          "type": "string",
+          "description": "The unique identifier of the user."
+        },
+        "identities": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Identities is the array of identities a Pulumi user's account is tied to."
+        },
+        "isAgent": {
+          "type": "boolean",
+          "description": "Whether the user is a synthetic agent account. Agent accounts cannot be authenticated except via their issued access token until a human claims the account via the claim URL."
+        },
+        "isManagedByMultiOrg": {
+          "type": "boolean",
+          "description": "Whether the user's account is managed by multiple organizations."
+        },
+        "isOrgManaged": {
+          "type": "boolean",
+          "description": "Whether the user's account is managed by an organization."
+        },
+        "name": {
+          "type": "string",
+          "description": "The user's display name."
+        },
+        "organizations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/types/pulumiservice:api:OrganizationSummaryWithRole"
+          },
+          "description": "Organizations is the list of Pulumi organizations the user is a member of."
+        },
+        "potentialOrganizations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/types/pulumiservice:api:OrganizationSummaryWithRole"
+          },
+          "description": "PotentialOrganizations is the list of Pulumi organizations the user is a potential member of."
+        },
+        "registryAdmin": {
+          "type": "boolean",
+          "description": "RegistryAdmin is whether or not the user is a registry administrator."
+        },
+        "siteAdmin": {
+          "type": "boolean",
+          "description": "SiteAdministrator is whether or not the user is a site administrator."
+        },
+        "tokenInfo": {
+          "$ref": "#/types/pulumiservice:api:TokenInfo",
+          "description": "TokenInfo is contains metadata, set only for machine tokens & to be used only in the CLI"
+        }
+      },
+      "type": "object",
+      "required": [
+        "avatarUrl",
+        "email",
+        "githubLogin",
+        "hasMFA",
+        "id",
+        "identities",
+        "isManagedByMultiOrg",
+        "isOrgManaged",
+        "name",
+        "organizations"
+      ]
+    },
+    "pulumiservice:api:UserInfo": {
+      "description": "UserInfo contains just the display information for a user.  This information may be returned from public APIs,\nand as such this structure must not contain sensitive information.  Please refer to User for this sort of thing.",
+      "properties": {
+        "avatarUrl": {
+          "type": "string",
+          "description": "The URL of the user's avatar image."
+        },
+        "email": {
+          "type": "string",
+          "description": "IMPORTANT: The email address of the user is only included on a few admin-only APIs.\nFor nearly all APIs that return a UserInfo object, this will not be provided.\nconsidered sensitive information."
+        },
+        "githubLogin": {
+          "type": "string",
+          "description": "The user's login name."
+        },
+        "name": {
+          "type": "string",
+          "description": "The user's display name."
+        }
+      },
+      "type": "object",
+      "required": [
+        "avatarUrl",
+        "githubLogin",
+        "name"
+      ]
+    },
+    "pulumiservice:api:VCSInfo": {
+      "description": "VCSInfo is the info of the VCS, with which a particular program is associated.",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "description": "The kind of VCS provider."
+        },
+        "owner": {
+          "type": "string",
+          "description": "The owner of the repository."
+        },
+        "repoName": {
+          "type": "string",
+          "description": "The name of the repository."
+        }
+      },
+      "type": "object",
+      "required": [
+        "kind",
+        "owner",
+        "repoName"
+      ]
+    },
+    "pulumiservice:api:X509Certificate": {
+      "description": "X509Certificate represents an X.509 certificate.",
+      "properties": {
+        "AuthorityKeyId": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The authority key identifier extension value."
+        },
+        "BasicConstraintsValid": {
+          "type": "boolean",
+          "description": "Whether the basic constraints extension is valid."
+        },
+        "CRLDistributionPoints": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "CRL distribution point URLs."
+        },
+        "DNSNames": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "DNS names from the subject alternative name extension."
+        },
+        "EmailAddresses": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Email addresses from the subject alternative name extension."
+        },
+        "ExcludedDNSDomains": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Excluded DNS domain names from the name constraints extension."
+        },
+        "ExcludedEmailAddresses": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Excluded email addresses from the name constraints extension."
+        },
+        "ExcludedIPRanges": {
+          "type": "array",
+          "items": {
+            "$ref": "#/types/pulumiservice:api:NetIPNet"
+          },
+          "description": "Excluded IP ranges from the name constraints extension."
+        },
+        "ExcludedURIDomains": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Excluded URI domains from the name constraints extension."
+        },
+        "ExtKeyUsage": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          },
+          "description": "Extended key usage values."
+        },
+        "Extensions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/types/pulumiservice:api:PkixExtension"
+          },
+          "description": "The certificate extensions."
+        },
+        "ExtraExtensions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/types/pulumiservice:api:PkixExtension"
+          },
+          "description": "Additional extensions to add to the certificate."
+        },
+        "IPAddresses": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "description": "IP addresses from the subject alternative name extension."
+        },
+        "InhibitAnyPolicy": {
+          "type": "integer",
+          "description": "The inhibit any-policy constraint value."
+        },
+        "InhibitAnyPolicyZero": {
+          "type": "boolean",
+          "description": "Whether InhibitAnyPolicy was explicitly set to zero."
+        },
+        "InhibitPolicyMapping": {
+          "type": "integer",
+          "description": "The inhibit policy mapping constraint value."
+        },
+        "InhibitPolicyMappingZero": {
+          "type": "boolean",
+          "description": "Whether InhibitPolicyMapping was explicitly set to zero."
+        },
+        "IsCA": {
+          "type": "boolean",
+          "description": "Whether the certificate is a CA certificate."
+        },
+        "Issuer": {
+          "$ref": "#/types/pulumiservice:api:PkixName",
+          "description": "The certificate issuer distinguished name."
+        },
+        "IssuingCertificateURL": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Issuing certificate URLs from the authority information access extension."
+        },
+        "KeyUsage": {
+          "type": "integer",
+          "description": "Bitfield of key usage flags."
+        },
+        "MaxPathLen": {
+          "type": "integer",
+          "description": "Maximum number of intermediate CAs allowed in the path."
+        },
+        "MaxPathLenZero": {
+          "type": "boolean",
+          "description": "Whether MaxPathLen was explicitly set to zero."
+        },
+        "NotAfter": {
+          "type": "string",
+          "description": "The end of the certificate validity period."
+        },
+        "NotBefore": {
+          "type": "string",
+          "description": "The start of the certificate validity period."
+        },
+        "OCSPServer": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "OCSP server URLs from the authority information access extension."
+        },
+        "PermittedDNSDomains": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Permitted DNS domain names from the name constraints extension."
+        },
+        "PermittedDNSDomainsCritical": {
+          "type": "boolean",
+          "description": "Whether the name constraints are marked critical."
+        },
+        "PermittedEmailAddresses": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Permitted email addresses from the name constraints extension."
+        },
+        "PermittedIPRanges": {
+          "type": "array",
+          "items": {
+            "$ref": "#/types/pulumiservice:api:NetIPNet"
+          },
+          "description": "Permitted IP ranges from the name constraints extension."
+        },
+        "PermittedURIDomains": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Permitted URI domains from the name constraints extension."
+        },
+        "Policies": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Certificate policies."
+        },
+        "PolicyIdentifiers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Certificate policy OIDs."
+        },
+        "PolicyMappings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/types/pulumiservice:api:X509PolicyMapping"
+          },
+          "description": "Policy mappings from the policy mapping extension."
+        },
+        "PublicKey": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "pulumi.json#/Any"
+          },
+          "description": "The public key contained in the certificate."
+        },
+        "PublicKeyAlgorithm": {
+          "type": "integer",
+          "description": "The public key algorithm identifier."
+        },
+        "Raw": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The raw ASN.1 DER encoded certificate."
+        },
+        "RawIssuer": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The raw ASN.1 DER encoded issuer."
+        },
+        "RawSubject": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The raw ASN.1 DER encoded subject."
+        },
+        "RawSubjectPublicKeyInfo": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The raw ASN.1 DER encoded SubjectPublicKeyInfo."
+        },
+        "RawTBSCertificate": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The raw ASN.1 DER encoded TBSCertificate."
+        },
+        "RequireExplicitPolicy": {
+          "type": "integer",
+          "description": "The require explicit policy constraint value."
+        },
+        "RequireExplicitPolicyZero": {
+          "type": "boolean",
+          "description": "Whether RequireExplicitPolicy was explicitly set to zero."
+        },
+        "SerialNumber": {
+          "type": "integer",
+          "description": "The certificate serial number."
+        },
+        "Signature": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The certificate signature."
+        },
+        "SignatureAlgorithm": {
+          "type": "integer",
+          "description": "The signature algorithm identifier."
+        },
+        "Subject": {
+          "$ref": "#/types/pulumiservice:api:PkixName",
+          "description": "The certificate subject distinguished name."
+        },
+        "SubjectKeyId": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The subject key identifier extension value."
+        },
+        "URIs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/types/pulumiservice:api:NetURL"
+          },
+          "description": "URIs from the subject alternative name extension."
+        },
+        "UnhandledCriticalExtensions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Critical extensions that were not handled during parsing."
+        },
+        "UnknownExtKeyUsage": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Unknown extended key usage OIDs."
+        },
+        "Version": {
+          "type": "integer",
+          "description": "The X.509 certificate version."
+        }
+      },
+      "type": "object",
+      "required": [
+        "AuthorityKeyId",
+        "BasicConstraintsValid",
+        "CRLDistributionPoints",
+        "DNSNames",
+        "EmailAddresses",
+        "ExcludedDNSDomains",
+        "ExcludedEmailAddresses",
+        "ExcludedIPRanges",
+        "ExcludedURIDomains",
+        "ExtKeyUsage",
+        "Extensions",
+        "ExtraExtensions",
+        "IPAddresses",
+        "InhibitAnyPolicy",
+        "InhibitAnyPolicyZero",
+        "InhibitPolicyMapping",
+        "InhibitPolicyMappingZero",
+        "IsCA",
+        "Issuer",
+        "IssuingCertificateURL",
+        "KeyUsage",
+        "MaxPathLen",
+        "MaxPathLenZero",
+        "NotAfter",
+        "NotBefore",
+        "OCSPServer",
+        "PermittedDNSDomains",
+        "PermittedDNSDomainsCritical",
+        "PermittedEmailAddresses",
+        "PermittedIPRanges",
+        "PermittedURIDomains",
+        "Policies",
+        "PolicyIdentifiers",
+        "PolicyMappings",
+        "PublicKey",
+        "PublicKeyAlgorithm",
+        "Raw",
+        "RawIssuer",
+        "RawSubject",
+        "RawSubjectPublicKeyInfo",
+        "RawTBSCertificate",
+        "RequireExplicitPolicy",
+        "RequireExplicitPolicyZero",
+        "SerialNumber",
+        "Signature",
+        "SignatureAlgorithm",
+        "Subject",
+        "SubjectKeyId",
+        "URIs",
+        "UnhandledCriticalExtensions",
+        "UnknownExtKeyUsage",
+        "Version"
+      ]
+    },
+    "pulumiservice:api:X509PolicyMapping": {
+      "description": "X509PolicyMapping represents a mapping between issuer and subject domain policies in an X.509 certificate.",
+      "properties": {
+        "IssuerDomainPolicy": {
+          "type": "string",
+          "description": "The OID of the issuer domain policy."
+        },
+        "SubjectDomainPolicy": {
+          "type": "string",
+          "description": "The OID of the subject domain policy."
+        }
+      },
+      "type": "object",
+      "required": [
+        "IssuerDomainPolicy",
+        "SubjectDomainPolicy"
+      ]
+    },
     "pulumiservice:index:AWSOIDCConfiguration": {
       "properties": {
         "duration": {
@@ -1282,7 +4454,7 @@
         "agents": {
           "type": "array",
           "items": {
-            "$ref": "pulumi.json#/Any"
+            "$ref": "#/types/pulumiservice:api:DeploymentAgentMetadata"
           },
           "description": "The agents"
         },
@@ -1372,13 +4544,13 @@
           "description": "When the task was created, in ISO 8601 format."
         },
         "createdBy": {
-          "$ref": "pulumi.json#/Any",
+          "$ref": "#/types/pulumiservice:api:UserInfo",
           "description": "Information about the user who created this task."
         },
         "entities": {
           "type": "array",
           "items": {
-            "$ref": "pulumi.json#/Any"
+            "$ref": "#/types/pulumiservice:api:AgentEntity"
           },
           "description": "Pulumi entities (stacks, projects, etc.) that provide context for the agent."
         },
@@ -1456,19 +4628,19 @@
         "cliIntegrations": {
           "type": "array",
           "items": {
-            "$ref": "pulumi.json#/Any"
+            "$ref": "#/types/pulumiservice:api:CLIIntegrationRef"
           },
           "description": "Optional filter for CLI integrations to enable for this task. Semantics: omitted/null → enable all CLI integrations connected for the org; empty list → explicit opt-out (no CLI integrations for this task); populated list → whitelist by (catalogId, name) of the configured instances to enable. Entries with missing or unknown catalogId, missing name, or referencing a (catalogId, name) pair that is not connected for the organization are rejected with a 400 response. catalogId matching is case-insensitive."
         },
         "enabledIntegrations": {
           "type": "array",
           "items": {
-            "$ref": "pulumi.json#/Any"
+            "$ref": "#/types/pulumiservice:api:AgentTaskIntegrationRef"
           },
           "description": "Optional list of integrations to enable for this task. Semantics: omitted/null → inherit all org-enabled integrations; empty list → explicit opt-out (no integration credentials for this task); populated list → whitelist of specific integrations by ID. Modeled as an object array rather than a bare string array so multi-instance support (instance_name, scope, etc.) can be added later without a wire break."
         },
         "message": {
-          "$ref": "pulumi.json#/Any",
+          "$ref": "#/types/pulumiservice:api:AgentUserEventMessage",
           "description": "The message content"
         },
         "orgName": {
@@ -1520,7 +4692,7 @@
           "description": "The unique identifier of the registered OIDC issuer."
         },
         "jwks": {
-          "$ref": "pulumi.json#/Any",
+          "$ref": "#/types/pulumiservice:api:JSONWebKeySet",
           "description": "The JSON Web Key Set for the OIDC issuer."
         },
         "lastUsed": {
@@ -1566,7 +4738,7 @@
           "willReplaceOnChanges": true
         },
         "jwks": {
-          "$ref": "pulumi.json#/Any",
+          "$ref": "#/types/pulumiservice:api:JSONWebKeySet",
           "description": "The JSON Web Key Set for the OIDC issuer."
         },
         "maxExpiration": {
@@ -1619,7 +4791,7 @@
         "policies": {
           "type": "array",
           "items": {
-            "$ref": "pulumi.json#/Any"
+            "$ref": "#/types/pulumiservice:api:AuthPolicyDefinition"
           },
           "description": "List of policies"
         },
@@ -1650,7 +4822,7 @@
         "policies": {
           "type": "array",
           "items": {
-            "$ref": "pulumi.json#/Any"
+            "$ref": "#/types/pulumiservice:api:AuthPolicyDefinition"
           },
           "description": "List of policies"
         },
@@ -1683,7 +4855,7 @@
           "description": "The SAML NameID format used by the identity provider."
         },
         "organization": {
-          "$ref": "pulumi.json#/Any",
+          "$ref": "#/types/pulumiservice:api:Organization",
           "description": "The Pulumi organization."
         },
         "ssoUrl": {
@@ -1797,7 +4969,7 @@
           "willReplaceOnChanges": true
         },
         "request": {
-          "$ref": "pulumi.json#/Any",
+          "$ref": "#/types/pulumiservice:api:CreateDeploymentRequest",
           "description": "Deployment request payload to execute when the schedule fires. This has the same shape and semantics as CreateDeploymentRequest used for immediate deployments."
         },
         "scheduleCron": {
@@ -1835,19 +5007,19 @@
           "description": "The identifier of the agent pool to use for deployments."
         },
         "cacheOptions": {
-          "$ref": "pulumi.json#/Any",
+          "$ref": "#/types/pulumiservice:api:CacheOptions",
           "description": "Cache options for the deployment."
         },
         "executorContext": {
-          "$ref": "pulumi.json#/Any",
+          "$ref": "#/types/pulumiservice:api:ExecutorContext",
           "description": "The executor context defining the execution environment."
         },
         "gitHub": {
-          "$ref": "pulumi.json#/Any",
+          "$ref": "#/types/pulumiservice:api:DeploymentSettingsGitHub",
           "description": "GitHub-specific deployment settings"
         },
         "operationContext": {
-          "$ref": "pulumi.json#/Any",
+          "$ref": "#/types/pulumiservice:api:OperationContext",
           "description": "The operation context defining pre-run and post-run commands and environment variables."
         },
         "source": {
@@ -1855,7 +5027,7 @@
           "description": "The source from which the deployment settings were created."
         },
         "sourceContext": {
-          "$ref": "pulumi.json#/Any",
+          "$ref": "#/types/pulumiservice:api:SourceContext",
           "description": "The source context defining where the source code is located."
         },
         "tag": {
@@ -1863,7 +5035,7 @@
           "description": "A tag to identify the deployment settings configuration."
         },
         "vcs": {
-          "$ref": "pulumi.json#/Any",
+          "$ref": "#/types/pulumiservice:api:DeploymentSettingsVCS",
           "description": "VCS provider settings"
         },
         "version": {
@@ -1878,19 +5050,19 @@
           "description": "The identifier of the agent pool to use for deployments."
         },
         "cacheOptions": {
-          "$ref": "pulumi.json#/Any",
+          "$ref": "#/types/pulumiservice:api:CacheOptionsRequest",
           "description": "Cache options for the deployment."
         },
         "executorContext": {
-          "$ref": "pulumi.json#/Any",
+          "$ref": "#/types/pulumiservice:api:ExecutorSettingsRequest",
           "description": "The executor context defining the execution environment."
         },
         "gitHub": {
-          "$ref": "pulumi.json#/Any",
+          "$ref": "#/types/pulumiservice:api:DeploymentSettingsGitHubRequest",
           "description": "GitHub-specific deployment settings"
         },
         "operationContext": {
-          "$ref": "pulumi.json#/Any",
+          "$ref": "#/types/pulumiservice:api:OperationContextRequest",
           "description": "The operation context defining pre-run and post-run commands and environment variables."
         },
         "orgName": {
@@ -1906,7 +5078,7 @@
           "willReplaceOnChanges": true
         },
         "sourceContext": {
-          "$ref": "pulumi.json#/Any",
+          "$ref": "#/types/pulumiservice:api:SourceContextRequest",
           "description": "The source context defining where the source code is located."
         },
         "stackName": {
@@ -1920,7 +5092,7 @@
           "description": "A tag to identify the deployment settings configuration."
         },
         "vcs": {
-          "$ref": "pulumi.json#/Any",
+          "$ref": "#/types/pulumiservice:api:DeploymentSettingsVCS",
           "description": "VCS provider settings"
         }
       },
@@ -2118,7 +5290,7 @@
           "description": "The schedule once"
         },
         "secretRotationRequest": {
-          "$ref": "pulumi.json#/Any",
+          "$ref": "#/types/pulumiservice:api:CreateEnvironmentSecretRotationScheduleRequest",
           "description": "The secret rotation request",
           "secret": true
         }
@@ -2541,7 +5713,7 @@
           "description": "The name of the account."
         },
         "ownedBy": {
-          "$ref": "pulumi.json#/Any",
+          "$ref": "#/types/pulumiservice:api:UserInfo",
           "description": "The user with ownership of this Insights account"
         },
         "provider": {
@@ -2564,7 +5736,7 @@
           "description": "The version of the Pulumi provider package used for discovery."
         },
         "scanStatus": {
-          "$ref": "pulumi.json#/Any",
+          "$ref": "#/types/pulumiservice:api:ScanStatus",
           "description": "Status of the last discovery scan for this account."
         },
         "scheduledScanEnabled": {
@@ -2708,7 +5880,7 @@
       "description": "Updates an existing Azure DevOps integration's settings. Can modify the Azure DevOps organization, project, or authentication configuration.",
       "properties": {
         "authUser": {
-          "$ref": "pulumi.json#/Any",
+          "$ref": "#/types/pulumiservice:api:User",
           "description": "The Pulumi user whose Azure DevOps authentication token is being used"
         },
         "disableDetailedDiff": {
@@ -2728,11 +5900,11 @@
           "description": "Does the org have an Azure DevOps app integration configured"
         },
         "organization": {
-          "$ref": "pulumi.json#/Any",
+          "$ref": "#/types/pulumiservice:api:AzureDevOpsOrganization",
           "description": "Metadata about the Azure DevOps organization linked to the Pulumi organization"
         },
         "project": {
-          "$ref": "pulumi.json#/Any",
+          "$ref": "#/types/pulumiservice:api:AzureDevOpsProject",
           "description": "Metadata about the Azure DevOps project linked to the Pulumi organization"
         },
         "valid": {
@@ -2784,7 +5956,7 @@
           "description": "The authentication type used: 'workspace_token', 'user_token', or 'pat'."
         },
         "authUser": {
-          "$ref": "pulumi.json#/Any",
+          "$ref": "#/types/pulumiservice:api:User",
           "description": "The user whose BitBucket OAuth token is being used for authentication, if user-based auth is configured."
         },
         "avatarUrl": {
@@ -2895,7 +6067,7 @@
         "repositories": {
           "type": "array",
           "items": {
-            "$ref": "pulumi.json#/Any"
+            "$ref": "#/types/pulumiservice:api:CustomVCSRepository"
           },
           "description": "List of repositories configured on this integration"
         },
@@ -3027,7 +6199,7 @@
           "description": "Whether PR comments are disabled for this installation."
         },
         "ghUrls": {
-          "$ref": "pulumi.json#/Any",
+          "$ref": "#/types/pulumiservice:api:GitHubAppURLs",
           "description": "URL to configure repository access for this GitHub App installation."
         },
         "hasContentsPermission": {
@@ -3053,7 +6225,7 @@
         "neoGitHubAppPermissionRequirements": {
           "type": "array",
           "items": {
-            "$ref": "pulumi.json#/Any"
+            "$ref": "#/types/pulumiservice:api:GitHubAppPermissionRequirement"
           },
           "description": "Neo GitHub App permission requirements for this installation."
         }
@@ -3141,7 +6313,7 @@
           "description": "Whether PR comments are disabled for this installation."
         },
         "ghUrls": {
-          "$ref": "pulumi.json#/Any",
+          "$ref": "#/types/pulumiservice:api:GitHubAppURLs",
           "description": "URL to configure repository access for this GitHub App installation."
         },
         "hasContentsPermission": {
@@ -3167,7 +6339,7 @@
         "neoGitHubAppPermissionRequirements": {
           "type": "array",
           "items": {
-            "$ref": "pulumi.json#/Any"
+            "$ref": "#/types/pulumiservice:api:GitHubAppPermissionRequirement"
           },
           "description": "Neo GitHub App permission requirements for this installation."
         }
@@ -3223,7 +6395,7 @@
       "description": "Updates an existing GitLab integration's settings, such as PR comment preferences and AI summary options.",
       "properties": {
         "authUser": {
-          "$ref": "pulumi.json#/Any",
+          "$ref": "#/types/pulumiservice:api:User",
           "description": "The Pulumi user whose GitLab authentication token is being used, if applicable."
         },
         "avatarUrl": {
@@ -3247,7 +6419,7 @@
           "description": "The GitLab group ID linked to this integration."
         },
         "gitLabOrg": {
-          "$ref": "pulumi.json#/Any",
+          "$ref": "#/types/pulumiservice:api:GitLabAppOrganization",
           "description": "Metadata about the GitLab group linked to this integration."
         },
         "groupAccessTokenExpiration": {
@@ -3322,12 +6494,12 @@
         "items": {
           "type": "array",
           "items": {
-            "$ref": "pulumi.json#/Any"
+            "$ref": "#/types/pulumiservice:api:ServiceItem"
           },
           "description": "The list of service items"
         },
         "service": {
-          "$ref": "pulumi.json#/Any",
+          "$ref": "#/types/pulumiservice:api:Service",
           "description": "The service details"
         }
       },
@@ -3340,7 +6512,7 @@
         "items": {
           "type": "array",
           "items": {
-            "$ref": "pulumi.json#/Any"
+            "$ref": "#/types/pulumiservice:api:AddServiceItem"
           },
           "description": "List of items"
         },
@@ -3387,7 +6559,7 @@
         "items": {
           "type": "array",
           "items": {
-            "$ref": "pulumi.json#/Any"
+            "$ref": "#/types/pulumiservice:api:ServiceItem"
           },
           "description": "The list of service items"
         }
@@ -3404,7 +6576,7 @@
         "items": {
           "type": "array",
           "items": {
-            "$ref": "pulumi.json#/Any"
+            "$ref": "#/types/pulumiservice:api:AddServiceItem"
           },
           "description": "an optional list of items to add during service creation"
         },
@@ -3435,7 +6607,7 @@
         "properties": {
           "type": "array",
           "items": {
-            "$ref": "pulumi.json#/Any"
+            "$ref": "#/types/pulumiservice:api:ServiceProperty"
           },
           "description": "an optional list of properties to set on the service"
         }
@@ -3527,11 +6699,11 @@
           "description": "The active update"
         },
         "config": {
-          "$ref": "pulumi.json#/Any",
+          "$ref": "#/types/pulumiservice:api:AppStackConfig",
           "description": "Optional cloud-persisted stack configuration.\nIf set, then the stack's configuration is loaded from the cloud and not a file on disk."
         },
         "currentOperation": {
-          "$ref": "pulumi.json#/Any",
+          "$ref": "#/types/pulumiservice:api:AppOperationStatus",
           "description": "CurrentOperation provides information about a stack operation in-progress, as applicable."
         },
         "orgName": {
@@ -3568,7 +6740,7 @@
       ],
       "inputProperties": {
         "config": {
-          "$ref": "pulumi.json#/Any",
+          "$ref": "#/types/pulumiservice:api:AppStackConfig",
           "description": "The configuration for the new stack."
         },
         "orgName": {
@@ -3590,7 +6762,7 @@
           "willReplaceOnChanges": true
         },
         "state": {
-          "$ref": "pulumi.json#/Any",
+          "$ref": "#/types/pulumiservice:api:AppUntypedDeployment",
           "description": "An optional state to initialize the stack with."
         },
         "tags": {
@@ -3840,7 +7012,7 @@
         "accounts": {
           "type": "array",
           "items": {
-            "$ref": "pulumi.json#/Any"
+            "$ref": "#/types/pulumiservice:api:TeamAccountPermission"
           },
           "description": "The list of account permissions granted to the team."
         },
@@ -3855,7 +7027,7 @@
         "environments": {
           "type": "array",
           "items": {
-            "$ref": "pulumi.json#/Any"
+            "$ref": "#/types/pulumiservice:api:TeamEnvironmentSettings"
           },
           "description": "The list of environment settings for the team."
         },
@@ -3870,7 +7042,7 @@
         "members": {
           "type": "array",
           "items": {
-            "$ref": "pulumi.json#/Any"
+            "$ref": "#/types/pulumiservice:api:TeamMemberInfo"
           },
           "description": "The list of team members."
         },
@@ -3888,7 +7060,7 @@
         "stacks": {
           "type": "array",
           "items": {
-            "$ref": "pulumi.json#/Any"
+            "$ref": "#/types/pulumiservice:api:TeamStackPermission"
           },
           "description": "The list of stack permissions granted to the team."
         },
@@ -4098,11 +7270,11 @@
           "description": "Whether audit log export is currently active. May be paused automatically if the configured destination repeatedly fails to authenticate."
         },
         "lastResult": {
-          "$ref": "pulumi.json#/Any",
+          "$ref": "#/types/pulumiservice:api:AuditLogExportResult",
           "description": "The result of the last audit log export attempt."
         },
         "s3Config": {
-          "$ref": "pulumi.json#/Any",
+          "$ref": "#/types/pulumiservice:api:AuditLogsExportS3Config",
           "description": "The S3 configuration for exporting audit logs."
         }
       },
@@ -4118,7 +7290,7 @@
           "description": "Whether the audit log export is enabled."
         },
         "newS3Configuration": {
-          "$ref": "pulumi.json#/Any",
+          "$ref": "#/types/pulumiservice:api:AuditLogsExportS3Config",
           "description": "The new S3 configuration for audit log export."
         },
         "orgName": {
@@ -4144,7 +7316,7 @@
         "Messages": {
           "type": "array",
           "items": {
-            "$ref": "pulumi.json#/Any"
+            "$ref": "#/types/pulumiservice:api:AppMessage"
           },
           "description": "Messages is a list of messages that should be displayed to the user that contextualize\nthe default org; for example: warning new users if their default org as returned by the\nservice is on an expiring trial and not free tier, with possible recommendations\non how to configure their default org locally.\nCan be possibly empty."
         }
@@ -4182,11 +7354,11 @@
           "description": "Name of the change gate"
         },
         "rule": {
-          "$ref": "pulumi.json#/Any",
+          "$ref": "#/types/pulumiservice:api:ChangeGateRuleOutput",
           "description": "Rule configuration for the gate"
         },
         "target": {
-          "$ref": "pulumi.json#/Any",
+          "$ref": "#/types/pulumiservice:api:ChangeGateTargetOutput",
           "description": "Target configuration for the gate"
         }
       },
@@ -4220,11 +7392,11 @@
           "willReplaceOnChanges": true
         },
         "rule": {
-          "$ref": "pulumi.json#/Any",
+          "$ref": "#/types/pulumiservice:api:ChangeGateRuleInput",
           "description": "Rule configuration for the gate"
         },
         "target": {
-          "$ref": "pulumi.json#/Any",
+          "$ref": "#/types/pulumiservice:api:ChangeGateTargetInput",
           "description": "Target configuration for the gate"
         }
       },
@@ -4240,7 +7412,7 @@
       "description": "Creates a new template collection (source) for an organization. Template collections define where project templates are sourced from, such as a Git repository. Organization members can use these templates to create new stacks with pre-configured infrastructure code.",
       "properties": {
         "destination": {
-          "$ref": "pulumi.json#/Any",
+          "$ref": "#/types/pulumiservice:api:TemplateDestination",
           "description": "Deprecated - use destinationURL instead."
         },
         "destinationURL": {
@@ -4277,7 +7449,7 @@
       ],
       "inputProperties": {
         "destination": {
-          "$ref": "pulumi.json#/Any",
+          "$ref": "#/types/pulumiservice:api:TemplateDestination",
           "description": "deprecated - use DestinationURL instead"
         },
         "destinationURL": {
@@ -4313,7 +7485,7 @@
           "description": "When the member joined the organization."
         },
         "fgaRole": {
-          "$ref": "pulumi.json#/Any",
+          "$ref": "#/types/pulumiservice:api:FGARole",
           "description": "The role currently assigned to this member — either a built-in role (member, admin, billingManager) or a custom role. Falls back to the organization's default role if no role is assigned directly."
         },
         "knownToPulumi": {
@@ -4321,7 +7493,7 @@
           "description": "KnownToPulumi returns if the organization member has a Pulumi account."
         },
         "links": {
-          "$ref": "pulumi.json#/Any",
+          "$ref": "#/types/pulumiservice:api:MemberLinks",
           "description": "Links to the member in the Pulumi Console"
         },
         "role": {
@@ -4336,7 +7508,7 @@
           "description": "Deprecated. Use GetOrganizationMemberTeams to list teams."
         },
         "user": {
-          "$ref": "pulumi.json#/Any",
+          "$ref": "#/types/pulumiservice:api:UserInfo",
           "description": "The user information for this organization member."
         },
         "virtualAdmin": {
@@ -4540,7 +7712,7 @@
         "appliedPolicyPacks": {
           "type": "array",
           "items": {
-            "$ref": "pulumi.json#/Any"
+            "$ref": "#/types/pulumiservice:api:AppPolicyPackMetadata"
           },
           "description": "List of policy packs that are applied to this policy group."
         },
@@ -4563,7 +7735,7 @@
         "stacks": {
           "type": "array",
           "items": {
-            "$ref": "pulumi.json#/Any"
+            "$ref": "#/types/pulumiservice:api:AppPulumiStackReference"
           },
           "description": "List of stacks that are members of this policy group."
         }
@@ -4732,7 +7904,7 @@
           "description": "A human-readable description of the permission descriptor."
         },
         "details": {
-          "$ref": "pulumi.json#/Any",
+          "$ref": "#/types/pulumiservice:api:PermissionDescriptor",
           "description": "The detailed permission descriptor tree."
         },
         "isOrgDefault": {
@@ -4789,7 +7961,7 @@
           "description": "A human-readable description of the permission descriptor."
         },
         "details": {
-          "$ref": "pulumi.json#/Any",
+          "$ref": "#/types/pulumiservice:api:PermissionDescriptor",
           "description": "The detailed permission descriptor tree."
         },
         "name": {

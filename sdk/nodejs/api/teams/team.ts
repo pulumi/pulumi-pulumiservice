@@ -2,6 +2,9 @@
 // *** Do not edit by hand unless you're certain you know what you are doing! ***
 
 import * as pulumi from "@pulumi/pulumi";
+import * as inputs from "../../types/input";
+import * as outputs from "../../types/output";
+import * as enums from "../../types/enums";
 import * as utilities from "../../utilities";
 
 /**
@@ -38,7 +41,7 @@ export class Team extends pulumi.CustomResource {
     /**
      * The list of account permissions granted to the team.
      */
-    declare public /*out*/ readonly accounts: pulumi.Output<any[] | undefined>;
+    declare public /*out*/ readonly accounts: pulumi.Output<outputs.api.TeamAccountPermission[] | undefined>;
     /**
      * A free-form text description of the team's purpose.
      */
@@ -50,7 +53,7 @@ export class Team extends pulumi.CustomResource {
     /**
      * The list of environment settings for the team.
      */
-    declare public /*out*/ readonly environments: pulumi.Output<any[] | undefined>;
+    declare public /*out*/ readonly environments: pulumi.Output<outputs.api.TeamEnvironmentSettings[] | undefined>;
     /**
      * The kind of team (e.g., pulumi or GitHub-backed).
      */
@@ -64,7 +67,7 @@ export class Team extends pulumi.CustomResource {
     /**
      * The list of team members.
      */
-    declare public /*out*/ readonly members: pulumi.Output<any[] | undefined>;
+    declare public /*out*/ readonly members: pulumi.Output<outputs.api.TeamMemberInfo[] | undefined>;
     /**
      * The unique identifier name of the team within the organization.
      */
@@ -77,7 +80,7 @@ export class Team extends pulumi.CustomResource {
     /**
      * The list of stack permissions granted to the team.
      */
-    declare public /*out*/ readonly stacks: pulumi.Output<any[] | undefined>;
+    declare public /*out*/ readonly stacks: pulumi.Output<outputs.api.TeamStackPermission[] | undefined>;
     /**
      * UserRole is the calling user's role on the given team.
      */

@@ -19,7 +19,7 @@ namespace Pulumi.PulumiService.Api.Integrations
         /// The Pulumi user whose GitLab authentication token is being used, if applicable.
         /// </summary>
         [Output("authUser")]
-        public Output<object?> AuthUser { get; private set; } = null!;
+        public Output<Pulumi.PulumiService.Api.Outputs.User?> AuthUser { get; private set; } = null!;
 
         /// <summary>
         /// The URL of the GitLab group's avatar image.
@@ -55,7 +55,7 @@ namespace Pulumi.PulumiService.Api.Integrations
         /// Metadata about the GitLab group linked to this integration.
         /// </summary>
         [Output("gitLabOrg")]
-        public Output<object?> GitLabOrg { get; private set; } = null!;
+        public Output<Pulumi.PulumiService.Api.Outputs.GitLabAppOrganization?> GitLabOrg { get; private set; } = null!;
 
         /// <summary>
         /// The expiration date of the group access token, if one is being used for authentication.

@@ -2,6 +2,9 @@
 // *** Do not edit by hand unless you're certain you know what you are doing! ***
 
 import * as pulumi from "@pulumi/pulumi";
+import * as inputs from "../../types/input";
+import * as outputs from "../../types/output";
+import * as enums from "../../types/enums";
 import * as utilities from "../../utilities";
 
 /**
@@ -42,7 +45,7 @@ export class Service extends pulumi.CustomResource {
     /**
      * The list of service items
      */
-    declare public readonly items: pulumi.Output<any[]>;
+    declare public readonly items: pulumi.Output<outputs.api.ServiceItem[]>;
 
     /**
      * Create a Service resource with the given unique name, arguments, and options.
@@ -104,7 +107,7 @@ export interface ServiceArgs {
     /**
      * an optional list of items to add during service creation
      */
-    items: pulumi.Input<any[]>;
+    items: pulumi.Input<pulumi.Input<inputs.api.AddServiceItemArgs>[]>;
     /**
      * the name of the service
      */
@@ -124,5 +127,5 @@ export interface ServiceArgs {
     /**
      * an optional list of properties to set on the service
      */
-    properties: pulumi.Input<any[]>;
+    properties: pulumi.Input<pulumi.Input<inputs.api.ServicePropertyArgs>[]>;
 }

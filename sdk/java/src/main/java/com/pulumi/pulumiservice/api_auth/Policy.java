@@ -8,9 +8,9 @@ import com.pulumi.core.annotations.Export;
 import com.pulumi.core.annotations.ResourceType;
 import com.pulumi.core.internal.Codegen;
 import com.pulumi.pulumiservice.Utilities;
+import com.pulumi.pulumiservice.api.outputs.AuthPolicyDefinition;
 import com.pulumi.pulumiservice.api_auth.PolicyArgs;
 import java.lang.Integer;
-import java.lang.Object;
 import java.lang.String;
 import java.util.List;
 import java.util.Optional;
@@ -79,14 +79,14 @@ public class Policy extends com.pulumi.resources.CustomResource {
      * List of policies
      * 
      */
-    @Export(name="policies", refs={List.class,Object.class}, tree="[0,1]")
-    private Output<List<Object>> policies;
+    @Export(name="policies", refs={List.class,AuthPolicyDefinition.class}, tree="[0,1]")
+    private Output<List<AuthPolicyDefinition>> policies;
 
     /**
      * @return List of policies
      * 
      */
-    public Output<List<Object>> policies() {
+    public Output<List<AuthPolicyDefinition>> policies() {
         return this.policies;
     }
     /**

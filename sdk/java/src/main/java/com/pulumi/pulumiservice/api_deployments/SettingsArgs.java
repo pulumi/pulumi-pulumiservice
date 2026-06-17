@@ -6,7 +6,12 @@ package com.pulumi.pulumiservice.api_deployments;
 import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
 import com.pulumi.exceptions.MissingRequiredPropertyException;
-import java.lang.Object;
+import com.pulumi.pulumiservice.api.inputs.CacheOptionsRequestArgs;
+import com.pulumi.pulumiservice.api.inputs.DeploymentSettingsGitHubRequestArgs;
+import com.pulumi.pulumiservice.api.inputs.DeploymentSettingsVCSArgs;
+import com.pulumi.pulumiservice.api.inputs.ExecutorSettingsRequestArgs;
+import com.pulumi.pulumiservice.api.inputs.OperationContextRequestArgs;
+import com.pulumi.pulumiservice.api.inputs.SourceContextRequestArgs;
 import java.lang.String;
 import java.util.Objects;
 import java.util.Optional;
@@ -37,13 +42,13 @@ public final class SettingsArgs extends com.pulumi.resources.ResourceArgs {
      * 
      */
     @Import(name="cacheOptions")
-    private @Nullable Output<Object> cacheOptions;
+    private @Nullable Output<CacheOptionsRequestArgs> cacheOptions;
 
     /**
      * @return Cache options for the deployment.
      * 
      */
-    public Optional<Output<Object>> cacheOptions() {
+    public Optional<Output<CacheOptionsRequestArgs>> cacheOptions() {
         return Optional.ofNullable(this.cacheOptions);
     }
 
@@ -52,13 +57,13 @@ public final class SettingsArgs extends com.pulumi.resources.ResourceArgs {
      * 
      */
     @Import(name="executorContext")
-    private @Nullable Output<Object> executorContext;
+    private @Nullable Output<ExecutorSettingsRequestArgs> executorContext;
 
     /**
      * @return The executor context defining the execution environment.
      * 
      */
-    public Optional<Output<Object>> executorContext() {
+    public Optional<Output<ExecutorSettingsRequestArgs>> executorContext() {
         return Optional.ofNullable(this.executorContext);
     }
 
@@ -67,13 +72,13 @@ public final class SettingsArgs extends com.pulumi.resources.ResourceArgs {
      * 
      */
     @Import(name="gitHub")
-    private @Nullable Output<Object> gitHub;
+    private @Nullable Output<DeploymentSettingsGitHubRequestArgs> gitHub;
 
     /**
      * @return GitHub-specific deployment settings
      * 
      */
-    public Optional<Output<Object>> gitHub() {
+    public Optional<Output<DeploymentSettingsGitHubRequestArgs>> gitHub() {
         return Optional.ofNullable(this.gitHub);
     }
 
@@ -82,13 +87,13 @@ public final class SettingsArgs extends com.pulumi.resources.ResourceArgs {
      * 
      */
     @Import(name="operationContext")
-    private @Nullable Output<Object> operationContext;
+    private @Nullable Output<OperationContextRequestArgs> operationContext;
 
     /**
      * @return The operation context defining pre-run and post-run commands and environment variables.
      * 
      */
-    public Optional<Output<Object>> operationContext() {
+    public Optional<Output<OperationContextRequestArgs>> operationContext() {
         return Optional.ofNullable(this.operationContext);
     }
 
@@ -127,13 +132,13 @@ public final class SettingsArgs extends com.pulumi.resources.ResourceArgs {
      * 
      */
     @Import(name="sourceContext")
-    private @Nullable Output<Object> sourceContext;
+    private @Nullable Output<SourceContextRequestArgs> sourceContext;
 
     /**
      * @return The source context defining where the source code is located.
      * 
      */
-    public Optional<Output<Object>> sourceContext() {
+    public Optional<Output<SourceContextRequestArgs>> sourceContext() {
         return Optional.ofNullable(this.sourceContext);
     }
 
@@ -172,13 +177,13 @@ public final class SettingsArgs extends com.pulumi.resources.ResourceArgs {
      * 
      */
     @Import(name="vcs")
-    private @Nullable Output<Object> vcs;
+    private @Nullable Output<DeploymentSettingsVCSArgs> vcs;
 
     /**
      * @return VCS provider settings
      * 
      */
-    public Optional<Output<Object>> vcs() {
+    public Optional<Output<DeploymentSettingsVCSArgs>> vcs() {
         return Optional.ofNullable(this.vcs);
     }
 
@@ -243,7 +248,7 @@ public final class SettingsArgs extends com.pulumi.resources.ResourceArgs {
          * @return builder
          * 
          */
-        public Builder cacheOptions(@Nullable Output<Object> cacheOptions) {
+        public Builder cacheOptions(@Nullable Output<CacheOptionsRequestArgs> cacheOptions) {
             $.cacheOptions = cacheOptions;
             return this;
         }
@@ -254,7 +259,7 @@ public final class SettingsArgs extends com.pulumi.resources.ResourceArgs {
          * @return builder
          * 
          */
-        public Builder cacheOptions(Object cacheOptions) {
+        public Builder cacheOptions(CacheOptionsRequestArgs cacheOptions) {
             return cacheOptions(Output.of(cacheOptions));
         }
 
@@ -264,7 +269,7 @@ public final class SettingsArgs extends com.pulumi.resources.ResourceArgs {
          * @return builder
          * 
          */
-        public Builder executorContext(@Nullable Output<Object> executorContext) {
+        public Builder executorContext(@Nullable Output<ExecutorSettingsRequestArgs> executorContext) {
             $.executorContext = executorContext;
             return this;
         }
@@ -275,7 +280,7 @@ public final class SettingsArgs extends com.pulumi.resources.ResourceArgs {
          * @return builder
          * 
          */
-        public Builder executorContext(Object executorContext) {
+        public Builder executorContext(ExecutorSettingsRequestArgs executorContext) {
             return executorContext(Output.of(executorContext));
         }
 
@@ -285,7 +290,7 @@ public final class SettingsArgs extends com.pulumi.resources.ResourceArgs {
          * @return builder
          * 
          */
-        public Builder gitHub(@Nullable Output<Object> gitHub) {
+        public Builder gitHub(@Nullable Output<DeploymentSettingsGitHubRequestArgs> gitHub) {
             $.gitHub = gitHub;
             return this;
         }
@@ -296,7 +301,7 @@ public final class SettingsArgs extends com.pulumi.resources.ResourceArgs {
          * @return builder
          * 
          */
-        public Builder gitHub(Object gitHub) {
+        public Builder gitHub(DeploymentSettingsGitHubRequestArgs gitHub) {
             return gitHub(Output.of(gitHub));
         }
 
@@ -306,7 +311,7 @@ public final class SettingsArgs extends com.pulumi.resources.ResourceArgs {
          * @return builder
          * 
          */
-        public Builder operationContext(@Nullable Output<Object> operationContext) {
+        public Builder operationContext(@Nullable Output<OperationContextRequestArgs> operationContext) {
             $.operationContext = operationContext;
             return this;
         }
@@ -317,7 +322,7 @@ public final class SettingsArgs extends com.pulumi.resources.ResourceArgs {
          * @return builder
          * 
          */
-        public Builder operationContext(Object operationContext) {
+        public Builder operationContext(OperationContextRequestArgs operationContext) {
             return operationContext(Output.of(operationContext));
         }
 
@@ -369,7 +374,7 @@ public final class SettingsArgs extends com.pulumi.resources.ResourceArgs {
          * @return builder
          * 
          */
-        public Builder sourceContext(@Nullable Output<Object> sourceContext) {
+        public Builder sourceContext(@Nullable Output<SourceContextRequestArgs> sourceContext) {
             $.sourceContext = sourceContext;
             return this;
         }
@@ -380,7 +385,7 @@ public final class SettingsArgs extends com.pulumi.resources.ResourceArgs {
          * @return builder
          * 
          */
-        public Builder sourceContext(Object sourceContext) {
+        public Builder sourceContext(SourceContextRequestArgs sourceContext) {
             return sourceContext(Output.of(sourceContext));
         }
 
@@ -432,7 +437,7 @@ public final class SettingsArgs extends com.pulumi.resources.ResourceArgs {
          * @return builder
          * 
          */
-        public Builder vcs(@Nullable Output<Object> vcs) {
+        public Builder vcs(@Nullable Output<DeploymentSettingsVCSArgs> vcs) {
             $.vcs = vcs;
             return this;
         }
@@ -443,7 +448,7 @@ public final class SettingsArgs extends com.pulumi.resources.ResourceArgs {
          * @return builder
          * 
          */
-        public Builder vcs(Object vcs) {
+        public Builder vcs(DeploymentSettingsVCSArgs vcs) {
             return vcs(Output.of(vcs));
         }
 

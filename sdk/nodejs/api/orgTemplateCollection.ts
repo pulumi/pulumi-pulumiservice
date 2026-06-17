@@ -2,6 +2,9 @@
 // *** Do not edit by hand unless you're certain you know what you are doing! ***
 
 import * as pulumi from "@pulumi/pulumi";
+import * as inputs from "../types/input";
+import * as outputs from "../types/output";
+import * as enums from "../types/enums";
 import * as utilities from "../utilities";
 
 /**
@@ -37,7 +40,7 @@ export class OrgTemplateCollection extends pulumi.CustomResource {
     /**
      * Deprecated - use destinationURL instead.
      */
-    declare public readonly destination: pulumi.Output<any | undefined>;
+    declare public readonly destination: pulumi.Output<outputs.api.TemplateDestination | undefined>;
     /**
      * The destination URL for the template source.
      */
@@ -112,7 +115,7 @@ export interface OrgTemplateCollectionArgs {
     /**
      * deprecated - use DestinationURL instead
      */
-    destination?: any | undefined;
+    destination?: pulumi.Input<inputs.api.TemplateDestinationArgs | undefined>;
     /**
      * The destination URL for the template source.
      */

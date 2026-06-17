@@ -6,7 +6,7 @@ package com.pulumi.pulumiservice.api_services;
 import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
 import com.pulumi.exceptions.MissingRequiredPropertyException;
-import java.lang.Object;
+import com.pulumi.pulumiservice.api.inputs.AddServiceItemArgs;
 import java.lang.String;
 import java.util.List;
 import java.util.Objects;
@@ -21,13 +21,13 @@ public final class ItemArgs extends com.pulumi.resources.ResourceArgs {
      * 
      */
     @Import(name="items", required=true)
-    private Output<List<Object>> items;
+    private Output<List<AddServiceItemArgs>> items;
 
     /**
      * @return List of items
      * 
      */
-    public Output<List<Object>> items() {
+    public Output<List<AddServiceItemArgs>> items() {
         return this.items;
     }
 
@@ -125,7 +125,7 @@ public final class ItemArgs extends com.pulumi.resources.ResourceArgs {
          * @return builder
          * 
          */
-        public Builder items(Output<List<Object>> items) {
+        public Builder items(Output<List<AddServiceItemArgs>> items) {
             $.items = items;
             return this;
         }
@@ -136,7 +136,7 @@ public final class ItemArgs extends com.pulumi.resources.ResourceArgs {
          * @return builder
          * 
          */
-        public Builder items(List<Object> items) {
+        public Builder items(List<AddServiceItemArgs> items) {
             return items(Output.of(items));
         }
 
@@ -146,7 +146,7 @@ public final class ItemArgs extends com.pulumi.resources.ResourceArgs {
          * @return builder
          * 
          */
-        public Builder items(Object... items) {
+        public Builder items(AddServiceItemArgs... items) {
             return items(List.of(items));
         }
 

@@ -8,9 +8,9 @@ import com.pulumi.core.annotations.Export;
 import com.pulumi.core.annotations.ResourceType;
 import com.pulumi.core.internal.Codegen;
 import com.pulumi.pulumiservice.Utilities;
+import com.pulumi.pulumiservice.api.outputs.JSONWebKeySet;
 import com.pulumi.pulumiservice.api_auth.OidcIssuerArgs;
 import java.lang.Integer;
-import java.lang.Object;
 import java.lang.String;
 import java.util.List;
 import java.util.Optional;
@@ -68,14 +68,14 @@ public class OidcIssuer extends com.pulumi.resources.CustomResource {
      * The JSON Web Key Set for the OIDC issuer.
      * 
      */
-    @Export(name="jwks", refs={Object.class}, tree="[0]")
-    private Output</* @Nullable */ Object> jwks;
+    @Export(name="jwks", refs={JSONWebKeySet.class}, tree="[0]")
+    private Output</* @Nullable */ JSONWebKeySet> jwks;
 
     /**
      * @return The JSON Web Key Set for the OIDC issuer.
      * 
      */
-    public Output<Optional<Object>> jwks() {
+    public Output<Optional<JSONWebKeySet>> jwks() {
         return Codegen.optional(this.jwks);
     }
     /**

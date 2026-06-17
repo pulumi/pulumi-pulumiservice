@@ -8,8 +8,8 @@ import com.pulumi.core.annotations.Export;
 import com.pulumi.core.annotations.ResourceType;
 import com.pulumi.core.internal.Codegen;
 import com.pulumi.pulumiservice.Utilities;
+import com.pulumi.pulumiservice.api.outputs.ServiceItem;
 import com.pulumi.pulumiservice.api_services.ServiceArgs;
-import java.lang.Object;
 import java.lang.String;
 import java.util.List;
 import java.util.Optional;
@@ -41,14 +41,14 @@ public class Service extends com.pulumi.resources.CustomResource {
      * The list of service items
      * 
      */
-    @Export(name="items", refs={List.class,Object.class}, tree="[0,1]")
-    private Output<List<Object>> items;
+    @Export(name="items", refs={List.class,ServiceItem.class}, tree="[0,1]")
+    private Output<List<ServiceItem>> items;
 
     /**
      * @return The list of service items
      * 
      */
-    public Output<List<Object>> items() {
+    public Output<List<ServiceItem>> items() {
         return this.items;
     }
 

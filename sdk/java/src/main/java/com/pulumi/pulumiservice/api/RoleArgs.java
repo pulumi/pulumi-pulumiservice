@@ -6,8 +6,8 @@ package com.pulumi.pulumiservice.api;
 import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
 import com.pulumi.exceptions.MissingRequiredPropertyException;
+import com.pulumi.pulumiservice.api.inputs.PermissionDescriptorArgs;
 import java.lang.Boolean;
-import java.lang.Object;
 import java.lang.String;
 import java.util.Objects;
 import java.util.Optional;
@@ -53,13 +53,13 @@ public final class RoleArgs extends com.pulumi.resources.ResourceArgs {
      * 
      */
     @Import(name="details")
-    private @Nullable Output<Object> details;
+    private @Nullable Output<PermissionDescriptorArgs> details;
 
     /**
      * @return The detailed permission descriptor tree.
      * 
      */
-    public Optional<Output<Object>> details() {
+    public Optional<Output<PermissionDescriptorArgs>> details() {
         return Optional.ofNullable(this.details);
     }
 
@@ -217,7 +217,7 @@ public final class RoleArgs extends com.pulumi.resources.ResourceArgs {
          * @return builder
          * 
          */
-        public Builder details(@Nullable Output<Object> details) {
+        public Builder details(@Nullable Output<PermissionDescriptorArgs> details) {
             $.details = details;
             return this;
         }
@@ -228,7 +228,7 @@ public final class RoleArgs extends com.pulumi.resources.ResourceArgs {
          * @return builder
          * 
          */
-        public Builder details(Object details) {
+        public Builder details(PermissionDescriptorArgs details) {
             return details(Output.of(details));
         }
 

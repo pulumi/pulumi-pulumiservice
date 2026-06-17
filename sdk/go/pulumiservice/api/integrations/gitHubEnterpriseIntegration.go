@@ -8,6 +8,7 @@ import (
 	"reflect"
 
 	"errors"
+	"github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/api"
 	"github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/internal"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
@@ -33,7 +34,7 @@ type GitHubEnterpriseIntegration struct {
 	// Whether PR comments are disabled for this installation.
 	DisablePRComments pulumi.BoolOutput `pulumi:"disablePRComments"`
 	// URL to configure repository access for this GitHub App installation.
-	GhUrls pulumi.AnyOutput `pulumi:"ghUrls"`
+	GhUrls api.GitHubAppURLsPtrOutput `pulumi:"ghUrls"`
 	// Whether the installation has the 'contents' permission.
 	HasContentsPermission pulumi.BoolOutput `pulumi:"hasContentsPermission"`
 	// Whether the installation has the 'members' permission (only relevant for organization accounts).
@@ -45,7 +46,7 @@ type GitHubEnterpriseIntegration struct {
 	// Whether this is a self-hosted GitHub Enterprise installation.
 	IsSelfHosted pulumi.BoolOutput `pulumi:"isSelfHosted"`
 	// Neo GitHub App permission requirements for this installation.
-	NeoGitHubAppPermissionRequirements pulumi.ArrayOutput `pulumi:"neoGitHubAppPermissionRequirements"`
+	NeoGitHubAppPermissionRequirements api.GitHubAppPermissionRequirementArrayOutput `pulumi:"neoGitHubAppPermissionRequirements"`
 }
 
 // NewGitHubEnterpriseIntegration registers a new resource with the given unique name, arguments, and options.
@@ -252,8 +253,8 @@ func (o GitHubEnterpriseIntegrationOutput) DisablePRComments() pulumi.BoolOutput
 }
 
 // URL to configure repository access for this GitHub App installation.
-func (o GitHubEnterpriseIntegrationOutput) GhUrls() pulumi.AnyOutput {
-	return o.ApplyT(func(v *GitHubEnterpriseIntegration) pulumi.AnyOutput { return v.GhUrls }).(pulumi.AnyOutput)
+func (o GitHubEnterpriseIntegrationOutput) GhUrls() api.GitHubAppURLsPtrOutput {
+	return o.ApplyT(func(v *GitHubEnterpriseIntegration) api.GitHubAppURLsPtrOutput { return v.GhUrls }).(api.GitHubAppURLsPtrOutput)
 }
 
 // Whether the installation has the 'contents' permission.
@@ -282,8 +283,10 @@ func (o GitHubEnterpriseIntegrationOutput) IsSelfHosted() pulumi.BoolOutput {
 }
 
 // Neo GitHub App permission requirements for this installation.
-func (o GitHubEnterpriseIntegrationOutput) NeoGitHubAppPermissionRequirements() pulumi.ArrayOutput {
-	return o.ApplyT(func(v *GitHubEnterpriseIntegration) pulumi.ArrayOutput { return v.NeoGitHubAppPermissionRequirements }).(pulumi.ArrayOutput)
+func (o GitHubEnterpriseIntegrationOutput) NeoGitHubAppPermissionRequirements() api.GitHubAppPermissionRequirementArrayOutput {
+	return o.ApplyT(func(v *GitHubEnterpriseIntegration) api.GitHubAppPermissionRequirementArrayOutput {
+		return v.NeoGitHubAppPermissionRequirements
+	}).(api.GitHubAppPermissionRequirementArrayOutput)
 }
 
 type GitHubEnterpriseIntegrationArrayOutput struct{ *pulumi.OutputState }

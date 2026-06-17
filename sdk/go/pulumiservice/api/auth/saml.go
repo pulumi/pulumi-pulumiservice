@@ -8,6 +8,7 @@ import (
 	"reflect"
 
 	"errors"
+	"github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/api"
 	"github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/internal"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
@@ -24,7 +25,7 @@ type SAML struct {
 	// The SAML NameID format used by the identity provider.
 	NameIdFormat pulumi.StringPtrOutput `pulumi:"nameIdFormat"`
 	// The Pulumi organization.
-	Organization pulumi.AnyOutput `pulumi:"organization"`
+	Organization api.OrganizationOutput `pulumi:"organization"`
 	// The SSO URL for the identity provider.
 	SsoUrl pulumi.StringPtrOutput `pulumi:"ssoUrl"`
 	// ValidUntil is the date until which the X.509 Certificate
@@ -195,8 +196,8 @@ func (o SAMLOutput) NameIdFormat() pulumi.StringPtrOutput {
 }
 
 // The Pulumi organization.
-func (o SAMLOutput) Organization() pulumi.AnyOutput {
-	return o.ApplyT(func(v *SAML) pulumi.AnyOutput { return v.Organization }).(pulumi.AnyOutput)
+func (o SAMLOutput) Organization() api.OrganizationOutput {
+	return o.ApplyT(func(v *SAML) api.OrganizationOutput { return v.Organization }).(api.OrganizationOutput)
 }
 
 // The SSO URL for the identity provider.

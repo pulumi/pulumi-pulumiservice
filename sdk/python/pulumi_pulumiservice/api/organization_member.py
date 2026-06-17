@@ -13,6 +13,7 @@ if sys.version_info >= (3, 11):
 else:
     from typing_extensions import NotRequired, TypedDict, TypeAlias
 from .. import _utilities
+from . import outputs
 
 __all__ = ['OrganizationMemberArgs', 'OrganizationMember']
 
@@ -193,7 +194,7 @@ class OrganizationMember(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter(name="fgaRole")
-    def fga_role(self) -> pulumi.Output[Any]:
+    def fga_role(self) -> pulumi.Output['outputs.FGARole']:
         """
         The role currently assigned to this member — either a built-in role (member, admin, billingManager) or a custom role. Falls back to the organization's default role if no role is assigned directly.
         """
@@ -209,7 +210,7 @@ class OrganizationMember(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter
-    def links(self) -> pulumi.Output[Optional[Any]]:
+    def links(self) -> pulumi.Output[Optional['outputs.MemberLinks']]:
         """
         Links to the member in the Pulumi Console
         """
@@ -233,7 +234,7 @@ class OrganizationMember(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter
-    def user(self) -> pulumi.Output[Any]:
+    def user(self) -> pulumi.Output['outputs.UserInfo']:
         """
         The user information for this organization member.
         """

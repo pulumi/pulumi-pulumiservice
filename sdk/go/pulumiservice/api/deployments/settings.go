@@ -8,6 +8,7 @@ import (
 	"reflect"
 
 	"errors"
+	"github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/api"
 	"github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/internal"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
@@ -19,21 +20,21 @@ type Settings struct {
 	// The identifier of the agent pool to use for deployments.
 	AgentPoolID pulumi.StringPtrOutput `pulumi:"agentPoolID"`
 	// Cache options for the deployment.
-	CacheOptions pulumi.AnyOutput `pulumi:"cacheOptions"`
+	CacheOptions api.CacheOptionsPtrOutput `pulumi:"cacheOptions"`
 	// The executor context defining the execution environment.
-	ExecutorContext pulumi.AnyOutput `pulumi:"executorContext"`
+	ExecutorContext api.ExecutorContextPtrOutput `pulumi:"executorContext"`
 	// GitHub-specific deployment settings
-	GitHub pulumi.AnyOutput `pulumi:"gitHub"`
+	GitHub api.DeploymentSettingsGitHubPtrOutput `pulumi:"gitHub"`
 	// The operation context defining pre-run and post-run commands and environment variables.
-	OperationContext pulumi.AnyOutput `pulumi:"operationContext"`
+	OperationContext api.OperationContextPtrOutput `pulumi:"operationContext"`
 	// The source from which the deployment settings were created.
 	Source pulumi.StringPtrOutput `pulumi:"source"`
 	// The source context defining where the source code is located.
-	SourceContext pulumi.AnyOutput `pulumi:"sourceContext"`
+	SourceContext api.SourceContextPtrOutput `pulumi:"sourceContext"`
 	// A tag to identify the deployment settings configuration.
 	Tag pulumi.StringPtrOutput `pulumi:"tag"`
 	// VCS provider settings
-	Vcs pulumi.AnyOutput `pulumi:"vcs"`
+	Vcs api.DeploymentSettingsVCSPtrOutput `pulumi:"vcs"`
 	// The version of the deployment settings.
 	Version pulumi.IntPtrOutput `pulumi:"version"`
 }
@@ -90,25 +91,25 @@ type settingsArgs struct {
 	// The identifier of the agent pool to use for deployments.
 	AgentPoolID *string `pulumi:"agentPoolID"`
 	// Cache options for the deployment.
-	CacheOptions interface{} `pulumi:"cacheOptions"`
+	CacheOptions *api.CacheOptionsRequest `pulumi:"cacheOptions"`
 	// The executor context defining the execution environment.
-	ExecutorContext interface{} `pulumi:"executorContext"`
+	ExecutorContext *api.ExecutorSettingsRequest `pulumi:"executorContext"`
 	// GitHub-specific deployment settings
-	GitHub interface{} `pulumi:"gitHub"`
+	GitHub *api.DeploymentSettingsGitHubRequest `pulumi:"gitHub"`
 	// The operation context defining pre-run and post-run commands and environment variables.
-	OperationContext interface{} `pulumi:"operationContext"`
+	OperationContext *api.OperationContextRequest `pulumi:"operationContext"`
 	// The organization name
 	OrgName string `pulumi:"orgName"`
 	// The project name
 	ProjectName string `pulumi:"projectName"`
 	// The source context defining where the source code is located.
-	SourceContext interface{} `pulumi:"sourceContext"`
+	SourceContext *api.SourceContextRequest `pulumi:"sourceContext"`
 	// The stack name
 	StackName string `pulumi:"stackName"`
 	// A tag to identify the deployment settings configuration.
 	Tag *string `pulumi:"tag"`
 	// VCS provider settings
-	Vcs interface{} `pulumi:"vcs"`
+	Vcs *api.DeploymentSettingsVCS `pulumi:"vcs"`
 }
 
 // The set of arguments for constructing a Settings resource.
@@ -116,25 +117,25 @@ type SettingsArgs struct {
 	// The identifier of the agent pool to use for deployments.
 	AgentPoolID pulumi.StringPtrInput
 	// Cache options for the deployment.
-	CacheOptions pulumi.Input
+	CacheOptions api.CacheOptionsRequestPtrInput
 	// The executor context defining the execution environment.
-	ExecutorContext pulumi.Input
+	ExecutorContext api.ExecutorSettingsRequestPtrInput
 	// GitHub-specific deployment settings
-	GitHub pulumi.Input
+	GitHub api.DeploymentSettingsGitHubRequestPtrInput
 	// The operation context defining pre-run and post-run commands and environment variables.
-	OperationContext pulumi.Input
+	OperationContext api.OperationContextRequestPtrInput
 	// The organization name
 	OrgName pulumi.StringInput
 	// The project name
 	ProjectName pulumi.StringInput
 	// The source context defining where the source code is located.
-	SourceContext pulumi.Input
+	SourceContext api.SourceContextRequestPtrInput
 	// The stack name
 	StackName pulumi.StringInput
 	// A tag to identify the deployment settings configuration.
 	Tag pulumi.StringPtrInput
 	// VCS provider settings
-	Vcs pulumi.Input
+	Vcs api.DeploymentSettingsVCSPtrInput
 }
 
 func (SettingsArgs) ElementType() reflect.Type {
@@ -230,23 +231,23 @@ func (o SettingsOutput) AgentPoolID() pulumi.StringPtrOutput {
 }
 
 // Cache options for the deployment.
-func (o SettingsOutput) CacheOptions() pulumi.AnyOutput {
-	return o.ApplyT(func(v *Settings) pulumi.AnyOutput { return v.CacheOptions }).(pulumi.AnyOutput)
+func (o SettingsOutput) CacheOptions() api.CacheOptionsPtrOutput {
+	return o.ApplyT(func(v *Settings) api.CacheOptionsPtrOutput { return v.CacheOptions }).(api.CacheOptionsPtrOutput)
 }
 
 // The executor context defining the execution environment.
-func (o SettingsOutput) ExecutorContext() pulumi.AnyOutput {
-	return o.ApplyT(func(v *Settings) pulumi.AnyOutput { return v.ExecutorContext }).(pulumi.AnyOutput)
+func (o SettingsOutput) ExecutorContext() api.ExecutorContextPtrOutput {
+	return o.ApplyT(func(v *Settings) api.ExecutorContextPtrOutput { return v.ExecutorContext }).(api.ExecutorContextPtrOutput)
 }
 
 // GitHub-specific deployment settings
-func (o SettingsOutput) GitHub() pulumi.AnyOutput {
-	return o.ApplyT(func(v *Settings) pulumi.AnyOutput { return v.GitHub }).(pulumi.AnyOutput)
+func (o SettingsOutput) GitHub() api.DeploymentSettingsGitHubPtrOutput {
+	return o.ApplyT(func(v *Settings) api.DeploymentSettingsGitHubPtrOutput { return v.GitHub }).(api.DeploymentSettingsGitHubPtrOutput)
 }
 
 // The operation context defining pre-run and post-run commands and environment variables.
-func (o SettingsOutput) OperationContext() pulumi.AnyOutput {
-	return o.ApplyT(func(v *Settings) pulumi.AnyOutput { return v.OperationContext }).(pulumi.AnyOutput)
+func (o SettingsOutput) OperationContext() api.OperationContextPtrOutput {
+	return o.ApplyT(func(v *Settings) api.OperationContextPtrOutput { return v.OperationContext }).(api.OperationContextPtrOutput)
 }
 
 // The source from which the deployment settings were created.
@@ -255,8 +256,8 @@ func (o SettingsOutput) Source() pulumi.StringPtrOutput {
 }
 
 // The source context defining where the source code is located.
-func (o SettingsOutput) SourceContext() pulumi.AnyOutput {
-	return o.ApplyT(func(v *Settings) pulumi.AnyOutput { return v.SourceContext }).(pulumi.AnyOutput)
+func (o SettingsOutput) SourceContext() api.SourceContextPtrOutput {
+	return o.ApplyT(func(v *Settings) api.SourceContextPtrOutput { return v.SourceContext }).(api.SourceContextPtrOutput)
 }
 
 // A tag to identify the deployment settings configuration.
@@ -265,8 +266,8 @@ func (o SettingsOutput) Tag() pulumi.StringPtrOutput {
 }
 
 // VCS provider settings
-func (o SettingsOutput) Vcs() pulumi.AnyOutput {
-	return o.ApplyT(func(v *Settings) pulumi.AnyOutput { return v.Vcs }).(pulumi.AnyOutput)
+func (o SettingsOutput) Vcs() api.DeploymentSettingsVCSPtrOutput {
+	return o.ApplyT(func(v *Settings) api.DeploymentSettingsVCSPtrOutput { return v.Vcs }).(api.DeploymentSettingsVCSPtrOutput)
 }
 
 // The version of the deployment settings.

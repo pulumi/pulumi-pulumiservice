@@ -592,3 +592,1986 @@ export interface TemplateSourceDestination {
     url?: string;
 }
 
+export namespace api {
+    /**
+     * Represents agent entity.
+     */
+    export interface AgentEntity {
+        type: string;
+    }
+
+    /**
+     * Message is a message from the backend to be displayed to the user.
+     */
+    export interface AppMessage {
+        /**
+         * Message is the message to display to the user.
+         */
+        message: string;
+        /**
+         * Severity is the severity of the message.
+         */
+        severity?: string;
+    }
+
+    /**
+     * OperationStatus describes the state of an operation being performed on a Pulumi stack.
+     */
+    export interface AppOperationStatus {
+        /**
+         * The login of the user who initiated this operation.
+         */
+        author: string;
+        /**
+         * The type of operation in progress (e.g. 'update', 'preview', 'destroy', 'refresh').
+         */
+        kind: string;
+        /**
+         * Unix epoch timestamp (seconds) when the operation started.
+         */
+        started: number;
+    }
+
+    /**
+     * PolicyPackMetadata is the metadata of a Policy Pack.
+     */
+    export interface AppPolicyPackMetadata {
+        /**
+         * The configuration that is to be passed to the Policy Pack. This
+         * map ties Policies with their configuration.
+         */
+        config?: {[key: string]: any};
+        /**
+         * The display name
+         */
+        displayName: string;
+        /**
+         * References to ESC environments to use for this policy pack.
+         */
+        environments?: string[];
+        /**
+         * The name
+         */
+        name: string;
+        /**
+         * The version number
+         */
+        version: number;
+        /**
+         * The version tag
+         */
+        versionTag: string;
+    }
+
+    /**
+     * PulumiStackReference contains the StackName and ProjectName of the stack.
+     */
+    export interface AppPulumiStackReference {
+        /**
+         * The name
+         */
+        name: string;
+        /**
+         * The routing project
+         */
+        routingProject: string;
+    }
+
+    /**
+     * StackConfig describes the configuration of a stack from Pulumi Cloud.
+     */
+    export interface AppStackConfig {
+        /**
+         * Deprecated: this field is no longer used by the service. Stacks that use a service-backed configuration store all config (including secrets) in ESC, which uses its own encryption. New callers should omit this field.
+         */
+        encryptedKey?: string;
+        /**
+         * Deprecated: this field is no longer used by the service. Stacks that use a service-backed configuration store all config (including secrets) in ESC, which uses its own encryption. New callers should omit this field.
+         */
+        encryptionSalt?: string;
+        /**
+         * Reference to ESC environment to use as stack configuration.
+         */
+        environment: string;
+        /**
+         * Deprecated: this field is no longer used by the service. Stacks that use a service-backed configuration store all config (including secrets) in ESC, which uses its own encryption. New callers should omit this field.
+         */
+        secretsProvider?: string;
+    }
+
+    /**
+     * AuditLogExportResult is the result of an audit log export or attempt to test access.
+     */
+    export interface AuditLogExportResult {
+        /**
+         * If the last result was successful, message will be "".
+         * Any other value is a user-facing error message.
+         */
+        message: string;
+        /**
+         * The timestamp
+         */
+        timestamp: number;
+    }
+
+    /**
+     * AuditLogsExportS3Config describes how a Pulumi organization's audit log data can be exported to S3.
+     */
+    export interface AuditLogsExportS3Config {
+        /**
+         * ARN of the IAM role that Pulumi will assume to write to the S3 bucket.
+         */
+        iamRoleArn: string;
+        /**
+         * Name of the S3 bucket to export audit logs to.
+         */
+        s3BucketName: string;
+        /**
+         * Optional path prefix within the S3 bucket for exported log files.
+         */
+        s3PathPrefix?: string;
+    }
+
+    /**
+     * A single rule within an authentication policy, specifying access decisions for a token type.
+     */
+    export interface AuthPolicyDefinition {
+        /**
+         * The set of permissions granted when this rule matches.
+         */
+        authorizedPermissions: string[];
+        /**
+         * The access decision for matching tokens (e.g. 'allow', 'deny').
+         */
+        decision: string;
+        /**
+         * Role ID filter. When set, this rule only applies to tokens with this role.
+         */
+        roleID?: string;
+        /**
+         * Additional rule conditions as key-value pairs.
+         */
+        rules: {[key: string]: any};
+        /**
+         * Runner ID filter. When set, this rule only applies to tokens for this deployment runner.
+         */
+        runnerID?: string;
+        /**
+         * Team name filter. When set, this rule only applies to tokens belonging to this team.
+         */
+        teamName?: string;
+        /**
+         * The type of token this rule applies to (e.g. 'personal', 'org', 'team').
+         */
+        tokenType: string;
+        /**
+         * User login filter. When set, this rule only applies to tokens belonging to this user.
+         */
+        userLogin?: string;
+    }
+
+    /**
+     * Metadata about an Azure DevOps organization, including its name, URL, and permission status.
+     */
+    export interface AzureDevOpsOrganization {
+        /**
+         * The account URL for the organization (e.g., https://dev.azure.com/myorg)
+         */
+        accountUrl?: string;
+        /**
+         * Whether the current user has the required permissions
+         */
+        hasRequiredPermissions?: boolean;
+        /**
+         * The unique ID of the organization
+         */
+        id?: string;
+        /**
+         * The name of the organization
+         */
+        name: string;
+    }
+
+    /**
+     * Metadata about an Azure DevOps project within an organization.
+     */
+    export interface AzureDevOpsProject {
+        /**
+         * The unique ID of the project
+         */
+        id: string;
+        /**
+         * The name of the project
+         */
+        name: string;
+    }
+
+    /**
+     * BasicAuth configures git authentication through basic auth —
+     * i.e. username and password. Both UserName and Password are required.
+     */
+    export interface BasicAuth {
+        /**
+         * The password
+         */
+        password: outputs.api.SecretValue;
+        /**
+         * The user name
+         */
+        userName: outputs.api.SecretValue;
+    }
+
+    /**
+     * Configuration options for deployment build caching.
+     */
+    export interface CacheOptions {
+        /**
+         * Whether build caching is enabled for deployments on this stack.
+         */
+        enable: boolean;
+    }
+
+    /**
+     * Output representation of change gate rule - contains full details for API responses
+     */
+    export interface ChangeGateRuleOutput {
+        ruleType: string;
+    }
+
+    /**
+     * Output representation of change gate target - contains full details for API responses
+     */
+    export interface ChangeGateTargetOutput {
+        /**
+         * The action types this gate targets
+         */
+        actionTypes: string[];
+        /**
+         * Populated details about the target entity
+         */
+        entityInfo?: outputs.api.TargetEntity;
+        /**
+         * The entity type this gate targets
+         */
+        entityType: string;
+        /**
+         * The qualified name of the entity this gate targets (e.g., 'project/env')
+         */
+        qualifiedName?: string;
+    }
+
+    /**
+     * A repository configured on a custom VCS integration. Each repository is identified by its name, which is joined with the integration's base URL to form the full clone URL.
+     */
+    export interface CustomVCSRepository {
+        /**
+         * Human-readable display name for the repository. If not provided, the name is used for display purposes.
+         */
+        displayName?: string;
+        /**
+         * Repository name or path, joined with the integration's base URL to form the clone URL (e.g. 'myrepo' or 'subgroup/myrepo')
+         */
+        name: string;
+    }
+
+    /**
+     * DeploymentAgentMetadata contains metadata about a deployment agent, including version, platform, and connectivity information.
+     */
+    export interface DeploymentAgentMetadata {
+        /**
+         * The hostname of the machine running the agent.
+         */
+        hostname: string;
+        /**
+         * The IP address of the agent.
+         */
+        ip: string;
+        /**
+         * The Unix timestamp when the agent was last seen.
+         */
+        lastSeen: number;
+        /**
+         * The process ID of the agent.
+         */
+        pid: string;
+        /**
+         * The platform the agent is running on.
+         */
+        platform: string;
+        /**
+         * The current status of the deployment agent.
+         */
+        status: string;
+        /**
+         * The version of the deployment agent.
+         */
+        version: string;
+    }
+
+    /**
+     * DeploymentRole represents a role used for Pulumi Deployments access control.
+     */
+    export interface DeploymentRole {
+        /**
+         * The default identifier associated with this role.
+         */
+        defaultIdentifier?: string;
+        /**
+         * The unique identifier of the deployment role.
+         */
+        id: string;
+        /**
+         * The name of the deployment role.
+         */
+        name?: string;
+    }
+
+    /**
+     * DeploymentSettingsGitHub contains GitHub-specific configuration for Pulumi Deployments.
+     */
+    export interface DeploymentSettingsGitHub {
+        /**
+         * Whether to automatically deploy commits pushed to the target branch.
+         */
+        deployCommits?: boolean;
+        /**
+         * The pull request number to deploy, if targeting a specific pull request.
+         */
+        deployPullRequest?: number;
+        /**
+         * The GitHub App installation ID.
+         */
+        installationId?: string;
+        /**
+         * The list of file paths to filter deployment triggers.
+         */
+        paths?: string[];
+        /**
+         * Whether to automatically preview pull requests.
+         */
+        previewPullRequests?: boolean;
+        /**
+         * Whether to use a pull request template for deployment previews.
+         */
+        pullRequestTemplate?: boolean;
+        /**
+         * The GitHub repository in the format owner/repo.
+         */
+        repository?: string;
+        /**
+         * Gates review stack creation. When set, only pull requests carrying a matching label (exact, case-sensitive) create a review stack.
+         */
+        reviewStackLabels?: string[];
+    }
+
+    /**
+     * DeploymentSettingsVCS contains VCS provider deployment settings.
+     */
+    export interface DeploymentSettingsVCS {
+        /**
+         * Whether to deploy all commits to the default branch
+         */
+        deployCommits?: boolean;
+        /**
+         * Specific pull request number to deploy (overrides automatic deployment)
+         */
+        deployPullRequest?: number;
+        /**
+         * VCS installation/integration ID linking to the VCS provider
+         */
+        installationId?: string;
+        /**
+         * Paths within the repository that trigger deployments when changed
+         */
+        paths?: string[];
+        /**
+         * Whether to create preview deployments for pull requests
+         */
+        previewPullRequests?: boolean;
+        provider: string;
+        /**
+         * Whether to use pull request templates for deployment PRs
+         */
+        pullRequestTemplate?: boolean;
+        /**
+         * The VCS repository reference (format varies by provider)
+         */
+        repository?: string;
+    }
+
+    /**
+     * A DockerImage describes a Docker image reference + optional credentials for use with aa job definition.
+     */
+    export interface DockerImage {
+        /**
+         * The credentials needed to pull the Docker image.
+         */
+        credentials?: outputs.api.DockerImageCredentials;
+        /**
+         * IsDefault indicates to the workflow runner that it should use its build-in default image if available
+         * and ignore the specified reference.
+         */
+        isDefault?: boolean;
+        /**
+         * The Docker image reference (e.g. registry/image:tag).
+         */
+        reference: string;
+    }
+
+    /**
+     * DockerImageCredentials describes the credentials needed to access a Docker repository.
+     */
+    export interface DockerImageCredentials {
+        /**
+         * The password for authenticating with the Docker registry.
+         */
+        password: outputs.api.SecretValue;
+        /**
+         * The username for authenticating with the Docker registry.
+         */
+        username: string;
+    }
+
+    /**
+     * ExecutorContext defines the execution environment for a deployment, including the Docker image to use.
+     */
+    export interface ExecutorContext {
+        /**
+         * Defines the image that the pulumi operations should run in.
+         */
+        executorImage?: outputs.api.DockerImage;
+        /**
+         * Defines the root path for the executor binary and working directory.
+         */
+        executorRootPath?: string;
+    }
+
+    /**
+     * A role assigned to an organization member, identified by ID and name. The role may be a built-in role or a custom role.
+     */
+    export interface FGARole {
+        /**
+         * The unique identifier of the role.
+         */
+        id: string;
+        /**
+         * The timestamp when the role was last modified.
+         */
+        modifiedAt: string;
+        /**
+         * The name of the role.
+         */
+        name: string;
+    }
+
+    /**
+     * GitAuthConfig specifies git authentication configuration options.
+     * There are 3 different authentication options:
+     * - Personal access token
+     * - SSH private key (and its optional password)
+     * - Basic auth username and password
+     * Only 1 authentication mode is valid.
+     */
+    export interface GitAuthConfig {
+        /**
+         * Personal access token for git authentication
+         */
+        accessToken?: outputs.api.SecretValue;
+        /**
+         * Basic auth username and password configuration
+         */
+        basicAuth?: outputs.api.BasicAuth;
+        /**
+         * SSH private key authentication configuration
+         */
+        sshAuth?: outputs.api.SSHAuth;
+    }
+
+    /**
+     * GitHubAppPermissionRequirement represents a single GitHub App permission requirement for Neo agents.
+     */
+    export interface GitHubAppPermissionRequirement {
+        /**
+         * The actual permission level from the installation.
+         */
+        actual: string;
+        /**
+         * Whether the actual permission level satisfies the required level. This is always precomputed from checking that actual satisfies required.
+         */
+        isSufficient: boolean;
+        /**
+         * The permission name (e.g., 'Checks', 'Contents').
+         */
+        name: string;
+        /**
+         * Explanation of why this permission is needed.
+         */
+        reason: string;
+        /**
+         * The required permission level.
+         */
+        required: string;
+    }
+
+    /**
+     * GitHubAppURLs contains links that should be used to properly account for
+     * things like installation IDs, org names, etc. when installing and
+     * configuring the app.
+     */
+    export interface GitHubAppURLs {
+        /**
+         * URL to configure the GitHub App installation
+         */
+        configurationUrl: string;
+        /**
+         * URL to install the GitHub App
+         */
+        installationUrl: string;
+        /**
+         * URL to manage the GitHub App permissions
+         */
+        permissionsUrl: string;
+        /**
+         * OAuth state parameter for CSRF protection
+         */
+        stateParam: string;
+    }
+
+    /**
+     * Metadata about a GitLab organization linked to a Pulumi organization.
+     */
+    export interface GitLabAppOrganization {
+        /**
+         * The URL of the organization's avatar image
+         */
+        avatarURL: string;
+        /**
+         * Whether the integration has the required permissions
+         */
+        hasRequiredPermissions: boolean;
+        /**
+         * The GitLab group or organization ID
+         */
+        id: number;
+        /**
+         * The name of the GitLab organization
+         */
+        name: string;
+    }
+
+    /**
+     * A JSON Web Key (JWK) as defined by RFC 7517.
+     */
+    export interface JSONWebKey {
+        /**
+         * The 'alg' parameter: the algorithm intended for use with this key (e.g. RS256, ES256).
+         */
+        Algorithm: string;
+        /**
+         * The SHA-1 thumbprint of the X.509 certificate
+         */
+        CertificateThumbprintSHA1: string[];
+        /**
+         * The SHA-256 thumbprint of the X.509 certificate
+         */
+        CertificateThumbprintSHA256: string[];
+        /**
+         * The X.509 certificate chain
+         */
+        Certificates: outputs.api.X509Certificate[];
+        /**
+         * The URL for the X.509 certificate chain
+         */
+        CertificatesURL: outputs.api.NetURL;
+        /**
+         * The cryptographic key material. Structure depends on the key type (RSA, EC, etc.).
+         */
+        Key: {[key: string]: any};
+        /**
+         * The 'kid' parameter: a unique identifier for the key.
+         */
+        KeyID: string;
+        /**
+         * The 'use' parameter: 'sig' for signing or 'enc' for encryption.
+         */
+        Use: string;
+    }
+
+    /**
+     * A JSON Web Key Set (JWKS) as defined by RFC 7517.
+     */
+    export interface JSONWebKeySet {
+        /**
+         * The set of JSON Web Keys
+         */
+        keys: outputs.api.JSONWebKey[];
+    }
+
+    /**
+     * JobRun contains information about a job run.
+     */
+    export interface JobRun {
+        /**
+         * When the job was last updated
+         */
+        lastUpdated?: string;
+        /**
+         * When the job started running
+         */
+        started?: string;
+        /**
+         * The current status of the job run
+         */
+        status: string;
+        /**
+         * The list of step runs within this job
+         */
+        steps: outputs.api.StepRun[];
+        /**
+         * The timeout duration for the job in nanoseconds (Go time.Duration).
+         */
+        timeout: number;
+        /**
+         * Information about the worker executing this job
+         */
+        worker?: {[key: string]: any};
+    }
+
+    /**
+     * MemberLinks contains hypermedia links related to an organization member.
+     */
+    export interface MemberLinks {
+        /**
+         * A self-referencing hypermedia link (URL) to this member resource.
+         */
+        self?: string;
+    }
+
+    /**
+     * NetIPNet represents an IP network with an address and subnet mask.
+     */
+    export interface NetIPNet {
+        /**
+         * The IP address of the network.
+         */
+        IP: string[];
+        /**
+         * The subnet mask of the network.
+         */
+        Mask: string[];
+    }
+
+    /**
+     * NetURL represents a parsed URL (Uniform Resource Locator).
+     */
+    export interface NetURL {
+        /**
+         * Whether to force a trailing question mark even if the query is empty.
+         */
+        ForceQuery: boolean;
+        /**
+         * The URL fragment (without the leading hash).
+         */
+        Fragment: string;
+        /**
+         * The host or host:port of the URL.
+         */
+        Host: string;
+        /**
+         * Whether to omit the host in the URL string.
+         */
+        OmitHost: boolean;
+        /**
+         * The opaque data of the URL.
+         */
+        Opaque: string;
+        /**
+         * The path of the URL.
+         */
+        Path: string;
+        /**
+         * The encoded fragment hint.
+         */
+        RawFragment: string;
+        /**
+         * The encoded path hint, used when the path contains escaped characters.
+         */
+        RawPath: string;
+        /**
+         * The encoded query string, without the leading question mark.
+         */
+        RawQuery: string;
+        /**
+         * The URL scheme (e.g. https, http).
+         */
+        Scheme: string;
+        /**
+         * The user information associated with the URL.
+         */
+        User: string;
+    }
+
+    /**
+     * OperationContext describes what to do.
+     */
+    export interface OperationContext {
+        /**
+         * EnvironmentVariables contains environment variables to be applied during the execution.
+         */
+        environmentVariables?: {[key: string]: any};
+        /**
+         * OIDC contains the OIDC configuration for the operation.
+         */
+        oidc?: outputs.api.OperationContextOIDCConfiguration;
+        /**
+         * The Pulumi operation to perform (e.g. update, preview, refresh, destroy).
+         */
+        operation?: string;
+        /**
+         * Options is a bag of settings to specify or override default behavior
+         */
+        options?: outputs.api.OperationContextOptions;
+        /**
+         * PreRunCommands is an optional list of arbitrary commands to run before Pulumi is invoked.
+         * ref: https://github.com/pulumi/pulumi/issues/9397
+         */
+        preRunCommands?: string[];
+        /**
+         * Role defines the deployment role to assume for the operation.
+         */
+        role?: outputs.api.DeploymentRole;
+    }
+
+    /**
+     * OperationContextAWSOIDCConfiguration contains information about how to exchange an OIDC token for temporary AWS
+     * credentials in the form of an assume-role session.
+     * See https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-idp_oidc.html for details on creating an
+     * appropriately-configured IAM role.
+     */
+    export interface OperationContextAWSOIDCConfiguration {
+        /**
+         * Duration is the duration of the assume-role session.
+         */
+        duration?: string;
+        /**
+         * PolicyARNs is an optional set of IAM policy ARNs that further restrict the assume-role session.
+         */
+        policyArns?: string[];
+        /**
+         * The ARN of the role to assume using the OIDC token.
+         */
+        roleArn: string;
+        /**
+         * The name of the assume-role session, sent to AWS STS as RoleSessionName. Supports ${var} placeholders for ${organization.name}, ${project.name}, ${stack.name}, ${operation}, ${deployment.version}, and ${deployment.id}. Recommended: include ${deployment.version} so each run is traceable in AWS CloudTrail (for example, 'pulumi-${deployment.version}'). AWS caps RoleSessionName at 64 characters; if a rendered template would exceed that, the name variables (organization, project, stack) are truncated to fit while ${operation}, ${deployment.version}, and ${deployment.id} are preserved.
+         */
+        sessionName: string;
+    }
+
+    /**
+     * OperationContextAzureOIDCConfiguration contains information about how to exchange an OIDC token for temporary Azure
+     * credentials in the form of a federated workload identity.
+     * See https://learn.microsoft.com/en-us/azure/active-directory/develop/workload-identity-federation-create-trust?pivots=identity-wif-apps-methods-azp
+     * for details on how to create an appropriately-configured identity.
+     */
+    export interface OperationContextAzureOIDCConfiguration {
+        /**
+         * ClientID is the client ID of the federated workload identity.
+         */
+        clientId?: string;
+        /**
+         * SubscriptionID is the subscription ID of the federated workload identity.
+         */
+        subscriptionId?: string;
+        /**
+         * TenantID is the tenant ID of the federated workload identity.
+         */
+        tenantId?: string;
+    }
+
+    /**
+     * OperationContextGCPOIDCConfiguration contains information about how to exchange an OIDC token for temporary GCP
+     * credentials in the form of a service account connected to a workload identity pool.
+     * See https://cloud.google.com/iam/docs/configuring-workload-identity-federation for details on how to create an
+     * appropriately-configured workload identity pool and service account.
+     */
+    export interface OperationContextGCPOIDCConfiguration {
+        /**
+         * ProjectID is the numerical ID of the GCP project.
+         */
+        projectId: string;
+        /**
+         * ProviderID is the ID of the identity provider associated with the workload pool.
+         */
+        providerId: string;
+        /**
+         * Region is the region of the GCP project.
+         */
+        region?: string;
+        /**
+         * ServiceAccount is the email address of the service account to use.
+         */
+        serviceAccount: string;
+        /**
+         * TokenLifetime is the lifetime of the temporary credentials.
+         */
+        tokenLifetime?: string;
+        /**
+         * WorkloadPoolID is the ID of the workload pool to use.
+         */
+        workloadPoolId: string;
+    }
+
+    /**
+     * OperationContextOIDCConfiguration contains configuration for automatically fetching temporary credentials from cloud
+     * providers using the OIDC token issued by the service.
+     */
+    export interface OperationContextOIDCConfiguration {
+        /**
+         * AWS contains AWS-specific configuration.
+         */
+        aws?: outputs.api.OperationContextAWSOIDCConfiguration;
+        /**
+         * Azure contains Azure-specific configuration.
+         */
+        azure?: outputs.api.OperationContextAzureOIDCConfiguration;
+        /**
+         * GCP contains GCP-specific configuration.
+         */
+        gcp?: outputs.api.OperationContextGCPOIDCConfiguration;
+    }
+
+    /**
+     * OperationContextOptions is a bag of settings to specify or override default behavior in a deployment
+     */
+    export interface OperationContextOptions {
+        /**
+         * DeleteAfterDestroy sets whether the stack should be deleted after it is destroyed.
+         */
+        deleteAfterDestroy?: boolean;
+        /**
+         * RemediateIfDriftDetected sets whether a detect-drift operation should be followed by remediate-drift step
+         * if drift is detected.
+         */
+        remediateIfDriftDetected?: boolean;
+        /**
+         * Shell indicates the shell to use when running commands.
+         */
+        shell?: string;
+        /**
+         * SkipInstallDependencies sets whether to skip the default dependency installation step. Defaults to false.
+         */
+        skipInstallDependencies?: boolean;
+        /**
+         * SkipIntermediateDeployments sets whether to skip queued intermediate deployments. Defaults to false.
+         */
+        skipIntermediateDeployments?: boolean;
+    }
+
+    /**
+     * Organization represents a Pulumi organization.
+     */
+    export interface Organization {
+        /**
+         * The URL of the organization's avatar image.
+         */
+        avatarUrl: string;
+        /**
+         * The GitHub login associated with the organization.
+         */
+        githubLogin: string;
+        /**
+         * The name of the organization.
+         */
+        name: string;
+        /**
+         * The repositories belonging to the organization.
+         */
+        repos: outputs.api.PulumiRepository[];
+    }
+
+    export interface OrganizationSummaryWithRole {
+        /**
+         * The URL of the organization's avatar image.
+         */
+        avatarUrl: string;
+        /**
+         * IMPORTANT: The email address of the user is only included on a few admin-only APIs.
+         * For nearly all APIs that return a UserInfo object, this will not be provided.
+         * considered sensitive information.
+         */
+        email?: string;
+        /**
+         * The GitHub login associated with the organization.
+         */
+        githubLogin: string;
+        /**
+         * The name of the organization.
+         */
+        name: string;
+        /**
+         * The role of the user within this organization.
+         */
+        role: string;
+    }
+
+    /**
+     * Base type for permission descriptors.
+     */
+    export interface PermissionDescriptor {
+        __type: string;
+    }
+
+    /**
+     * PkixAttributeTypeAndValue represents an ASN.1 attribute type and value pair.
+     */
+    export interface PkixAttributeTypeAndValue {
+        /**
+         * The ASN.1 object identifier of the attribute type.
+         */
+        Type: string;
+        /**
+         * The value of the attribute.
+         */
+        Value: {[key: string]: any};
+    }
+
+    /**
+     * PkixExtension represents an X.509 certificate extension.
+     */
+    export interface PkixExtension {
+        /**
+         * Whether this extension is critical.
+         */
+        Critical: boolean;
+        /**
+         * The ASN.1 object identifier of the extension.
+         */
+        Id: string;
+        /**
+         * The raw extension value.
+         */
+        Value: string[];
+    }
+
+    /**
+     * PkixName represents an X.509 distinguished name (DN).
+     */
+    export interface PkixName {
+        /**
+         * The common name (CN) of the distinguished name.
+         */
+        CommonName: string;
+        /**
+         * The country names in the distinguished name.
+         */
+        Country: string[];
+        /**
+         * Additional attribute type and value pairs to include in the distinguished name.
+         */
+        ExtraNames: outputs.api.PkixAttributeTypeAndValue[];
+        /**
+         * The locality (city) names in the distinguished name.
+         */
+        Locality: string[];
+        /**
+         * The parsed attribute type and value pairs of the distinguished name.
+         */
+        Names: outputs.api.PkixAttributeTypeAndValue[];
+        /**
+         * The organization names in the distinguished name.
+         */
+        Organization: string[];
+        /**
+         * The organizational unit names in the distinguished name.
+         */
+        OrganizationalUnit: string[];
+        /**
+         * The postal codes in the distinguished name.
+         */
+        PostalCode: string[];
+        /**
+         * The state or province names in the distinguished name.
+         */
+        Province: string[];
+        /**
+         * The serial number of the distinguished name.
+         */
+        SerialNumber: string;
+        /**
+         * The street addresses in the distinguished name.
+         */
+        StreetAddress: string[];
+    }
+
+    /**
+     * PulumiProject describes a grouping of Pulumi stacks. It is based on Pulumi.yaml,
+     * but is specific to the Pulumi Service.
+     */
+    export interface PulumiProject {
+        /**
+         * The project description from Pulumi.yaml.
+         */
+        description?: string;
+        /**
+         * The name of the project.
+         */
+        name: string;
+        /**
+         * The name of the organization that owns this project.
+         */
+        orgName: string;
+        /**
+         * The repository name this project belongs to.
+         */
+        repoName: string;
+        /**
+         * Optional tags from Pulumi.yaml.
+         */
+        runtime?: string;
+        /**
+         * Optional project-level settings.
+         */
+        settings?: outputs.api.PulumiProjectSettings;
+        /**
+         * The stacks belonging to this project.
+         */
+        stacks: outputs.api.PulumiStack[];
+    }
+
+    /**
+     * PulumiProjectSettings contains the settings for a Pulumi project, including source and destination paths.
+     */
+    export interface PulumiProjectSettings {
+        /**
+         * An optional reason for disabling new stacks.
+         * If `CanAddStacks` is false there may be additional context provided
+         * via this field such that the user can determine why they cannot add
+         * new stacks. For example, the organization has hit their max stack quota
+         * or the project's source and/or destination no longer exist.
+         */
+        addStacksDisabledReason?: string;
+        /**
+         * A flag denoting if the user can add stacks to the project.
+         * This flag might be false if the organization has hit their max stack quota
+         * or if the project's source and/or destination no longer exist.
+         */
+        canAddStacks: boolean;
+        /**
+         * A path to the destination
+         */
+        destination: string;
+        /**
+         * A path to the source of a project
+         */
+        source: string;
+    }
+
+    /**
+     * PulumiRepository is a grouping of "Projects". We also return a subset of the organization's
+     * VCS repo with the same name, should it exist.
+     */
+    export interface PulumiRepository {
+        /**
+         * The name of the repository.
+         */
+        name: string;
+        /**
+         * The name of the organization that owns this repository.
+         */
+        orgName: string;
+        /**
+         * The projects within this repository.
+         */
+        projects: outputs.api.PulumiProject[];
+        /**
+         * Version control system information for the repository.
+         */
+        vcsInfo?: outputs.api.VCSInfo;
+    }
+
+    /**
+     * PulumiStack contains a name and some information for the frontend to construct a route to the details page. The
+     * custom routing parameters are here to help land the new identity model in an iterative fashion and long term will
+     * be removed.
+     */
+    export interface PulumiStack {
+        /**
+         * Whether the last drift detection run found differences between the desired and actual state.
+         */
+        driftDetected: boolean;
+        /**
+         * Whether the stack has Pulumi Deployments settings configured (source, OIDC, etc.).
+         */
+        hasDeploymentSettings: boolean;
+        /**
+         * Summary of the last update to the stack. nil if never updated.
+         */
+        lastUpdate?: outputs.api.UpdateSummary;
+        /**
+         * The name of the stack.
+         */
+        name: string;
+        /**
+         * Unique identifier for the stack.
+         */
+        programId: string;
+        /**
+         * If true, the stack has at least one Policy Pack enforced.
+         */
+        protectedByPolicy: boolean;
+        /**
+         * The project name used for routing to the stack details page.
+         */
+        routingProject: string;
+        /**
+         * The repository name used for routing to the stack details page.
+         */
+        routingRepo: string;
+        /**
+         * Tags associated with the stack as key-value pairs.
+         */
+        tags?: {[key: string]: any};
+    }
+
+    /**
+     * SSHAuth configures ssh-based auth for git authentication.
+     * SSHPrivateKey is required but password is optional.
+     */
+    export interface SSHAuth {
+        /**
+         * An optional password or passphrase for the SSH private key.
+         */
+        password?: outputs.api.SecretValue;
+        /**
+         * The SSH private key used for authentication.
+         */
+        sshPrivateKey: outputs.api.SecretValue;
+    }
+
+    export interface ScanStatus {
+        /**
+         * The name of the insights account associated with this scan.
+         */
+        accountName?: string;
+        /**
+         * The time the workflow run finished, if completed.
+         */
+        finishedAt: string;
+        /**
+         * The unique identifier of the workflow run.
+         */
+        id: string;
+        /**
+         * The timeout for jobs in the workflow run.
+         */
+        jobTimeout: string;
+        /**
+         * The list of job runs within the workflow.
+         */
+        jobs?: outputs.api.JobRun[];
+        /**
+         * The time the workflow run was last updated.
+         */
+        lastUpdatedAt: string;
+        /**
+         * The organization ID.
+         */
+        orgId: string;
+        /**
+         * The number of resources discovered by this scan.
+         */
+        resourceCount?: number;
+        /**
+         * The time the workflow run started.
+         */
+        startedAt: string;
+        /**
+         * The current status of the workflow run.
+         */
+        status: string;
+        /**
+         * The user ID who initiated the workflow run.
+         */
+        userId: string;
+    }
+
+    /**
+     * A SecretValue describes a secret value on the wire. The JSON representation is an object with a required 'secret' field containing the plaintext and an optional 'ciphertext' field containing the encrypted representation.
+     */
+    export interface SecretValue {
+        /**
+         * The encrypted representation of the secret value.
+         */
+        ciphertext?: string[];
+        /**
+         * The secret value in plaintext.
+         */
+        secret: string;
+    }
+
+    /**
+     * A service is a Pulumi construct that aggregates items and additional metadata
+     * that can be accessed by the service's members.
+     */
+    export interface Service {
+        /**
+         * the time the service was create
+         */
+        created?: string;
+        /**
+         * an optional description of the service
+         */
+        description: string;
+        /**
+         * item types to their count within the service based on the current user's permissions
+         */
+        itemCountSummary: {[key: string]: any};
+        /**
+         * a list of members that have access to the service
+         */
+        members: outputs.api.ServiceMember[];
+        /**
+         * the name of the service
+         */
+        name: string;
+        /**
+         * the name of the organization this service belongs to
+         */
+        organizationName: string;
+        /**
+         * the owner of the service
+         */
+        owner: outputs.api.ServiceMember;
+        /**
+         * an optional list of properties set on the service
+         */
+        properties: outputs.api.ServiceProperty[];
+    }
+
+    /**
+     * An item within a service.
+     */
+    export interface ServiceItem {
+        /**
+         * who added the item reference to the service - this will always be a user
+         */
+        addedByUser?: outputs.api.ServiceMember;
+        /**
+         * how many Pulumi cloud measured primitives are within this item
+         */
+        cloudCount: number;
+        /**
+         * timestamp of when the item was  created
+         */
+        created: string;
+        /**
+         * when did the last update occur to this item, if any
+         */
+        lastUpdate?: outputs.api.ServiceItemUpdate;
+        /**
+         * the name (including any namespacing) of the item
+         */
+        name: string;
+        /**
+         * the name of the organization this item belongs to
+         */
+        organizationName: string;
+        /**
+         * the type of the item
+         */
+        type: string;
+        /**
+         * optional field if the item has versioning
+         */
+        version?: string;
+    }
+
+    /**
+     * An update that the item may have in it's history.
+     */
+    export interface ServiceItemUpdate {
+        /**
+         * the message to show alongside the timestamp
+         */
+        message: string;
+        /**
+         * used to toggle a status icon for the update
+         */
+        success?: boolean;
+        /**
+         * the timestamp of the last update
+         */
+        timestamp: string;
+    }
+
+    /**
+     * A service member is either a direct user or a indirect user representation
+     * that allows them to access and mutate a service.
+     */
+    export interface ServiceMember {
+        /**
+         * an optional avatar URL for the member
+         */
+        avatarUrl: string;
+        /**
+         * the login name of the member within Pulumi
+         */
+        name: string;
+        /**
+         * the type of the member (e.g. team / user)
+         */
+        type: string;
+    }
+
+    /**
+     * A property that the service will show in it's metadata.
+     */
+    export interface ServiceProperty {
+        /**
+         * the name of the property
+         */
+        key: string;
+        /**
+         * the position of the property
+         */
+        order: number;
+        /**
+         * the type of the property
+         */
+        type: string;
+        /**
+         * the value of the property
+         */
+        value: string;
+    }
+
+    /**
+     * SourceContext describes some source code, and how to obtain it.
+     */
+    export interface SourceContext {
+        /**
+         * Git-based source context for obtaining source code from a repository.
+         */
+        git?: outputs.api.SourceContextGit;
+        /**
+         * Mercurial-based source context for obtaining source code from a repository.
+         */
+        hg?: outputs.api.SourceContextHg;
+        /**
+         * Template-based source context for obtaining source code from a template URL.
+         */
+        template?: outputs.api.SourceContextTemplate;
+    }
+
+    /**
+     * Git-based source context for obtaining source code from a repository.
+     */
+    export interface SourceContextGit {
+        /**
+         * The branch to use from the repository.
+         */
+        branch?: string;
+        /**
+         * (optional) Commit is the hash of the commit to deploy. If used, HEAD will be in detached mode. This
+         * is mutually exclusive with the Branch setting. Either value needs to be specified.
+         */
+        commit?: string;
+        /**
+         * (optional) GitAuth allows configuring git authentication options
+         * There are 3 different authentication options:
+         *   * SSH private key (and its optional password)
+         *   * Personal access token
+         *   * Basic auth username and password
+         * Only one authentication mode will be considered if more than one option is specified,
+         * with ssh private key/password preferred first, then personal access token, and finally
+         * basic auth credentials.
+         */
+        gitAuth?: outputs.api.GitAuthConfig;
+        /**
+         * (optional) RepoDir is the directory to work from in the project's source repository
+         * where Pulumi.yaml is located. It is used in case Pulumi.yaml is not
+         * in the project source root.
+         */
+        repoDir?: string;
+        /**
+         * The URL of the git repository.
+         */
+        repoUrl?: string;
+    }
+
+    /**
+     * Mercurial-based source context for obtaining source code from a repository.
+     */
+    export interface SourceContextHg {
+        /**
+         * The branch to use from the repository.
+         */
+        branch?: string;
+        /**
+         * (optional) HgAuth allows configuring Mercurial authentication options.
+         * There are 3 different authentication options:
+         *   * SSH private key (and its optional password)
+         *   * Personal access token
+         *   * Basic auth username and password
+         * Only one authentication mode will be considered if more than one option is specified,
+         * with ssh private key/password preferred first, then personal access token, and finally
+         * basic auth credentials.
+         */
+        hgAuth?: outputs.api.GitAuthConfig;
+        /**
+         * (optional) RepoDir is the directory to work from in the project's source repository
+         * where Pulumi.yaml is located. It is used in case Pulumi.yaml is not
+         * in the project source root.
+         */
+        repoDir?: string;
+        /**
+         * The URL of the Mercurial repository.
+         */
+        repoUrl?: string;
+        /**
+         * (optional) Revision is the changeset hash to check out. If used, the working directory
+         * will be updated to this specific revision. This is mutually exclusive with the Branch setting.
+         * Either value needs to be specified.
+         */
+        revision?: string;
+    }
+
+    /**
+     * Template-based source context for obtaining source code from a template URL.
+     */
+    export interface SourceContextTemplate {
+        /**
+         * GitAuth allows configuring git authentication options
+         * The only authentication option is personal access token as of now.
+         */
+        gitAuth?: outputs.api.GitAuthConfig;
+        /**
+         * The URL of the template source. Supports two URL schemes:
+         *
+         * **Registry-backed templates** use the `registry://` scheme with the format:
+         * `registry://templates/source/publisher/name[@version]`
+         *
+         * - `source`: The template source identifier (e.g., the registry source name)
+         * - `publisher`: The organization or user that published the template
+         * - `name`: The template name
+         * - `version`: Optional semver version (e.g., `1.0.0`). If omitted, defaults to the latest version
+         *
+         * Example: `registry://templates/pulumi/acme-corp/aws-vpc@2.1.0`
+         *
+         * **VCS-backed templates** use standard VCS URLs (GitHub, GitLab, Azure DevOps, etc.):
+         * `https://github.com/org/repo`
+         */
+        sourceUrl?: string;
+    }
+
+    /**
+     * StepRun contains information about a step run.
+     */
+    export interface StepRun {
+        /**
+         * The timestamp when the step was last updated.
+         */
+        lastUpdated?: string;
+        /**
+         * The name of the step.
+         */
+        name: string;
+        /**
+         * The timestamp when the step started.
+         */
+        started?: string;
+        /**
+         * The current status of the step.
+         */
+        status: string;
+    }
+
+    /**
+     * TargetEntity contains populated details about the targeted entity for a change request or gate
+     */
+    export interface TargetEntity {
+        entityType: string;
+    }
+
+    /**
+     * TeamAccountPermission is the permission team membership grants to an account.
+     */
+    export interface TeamAccountPermission {
+        /**
+         * The Insights account name.
+         */
+        accountName: string;
+        /**
+         * The permission level the team has on this Insights account.
+         */
+        permission: number;
+        /**
+         * Display name of the permission set for this account, when available. Enables read-only entity access UI without requiring RoleRead.
+         */
+        permissionSetName?: string;
+    }
+
+    /**
+     * TeamEnvironmentSettings contains additional settings a team applies to an environment.
+     */
+    export interface TeamEnvironmentSettings {
+        /**
+         * The environment within the project.
+         */
+        envName: string;
+        /**
+         * The maximum duration an environment session can remain open, as a Go duration string (e.g. "1h30m").
+         */
+        maxOpenDuration?: string;
+        /**
+         * The permission level the team has on this environment.
+         */
+        permission: string;
+        /**
+         * Display name of the permission set for this environment, when available. Enables read-only entity access UI without requiring RoleRead.
+         */
+        permissionSetName?: string;
+        /**
+         * The project containing the environment.
+         */
+        projectName: string;
+    }
+
+    export interface TeamMemberInfo {
+        /**
+         * The URL of the user's avatar image.
+         */
+        avatarUrl: string;
+        /**
+         * IMPORTANT: The email address of the user is only included on a few admin-only APIs.
+         * For nearly all APIs that return a UserInfo object, this will not be provided.
+         * considered sensitive information.
+         */
+        email?: string;
+        /**
+         * The user's login name.
+         */
+        githubLogin: string;
+        /**
+         * The user's display name.
+         */
+        name: string;
+        /**
+         * The member's role within the team.
+         */
+        role: string;
+    }
+
+    /**
+     * TeamStackPermission is the permission team membership grants to a stack.
+     */
+    export interface TeamStackPermission {
+        /**
+         * The permission level the team has on this stack (e.g., read, write, admin).
+         */
+        permission: number;
+        /**
+         * Display name of the permission set for this stack, when available. Enables read-only entity access UI without requiring RoleRead.
+         */
+        permissionSetName?: string;
+        /**
+         * The project containing the stack.
+         */
+        projectName: string;
+        /**
+         * The stack within the project.
+         */
+        stackName: string;
+    }
+
+    /**
+     * TemplateDestination describes the destination for a template.
+     */
+    export interface TemplateDestination {
+        /**
+         * The destination URL.
+         */
+        url: string;
+    }
+
+    /**
+     * TokenInfo contains metadata about an access token.
+     */
+    export interface TokenInfo {
+        /**
+         * The name of the access token.
+         */
+        name: string;
+        /**
+         * The organization the token is scoped to, if any.
+         */
+        organization: string;
+        /**
+         * The team the token is scoped to, if any.
+         */
+        team: string;
+    }
+
+    /**
+     * UpdateSummary contains a subset of the update data found in apitype.UpdateInfo.
+     */
+    export interface UpdateSummary {
+        /**
+         * The end time of the update as a Unix timestamp.
+         */
+        endTime: number;
+        /**
+         * ResourceCount is the current resource count for the update. Note that it
+         * doesn't reflect the Stack's current resource count, only that particular
+         * update. (So the UpdateSummary for the same Stack will be different.)
+         */
+        resourceCount: number;
+        /**
+         * The result of the update.
+         */
+        result: string;
+        /**
+         * The start time of the update as a Unix timestamp.
+         */
+        startTime: number;
+    }
+
+    /**
+     * User represents a Pulumi user.  This structure contains the full, private information that will be used only for
+     * an authenticated user.  As a result, sensitive information (like email) is permitted.
+     */
+    export interface User {
+        /**
+         * The URL of the user's avatar image.
+         */
+        avatarUrl: string;
+        /**
+         * The user's email address.
+         */
+        email: string;
+        /**
+         * The user's login name (originally from GitHub).
+         */
+        githubLogin: string;
+        /**
+         * Whether the user has multi-factor authentication enabled.
+         */
+        hasMFA: boolean;
+        /**
+         * The unique identifier of the user.
+         */
+        id: string;
+        /**
+         * Identities is the array of identities a Pulumi user's account is tied to.
+         */
+        identities: string[];
+        /**
+         * Whether the user is a synthetic agent account. Agent accounts cannot be authenticated except via their issued access token until a human claims the account via the claim URL.
+         */
+        isAgent?: boolean;
+        /**
+         * Whether the user's account is managed by multiple organizations.
+         */
+        isManagedByMultiOrg: boolean;
+        /**
+         * Whether the user's account is managed by an organization.
+         */
+        isOrgManaged: boolean;
+        /**
+         * The user's display name.
+         */
+        name: string;
+        /**
+         * Organizations is the list of Pulumi organizations the user is a member of.
+         */
+        organizations: outputs.api.OrganizationSummaryWithRole[];
+        /**
+         * PotentialOrganizations is the list of Pulumi organizations the user is a potential member of.
+         */
+        potentialOrganizations?: outputs.api.OrganizationSummaryWithRole[];
+        /**
+         * RegistryAdmin is whether or not the user is a registry administrator.
+         */
+        registryAdmin?: boolean;
+        /**
+         * SiteAdministrator is whether or not the user is a site administrator.
+         */
+        siteAdmin?: boolean;
+        /**
+         * TokenInfo is contains metadata, set only for machine tokens & to be used only in the CLI
+         */
+        tokenInfo?: outputs.api.TokenInfo;
+    }
+
+    /**
+     * UserInfo contains just the display information for a user.  This information may be returned from public APIs,
+     * and as such this structure must not contain sensitive information.  Please refer to User for this sort of thing.
+     */
+    export interface UserInfo {
+        /**
+         * The URL of the user's avatar image.
+         */
+        avatarUrl: string;
+        /**
+         * IMPORTANT: The email address of the user is only included on a few admin-only APIs.
+         * For nearly all APIs that return a UserInfo object, this will not be provided.
+         * considered sensitive information.
+         */
+        email?: string;
+        /**
+         * The user's login name.
+         */
+        githubLogin: string;
+        /**
+         * The user's display name.
+         */
+        name: string;
+    }
+
+    /**
+     * VCSInfo is the info of the VCS, with which a particular program is associated.
+     */
+    export interface VCSInfo {
+        /**
+         * The kind of VCS provider.
+         */
+        kind: string;
+        /**
+         * The owner of the repository.
+         */
+        owner: string;
+        /**
+         * The name of the repository.
+         */
+        repoName: string;
+    }
+
+    /**
+     * X509Certificate represents an X.509 certificate.
+     */
+    export interface X509Certificate {
+        /**
+         * The authority key identifier extension value.
+         */
+        AuthorityKeyId: string[];
+        /**
+         * Whether the basic constraints extension is valid.
+         */
+        BasicConstraintsValid: boolean;
+        /**
+         * CRL distribution point URLs.
+         */
+        CRLDistributionPoints: string[];
+        /**
+         * DNS names from the subject alternative name extension.
+         */
+        DNSNames: string[];
+        /**
+         * Email addresses from the subject alternative name extension.
+         */
+        EmailAddresses: string[];
+        /**
+         * Excluded DNS domain names from the name constraints extension.
+         */
+        ExcludedDNSDomains: string[];
+        /**
+         * Excluded email addresses from the name constraints extension.
+         */
+        ExcludedEmailAddresses: string[];
+        /**
+         * Excluded IP ranges from the name constraints extension.
+         */
+        ExcludedIPRanges: outputs.api.NetIPNet[];
+        /**
+         * Excluded URI domains from the name constraints extension.
+         */
+        ExcludedURIDomains: string[];
+        /**
+         * Extended key usage values.
+         */
+        ExtKeyUsage: number[];
+        /**
+         * The certificate extensions.
+         */
+        Extensions: outputs.api.PkixExtension[];
+        /**
+         * Additional extensions to add to the certificate.
+         */
+        ExtraExtensions: outputs.api.PkixExtension[];
+        /**
+         * IP addresses from the subject alternative name extension.
+         */
+        IPAddresses: string[][];
+        /**
+         * The inhibit any-policy constraint value.
+         */
+        InhibitAnyPolicy: number;
+        /**
+         * Whether InhibitAnyPolicy was explicitly set to zero.
+         */
+        InhibitAnyPolicyZero: boolean;
+        /**
+         * The inhibit policy mapping constraint value.
+         */
+        InhibitPolicyMapping: number;
+        /**
+         * Whether InhibitPolicyMapping was explicitly set to zero.
+         */
+        InhibitPolicyMappingZero: boolean;
+        /**
+         * Whether the certificate is a CA certificate.
+         */
+        IsCA: boolean;
+        /**
+         * The certificate issuer distinguished name.
+         */
+        Issuer: outputs.api.PkixName;
+        /**
+         * Issuing certificate URLs from the authority information access extension.
+         */
+        IssuingCertificateURL: string[];
+        /**
+         * Bitfield of key usage flags.
+         */
+        KeyUsage: number;
+        /**
+         * Maximum number of intermediate CAs allowed in the path.
+         */
+        MaxPathLen: number;
+        /**
+         * Whether MaxPathLen was explicitly set to zero.
+         */
+        MaxPathLenZero: boolean;
+        /**
+         * The end of the certificate validity period.
+         */
+        NotAfter: string;
+        /**
+         * The start of the certificate validity period.
+         */
+        NotBefore: string;
+        /**
+         * OCSP server URLs from the authority information access extension.
+         */
+        OCSPServer: string[];
+        /**
+         * Permitted DNS domain names from the name constraints extension.
+         */
+        PermittedDNSDomains: string[];
+        /**
+         * Whether the name constraints are marked critical.
+         */
+        PermittedDNSDomainsCritical: boolean;
+        /**
+         * Permitted email addresses from the name constraints extension.
+         */
+        PermittedEmailAddresses: string[];
+        /**
+         * Permitted IP ranges from the name constraints extension.
+         */
+        PermittedIPRanges: outputs.api.NetIPNet[];
+        /**
+         * Permitted URI domains from the name constraints extension.
+         */
+        PermittedURIDomains: string[];
+        /**
+         * Certificate policies.
+         */
+        Policies: string[];
+        /**
+         * Certificate policy OIDs.
+         */
+        PolicyIdentifiers: string[];
+        /**
+         * Policy mappings from the policy mapping extension.
+         */
+        PolicyMappings: outputs.api.X509PolicyMapping[];
+        /**
+         * The public key contained in the certificate.
+         */
+        PublicKey: {[key: string]: any};
+        /**
+         * The public key algorithm identifier.
+         */
+        PublicKeyAlgorithm: number;
+        /**
+         * The raw ASN.1 DER encoded certificate.
+         */
+        Raw: string[];
+        /**
+         * The raw ASN.1 DER encoded issuer.
+         */
+        RawIssuer: string[];
+        /**
+         * The raw ASN.1 DER encoded subject.
+         */
+        RawSubject: string[];
+        /**
+         * The raw ASN.1 DER encoded SubjectPublicKeyInfo.
+         */
+        RawSubjectPublicKeyInfo: string[];
+        /**
+         * The raw ASN.1 DER encoded TBSCertificate.
+         */
+        RawTBSCertificate: string[];
+        /**
+         * The require explicit policy constraint value.
+         */
+        RequireExplicitPolicy: number;
+        /**
+         * Whether RequireExplicitPolicy was explicitly set to zero.
+         */
+        RequireExplicitPolicyZero: boolean;
+        /**
+         * The certificate serial number.
+         */
+        SerialNumber: number;
+        /**
+         * The certificate signature.
+         */
+        Signature: string[];
+        /**
+         * The signature algorithm identifier.
+         */
+        SignatureAlgorithm: number;
+        /**
+         * The certificate subject distinguished name.
+         */
+        Subject: outputs.api.PkixName;
+        /**
+         * The subject key identifier extension value.
+         */
+        SubjectKeyId: string[];
+        /**
+         * URIs from the subject alternative name extension.
+         */
+        URIs: outputs.api.NetURL[];
+        /**
+         * Critical extensions that were not handled during parsing.
+         */
+        UnhandledCriticalExtensions: string[];
+        /**
+         * Unknown extended key usage OIDs.
+         */
+        UnknownExtKeyUsage: string[];
+        /**
+         * The X.509 certificate version.
+         */
+        Version: number;
+    }
+
+    /**
+     * X509PolicyMapping represents a mapping between issuer and subject domain policies in an X.509 certificate.
+     */
+    export interface X509PolicyMapping {
+        /**
+         * The OID of the issuer domain policy.
+         */
+        IssuerDomainPolicy: string;
+        /**
+         * The OID of the subject domain policy.
+         */
+        SubjectDomainPolicy: string;
+    }
+
+}

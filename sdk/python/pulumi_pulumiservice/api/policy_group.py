@@ -13,6 +13,7 @@ if sys.version_info >= (3, 11):
 else:
     from typing_extensions import NotRequired, TypedDict, TypeAlias
 from .. import _utilities
+from . import outputs
 
 __all__ = ['PolicyGroupArgs', 'PolicyGroup']
 
@@ -230,7 +231,7 @@ class PolicyGroup(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter(name="appliedPolicyPacks")
-    def applied_policy_packs(self) -> pulumi.Output[Sequence[Any]]:
+    def applied_policy_packs(self) -> pulumi.Output[Sequence['outputs.AppPolicyPackMetadata']]:
         """
         List of policy packs that are applied to this policy group.
         """
@@ -270,7 +271,7 @@ class PolicyGroup(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter
-    def stacks(self) -> pulumi.Output[Sequence[Any]]:
+    def stacks(self) -> pulumi.Output[Sequence['outputs.AppPulumiStackReference']]:
         """
         List of stacks that are members of this policy group.
         """

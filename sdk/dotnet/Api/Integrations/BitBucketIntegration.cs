@@ -25,7 +25,7 @@ namespace Pulumi.PulumiService.Api.Integrations
         /// The user whose BitBucket OAuth token is being used for authentication, if user-based auth is configured.
         /// </summary>
         [Output("authUser")]
-        public Output<object?> AuthUser { get; private set; } = null!;
+        public Output<Pulumi.PulumiService.Api.Outputs.User?> AuthUser { get; private set; } = null!;
 
         /// <summary>
         /// URL of the BitBucket workspace avatar image.
