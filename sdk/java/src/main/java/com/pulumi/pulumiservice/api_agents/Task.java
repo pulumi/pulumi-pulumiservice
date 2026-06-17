@@ -8,11 +8,11 @@ import com.pulumi.core.annotations.Export;
 import com.pulumi.core.annotations.ResourceType;
 import com.pulumi.core.internal.Codegen;
 import com.pulumi.pulumiservice.Utilities;
-import com.pulumi.pulumiservice.api.outputs.AgentEntity;
 import com.pulumi.pulumiservice.api.outputs.UserInfo;
 import com.pulumi.pulumiservice.api_agents.TaskArgs;
 import java.lang.Boolean;
 import java.lang.Integer;
+import java.lang.Object;
 import java.lang.String;
 import java.util.List;
 import java.util.Optional;
@@ -126,14 +126,14 @@ public class Task extends com.pulumi.resources.CustomResource {
      * Pulumi entities (stacks, projects, etc.) that provide context for the agent.
      * 
      */
-    @Export(name="entities", refs={List.class,AgentEntity.class}, tree="[0,1]")
-    private Output<List<AgentEntity>> entities;
+    @Export(name="entities", refs={List.class,Object.class}, tree="[0,1]")
+    private Output<List<Object>> entities;
 
     /**
      * @return Pulumi entities (stacks, projects, etc.) that provide context for the agent.
      * 
      */
-    public Output<List<AgentEntity>> entities() {
+    public Output<List<Object>> entities() {
         return this.entities;
     }
     /**

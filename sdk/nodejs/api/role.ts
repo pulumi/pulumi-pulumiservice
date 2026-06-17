@@ -2,9 +2,6 @@
 // *** Do not edit by hand unless you're certain you know what you are doing! ***
 
 import * as pulumi from "@pulumi/pulumi";
-import * as inputs from "../types/input";
-import * as outputs from "../types/output";
-import * as enums from "../types/enums";
 import * as utilities from "../utilities";
 
 /**
@@ -52,7 +49,7 @@ export class Role extends pulumi.CustomResource {
     /**
      * The detailed permission descriptor tree.
      */
-    declare public readonly details: pulumi.Output<outputs.api.PermissionDescriptor | undefined>;
+    declare public readonly details: pulumi.Output<any | undefined>;
     /**
      * Whether this role is the organization default.
      */
@@ -148,7 +145,7 @@ export interface RoleArgs {
     /**
      * The detailed permission descriptor tree.
      */
-    details?: pulumi.Input<inputs.api.PermissionDescriptorArgs | undefined>;
+    details?: any | undefined;
     /**
      * The name of the permission descriptor.
      */

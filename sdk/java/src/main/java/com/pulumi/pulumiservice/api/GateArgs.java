@@ -6,9 +6,9 @@ package com.pulumi.pulumiservice.api;
 import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
 import com.pulumi.exceptions.MissingRequiredPropertyException;
-import com.pulumi.pulumiservice.api.inputs.ChangeGateRuleInputArgs;
 import com.pulumi.pulumiservice.api.inputs.ChangeGateTargetInputArgs;
 import java.lang.Boolean;
+import java.lang.Object;
 import java.lang.String;
 import java.util.Objects;
 import java.util.Optional;
@@ -84,13 +84,13 @@ public final class GateArgs extends com.pulumi.resources.ResourceArgs {
      * 
      */
     @Import(name="rule", required=true)
-    private Output<ChangeGateRuleInputArgs> rule;
+    private Output<Object> rule;
 
     /**
      * @return Rule configuration for the gate
      * 
      */
-    public Output<ChangeGateRuleInputArgs> rule() {
+    public Output<Object> rule() {
         return this.rule;
     }
 
@@ -228,7 +228,7 @@ public final class GateArgs extends com.pulumi.resources.ResourceArgs {
          * @return builder
          * 
          */
-        public Builder rule(Output<ChangeGateRuleInputArgs> rule) {
+        public Builder rule(Output<Object> rule) {
             $.rule = rule;
             return this;
         }
@@ -239,7 +239,7 @@ public final class GateArgs extends com.pulumi.resources.ResourceArgs {
          * @return builder
          * 
          */
-        public Builder rule(ChangeGateRuleInputArgs rule) {
+        public Builder rule(Object rule) {
             return rule(Output.of(rule));
         }
 

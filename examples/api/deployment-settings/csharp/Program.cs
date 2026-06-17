@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Collections.Immutable;
 using Pulumi;
 using Ps = Pulumi.PulumiService;
 
@@ -23,30 +21,24 @@ return await Deployment.RunAsync(() =>
         OrgName = organizationName,
         ProjectName = projectName,
         StackName = stackName,
-        ExecutorContext = ImmutableDictionary.CreateRange(new[]
+        ExecutorContext = new Ps.Api.Inputs.ExecutorSettingsRequestArgs
         {
-            new KeyValuePair<string, object>("executorImage", executorImage),
-        }),
-        OperationContext = ImmutableDictionary.CreateRange(new[]
+            ExecutorImage = new Ps.Api.Inputs.DockerImageRequestArgs { Reference = executorImage },
+        },
+        OperationContext = new Ps.Api.Inputs.OperationContextRequestArgs
         {
-            new KeyValuePair<string, object>("preRunCommands", new[] { "yarn" }),
-            new KeyValuePair<string, object>("environmentVariables", ImmutableDictionary.CreateRange(new[]
-            {
-                new KeyValuePair<string, object>("TEST_VAR", "foo"),
-            })),
-            new KeyValuePair<string, object>("options", ImmutableDictionary.CreateRange(new[]
-            {
-                new KeyValuePair<string, object>("skipInstallDependencies", true),
-            })),
-        }),
-        SourceContext = ImmutableDictionary.CreateRange(new[]
+            PreRunCommands = { "yarn" },
+            EnvironmentVariables = { { "TEST_VAR", "foo" } },
+            Options = new Ps.Api.Inputs.OperationContextOptionsRequestArgs { SkipInstallDependencies = true },
+        },
+        SourceContext = new Ps.Api.Inputs.SourceContextRequestArgs
         {
-            new KeyValuePair<string, object>("git", ImmutableDictionary.CreateRange(new[]
+            Git = new Ps.Api.Inputs.SourceContextGitRequestArgs
             {
-                new KeyValuePair<string, object>("repoUrl", "https://github.com/example/example.git"),
-                new KeyValuePair<string, object>("branch", "refs/heads/main"),
-            })),
-        }),
+                RepoUrl = "https://github.com/example/example.git",
+                Branch = "refs/heads/main",
+            },
+        },
     }, new CustomResourceOptions { DependsOn = { parentStack } });
 
     _ = settings;

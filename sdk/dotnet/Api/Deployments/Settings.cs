@@ -67,7 +67,7 @@ namespace Pulumi.PulumiService.Api.Deployments
         /// VCS provider settings
         /// </summary>
         [Output("vcs")]
-        public Output<Pulumi.PulumiService.Api.Outputs.DeploymentSettingsVCS?> Vcs { get; private set; } = null!;
+        public Output<object?> Vcs { get; private set; } = null!;
 
         /// <summary>
         /// The version of the deployment settings.
@@ -184,7 +184,7 @@ namespace Pulumi.PulumiService.Api.Deployments
         /// VCS provider settings
         /// </summary>
         [Input("vcs")]
-        public Input<Pulumi.PulumiService.Api.Inputs.DeploymentSettingsVCSArgs>? Vcs { get; set; }
+        public Input<object>? Vcs { get; set; }
 
         public SettingsArgs()
         {

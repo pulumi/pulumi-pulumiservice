@@ -513,13 +513,6 @@ export namespace api {
     }
 
     /**
-     * Represents agent entity.
-     */
-    export interface AgentEntityArgs {
-        type: pulumi.Input<string>;
-    }
-
-    /**
      * Represents agent entity diff.
      */
     export interface AgentEntityDiffArgs {
@@ -527,11 +520,11 @@ export namespace api {
          * Entities to add to the Agent's context.
          * Entities must be valid, and will be automatically deleted if they are invalid.
          */
-        add?: pulumi.Input<pulumi.Input<inputs.api.AgentEntityArgs>[] | undefined>;
+        add?: pulumi.Input<any[] | undefined>;
         /**
          * Entities to remove from the Agent's context.
          */
-        remove?: pulumi.Input<pulumi.Input<inputs.api.AgentEntityArgs>[] | undefined>;
+        remove?: pulumi.Input<any[] | undefined>;
     }
 
     /**
@@ -703,13 +696,6 @@ export namespace api {
     }
 
     /**
-     * Input specification for change gate rule - contains minimal identifiers for API requests
-     */
-    export interface ChangeGateRuleInputArgs {
-        ruleType: pulumi.Input<string>;
-    }
-
-    /**
      * Input specification for change gate target - contains minimal identifiers for API requests
      */
     export interface ChangeGateTargetInputArgs {
@@ -767,7 +753,7 @@ export namespace api {
         /**
          * VCS provider settings
          */
-        vcs?: pulumi.Input<inputs.api.DeploymentSettingsVCSArgs | undefined>;
+        vcs?: any | undefined;
     }
 
     /**
@@ -836,41 +822,6 @@ export namespace api {
          * Gates review stack creation. When set, only pull requests carrying a matching label (exact, case-sensitive) create a review stack.
          */
         reviewStackLabels?: pulumi.Input<pulumi.Input<string>[] | undefined>;
-    }
-
-    /**
-     * DeploymentSettingsVCS contains VCS provider deployment settings.
-     */
-    export interface DeploymentSettingsVCSArgs {
-        /**
-         * Whether to deploy all commits to the default branch
-         */
-        deployCommits?: pulumi.Input<boolean | undefined>;
-        /**
-         * Specific pull request number to deploy (overrides automatic deployment)
-         */
-        deployPullRequest?: pulumi.Input<number | undefined>;
-        /**
-         * VCS installation/integration ID linking to the VCS provider
-         */
-        installationId?: pulumi.Input<string | undefined>;
-        /**
-         * Paths within the repository that trigger deployments when changed
-         */
-        paths?: pulumi.Input<pulumi.Input<string>[] | undefined>;
-        /**
-         * Whether to create preview deployments for pull requests
-         */
-        previewPullRequests?: pulumi.Input<boolean | undefined>;
-        provider: pulumi.Input<string>;
-        /**
-         * Whether to use pull request templates for deployment PRs
-         */
-        pullRequestTemplate?: pulumi.Input<boolean | undefined>;
-        /**
-         * The VCS repository reference (format varies by provider)
-         */
-        repository?: pulumi.Input<string | undefined>;
     }
 
     /**
@@ -1205,13 +1156,6 @@ export namespace api {
          * Raw URL path of the page the user is viewing (e.g. '/myorg/myapp/prod/updates/47'). Always populated.
          */
         path?: pulumi.Input<string | undefined>;
-    }
-
-    /**
-     * Base type for permission descriptors.
-     */
-    export interface PermissionDescriptorArgs {
-        __type: pulumi.Input<string>;
     }
 
     /**

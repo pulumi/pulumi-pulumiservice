@@ -9,9 +9,9 @@ import com.pulumi.core.annotations.ResourceType;
 import com.pulumi.core.internal.Codegen;
 import com.pulumi.pulumiservice.Utilities;
 import com.pulumi.pulumiservice.api.RoleArgs;
-import com.pulumi.pulumiservice.api.outputs.PermissionDescriptor;
 import java.lang.Boolean;
 import java.lang.Integer;
+import java.lang.Object;
 import java.lang.String;
 import java.util.Optional;
 import javax.annotation.Nullable;
@@ -68,14 +68,14 @@ public class Role extends com.pulumi.resources.CustomResource {
      * The detailed permission descriptor tree.
      * 
      */
-    @Export(name="details", refs={PermissionDescriptor.class}, tree="[0]")
-    private Output</* @Nullable */ PermissionDescriptor> details;
+    @Export(name="details", refs={Object.class}, tree="[0]")
+    private Output</* @Nullable */ Object> details;
 
     /**
      * @return The detailed permission descriptor tree.
      * 
      */
-    public Output<Optional<PermissionDescriptor>> details() {
+    public Output<Optional<Object>> details() {
         return Codegen.optional(this.details);
     }
     /**

@@ -1,6 +1,7 @@
 package main
 
 import (
+	api "github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/api"
 	auth "github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/api/auth"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi/config"
@@ -21,16 +22,18 @@ func main() {
 		_, err := auth.NewPolicy(ctx, "policy", &auth.PolicyArgs{
 			OrgName:  pulumi.String(organizationName),
 			PolicyId: pulumi.String(policyId),
-			Policies: pulumi.Array{
-				pulumi.Map{
-					"decision":   pulumi.String("allow"),
-					"permission": pulumi.String("read"),
-					"tokenType":  pulumi.String("organization"),
+			Policies: api.AuthPolicyDefinitionArray{
+				api.AuthPolicyDefinitionArgs{
+					Decision:              pulumi.String("allow"),
+					AuthorizedPermissions: pulumi.ToStringArray([]string{"read"}),
+					TokenType:             pulumi.String("organization"),
+					Rules:                 pulumi.Map{},
 				},
-				pulumi.Map{
-					"decision":   pulumi.String("deny"),
-					"permission": pulumi.String("admin"),
-					"tokenType":  pulumi.String("organization"),
+				api.AuthPolicyDefinitionArgs{
+					Decision:              pulumi.String("deny"),
+					AuthorizedPermissions: pulumi.ToStringArray([]string{"admin"}),
+					TokenType:             pulumi.String("organization"),
+					Rules:                 pulumi.Map{},
 				},
 			},
 		})

@@ -18,7 +18,7 @@ const settings = new ps.api.deployments.Settings("settings", {
     orgName: organizationName,
     projectName: projectName,
     stackName: stackName,
-    executorContext: { executorImage: executorImage },
+    executorContext: { executorImage: { reference: executorImage } },
     operationContext: {
         preRunCommands: ["yarn"],
         environmentVariables: { TEST_VAR: "foo" },

@@ -32,7 +32,7 @@ type Task struct {
 	// Information about the user who created this task.
 	CreatedBy api.UserInfoOutput `pulumi:"createdBy"`
 	// Pulumi entities (stacks, projects, etc.) that provide context for the agent.
-	Entities api.AgentEntityArrayOutput `pulumi:"entities"`
+	Entities pulumi.ArrayOutput `pulumi:"entities"`
 	// Whether this task is shared with other org members.
 	IsShared pulumi.BoolOutput `pulumi:"isShared"`
 	// When the task runtime last reported a heartbeat. Null if the runtime has never checked in.
@@ -273,8 +273,8 @@ func (o TaskOutput) CreatedBy() api.UserInfoOutput {
 }
 
 // Pulumi entities (stacks, projects, etc.) that provide context for the agent.
-func (o TaskOutput) Entities() api.AgentEntityArrayOutput {
-	return o.ApplyT(func(v *Task) api.AgentEntityArrayOutput { return v.Entities }).(api.AgentEntityArrayOutput)
+func (o TaskOutput) Entities() pulumi.ArrayOutput {
+	return o.ApplyT(func(v *Task) pulumi.ArrayOutput { return v.Entities }).(pulumi.ArrayOutput)
 }
 
 // Whether this task is shared with other org members.

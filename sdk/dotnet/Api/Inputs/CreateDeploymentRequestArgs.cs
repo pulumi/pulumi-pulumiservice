@@ -70,7 +70,7 @@ namespace Pulumi.PulumiService.Api.Inputs
         /// VCS provider settings
         /// </summary>
         [Input("vcs")]
-        public Input<Inputs.DeploymentSettingsVCSArgs>? Vcs { get; set; }
+        public Input<object>? Vcs { get; set; }
 
         public CreateDeploymentRequestArgs()
         {

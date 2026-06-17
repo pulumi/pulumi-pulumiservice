@@ -61,7 +61,7 @@ namespace Pulumi.PulumiService.Api.Agents
         /// Pulumi entities (stacks, projects, etc.) that provide context for the agent.
         /// </summary>
         [Output("entities")]
-        public Output<ImmutableArray<Pulumi.PulumiService.Api.Outputs.AgentEntity>> Entities { get; private set; } = null!;
+        public Output<ImmutableArray<object>> Entities { get; private set; } = null!;
 
         /// <summary>
         /// Whether this task is shared with other org members.

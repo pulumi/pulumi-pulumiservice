@@ -7,6 +7,3 @@ config:
   bucketName:
     type: string
     default: pulumi-audit-log-archive
-  region:
-    type: string
-    default: us-west-2

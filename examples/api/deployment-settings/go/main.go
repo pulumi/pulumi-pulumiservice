@@ -1,8 +1,9 @@
 package main
 
 import (
-	stacks "github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/api/stacks"
+	api "github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/api"
 	deployments "github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/api/deployments"
+	stacks "github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/api/stacks"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi/config"
 )
@@ -40,21 +41,23 @@ func main() {
 			OrgName:     pulumi.String(organizationName),
 			ProjectName: pulumi.String(projectName),
 			StackName:   pulumi.String(stackName),
-			ExecutorContext: pulumi.Map{
-				"executorImage": pulumi.String(executorImage),
+			ExecutorContext: api.ExecutorSettingsRequestArgs{
+				ExecutorImage: api.DockerImageRequestArgs{
+					Reference: pulumi.StringPtr(executorImage),
+				}.ToDockerImageRequestPtrOutput(),
 			},
-			OperationContext: pulumi.Map{
-				"preRunCommands":       pulumi.StringArray{pulumi.String("yarn")},
-				"environmentVariables": pulumi.StringMap{"TEST_VAR": pulumi.String("foo")},
-				"options": pulumi.Map{
-					"skipInstallDependencies": pulumi.Bool(true),
-				},
+			OperationContext: api.OperationContextRequestArgs{
+				PreRunCommands:       pulumi.ToStringArray([]string{"yarn"}),
+				EnvironmentVariables: pulumi.StringMap{"TEST_VAR": pulumi.String("foo")},
+				Options: api.OperationContextOptionsRequestArgs{
+					SkipInstallDependencies: pulumi.BoolPtr(true),
+				}.ToOperationContextOptionsRequestPtrOutput(),
 			},
-			SourceContext: pulumi.Map{
-				"git": pulumi.Map{
-					"repoUrl": pulumi.String("https://github.com/example/example.git"),
-					"branch":  pulumi.String("refs/heads/main"),
-				},
+			SourceContext: api.SourceContextRequestArgs{
+				Git: api.SourceContextGitRequestArgs{
+					RepoUrl: pulumi.StringPtr("https://github.com/example/example.git"),
+					Branch:  pulumi.StringPtr("refs/heads/main"),
+				}.ToSourceContextGitRequestPtrOutput(),
 			},
 		}, pulumi.DependsOn([]pulumi.Resource{parentStack}))
 		if err != nil {

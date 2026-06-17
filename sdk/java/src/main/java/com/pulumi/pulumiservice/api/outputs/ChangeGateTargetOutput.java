@@ -5,7 +5,7 @@ package com.pulumi.pulumiservice.api.outputs;
 
 import com.pulumi.core.annotations.CustomType;
 import com.pulumi.exceptions.MissingRequiredPropertyException;
-import com.pulumi.pulumiservice.api.outputs.TargetEntity;
+import java.lang.Object;
 import java.lang.String;
 import java.util.List;
 import java.util.Objects;
@@ -23,7 +23,7 @@ public final class ChangeGateTargetOutput {
      * @return Populated details about the target entity
      * 
      */
-    private @Nullable TargetEntity entityInfo;
+    private @Nullable Object entityInfo;
     /**
      * @return The entity type this gate targets
      * 
@@ -47,7 +47,7 @@ public final class ChangeGateTargetOutput {
      * @return Populated details about the target entity
      * 
      */
-    public Optional<TargetEntity> entityInfo() {
+    public Optional<Object> entityInfo() {
         return Optional.ofNullable(this.entityInfo);
     }
     /**
@@ -75,7 +75,7 @@ public final class ChangeGateTargetOutput {
     @CustomType.Builder
     public static final class Builder {
         private List<String> actionTypes;
-        private @Nullable TargetEntity entityInfo;
+        private @Nullable Object entityInfo;
         private String entityType;
         private @Nullable String qualifiedName;
         public Builder() {}
@@ -99,7 +99,7 @@ public final class ChangeGateTargetOutput {
             return actionTypes(List.of(actionTypes));
         }
         @CustomType.Setter
-        public Builder entityInfo(@Nullable TargetEntity entityInfo) {
+        public Builder entityInfo(@Nullable Object entityInfo) {
 
             this.entityInfo = entityInfo;
             return this;

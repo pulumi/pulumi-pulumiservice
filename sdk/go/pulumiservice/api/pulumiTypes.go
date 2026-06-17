@@ -122,110 +122,13 @@ func (o AddServiceItemArrayOutput) Index(i pulumi.IntInput) AddServiceItemOutput
 	}).(AddServiceItemOutput)
 }
 
-// Represents agent entity.
-type AgentEntity struct {
-	Type string `pulumi:"type"`
-}
-
-// AgentEntityInput is an input type that accepts AgentEntityArgs and AgentEntityOutput values.
-// You can construct a concrete instance of `AgentEntityInput` via:
-//
-//	AgentEntityArgs{...}
-type AgentEntityInput interface {
-	pulumi.Input
-
-	ToAgentEntityOutput() AgentEntityOutput
-	ToAgentEntityOutputWithContext(context.Context) AgentEntityOutput
-}
-
-// Represents agent entity.
-type AgentEntityArgs struct {
-	Type pulumi.StringInput `pulumi:"type"`
-}
-
-func (AgentEntityArgs) ElementType() reflect.Type {
-	return reflect.TypeOf((*AgentEntity)(nil)).Elem()
-}
-
-func (i AgentEntityArgs) ToAgentEntityOutput() AgentEntityOutput {
-	return i.ToAgentEntityOutputWithContext(context.Background())
-}
-
-func (i AgentEntityArgs) ToAgentEntityOutputWithContext(ctx context.Context) AgentEntityOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(AgentEntityOutput)
-}
-
-// AgentEntityArrayInput is an input type that accepts AgentEntityArray and AgentEntityArrayOutput values.
-// You can construct a concrete instance of `AgentEntityArrayInput` via:
-//
-//	AgentEntityArray{ AgentEntityArgs{...} }
-type AgentEntityArrayInput interface {
-	pulumi.Input
-
-	ToAgentEntityArrayOutput() AgentEntityArrayOutput
-	ToAgentEntityArrayOutputWithContext(context.Context) AgentEntityArrayOutput
-}
-
-type AgentEntityArray []AgentEntityInput
-
-func (AgentEntityArray) ElementType() reflect.Type {
-	return reflect.TypeOf((*[]AgentEntity)(nil)).Elem()
-}
-
-func (i AgentEntityArray) ToAgentEntityArrayOutput() AgentEntityArrayOutput {
-	return i.ToAgentEntityArrayOutputWithContext(context.Background())
-}
-
-func (i AgentEntityArray) ToAgentEntityArrayOutputWithContext(ctx context.Context) AgentEntityArrayOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(AgentEntityArrayOutput)
-}
-
-// Represents agent entity.
-type AgentEntityOutput struct{ *pulumi.OutputState }
-
-func (AgentEntityOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((*AgentEntity)(nil)).Elem()
-}
-
-func (o AgentEntityOutput) ToAgentEntityOutput() AgentEntityOutput {
-	return o
-}
-
-func (o AgentEntityOutput) ToAgentEntityOutputWithContext(ctx context.Context) AgentEntityOutput {
-	return o
-}
-
-func (o AgentEntityOutput) Type() pulumi.StringOutput {
-	return o.ApplyT(func(v AgentEntity) string { return v.Type }).(pulumi.StringOutput)
-}
-
-type AgentEntityArrayOutput struct{ *pulumi.OutputState }
-
-func (AgentEntityArrayOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((*[]AgentEntity)(nil)).Elem()
-}
-
-func (o AgentEntityArrayOutput) ToAgentEntityArrayOutput() AgentEntityArrayOutput {
-	return o
-}
-
-func (o AgentEntityArrayOutput) ToAgentEntityArrayOutputWithContext(ctx context.Context) AgentEntityArrayOutput {
-	return o
-}
-
-func (o AgentEntityArrayOutput) Index(i pulumi.IntInput) AgentEntityOutput {
-	return pulumi.All(o, i).ApplyT(func(vs []interface{}) AgentEntity {
-		return vs[0].([]AgentEntity)[vs[1].(int)]
-	}).(AgentEntityOutput)
-}
-
 // Represents agent entity diff.
 type AgentEntityDiff struct {
 	// Entities to add to the Agent's context.
 	// Entities must be valid, and will be automatically deleted if they are invalid.
-	Add []AgentEntity `pulumi:"add"`
+	Add []interface{} `pulumi:"add"`
 	// Entities to remove from the Agent's context.
-	Remove []AgentEntity `pulumi:"remove"`
+	Remove []interface{} `pulumi:"remove"`
 }
 
 // AgentEntityDiffInput is an input type that accepts AgentEntityDiffArgs and AgentEntityDiffOutput values.
@@ -243,9 +146,9 @@ type AgentEntityDiffInput interface {
 type AgentEntityDiffArgs struct {
 	// Entities to add to the Agent's context.
 	// Entities must be valid, and will be automatically deleted if they are invalid.
-	Add AgentEntityArrayInput `pulumi:"add"`
+	Add pulumi.ArrayInput `pulumi:"add"`
 	// Entities to remove from the Agent's context.
-	Remove AgentEntityArrayInput `pulumi:"remove"`
+	Remove pulumi.ArrayInput `pulumi:"remove"`
 }
 
 func (AgentEntityDiffArgs) ElementType() reflect.Type {
@@ -328,13 +231,13 @@ func (o AgentEntityDiffOutput) ToAgentEntityDiffPtrOutputWithContext(ctx context
 
 // Entities to add to the Agent's context.
 // Entities must be valid, and will be automatically deleted if they are invalid.
-func (o AgentEntityDiffOutput) Add() AgentEntityArrayOutput {
-	return o.ApplyT(func(v AgentEntityDiff) []AgentEntity { return v.Add }).(AgentEntityArrayOutput)
+func (o AgentEntityDiffOutput) Add() pulumi.ArrayOutput {
+	return o.ApplyT(func(v AgentEntityDiff) []interface{} { return v.Add }).(pulumi.ArrayOutput)
 }
 
 // Entities to remove from the Agent's context.
-func (o AgentEntityDiffOutput) Remove() AgentEntityArrayOutput {
-	return o.ApplyT(func(v AgentEntityDiff) []AgentEntity { return v.Remove }).(AgentEntityArrayOutput)
+func (o AgentEntityDiffOutput) Remove() pulumi.ArrayOutput {
+	return o.ApplyT(func(v AgentEntityDiff) []interface{} { return v.Remove }).(pulumi.ArrayOutput)
 }
 
 type AgentEntityDiffPtrOutput struct{ *pulumi.OutputState }
@@ -363,23 +266,23 @@ func (o AgentEntityDiffPtrOutput) Elem() AgentEntityDiffOutput {
 
 // Entities to add to the Agent's context.
 // Entities must be valid, and will be automatically deleted if they are invalid.
-func (o AgentEntityDiffPtrOutput) Add() AgentEntityArrayOutput {
-	return o.ApplyT(func(v *AgentEntityDiff) []AgentEntity {
+func (o AgentEntityDiffPtrOutput) Add() pulumi.ArrayOutput {
+	return o.ApplyT(func(v *AgentEntityDiff) []interface{} {
 		if v == nil {
 			return nil
 		}
 		return v.Add
-	}).(AgentEntityArrayOutput)
+	}).(pulumi.ArrayOutput)
 }
 
 // Entities to remove from the Agent's context.
-func (o AgentEntityDiffPtrOutput) Remove() AgentEntityArrayOutput {
-	return o.ApplyT(func(v *AgentEntityDiff) []AgentEntity {
+func (o AgentEntityDiffPtrOutput) Remove() pulumi.ArrayOutput {
+	return o.ApplyT(func(v *AgentEntityDiff) []interface{} {
 		if v == nil {
 			return nil
 		}
 		return v.Remove
-	}).(AgentEntityArrayOutput)
+	}).(pulumi.ArrayOutput)
 }
 
 // A reference to an integration enabled for an agent task. Structured as an object (rather than a bare string) so additional fields like instance name or scope can be added later without breaking the wire format.
@@ -2374,82 +2277,6 @@ func (o CacheOptionsRequestPtrOutput) Enable() pulumi.BoolPtrOutput {
 	}).(pulumi.BoolPtrOutput)
 }
 
-// Input specification for change gate rule - contains minimal identifiers for API requests
-type ChangeGateRuleInput struct {
-	RuleType string `pulumi:"ruleType"`
-}
-
-// ChangeGateRuleInputInput is an input type that accepts ChangeGateRuleInputArgs and ChangeGateRuleInputOutput values.
-// You can construct a concrete instance of `ChangeGateRuleInputInput` via:
-//
-//	ChangeGateRuleInputArgs{...}
-type ChangeGateRuleInputInput interface {
-	pulumi.Input
-
-	ToChangeGateRuleInputOutput() ChangeGateRuleInputOutput
-	ToChangeGateRuleInputOutputWithContext(context.Context) ChangeGateRuleInputOutput
-}
-
-// Input specification for change gate rule - contains minimal identifiers for API requests
-type ChangeGateRuleInputArgs struct {
-	RuleType pulumi.StringInput `pulumi:"ruleType"`
-}
-
-func (ChangeGateRuleInputArgs) ElementType() reflect.Type {
-	return reflect.TypeOf((*ChangeGateRuleInput)(nil)).Elem()
-}
-
-func (i ChangeGateRuleInputArgs) ToChangeGateRuleInputOutput() ChangeGateRuleInputOutput {
-	return i.ToChangeGateRuleInputOutputWithContext(context.Background())
-}
-
-func (i ChangeGateRuleInputArgs) ToChangeGateRuleInputOutputWithContext(ctx context.Context) ChangeGateRuleInputOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(ChangeGateRuleInputOutput)
-}
-
-// Input specification for change gate rule - contains minimal identifiers for API requests
-type ChangeGateRuleInputOutput struct{ *pulumi.OutputState }
-
-func (ChangeGateRuleInputOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((*ChangeGateRuleInput)(nil)).Elem()
-}
-
-func (o ChangeGateRuleInputOutput) ToChangeGateRuleInputOutput() ChangeGateRuleInputOutput {
-	return o
-}
-
-func (o ChangeGateRuleInputOutput) ToChangeGateRuleInputOutputWithContext(ctx context.Context) ChangeGateRuleInputOutput {
-	return o
-}
-
-func (o ChangeGateRuleInputOutput) RuleType() pulumi.StringOutput {
-	return o.ApplyT(func(v ChangeGateRuleInput) string { return v.RuleType }).(pulumi.StringOutput)
-}
-
-// Output representation of change gate rule - contains full details for API responses
-type ChangeGateRuleOutput struct {
-	RuleType string `pulumi:"ruleType"`
-}
-
-// Output representation of change gate rule - contains full details for API responses
-type ChangeGateRuleOutputOutput struct{ *pulumi.OutputState }
-
-func (ChangeGateRuleOutputOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((*ChangeGateRuleOutput)(nil)).Elem()
-}
-
-func (o ChangeGateRuleOutputOutput) ToChangeGateRuleOutputOutput() ChangeGateRuleOutputOutput {
-	return o
-}
-
-func (o ChangeGateRuleOutputOutput) ToChangeGateRuleOutputOutputWithContext(ctx context.Context) ChangeGateRuleOutputOutput {
-	return o
-}
-
-func (o ChangeGateRuleOutputOutput) RuleType() pulumi.StringOutput {
-	return o.ApplyT(func(v ChangeGateRuleOutput) string { return v.RuleType }).(pulumi.StringOutput)
-}
-
 // Input specification for change gate target - contains minimal identifiers for API requests
 type ChangeGateTargetInput struct {
 	// The action types this gate targets (currently only supports single action)
@@ -2528,7 +2355,7 @@ type ChangeGateTargetOutput struct {
 	// The action types this gate targets
 	ActionTypes []string `pulumi:"actionTypes"`
 	// Populated details about the target entity
-	EntityInfo *TargetEntity `pulumi:"entityInfo"`
+	EntityInfo interface{} `pulumi:"entityInfo"`
 	// The entity type this gate targets
 	EntityType string `pulumi:"entityType"`
 	// The qualified name of the entity this gate targets (e.g., 'project/env')
@@ -2556,8 +2383,8 @@ func (o ChangeGateTargetOutputOutput) ActionTypes() pulumi.StringArrayOutput {
 }
 
 // Populated details about the target entity
-func (o ChangeGateTargetOutputOutput) EntityInfo() TargetEntityPtrOutput {
-	return o.ApplyT(func(v ChangeGateTargetOutput) *TargetEntity { return v.EntityInfo }).(TargetEntityPtrOutput)
+func (o ChangeGateTargetOutputOutput) EntityInfo() pulumi.AnyOutput {
+	return o.ApplyT(func(v ChangeGateTargetOutput) interface{} { return v.EntityInfo }).(pulumi.AnyOutput)
 }
 
 // The entity type this gate targets
@@ -2590,7 +2417,7 @@ type CreateDeploymentRequest struct {
 	// A tag to identify the deployment settings configuration.
 	Tag *string `pulumi:"tag"`
 	// VCS provider settings
-	Vcs *DeploymentSettingsVCS `pulumi:"vcs"`
+	Vcs interface{} `pulumi:"vcs"`
 }
 
 // CreateDeploymentRequestInput is an input type that accepts CreateDeploymentRequestArgs and CreateDeploymentRequestOutput values.
@@ -2624,7 +2451,7 @@ type CreateDeploymentRequestArgs struct {
 	// A tag to identify the deployment settings configuration.
 	Tag pulumi.StringPtrInput `pulumi:"tag"`
 	// VCS provider settings
-	Vcs DeploymentSettingsVCSPtrInput `pulumi:"vcs"`
+	Vcs pulumi.Input `pulumi:"vcs"`
 }
 
 func (CreateDeploymentRequestArgs) ElementType() reflect.Type {
@@ -2750,8 +2577,8 @@ func (o CreateDeploymentRequestOutput) Tag() pulumi.StringPtrOutput {
 }
 
 // VCS provider settings
-func (o CreateDeploymentRequestOutput) Vcs() DeploymentSettingsVCSPtrOutput {
-	return o.ApplyT(func(v CreateDeploymentRequest) *DeploymentSettingsVCS { return v.Vcs }).(DeploymentSettingsVCSPtrOutput)
+func (o CreateDeploymentRequestOutput) Vcs() pulumi.AnyOutput {
+	return o.ApplyT(func(v CreateDeploymentRequest) interface{} { return v.Vcs }).(pulumi.AnyOutput)
 }
 
 type CreateDeploymentRequestPtrOutput struct{ *pulumi.OutputState }
@@ -2869,13 +2696,13 @@ func (o CreateDeploymentRequestPtrOutput) Tag() pulumi.StringPtrOutput {
 }
 
 // VCS provider settings
-func (o CreateDeploymentRequestPtrOutput) Vcs() DeploymentSettingsVCSPtrOutput {
-	return o.ApplyT(func(v *CreateDeploymentRequest) *DeploymentSettingsVCS {
+func (o CreateDeploymentRequestPtrOutput) Vcs() pulumi.AnyOutput {
+	return o.ApplyT(func(v *CreateDeploymentRequest) interface{} {
 		if v == nil {
 			return nil
 		}
 		return v.Vcs
-	}).(DeploymentSettingsVCSPtrOutput)
+	}).(pulumi.AnyOutput)
 }
 
 // CreateEnvironmentSecretRotationScheduleRequest defines the request payload that is expected when
@@ -3888,275 +3715,6 @@ func (o DeploymentSettingsGitHubRequestPtrOutput) ReviewStackLabels() pulumi.Str
 		}
 		return v.ReviewStackLabels
 	}).(pulumi.StringArrayOutput)
-}
-
-// DeploymentSettingsVCS contains VCS provider deployment settings.
-type DeploymentSettingsVCS struct {
-	// Whether to deploy all commits to the default branch
-	DeployCommits *bool `pulumi:"deployCommits"`
-	// Specific pull request number to deploy (overrides automatic deployment)
-	DeployPullRequest *int `pulumi:"deployPullRequest"`
-	// VCS installation/integration ID linking to the VCS provider
-	InstallationId *string `pulumi:"installationId"`
-	// Paths within the repository that trigger deployments when changed
-	Paths []string `pulumi:"paths"`
-	// Whether to create preview deployments for pull requests
-	PreviewPullRequests *bool  `pulumi:"previewPullRequests"`
-	Provider            string `pulumi:"provider"`
-	// Whether to use pull request templates for deployment PRs
-	PullRequestTemplate *bool `pulumi:"pullRequestTemplate"`
-	// The VCS repository reference (format varies by provider)
-	Repository *string `pulumi:"repository"`
-}
-
-// DeploymentSettingsVCSInput is an input type that accepts DeploymentSettingsVCSArgs and DeploymentSettingsVCSOutput values.
-// You can construct a concrete instance of `DeploymentSettingsVCSInput` via:
-//
-//	DeploymentSettingsVCSArgs{...}
-type DeploymentSettingsVCSInput interface {
-	pulumi.Input
-
-	ToDeploymentSettingsVCSOutput() DeploymentSettingsVCSOutput
-	ToDeploymentSettingsVCSOutputWithContext(context.Context) DeploymentSettingsVCSOutput
-}
-
-// DeploymentSettingsVCS contains VCS provider deployment settings.
-type DeploymentSettingsVCSArgs struct {
-	// Whether to deploy all commits to the default branch
-	DeployCommits pulumi.BoolPtrInput `pulumi:"deployCommits"`
-	// Specific pull request number to deploy (overrides automatic deployment)
-	DeployPullRequest pulumi.IntPtrInput `pulumi:"deployPullRequest"`
-	// VCS installation/integration ID linking to the VCS provider
-	InstallationId pulumi.StringPtrInput `pulumi:"installationId"`
-	// Paths within the repository that trigger deployments when changed
-	Paths pulumi.StringArrayInput `pulumi:"paths"`
-	// Whether to create preview deployments for pull requests
-	PreviewPullRequests pulumi.BoolPtrInput `pulumi:"previewPullRequests"`
-	Provider            pulumi.StringInput  `pulumi:"provider"`
-	// Whether to use pull request templates for deployment PRs
-	PullRequestTemplate pulumi.BoolPtrInput `pulumi:"pullRequestTemplate"`
-	// The VCS repository reference (format varies by provider)
-	Repository pulumi.StringPtrInput `pulumi:"repository"`
-}
-
-func (DeploymentSettingsVCSArgs) ElementType() reflect.Type {
-	return reflect.TypeOf((*DeploymentSettingsVCS)(nil)).Elem()
-}
-
-func (i DeploymentSettingsVCSArgs) ToDeploymentSettingsVCSOutput() DeploymentSettingsVCSOutput {
-	return i.ToDeploymentSettingsVCSOutputWithContext(context.Background())
-}
-
-func (i DeploymentSettingsVCSArgs) ToDeploymentSettingsVCSOutputWithContext(ctx context.Context) DeploymentSettingsVCSOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(DeploymentSettingsVCSOutput)
-}
-
-func (i DeploymentSettingsVCSArgs) ToDeploymentSettingsVCSPtrOutput() DeploymentSettingsVCSPtrOutput {
-	return i.ToDeploymentSettingsVCSPtrOutputWithContext(context.Background())
-}
-
-func (i DeploymentSettingsVCSArgs) ToDeploymentSettingsVCSPtrOutputWithContext(ctx context.Context) DeploymentSettingsVCSPtrOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(DeploymentSettingsVCSOutput).ToDeploymentSettingsVCSPtrOutputWithContext(ctx)
-}
-
-// DeploymentSettingsVCSPtrInput is an input type that accepts DeploymentSettingsVCSArgs, DeploymentSettingsVCSPtr and DeploymentSettingsVCSPtrOutput values.
-// You can construct a concrete instance of `DeploymentSettingsVCSPtrInput` via:
-//
-//	        DeploymentSettingsVCSArgs{...}
-//
-//	or:
-//
-//	        nil
-type DeploymentSettingsVCSPtrInput interface {
-	pulumi.Input
-
-	ToDeploymentSettingsVCSPtrOutput() DeploymentSettingsVCSPtrOutput
-	ToDeploymentSettingsVCSPtrOutputWithContext(context.Context) DeploymentSettingsVCSPtrOutput
-}
-
-type deploymentSettingsVCSPtrType DeploymentSettingsVCSArgs
-
-func DeploymentSettingsVCSPtr(v *DeploymentSettingsVCSArgs) DeploymentSettingsVCSPtrInput {
-	return (*deploymentSettingsVCSPtrType)(v)
-}
-
-func (*deploymentSettingsVCSPtrType) ElementType() reflect.Type {
-	return reflect.TypeOf((**DeploymentSettingsVCS)(nil)).Elem()
-}
-
-func (i *deploymentSettingsVCSPtrType) ToDeploymentSettingsVCSPtrOutput() DeploymentSettingsVCSPtrOutput {
-	return i.ToDeploymentSettingsVCSPtrOutputWithContext(context.Background())
-}
-
-func (i *deploymentSettingsVCSPtrType) ToDeploymentSettingsVCSPtrOutputWithContext(ctx context.Context) DeploymentSettingsVCSPtrOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(DeploymentSettingsVCSPtrOutput)
-}
-
-// DeploymentSettingsVCS contains VCS provider deployment settings.
-type DeploymentSettingsVCSOutput struct{ *pulumi.OutputState }
-
-func (DeploymentSettingsVCSOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((*DeploymentSettingsVCS)(nil)).Elem()
-}
-
-func (o DeploymentSettingsVCSOutput) ToDeploymentSettingsVCSOutput() DeploymentSettingsVCSOutput {
-	return o
-}
-
-func (o DeploymentSettingsVCSOutput) ToDeploymentSettingsVCSOutputWithContext(ctx context.Context) DeploymentSettingsVCSOutput {
-	return o
-}
-
-func (o DeploymentSettingsVCSOutput) ToDeploymentSettingsVCSPtrOutput() DeploymentSettingsVCSPtrOutput {
-	return o.ToDeploymentSettingsVCSPtrOutputWithContext(context.Background())
-}
-
-func (o DeploymentSettingsVCSOutput) ToDeploymentSettingsVCSPtrOutputWithContext(ctx context.Context) DeploymentSettingsVCSPtrOutput {
-	return o.ApplyTWithContext(ctx, func(_ context.Context, v DeploymentSettingsVCS) *DeploymentSettingsVCS {
-		return &v
-	}).(DeploymentSettingsVCSPtrOutput)
-}
-
-// Whether to deploy all commits to the default branch
-func (o DeploymentSettingsVCSOutput) DeployCommits() pulumi.BoolPtrOutput {
-	return o.ApplyT(func(v DeploymentSettingsVCS) *bool { return v.DeployCommits }).(pulumi.BoolPtrOutput)
-}
-
-// Specific pull request number to deploy (overrides automatic deployment)
-func (o DeploymentSettingsVCSOutput) DeployPullRequest() pulumi.IntPtrOutput {
-	return o.ApplyT(func(v DeploymentSettingsVCS) *int { return v.DeployPullRequest }).(pulumi.IntPtrOutput)
-}
-
-// VCS installation/integration ID linking to the VCS provider
-func (o DeploymentSettingsVCSOutput) InstallationId() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v DeploymentSettingsVCS) *string { return v.InstallationId }).(pulumi.StringPtrOutput)
-}
-
-// Paths within the repository that trigger deployments when changed
-func (o DeploymentSettingsVCSOutput) Paths() pulumi.StringArrayOutput {
-	return o.ApplyT(func(v DeploymentSettingsVCS) []string { return v.Paths }).(pulumi.StringArrayOutput)
-}
-
-// Whether to create preview deployments for pull requests
-func (o DeploymentSettingsVCSOutput) PreviewPullRequests() pulumi.BoolPtrOutput {
-	return o.ApplyT(func(v DeploymentSettingsVCS) *bool { return v.PreviewPullRequests }).(pulumi.BoolPtrOutput)
-}
-
-func (o DeploymentSettingsVCSOutput) Provider() pulumi.StringOutput {
-	return o.ApplyT(func(v DeploymentSettingsVCS) string { return v.Provider }).(pulumi.StringOutput)
-}
-
-// Whether to use pull request templates for deployment PRs
-func (o DeploymentSettingsVCSOutput) PullRequestTemplate() pulumi.BoolPtrOutput {
-	return o.ApplyT(func(v DeploymentSettingsVCS) *bool { return v.PullRequestTemplate }).(pulumi.BoolPtrOutput)
-}
-
-// The VCS repository reference (format varies by provider)
-func (o DeploymentSettingsVCSOutput) Repository() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v DeploymentSettingsVCS) *string { return v.Repository }).(pulumi.StringPtrOutput)
-}
-
-type DeploymentSettingsVCSPtrOutput struct{ *pulumi.OutputState }
-
-func (DeploymentSettingsVCSPtrOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((**DeploymentSettingsVCS)(nil)).Elem()
-}
-
-func (o DeploymentSettingsVCSPtrOutput) ToDeploymentSettingsVCSPtrOutput() DeploymentSettingsVCSPtrOutput {
-	return o
-}
-
-func (o DeploymentSettingsVCSPtrOutput) ToDeploymentSettingsVCSPtrOutputWithContext(ctx context.Context) DeploymentSettingsVCSPtrOutput {
-	return o
-}
-
-func (o DeploymentSettingsVCSPtrOutput) Elem() DeploymentSettingsVCSOutput {
-	return o.ApplyT(func(v *DeploymentSettingsVCS) DeploymentSettingsVCS {
-		if v != nil {
-			return *v
-		}
-		var ret DeploymentSettingsVCS
-		return ret
-	}).(DeploymentSettingsVCSOutput)
-}
-
-// Whether to deploy all commits to the default branch
-func (o DeploymentSettingsVCSPtrOutput) DeployCommits() pulumi.BoolPtrOutput {
-	return o.ApplyT(func(v *DeploymentSettingsVCS) *bool {
-		if v == nil {
-			return nil
-		}
-		return v.DeployCommits
-	}).(pulumi.BoolPtrOutput)
-}
-
-// Specific pull request number to deploy (overrides automatic deployment)
-func (o DeploymentSettingsVCSPtrOutput) DeployPullRequest() pulumi.IntPtrOutput {
-	return o.ApplyT(func(v *DeploymentSettingsVCS) *int {
-		if v == nil {
-			return nil
-		}
-		return v.DeployPullRequest
-	}).(pulumi.IntPtrOutput)
-}
-
-// VCS installation/integration ID linking to the VCS provider
-func (o DeploymentSettingsVCSPtrOutput) InstallationId() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *DeploymentSettingsVCS) *string {
-		if v == nil {
-			return nil
-		}
-		return v.InstallationId
-	}).(pulumi.StringPtrOutput)
-}
-
-// Paths within the repository that trigger deployments when changed
-func (o DeploymentSettingsVCSPtrOutput) Paths() pulumi.StringArrayOutput {
-	return o.ApplyT(func(v *DeploymentSettingsVCS) []string {
-		if v == nil {
-			return nil
-		}
-		return v.Paths
-	}).(pulumi.StringArrayOutput)
-}
-
-// Whether to create preview deployments for pull requests
-func (o DeploymentSettingsVCSPtrOutput) PreviewPullRequests() pulumi.BoolPtrOutput {
-	return o.ApplyT(func(v *DeploymentSettingsVCS) *bool {
-		if v == nil {
-			return nil
-		}
-		return v.PreviewPullRequests
-	}).(pulumi.BoolPtrOutput)
-}
-
-func (o DeploymentSettingsVCSPtrOutput) Provider() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *DeploymentSettingsVCS) *string {
-		if v == nil {
-			return nil
-		}
-		return &v.Provider
-	}).(pulumi.StringPtrOutput)
-}
-
-// Whether to use pull request templates for deployment PRs
-func (o DeploymentSettingsVCSPtrOutput) PullRequestTemplate() pulumi.BoolPtrOutput {
-	return o.ApplyT(func(v *DeploymentSettingsVCS) *bool {
-		if v == nil {
-			return nil
-		}
-		return v.PullRequestTemplate
-	}).(pulumi.BoolPtrOutput)
-}
-
-// The VCS repository reference (format varies by provider)
-func (o DeploymentSettingsVCSPtrOutput) Repository() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *DeploymentSettingsVCS) *string {
-		if v == nil {
-			return nil
-		}
-		return v.Repository
-	}).(pulumi.StringPtrOutput)
 }
 
 // A DockerImage describes a Docker image reference + optional credentials for use with aa job definition.
@@ -8541,142 +8099,6 @@ func (o PageContextPtrOutput) Path() pulumi.StringPtrOutput {
 	}).(pulumi.StringPtrOutput)
 }
 
-// Base type for permission descriptors.
-type PermissionDescriptor struct {
-	__type string `pulumi:"__type"`
-}
-
-// PermissionDescriptorInput is an input type that accepts PermissionDescriptorArgs and PermissionDescriptorOutput values.
-// You can construct a concrete instance of `PermissionDescriptorInput` via:
-//
-//	PermissionDescriptorArgs{...}
-type PermissionDescriptorInput interface {
-	pulumi.Input
-
-	ToPermissionDescriptorOutput() PermissionDescriptorOutput
-	ToPermissionDescriptorOutputWithContext(context.Context) PermissionDescriptorOutput
-}
-
-// Base type for permission descriptors.
-type PermissionDescriptorArgs struct {
-	__type pulumi.StringInput `pulumi:"__type"`
-}
-
-func (PermissionDescriptorArgs) ElementType() reflect.Type {
-	return reflect.TypeOf((*PermissionDescriptor)(nil)).Elem()
-}
-
-func (i PermissionDescriptorArgs) ToPermissionDescriptorOutput() PermissionDescriptorOutput {
-	return i.ToPermissionDescriptorOutputWithContext(context.Background())
-}
-
-func (i PermissionDescriptorArgs) ToPermissionDescriptorOutputWithContext(ctx context.Context) PermissionDescriptorOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(PermissionDescriptorOutput)
-}
-
-func (i PermissionDescriptorArgs) ToPermissionDescriptorPtrOutput() PermissionDescriptorPtrOutput {
-	return i.ToPermissionDescriptorPtrOutputWithContext(context.Background())
-}
-
-func (i PermissionDescriptorArgs) ToPermissionDescriptorPtrOutputWithContext(ctx context.Context) PermissionDescriptorPtrOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(PermissionDescriptorOutput).ToPermissionDescriptorPtrOutputWithContext(ctx)
-}
-
-// PermissionDescriptorPtrInput is an input type that accepts PermissionDescriptorArgs, PermissionDescriptorPtr and PermissionDescriptorPtrOutput values.
-// You can construct a concrete instance of `PermissionDescriptorPtrInput` via:
-//
-//	        PermissionDescriptorArgs{...}
-//
-//	or:
-//
-//	        nil
-type PermissionDescriptorPtrInput interface {
-	pulumi.Input
-
-	ToPermissionDescriptorPtrOutput() PermissionDescriptorPtrOutput
-	ToPermissionDescriptorPtrOutputWithContext(context.Context) PermissionDescriptorPtrOutput
-}
-
-type permissionDescriptorPtrType PermissionDescriptorArgs
-
-func PermissionDescriptorPtr(v *PermissionDescriptorArgs) PermissionDescriptorPtrInput {
-	return (*permissionDescriptorPtrType)(v)
-}
-
-func (*permissionDescriptorPtrType) ElementType() reflect.Type {
-	return reflect.TypeOf((**PermissionDescriptor)(nil)).Elem()
-}
-
-func (i *permissionDescriptorPtrType) ToPermissionDescriptorPtrOutput() PermissionDescriptorPtrOutput {
-	return i.ToPermissionDescriptorPtrOutputWithContext(context.Background())
-}
-
-func (i *permissionDescriptorPtrType) ToPermissionDescriptorPtrOutputWithContext(ctx context.Context) PermissionDescriptorPtrOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(PermissionDescriptorPtrOutput)
-}
-
-// Base type for permission descriptors.
-type PermissionDescriptorOutput struct{ *pulumi.OutputState }
-
-func (PermissionDescriptorOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((*PermissionDescriptor)(nil)).Elem()
-}
-
-func (o PermissionDescriptorOutput) ToPermissionDescriptorOutput() PermissionDescriptorOutput {
-	return o
-}
-
-func (o PermissionDescriptorOutput) ToPermissionDescriptorOutputWithContext(ctx context.Context) PermissionDescriptorOutput {
-	return o
-}
-
-func (o PermissionDescriptorOutput) ToPermissionDescriptorPtrOutput() PermissionDescriptorPtrOutput {
-	return o.ToPermissionDescriptorPtrOutputWithContext(context.Background())
-}
-
-func (o PermissionDescriptorOutput) ToPermissionDescriptorPtrOutputWithContext(ctx context.Context) PermissionDescriptorPtrOutput {
-	return o.ApplyTWithContext(ctx, func(_ context.Context, v PermissionDescriptor) *PermissionDescriptor {
-		return &v
-	}).(PermissionDescriptorPtrOutput)
-}
-
-func (o PermissionDescriptorOutput) __type() pulumi.StringOutput {
-	return o.ApplyT(func(v PermissionDescriptor) string { return v.__type }).(pulumi.StringOutput)
-}
-
-type PermissionDescriptorPtrOutput struct{ *pulumi.OutputState }
-
-func (PermissionDescriptorPtrOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((**PermissionDescriptor)(nil)).Elem()
-}
-
-func (o PermissionDescriptorPtrOutput) ToPermissionDescriptorPtrOutput() PermissionDescriptorPtrOutput {
-	return o
-}
-
-func (o PermissionDescriptorPtrOutput) ToPermissionDescriptorPtrOutputWithContext(ctx context.Context) PermissionDescriptorPtrOutput {
-	return o
-}
-
-func (o PermissionDescriptorPtrOutput) Elem() PermissionDescriptorOutput {
-	return o.ApplyT(func(v *PermissionDescriptor) PermissionDescriptor {
-		if v != nil {
-			return *v
-		}
-		var ret PermissionDescriptor
-		return ret
-	}).(PermissionDescriptorOutput)
-}
-
-func (o PermissionDescriptorPtrOutput) __type() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *PermissionDescriptor) *string {
-		if v == nil {
-			return nil
-		}
-		return &v.__type
-	}).(pulumi.StringPtrOutput)
-}
-
 // PkixAttributeTypeAndValue represents an ASN.1 attribute type and value pair.
 type PkixAttributeTypeAndValue struct {
 	// The ASN.1 object identifier of the attribute type.
@@ -11997,63 +11419,6 @@ func (o StepRunArrayOutput) Index(i pulumi.IntInput) StepRunOutput {
 	}).(StepRunOutput)
 }
 
-// TargetEntity contains populated details about the targeted entity for a change request or gate
-type TargetEntity struct {
-	EntityType string `pulumi:"entityType"`
-}
-
-// TargetEntity contains populated details about the targeted entity for a change request or gate
-type TargetEntityOutput struct{ *pulumi.OutputState }
-
-func (TargetEntityOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((*TargetEntity)(nil)).Elem()
-}
-
-func (o TargetEntityOutput) ToTargetEntityOutput() TargetEntityOutput {
-	return o
-}
-
-func (o TargetEntityOutput) ToTargetEntityOutputWithContext(ctx context.Context) TargetEntityOutput {
-	return o
-}
-
-func (o TargetEntityOutput) EntityType() pulumi.StringOutput {
-	return o.ApplyT(func(v TargetEntity) string { return v.EntityType }).(pulumi.StringOutput)
-}
-
-type TargetEntityPtrOutput struct{ *pulumi.OutputState }
-
-func (TargetEntityPtrOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((**TargetEntity)(nil)).Elem()
-}
-
-func (o TargetEntityPtrOutput) ToTargetEntityPtrOutput() TargetEntityPtrOutput {
-	return o
-}
-
-func (o TargetEntityPtrOutput) ToTargetEntityPtrOutputWithContext(ctx context.Context) TargetEntityPtrOutput {
-	return o
-}
-
-func (o TargetEntityPtrOutput) Elem() TargetEntityOutput {
-	return o.ApplyT(func(v *TargetEntity) TargetEntity {
-		if v != nil {
-			return *v
-		}
-		var ret TargetEntity
-		return ret
-	}).(TargetEntityOutput)
-}
-
-func (o TargetEntityPtrOutput) EntityType() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *TargetEntity) *string {
-		if v == nil {
-			return nil
-		}
-		return &v.EntityType
-	}).(pulumi.StringPtrOutput)
-}
-
 // TeamAccountPermission is the permission team membership grants to an account.
 type TeamAccountPermission struct {
 	// The Insights account name.
@@ -13800,8 +13165,6 @@ func (o X509PolicyMappingArrayOutput) Index(i pulumi.IntInput) X509PolicyMapping
 func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*AddServiceItemInput)(nil)).Elem(), AddServiceItemArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*AddServiceItemArrayInput)(nil)).Elem(), AddServiceItemArray{})
-	pulumi.RegisterInputType(reflect.TypeOf((*AgentEntityInput)(nil)).Elem(), AgentEntityArgs{})
-	pulumi.RegisterInputType(reflect.TypeOf((*AgentEntityArrayInput)(nil)).Elem(), AgentEntityArray{})
 	pulumi.RegisterInputType(reflect.TypeOf((*AgentEntityDiffInput)(nil)).Elem(), AgentEntityDiffArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*AgentEntityDiffPtrInput)(nil)).Elem(), AgentEntityDiffArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*AgentTaskIntegrationRefInput)(nil)).Elem(), AgentTaskIntegrationRefArgs{})
@@ -13821,7 +13184,6 @@ func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*CLIIntegrationRefArrayInput)(nil)).Elem(), CLIIntegrationRefArray{})
 	pulumi.RegisterInputType(reflect.TypeOf((*CacheOptionsRequestInput)(nil)).Elem(), CacheOptionsRequestArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*CacheOptionsRequestPtrInput)(nil)).Elem(), CacheOptionsRequestArgs{})
-	pulumi.RegisterInputType(reflect.TypeOf((*ChangeGateRuleInputInput)(nil)).Elem(), ChangeGateRuleInputArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*ChangeGateTargetInputInput)(nil)).Elem(), ChangeGateTargetInputArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*CreateDeploymentRequestInput)(nil)).Elem(), CreateDeploymentRequestArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*CreateDeploymentRequestPtrInput)(nil)).Elem(), CreateDeploymentRequestArgs{})
@@ -13831,8 +13193,6 @@ func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*DeploymentRoleRequestPtrInput)(nil)).Elem(), DeploymentRoleRequestArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*DeploymentSettingsGitHubRequestInput)(nil)).Elem(), DeploymentSettingsGitHubRequestArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*DeploymentSettingsGitHubRequestPtrInput)(nil)).Elem(), DeploymentSettingsGitHubRequestArgs{})
-	pulumi.RegisterInputType(reflect.TypeOf((*DeploymentSettingsVCSInput)(nil)).Elem(), DeploymentSettingsVCSArgs{})
-	pulumi.RegisterInputType(reflect.TypeOf((*DeploymentSettingsVCSPtrInput)(nil)).Elem(), DeploymentSettingsVCSArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*DockerImageCredentialsRequestInput)(nil)).Elem(), DockerImageCredentialsRequestArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*DockerImageCredentialsRequestPtrInput)(nil)).Elem(), DockerImageCredentialsRequestArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*DockerImageRequestInput)(nil)).Elem(), DockerImageRequestArgs{})
@@ -13863,8 +13223,6 @@ func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*OperationContextRequestPtrInput)(nil)).Elem(), OperationContextRequestArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*PageContextInput)(nil)).Elem(), PageContextArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*PageContextPtrInput)(nil)).Elem(), PageContextArgs{})
-	pulumi.RegisterInputType(reflect.TypeOf((*PermissionDescriptorInput)(nil)).Elem(), PermissionDescriptorArgs{})
-	pulumi.RegisterInputType(reflect.TypeOf((*PermissionDescriptorPtrInput)(nil)).Elem(), PermissionDescriptorArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*PkixAttributeTypeAndValueInput)(nil)).Elem(), PkixAttributeTypeAndValueArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*PkixAttributeTypeAndValueArrayInput)(nil)).Elem(), PkixAttributeTypeAndValueArray{})
 	pulumi.RegisterInputType(reflect.TypeOf((*PkixExtensionInput)(nil)).Elem(), PkixExtensionArgs{})
@@ -13892,8 +13250,6 @@ func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*X509PolicyMappingArrayInput)(nil)).Elem(), X509PolicyMappingArray{})
 	pulumi.RegisterOutputType(AddServiceItemOutput{})
 	pulumi.RegisterOutputType(AddServiceItemArrayOutput{})
-	pulumi.RegisterOutputType(AgentEntityOutput{})
-	pulumi.RegisterOutputType(AgentEntityArrayOutput{})
 	pulumi.RegisterOutputType(AgentEntityDiffOutput{})
 	pulumi.RegisterOutputType(AgentEntityDiffPtrOutput{})
 	pulumi.RegisterOutputType(AgentTaskIntegrationRefOutput{})
@@ -13930,8 +13286,6 @@ func init() {
 	pulumi.RegisterOutputType(CacheOptionsPtrOutput{})
 	pulumi.RegisterOutputType(CacheOptionsRequestOutput{})
 	pulumi.RegisterOutputType(CacheOptionsRequestPtrOutput{})
-	pulumi.RegisterOutputType(ChangeGateRuleInputOutput{})
-	pulumi.RegisterOutputType(ChangeGateRuleOutputOutput{})
 	pulumi.RegisterOutputType(ChangeGateTargetInputOutput{})
 	pulumi.RegisterOutputType(ChangeGateTargetOutputOutput{})
 	pulumi.RegisterOutputType(CreateDeploymentRequestOutput{})
@@ -13950,8 +13304,6 @@ func init() {
 	pulumi.RegisterOutputType(DeploymentSettingsGitHubPtrOutput{})
 	pulumi.RegisterOutputType(DeploymentSettingsGitHubRequestOutput{})
 	pulumi.RegisterOutputType(DeploymentSettingsGitHubRequestPtrOutput{})
-	pulumi.RegisterOutputType(DeploymentSettingsVCSOutput{})
-	pulumi.RegisterOutputType(DeploymentSettingsVCSPtrOutput{})
 	pulumi.RegisterOutputType(DockerImageOutput{})
 	pulumi.RegisterOutputType(DockerImagePtrOutput{})
 	pulumi.RegisterOutputType(DockerImageCredentialsOutput{})
@@ -14016,8 +13368,6 @@ func init() {
 	pulumi.RegisterOutputType(OrganizationSummaryWithRoleArrayOutput{})
 	pulumi.RegisterOutputType(PageContextOutput{})
 	pulumi.RegisterOutputType(PageContextPtrOutput{})
-	pulumi.RegisterOutputType(PermissionDescriptorOutput{})
-	pulumi.RegisterOutputType(PermissionDescriptorPtrOutput{})
 	pulumi.RegisterOutputType(PkixAttributeTypeAndValueOutput{})
 	pulumi.RegisterOutputType(PkixAttributeTypeAndValueArrayOutput{})
 	pulumi.RegisterOutputType(PkixExtensionOutput{})
@@ -14067,8 +13417,6 @@ func init() {
 	pulumi.RegisterOutputType(SourceContextTemplateRequestPtrOutput{})
 	pulumi.RegisterOutputType(StepRunOutput{})
 	pulumi.RegisterOutputType(StepRunArrayOutput{})
-	pulumi.RegisterOutputType(TargetEntityOutput{})
-	pulumi.RegisterOutputType(TargetEntityPtrOutput{})
 	pulumi.RegisterOutputType(TeamAccountPermissionOutput{})
 	pulumi.RegisterOutputType(TeamAccountPermissionArrayOutput{})
 	pulumi.RegisterOutputType(TeamEnvironmentSettingsOutput{})

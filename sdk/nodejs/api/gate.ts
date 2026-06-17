@@ -52,7 +52,7 @@ export class Gate extends pulumi.CustomResource {
     /**
      * Rule configuration for the gate
      */
-    declare public readonly rule: pulumi.Output<outputs.api.ChangeGateRuleOutput>;
+    declare public readonly rule: pulumi.Output<any>;
     /**
      * Target configuration for the gate
      */
@@ -125,7 +125,7 @@ export interface GateArgs {
     /**
      * Rule configuration for the gate
      */
-    rule: pulumi.Input<inputs.api.ChangeGateRuleInputArgs>;
+    rule: any;
     /**
      * Target configuration for the gate
      */

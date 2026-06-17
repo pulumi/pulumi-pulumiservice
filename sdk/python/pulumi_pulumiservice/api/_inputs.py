@@ -19,8 +19,6 @@ __all__ = [
     'AddServiceItemArgsDict',
     'AgentEntityDiffArgs',
     'AgentEntityDiffArgsDict',
-    'AgentEntityArgs',
-    'AgentEntityArgsDict',
     'AgentTaskIntegrationRefArgs',
     'AgentTaskIntegrationRefArgsDict',
     'AgentUserEventMessageArgs',
@@ -39,8 +37,6 @@ __all__ = [
     'CLIIntegrationRefArgsDict',
     'CacheOptionsRequestArgs',
     'CacheOptionsRequestArgsDict',
-    'ChangeGateRuleInputArgs',
-    'ChangeGateRuleInputArgsDict',
     'ChangeGateTargetInputArgs',
     'ChangeGateTargetInputArgsDict',
     'CreateDeploymentRequestArgs',
@@ -51,8 +47,6 @@ __all__ = [
     'DeploymentRoleRequestArgsDict',
     'DeploymentSettingsGitHubRequestArgs',
     'DeploymentSettingsGitHubRequestArgsDict',
-    'DeploymentSettingsVCSArgs',
-    'DeploymentSettingsVCSArgsDict',
     'DockerImageCredentialsRequestArgs',
     'DockerImageCredentialsRequestArgsDict',
     'DockerImageRequestArgs',
@@ -83,8 +77,6 @@ __all__ = [
     'OperationContextRequestArgsDict',
     'PageContextArgs',
     'PageContextArgsDict',
-    'PermissionDescriptorArgs',
-    'PermissionDescriptorArgsDict',
     'PkixAttributeTypeAndValueArgs',
     'PkixAttributeTypeAndValueArgsDict',
     'PkixExtensionArgs',
@@ -169,12 +161,12 @@ class AgentEntityDiffArgsDict(TypedDict):
     """
     Represents agent entity diff.
     """
-    add: NotRequired[pulumi.Input[Optional[Sequence[pulumi.Input['AgentEntityArgs']]]]]
+    add: NotRequired[pulumi.Input[Optional[Sequence[Any]]]]
     """
     Entities to add to the Agent's context.
     Entities must be valid, and will be automatically deleted if they are invalid.
     """
-    remove: NotRequired[pulumi.Input[Optional[Sequence[pulumi.Input['AgentEntityArgs']]]]]
+    remove: NotRequired[pulumi.Input[Optional[Sequence[Any]]]]
     """
     Entities to remove from the Agent's context.
     """
@@ -182,14 +174,14 @@ class AgentEntityDiffArgsDict(TypedDict):
 @pulumi.input_type
 class AgentEntityDiffArgs:
     def __init__(__self__, *,
-                 add: pulumi.Input[Optional[Sequence[pulumi.Input['AgentEntityArgs']]]] = None,
-                 remove: pulumi.Input[Optional[Sequence[pulumi.Input['AgentEntityArgs']]]] = None):
+                 add: pulumi.Input[Optional[Sequence[Any]]] = None,
+                 remove: pulumi.Input[Optional[Sequence[Any]]] = None):
         """
         Represents agent entity diff.
 
-        :param pulumi.Input[Sequence[pulumi.Input['AgentEntityArgs']]] add: Entities to add to the Agent's context.
+        :param pulumi.Input[Sequence[Any]] add: Entities to add to the Agent's context.
                Entities must be valid, and will be automatically deleted if they are invalid.
-        :param pulumi.Input[Sequence[pulumi.Input['AgentEntityArgs']]] remove: Entities to remove from the Agent's context.
+        :param pulumi.Input[Sequence[Any]] remove: Entities to remove from the Agent's context.
         """
         if add is not None:
             pulumi.set(__self__, "add", add)
@@ -198,7 +190,7 @@ class AgentEntityDiffArgs:
 
     @_builtins.property
     @pulumi.getter
-    def add(self) -> pulumi.Input[Optional[Sequence[pulumi.Input['AgentEntityArgs']]]]:
+    def add(self) -> pulumi.Input[Optional[Sequence[Any]]]:
         """
         Entities to add to the Agent's context.
         Entities must be valid, and will be automatically deleted if they are invalid.
@@ -206,45 +198,20 @@ class AgentEntityDiffArgs:
         return pulumi.get(self, "add")
 
     @add.setter
-    def add(self, value: pulumi.Input[Optional[Sequence[pulumi.Input['AgentEntityArgs']]]]):
+    def add(self, value: pulumi.Input[Optional[Sequence[Any]]]):
         pulumi.set(self, "add", value)
 
     @_builtins.property
     @pulumi.getter
-    def remove(self) -> pulumi.Input[Optional[Sequence[pulumi.Input['AgentEntityArgs']]]]:
+    def remove(self) -> pulumi.Input[Optional[Sequence[Any]]]:
         """
         Entities to remove from the Agent's context.
         """
         return pulumi.get(self, "remove")
 
     @remove.setter
-    def remove(self, value: pulumi.Input[Optional[Sequence[pulumi.Input['AgentEntityArgs']]]]):
+    def remove(self, value: pulumi.Input[Optional[Sequence[Any]]]):
         pulumi.set(self, "remove", value)
-
-
-class AgentEntityArgsDict(TypedDict):
-    """
-    Represents agent entity.
-    """
-    type: pulumi.Input[_builtins.str]
-
-@pulumi.input_type
-class AgentEntityArgs:
-    def __init__(__self__, *,
-                 type: pulumi.Input[_builtins.str]):
-        """
-        Represents agent entity.
-        """
-        pulumi.set(__self__, "type", type)
-
-    @_builtins.property
-    @pulumi.getter
-    def type(self) -> pulumi.Input[_builtins.str]:
-        return pulumi.get(self, "type")
-
-    @type.setter
-    def type(self, value: pulumi.Input[_builtins.str]):
-        pulumi.set(self, "type", value)
 
 
 class AgentTaskIntegrationRefArgsDict(TypedDict):
@@ -948,31 +915,6 @@ class CacheOptionsRequestArgs:
         pulumi.set(self, "enable", value)
 
 
-class ChangeGateRuleInputArgsDict(TypedDict):
-    """
-    Input specification for change gate rule - contains minimal identifiers for API requests
-    """
-    rule_type: pulumi.Input[_builtins.str]
-
-@pulumi.input_type
-class ChangeGateRuleInputArgs:
-    def __init__(__self__, *,
-                 rule_type: pulumi.Input[_builtins.str]):
-        """
-        Input specification for change gate rule - contains minimal identifiers for API requests
-        """
-        pulumi.set(__self__, "rule_type", rule_type)
-
-    @_builtins.property
-    @pulumi.getter(name="ruleType")
-    def rule_type(self) -> pulumi.Input[_builtins.str]:
-        return pulumi.get(self, "rule_type")
-
-    @rule_type.setter
-    def rule_type(self, value: pulumi.Input[_builtins.str]):
-        pulumi.set(self, "rule_type", value)
-
-
 class ChangeGateTargetInputArgsDict(TypedDict):
     """
     Input specification for change gate target - contains minimal identifiers for API requests
@@ -1082,7 +1024,7 @@ class CreateDeploymentRequestArgsDict(TypedDict):
     """
     A tag to identify the deployment settings configuration.
     """
-    vcs: NotRequired[pulumi.Input[Optional['DeploymentSettingsVCSArgs']]]
+    vcs: NotRequired[Optional[Any]]
     """
     VCS provider settings
     """
@@ -1099,7 +1041,7 @@ class CreateDeploymentRequestArgs:
                  operation_context: pulumi.Input[Optional['OperationContextRequestArgs']] = None,
                  source_context: pulumi.Input[Optional['SourceContextRequestArgs']] = None,
                  tag: pulumi.Input[Optional[_builtins.str]] = None,
-                 vcs: pulumi.Input[Optional['DeploymentSettingsVCSArgs']] = None):
+                 vcs: Optional[Any] = None):
         """
         :param pulumi.Input[_builtins.str] agent_pool_id: The identifier of the agent pool to use for deployments.
         :param pulumi.Input['CacheOptionsRequestArgs'] cache_options: Cache options for the deployment.
@@ -1110,7 +1052,7 @@ class CreateDeploymentRequestArgs:
         :param pulumi.Input['OperationContextRequestArgs'] operation_context: The operation context defining pre-run and post-run commands and environment variables.
         :param pulumi.Input['SourceContextRequestArgs'] source_context: The source context defining where the source code is located.
         :param pulumi.Input[_builtins.str] tag: A tag to identify the deployment settings configuration.
-        :param pulumi.Input['DeploymentSettingsVCSArgs'] vcs: VCS provider settings
+        :param Any vcs: VCS provider settings
         """
         if agent_pool_id is not None:
             pulumi.set(__self__, "agent_pool_id", agent_pool_id)
@@ -1243,14 +1185,14 @@ class CreateDeploymentRequestArgs:
 
     @_builtins.property
     @pulumi.getter
-    def vcs(self) -> pulumi.Input[Optional['DeploymentSettingsVCSArgs']]:
+    def vcs(self) -> Optional[Any]:
         """
         VCS provider settings
         """
         return pulumi.get(self, "vcs")
 
     @vcs.setter
-    def vcs(self, value: pulumi.Input[Optional['DeploymentSettingsVCSArgs']]):
+    def vcs(self, value: Optional[Any]):
         pulumi.set(self, "vcs", value)
 
 
@@ -1537,172 +1479,6 @@ class DeploymentSettingsGitHubRequestArgs:
     @review_stack_labels.setter
     def review_stack_labels(self, value: pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]]):
         pulumi.set(self, "review_stack_labels", value)
-
-
-class DeploymentSettingsVCSArgsDict(TypedDict):
-    """
-    DeploymentSettingsVCS contains VCS provider deployment settings.
-    """
-    provider: pulumi.Input[_builtins.str]
-    deploy_commits: NotRequired[pulumi.Input[Optional[_builtins.bool]]]
-    """
-    Whether to deploy all commits to the default branch
-    """
-    deploy_pull_request: NotRequired[pulumi.Input[Optional[_builtins.int]]]
-    """
-    Specific pull request number to deploy (overrides automatic deployment)
-    """
-    installation_id: NotRequired[pulumi.Input[Optional[_builtins.str]]]
-    """
-    VCS installation/integration ID linking to the VCS provider
-    """
-    paths: NotRequired[pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]]]
-    """
-    Paths within the repository that trigger deployments when changed
-    """
-    preview_pull_requests: NotRequired[pulumi.Input[Optional[_builtins.bool]]]
-    """
-    Whether to create preview deployments for pull requests
-    """
-    pull_request_template: NotRequired[pulumi.Input[Optional[_builtins.bool]]]
-    """
-    Whether to use pull request templates for deployment PRs
-    """
-    repository: NotRequired[pulumi.Input[Optional[_builtins.str]]]
-    """
-    The VCS repository reference (format varies by provider)
-    """
-
-@pulumi.input_type
-class DeploymentSettingsVCSArgs:
-    def __init__(__self__, *,
-                 provider: pulumi.Input[_builtins.str],
-                 deploy_commits: pulumi.Input[Optional[_builtins.bool]] = None,
-                 deploy_pull_request: pulumi.Input[Optional[_builtins.int]] = None,
-                 installation_id: pulumi.Input[Optional[_builtins.str]] = None,
-                 paths: pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]] = None,
-                 preview_pull_requests: pulumi.Input[Optional[_builtins.bool]] = None,
-                 pull_request_template: pulumi.Input[Optional[_builtins.bool]] = None,
-                 repository: pulumi.Input[Optional[_builtins.str]] = None):
-        """
-        DeploymentSettingsVCS contains VCS provider deployment settings.
-
-        :param pulumi.Input[_builtins.bool] deploy_commits: Whether to deploy all commits to the default branch
-        :param pulumi.Input[_builtins.int] deploy_pull_request: Specific pull request number to deploy (overrides automatic deployment)
-        :param pulumi.Input[_builtins.str] installation_id: VCS installation/integration ID linking to the VCS provider
-        :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] paths: Paths within the repository that trigger deployments when changed
-        :param pulumi.Input[_builtins.bool] preview_pull_requests: Whether to create preview deployments for pull requests
-        :param pulumi.Input[_builtins.bool] pull_request_template: Whether to use pull request templates for deployment PRs
-        :param pulumi.Input[_builtins.str] repository: The VCS repository reference (format varies by provider)
-        """
-        pulumi.set(__self__, "provider", provider)
-        if deploy_commits is not None:
-            pulumi.set(__self__, "deploy_commits", deploy_commits)
-        if deploy_pull_request is not None:
-            pulumi.set(__self__, "deploy_pull_request", deploy_pull_request)
-        if installation_id is not None:
-            pulumi.set(__self__, "installation_id", installation_id)
-        if paths is not None:
-            pulumi.set(__self__, "paths", paths)
-        if preview_pull_requests is not None:
-            pulumi.set(__self__, "preview_pull_requests", preview_pull_requests)
-        if pull_request_template is not None:
-            pulumi.set(__self__, "pull_request_template", pull_request_template)
-        if repository is not None:
-            pulumi.set(__self__, "repository", repository)
-
-    @_builtins.property
-    @pulumi.getter
-    def provider(self) -> pulumi.Input[_builtins.str]:
-        return pulumi.get(self, "provider")
-
-    @provider.setter
-    def provider(self, value: pulumi.Input[_builtins.str]):
-        pulumi.set(self, "provider", value)
-
-    @_builtins.property
-    @pulumi.getter(name="deployCommits")
-    def deploy_commits(self) -> pulumi.Input[Optional[_builtins.bool]]:
-        """
-        Whether to deploy all commits to the default branch
-        """
-        return pulumi.get(self, "deploy_commits")
-
-    @deploy_commits.setter
-    def deploy_commits(self, value: pulumi.Input[Optional[_builtins.bool]]):
-        pulumi.set(self, "deploy_commits", value)
-
-    @_builtins.property
-    @pulumi.getter(name="deployPullRequest")
-    def deploy_pull_request(self) -> pulumi.Input[Optional[_builtins.int]]:
-        """
-        Specific pull request number to deploy (overrides automatic deployment)
-        """
-        return pulumi.get(self, "deploy_pull_request")
-
-    @deploy_pull_request.setter
-    def deploy_pull_request(self, value: pulumi.Input[Optional[_builtins.int]]):
-        pulumi.set(self, "deploy_pull_request", value)
-
-    @_builtins.property
-    @pulumi.getter(name="installationId")
-    def installation_id(self) -> pulumi.Input[Optional[_builtins.str]]:
-        """
-        VCS installation/integration ID linking to the VCS provider
-        """
-        return pulumi.get(self, "installation_id")
-
-    @installation_id.setter
-    def installation_id(self, value: pulumi.Input[Optional[_builtins.str]]):
-        pulumi.set(self, "installation_id", value)
-
-    @_builtins.property
-    @pulumi.getter
-    def paths(self) -> pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]]:
-        """
-        Paths within the repository that trigger deployments when changed
-        """
-        return pulumi.get(self, "paths")
-
-    @paths.setter
-    def paths(self, value: pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]]):
-        pulumi.set(self, "paths", value)
-
-    @_builtins.property
-    @pulumi.getter(name="previewPullRequests")
-    def preview_pull_requests(self) -> pulumi.Input[Optional[_builtins.bool]]:
-        """
-        Whether to create preview deployments for pull requests
-        """
-        return pulumi.get(self, "preview_pull_requests")
-
-    @preview_pull_requests.setter
-    def preview_pull_requests(self, value: pulumi.Input[Optional[_builtins.bool]]):
-        pulumi.set(self, "preview_pull_requests", value)
-
-    @_builtins.property
-    @pulumi.getter(name="pullRequestTemplate")
-    def pull_request_template(self) -> pulumi.Input[Optional[_builtins.bool]]:
-        """
-        Whether to use pull request templates for deployment PRs
-        """
-        return pulumi.get(self, "pull_request_template")
-
-    @pull_request_template.setter
-    def pull_request_template(self, value: pulumi.Input[Optional[_builtins.bool]]):
-        pulumi.set(self, "pull_request_template", value)
-
-    @_builtins.property
-    @pulumi.getter
-    def repository(self) -> pulumi.Input[Optional[_builtins.str]]:
-        """
-        The VCS repository reference (format varies by provider)
-        """
-        return pulumi.get(self, "repository")
-
-    @repository.setter
-    def repository(self, value: pulumi.Input[Optional[_builtins.str]]):
-        pulumi.set(self, "repository", value)
 
 
 class DockerImageCredentialsRequestArgsDict(TypedDict):
@@ -3111,31 +2887,6 @@ class PageContextArgs:
     @path.setter
     def path(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "path", value)
-
-
-class PermissionDescriptorArgsDict(TypedDict):
-    """
-    Base type for permission descriptors.
-    """
-    __type: pulumi.Input[_builtins.str]
-
-@pulumi.input_type
-class PermissionDescriptorArgs:
-    def __init__(__self__, *,
-                 __type: pulumi.Input[_builtins.str]):
-        """
-        Base type for permission descriptors.
-        """
-        pulumi.set(__self__, "__type", __type)
-
-    @_builtins.property
-    @pulumi.getter
-    def __type(self) -> pulumi.Input[_builtins.str]:
-        return pulumi.get(self, "__type")
-
-    @__type.setter
-    def __type(self, value: pulumi.Input[_builtins.str]):
-        pulumi.set(self, "__type", value)
 
 
 class PkixAttributeTypeAndValueArgsDict(TypedDict):

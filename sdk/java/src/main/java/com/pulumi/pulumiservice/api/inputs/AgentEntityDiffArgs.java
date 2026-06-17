@@ -5,7 +5,7 @@ package com.pulumi.pulumiservice.api.inputs;
 
 import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
-import com.pulumi.pulumiservice.api.inputs.AgentEntityArgs;
+import java.lang.Object;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -26,14 +26,14 @@ public final class AgentEntityDiffArgs extends com.pulumi.resources.ResourceArgs
      * 
      */
     @Import(name="add")
-    private @Nullable Output<List<AgentEntityArgs>> add;
+    private @Nullable Output<List<Object>> add;
 
     /**
      * @return Entities to add to the Agent&#39;s context.
      * Entities must be valid, and will be automatically deleted if they are invalid.
      * 
      */
-    public Optional<Output<List<AgentEntityArgs>>> add() {
+    public Optional<Output<List<Object>>> add() {
         return Optional.ofNullable(this.add);
     }
 
@@ -42,13 +42,13 @@ public final class AgentEntityDiffArgs extends com.pulumi.resources.ResourceArgs
      * 
      */
     @Import(name="remove")
-    private @Nullable Output<List<AgentEntityArgs>> remove;
+    private @Nullable Output<List<Object>> remove;
 
     /**
      * @return Entities to remove from the Agent&#39;s context.
      * 
      */
-    public Optional<Output<List<AgentEntityArgs>>> remove() {
+    public Optional<Output<List<Object>>> remove() {
         return Optional.ofNullable(this.remove);
     }
 
@@ -84,7 +84,7 @@ public final class AgentEntityDiffArgs extends com.pulumi.resources.ResourceArgs
          * @return builder
          * 
          */
-        public Builder add(@Nullable Output<List<AgentEntityArgs>> add) {
+        public Builder add(@Nullable Output<List<Object>> add) {
             $.add = add;
             return this;
         }
@@ -96,7 +96,7 @@ public final class AgentEntityDiffArgs extends com.pulumi.resources.ResourceArgs
          * @return builder
          * 
          */
-        public Builder add(List<AgentEntityArgs> add) {
+        public Builder add(List<Object> add) {
             return add(Output.of(add));
         }
 
@@ -107,7 +107,7 @@ public final class AgentEntityDiffArgs extends com.pulumi.resources.ResourceArgs
          * @return builder
          * 
          */
-        public Builder add(AgentEntityArgs... add) {
+        public Builder add(Object... add) {
             return add(List.of(add));
         }
 
@@ -117,7 +117,7 @@ public final class AgentEntityDiffArgs extends com.pulumi.resources.ResourceArgs
          * @return builder
          * 
          */
-        public Builder remove(@Nullable Output<List<AgentEntityArgs>> remove) {
+        public Builder remove(@Nullable Output<List<Object>> remove) {
             $.remove = remove;
             return this;
         }
@@ -128,7 +128,7 @@ public final class AgentEntityDiffArgs extends com.pulumi.resources.ResourceArgs
          * @return builder
          * 
          */
-        public Builder remove(List<AgentEntityArgs> remove) {
+        public Builder remove(List<Object> remove) {
             return remove(Output.of(remove));
         }
 
@@ -138,7 +138,7 @@ public final class AgentEntityDiffArgs extends com.pulumi.resources.ResourceArgs
          * @return builder
          * 
          */
-        public Builder remove(AgentEntityArgs... remove) {
+        public Builder remove(Object... remove) {
             return remove(List.of(remove));
         }
 

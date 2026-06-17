@@ -34,7 +34,7 @@ type Settings struct {
 	// A tag to identify the deployment settings configuration.
 	Tag pulumi.StringPtrOutput `pulumi:"tag"`
 	// VCS provider settings
-	Vcs api.DeploymentSettingsVCSPtrOutput `pulumi:"vcs"`
+	Vcs pulumi.AnyOutput `pulumi:"vcs"`
 	// The version of the deployment settings.
 	Version pulumi.IntPtrOutput `pulumi:"version"`
 }
@@ -109,7 +109,7 @@ type settingsArgs struct {
 	// A tag to identify the deployment settings configuration.
 	Tag *string `pulumi:"tag"`
 	// VCS provider settings
-	Vcs *api.DeploymentSettingsVCS `pulumi:"vcs"`
+	Vcs interface{} `pulumi:"vcs"`
 }
 
 // The set of arguments for constructing a Settings resource.
@@ -135,7 +135,7 @@ type SettingsArgs struct {
 	// A tag to identify the deployment settings configuration.
 	Tag pulumi.StringPtrInput
 	// VCS provider settings
-	Vcs api.DeploymentSettingsVCSPtrInput
+	Vcs pulumi.Input
 }
 
 func (SettingsArgs) ElementType() reflect.Type {
@@ -266,8 +266,8 @@ func (o SettingsOutput) Tag() pulumi.StringPtrOutput {
 }
 
 // VCS provider settings
-func (o SettingsOutput) Vcs() api.DeploymentSettingsVCSPtrOutput {
-	return o.ApplyT(func(v *Settings) api.DeploymentSettingsVCSPtrOutput { return v.Vcs }).(api.DeploymentSettingsVCSPtrOutput)
+func (o SettingsOutput) Vcs() pulumi.AnyOutput {
+	return o.ApplyT(func(v *Settings) pulumi.AnyOutput { return v.Vcs }).(pulumi.AnyOutput)
 }
 
 // The version of the deployment settings.

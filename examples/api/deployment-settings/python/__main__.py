@@ -19,7 +19,7 @@ settings = ps_api.deployments.Settings(
     org_name=organization_name,
     project_name=project_name,
     stack_name=stack_name,
-    executor_context={"executorImage": executor_image},
+    executor_context={"executorImage": {"reference": executor_image}},
     operation_context={
         "preRunCommands": ["yarn"],
         "environmentVariables": {"TEST_VAR": "foo"},

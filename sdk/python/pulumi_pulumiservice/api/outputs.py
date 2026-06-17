@@ -16,7 +16,6 @@ from .. import _utilities
 from . import outputs
 
 __all__ = [
-    'AgentEntity',
     'AppMessage',
     'AppOperationStatus',
     'AppPolicyPackMetadata',
@@ -29,13 +28,11 @@ __all__ = [
     'AzureDevOpsProject',
     'BasicAuth',
     'CacheOptions',
-    'ChangeGateRuleOutput',
     'ChangeGateTargetOutput',
     'CustomVCSRepository',
     'DeploymentAgentMetadata',
     'DeploymentRole',
     'DeploymentSettingsGitHub',
-    'DeploymentSettingsVCS',
     'DockerImage',
     'DockerImageCredentials',
     'ExecutorContext',
@@ -58,7 +55,6 @@ __all__ = [
     'OperationContextOptions',
     'Organization',
     'OrganizationSummaryWithRole',
-    'PermissionDescriptor',
     'PkixAttributeTypeAndValue',
     'PkixExtension',
     'PkixName',
@@ -79,7 +75,6 @@ __all__ = [
     'SourceContextHg',
     'SourceContextTemplate',
     'StepRun',
-    'TargetEntity',
     'TeamAccountPermission',
     'TeamEnvironmentSettings',
     'TeamMemberInfo',
@@ -93,24 +88,6 @@ __all__ = [
     'X509Certificate',
     'X509PolicyMapping',
 ]
-
-@pulumi.output_type
-class AgentEntity(dict):
-    """
-    Represents agent entity.
-    """
-    def __init__(__self__, *,
-                 type: _builtins.str):
-        """
-        Represents agent entity.
-        """
-        pulumi.set(__self__, "type", type)
-
-    @_builtins.property
-    @pulumi.getter
-    def type(self) -> _builtins.str:
-        return pulumi.get(self, "type")
-
 
 @pulumi.output_type
 class AppMessage(dict):
@@ -847,41 +824,6 @@ class CacheOptions(dict):
 
 
 @pulumi.output_type
-class ChangeGateRuleOutput(dict):
-    """
-    Output representation of change gate rule - contains full details for API responses
-    """
-    @staticmethod
-    def __key_warning(key: str):
-        suggest = None
-        if key == "ruleType":
-            suggest = "rule_type"
-
-        if suggest:
-            pulumi.log.warn(f"Key '{key}' not found in ChangeGateRuleOutput. Access the value via the '{suggest}' property getter instead.")
-
-    def __getitem__(self, key: str) -> Any:
-        ChangeGateRuleOutput.__key_warning(key)
-        return super().__getitem__(key)
-
-    def get(self, key: str, default = None) -> Any:
-        ChangeGateRuleOutput.__key_warning(key)
-        return super().get(key, default)
-
-    def __init__(__self__, *,
-                 rule_type: _builtins.str):
-        """
-        Output representation of change gate rule - contains full details for API responses
-        """
-        pulumi.set(__self__, "rule_type", rule_type)
-
-    @_builtins.property
-    @pulumi.getter(name="ruleType")
-    def rule_type(self) -> _builtins.str:
-        return pulumi.get(self, "rule_type")
-
-
-@pulumi.output_type
 class ChangeGateTargetOutput(dict):
     """
     Output representation of change gate target - contains full details for API responses
@@ -912,14 +854,14 @@ class ChangeGateTargetOutput(dict):
     def __init__(__self__, *,
                  action_types: Sequence[_builtins.str],
                  entity_type: _builtins.str,
-                 entity_info: Optional['outputs.TargetEntity'] = None,
+                 entity_info: Optional[Any] = None,
                  qualified_name: Optional[_builtins.str] = None):
         """
         Output representation of change gate target - contains full details for API responses
 
         :param Sequence[_builtins.str] action_types: The action types this gate targets
         :param _builtins.str entity_type: The entity type this gate targets
-        :param 'TargetEntity' entity_info: Populated details about the target entity
+        :param Any entity_info: Populated details about the target entity
         :param _builtins.str qualified_name: The qualified name of the entity this gate targets (e.g., 'project/env')
         """
         pulumi.set(__self__, "action_types", action_types)
@@ -947,7 +889,7 @@ class ChangeGateTargetOutput(dict):
 
     @_builtins.property
     @pulumi.getter(name="entityInfo")
-    def entity_info(self) -> Optional['outputs.TargetEntity']:
+    def entity_info(self) -> Optional[Any]:
         """
         Populated details about the target entity
         """
@@ -1317,134 +1259,6 @@ class DeploymentSettingsGitHub(dict):
         Gates review stack creation. When set, only pull requests carrying a matching label (exact, case-sensitive) create a review stack.
         """
         return pulumi.get(self, "review_stack_labels")
-
-
-@pulumi.output_type
-class DeploymentSettingsVCS(dict):
-    """
-    DeploymentSettingsVCS contains VCS provider deployment settings.
-    """
-    @staticmethod
-    def __key_warning(key: str):
-        suggest = None
-        if key == "deployCommits":
-            suggest = "deploy_commits"
-        elif key == "deployPullRequest":
-            suggest = "deploy_pull_request"
-        elif key == "installationId":
-            suggest = "installation_id"
-        elif key == "previewPullRequests":
-            suggest = "preview_pull_requests"
-        elif key == "pullRequestTemplate":
-            suggest = "pull_request_template"
-
-        if suggest:
-            pulumi.log.warn(f"Key '{key}' not found in DeploymentSettingsVCS. Access the value via the '{suggest}' property getter instead.")
-
-    def __getitem__(self, key: str) -> Any:
-        DeploymentSettingsVCS.__key_warning(key)
-        return super().__getitem__(key)
-
-    def get(self, key: str, default = None) -> Any:
-        DeploymentSettingsVCS.__key_warning(key)
-        return super().get(key, default)
-
-    def __init__(__self__, *,
-                 provider: _builtins.str,
-                 deploy_commits: Optional[_builtins.bool] = None,
-                 deploy_pull_request: Optional[_builtins.int] = None,
-                 installation_id: Optional[_builtins.str] = None,
-                 paths: Optional[Sequence[_builtins.str]] = None,
-                 preview_pull_requests: Optional[_builtins.bool] = None,
-                 pull_request_template: Optional[_builtins.bool] = None,
-                 repository: Optional[_builtins.str] = None):
-        """
-        DeploymentSettingsVCS contains VCS provider deployment settings.
-
-        :param _builtins.bool deploy_commits: Whether to deploy all commits to the default branch
-        :param _builtins.int deploy_pull_request: Specific pull request number to deploy (overrides automatic deployment)
-        :param _builtins.str installation_id: VCS installation/integration ID linking to the VCS provider
-        :param Sequence[_builtins.str] paths: Paths within the repository that trigger deployments when changed
-        :param _builtins.bool preview_pull_requests: Whether to create preview deployments for pull requests
-        :param _builtins.bool pull_request_template: Whether to use pull request templates for deployment PRs
-        :param _builtins.str repository: The VCS repository reference (format varies by provider)
-        """
-        pulumi.set(__self__, "provider", provider)
-        if deploy_commits is not None:
-            pulumi.set(__self__, "deploy_commits", deploy_commits)
-        if deploy_pull_request is not None:
-            pulumi.set(__self__, "deploy_pull_request", deploy_pull_request)
-        if installation_id is not None:
-            pulumi.set(__self__, "installation_id", installation_id)
-        if paths is not None:
-            pulumi.set(__self__, "paths", paths)
-        if preview_pull_requests is not None:
-            pulumi.set(__self__, "preview_pull_requests", preview_pull_requests)
-        if pull_request_template is not None:
-            pulumi.set(__self__, "pull_request_template", pull_request_template)
-        if repository is not None:
-            pulumi.set(__self__, "repository", repository)
-
-    @_builtins.property
-    @pulumi.getter
-    def provider(self) -> _builtins.str:
-        return pulumi.get(self, "provider")
-
-    @_builtins.property
-    @pulumi.getter(name="deployCommits")
-    def deploy_commits(self) -> Optional[_builtins.bool]:
-        """
-        Whether to deploy all commits to the default branch
-        """
-        return pulumi.get(self, "deploy_commits")
-
-    @_builtins.property
-    @pulumi.getter(name="deployPullRequest")
-    def deploy_pull_request(self) -> Optional[_builtins.int]:
-        """
-        Specific pull request number to deploy (overrides automatic deployment)
-        """
-        return pulumi.get(self, "deploy_pull_request")
-
-    @_builtins.property
-    @pulumi.getter(name="installationId")
-    def installation_id(self) -> Optional[_builtins.str]:
-        """
-        VCS installation/integration ID linking to the VCS provider
-        """
-        return pulumi.get(self, "installation_id")
-
-    @_builtins.property
-    @pulumi.getter
-    def paths(self) -> Optional[Sequence[_builtins.str]]:
-        """
-        Paths within the repository that trigger deployments when changed
-        """
-        return pulumi.get(self, "paths")
-
-    @_builtins.property
-    @pulumi.getter(name="previewPullRequests")
-    def preview_pull_requests(self) -> Optional[_builtins.bool]:
-        """
-        Whether to create preview deployments for pull requests
-        """
-        return pulumi.get(self, "preview_pull_requests")
-
-    @_builtins.property
-    @pulumi.getter(name="pullRequestTemplate")
-    def pull_request_template(self) -> Optional[_builtins.bool]:
-        """
-        Whether to use pull request templates for deployment PRs
-        """
-        return pulumi.get(self, "pull_request_template")
-
-    @_builtins.property
-    @pulumi.getter
-    def repository(self) -> Optional[_builtins.str]:
-        """
-        The VCS repository reference (format varies by provider)
-        """
-        return pulumi.get(self, "repository")
 
 
 @pulumi.output_type
@@ -3166,24 +2980,6 @@ class OrganizationSummaryWithRole(dict):
         considered sensitive information.
         """
         return pulumi.get(self, "email")
-
-
-@pulumi.output_type
-class PermissionDescriptor(dict):
-    """
-    Base type for permission descriptors.
-    """
-    def __init__(__self__, *,
-                 __type: _builtins.str):
-        """
-        Base type for permission descriptors.
-        """
-        pulumi.set(__self__, "__type", __type)
-
-    @_builtins.property
-    @pulumi.getter
-    def __type(self) -> _builtins.str:
-        return pulumi.get(self, "__type")
 
 
 @pulumi.output_type
@@ -4997,41 +4793,6 @@ class StepRun(dict):
         The timestamp when the step started.
         """
         return pulumi.get(self, "started")
-
-
-@pulumi.output_type
-class TargetEntity(dict):
-    """
-    TargetEntity contains populated details about the targeted entity for a change request or gate
-    """
-    @staticmethod
-    def __key_warning(key: str):
-        suggest = None
-        if key == "entityType":
-            suggest = "entity_type"
-
-        if suggest:
-            pulumi.log.warn(f"Key '{key}' not found in TargetEntity. Access the value via the '{suggest}' property getter instead.")
-
-    def __getitem__(self, key: str) -> Any:
-        TargetEntity.__key_warning(key)
-        return super().__getitem__(key)
-
-    def get(self, key: str, default = None) -> Any:
-        TargetEntity.__key_warning(key)
-        return super().get(key, default)
-
-    def __init__(__self__, *,
-                 entity_type: _builtins.str):
-        """
-        TargetEntity contains populated details about the targeted entity for a change request or gate
-        """
-        pulumi.set(__self__, "entity_type", entity_type)
-
-    @_builtins.property
-    @pulumi.getter(name="entityType")
-    def entity_type(self) -> _builtins.str:
-        return pulumi.get(self, "entity_type")
 
 
 @pulumi.output_type

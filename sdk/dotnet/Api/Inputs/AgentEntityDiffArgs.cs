@@ -16,27 +16,27 @@ namespace Pulumi.PulumiService.Api.Inputs
     public sealed class AgentEntityDiffArgs : global::Pulumi.ResourceArgs
     {
         [Input("add")]
-        private InputList<Inputs.AgentEntityArgs>? _add;
+        private InputList<object>? _add;
 
         /// <summary>
         /// Entities to add to the Agent's context.
         /// Entities must be valid, and will be automatically deleted if they are invalid.
         /// </summary>
-        public InputList<Inputs.AgentEntityArgs> Add
+        public InputList<object> Add
         {
-            get => _add ?? (_add = new InputList<Inputs.AgentEntityArgs>());
+            get => _add ?? (_add = new InputList<object>());
             set => _add = value;
         }
 
         [Input("remove")]
-        private InputList<Inputs.AgentEntityArgs>? _remove;
+        private InputList<object>? _remove;
 
         /// <summary>
         /// Entities to remove from the Agent's context.
         /// </summary>
-        public InputList<Inputs.AgentEntityArgs> Remove
+        public InputList<object> Remove
         {
-            get => _remove ?? (_remove = new InputList<Inputs.AgentEntityArgs>());
+            get => _remove ?? (_remove = new InputList<object>());
             set => _remove = value;
         }
 

@@ -594,13 +594,6 @@ export interface TemplateSourceDestination {
 
 export namespace api {
     /**
-     * Represents agent entity.
-     */
-    export interface AgentEntity {
-        type: string;
-    }
-
-    /**
      * Message is a message from the backend to be displayed to the user.
      */
     export interface AppMessage {
@@ -832,13 +825,6 @@ export namespace api {
     }
 
     /**
-     * Output representation of change gate rule - contains full details for API responses
-     */
-    export interface ChangeGateRuleOutput {
-        ruleType: string;
-    }
-
-    /**
      * Output representation of change gate target - contains full details for API responses
      */
     export interface ChangeGateTargetOutput {
@@ -849,7 +835,7 @@ export namespace api {
         /**
          * Populated details about the target entity
          */
-        entityInfo?: outputs.api.TargetEntity;
+        entityInfo?: any;
         /**
          * The entity type this gate targets
          */
@@ -962,41 +948,6 @@ export namespace api {
          * Gates review stack creation. When set, only pull requests carrying a matching label (exact, case-sensitive) create a review stack.
          */
         reviewStackLabels?: string[];
-    }
-
-    /**
-     * DeploymentSettingsVCS contains VCS provider deployment settings.
-     */
-    export interface DeploymentSettingsVCS {
-        /**
-         * Whether to deploy all commits to the default branch
-         */
-        deployCommits?: boolean;
-        /**
-         * Specific pull request number to deploy (overrides automatic deployment)
-         */
-        deployPullRequest?: number;
-        /**
-         * VCS installation/integration ID linking to the VCS provider
-         */
-        installationId?: string;
-        /**
-         * Paths within the repository that trigger deployments when changed
-         */
-        paths?: string[];
-        /**
-         * Whether to create preview deployments for pull requests
-         */
-        previewPullRequests?: boolean;
-        provider: string;
-        /**
-         * Whether to use pull request templates for deployment PRs
-         */
-        pullRequestTemplate?: boolean;
-        /**
-         * The VCS repository reference (format varies by provider)
-         */
-        repository?: string;
     }
 
     /**
@@ -1512,13 +1463,6 @@ export namespace api {
          * The role of the user within this organization.
          */
         role: string;
-    }
-
-    /**
-     * Base type for permission descriptors.
-     */
-    export interface PermissionDescriptor {
-        __type: string;
     }
 
     /**
@@ -2084,13 +2028,6 @@ export namespace api {
          * The current status of the step.
          */
         status: string;
-    }
-
-    /**
-     * TargetEntity contains populated details about the targeted entity for a change request or gate
-     */
-    export interface TargetEntity {
-        entityType: string;
     }
 
     /**

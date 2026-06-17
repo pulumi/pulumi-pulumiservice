@@ -37,7 +37,7 @@ namespace Pulumi.PulumiService.Api
         /// The detailed permission descriptor tree.
         /// </summary>
         [Output("details")]
-        public Output<Outputs.PermissionDescriptor?> Details { get; private set; } = null!;
+        public Output<object?> Details { get; private set; } = null!;
 
         /// <summary>
         /// Whether this role is the organization default.
@@ -148,7 +148,7 @@ namespace Pulumi.PulumiService.Api
         /// The detailed permission descriptor tree.
         /// </summary>
         [Input("details")]
-        public Input<Inputs.PermissionDescriptorArgs>? Details { get; set; }
+        public Input<object>? Details { get; set; }
 
         /// <summary>
         /// The name of the permission descriptor.

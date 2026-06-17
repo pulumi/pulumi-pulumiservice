@@ -1,4 +1,3 @@
-using System.Collections.Immutable;
 using Pulumi;
 using Ps = Pulumi.PulumiService;
 
@@ -8,16 +7,6 @@ return await Deployment.RunAsync(() =>
     var organizationName = config.Get("organizationName") ?? "service-provider-test-org";
     var serviceSuffix = config.Get("serviceSuffix") ?? "dev";
 
-    var stackItem = ImmutableDictionary<string, object>.Empty
-        .Add("kind", "stack")
-        .Add("ref", "service-provider-test-org/example-app/dev");
-    var tierProp = ImmutableDictionary<string, object>.Empty
-        .Add("key", "tier")
-        .Add("value", "gold");
-    var oncallProp = ImmutableDictionary<string, object>.Empty
-        .Add("key", "oncall")
-        .Add("value", "platform-ops");
-
     new Ps.Api.Services.Service("catalogService", new()
     {
         OrgName = organizationName,
@@ -25,7 +14,14 @@ return await Deployment.RunAsync(() =>
         Description = "An example api service catalog entry.",
         OwnerType = "team",
         OwnerName = "platform",
-        Items = new object[] { stackItem },
-        Properties = new object[] { tierProp, oncallProp },
+        Items =
+        {
+            new Ps.Api.Inputs.AddServiceItemArgs { Type = "stack", Name = "service-provider-test-org/example-app/dev" },
+        },
+        Properties =
+        {
+            new Ps.Api.Inputs.ServicePropertyArgs { Key = "tier", Value = "gold", Type = "string", Order = 1 },
+            new Ps.Api.Inputs.ServicePropertyArgs { Key = "oncall", Value = "platform-ops", Type = "string", Order = 2 },
+        },
     });
 });

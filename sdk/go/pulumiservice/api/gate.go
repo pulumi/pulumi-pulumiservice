@@ -23,7 +23,7 @@ type Gate struct {
 	// Name of the change gate
 	Name pulumi.StringOutput `pulumi:"name"`
 	// Rule configuration for the gate
-	Rule ChangeGateRuleOutputOutput `pulumi:"rule"`
+	Rule pulumi.AnyOutput `pulumi:"rule"`
 	// Target configuration for the gate
 	Target ChangeGateTargetOutputOutput `pulumi:"target"`
 }
@@ -92,7 +92,7 @@ type gateArgs struct {
 	// The organization name
 	OrgName string `pulumi:"orgName"`
 	// Rule configuration for the gate
-	Rule ChangeGateRuleInput `pulumi:"rule"`
+	Rule interface{} `pulumi:"rule"`
 	// Target configuration for the gate
 	Target ChangeGateTargetInput `pulumi:"target"`
 }
@@ -108,7 +108,7 @@ type GateArgs struct {
 	// The organization name
 	OrgName pulumi.StringInput
 	// Rule configuration for the gate
-	Rule ChangeGateRuleInputInput
+	Rule pulumi.Input
 	// Target configuration for the gate
 	Target ChangeGateTargetInputInput
 }
@@ -216,8 +216,8 @@ func (o GateOutput) Name() pulumi.StringOutput {
 }
 
 // Rule configuration for the gate
-func (o GateOutput) Rule() ChangeGateRuleOutputOutput {
-	return o.ApplyT(func(v *Gate) ChangeGateRuleOutputOutput { return v.Rule }).(ChangeGateRuleOutputOutput)
+func (o GateOutput) Rule() pulumi.AnyOutput {
+	return o.ApplyT(func(v *Gate) pulumi.AnyOutput { return v.Rule }).(pulumi.AnyOutput)
 }
 
 // Target configuration for the gate

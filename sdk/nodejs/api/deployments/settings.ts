@@ -72,7 +72,7 @@ export class Settings extends pulumi.CustomResource {
     /**
      * VCS provider settings
      */
-    declare public readonly vcs: pulumi.Output<outputs.api.DeploymentSettingsVCS | undefined>;
+    declare public readonly vcs: pulumi.Output<any | undefined>;
     /**
      * The version of the deployment settings.
      */
@@ -175,5 +175,5 @@ export interface SettingsArgs {
     /**
      * VCS provider settings
      */
-    vcs?: pulumi.Input<inputs.api.DeploymentSettingsVCSArgs | undefined>;
+    vcs?: any | undefined;
 }

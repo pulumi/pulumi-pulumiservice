@@ -23,7 +23,7 @@ type Role struct {
 	// A human-readable description of the permission descriptor.
 	Description pulumi.StringPtrOutput `pulumi:"description"`
 	// The detailed permission descriptor tree.
-	Details PermissionDescriptorPtrOutput `pulumi:"details"`
+	Details pulumi.AnyOutput `pulumi:"details"`
 	// Whether this role is the organization default.
 	IsOrgDefault pulumi.BoolOutput `pulumi:"isOrgDefault"`
 	// When the role was last modified.
@@ -90,7 +90,7 @@ type roleArgs struct {
 	// A human-readable description of the permission descriptor.
 	Description *string `pulumi:"description"`
 	// The detailed permission descriptor tree.
-	Details *PermissionDescriptor `pulumi:"details"`
+	Details interface{} `pulumi:"details"`
 	// The name of the permission descriptor.
 	Name *string `pulumi:"name"`
 	// The organization name
@@ -110,7 +110,7 @@ type RoleArgs struct {
 	// A human-readable description of the permission descriptor.
 	Description pulumi.StringPtrInput
 	// The detailed permission descriptor tree.
-	Details PermissionDescriptorPtrInput
+	Details pulumi.Input
 	// The name of the permission descriptor.
 	Name pulumi.StringPtrInput
 	// The organization name
@@ -226,8 +226,8 @@ func (o RoleOutput) Description() pulumi.StringPtrOutput {
 }
 
 // The detailed permission descriptor tree.
-func (o RoleOutput) Details() PermissionDescriptorPtrOutput {
-	return o.ApplyT(func(v *Role) PermissionDescriptorPtrOutput { return v.Details }).(PermissionDescriptorPtrOutput)
+func (o RoleOutput) Details() pulumi.AnyOutput {
+	return o.ApplyT(func(v *Role) pulumi.AnyOutput { return v.Details }).(pulumi.AnyOutput)
 }
 
 // Whether this role is the organization default.

@@ -99,32 +99,20 @@
         "type"
       ]
     },
-    "pulumiservice:api:AgentEntity": {
-      "description": "Represents agent entity.",
-      "properties": {
-        "type": {
-          "type": "string"
-        }
-      },
-      "type": "object",
-      "required": [
-        "type"
-      ]
-    },
     "pulumiservice:api:AgentEntityDiff": {
       "description": "Represents agent entity diff.",
       "properties": {
         "add": {
           "type": "array",
           "items": {
-            "$ref": "#/types/pulumiservice:api:AgentEntity"
+            "$ref": "pulumi.json#/Any"
           },
           "description": "Entities to add to the Agent's context.\nEntities must be valid, and will be automatically deleted if they are invalid."
         },
         "remove": {
           "type": "array",
           "items": {
-            "$ref": "#/types/pulumiservice:api:AgentEntity"
+            "$ref": "pulumi.json#/Any"
           },
           "description": "Entities to remove from the Agent's context."
         }
@@ -535,30 +523,6 @@
       },
       "type": "object"
     },
-    "pulumiservice:api:ChangeGateRuleInput": {
-      "description": "Input specification for change gate rule - contains minimal identifiers for API requests",
-      "properties": {
-        "ruleType": {
-          "type": "string"
-        }
-      },
-      "type": "object",
-      "required": [
-        "ruleType"
-      ]
-    },
-    "pulumiservice:api:ChangeGateRuleOutput": {
-      "description": "Output representation of change gate rule - contains full details for API responses",
-      "properties": {
-        "ruleType": {
-          "type": "string"
-        }
-      },
-      "type": "object",
-      "required": [
-        "ruleType"
-      ]
-    },
     "pulumiservice:api:ChangeGateTargetInput": {
       "description": "Input specification for change gate target - contains minimal identifiers for API requests",
       "properties": {
@@ -595,7 +559,7 @@
           "description": "The action types this gate targets"
         },
         "entityInfo": {
-          "$ref": "#/types/pulumiservice:api:TargetEntity",
+          "$ref": "pulumi.json#/Any",
           "description": "Populated details about the target entity"
         },
         "entityType": {
@@ -652,7 +616,7 @@
           "description": "A tag to identify the deployment settings configuration."
         },
         "vcs": {
-          "$ref": "#/types/pulumiservice:api:DeploymentSettingsVCS",
+          "$ref": "pulumi.json#/Any",
           "description": "VCS provider settings"
         }
       },
@@ -859,49 +823,6 @@
       "type": "object",
       "required": [
         "pullRequestTemplate"
-      ]
-    },
-    "pulumiservice:api:DeploymentSettingsVCS": {
-      "description": "DeploymentSettingsVCS contains VCS provider deployment settings.",
-      "properties": {
-        "deployCommits": {
-          "type": "boolean",
-          "description": "Whether to deploy all commits to the default branch"
-        },
-        "deployPullRequest": {
-          "type": "integer",
-          "description": "Specific pull request number to deploy (overrides automatic deployment)"
-        },
-        "installationId": {
-          "type": "string",
-          "description": "VCS installation/integration ID linking to the VCS provider"
-        },
-        "paths": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "Paths within the repository that trigger deployments when changed"
-        },
-        "previewPullRequests": {
-          "type": "boolean",
-          "description": "Whether to create preview deployments for pull requests"
-        },
-        "provider": {
-          "type": "string"
-        },
-        "pullRequestTemplate": {
-          "type": "boolean",
-          "description": "Whether to use pull request templates for deployment PRs"
-        },
-        "repository": {
-          "type": "string",
-          "description": "The VCS repository reference (format varies by provider)"
-        }
-      },
-      "type": "object",
-      "required": [
-        "provider"
       ]
     },
     "pulumiservice:api:DockerImage": {
@@ -1760,18 +1681,6 @@
       },
       "type": "object"
     },
-    "pulumiservice:api:PermissionDescriptor": {
-      "description": "Base type for permission descriptors.",
-      "properties": {
-        "__type": {
-          "type": "string"
-        }
-      },
-      "type": "object",
-      "required": [
-        "__type"
-      ]
-    },
     "pulumiservice:api:PkixAttributeTypeAndValue": {
       "description": "PkixAttributeTypeAndValue represents an ASN.1 attribute type and value pair.",
       "properties": {
@@ -2542,18 +2451,6 @@
       "required": [
         "name",
         "status"
-      ]
-    },
-    "pulumiservice:api:TargetEntity": {
-      "description": "TargetEntity contains populated details about the targeted entity for a change request or gate",
-      "properties": {
-        "entityType": {
-          "type": "string"
-        }
-      },
-      "type": "object",
-      "required": [
-        "entityType"
       ]
     },
     "pulumiservice:api:TeamAccountPermission": {
@@ -4550,7 +4447,7 @@
         "entities": {
           "type": "array",
           "items": {
-            "$ref": "#/types/pulumiservice:api:AgentEntity"
+            "$ref": "pulumi.json#/Any"
           },
           "description": "Pulumi entities (stacks, projects, etc.) that provide context for the agent."
         },
@@ -5035,7 +4932,7 @@
           "description": "A tag to identify the deployment settings configuration."
         },
         "vcs": {
-          "$ref": "#/types/pulumiservice:api:DeploymentSettingsVCS",
+          "$ref": "pulumi.json#/Any",
           "description": "VCS provider settings"
         },
         "version": {
@@ -5092,7 +4989,7 @@
           "description": "A tag to identify the deployment settings configuration."
         },
         "vcs": {
-          "$ref": "#/types/pulumiservice:api:DeploymentSettingsVCS",
+          "$ref": "pulumi.json#/Any",
           "description": "VCS provider settings"
         }
       },
@@ -7354,7 +7251,7 @@
           "description": "Name of the change gate"
         },
         "rule": {
-          "$ref": "#/types/pulumiservice:api:ChangeGateRuleOutput",
+          "$ref": "pulumi.json#/Any",
           "description": "Rule configuration for the gate"
         },
         "target": {
@@ -7392,7 +7289,7 @@
           "willReplaceOnChanges": true
         },
         "rule": {
-          "$ref": "#/types/pulumiservice:api:ChangeGateRuleInput",
+          "$ref": "pulumi.json#/Any",
           "description": "Rule configuration for the gate"
         },
         "target": {
@@ -7904,7 +7801,7 @@
           "description": "A human-readable description of the permission descriptor."
         },
         "details": {
-          "$ref": "#/types/pulumiservice:api:PermissionDescriptor",
+          "$ref": "pulumi.json#/Any",
           "description": "The detailed permission descriptor tree."
         },
         "isOrgDefault": {
@@ -7961,7 +7858,7 @@
           "description": "A human-readable description of the permission descriptor."
         },
         "details": {
-          "$ref": "#/types/pulumiservice:api:PermissionDescriptor",
+          "$ref": "pulumi.json#/Any",
           "description": "The detailed permission descriptor tree."
         },
         "name": {

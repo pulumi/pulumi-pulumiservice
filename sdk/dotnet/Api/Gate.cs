@@ -37,7 +37,7 @@ namespace Pulumi.PulumiService.Api
         /// Rule configuration for the gate
         /// </summary>
         [Output("rule")]
-        public Output<Outputs.ChangeGateRuleOutput> Rule { get; private set; } = null!;
+        public Output<object> Rule { get; private set; } = null!;
 
         /// <summary>
         /// Target configuration for the gate
@@ -118,7 +118,7 @@ namespace Pulumi.PulumiService.Api
         /// Rule configuration for the gate
         /// </summary>
         [Input("rule", required: true)]
-        public Input<Inputs.ChangeGateRuleInputArgs> Rule { get; set; } = null!;
+        public Input<object> Rule { get; set; } = null!;
 
         /// <summary>
         /// Target configuration for the gate

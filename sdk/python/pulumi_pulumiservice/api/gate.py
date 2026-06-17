@@ -24,7 +24,7 @@ class GateArgs:
                  enabled: pulumi.Input[_builtins.bool],
                  name: pulumi.Input[_builtins.str],
                  org_name: pulumi.Input[_builtins.str],
-                 rule: pulumi.Input['ChangeGateRuleInputArgs'],
+                 rule: Any,
                  target: pulumi.Input['ChangeGateTargetInputArgs'],
                  gate_id: pulumi.Input[Optional[_builtins.str]] = None):
         """
@@ -33,7 +33,7 @@ class GateArgs:
         :param pulumi.Input[_builtins.bool] enabled: Whether the change gate is enabled
         :param pulumi.Input[_builtins.str] name: Name of the change gate
         :param pulumi.Input[_builtins.str] org_name: The organization name
-        :param pulumi.Input['ChangeGateRuleInputArgs'] rule: Rule configuration for the gate
+        :param Any rule: Rule configuration for the gate
         :param pulumi.Input['ChangeGateTargetInputArgs'] target: Target configuration for the gate
         :param pulumi.Input[_builtins.str] gate_id: The change gate identifier
         """
@@ -83,14 +83,14 @@ class GateArgs:
 
     @_builtins.property
     @pulumi.getter
-    def rule(self) -> pulumi.Input['ChangeGateRuleInputArgs']:
+    def rule(self) -> Any:
         """
         Rule configuration for the gate
         """
         return pulumi.get(self, "rule")
 
     @rule.setter
-    def rule(self, value: pulumi.Input['ChangeGateRuleInputArgs']):
+    def rule(self, value: Any):
         pulumi.set(self, "rule", value)
 
     @_builtins.property
@@ -128,7 +128,7 @@ class Gate(pulumi.CustomResource):
                  gate_id: pulumi.Input[Optional[_builtins.str]] = None,
                  name: pulumi.Input[Optional[_builtins.str]] = None,
                  org_name: pulumi.Input[Optional[_builtins.str]] = None,
-                 rule: pulumi.Input[Optional[Union['ChangeGateRuleInputArgs', 'ChangeGateRuleInputArgsDict']]] = None,
+                 rule: Optional[Any] = None,
                  target: pulumi.Input[Optional[Union['ChangeGateTargetInputArgs', 'ChangeGateTargetInputArgsDict']]] = None,
                  __props__=None):
         """
@@ -141,7 +141,7 @@ class Gate(pulumi.CustomResource):
         :param pulumi.Input[_builtins.str] gate_id: The change gate identifier
         :param pulumi.Input[_builtins.str] name: Name of the change gate
         :param pulumi.Input[_builtins.str] org_name: The organization name
-        :param pulumi.Input[Union['ChangeGateRuleInputArgs', 'ChangeGateRuleInputArgsDict']] rule: Rule configuration for the gate
+        :param Any rule: Rule configuration for the gate
         :param pulumi.Input[Union['ChangeGateTargetInputArgs', 'ChangeGateTargetInputArgsDict']] target: Target configuration for the gate
         """
         ...
@@ -173,7 +173,7 @@ class Gate(pulumi.CustomResource):
                  gate_id: pulumi.Input[Optional[_builtins.str]] = None,
                  name: pulumi.Input[Optional[_builtins.str]] = None,
                  org_name: pulumi.Input[Optional[_builtins.str]] = None,
-                 rule: pulumi.Input[Optional[Union['ChangeGateRuleInputArgs', 'ChangeGateRuleInputArgsDict']]] = None,
+                 rule: Optional[Any] = None,
                  target: pulumi.Input[Optional[Union['ChangeGateTargetInputArgs', 'ChangeGateTargetInputArgsDict']]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
@@ -255,7 +255,7 @@ class Gate(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter
-    def rule(self) -> pulumi.Output['outputs.ChangeGateRuleOutput']:
+    def rule(self) -> pulumi.Output[Any]:
         """
         Rule configuration for the gate
         """

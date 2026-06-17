@@ -23,7 +23,7 @@ namespace Pulumi.PulumiService.Api.Outputs
         /// <summary>
         /// Populated details about the target entity
         /// </summary>
-        public readonly Outputs.TargetEntity? EntityInfo;
+        public readonly object? EntityInfo;
         /// <summary>
         /// The entity type this gate targets
         /// </summary>
@@ -37,7 +37,7 @@ namespace Pulumi.PulumiService.Api.Outputs
         private ChangeGateTargetOutput(
             ImmutableArray<string> actionTypes,
 
-            Outputs.TargetEntity? entityInfo,
+            object? entityInfo,
 
             string entityType,
 

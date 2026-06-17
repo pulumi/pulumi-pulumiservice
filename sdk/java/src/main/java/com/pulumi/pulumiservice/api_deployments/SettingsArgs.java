@@ -8,10 +8,10 @@ import com.pulumi.core.annotations.Import;
 import com.pulumi.exceptions.MissingRequiredPropertyException;
 import com.pulumi.pulumiservice.api.inputs.CacheOptionsRequestArgs;
 import com.pulumi.pulumiservice.api.inputs.DeploymentSettingsGitHubRequestArgs;
-import com.pulumi.pulumiservice.api.inputs.DeploymentSettingsVCSArgs;
 import com.pulumi.pulumiservice.api.inputs.ExecutorSettingsRequestArgs;
 import com.pulumi.pulumiservice.api.inputs.OperationContextRequestArgs;
 import com.pulumi.pulumiservice.api.inputs.SourceContextRequestArgs;
+import java.lang.Object;
 import java.lang.String;
 import java.util.Objects;
 import java.util.Optional;
@@ -177,13 +177,13 @@ public final class SettingsArgs extends com.pulumi.resources.ResourceArgs {
      * 
      */
     @Import(name="vcs")
-    private @Nullable Output<DeploymentSettingsVCSArgs> vcs;
+    private @Nullable Output<Object> vcs;
 
     /**
      * @return VCS provider settings
      * 
      */
-    public Optional<Output<DeploymentSettingsVCSArgs>> vcs() {
+    public Optional<Output<Object>> vcs() {
         return Optional.ofNullable(this.vcs);
     }
 
@@ -437,7 +437,7 @@ public final class SettingsArgs extends com.pulumi.resources.ResourceArgs {
          * @return builder
          * 
          */
-        public Builder vcs(@Nullable Output<DeploymentSettingsVCSArgs> vcs) {
+        public Builder vcs(@Nullable Output<Object> vcs) {
             $.vcs = vcs;
             return this;
         }
@@ -448,7 +448,7 @@ public final class SettingsArgs extends com.pulumi.resources.ResourceArgs {
          * @return builder
          * 
          */
-        public Builder vcs(DeploymentSettingsVCSArgs vcs) {
+        public Builder vcs(Object vcs) {
             return vcs(Output.of(vcs));
         }
 

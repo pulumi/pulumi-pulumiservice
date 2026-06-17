@@ -394,7 +394,7 @@ class Task(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter
-    def entities(self) -> pulumi.Output[Sequence['_api.outputs.AgentEntity']]:
+    def entities(self) -> pulumi.Output[Sequence[Any]]:
         """
         Pulumi entities (stacks, projects, etc.) that provide context for the agent.
         """

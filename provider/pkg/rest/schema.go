@@ -111,6 +111,18 @@ func (tb *typeBuilder) resolveRef(ref string) schema.TypeSpec {
 	}
 
 	resolved, _ := tb.spec.ResolveSchema(ref)
+
+	// Discriminated union types (those with a "discriminator" in the OpenAPI spec) are
+	// polymorphic: subtypes add extra fields beyond the base type. The base type cannot
+	// be expressed as a simple named object type because callers must pass subtype-specific
+	// fields (e.g. "permissions" on PermissionDescriptorAllow). Additionally, Go codegen
+	// generates unexported struct fields for properties like "__type", making them unusable
+	// from outside the package. Fall back to Any.
+	if _, hasDisc := resolved["discriminator"]; hasDisc {
+		delete(tb.types, token)
+		return schema.TypeSpec{Ref: "pulumi.json#/Any"}
+	}
+
 	desc, _ := resolved["description"].(string)
 
 	tb.types[token] = schema.ComplexTypeSpec{

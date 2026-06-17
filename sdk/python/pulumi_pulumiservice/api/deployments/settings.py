@@ -30,7 +30,7 @@ class SettingsArgs:
                  operation_context: pulumi.Input[Optional['_api.OperationContextRequestArgs']] = None,
                  source_context: pulumi.Input[Optional['_api.SourceContextRequestArgs']] = None,
                  tag: pulumi.Input[Optional[_builtins.str]] = None,
-                 vcs: pulumi.Input[Optional['_api.DeploymentSettingsVCSArgs']] = None):
+                 vcs: Optional[Any] = None):
         """
         The set of arguments for constructing a Settings resource.
 
@@ -44,7 +44,7 @@ class SettingsArgs:
         :param pulumi.Input['_api.OperationContextRequestArgs'] operation_context: The operation context defining pre-run and post-run commands and environment variables.
         :param pulumi.Input['_api.SourceContextRequestArgs'] source_context: The source context defining where the source code is located.
         :param pulumi.Input[_builtins.str] tag: A tag to identify the deployment settings configuration.
-        :param pulumi.Input['_api.DeploymentSettingsVCSArgs'] vcs: VCS provider settings
+        :param Any vcs: VCS provider settings
         """
         pulumi.set(__self__, "org_name", org_name)
         pulumi.set(__self__, "project_name", project_name)
@@ -188,14 +188,14 @@ class SettingsArgs:
 
     @_builtins.property
     @pulumi.getter
-    def vcs(self) -> pulumi.Input[Optional['_api.DeploymentSettingsVCSArgs']]:
+    def vcs(self) -> Optional[Any]:
         """
         VCS provider settings
         """
         return pulumi.get(self, "vcs")
 
     @vcs.setter
-    def vcs(self, value: pulumi.Input[Optional['_api.DeploymentSettingsVCSArgs']]):
+    def vcs(self, value: Optional[Any]):
         pulumi.set(self, "vcs", value)
 
 
@@ -215,7 +215,7 @@ class Settings(pulumi.CustomResource):
                  source_context: pulumi.Input[Optional[Union['_api.SourceContextRequestArgs', '_api.SourceContextRequestArgsDict']]] = None,
                  stack_name: pulumi.Input[Optional[_builtins.str]] = None,
                  tag: pulumi.Input[Optional[_builtins.str]] = None,
-                 vcs: pulumi.Input[Optional[Union['_api.DeploymentSettingsVCSArgs', '_api.DeploymentSettingsVCSArgsDict']]] = None,
+                 vcs: Optional[Any] = None,
                  __props__=None):
         """
         Creates or updates Pulumi Deployments settings for a stack using a merge operation. If no settings exist, they are created. If settings already exist, the request body is merged with the current settings using the following logic: for each property, start with the current value, remove it if the patch specifies null, or merge the new non-null value with the existing one. Non-object properties (strings, numbers, booleans) are replaced entirely. Settings include source context (git repository URL, branch, directory), operation context (environment variables, pre-run commands, OIDC configuration), executor context, GitHub integration settings, and cache options. Requires a Team Growth or higher subscription. Cannot be used to configure Pulumi Deployments for Terraform stacks.
@@ -233,7 +233,7 @@ class Settings(pulumi.CustomResource):
         :param pulumi.Input[Union['_api.SourceContextRequestArgs', '_api.SourceContextRequestArgsDict']] source_context: The source context defining where the source code is located.
         :param pulumi.Input[_builtins.str] stack_name: The stack name
         :param pulumi.Input[_builtins.str] tag: A tag to identify the deployment settings configuration.
-        :param pulumi.Input[Union['_api.DeploymentSettingsVCSArgs', '_api.DeploymentSettingsVCSArgsDict']] vcs: VCS provider settings
+        :param Any vcs: VCS provider settings
         """
         ...
     @overload
@@ -270,7 +270,7 @@ class Settings(pulumi.CustomResource):
                  source_context: pulumi.Input[Optional[Union['_api.SourceContextRequestArgs', '_api.SourceContextRequestArgsDict']]] = None,
                  stack_name: pulumi.Input[Optional[_builtins.str]] = None,
                  tag: pulumi.Input[Optional[_builtins.str]] = None,
-                 vcs: pulumi.Input[Optional[Union['_api.DeploymentSettingsVCSArgs', '_api.DeploymentSettingsVCSArgsDict']]] = None,
+                 vcs: Optional[Any] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
         if not isinstance(opts, pulumi.ResourceOptions):
@@ -399,7 +399,7 @@ class Settings(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter
-    def vcs(self) -> pulumi.Output[Optional['_api.outputs.DeploymentSettingsVCS']]:
+    def vcs(self) -> pulumi.Output[Optional[Any]]:
         """
         VCS provider settings
         """

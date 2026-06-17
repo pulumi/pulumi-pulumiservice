@@ -10,12 +10,12 @@ import com.pulumi.core.internal.Codegen;
 import com.pulumi.pulumiservice.Utilities;
 import com.pulumi.pulumiservice.api.outputs.CacheOptions;
 import com.pulumi.pulumiservice.api.outputs.DeploymentSettingsGitHub;
-import com.pulumi.pulumiservice.api.outputs.DeploymentSettingsVCS;
 import com.pulumi.pulumiservice.api.outputs.ExecutorContext;
 import com.pulumi.pulumiservice.api.outputs.OperationContext;
 import com.pulumi.pulumiservice.api.outputs.SourceContext;
 import com.pulumi.pulumiservice.api_deployments.SettingsArgs;
 import java.lang.Integer;
+import java.lang.Object;
 import java.lang.String;
 import java.util.Optional;
 import javax.annotation.Nullable;
@@ -142,14 +142,14 @@ public class Settings extends com.pulumi.resources.CustomResource {
      * VCS provider settings
      * 
      */
-    @Export(name="vcs", refs={DeploymentSettingsVCS.class}, tree="[0]")
-    private Output</* @Nullable */ DeploymentSettingsVCS> vcs;
+    @Export(name="vcs", refs={Object.class}, tree="[0]")
+    private Output</* @Nullable */ Object> vcs;
 
     /**
      * @return VCS provider settings
      * 
      */
-    public Output<Optional<DeploymentSettingsVCS>> vcs() {
+    public Output<Optional<Object>> vcs() {
         return Codegen.optional(this.vcs);
     }
     /**
