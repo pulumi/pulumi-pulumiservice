@@ -519,6 +519,14 @@ namespace Pulumi.PulumiService
         /// Trigger a webhook when an imported environment has changed.
         /// </summary>
         public static WebhookFilters ImportedEnvironmentChanged { get; } = new WebhookFilters("imported_environment_changed");
+        /// <summary>
+        /// Trigger a webhook when an environment rotation succeeds.
+        /// </summary>
+        public static WebhookFilters EnvironmentRotationSucceeded { get; } = new WebhookFilters("environment_rotation_succeeded");
+        /// <summary>
+        /// Trigger a webhook when an environment rotation fails.
+        /// </summary>
+        public static WebhookFilters EnvironmentRotationFailed { get; } = new WebhookFilters("environment_rotation_failed");
 
         public static bool operator ==(WebhookFilters left, WebhookFilters right) => left.Equals(right);
         public static bool operator !=(WebhookFilters left, WebhookFilters right) => !left.Equals(right);

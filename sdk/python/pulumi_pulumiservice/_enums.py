@@ -329,6 +329,14 @@ class WebhookFilters(_builtins.str, Enum):
     """
     Trigger a webhook when an imported environment has changed.
     """
+    ENVIRONMENT_ROTATION_SUCCEEDED = "environment_rotation_succeeded"
+    """
+    Trigger a webhook when an environment rotation succeeds.
+    """
+    ENVIRONMENT_ROTATION_FAILED = "environment_rotation_failed"
+    """
+    Trigger a webhook when an environment rotation fails.
+    """
 
 
 @pulumi.type_token("pulumiservice:index:WebhookFormat")

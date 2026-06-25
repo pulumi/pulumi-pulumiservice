@@ -1190,6 +1190,16 @@
           "name": "ImportedEnvironmentChanged",
           "description": "Trigger a webhook when an imported environment has changed.",
           "value": "imported_environment_changed"
+        },
+        {
+          "name": "EnvironmentRotationSucceeded",
+          "description": "Trigger a webhook when an environment rotation succeeds.",
+          "value": "environment_rotation_succeeded"
+        },
+        {
+          "name": "EnvironmentRotationFailed",
+          "description": "Trigger a webhook when an environment rotation fails.",
+          "value": "environment_rotation_failed"
         }
       ]
     },

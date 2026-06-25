@@ -317,6 +317,14 @@ export const WebhookFilters = {
      * Trigger a webhook when an imported environment has changed.
      */
     ImportedEnvironmentChanged: "imported_environment_changed",
+    /**
+     * Trigger a webhook when an environment rotation succeeds.
+     */
+    EnvironmentRotationSucceeded: "environment_rotation_succeeded",
+    /**
+     * Trigger a webhook when an environment rotation fails.
+     */
+    EnvironmentRotationFailed: "environment_rotation_failed",
 } as const;
 
 export type WebhookFilters = (typeof WebhookFilters)[keyof typeof WebhookFilters];

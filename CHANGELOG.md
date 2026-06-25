@@ -27,6 +27,7 @@
 
 ### Improvements
 
+- Added `EnvironmentRotationSucceeded` and `EnvironmentRotationFailed` webhook filters.
 - Added `PolicyPack` resource for publishing policy packs to Pulumi Cloud directly from a Pulumi program. The source directory is tarballed and uploaded on Create; the pack's policy metadata is auto-extracted by running its language analyzer plugin (matching `pulumi policy publish` behavior) and may be overridden inline.
 - Added `PolicyGroupStackAttachment` and `PolicyGroupInsightsAccountAttachment` resources for managing a single stack or Insights-account membership of a Policy Group as a standalone resource, rather than declaring the full membership list on the group.
 - The provider now honors `PULUMI_API` as a fallback when `PULUMI_BACKEND_URL` is unset. Without this fallback, a workflow that sets only `PULUMI_API` (e.g. logging into a non-prod backend) would silently dial `api.pulumi.com` and the non-prod token would 401. `PULUMI_BACKEND_URL` still wins when both are set.
