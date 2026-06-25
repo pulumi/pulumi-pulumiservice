@@ -131,6 +131,8 @@ export class DeploymentSettings extends pulumi.CustomResource {
             resourceInputs["vcs"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
+        const replaceOnChanges = { replaceOnChanges: ["organization", "project", "stack"] };
+        opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(DeploymentSettings.__pulumiType, name, resourceInputs, opts);
     }
 }

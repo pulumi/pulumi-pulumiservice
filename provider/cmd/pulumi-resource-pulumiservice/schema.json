@@ -5095,11 +5095,13 @@
         },
         "organization": {
           "type": "string",
-          "description": "Organization name."
+          "description": "Organization name.",
+          "replaceOnChanges": true
         },
         "project": {
           "type": "string",
-          "description": "Project name."
+          "description": "Project name.",
+          "replaceOnChanges": true
         },
         "sourceContext": {
           "$ref": "#/types/pulumiservice:index:DeploymentSettingsSourceContext",
@@ -5107,7 +5109,8 @@
         },
         "stack": {
           "type": "string",
-          "description": "Stack name."
+          "description": "Stack name.",
+          "replaceOnChanges": true
         },
         "vcs": {
           "$ref": "#/types/pulumiservice:index:DeploymentSettingsVcs",
@@ -5144,12 +5147,12 @@
         "organization": {
           "type": "string",
           "description": "Organization name.",
-          "willReplaceOnChanges": true
+          "replaceOnChanges": true
         },
         "project": {
           "type": "string",
           "description": "Project name.",
-          "willReplaceOnChanges": true
+          "replaceOnChanges": true
         },
         "sourceContext": {
           "$ref": "#/types/pulumiservice:index:DeploymentSettingsSourceContext",
@@ -5158,7 +5161,7 @@
         "stack": {
           "type": "string",
           "description": "Stack name.",
-          "willReplaceOnChanges": true
+          "replaceOnChanges": true
         },
         "vcs": {
           "$ref": "#/types/pulumiservice:index:DeploymentSettingsVcs",
