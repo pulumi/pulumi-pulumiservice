@@ -13,6 +13,7 @@ if sys.version_info >= (3, 11):
 else:
     from typing_extensions import NotRequired, TypedDict, TypeAlias
 from ... import _utilities
+from ... import api as _api
 
 __all__ = ['BitBucketIntegrationArgs', 'BitBucketIntegration']
 
@@ -228,7 +229,7 @@ class BitBucketIntegration(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter(name="authUser")
-    def auth_user(self) -> pulumi.Output[Optional[Any]]:
+    def auth_user(self) -> pulumi.Output[Optional['_api.outputs.User']]:
         """
         The user whose BitBucket OAuth token is being used for authentication, if user-based auth is configured.
         """

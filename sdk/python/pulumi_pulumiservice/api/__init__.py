@@ -16,6 +16,8 @@ from .policy_group import *
 from .policy_group_insights_account_attachment import *
 from .policy_group_stack_attachment import *
 from .role import *
+from ._inputs import *
+from . import outputs
 
 # Make subpackages available:
 if typing.TYPE_CHECKING:

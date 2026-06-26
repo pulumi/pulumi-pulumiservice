@@ -13,6 +13,7 @@ if sys.version_info >= (3, 11):
 else:
     from typing_extensions import NotRequired, TypedDict, TypeAlias
 from ... import _utilities
+from ... import api as _api
 
 __all__ = ['GitHubEnterpriseIntegrationArgs', 'GitHubEnterpriseIntegration']
 
@@ -311,7 +312,7 @@ class GitHubEnterpriseIntegration(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter(name="ghUrls")
-    def gh_urls(self) -> pulumi.Output[Optional[Any]]:
+    def gh_urls(self) -> pulumi.Output[Optional['_api.outputs.GitHubAppURLs']]:
         """
         URL to configure repository access for this GitHub App installation.
         """
@@ -359,7 +360,7 @@ class GitHubEnterpriseIntegration(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter(name="neoGitHubAppPermissionRequirements")
-    def neo_git_hub_app_permission_requirements(self) -> pulumi.Output[Optional[Sequence[Any]]]:
+    def neo_git_hub_app_permission_requirements(self) -> pulumi.Output[Optional[Sequence['_api.outputs.GitHubAppPermissionRequirement']]]:
         """
         Neo GitHub App permission requirements for this installation.
         """

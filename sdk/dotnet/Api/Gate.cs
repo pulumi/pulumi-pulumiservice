@@ -43,7 +43,7 @@ namespace Pulumi.PulumiService.Api
         /// Target configuration for the gate
         /// </summary>
         [Output("target")]
-        public Output<object> Target { get; private set; } = null!;
+        public Output<Outputs.ChangeGateTargetOutput> Target { get; private set; } = null!;
 
 
         /// <summary>
@@ -124,7 +124,7 @@ namespace Pulumi.PulumiService.Api
         /// Target configuration for the gate
         /// </summary>
         [Input("target", required: true)]
-        public Input<object> Target { get; set; } = null!;
+        public Input<Inputs.ChangeGateTargetInputArgs> Target { get; set; } = null!;
 
         public GateArgs()
         {

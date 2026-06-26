@@ -9,7 +9,7 @@ import com.pulumi.core.annotations.ResourceType;
 import com.pulumi.core.internal.Codegen;
 import com.pulumi.pulumiservice.Utilities;
 import com.pulumi.pulumiservice.api.DefaultOrganizationArgs;
-import java.lang.Object;
+import com.pulumi.pulumiservice.api.outputs.AppMessage;
 import java.lang.String;
 import java.util.List;
 import javax.annotation.Nullable;
@@ -42,8 +42,8 @@ public class DefaultOrganization extends com.pulumi.resources.CustomResource {
      * Can be possibly empty.
      * 
      */
-    @Export(name="Messages", refs={List.class,Object.class}, tree="[0,1]")
-    private Output<List<Object>> Messages;
+    @Export(name="Messages", refs={List.class,AppMessage.class}, tree="[0,1]")
+    private Output<List<AppMessage>> Messages;
 
     /**
      * @return Messages is a list of messages that should be displayed to the user that contextualize
@@ -53,7 +53,7 @@ public class DefaultOrganization extends com.pulumi.resources.CustomResource {
      * Can be possibly empty.
      * 
      */
-    public Output<List<Object>> Messages() {
+    public Output<List<AppMessage>> Messages() {
         return this.Messages;
     }
 

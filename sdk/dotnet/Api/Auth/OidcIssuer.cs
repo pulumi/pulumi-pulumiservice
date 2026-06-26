@@ -37,7 +37,7 @@ namespace Pulumi.PulumiService.Api.Auth
         /// The JSON Web Key Set for the OIDC issuer.
         /// </summary>
         [Output("jwks")]
-        public Output<object?> Jwks { get; private set; } = null!;
+        public Output<Pulumi.PulumiService.Api.Outputs.JSONWebKeySet?> Jwks { get; private set; } = null!;
 
         /// <summary>
         /// The ISO 8601 timestamp when the OIDC issuer was last used for token exchange.
@@ -130,7 +130,7 @@ namespace Pulumi.PulumiService.Api.Auth
         /// The JSON Web Key Set for the OIDC issuer.
         /// </summary>
         [Input("jwks")]
-        public Input<object>? Jwks { get; set; }
+        public Input<Pulumi.PulumiService.Api.Inputs.JSONWebKeySetArgs>? Jwks { get; set; }
 
         /// <summary>
         /// The maximum token expiration time in seconds.

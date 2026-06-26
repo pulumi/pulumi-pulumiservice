@@ -9,8 +9,9 @@ import com.pulumi.core.annotations.ResourceType;
 import com.pulumi.core.internal.Codegen;
 import com.pulumi.pulumiservice.Utilities;
 import com.pulumi.pulumiservice.api.AuditLogExportConfigurationArgs;
+import com.pulumi.pulumiservice.api.outputs.AuditLogExportResult;
+import com.pulumi.pulumiservice.api.outputs.AuditLogsExportS3Config;
 import java.lang.Boolean;
-import java.lang.Object;
 import javax.annotation.Nullable;
 
 /**
@@ -37,28 +38,28 @@ public class AuditLogExportConfiguration extends com.pulumi.resources.CustomReso
      * The result of the last audit log export attempt.
      * 
      */
-    @Export(name="lastResult", refs={Object.class}, tree="[0]")
-    private Output<Object> lastResult;
+    @Export(name="lastResult", refs={AuditLogExportResult.class}, tree="[0]")
+    private Output<AuditLogExportResult> lastResult;
 
     /**
      * @return The result of the last audit log export attempt.
      * 
      */
-    public Output<Object> lastResult() {
+    public Output<AuditLogExportResult> lastResult() {
         return this.lastResult;
     }
     /**
      * The S3 configuration for exporting audit logs.
      * 
      */
-    @Export(name="s3Config", refs={Object.class}, tree="[0]")
-    private Output<Object> s3Config;
+    @Export(name="s3Config", refs={AuditLogsExportS3Config.class}, tree="[0]")
+    private Output<AuditLogsExportS3Config> s3Config;
 
     /**
      * @return The S3 configuration for exporting audit logs.
      * 
      */
-    public Output<Object> s3Config() {
+    public Output<AuditLogsExportS3Config> s3Config() {
         return this.s3Config;
     }
 

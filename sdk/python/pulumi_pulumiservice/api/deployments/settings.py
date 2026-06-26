@@ -13,6 +13,7 @@ if sys.version_info >= (3, 11):
 else:
     from typing_extensions import NotRequired, TypedDict, TypeAlias
 from ... import _utilities
+from ... import api as _api
 
 __all__ = ['SettingsArgs', 'Settings']
 
@@ -23,11 +24,11 @@ class SettingsArgs:
                  project_name: pulumi.Input[_builtins.str],
                  stack_name: pulumi.Input[_builtins.str],
                  agent_pool_id: pulumi.Input[Optional[_builtins.str]] = None,
-                 cache_options: Optional[Any] = None,
-                 executor_context: Optional[Any] = None,
-                 git_hub: Optional[Any] = None,
-                 operation_context: Optional[Any] = None,
-                 source_context: Optional[Any] = None,
+                 cache_options: pulumi.Input[Optional['_api.CacheOptionsRequestArgs']] = None,
+                 executor_context: pulumi.Input[Optional['_api.ExecutorSettingsRequestArgs']] = None,
+                 git_hub: pulumi.Input[Optional['_api.DeploymentSettingsGitHubRequestArgs']] = None,
+                 operation_context: pulumi.Input[Optional['_api.OperationContextRequestArgs']] = None,
+                 source_context: pulumi.Input[Optional['_api.SourceContextRequestArgs']] = None,
                  tag: pulumi.Input[Optional[_builtins.str]] = None,
                  vcs: Optional[Any] = None):
         """
@@ -37,11 +38,11 @@ class SettingsArgs:
         :param pulumi.Input[_builtins.str] project_name: The project name
         :param pulumi.Input[_builtins.str] stack_name: The stack name
         :param pulumi.Input[_builtins.str] agent_pool_id: The identifier of the agent pool to use for deployments.
-        :param Any cache_options: Cache options for the deployment.
-        :param Any executor_context: The executor context defining the execution environment.
-        :param Any git_hub: GitHub-specific deployment settings
-        :param Any operation_context: The operation context defining pre-run and post-run commands and environment variables.
-        :param Any source_context: The source context defining where the source code is located.
+        :param pulumi.Input['_api.CacheOptionsRequestArgs'] cache_options: Cache options for the deployment.
+        :param pulumi.Input['_api.ExecutorSettingsRequestArgs'] executor_context: The executor context defining the execution environment.
+        :param pulumi.Input['_api.DeploymentSettingsGitHubRequestArgs'] git_hub: GitHub-specific deployment settings
+        :param pulumi.Input['_api.OperationContextRequestArgs'] operation_context: The operation context defining pre-run and post-run commands and environment variables.
+        :param pulumi.Input['_api.SourceContextRequestArgs'] source_context: The source context defining where the source code is located.
         :param pulumi.Input[_builtins.str] tag: A tag to identify the deployment settings configuration.
         :param Any vcs: VCS provider settings
         """
@@ -115,62 +116,62 @@ class SettingsArgs:
 
     @_builtins.property
     @pulumi.getter(name="cacheOptions")
-    def cache_options(self) -> Optional[Any]:
+    def cache_options(self) -> pulumi.Input[Optional['_api.CacheOptionsRequestArgs']]:
         """
         Cache options for the deployment.
         """
         return pulumi.get(self, "cache_options")
 
     @cache_options.setter
-    def cache_options(self, value: Optional[Any]):
+    def cache_options(self, value: pulumi.Input[Optional['_api.CacheOptionsRequestArgs']]):
         pulumi.set(self, "cache_options", value)
 
     @_builtins.property
     @pulumi.getter(name="executorContext")
-    def executor_context(self) -> Optional[Any]:
+    def executor_context(self) -> pulumi.Input[Optional['_api.ExecutorSettingsRequestArgs']]:
         """
         The executor context defining the execution environment.
         """
         return pulumi.get(self, "executor_context")
 
     @executor_context.setter
-    def executor_context(self, value: Optional[Any]):
+    def executor_context(self, value: pulumi.Input[Optional['_api.ExecutorSettingsRequestArgs']]):
         pulumi.set(self, "executor_context", value)
 
     @_builtins.property
     @pulumi.getter(name="gitHub")
-    def git_hub(self) -> Optional[Any]:
+    def git_hub(self) -> pulumi.Input[Optional['_api.DeploymentSettingsGitHubRequestArgs']]:
         """
         GitHub-specific deployment settings
         """
         return pulumi.get(self, "git_hub")
 
     @git_hub.setter
-    def git_hub(self, value: Optional[Any]):
+    def git_hub(self, value: pulumi.Input[Optional['_api.DeploymentSettingsGitHubRequestArgs']]):
         pulumi.set(self, "git_hub", value)
 
     @_builtins.property
     @pulumi.getter(name="operationContext")
-    def operation_context(self) -> Optional[Any]:
+    def operation_context(self) -> pulumi.Input[Optional['_api.OperationContextRequestArgs']]:
         """
         The operation context defining pre-run and post-run commands and environment variables.
         """
         return pulumi.get(self, "operation_context")
 
     @operation_context.setter
-    def operation_context(self, value: Optional[Any]):
+    def operation_context(self, value: pulumi.Input[Optional['_api.OperationContextRequestArgs']]):
         pulumi.set(self, "operation_context", value)
 
     @_builtins.property
     @pulumi.getter(name="sourceContext")
-    def source_context(self) -> Optional[Any]:
+    def source_context(self) -> pulumi.Input[Optional['_api.SourceContextRequestArgs']]:
         """
         The source context defining where the source code is located.
         """
         return pulumi.get(self, "source_context")
 
     @source_context.setter
-    def source_context(self, value: Optional[Any]):
+    def source_context(self, value: pulumi.Input[Optional['_api.SourceContextRequestArgs']]):
         pulumi.set(self, "source_context", value)
 
     @_builtins.property
@@ -205,13 +206,13 @@ class Settings(pulumi.CustomResource):
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
                  agent_pool_id: pulumi.Input[Optional[_builtins.str]] = None,
-                 cache_options: Optional[Any] = None,
-                 executor_context: Optional[Any] = None,
-                 git_hub: Optional[Any] = None,
-                 operation_context: Optional[Any] = None,
+                 cache_options: pulumi.Input[Optional[Union['_api.CacheOptionsRequestArgs', '_api.CacheOptionsRequestArgsDict']]] = None,
+                 executor_context: pulumi.Input[Optional[Union['_api.ExecutorSettingsRequestArgs', '_api.ExecutorSettingsRequestArgsDict']]] = None,
+                 git_hub: pulumi.Input[Optional[Union['_api.DeploymentSettingsGitHubRequestArgs', '_api.DeploymentSettingsGitHubRequestArgsDict']]] = None,
+                 operation_context: pulumi.Input[Optional[Union['_api.OperationContextRequestArgs', '_api.OperationContextRequestArgsDict']]] = None,
                  org_name: pulumi.Input[Optional[_builtins.str]] = None,
                  project_name: pulumi.Input[Optional[_builtins.str]] = None,
-                 source_context: Optional[Any] = None,
+                 source_context: pulumi.Input[Optional[Union['_api.SourceContextRequestArgs', '_api.SourceContextRequestArgsDict']]] = None,
                  stack_name: pulumi.Input[Optional[_builtins.str]] = None,
                  tag: pulumi.Input[Optional[_builtins.str]] = None,
                  vcs: Optional[Any] = None,
@@ -223,13 +224,13 @@ class Settings(pulumi.CustomResource):
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] agent_pool_id: The identifier of the agent pool to use for deployments.
-        :param Any cache_options: Cache options for the deployment.
-        :param Any executor_context: The executor context defining the execution environment.
-        :param Any git_hub: GitHub-specific deployment settings
-        :param Any operation_context: The operation context defining pre-run and post-run commands and environment variables.
+        :param pulumi.Input[Union['_api.CacheOptionsRequestArgs', '_api.CacheOptionsRequestArgsDict']] cache_options: Cache options for the deployment.
+        :param pulumi.Input[Union['_api.ExecutorSettingsRequestArgs', '_api.ExecutorSettingsRequestArgsDict']] executor_context: The executor context defining the execution environment.
+        :param pulumi.Input[Union['_api.DeploymentSettingsGitHubRequestArgs', '_api.DeploymentSettingsGitHubRequestArgsDict']] git_hub: GitHub-specific deployment settings
+        :param pulumi.Input[Union['_api.OperationContextRequestArgs', '_api.OperationContextRequestArgsDict']] operation_context: The operation context defining pre-run and post-run commands and environment variables.
         :param pulumi.Input[_builtins.str] org_name: The organization name
         :param pulumi.Input[_builtins.str] project_name: The project name
-        :param Any source_context: The source context defining where the source code is located.
+        :param pulumi.Input[Union['_api.SourceContextRequestArgs', '_api.SourceContextRequestArgsDict']] source_context: The source context defining where the source code is located.
         :param pulumi.Input[_builtins.str] stack_name: The stack name
         :param pulumi.Input[_builtins.str] tag: A tag to identify the deployment settings configuration.
         :param Any vcs: VCS provider settings
@@ -260,13 +261,13 @@ class Settings(pulumi.CustomResource):
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
                  agent_pool_id: pulumi.Input[Optional[_builtins.str]] = None,
-                 cache_options: Optional[Any] = None,
-                 executor_context: Optional[Any] = None,
-                 git_hub: Optional[Any] = None,
-                 operation_context: Optional[Any] = None,
+                 cache_options: pulumi.Input[Optional[Union['_api.CacheOptionsRequestArgs', '_api.CacheOptionsRequestArgsDict']]] = None,
+                 executor_context: pulumi.Input[Optional[Union['_api.ExecutorSettingsRequestArgs', '_api.ExecutorSettingsRequestArgsDict']]] = None,
+                 git_hub: pulumi.Input[Optional[Union['_api.DeploymentSettingsGitHubRequestArgs', '_api.DeploymentSettingsGitHubRequestArgsDict']]] = None,
+                 operation_context: pulumi.Input[Optional[Union['_api.OperationContextRequestArgs', '_api.OperationContextRequestArgsDict']]] = None,
                  org_name: pulumi.Input[Optional[_builtins.str]] = None,
                  project_name: pulumi.Input[Optional[_builtins.str]] = None,
-                 source_context: Optional[Any] = None,
+                 source_context: pulumi.Input[Optional[Union['_api.SourceContextRequestArgs', '_api.SourceContextRequestArgsDict']]] = None,
                  stack_name: pulumi.Input[Optional[_builtins.str]] = None,
                  tag: pulumi.Input[Optional[_builtins.str]] = None,
                  vcs: Optional[Any] = None,
@@ -342,7 +343,7 @@ class Settings(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter(name="cacheOptions")
-    def cache_options(self) -> pulumi.Output[Optional[Any]]:
+    def cache_options(self) -> pulumi.Output[Optional['_api.outputs.CacheOptions']]:
         """
         Cache options for the deployment.
         """
@@ -350,7 +351,7 @@ class Settings(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter(name="executorContext")
-    def executor_context(self) -> pulumi.Output[Optional[Any]]:
+    def executor_context(self) -> pulumi.Output[Optional['_api.outputs.ExecutorContext']]:
         """
         The executor context defining the execution environment.
         """
@@ -358,7 +359,7 @@ class Settings(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter(name="gitHub")
-    def git_hub(self) -> pulumi.Output[Optional[Any]]:
+    def git_hub(self) -> pulumi.Output[Optional['_api.outputs.DeploymentSettingsGitHub']]:
         """
         GitHub-specific deployment settings
         """
@@ -366,7 +367,7 @@ class Settings(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter(name="operationContext")
-    def operation_context(self) -> pulumi.Output[Optional[Any]]:
+    def operation_context(self) -> pulumi.Output[Optional['_api.outputs.OperationContext']]:
         """
         The operation context defining pre-run and post-run commands and environment variables.
         """
@@ -382,7 +383,7 @@ class Settings(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter(name="sourceContext")
-    def source_context(self) -> pulumi.Output[Optional[Any]]:
+    def source_context(self) -> pulumi.Output[Optional['_api.outputs.SourceContext']]:
         """
         The source context defining where the source code is located.
         """

@@ -8,8 +8,11 @@ import com.pulumi.core.annotations.Export;
 import com.pulumi.core.annotations.ResourceType;
 import com.pulumi.core.internal.Codegen;
 import com.pulumi.pulumiservice.Utilities;
+import com.pulumi.pulumiservice.api.outputs.TeamAccountPermission;
+import com.pulumi.pulumiservice.api.outputs.TeamEnvironmentSettings;
+import com.pulumi.pulumiservice.api.outputs.TeamMemberInfo;
+import com.pulumi.pulumiservice.api.outputs.TeamStackPermission;
 import com.pulumi.pulumiservice.api_teams.TeamArgs;
-import java.lang.Object;
 import java.lang.String;
 import java.util.List;
 import java.util.Optional;
@@ -26,14 +29,14 @@ public class Team extends com.pulumi.resources.CustomResource {
      * The list of account permissions granted to the team.
      * 
      */
-    @Export(name="accounts", refs={List.class,Object.class}, tree="[0,1]")
-    private Output</* @Nullable */ List<Object>> accounts;
+    @Export(name="accounts", refs={List.class,TeamAccountPermission.class}, tree="[0,1]")
+    private Output</* @Nullable */ List<TeamAccountPermission>> accounts;
 
     /**
      * @return The list of account permissions granted to the team.
      * 
      */
-    public Output<Optional<List<Object>>> accounts() {
+    public Output<Optional<List<TeamAccountPermission>>> accounts() {
         return Codegen.optional(this.accounts);
     }
     /**
@@ -68,14 +71,14 @@ public class Team extends com.pulumi.resources.CustomResource {
      * The list of environment settings for the team.
      * 
      */
-    @Export(name="environments", refs={List.class,Object.class}, tree="[0,1]")
-    private Output</* @Nullable */ List<Object>> environments;
+    @Export(name="environments", refs={List.class,TeamEnvironmentSettings.class}, tree="[0,1]")
+    private Output</* @Nullable */ List<TeamEnvironmentSettings>> environments;
 
     /**
      * @return The list of environment settings for the team.
      * 
      */
-    public Output<Optional<List<Object>>> environments() {
+    public Output<Optional<List<TeamEnvironmentSettings>>> environments() {
         return Codegen.optional(this.environments);
     }
     /**
@@ -114,14 +117,14 @@ public class Team extends com.pulumi.resources.CustomResource {
      * The list of team members.
      * 
      */
-    @Export(name="members", refs={List.class,Object.class}, tree="[0,1]")
-    private Output</* @Nullable */ List<Object>> members;
+    @Export(name="members", refs={List.class,TeamMemberInfo.class}, tree="[0,1]")
+    private Output</* @Nullable */ List<TeamMemberInfo>> members;
 
     /**
      * @return The list of team members.
      * 
      */
-    public Output<Optional<List<Object>>> members() {
+    public Output<Optional<List<TeamMemberInfo>>> members() {
         return Codegen.optional(this.members);
     }
     /**
@@ -158,14 +161,14 @@ public class Team extends com.pulumi.resources.CustomResource {
      * The list of stack permissions granted to the team.
      * 
      */
-    @Export(name="stacks", refs={List.class,Object.class}, tree="[0,1]")
-    private Output</* @Nullable */ List<Object>> stacks;
+    @Export(name="stacks", refs={List.class,TeamStackPermission.class}, tree="[0,1]")
+    private Output</* @Nullable */ List<TeamStackPermission>> stacks;
 
     /**
      * @return The list of stack permissions granted to the team.
      * 
      */
-    public Output<Optional<List<Object>>> stacks() {
+    public Output<Optional<List<TeamStackPermission>>> stacks() {
         return Codegen.optional(this.stacks);
     }
     /**

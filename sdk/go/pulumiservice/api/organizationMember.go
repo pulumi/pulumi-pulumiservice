@@ -23,17 +23,17 @@ type OrganizationMember struct {
 	// When the member joined the organization.
 	Created pulumi.StringOutput `pulumi:"created"`
 	// The role currently assigned to this member — either a built-in role (member, admin, billingManager) or a custom role. Falls back to the organization's default role if no role is assigned directly.
-	FgaRole pulumi.AnyOutput `pulumi:"fgaRole"`
+	FgaRole FGARoleOutput `pulumi:"fgaRole"`
 	// KnownToPulumi returns if the organization member has a Pulumi account.
 	KnownToPulumi pulumi.BoolOutput `pulumi:"knownToPulumi"`
 	// Links to the member in the Pulumi Console
-	Links pulumi.AnyOutput `pulumi:"links"`
+	Links MemberLinksPtrOutput `pulumi:"links"`
 	// **Deprecated:** Use `fgaRole` instead. The member's built-in role within the organization. For members assigned a custom role, this is the closest built-in projection (`member`, `admin`, or `billingManager`) and may lose detail; `fgaRole` is authoritative.
 	Role pulumi.StringOutput `pulumi:"role"`
 	// Deprecated. Use GetOrganizationMemberTeams to list teams.
 	Teams pulumi.StringArrayOutput `pulumi:"teams"`
 	// The user information for this organization member.
-	User pulumi.AnyOutput `pulumi:"user"`
+	User UserInfoOutput `pulumi:"user"`
 	// VirtualAdmin indicates that the member does not have admin access on the
 	// backing identity provider, but does have admin access to the Pulumi organization.
 	VirtualAdmin pulumi.BoolOutput `pulumi:"virtualAdmin"`
@@ -199,8 +199,8 @@ func (o OrganizationMemberOutput) Created() pulumi.StringOutput {
 }
 
 // The role currently assigned to this member — either a built-in role (member, admin, billingManager) or a custom role. Falls back to the organization's default role if no role is assigned directly.
-func (o OrganizationMemberOutput) FgaRole() pulumi.AnyOutput {
-	return o.ApplyT(func(v *OrganizationMember) pulumi.AnyOutput { return v.FgaRole }).(pulumi.AnyOutput)
+func (o OrganizationMemberOutput) FgaRole() FGARoleOutput {
+	return o.ApplyT(func(v *OrganizationMember) FGARoleOutput { return v.FgaRole }).(FGARoleOutput)
 }
 
 // KnownToPulumi returns if the organization member has a Pulumi account.
@@ -209,8 +209,8 @@ func (o OrganizationMemberOutput) KnownToPulumi() pulumi.BoolOutput {
 }
 
 // Links to the member in the Pulumi Console
-func (o OrganizationMemberOutput) Links() pulumi.AnyOutput {
-	return o.ApplyT(func(v *OrganizationMember) pulumi.AnyOutput { return v.Links }).(pulumi.AnyOutput)
+func (o OrganizationMemberOutput) Links() MemberLinksPtrOutput {
+	return o.ApplyT(func(v *OrganizationMember) MemberLinksPtrOutput { return v.Links }).(MemberLinksPtrOutput)
 }
 
 // **Deprecated:** Use `fgaRole` instead. The member's built-in role within the organization. For members assigned a custom role, this is the closest built-in projection (`member`, `admin`, or `billingManager`) and may lose detail; `fgaRole` is authoritative.
@@ -224,8 +224,8 @@ func (o OrganizationMemberOutput) Teams() pulumi.StringArrayOutput {
 }
 
 // The user information for this organization member.
-func (o OrganizationMemberOutput) User() pulumi.AnyOutput {
-	return o.ApplyT(func(v *OrganizationMember) pulumi.AnyOutput { return v.User }).(pulumi.AnyOutput)
+func (o OrganizationMemberOutput) User() UserInfoOutput {
+	return o.ApplyT(func(v *OrganizationMember) UserInfoOutput { return v.User }).(UserInfoOutput)
 }
 
 // VirtualAdmin indicates that the member does not have admin access on the

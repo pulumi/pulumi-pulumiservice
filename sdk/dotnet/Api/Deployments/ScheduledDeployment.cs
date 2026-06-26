@@ -142,7 +142,7 @@ namespace Pulumi.PulumiService.Api.Deployments
         /// Deployment request payload to execute when the schedule fires. This has the same shape and semantics as CreateDeploymentRequest used for immediate deployments.
         /// </summary>
         [Input("request")]
-        public Input<object>? Request { get; set; }
+        public Input<Pulumi.PulumiService.Api.Inputs.CreateDeploymentRequestArgs>? Request { get; set; }
 
         /// <summary>
         /// Cron expression defining a recurring schedule for this deployment. When set, scheduleOnce must be null. Uses standard 5-field cron syntax (MIN HOUR DOM MON DOW) and is evaluated in UTC.

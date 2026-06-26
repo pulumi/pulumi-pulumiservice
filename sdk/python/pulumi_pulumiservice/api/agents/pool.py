@@ -13,6 +13,7 @@ if sys.version_info >= (3, 11):
 else:
     from typing_extensions import NotRequired, TypedDict, TypeAlias
 from ... import _utilities
+from ... import api as _api
 
 __all__ = ['PoolArgs', 'Pool']
 
@@ -193,7 +194,7 @@ class Pool(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter
-    def agents(self) -> pulumi.Output[Sequence[Any]]:
+    def agents(self) -> pulumi.Output[Sequence['_api.outputs.DeploymentAgentMetadata']]:
         """
         The agents
         """

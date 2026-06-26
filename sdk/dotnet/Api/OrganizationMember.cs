@@ -29,7 +29,7 @@ namespace Pulumi.PulumiService.Api
         /// The role currently assigned to this member — either a built-in role (member, admin, billingManager) or a custom role. Falls back to the organization's default role if no role is assigned directly.
         /// </summary>
         [Output("fgaRole")]
-        public Output<object> FgaRole { get; private set; } = null!;
+        public Output<Outputs.FGARole> FgaRole { get; private set; } = null!;
 
         /// <summary>
         /// KnownToPulumi returns if the organization member has a Pulumi account.
@@ -41,7 +41,7 @@ namespace Pulumi.PulumiService.Api
         /// Links to the member in the Pulumi Console
         /// </summary>
         [Output("links")]
-        public Output<object?> Links { get; private set; } = null!;
+        public Output<Outputs.MemberLinks?> Links { get; private set; } = null!;
 
         /// <summary>
         /// **Deprecated:** Use `fgaRole` instead. The member's built-in role within the organization. For members assigned a custom role, this is the closest built-in projection (`member`, `admin`, or `billingManager`) and may lose detail; `fgaRole` is authoritative.
@@ -59,7 +59,7 @@ namespace Pulumi.PulumiService.Api
         /// The user information for this organization member.
         /// </summary>
         [Output("user")]
-        public Output<object> User { get; private set; } = null!;
+        public Output<Outputs.UserInfo> User { get; private set; } = null!;
 
         /// <summary>
         /// VirtualAdmin indicates that the member does not have admin access on the

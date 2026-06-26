@@ -9,6 +9,7 @@ import com.pulumi.core.annotations.ResourceType;
 import com.pulumi.core.internal.Codegen;
 import com.pulumi.pulumiservice.Utilities;
 import com.pulumi.pulumiservice.api.GateArgs;
+import com.pulumi.pulumiservice.api.outputs.ChangeGateTargetOutput;
 import java.lang.Boolean;
 import java.lang.Object;
 import java.lang.String;
@@ -80,14 +81,14 @@ public class Gate extends com.pulumi.resources.CustomResource {
      * Target configuration for the gate
      * 
      */
-    @Export(name="target", refs={Object.class}, tree="[0]")
-    private Output<Object> target;
+    @Export(name="target", refs={ChangeGateTargetOutput.class}, tree="[0]")
+    private Output<ChangeGateTargetOutput> target;
 
     /**
      * @return Target configuration for the gate
      * 
      */
-    public Output<Object> target() {
+    public Output<ChangeGateTargetOutput> target() {
         return this.target;
     }
 

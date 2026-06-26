@@ -25,13 +25,13 @@ namespace Pulumi.PulumiService.Api
         /// The result of the last audit log export attempt.
         /// </summary>
         [Output("lastResult")]
-        public Output<object> LastResult { get; private set; } = null!;
+        public Output<Outputs.AuditLogExportResult> LastResult { get; private set; } = null!;
 
         /// <summary>
         /// The S3 configuration for exporting audit logs.
         /// </summary>
         [Output("s3Config")]
-        public Output<object> S3Config { get; private set; } = null!;
+        public Output<Outputs.AuditLogsExportS3Config> S3Config { get; private set; } = null!;
 
 
         /// <summary>
@@ -88,7 +88,7 @@ namespace Pulumi.PulumiService.Api
         /// The new S3 configuration for audit log export.
         /// </summary>
         [Input("newS3Configuration", required: true)]
-        public Input<object> NewS3Configuration { get; set; } = null!;
+        public Input<Inputs.AuditLogsExportS3ConfigArgs> NewS3Configuration { get; set; } = null!;
 
         /// <summary>
         /// The organization name

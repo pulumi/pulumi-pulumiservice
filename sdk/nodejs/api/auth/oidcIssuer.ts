@@ -2,6 +2,9 @@
 // *** Do not edit by hand unless you're certain you know what you are doing! ***
 
 import * as pulumi from "@pulumi/pulumi";
+import * as inputs from "../../types/input";
+import * as outputs from "../../types/output";
+import * as enums from "../../types/enums";
 import * as utilities from "../../utilities";
 
 /**
@@ -49,7 +52,7 @@ export class OidcIssuer extends pulumi.CustomResource {
     /**
      * The JSON Web Key Set for the OIDC issuer.
      */
-    declare public readonly jwks: pulumi.Output<any | undefined>;
+    declare public readonly jwks: pulumi.Output<outputs.api.JSONWebKeySet | undefined>;
     /**
      * The ISO 8601 timestamp when the OIDC issuer was last used for token exchange.
      */
@@ -134,7 +137,7 @@ export interface OidcIssuerArgs {
     /**
      * The JSON Web Key Set for the OIDC issuer.
      */
-    jwks?: any | undefined;
+    jwks?: pulumi.Input<inputs.api.JSONWebKeySetArgs | undefined>;
     /**
      * The maximum token expiration time in seconds.
      */

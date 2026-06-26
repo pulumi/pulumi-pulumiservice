@@ -6,7 +6,7 @@ package com.pulumi.pulumiservice.api_auth;
 import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
 import com.pulumi.exceptions.MissingRequiredPropertyException;
-import java.lang.Object;
+import com.pulumi.pulumiservice.api.inputs.AuthPolicyDefinitionArgs;
 import java.lang.String;
 import java.util.List;
 import java.util.Objects;
@@ -53,13 +53,13 @@ public final class PolicyArgs extends com.pulumi.resources.ResourceArgs {
      * 
      */
     @Import(name="policies", required=true)
-    private Output<List<Object>> policies;
+    private Output<List<AuthPolicyDefinitionArgs>> policies;
 
     /**
      * @return List of policies
      * 
      */
-    public Output<List<Object>> policies() {
+    public Output<List<AuthPolicyDefinitionArgs>> policies() {
         return this.policies;
     }
 
@@ -153,7 +153,7 @@ public final class PolicyArgs extends com.pulumi.resources.ResourceArgs {
          * @return builder
          * 
          */
-        public Builder policies(Output<List<Object>> policies) {
+        public Builder policies(Output<List<AuthPolicyDefinitionArgs>> policies) {
             $.policies = policies;
             return this;
         }
@@ -164,7 +164,7 @@ public final class PolicyArgs extends com.pulumi.resources.ResourceArgs {
          * @return builder
          * 
          */
-        public Builder policies(List<Object> policies) {
+        public Builder policies(List<AuthPolicyDefinitionArgs> policies) {
             return policies(Output.of(policies));
         }
 
@@ -174,7 +174,7 @@ public final class PolicyArgs extends com.pulumi.resources.ResourceArgs {
          * @return builder
          * 
          */
-        public Builder policies(Object... policies) {
+        public Builder policies(AuthPolicyDefinitionArgs... policies) {
             return policies(List.of(policies));
         }
 

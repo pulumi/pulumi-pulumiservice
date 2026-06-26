@@ -9,8 +9,8 @@ import com.pulumi.core.annotations.ResourceType;
 import com.pulumi.core.internal.Codegen;
 import com.pulumi.pulumiservice.Utilities;
 import com.pulumi.pulumiservice.api.OrgTemplateCollectionArgs;
+import com.pulumi.pulumiservice.api.outputs.TemplateDestination;
 import java.lang.Boolean;
-import java.lang.Object;
 import java.lang.String;
 import java.util.Optional;
 import javax.annotation.Nullable;
@@ -25,14 +25,14 @@ public class OrgTemplateCollection extends com.pulumi.resources.CustomResource {
      * Deprecated - use destinationURL instead.
      * 
      */
-    @Export(name="destination", refs={Object.class}, tree="[0]")
-    private Output</* @Nullable */ Object> destination;
+    @Export(name="destination", refs={TemplateDestination.class}, tree="[0]")
+    private Output</* @Nullable */ TemplateDestination> destination;
 
     /**
      * @return Deprecated - use destinationURL instead.
      * 
      */
-    public Output<Optional<Object>> destination() {
+    public Output<Optional<TemplateDestination>> destination() {
         return Codegen.optional(this.destination);
     }
     /**

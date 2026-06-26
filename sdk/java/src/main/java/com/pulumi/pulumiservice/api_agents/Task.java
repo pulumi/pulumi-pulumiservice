@@ -8,6 +8,7 @@ import com.pulumi.core.annotations.Export;
 import com.pulumi.core.annotations.ResourceType;
 import com.pulumi.core.internal.Codegen;
 import com.pulumi.pulumiservice.Utilities;
+import com.pulumi.pulumiservice.api.outputs.UserInfo;
 import com.pulumi.pulumiservice.api_agents.TaskArgs;
 import java.lang.Boolean;
 import java.lang.Integer;
@@ -111,14 +112,14 @@ public class Task extends com.pulumi.resources.CustomResource {
      * Information about the user who created this task.
      * 
      */
-    @Export(name="createdBy", refs={Object.class}, tree="[0]")
-    private Output<Object> createdBy;
+    @Export(name="createdBy", refs={UserInfo.class}, tree="[0]")
+    private Output<UserInfo> createdBy;
 
     /**
      * @return Information about the user who created this task.
      * 
      */
-    public Output<Object> createdBy() {
+    public Output<UserInfo> createdBy() {
         return this.createdBy;
     }
     /**

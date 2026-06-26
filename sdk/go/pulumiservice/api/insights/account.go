@@ -8,6 +8,7 @@ import (
 	"reflect"
 
 	"errors"
+	"github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/api"
 	"github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/internal"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
@@ -22,7 +23,7 @@ type Account struct {
 	// The name of the account.
 	Name pulumi.StringOutput `pulumi:"name"`
 	// The user with ownership of this Insights account
-	OwnedBy pulumi.AnyOutput `pulumi:"ownedBy"`
+	OwnedBy api.UserInfoOutput `pulumi:"ownedBy"`
 	// The cloud provider for the account (e.g., aws, gcp, azure-native).
 	Provider pulumi.StringOutput `pulumi:"provider"`
 	// Provider-specific configuration for the account.
@@ -33,7 +34,7 @@ type Account struct {
 	// The version of the Pulumi provider package used for discovery.
 	ProviderVersion pulumi.StringPtrOutput `pulumi:"providerVersion"`
 	// Status of the last discovery scan for this account.
-	ScanStatus pulumi.AnyOutput `pulumi:"scanStatus"`
+	ScanStatus api.ScanStatusPtrOutput `pulumi:"scanStatus"`
 	// If true, the account is scheduled for recurring discovery.
 	ScheduledScanEnabled pulumi.BoolOutput `pulumi:"scheduledScanEnabled"`
 }
@@ -231,8 +232,8 @@ func (o AccountOutput) Name() pulumi.StringOutput {
 }
 
 // The user with ownership of this Insights account
-func (o AccountOutput) OwnedBy() pulumi.AnyOutput {
-	return o.ApplyT(func(v *Account) pulumi.AnyOutput { return v.OwnedBy }).(pulumi.AnyOutput)
+func (o AccountOutput) OwnedBy() api.UserInfoOutput {
+	return o.ApplyT(func(v *Account) api.UserInfoOutput { return v.OwnedBy }).(api.UserInfoOutput)
 }
 
 // The cloud provider for the account (e.g., aws, gcp, azure-native).
@@ -257,8 +258,8 @@ func (o AccountOutput) ProviderVersion() pulumi.StringPtrOutput {
 }
 
 // Status of the last discovery scan for this account.
-func (o AccountOutput) ScanStatus() pulumi.AnyOutput {
-	return o.ApplyT(func(v *Account) pulumi.AnyOutput { return v.ScanStatus }).(pulumi.AnyOutput)
+func (o AccountOutput) ScanStatus() api.ScanStatusPtrOutput {
+	return o.ApplyT(func(v *Account) api.ScanStatusPtrOutput { return v.ScanStatus }).(api.ScanStatusPtrOutput)
 }
 
 // If true, the account is scheduled for recurring discovery.

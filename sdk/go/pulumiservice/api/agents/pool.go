@@ -8,6 +8,7 @@ import (
 	"reflect"
 
 	"errors"
+	"github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/api"
 	"github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/internal"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
@@ -17,7 +18,7 @@ type Pool struct {
 	pulumi.CustomResourceState
 
 	// The agents
-	Agents pulumi.ArrayOutput `pulumi:"agents"`
+	Agents api.DeploymentAgentMetadataArrayOutput `pulumi:"agents"`
 	// The creation timestamp
 	Created pulumi.IntOutput `pulumi:"created"`
 	// The description
@@ -193,8 +194,8 @@ func (o PoolOutput) ToPoolOutputWithContext(ctx context.Context) PoolOutput {
 }
 
 // The agents
-func (o PoolOutput) Agents() pulumi.ArrayOutput {
-	return o.ApplyT(func(v *Pool) pulumi.ArrayOutput { return v.Agents }).(pulumi.ArrayOutput)
+func (o PoolOutput) Agents() api.DeploymentAgentMetadataArrayOutput {
+	return o.ApplyT(func(v *Pool) api.DeploymentAgentMetadataArrayOutput { return v.Agents }).(api.DeploymentAgentMetadataArrayOutput)
 }
 
 // The creation timestamp

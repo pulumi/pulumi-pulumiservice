@@ -2,6 +2,9 @@
 // *** Do not edit by hand unless you're certain you know what you are doing! ***
 
 import * as pulumi from "@pulumi/pulumi";
+import * as inputs from "../../types/input";
+import * as outputs from "../../types/output";
+import * as enums from "../../types/enums";
 import * as utilities from "../../utilities";
 
 /**
@@ -61,7 +64,7 @@ export class Task extends pulumi.CustomResource {
     /**
      * Information about the user who created this task.
      */
-    declare public /*out*/ readonly createdBy: pulumi.Output<any>;
+    declare public /*out*/ readonly createdBy: pulumi.Output<outputs.api.UserInfo>;
     /**
      * Pulumi entities (stacks, projects, etc.) that provide context for the agent.
      */
@@ -198,15 +201,15 @@ export interface TaskArgs {
     /**
      * Optional filter for CLI integrations to enable for this task. Semantics: omitted/null → enable all CLI integrations connected for the org; empty list → explicit opt-out (no CLI integrations for this task); populated list → whitelist by (catalogId, name) of the configured instances to enable. Entries with missing or unknown catalogId, missing name, or referencing a (catalogId, name) pair that is not connected for the organization are rejected with a 400 response. catalogId matching is case-insensitive.
      */
-    cliIntegrations?: pulumi.Input<any[] | undefined>;
+    cliIntegrations?: pulumi.Input<pulumi.Input<inputs.api.CLIIntegrationRefArgs>[] | undefined>;
     /**
      * Optional list of integrations to enable for this task. Semantics: omitted/null → inherit all org-enabled integrations; empty list → explicit opt-out (no integration credentials for this task); populated list → whitelist of specific integrations by ID. Modeled as an object array rather than a bare string array so multi-instance support (instance_name, scope, etc.) can be added later without a wire break.
      */
-    enabledIntegrations?: pulumi.Input<any[] | undefined>;
+    enabledIntegrations?: pulumi.Input<pulumi.Input<inputs.api.AgentTaskIntegrationRefArgs>[] | undefined>;
     /**
      * The message content
      */
-    message?: any | undefined;
+    message?: pulumi.Input<inputs.api.AgentUserEventMessageArgs | undefined>;
     /**
      * The organization name
      */

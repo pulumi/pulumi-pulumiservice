@@ -2,6 +2,9 @@
 // *** Do not edit by hand unless you're certain you know what you are doing! ***
 
 import * as pulumi from "@pulumi/pulumi";
+import * as inputs from "../../types/input";
+import * as outputs from "../../types/output";
+import * as enums from "../../types/enums";
 import * as utilities from "../../utilities";
 
 /**
@@ -37,7 +40,7 @@ export class GitLabIntegration extends pulumi.CustomResource {
     /**
      * The Pulumi user whose GitLab authentication token is being used, if applicable.
      */
-    declare public /*out*/ readonly authUser: pulumi.Output<any | undefined>;
+    declare public /*out*/ readonly authUser: pulumi.Output<outputs.api.User | undefined>;
     /**
      * The URL of the GitLab group's avatar image.
      */
@@ -61,7 +64,7 @@ export class GitLabIntegration extends pulumi.CustomResource {
     /**
      * Metadata about the GitLab group linked to this integration.
      */
-    declare public /*out*/ readonly gitLabOrg: pulumi.Output<any | undefined>;
+    declare public /*out*/ readonly gitLabOrg: pulumi.Output<outputs.api.GitLabAppOrganization | undefined>;
     /**
      * The expiration date of the group access token, if one is being used for authentication.
      */

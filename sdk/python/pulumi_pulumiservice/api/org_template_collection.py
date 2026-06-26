@@ -13,6 +13,8 @@ if sys.version_info >= (3, 11):
 else:
     from typing_extensions import NotRequired, TypedDict, TypeAlias
 from .. import _utilities
+from . import outputs
+from ._inputs import *
 
 __all__ = ['OrgTemplateCollectionArgs', 'OrgTemplateCollection']
 
@@ -22,7 +24,7 @@ class OrgTemplateCollectionArgs:
                  name: pulumi.Input[_builtins.str],
                  org_name: pulumi.Input[_builtins.str],
                  source_url: pulumi.Input[_builtins.str],
-                 destination: Optional[Any] = None,
+                 destination: pulumi.Input[Optional['TemplateDestinationArgs']] = None,
                  destination_url: pulumi.Input[Optional[_builtins.str]] = None):
         """
         The set of arguments for constructing a OrgTemplateCollection resource.
@@ -30,7 +32,7 @@ class OrgTemplateCollectionArgs:
         :param pulumi.Input[_builtins.str] name: The name of the template source.
         :param pulumi.Input[_builtins.str] org_name: The organization name
         :param pulumi.Input[_builtins.str] source_url: The source URL to fetch templates from.
-        :param Any destination: deprecated - use DestinationURL instead
+        :param pulumi.Input['TemplateDestinationArgs'] destination: deprecated - use DestinationURL instead
         :param pulumi.Input[_builtins.str] destination_url: The destination URL for the template source.
         """
         pulumi.set(__self__, "name", name)
@@ -79,14 +81,14 @@ class OrgTemplateCollectionArgs:
 
     @_builtins.property
     @pulumi.getter
-    def destination(self) -> Optional[Any]:
+    def destination(self) -> pulumi.Input[Optional['TemplateDestinationArgs']]:
         """
         deprecated - use DestinationURL instead
         """
         return pulumi.get(self, "destination")
 
     @destination.setter
-    def destination(self, value: Optional[Any]):
+    def destination(self, value: pulumi.Input[Optional['TemplateDestinationArgs']]):
         pulumi.set(self, "destination", value)
 
     @_builtins.property
@@ -108,7 +110,7 @@ class OrgTemplateCollection(pulumi.CustomResource):
     def __init__(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 destination: Optional[Any] = None,
+                 destination: pulumi.Input[Optional[Union['TemplateDestinationArgs', 'TemplateDestinationArgsDict']]] = None,
                  destination_url: pulumi.Input[Optional[_builtins.str]] = None,
                  name: pulumi.Input[Optional[_builtins.str]] = None,
                  org_name: pulumi.Input[Optional[_builtins.str]] = None,
@@ -120,7 +122,7 @@ class OrgTemplateCollection(pulumi.CustomResource):
 
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
-        :param Any destination: deprecated - use DestinationURL instead
+        :param pulumi.Input[Union['TemplateDestinationArgs', 'TemplateDestinationArgsDict']] destination: deprecated - use DestinationURL instead
         :param pulumi.Input[_builtins.str] destination_url: The destination URL for the template source.
         :param pulumi.Input[_builtins.str] name: The name of the template source.
         :param pulumi.Input[_builtins.str] org_name: The organization name
@@ -151,7 +153,7 @@ class OrgTemplateCollection(pulumi.CustomResource):
     def _internal_init(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 destination: Optional[Any] = None,
+                 destination: pulumi.Input[Optional[Union['TemplateDestinationArgs', 'TemplateDestinationArgsDict']]] = None,
                  destination_url: pulumi.Input[Optional[_builtins.str]] = None,
                  name: pulumi.Input[Optional[_builtins.str]] = None,
                  org_name: pulumi.Input[Optional[_builtins.str]] = None,
@@ -212,7 +214,7 @@ class OrgTemplateCollection(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter
-    def destination(self) -> pulumi.Output[Optional[Any]]:
+    def destination(self) -> pulumi.Output[Optional['outputs.TemplateDestination']]:
         """
         Deprecated - use destinationURL instead.
         """

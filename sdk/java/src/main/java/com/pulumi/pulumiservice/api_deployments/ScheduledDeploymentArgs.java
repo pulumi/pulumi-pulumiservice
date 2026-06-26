@@ -6,7 +6,7 @@ package com.pulumi.pulumiservice.api_deployments;
 import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
 import com.pulumi.exceptions.MissingRequiredPropertyException;
-import java.lang.Object;
+import com.pulumi.pulumiservice.api.inputs.CreateDeploymentRequestArgs;
 import java.lang.String;
 import java.util.Objects;
 import java.util.Optional;
@@ -52,13 +52,13 @@ public final class ScheduledDeploymentArgs extends com.pulumi.resources.Resource
      * 
      */
     @Import(name="request")
-    private @Nullable Output<Object> request;
+    private @Nullable Output<CreateDeploymentRequestArgs> request;
 
     /**
      * @return Deployment request payload to execute when the schedule fires. This has the same shape and semantics as CreateDeploymentRequest used for immediate deployments.
      * 
      */
-    public Optional<Output<Object>> request() {
+    public Optional<Output<CreateDeploymentRequestArgs>> request() {
         return Optional.ofNullable(this.request);
     }
 
@@ -200,7 +200,7 @@ public final class ScheduledDeploymentArgs extends com.pulumi.resources.Resource
          * @return builder
          * 
          */
-        public Builder request(@Nullable Output<Object> request) {
+        public Builder request(@Nullable Output<CreateDeploymentRequestArgs> request) {
             $.request = request;
             return this;
         }
@@ -211,7 +211,7 @@ public final class ScheduledDeploymentArgs extends com.pulumi.resources.Resource
          * @return builder
          * 
          */
-        public Builder request(Object request) {
+        public Builder request(CreateDeploymentRequestArgs request) {
             return request(Output.of(request));
         }
 

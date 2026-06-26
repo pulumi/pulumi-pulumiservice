@@ -2,6 +2,9 @@
 // *** Do not edit by hand unless you're certain you know what you are doing! ***
 
 import * as pulumi from "@pulumi/pulumi";
+import * as inputs from "../../types/input";
+import * as outputs from "../../types/output";
+import * as enums from "../../types/enums";
 import * as utilities from "../../utilities";
 
 /**
@@ -69,7 +72,7 @@ export class GitHubIntegration extends pulumi.CustomResource {
     /**
      * URL to configure repository access for this GitHub App installation.
      */
-    declare public /*out*/ readonly ghUrls: pulumi.Output<any | undefined>;
+    declare public /*out*/ readonly ghUrls: pulumi.Output<outputs.api.GitHubAppURLs | undefined>;
     /**
      * Whether the installation has the 'contents' permission.
      */
@@ -93,7 +96,7 @@ export class GitHubIntegration extends pulumi.CustomResource {
     /**
      * Neo GitHub App permission requirements for this installation.
      */
-    declare public /*out*/ readonly neoGitHubAppPermissionRequirements: pulumi.Output<any[] | undefined>;
+    declare public /*out*/ readonly neoGitHubAppPermissionRequirements: pulumi.Output<outputs.api.GitHubAppPermissionRequirement[] | undefined>;
 
     /**
      * Create a GitHubIntegration resource with the given unique name, arguments, and options.

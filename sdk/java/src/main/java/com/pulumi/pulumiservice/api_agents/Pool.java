@@ -8,9 +8,9 @@ import com.pulumi.core.annotations.Export;
 import com.pulumi.core.annotations.ResourceType;
 import com.pulumi.core.internal.Codegen;
 import com.pulumi.pulumiservice.Utilities;
+import com.pulumi.pulumiservice.api.outputs.DeploymentAgentMetadata;
 import com.pulumi.pulumiservice.api_agents.PoolArgs;
 import java.lang.Integer;
-import java.lang.Object;
 import java.lang.String;
 import java.util.List;
 import java.util.Optional;
@@ -26,14 +26,14 @@ public class Pool extends com.pulumi.resources.CustomResource {
      * The agents
      * 
      */
-    @Export(name="agents", refs={List.class,Object.class}, tree="[0,1]")
-    private Output<List<Object>> agents;
+    @Export(name="agents", refs={List.class,DeploymentAgentMetadata.class}, tree="[0,1]")
+    private Output<List<DeploymentAgentMetadata>> agents;
 
     /**
      * @return The agents
      * 
      */
-    public Output<List<Object>> agents() {
+    public Output<List<DeploymentAgentMetadata>> agents() {
         return this.agents;
     }
     /**

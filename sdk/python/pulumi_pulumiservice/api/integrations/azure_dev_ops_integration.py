@@ -13,6 +13,7 @@ if sys.version_info >= (3, 11):
 else:
     from typing_extensions import NotRequired, TypedDict, TypeAlias
 from ... import _utilities
+from ... import api as _api
 
 __all__ = ['AzureDevOpsIntegrationArgs', 'AzureDevOpsIntegration']
 
@@ -214,7 +215,7 @@ class AzureDevOpsIntegration(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter(name="authUser")
-    def auth_user(self) -> pulumi.Output[Optional[Any]]:
+    def auth_user(self) -> pulumi.Output[Optional['_api.outputs.User']]:
         """
         The Pulumi user whose Azure DevOps authentication token is being used
         """
@@ -254,7 +255,7 @@ class AzureDevOpsIntegration(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter
-    def organization(self) -> pulumi.Output[Optional[Any]]:
+    def organization(self) -> pulumi.Output[Optional['_api.outputs.AzureDevOpsOrganization']]:
         """
         Metadata about the Azure DevOps organization linked to the Pulumi organization
         """
@@ -262,7 +263,7 @@ class AzureDevOpsIntegration(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter
-    def project(self) -> pulumi.Output[Optional[Any]]:
+    def project(self) -> pulumi.Output[Optional['_api.outputs.AzureDevOpsProject']]:
         """
         Metadata about the Azure DevOps project linked to the Pulumi organization
         """

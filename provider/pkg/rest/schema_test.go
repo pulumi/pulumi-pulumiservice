@@ -19,6 +19,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/pulumi/pulumi/pkg/v3/codegen/schema"
 	"github.com/pulumi/pulumi/sdk/v3/go/property"
 )
 
@@ -359,7 +360,7 @@ func TestBuildResourceOmitsPathParamsFromOutputs(t *testing.T) {
 		Operations: Operations{Create: "CreateThing", Read: "GetThing"},
 		IDFormat:   "{org}/{id}",
 	}
-	rs, err := buildResource(spec, nil, "test:index:Thing", rm)
+	rs, err := buildResource(testTypeBuilder(spec), nil, "test:index:Thing", rm)
 	if err != nil {
 		t.Fatalf("build: %v", err)
 	}
@@ -398,7 +399,7 @@ func TestBuildResourceRejectsPathParamsWithoutIDFormat(t *testing.T) {
 		t.Fatalf("spec: %v", err)
 	}
 	rm := ResourceMeta{Operations: Operations{Create: "CreateThing"}}
-	_, err = buildResource(spec, nil, "test:index:Thing", rm)
+	_, err = buildResource(testTypeBuilder(spec), nil, "test:index:Thing", rm)
 	if err == nil || !strings.Contains(err.Error(), "idFormat") {
 		t.Fatalf("expected idFormat error, got: %v", err)
 	}
@@ -443,7 +444,7 @@ func TestBuildResourceSurfacesYamlBody(t *testing.T) {
 		Operations: Operations{Create: "CreateThing", Update: "UpdateThing"},
 		IDFormat:   "{org}/{project}/{name}",
 	}
-	rs, err := buildResource(spec, nil, "test:index:Thing", rm)
+	rs, err := buildResource(testTypeBuilder(spec), nil, "test:index:Thing", rm)
 	if err != nil {
 		t.Fatalf("build: %v", err)
 	}
@@ -485,8 +486,90 @@ func TestBuildResourceAcceptsResourceWithoutPathParams(t *testing.T) {
 	}`
 	spec, _ := ParseSpec([]byte(specJSON))
 	rm := ResourceMeta{Operations: Operations{Create: "CreateThing"}}
-	if _, err := buildResource(spec, nil, "test:index:Thing", rm); err != nil {
+	if _, err := buildResource(testTypeBuilder(spec), nil, "test:index:Thing", rm); err != nil {
 		t.Errorf("path-param-free resource should build without idFormat: %v", err)
+	}
+}
+
+// testTypeBuilder returns a typeBuilder backed by spec with an empty types map,
+// for use in tests that call buildResource directly.
+func testTypeBuilder(spec *Spec) *typeBuilder {
+	return &typeBuilder{spec: spec, types: map[string]schema.ComplexTypeSpec{}, pkg: "test"}
+}
+
+// TestRefPropertyResolvesToNamedType: a request body property that is a $ref
+// to a component schema should produce a "#/types/..." ref in the Pulumi
+// schema, not pulumi.json#/Any, and the type must be registered in the
+// types map.
+func TestRefPropertyResolvesToNamedType(t *testing.T) {
+	const specJSON = `{
+	  "openapi": "3.0.0",
+	  "components": {"schemas": {
+	    "S3Config": {
+	      "description": "S3 configuration for export.",
+	      "type": "object",
+	      "properties": {
+	        "bucketName": {"type": "string", "description": "The bucket name."},
+	        "roleArn":    {"type": "string", "description": "The IAM role ARN."}
+	      },
+	      "required": ["bucketName", "roleArn"]
+	    },
+	    "CreateBody": {
+	      "type": "object",
+	      "properties": {
+	        "config": {"$ref": "#/components/schemas/S3Config", "description": "The S3 config."},
+	        "enabled": {"type": "boolean", "description": "Whether enabled."}
+	      },
+	      "required": ["config", "enabled"]
+	    }
+	  }},
+	  "paths": {
+	    "/things/{org}": {
+	      "post": {
+	        "operationId": "CreateThing",
+	        "parameters": [{"name": "org", "in": "path", "required": true, "schema": {"type": "string"}}],
+	        "requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/CreateBody"}}}},
+	        "responses": {"200": {"description": "OK"}}
+	      }
+	    }
+	  }
+	}`
+	spec, err := ParseSpec([]byte(specJSON))
+	if err != nil {
+		t.Fatalf("parse: %v", err)
+	}
+	types := map[string]schema.ComplexTypeSpec{}
+	tb := &typeBuilder{spec: spec, types: types, pkg: "mypkg"}
+	rm := ResourceMeta{
+		Operations: Operations{Create: "CreateThing"},
+		IDFormat:   "{org}",
+	}
+	rs, err := buildResource(tb, nil, "mypkg:api:Thing", rm)
+	if err != nil {
+		t.Fatalf("build: %v", err)
+	}
+
+	configProp, ok := rs.InputProperties["config"]
+	if !ok {
+		t.Fatalf("input 'config' missing from resource")
+	}
+	wantRef := "#/types/mypkg:api:S3Config"
+	if configProp.Ref != wantRef {
+		t.Errorf("config input TypeSpec.Ref = %q; want %q", configProp.Ref, wantRef)
+	}
+
+	ct, registered := types["mypkg:api:S3Config"]
+	if !registered {
+		t.Fatalf("type %q not registered in types map", "mypkg:api:S3Config")
+	}
+	if ct.Type != "object" { //nolint:goconst // "object" is a schema literal, not a candidate for extraction
+		t.Errorf("registered type kind = %q; want \"object\"", ct.Type)
+	}
+	if _, hasBucket := ct.Properties["bucketName"]; !hasBucket {
+		t.Errorf("registered type missing property 'bucketName'")
+	}
+	if _, hasRole := ct.Properties["roleArn"]; !hasRole {
+		t.Errorf("registered type missing property 'roleArn'")
 	}
 }
 

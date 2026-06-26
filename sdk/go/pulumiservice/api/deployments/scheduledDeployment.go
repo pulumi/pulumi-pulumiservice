@@ -8,6 +8,7 @@ import (
 	"reflect"
 
 	"errors"
+	"github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/api"
 	"github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/internal"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
@@ -94,7 +95,7 @@ type scheduledDeploymentArgs struct {
 	// The project name
 	ProjectName string `pulumi:"projectName"`
 	// Deployment request payload to execute when the schedule fires. This has the same shape and semantics as CreateDeploymentRequest used for immediate deployments.
-	Request interface{} `pulumi:"request"`
+	Request *api.CreateDeploymentRequest `pulumi:"request"`
 	// Cron expression defining a recurring schedule for this deployment. When set, scheduleOnce must be null. Uses standard 5-field cron syntax (MIN HOUR DOM MON DOW) and is evaluated in UTC.
 	ScheduleCron *string `pulumi:"scheduleCron"`
 	// The schedule identifier
@@ -112,7 +113,7 @@ type ScheduledDeploymentArgs struct {
 	// The project name
 	ProjectName pulumi.StringInput
 	// Deployment request payload to execute when the schedule fires. This has the same shape and semantics as CreateDeploymentRequest used for immediate deployments.
-	Request pulumi.Input
+	Request api.CreateDeploymentRequestPtrInput
 	// Cron expression defining a recurring schedule for this deployment. When set, scheduleOnce must be null. Uses standard 5-field cron syntax (MIN HOUR DOM MON DOW) and is evaluated in UTC.
 	ScheduleCron pulumi.StringPtrInput
 	// The schedule identifier

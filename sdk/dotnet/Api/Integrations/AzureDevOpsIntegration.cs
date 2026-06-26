@@ -19,7 +19,7 @@ namespace Pulumi.PulumiService.Api.Integrations
         /// The Pulumi user whose Azure DevOps authentication token is being used
         /// </summary>
         [Output("authUser")]
-        public Output<object?> AuthUser { get; private set; } = null!;
+        public Output<Pulumi.PulumiService.Api.Outputs.User?> AuthUser { get; private set; } = null!;
 
         /// <summary>
         /// Whether detailed property-level diffs are disabled for PR comments
@@ -49,13 +49,13 @@ namespace Pulumi.PulumiService.Api.Integrations
         /// Metadata about the Azure DevOps organization linked to the Pulumi organization
         /// </summary>
         [Output("organization")]
-        public Output<object?> Organization { get; private set; } = null!;
+        public Output<Pulumi.PulumiService.Api.Outputs.AzureDevOpsOrganization?> Organization { get; private set; } = null!;
 
         /// <summary>
         /// Metadata about the Azure DevOps project linked to the Pulumi organization
         /// </summary>
         [Output("project")]
-        public Output<object?> Project { get; private set; } = null!;
+        public Output<Pulumi.PulumiService.Api.Outputs.AzureDevOpsProject?> Project { get; private set; } = null!;
 
         /// <summary>
         /// Is the app integration valid

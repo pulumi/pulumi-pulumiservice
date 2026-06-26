@@ -6,7 +6,7 @@ package com.pulumi.pulumiservice.api;
 import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
 import com.pulumi.exceptions.MissingRequiredPropertyException;
-import java.lang.Object;
+import com.pulumi.pulumiservice.api.inputs.TemplateDestinationArgs;
 import java.lang.String;
 import java.util.Objects;
 import java.util.Optional;
@@ -22,13 +22,13 @@ public final class OrgTemplateCollectionArgs extends com.pulumi.resources.Resour
      * 
      */
     @Import(name="destination")
-    private @Nullable Output<Object> destination;
+    private @Nullable Output<TemplateDestinationArgs> destination;
 
     /**
      * @return deprecated - use DestinationURL instead
      * 
      */
-    public Optional<Output<Object>> destination() {
+    public Optional<Output<TemplateDestinationArgs>> destination() {
         return Optional.ofNullable(this.destination);
     }
 
@@ -126,7 +126,7 @@ public final class OrgTemplateCollectionArgs extends com.pulumi.resources.Resour
          * @return builder
          * 
          */
-        public Builder destination(@Nullable Output<Object> destination) {
+        public Builder destination(@Nullable Output<TemplateDestinationArgs> destination) {
             $.destination = destination;
             return this;
         }
@@ -137,7 +137,7 @@ public final class OrgTemplateCollectionArgs extends com.pulumi.resources.Resour
          * @return builder
          * 
          */
-        public Builder destination(Object destination) {
+        public Builder destination(TemplateDestinationArgs destination) {
             return destination(Output.of(destination));
         }
 

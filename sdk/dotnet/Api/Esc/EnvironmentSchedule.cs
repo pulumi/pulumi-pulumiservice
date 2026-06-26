@@ -163,18 +163,18 @@ namespace Pulumi.PulumiService.Api.Esc
         public Input<string>? ScheduleOnce { get; set; }
 
         [Input("secretRotationRequest")]
-        private Input<object>? _secretRotationRequest;
+        private Input<Pulumi.PulumiService.Api.Inputs.CreateEnvironmentSecretRotationScheduleRequestArgs>? _secretRotationRequest;
 
         /// <summary>
         /// The secret rotation request
         /// </summary>
-        public Input<object>? SecretRotationRequest
+        public Input<Pulumi.PulumiService.Api.Inputs.CreateEnvironmentSecretRotationScheduleRequestArgs>? SecretRotationRequest
         {
             get => _secretRotationRequest;
             set
             {
                 var emptySecret = Output.CreateSecret(0);
-                _secretRotationRequest = Output.Tuple<Input<object>?, int>(value, emptySecret).Apply(t => t.Item1);
+                _secretRotationRequest = Output.Tuple<Input<Pulumi.PulumiService.Api.Inputs.CreateEnvironmentSecretRotationScheduleRequestArgs>?, int>(value, emptySecret).Apply(t => t.Item1);
             }
         }
 

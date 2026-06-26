@@ -9,7 +9,7 @@ new ps.api.auth.Policy("policy", {
     orgName: organizationName,
     policyId: policyId,
     policies: [
-        { decision: "allow", permission: "read", tokenType: "organization" },
-        { decision: "deny", permission: "admin", tokenType: "organization" },
+        { decision: "allow", authorizedPermissions: ["read"], tokenType: "organization", rules: {} },
+        { decision: "deny", authorizedPermissions: ["admin"], tokenType: "organization", rules: {} },
     ],
 });

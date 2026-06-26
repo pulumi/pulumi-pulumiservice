@@ -8,6 +8,8 @@ import com.pulumi.core.annotations.Export;
 import com.pulumi.core.annotations.ResourceType;
 import com.pulumi.core.internal.Codegen;
 import com.pulumi.pulumiservice.Utilities;
+import com.pulumi.pulumiservice.api.outputs.AppOperationStatus;
+import com.pulumi.pulumiservice.api.outputs.AppStackConfig;
 import com.pulumi.pulumiservice.api_stacks.StackArgs;
 import java.lang.Integer;
 import java.lang.Object;
@@ -47,29 +49,29 @@ public class Stack extends com.pulumi.resources.CustomResource {
      * If set, then the stack&#39;s configuration is loaded from the cloud and not a file on disk.
      * 
      */
-    @Export(name="config", refs={Object.class}, tree="[0]")
-    private Output</* @Nullable */ Object> config;
+    @Export(name="config", refs={AppStackConfig.class}, tree="[0]")
+    private Output</* @Nullable */ AppStackConfig> config;
 
     /**
      * @return Optional cloud-persisted stack configuration.
      * If set, then the stack&#39;s configuration is loaded from the cloud and not a file on disk.
      * 
      */
-    public Output<Optional<Object>> config() {
+    public Output<Optional<AppStackConfig>> config() {
         return Codegen.optional(this.config);
     }
     /**
      * CurrentOperation provides information about a stack operation in-progress, as applicable.
      * 
      */
-    @Export(name="currentOperation", refs={Object.class}, tree="[0]")
-    private Output</* @Nullable */ Object> currentOperation;
+    @Export(name="currentOperation", refs={AppOperationStatus.class}, tree="[0]")
+    private Output</* @Nullable */ AppOperationStatus> currentOperation;
 
     /**
      * @return CurrentOperation provides information about a stack operation in-progress, as applicable.
      * 
      */
-    public Output<Optional<Object>> currentOperation() {
+    public Output<Optional<AppOperationStatus>> currentOperation() {
         return Codegen.optional(this.currentOperation);
     }
     /**

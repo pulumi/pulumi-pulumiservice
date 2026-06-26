@@ -6,7 +6,7 @@ package com.pulumi.pulumiservice.api_esc;
 import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
 import com.pulumi.exceptions.MissingRequiredPropertyException;
-import java.lang.Object;
+import com.pulumi.pulumiservice.api.inputs.CreateEnvironmentSecretRotationScheduleRequestArgs;
 import java.lang.String;
 import java.util.Objects;
 import java.util.Optional;
@@ -112,13 +112,13 @@ public final class EnvironmentScheduleArgs extends com.pulumi.resources.Resource
      * 
      */
     @Import(name="secretRotationRequest")
-    private @Nullable Output<Object> secretRotationRequest;
+    private @Nullable Output<CreateEnvironmentSecretRotationScheduleRequestArgs> secretRotationRequest;
 
     /**
      * @return The secret rotation request
      * 
      */
-    public Optional<Output<Object>> secretRotationRequest() {
+    public Optional<Output<CreateEnvironmentSecretRotationScheduleRequestArgs>> secretRotationRequest() {
         return Optional.ofNullable(this.secretRotationRequest);
     }
 
@@ -284,7 +284,7 @@ public final class EnvironmentScheduleArgs extends com.pulumi.resources.Resource
          * @return builder
          * 
          */
-        public Builder secretRotationRequest(@Nullable Output<Object> secretRotationRequest) {
+        public Builder secretRotationRequest(@Nullable Output<CreateEnvironmentSecretRotationScheduleRequestArgs> secretRotationRequest) {
             $.secretRotationRequest = secretRotationRequest;
             return this;
         }
@@ -295,7 +295,7 @@ public final class EnvironmentScheduleArgs extends com.pulumi.resources.Resource
          * @return builder
          * 
          */
-        public Builder secretRotationRequest(Object secretRotationRequest) {
+        public Builder secretRotationRequest(CreateEnvironmentSecretRotationScheduleRequestArgs secretRotationRequest) {
             return secretRotationRequest(Output.of(secretRotationRequest));
         }
 

@@ -13,6 +13,7 @@ if sys.version_info >= (3, 11):
 else:
     from typing_extensions import NotRequired, TypedDict, TypeAlias
 from ... import _utilities
+from ... import api as _api
 
 __all__ = ['StackArgs', 'Stack']
 
@@ -22,8 +23,8 @@ class StackArgs:
                  org_name: pulumi.Input[_builtins.str],
                  project_name: pulumi.Input[_builtins.str],
                  stack_name: pulumi.Input[_builtins.str],
-                 config: Optional[Any] = None,
-                 state: Optional[Any] = None,
+                 config: pulumi.Input[Optional['_api.AppStackConfigArgs']] = None,
+                 state: pulumi.Input[Optional['_api.AppUntypedDeploymentArgs']] = None,
                  tags: pulumi.Input[Optional[Mapping[str, Any]]] = None,
                  teams: pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]] = None):
         """
@@ -32,8 +33,8 @@ class StackArgs:
         :param pulumi.Input[_builtins.str] org_name: The organization name
         :param pulumi.Input[_builtins.str] project_name: The project name
         :param pulumi.Input[_builtins.str] stack_name: The name of the stack being created.
-        :param Any config: The configuration for the new stack.
-        :param Any state: An optional state to initialize the stack with.
+        :param pulumi.Input['_api.AppStackConfigArgs'] config: The configuration for the new stack.
+        :param pulumi.Input['_api.AppUntypedDeploymentArgs'] state: An optional state to initialize the stack with.
         :param pulumi.Input[Mapping[str, Any]] tags: An optional set of tags to apply to the stack.
         :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] teams: An optional set of teams to assign to the stack.
         """
@@ -87,26 +88,26 @@ class StackArgs:
 
     @_builtins.property
     @pulumi.getter
-    def config(self) -> Optional[Any]:
+    def config(self) -> pulumi.Input[Optional['_api.AppStackConfigArgs']]:
         """
         The configuration for the new stack.
         """
         return pulumi.get(self, "config")
 
     @config.setter
-    def config(self, value: Optional[Any]):
+    def config(self, value: pulumi.Input[Optional['_api.AppStackConfigArgs']]):
         pulumi.set(self, "config", value)
 
     @_builtins.property
     @pulumi.getter
-    def state(self) -> Optional[Any]:
+    def state(self) -> pulumi.Input[Optional['_api.AppUntypedDeploymentArgs']]:
         """
         An optional state to initialize the stack with.
         """
         return pulumi.get(self, "state")
 
     @state.setter
-    def state(self, value: Optional[Any]):
+    def state(self, value: pulumi.Input[Optional['_api.AppUntypedDeploymentArgs']]):
         pulumi.set(self, "state", value)
 
     @_builtins.property
@@ -140,11 +141,11 @@ class Stack(pulumi.CustomResource):
     def __init__(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 config: Optional[Any] = None,
+                 config: pulumi.Input[Optional[Union['_api.AppStackConfigArgs', '_api.AppStackConfigArgsDict']]] = None,
                  org_name: pulumi.Input[Optional[_builtins.str]] = None,
                  project_name: pulumi.Input[Optional[_builtins.str]] = None,
                  stack_name: pulumi.Input[Optional[_builtins.str]] = None,
-                 state: Optional[Any] = None,
+                 state: pulumi.Input[Optional[Union['_api.AppUntypedDeploymentArgs', '_api.AppUntypedDeploymentArgsDict']]] = None,
                  tags: pulumi.Input[Optional[Mapping[str, Any]]] = None,
                  teams: pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]] = None,
                  __props__=None):
@@ -160,11 +161,11 @@ class Stack(pulumi.CustomResource):
 
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
-        :param Any config: The configuration for the new stack.
+        :param pulumi.Input[Union['_api.AppStackConfigArgs', '_api.AppStackConfigArgsDict']] config: The configuration for the new stack.
         :param pulumi.Input[_builtins.str] org_name: The organization name
         :param pulumi.Input[_builtins.str] project_name: The project name
         :param pulumi.Input[_builtins.str] stack_name: The name of the stack being created.
-        :param Any state: An optional state to initialize the stack with.
+        :param pulumi.Input[Union['_api.AppUntypedDeploymentArgs', '_api.AppUntypedDeploymentArgsDict']] state: An optional state to initialize the stack with.
         :param pulumi.Input[Mapping[str, Any]] tags: An optional set of tags to apply to the stack.
         :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] teams: An optional set of teams to assign to the stack.
         """
@@ -199,11 +200,11 @@ class Stack(pulumi.CustomResource):
     def _internal_init(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 config: Optional[Any] = None,
+                 config: pulumi.Input[Optional[Union['_api.AppStackConfigArgs', '_api.AppStackConfigArgsDict']]] = None,
                  org_name: pulumi.Input[Optional[_builtins.str]] = None,
                  project_name: pulumi.Input[Optional[_builtins.str]] = None,
                  stack_name: pulumi.Input[Optional[_builtins.str]] = None,
-                 state: Optional[Any] = None,
+                 state: pulumi.Input[Optional[Union['_api.AppUntypedDeploymentArgs', '_api.AppUntypedDeploymentArgsDict']]] = None,
                  tags: pulumi.Input[Optional[Mapping[str, Any]]] = None,
                  teams: pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]] = None,
                  __props__=None):
@@ -273,7 +274,7 @@ class Stack(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter
-    def config(self) -> pulumi.Output[Optional[Any]]:
+    def config(self) -> pulumi.Output[Optional['_api.outputs.AppStackConfig']]:
         """
         Optional cloud-persisted stack configuration.
         If set, then the stack's configuration is loaded from the cloud and not a file on disk.
@@ -282,7 +283,7 @@ class Stack(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter(name="currentOperation")
-    def current_operation(self) -> pulumi.Output[Optional[Any]]:
+    def current_operation(self) -> pulumi.Output[Optional['_api.outputs.AppOperationStatus']]:
         """
         CurrentOperation provides information about a stack operation in-progress, as applicable.
         """

@@ -8,6 +8,7 @@ import (
 	"reflect"
 
 	"errors"
+	"github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/api"
 	"github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/internal"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
@@ -29,7 +30,7 @@ type Task struct {
 	// When the task was created, in ISO 8601 format.
 	CreatedAt pulumi.StringOutput `pulumi:"createdAt"`
 	// Information about the user who created this task.
-	CreatedBy pulumi.AnyOutput `pulumi:"createdBy"`
+	CreatedBy api.UserInfoOutput `pulumi:"createdBy"`
 	// Pulumi entities (stacks, projects, etc.) that provide context for the agent.
 	Entities pulumi.ArrayOutput `pulumi:"entities"`
 	// Whether this task is shared with other org members.
@@ -106,11 +107,11 @@ type taskArgs struct {
 	// Optional approval mode override for this task. If omitted, org default is used.
 	ApprovalMode *string `pulumi:"approvalMode"`
 	// Optional filter for CLI integrations to enable for this task. Semantics: omitted/null → enable all CLI integrations connected for the org; empty list → explicit opt-out (no CLI integrations for this task); populated list → whitelist by (catalogId, name) of the configured instances to enable. Entries with missing or unknown catalogId, missing name, or referencing a (catalogId, name) pair that is not connected for the organization are rejected with a 400 response. catalogId matching is case-insensitive.
-	CliIntegrations []interface{} `pulumi:"cliIntegrations"`
+	CliIntegrations []api.CLIIntegrationRef `pulumi:"cliIntegrations"`
 	// Optional list of integrations to enable for this task. Semantics: omitted/null → inherit all org-enabled integrations; empty list → explicit opt-out (no integration credentials for this task); populated list → whitelist of specific integrations by ID. Modeled as an object array rather than a bare string array so multi-instance support (instance_name, scope, etc.) can be added later without a wire break.
-	EnabledIntegrations []interface{} `pulumi:"enabledIntegrations"`
+	EnabledIntegrations []api.AgentTaskIntegrationRef `pulumi:"enabledIntegrations"`
 	// The message content
-	Message interface{} `pulumi:"message"`
+	Message *api.AgentUserEventMessage `pulumi:"message"`
 	// The organization name
 	OrgName string `pulumi:"orgName"`
 	// Controls the permission scope for the task. When omitted, defaults to 'default' (the agent uses the creating user's full permissions).
@@ -130,11 +131,11 @@ type TaskArgs struct {
 	// Optional approval mode override for this task. If omitted, org default is used.
 	ApprovalMode pulumi.StringPtrInput
 	// Optional filter for CLI integrations to enable for this task. Semantics: omitted/null → enable all CLI integrations connected for the org; empty list → explicit opt-out (no CLI integrations for this task); populated list → whitelist by (catalogId, name) of the configured instances to enable. Entries with missing or unknown catalogId, missing name, or referencing a (catalogId, name) pair that is not connected for the organization are rejected with a 400 response. catalogId matching is case-insensitive.
-	CliIntegrations pulumi.ArrayInput
+	CliIntegrations api.CLIIntegrationRefArrayInput
 	// Optional list of integrations to enable for this task. Semantics: omitted/null → inherit all org-enabled integrations; empty list → explicit opt-out (no integration credentials for this task); populated list → whitelist of specific integrations by ID. Modeled as an object array rather than a bare string array so multi-instance support (instance_name, scope, etc.) can be added later without a wire break.
-	EnabledIntegrations pulumi.ArrayInput
+	EnabledIntegrations api.AgentTaskIntegrationRefArrayInput
 	// The message content
-	Message pulumi.Input
+	Message api.AgentUserEventMessagePtrInput
 	// The organization name
 	OrgName pulumi.StringInput
 	// Controls the permission scope for the task. When omitted, defaults to 'default' (the agent uses the creating user's full permissions).
@@ -267,8 +268,8 @@ func (o TaskOutput) CreatedAt() pulumi.StringOutput {
 }
 
 // Information about the user who created this task.
-func (o TaskOutput) CreatedBy() pulumi.AnyOutput {
-	return o.ApplyT(func(v *Task) pulumi.AnyOutput { return v.CreatedBy }).(pulumi.AnyOutput)
+func (o TaskOutput) CreatedBy() api.UserInfoOutput {
+	return o.ApplyT(func(v *Task) api.UserInfoOutput { return v.CreatedBy }).(api.UserInfoOutput)
 }
 
 // Pulumi entities (stacks, projects, etc.) that provide context for the agent.

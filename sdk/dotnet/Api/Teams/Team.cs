@@ -20,7 +20,7 @@ namespace Pulumi.PulumiService.Api.Teams
         /// The list of account permissions granted to the team.
         /// </summary>
         [Output("accounts")]
-        public Output<ImmutableArray<object>> Accounts { get; private set; } = null!;
+        public Output<ImmutableArray<Pulumi.PulumiService.Api.Outputs.TeamAccountPermission>> Accounts { get; private set; } = null!;
 
         /// <summary>
         /// A free-form text description of the team's purpose.
@@ -38,7 +38,7 @@ namespace Pulumi.PulumiService.Api.Teams
         /// The list of environment settings for the team.
         /// </summary>
         [Output("environments")]
-        public Output<ImmutableArray<object>> Environments { get; private set; } = null!;
+        public Output<ImmutableArray<Pulumi.PulumiService.Api.Outputs.TeamEnvironmentSettings>> Environments { get; private set; } = null!;
 
         /// <summary>
         /// The kind of team (e.g., pulumi or GitHub-backed).
@@ -58,7 +58,7 @@ namespace Pulumi.PulumiService.Api.Teams
         /// The list of team members.
         /// </summary>
         [Output("members")]
-        public Output<ImmutableArray<object>> Members { get; private set; } = null!;
+        public Output<ImmutableArray<Pulumi.PulumiService.Api.Outputs.TeamMemberInfo>> Members { get; private set; } = null!;
 
         /// <summary>
         /// The unique identifier name of the team within the organization.
@@ -77,7 +77,7 @@ namespace Pulumi.PulumiService.Api.Teams
         /// The list of stack permissions granted to the team.
         /// </summary>
         [Output("stacks")]
-        public Output<ImmutableArray<object>> Stacks { get; private set; } = null!;
+        public Output<ImmutableArray<Pulumi.PulumiService.Api.Outputs.TeamStackPermission>> Stacks { get; private set; } = null!;
 
         /// <summary>
         /// UserRole is the calling user's role on the given team.

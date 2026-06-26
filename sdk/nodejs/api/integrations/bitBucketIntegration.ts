@@ -2,6 +2,9 @@
 // *** Do not edit by hand unless you're certain you know what you are doing! ***
 
 import * as pulumi from "@pulumi/pulumi";
+import * as inputs from "../../types/input";
+import * as outputs from "../../types/output";
+import * as enums from "../../types/enums";
 import * as utilities from "../../utilities";
 
 /**
@@ -41,7 +44,7 @@ export class BitBucketIntegration extends pulumi.CustomResource {
     /**
      * The user whose BitBucket OAuth token is being used for authentication, if user-based auth is configured.
      */
-    declare public /*out*/ readonly authUser: pulumi.Output<any | undefined>;
+    declare public /*out*/ readonly authUser: pulumi.Output<outputs.api.User | undefined>;
     /**
      * URL of the BitBucket workspace avatar image.
      */

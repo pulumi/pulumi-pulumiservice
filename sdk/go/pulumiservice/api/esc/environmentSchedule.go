@@ -8,6 +8,7 @@ import (
 	"reflect"
 
 	"errors"
+	"github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/api"
 	"github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/internal"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
@@ -57,7 +58,7 @@ func NewEnvironmentSchedule(ctx *pulumi.Context,
 		return nil, errors.New("invalid value for required argument 'ProjectName'")
 	}
 	if args.SecretRotationRequest != nil {
-		args.SecretRotationRequest = pulumi.ToSecret(args.SecretRotationRequest).(pulumi.Input)
+		args.SecretRotationRequest = pulumi.ToSecret(args.SecretRotationRequest).(api.CreateEnvironmentSecretRotationScheduleRequestPtrInput)
 	}
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource EnvironmentSchedule
@@ -105,7 +106,7 @@ type environmentScheduleArgs struct {
 	// The schedule once
 	ScheduleOnce *string `pulumi:"scheduleOnce"`
 	// The secret rotation request
-	SecretRotationRequest interface{} `pulumi:"secretRotationRequest"`
+	SecretRotationRequest *api.CreateEnvironmentSecretRotationScheduleRequest `pulumi:"secretRotationRequest"`
 }
 
 // The set of arguments for constructing a EnvironmentSchedule resource.
@@ -123,7 +124,7 @@ type EnvironmentScheduleArgs struct {
 	// The schedule once
 	ScheduleOnce pulumi.StringPtrInput
 	// The secret rotation request
-	SecretRotationRequest pulumi.Input
+	SecretRotationRequest api.CreateEnvironmentSecretRotationScheduleRequestPtrInput
 }
 
 func (EnvironmentScheduleArgs) ElementType() reflect.Type {

@@ -8,6 +8,7 @@ import (
 	"reflect"
 
 	"errors"
+	"github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/api"
 	"github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/internal"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
@@ -20,7 +21,7 @@ type Service struct {
 	// items. Will be nil once all items have been returned.
 	ContinuationToken pulumi.StringPtrOutput `pulumi:"continuationToken"`
 	// The list of service items
-	Items pulumi.ArrayOutput `pulumi:"items"`
+	Items api.ServiceItemArrayOutput `pulumi:"items"`
 }
 
 // NewService registers a new resource with the given unique name, arguments, and options.
@@ -87,7 +88,7 @@ type serviceArgs struct {
 	// an optional description of the service
 	Description string `pulumi:"description"`
 	// an optional list of items to add during service creation
-	Items []interface{} `pulumi:"items"`
+	Items []api.AddServiceItem `pulumi:"items"`
 	// the name of the service
 	Name string `pulumi:"name"`
 	// The organization name
@@ -97,7 +98,7 @@ type serviceArgs struct {
 	// the service owner type
 	OwnerType string `pulumi:"ownerType"`
 	// an optional list of properties to set on the service
-	Properties []interface{} `pulumi:"properties"`
+	Properties []api.ServiceProperty `pulumi:"properties"`
 }
 
 // The set of arguments for constructing a Service resource.
@@ -105,7 +106,7 @@ type ServiceArgs struct {
 	// an optional description of the service
 	Description pulumi.StringInput
 	// an optional list of items to add during service creation
-	Items pulumi.ArrayInput
+	Items api.AddServiceItemArrayInput
 	// the name of the service
 	Name pulumi.StringInput
 	// The organization name
@@ -115,7 +116,7 @@ type ServiceArgs struct {
 	// the service owner type
 	OwnerType pulumi.StringInput
 	// an optional list of properties to set on the service
-	Properties pulumi.ArrayInput
+	Properties api.ServicePropertyArrayInput
 }
 
 func (ServiceArgs) ElementType() reflect.Type {
@@ -212,8 +213,8 @@ func (o ServiceOutput) ContinuationToken() pulumi.StringPtrOutput {
 }
 
 // The list of service items
-func (o ServiceOutput) Items() pulumi.ArrayOutput {
-	return o.ApplyT(func(v *Service) pulumi.ArrayOutput { return v.Items }).(pulumi.ArrayOutput)
+func (o ServiceOutput) Items() api.ServiceItemArrayOutput {
+	return o.ApplyT(func(v *Service) api.ServiceItemArrayOutput { return v.Items }).(api.ServiceItemArrayOutput)
 }
 
 type ServiceArrayOutput struct{ *pulumi.OutputState }

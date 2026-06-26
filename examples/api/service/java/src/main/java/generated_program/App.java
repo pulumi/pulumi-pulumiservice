@@ -3,9 +3,10 @@ package generated_program;
 import com.pulumi.Pulumi;
 import com.pulumi.pulumiservice.api_services.Service;
 import com.pulumi.pulumiservice.api_services.ServiceArgs;
+import com.pulumi.pulumiservice.api.inputs.AddServiceItemArgs;
+import com.pulumi.pulumiservice.api.inputs.ServicePropertyArgs;
 
 import java.util.List;
-import java.util.Map;
 
 public class App {
     public static void main(String[] args) {
@@ -22,10 +23,15 @@ public class App {
                     .ownerType("team")
                     .ownerName("platform")
                     .items(List.of(
-                        Map.of("kind", "stack", "ref", "service-provider-test-org/example-app/dev")))
+                        AddServiceItemArgs.builder()
+                            .type("stack")
+                            .name("service-provider-test-org/example-app/dev")
+                            .build()))
                     .properties(List.of(
-                        Map.of("key", "tier", "value", "gold"),
-                        Map.of("key", "oncall", "value", "platform-ops")))
+                        ServicePropertyArgs.builder()
+                            .key("tier").value("gold").type("string").order(1).build(),
+                        ServicePropertyArgs.builder()
+                            .key("oncall").value("platform-ops").type("string").order(2).build()))
                     .build());
         });
     }

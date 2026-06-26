@@ -8,8 +8,8 @@ import com.pulumi.core.annotations.Export;
 import com.pulumi.core.annotations.ResourceType;
 import com.pulumi.core.internal.Codegen;
 import com.pulumi.pulumiservice.Utilities;
+import com.pulumi.pulumiservice.api.outputs.Organization;
 import com.pulumi.pulumiservice.api_auth.SAMLArgs;
-import java.lang.Object;
 import java.lang.String;
 import java.util.Optional;
 import javax.annotation.Nullable;
@@ -68,14 +68,14 @@ public class SAML extends com.pulumi.resources.CustomResource {
      * The Pulumi organization.
      * 
      */
-    @Export(name="organization", refs={Object.class}, tree="[0]")
-    private Output<Object> organization;
+    @Export(name="organization", refs={Organization.class}, tree="[0]")
+    private Output<Organization> organization;
 
     /**
      * @return The Pulumi organization.
      * 
      */
-    public Output<Object> organization() {
+    public Output<Organization> organization() {
         return this.organization;
     }
     /**

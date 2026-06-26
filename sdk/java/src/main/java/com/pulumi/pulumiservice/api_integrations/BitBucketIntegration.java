@@ -8,9 +8,9 @@ import com.pulumi.core.annotations.Export;
 import com.pulumi.core.annotations.ResourceType;
 import com.pulumi.core.internal.Codegen;
 import com.pulumi.pulumiservice.Utilities;
+import com.pulumi.pulumiservice.api.outputs.User;
 import com.pulumi.pulumiservice.api_integrations.BitBucketIntegrationArgs;
 import java.lang.Boolean;
-import java.lang.Object;
 import java.lang.String;
 import java.util.Optional;
 import javax.annotation.Nullable;
@@ -39,14 +39,14 @@ public class BitBucketIntegration extends com.pulumi.resources.CustomResource {
      * The user whose BitBucket OAuth token is being used for authentication, if user-based auth is configured.
      * 
      */
-    @Export(name="authUser", refs={Object.class}, tree="[0]")
-    private Output</* @Nullable */ Object> authUser;
+    @Export(name="authUser", refs={User.class}, tree="[0]")
+    private Output</* @Nullable */ User> authUser;
 
     /**
      * @return The user whose BitBucket OAuth token is being used for authentication, if user-based auth is configured.
      * 
      */
-    public Output<Optional<Object>> authUser() {
+    public Output<Optional<User>> authUser() {
         return Codegen.optional(this.authUser);
     }
     /**

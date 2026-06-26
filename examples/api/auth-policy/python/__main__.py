@@ -10,7 +10,7 @@ ps_api.auth.Policy(
     org_name=organization_name,
     policy_id=policy_id,
     policies=[
-        {"decision": "allow", "permission": "read", "tokenType": "organization"},
-        {"decision": "deny", "permission": "admin", "tokenType": "organization"},
+        {"decision": "allow", "authorizedPermissions": ["read"], "tokenType": "organization", "rules": {}},
+        {"decision": "deny", "authorizedPermissions": ["admin"], "tokenType": "organization", "rules": {}},
     ],
 )

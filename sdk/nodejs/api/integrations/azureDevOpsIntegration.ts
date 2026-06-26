@@ -2,6 +2,9 @@
 // *** Do not edit by hand unless you're certain you know what you are doing! ***
 
 import * as pulumi from "@pulumi/pulumi";
+import * as inputs from "../../types/input";
+import * as outputs from "../../types/output";
+import * as enums from "../../types/enums";
 import * as utilities from "../../utilities";
 
 /**
@@ -37,7 +40,7 @@ export class AzureDevOpsIntegration extends pulumi.CustomResource {
     /**
      * The Pulumi user whose Azure DevOps authentication token is being used
      */
-    declare public /*out*/ readonly authUser: pulumi.Output<any | undefined>;
+    declare public /*out*/ readonly authUser: pulumi.Output<outputs.api.User | undefined>;
     /**
      * Whether detailed property-level diffs are disabled for PR comments
      */
@@ -57,11 +60,11 @@ export class AzureDevOpsIntegration extends pulumi.CustomResource {
     /**
      * Metadata about the Azure DevOps organization linked to the Pulumi organization
      */
-    declare public /*out*/ readonly organization: pulumi.Output<any | undefined>;
+    declare public /*out*/ readonly organization: pulumi.Output<outputs.api.AzureDevOpsOrganization | undefined>;
     /**
      * Metadata about the Azure DevOps project linked to the Pulumi organization
      */
-    declare public /*out*/ readonly project: pulumi.Output<any | undefined>;
+    declare public /*out*/ readonly project: pulumi.Output<outputs.api.AzureDevOpsProject | undefined>;
     /**
      * Is the app integration valid
      */

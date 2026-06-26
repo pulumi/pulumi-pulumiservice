@@ -13,6 +13,8 @@ if sys.version_info >= (3, 11):
 else:
     from typing_extensions import NotRequired, TypedDict, TypeAlias
 from .. import _utilities
+from . import outputs
+from ._inputs import *
 
 __all__ = ['AuditLogExportConfigurationArgs', 'AuditLogExportConfiguration']
 
@@ -20,13 +22,13 @@ __all__ = ['AuditLogExportConfigurationArgs', 'AuditLogExportConfiguration']
 class AuditLogExportConfigurationArgs:
     def __init__(__self__, *,
                  new_enabled: pulumi.Input[_builtins.bool],
-                 new_s3_configuration: Any,
+                 new_s3_configuration: pulumi.Input['AuditLogsExportS3ConfigArgs'],
                  org_name: pulumi.Input[_builtins.str]):
         """
         The set of arguments for constructing a AuditLogExportConfiguration resource.
 
         :param pulumi.Input[_builtins.bool] new_enabled: Whether the audit log export is enabled.
-        :param Any new_s3_configuration: The new S3 configuration for audit log export.
+        :param pulumi.Input['AuditLogsExportS3ConfigArgs'] new_s3_configuration: The new S3 configuration for audit log export.
         :param pulumi.Input[_builtins.str] org_name: The organization name
         """
         pulumi.set(__self__, "new_enabled", new_enabled)
@@ -47,14 +49,14 @@ class AuditLogExportConfigurationArgs:
 
     @_builtins.property
     @pulumi.getter(name="newS3Configuration")
-    def new_s3_configuration(self) -> Any:
+    def new_s3_configuration(self) -> pulumi.Input['AuditLogsExportS3ConfigArgs']:
         """
         The new S3 configuration for audit log export.
         """
         return pulumi.get(self, "new_s3_configuration")
 
     @new_s3_configuration.setter
-    def new_s3_configuration(self, value: Any):
+    def new_s3_configuration(self, value: pulumi.Input['AuditLogsExportS3ConfigArgs']):
         pulumi.set(self, "new_s3_configuration", value)
 
     @_builtins.property
@@ -77,7 +79,7 @@ class AuditLogExportConfiguration(pulumi.CustomResource):
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
                  new_enabled: pulumi.Input[Optional[_builtins.bool]] = None,
-                 new_s3_configuration: Optional[Any] = None,
+                 new_s3_configuration: pulumi.Input[Optional[Union['AuditLogsExportS3ConfigArgs', 'AuditLogsExportS3ConfigArgsDict']]] = None,
                  org_name: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         """
@@ -87,7 +89,7 @@ class AuditLogExportConfiguration(pulumi.CustomResource):
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.bool] new_enabled: Whether the audit log export is enabled.
-        :param Any new_s3_configuration: The new S3 configuration for audit log export.
+        :param pulumi.Input[Union['AuditLogsExportS3ConfigArgs', 'AuditLogsExportS3ConfigArgsDict']] new_s3_configuration: The new S3 configuration for audit log export.
         :param pulumi.Input[_builtins.str] org_name: The organization name
         """
         ...
@@ -116,7 +118,7 @@ class AuditLogExportConfiguration(pulumi.CustomResource):
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
                  new_enabled: pulumi.Input[Optional[_builtins.bool]] = None,
-                 new_s3_configuration: Optional[Any] = None,
+                 new_s3_configuration: pulumi.Input[Optional[Union['AuditLogsExportS3ConfigArgs', 'AuditLogsExportS3ConfigArgsDict']]] = None,
                  org_name: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
@@ -176,7 +178,7 @@ class AuditLogExportConfiguration(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter(name="lastResult")
-    def last_result(self) -> pulumi.Output[Any]:
+    def last_result(self) -> pulumi.Output['outputs.AuditLogExportResult']:
         """
         The result of the last audit log export attempt.
         """
@@ -184,7 +186,7 @@ class AuditLogExportConfiguration(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter(name="s3Config")
-    def s3_config(self) -> pulumi.Output[Any]:
+    def s3_config(self) -> pulumi.Output['outputs.AuditLogsExportS3Config']:
         """
         The S3 configuration for exporting audit logs.
         """

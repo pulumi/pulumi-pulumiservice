@@ -25,7 +25,7 @@ type Gate struct {
 	// Rule configuration for the gate
 	Rule pulumi.AnyOutput `pulumi:"rule"`
 	// Target configuration for the gate
-	Target pulumi.AnyOutput `pulumi:"target"`
+	Target ChangeGateTargetOutputOutput `pulumi:"target"`
 }
 
 // NewGate registers a new resource with the given unique name, arguments, and options.
@@ -94,7 +94,7 @@ type gateArgs struct {
 	// Rule configuration for the gate
 	Rule interface{} `pulumi:"rule"`
 	// Target configuration for the gate
-	Target interface{} `pulumi:"target"`
+	Target ChangeGateTargetInput `pulumi:"target"`
 }
 
 // The set of arguments for constructing a Gate resource.
@@ -110,7 +110,7 @@ type GateArgs struct {
 	// Rule configuration for the gate
 	Rule pulumi.Input
 	// Target configuration for the gate
-	Target pulumi.Input
+	Target ChangeGateTargetInputInput
 }
 
 func (GateArgs) ElementType() reflect.Type {
@@ -221,8 +221,8 @@ func (o GateOutput) Rule() pulumi.AnyOutput {
 }
 
 // Target configuration for the gate
-func (o GateOutput) Target() pulumi.AnyOutput {
-	return o.ApplyT(func(v *Gate) pulumi.AnyOutput { return v.Target }).(pulumi.AnyOutput)
+func (o GateOutput) Target() ChangeGateTargetOutputOutput {
+	return o.ApplyT(func(v *Gate) ChangeGateTargetOutputOutput { return v.Target }).(ChangeGateTargetOutputOutput)
 }
 
 type GateArrayOutput struct{ *pulumi.OutputState }

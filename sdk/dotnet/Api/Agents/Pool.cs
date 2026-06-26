@@ -19,7 +19,7 @@ namespace Pulumi.PulumiService.Api.Agents
         /// The agents
         /// </summary>
         [Output("agents")]
-        public Output<ImmutableArray<object>> Agents { get; private set; } = null!;
+        public Output<ImmutableArray<Pulumi.PulumiService.Api.Outputs.DeploymentAgentMetadata>> Agents { get; private set; } = null!;
 
         /// <summary>
         /// The creation timestamp

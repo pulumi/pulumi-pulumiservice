@@ -8,9 +8,11 @@ import com.pulumi.core.annotations.Export;
 import com.pulumi.core.annotations.ResourceType;
 import com.pulumi.core.internal.Codegen;
 import com.pulumi.pulumiservice.Utilities;
+import com.pulumi.pulumiservice.api.outputs.AzureDevOpsOrganization;
+import com.pulumi.pulumiservice.api.outputs.AzureDevOpsProject;
+import com.pulumi.pulumiservice.api.outputs.User;
 import com.pulumi.pulumiservice.api_integrations.AzureDevOpsIntegrationArgs;
 import java.lang.Boolean;
-import java.lang.Object;
 import java.util.Optional;
 import javax.annotation.Nullable;
 
@@ -24,14 +26,14 @@ public class AzureDevOpsIntegration extends com.pulumi.resources.CustomResource 
      * The Pulumi user whose Azure DevOps authentication token is being used
      * 
      */
-    @Export(name="authUser", refs={Object.class}, tree="[0]")
-    private Output</* @Nullable */ Object> authUser;
+    @Export(name="authUser", refs={User.class}, tree="[0]")
+    private Output</* @Nullable */ User> authUser;
 
     /**
      * @return The Pulumi user whose Azure DevOps authentication token is being used
      * 
      */
-    public Output<Optional<Object>> authUser() {
+    public Output<Optional<User>> authUser() {
         return Codegen.optional(this.authUser);
     }
     /**
@@ -94,28 +96,28 @@ public class AzureDevOpsIntegration extends com.pulumi.resources.CustomResource 
      * Metadata about the Azure DevOps organization linked to the Pulumi organization
      * 
      */
-    @Export(name="organization", refs={Object.class}, tree="[0]")
-    private Output</* @Nullable */ Object> organization;
+    @Export(name="organization", refs={AzureDevOpsOrganization.class}, tree="[0]")
+    private Output</* @Nullable */ AzureDevOpsOrganization> organization;
 
     /**
      * @return Metadata about the Azure DevOps organization linked to the Pulumi organization
      * 
      */
-    public Output<Optional<Object>> organization() {
+    public Output<Optional<AzureDevOpsOrganization>> organization() {
         return Codegen.optional(this.organization);
     }
     /**
      * Metadata about the Azure DevOps project linked to the Pulumi organization
      * 
      */
-    @Export(name="project", refs={Object.class}, tree="[0]")
-    private Output</* @Nullable */ Object> project;
+    @Export(name="project", refs={AzureDevOpsProject.class}, tree="[0]")
+    private Output</* @Nullable */ AzureDevOpsProject> project;
 
     /**
      * @return Metadata about the Azure DevOps project linked to the Pulumi organization
      * 
      */
-    public Output<Optional<Object>> project() {
+    public Output<Optional<AzureDevOpsProject>> project() {
         return Codegen.optional(this.project);
     }
     /**

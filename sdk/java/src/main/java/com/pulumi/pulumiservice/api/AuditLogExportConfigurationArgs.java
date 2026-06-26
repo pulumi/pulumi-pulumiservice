@@ -6,8 +6,8 @@ package com.pulumi.pulumiservice.api;
 import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
 import com.pulumi.exceptions.MissingRequiredPropertyException;
+import com.pulumi.pulumiservice.api.inputs.AuditLogsExportS3ConfigArgs;
 import java.lang.Boolean;
-import java.lang.Object;
 import java.lang.String;
 import java.util.Objects;
 
@@ -36,13 +36,13 @@ public final class AuditLogExportConfigurationArgs extends com.pulumi.resources.
      * 
      */
     @Import(name="newS3Configuration", required=true)
-    private Output<Object> newS3Configuration;
+    private Output<AuditLogsExportS3ConfigArgs> newS3Configuration;
 
     /**
      * @return The new S3 configuration for audit log export.
      * 
      */
-    public Output<Object> newS3Configuration() {
+    public Output<AuditLogsExportS3ConfigArgs> newS3Configuration() {
         return this.newS3Configuration;
     }
 
@@ -114,7 +114,7 @@ public final class AuditLogExportConfigurationArgs extends com.pulumi.resources.
          * @return builder
          * 
          */
-        public Builder newS3Configuration(Output<Object> newS3Configuration) {
+        public Builder newS3Configuration(Output<AuditLogsExportS3ConfigArgs> newS3Configuration) {
             $.newS3Configuration = newS3Configuration;
             return this;
         }
@@ -125,7 +125,7 @@ public final class AuditLogExportConfigurationArgs extends com.pulumi.resources.
          * @return builder
          * 
          */
-        public Builder newS3Configuration(Object newS3Configuration) {
+        public Builder newS3Configuration(AuditLogsExportS3ConfigArgs newS3Configuration) {
             return newS3Configuration(Output.of(newS3Configuration));
         }
 

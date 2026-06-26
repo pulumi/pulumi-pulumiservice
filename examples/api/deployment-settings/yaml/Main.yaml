@@ -14,7 +14,8 @@ resources:
       projectName: ${projectName}
       stackName: ${stackName}
       executorContext:
-        executorImage: pulumi-cli
+        executorImage:
+          reference: pulumi-cli
       operationContext:
         preRunCommands:
           - yarn

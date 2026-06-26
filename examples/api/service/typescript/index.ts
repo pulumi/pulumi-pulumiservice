@@ -12,10 +12,10 @@ new ps.api.services.Service("catalogService", {
     ownerType: "team",
     ownerName: "platform",
     items: [
-        { kind: "stack", ref: "service-provider-test-org/example-app/dev" },
+        { type: "stack", name: "service-provider-test-org/example-app/dev" },
     ],
     properties: [
-        { key: "tier", value: "gold" },
-        { key: "oncall", value: "platform-ops" },
+        { key: "tier", value: "gold", type: "string", order: 1 },
+        { key: "oncall", value: "platform-ops", type: "string", order: 2 },
     ],
 });

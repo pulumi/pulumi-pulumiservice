@@ -8,6 +8,11 @@ import com.pulumi.core.annotations.Export;
 import com.pulumi.core.annotations.ResourceType;
 import com.pulumi.core.internal.Codegen;
 import com.pulumi.pulumiservice.Utilities;
+import com.pulumi.pulumiservice.api.outputs.CacheOptions;
+import com.pulumi.pulumiservice.api.outputs.DeploymentSettingsGitHub;
+import com.pulumi.pulumiservice.api.outputs.ExecutorContext;
+import com.pulumi.pulumiservice.api.outputs.OperationContext;
+import com.pulumi.pulumiservice.api.outputs.SourceContext;
 import com.pulumi.pulumiservice.api_deployments.SettingsArgs;
 import java.lang.Integer;
 import java.lang.Object;
@@ -39,56 +44,56 @@ public class Settings extends com.pulumi.resources.CustomResource {
      * Cache options for the deployment.
      * 
      */
-    @Export(name="cacheOptions", refs={Object.class}, tree="[0]")
-    private Output</* @Nullable */ Object> cacheOptions;
+    @Export(name="cacheOptions", refs={CacheOptions.class}, tree="[0]")
+    private Output</* @Nullable */ CacheOptions> cacheOptions;
 
     /**
      * @return Cache options for the deployment.
      * 
      */
-    public Output<Optional<Object>> cacheOptions() {
+    public Output<Optional<CacheOptions>> cacheOptions() {
         return Codegen.optional(this.cacheOptions);
     }
     /**
      * The executor context defining the execution environment.
      * 
      */
-    @Export(name="executorContext", refs={Object.class}, tree="[0]")
-    private Output</* @Nullable */ Object> executorContext;
+    @Export(name="executorContext", refs={ExecutorContext.class}, tree="[0]")
+    private Output</* @Nullable */ ExecutorContext> executorContext;
 
     /**
      * @return The executor context defining the execution environment.
      * 
      */
-    public Output<Optional<Object>> executorContext() {
+    public Output<Optional<ExecutorContext>> executorContext() {
         return Codegen.optional(this.executorContext);
     }
     /**
      * GitHub-specific deployment settings
      * 
      */
-    @Export(name="gitHub", refs={Object.class}, tree="[0]")
-    private Output</* @Nullable */ Object> gitHub;
+    @Export(name="gitHub", refs={DeploymentSettingsGitHub.class}, tree="[0]")
+    private Output</* @Nullable */ DeploymentSettingsGitHub> gitHub;
 
     /**
      * @return GitHub-specific deployment settings
      * 
      */
-    public Output<Optional<Object>> gitHub() {
+    public Output<Optional<DeploymentSettingsGitHub>> gitHub() {
         return Codegen.optional(this.gitHub);
     }
     /**
      * The operation context defining pre-run and post-run commands and environment variables.
      * 
      */
-    @Export(name="operationContext", refs={Object.class}, tree="[0]")
-    private Output</* @Nullable */ Object> operationContext;
+    @Export(name="operationContext", refs={OperationContext.class}, tree="[0]")
+    private Output</* @Nullable */ OperationContext> operationContext;
 
     /**
      * @return The operation context defining pre-run and post-run commands and environment variables.
      * 
      */
-    public Output<Optional<Object>> operationContext() {
+    public Output<Optional<OperationContext>> operationContext() {
         return Codegen.optional(this.operationContext);
     }
     /**
@@ -109,14 +114,14 @@ public class Settings extends com.pulumi.resources.CustomResource {
      * The source context defining where the source code is located.
      * 
      */
-    @Export(name="sourceContext", refs={Object.class}, tree="[0]")
-    private Output</* @Nullable */ Object> sourceContext;
+    @Export(name="sourceContext", refs={SourceContext.class}, tree="[0]")
+    private Output</* @Nullable */ SourceContext> sourceContext;
 
     /**
      * @return The source context defining where the source code is located.
      * 
      */
-    public Output<Optional<Object>> sourceContext() {
+    public Output<Optional<SourceContext>> sourceContext() {
         return Codegen.optional(this.sourceContext);
     }
     /**

@@ -10,8 +10,12 @@ resources:
       policyId: ${policyId}
       policies:
         - decision: allow
-          permission: read
+          authorizedPermissions:
+            - read
           tokenType: organization
+          rules: {}
         - decision: deny
-          permission: admin
+          authorizedPermissions:
+            - admin
           tokenType: organization
+          rules: {}

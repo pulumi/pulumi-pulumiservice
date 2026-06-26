@@ -2,6 +2,9 @@
 // *** Do not edit by hand unless you're certain you know what you are doing! ***
 
 import * as pulumi from "@pulumi/pulumi";
+import * as inputs from "../types/input";
+import * as outputs from "../types/output";
+import * as enums from "../types/enums";
 import * as utilities from "../utilities";
 
 /**
@@ -45,7 +48,7 @@ export class DefaultOrganization extends pulumi.CustomResource {
      * on how to configure their default org locally.
      * Can be possibly empty.
      */
-    declare public /*out*/ readonly Messages: pulumi.Output<any[]>;
+    declare public /*out*/ readonly Messages: pulumi.Output<outputs.api.AppMessage[]>;
 
     /**
      * Create a DefaultOrganization resource with the given unique name, arguments, and options.

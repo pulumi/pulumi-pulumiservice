@@ -6,8 +6,8 @@ package com.pulumi.pulumiservice.api_auth;
 import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
 import com.pulumi.exceptions.MissingRequiredPropertyException;
+import com.pulumi.pulumiservice.api.inputs.JSONWebKeySetArgs;
 import java.lang.Integer;
-import java.lang.Object;
 import java.lang.String;
 import java.util.List;
 import java.util.Objects;
@@ -39,13 +39,13 @@ public final class OidcIssuerArgs extends com.pulumi.resources.ResourceArgs {
      * 
      */
     @Import(name="jwks")
-    private @Nullable Output<Object> jwks;
+    private @Nullable Output<JSONWebKeySetArgs> jwks;
 
     /**
      * @return The JSON Web Key Set for the OIDC issuer.
      * 
      */
-    public Optional<Output<Object>> jwks() {
+    public Optional<Output<JSONWebKeySetArgs>> jwks() {
         return Optional.ofNullable(this.jwks);
     }
 
@@ -181,7 +181,7 @@ public final class OidcIssuerArgs extends com.pulumi.resources.ResourceArgs {
          * @return builder
          * 
          */
-        public Builder jwks(@Nullable Output<Object> jwks) {
+        public Builder jwks(@Nullable Output<JSONWebKeySetArgs> jwks) {
             $.jwks = jwks;
             return this;
         }
@@ -192,7 +192,7 @@ public final class OidcIssuerArgs extends com.pulumi.resources.ResourceArgs {
          * @return builder
          * 
          */
-        public Builder jwks(Object jwks) {
+        public Builder jwks(JSONWebKeySetArgs jwks) {
             return jwks(Output.of(jwks));
         }
 

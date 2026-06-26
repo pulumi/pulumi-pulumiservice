@@ -26,13 +26,13 @@ namespace Pulumi.PulumiService.Api.Services
         /// The list of service items
         /// </summary>
         [Output("items")]
-        public Output<ImmutableArray<object>> Items { get; private set; } = null!;
+        public Output<ImmutableArray<Pulumi.PulumiService.Api.Outputs.ServiceItem>> Items { get; private set; } = null!;
 
         /// <summary>
         /// The service details
         /// </summary>
         [Output("service")]
-        public Output<object> Service { get; private set; } = null!;
+        public Output<Pulumi.PulumiService.Api.Outputs.Service> Service { get; private set; } = null!;
 
 
         /// <summary>
@@ -80,14 +80,14 @@ namespace Pulumi.PulumiService.Api.Services
     public sealed class ItemArgs : global::Pulumi.ResourceArgs
     {
         [Input("items", required: true)]
-        private InputList<object>? _items;
+        private InputList<Pulumi.PulumiService.Api.Inputs.AddServiceItemArgs>? _items;
 
         /// <summary>
         /// List of items
         /// </summary>
-        public InputList<object> Items
+        public InputList<Pulumi.PulumiService.Api.Inputs.AddServiceItemArgs> Items
         {
-            get => _items ?? (_items = new InputList<object>());
+            get => _items ?? (_items = new InputList<Pulumi.PulumiService.Api.Inputs.AddServiceItemArgs>());
             set => _items = value;
         }
 

@@ -5,6 +5,12 @@ import com.pulumi.pulumiservice.api_stacks.Stack;
 import com.pulumi.pulumiservice.api_stacks.StackArgs;
 import com.pulumi.pulumiservice.api_deployments.Settings;
 import com.pulumi.pulumiservice.api_deployments.SettingsArgs;
+import com.pulumi.pulumiservice.api.inputs.DockerImageRequestArgs;
+import com.pulumi.pulumiservice.api.inputs.ExecutorSettingsRequestArgs;
+import com.pulumi.pulumiservice.api.inputs.OperationContextOptionsRequestArgs;
+import com.pulumi.pulumiservice.api.inputs.OperationContextRequestArgs;
+import com.pulumi.pulumiservice.api.inputs.SourceContextGitRequestArgs;
+import com.pulumi.pulumiservice.api.inputs.SourceContextRequestArgs;
 import com.pulumi.resources.CustomResourceOptions;
 
 import java.util.List;
@@ -31,15 +37,24 @@ public class App {
                     .orgName(organizationName)
                     .projectName(projectName)
                     .stackName(stackName)
-                    .executorContext(Map.of("executorImage", executorImage))
-                    .operationContext(Map.of(
-                        "preRunCommands", List.of("yarn"),
-                        "environmentVariables", Map.of("TEST_VAR", "foo"),
-                        "options", Map.of("skipInstallDependencies", true)))
-                    .sourceContext(Map.of(
-                        "git", Map.of(
-                            "repoUrl", "https://github.com/example/example.git",
-                            "branch", "refs/heads/main")))
+                    .executorContext(ExecutorSettingsRequestArgs.builder()
+                        .executorImage(DockerImageRequestArgs.builder()
+                            .reference(executorImage)
+                            .build())
+                        .build())
+                    .operationContext(OperationContextRequestArgs.builder()
+                        .preRunCommands(List.of("yarn"))
+                        .environmentVariables(Map.of("TEST_VAR", "foo"))
+                        .options(OperationContextOptionsRequestArgs.builder()
+                            .skipInstallDependencies(true)
+                            .build())
+                        .build())
+                    .sourceContext(SourceContextRequestArgs.builder()
+                        .git(SourceContextGitRequestArgs.builder()
+                            .repoUrl("https://github.com/example/example.git")
+                            .branch("refs/heads/main")
+                            .build())
+                        .build())
                     .build(),
                 CustomResourceOptions.builder().dependsOn(List.of(parentStack)).build());
 
