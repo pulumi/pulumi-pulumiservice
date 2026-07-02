@@ -118,7 +118,7 @@ func TestCreateSynthesizesID(t *testing.T) {
 		inputs     map[string]any
 		wantID     string
 	}{
-		{
+		{ //nolint:gosec // G101: test fixture, not a real credential.
 			// AgentPool: server-generated id, ID = {orgName}/{uuid}.
 			token: "pulumiservice:api:AgentPool",
 			responses: map[string]mockResponse{
@@ -132,24 +132,24 @@ func TestCreateSynthesizesID(t *testing.T) {
 				},
 			},
 			inputs: map[string]any{
-				"orgName":     "test-org",
-				"name":        "runners",
-				"description": "hi",
+				orgNameKey:     testOrgName,
+				nameKey:        "runners",
+				descriptionKey: "hi",
 			},
 			wantID: "test-org/abc-123",
 		},
-		{
+		{ //nolint:gosec // G101: test fixture, not a real credential.
 			// StackTag: 204 No Content, identity entirely from inputs.
 			token: "pulumiservice:api:StackTag",
 			responses: map[string]mockResponse{
 				"POST /api/stacks/test-org/myproj/mystack/tags": {status: 204, body: ""},
 			},
 			inputs: map[string]any{
-				"orgName":     "test-org",
+				orgNameKey:    testOrgName,
 				"projectName": "myproj",
 				"stackName":   "mystack",
-				"name":        "owner", // body field; rename name→tagName for path
-				"value":       "team-x",
+				nameKey:       "owner", // body field; rename name→tagName for path
+				valueKey:      "team-x",
 			},
 			wantID: "test-org/myproj/mystack/owner",
 		},
@@ -167,13 +167,13 @@ func TestCreateSynthesizesID(t *testing.T) {
 				},
 			},
 			inputs: map[string]any{
-				"orgName":     "test-org",
-				"name":        "infra", // body; renames map name→teamName for path
-				"description": "infra team",
+				orgNameKey:     testOrgName,
+				nameKey:        infraVal, // body; renames map name→teamName for path
+				descriptionKey: infraTeamVal,
 			},
 			wantID: "test-org/infra",
 		},
-		{
+		{ //nolint:gosec // G101: test fixture, not a real credential.
 			// DefaultOrganization: requireImport singleton; GET returns 404
 			// for the probe, 200 after the mutating call writes it.
 			token: "pulumiservice:api:DefaultOrganization",
@@ -182,22 +182,22 @@ func TestCreateSynthesizesID(t *testing.T) {
 				return func(req *http.Request) mockResponse {
 					switch {
 					case req.Method == http.MethodGet && !written:
-						return mockResponse{status: 404, body: `{"error":"not found"}`}
+						return mockResponse{status: 404, body: notFoundBody}
 					case req.Method == http.MethodGet:
 						return mockResponse{status: 200, body: `{"orgName":"test-org"}`}
 					case req.URL.Path == "/api/user/organizations/test-org/default":
 						written = true
 						return mockResponse{status: 200, body: `{}`}
 					}
-					return mockResponse{status: 500, body: "unexpected"}
+					return mockResponse{status: 500, body: unexpectedBody}
 				}
 			},
 			inputs: map[string]any{
-				"orgName": "test-org",
+				orgNameKey: testOrgName,
 			},
-			wantID: "test-org",
+			wantID: testOrgName,
 		},
-		{
+		{ //nolint:gosec // G101: test fixture, not a real credential.
 			// AuditLogExportConfiguration: requireImport singleton, same
 			// staging pattern as DefaultOrganization.
 			token: "pulumiservice:api:AuditLogExportConfiguration",
@@ -206,22 +206,22 @@ func TestCreateSynthesizesID(t *testing.T) {
 				return func(req *http.Request) mockResponse {
 					switch {
 					case req.Method == http.MethodGet && !written:
-						return mockResponse{status: 404, body: `{"error":"not found"}`}
+						return mockResponse{status: 404, body: notFoundBody}
 					case req.Method == http.MethodGet:
 						return mockResponse{status: 200, body: `{}`}
 					case req.Method == http.MethodPost:
 						written = true
 						return mockResponse{status: 200, body: `{}`}
 					}
-					return mockResponse{status: 500, body: "unexpected"}
+					return mockResponse{status: 500, body: unexpectedBody}
 				}
 			},
 			inputs: map[string]any{
-				"orgName": "test-org",
+				orgNameKey: testOrgName,
 			},
-			wantID: "test-org",
+			wantID: testOrgName,
 		},
-		{
+		{ //nolint:gosec // G101: test fixture, not a real credential.
 			// Role: server-generated id, response rename id→roleID.
 			token: "pulumiservice:api:Role",
 			responses: map[string]mockResponse{
@@ -235,9 +235,9 @@ func TestCreateSynthesizesID(t *testing.T) {
 				},
 			},
 			inputs: map[string]any{
-				"orgName":     "test-org",
-				"name":        "deployer",
-				"description": "deploy access",
+				orgNameKey:     testOrgName,
+				nameKey:        "deployer",
+				descriptionKey: "deploy access",
 			},
 			wantID: "test-org/role-7",
 		},
@@ -317,7 +317,7 @@ func TestCreateFusesYamlUpdateAfterJsonCreate(t *testing.T) {
 		spec: spec,
 		meta: ResourceMeta{
 			Operations: Operations{Create: "CreateEnv", Update: "UpdateEnv"},
-			IDFormat:   "{org}/{project}/{name}",
+			IDFormat:   orgProjectNameFormat,
 		},
 	}
 
@@ -346,9 +346,9 @@ func TestCreateFusesYamlUpdateAfterJsonCreate(t *testing.T) {
 	// Secret-wrapped yaml mirrors what codegen sends for Secret fields.
 	yamlVal := property.New(yamlBody).WithSecret(true)
 	inputs := property.NewMap(map[string]property.Value{
-		"org":     property.New("acme"),
+		orgKey:    property.New(acmeVal),
 		"project": property.New("default"),
-		"name":    property.New("platform-bootstrap"),
+		nameKey:   property.New("platform-bootstrap"),
 		"yaml":    yamlVal,
 	})
 	_, err := r.Create(t.Context(), p.CreateRequest{Properties: inputs})
@@ -400,7 +400,7 @@ func TestReadDecodesYamlResponseBody(t *testing.T) {
 		spec: spec,
 		meta: ResourceMeta{
 			Operations: Operations{Read: "ReadEnv"},
-			IDFormat:   "{org}/{project}/{name}",
+			IDFormat:   orgProjectNameFormat,
 		},
 	}
 
@@ -468,18 +468,18 @@ func TestCreateReadAfterCreateSourcesFromInputs(t *testing.T) {
 	r := &Resource{
 		spec: spec,
 		meta: ResourceMeta{
-			Operations: Operations{Create: "CreateThing", Read: "GetThing"},
-			IDFormat:   "{org}/{id}",
+			Operations: Operations{Create: createThingOp, Read: getThingOp},
+			IDFormat:   orgIDFormat,
 		},
 	}
 	mock := &mockTransport{responses: map[string]mockResponse{
-		"POST /things/acme": {status: 200, body: `{"id":"thing-1"}`},
-		getThingPath:        {status: 200, body: `{"id":"thing-1","name":"foo","status":"ready"}`},
+		postThingsAcme: {status: 200, body: `{"id":"thing-1"}`},
+		getThingPath:   {status: 200, body: `{"id":"thing-1","name":"foo","status":"ready"}`},
 	}}
 	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
 
 	resp, err := r.Create(t.Context(), p.CreateRequest{
-		Properties: propMap(map[string]any{"org": "acme", "name": "foo"}),
+		Properties: propMap(map[string]any{orgKey: acmeVal, nameKey: fooVal}),
 	})
 	if err != nil {
 		t.Fatalf("create: %v\n  calls: %v", err, mock.calls)
@@ -536,25 +536,25 @@ func TestCreateReadsAfterCreate(t *testing.T) {
 	r := &Resource{
 		spec: spec,
 		meta: ResourceMeta{
-			Operations: Operations{Create: "CreateThing", Read: "GetThing"},
-			IDFormat:   "{org}/{id}",
+			Operations: Operations{Create: createThingOp, Read: getThingOp},
+			IDFormat:   orgIDFormat,
 		},
 	}
 	readBody := `{"id":"thing-1","name":"foo","lastUpdate":"2026-05-05T00:00:00Z","status":"ready"}`
 	mock := &mockTransport{responses: map[string]mockResponse{
-		"POST /things/acme": {status: 200, body: `{"id":"thing-1"}`},
-		getThingPath:        {status: 200, body: readBody},
+		postThingsAcme: {status: 200, body: `{"id":"thing-1"}`},
+		getThingPath:   {status: 200, body: readBody},
 	}}
 	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
 
 	resp, err := r.Create(t.Context(), p.CreateRequest{
-		Properties: propMap(map[string]any{"org": "acme", "name": "foo"}),
+		Properties: propMap(map[string]any{orgKey: acmeVal, nameKey: fooVal}),
 	})
 	if err != nil {
 		t.Fatalf("create: %v\n  calls: %v", err, mock.calls)
 	}
 
-	if len(mock.calls) != 2 || mock.calls[0] != "POST /things/acme" || mock.calls[1] != getThingPath {
+	if len(mock.calls) != 2 || mock.calls[0] != postThingsAcme || mock.calls[1] != getThingPath {
 		t.Errorf("expected POST then GET, got: %v", mock.calls)
 	}
 	for _, key := range []string{"lastUpdate", "status"} {
@@ -568,7 +568,7 @@ func TestCreateReadsAfterCreate(t *testing.T) {
 		}
 	}
 	// Path params are program-owned: they live in inputs and the ID, not state.
-	if _, ok := resp.Properties.GetOk("org"); ok {
+	if _, ok := resp.Properties.GetOk(orgKey); ok {
 		t.Errorf("state should not carry path-param `org`")
 	}
 	if resp.ID != "acme/thing-1" {
@@ -583,18 +583,18 @@ func TestCreateRequireImport_BlocksWhenExists(t *testing.T) {
 	r := &Resource{
 		spec: spec,
 		meta: ResourceMeta{
-			Operations:    Operations{Create: "PutThing", Read: "GetThing", Update: "PutThing"},
-			IDFormat:      "{org}",
+			Operations:    Operations{Create: putThingOp, Read: getThingOp, Update: putThingOp},
+			IDFormat:      orgFormat,
 			RequireImport: true,
 		},
 	}
 	mock := &mockTransport{responses: map[string]mockResponse{
-		"GET /things/acme": {status: 200, body: `{"org":"acme","value":"existing"}`},
+		getThingsAcme: {status: 200, body: `{"org":"acme","value":"existing"}`},
 	}}
 	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
 
 	_, err := r.Create(t.Context(), p.CreateRequest{
-		Properties: propMap(map[string]any{"org": "acme", "value": "new"}),
+		Properties: propMap(map[string]any{orgKey: acmeVal, valueKey: newVal}),
 	})
 	if err == nil {
 		t.Fatalf("expected error when resource already exists, got nil")
@@ -602,7 +602,7 @@ func TestCreateRequireImport_BlocksWhenExists(t *testing.T) {
 	if !strings.Contains(err.Error(), "already exists") || !strings.Contains(err.Error(), "import") {
 		t.Errorf("error message should mention `already exists` and `import`: %v", err)
 	}
-	if len(mock.calls) != 1 || mock.calls[0] != "GET /things/acme" {
+	if len(mock.calls) != 1 || mock.calls[0] != getThingsAcme {
 		t.Errorf("expected exactly one GET, got: %v", mock.calls)
 	}
 }
@@ -613,8 +613,8 @@ func TestCreateRequireImport_ProceedsOn404(t *testing.T) {
 	r := &Resource{
 		spec: spec,
 		meta: ResourceMeta{
-			Operations:    Operations{Create: "PutThing", Read: "GetThing", Update: "PutThing"},
-			IDFormat:      "{org}",
+			Operations:    Operations{Create: putThingOp, Read: getThingOp, Update: putThingOp},
+			IDFormat:      orgFormat,
 			RequireImport: true,
 		},
 	}
@@ -623,27 +623,27 @@ func TestCreateRequireImport_ProceedsOn404(t *testing.T) {
 		switch req.Method {
 		case http.MethodPut:
 			putCalled = true
-			return mockResponse{status: 200, body: `{"org":"acme","value":"new"}`}
+			return mockResponse{status: 200, body: orgAcmeNewBody}
 		case http.MethodGet:
 			if putCalled {
-				return mockResponse{status: 200, body: `{"org":"acme","value":"new"}`}
+				return mockResponse{status: 200, body: orgAcmeNewBody}
 			}
-			return mockResponse{status: 404, body: `{"error":"not found"}`}
+			return mockResponse{status: 404, body: notFoundBody}
 		}
-		return mockResponse{status: 500, body: "unexpected"}
+		return mockResponse{status: 500, body: unexpectedBody}
 	}}
 	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
 
 	resp, err := r.Create(t.Context(), p.CreateRequest{
-		Properties: propMap(map[string]any{"org": "acme", "value": "new"}),
+		Properties: propMap(map[string]any{orgKey: acmeVal, valueKey: newVal}),
 	})
 	if err != nil {
 		t.Fatalf("create should proceed on 404, got: %v\n  calls: %v", err, mock.calls)
 	}
-	if resp.ID != "acme" {
-		t.Errorf("ID: got %q, want %q", resp.ID, "acme")
+	if resp.ID != acmeVal {
+		t.Errorf("ID: got %q, want %q", resp.ID, acmeVal)
 	}
-	wantCalls := []string{"GET /things/acme", "PUT /things/acme", "GET /things/acme"}
+	wantCalls := []string{getThingsAcme, putThingsAcme, getThingsAcme}
 	if len(mock.calls) != len(wantCalls) {
 		t.Fatalf("expected %d calls, got %d: %v", len(wantCalls), len(mock.calls), mock.calls)
 	}
@@ -688,8 +688,8 @@ func TestCreateRequireImport_ServerIDReadURL_MetadataError(t *testing.T) {
 	}
 	r := &Resource{
 		spec: spec,
-		meta: ResourceMeta{
-			Operations:    Operations{Create: "CreateThing", Read: "ReadThing"},
+		meta: ResourceMeta{ //nolint:gosec // G101: test fixture, not a real credential.
+			Operations:    Operations{Create: createThingOp, Read: "ReadThing"},
 			Token:         "pulumiservice:api:Thing",
 			RequireImport: true,
 		},
@@ -698,7 +698,7 @@ func TestCreateRequireImport_ServerIDReadURL_MetadataError(t *testing.T) {
 	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
 
 	_, err = r.Create(t.Context(), p.CreateRequest{
-		Properties: propMap(map[string]any{"value": "new"}),
+		Properties: propMap(map[string]any{valueKey: newVal}),
 	})
 	if err == nil {
 		t.Fatalf("expected metadata-error, got nil")
@@ -721,23 +721,23 @@ func TestCreateRequireImport_NoReadOp_OptsOut(t *testing.T) {
 	r := &Resource{
 		spec: spec,
 		meta: ResourceMeta{
-			Operations:    Operations{Create: "PutThing", Update: "PutThing"},
-			IDFormat:      "{org}",
+			Operations:    Operations{Create: putThingOp, Update: putThingOp},
+			IDFormat:      orgFormat,
 			RequireImport: true,
 		},
 	}
 	mock := &mockTransport{responses: map[string]mockResponse{
-		"PUT /things/acme": {status: 200, body: `{"org":"acme","value":"new"}`},
+		putThingsAcme: {status: 200, body: orgAcmeNewBody},
 	}}
 	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
 
 	_, err := r.Create(t.Context(), p.CreateRequest{
-		Properties: propMap(map[string]any{"org": "acme", "value": "new"}),
+		Properties: propMap(map[string]any{orgKey: acmeVal, valueKey: newVal}),
 	})
 	if err != nil {
 		t.Fatalf("create should proceed without probe, got: %v\n  calls: %v", err, mock.calls)
 	}
-	if len(mock.calls) != 1 || mock.calls[0] != "PUT /things/acme" {
+	if len(mock.calls) != 1 || mock.calls[0] != putThingsAcme {
 		t.Errorf("expected only the PUT call, got: %v", mock.calls)
 	}
 }
@@ -798,7 +798,7 @@ func TestCreateMissingPathParam(t *testing.T) {
 
 	// Omit `name` — the body field that renames to teamName for the path.
 	req := p.CreateRequest{Properties: propMap(map[string]any{
-		"orgName": "test-org",
+		orgNameKey: testOrgName,
 	})}
 	_, err := r.Create(t.Context(), req)
 	if err == nil {
@@ -855,15 +855,15 @@ func TestUpdateReadsAfterUpdate(t *testing.T) {
 	r := &Resource{
 		spec: spec,
 		meta: ResourceMeta{
-			Operations: Operations{Read: "GetThing", Update: "PatchThing"},
-			IDFormat:   "{org}/{id}",
+			Operations: Operations{Read: getThingOp, Update: "PatchThing"},
+			IDFormat:   orgIDFormat,
 		},
 	}
 	patchBody := `{"name":"foo-renamed","description":"rotated"}`
 	readBody := `{"id":"thing-1","name":"foo-renamed","description":"rotated","created":"2026-05-05T00:00:00Z"}`
 	priorState := map[string]any{
-		"id": "thing-1", "name": "foo", "description": "original",
-		"created": "2026-05-05T00:00:00Z",
+		"id": thing1ID, nameKey: fooVal, descriptionKey: originalVal,
+		createdKey: createdTimestamp,
 	}
 	mock := &mockTransport{responses: map[string]mockResponse{
 		patchThingPath: {status: 200, body: patchBody},
@@ -872,8 +872,8 @@ func TestUpdateReadsAfterUpdate(t *testing.T) {
 	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
 
 	resp, err := r.Update(t.Context(), p.UpdateRequest{
-		Inputs:    propMap(map[string]any{"org": "acme", "name": "foo-renamed", "description": "rotated"}),
-		OldInputs: propMap(map[string]any{"org": "acme", "name": "foo", "description": "original"}),
+		Inputs:    propMap(map[string]any{orgKey: acmeVal, nameKey: "foo-renamed", descriptionKey: rotatedVal}),
+		OldInputs: propMap(map[string]any{orgKey: acmeVal, nameKey: fooVal, descriptionKey: originalVal}),
 		State:     propMap(priorState),
 	})
 	if err != nil {
@@ -882,7 +882,7 @@ func TestUpdateReadsAfterUpdate(t *testing.T) {
 	if len(mock.calls) != 2 || mock.calls[0] != patchThingPath || mock.calls[1] != getThingPath {
 		t.Errorf("expected PATCH then GET, got: %v", mock.calls)
 	}
-	for _, key := range []string{"id", "created", "name", "description"} {
+	for _, key := range []string{"id", createdKey, nameKey, descriptionKey} {
 		if _, ok := resp.Properties.GetOk(key); !ok {
 			t.Errorf("state missing %q after read-after-update", key)
 		}
@@ -921,7 +921,7 @@ func TestUpdateMergesPriorStateWithoutReadOp(t *testing.T) {
 		spec: spec,
 		meta: ResourceMeta{
 			Operations: Operations{Update: "PatchThing"},
-			IDFormat:   "{org}/{id}",
+			IDFormat:   orgIDFormat,
 		},
 	}
 	mock := &mockTransport{responses: map[string]mockResponse{
@@ -930,25 +930,25 @@ func TestUpdateMergesPriorStateWithoutReadOp(t *testing.T) {
 	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
 
 	priorState := map[string]any{
-		"id": "thing-1", "name": "foo", "description": "original",
-		"created": "2026-05-05T00:00:00Z",
+		"id": thing1ID, nameKey: fooVal, descriptionKey: originalVal,
+		createdKey: createdTimestamp,
 	}
 	resp, err := r.Update(t.Context(), p.UpdateRequest{
-		Inputs:    propMap(map[string]any{"org": "acme", "description": "rotated"}),
-		OldInputs: propMap(map[string]any{"org": "acme", "description": "original"}),
+		Inputs:    propMap(map[string]any{orgKey: acmeVal, descriptionKey: rotatedVal}),
+		OldInputs: propMap(map[string]any{orgKey: acmeVal, descriptionKey: originalVal}),
 		State:     propMap(priorState),
 	})
 	if err != nil {
 		t.Fatalf("update: %v\n  calls: %v", err, mock.calls)
 	}
-	if v, ok := resp.Properties.GetOk("id"); !ok || v.AsString() != "thing-1" {
+	if v, ok := resp.Properties.GetOk("id"); !ok || v.AsString() != thing1ID {
 		t.Errorf("state missing or wrong `id` after update-with-no-read-op: %v (ok=%v)", v, ok)
 	}
-	if v, ok := resp.Properties.GetOk("created"); !ok || v.AsString() != "2026-05-05T00:00:00Z" {
+	if v, ok := resp.Properties.GetOk(createdKey); !ok || v.AsString() != createdTimestamp {
 		t.Errorf("state missing prior `created` after update-with-no-read-op: %v (ok=%v)", v, ok)
 	}
-	if v, ok := resp.Properties.GetOk("description"); !ok || v.AsString() != "rotated" {
-		t.Errorf("state has stale description, want %q got %v (ok=%v)", "rotated", v, ok)
+	if v, ok := resp.Properties.GetOk(descriptionKey); !ok || v.AsString() != rotatedVal {
+		t.Errorf("state has stale description, want %q got %v (ok=%v)", rotatedVal, v, ok)
 	}
 }
 
@@ -1019,22 +1019,22 @@ func TestBuildRequestBody(t *testing.T) {
 			name:    "path param not declared in body schema is dropped",
 			op:      "CreateTeam",
 			renames: nil,
-			inputs:  map[string]any{"org": "acme", "name": "infra", "description": "infra team"},
-			want:    map[string]any{"name": "infra", "description": "infra team"},
+			inputs:  map[string]any{orgKey: acmeVal, nameKey: infraVal, descriptionKey: infraTeamVal},
+			want:    map[string]any{nameKey: infraVal, descriptionKey: infraTeamVal},
 		},
 		{
 			name:    "rename for path-param does not rewrite body field of same Pulumi name",
 			op:      "CreateTeam",
-			renames: map[string]string{"name": "teamName"}, // path-only rename
-			inputs:  map[string]any{"org": "acme", "name": "infra", "description": "infra team"},
-			want:    map[string]any{"name": "infra", "description": "infra team"},
+			renames: map[string]string{nameKey: "teamName"}, // path-only rename
+			inputs:  map[string]any{orgKey: acmeVal, nameKey: infraVal, descriptionKey: infraTeamVal},
+			want:    map[string]any{nameKey: infraVal, descriptionKey: infraTeamVal},
 		},
 		{
 			name:    "rename that targets a body field is applied",
 			op:      "CreateWidget",
-			renames: map[string]string{"id": "widgetID"}, // body field rename
-			inputs:  map[string]any{"org": "acme", "id": "w-1", "description": "wodget"},
-			want:    map[string]any{"widgetID": "w-1", "description": "wodget"},
+			renames: map[string]string{"id": widgetIDVal}, // body field rename
+			inputs:  map[string]any{orgKey: acmeVal, "id": "w-1", descriptionKey: "wodget"},
+			want:    map[string]any{widgetIDVal: "w-1", descriptionKey: "wodget"},
 		},
 		{
 			name: "path param ALSO declared in body schema is kept (server validates match)",
@@ -1042,12 +1042,12 @@ func TestBuildRequestBody(t *testing.T) {
 			// OrganizationWebhook-style: Pulumi-side `organizationName` maps to
 			// wire path-param `orgName`, but the body schema also declares a
 			// wire-side `organizationName`. The body must carry it.
-			renames: map[string]string{"organizationName": "orgName"},
+			renames: map[string]string{organizationNameVal: orgNameKey},
 			inputs: map[string]any{
-				"organizationName": "acme", "name": "alerts", "payloadUrl": "https://x",
+				organizationNameVal: acmeVal, nameKey: "alerts", "payloadUrl": "https://x",
 			},
 			want: map[string]any{
-				"organizationName": "acme", "name": "alerts", "payloadUrl": "https://x",
+				organizationNameVal: acmeVal, nameKey: "alerts", "payloadUrl": "https://x",
 			},
 		},
 	}
@@ -1099,18 +1099,18 @@ func TestDeleteIsIdempotentOn404(t *testing.T) {
 		spec: spec,
 		meta: ResourceMeta{
 			Operations: Operations{Delete: "DeleteThing"},
-			IDFormat:   "{org}/{id}",
+			IDFormat:   orgIDFormat,
 		},
 	}
 
 	t.Run("204 is success", func(t *testing.T) {
 		mock := &mockTransport{responses: map[string]mockResponse{
-			"DELETE /things/acme/gone": {status: 204},
+			deleteThingsAcmeGone: {status: 204},
 		}}
 		SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
 		err := r.Delete(t.Context(), p.DeleteRequest{
-			ID:         "acme/gone",
-			Properties: propMap(map[string]any{"org": "acme", "id": "gone"}),
+			ID:         acmeGoneID,
+			Properties: propMap(map[string]any{orgKey: acmeVal, "id": goneVal}),
 		})
 		if err != nil {
 			t.Errorf("204 should be nil, got: %v", err)
@@ -1119,12 +1119,12 @@ func TestDeleteIsIdempotentOn404(t *testing.T) {
 
 	t.Run("404 is also success — already gone is what Delete wants", func(t *testing.T) {
 		mock := &mockTransport{responses: map[string]mockResponse{
-			"DELETE /things/acme/gone": {status: 404, body: `{"code":404,"message":"not found"}`},
+			deleteThingsAcmeGone: {status: 404, body: `{"code":404,"message":"not found"}`},
 		}}
 		SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
 		err := r.Delete(t.Context(), p.DeleteRequest{
-			ID:         "acme/gone",
-			Properties: propMap(map[string]any{"org": "acme", "id": "gone"}),
+			ID:         acmeGoneID,
+			Properties: propMap(map[string]any{orgKey: acmeVal, "id": goneVal}),
 		})
 		if err != nil {
 			t.Errorf("404 should be nil, got: %v", err)
@@ -1133,12 +1133,12 @@ func TestDeleteIsIdempotentOn404(t *testing.T) {
 
 	t.Run("non-404 errors still surface", func(t *testing.T) {
 		mock := &mockTransport{responses: map[string]mockResponse{
-			"DELETE /things/acme/gone": {status: 500, body: `oops`},
+			deleteThingsAcmeGone: {status: 500, body: `oops`},
 		}}
 		SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
 		err := r.Delete(t.Context(), p.DeleteRequest{
-			ID:         "acme/gone",
-			Properties: propMap(map[string]any{"org": "acme", "id": "gone"}),
+			ID:         acmeGoneID,
+			Properties: propMap(map[string]any{orgKey: acmeVal, "id": goneVal}),
 		})
 		if err == nil {
 			t.Error("500 should propagate")
@@ -1205,19 +1205,19 @@ func TestUpdateUsesStateForPathParamsAndInputsForBody(t *testing.T) {
 	// State has the real server-resolved widgetID; Inputs has a stale
 	// value the user shouldn't be able to redirect the PATCH with.
 	state := propMap(map[string]any{
-		"org":      "acme",
-		"widgetID": "real-7",
-		"name":     "old-name",
+		orgKey:      acmeVal,
+		widgetIDVal: "real-7",
+		nameKey:     "old-name",
 	})
 	inputs := propMap(map[string]any{
-		"org":      "acme",
-		"widgetID": "stale-from-user", // should be ignored for the URL
-		"name":     "new-name",
+		orgKey:      acmeVal,
+		widgetIDVal: "stale-from-user", // should be ignored for the URL
+		nameKey:     "new-name",
 	})
 	oldInputs := propMap(map[string]any{
-		"org":      "acme",
-		"widgetID": "stale-from-user",
-		"name":     "old-name",
+		orgKey:      acmeVal,
+		widgetIDVal: "stale-from-user",
+		nameKey:     "old-name",
 	})
 
 	mock := &mockTransport{responses: map[string]mockResponse{
@@ -1277,7 +1277,7 @@ func TestDiffEmitsUpdateOnUnknownInput(t *testing.T) {
 	}
 	r := &Resource{
 		spec: spec,
-		meta: ResourceMeta{Operations: Operations{Create: "CreateThing"}, IDFormat: "{org}"},
+		meta: ResourceMeta{Operations: Operations{Create: createThingOp}, IDFormat: orgFormat},
 	}
 
 	cases := []struct {
@@ -1288,21 +1288,21 @@ func TestDiffEmitsUpdateOnUnknownInput(t *testing.T) {
 	}{
 		{
 			name: "known → unknown emits a diff",
-			old:  map[string]any{"org": "acme", "x": "old"},
-			new:  map[string]any{"org": "acme", "x": property.Computed},
+			old:  map[string]any{orgKey: acmeVal, "x": "old"},
+			new:  map[string]any{orgKey: acmeVal, "x": property.Computed},
 			want: "x",
 		},
 		{
 			name: "unknown → known emits a diff",
-			old:  map[string]any{"org": "acme", "x": property.Computed},
-			new:  map[string]any{"org": "acme", "x": "new"},
+			old:  map[string]any{orgKey: acmeVal, "x": property.Computed},
+			new:  map[string]any{orgKey: acmeVal, "x": newVal},
 			want: "x",
 		},
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
 			resp, err := r.Diff(t.Context(), p.DiffRequest{
-				ID:        "acme",
+				ID:        acmeVal,
 				OldInputs: propMap(tc.old),
 				Inputs:    propMap(tc.new),
 			})
@@ -1351,7 +1351,7 @@ func TestErrorURLIsPostTransportRewrite(t *testing.T) {
 	}
 	r := &Resource{
 		spec: spec,
-		meta: ResourceMeta{Operations: Operations{Create: "CreateThing"}, IDFormat: "{org}"},
+		meta: ResourceMeta{Operations: Operations{Create: createThingOp}, IDFormat: orgFormat},
 	}
 	// Rewriting shim: mimics authedTransport.Do — overwrites scheme+host
 	// and returns a 500 so execAndDecode constructs an HTTPError.
@@ -1360,7 +1360,7 @@ func TestErrorURLIsPostTransportRewrite(t *testing.T) {
 	})
 
 	_, err = r.Create(t.Context(), p.CreateRequest{
-		Properties: propMap(map[string]any{"org": "acme"}),
+		Properties: propMap(map[string]any{orgKey: acmeVal}),
 	})
 	if err == nil {
 		t.Fatal("expected error from 500 response")

@@ -27,7 +27,7 @@ func TestParseTemplateSourceID(t *testing.T) {
 	t.Run("valid", func(t *testing.T) {
 		org, id, err := parseTemplateSourceID("my-org/my-template-id")
 		require.NoError(t, err)
-		assert.Equal(t, "my-org", org)
+		assert.Equal(t, gcMyOrg, org)
 		assert.Equal(t, "my-template-id", id)
 	})
 
@@ -41,14 +41,14 @@ func TestTemplateSourceLegacyStateMigration(t *testing.T) {
 	t.Run("migrates legacy state with __inputs", func(t *testing.T) {
 		destURL := "https://github.com/pulumi/pulumi"
 		legacy := property.NewMap(map[string]property.Value{
-			"__inputs": property.New(property.NewMap(map[string]property.Value{
-				"organizationName": property.New("my-org"),
-				"sourceName":       property.New("bootstrap"),
-				"sourceURL":        property.New("https://github.com/pulumi/pulumi"),
+			gcInputs: property.New(property.NewMap(map[string]property.Value{
+				gcOrganizationName: property.New(gcMyOrg),
+				gcSourceName:       property.New("bootstrap"),
+				gcSourceURL:        property.New("https://github.com/pulumi/pulumi"),
 			})),
-			"organizationName": property.New("my-org"),
-			"sourceName":       property.New("bootstrap"),
-			"sourceURL":        property.New("https://github.com/pulumi/pulumi"),
+			gcOrganizationName: property.New(gcMyOrg),
+			gcSourceName:       property.New("bootstrap"),
+			gcSourceURL:        property.New("https://github.com/pulumi/pulumi"),
 			"destination": property.New(property.NewMap(map[string]property.Value{
 				"url": property.New(destURL),
 			})),
@@ -58,7 +58,7 @@ func TestTemplateSourceLegacyStateMigration(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, &TemplateSourceState{
 			TemplateSourceInput: TemplateSourceInput{
-				OrganizationName: "my-org",
+				OrganizationName: gcMyOrg,
 				SourceName:       "bootstrap",
 				SourceURL:        "https://github.com/pulumi/pulumi",
 				Destination:      &TemplateSourceDestination{URL: &destURL},
@@ -68,10 +68,10 @@ func TestTemplateSourceLegacyStateMigration(t *testing.T) {
 
 	t.Run("migrates legacy state without destination", func(t *testing.T) {
 		legacy := property.NewMap(map[string]property.Value{
-			"__inputs":         property.New(property.NewMap(map[string]property.Value{})),
-			"organizationName": property.New("my-org"),
-			"sourceName":       property.New("bootstrap"),
-			"sourceURL":        property.New("https://example.com"),
+			gcInputs:           property.New(property.NewMap(map[string]property.Value{})),
+			gcOrganizationName: property.New(gcMyOrg),
+			gcSourceName:       property.New("bootstrap"),
+			gcSourceURL:        property.New("https://example.com"),
 		})
 
 		got, err := migrateTemplateSourceLegacyInputs(t.Context(), legacy)
@@ -82,9 +82,9 @@ func TestTemplateSourceLegacyStateMigration(t *testing.T) {
 
 	t.Run("no-op for already-migrated state", func(t *testing.T) {
 		current := property.NewMap(map[string]property.Value{
-			"organizationName": property.New("my-org"),
-			"sourceName":       property.New("bootstrap"),
-			"sourceURL":        property.New("https://example.com"),
+			gcOrganizationName: property.New(gcMyOrg),
+			gcSourceName:       property.New("bootstrap"),
+			gcSourceURL:        property.New("https://example.com"),
 		})
 
 		got, err := migrateTemplateSourceLegacyInputs(t.Context(), current)

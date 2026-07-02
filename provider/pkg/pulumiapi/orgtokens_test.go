@@ -33,7 +33,7 @@ func TestDeleteOrgAccessToken(t *testing.T) {
 			ResponseCode:      404,
 			ResponseBody: ErrorResponse{
 				StatusCode: 404,
-				Message:    "token not found",
+				Message:    tokenNotFoundError,
 			},
 		})
 		assert.EqualError(t,
@@ -51,8 +51,8 @@ func TestCreateOrgAccessToken(t *testing.T) {
 
 	t.Run("Happy Path", func(t *testing.T) {
 		resp := createTokenResponse{
-			ID:         "token_id",
-			TokenValue: "secret",
+			ID:         tokenIDKey,
+			TokenValue: secretKey,
 		}
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPost,
@@ -60,7 +60,7 @@ func TestCreateOrgAccessToken(t *testing.T) {
 				Description: desc,
 				Name:        name,
 			},
-			ExpectedReqPath: "/api/orgs/anOrg/tokens",
+			ExpectedReqPath: orgTokPath,
 			ResponseCode:    201,
 			ResponseBody:    resp,
 		})
@@ -75,8 +75,8 @@ func TestCreateOrgAccessToken(t *testing.T) {
 
 	t.Run("Admin token", func(t *testing.T) {
 		resp := createTokenResponse{
-			ID:         "token_id",
-			TokenValue: "secret",
+			ID:         tokenIDKey,
+			TokenValue: secretKey,
 		}
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPost,
@@ -85,7 +85,7 @@ func TestCreateOrgAccessToken(t *testing.T) {
 				Name:        name,
 				Admin:       true,
 			},
-			ExpectedReqPath: "/api/orgs/anOrg/tokens",
+			ExpectedReqPath: orgTokPath,
 			ResponseCode:    201,
 			ResponseBody:    resp,
 		})
@@ -101,7 +101,7 @@ func TestCreateOrgAccessToken(t *testing.T) {
 	t.Run("Error", func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPost,
-			ExpectedReqPath:   "/api/orgs/anOrg/tokens",
+			ExpectedReqPath:   orgTokPath,
 			ExpectedReqBody: createOrgTokenRequest{
 				Description: desc,
 				Name:        name,
@@ -109,7 +109,7 @@ func TestCreateOrgAccessToken(t *testing.T) {
 			ResponseCode: 401,
 			ResponseBody: ErrorResponse{
 				StatusCode: 401,
-				Message:    "unauthorized",
+				Message:    unauthorizedError,
 			},
 		})
 		token, err := c.CreateOrgAccessToken(teamCtx, name, orgName, desc, false)
@@ -135,7 +135,7 @@ func TestGetOrgAccessToken(t *testing.T) {
 					LastUsed:    lastUsed,
 				},
 				{
-					ID:          "other",
+					ID:          otherValue,
 					Description: desc,
 					LastUsed:    lastUsed,
 				},
@@ -164,7 +164,7 @@ func TestGetOrgAccessToken(t *testing.T) {
 			ResponseCode:      401,
 			ResponseBody: ErrorResponse{
 				StatusCode: 401,
-				Message:    "unauthorized",
+				Message:    unauthorizedError,
 			},
 		})
 		token, err := c.GetOrgAccessToken(ctx, id, org)

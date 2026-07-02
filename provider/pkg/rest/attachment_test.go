@@ -38,13 +38,13 @@ func groupWithStacks(stacks ...map[string]string) string {
 	arr := make([]map[string]string, 0, len(stacks))
 	arr = append(arr, stacks...)
 	body, _ := json.Marshal(map[string]any{
-		"name":               "grp",
+		nameKey:              grpVal,
 		"isOrgDefault":       false,
-		"entityType":         "stacks",
-		"mode":               "audit",
+		"entityType":         stacksVal,
+		modeKey:              "audit",
 		"appliedPolicyPacks": []any{},
-		"accounts":           []any{},
-		"stacks":             arr,
+		accountsKey:          []any{},
+		stacksVal:            arr,
 	})
 	return string(body)
 }
@@ -64,10 +64,10 @@ func stackAttachmentResource(t *testing.T) *Resource {
 
 func stackAttachmentInputs() property.Map {
 	return propMap(map[string]any{
-		"orgName":        "test-org",
-		"policyGroup":    "grp",
-		"name":           "dev",
-		"routingProject": "my-project",
+		orgNameKey:        testOrgName,
+		policyGroupKey:    grpVal,
+		nameKey:           devVal,
+		routingProjectKey: myProjectVal,
 	})
 }
 
@@ -84,7 +84,7 @@ func TestAttachmentCreate(t *testing.T) {
 			return mockResponse{status: 204}
 		}
 		return mockResponse{status: 200, body: groupWithStacks(
-			map[string]string{"name": "dev", "routingProject": "my-project"},
+			map[string]string{nameKey: devVal, routingProjectKey: myProjectVal},
 		)}
 	}}
 	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
@@ -93,7 +93,7 @@ func TestAttachmentCreate(t *testing.T) {
 	if err != nil {
 		t.Fatalf("create: %v\n  calls: %v", err, mock.calls)
 	}
-	if want := "test-org/grp/dev/my-project"; resp.ID != want {
+	if want := devProjectID; resp.ID != want {
 		t.Errorf("ID: got %q, want %q", resp.ID, want)
 	}
 	wantCalls := []string{"PATCH " + pgPath, "GET " + pgPath}
@@ -109,7 +109,7 @@ func TestAttachmentCreate(t *testing.T) {
 	if !ok {
 		t.Fatalf("patch body missing addStack object: %v", sent)
 	}
-	if add["name"] != "dev" || add["routingProject"] != "my-project" { //nolint:goconst // test fixture
+	if add[nameKey] != devVal || add[routingProjectKey] != myProjectVal { //nolint:goconst // test fixture
 		t.Errorf("addStack edge: got %v, want {name:dev, routingProject:my-project}", add)
 	}
 	if _, leaked := sent["removeStack"]; leaked {
@@ -117,7 +117,7 @@ func TestAttachmentCreate(t *testing.T) {
 	}
 	// State carries both parent path params and edge fields.
 	for k, want := range map[string]string{
-		"orgName": "test-org", "policyGroup": "grp", "name": "dev", "routingProject": "my-project",
+		orgNameKey: testOrgName, policyGroupKey: grpVal, nameKey: devVal, routingProjectKey: myProjectVal,
 	} {
 		v, ok := resp.Properties.GetOk(k)
 		if !ok || v.AsString() != want {
@@ -132,23 +132,23 @@ func TestAttachmentReadPresent(t *testing.T) {
 	r := stackAttachmentResource(t)
 	mock := &mockTransport{responses: map[string]mockResponse{
 		"GET " + pgPath: {status: 200, body: groupWithStacks(
-			map[string]string{"name": "other", "routingProject": "p"},
-			map[string]string{"name": "dev", "routingProject": "my-project"},
+			map[string]string{nameKey: "other", routingProjectKey: "p"},
+			map[string]string{nameKey: devVal, routingProjectKey: myProjectVal},
 		)},
 	}}
 	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
 
 	resp, err := r.Read(t.Context(), p.ReadRequest{
-		ID:         "test-org/grp/dev/my-project",
+		ID:         devProjectID,
 		Properties: stackAttachmentInputs(),
 	})
 	if err != nil {
 		t.Fatalf("read: %v", err)
 	}
-	if resp.ID != "test-org/grp/dev/my-project" {
+	if resp.ID != devProjectID {
 		t.Errorf("present edge should keep its ID, got %q", resp.ID)
 	}
-	if v, ok := resp.Properties.GetOk("routingProject"); !ok || v.AsString() != "my-project" {
+	if v, ok := resp.Properties.GetOk(routingProjectKey); !ok || v.AsString() != myProjectVal {
 		t.Errorf("state missing routingProject: %v (ok=%v)", v, ok)
 	}
 }
@@ -159,13 +159,13 @@ func TestAttachmentReadAbsent(t *testing.T) {
 	r := stackAttachmentResource(t)
 	mock := &mockTransport{responses: map[string]mockResponse{
 		"GET " + pgPath: {status: 200, body: groupWithStacks(
-			map[string]string{"name": "other", "routingProject": "p"},
+			map[string]string{nameKey: "other", routingProjectKey: "p"},
 		)},
 	}}
 	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
 
 	resp, err := r.Read(t.Context(), p.ReadRequest{
-		ID:         "test-org/grp/dev/my-project",
+		ID:         devProjectID,
 		Properties: stackAttachmentInputs(),
 	})
 	if err != nil {
@@ -185,7 +185,7 @@ func TestAttachmentReadParentGone(t *testing.T) {
 	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
 
 	resp, err := r.Read(t.Context(), p.ReadRequest{
-		ID:         "test-org/grp/dev/my-project",
+		ID:         devProjectID,
 		Properties: stackAttachmentInputs(),
 	})
 	if err != nil {
@@ -208,7 +208,7 @@ func TestAttachmentDelete(t *testing.T) {
 	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
 
 	err := r.Delete(t.Context(), p.DeleteRequest{
-		ID:         "test-org/grp/dev/my-project",
+		ID:         devProjectID,
 		Properties: stackAttachmentInputs(),
 	})
 	if err != nil {
@@ -238,7 +238,7 @@ func TestAttachmentDeleteIdempotentOn404(t *testing.T) {
 	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
 
 	err := r.Delete(t.Context(), p.DeleteRequest{
-		ID:         "test-org/grp/dev/my-project",
+		ID:         devProjectID,
 		Properties: stackAttachmentInputs(),
 	})
 	if err != nil {
@@ -251,11 +251,11 @@ func TestAttachmentDeleteIdempotentOn404(t *testing.T) {
 func TestAttachmentDiffReplaces(t *testing.T) {
 	r := stackAttachmentResource(t)
 	resp, err := r.Diff(t.Context(), p.DiffRequest{
-		ID:        "test-org/grp/dev/my-project",
+		ID:        devProjectID,
 		OldInputs: stackAttachmentInputs(),
 		Inputs: propMap(map[string]any{
-			"orgName": "test-org", "policyGroup": "grp",
-			"name": "dev", "routingProject": "other-project",
+			orgNameKey: testOrgName, policyGroupKey: grpVal,
+			nameKey: devVal, routingProjectKey: "other-project",
 		}),
 	})
 	if err != nil {
@@ -264,7 +264,7 @@ func TestAttachmentDiffReplaces(t *testing.T) {
 	if !resp.HasChanges {
 		t.Fatal("expected HasChanges")
 	}
-	d, ok := resp.DetailedDiff["routingProject"]
+	d, ok := resp.DetailedDiff[routingProjectKey]
 	if !ok {
 		t.Fatalf("expected a diff on routingProject, got %v", resp.DetailedDiff)
 	}
@@ -277,7 +277,7 @@ func TestAttachmentDiffReplaces(t *testing.T) {
 func TestAttachmentNoDiffWhenEqual(t *testing.T) {
 	r := stackAttachmentResource(t)
 	resp, err := r.Diff(t.Context(), p.DiffRequest{
-		ID:        "test-org/grp/dev/my-project",
+		ID:        devProjectID,
 		OldInputs: stackAttachmentInputs(),
 		Inputs:    stackAttachmentInputs(),
 	})
@@ -297,7 +297,7 @@ func TestAttachmentReadMatchesSecretAndDependentInput(t *testing.T) {
 	r := stackAttachmentResource(t)
 	mock := &mockTransport{responses: map[string]mockResponse{
 		"GET " + pgPath: {status: 200, body: groupWithStacks(
-			map[string]string{"name": "dev", "routingProject": "my-project"},
+			map[string]string{nameKey: devVal, routingProjectKey: myProjectVal},
 		)},
 	}}
 	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
@@ -306,14 +306,14 @@ func TestAttachmentReadMatchesSecretAndDependentInput(t *testing.T) {
 	// (old inputs from state), where they survive into the membership compare —
 	// unlike an import, where empty Inputs are reconstructed plain from the ID.
 	inputs := property.NewMap(map[string]property.Value{
-		"orgName":     property.New("test-org"),
-		"policyGroup": property.New("grp"),
-		"name":        property.New("dev").WithSecret(true),
-		"routingProject": property.New("my-project").
+		orgNameKey:     property.New(testOrgName),
+		policyGroupKey: property.New(grpVal),
+		nameKey:        property.New(devVal).WithSecret(true),
+		routingProjectKey: property.New(myProjectVal).
 			WithDependencies([]urn.URN{"urn:pulumi:dev::proj::pulumiservice:api/stacks:Stack::s"}),
 	})
 	resp, err := r.Read(t.Context(), p.ReadRequest{
-		ID:         "test-org/grp/dev/my-project",
+		ID:         devProjectID,
 		Inputs:     inputs,
 		Properties: inputs,
 	})
@@ -331,13 +331,13 @@ func TestAttachmentReadIgnoresExtraElementFields(t *testing.T) {
 	r := stackAttachmentResource(t)
 	mock := &mockTransport{responses: map[string]mockResponse{
 		"GET " + pgPath: {status: 200, body: groupWithStacks(
-			map[string]string{"name": "dev", "routingProject": "my-project", "serverOnly": "leak"},
+			map[string]string{nameKey: devVal, routingProjectKey: myProjectVal, "serverOnly": "leak"},
 		)},
 	}}
 	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
 
 	resp, err := r.Read(t.Context(), p.ReadRequest{
-		ID:         "test-org/grp/dev/my-project",
+		ID:         devProjectID,
 		Properties: stackAttachmentInputs(),
 	})
 	if err != nil {
@@ -346,7 +346,7 @@ func TestAttachmentReadIgnoresExtraElementFields(t *testing.T) {
 	if _, leaked := resp.Properties.GetOk("serverOnly"); leaked {
 		t.Errorf("undeclared server field leaked into state: %v", resp.Properties)
 	}
-	if v, ok := resp.Properties.GetOk("routingProject"); !ok || v.AsString() != "my-project" {
+	if v, ok := resp.Properties.GetOk(routingProjectKey); !ok || v.AsString() != myProjectVal {
 		t.Errorf("declared edge field missing from state: %v (ok=%v)", v, ok)
 	}
 }
@@ -370,7 +370,7 @@ func TestAttachmentCheckPassthrough(t *testing.T) {
 func TestAttachmentUpdateRejected(t *testing.T) {
 	r := stackAttachmentResource(t)
 	_, err := r.Update(t.Context(), p.UpdateRequest{
-		ID:        "test-org/grp/dev/my-project",
+		ID:        devProjectID,
 		OldInputs: stackAttachmentInputs(),
 		Inputs:    stackAttachmentInputs(),
 	})
@@ -387,13 +387,13 @@ func groupWithAccounts(accounts ...string) string {
 	arr := make([]string, 0, len(accounts))
 	arr = append(arr, accounts...)
 	body, _ := json.Marshal(map[string]any{
-		"name":               "grp",
+		nameKey:              grpVal,
 		"isOrgDefault":       false,
-		"entityType":         "accounts",
-		"mode":               "audit",
+		"entityType":         accountsKey,
+		modeKey:              "audit",
 		"appliedPolicyPacks": []any{},
-		"stacks":             []any{},
-		"accounts":           arr,
+		stacksVal:            []any{},
+		accountsKey:          arr,
 	})
 	return string(body)
 }
@@ -413,9 +413,9 @@ func accountAttachmentResource(t *testing.T) *Resource {
 
 func accountAttachmentInputs() property.Map {
 	return propMap(map[string]any{
-		"orgName":     "test-org",
-		"policyGroup": "grp",
-		"name":        "acct-1",
+		orgNameKey:     testOrgName,
+		policyGroupKey: grpVal,
+		nameKey:        acct1Val,
 	})
 }
 
@@ -430,7 +430,7 @@ func TestAccountAttachmentCreate(t *testing.T) {
 			patchBody = string(b)
 			return mockResponse{status: 204}
 		}
-		return mockResponse{status: 200, body: groupWithAccounts("acct-1", "acct-2")}
+		return mockResponse{status: 200, body: groupWithAccounts(acct1Val, "acct-2")}
 	}}
 	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
 
@@ -438,7 +438,7 @@ func TestAccountAttachmentCreate(t *testing.T) {
 	if err != nil {
 		t.Fatalf("create: %v\n  calls: %v", err, mock.calls)
 	}
-	if want := "test-org/grp/acct-1"; resp.ID != want {
+	if want := acct1ID; resp.ID != want {
 		t.Errorf("ID: got %q, want %q", resp.ID, want)
 	}
 	var sent map[string]any
@@ -446,7 +446,7 @@ func TestAccountAttachmentCreate(t *testing.T) {
 		t.Fatalf("patch body not JSON: %q", patchBody)
 	}
 	add, ok := sent["addInsightsAccount"].(map[string]any)
-	if !ok || add["name"] != "acct-1" { //nolint:goconst // test fixture
+	if !ok || add[nameKey] != acct1Val { //nolint:goconst // test fixture
 		t.Errorf("addInsightsAccount edge: got %v, want {name: acct-1}", sent["addInsightsAccount"])
 	}
 	// Spec-only account fields must NOT leak into the body.
@@ -465,7 +465,7 @@ func TestAccountAttachmentReadAbsent(t *testing.T) {
 	}}
 	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
 
-	resp, err := r.Read(t.Context(), p.ReadRequest{ID: "test-org/grp/acct-1", Properties: accountAttachmentInputs()})
+	resp, err := r.Read(t.Context(), p.ReadRequest{ID: acct1ID, Properties: accountAttachmentInputs()})
 	if err != nil {
 		t.Fatalf("read: %v", err)
 	}
@@ -478,18 +478,18 @@ func TestAccountAttachmentReadAbsent(t *testing.T) {
 func TestAccountAttachmentReadPresent(t *testing.T) {
 	r := accountAttachmentResource(t)
 	mock := &mockTransport{responses: map[string]mockResponse{
-		"GET " + pgPath: {status: 200, body: groupWithAccounts("acct-1")},
+		"GET " + pgPath: {status: 200, body: groupWithAccounts(acct1Val)},
 	}}
 	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
 
-	resp, err := r.Read(t.Context(), p.ReadRequest{ID: "test-org/grp/acct-1", Properties: accountAttachmentInputs()})
+	resp, err := r.Read(t.Context(), p.ReadRequest{ID: acct1ID, Properties: accountAttachmentInputs()})
 	if err != nil {
 		t.Fatalf("read: %v", err)
 	}
 	if resp.ID == "" {
 		t.Fatal("present scalar member should keep its ID")
 	}
-	if v, ok := resp.Properties.GetOk("name"); !ok || v.AsString() != "acct-1" {
+	if v, ok := resp.Properties.GetOk(nameKey); !ok || v.AsString() != acct1Val {
 		t.Errorf("state name: got %q (ok=%v), want acct-1", v.AsString(), ok)
 	}
 }
@@ -506,7 +506,7 @@ func TestAccountAttachmentDelete(t *testing.T) {
 	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
 
 	if err := r.Delete(t.Context(), p.DeleteRequest{
-		ID:         "test-org/grp/acct-1",
+		ID:         acct1ID,
 		Properties: accountAttachmentInputs(),
 	}); err != nil {
 		t.Fatalf("delete: %v", err)
@@ -515,7 +515,7 @@ func TestAccountAttachmentDelete(t *testing.T) {
 	if err := json.Unmarshal([]byte(body), &sent); err != nil {
 		t.Fatalf("delete body not JSON: %q", body)
 	}
-	if rm, ok := sent["removeInsightsAccount"].(map[string]any); !ok || rm["name"] != "acct-1" {
+	if rm, ok := sent["removeInsightsAccount"].(map[string]any); !ok || rm[nameKey] != acct1Val {
 		t.Errorf("delete body must nest under removeInsightsAccount {name}: %v", sent)
 	}
 }
@@ -532,7 +532,7 @@ func TestAttachmentSchema(t *testing.T) {
 	if !ok {
 		t.Fatalf("%s missing from package", stackAttachmentToken)
 	}
-	for _, name := range []string{"orgName", "policyGroup", "name", "routingProject"} {
+	for _, name := range []string{orgNameKey, policyGroupKey, nameKey, routingProjectKey} {
 		ps, ok := rs.InputProperties[name]
 		if !ok {
 			t.Errorf("input %q missing", name)
@@ -542,7 +542,7 @@ func TestAttachmentSchema(t *testing.T) {
 			t.Errorf("input %q must be replaceOnChanges (edges have no update)", name)
 		}
 	}
-	wantRequired := map[string]bool{"orgName": true, "policyGroup": true, "name": true, "routingProject": true}
+	wantRequired := map[string]bool{orgNameKey: true, policyGroupKey: true, nameKey: true, routingProjectKey: true}
 	for _, req := range rs.RequiredInputs {
 		delete(wantRequired, req)
 	}

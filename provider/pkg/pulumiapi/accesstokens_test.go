@@ -34,7 +34,7 @@ func TestDeleteAccessToken(t *testing.T) {
 			ResponseCode:      404,
 			ResponseBody: ErrorResponse{
 				StatusCode: 404,
-				Message:    "token not found",
+				Message:    tokenNotFoundError,
 			},
 		})
 		assert.EqualError(t,
@@ -49,15 +49,15 @@ func TestCreateAccessToken(t *testing.T) {
 	desc := testTokenDescription
 	t.Run("Happy Path", func(t *testing.T) {
 		resp := createTokenResponse{
-			ID:         "token_id",
-			TokenValue: "secret",
+			ID:         tokenIDKey,
+			TokenValue: secretKey,
 		}
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPost,
 			ExpectedReqBody: createTokenRequest{
 				Description: desc,
 			},
-			ExpectedReqPath: "/api/user/tokens",
+			ExpectedReqPath: userTokPath,
 			ResponseCode:    201,
 			ResponseBody:    resp,
 		})
@@ -73,14 +73,14 @@ func TestCreateAccessToken(t *testing.T) {
 	t.Run("Error", func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPost,
-			ExpectedReqPath:   "/api/user/tokens",
+			ExpectedReqPath:   userTokPath,
 			ExpectedReqBody: createTokenRequest{
 				Description: desc,
 			},
 			ResponseCode: 401,
 			ResponseBody: ErrorResponse{
 				StatusCode: 401,
-				Message:    "unauthorized",
+				Message:    unauthorizedError,
 			},
 		})
 		token, err := c.CreateAccessToken(ctx, desc)
@@ -105,7 +105,7 @@ func TestGetAccessToken(t *testing.T) {
 					LastUsed:    lastUsed,
 				},
 				{
-					ID:          "other",
+					ID:          otherValue,
 					Description: desc,
 					LastUsed:    lastUsed,
 				},
@@ -114,7 +114,7 @@ func TestGetAccessToken(t *testing.T) {
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodGet,
 			ExpectedReqBody:   nil,
-			ExpectedReqPath:   "/api/user/tokens",
+			ExpectedReqPath:   userTokPath,
 			ResponseCode:      200,
 			ResponseBody:      resp,
 		})
@@ -129,12 +129,12 @@ func TestGetAccessToken(t *testing.T) {
 	t.Run("Error", func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodGet,
-			ExpectedReqPath:   "/api/user/tokens",
+			ExpectedReqPath:   userTokPath,
 			ExpectedReqBody:   nil,
 			ResponseCode:      401,
 			ResponseBody: ErrorResponse{
 				StatusCode: 401,
-				Message:    "unauthorized",
+				Message:    unauthorizedError,
 			},
 		})
 		token, err := c.GetAccessToken(ctx, id)

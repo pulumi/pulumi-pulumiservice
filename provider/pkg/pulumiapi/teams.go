@@ -191,7 +191,7 @@ func (c *Client) CreateTeam(
 	orgName, teamName, teamType, displayName, description string,
 	teamID int64,
 ) (*Team, error) {
-	teamtypeList := []string{"github", "pulumi"}
+	teamtypeList := []string{githubTeamType, pulumiTeamType}
 	if !contains(teamtypeList, teamType) {
 		return nil, fmt.Errorf("teamtype must be one of %v, got %q", teamtypeList, teamType)
 	}
@@ -200,11 +200,11 @@ func (c *Client) CreateTeam(
 		return nil, errors.New("orgname must not be empty")
 	}
 
-	if len(teamName) == 0 && teamType != "github" {
+	if len(teamName) == 0 && teamType != githubTeamType {
 		return nil, errors.New("teamname must not be empty")
 	}
 
-	if teamType == "github" && teamID == 0 {
+	if teamType == githubTeamType && teamID == 0 {
 		return nil, errors.New("github teams require a githubTeamId")
 	}
 
@@ -282,7 +282,7 @@ func (c *Client) updateTeamMembership(ctx context.Context, orgName, teamName, us
 		return errors.New("username must not be empty")
 	}
 
-	addOrRemoveValues := []string{"add", "remove"}
+	addOrRemoveValues := []string{addMembershipAction, "remove"}
 	if !contains(addOrRemoveValues, addOrRemove) {
 		return errors.New("value must be `add` or `remove`")
 	}
@@ -302,7 +302,7 @@ func (c *Client) updateTeamMembership(ctx context.Context, orgName, teamName, us
 }
 
 func (c *Client) AddMemberToTeam(ctx context.Context, orgName, teamName, userName string) error {
-	err := c.updateTeamMembership(ctx, orgName, teamName, userName, "add")
+	err := c.updateTeamMembership(ctx, orgName, teamName, userName, addMembershipAction)
 	if err != nil {
 		statusCode := GetErrorStatusCode(err)
 		if statusCode == http.StatusConflict {

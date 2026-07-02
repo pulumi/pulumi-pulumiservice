@@ -14,8 +14,8 @@ import (
 
 const (
 	testMemberUserName = "a-user"
-	testMemberRole     = "admin"
-	testMemberOrgName  = "an-organization"
+	testMemberRole     = adminRole
+	testMemberOrgName  = testDeploymentSettingsOrgName
 
 	rosterBackend  = "backend"
 	rosterFrontend = "frontend"
@@ -28,7 +28,7 @@ func TestAddMemberToOrg(t *testing.T) {
 	t.Run("Happy Path", func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPost,
-			ExpectedReqPath:   "/api/orgs/an-organization/members/a-user",
+			ExpectedReqPath:   memberUserPath,
 			ExpectedReqBody: addMemberToOrgReq{
 				Role: role,
 			},
@@ -41,13 +41,13 @@ func TestAddMemberToOrg(t *testing.T) {
 	t.Run("Error", func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPost,
-			ExpectedReqPath:   "/api/orgs/an-organization/members/a-user",
+			ExpectedReqPath:   memberUserPath,
 			ExpectedReqBody: addMemberToOrgReq{
 				Role: role,
 			},
 			ResponseCode: 401,
 			ResponseBody: ErrorResponse{
-				Message: "unauthorized",
+				Message: unauthorizedError,
 			},
 		})
 		err := c.AddMemberToOrg(ctx, userName, orgName, role)
@@ -65,7 +65,7 @@ func TestListOrgMembers(t *testing.T) {
 		body := Members{Members: []Member{{User: User{Name: userName}, Role: role}}}
 		c := startTestServerMulti(t, func(r *http.Request) (int, any) {
 			assert.Equal(t, http.MethodGet, r.Method)
-			assert.Equal(t, "/api/orgs/an-organization/members", r.URL.Path)
+			assert.Equal(t, membersPath, r.URL.Path)
 			return 200, body
 		})
 		got, err := c.ListOrgMembers(ctx, orgName)
@@ -79,9 +79,9 @@ func TestListOrgMembers(t *testing.T) {
 	t.Run("Backend error fails the call", func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodGet,
-			ExpectedReqPath:   "/api/orgs/an-organization/members",
+			ExpectedReqPath:   membersPath,
 			ResponseCode:      401,
-			ResponseBody:      ErrorResponse{Message: "unauthorized"},
+			ResponseBody:      ErrorResponse{Message: unauthorizedError},
 		})
 		got, err := c.ListOrgMembers(ctx, orgName)
 		assert.Nil(t, got, "members should be null since backend error was returned")
@@ -91,7 +91,7 @@ func TestListOrgMembers(t *testing.T) {
 	// Frontend errors are non-fatal: a transient frontend issue should not
 	// gate the more-inclusive backend roster.
 	t.Run("Frontend error is non-fatal", func(t *testing.T) {
-		backendBody := Members{Members: []Member{{User: User{Name: "alice"}, Role: "admin"}}}
+		backendBody := Members{Members: []Member{{User: User{Name: aliceUser}, Role: adminRole}}}
 		c := startTestServerMulti(t, func(r *http.Request) (int, any) {
 			switch r.URL.Query().Get("type") {
 			case rosterBackend:
@@ -107,7 +107,7 @@ func TestListOrgMembers(t *testing.T) {
 		assert.NoError(t, err)
 		if assert.NotNil(t, got) {
 			assert.Len(t, got.Members, 1, "backend result must be returned despite frontend failure")
-			assert.Equal(t, "alice", got.Members[0].User.Name)
+			assert.Equal(t, aliceUser, got.Members[0].User.Name)
 		}
 	})
 
@@ -117,8 +117,8 @@ func TestListOrgMembers(t *testing.T) {
 	// surfaces real human members.
 	t.Run("Filters synthetic org-as-user entry", func(t *testing.T) {
 		backendBody := Members{Members: []Member{
-			{User: User{Name: "alice"}, Role: "member"},
-			{User: User{Name: orgName, GithubLogin: orgName}, Role: "member"},
+			{User: User{Name: aliceUser}, Role: memberRole},
+			{User: User{Name: orgName, GithubLogin: orgName}, Role: memberRole},
 		}}
 		c := startTestServerMulti(t, func(r *http.Request) (int, any) {
 			switch r.URL.Query().Get("type") {
@@ -134,19 +134,19 @@ func TestListOrgMembers(t *testing.T) {
 		assert.NoError(t, err)
 		require.NotNil(t, got)
 		assert.Len(t, got.Members, 1, "synthetic org-as-user entry must be dropped")
-		assert.Equal(t, "alice", got.Members[0].User.Name)
+		assert.Equal(t, aliceUser, got.Members[0].User.Name)
 	})
 
 	// Members appearing in both rosters are deduped; backend's record wins.
 	// Members unique to either roster are included.
 	t.Run("Merges and dedups", func(t *testing.T) {
 		backendBody := Members{Members: []Member{
-			{User: User{Name: "alice"}, Role: "admin", KnownToPulumi: false},
-			{User: User{Name: "bob"}, Role: "member"},
+			{User: User{Name: aliceUser}, Role: adminRole, KnownToPulumi: false},
+			{User: User{Name: bobUser}, Role: memberRole},
 		}}
 		frontendBody := Members{Members: []Member{
-			{User: User{Name: "alice"}, Role: "admin", KnownToPulumi: true}, // dup
-			{User: User{Name: "carol"}, Role: "member"},                     // unique to frontend
+			{User: User{Name: aliceUser}, Role: adminRole, KnownToPulumi: true}, // dup
+			{User: User{Name: "carol"}, Role: memberRole},                       // unique to frontend
 		}}
 		c := startTestServerMulti(t, func(r *http.Request) (int, any) {
 			switch r.URL.Query().Get("type") {
@@ -165,7 +165,7 @@ func TestListOrgMembers(t *testing.T) {
 		// Backend wins on conflict — alice's KnownToPulumi must be false.
 		var alice *Member
 		for i, m := range got.Members {
-			if m.User.Name == "alice" {
+			if m.User.Name == aliceUser {
 				alice = &got.Members[i]
 			}
 		}
@@ -181,7 +181,7 @@ func TestDeleteMemberFromOrg(t *testing.T) {
 	t.Run("Happy Path", func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodDelete,
-			ExpectedReqPath:   "/api/orgs/an-organization/members/a-user",
+			ExpectedReqPath:   memberUserPath,
 			ResponseCode:      201,
 		})
 		err := c.DeleteMemberFromOrg(ctx, orgName, userName)
@@ -191,10 +191,10 @@ func TestDeleteMemberFromOrg(t *testing.T) {
 	t.Run("Error", func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodDelete,
-			ExpectedReqPath:   "/api/orgs/an-organization/members/a-user",
+			ExpectedReqPath:   memberUserPath,
 			ResponseCode:      401,
 			ResponseBody: ErrorResponse{
-				Message: "unauthorized",
+				Message: unauthorizedError,
 			},
 		})
 		err := c.DeleteMemberFromOrg(ctx, orgName, userName)
@@ -214,12 +214,12 @@ func TestUpdateOrgMemberRole(t *testing.T) {
 				{
 					PermissionDescriptorBase: apitype.PermissionDescriptorBase{Name: "Admin"},
 					ID:                       "admin-fga-id",
-					DefaultIdentifier:        "admin",
+					DefaultIdentifier:        adminRole,
 				},
 				{
 					PermissionDescriptorBase: apitype.PermissionDescriptorBase{Name: "Member"},
 					ID:                       "member-fga-id",
-					DefaultIdentifier:        "member",
+					DefaultIdentifier:        memberRole,
 				},
 			},
 		}
@@ -230,7 +230,7 @@ func TestUpdateOrgMemberRole(t *testing.T) {
 			case r.Method == http.MethodGet && r.URL.Path == "/api/orgs/an-organization/roles":
 				assert.Equal(t, "role", r.URL.Query().Get("uxPurpose"))
 				return 200, roles
-			case r.Method == http.MethodPatch && r.URL.Path == "/api/orgs/an-organization/members/a-user":
+			case r.Method == http.MethodPatch && r.URL.Path == memberUserPath:
 				patchBody, _ = io.ReadAll(r.Body)
 				return 204, nil
 			default:
@@ -238,7 +238,7 @@ func TestUpdateOrgMemberRole(t *testing.T) {
 				return 500, nil
 			}
 		})
-		assert.NoError(t, c.UpdateOrgMemberRole(ctx, orgName, userName, "admin", nil))
+		assert.NoError(t, c.UpdateOrgMemberRole(ctx, orgName, userName, adminRole, nil))
 		expected, _ := json.Marshal(updateMemberRoleReq{FGARoleID: &adminID})
 		assert.JSONEq(t, string(expected), string(patchBody))
 	})
@@ -247,7 +247,7 @@ func TestUpdateOrgMemberRole(t *testing.T) {
 		roleID := "role-123"
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPatch,
-			ExpectedReqPath:   "/api/orgs/an-organization/members/a-user",
+			ExpectedReqPath:   memberUserPath,
 			ExpectedReqBody:   updateMemberRoleReq{FGARoleID: &roleID},
 			ResponseCode:      204,
 		})
@@ -278,21 +278,21 @@ func TestListOrgMembersPagination(t *testing.T) {
 	backendPages := []Members{
 		{
 			Members: []Member{
-				{User: User{Name: "alice"}, Role: "member"},
-				{User: User{Name: "bob"}, Role: "member"},
+				{User: User{Name: aliceUser}, Role: memberRole},
+				{User: User{Name: bobUser}, Role: memberRole},
 			},
 			ContinuationToken: &second,
 		},
 		{
 			Members: []Member{
-				{User: User{Name: "carol"}, Role: "admin"},
+				{User: User{Name: "carol"}, Role: adminRole},
 			},
 		},
 	}
 
 	c := startTestServerMulti(t, func(r *http.Request) (int, any) {
 		assert.Equal(t, http.MethodGet, r.Method)
-		assert.Equal(t, "/api/orgs/an-organization/members", r.URL.Path)
+		assert.Equal(t, membersPath, r.URL.Path)
 		switch r.URL.Query().Get("type") {
 		case rosterBackend:
 			if backendCall == 0 {
@@ -314,7 +314,7 @@ func TestListOrgMembersPagination(t *testing.T) {
 	assert.NoError(t, err)
 	if assert.NotNil(t, got) {
 		assert.Len(t, got.Members, 3)
-		assert.Equal(t, "alice", got.Members[0].User.Name)
+		assert.Equal(t, aliceUser, got.Members[0].User.Name)
 		assert.Equal(t, "carol", got.Members[2].User.Name)
 	}
 	assert.Equal(t, 2, backendCall, "backend pagination must traverse both pages")
@@ -323,28 +323,28 @@ func TestListOrgMembersPagination(t *testing.T) {
 func TestGetOrgMember(t *testing.T) {
 	orgName := testMemberOrgName
 	members := Members{Members: []Member{
-		{User: User{Name: "alice", GithubLogin: "alice"}, Role: "admin"},
-		{User: User{Name: "bob", GithubLogin: "bob"}, Role: "member"},
+		{User: User{Name: aliceUser, GithubLogin: aliceUser}, Role: adminRole},
+		{User: User{Name: bobUser, GithubLogin: bobUser}, Role: memberRole},
 	}}
 
 	t.Run("found", func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodGet,
-			ExpectedReqPath:   "/api/orgs/an-organization/members",
+			ExpectedReqPath:   membersPath,
 			ResponseCode:      200,
 			ResponseBody:      members,
 		})
-		got, err := c.GetOrgMember(ctx, orgName, "bob")
+		got, err := c.GetOrgMember(ctx, orgName, bobUser)
 		assert.NoError(t, err)
 		if assert.NotNil(t, got) {
-			assert.Equal(t, "member", got.Role)
+			assert.Equal(t, memberRole, got.Role)
 		}
 	})
 
-	t.Run("not found", func(t *testing.T) {
+	t.Run(notFoundError, func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodGet,
-			ExpectedReqPath:   "/api/orgs/an-organization/members",
+			ExpectedReqPath:   membersPath,
 			ResponseCode:      200,
 			ResponseBody:      members,
 		})

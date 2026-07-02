@@ -22,14 +22,14 @@ import (
 )
 
 func TestOidcIssuerID(t *testing.T) {
-	assert.Equal(t, "my-org/issuer-123", oidcIssuerID("my-org", "issuer-123"))
+	assert.Equal(t, "my-org/issuer-123", oidcIssuerID(gcMyOrg, "issuer-123"))
 }
 
 func TestSplitOidcIssuerID(t *testing.T) {
 	t.Run("valid", func(t *testing.T) {
 		org, id, err := splitOidcIssuerID("my-org/issuer-123")
 		require.NoError(t, err)
-		assert.Equal(t, "my-org", org)
+		assert.Equal(t, gcMyOrg, org)
 		assert.Equal(t, "issuer-123", id)
 	})
 

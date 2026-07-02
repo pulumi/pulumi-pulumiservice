@@ -21,7 +21,7 @@ func TestToPropertyMap(t *testing.T) {
 	a := A{
 		IntField:      int(intvalue),
 		FloatField:    floatValue,
-		StringField:   "example",
+		StringField:   exampleVal,
 		FloatPtrField: &floatValue,
 		IntPtrField:   &intvalue,
 	}
@@ -30,7 +30,7 @@ func TestToPropertyMap(t *testing.T) {
 		// NewPropertyValue() auto converts ints to float64
 		"int_field":    float64(1),
 		"float_field":  float64(2.5),
-		"string_field": "example",
+		"string_field": exampleVal,
 	}
 	for key, value := range expected {
 		actualValue := propertyMap[resource.PropertyKey(key)].V
@@ -52,7 +52,7 @@ func TestFromPropertyMap(t *testing.T) {
 		want := A{
 			IntField:      int(intValue),
 			FloatField:    floatValue,
-			StringField:   "example",
+			StringField:   exampleVal,
 			FloatPtrField: &floatValue,
 			IntPtrField:   &intValue,
 		}
@@ -61,7 +61,7 @@ func TestFromPropertyMap(t *testing.T) {
 			// NewPropertyValue() auto converts ints to float64
 			"int_field":      float64(1),
 			"float_field":    float64(2.5),
-			"string_field":   "example",
+			"string_field":   exampleVal,
 			"floatptr_field": &floatValue,
 			"intptr_field":   &intValue,
 		}
@@ -95,12 +95,12 @@ func TestFromPropertyMap(t *testing.T) {
 		// A struct that already has a populated map — the incoming property
 		// map has a smaller set of keys. Decoding must not leave the stale
 		// "kept" key behind.
-		got := B{Tags: map[string]string{"kept": "old", "removed": "old"}}
+		got := B{Tags: map[string]string{keptVal: "old", "removed": "old"}}
 		propertyMap := resource.PropertyMap{
-			"tags": resource.NewPropertyValue(map[string]any{"kept": "new"}),
+			"tags": resource.NewPropertyValue(map[string]any{keptVal: "new"}),
 		}
 		err := FromPropertyMap(propertyMap, &got)
 		assert.NoError(t, err)
-		assert.Equal(t, map[string]string{"kept": "new"}, got.Tags)
+		assert.Equal(t, map[string]string{keptVal: "new"}, got.Tags)
 	})
 }

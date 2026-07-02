@@ -9,7 +9,7 @@ import (
 
 const (
 	testWebhookName        = "a-webhook"
-	testWebhookOrgName     = "an-organization"
+	testWebhookOrgName     = testDeploymentSettingsOrgName
 	testWebhookDisplayName = "A Webhook"
 	testWebhookPayloadURL  = "https://example.com/webhook"
 	testWebhookSecret      = "{...}"
@@ -38,7 +38,7 @@ func TestCreateWebhook(t *testing.T) {
 	t.Run("Happy Path", func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPost,
-			ExpectedReqPath:   "/api/orgs/an-organization/hooks",
+			ExpectedReqPath:   hooksPath,
 			ExpectedReqBody:   createReq,
 			ResponseCode:      201,
 			ResponseBody:      webhook,
@@ -51,11 +51,11 @@ func TestCreateWebhook(t *testing.T) {
 	t.Run("Error", func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPost,
-			ExpectedReqPath:   "/api/orgs/an-organization/hooks",
+			ExpectedReqPath:   hooksPath,
 			ExpectedReqBody:   createReq,
 			ResponseCode:      401,
 			ResponseBody: ErrorResponse{
-				Message: "unauthorized",
+				Message: unauthorizedError,
 			},
 		})
 		actualWebhook, err := c.CreateWebhook(ctx, createReq)
@@ -81,7 +81,7 @@ func TestListWebhooks(t *testing.T) {
 	t.Run("Happy Path", func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodGet,
-			ExpectedReqPath:   "/api/orgs/an-organization/hooks",
+			ExpectedReqPath:   hooksPath,
 			ResponseCode:      200,
 			ResponseBody:      webhooks,
 		})
@@ -93,10 +93,10 @@ func TestListWebhooks(t *testing.T) {
 	t.Run("Error", func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodGet,
-			ExpectedReqPath:   "/api/orgs/an-organization/hooks",
+			ExpectedReqPath:   hooksPath,
 			ResponseCode:      401,
 			ResponseBody: ErrorResponse{
-				Message: "unauthorized",
+				Message: unauthorizedError,
 			},
 		})
 		actualWebhooks, err := c.ListWebhooks(ctx, orgName, nil, nil, nil)
@@ -121,7 +121,7 @@ func TestGetWebhook(t *testing.T) {
 	t.Run("Happy Path", func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodGet,
-			ExpectedReqPath:   "/api/orgs/an-organization/hooks/a-webhook",
+			ExpectedReqPath:   webhookPath,
 			ResponseCode:      200,
 			ResponseBody:      webhook,
 		})
@@ -133,10 +133,10 @@ func TestGetWebhook(t *testing.T) {
 	t.Run("Error", func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodGet,
-			ExpectedReqPath:   "/api/orgs/an-organization/hooks/a-webhook",
+			ExpectedReqPath:   webhookPath,
 			ResponseCode:      401,
 			ResponseBody: ErrorResponse{
-				Message: "unauthorized",
+				Message: unauthorizedError,
 			},
 		})
 		actualWebhook, err := c.GetWebhook(ctx, orgName, nil, nil, nil, webhookName)
@@ -147,11 +147,11 @@ func TestGetWebhook(t *testing.T) {
 	t.Run("404", func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodGet,
-			ExpectedReqPath:   "/api/orgs/an-organization/hooks/a-webhook",
+			ExpectedReqPath:   webhookPath,
 			ResponseCode:      404,
 			ResponseBody: ErrorResponse{
 				StatusCode: 404,
-				Message:    "not found",
+				Message:    notFoundError,
 			},
 		})
 		actualWebhook, err := c.GetWebhook(ctx, orgName, nil, nil, nil, webhookName)
@@ -162,7 +162,7 @@ func TestGetWebhook(t *testing.T) {
 
 func TestUpdateWebhook(t *testing.T) {
 	webhookName := "a-webhook"
-	orgName := "an-organization"
+	orgName := testDeploymentSettingsOrgName
 	displayName := "A Webhook"
 	payloadURL := "https://example.com/webhook"
 	secret := "{...}"
@@ -186,7 +186,7 @@ func TestUpdateWebhook(t *testing.T) {
 	t.Run("Happy Path", func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPatch,
-			ExpectedReqPath:   "/api/orgs/an-organization/hooks/a-webhook",
+			ExpectedReqPath:   webhookPath,
 			ExpectedReqBody:   updateReq,
 			ResponseCode:      201,
 			ResponseBody:      webhook,
@@ -199,11 +199,11 @@ func TestUpdateWebhook(t *testing.T) {
 	t.Run("error", func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPatch,
-			ExpectedReqPath:   "/api/orgs/an-organization/hooks/a-webhook",
+			ExpectedReqPath:   webhookPath,
 			ExpectedReqBody:   updateReq,
 			ResponseCode:      401,
 			ResponseBody: ErrorResponse{
-				Message: "unauthorized",
+				Message: unauthorizedError,
 			},
 		})
 		_, err := c.UpdateWebhook(ctx, updateReq)
@@ -213,11 +213,11 @@ func TestUpdateWebhook(t *testing.T) {
 
 func TestDeleteWebhook(t *testing.T) {
 	webhookName := "a-webhook"
-	orgName := "an-organization"
+	orgName := testDeploymentSettingsOrgName
 	t.Run("Happy Path", func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodDelete,
-			ExpectedReqPath:   "/api/orgs/an-organization/hooks/a-webhook",
+			ExpectedReqPath:   webhookPath,
 			ResponseCode:      201,
 		})
 		err := c.DeleteWebhook(ctx, orgName, nil, nil, nil, webhookName)
@@ -227,10 +227,10 @@ func TestDeleteWebhook(t *testing.T) {
 	t.Run("error", func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodDelete,
-			ExpectedReqPath:   "/api/orgs/an-organization/hooks/a-webhook",
+			ExpectedReqPath:   webhookPath,
 			ResponseCode:      401,
 			ResponseBody: ErrorResponse{
-				Message: "unauthorized",
+				Message: unauthorizedError,
 			},
 		})
 		err := c.DeleteWebhook(ctx, orgName, nil, nil, nil, webhookName)

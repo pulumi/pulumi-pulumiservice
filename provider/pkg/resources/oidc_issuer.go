@@ -63,8 +63,8 @@ type AuthPolicyTokenType string
 
 const (
 	AuthPolicyTokenTypePersonal         AuthPolicyTokenType = "personal"
-	AuthPolicyTokenTypeTeam             AuthPolicyTokenType = "team"
-	AuthPolicyTokenTypeOrganization     AuthPolicyTokenType = "organization"
+	AuthPolicyTokenTypeTeam             AuthPolicyTokenType = gcTeam
+	AuthPolicyTokenTypeOrganization     AuthPolicyTokenType = gcOrganization
 	AuthPolicyTokenTypeDeploymentRunner AuthPolicyTokenType = "runner"
 )
 
@@ -88,7 +88,7 @@ type AuthPolicyPermissionLevel string
 
 const (
 	AuthPolicyPermissionLevelStandard AuthPolicyPermissionLevel = "standard"
-	AuthPolicyPermissionLevelAdmin    AuthPolicyPermissionLevel = "admin"
+	AuthPolicyPermissionLevelAdmin    AuthPolicyPermissionLevel = gcAdmin
 )
 
 func (AuthPolicyPermissionLevel) Values() []infer.EnumValue[AuthPolicyPermissionLevel] {

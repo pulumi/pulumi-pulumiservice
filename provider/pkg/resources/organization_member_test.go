@@ -14,7 +14,7 @@ import (
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 )
 
-const testAdminRole = "admin"
+const testAdminRole = gcAdmin
 
 type orgMemberClientMock struct {
 	config.Client
@@ -60,14 +60,14 @@ func (c *orgMemberClientMock) ListOrgRoles(
 // to the matching built-in Role string.
 var builtinRoles = []apitype.PermissionDescriptorRecord{
 	{
-		PermissionDescriptorBase: apitype.PermissionDescriptorBase{Name: "Admin"},
-		ID:                       "admin-fga",
-		DefaultIdentifier:        "admin",
+		PermissionDescriptorBase: apitype.PermissionDescriptorBase{Name: gcAdminCap},
+		ID:                       gcAdminFGA,
+		DefaultIdentifier:        gcAdmin,
 	},
 	{
 		PermissionDescriptorBase: apitype.PermissionDescriptorBase{Name: "Member"},
 		ID:                       "member-fga",
-		DefaultIdentifier:        "member",
+		DefaultIdentifier:        defaultOrgMemberRole,
 	},
 	{
 		PermissionDescriptorBase: apitype.PermissionDescriptorBase{Name: "Billing Manager"},
@@ -89,7 +89,7 @@ func TestOrganizationMemberRead(t *testing.T) {
 
 		r := &OrganizationMember{}
 		resp, err := r.Read(ctx, infer.ReadRequest[OrganizationMemberInput, OrganizationMemberState]{
-			ID: "acme/alice",
+			ID: gcAcmeAlice,
 		})
 		assert.NoError(t, err)
 		assert.Equal(t, "", resp.ID)
@@ -104,13 +104,13 @@ func TestOrganizationMemberRead(t *testing.T) {
 		mock := &orgMemberClientMock{
 			getFunc: func(_ context.Context, _, _ string) (*pulumiapi.Member, error) {
 				return &pulumiapi.Member{
-					Role: "admin",
+					Role: gcAdmin,
 					User: pulumiapi.User{
 						Name:        "Alice",
-						GithubLogin: "alice",
+						GithubLogin: gcAlice,
 						Email:       "alice@example.com",
 					},
-					FGARole: &pulumiapi.FGARole{ID: "admin-fga", Name: "Admin"},
+					FGARole: &pulumiapi.FGARole{ID: gcAdminFGA, Name: gcAdminCap},
 				}, nil
 			},
 			listRolesFunc: stubBuiltinRoles,
@@ -119,15 +119,15 @@ func TestOrganizationMemberRead(t *testing.T) {
 
 		r := &OrganizationMember{}
 		resp, err := r.Read(ctx, infer.ReadRequest[OrganizationMemberInput, OrganizationMemberState]{
-			ID: "acme/alice",
+			ID: gcAcmeAlice,
 		})
 		assert.NoError(t, err)
-		assert.Equal(t, "acme/alice", resp.ID)
+		assert.Equal(t, gcAcmeAlice, resp.ID)
 		if assert.NotNil(t, resp.State.Role) {
-			assert.Equal(t, "admin", *resp.State.Role)
+			assert.Equal(t, gcAdmin, *resp.State.Role)
 		}
 		assert.Nil(t, resp.State.RoleId)
-		assert.Equal(t, "alice", resp.State.Username)
+		assert.Equal(t, gcAlice, resp.State.Username)
 	})
 
 	t.Run("custom role surfaces the catalogue ID, not the FGA-side ID", func(t *testing.T) {
@@ -143,8 +143,8 @@ func TestOrganizationMemberRead(t *testing.T) {
 		mock := &orgMemberClientMock{
 			getFunc: func(_ context.Context, _, _ string) (*pulumiapi.Member, error) {
 				return &pulumiapi.Member{
-					Role:    "member",
-					User:    pulumiapi.User{Name: "Bob", GithubLogin: "bob"},
+					Role:    defaultOrgMemberRole,
+					User:    pulumiapi.User{Name: "Bob", GithubLogin: gcBob},
 					FGARole: &pulumiapi.FGARole{ID: fgaID, Name: "read-only-devops"},
 				}, nil
 			},
@@ -181,8 +181,8 @@ func TestOrganizationMemberRead(t *testing.T) {
 		mock := &orgMemberClientMock{
 			getFunc: func(_ context.Context, _, _ string) (*pulumiapi.Member, error) {
 				return &pulumiapi.Member{
-					Role:    "admin",
-					User:    pulumiapi.User{GithubLogin: "alice"},
+					Role:    gcAdmin,
+					User:    pulumiapi.User{GithubLogin: gcAlice},
 					FGARole: nil,
 				}, nil
 			},
@@ -192,12 +192,12 @@ func TestOrganizationMemberRead(t *testing.T) {
 
 		r := &OrganizationMember{}
 		resp, err := r.Read(ctx, infer.ReadRequest[OrganizationMemberInput, OrganizationMemberState]{
-			ID:     "acme/alice",
+			ID:     gcAcmeAlice,
 			Inputs: OrganizationMemberInput{OrganizationMemberCore: OrganizationMemberCore{RoleId: &priorRoleID}},
 		})
 		assert.NoError(t, err)
 		if assert.NotNil(t, resp.State.Role) {
-			assert.Equal(t, "admin", *resp.State.Role)
+			assert.Equal(t, gcAdmin, *resp.State.Role)
 		}
 		assert.Nil(t, resp.State.RoleId, "RoleId must be cleared in built-in branch")
 	})
@@ -217,9 +217,9 @@ func TestOrganizationMemberCreate(t *testing.T) {
 		mock := &orgMemberClientMock{
 			addFunc: func(_ context.Context, user, org, role string) error {
 				added = true
-				assert.Equal(t, "alice", user)
-				assert.Equal(t, "acme", org)
-				assert.Equal(t, "admin", role)
+				assert.Equal(t, gcAlice, user)
+				assert.Equal(t, gcAcme, org)
+				assert.Equal(t, gcAdmin, role)
 				return nil
 			},
 			updateFunc: func(_ context.Context, _, _, _ string, _ *string) error {
@@ -228,9 +228,9 @@ func TestOrganizationMemberCreate(t *testing.T) {
 			},
 			getFunc: func(_ context.Context, _, _ string) (*pulumiapi.Member, error) {
 				return &pulumiapi.Member{
-					Role:    "admin",
-					User:    pulumiapi.User{GithubLogin: "alice"},
-					FGARole: &pulumiapi.FGARole{ID: "admin-fga", Name: "Admin"},
+					Role:    gcAdmin,
+					User:    pulumiapi.User{GithubLogin: gcAlice},
+					FGARole: &pulumiapi.FGARole{ID: gcAdminFGA, Name: gcAdminCap},
 				}, nil
 			},
 			listRolesFunc: stubBuiltinRoles,
@@ -242,14 +242,14 @@ func TestOrganizationMemberCreate(t *testing.T) {
 		resp, err := r.Create(ctx, infer.CreateRequest[OrganizationMemberInput]{
 			Inputs: OrganizationMemberInput{
 				OrganizationMemberCore: OrganizationMemberCore{
-					OrganizationName: "acme",
-					Username:         "alice",
+					OrganizationName: gcAcme,
+					Username:         gcAlice,
 					Role:             &role,
 				},
 			},
 		})
 		assert.NoError(t, err)
-		assert.Equal(t, "acme/alice", resp.ID)
+		assert.Equal(t, gcAcmeAlice, resp.ID)
 		assert.True(t, added)
 		assert.False(t, updated, "no UpdateOrgMemberRole expected when only built-in role is set")
 	})
@@ -258,7 +258,7 @@ func TestOrganizationMemberCreate(t *testing.T) {
 		updateRoleID := ""
 		mock := &orgMemberClientMock{
 			addFunc: func(_ context.Context, _, _, role string) error {
-				assert.Equal(t, "member", role, "defaults to member when roleId is set")
+				assert.Equal(t, defaultOrgMemberRole, role, "defaults to member when roleId is set")
 				return nil
 			},
 			updateFunc: func(_ context.Context, _, _, role string, fgaRoleID *string) error {
@@ -270,8 +270,8 @@ func TestOrganizationMemberCreate(t *testing.T) {
 			},
 			getFunc: func(_ context.Context, _, _ string) (*pulumiapi.Member, error) {
 				return &pulumiapi.Member{
-					Role:    "member",
-					User:    pulumiapi.User{GithubLogin: "bob"},
+					Role:    defaultOrgMemberRole,
+					User:    pulumiapi.User{GithubLogin: gcBob},
 					FGARole: &pulumiapi.FGARole{ID: "role-xyz", Name: "custom"},
 				}, nil
 			},
@@ -284,8 +284,8 @@ func TestOrganizationMemberCreate(t *testing.T) {
 		_, err := r.Create(ctx, infer.CreateRequest[OrganizationMemberInput]{
 			Inputs: OrganizationMemberInput{
 				OrganizationMemberCore: OrganizationMemberCore{
-					OrganizationName: "acme",
-					Username:         "bob",
+					OrganizationName: gcAcme,
+					Username:         gcBob,
 					RoleId:           &roleID,
 				},
 			},
@@ -306,7 +306,7 @@ func TestOrganizationMemberDelete(t *testing.T) {
 			},
 			updateFunc: func(_ context.Context, _, _, role string, fgaRoleID *string) error {
 				updated = true
-				assert.Equal(t, "member", role)
+				assert.Equal(t, defaultOrgMemberRole, role)
 				// Nil fgaRoleID: server falls through to the legacy path and
 				// applies the built-in role as the new FGA role, clearing
 				// any prior custom-role assignment.
@@ -319,8 +319,8 @@ func TestOrganizationMemberDelete(t *testing.T) {
 		_, err := r.Delete(ctx, infer.DeleteRequest[OrganizationMemberState]{
 			State: OrganizationMemberState{
 				OrganizationMemberCore: OrganizationMemberCore{
-					OrganizationName: "acme",
-					Username:         "alice",
+					OrganizationName: gcAcme,
+					Username:         gcAlice,
 				},
 				Adopted: true,
 			},
@@ -343,8 +343,8 @@ func TestOrganizationMemberDelete(t *testing.T) {
 		_, err := r.Delete(ctx, infer.DeleteRequest[OrganizationMemberState]{
 			State: OrganizationMemberState{
 				OrganizationMemberCore: OrganizationMemberCore{
-					OrganizationName: "acme",
-					Username:         "alice",
+					OrganizationName: gcAcme,
+					Username:         gcAlice,
 				},
 				Adopted: false,
 			},
@@ -366,15 +366,15 @@ func TestOrganizationMemberUpdateDryRunPreservesAdopted(t *testing.T) {
 		DryRun: true,
 		Inputs: OrganizationMemberInput{
 			OrganizationMemberCore: OrganizationMemberCore{
-				OrganizationName: "acme",
-				Username:         "alice",
+				OrganizationName: gcAcme,
+				Username:         gcAlice,
 				Role:             &role,
 			},
 		},
 		State: OrganizationMemberState{
 			OrganizationMemberCore: OrganizationMemberCore{
-				OrganizationName: "acme",
-				Username:         "alice",
+				OrganizationName: gcAcme,
+				Username:         gcAlice,
 			},
 			Adopted: true,
 		},
@@ -393,8 +393,8 @@ func TestOrganizationMemberUpdatePreservesAdopted(t *testing.T) {
 		updateFunc: func(_ context.Context, _, _, _ string, _ *string) error { return nil },
 		getFunc: func(_ context.Context, _, _ string) (*pulumiapi.Member, error) {
 			return &pulumiapi.Member{
-				Role: "admin",
-				User: pulumiapi.User{GithubLogin: "alice"},
+				Role: gcAdmin,
+				User: pulumiapi.User{GithubLogin: gcAlice},
 			}, nil
 		},
 	}
@@ -405,15 +405,15 @@ func TestOrganizationMemberUpdatePreservesAdopted(t *testing.T) {
 	resp, err := r.Update(ctx, infer.UpdateRequest[OrganizationMemberInput, OrganizationMemberState]{
 		Inputs: OrganizationMemberInput{
 			OrganizationMemberCore: OrganizationMemberCore{
-				OrganizationName: "acme",
-				Username:         "alice",
+				OrganizationName: gcAcme,
+				Username:         gcAlice,
 				Role:             &role,
 			},
 		},
 		State: OrganizationMemberState{
 			OrganizationMemberCore: OrganizationMemberCore{
-				OrganizationName: "acme",
-				Username:         "alice",
+				OrganizationName: gcAcme,
+				Username:         gcAlice,
 			},
 			Adopted: true,
 		},
@@ -429,8 +429,8 @@ func TestOrganizationMemberReadPreservesAdopted(t *testing.T) {
 	mock := &orgMemberClientMock{
 		getFunc: func(_ context.Context, _, _ string) (*pulumiapi.Member, error) {
 			return &pulumiapi.Member{
-				Role: "member",
-				User: pulumiapi.User{GithubLogin: "alice"},
+				Role: defaultOrgMemberRole,
+				User: pulumiapi.User{GithubLogin: gcAlice},
 			}, nil
 		},
 	}
@@ -438,11 +438,11 @@ func TestOrganizationMemberReadPreservesAdopted(t *testing.T) {
 
 	r := &OrganizationMember{}
 	resp, err := r.Read(ctx, infer.ReadRequest[OrganizationMemberInput, OrganizationMemberState]{
-		ID: "acme/alice",
+		ID: gcAcmeAlice,
 		State: OrganizationMemberState{
 			OrganizationMemberCore: OrganizationMemberCore{
-				OrganizationName: "acme",
-				Username:         "alice",
+				OrganizationName: gcAcme,
+				Username:         gcAlice,
 			},
 			Adopted: true,
 		},
@@ -457,8 +457,8 @@ func TestOrganizationMemberCheck(t *testing.T) {
 
 	resp, err := r.Check(context.Background(), infer.CheckRequest{
 		NewInputs: property.NewMap(map[string]property.Value{
-			"organizationName": property.New("acme"),
-			"username":         property.New("alice"),
+			gcOrganizationName: property.New(gcAcme),
+			"username":         property.New(gcAlice),
 			"role":             property.New(bad),
 		}),
 	})

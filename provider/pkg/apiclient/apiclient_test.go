@@ -50,13 +50,13 @@ func TestCloudClient_CreateRequest_QueryParams(t *testing.T) {
 	tags := []string{"a", "b"}
 	var nilStr *string
 	req, err := c.createRequest(context.Background(), http.MethodGet, "/api/things", nil,
-		map[string]any{"limit": &limit, "tags": &tags, "filter": nilStr, "skip": nil})
+		map[string]any{limitKey: &limit, "tags": &tags, filterKey: nilStr, "skip": nil})
 	require.NoError(t, err)
 
 	q := req.URL.Query()
-	assert.Equal(t, "10", q.Get("limit"))
+	assert.Equal(t, "10", q.Get(limitKey))
 	assert.Equal(t, "a,b", q.Get("tags"))
-	assert.False(t, q.Has("filter"), "nil pointer should be omitted")
+	assert.False(t, q.Has(filterKey), "nil pointer should be omitted")
 	assert.False(t, q.Has("skip"), "nil any should be omitted")
 }
 

@@ -115,10 +115,10 @@ type policyPackRef struct {
 
 func newPolicyGroupInput() *policyGroupInputBuilder {
 	return &policyGroupInputBuilder{
-		name:       "test-policy-group",
-		org:        "test-org",
-		entityType: "stacks",
-		mode:       "audit",
+		name:       gcTestPolicyGroup,
+		org:        gcTestOrg,
+		entityType: gcStacks,
+		mode:       gcAudit,
 	}
 }
 
@@ -144,39 +144,39 @@ func (b *policyGroupInputBuilder) withAccounts(accounts ...string) *policyGroupI
 
 func (b *policyGroupInputBuilder) build() resource.PropertyMap {
 	pm := resource.PropertyMap{
-		"name":             resource.NewStringProperty(b.name),
-		"organizationName": resource.NewStringProperty(b.org),
-		"entityType":       resource.NewStringProperty(b.entityType),
-		"mode":             resource.NewStringProperty(b.mode),
+		gcName:             resource.NewStringProperty(b.name),
+		gcOrganizationName: resource.NewStringProperty(b.org),
+		gcEntityType:       resource.NewStringProperty(b.entityType),
+		gcMode:             resource.NewStringProperty(b.mode),
 	}
 
 	// Build stacks array
 	stackValues := make([]resource.PropertyValue, len(b.stacks))
 	for i, s := range b.stacks {
 		stackValues[i] = resource.NewObjectProperty(resource.PropertyMap{
-			"name":           resource.NewStringProperty(s.name),
+			gcName:           resource.NewStringProperty(s.name),
 			"routingProject": resource.NewStringProperty(s.project),
 		})
 	}
-	pm["stacks"] = resource.NewArrayProperty(stackValues)
+	pm[gcStacks] = resource.NewArrayProperty(stackValues)
 
 	// Build policy packs array. `version` is intentionally omitted from inputs:
 	// it is server-derived and output-only.
 	ppValues := make([]resource.PropertyValue, len(b.policyPacks))
 	for i, pp := range b.policyPacks {
 		ppValues[i] = resource.NewObjectProperty(resource.PropertyMap{
-			"name":       resource.NewStringProperty(pp.name),
-			"versionTag": resource.NewStringProperty(pp.versionTag),
+			gcName:       resource.NewStringProperty(pp.name),
+			gcVersionTag: resource.NewStringProperty(pp.versionTag),
 		})
 	}
-	pm["policyPacks"] = resource.NewArrayProperty(ppValues)
+	pm[gcPolicyPacks] = resource.NewArrayProperty(ppValues)
 
 	// Build accounts array
 	accountValues := make([]resource.PropertyValue, len(b.accounts))
 	for i, a := range b.accounts {
 		accountValues[i] = resource.NewStringProperty(a)
 	}
-	pm["accounts"] = resource.NewArrayProperty(accountValues)
+	pm[gcAccounts] = resource.NewArrayProperty(accountValues)
 
 	return pm
 }
@@ -196,9 +196,9 @@ type mockPolicyGroupBuilder struct {
 func newMockPolicyGroup() *mockPolicyGroupBuilder {
 	return &mockPolicyGroupBuilder{
 		pg: &pulumiapi.PolicyGroup{
-			Name:       "test-policy-group",
-			EntityType: "stacks",
-			Mode:       "audit",
+			Name:       gcTestPolicyGroup,
+			EntityType: gcStacks,
+			Mode:       gcAudit,
 		},
 	}
 }
@@ -220,7 +220,7 @@ func (b *mockPolicyGroupBuilder) withPolicyPacks(packs ...policyPackRef) *mockPo
 }
 
 func (b *mockPolicyGroupBuilder) withAccounts(accounts ...string) *mockPolicyGroupBuilder {
-	b.pg.EntityType = "accounts"
+	b.pg.EntityType = gcAccounts
 	b.pg.Accounts = accounts
 	return b
 }
@@ -240,17 +240,17 @@ func TestPolicyGroup_Check_Defaults(t *testing.T) {
 
 	// Create input without entityType and mode
 	inputs := resource.PropertyMap{
-		"name":             resource.NewStringProperty("test-policy-group"),
-		"organizationName": resource.NewStringProperty("test-org"),
-		"stacks":           resource.NewArrayProperty([]resource.PropertyValue{}),
-		"policyPacks":      resource.NewArrayProperty([]resource.PropertyValue{}),
+		gcName:             resource.NewStringProperty(gcTestPolicyGroup),
+		gcOrganizationName: resource.NewStringProperty(gcTestOrg),
+		gcStacks:           resource.NewArrayProperty([]resource.PropertyValue{}),
+		gcPolicyPacks:      resource.NewArrayProperty([]resource.PropertyValue{}),
 	}
 
 	inputsStruct, err := structpb.NewStruct(inputs.Mappable())
 	require.NoError(t, err)
 
 	req := &pulumirpc.CheckRequest{
-		Urn:  "urn:pulumi:dev::test::pulumiservice:index:PolicyGroup::testPolicyGroup",
+		Urn:  testPolicyGroupURN,
 		News: inputsStruct,
 	}
 
@@ -265,11 +265,11 @@ func TestPolicyGroup_Check_Defaults(t *testing.T) {
 		outputMap[resource.PropertyKey(k)] = resource.NewPropertyValue(v.AsInterface())
 	}
 
-	assert.True(t, outputMap["entityType"].HasValue(), "entityType should have a value")
-	assert.Equal(t, "stacks", outputMap["entityType"].StringValue(), "entityType should default to 'stacks'")
+	assert.True(t, outputMap[gcEntityType].HasValue(), "entityType should have a value")
+	assert.Equal(t, gcStacks, outputMap[gcEntityType].StringValue(), "entityType should default to 'stacks'")
 
-	assert.True(t, outputMap["mode"].HasValue(), "mode should have a value")
-	assert.Equal(t, "audit", outputMap["mode"].StringValue(), "mode should default to 'audit'")
+	assert.True(t, outputMap[gcMode].HasValue(), "mode should have a value")
+	assert.Equal(t, gcAudit, outputMap[gcMode].StringValue(), "mode should default to 'audit'")
 }
 
 // TestPolicyGroup_Check_StripsPolicyPackVersion verifies that the server-derived
@@ -281,13 +281,13 @@ func TestPolicyGroup_Check_StripsPolicyPackVersion(t *testing.T) {
 	}
 
 	inputs := resource.PropertyMap{
-		"name":             resource.NewStringProperty("test-policy-group"),
-		"organizationName": resource.NewStringProperty("test-org"),
-		"policyPacks": resource.NewArrayProperty([]resource.PropertyValue{
+		gcName:             resource.NewStringProperty(gcTestPolicyGroup),
+		gcOrganizationName: resource.NewStringProperty(gcTestOrg),
+		gcPolicyPacks: resource.NewArrayProperty([]resource.PropertyValue{
 			resource.NewObjectProperty(resource.PropertyMap{
-				"name":       resource.NewStringProperty("pp1"),
+				gcName:       resource.NewStringProperty("pp1"),
 				"version":    resource.NewNumberProperty(5),
-				"versionTag": resource.NewStringProperty("1.0.0"),
+				gcVersionTag: resource.NewStringProperty(gcVersion100),
 			}),
 		}),
 	}
@@ -296,7 +296,7 @@ func TestPolicyGroup_Check_StripsPolicyPackVersion(t *testing.T) {
 	require.NoError(t, err)
 
 	resp, err := provider.Check(&pulumirpc.CheckRequest{
-		Urn:  "urn:pulumi:dev::test::pulumiservice:index:PolicyGroup::testPolicyGroup",
+		Urn:  testPolicyGroupURN,
 		News: inputsStruct,
 	})
 	require.NoError(t, err)
@@ -307,13 +307,13 @@ func TestPolicyGroup_Check_StripsPolicyPackVersion(t *testing.T) {
 		outputMap[resource.PropertyKey(k)] = resource.NewPropertyValue(v.AsInterface())
 	}
 
-	packs := outputMap["policyPacks"].ArrayValue()
+	packs := outputMap[gcPolicyPacks].ArrayValue()
 	require.Len(t, packs, 1)
 	pp := packs[0].ObjectValue()
 	_, hasVersion := pp["version"]
 	assert.False(t, hasVersion, "version should be stripped from policy pack inputs")
-	assert.Equal(t, "pp1", pp["name"].StringValue())
-	assert.Equal(t, "1.0.0", pp["versionTag"].StringValue())
+	assert.Equal(t, "pp1", pp[gcName].StringValue())
+	assert.Equal(t, gcVersion100, pp[gcVersionTag].StringValue())
 }
 
 // TestPolicyGroup_Check_ExplicitValues tests that Check preserves explicit entityType and mode values
@@ -325,23 +325,23 @@ func TestPolicyGroup_Check_ExplicitValues(t *testing.T) {
 	}{
 		{
 			name:       "stacks and audit",
-			entityType: "stacks",
-			mode:       "audit",
+			entityType: gcStacks,
+			mode:       gcAudit,
 		},
 		{
 			name:       "stacks and preventative",
-			entityType: "stacks",
-			mode:       "preventative",
+			entityType: gcStacks,
+			mode:       gcPreventative,
 		},
 		{
 			name:       "accounts and audit",
-			entityType: "accounts",
-			mode:       "audit",
+			entityType: gcAccounts,
+			mode:       gcAudit,
 		},
 		{
 			name:       "accounts and preventative",
-			entityType: "accounts",
-			mode:       "preventative",
+			entityType: gcAccounts,
+			mode:       gcPreventative,
 		},
 	}
 
@@ -352,19 +352,19 @@ func TestPolicyGroup_Check_ExplicitValues(t *testing.T) {
 			}
 
 			inputs := resource.PropertyMap{
-				"name":             resource.NewStringProperty("test-policy-group"),
-				"organizationName": resource.NewStringProperty("test-org"),
-				"entityType":       resource.NewStringProperty(tc.entityType),
-				"mode":             resource.NewStringProperty(tc.mode),
-				"stacks":           resource.NewArrayProperty([]resource.PropertyValue{}),
-				"policyPacks":      resource.NewArrayProperty([]resource.PropertyValue{}),
+				gcName:             resource.NewStringProperty(gcTestPolicyGroup),
+				gcOrganizationName: resource.NewStringProperty(gcTestOrg),
+				gcEntityType:       resource.NewStringProperty(tc.entityType),
+				gcMode:             resource.NewStringProperty(tc.mode),
+				gcStacks:           resource.NewArrayProperty([]resource.PropertyValue{}),
+				gcPolicyPacks:      resource.NewArrayProperty([]resource.PropertyValue{}),
 			}
 
 			inputsStruct, err := structpb.NewStruct(inputs.Mappable())
 			require.NoError(t, err)
 
 			req := &pulumirpc.CheckRequest{
-				Urn:  "urn:pulumi:dev::test::pulumiservice:index:PolicyGroup::testPolicyGroup",
+				Urn:  testPolicyGroupURN,
 				News: inputsStruct,
 			}
 
@@ -382,10 +382,10 @@ func TestPolicyGroup_Check_ExplicitValues(t *testing.T) {
 			assert.Equal(
 				t,
 				tc.entityType,
-				outputMap["entityType"].StringValue(),
+				outputMap[gcEntityType].StringValue(),
 				"entityType should preserve explicit value",
 			)
-			assert.Equal(t, tc.mode, outputMap["mode"].StringValue(), "mode should preserve explicit value")
+			assert.Equal(t, tc.mode, outputMap[gcMode].StringValue(), "mode should preserve explicit value")
 		})
 	}
 }
@@ -399,7 +399,7 @@ func TestPolicyGroup_Check_InvalidEntityType(t *testing.T) {
 		{name: "empty string", entityType: ""},
 		{name: "invalid value", entityType: "invalid"},
 		{name: "wrong case", entityType: "Stacks"},
-		{name: "typo", entityType: "stack"},
+		{name: "typo", entityType: gcStack},
 	}
 
 	for _, tc := range testCases {
@@ -409,19 +409,19 @@ func TestPolicyGroup_Check_InvalidEntityType(t *testing.T) {
 			}
 
 			inputs := resource.PropertyMap{
-				"name":             resource.NewStringProperty("test-policy-group"),
-				"organizationName": resource.NewStringProperty("test-org"),
-				"entityType":       resource.NewStringProperty(tc.entityType),
-				"mode":             resource.NewStringProperty("audit"),
-				"stacks":           resource.NewArrayProperty([]resource.PropertyValue{}),
-				"policyPacks":      resource.NewArrayProperty([]resource.PropertyValue{}),
+				gcName:             resource.NewStringProperty(gcTestPolicyGroup),
+				gcOrganizationName: resource.NewStringProperty(gcTestOrg),
+				gcEntityType:       resource.NewStringProperty(tc.entityType),
+				gcMode:             resource.NewStringProperty(gcAudit),
+				gcStacks:           resource.NewArrayProperty([]resource.PropertyValue{}),
+				gcPolicyPacks:      resource.NewArrayProperty([]resource.PropertyValue{}),
 			}
 
 			inputsStruct, err := structpb.NewStruct(inputs.Mappable())
 			require.NoError(t, err)
 
 			req := &pulumirpc.CheckRequest{
-				Urn:  "urn:pulumi:dev::test::pulumiservice:index:PolicyGroup::testPolicyGroup",
+				Urn:  testPolicyGroupURN,
 				News: inputsStruct,
 			}
 
@@ -433,7 +433,7 @@ func TestPolicyGroup_Check_InvalidEntityType(t *testing.T) {
 			// Verify failure message mentions entityType
 			found := false
 			for _, failure := range resp.Failures {
-				if failure.Property == "entityType" {
+				if failure.Property == gcEntityType {
 					found = true
 					assert.Contains(t, failure.Reason, "entityType must be either 'stacks' or 'accounts'")
 					break
@@ -464,19 +464,19 @@ func TestPolicyGroup_Check_InvalidMode(t *testing.T) {
 			}
 
 			inputs := resource.PropertyMap{
-				"name":             resource.NewStringProperty("test-policy-group"),
-				"organizationName": resource.NewStringProperty("test-org"),
-				"entityType":       resource.NewStringProperty("stacks"),
-				"mode":             resource.NewStringProperty(tc.mode),
-				"stacks":           resource.NewArrayProperty([]resource.PropertyValue{}),
-				"policyPacks":      resource.NewArrayProperty([]resource.PropertyValue{}),
+				gcName:             resource.NewStringProperty(gcTestPolicyGroup),
+				gcOrganizationName: resource.NewStringProperty(gcTestOrg),
+				gcEntityType:       resource.NewStringProperty(gcStacks),
+				gcMode:             resource.NewStringProperty(tc.mode),
+				gcStacks:           resource.NewArrayProperty([]resource.PropertyValue{}),
+				gcPolicyPacks:      resource.NewArrayProperty([]resource.PropertyValue{}),
 			}
 
 			inputsStruct, err := structpb.NewStruct(inputs.Mappable())
 			require.NoError(t, err)
 
 			req := &pulumirpc.CheckRequest{
-				Urn:  "urn:pulumi:dev::test::pulumiservice:index:PolicyGroup::testPolicyGroup",
+				Urn:  testPolicyGroupURN,
 				News: inputsStruct,
 			}
 
@@ -488,7 +488,7 @@ func TestPolicyGroup_Check_InvalidMode(t *testing.T) {
 			// Verify failure message mentions mode
 			found := false
 			for _, failure := range resp.Failures {
-				if failure.Property == "mode" {
+				if failure.Property == gcMode {
 					found = true
 					assert.Contains(t, failure.Reason, "mode must be either 'audit' or 'preventative'")
 					break
@@ -507,12 +507,12 @@ func TestPolicyGroup_Diff_EntityTypeChange(t *testing.T) {
 
 	// Old state: entityType = "stacks"
 	oldInputs := resource.PropertyMap{
-		"name":             resource.NewStringProperty("test-policy-group"),
-		"organizationName": resource.NewStringProperty("test-org"),
-		"entityType":       resource.NewStringProperty("stacks"),
-		"mode":             resource.NewStringProperty("audit"),
-		"stacks":           resource.NewArrayProperty([]resource.PropertyValue{}),
-		"policyPacks":      resource.NewArrayProperty([]resource.PropertyValue{}),
+		gcName:             resource.NewStringProperty(gcTestPolicyGroup),
+		gcOrganizationName: resource.NewStringProperty(gcTestOrg),
+		gcEntityType:       resource.NewStringProperty(gcStacks),
+		gcMode:             resource.NewStringProperty(gcAudit),
+		gcStacks:           resource.NewArrayProperty([]resource.PropertyValue{}),
+		gcPolicyPacks:      resource.NewArrayProperty([]resource.PropertyValue{}),
 	}
 
 	oldState, err := structpb.NewStruct(oldInputs.Mappable())
@@ -520,20 +520,20 @@ func TestPolicyGroup_Diff_EntityTypeChange(t *testing.T) {
 
 	// New state: entityType = "accounts"
 	newInputs := resource.PropertyMap{
-		"name":             resource.NewStringProperty("test-policy-group"),
-		"organizationName": resource.NewStringProperty("test-org"),
-		"entityType":       resource.NewStringProperty("accounts"),
-		"mode":             resource.NewStringProperty("audit"),
-		"stacks":           resource.NewArrayProperty([]resource.PropertyValue{}),
-		"policyPacks":      resource.NewArrayProperty([]resource.PropertyValue{}),
+		gcName:             resource.NewStringProperty(gcTestPolicyGroup),
+		gcOrganizationName: resource.NewStringProperty(gcTestOrg),
+		gcEntityType:       resource.NewStringProperty(gcAccounts),
+		gcMode:             resource.NewStringProperty(gcAudit),
+		gcStacks:           resource.NewArrayProperty([]resource.PropertyValue{}),
+		gcPolicyPacks:      resource.NewArrayProperty([]resource.PropertyValue{}),
 	}
 
 	newState, err := structpb.NewStruct(newInputs.Mappable())
 	require.NoError(t, err)
 
 	req := &pulumirpc.DiffRequest{
-		Id:   "test-org/test-policy-group",
-		Urn:  "urn:pulumi:dev::test::pulumiservice:index:PolicyGroup::testPolicyGroup",
+		Id:   testPolicyGroupID,
+		Urn:  testPolicyGroupURN,
 		Olds: oldState,
 		News: newState,
 	}
@@ -543,7 +543,7 @@ func TestPolicyGroup_Diff_EntityTypeChange(t *testing.T) {
 	require.NotNil(t, resp)
 
 	// Verify that entityType change triggers replacement
-	assert.Contains(t, resp.Replaces, "entityType", "Changing entityType should trigger replacement")
+	assert.Contains(t, resp.Replaces, gcEntityType, "Changing entityType should trigger replacement")
 }
 
 // TestPolicyGroup_Diff_ModeChange tests that changing mode triggers replacement
@@ -554,12 +554,12 @@ func TestPolicyGroup_Diff_ModeChange(t *testing.T) {
 
 	// Old state: mode = "audit"
 	oldInputs := resource.PropertyMap{
-		"name":             resource.NewStringProperty("test-policy-group"),
-		"organizationName": resource.NewStringProperty("test-org"),
-		"entityType":       resource.NewStringProperty("stacks"),
-		"mode":             resource.NewStringProperty("audit"),
-		"stacks":           resource.NewArrayProperty([]resource.PropertyValue{}),
-		"policyPacks":      resource.NewArrayProperty([]resource.PropertyValue{}),
+		gcName:             resource.NewStringProperty(gcTestPolicyGroup),
+		gcOrganizationName: resource.NewStringProperty(gcTestOrg),
+		gcEntityType:       resource.NewStringProperty(gcStacks),
+		gcMode:             resource.NewStringProperty(gcAudit),
+		gcStacks:           resource.NewArrayProperty([]resource.PropertyValue{}),
+		gcPolicyPacks:      resource.NewArrayProperty([]resource.PropertyValue{}),
 	}
 
 	oldState, err := structpb.NewStruct(oldInputs.Mappable())
@@ -567,20 +567,20 @@ func TestPolicyGroup_Diff_ModeChange(t *testing.T) {
 
 	// New state: mode = "preventative"
 	newInputs := resource.PropertyMap{
-		"name":             resource.NewStringProperty("test-policy-group"),
-		"organizationName": resource.NewStringProperty("test-org"),
-		"entityType":       resource.NewStringProperty("stacks"),
-		"mode":             resource.NewStringProperty("preventative"),
-		"stacks":           resource.NewArrayProperty([]resource.PropertyValue{}),
-		"policyPacks":      resource.NewArrayProperty([]resource.PropertyValue{}),
+		gcName:             resource.NewStringProperty(gcTestPolicyGroup),
+		gcOrganizationName: resource.NewStringProperty(gcTestOrg),
+		gcEntityType:       resource.NewStringProperty(gcStacks),
+		gcMode:             resource.NewStringProperty(gcPreventative),
+		gcStacks:           resource.NewArrayProperty([]resource.PropertyValue{}),
+		gcPolicyPacks:      resource.NewArrayProperty([]resource.PropertyValue{}),
 	}
 
 	newState, err := structpb.NewStruct(newInputs.Mappable())
 	require.NoError(t, err)
 
 	req := &pulumirpc.DiffRequest{
-		Id:   "test-org/test-policy-group",
-		Urn:  "urn:pulumi:dev::test::pulumiservice:index:PolicyGroup::testPolicyGroup",
+		Id:   testPolicyGroupID,
+		Urn:  testPolicyGroupURN,
 		Olds: oldState,
 		News: newState,
 	}
@@ -590,7 +590,7 @@ func TestPolicyGroup_Diff_ModeChange(t *testing.T) {
 	require.NotNil(t, resp)
 
 	// Verify that mode change triggers replacement
-	assert.Contains(t, resp.Replaces, "mode", "Changing mode should trigger replacement")
+	assert.Contains(t, resp.Replaces, gcMode, "Changing mode should trigger replacement")
 }
 
 // TestPolicyGroup_Diff_ArrayOrderIndependent tests that arrays with same elements in different order don't cause diffs
@@ -601,7 +601,7 @@ func TestPolicyGroup_Diff_ArrayOrderIndependent(t *testing.T) {
 
 	// Old state (from refresh): accounts in one order
 	oldInputs := resource.PropertyMap{
-		"accounts": resource.NewArrayProperty([]resource.PropertyValue{
+		gcAccounts: resource.NewArrayProperty([]resource.PropertyValue{
 			resource.NewStringProperty("account-b"),
 			resource.NewStringProperty("account-a"),
 		}),
@@ -612,7 +612,7 @@ func TestPolicyGroup_Diff_ArrayOrderIndependent(t *testing.T) {
 
 	// New inputs (from program): accounts in different order
 	newInputs := resource.PropertyMap{
-		"accounts": resource.NewArrayProperty([]resource.PropertyValue{
+		gcAccounts: resource.NewArrayProperty([]resource.PropertyValue{
 			resource.NewStringProperty("account-a"),
 			resource.NewStringProperty("account-b"),
 		}),
@@ -622,8 +622,8 @@ func TestPolicyGroup_Diff_ArrayOrderIndependent(t *testing.T) {
 	require.NoError(t, err)
 
 	req := &pulumirpc.DiffRequest{
-		Id:        "test-org/test-policy-group",
-		Urn:       "urn:pulumi:dev::test::pulumiservice:index:PolicyGroup::testPolicyGroup",
+		Id:        testPolicyGroupID,
+		Urn:       testPolicyGroupURN,
 		OldInputs: oldState,
 		News:      newState,
 	}
@@ -647,9 +647,9 @@ func TestPolicyGroup_Diff_NullVsEmptyArray(t *testing.T) {
 
 	// Old state (from refresh): empty arrays
 	oldInputs := resource.PropertyMap{
-		"stacks":      resource.NewArrayProperty([]resource.PropertyValue{}),
-		"accounts":    resource.NewArrayProperty([]resource.PropertyValue{}),
-		"policyPacks": resource.NewArrayProperty([]resource.PropertyValue{}),
+		gcStacks:      resource.NewArrayProperty([]resource.PropertyValue{}),
+		gcAccounts:    resource.NewArrayProperty([]resource.PropertyValue{}),
+		gcPolicyPacks: resource.NewArrayProperty([]resource.PropertyValue{}),
 	}
 
 	oldState, err := structpb.NewStruct(oldInputs.Mappable())
@@ -657,17 +657,17 @@ func TestPolicyGroup_Diff_NullVsEmptyArray(t *testing.T) {
 
 	// New inputs (from program): null values (property not specified)
 	newInputs := resource.PropertyMap{
-		"stacks":      resource.NewNullProperty(),
-		"accounts":    resource.NewNullProperty(),
-		"policyPacks": resource.NewNullProperty(),
+		gcStacks:      resource.NewNullProperty(),
+		gcAccounts:    resource.NewNullProperty(),
+		gcPolicyPacks: resource.NewNullProperty(),
 	}
 
 	newState, err := structpb.NewStruct(newInputs.Mappable())
 	require.NoError(t, err)
 
 	req := &pulumirpc.DiffRequest{
-		Id:        "test-org/test-policy-group",
-		Urn:       "urn:pulumi:dev::test::pulumiservice:index:PolicyGroup::testPolicyGroup",
+		Id:        testPolicyGroupID,
+		Urn:       testPolicyGroupURN,
 		OldInputs: oldState,
 		News:      newState,
 	}
@@ -685,10 +685,10 @@ func TestPolicyGroup_Diff_NullVsEmptyArray(t *testing.T) {
 // TestPolicyGroup_ToPropertyMap tests that ToPropertyMap includes entityType and mode
 func TestPolicyGroup_ToPropertyMap(t *testing.T) {
 	input := PulumiServicePolicyGroupInput{
-		Name:             "test-policy-group",
-		OrganizationName: "test-org",
-		EntityType:       "accounts",
-		Mode:             "preventative",
+		Name:             gcTestPolicyGroup,
+		OrganizationName: gcTestOrg,
+		EntityType:       gcAccounts,
+		Mode:             gcPreventative,
 		Stacks:           []pulumiapi.StackReference{},
 		PolicyPacks:      []pulumiapi.PolicyPackMetadata{},
 	}
@@ -696,42 +696,42 @@ func TestPolicyGroup_ToPropertyMap(t *testing.T) {
 	pm := input.ToPropertyMap()
 
 	// Verify all fields are present
-	assert.True(t, pm["name"].HasValue())
-	assert.Equal(t, "test-policy-group", pm["name"].StringValue())
+	assert.True(t, pm[gcName].HasValue())
+	assert.Equal(t, gcTestPolicyGroup, pm[gcName].StringValue())
 
-	assert.True(t, pm["organizationName"].HasValue())
-	assert.Equal(t, "test-org", pm["organizationName"].StringValue())
+	assert.True(t, pm[gcOrganizationName].HasValue())
+	assert.Equal(t, gcTestOrg, pm[gcOrganizationName].StringValue())
 
-	assert.True(t, pm["entityType"].HasValue())
-	assert.Equal(t, "accounts", pm["entityType"].StringValue())
+	assert.True(t, pm[gcEntityType].HasValue())
+	assert.Equal(t, gcAccounts, pm[gcEntityType].StringValue())
 
-	assert.True(t, pm["mode"].HasValue())
-	assert.Equal(t, "preventative", pm["mode"].StringValue())
+	assert.True(t, pm[gcMode].HasValue())
+	assert.Equal(t, gcPreventative, pm[gcMode].StringValue())
 
-	assert.True(t, pm["stacks"].HasValue())
-	assert.True(t, pm["stacks"].IsArray())
+	assert.True(t, pm[gcStacks].HasValue())
+	assert.True(t, pm[gcStacks].IsArray())
 
-	assert.True(t, pm["policyPacks"].HasValue())
-	assert.True(t, pm["policyPacks"].IsArray())
+	assert.True(t, pm[gcPolicyPacks].HasValue())
+	assert.True(t, pm[gcPolicyPacks].IsArray())
 }
 
 // TestPolicyGroup_ToPulumiServicePolicyGroupInput tests parsing of entityType and mode from PropertyMap
 func TestPolicyGroup_ToPulumiServicePolicyGroupInput(t *testing.T) {
 	inputMap := resource.PropertyMap{
-		"name":             resource.NewStringProperty("test-policy-group"),
-		"organizationName": resource.NewStringProperty("test-org"),
-		"entityType":       resource.NewStringProperty("accounts"),
-		"mode":             resource.NewStringProperty("preventative"),
-		"stacks":           resource.NewArrayProperty([]resource.PropertyValue{}),
-		"policyPacks":      resource.NewArrayProperty([]resource.PropertyValue{}),
+		gcName:             resource.NewStringProperty(gcTestPolicyGroup),
+		gcOrganizationName: resource.NewStringProperty(gcTestOrg),
+		gcEntityType:       resource.NewStringProperty(gcAccounts),
+		gcMode:             resource.NewStringProperty(gcPreventative),
+		gcStacks:           resource.NewArrayProperty([]resource.PropertyValue{}),
+		gcPolicyPacks:      resource.NewArrayProperty([]resource.PropertyValue{}),
 	}
 
 	result := ToPulumiServicePolicyGroupInput(inputMap)
 
-	assert.Equal(t, "test-policy-group", result.Name)
-	assert.Equal(t, "test-org", result.OrganizationName)
-	assert.Equal(t, "accounts", result.EntityType)
-	assert.Equal(t, "preventative", result.Mode)
+	assert.Equal(t, gcTestPolicyGroup, result.Name)
+	assert.Equal(t, gcTestOrg, result.OrganizationName)
+	assert.Equal(t, gcAccounts, result.EntityType)
+	assert.Equal(t, gcPreventative, result.Mode)
 	assert.Empty(t, result.Stacks)
 	assert.Empty(t, result.PolicyPacks)
 }
@@ -739,16 +739,16 @@ func TestPolicyGroup_ToPulumiServicePolicyGroupInput(t *testing.T) {
 // TestPolicyGroup_ToPulumiServicePolicyGroupInput_MissingFields tests that missing entityType/mode are handled
 func TestPolicyGroup_ToPulumiServicePolicyGroupInput_MissingFields(t *testing.T) {
 	inputMap := resource.PropertyMap{
-		"name":             resource.NewStringProperty("test-policy-group"),
-		"organizationName": resource.NewStringProperty("test-org"),
-		"stacks":           resource.NewArrayProperty([]resource.PropertyValue{}),
-		"policyPacks":      resource.NewArrayProperty([]resource.PropertyValue{}),
+		gcName:             resource.NewStringProperty(gcTestPolicyGroup),
+		gcOrganizationName: resource.NewStringProperty(gcTestOrg),
+		gcStacks:           resource.NewArrayProperty([]resource.PropertyValue{}),
+		gcPolicyPacks:      resource.NewArrayProperty([]resource.PropertyValue{}),
 	}
 
 	result := ToPulumiServicePolicyGroupInput(inputMap)
 
-	assert.Equal(t, "test-policy-group", result.Name)
-	assert.Equal(t, "test-org", result.OrganizationName)
+	assert.Equal(t, gcTestPolicyGroup, result.Name)
+	assert.Equal(t, gcTestOrg, result.OrganizationName)
 	// EntityType and Mode should be empty strings if not provided
 	assert.Equal(t, "", result.EntityType)
 	assert.Equal(t, "", result.Mode)
@@ -759,24 +759,24 @@ func TestPolicyGroup_ToPulumiServicePolicyGroupInput_MissingFields(t *testing.T)
 func TestPolicyGroup_ToPulumiServicePolicyGroupInput_OptionalPolicyPackFields(t *testing.T) {
 	// Test with only required name field
 	inputMap := resource.PropertyMap{
-		"name":             resource.NewStringProperty("test-policy-group"),
-		"organizationName": resource.NewStringProperty("test-org"),
-		"entityType":       resource.NewStringProperty("stacks"),
-		"mode":             resource.NewStringProperty("audit"),
-		"stacks":           resource.NewArrayProperty([]resource.PropertyValue{}),
-		"policyPacks": resource.NewArrayProperty([]resource.PropertyValue{
+		gcName:             resource.NewStringProperty(gcTestPolicyGroup),
+		gcOrganizationName: resource.NewStringProperty(gcTestOrg),
+		gcEntityType:       resource.NewStringProperty(gcStacks),
+		gcMode:             resource.NewStringProperty(gcAudit),
+		gcStacks:           resource.NewArrayProperty([]resource.PropertyValue{}),
+		gcPolicyPacks: resource.NewArrayProperty([]resource.PropertyValue{
 			resource.NewObjectProperty(resource.PropertyMap{
-				"name": resource.NewStringProperty("test-policy-pack"),
+				gcName: resource.NewStringProperty("test-policy-pack"),
 			}),
 		}),
 	}
 
 	result := ToPulumiServicePolicyGroupInput(inputMap)
 
-	assert.Equal(t, "test-policy-group", result.Name)
-	assert.Equal(t, "test-org", result.OrganizationName)
-	assert.Equal(t, "stacks", result.EntityType)
-	assert.Equal(t, "audit", result.Mode)
+	assert.Equal(t, gcTestPolicyGroup, result.Name)
+	assert.Equal(t, gcTestOrg, result.OrganizationName)
+	assert.Equal(t, gcStacks, result.EntityType)
+	assert.Equal(t, gcAudit, result.Mode)
 	assert.Empty(t, result.Stacks)
 	assert.Len(t, result.PolicyPacks, 1)
 
@@ -793,15 +793,15 @@ func TestPolicyGroup_ToPulumiServicePolicyGroupInput_OptionalPolicyPackFields(t 
 func TestPolicyGroup_ToPulumiServicePolicyGroupInput_PartialPolicyPackFields(t *testing.T) {
 	// Test with some optional fields provided
 	inputMap := resource.PropertyMap{
-		"name":             resource.NewStringProperty("test-policy-group"),
-		"organizationName": resource.NewStringProperty("test-org"),
-		"entityType":       resource.NewStringProperty("stacks"),
-		"mode":             resource.NewStringProperty("audit"),
-		"stacks":           resource.NewArrayProperty([]resource.PropertyValue{}),
-		"policyPacks": resource.NewArrayProperty([]resource.PropertyValue{
+		gcName:             resource.NewStringProperty(gcTestPolicyGroup),
+		gcOrganizationName: resource.NewStringProperty(gcTestOrg),
+		gcEntityType:       resource.NewStringProperty(gcStacks),
+		gcMode:             resource.NewStringProperty(gcAudit),
+		gcStacks:           resource.NewArrayProperty([]resource.PropertyValue{}),
+		gcPolicyPacks: resource.NewArrayProperty([]resource.PropertyValue{
 			resource.NewObjectProperty(resource.PropertyMap{
-				"name":        resource.NewStringProperty("test-policy-pack"),
-				"displayName": resource.NewStringProperty("Test Policy Pack"),
+				gcName:        resource.NewStringProperty("test-policy-pack"),
+				gcDisplayName: resource.NewStringProperty("Test Policy Pack"),
 				// Note: version and versionTag are intentionally omitted
 				"config": resource.NewObjectProperty(resource.PropertyMap{
 					"enabled": resource.NewBoolProperty(true),
@@ -834,38 +834,38 @@ func TestHasParentAccount(t *testing.T) {
 	}{
 		{
 			name:     "child account with parent in list",
-			account:  "parent/child",
-			accounts: []string{"parent", "other"},
+			account:  gcParentChild,
+			accounts: []string{gcParent, gcOther},
 			expected: true,
 		},
 		{
 			name:     "child account without parent in list",
-			account:  "parent/child",
-			accounts: []string{"other", "another"},
+			account:  gcParentChild,
+			accounts: []string{gcOther, "another"},
 			expected: false,
 		},
 		{
 			name:     "parent account (no parent exists)",
-			account:  "parent",
-			accounts: []string{"other", "another"},
+			account:  gcParent,
+			accounts: []string{gcOther, "another"},
 			expected: false,
 		},
 		{
 			name:     "empty accounts list",
-			account:  "parent/child",
+			account:  gcParentChild,
 			accounts: []string{},
 			expected: false,
 		},
 		{
 			name:     "similar prefix but not parent",
 			account:  "parent-other/child",
-			accounts: []string{"parent", "other"},
+			accounts: []string{gcParent, gcOther},
 			expected: false,
 		},
 		{
 			name:     "exact match is not a parent",
-			account:  "parent",
-			accounts: []string{"parent"},
+			account:  gcParent,
+			accounts: []string{gcParent},
 			expected: false,
 		},
 	}
@@ -899,10 +899,10 @@ func TestPolicyGroup_Read(t *testing.T) {
 		req := &pulumirpc.ReadRequest{
 			Id:  testPolicyGroupID,
 			Urn: testPolicyGroupURN,
-			Properties: newPolicyGroupInput().withEntityType("accounts").
+			Properties: newPolicyGroupInput().withEntityType(gcAccounts).
 				withAccounts(parentAccount, childAccount).
 				buildStruct(t),
-			Inputs: newPolicyGroupInput().withEntityType("accounts").withAccounts(parentAccount).buildStruct(t),
+			Inputs: newPolicyGroupInput().withEntityType(gcAccounts).withAccounts(parentAccount).buildStruct(t),
 		}
 
 		resp, err := provider.Read(req)
@@ -914,15 +914,15 @@ func TestPolicyGroup_Read(t *testing.T) {
 		for k, v := range resp.Properties.GetFields() {
 			propsMap[resource.PropertyKey(k)] = resource.NewPropertyValue(v.AsInterface())
 		}
-		assert.Len(t, propsMap["accounts"].ArrayValue(), 2, "Properties should have both parent and child accounts")
+		assert.Len(t, propsMap[gcAccounts].ArrayValue(), 2, "Properties should have both parent and child accounts")
 
 		// Inputs should preserve original user input (just the parent)
 		inputsMap := resource.PropertyMap{}
 		for k, v := range resp.Inputs.GetFields() {
 			inputsMap[resource.PropertyKey(k)] = resource.NewPropertyValue(v.AsInterface())
 		}
-		assert.Len(t, inputsMap["accounts"].ArrayValue(), 1, "Inputs should preserve original user input")
-		assert.Equal(t, parentAccount, inputsMap["accounts"].ArrayValue()[0].StringValue())
+		assert.Len(t, inputsMap[gcAccounts].ArrayValue(), 1, "Inputs should preserve original user input")
+		assert.Equal(t, parentAccount, inputsMap[gcAccounts].ArrayValue()[0].StringValue())
 	})
 
 	t.Run("updates inputs when API state has changed externally", func(t *testing.T) {
@@ -939,10 +939,10 @@ func TestPolicyGroup_Read(t *testing.T) {
 		req := &pulumirpc.ReadRequest{
 			Id:  testPolicyGroupID,
 			Urn: testPolicyGroupURN,
-			Properties: newPolicyGroupInput().withEntityType("accounts").
+			Properties: newPolicyGroupInput().withEntityType(gcAccounts).
 				withAccounts(accountA, accountB).
 				buildStruct(t),
-			Inputs: newPolicyGroupInput().withEntityType("accounts").
+			Inputs: newPolicyGroupInput().withEntityType(gcAccounts).
 				withAccounts(accountA, accountB).
 				buildStruct(t),
 		}
@@ -956,7 +956,7 @@ func TestPolicyGroup_Read(t *testing.T) {
 		for k, v := range resp.Inputs.GetFields() {
 			inputsMap[resource.PropertyKey(k)] = resource.NewPropertyValue(v.AsInterface())
 		}
-		assert.Len(t, inputsMap["accounts"].ArrayValue(), 3, "Inputs should be updated to match new API state")
+		assert.Len(t, inputsMap[gcAccounts].ArrayValue(), 3, "Inputs should be updated to match new API state")
 	})
 
 	t.Run("handles read with no previous state or inputs", func(t *testing.T) {
@@ -985,13 +985,13 @@ func TestPolicyGroup_Read(t *testing.T) {
 		for k, v := range resp.Properties.GetFields() {
 			propsMap[resource.PropertyKey(k)] = resource.NewPropertyValue(v.AsInterface())
 		}
-		assert.Len(t, propsMap["accounts"].ArrayValue(), 1)
+		assert.Len(t, propsMap[gcAccounts].ArrayValue(), 1)
 
 		inputsMap := resource.PropertyMap{}
 		for k, v := range resp.Inputs.GetFields() {
 			inputsMap[resource.PropertyKey(k)] = resource.NewPropertyValue(v.AsInterface())
 		}
-		assert.Len(t, inputsMap["accounts"].ArrayValue(), 1)
+		assert.Len(t, inputsMap[gcAccounts].ArrayValue(), 1)
 	})
 
 	t.Run("returns empty response when policy group not found", func(t *testing.T) {
@@ -1020,7 +1020,7 @@ func TestPolicyGroup_Read(t *testing.T) {
 func TestParsePreviousAccounts(t *testing.T) {
 	t.Run("parses both properties and inputs", func(t *testing.T) {
 		props := resource.PropertyMap{
-			"accounts": resource.NewArrayProperty([]resource.PropertyValue{
+			gcAccounts: resource.NewArrayProperty([]resource.PropertyValue{
 				resource.NewStringProperty("state-account-1"),
 				resource.NewStringProperty("state-account-2"),
 			}),
@@ -1029,7 +1029,7 @@ func TestParsePreviousAccounts(t *testing.T) {
 		require.NoError(t, err)
 
 		inputs := resource.PropertyMap{
-			"accounts": resource.NewArrayProperty([]resource.PropertyValue{
+			gcAccounts: resource.NewArrayProperty([]resource.PropertyValue{
 				resource.NewStringProperty("input-account-1"),
 			}),
 		}
@@ -1044,7 +1044,7 @@ func TestParsePreviousAccounts(t *testing.T) {
 
 	t.Run("handles nil properties", func(t *testing.T) {
 		inputs := resource.PropertyMap{
-			"accounts": resource.NewArrayProperty([]resource.PropertyValue{
+			gcAccounts: resource.NewArrayProperty([]resource.PropertyValue{
 				resource.NewStringProperty("input-account"),
 			}),
 		}
@@ -1059,7 +1059,7 @@ func TestParsePreviousAccounts(t *testing.T) {
 
 	t.Run("handles nil inputs", func(t *testing.T) {
 		props := resource.PropertyMap{
-			"accounts": resource.NewArrayProperty([]resource.PropertyValue{
+			gcAccounts: resource.NewArrayProperty([]resource.PropertyValue{
 				resource.NewStringProperty("state-account"),
 			}),
 		}
@@ -1082,9 +1082,9 @@ func TestParsePreviousAccounts(t *testing.T) {
 
 // TestPolicyGroup_Create tests the Create function
 func TestPolicyGroup_Create(t *testing.T) {
-	stack1 := stackRef{name: "stack-1", project: "project-1"}
+	stack1 := stackRef{name: gcStack1, project: gcProject1}
 	stack2 := stackRef{name: "stack-2", project: "project-2"}
-	pp1 := policyPackRef{name: "policy-pack-1", version: 1, versionTag: "1.0.0"}
+	pp1 := policyPackRef{name: gcPolicyPack1, version: 1, versionTag: gcVersion100}
 	account1 := "account-1"
 	account2 := "account-2"
 
@@ -1095,10 +1095,10 @@ func TestPolicyGroup_Create(t *testing.T) {
 			Client: &PolicyGroupClientMock{
 				createPolicyGroupFunc: func(_ context.Context, orgName, policyGroupName, entityType, mode string) error {
 					createCalled = true
-					assert.Equal(t, "test-org", orgName)
-					assert.Equal(t, "test-policy-group", policyGroupName)
-					assert.Equal(t, "stacks", entityType)
-					assert.Equal(t, "audit", mode)
+					assert.Equal(t, gcTestOrg, orgName)
+					assert.Equal(t, gcTestPolicyGroup, policyGroupName)
+					assert.Equal(t, gcStacks, entityType)
+					assert.Equal(t, gcAudit, mode)
 					return nil
 				},
 				batchUpdatePolicyGroupFunc: func(_ context.Context, _, _ string, _ []pulumiapi.UpdatePolicyGroupRequest) error {
@@ -1208,7 +1208,7 @@ func TestPolicyGroup_Create(t *testing.T) {
 
 		req := &pulumirpc.CreateRequest{
 			Urn: testPolicyGroupURN,
-			Properties: newPolicyGroupInput().withEntityType("accounts").
+			Properties: newPolicyGroupInput().withEntityType(gcAccounts).
 				withAccounts(account1, account2).
 				buildStruct(t),
 		}
@@ -1307,7 +1307,7 @@ func TestPolicyGroup_Create(t *testing.T) {
 
 		req := &pulumirpc.CreateRequest{
 			Urn:        testPolicyGroupURN,
-			Properties: newPolicyGroupInput().withEntityType("accounts").withAccounts(account1).buildStruct(t),
+			Properties: newPolicyGroupInput().withEntityType(gcAccounts).withAccounts(account1).buildStruct(t),
 		}
 
 		resp, err := provider.Create(req)
@@ -1320,17 +1320,17 @@ func TestPolicyGroup_Create(t *testing.T) {
 			propsMap[resource.PropertyKey(k)] = resource.NewPropertyValue(v.AsInterface())
 		}
 
-		accounts := propsMap["accounts"].ArrayValue()
+		accounts := propsMap[gcAccounts].ArrayValue()
 		require.Len(t, accounts, 2, "Should return full state from API including auto-added accounts")
 	})
 }
 
 // TestPolicyGroup_Update tests the Update function
 func TestPolicyGroup_Update(t *testing.T) {
-	stack1 := stackRef{name: "stack-1", project: "project-1"}
+	stack1 := stackRef{name: gcStack1, project: gcProject1}
 	stack2 := stackRef{name: "stack-2", project: "project-2"}
-	pp1 := policyPackRef{name: "policy-pack-1", version: 1, versionTag: "1.0.0"}
-	pp2 := policyPackRef{name: "policy-pack-2", version: 1, versionTag: "1.0.0"}
+	pp1 := policyPackRef{name: gcPolicyPack1, version: 1, versionTag: gcVersion100}
+	pp2 := policyPackRef{name: "policy-pack-2", version: 1, versionTag: gcVersion100}
 	account1 := "account-1"
 	account2 := "account-2"
 	parentAccount := "parent-account"
@@ -1458,8 +1458,8 @@ func TestPolicyGroup_Update(t *testing.T) {
 		req := &pulumirpc.UpdateRequest{
 			Id:   testPolicyGroupID,
 			Urn:  testPolicyGroupURN,
-			Olds: newPolicyGroupInput().withEntityType("accounts").withAccounts(account1).buildStruct(t),
-			News: newPolicyGroupInput().withEntityType("accounts").withAccounts(account1, account2).buildStruct(t),
+			Olds: newPolicyGroupInput().withEntityType(gcAccounts).withAccounts(account1).buildStruct(t),
+			News: newPolicyGroupInput().withEntityType(gcAccounts).withAccounts(account1, account2).buildStruct(t),
 		}
 
 		resp, err := provider.Update(req)
@@ -1488,10 +1488,10 @@ func TestPolicyGroup_Update(t *testing.T) {
 		req := &pulumirpc.UpdateRequest{
 			Id:  testPolicyGroupID,
 			Urn: testPolicyGroupURN,
-			Olds: newPolicyGroupInput().withEntityType("accounts").
+			Olds: newPolicyGroupInput().withEntityType(gcAccounts).
 				withAccounts(parentAccount, childAccount).
 				buildStruct(t),
-			News: newPolicyGroupInput().withEntityType("accounts").withAccounts(parentAccount).buildStruct(t),
+			News: newPolicyGroupInput().withEntityType(gcAccounts).withAccounts(parentAccount).buildStruct(t),
 		}
 
 		resp, err := provider.Update(req)
@@ -1519,10 +1519,10 @@ func TestPolicyGroup_Update(t *testing.T) {
 		req := &pulumirpc.UpdateRequest{
 			Id:  testPolicyGroupID,
 			Urn: testPolicyGroupURN,
-			Olds: newPolicyGroupInput().withEntityType("accounts").
+			Olds: newPolicyGroupInput().withEntityType(gcAccounts).
 				withAccounts(parentAccount, childAccount).
 				buildStruct(t),
-			News: newPolicyGroupInput().withEntityType("accounts").buildStruct(t),
+			News: newPolicyGroupInput().withEntityType(gcAccounts).buildStruct(t),
 		}
 
 		resp, err := provider.Update(req)
@@ -1628,8 +1628,8 @@ func TestPolicyGroup_Update(t *testing.T) {
 		req := &pulumirpc.UpdateRequest{
 			Id:   testPolicyGroupID,
 			Urn:  testPolicyGroupURN,
-			Olds: newPolicyGroupInput().withEntityType("accounts").buildStruct(t),
-			News: newPolicyGroupInput().withEntityType("accounts").withAccounts(parentAccount).buildStruct(t),
+			Olds: newPolicyGroupInput().withEntityType(gcAccounts).buildStruct(t),
+			News: newPolicyGroupInput().withEntityType(gcAccounts).withAccounts(parentAccount).buildStruct(t),
 		}
 
 		resp, err := provider.Update(req)
@@ -1642,7 +1642,7 @@ func TestPolicyGroup_Update(t *testing.T) {
 			propsMap[resource.PropertyKey(k)] = resource.NewPropertyValue(v.AsInterface())
 		}
 
-		accounts := propsMap["accounts"].ArrayValue()
+		accounts := propsMap[gcAccounts].ArrayValue()
 		require.Len(t, accounts, 2)
 
 		accountNames := make([]string, len(accounts))
@@ -1655,9 +1655,9 @@ func TestPolicyGroup_Update(t *testing.T) {
 }
 
 func TestPolicyGroup_Update_PartialFailureSurfacesActualState(t *testing.T) {
-	pp1 := policyPackRef{name: "policy-pack-1", version: 1, versionTag: "1.0.0"}
-	pp2 := policyPackRef{name: "policy-pack-2", version: 1, versionTag: "1.0.0"}
-	stack1 := stackRef{name: "stack-1", project: "project-1"}
+	pp1 := policyPackRef{name: gcPolicyPack1, version: 1, versionTag: gcVersion100}
+	pp2 := policyPackRef{name: "policy-pack-2", version: 1, versionTag: gcVersion100}
+	stack1 := stackRef{name: gcStack1, project: gcProject1}
 
 	// First batched single-op call (remove pp1) succeeds; second (add pp2) fails.
 	// The handler should hit GetPolicyGroup to report the post-failure state.
@@ -1698,9 +1698,9 @@ func TestPolicyGroupSerializationConsistency(t *testing.T) {
 	// Create a policy group input with complex config
 	input := PulumiServicePolicyGroupInput{
 		Name:             "test-group",
-		OrganizationName: "test-org",
-		EntityType:       "stacks",
-		Mode:             "audit",
+		OrganizationName: gcTestOrg,
+		EntityType:       gcStacks,
+		Mode:             gcAudit,
 		Stacks: []pulumiapi.StackReference{
 			{Name: "stack1", RoutingProject: "project1"},
 			{Name: "stack2", RoutingProject: "project2"},
@@ -1715,7 +1715,7 @@ func TestPolicyGroupSerializationConsistency(t *testing.T) {
 					"approvedAmiIds": []interface{}{"ami-123", "ami-456"},
 					"maxInstances":   float64(10),
 					"nestedConfig": map[string]interface{}{
-						"regions": []interface{}{"us-east-1", "us-west-2"},
+						gcRegions: []interface{}{"us-east-1", gcUSWest2},
 						"enabled": true,
 					},
 				},

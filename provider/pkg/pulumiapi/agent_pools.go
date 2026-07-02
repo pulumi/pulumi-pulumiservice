@@ -120,7 +120,7 @@ func (c *Client) DeleteAgentPool(ctx context.Context, agentPoolID, orgName strin
 
 	var err error
 	if forceDestroy {
-		_, err = c.doWithQuery(ctx, http.MethodDelete, apiPath, url.Values{"force": []string{"true"}}, nil, nil)
+		_, err = c.doWithQuery(ctx, http.MethodDelete, apiPath, url.Values{"force": []string{trueValue}}, nil, nil)
 	} else {
 		_, err = c.do(ctx, http.MethodDelete, apiPath, nil, nil)
 	}

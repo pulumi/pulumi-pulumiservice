@@ -69,7 +69,7 @@ type updateMemberRoleReq struct {
 
 func validBuiltinOrgRole(role string) bool {
 	switch role {
-	case "admin", "member", "billing-manager":
+	case adminRole, memberRole, "billing-manager":
 		return true
 	}
 	return false

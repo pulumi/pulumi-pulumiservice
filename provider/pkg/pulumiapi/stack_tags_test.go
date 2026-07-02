@@ -16,9 +16,9 @@ func TestCreateStackTags(t *testing.T) {
 		Value: tagValue,
 	}
 	stackName := StackIdentifier{
-		OrgName:     "organization",
-		ProjectName: "project",
-		StackName:   "stack",
+		OrgName:     organizationKey,
+		ProjectName: projectKey,
+		StackName:   stackKey,
 	}
 	t.Run("Happy Path", func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{
@@ -46,7 +46,7 @@ func TestCreateStackTags(t *testing.T) {
 			),
 			ResponseCode: 401,
 			ResponseBody: ErrorResponse{
-				Message: "unauthorized",
+				Message: unauthorizedError,
 			},
 		})
 		err := c.CreateStackTag(ctx, stackName, tag)
@@ -56,9 +56,9 @@ func TestCreateStackTags(t *testing.T) {
 
 func TestDeleteStackTags(t *testing.T) {
 	stackName := StackIdentifier{
-		OrgName:     "organization",
-		ProjectName: "project",
-		StackName:   "stack",
+		OrgName:     organizationKey,
+		ProjectName: projectKey,
+		StackName:   stackKey,
 	}
 	tagName := "tagName"
 	t.Run("Happy Path", func(t *testing.T) {
@@ -76,7 +76,7 @@ func TestDeleteStackTags(t *testing.T) {
 			ExpectedReqPath:   "/api/stacks/organization/project/stack/tags/tagName",
 			ResponseCode:      401,
 			ResponseBody: ErrorResponse{
-				Message: "unauthorized",
+				Message: unauthorizedError,
 			},
 		})
 		assert.EqualError(

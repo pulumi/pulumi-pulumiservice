@@ -57,18 +57,18 @@ func TestStackTag(t *testing.T) {
 		req := infer.ReadRequest[StackTagInput, StackTagState]{
 			ID: "org/project/stack/tag",
 			Inputs: StackTagInput{
-				Organization: "org",
-				Project:      "project",
-				Stack:        "stack",
+				Organization: gcOrg,
+				Project:      gcProject,
+				Stack:        gcStack,
 				Name:         "tag",
-				Value:        "value",
+				Value:        gcValue,
 			},
 			State: StackTagState{
-				Organization: "org",
-				Project:      "project",
-				Stack:        "stack",
+				Organization: gcOrg,
+				Project:      gcProject,
+				Stack:        gcStack,
 				Name:         "tag",
-				Value:        "value",
+				Value:        gcValue,
 			},
 		}
 
@@ -82,8 +82,8 @@ func TestStackTag(t *testing.T) {
 		mockedClient := &StackTagClientMock{
 			getStackTagFunc: func(_ context.Context, _ pulumiapi.StackIdentifier, _ string) (*pulumiapi.StackTag, error) {
 				return &pulumiapi.StackTag{
-					Name:  "myTag",
-					Value: "myValue",
+					Name:  gcMyTag,
+					Value: gcMyValue,
 				}, nil
 			},
 		}
@@ -94,17 +94,17 @@ func TestStackTag(t *testing.T) {
 		req := infer.ReadRequest[StackTagInput, StackTagState]{
 			ID: "org/project/stack/myTag",
 			Inputs: StackTagInput{
-				Organization: "org",
-				Project:      "project",
-				Stack:        "stack",
-				Name:         "myTag",
+				Organization: gcOrg,
+				Project:      gcProject,
+				Stack:        gcStack,
+				Name:         gcMyTag,
 				Value:        "oldValue",
 			},
 			State: StackTagState{
-				Organization: "org",
-				Project:      "project",
-				Stack:        "stack",
-				Name:         "myTag",
+				Organization: gcOrg,
+				Project:      gcProject,
+				Stack:        gcStack,
+				Name:         gcMyTag,
 				Value:        "oldValue",
 			},
 		}
@@ -114,18 +114,18 @@ func TestStackTag(t *testing.T) {
 		assert.Equal(t, infer.ReadResponse[StackTagInput, StackTagState]{
 			ID: "org/project/stack/myTag",
 			Inputs: StackTagInput{
-				Organization: "org",
-				Project:      "project",
-				Stack:        "stack",
-				Name:         "myTag",
-				Value:        "myValue",
+				Organization: gcOrg,
+				Project:      gcProject,
+				Stack:        gcStack,
+				Name:         gcMyTag,
+				Value:        gcMyValue,
 			},
 			State: StackTagState{
-				Organization: "org",
-				Project:      "project",
-				Stack:        "stack",
-				Name:         "myTag",
-				Value:        "myValue",
+				Organization: gcOrg,
+				Project:      gcProject,
+				Stack:        gcStack,
+				Name:         gcMyTag,
+				Value:        gcMyValue,
 			},
 		}, resp)
 	})

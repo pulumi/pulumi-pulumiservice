@@ -17,18 +17,18 @@ import (
 func TestOrgAccessTokenLegacyInputsMigration(t *testing.T) {
 	t.Run("migrates legacy state", func(t *testing.T) {
 		legacyInputs := property.NewMap(map[string]property.Value{
-			"name":             property.New("admin-token"),
-			"organizationName": property.New("my-org"),
-			"description":      property.New("example org token"),
-			"admin":            property.New(true),
+			gcName:             property.New("admin-token"),
+			gcOrganizationName: property.New(gcMyOrg),
+			gcDescription:      property.New("example org token"),
+			gcAdmin:            property.New(true),
 		})
 		legacy := property.NewMap(map[string]property.Value{
-			"__inputs":         property.New(legacyInputs),
-			"name":             property.New("admin-token"),
-			"organizationName": property.New("my-org"),
-			"description":      property.New("example org token"),
-			"admin":            property.New(true),
-			"value":            property.New("tok-secret-value"),
+			gcInputs:           property.New(legacyInputs),
+			gcName:             property.New("admin-token"),
+			gcOrganizationName: property.New(gcMyOrg),
+			gcDescription:      property.New("example org token"),
+			gcAdmin:            property.New(true),
+			gcValue:            property.New(gcTokSecretValue),
 		})
 
 		got, err := migrateOrgAccessTokenLegacyInputs(t.Context(), legacy)
@@ -38,20 +38,20 @@ func TestOrgAccessTokenLegacyInputsMigration(t *testing.T) {
 		assert.Equal(t, &OrgAccessTokenState{
 			OrgAccessTokenInput: OrgAccessTokenInput{
 				Name:             "admin-token",
-				OrganizationName: "my-org",
+				OrganizationName: gcMyOrg,
 				Description:      &desc,
 				Admin:            &admin,
 			},
-			Value: "tok-secret-value",
+			Value: gcTokSecretValue,
 		}, got.Result)
 	})
 
 	t.Run("migrates legacy state with optional fields omitted", func(t *testing.T) {
 		legacy := property.NewMap(map[string]property.Value{
-			"__inputs":         property.New(property.NewMap(nil)),
-			"name":             property.New("plain-token"),
-			"organizationName": property.New("my-org"),
-			"value":            property.New("tok-secret-value"),
+			gcInputs:           property.New(property.NewMap(nil)),
+			gcName:             property.New("plain-token"),
+			gcOrganizationName: property.New(gcMyOrg),
+			gcValue:            property.New(gcTokSecretValue),
 		})
 
 		got, err := migrateOrgAccessTokenLegacyInputs(t.Context(), legacy)
@@ -59,17 +59,17 @@ func TestOrgAccessTokenLegacyInputsMigration(t *testing.T) {
 		assert.Equal(t, &OrgAccessTokenState{
 			OrgAccessTokenInput: OrgAccessTokenInput{
 				Name:             "plain-token",
-				OrganizationName: "my-org",
+				OrganizationName: gcMyOrg,
 			},
-			Value: "tok-secret-value",
+			Value: gcTokSecretValue,
 		}, got.Result)
 	})
 
 	t.Run("no-op for already-migrated state", func(t *testing.T) {
 		current := property.NewMap(map[string]property.Value{
-			"name":             property.New("admin-token"),
-			"organizationName": property.New("my-org"),
-			"value":            property.New("tok-secret-value"),
+			gcName:             property.New("admin-token"),
+			gcOrganizationName: property.New(gcMyOrg),
+			gcValue:            property.New(gcTokSecretValue),
 		})
 
 		got, err := migrateOrgAccessTokenLegacyInputs(t.Context(), current)
@@ -90,8 +90,8 @@ func TestSplitOrgAccessTokenId(t *testing.T) {
 		org, name, id, err := splitOrgAccessTokenID(tokenID)
 		assert.NoError(t, err)
 
-		assert.Equal(t, "org", org)
-		assert.Equal(t, "name", name)
+		assert.Equal(t, gcOrg, org)
+		assert.Equal(t, gcName, name)
 		assert.Equal(t, "id", id)
 	})
 
@@ -101,7 +101,7 @@ func TestSplitOrgAccessTokenId(t *testing.T) {
 		org, name, id, err := splitOrgAccessTokenID(tokenID)
 		assert.NoError(t, err)
 
-		assert.Equal(t, "org", org)
+		assert.Equal(t, gcOrg, org)
 		assert.Equal(t, "name/with/slashes", name)
 		assert.Equal(t, "id", id)
 	})

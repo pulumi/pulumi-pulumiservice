@@ -61,8 +61,8 @@ func mustParseDescriptor(t *testing.T, wireJSON string) apitype.PermissionDescri
 }
 
 var testPermissions = map[string]interface{}{
-	"__type":      "PermissionDescriptorAllow",
-	"permissions": []interface{}{"stack:read"},
+	gcTypeMeta:    "PermissionDescriptorAllow",
+	gcPermissions: []interface{}{"stack:read"},
 }
 
 func TestOrganizationRoleCreate(t *testing.T) {
@@ -70,11 +70,11 @@ func TestOrganizationRoleCreate(t *testing.T) {
 		create: func(
 			_ context.Context, org string, req apitype.PermissionDescriptorBase,
 		) (*apitype.PermissionDescriptorRecord, error) {
-			assert.Equal(t, "acme", org)
-			assert.Equal(t, "read-only", req.Name)
+			assert.Equal(t, gcAcme, org)
+			assert.Equal(t, gcReadOnly, req.Name)
 			// Defaulting moved into the resource layer: empty user input
 			// becomes "global" before reaching the API.
-			assert.Equal(t, "global", req.ResourceType)
+			assert.Equal(t, gcGlobal, req.ResourceType)
 			assert.Equal(t, apitype.PermissionDescriptorUXPurposeRole, req.UxPurpose)
 			require.NotNil(t, req.Details, "Details must be a typed descriptor")
 			// Round-trip the typed descriptor back through JSON to assert
@@ -84,13 +84,13 @@ func TestOrganizationRoleCreate(t *testing.T) {
 			require.NoError(t, err)
 			var parsed map[string]interface{}
 			require.NoError(t, json.Unmarshal(raw, &parsed))
-			assert.Equal(t, "PermissionDescriptorAllow", parsed["__type"])
+			assert.Equal(t, "PermissionDescriptorAllow", parsed[gcTypeMeta])
 			return &apitype.PermissionDescriptorRecord{
 				PermissionDescriptorBase: apitype.PermissionDescriptorBase{
 					Name:    req.Name,
 					Details: req.Details,
 				},
-				ID:      "role-123",
+				ID:      gcRoleID,
 				Version: 1,
 			}, nil
 		},
@@ -101,15 +101,15 @@ func TestOrganizationRoleCreate(t *testing.T) {
 	resp, err := r.Create(ctx, infer.CreateRequest[OrganizationRoleInput]{
 		Inputs: OrganizationRoleInput{
 			OrganizationRoleCore: OrganizationRoleCore{
-				OrganizationName: "acme",
-				Name:             "read-only",
+				OrganizationName: gcAcme,
+				Name:             gcReadOnly,
 				Permissions:      testPermissions,
 			},
 		},
 	})
 	assert.NoError(t, err)
 	assert.Equal(t, "acme/role-123", resp.ID)
-	assert.Equal(t, "role-123", resp.Output.RoleId)
+	assert.Equal(t, gcRoleID, resp.Output.RoleId)
 }
 
 func TestOrganizationRoleRead(t *testing.T) {
@@ -135,13 +135,13 @@ func TestOrganizationRoleRead(t *testing.T) {
 			get: func(_ context.Context, _, _ string) (*apitype.PermissionDescriptorRecord, error) {
 				return &apitype.PermissionDescriptorRecord{
 					PermissionDescriptorBase: apitype.PermissionDescriptorBase{
-						Name:         "read-only",
+						Name:         gcReadOnly,
 						Description:  "ro",
-						ResourceType: "global",
+						ResourceType: gcGlobal,
 						UxPurpose:    apitype.PermissionDescriptorUXPurposeRole,
 						Details:      details,
 					},
-					ID:      "role-123",
+					ID:      gcRoleID,
 					Version: 2,
 				}, nil
 			},
@@ -153,7 +153,7 @@ func TestOrganizationRoleRead(t *testing.T) {
 		})
 		assert.NoError(t, err)
 		assert.Equal(t, "acme/role-123", resp.ID)
-		assert.Equal(t, "PermissionDescriptorAllow", resp.State.Permissions["__type"])
+		assert.Equal(t, "PermissionDescriptorAllow", resp.State.Permissions[gcTypeMeta])
 	})
 
 	// Pulumi Cloud's permission-descriptor table holds entries for both
@@ -210,8 +210,8 @@ func TestOrganizationRoleDelete_InUseConflict(t *testing.T) {
 	r := &OrganizationRole{}
 	_, err := r.Delete(ctx, infer.DeleteRequest[OrganizationRoleState]{
 		State: OrganizationRoleState{
-			OrganizationRoleCore: OrganizationRoleCore{OrganizationName: "acme"},
-			RoleId:               "role-123",
+			OrganizationRoleCore: OrganizationRoleCore{OrganizationName: gcAcme},
+			RoleId:               gcRoleID,
 		},
 	})
 	// Both attempts (non-force then force) must have been tried before
@@ -223,7 +223,7 @@ func TestOrganizationRoleDelete_InUseConflict(t *testing.T) {
 	assert.Error(t, err)
 	// Message must name the role, point at PermissionDescriptorCompose
 	// (the typical cause), and tell the user how to recover.
-	assert.Contains(t, err.Error(), "role-123")
+	assert.Contains(t, err.Error(), gcRoleID)
 	assert.Contains(t, err.Error(), "PermissionDescriptorCompose")
 	assert.Contains(t, err.Error(), "destroy",
 		"error should tell the user to destroy the composing role(s) first")
@@ -258,8 +258,8 @@ func TestOrganizationRoleDelete_EscalatesForceOnConflict(t *testing.T) {
 	r := &OrganizationRole{}
 	_, err := r.Delete(ctx, infer.DeleteRequest[OrganizationRoleState]{
 		State: OrganizationRoleState{
-			OrganizationRoleCore: OrganizationRoleCore{OrganizationName: "acme"},
-			RoleId:               "role-123",
+			OrganizationRoleCore: OrganizationRoleCore{OrganizationName: gcAcme},
+			RoleId:               gcRoleID,
 		},
 	})
 	assert.NoError(t, err, "force-true retry must succeed when assignments are the only blocker")
@@ -272,8 +272,8 @@ func TestOrganizationRoleDelete(t *testing.T) {
 	mock := &orgRoleClientMock{
 		del: func(_ context.Context, org, id string, force bool) error {
 			calls = append(calls, force)
-			assert.Equal(t, "acme", org)
-			assert.Equal(t, "role-123", id)
+			assert.Equal(t, gcAcme, org)
+			assert.Equal(t, gcRoleID, id)
 			return nil
 		},
 	}
@@ -281,8 +281,8 @@ func TestOrganizationRoleDelete(t *testing.T) {
 	r := &OrganizationRole{}
 	_, err := r.Delete(ctx, infer.DeleteRequest[OrganizationRoleState]{
 		State: OrganizationRoleState{
-			OrganizationRoleCore: OrganizationRoleCore{OrganizationName: "acme"},
-			RoleId:               "role-123",
+			OrganizationRoleCore: OrganizationRoleCore{OrganizationName: gcAcme},
+			RoleId:               gcRoleID,
 		},
 	})
 	assert.NoError(t, err)
@@ -307,10 +307,10 @@ func TestOrganizationRoleUpdateOmitsDescriptionWhenUnset(t *testing.T) {
 			gotDesc = req.Description
 			return &apitype.PermissionDescriptorRecord{
 				PermissionDescriptorBase: apitype.PermissionDescriptorBase{
-					Name:    "read-only",
+					Name:    gcReadOnly,
 					Details: details,
 				},
-				ID:      "role-123",
+				ID:      gcRoleID,
 				Version: 3,
 			}, nil
 		},
@@ -320,15 +320,15 @@ func TestOrganizationRoleUpdateOmitsDescriptionWhenUnset(t *testing.T) {
 	_, err := r.Update(ctx, infer.UpdateRequest[OrganizationRoleInput, OrganizationRoleState]{
 		Inputs: OrganizationRoleInput{
 			OrganizationRoleCore: OrganizationRoleCore{
-				OrganizationName: "acme",
-				Name:             "read-only",
+				OrganizationName: gcAcme,
+				Name:             gcReadOnly,
 				// Description intentionally unset.
 				Permissions: testPermissions,
 			},
 		},
 		State: OrganizationRoleState{
-			OrganizationRoleCore: OrganizationRoleCore{OrganizationName: "acme"},
-			RoleId:               "role-123",
+			OrganizationRoleCore: OrganizationRoleCore{OrganizationName: gcAcme},
+			RoleId:               gcRoleID,
 		},
 	})
 	assert.NoError(t, err)
@@ -341,8 +341,8 @@ func TestOrganizationRoleCheck(t *testing.T) {
 	t.Run("rejects empty permissions", func(t *testing.T) {
 		resp, err := r.Check(context.Background(), infer.CheckRequest{
 			NewInputs: property.NewMap(map[string]property.Value{
-				"organizationName": property.New("acme"),
-				"name":             property.New("r"),
+				gcOrganizationName: property.New(gcAcme),
+				gcName:             property.New("r"),
 			}),
 		})
 		assert.NoError(t, err)
@@ -350,7 +350,7 @@ func TestOrganizationRoleCheck(t *testing.T) {
 		for _, f := range resp.Failures {
 			props[f.Property] = true
 		}
-		assert.True(t, props["permissions"])
+		assert.True(t, props[gcPermissions])
 	})
 
 	// At preview, `permissions` (or `name`) may arrive as Computed when wired
@@ -362,14 +362,14 @@ func TestOrganizationRoleCheck(t *testing.T) {
 	t.Run("tolerates computed permissions at preview", func(t *testing.T) {
 		resp, err := r.Check(context.Background(), infer.CheckRequest{
 			NewInputs: property.NewMap(map[string]property.Value{
-				"organizationName": property.New("acme"),
-				"name":             property.New("r"),
-				"permissions":      property.New(property.Computed),
+				gcOrganizationName: property.New(gcAcme),
+				gcName:             property.New("r"),
+				gcPermissions:      property.New(property.Computed),
 			}),
 		})
 		assert.NoError(t, err)
 		for _, f := range resp.Failures {
-			assert.NotEqual(t, "permissions", f.Property,
+			assert.NotEqual(t, gcPermissions, f.Property,
 				"Check must not reject a computed permissions input: %s", f.Reason)
 		}
 	})
@@ -377,16 +377,16 @@ func TestOrganizationRoleCheck(t *testing.T) {
 	t.Run("tolerates computed name at preview", func(t *testing.T) {
 		resp, err := r.Check(context.Background(), infer.CheckRequest{
 			NewInputs: property.NewMap(map[string]property.Value{
-				"organizationName": property.New("acme"),
-				"name":             property.New(property.Computed),
-				"permissions": property.New(property.NewMap(map[string]property.Value{
-					"__type": property.New("allow"),
+				gcOrganizationName: property.New(gcAcme),
+				gcName:             property.New(property.Computed),
+				gcPermissions: property.New(property.NewMap(map[string]property.Value{
+					gcTypeMeta: property.New("allow"),
 				})),
 			}),
 		})
 		assert.NoError(t, err)
 		for _, f := range resp.Failures {
-			assert.NotEqual(t, "name", f.Property,
+			assert.NotEqual(t, gcName, f.Property,
 				"Check must not reject a computed name input: %s", f.Reason)
 		}
 	})
@@ -400,10 +400,10 @@ func TestOrganizationRoleCheck(t *testing.T) {
 	t.Run("rejects unknown __type values", func(t *testing.T) {
 		resp, err := r.Check(context.Background(), infer.CheckRequest{
 			NewInputs: property.NewMap(map[string]property.Value{
-				"organizationName": property.New("acme"),
-				"name":             property.New("r"),
-				"permissions": property.New(property.NewMap(map[string]property.Value{
-					"__type": property.New("PermissionDescriptorWhateverFutureCloudVariant"),
+				gcOrganizationName: property.New(gcAcme),
+				gcName:             property.New("r"),
+				gcPermissions: property.New(property.NewMap(map[string]property.Value{
+					gcTypeMeta: property.New("PermissionDescriptorWhateverFutureCloudVariant"),
 				})),
 			}),
 		})
@@ -412,9 +412,9 @@ func TestOrganizationRoleCheck(t *testing.T) {
 		for _, f := range resp.Failures {
 			props[f.Property] = f.Reason
 		}
-		assert.Contains(t, props["permissions"], "PermissionDescriptorWhateverFutureCloudVariant",
+		assert.Contains(t, props[gcPermissions], "PermissionDescriptorWhateverFutureCloudVariant",
 			"Check must name the unrecognized variant so the user knows what to fix")
-		assert.Contains(t, props["permissions"], "not recognized",
+		assert.Contains(t, props[gcPermissions], "not recognized",
 			"Check must surface the typed unmarshaller's diagnostic")
 	})
 
@@ -424,10 +424,10 @@ func TestOrganizationRoleCheck(t *testing.T) {
 	t.Run("rejects descriptor missing __type", func(t *testing.T) {
 		resp, err := r.Check(context.Background(), infer.CheckRequest{
 			NewInputs: property.NewMap(map[string]property.Value{
-				"organizationName": property.New("acme"),
-				"name":             property.New("r"),
-				"permissions": property.New(property.NewMap(map[string]property.Value{
-					"permissions": property.New(property.NewArray([]property.Value{
+				gcOrganizationName: property.New(gcAcme),
+				gcName:             property.New("r"),
+				gcPermissions: property.New(property.NewMap(map[string]property.Value{
+					gcPermissions: property.New(property.NewArray([]property.Value{
 						property.New("stack:read"),
 					})),
 				})),
@@ -438,7 +438,7 @@ func TestOrganizationRoleCheck(t *testing.T) {
 		for _, f := range resp.Failures {
 			props[f.Property] = f.Reason
 		}
-		assert.Contains(t, props["permissions"], "not recognized",
+		assert.Contains(t, props[gcPermissions], "not recognized",
 			"Check must reject a descriptor with no `__type` discriminator")
 	})
 }

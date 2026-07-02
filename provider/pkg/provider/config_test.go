@@ -32,7 +32,7 @@ func TestGetPulumiAccessToken(t *testing.T) {
 		defer setEnv(EnvVarPulumiAccessToken, "")()
 		c := PulumiServiceConfig{
 			Config: map[string]string{
-				"accessToken": wantToken,
+				accessTokenKey: wantToken,
 			},
 		}
 		gotToken, err := c.getPulumiAccessToken()

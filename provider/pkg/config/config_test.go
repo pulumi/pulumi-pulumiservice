@@ -46,7 +46,7 @@ func TestConfigure_ExplicitConfigBeatsEnvVar(t *testing.T) {
 	t.Setenv(EnvVarPulumiAccessToken, "pul-env-token")
 	t.Setenv(EnvVarPulumiBackendURL, "https://env-backend.example/")
 
-	c := &Config{
+	c := &Config{ //nolint:gosec // G101: test fixture, not a real credential.
 		AccessToken: "pul-explicit-token",
 		APIURL:      "https://explicit-backend.example/",
 	}

@@ -408,10 +408,10 @@ func TestEnvironmentCheck(t *testing.T) {
 foo: bar
 `
 	propertyMap := resource.PropertyMap{}
-	propertyMap["organization"] = resource.NewPropertyValue("org")
-	propertyMap["project"] = resource.NewPropertyValue("project")
-	propertyMap["name"] = resource.NewPropertyValue("env")
-	propertyMap["yaml"] = resource.NewAssetProperty(&asset.Asset{Text: envDef})
+	propertyMap[gcOrganization] = resource.NewPropertyValue(gcOrg)
+	propertyMap[gcProject] = resource.NewPropertyValue(gcProject)
+	propertyMap[gcName] = resource.NewPropertyValue(gcEnv)
+	propertyMap[gcYaml] = resource.NewAssetProperty(&asset.Asset{Text: envDef})
 
 	t.Run("Check", func(t *testing.T) {
 		properties, _ := plugin.MarshalProperties(
@@ -430,7 +430,7 @@ foo: bar
 	})
 
 	t.Run("Check when yaml contains computed resource", func(t *testing.T) {
-		propertyMap["yaml"] = resource.NewComputedProperty(resource.Computed{Element: resource.NewStringProperty("")})
+		propertyMap[gcYaml] = resource.NewComputedProperty(resource.Computed{Element: resource.NewStringProperty("")})
 
 		properties, _ := plugin.MarshalProperties(
 			propertyMap,
@@ -451,7 +451,7 @@ foo: bar
 		// This tests the bug fix for issue #606:
 		// Secret wraps a computed value (from Output.ApplyT), causing panic in Check()
 		computedValue := resource.NewComputedProperty(resource.Computed{Element: resource.NewStringProperty("")})
-		propertyMap["yaml"] = resource.MakeSecret(computedValue)
+		propertyMap[gcYaml] = resource.MakeSecret(computedValue)
 
 		properties, _ := plugin.MarshalProperties(
 			propertyMap,
@@ -486,16 +486,16 @@ func TestEnvironmentDiff(t *testing.T) {
 	t.Run("No spurious replace when upgrading from pre-0.25.0 state without project", func(t *testing.T) {
 		// Old inputs from pre-0.25.0 lack the "project" field.
 		oldInputs := resource.PropertyMap{
-			"organization": resource.NewPropertyValue("org"),
-			"name":         resource.NewPropertyValue("env"),
-			"yaml":         resource.MakeSecret(resource.NewStringProperty("values:\n  foo: bar")),
+			gcOrganization: resource.NewPropertyValue(gcOrg),
+			gcName:         resource.NewPropertyValue(gcEnv),
+			gcYaml:         resource.MakeSecret(resource.NewStringProperty("values:\n  foo: bar")),
 		}
 		// New inputs from 0.25.0+ include project defaulting to "default".
 		newInputs := resource.PropertyMap{
-			"organization": resource.NewPropertyValue("org"),
-			"project":      resource.NewPropertyValue("default"),
-			"name":         resource.NewPropertyValue("env"),
-			"yaml":         resource.MakeSecret(resource.NewStringProperty("values:\n  foo: bar")),
+			gcOrganization: resource.NewPropertyValue(gcOrg),
+			gcProject:      resource.NewPropertyValue("default"),
+			gcName:         resource.NewPropertyValue(gcEnv),
+			gcYaml:         resource.MakeSecret(resource.NewStringProperty("values:\n  foo: bar")),
 		}
 
 		oldProps, err := plugin.MarshalProperties(oldInputs, plugin.MarshalOptions{KeepSecrets: true})
@@ -515,16 +515,16 @@ func TestEnvironmentDiff(t *testing.T) {
 
 	t.Run("Replace when project actually changes", func(t *testing.T) {
 		oldInputs := resource.PropertyMap{
-			"organization": resource.NewPropertyValue("org"),
-			"project":      resource.NewPropertyValue("proj-a"),
-			"name":         resource.NewPropertyValue("env"),
-			"yaml":         resource.MakeSecret(resource.NewStringProperty("values:\n  foo: bar")),
+			gcOrganization: resource.NewPropertyValue(gcOrg),
+			gcProject:      resource.NewPropertyValue("proj-a"),
+			gcName:         resource.NewPropertyValue(gcEnv),
+			gcYaml:         resource.MakeSecret(resource.NewStringProperty("values:\n  foo: bar")),
 		}
 		newInputs := resource.PropertyMap{
-			"organization": resource.NewPropertyValue("org"),
-			"project":      resource.NewPropertyValue("proj-b"),
-			"name":         resource.NewPropertyValue("env"),
-			"yaml":         resource.MakeSecret(resource.NewStringProperty("values:\n  foo: bar")),
+			gcOrganization: resource.NewPropertyValue(gcOrg),
+			gcProject:      resource.NewPropertyValue("proj-b"),
+			gcName:         resource.NewPropertyValue(gcEnv),
+			gcYaml:         resource.MakeSecret(resource.NewStringProperty("values:\n  foo: bar")),
 		}
 
 		oldProps, err := plugin.MarshalProperties(oldInputs, plugin.MarshalOptions{KeepSecrets: true})
@@ -538,9 +538,9 @@ func TestEnvironmentDiff(t *testing.T) {
 		})
 		assert.NoError(t, err)
 		assert.Equal(t, pulumirpc.DiffResponse_DIFF_SOME, resp.Changes)
-		assert.Contains(t, resp.DetailedDiff, "project")
+		assert.Contains(t, resp.DetailedDiff, gcProject)
 		// The kind should be a replace variant.
-		assert.True(t, resp.DetailedDiff["project"].Kind >= pulumirpc.PropertyDiff_ADD_REPLACE)
+		assert.True(t, resp.DetailedDiff[gcProject].Kind >= pulumirpc.PropertyDiff_ADD_REPLACE)
 	})
 }
 
@@ -560,9 +560,9 @@ func TestEnvironment(t *testing.T) {
 		}
 
 		input := PulumiServiceEnvironmentInput{
-			OrgName:     "org",
-			ProjectName: "project",
-			EnvName:     "env",
+			OrgName:     gcOrg,
+			ProjectName: gcProject,
+			EnvName:     gcEnv,
 			Yaml: `values:
 	foo: bar
 `,
@@ -603,8 +603,8 @@ func TestEnvironment(t *testing.T) {
 		}
 
 		input := PulumiServiceEnvironmentInput{
-			OrgName: "org",
-			EnvName: "project",
+			OrgName: gcOrg,
+			EnvName: gcProject,
 			Yaml: `values:
 	foo: bar
 `,

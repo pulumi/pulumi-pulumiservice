@@ -30,18 +30,18 @@ import (
 func TestTeamAccessTokenLegacyInputsMigration(t *testing.T) {
 	t.Run("migrates legacy state", func(t *testing.T) {
 		legacyInputs := property.NewMap(map[string]property.Value{
-			"name":             property.New("test-token"),
-			"organizationName": property.New("my-org"),
-			"teamName":         property.New("my-team"),
-			"description":      property.New("example team token"),
+			gcName:             property.New("test-token"),
+			gcOrganizationName: property.New(gcMyOrg),
+			gcTeamName:         property.New("my-team"),
+			gcDescription:      property.New("example team token"),
 		})
 		legacy := property.NewMap(map[string]property.Value{
-			"__inputs":         property.New(legacyInputs),
-			"name":             property.New("test-token"),
-			"organizationName": property.New("my-org"),
-			"teamName":         property.New("my-team"),
-			"description":      property.New("example team token"),
-			"value":            property.New("tok-secret-value"),
+			gcInputs:           property.New(legacyInputs),
+			gcName:             property.New("test-token"),
+			gcOrganizationName: property.New(gcMyOrg),
+			gcTeamName:         property.New("my-team"),
+			gcDescription:      property.New("example team token"),
+			gcValue:            property.New(gcTokSecretValue),
 		})
 
 		got, err := migrateTeamAccessTokenLegacyInputs(t.Context(), legacy)
@@ -50,21 +50,21 @@ func TestTeamAccessTokenLegacyInputsMigration(t *testing.T) {
 		assert.Equal(t, &TeamAccessTokenState{
 			TeamAccessTokenInput: TeamAccessTokenInput{
 				Name:             "test-token",
-				OrganizationName: "my-org",
+				OrganizationName: gcMyOrg,
 				TeamName:         "my-team",
 				Description:      &desc,
 			},
-			Value: "tok-secret-value",
+			Value: gcTokSecretValue,
 		}, got.Result)
 	})
 
 	t.Run("migrates legacy state without description", func(t *testing.T) {
 		legacy := property.NewMap(map[string]property.Value{
-			"__inputs":         property.New(property.NewMap(nil)),
-			"name":             property.New("test-token"),
-			"organizationName": property.New("my-org"),
-			"teamName":         property.New("my-team"),
-			"value":            property.New("tok-secret-value"),
+			gcInputs:           property.New(property.NewMap(nil)),
+			gcName:             property.New("test-token"),
+			gcOrganizationName: property.New(gcMyOrg),
+			gcTeamName:         property.New("my-team"),
+			gcValue:            property.New(gcTokSecretValue),
 		})
 
 		got, err := migrateTeamAccessTokenLegacyInputs(t.Context(), legacy)
@@ -72,19 +72,19 @@ func TestTeamAccessTokenLegacyInputsMigration(t *testing.T) {
 		assert.Equal(t, &TeamAccessTokenState{
 			TeamAccessTokenInput: TeamAccessTokenInput{
 				Name:             "test-token",
-				OrganizationName: "my-org",
+				OrganizationName: gcMyOrg,
 				TeamName:         "my-team",
 			},
-			Value: "tok-secret-value",
+			Value: gcTokSecretValue,
 		}, got.Result)
 	})
 
 	t.Run("no-op for already-migrated state", func(t *testing.T) {
 		current := property.NewMap(map[string]property.Value{
-			"name":             property.New("test-token"),
-			"organizationName": property.New("my-org"),
-			"teamName":         property.New("my-team"),
-			"value":            property.New("tok-secret-value"),
+			gcName:             property.New("test-token"),
+			gcOrganizationName: property.New(gcMyOrg),
+			gcTeamName:         property.New("my-team"),
+			gcValue:            property.New(gcTokSecretValue),
 		})
 
 		got, err := migrateTeamAccessTokenLegacyInputs(t.Context(), current)

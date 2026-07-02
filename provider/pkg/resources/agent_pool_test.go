@@ -27,7 +27,7 @@ func TestAgentPoolSplitID(t *testing.T) {
 	t.Run("valid", func(t *testing.T) {
 		org, name, id, err := splitAgentPoolID("my-org/my-pool/abc-123")
 		require.NoError(t, err)
-		assert.Equal(t, "my-org", org)
+		assert.Equal(t, gcMyOrg, org)
 		assert.Equal(t, "my-pool", name)
 		assert.Equal(t, "abc-123", id)
 	})
@@ -46,23 +46,23 @@ func TestAgentPoolSplitID(t *testing.T) {
 func TestAgentPoolLegacyStateMigration(t *testing.T) {
 	t.Run("migrates legacy state with __inputs", func(t *testing.T) {
 		legacy := property.NewMap(map[string]property.Value{
-			"__inputs": property.New(property.NewMap(map[string]property.Value{
-				"name":             property.New("test-pool"),
-				"organizationName": property.New("my-org"),
+			gcInputs: property.New(property.NewMap(map[string]property.Value{
+				gcName:             property.New("test-pool"),
+				gcOrganizationName: property.New(gcMyOrg),
 			})),
-			"agentPoolID":      property.New("api-id-123"),
-			"name":             property.New("test-pool"),
-			"organizationName": property.New("my-org"),
-			"description":      property.New("a description"),
+			gcAgentPoolID:      property.New("api-id-123"),
+			gcName:             property.New("test-pool"),
+			gcOrganizationName: property.New(gcMyOrg),
+			gcDescription:      property.New("a description"),
 			"forceDestroy":     property.New(true),
-			"tokenValue":       property.New("token-secret"),
+			gcTokenValue:       property.New("token-secret"),
 		})
 
 		got, err := migrateAgentPoolLegacyState(t.Context(), legacy)
 		require.NoError(t, err)
 		assert.Equal(t, &AgentPoolState{
 			AgentPoolInput: AgentPoolInput{
-				OrganizationName: "my-org",
+				OrganizationName: gcMyOrg,
 				Name:             "test-pool",
 				Description:      "a description",
 				ForceDestroy:     true,
@@ -76,10 +76,10 @@ func TestAgentPoolLegacyStateMigration(t *testing.T) {
 		// Pre-infer code wrote `agentPoolID` (capital D) even though the
 		// schema declared `agentPoolId`; the migration must rename the key.
 		legacy := property.NewMap(map[string]property.Value{
-			"agentPoolID":      property.New("api-id-456"),
-			"name":             property.New("pool"),
-			"organizationName": property.New("org"),
-			"tokenValue":       property.New("tok"),
+			gcAgentPoolID:      property.New("api-id-456"),
+			gcName:             property.New("pool"),
+			gcOrganizationName: property.New(gcOrg),
+			gcTokenValue:       property.New("tok"),
 		})
 
 		got, err := migrateAgentPoolLegacyState(t.Context(), legacy)
@@ -92,11 +92,11 @@ func TestAgentPoolLegacyStateMigration(t *testing.T) {
 		// Secrets in property.Value are flagged on the value itself, not
 		// wrapped — IsString() returns true on a secret string.
 		legacy := property.NewMap(map[string]property.Value{
-			"__inputs":         property.New(property.NewMap(map[string]property.Value{})),
-			"agentPoolID":      property.New("id"),
-			"name":             property.New("pool"),
-			"organizationName": property.New("org"),
-			"tokenValue":       property.New("tok-secret").WithSecret(true),
+			gcInputs:           property.New(property.NewMap(map[string]property.Value{})),
+			gcAgentPoolID:      property.New("id"),
+			gcName:             property.New("pool"),
+			gcOrganizationName: property.New(gcOrg),
+			gcTokenValue:       property.New("tok-secret").WithSecret(true),
 		})
 
 		got, err := migrateAgentPoolLegacyState(t.Context(), legacy)
@@ -108,9 +108,9 @@ func TestAgentPoolLegacyStateMigration(t *testing.T) {
 	t.Run("no-op for already-migrated state", func(t *testing.T) {
 		current := property.NewMap(map[string]property.Value{
 			"agentPoolId":      property.New("api-id"),
-			"name":             property.New("pool"),
-			"organizationName": property.New("org"),
-			"tokenValue":       property.New("tok"),
+			gcName:             property.New("pool"),
+			gcOrganizationName: property.New(gcOrg),
+			gcTokenValue:       property.New("tok"),
 		})
 
 		got, err := migrateAgentPoolLegacyState(t.Context(), current)

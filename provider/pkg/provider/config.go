@@ -31,7 +31,7 @@ func (pc *PulumiServiceConfig) getConfig(configName, envName string) string {
 }
 
 func (pc *PulumiServiceConfig) getPulumiAccessToken() (*string, error) {
-	token := pc.getConfig("accessToken", EnvVarPulumiAccessToken)
+	token := pc.getConfig(accessTokenKey, EnvVarPulumiAccessToken)
 
 	if len(token) > 0 {
 		// found the token
@@ -50,7 +50,7 @@ func (pc *PulumiServiceConfig) getPulumiAccessToken() (*string, error) {
 }
 
 func (pc *PulumiServiceConfig) getPulumiServiceURL() (*string, error) {
-	url := pc.getConfig("apiUrl", EnvVarPulumiBackendURL)
+	url := pc.getConfig(apiURLKey, EnvVarPulumiBackendURL)
 	if url == "" {
 		url = os.Getenv(EnvVarPulumiAPI)
 	}

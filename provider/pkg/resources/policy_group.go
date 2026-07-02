@@ -52,13 +52,13 @@ type PulumiServicePolicyGroupInput struct {
 func (i *PulumiServicePolicyGroupInput) ToPropertyMap() resource.PropertyMap {
 	// Convert the entire struct to a map first, then use helper
 	inputMap := map[string]interface{}{
-		"name":             i.Name,
-		"organizationName": i.OrganizationName,
-		"entityType":       i.EntityType,
-		"mode":             i.Mode,
-		"stacks":           convertStacksToInterfaceArray(i.Stacks),
-		"accounts":         i.Accounts,
-		"policyPacks":      convertPolicyPacksToInterfaceArray(i.PolicyPacks),
+		gcName:             i.Name,
+		gcOrganizationName: i.OrganizationName,
+		gcEntityType:       i.EntityType,
+		gcMode:             i.Mode,
+		gcStacks:           convertStacksToInterfaceArray(i.Stacks),
+		gcAccounts:         i.Accounts,
+		gcPolicyPacks:      convertPolicyPacksToInterfaceArray(i.PolicyPacks),
 	}
 
 	return resource.NewPropertyMapFromMap(inputMap)
@@ -69,7 +69,7 @@ func convertStacksToInterfaceArray(stacks []pulumiapi.StackReference) []interfac
 	result := make([]interface{}, len(stacks))
 	for i, stack := range stacks {
 		result[i] = map[string]interface{}{
-			"name":           stack.Name,
+			gcName:           stack.Name,
 			"routingProject": stack.RoutingProject,
 		}
 	}
@@ -81,10 +81,10 @@ func convertPolicyPacksToInterfaceArray(policyPacks []pulumiapi.PolicyPackMetada
 	result := make([]interface{}, len(policyPacks))
 	for i, pp := range policyPacks {
 		ppMap := map[string]interface{}{
-			"name":        pp.Name,
-			"displayName": pp.DisplayName,
+			gcName:        pp.Name,
+			gcDisplayName: pp.DisplayName,
 			"version":     float64(pp.Version),
-			"versionTag":  pp.VersionTag,
+			gcVersionTag:  pp.VersionTag,
 		}
 		if pp.Config != nil {
 			ppMap["config"] = pp.Config
@@ -100,7 +100,7 @@ func convertInterfaceArrayToStacks(arr []interface{}) []pulumiapi.StackReference
 	for _, item := range arr {
 		if stackMap, ok := item.(map[string]interface{}); ok {
 			stack := pulumiapi.StackReference{}
-			if name, ok := stackMap["name"].(string); ok {
+			if name, ok := stackMap[gcName].(string); ok {
 				stack.Name = name
 			}
 			if routingProject, ok := stackMap["routingProject"].(string); ok {
@@ -118,16 +118,16 @@ func convertInterfaceArrayToPolicyPacks(arr []interface{}) []pulumiapi.PolicyPac
 	for _, item := range arr {
 		if ppMap, ok := item.(map[string]interface{}); ok {
 			pp := pulumiapi.PolicyPackMetadata{}
-			if name, ok := ppMap["name"].(string); ok {
+			if name, ok := ppMap[gcName].(string); ok {
 				pp.Name = name
 			}
-			if displayName, ok := ppMap["displayName"].(string); ok {
+			if displayName, ok := ppMap[gcDisplayName].(string); ok {
 				pp.DisplayName = displayName
 			}
 			if version, ok := ppMap["version"].(float64); ok {
 				pp.Version = int(version)
 			}
-			if versionTag, ok := ppMap["versionTag"].(string); ok {
+			if versionTag, ok := ppMap[gcVersionTag].(string); ok {
 				pp.VersionTag = versionTag
 			}
 			if config, ok := ppMap["config"].(map[string]interface{}); ok {
@@ -162,34 +162,34 @@ func ToPulumiServicePolicyGroupInput(inputMap resource.PropertyMap) PulumiServic
 
 	input := PulumiServicePolicyGroupInput{}
 
-	if name, ok := interfaceMap["name"].(string); ok {
+	if name, ok := interfaceMap[gcName].(string); ok {
 		input.Name = name
 	}
 
-	if organizationName, ok := interfaceMap["organizationName"].(string); ok {
+	if organizationName, ok := interfaceMap[gcOrganizationName].(string); ok {
 		input.OrganizationName = organizationName
 	}
 
-	if entityType, ok := interfaceMap["entityType"].(string); ok {
+	if entityType, ok := interfaceMap[gcEntityType].(string); ok {
 		input.EntityType = entityType
 	}
 
-	if mode, ok := interfaceMap["mode"].(string); ok {
+	if mode, ok := interfaceMap[gcMode].(string); ok {
 		input.Mode = mode
 	}
 
 	// Parse stacks using helper
-	if stacksInterface, ok := interfaceMap["stacks"].([]interface{}); ok {
+	if stacksInterface, ok := interfaceMap[gcStacks].([]interface{}); ok {
 		input.Stacks = convertInterfaceArrayToStacks(stacksInterface)
 	}
 
 	// Parse policy packs using helper
-	if policyPacksInterface, ok := interfaceMap["policyPacks"].([]interface{}); ok {
+	if policyPacksInterface, ok := interfaceMap[gcPolicyPacks].([]interface{}); ok {
 		input.PolicyPacks = convertInterfaceArrayToPolicyPacks(policyPacksInterface)
 	}
 
 	// Parse accounts using helper
-	if accountsInterface, ok := interfaceMap["accounts"].([]interface{}); ok {
+	if accountsInterface, ok := interfaceMap[gcAccounts].([]interface{}); ok {
 		input.Accounts = convertInterfaceArrayToStrings(accountsInterface)
 	}
 
@@ -209,45 +209,45 @@ func (p *PulumiServicePolicyGroupResource) Check(req *pulumirpc.CheckRequest) (*
 
 	var failures []*pulumirpc.CheckFailure
 
-	if !newsMap["name"].HasValue() {
+	if !newsMap[gcName].HasValue() {
 		failures = append(failures, &pulumirpc.CheckFailure{
 			Reason:   "missing required property 'name'",
-			Property: "name",
+			Property: gcName,
 		})
 	}
 
-	if !newsMap["organizationName"].HasValue() {
+	if !newsMap[gcOrganizationName].HasValue() {
 		failures = append(failures, &pulumirpc.CheckFailure{
 			Reason:   "missing required property 'organizationName'",
-			Property: "organizationName",
+			Property: gcOrganizationName,
 		})
 	}
 
 	// Apply defaults if not provided
-	if !newsMap["entityType"].HasValue() {
-		newsMap["entityType"] = resource.NewPropertyValue("stacks")
+	if !newsMap[gcEntityType].HasValue() {
+		newsMap[gcEntityType] = resource.NewPropertyValue(gcStacks)
 	}
-	if !newsMap["mode"].HasValue() {
-		newsMap["mode"] = resource.NewPropertyValue("audit")
+	if !newsMap[gcMode].HasValue() {
+		newsMap[gcMode] = resource.NewPropertyValue(gcAudit)
 	}
 
 	// Validate enum values
-	if newsMap["entityType"].HasValue() {
-		entityType := newsMap["entityType"].StringValue()
-		if entityType != "stacks" && entityType != "accounts" {
+	if newsMap[gcEntityType].HasValue() {
+		entityType := newsMap[gcEntityType].StringValue()
+		if entityType != gcStacks && entityType != gcAccounts {
 			failures = append(failures, &pulumirpc.CheckFailure{
 				Reason:   "entityType must be either 'stacks' or 'accounts'",
-				Property: "entityType",
+				Property: gcEntityType,
 			})
 		}
 	}
 
-	if newsMap["mode"].HasValue() {
-		mode := newsMap["mode"].StringValue()
-		if mode != "audit" && mode != "preventative" {
+	if newsMap[gcMode].HasValue() {
+		mode := newsMap[gcMode].StringValue()
+		if mode != gcAudit && mode != gcPreventative {
 			failures = append(failures, &pulumirpc.CheckFailure{
 				Reason:   "mode must be either 'audit' or 'preventative'",
-				Property: "mode",
+				Property: gcMode,
 			})
 		}
 	}
@@ -308,17 +308,17 @@ func (p *PulumiServicePolicyGroupResource) Diff(req *pulumirpc.DiffRequest) (*pu
 	// Name change requires replacement
 	replaces := []string{}
 	if oldPolicyGroup.Name != newPolicyGroup.Name {
-		replaces = append(replaces, "name")
+		replaces = append(replaces, gcName)
 	}
 
 	// EntityType change requires replacement
 	if oldPolicyGroup.EntityType != newPolicyGroup.EntityType {
-		replaces = append(replaces, "entityType")
+		replaces = append(replaces, gcEntityType)
 	}
 
 	// Mode change requires replacement (API doesn't support update yet)
 	if oldPolicyGroup.Mode != newPolicyGroup.Mode {
-		replaces = append(replaces, "mode")
+		replaces = append(replaces, gcMode)
 	}
 
 	return &pulumirpc.DiffResponse{
@@ -358,13 +358,13 @@ func (p *PulumiServicePolicyGroupResource) Read(req *pulumirpc.ReadRequest) (*pu
 
 	// Properties (state) always reflect the full API response
 	propsMap := map[string]interface{}{
-		"name":             policyGroup.Name,
-		"organizationName": orgName,
-		"entityType":       policyGroup.EntityType,
-		"mode":             policyGroup.Mode,
-		"stacks":           convertStacksToInterfaceArray(policyGroup.Stacks),
-		"accounts":         policyGroup.Accounts,
-		"policyPacks":      convertPolicyPacksToInterfaceArray(policyGroup.AppliedPolicyPacks),
+		gcName:             policyGroup.Name,
+		gcOrganizationName: orgName,
+		gcEntityType:       policyGroup.EntityType,
+		gcMode:             policyGroup.Mode,
+		gcStacks:           convertStacksToInterfaceArray(policyGroup.Stacks),
+		gcAccounts:         policyGroup.Accounts,
+		gcPolicyPacks:      convertPolicyPacksToInterfaceArray(policyGroup.AppliedPolicyPacks),
 	}
 
 	props, err := plugin.MarshalProperties(resource.NewPropertyMapFromMap(propsMap), plugin.MarshalOptions{})
@@ -372,7 +372,7 @@ func (p *PulumiServicePolicyGroupResource) Read(req *pulumirpc.ReadRequest) (*pu
 		return nil, fmt.Errorf("failed to marshal properties: %w", err)
 	}
 
-	propsMap["accounts"] = inputAccounts
+	propsMap[gcAccounts] = inputAccounts
 	inputs, err := plugin.MarshalProperties(resource.NewPropertyMapFromMap(propsMap), plugin.MarshalOptions{})
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal inputs: %w", err)
@@ -720,7 +720,7 @@ func containsPolicyPack(packs []pulumiapi.PolicyPackMetadata, target pulumiapi.P
 // stripPolicyPackVersion removes the server-derived `version` field from each
 // policy pack in the given inputs map. See Check for rationale.
 func stripPolicyPackVersion(news resource.PropertyMap) {
-	packs, ok := news["policyPacks"]
+	packs, ok := news[gcPolicyPacks]
 	if !ok || !packs.IsArray() {
 		return
 	}
@@ -735,7 +735,7 @@ func stripPolicyPackVersion(news resource.PropertyMap) {
 			items[i] = resource.NewObjectProperty(obj)
 		}
 	}
-	news["policyPacks"] = resource.NewArrayProperty(items)
+	news[gcPolicyPacks] = resource.NewArrayProperty(items)
 }
 
 // parsePreviousAccounts extracts the accounts from previous state and inputs.

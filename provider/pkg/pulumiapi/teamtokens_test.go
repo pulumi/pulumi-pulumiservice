@@ -36,7 +36,7 @@ func TestDeleteTeamAccessToken(t *testing.T) {
 			ResponseCode:      404,
 			ResponseBody: ErrorResponse{
 				StatusCode: 404,
-				Message:    "token not found",
+				Message:    tokenNotFoundError,
 			},
 		})
 		assert.EqualError(t,
@@ -54,8 +54,8 @@ func TestCreateTeamAccessToken(t *testing.T) {
 	tokenName := "aTeamToken"
 	t.Run("Happy Path", func(t *testing.T) {
 		resp := createTokenResponse{
-			ID:         "token_id",
-			TokenValue: "secret",
+			ID:         tokenIDKey,
+			TokenValue: secretKey,
 		}
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPost,
@@ -87,7 +87,7 @@ func TestCreateTeamAccessToken(t *testing.T) {
 			ResponseCode: 401,
 			ResponseBody: ErrorResponse{
 				StatusCode: 401,
-				Message:    "unauthorized",
+				Message:    unauthorizedError,
 			},
 		})
 		token, err := c.CreateTeamAccessToken(teamCtx, tokenName, orgName, teamName, desc)
@@ -114,7 +114,7 @@ func TestGetTeamAccessToken(t *testing.T) {
 					LastUsed:    lastUsed,
 				},
 				{
-					ID:          "other",
+					ID:          otherValue,
 					Description: desc,
 					LastUsed:    lastUsed,
 				},
@@ -143,7 +143,7 @@ func TestGetTeamAccessToken(t *testing.T) {
 			ResponseCode:      401,
 			ResponseBody: ErrorResponse{
 				StatusCode: 401,
-				Message:    "unauthorized",
+				Message:    unauthorizedError,
 			},
 		})
 		token, err := c.GetTeamAccessToken(ctx, id, org, team)

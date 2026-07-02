@@ -36,7 +36,12 @@ const policyPacksPath = "/api/orgs/anOrg/policypacks"
 func TestListPolicyPacks(t *testing.T) {
 	t.Run("happy path", func(t *testing.T) {
 		want := []PolicyPackWithVersions{
-			{Name: "alpha", DisplayName: "Alpha", Versions: []int{1, 2}, VersionTags: []string{"1.0.0", "1.1.0"}},
+			{
+				Name:        alphaPolicyPack,
+				DisplayName: "Alpha",
+				Versions:    []int{1, 2},
+				VersionTags: []string{policyPackVersion, "1.1.0"},
+			},
 		}
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodGet,
@@ -58,14 +63,14 @@ func TestListPolicyPacks(t *testing.T) {
 
 func TestGetPolicyPack(t *testing.T) {
 	t.Run("happy path", func(t *testing.T) {
-		want := &PolicyPackDetail{Name: "alpha", Version: 2, VersionTag: "1.1.0"}
+		want := &PolicyPackDetail{Name: alphaPolicyPack, Version: 2, VersionTag: "1.1.0"}
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodGet,
 			ExpectedReqPath:   "/api/orgs/anOrg/policypacks/alpha/versions/2",
 			ResponseCode:      http.StatusOK,
 			ResponseBody:      want,
 		})
-		got, err := c.GetPolicyPack(ctx, "anOrg", "alpha", 2)
+		got, err := c.GetPolicyPack(ctx, "anOrg", alphaPolicyPack, 2)
 		require.NoError(t, err)
 		assert.Equal(t, want, got)
 	})
@@ -75,7 +80,7 @@ func TestGetPolicyPack(t *testing.T) {
 			ExpectedReqMethod: http.MethodGet,
 			ExpectedReqPath:   "/api/orgs/anOrg/policypacks/missing/versions/1",
 			ResponseCode:      http.StatusNotFound,
-			ResponseBody:      ErrorResponse{StatusCode: 404, Message: "not found"},
+			ResponseBody:      ErrorResponse{StatusCode: 404, Message: notFoundError},
 		})
 		got, err := c.GetPolicyPack(ctx, "anOrg", "missing", 1)
 		require.NoError(t, err)
@@ -84,7 +89,7 @@ func TestGetPolicyPack(t *testing.T) {
 
 	t.Run("input validation", func(t *testing.T) {
 		c := &Client{}
-		_, err := c.GetPolicyPack(ctx, "", "alpha", 1)
+		_, err := c.GetPolicyPack(ctx, "", alphaPolicyPack, 1)
 		assert.EqualError(t, err, "empty orgName")
 		_, err = c.GetPolicyPack(ctx, "anOrg", "", 1)
 		assert.EqualError(t, err, "empty policyPackName")
@@ -93,14 +98,14 @@ func TestGetPolicyPack(t *testing.T) {
 
 func TestGetLatestPolicyPack(t *testing.T) {
 	t.Run("happy path", func(t *testing.T) {
-		want := &PolicyPackDetail{Name: "alpha", Version: 9, VersionTag: "9.0.0"}
+		want := &PolicyPackDetail{Name: alphaPolicyPack, Version: 9, VersionTag: "9.0.0"}
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodGet,
 			ExpectedReqPath:   "/api/orgs/anOrg/policypacks/alpha/latest",
 			ResponseCode:      http.StatusOK,
 			ResponseBody:      want,
 		})
-		got, err := c.GetLatestPolicyPack(ctx, "anOrg", "alpha")
+		got, err := c.GetLatestPolicyPack(ctx, "anOrg", alphaPolicyPack)
 		require.NoError(t, err)
 		assert.Equal(t, want, got)
 	})
@@ -110,7 +115,7 @@ func TestGetLatestPolicyPack(t *testing.T) {
 			ExpectedReqMethod: http.MethodGet,
 			ExpectedReqPath:   "/api/orgs/anOrg/policypacks/missing/latest",
 			ResponseCode:      http.StatusNotFound,
-			ResponseBody:      ErrorResponse{StatusCode: 404, Message: "not found"},
+			ResponseBody:      ErrorResponse{StatusCode: 404, Message: notFoundError},
 		})
 		got, err := c.GetLatestPolicyPack(ctx, "anOrg", "missing")
 		require.NoError(t, err)
@@ -122,20 +127,20 @@ func TestDeletePolicyPackVersion(t *testing.T) {
 	t.Run("happy path", func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodDelete,
-			ExpectedReqPath:   "/api/orgs/anOrg/policypacks/alpha/versions/1.0.0",
+			ExpectedReqPath:   policyPackVersionPath,
 			ResponseCode:      http.StatusNoContent,
 		})
-		assert.NoError(t, c.DeletePolicyPackVersion(ctx, "anOrg", "alpha", "1.0.0"))
+		assert.NoError(t, c.DeletePolicyPackVersion(ctx, "anOrg", alphaPolicyPack, policyPackVersion))
 	})
 
 	t.Run("404 is a no-op", func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodDelete,
-			ExpectedReqPath:   "/api/orgs/anOrg/policypacks/alpha/versions/1.0.0",
+			ExpectedReqPath:   policyPackVersionPath,
 			ResponseCode:      http.StatusNotFound,
-			ResponseBody:      ErrorResponse{StatusCode: 404, Message: "not found"},
+			ResponseBody:      ErrorResponse{StatusCode: 404, Message: notFoundError},
 		})
-		assert.NoError(t, c.DeletePolicyPackVersion(ctx, "anOrg", "alpha", "1.0.0"))
+		assert.NoError(t, c.DeletePolicyPackVersion(ctx, "anOrg", alphaPolicyPack, policyPackVersion))
 	})
 
 	t.Run("input validation", func(t *testing.T) {
@@ -153,7 +158,7 @@ func TestDeletePolicyPack(t *testing.T) {
 			ExpectedReqPath:   "/api/orgs/anOrg/policypacks/alpha",
 			ResponseCode:      http.StatusNoContent,
 		})
-		assert.NoError(t, c.DeletePolicyPack(ctx, "anOrg", "alpha"))
+		assert.NoError(t, c.DeletePolicyPack(ctx, "anOrg", alphaPolicyPack))
 	})
 
 	t.Run("404 is a no-op", func(t *testing.T) {
@@ -161,9 +166,9 @@ func TestDeletePolicyPack(t *testing.T) {
 			ExpectedReqMethod: http.MethodDelete,
 			ExpectedReqPath:   "/api/orgs/anOrg/policypacks/alpha",
 			ResponseCode:      http.StatusNotFound,
-			ResponseBody:      ErrorResponse{StatusCode: 404, Message: "not found"},
+			ResponseBody:      ErrorResponse{StatusCode: 404, Message: notFoundError},
 		})
-		assert.NoError(t, c.DeletePolicyPack(ctx, "anOrg", "alpha"))
+		assert.NoError(t, c.DeletePolicyPack(ctx, "anOrg", alphaPolicyPack))
 	})
 
 	t.Run("input validation", func(t *testing.T) {
@@ -181,7 +186,7 @@ func TestPublishPolicyPack_HappyPath(t *testing.T) {
 	uploadServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		uploadHit = true
 		assert.Equal(t, http.MethodPut, r.Method)
-		assert.Equal(t, "value", r.Header.Get("X-Required"))
+		assert.Equal(t, valueKey, r.Header.Get("X-Required"))
 		body, _ := io.ReadAll(r.Body)
 		assert.Equal(t, archive, body)
 		w.WriteHeader(http.StatusOK)
@@ -193,12 +198,12 @@ func TestPublishPolicyPack_HappyPath(t *testing.T) {
 		case r.Method == http.MethodPost && r.URL.Path == policyPacksPath:
 			var got CreatePolicyPackRequest
 			require.NoError(t, json.NewDecoder(r.Body).Decode(&got))
-			assert.Equal(t, "alpha", got.Name)
-			assert.Equal(t, "1.0.0", got.VersionTag)
+			assert.Equal(t, alphaPolicyPack, got.Name)
+			assert.Equal(t, policyPackVersion, got.VersionTag)
 			return http.StatusOK, CreatePolicyPackResponse{
 				Version:         7,
 				UploadURI:       uploadServer.URL + "/upload",
-				RequiredHeaders: map[string]string{"X-Required": "value"},
+				RequiredHeaders: map[string]string{"X-Required": valueKey},
 			}
 		case r.Method == http.MethodPost && r.URL.Path == "/api/orgs/anOrg/policypacks/alpha/versions/1.0.0/complete":
 			completeHit = true
@@ -209,8 +214,8 @@ func TestPublishPolicyPack_HappyPath(t *testing.T) {
 	})
 
 	version, err := c.PublishPolicyPack(ctx, "anOrg", CreatePolicyPackRequest{
-		Name:       "alpha",
-		VersionTag: "1.0.0",
+		Name:       alphaPolicyPack,
+		VersionTag: policyPackVersion,
 		Policies:   []apitype.Policy{{Name: "rule"}},
 	}, bytes.NewReader(archive))
 	require.NoError(t, err)
@@ -234,7 +239,7 @@ func TestPublishPolicyPack_UploadFailureTriggersCleanup(t *testing.T) {
 				Version:   7,
 				UploadURI: uploadServer.URL + "/upload",
 			}
-		case r.Method == http.MethodDelete && r.URL.Path == "/api/orgs/anOrg/policypacks/alpha/versions/1.0.0":
+		case r.Method == http.MethodDelete && r.URL.Path == policyPackVersionPath:
 			cleanupHit = true
 			return http.StatusNoContent, nil
 		}
@@ -243,8 +248,8 @@ func TestPublishPolicyPack_UploadFailureTriggersCleanup(t *testing.T) {
 	})
 
 	_, err := c.PublishPolicyPack(ctx, "anOrg", CreatePolicyPackRequest{
-		Name:       "alpha",
-		VersionTag: "1.0.0",
+		Name:       alphaPolicyPack,
+		VersionTag: policyPackVersion,
 	}, strings.NewReader("payload"))
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "upload failed")
@@ -270,7 +275,7 @@ func TestPublishPolicyPack_CleanupUsesDetachedContext(t *testing.T) {
 			// cancel the caller's context just before completion to make complete fail
 			cancel()
 			return http.StatusInternalServerError, ErrorResponse{StatusCode: 500, Message: "complete failed"}
-		case r.Method == http.MethodDelete && r.URL.Path == "/api/orgs/anOrg/policypacks/alpha/versions/1.0.0":
+		case r.Method == http.MethodDelete && r.URL.Path == policyPackVersionPath:
 			cleanupHit = true
 			return http.StatusNoContent, nil
 		}
@@ -279,8 +284,8 @@ func TestPublishPolicyPack_CleanupUsesDetachedContext(t *testing.T) {
 	})
 
 	_, err := c.PublishPolicyPack(canceledCtx, "anOrg", CreatePolicyPackRequest{
-		Name:       "alpha",
-		VersionTag: "1.0.0",
+		Name:       alphaPolicyPack,
+		VersionTag: policyPackVersion,
 	}, strings.NewReader("payload"))
 	require.Error(t, err)
 	assert.True(t, cleanupHit, "cleanup should run even when caller context is canceled")
@@ -290,7 +295,7 @@ func TestUploadToSignedURL_Retries5xx(t *testing.T) {
 	var attempts atomic.Int32
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodPut, r.Method)
-		assert.Equal(t, "value", r.Header.Get("X-Required"))
+		assert.Equal(t, valueKey, r.Header.Get("X-Required"))
 		body, _ := io.ReadAll(r.Body)
 		assert.Equal(t, []byte("payload"), body)
 		if attempts.Add(1) == 1 {
@@ -305,7 +310,7 @@ func TestUploadToSignedURL_Retries5xx(t *testing.T) {
 	require.NoError(t, err)
 
 	err = c.uploadToSignedURL(ctx, server.URL+"/upload",
-		map[string]string{"X-Required": "value"}, []byte("payload"))
+		map[string]string{"X-Required": valueKey}, []byte("payload"))
 	require.NoError(t, err)
 	assert.EqualValues(t, 2, attempts.Load(), "expected one retry after the first 5xx")
 }

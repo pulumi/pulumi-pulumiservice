@@ -11,7 +11,7 @@ import (
 
 const (
 	testTeamName    = "a-team"
-	testTeamOrgName = "an-organization"
+	testTeamOrgName = testDeploymentSettingsOrgName
 )
 
 func TestListTeams(t *testing.T) {
@@ -23,7 +23,7 @@ func TestListTeams(t *testing.T) {
 		Name: "member2",
 	}
 	team1 := Team{
-		Type:        "pulumi",
+		Type:        pulumiTeamType,
 		Name:        "team1",
 		DisplayName: "Team 1",
 		Description: "Team 1 description",
@@ -49,7 +49,7 @@ func TestListTeams(t *testing.T) {
 			ExpectedReqPath:   "/api/orgs/an-organization/teams",
 			ResponseCode:      401,
 			ResponseBody: ErrorResponse{
-				Message: "unauthorized",
+				Message: unauthorizedError,
 			},
 		})
 		teamsList, err := c.ListTeams(ctx, orgName)
@@ -62,20 +62,20 @@ func TestGetTeam(t *testing.T) {
 	orgName := testTeamOrgName
 	teamName := testTeamName
 	team := Team{
-		Type:        "pulumi",
+		Type:        pulumiTeamType,
 		Name:        teamName,
 		DisplayName: "Team 1",
 		Description: "Team 1 description",
 		Members: []TeamMember{
 			{
-				Name: "alice",
+				Name: aliceUser,
 			},
 		},
 	}
 	t.Run("Happy Path", func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodGet,
-			ExpectedReqPath:   "/api/orgs/an-organization/teams/a-team",
+			ExpectedReqPath:   teamPath,
 			ResponseCode:      200,
 			ResponseBody:      team,
 		})
@@ -86,10 +86,10 @@ func TestGetTeam(t *testing.T) {
 	t.Run("Error", func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodGet,
-			ExpectedReqPath:   "/api/orgs/an-organization/teams/a-team",
+			ExpectedReqPath:   teamPath,
 			ResponseCode:      401,
 			ResponseBody: ErrorResponse{
-				Message: "unauthorized",
+				Message: unauthorizedError,
 			},
 		})
 		team, err := c.GetTeam(ctx, orgName, teamName)
@@ -100,11 +100,11 @@ func TestGetTeam(t *testing.T) {
 	t.Run("404", func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodGet,
-			ExpectedReqPath:   "/api/orgs/an-organization/teams/a-team",
+			ExpectedReqPath:   teamPath,
 			ResponseCode:      404,
 			ResponseBody: ErrorResponse{
 				StatusCode: 404,
-				Message:    "not found",
+				Message:    notFoundError,
 			},
 		})
 		team, err := c.GetTeam(ctx, orgName, teamName)
@@ -120,7 +120,7 @@ func TestCreateTeam(t *testing.T) {
 	description := "The A Team"
 	t.Run("Happy Path (pulumi team)", func(t *testing.T) {
 		expected := Team{
-			Type:        "pulumi",
+			Type:        pulumiTeamType,
 			Name:        teamName,
 			DisplayName: displayName,
 			Description: description,
@@ -130,7 +130,7 @@ func TestCreateTeam(t *testing.T) {
 			ExpectedReqPath:   "/api/orgs/an-organization/teams/pulumi",
 			ExpectedReqBody: createTeamRequest{
 				Organization: orgName,
-				TeamType:     "pulumi",
+				TeamType:     pulumiTeamType,
 				Name:         teamName,
 				DisplayName:  displayName,
 				Description:  description,
@@ -138,13 +138,13 @@ func TestCreateTeam(t *testing.T) {
 			ResponseBody: expected,
 			ResponseCode: 201,
 		})
-		actualTeam, err := c.CreateTeam(ctx, orgName, teamName, "pulumi", displayName, description, 0)
+		actualTeam, err := c.CreateTeam(ctx, orgName, teamName, pulumiTeamType, displayName, description, 0)
 		assert.NoError(t, err)
 		assert.Equal(t, expected, *actualTeam)
 	})
 	t.Run("Happy Path (github team)", func(t *testing.T) {
 		expected := Team{
-			Type:        "github",
+			Type:        githubTeamType,
 			Name:        teamName,
 			DisplayName: displayName,
 			Description: description,
@@ -153,14 +153,14 @@ func TestCreateTeam(t *testing.T) {
 			ExpectedReqMethod: http.MethodPost,
 			ExpectedReqPath:   "/api/orgs/an-organization/teams/github",
 			ExpectedReqBody: createTeamRequest{
-				TeamType:     "github",
+				TeamType:     githubTeamType,
 				Organization: orgName,
 				GitHubTeamID: 1,
 			},
 			ResponseBody: expected,
 			ResponseCode: 201,
 		})
-		actualTeam, err := c.CreateTeam(ctx, orgName, "", "github", "", "", 1)
+		actualTeam, err := c.CreateTeam(ctx, orgName, "", githubTeamType, "", "", 1)
 		assert.NoError(t, err)
 		assert.Equal(t, expected, *actualTeam)
 	})
@@ -170,23 +170,23 @@ func TestCreateTeam(t *testing.T) {
 			ExpectedReqPath:   "/api/orgs/an-organization/teams/pulumi",
 			ExpectedReqBody: createTeamRequest{
 				Organization: orgName,
-				TeamType:     "pulumi",
+				TeamType:     pulumiTeamType,
 				Name:         teamName,
 				DisplayName:  displayName,
 				Description:  description,
 			},
 			ResponseCode: 401,
 			ResponseBody: ErrorResponse{
-				Message: "unauthorized",
+				Message: unauthorizedError,
 			},
 		})
-		team, err := c.CreateTeam(ctx, orgName, teamName, "pulumi", displayName, description, 0)
+		team, err := c.CreateTeam(ctx, orgName, teamName, pulumiTeamType, displayName, description, 0)
 		assert.Nil(t, team, "team should be nil since error was returned")
 		assert.EqualError(t, err, "failed to create team: 401 API error: unauthorized")
 	})
 	t.Run("Error (github team missing ID)", func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{})
-		_, err := c.CreateTeam(ctx, orgName, "", "github", "", "", 0)
+		_, err := c.CreateTeam(ctx, orgName, "", githubTeamType, "", "", 0)
 		assert.EqualError(t, err, "github teams require a githubTeamId")
 	})
 	t.Run("Error (invalid team type)", func(t *testing.T) {
@@ -196,12 +196,12 @@ func TestCreateTeam(t *testing.T) {
 	})
 	t.Run("Error (invalid team name for pulumi team)", func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{})
-		_, err := c.CreateTeam(ctx, orgName, "", "pulumi", "", "", 0)
+		_, err := c.CreateTeam(ctx, orgName, "", pulumiTeamType, "", "", 0)
 		assert.EqualError(t, err, "teamname must not be empty")
 	})
 	t.Run("Error (missing org name)", func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{})
-		_, err := c.CreateTeam(ctx, "", "", "pulumi", "", "", 0)
+		_, err := c.CreateTeam(ctx, "", "", pulumiTeamType, "", "", 0)
 		assert.EqualError(t, err, "orgname must not be empty")
 	})
 }
@@ -213,9 +213,9 @@ func TestAddMemberToTeam(t *testing.T) {
 	t.Run("Happy Path", func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPatch,
-			ExpectedReqPath:   "/api/orgs/an-organization/teams/a-team",
+			ExpectedReqPath:   teamPath,
 			ExpectedReqBody: updateTeamMembershipRequest{
-				MemberAction: "add",
+				MemberAction: addMembershipAction,
 				Member:       userName,
 			},
 			ResponseCode: 204,
@@ -226,14 +226,14 @@ func TestAddMemberToTeam(t *testing.T) {
 	t.Run("Error", func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPatch,
-			ExpectedReqPath:   "/api/orgs/an-organization/teams/a-team",
+			ExpectedReqPath:   teamPath,
 			ExpectedReqBody: updateTeamMembershipRequest{
-				MemberAction: "add",
+				MemberAction: addMembershipAction,
 				Member:       userName,
 			},
 			ResponseCode: 401,
 			ResponseBody: ErrorResponse{
-				Message: "unauthorized",
+				Message: unauthorizedError,
 			},
 		})
 		assert.EqualError(t,
@@ -246,15 +246,15 @@ func TestAddMemberToTeam(t *testing.T) {
 func TestAddStackPermission(t *testing.T) {
 	teamName := testTeamName
 	stack := StackIdentifier{
-		OrgName:     "an-organization",
-		ProjectName: "a-project",
+		OrgName:     testDeploymentSettingsOrgName,
+		ProjectName: testDeploymentSettingsProjectName,
 		StackName:   "a-stack",
 	}
 	permission := 101
 	t.Run("Happy Path", func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPatch,
-			ExpectedReqPath:   "/api/orgs/an-organization/teams/a-team",
+			ExpectedReqPath:   teamPath,
 			ExpectedReqBody: addStackPermissionRequest{
 				AddStackPermission: AddStackPermission{
 					ProjectName: stack.ProjectName,
@@ -271,14 +271,14 @@ func TestAddStackPermission(t *testing.T) {
 func TestRemoveStackPermission(t *testing.T) {
 	teamName := testTeamName
 	stack := StackIdentifier{
-		OrgName:     "an-organization",
-		ProjectName: "a-project",
+		OrgName:     testDeploymentSettingsOrgName,
+		ProjectName: testDeploymentSettingsProjectName,
 		StackName:   "a-stack",
 	}
 	t.Run("Happy Path", func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPatch,
-			ExpectedReqPath:   "/api/orgs/an-organization/teams/a-team",
+			ExpectedReqPath:   teamPath,
 			ExpectedReqBody: removeStackPermissionRequest{
 				RemoveStackPermission: RemoveStackPermission{
 					ProjectName: stack.ProjectName,
@@ -293,14 +293,14 @@ func TestRemoveStackPermission(t *testing.T) {
 
 func TestAddEnvironmentPermission(t *testing.T) {
 	teamName := testTeamName
-	permission := "admin"
+	permission := adminRole
 	organization := testTeamOrgName
-	project := "a-project"
+	project := testDeploymentSettingsProjectName
 	environment := "an-environment"
 	t.Run("Happy Path", func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPatch,
-			ExpectedReqPath:   "/api/orgs/an-organization/teams/a-team",
+			ExpectedReqPath:   teamPath,
 			ExpectedReqBody: addEnvironmentSettingsRequest{
 				AddEnvironmentPermission: AddEnvironmentPermission{
 					ProjectName:     project,
@@ -329,18 +329,18 @@ func TestGetTeamEnvironmentSettings(t *testing.T) {
 	teamName := testTeamName
 
 	team := Team{
-		Type: "pulumi",
+		Type: pulumiTeamType,
 		Name: teamName,
 		Environments: []TeamEnvironmentSettings{
 			{
-				EnvName:     "Default",
+				EnvName:     defaultValue,
 				ProjectName: "project-a",
 				Permission:  "read",
 			},
 			{
-				EnvName:     "Default",
+				EnvName:     defaultValue,
 				ProjectName: "project-b",
-				Permission:  "admin",
+				Permission:  adminRole,
 			},
 		},
 	}
@@ -348,7 +348,7 @@ func TestGetTeamEnvironmentSettings(t *testing.T) {
 	t.Run("Matches correct project when same env name exists in multiple projects", func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodGet,
-			ExpectedReqPath:   "/api/orgs/an-organization/teams/a-team",
+			ExpectedReqPath:   teamPath,
 			ResponseCode:      200,
 			ResponseBody:      team,
 		})
@@ -356,17 +356,17 @@ func TestGetTeamEnvironmentSettings(t *testing.T) {
 			Organization: organization,
 			Team:         teamName,
 			Project:      "project-b",
-			Environment:  "Default",
+			Environment:  defaultValue,
 		})
 		assert.NoError(t, err)
 		assert.NotNil(t, perm)
-		assert.Equal(t, "admin", *perm)
+		assert.Equal(t, adminRole, *perm)
 	})
 
 	t.Run("Returns nil when project does not match", func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodGet,
-			ExpectedReqPath:   "/api/orgs/an-organization/teams/a-team",
+			ExpectedReqPath:   teamPath,
 			ResponseCode:      200,
 			ResponseBody:      team,
 		})
@@ -374,7 +374,7 @@ func TestGetTeamEnvironmentSettings(t *testing.T) {
 			Organization: organization,
 			Team:         teamName,
 			Project:      "project-c",
-			Environment:  "Default",
+			Environment:  defaultValue,
 		})
 		assert.NoError(t, err)
 		assert.Nil(t, perm)
@@ -384,12 +384,12 @@ func TestGetTeamEnvironmentSettings(t *testing.T) {
 func TestRemoveEnvironmentPermission(t *testing.T) {
 	teamName := testTeamName
 	organization := testTeamOrgName
-	project := "a-project"
+	project := testDeploymentSettingsProjectName
 	environment := "an-environment"
 	t.Run("Happy Path", func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPatch,
-			ExpectedReqPath:   "/api/orgs/an-organization/teams/a-team",
+			ExpectedReqPath:   teamPath,
 			ExpectedReqBody: removeEnvironmentPermissionRequest{
 				RemoveEnvironment: RemoveEnvironmentPermission{
 					ProjectName: project,

@@ -163,17 +163,17 @@ func (*TemplateSource) StateMigrations(context.Context) []infer.StateMigrationFu
 func migrateTemplateSourceLegacyInputs(
 	_ context.Context, old property.Map,
 ) (infer.MigrationResult[TemplateSourceState], error) {
-	if _, ok := old.GetOk("__inputs"); !ok {
+	if _, ok := old.GetOk(gcInputs); !ok {
 		return infer.MigrationResult[TemplateSourceState]{}, nil
 	}
 	state := TemplateSourceState{}
-	if v, ok := old.GetOk("organizationName"); ok && v.IsString() {
+	if v, ok := old.GetOk(gcOrganizationName); ok && v.IsString() {
 		state.OrganizationName = v.AsString()
 	}
-	if v, ok := old.GetOk("sourceName"); ok && v.IsString() {
+	if v, ok := old.GetOk(gcSourceName); ok && v.IsString() {
 		state.SourceName = v.AsString()
 	}
-	if v, ok := old.GetOk("sourceURL"); ok && v.IsString() {
+	if v, ok := old.GetOk(gcSourceURL); ok && v.IsString() {
 		state.SourceURL = v.AsString()
 	}
 	if v, ok := old.GetOk("destination"); ok && v.IsMap() {

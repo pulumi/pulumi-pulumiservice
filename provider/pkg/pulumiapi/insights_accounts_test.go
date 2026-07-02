@@ -22,11 +22,11 @@ func TestCreateInsightsAccount(t *testing.T) {
 
 	t.Run("Happy Path", func(t *testing.T) {
 		reqBody := CreateInsightsAccountRequest{
-			Provider:     "aws",
-			Environment:  "test-env",
+			Provider:     awsProvider,
+			Environment:  testEnvName,
 			ScanSchedule: "daily",
 			ProviderConfig: map[string]interface{}{
-				"regions": []interface{}{"us-west-2"},
+				regionsKey: []interface{}{usWest2Region},
 			},
 		}
 
@@ -43,8 +43,8 @@ func TestCreateInsightsAccount(t *testing.T) {
 
 	t.Run("Error", func(t *testing.T) {
 		reqBody := CreateInsightsAccountRequest{
-			Provider:    "aws",
-			Environment: "test-env",
+			Provider:    awsProvider,
+			Environment: testEnvName,
 		}
 
 		c := startTestServer(t, testServerConfig{
@@ -80,11 +80,11 @@ func TestListInsightsAccounts(t *testing.T) {
 				{
 					ID:                   "account-id-123",
 					Name:                 "test-account-1",
-					Provider:             "aws",
-					ProviderEnvRef:       "test-env",
+					Provider:             awsProvider,
+					ProviderEnvRef:       testEnvName,
 					ScheduledScanEnabled: true,
 					ProviderConfig: map[string]interface{}{
-						"regions": []interface{}{"us-west-2", "us-east-1"},
+						regionsKey: []interface{}{usWest2Region, "us-east-1"},
 					},
 				},
 				{
@@ -117,7 +117,7 @@ func TestListInsightsAccounts(t *testing.T) {
 			ResponseCode:      500,
 			ResponseBody: ErrorResponse{
 				StatusCode: 500,
-				Message:    "internal server error",
+				Message:    internalServerError,
 			},
 		})
 
@@ -135,11 +135,11 @@ func TestGetInsightsAccount(t *testing.T) {
 		resp := InsightsAccount{
 			ID:                   "account-id-123",
 			Name:                 accountName,
-			Provider:             "aws",
-			ProviderEnvRef:       "test-env",
+			Provider:             awsProvider,
+			ProviderEnvRef:       testEnvName,
 			ScheduledScanEnabled: true,
 			ProviderConfig: map[string]interface{}{
-				"regions": []interface{}{"us-west-2", "us-east-1"},
+				regionsKey: []interface{}{usWest2Region, "us-east-1"},
 			},
 		}
 
@@ -178,7 +178,7 @@ func TestGetInsightsAccount(t *testing.T) {
 			ResponseCode:      500,
 			ResponseBody: ErrorResponse{
 				StatusCode: 500,
-				Message:    "internal server error",
+				Message:    internalServerError,
 			},
 		})
 
@@ -196,7 +196,7 @@ func TestUpdateInsightsAccount(t *testing.T) {
 			Environment:  "updated-env",
 			ScanSchedule: "none",
 			ProviderConfig: map[string]interface{}{
-				"regions": []interface{}{"us-west-1"},
+				regionsKey: []interface{}{"us-west-1"},
 			},
 		}
 
@@ -437,7 +437,7 @@ func TestGetScanStatus(t *testing.T) {
 			ResponseCode:      500,
 			ResponseBody: ErrorResponse{
 				StatusCode: 500,
-				Message:    "internal server error",
+				Message:    internalServerError,
 			},
 		})
 
@@ -482,17 +482,17 @@ func TestGetInsightsAccountTags(t *testing.T) {
 	t.Run("Happy Path", func(t *testing.T) {
 		resp := GetInsightsAccountTagsResponse{
 			Tags: map[string]*InsightsAccountTag{
-				"environment": {
-					Name:     "environment",
+				environmentKey: {
+					Name:     environmentKey,
 					Value:    "production",
-					Created:  "2025-01-01T00:00:00Z",
+					Created:  testTimestamp,
 					Modified: "2025-01-02T00:00:00Z",
 				},
-				"team": {
-					Name:     "team",
+				teamKey: {
+					Name:     teamKey,
 					Value:    "platform",
-					Created:  "2025-01-01T00:00:00Z",
-					Modified: "2025-01-01T00:00:00Z",
+					Created:  testTimestamp,
+					Modified: testTimestamp,
 				},
 			},
 		}
@@ -507,8 +507,8 @@ func TestGetInsightsAccountTags(t *testing.T) {
 		tags, err := c.GetInsightsAccountTags(t.Context(), orgName, accountName)
 		assert.NoError(t, err)
 		assert.Equal(t, map[string]string{
-			"environment": "production",
-			"team":        "platform",
+			environmentKey: "production",
+			teamKey:        "platform",
 		}, tags)
 	})
 
@@ -532,9 +532,9 @@ func TestGetInsightsAccountTags(t *testing.T) {
 	t.Run("Nil Tag Value Skipped", func(t *testing.T) {
 		resp := GetInsightsAccountTagsResponse{
 			Tags: map[string]*InsightsAccountTag{
-				"valid-tag": {
-					Name:  "valid-tag",
-					Value: "value",
+				validTag: {
+					Name:  validTag,
+					Value: valueKey,
 				},
 				"nil-tag": nil, // This should be skipped
 			},
@@ -550,7 +550,7 @@ func TestGetInsightsAccountTags(t *testing.T) {
 		tags, err := c.GetInsightsAccountTags(t.Context(), orgName, accountName)
 		assert.NoError(t, err)
 		assert.Equal(t, map[string]string{
-			"valid-tag": "value",
+			validTag: valueKey,
 		}, tags)
 		assert.NotContains(t, tags, "nil-tag")
 	})
@@ -562,7 +562,7 @@ func TestGetInsightsAccountTags(t *testing.T) {
 			ResponseCode:      500,
 			ResponseBody: ErrorResponse{
 				StatusCode: 500,
-				Message:    "internal server error",
+				Message:    internalServerError,
 			},
 		})
 
@@ -587,7 +587,7 @@ func TestSetInsightsAccountTags(t *testing.T) {
 			ResponseCode:      200,
 		})
 
-		err := c.SetInsightsAccountTags(t.Context(), "", accountName, map[string]string{"key": "value"})
+		err := c.SetInsightsAccountTags(t.Context(), "", accountName, map[string]string{"key": valueKey})
 		assert.EqualError(t, err, "empty orgName")
 	})
 
@@ -598,15 +598,15 @@ func TestSetInsightsAccountTags(t *testing.T) {
 			ResponseCode:      200,
 		})
 
-		err := c.SetInsightsAccountTags(t.Context(), orgName, "", map[string]string{"key": "value"})
+		err := c.SetInsightsAccountTags(t.Context(), orgName, "", map[string]string{"key": valueKey})
 		assert.EqualError(t, err, "empty accountName")
 	})
 
 	t.Run("Happy Path", func(t *testing.T) {
 		reqBody := SetInsightsAccountTagsRequest{
 			Tags: map[string]string{
-				"environment": "staging",
-				"cost-center": "engineering",
+				environmentKey: "staging",
+				"cost-center":  "engineering",
 			},
 		}
 

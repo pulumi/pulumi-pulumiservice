@@ -78,13 +78,13 @@ func writePolicySource(t *testing.T) string {
 }
 
 func TestPolicyPackID_RoundTrip(t *testing.T) {
-	id := policyPackID("acme", "guard", "1.2.3")
+	id := policyPackID(gcAcme, gcGuard, "1.2.3")
 	assert.Equal(t, "acme/guard/1.2.3", id)
 
 	org, name, tag, err := splitPolicyPackID(id)
 	require.NoError(t, err)
-	assert.Equal(t, "acme", org)
-	assert.Equal(t, "guard", name)
+	assert.Equal(t, gcAcme, org)
+	assert.Equal(t, gcGuard, name)
 	assert.Equal(t, "1.2.3", tag)
 }
 
@@ -102,27 +102,27 @@ func TestNormalizeConfigSchema(t *testing.T) {
 	assert.Equal(t, empty, normalizeConfigSchema(empty))
 
 	// existing "type" is preserved
-	withType := map[string]any{"type": "string"}
+	withType := map[string]any{gcType: "string"}
 	got := normalizeConfigSchema(withType)
-	assert.Equal(t, "string", got["type"])
+	assert.Equal(t, "string", got[gcType])
 
 	// missing "type" gets defaulted to object without mutating the input
-	in := map[string]any{"properties": map[string]any{"x": map[string]any{"type": "number"}}}
+	in := map[string]any{"properties": map[string]any{"x": map[string]any{gcType: "number"}}}
 	out := normalizeConfigSchema(in)
-	assert.Equal(t, "object", out["type"])
-	_, hadType := in["type"]
+	assert.Equal(t, gcObject, out[gcType])
+	_, hadType := in[gcType]
 	assert.False(t, hadType, "input must not be mutated")
 }
 
 func TestToAPIPolicies(t *testing.T) {
 	in := []PolicyPackPolicyInput{
 		{
-			Name:             "no-secrets",
+			Name:             gcNoSecrets,
 			DisplayName:      "No Secrets",
 			Description:      "block secret literals",
-			EnforcementLevel: "mandatory",
+			EnforcementLevel: gcMandatory,
 			Message:          "remove the secret",
-			ConfigSchema:     map[string]any{"type": "object", "required": []string{"k"}},
+			ConfigSchema:     map[string]any{gcType: gcObject, gcRequired: []string{"k"}},
 			Severity:         "high",
 			Framework: &PolicyPackComplianceFrameworkInput{
 				Name:    "PCI-DSS",
@@ -137,9 +137,9 @@ func TestToAPIPolicies(t *testing.T) {
 	got := toAPIPolicies(in)
 	require.Len(t, got, 2)
 	first := got[0]
-	assert.Equal(t, "no-secrets", first.Name)
+	assert.Equal(t, gcNoSecrets, first.Name)
 	assert.Equal(t, "No Secrets", first.DisplayName)
-	assert.Equal(t, apitype.EnforcementLevel("mandatory"), first.EnforcementLevel)
+	assert.Equal(t, apitype.EnforcementLevel(gcMandatory), first.EnforcementLevel)
 	assert.Equal(t, apitype.PolicySeverity("high"), first.Severity)
 	require.NotNil(t, first.ConfigSchema)
 	assert.Equal(t, apitype.Object, first.ConfigSchema.Type)
@@ -157,7 +157,7 @@ func TestPoliciesNormalizedDeepEqual(t *testing.T) {
 	b := []PolicyPackPolicyInput{{Name: "a", EnforcementLevel: "advisory"}}
 	assert.True(t, reflect.DeepEqual(a, b))
 
-	b[0].EnforcementLevel = "mandatory"
+	b[0].EnforcementLevel = gcMandatory
 	assert.False(t, reflect.DeepEqual(a, b))
 }
 
@@ -166,20 +166,20 @@ func TestConvertAnalyzerConfigSchema(t *testing.T) {
 
 	got := convertAnalyzerConfigSchema(&plugin.AnalyzerPolicyConfigSchema{
 		Properties: map[string]plugin.JSONSchema{
-			"threshold": {"type": "number"},
+			gcThreshold: {gcType: "number"},
 		},
-		Required: []string{"threshold"},
+		Required: []string{gcThreshold},
 	})
-	assert.Equal(t, "object", got["type"])
-	assert.Equal(t, []string{"threshold"}, got["required"])
+	assert.Equal(t, gcObject, got[gcType])
+	assert.Equal(t, []string{gcThreshold}, got[gcRequired])
 
 	props, ok := got["properties"].(map[string]any)
 	require.True(t, ok)
-	assert.Contains(t, props, "threshold")
+	assert.Contains(t, props, gcThreshold)
 
 	// Empty schema still gets a type but no properties/required keys.
 	empty := convertAnalyzerConfigSchema(&plugin.AnalyzerPolicyConfigSchema{})
-	assert.Equal(t, map[string]any{"type": "object"}, empty)
+	assert.Equal(t, map[string]any{gcType: gcObject}, empty)
 }
 
 func TestPolicyPack_Create_DryRun(t *testing.T) {
@@ -194,15 +194,15 @@ func TestPolicyPack_Create_DryRun(t *testing.T) {
 	resp, err := (&PolicyPack{}).Create(ctx, infer.CreateRequest[PolicyPackInput]{
 		DryRun: true,
 		Inputs: PolicyPackInput{
-			Organization: "acme",
-			Name:         "guard",
-			VersionTag:   "1.0.0",
+			Organization: gcAcme,
+			Name:         gcGuard,
+			VersionTag:   gcVersion100,
 			SourcePath:   dir,
-			Policies:     []PolicyPackPolicyInput{{Name: "rule"}},
+			Policies:     []PolicyPackPolicyInput{{Name: gcRule}},
 		},
 	})
 	require.NoError(t, err)
-	assert.Equal(t, "acme", resp.Output.Organization)
+	assert.Equal(t, gcAcme, resp.Output.Organization)
 	assert.Empty(t, resp.ID, "DryRun should not assign an ID")
 }
 
@@ -213,7 +213,7 @@ func TestPolicyPack_Create_HappyPath(t *testing.T) {
 		publishFunc: func(
 			_ context.Context, org string, req pulumiapi.CreatePolicyPackRequest, archive io.Reader,
 		) (int, error) {
-			assert.Equal(t, "acme", org)
+			assert.Equal(t, gcAcme, org)
 			capturedReq = req
 			body, _ := io.ReadAll(archive)
 			assert.NotEmpty(t, body, "archive should be non-empty")
@@ -223,23 +223,23 @@ func TestPolicyPack_Create_HappyPath(t *testing.T) {
 	ctx := config.WithMockClient(context.Background(), mock)
 	resp, err := (&PolicyPack{}).Create(ctx, infer.CreateRequest[PolicyPackInput]{
 		Inputs: PolicyPackInput{
-			Organization: "acme",
-			Name:         "guard",
-			DisplayName:  "Guard",
-			VersionTag:   "1.0.0",
+			Organization: gcAcme,
+			Name:         gcGuard,
+			DisplayName:  gcGuardCap,
+			VersionTag:   gcVersion100,
 			SourcePath:   dir,
 			Policies: []PolicyPackPolicyInput{
-				{Name: "no-secrets", EnforcementLevel: "mandatory", ConfigSchema: map[string]any{"required": []string{"k"}}},
+				{Name: gcNoSecrets, EnforcementLevel: gcMandatory, ConfigSchema: map[string]any{gcRequired: []string{"k"}}},
 			},
 		},
 	})
 	require.NoError(t, err)
-	assert.Equal(t, "acme/guard/1.0.0", resp.ID)
+	assert.Equal(t, gcAcmeGuard100, resp.ID)
 	assert.Equal(t, 5, resp.Output.Version)
 	assert.NotEmpty(t, resp.Output.ContentHash)
-	assert.Equal(t, "guard", capturedReq.Name)
-	assert.Equal(t, "Guard", capturedReq.DisplayName)
-	assert.Equal(t, "1.0.0", capturedReq.VersionTag)
+	assert.Equal(t, gcGuard, capturedReq.Name)
+	assert.Equal(t, gcGuardCap, capturedReq.DisplayName)
+	assert.Equal(t, gcVersion100, capturedReq.VersionTag)
 	require.Len(t, capturedReq.Policies, 1)
 	// normalizeConfigSchema should have defaulted type=object
 	require.NotNil(t, capturedReq.Policies[0].ConfigSchema)
@@ -257,11 +257,11 @@ func TestPolicyPack_Create_PublishError(t *testing.T) {
 	ctx := config.WithMockClient(context.Background(), mock)
 	_, err := (&PolicyPack{}).Create(ctx, infer.CreateRequest[PolicyPackInput]{
 		Inputs: PolicyPackInput{
-			Organization: "acme",
-			Name:         "guard",
-			VersionTag:   "1.0.0",
+			Organization: gcAcme,
+			Name:         gcGuard,
+			VersionTag:   gcVersion100,
 			SourcePath:   dir,
-			Policies:     []PolicyPackPolicyInput{{Name: "rule"}},
+			Policies:     []PolicyPackPolicyInput{{Name: gcRule}},
 		},
 	})
 	require.Error(t, err)
@@ -273,11 +273,11 @@ func TestPolicyPack_Create_TarballError(t *testing.T) {
 	ctx := config.WithMockClient(context.Background(), mock)
 	_, err := (&PolicyPack{}).Create(ctx, infer.CreateRequest[PolicyPackInput]{
 		Inputs: PolicyPackInput{
-			Organization: "acme",
-			Name:         "guard",
-			VersionTag:   "1.0.0",
+			Organization: gcAcme,
+			Name:         gcGuard,
+			VersionTag:   gcVersion100,
 			SourcePath:   filepath.Join(t.TempDir(), "does-not-exist"),
-			Policies:     []PolicyPackPolicyInput{{Name: "rule"}},
+			Policies:     []PolicyPackPolicyInput{{Name: gcRule}},
 		},
 	})
 	require.Error(t, err)
@@ -291,10 +291,10 @@ func TestPolicyPack_Diff_NoChanges(t *testing.T) {
 
 	state := PolicyPackState{
 		PolicyPackInput: PolicyPackInput{
-			Organization: "acme",
-			Name:         "guard",
-			VersionTag:   "1.0.0",
-			DisplayName:  "Guard",
+			Organization: gcAcme,
+			Name:         gcGuard,
+			VersionTag:   gcVersion100,
+			DisplayName:  gcGuardCap,
 			SourcePath:   dir,
 		},
 		ContentHash: hash,
@@ -312,9 +312,9 @@ func TestPolicyPack_Diff_ReplacesOnContentChange(t *testing.T) {
 	dir := writePolicySource(t)
 	state := PolicyPackState{
 		PolicyPackInput: PolicyPackInput{
-			Organization: "acme",
-			Name:         "guard",
-			VersionTag:   "1.0.0",
+			Organization: gcAcme,
+			Name:         gcGuard,
+			VersionTag:   gcVersion100,
 			SourcePath:   dir,
 		},
 		ContentHash: "not-the-current-hash",
@@ -335,9 +335,9 @@ func TestPolicyPack_Diff_ReplacesOnIdentityChange(t *testing.T) {
 
 	state := PolicyPackState{
 		PolicyPackInput: PolicyPackInput{
-			Organization: "acme",
-			Name:         "guard",
-			VersionTag:   "1.0.0",
+			Organization: gcAcme,
+			Name:         gcGuard,
+			VersionTag:   gcVersion100,
 			DisplayName:  "Old",
 			SourcePath:   dir,
 		},
@@ -347,10 +347,10 @@ func TestPolicyPack_Diff_ReplacesOnIdentityChange(t *testing.T) {
 		field string
 		patch func(*PolicyPackInput)
 	}{
-		{"organization", func(in *PolicyPackInput) { in.Organization = "other" }},
-		{"name", func(in *PolicyPackInput) { in.Name = "renamed" }},
-		{"versionTag", func(in *PolicyPackInput) { in.VersionTag = "2.0.0" }},
-		{"displayName", func(in *PolicyPackInput) { in.DisplayName = "New" }},
+		{gcOrganization, func(in *PolicyPackInput) { in.Organization = gcOther }},
+		{gcName, func(in *PolicyPackInput) { in.Name = "renamed" }},
+		{gcVersionTag, func(in *PolicyPackInput) { in.VersionTag = "2.0.0" }},
+		{gcDisplayName, func(in *PolicyPackInput) { in.DisplayName = "New" }},
 	} {
 		t.Run(tc.field, func(t *testing.T) {
 			inputs := state.PolicyPackInput
@@ -372,16 +372,16 @@ func TestPolicyPack_Delete(t *testing.T) {
 		mock := &PolicyPackClientMock{
 			deleteVersionFunc: func(_ context.Context, org, name, tag string) error {
 				called = true
-				assert.Equal(t, "acme", org)
-				assert.Equal(t, "guard", name)
-				assert.Equal(t, "1.0.0", tag)
+				assert.Equal(t, gcAcme, org)
+				assert.Equal(t, gcGuard, name)
+				assert.Equal(t, gcVersion100, tag)
 				return nil
 			},
 		}
 		ctx := config.WithMockClient(context.Background(), mock)
 		_, err := (&PolicyPack{}).Delete(ctx, infer.DeleteRequest[PolicyPackState]{
 			State: PolicyPackState{
-				PolicyPackInput: PolicyPackInput{Organization: "acme", Name: "guard", VersionTag: "1.0.0"},
+				PolicyPackInput: PolicyPackInput{Organization: gcAcme, Name: gcGuard, VersionTag: gcVersion100},
 			},
 		})
 		require.NoError(t, err)
@@ -397,7 +397,7 @@ func TestPolicyPack_Delete(t *testing.T) {
 		ctx := config.WithMockClient(context.Background(), mock)
 		_, err := (&PolicyPack{}).Delete(ctx, infer.DeleteRequest[PolicyPackState]{
 			State: PolicyPackState{
-				PolicyPackInput: PolicyPackInput{Organization: "acme", Name: "guard", VersionTag: "1.0.0"},
+				PolicyPackInput: PolicyPackInput{Organization: gcAcme, Name: gcGuard, VersionTag: gcVersion100},
 			},
 		})
 		require.Error(t, err)
@@ -408,10 +408,10 @@ func TestPolicyPack_Read(t *testing.T) {
 	t.Run("happy path", func(t *testing.T) {
 		mock := &PolicyPackClientMock{
 			listFunc: func(_ context.Context, org string) ([]pulumiapi.PolicyPackWithVersions, error) {
-				assert.Equal(t, "acme", org)
+				assert.Equal(t, gcAcme, org)
 				return []pulumiapi.PolicyPackWithVersions{
-					{Name: "other"},
-					{Name: "guard", DisplayName: "Guard", Versions: []int{4, 5}, VersionTags: []string{"0.9.0", "1.0.0"}},
+					{Name: gcOther},
+					{Name: gcGuard, DisplayName: gcGuardCap, Versions: []int{4, 5}, VersionTags: []string{"0.9.0", gcVersion100}},
 				}, nil
 			},
 		}
@@ -421,12 +421,12 @@ func TestPolicyPack_Read(t *testing.T) {
 			ContentHash:     "preserved-hash",
 		}
 		resp, err := (&PolicyPack{}).Read(ctx, infer.ReadRequest[PolicyPackInput, PolicyPackState]{
-			ID:    "acme/guard/1.0.0",
+			ID:    gcAcmeGuard100,
 			State: existing,
 		})
 		require.NoError(t, err)
-		assert.Equal(t, "acme/guard/1.0.0", resp.ID)
-		assert.Equal(t, "Guard", resp.Inputs.DisplayName)
+		assert.Equal(t, gcAcmeGuard100, resp.ID)
+		assert.Equal(t, gcGuardCap, resp.Inputs.DisplayName)
 		assert.Equal(t, 5, resp.State.Version)
 		assert.Equal(t, "preserved-hash", resp.State.ContentHash)
 	})
@@ -434,12 +434,12 @@ func TestPolicyPack_Read(t *testing.T) {
 	t.Run("missing pack returns empty response", func(t *testing.T) {
 		mock := &PolicyPackClientMock{
 			listFunc: func(context.Context, string) ([]pulumiapi.PolicyPackWithVersions, error) {
-				return []pulumiapi.PolicyPackWithVersions{{Name: "other"}}, nil
+				return []pulumiapi.PolicyPackWithVersions{{Name: gcOther}}, nil
 			},
 		}
 		ctx := config.WithMockClient(context.Background(), mock)
 		resp, err := (&PolicyPack{}).Read(ctx, infer.ReadRequest[PolicyPackInput, PolicyPackState]{
-			ID: "acme/guard/1.0.0",
+			ID: gcAcmeGuard100,
 		})
 		require.NoError(t, err)
 		assert.Empty(t, resp.ID)
@@ -449,13 +449,13 @@ func TestPolicyPack_Read(t *testing.T) {
 		mock := &PolicyPackClientMock{
 			listFunc: func(context.Context, string) ([]pulumiapi.PolicyPackWithVersions, error) {
 				return []pulumiapi.PolicyPackWithVersions{
-					{Name: "guard", Versions: []int{1}, VersionTags: []string{"0.9.0"}},
+					{Name: gcGuard, Versions: []int{1}, VersionTags: []string{"0.9.0"}},
 				}, nil
 			},
 		}
 		ctx := config.WithMockClient(context.Background(), mock)
 		resp, err := (&PolicyPack{}).Read(ctx, infer.ReadRequest[PolicyPackInput, PolicyPackState]{
-			ID: "acme/guard/1.0.0",
+			ID: gcAcmeGuard100,
 		})
 		require.NoError(t, err)
 		assert.Empty(t, resp.ID)
@@ -474,11 +474,11 @@ func TestPolicyPack_Read(t *testing.T) {
 func TestResolvePolicies_Inline(t *testing.T) {
 	in := PolicyPackInput{
 		Policies: []PolicyPackPolicyInput{
-			{Name: "no-secrets", ConfigSchema: map[string]any{"required": []string{"k"}}},
+			{Name: gcNoSecrets, ConfigSchema: map[string]any{gcRequired: []string{"k"}}},
 		},
 	}
 	got, err := resolvePolicies(context.Background(), in)
 	require.NoError(t, err)
 	require.Len(t, got, 1)
-	assert.Equal(t, "object", got[0].ConfigSchema["type"])
+	assert.Equal(t, gcObject, got[0].ConfigSchema[gcType])
 }

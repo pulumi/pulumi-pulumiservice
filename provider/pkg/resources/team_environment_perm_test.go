@@ -49,10 +49,10 @@ func TestTeamEnvironmentPermissionCheck(t *testing.T) {
 	r := &TeamEnvironmentPermission{}
 	base := func() map[string]property.Value {
 		return map[string]property.Value{
-			"organization": property.New("org"),
-			"team":         property.New("team"),
-			"project":      property.New("proj"),
-			"environment":  property.New("env"),
+			gcOrganization: property.New(gcOrg),
+			gcTeam:         property.New(gcTeam),
+			gcProject:      property.New("proj"),
+			gcEnvironment:  property.New(gcEnv),
 			"permission":   property.New("open"),
 		}
 	}
@@ -104,10 +104,10 @@ func TestTeamEnvironmentPermissionDiff(t *testing.T) {
 	state := func() TeamEnvironmentPermissionState {
 		return TeamEnvironmentPermissionState{
 			TeamEnvironmentPermissionInput: TeamEnvironmentPermissionInput{
-				Organization: "org",
-				Team:         "team",
+				Organization: gcOrg,
+				Team:         gcTeam,
 				Project:      "proj",
-				Environment:  "env",
+				Environment:  gcEnv,
 				Permission:   EnvironmentPermissionOpen,
 			},
 		}
@@ -206,10 +206,10 @@ func TestSplitTeamEnvironmentPermissionID(t *testing.T) {
 		got, err := splitTeamEnvironmentPermissionID("org/team/proj+env")
 		require.NoError(t, err)
 		assert.Equal(t, teamEnvironmentPermissionID{
-			Organization: "org",
-			Team:         "team",
+			Organization: gcOrg,
+			Team:         gcTeam,
 			Project:      "proj",
-			Environment:  "env",
+			Environment:  gcEnv,
 		}, got)
 	})
 
@@ -217,10 +217,10 @@ func TestSplitTeamEnvironmentPermissionID(t *testing.T) {
 		got, err := splitTeamEnvironmentPermissionID("org/team/env")
 		require.NoError(t, err)
 		assert.Equal(t, teamEnvironmentPermissionID{
-			Organization: "org",
-			Team:         "team",
+			Organization: gcOrg,
+			Team:         gcTeam,
 			Project:      "default",
-			Environment:  "env",
+			Environment:  gcEnv,
 		}, got)
 	})
 

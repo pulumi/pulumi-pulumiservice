@@ -289,7 +289,7 @@ func approvalRuleTargetToAPI(
 	}
 	return pulumiapi.ChangeGateTargetInput{
 		ActionTypes:   actions,
-		EntityType:    "environment",
+		EntityType:    gcEnvironment,
 		QualifiedName: fmt.Sprintf("%s/%s", env.Project, env.Name),
 	}
 }
@@ -366,7 +366,7 @@ func buildApprovalRuleID(env EnvironmentIdentifier, ruleID string) string {
 
 func parseApprovalRuleID(compositeID string) (EnvironmentIdentifier, string, error) {
 	parts := strings.Split(compositeID, "/")
-	if len(parts) != 5 || parts[0] != "environment" {
+	if len(parts) != 5 || parts[0] != gcEnvironment {
 		return EnvironmentIdentifier{}, "", fmt.Errorf(
 			"invalid approval rule ID format: expected 'environment/{orgName}/{projectName}/{envName}/{ruleID}', got %q",
 			compositeID,

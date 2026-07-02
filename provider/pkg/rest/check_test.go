@@ -103,13 +103,13 @@ func TestCheckNormalizesEnumCase(t *testing.T) {
 	r := fooResource(spec, nil, "", false)
 	resp, err := r.Check(t.Context(), p.CheckRequest{
 		Inputs: property.NewMap(map[string]property.Value{
-			"mode": property.New("up"),
+			modeKey: property.New("up"),
 		}),
 	})
 	if err != nil {
 		t.Fatalf("check: %v", err)
 	}
-	got, _ := resp.Inputs.GetOk("mode")
+	got, _ := resp.Inputs.GetOk(modeKey)
 	if got.AsString() != "UP" {
 		t.Errorf("mode: got %q, want \"UP\"", got.AsString())
 	}
@@ -145,7 +145,7 @@ func TestCheckSortsUnorderedArray(t *testing.T) {
 func TestCheckGeneratesAutoName(t *testing.T) {
 	spec := syntheticSpec(t)
 	r := fooResource(spec, map[string]FieldMeta{
-		"name": {AutoName: 24},
+		nameKey: {AutoName: 24},
 	}, "", false)
 	resp, err := r.Check(t.Context(), p.CheckRequest{
 		Urn:        presource.URN("urn:pulumi:dev::demo::pulumiservice:api:Foo::myresource"),
@@ -155,7 +155,7 @@ func TestCheckGeneratesAutoName(t *testing.T) {
 	if err != nil {
 		t.Fatalf("check: %v", err)
 	}
-	got, ok := resp.Inputs.GetOk("name")
+	got, ok := resp.Inputs.GetOk(nameKey)
 	if !ok {
 		t.Fatalf("name: missing from inputs")
 	}
@@ -171,7 +171,7 @@ func TestCheckGeneratesAutoName(t *testing.T) {
 		Urn:        presource.URN("urn:pulumi:dev::demo::pulumiservice:api:Foo::myresource"),
 		RandomSeed: []byte("deterministic-seed"),
 	})
-	got2, _ := resp2.Inputs.GetOk("name")
+	got2, _ := resp2.Inputs.GetOk(nameKey)
 	if got2.AsString() != name {
 		t.Errorf("name: not deterministic (%q vs %q)", name, got2.AsString())
 	}
@@ -180,16 +180,16 @@ func TestCheckGeneratesAutoName(t *testing.T) {
 func TestCheckPreservesUserSuppliedName(t *testing.T) {
 	spec := syntheticSpec(t)
 	r := fooResource(spec, map[string]FieldMeta{
-		"name": {AutoName: 24},
+		nameKey: {AutoName: 24},
 	}, "", false)
 	resp, _ := r.Check(t.Context(), p.CheckRequest{
 		Urn:        presource.URN("urn:pulumi:dev::demo::pulumiservice:api:Foo::myresource"),
 		RandomSeed: []byte("seed"),
 		Inputs: property.NewMap(map[string]property.Value{
-			"name": property.New("explicit-name"),
+			nameKey: property.New("explicit-name"),
 		}),
 	})
-	got, _ := resp.Inputs.GetOk("name")
+	got, _ := resp.Inputs.GetOk(nameKey)
 	if got.AsString() != "explicit-name" {
 		t.Errorf("user-supplied name overwritten: got %q", got.AsString())
 	}
@@ -200,8 +200,8 @@ func TestSynthesizeIDFromFormat(t *testing.T) {
 	r := fooResource(spec, nil, "{org}/{name}", false)
 	id, err := r.synthesizeID(
 		property.NewMap(map[string]property.Value{
-			"org":  property.New("acme"),
-			"name": property.New("payments"),
+			orgKey:  property.New(acmeVal),
+			nameKey: property.New("payments"),
 		}),
 		property.Map{},
 	)
@@ -218,11 +218,11 @@ func TestSynthesizeIDFromFormat_MissingValue(t *testing.T) {
 	r := fooResource(spec, nil, "{org}/{name}", false)
 	_, err := r.synthesizeID(
 		property.NewMap(map[string]property.Value{
-			"org": property.New("acme"),
+			orgKey: property.New(acmeVal),
 		}),
 		property.Map{},
 	)
-	if err == nil || !strings.Contains(err.Error(), "name") {
+	if err == nil || !strings.Contains(err.Error(), nameKey) {
 		t.Errorf("expected missing-value error mentioning \"name\", got: %v", err)
 	}
 }
@@ -231,9 +231,9 @@ func TestParseIDIntoInputsRecoversPathParams(t *testing.T) {
 	spec := syntheticSpec(t)
 	r := fooResource(spec, nil, "{org}/{name}", false)
 	got := r.parseIDIntoInputs("acme/payments", property.Map{})
-	wantOrg, _ := got.GetOk("org")
-	wantName, _ := got.GetOk("name")
-	if wantOrg.AsString() != "acme" || wantName.AsString() != "payments" {
+	wantOrg, _ := got.GetOk(orgKey)
+	wantName, _ := got.GetOk(nameKey)
+	if wantOrg.AsString() != acmeVal || wantName.AsString() != "payments" {
 		t.Errorf("parsed inputs: org=%q name=%q", wantOrg.AsString(), wantName.AsString())
 	}
 }
@@ -244,15 +244,15 @@ func TestParseIDIntoInputs_FillsMissingKeys(t *testing.T) {
 	spec := syntheticSpec(t)
 	r := fooResource(spec, nil, "{org}/{name}", false)
 	original := property.NewMap(map[string]property.Value{
-		"org":   property.New("existing-org"),
+		orgKey:  property.New("existing-org"),
 		"extra": property.New("user-data"),
 	})
 	got := r.parseIDIntoInputs("other/different", original)
-	gotOrg, _ := got.GetOk("org")
+	gotOrg, _ := got.GetOk(orgKey)
 	if gotOrg.AsString() != "existing-org" {
 		t.Errorf("org: got %q, want %q (existing inputs must not be overwritten)", gotOrg.AsString(), "existing-org")
 	}
-	gotName, ok := got.GetOk("name")
+	gotName, ok := got.GetOk(nameKey)
 	if !ok {
 		t.Errorf("name: missing — should have been filled from ID")
 	} else if gotName.AsString() != "different" {
@@ -267,17 +267,17 @@ func TestParseIDIntoInputs_FillsMissingKeys(t *testing.T) {
 func TestPreserveEmitOnCreate(t *testing.T) {
 	spec := syntheticSpec(t)
 	r := fooResource(spec, map[string]FieldMeta{
-		"tokenValue": {EmitOnCreate: true},
+		tokenValueKey: {EmitOnCreate: true},
 	}, "", false)
 	prior := property.NewMap(map[string]property.Value{
-		"id":         property.New("foo-1"),
-		"tokenValue": property.New("secret-from-create"),
+		"id":          property.New("foo-1"),
+		tokenValueKey: property.New("secret-from-create"),
 	})
 	fresh := property.NewMap(map[string]property.Value{
 		"id": property.New("foo-1"),
 	})
 	merged := r.preserveEmitOnCreate(fresh, prior)
-	got, ok := merged.GetOk("tokenValue")
+	got, ok := merged.GetOk(tokenValueKey)
 	if !ok || got.AsString() != "secret-from-create" {
 		t.Errorf("tokenValue: got %v, want \"secret-from-create\"", got.AsString())
 	}
@@ -287,8 +287,8 @@ func TestDiffSetsDeleteBeforeReplaceWhenMarked(t *testing.T) {
 	spec := syntheticSpec(t)
 	r := fooResource(spec, nil, "", true)
 	resp, err := r.Diff(t.Context(), p.DiffRequest{
-		OldInputs: property.NewMap(map[string]property.Value{"name": property.New("a")}),
-		Inputs:    property.NewMap(map[string]property.Value{"name": property.New("b")}),
+		OldInputs: property.NewMap(map[string]property.Value{nameKey: property.New("a")}),
+		Inputs:    property.NewMap(map[string]property.Value{nameKey: property.New("b")}),
 	})
 	if err != nil {
 		t.Fatalf("diff: %v", err)
@@ -305,8 +305,8 @@ func TestDiffOmitsDeleteBeforeReplaceWhenUnmarked(t *testing.T) {
 	spec := syntheticSpec(t)
 	r := fooResource(spec, nil, "", false)
 	resp, _ := r.Diff(t.Context(), p.DiffRequest{
-		OldInputs: property.NewMap(map[string]property.Value{"name": property.New("a")}),
-		Inputs:    property.NewMap(map[string]property.Value{"name": property.New("b")}),
+		OldInputs: property.NewMap(map[string]property.Value{nameKey: property.New("a")}),
+		Inputs:    property.NewMap(map[string]property.Value{nameKey: property.New("b")}),
 	})
 	if resp.DeleteBeforeReplace {
 		t.Errorf("DeleteBeforeReplace: got true, want false")

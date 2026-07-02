@@ -14,7 +14,7 @@ func TestGetCurrentUser(t *testing.T) {
 		ResponseCode:      200,
 		ResponseBody: CurrentUser{
 			ID:          "user-123",
-			GithubLogin: "alice",
+			GithubLogin: aliceUser,
 			Name:        "Alice Example",
 			Email:       "alice@example.com",
 			AvatarURL:   "https://avatars.example.com/alice.png",
@@ -23,7 +23,7 @@ func TestGetCurrentUser(t *testing.T) {
 	got, err := c.GetCurrentUser(ctx)
 	assert.NoError(t, err)
 	if assert.NotNil(t, got) {
-		assert.Equal(t, "alice", got.GithubLogin)
+		assert.Equal(t, aliceUser, got.GithubLogin)
 		assert.Equal(t, "Alice Example", got.Name)
 		assert.Equal(t, "alice@example.com", got.Email)
 	}

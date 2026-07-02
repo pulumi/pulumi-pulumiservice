@@ -23,8 +23,8 @@ import (
 
 func TestBuildApprovalRuleID(t *testing.T) {
 	got := buildApprovalRuleID(EnvironmentIdentifier{
-		Organization: "my-org",
-		Project:      "my-project",
+		Organization: gcMyOrg,
+		Project:      gcMyProject,
 		Name:         "my-env",
 	}, "rule-abc")
 	assert.Equal(t, "environment/my-org/my-project/my-env/rule-abc", got)
@@ -35,8 +35,8 @@ func TestParseApprovalRuleID(t *testing.T) {
 		env, ruleID, err := parseApprovalRuleID("environment/my-org/my-project/my-env/rule-abc")
 		require.NoError(t, err)
 		assert.Equal(t, EnvironmentIdentifier{
-			Organization: "my-org",
-			Project:      "my-project",
+			Organization: gcMyOrg,
+			Project:      gcMyProject,
 			Name:         "my-env",
 		}, env)
 		assert.Equal(t, "rule-abc", ruleID)

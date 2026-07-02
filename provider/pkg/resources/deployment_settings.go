@@ -49,9 +49,9 @@ func (ds *PulumiServiceDeploymentSettingsInput) ToPropertyMap(
 	// the state
 
 	pm := resource.PropertyMap{}
-	pm["organization"] = resource.NewPropertyValue(ds.Stack.OrgName)
-	pm["project"] = resource.NewPropertyValue(ds.Stack.ProjectName)
-	pm["stack"] = resource.NewPropertyValue(ds.Stack.StackName)
+	pm[gcOrganization] = resource.NewPropertyValue(ds.Stack.OrgName)
+	pm[gcProject] = resource.NewPropertyValue(ds.Stack.ProjectName)
+	pm[gcStack] = resource.NewPropertyValue(ds.Stack.StackName)
 
 	if ds.AgentPoolID != nil {
 		pm["agentPoolId"] = resource.NewPropertyValue(*ds.AgentPoolID)
@@ -242,7 +242,7 @@ func (ds *PulumiServiceDeploymentSettingsInput) ToPropertyMap(
 					if ds.Operation.OIDC.AWS.Duration != "" {
 						awsMap["duration"] = resource.NewPropertyValue(ds.Operation.OIDC.AWS.Duration)
 					}
-					oidcMap["aws"] = resource.PropertyValue{V: awsMap}
+					oidcMap[gcAWS] = resource.PropertyValue{V: awsMap}
 				}
 				if ds.Operation.OIDC.GCP != nil {
 					gcpMap := resource.PropertyMap{}
@@ -352,9 +352,9 @@ func (ds *PulumiServiceDeploymentSettingsResource) ToPulumiServiceDeploymentSett
 ) PulumiServiceDeploymentSettingsInput {
 	input := PulumiServiceDeploymentSettingsInput{}
 
-	input.Stack.OrgName = util.GetSecretOrStringValue(inputMap["organization"])
-	input.Stack.ProjectName = util.GetSecretOrStringValue(inputMap["project"])
-	input.Stack.StackName = util.GetSecretOrStringValue(inputMap["stack"])
+	input.Stack.OrgName = util.GetSecretOrStringValue(inputMap[gcOrganization])
+	input.Stack.ProjectName = util.GetSecretOrStringValue(inputMap[gcProject])
+	input.Stack.StackName = util.GetSecretOrStringValue(inputMap[gcStack])
 
 	if inputMap["agentPoolId"].HasValue() {
 		value := util.GetSecretOrStringValue(inputMap["agentPoolId"])
@@ -627,8 +627,8 @@ func toOperationContext(inputMap resource.PropertyMap) *pulumiapi.OperationConte
 		oidcInput := util.GetSecretOrObjectValue(ocInput["oidc"])
 		var oidc pulumiapi.OperationContextOIDCConfiguration
 
-		if oidcInput["aws"].HasValue() {
-			awsInput := util.GetSecretOrObjectValue(oidcInput["aws"])
+		if oidcInput[gcAWS].HasValue() {
+			awsInput := util.GetSecretOrObjectValue(oidcInput[gcAWS])
 			var aws pulumiapi.OperationContextAWSOIDCConfiguration
 
 			if awsInput["roleARN"].HasValue() {
@@ -741,9 +741,9 @@ func (ds *PulumiServiceDeploymentSettingsResource) Diff(req *pulumirpc.DiffReque
 	detailedDiffs := map[string]*pulumirpc.PropertyDiff{}
 	replaces := []string(nil)
 	replaceProperties := map[string]bool{
-		"organization": true,
-		"project":      true,
-		"stack":        true,
+		gcOrganization: true,
+		gcProject:      true,
+		gcStack:        true,
 	}
 	for k, v := range dd {
 		if _, ok := replaceProperties[k]; ok {
@@ -774,7 +774,7 @@ func (ds *PulumiServiceDeploymentSettingsResource) Check(
 	}
 
 	var failures []*pulumirpc.CheckFailure
-	for _, p := range []resource.PropertyKey{"organization", "project", "stack"} {
+	for _, p := range []resource.PropertyKey{gcOrganization, gcProject, gcStack} {
 		if !news[(p)].HasValue() {
 			failures = append(failures, &pulumirpc.CheckFailure{
 				Reason:   fmt.Sprintf("missing required property '%s'", p),
@@ -788,8 +788,8 @@ func (ds *PulumiServiceDeploymentSettingsResource) Check(
 		operationContext := util.GetSecretOrObjectValue(news["operationContext"])
 		if operationContext["oidc"].HasValue() {
 			oidc := util.GetSecretOrObjectValue(operationContext["oidc"])
-			if oidc["aws"].HasValue() {
-				aws := util.GetSecretOrObjectValue(oidc["aws"])
+			if oidc[gcAWS].HasValue() {
+				aws := util.GetSecretOrObjectValue(oidc[gcAWS])
 				if aws["duration"].HasValue() {
 					durationString := util.GetSecretOrStringValue(aws["duration"])
 					normalized, err := normalizeDurationString(durationString)
@@ -850,7 +850,7 @@ func (ds *PulumiServiceDeploymentSettingsResource) Read(req *pulumirpc.ReadReque
 	if err != nil {
 		return nil, err
 	}
-	if propertyMap["stack"].HasValue() {
+	if propertyMap[gcStack].HasValue() {
 		tempPlain := ds.ToPulumiServiceDeploymentSettingsInput(inputMap)
 		plaintextSettings = &tempPlain.DeploymentSettings
 		tempCipher := ds.ToPulumiServiceDeploymentSettingsInput(propertyMap)

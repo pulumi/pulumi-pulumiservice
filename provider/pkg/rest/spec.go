@@ -30,6 +30,9 @@ const (
 	contentYAML = "application/x-yaml"
 	inPath      = "path"  // Parameter.In value for path parameters
 	inQuery     = "query" // Parameter.In value for query parameters
+
+	// descriptionKey is the operation/property field name carrying a description.
+	descriptionKey = "description"
 )
 
 // Operation is the subset of an OpenAPI operation needed at runtime.
@@ -164,7 +167,7 @@ func parseOperation(id, path, method string, raw map[string]any) *Operation {
 		Method: method,
 		Raw:    raw,
 	}
-	if d, ok := raw["description"].(string); ok {
+	if d, ok := raw[descriptionKey].(string); ok {
 		op.Description = d
 	}
 	if dep, _ := raw["deprecated"].(bool); dep {
@@ -185,7 +188,7 @@ func parseOperation(id, path, method string, raw map[string]any) *Operation {
 			pp.Name, _ = pm["name"].(string)
 			pp.In, _ = pm["in"].(string)
 			pp.Required, _ = pm["required"].(bool)
-			pp.Description, _ = pm["description"].(string)
+			pp.Description, _ = pm[descriptionKey].(string)
 			if sch, ok := pm["schema"].(map[string]any); ok {
 				pp.SchemaType, _ = sch["type"].(string)
 			}
