@@ -35,6 +35,20 @@ import (
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 )
 
+const (
+	gcName             = "name"
+	gcOrganizationName = "organizationName"
+	gcEntityType       = "entityType"
+	gcMode             = "mode"
+	gcStacks           = "stacks"
+	gcAccounts         = "accounts"
+	gcPolicyPacks      = "policyPacks"
+	gcDisplayName      = "displayName"
+	gcVersionTag       = "versionTag"
+	gcAudit            = "audit"
+	gcPreventative     = "preventative"
+)
+
 type PulumiServicePolicyGroupResource struct {
 	Client pulumiapi.PolicyGroupClient
 }

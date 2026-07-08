@@ -34,6 +34,7 @@ const (
 	PulumiOperationPreview PulumiOperation = "preview"
 	PulumiOperationRefresh PulumiOperation = "refresh"
 	PulumiOperationDestroy PulumiOperation = "destroy"
+	gcTimestamp                            = "timestamp"
 )
 
 func (PulumiOperation) Values() []infer.EnumValue[PulumiOperation] {

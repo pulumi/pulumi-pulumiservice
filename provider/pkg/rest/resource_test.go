@@ -31,9 +31,41 @@ import (
 
 // Repeated test-only literals — extracted so goconst stops flagging them.
 const (
-	teamToken      = "pulumiservice:api:Team" //nolint:gosec // resource token, not a credential
-	getThingPath   = "GET /things/acme/thing-1"
-	patchThingPath = "PATCH /things/acme/thing-1"
+	teamToken            = "pulumiservice:api:Team" //nolint:gosec // resource token, not a credential
+	getThingPath         = "GET /things/acme/thing-1"
+	patchThingPath       = "PATCH /things/acme/thing-1"
+	nameKey              = "name"
+	orgKey               = "org"
+	orgNameKey           = "orgName"
+	valueKey             = "value"
+	organizationNameVal  = "organizationName"
+	widgetIDVal          = "widgetID"
+	acmeVal              = "acme"
+	infraVal             = "infra"
+	infraTeamVal         = "infra team"
+	newVal               = "new"
+	originalVal          = "original"
+	rotatedVal           = "rotated"
+	goneVal              = "gone"
+	acmeGoneID           = "acme/gone"
+	createThingOp        = "CreateThing"
+	putThingOp           = "PutThing"
+	orgIDFormat          = "{org}/{id}"
+	orgFormat            = "{org}"
+	postThingsAcme       = "POST /things/acme"
+	getThingsAcme        = "GET /things/acme"
+	putThingsAcme        = "PUT /things/acme"
+	deleteThingsAcmeGone = "DELETE /things/acme/gone"
+	unexpectedBody       = "unexpected"
+	notFoundBody         = `{"error":"not found"}`
+	orgAcmeNewBody       = `{"org":"acme","value":"new"}`
+	createdTimestamp     = "2026-05-05T00:00:00Z"
+	testOrgName          = "test-org"
+	orgProjectNameFormat = "{org}/{project}/{name}"
+	getThingOp           = "GetThing"
+	fooVal               = "foo"
+	thing1ID             = "thing-1"
+	createdKey           = "created"
 )
 
 // mockTransport serves canned responses keyed by "<METHOD> <path>". Set

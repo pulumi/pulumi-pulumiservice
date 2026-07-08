@@ -31,6 +31,13 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/common/apitype"
 )
 
+const (
+	notFoundError         = "not found"
+	policyPackVersion     = "1.0.0"
+	policyPackVersionPath = "/api/orgs/anOrg/policypacks/alpha/versions/1.0.0"
+	alphaPolicyPack       = "alpha"
+)
+
 const policyPacksPath = "/api/orgs/anOrg/policypacks"
 
 func TestListPolicyPacks(t *testing.T) {

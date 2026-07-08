@@ -31,6 +31,11 @@ import (
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 )
 
+const (
+	gcPermissions = "permissions"
+	gcGlobal      = "global"
+)
+
 type OrganizationRole struct{}
 
 var (

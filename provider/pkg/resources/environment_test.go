@@ -17,6 +17,10 @@ import (
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 )
 
+const (
+	gcEnv = "env"
+)
+
 type getEnvironmentFunc func(
 	ctx context.Context, orgName string, envName string, version string, decrypt bool,
 ) (yaml []byte, etag string, revision int, err error)

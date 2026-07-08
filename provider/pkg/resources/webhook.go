@@ -43,6 +43,7 @@ const (
 	WebhookFormatSlack             WebhookFormat = "slack"
 	WebhookFormatPulumiDeployments WebhookFormat = "pulumi_deployments"
 	WebhookFormatMicrosoftTeams    WebhookFormat = "ms_teams"
+	gcProjectName                                = "projectName"
 )
 
 func (WebhookFormat) Values() []infer.EnumValue[WebhookFormat] {

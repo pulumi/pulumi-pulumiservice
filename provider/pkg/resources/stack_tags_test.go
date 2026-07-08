@@ -27,6 +27,11 @@ import (
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 )
 
+const (
+	gcMyTag   = "myTag"
+	gcMyValue = "myValue"
+)
+
 type StackTagClientMock struct {
 	config.Client
 	getStackTagFunc func(

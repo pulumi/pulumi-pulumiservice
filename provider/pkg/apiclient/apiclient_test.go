@@ -15,6 +15,11 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+const (
+	filterKey = "filter"
+	limitKey  = "limit"
+)
+
 func newTestClient(t *testing.T, handler http.Handler) (*CloudClient, *httptest.Server) {
 	t.Helper()
 	srv := httptest.NewServer(handler)

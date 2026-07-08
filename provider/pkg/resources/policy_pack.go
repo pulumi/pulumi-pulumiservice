@@ -45,6 +45,12 @@ import (
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 )
 
+const (
+	gcObject   = "object"
+	gcType     = "type"
+	gcRequired = "required"
+)
+
 type PolicyPack struct{}
 
 var (

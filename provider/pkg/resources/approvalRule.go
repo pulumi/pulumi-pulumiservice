@@ -48,6 +48,10 @@ const (
 	TargetActionTypeUpdate TargetActionType = "update"
 )
 
+const (
+	gcEnvironment = "environment"
+)
+
 func (TargetActionType) Values() []infer.EnumValue[TargetActionType] {
 	return []infer.EnumValue[TargetActionType]{
 		{Name: "Update", Value: TargetActionTypeUpdate, Description: "Update action type for approval rules."},

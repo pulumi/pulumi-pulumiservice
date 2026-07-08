@@ -14,6 +14,16 @@ import (
 const (
 	testInsightsOrgName     = "test-org"
 	testInsightsAccountName = "test-account"
+	awsProvider             = "aws"
+	testEnvName             = "test-env"
+	regionsKey              = "regions"
+	internalServerError     = "internal server error"
+	environmentKey          = "environment"
+	testTimestamp           = "2025-01-01T00:00:00Z"
+	teamKey                 = "team"
+	validTag                = "valid-tag"
+	valueKey                = "value"
+	usWest2Region           = "us-west-2"
 )
 
 func TestCreateInsightsAccount(t *testing.T) {

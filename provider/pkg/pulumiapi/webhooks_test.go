@@ -13,6 +13,8 @@ const (
 	testWebhookDisplayName = "A Webhook"
 	testWebhookPayloadURL  = "https://example.com/webhook"
 	testWebhookSecret      = "{...}"
+	hooksPath              = "/api/orgs/an-organization/hooks"
+	webhookPath            = "/api/orgs/an-organization/hooks/a-webhook"
 )
 
 func TestCreateWebhook(t *testing.T) {

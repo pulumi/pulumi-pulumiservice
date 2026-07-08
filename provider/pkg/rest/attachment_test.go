@@ -26,6 +26,20 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/property"
 )
 
+const (
+	modeKey           = "mode"
+	accountsKey       = "accounts"
+	policyGroupKey    = "policyGroup"
+	grpVal            = "grp"
+	stacksVal         = "stacks"
+	devVal            = "dev"
+	myProjectVal      = "my-project"
+	acct1Val          = "acct-1"
+	devProjectID      = "test-org/grp/dev/my-project"
+	acct1ID           = "test-org/grp/acct-1"
+	routingProjectKey = "routingProject"
+)
+
 const stackAttachmentToken = "pulumiservice:api:PolicyGroupStackAttachment" //nolint:gosec // type token
 
 // pgPath is the shared parent path for UpdatePolicyGroup (PATCH) and

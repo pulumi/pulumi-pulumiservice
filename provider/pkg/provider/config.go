@@ -14,6 +14,8 @@ const (
 	// flows (e.g. `pl login devstack`). We honor it as a fallback so a token
 	// scoped to a non-prod backend doesn't silently route to api.pulumi.com.
 	EnvVarPulumiAPI = "PULUMI_API"
+	accessTokenKey  = "accessToken"
+	apiURLKey       = "apiUrl"
 )
 
 var ErrAccessTokenNotFound = fmt.Errorf("pulumi access token not found")

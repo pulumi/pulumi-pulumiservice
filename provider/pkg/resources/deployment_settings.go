@@ -16,6 +16,12 @@ import (
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 )
 
+const (
+	gcOrganization = "organization"
+	gcStack        = "stack"
+	gcAWS          = "aws"
+)
+
 type PulumiServiceDeploymentSettingsInput struct {
 	pulumiapi.DeploymentSettings
 	Stack pulumiapi.StackIdentifier

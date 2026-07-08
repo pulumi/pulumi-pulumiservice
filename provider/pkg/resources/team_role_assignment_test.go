@@ -12,6 +12,10 @@ import (
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 )
 
+const (
+	gcDevops = "devops"
+)
+
 type teamRoleClientMock struct {
 	config.Client
 	assign func(ctx context.Context, org, team, roleID string) error

@@ -25,6 +25,11 @@ import (
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 )
 
+const (
+	gcAgentPoolID = "agentPoolID"
+	gcTokenValue  = "tokenValue"
+)
+
 type AgentPool struct{}
 
 var (

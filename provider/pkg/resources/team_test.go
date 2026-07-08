@@ -12,6 +12,12 @@ import (
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 )
 
+const (
+	gcABC     = "abc"
+	gcMember1 = "member1"
+	gcMember2 = "member2"
+)
+
 type TeamClientMock struct {
 	config.Client
 	getTeamFunc func(ctx context.Context, orgName string, teamName string) (*pulumiapi.Team, error)

@@ -8,6 +8,11 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+const (
+	projectKey      = "project"
+	organizationKey = "organization"
+)
+
 func TestCreateStackTags(t *testing.T) {
 	tagName := "tagName"
 	tagValue := "tagValue"

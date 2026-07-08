@@ -14,6 +14,9 @@ const (
 	testTokenID          = "abcdegh"
 	testTokenUUID        = "uuid"
 	testTokenDescription = "token description"
+	tokenNotFoundError   = "token not found"
+	userTokPath          = "/api/user/tokens"
+	otherValue           = "other"
 )
 
 func TestDeleteAccessToken(t *testing.T) {

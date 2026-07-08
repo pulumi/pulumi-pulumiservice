@@ -49,6 +49,8 @@ type AuthPolicyDecision string
 const (
 	AuthPolicyDecisionDeny  AuthPolicyDecision = "deny"
 	AuthPolicyDecisionAllow AuthPolicyDecision = "allow"
+	gcTeam                                     = "team"
+	gcAdmin                                    = "admin"
 )
 
 func (AuthPolicyDecision) Values() []infer.EnumValue[AuthPolicyDecision] {

@@ -14,6 +14,14 @@ import (
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 )
 
+const (
+	gcAdminCap  = "Admin"
+	gcAdminFGA  = "admin-fga"
+	gcAcmeAlice = "acme/alice"
+	gcAlice     = "alice"
+	gcBob       = "bob"
+)
+
 const testAdminRole = gcAdmin
 
 type orgMemberClientMock struct {

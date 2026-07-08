@@ -56,6 +56,12 @@ import (
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/rest"
 )
 
+const (
+	respectSchemaVersionKey = "respectSchemaVersion"
+	readmeKey               = "readme"
+	nameKey                 = "name"
+)
+
 //go:embed README.md
 var readme string
 

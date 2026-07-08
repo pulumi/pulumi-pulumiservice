@@ -46,8 +46,14 @@ var pathParamPattern = regexp.MustCompile(`\{([^/{}]+)\}`)
 
 // OpenAPI schema "type" discriminator values.
 const (
-	typeArray  = "array"
-	typeString = "string"
+	typeArray    = "array"
+	typeString   = "string"
+	opCreate     = "create"
+	opRead       = "read"
+	opUpdate     = "update"
+	opDelete     = "delete"
+	authModule   = "auth"
+	nameFieldKey = "name"
 )
 
 // unorderedFieldNames is the heuristic set of Pulumi-side field names that the

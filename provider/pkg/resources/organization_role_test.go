@@ -16,6 +16,12 @@ import (
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 )
 
+const (
+	gcTypeMeta = "__type"
+	gcRoleID   = "role-123"
+	gcReadOnly = "read-only"
+)
+
 type orgRoleClientMock struct {
 	config.Client
 	create func(

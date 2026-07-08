@@ -20,6 +20,11 @@ import (
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 )
 
+const (
+	gcProject = "project"
+	gcYaml    = "yaml"
+)
+
 const defaultProject = "default"
 
 type PulumiServiceEnvironmentResource struct {

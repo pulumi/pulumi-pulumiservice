@@ -10,6 +10,7 @@ import (
 const (
 	testTeamRolesOrg  = testDeploymentSettingsOrgName
 	testTeamRolesTeam = "a-team"
+	teamRolesPath     = "/api/orgs/an-organization/teams/a-team/roles"
 )
 
 func TestAssignRoleToTeam(t *testing.T) {

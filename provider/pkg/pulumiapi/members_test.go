@@ -19,6 +19,10 @@ const (
 
 	rosterBackend  = "backend"
 	rosterFrontend = "frontend"
+	memberUserPath = "/api/orgs/an-organization/members/a-user"
+	membersPath    = "/api/orgs/an-organization/members"
+	bobUser        = "bob"
+	aliceUser      = "alice"
 )
 
 func TestAddMemberToOrg(t *testing.T) {

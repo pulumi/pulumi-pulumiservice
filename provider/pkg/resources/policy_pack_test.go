@@ -34,6 +34,18 @@ import (
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 )
 
+const (
+	gcAcme         = "acme"
+	gcVersion100   = "1.0.0"
+	gcNoSecrets    = "no-secrets"
+	gcMandatory    = "mandatory"
+	gcThreshold    = "threshold"
+	gcGuard        = "guard"
+	gcRule         = "rule"
+	gcGuardCap     = "Guard"
+	gcAcmeGuard100 = "acme/guard/1.0.0"
+)
+
 type PolicyPackClientMock struct {
 	config.Client
 	publishFunc func(

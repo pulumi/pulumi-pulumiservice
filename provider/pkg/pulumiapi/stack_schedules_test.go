@@ -8,6 +8,10 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+const (
+	unauthorizedError = "unauthorized"
+)
+
 var testStack = StackIdentifier{
 	OrgName:     "org",
 	ProjectName: projectKey,

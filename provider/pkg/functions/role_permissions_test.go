@@ -24,6 +24,13 @@ import (
 	"github.com/pulumi/pulumi-go-provider/infer"
 )
 
+const (
+	permEnvironmentOpen     = "environment:open"
+	permEnvironmentRead     = "environment:read"
+	permInsightsAccountRead = "insights_account:read"
+	permStackRead           = "stack:read"
+)
+
 // assertScopedConditionShape verifies a helper's output is the
 // `PermissionDescriptorCondition(Equal(Expression<E>, Literal<E>(id)),
 // Allow(perms))` shape. The wire format and SDK boundary share the

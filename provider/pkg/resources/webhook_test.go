@@ -21,6 +21,10 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+const (
+	gcMyProject = "my-project"
+)
+
 func ptr[T any](v T) *T { return &v }
 
 func TestGenerateWebhookID(t *testing.T) {

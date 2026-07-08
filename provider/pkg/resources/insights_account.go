@@ -47,6 +47,7 @@ const (
 	CloudProviderGCP        CloudProvider = "gcp"
 	CloudProviderKubernetes CloudProvider = "kubernetes"
 	CloudProviderOCI        CloudProvider = "oci"
+	gcRegions                             = "regions"
 )
 
 func (CloudProvider) Values() []infer.EnumValue[CloudProvider] {

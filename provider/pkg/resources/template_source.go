@@ -27,6 +27,11 @@ import (
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 )
 
+const (
+	gcSourceName = "sourceName"
+	gcSourceURL  = "sourceURL"
+)
+
 type TemplateSource struct{}
 
 var (

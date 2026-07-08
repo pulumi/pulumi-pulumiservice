@@ -12,6 +12,9 @@ const (
 	testOrgTokenOrgName     = "anOrg"
 	testOrgTokenID          = "abcdegh"
 	testOrgTokenDescription = "token description"
+	tokenIDKey              = "token_id"
+	secretKey               = "secret"
+	orgTokPath              = "/api/orgs/anOrg/tokens"
 )
 
 func TestDeleteOrgAccessToken(t *testing.T) {

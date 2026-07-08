@@ -16,6 +16,20 @@ import (
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 )
 
+const (
+	gcTestOrgAccount = "test-org/test-account"
+	gcTestOrg        = "test-org"
+	gcTestAccount    = "test-account"
+	gcTestEnv        = "test-env"
+	gcTestAccountID  = "test-account-id"
+	gcUSWest2        = "us-west-2"
+	gcAccountID123   = "account-id-123"
+	gcUpdatedEnv     = "updated-env"
+	gcOldEnv         = "old-env"
+	gcStaging        = "staging"
+	gcProduction     = "production"
+)
+
 type InsightsAccountClientMock struct {
 	config.Client
 	getInsightsAccountFunc func(

@@ -21,6 +21,12 @@ import (
 	"path"
 )
 
+const (
+	githubTeamType      = "github"
+	pulumiTeamType      = "pulumi"
+	addMembershipAction = "add"
+)
+
 type TeamClient interface {
 	ListTeams(ctx context.Context, orgName string) ([]Team, error)
 	GetTeam(ctx context.Context, orgName string, teamName string) (*Team, error)

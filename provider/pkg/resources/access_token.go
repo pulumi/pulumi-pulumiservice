@@ -24,6 +24,12 @@ import (
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 )
 
+const (
+	gcInputs      = "__inputs"
+	gcDescription = "description"
+	gcValue       = "value"
+)
+
 type AccessToken struct{}
 
 var (

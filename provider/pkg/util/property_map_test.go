@@ -8,6 +8,12 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
 )
 
+// Repeated test-only literals, hoisted so goconst stops flagging them.
+const (
+	exampleVal = "example"
+	keptVal    = "kept"
+)
+
 func TestToPropertyMap(t *testing.T) {
 	type A struct {
 		IntField      int      `pulumi:"int_field"`

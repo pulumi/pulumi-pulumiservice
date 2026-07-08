@@ -11,8 +11,12 @@ import (
 )
 
 const (
-	testRoleOrgName = testDeploymentSettingsOrgName
-	testRoleID      = "11111111-2222-3333-4444-555555555555"
+	testRoleOrgName     = testDeploymentSettingsOrgName
+	testRoleID          = "11111111-2222-3333-4444-555555555555"
+	readOnlyRoleName    = "read-only"
+	readOnlyDescription = "read only access"
+	globalScope         = "global"
+	stackKey            = "stack"
 )
 
 // testRoleDetails is the wire-shape JSON the server speaks. Tests build a

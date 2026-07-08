@@ -10,6 +10,11 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/property"
 )
 
+const (
+	gcTokSecretValue = "tok-secret-value"
+	gcMyOrg          = "my-org"
+)
+
 // State written by the pre-infer OrgAccessToken implementation embedded a
 // duplicate `__inputs` map alongside the real outputs. After migrating to
 // infer, decoding such state fails with "Unrecognized field '__inputs'" unless

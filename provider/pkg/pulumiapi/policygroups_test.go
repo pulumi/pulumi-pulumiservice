@@ -26,6 +26,7 @@ const (
 	testPolicyGroupName    = "test-policy-group"
 	testPolicyGroupMode    = "audit"
 	testPolicyGroupOrgName = "test-org"
+	policyGroupsPath       = "/api/orgs/test-org/policygroups"
 )
 
 // TestCreatePolicyGroup_HappyPath tests that CreatePolicyGroup sends all required fields

@@ -30,6 +30,16 @@ import (
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 )
 
+const (
+	gcParentChild     = "parent/child"
+	gcParent          = "parent"
+	gcTestPolicyGroup = "test-policy-group"
+	gcOther           = "other"
+	gcProject1        = "project-1"
+	gcStack1          = "stack-1"
+	gcPolicyPack1     = "policy-pack-1"
+)
+
 // Mock client for PolicyGroup tests
 type PolicyGroupClientMock struct {
 	getPolicyGroupFunc         func() (*pulumiapi.PolicyGroup, error)

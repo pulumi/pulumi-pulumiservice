@@ -25,6 +25,10 @@ import (
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 )
 
+const (
+	gcTeamName = "teamName"
+)
+
 type TeamAccessToken struct{}
 
 var (

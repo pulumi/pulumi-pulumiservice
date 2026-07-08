@@ -12,6 +12,8 @@ import (
 const (
 	testTeamName    = "a-team"
 	testTeamOrgName = testDeploymentSettingsOrgName
+	teamPath        = "/api/orgs/an-organization/teams/a-team"
+	defaultValue    = "Default"
 )
 
 func TestListTeams(t *testing.T) {

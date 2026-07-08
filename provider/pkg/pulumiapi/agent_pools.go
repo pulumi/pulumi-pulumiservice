@@ -22,6 +22,10 @@ import (
 	"path"
 )
 
+const (
+	trueValue = "true"
+)
+
 type AgentPoolClient interface {
 	CreateAgentPool(ctx context.Context, orgName, name, description string) (*AgentPool, error)
 	UpdateAgentPool(ctx context.Context, agentPoolID, orgName, name, description string) error

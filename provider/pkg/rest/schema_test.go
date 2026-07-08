@@ -22,6 +22,11 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/property"
 )
 
+const (
+	tokenValueKey = "tokenValue"
+	outputVal     = "output"
+)
+
 // TestBuildSchemaSucceeds catches drift between metadata and spec.json.
 func TestBuildSchemaSucceeds(t *testing.T) {
 	spec, meta := loadFixtures(t)

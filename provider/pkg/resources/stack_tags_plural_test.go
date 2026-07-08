@@ -28,6 +28,16 @@ import (
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 )
 
+const (
+	gcOrg                 = "org"
+	gcTag3                = "tag3"
+	gcTag1                = "tag1"
+	gcTag4                = "tag4"
+	gcOrgProjectStackTags = "org/project/stack/tags"
+	gcTag2                = "tag2"
+	gcV2New               = "v2-new"
+)
+
 // stackTagsClientMock implements the slice of config.Client that StackTags uses.
 type stackTagsClientMock struct {
 	config.Client

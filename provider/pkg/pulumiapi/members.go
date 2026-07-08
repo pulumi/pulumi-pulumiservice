@@ -22,6 +22,11 @@ import (
 	"path"
 )
 
+const (
+	adminRole  = "admin"
+	memberRole = "member"
+)
+
 type MemberClient interface {
 	AddMemberToOrg(ctx context.Context, userName, orgName, role string) error
 	UpdateOrgMemberRole(ctx context.Context, orgName, userName, role string, fgaRoleID *string) error
