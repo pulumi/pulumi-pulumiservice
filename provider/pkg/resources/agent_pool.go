@@ -25,6 +25,11 @@ import (
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 )
 
+const (
+	gcAgentPoolID = "agentPoolID"
+	gcTokenValue  = "tokenValue"
+)
+
 type AgentPool struct{}
 
 var (
@@ -186,19 +191,19 @@ func (*AgentPool) StateMigrations(context.Context) []infer.StateMigrationFunc[Ag
 func migrateAgentPoolLegacyState(
 	_ context.Context, old property.Map,
 ) (infer.MigrationResult[AgentPoolState], error) {
-	_, hasLegacyInputs := old.GetOk("__inputs")
-	_, hasMisnamedID := old.GetOk("agentPoolID")
+	_, hasLegacyInputs := old.GetOk(gcInputs)
+	_, hasMisnamedID := old.GetOk(gcAgentPoolID)
 	if !hasLegacyInputs && !hasMisnamedID {
 		return infer.MigrationResult[AgentPoolState]{}, nil
 	}
 	state := AgentPoolState{}
-	if v, ok := old.GetOk("organizationName"); ok && v.IsString() {
+	if v, ok := old.GetOk(gcOrganizationName); ok && v.IsString() {
 		state.OrganizationName = v.AsString()
 	}
-	if v, ok := old.GetOk("name"); ok && v.IsString() {
+	if v, ok := old.GetOk(gcName); ok && v.IsString() {
 		state.Name = v.AsString()
 	}
-	if v, ok := old.GetOk("description"); ok && v.IsString() {
+	if v, ok := old.GetOk(gcDescription); ok && v.IsString() {
 		state.Description = v.AsString()
 	}
 	if v, ok := old.GetOk("forceDestroy"); ok && v.IsBool() {
@@ -206,10 +211,10 @@ func migrateAgentPoolLegacyState(
 	}
 	if v, ok := old.GetOk("agentPoolId"); ok && v.IsString() {
 		state.AgentPoolID = v.AsString()
-	} else if v, ok := old.GetOk("agentPoolID"); ok && v.IsString() {
+	} else if v, ok := old.GetOk(gcAgentPoolID); ok && v.IsString() {
 		state.AgentPoolID = v.AsString()
 	}
-	if v, ok := old.GetOk("tokenValue"); ok && v.IsString() {
+	if v, ok := old.GetOk(gcTokenValue); ok && v.IsString() {
 		state.TokenValue = v.AsString()
 	}
 	return infer.MigrationResult[AgentPoolState]{Result: &state}, nil

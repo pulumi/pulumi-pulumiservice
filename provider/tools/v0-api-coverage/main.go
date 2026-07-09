@@ -38,6 +38,10 @@ const (
 	v0Prefix        = "pulumiservice:index:"
 	apiPrefix       = "pulumiservice:api:" // root-level api (no module)
 	apiModulePrefix = "pulumiservice:api/" // module-namespaced api
+
+	// scheduledDeployment is the api token shared by the several v0
+	// schedule resources that all map onto the same deployments resource.
+	scheduledDeployment = "pulumiservice:api/deployments:ScheduledDeployment"
 )
 
 type mapping struct {
@@ -51,9 +55,9 @@ var mappings = []mapping{
 	{V0: "AccessToken", API: []string{"pulumiservice:api/tokens:PersonalToken"}},
 	{V0: "AgentPool", API: []string{"pulumiservice:api/agents:Pool"}},
 	{V0: "ApprovalRule", API: []string{"pulumiservice:api:Gate"}},
-	{V0: "DeploymentSchedule", API: []string{"pulumiservice:api/deployments:ScheduledDeployment"}},
+	{V0: "DeploymentSchedule", API: []string{scheduledDeployment}},
 	{V0: "DeploymentSettings", API: []string{"pulumiservice:api/deployments:Settings"}},
-	{V0: "DriftSchedule", API: []string{"pulumiservice:api/deployments:ScheduledDeployment"}, Note: "partial"},
+	{V0: "DriftSchedule", API: []string{scheduledDeployment}, Note: "partial"},
 	{V0: "Environment", API: []string{"pulumiservice:api/esc:Environment"}},
 	{V0: "EnvironmentRotationSchedule", API: []string{"pulumiservice:api/esc:EnvironmentSchedule"}},
 	{V0: "EnvironmentVersionTag", API: []string{"pulumiservice:api/esc:RevisionTag"}},
@@ -72,7 +76,7 @@ var mappings = []mapping{
 	{V0: "TeamRoleAssignment", API: []string{"pulumiservice:api/teams:Role"}},
 	{V0: "TeamStackPermission", API: []string{"pulumiservice:api/auth:Policy"}},
 	{V0: "TemplateSource", API: []string{"pulumiservice:api:OrgTemplateCollection"}},
-	{V0: "TtlSchedule", API: []string{"pulumiservice:api/deployments:ScheduledDeployment"}, Note: "partial"},
+	{V0: "TtlSchedule", API: []string{scheduledDeployment}, Note: "partial"},
 	{V0: "Webhook", API: []string{
 		"pulumiservice:api:OrganizationWebhook",
 		"pulumiservice:api/stacks:Webhook",

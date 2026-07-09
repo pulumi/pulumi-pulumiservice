@@ -12,6 +12,12 @@ import (
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 )
 
+const (
+	gcABC     = "abc"
+	gcMember1 = "member1"
+	gcMember2 = "member2"
+)
+
 type TeamClientMock struct {
 	config.Client
 	getTeamFunc func(ctx context.Context, orgName string, teamName string) (*pulumiapi.Team, error)
@@ -36,15 +42,15 @@ func TestTeam(t *testing.T) {
 			ID: "abc/test",
 			Inputs: TeamInput{
 				TeamCore: TeamCore{
-					OrganizationName: "abc",
-					Type:             "pulumi",
+					OrganizationName: gcABC,
+					Type:             teamTypePulumi,
 					Name:             ref("test"),
 				},
 			},
 			State: TeamState{
 				TeamCore: TeamCore{
-					OrganizationName: "abc",
-					Type:             "pulumi",
+					OrganizationName: gcABC,
+					Type:             teamTypePulumi,
 					Name:             ref("test"),
 				},
 			},
@@ -62,13 +68,13 @@ func TestTeam(t *testing.T) {
 		mockedClient := &TeamClientMock{
 			getTeamFunc: func(_ context.Context, _ string, _ string) (*pulumiapi.Team, error) {
 				return &pulumiapi.Team{
-					Type:        "pulumi",
+					Type:        teamTypePulumi,
 					Name:        "test",
 					DisplayName: "test team",
 					Description: "test team description",
 					Members: []pulumiapi.TeamMember{
-						{GithubLogin: "member1"},
-						{GithubLogin: "member2"},
+						{GithubLogin: gcMember1},
+						{GithubLogin: gcMember2},
 					},
 				}, nil
 			},
@@ -81,15 +87,15 @@ func TestTeam(t *testing.T) {
 			ID: "abc/test",
 			Inputs: TeamInput{
 				TeamCore: TeamCore{
-					OrganizationName: "abc",
-					Type:             "pulumi",
+					OrganizationName: gcABC,
+					Type:             teamTypePulumi,
 					Name:             ref("test"),
 				},
 			},
 			State: TeamState{
 				TeamCore: TeamCore{
-					OrganizationName: "abc",
-					Type:             "pulumi",
+					OrganizationName: gcABC,
+					Type:             teamTypePulumi,
 					Name:             ref("test"),
 				},
 			},
@@ -101,23 +107,23 @@ func TestTeam(t *testing.T) {
 		assert.Equal(t, "abc/test", resp.ID)
 		assert.Equal(t, TeamInput{
 			TeamCore: TeamCore{
-				OrganizationName: "abc",
-				Type:             "pulumi",
+				OrganizationName: gcABC,
+				Type:             teamTypePulumi,
 				Name:             ref("test"),
 				DisplayName:      ref("test team"),
 				Description:      ref("test team description"),
 			},
-			Members: []string{"member1", "member2"},
+			Members: []string{gcMember1, gcMember2},
 		}, resp.Inputs)
 		assert.Equal(t, TeamState{
 			TeamCore: TeamCore{
-				OrganizationName: "abc",
-				Type:             "pulumi",
+				OrganizationName: gcABC,
+				Type:             teamTypePulumi,
 				Name:             ref("test"),
 				DisplayName:      ref("test team"),
 				Description:      ref("test team description"),
 			},
-			Members: []string{"member1", "member2"},
+			Members: []string{gcMember1, gcMember2},
 		}, resp.State)
 	})
 }

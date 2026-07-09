@@ -41,7 +41,7 @@ func ToPropertyMap(obj any) resource.PropertyMap {
 func FromPropertyMap(properties resource.PropertyMap, out any) error {
 	v := reflect.ValueOf(out)
 	kind := v.Kind()
-	if kind == reflect.Ptr {
+	if kind == reflect.Pointer {
 		v = v.Elem()
 		kind = v.Kind()
 	}
@@ -102,7 +102,7 @@ func get(v reflect.Value) interface{} {
 		return v.Uint()
 	case reflect.Float32, reflect.Float64:
 		return v.Float()
-	case reflect.Ptr:
+	case reflect.Pointer:
 		if v.CanAddr() {
 			return get(v.Elem())
 		}
@@ -151,7 +151,7 @@ func set(v reflect.Value, value interface{}) error {
 		v.SetUint(uint64(*floatValue))
 	case reflect.Float32, reflect.Float64:
 		v.SetFloat(*floatValue)
-	case reflect.Ptr:
+	case reflect.Pointer:
 		// create a new ptr to the type of this pointer. i.e. create string if *string
 		v.Set(reflect.New(v.Type().Elem()))
 		// call set again, but with deref'd value. note that this will recurse down for ptr to ptr's (and so on)

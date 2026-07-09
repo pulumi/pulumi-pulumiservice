@@ -54,7 +54,7 @@ func (c *Client) DeleteStack(ctx context.Context, stackName StackIdentifier, for
 
 	var err error
 	if forceDestroy {
-		_, err = c.doWithQuery(ctx, http.MethodDelete, apiPath, url.Values{"forceDestroy": []string{"true"}}, nil, nil)
+		_, err = c.doWithQuery(ctx, http.MethodDelete, apiPath, url.Values{"forceDestroy": []string{trueValue}}, nil, nil)
 	} else {
 		_, err = c.do(ctx, http.MethodDelete, apiPath, nil, nil)
 	}

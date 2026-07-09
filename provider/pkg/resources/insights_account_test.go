@@ -16,6 +16,20 @@ import (
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 )
 
+const (
+	gcTestOrgAccount = "test-org/test-account"
+	gcTestOrg        = "test-org"
+	gcTestAccount    = "test-account"
+	gcTestEnv        = "test-env"
+	gcTestAccountID  = "test-account-id"
+	gcUSWest2        = "us-west-2"
+	gcAccountID123   = "account-id-123"
+	gcUpdatedEnv     = "updated-env"
+	gcOldEnv         = "old-env"
+	gcStaging        = "staging"
+	gcProduction     = "production"
+)
+
 type InsightsAccountClientMock struct {
 	config.Client
 	getInsightsAccountFunc func(
@@ -143,25 +157,25 @@ func TestInsightsAccount(t *testing.T) {
 		ia := &InsightsAccount{}
 		scanSchedule := ScanScheduleDaily
 		req := infer.ReadRequest[InsightsAccountInput, InsightsAccountState]{
-			ID: "test-org/test-account",
+			ID: gcTestOrgAccount,
 			Inputs: InsightsAccountInput{
 				InsightsAccountCore: InsightsAccountCore{
-					OrganizationName: "test-org",
-					AccountName:      "test-account",
+					OrganizationName: gcTestOrg,
+					AccountName:      gcTestAccount,
 					Provider:         CloudProviderAWS,
-					Environment:      "test-env",
+					Environment:      gcTestEnv,
 					ScanSchedule:     scanSchedule,
 				},
 			},
 			State: InsightsAccountState{
 				InsightsAccountCore: InsightsAccountCore{
-					OrganizationName: "test-org",
-					AccountName:      "test-account",
+					OrganizationName: gcTestOrg,
+					AccountName:      gcTestAccount,
 					Provider:         CloudProviderAWS,
-					Environment:      "test-env",
+					Environment:      gcTestEnv,
 					ScanSchedule:     scanSchedule,
 				},
-				InsightsAccountID: "test-account-id",
+				InsightsAccountID: gcTestAccountID,
 			},
 		}
 
@@ -176,13 +190,13 @@ func TestInsightsAccount(t *testing.T) {
 		mockedClient := &InsightsAccountClientMock{
 			getInsightsAccountFunc: func(_ context.Context, _ string, _ string) (*pulumiapi.InsightsAccount, error) {
 				return &pulumiapi.InsightsAccount{
-					ID:                   "test-account-id",
-					Name:                 "test-account",
-					Provider:             "aws",
-					ProviderEnvRef:       "test-env",
+					ID:                   gcTestAccountID,
+					Name:                 gcTestAccount,
+					Provider:             gcAWS,
+					ProviderEnvRef:       gcTestEnv,
 					ScheduledScanEnabled: true,
 					ProviderConfig: map[string]interface{}{
-						"region": "us-west-2",
+						"region": gcUSWest2,
 					},
 				}, nil
 			},
@@ -193,22 +207,22 @@ func TestInsightsAccount(t *testing.T) {
 		ia := &InsightsAccount{}
 		scanSchedule := ScanScheduleDaily
 		req := infer.ReadRequest[InsightsAccountInput, InsightsAccountState]{
-			ID: "test-org/test-account",
+			ID: gcTestOrgAccount,
 			Inputs: InsightsAccountInput{
 				InsightsAccountCore: InsightsAccountCore{
-					OrganizationName: "test-org",
-					AccountName:      "test-account",
+					OrganizationName: gcTestOrg,
+					AccountName:      gcTestAccount,
 					Provider:         CloudProviderAWS,
-					Environment:      "test-env",
+					Environment:      gcTestEnv,
 					ScanSchedule:     scanSchedule,
 				},
 			},
 			State: InsightsAccountState{
 				InsightsAccountCore: InsightsAccountCore{
-					OrganizationName: "test-org",
-					AccountName:      "test-account",
+					OrganizationName: gcTestOrg,
+					AccountName:      gcTestAccount,
 					Provider:         CloudProviderAWS,
-					Environment:      "test-env",
+					Environment:      gcTestEnv,
 					ScanSchedule:     scanSchedule,
 				},
 			},
@@ -218,22 +232,22 @@ func TestInsightsAccount(t *testing.T) {
 
 		require.NoError(t, err)
 		expectedCore := InsightsAccountCore{
-			OrganizationName: "test-org",
-			AccountName:      "test-account",
+			OrganizationName: gcTestOrg,
+			AccountName:      gcTestAccount,
 			Provider:         CloudProviderAWS,
-			Environment:      "test-env",
+			Environment:      gcTestEnv,
 			ScanSchedule:     ScanScheduleDaily,
 			ProviderConfig: map[string]interface{}{
-				"region": "us-west-2",
+				"region": gcUSWest2,
 			},
 			Tags: map[string]string{},
 		}
 		assert.Equal(t, infer.ReadResponse[InsightsAccountInput, InsightsAccountState]{
-			ID:     "test-org/test-account",
+			ID:     gcTestOrgAccount,
 			Inputs: InsightsAccountInput{InsightsAccountCore: expectedCore},
 			State: InsightsAccountState{
 				InsightsAccountCore:  expectedCore,
-				InsightsAccountID:    "test-account-id",
+				InsightsAccountID:    gcTestAccountID,
 				ScheduledScanEnabled: true,
 			},
 		}, resp)
@@ -246,10 +260,10 @@ func TestInsightsAccount(t *testing.T) {
 		mockedClient := &InsightsAccountClientMock{
 			getInsightsAccountFunc: func(_ context.Context, _ string, _ string) (*pulumiapi.InsightsAccount, error) {
 				return &pulumiapi.InsightsAccount{
-					ID:                   "test-account-id",
-					Name:                 "test-account",
-					Provider:             "aws",
-					ProviderEnvRef:       "test-env",
+					ID:                   gcTestAccountID,
+					Name:                 gcTestAccount,
+					Provider:             gcAWS,
+					ProviderEnvRef:       gcTestEnv,
 					ScheduledScanEnabled: false,
 					ProviderConfig:       map[string]interface{}{}, // API returns empty map
 				}, nil
@@ -260,23 +274,23 @@ func TestInsightsAccount(t *testing.T) {
 
 		ia := &InsightsAccount{}
 		req := infer.ReadRequest[InsightsAccountInput, InsightsAccountState]{
-			ID: "test-org/test-account",
+			ID: gcTestOrgAccount,
 			Inputs: InsightsAccountInput{
 				InsightsAccountCore: InsightsAccountCore{
-					OrganizationName: "test-org",
-					AccountName:      "test-account",
+					OrganizationName: gcTestOrg,
+					AccountName:      gcTestAccount,
 					Provider:         CloudProviderAWS,
-					Environment:      "test-env",
+					Environment:      gcTestEnv,
 				},
 			},
 			State: InsightsAccountState{
 				InsightsAccountCore: InsightsAccountCore{
-					OrganizationName: "test-org",
-					AccountName:      "test-account",
+					OrganizationName: gcTestOrg,
+					AccountName:      gcTestAccount,
 					Provider:         CloudProviderAWS,
-					Environment:      "test-env",
+					Environment:      gcTestEnv,
 				},
-				InsightsAccountID: "test-account-id",
+				InsightsAccountID: gcTestAccountID,
 			},
 		}
 
@@ -302,13 +316,13 @@ func TestInsightsAccount(t *testing.T) {
 			DryRun: true,
 			Inputs: InsightsAccountInput{
 				InsightsAccountCore: InsightsAccountCore{
-					OrganizationName: "test-org",
-					AccountName:      "test-account",
+					OrganizationName: gcTestOrg,
+					AccountName:      gcTestAccount,
 					Provider:         CloudProviderAWS,
-					Environment:      "test-env",
+					Environment:      gcTestEnv,
 					ScanSchedule:     scanSchedule,
 					ProviderConfig: map[string]interface{}{
-						"regions": []string{"us-west-2"},
+						gcRegions: []string{gcUSWest2},
 					},
 				},
 			},
@@ -318,7 +332,7 @@ func TestInsightsAccount(t *testing.T) {
 
 		require.NoError(t, err)
 		assert.Equal(t, infer.CreateResponse[InsightsAccountState]{
-			ID: "test-org/test-account",
+			ID: gcTestOrgAccount,
 			Output: InsightsAccountState{
 				InsightsAccountCore:  req.Inputs.InsightsAccountCore,
 				InsightsAccountID:    "",
@@ -339,13 +353,13 @@ func TestInsightsAccount(t *testing.T) {
 			},
 			getInsightsAccountFunc: func(_ context.Context, _ string, accountName string) (*pulumiapi.InsightsAccount, error) {
 				return &pulumiapi.InsightsAccount{
-					ID:                   "account-id-123",
+					ID:                   gcAccountID123,
 					Name:                 accountName,
-					Provider:             "aws",
-					ProviderEnvRef:       "test-env",
+					Provider:             gcAWS,
+					ProviderEnvRef:       gcTestEnv,
 					ScheduledScanEnabled: true,
 					ProviderConfig: map[string]interface{}{
-						"regions": []interface{}{"us-west-2"},
+						gcRegions: []interface{}{gcUSWest2},
 					},
 				}, nil
 			},
@@ -358,13 +372,13 @@ func TestInsightsAccount(t *testing.T) {
 			DryRun: false,
 			Inputs: InsightsAccountInput{
 				InsightsAccountCore: InsightsAccountCore{
-					OrganizationName: "test-org",
-					AccountName:      "test-account",
+					OrganizationName: gcTestOrg,
+					AccountName:      gcTestAccount,
 					Provider:         CloudProviderAWS,
-					Environment:      "test-env",
+					Environment:      gcTestEnv,
 					ScanSchedule:     scanSchedule,
 					ProviderConfig: map[string]interface{}{
-						"regions": []string{"us-west-2"},
+						gcRegions: []string{gcUSWest2},
 					},
 				},
 			},
@@ -373,11 +387,11 @@ func TestInsightsAccount(t *testing.T) {
 		resp, err := ia.Create(ctx, req)
 
 		require.NoError(t, err)
-		assert.Equal(t, "test-org/test-account", resp.ID)
-		assert.Equal(t, "account-id-123", resp.Output.InsightsAccountID)
+		assert.Equal(t, gcTestOrgAccount, resp.ID)
+		assert.Equal(t, gcAccountID123, resp.Output.InsightsAccountID)
 		assert.Equal(t, true, resp.Output.ScheduledScanEnabled)
-		assert.Equal(t, "aws", capturedRequest.Provider)
-		assert.Equal(t, "test-env", capturedRequest.Environment)
+		assert.Equal(t, gcAWS, capturedRequest.Provider)
+		assert.Equal(t, gcTestEnv, capturedRequest.Environment)
 		assert.Equal(t, "daily", capturedRequest.ScanSchedule)
 	})
 
@@ -393,10 +407,10 @@ func TestInsightsAccount(t *testing.T) {
 			},
 			getInsightsAccountFunc: func(_ context.Context, _ string, accountName string) (*pulumiapi.InsightsAccount, error) {
 				return &pulumiapi.InsightsAccount{
-					ID:                   "account-id-123",
+					ID:                   gcAccountID123,
 					Name:                 accountName,
-					Provider:             "aws",
-					ProviderEnvRef:       "test-env",
+					Provider:             gcAWS,
+					ProviderEnvRef:       gcTestEnv,
 					ScheduledScanEnabled: false,
 				}, nil
 			},
@@ -409,10 +423,10 @@ func TestInsightsAccount(t *testing.T) {
 			DryRun: false,
 			Inputs: InsightsAccountInput{
 				InsightsAccountCore: InsightsAccountCore{
-					OrganizationName: "test-org",
-					AccountName:      "test-account",
+					OrganizationName: gcTestOrg,
+					AccountName:      gcTestAccount,
 					Provider:         CloudProviderAWS,
-					Environment:      "test-env",
+					Environment:      gcTestEnv,
 					ScanSchedule:     scanSchedule,
 				},
 			},
@@ -441,8 +455,8 @@ func TestInsightsAccount(t *testing.T) {
 			DryRun: false,
 			Inputs: InsightsAccountInput{
 				InsightsAccountCore: InsightsAccountCore{
-					OrganizationName: "test-org",
-					AccountName:      "test-account",
+					OrganizationName: gcTestOrg,
+					AccountName:      gcTestAccount,
 					Provider:         CloudProviderAWS,
 					Environment:      "invalid-env",
 					ScanSchedule:     ScanScheduleDaily,
@@ -476,10 +490,10 @@ func TestInsightsAccount(t *testing.T) {
 			DryRun: false,
 			Inputs: InsightsAccountInput{
 				InsightsAccountCore: InsightsAccountCore{
-					OrganizationName: "test-org",
-					AccountName:      "test-account",
+					OrganizationName: gcTestOrg,
+					AccountName:      gcTestAccount,
 					Provider:         CloudProviderAWS,
-					Environment:      "test-env",
+					Environment:      gcTestEnv,
 					ScanSchedule:     ScanScheduleDaily,
 				},
 			},
@@ -491,7 +505,7 @@ func TestInsightsAccount(t *testing.T) {
 		var initErr infer.ResourceInitFailedError
 		assert.ErrorAs(t, err, &initErr)
 		assert.Contains(t, initErr.Reasons[0], "internal server error")
-		assert.Equal(t, "test-org/test-account", resp.ID)
+		assert.Equal(t, gcTestOrgAccount, resp.ID)
 		assert.Equal(t, "", resp.Output.InsightsAccountID)
 	})
 
@@ -514,10 +528,10 @@ func TestInsightsAccount(t *testing.T) {
 			DryRun: false,
 			Inputs: InsightsAccountInput{
 				InsightsAccountCore: InsightsAccountCore{
-					OrganizationName: "test-org",
-					AccountName:      "test-account",
+					OrganizationName: gcTestOrg,
+					AccountName:      gcTestAccount,
 					Provider:         CloudProviderAWS,
-					Environment:      "test-env",
+					Environment:      gcTestEnv,
 					ScanSchedule:     ScanScheduleDaily,
 				},
 			},
@@ -529,7 +543,7 @@ func TestInsightsAccount(t *testing.T) {
 		var initErr infer.ResourceInitFailedError
 		assert.ErrorAs(t, err, &initErr)
 		assert.Contains(t, initErr.Reasons[0], "insights account 'test-account' not found after creation")
-		assert.Equal(t, "test-org/test-account", resp.ID)
+		assert.Equal(t, gcTestOrgAccount, resp.ID)
 		assert.Equal(t, "", resp.Output.InsightsAccountID)
 	})
 
@@ -545,22 +559,22 @@ func TestInsightsAccount(t *testing.T) {
 			DryRun: true,
 			Inputs: InsightsAccountInput{
 				InsightsAccountCore: InsightsAccountCore{
-					OrganizationName: "test-org",
-					AccountName:      "test-account",
+					OrganizationName: gcTestOrg,
+					AccountName:      gcTestAccount,
 					Provider:         CloudProviderAWS,
-					Environment:      "updated-env",
+					Environment:      gcUpdatedEnv,
 					ScanSchedule:     newSchedule,
 				},
 			},
 			State: InsightsAccountState{
 				InsightsAccountCore: InsightsAccountCore{
-					OrganizationName: "test-org",
-					AccountName:      "test-account",
+					OrganizationName: gcTestOrg,
+					AccountName:      gcTestAccount,
 					Provider:         CloudProviderAWS,
-					Environment:      "old-env",
+					Environment:      gcOldEnv,
 					ScanSchedule:     oldSchedule,
 				},
-				InsightsAccountID:    "account-id-123",
+				InsightsAccountID:    gcAccountID123,
 				ScheduledScanEnabled: true,
 			},
 		}
@@ -571,7 +585,7 @@ func TestInsightsAccount(t *testing.T) {
 		assert.Equal(t, infer.UpdateResponse[InsightsAccountState]{
 			Output: InsightsAccountState{
 				InsightsAccountCore:  req.Inputs.InsightsAccountCore,
-				InsightsAccountID:    "account-id-123",
+				InsightsAccountID:    gcAccountID123,
 				ScheduledScanEnabled: true, // State value preserved in DryRun
 			},
 		}, resp)
@@ -589,10 +603,10 @@ func TestInsightsAccount(t *testing.T) {
 			},
 			getInsightsAccountFunc: func(_ context.Context, _ string, accountName string) (*pulumiapi.InsightsAccount, error) {
 				return &pulumiapi.InsightsAccount{
-					ID:                   "account-id-123",
+					ID:                   gcAccountID123,
 					Name:                 accountName,
-					Provider:             "aws",
-					ProviderEnvRef:       "updated-env",
+					Provider:             gcAWS,
+					ProviderEnvRef:       gcUpdatedEnv,
 					ScheduledScanEnabled: false,
 				}, nil
 			},
@@ -606,22 +620,22 @@ func TestInsightsAccount(t *testing.T) {
 			DryRun: false,
 			Inputs: InsightsAccountInput{
 				InsightsAccountCore: InsightsAccountCore{
-					OrganizationName: "test-org",
-					AccountName:      "test-account",
+					OrganizationName: gcTestOrg,
+					AccountName:      gcTestAccount,
 					Provider:         CloudProviderAWS,
-					Environment:      "updated-env",
+					Environment:      gcUpdatedEnv,
 					ScanSchedule:     newSchedule,
 				},
 			},
 			State: InsightsAccountState{
 				InsightsAccountCore: InsightsAccountCore{
-					OrganizationName: "test-org",
-					AccountName:      "test-account",
+					OrganizationName: gcTestOrg,
+					AccountName:      gcTestAccount,
 					Provider:         CloudProviderAWS,
-					Environment:      "old-env",
+					Environment:      gcOldEnv,
 					ScanSchedule:     oldSchedule,
 				},
-				InsightsAccountID:    "account-id-123",
+				InsightsAccountID:    gcAccountID123,
 				ScheduledScanEnabled: true,
 			},
 		}
@@ -629,7 +643,7 @@ func TestInsightsAccount(t *testing.T) {
 		resp, err := ia.Update(ctx, req)
 
 		require.NoError(t, err)
-		assert.Equal(t, "updated-env", capturedRequest.Environment)
+		assert.Equal(t, gcUpdatedEnv, capturedRequest.Environment)
 		assert.Equal(t, "none", capturedRequest.ScanSchedule)
 		assert.Equal(t, false, resp.Output.ScheduledScanEnabled)
 	})
@@ -650,8 +664,8 @@ func TestInsightsAccount(t *testing.T) {
 			DryRun: false,
 			Inputs: InsightsAccountInput{
 				InsightsAccountCore: InsightsAccountCore{
-					OrganizationName: "test-org",
-					AccountName:      "test-account",
+					OrganizationName: gcTestOrg,
+					AccountName:      gcTestAccount,
 					Provider:         CloudProviderAWS,
 					Environment:      "invalid-env",
 					ScanSchedule:     ScanScheduleNone,
@@ -659,13 +673,13 @@ func TestInsightsAccount(t *testing.T) {
 			},
 			State: InsightsAccountState{
 				InsightsAccountCore: InsightsAccountCore{
-					OrganizationName: "test-org",
-					AccountName:      "test-account",
+					OrganizationName: gcTestOrg,
+					AccountName:      gcTestAccount,
 					Provider:         CloudProviderAWS,
-					Environment:      "old-env",
+					Environment:      gcOldEnv,
 					ScanSchedule:     ScanScheduleDaily,
 				},
-				InsightsAccountID:    "account-id-123",
+				InsightsAccountID:    gcAccountID123,
 				ScheduledScanEnabled: true,
 			},
 		}
@@ -696,22 +710,22 @@ func TestInsightsAccount(t *testing.T) {
 			DryRun: false,
 			Inputs: InsightsAccountInput{
 				InsightsAccountCore: InsightsAccountCore{
-					OrganizationName: "test-org",
-					AccountName:      "test-account",
+					OrganizationName: gcTestOrg,
+					AccountName:      gcTestAccount,
 					Provider:         CloudProviderAWS,
-					Environment:      "updated-env",
+					Environment:      gcUpdatedEnv,
 					ScanSchedule:     ScanScheduleNone,
 				},
 			},
 			State: InsightsAccountState{
 				InsightsAccountCore: InsightsAccountCore{
-					OrganizationName: "test-org",
-					AccountName:      "test-account",
+					OrganizationName: gcTestOrg,
+					AccountName:      gcTestAccount,
 					Provider:         CloudProviderAWS,
-					Environment:      "old-env",
+					Environment:      gcOldEnv,
 					ScanSchedule:     ScanScheduleDaily,
 				},
-				InsightsAccountID:    "account-id-123",
+				InsightsAccountID:    gcAccountID123,
 				ScheduledScanEnabled: true,
 			},
 		}
@@ -722,7 +736,7 @@ func TestInsightsAccount(t *testing.T) {
 		var initErr infer.ResourceInitFailedError
 		assert.ErrorAs(t, err, &initErr)
 		assert.Contains(t, initErr.Reasons[0], "internal server error")
-		assert.Equal(t, "account-id-123", resp.Output.InsightsAccountID)
+		assert.Equal(t, gcAccountID123, resp.Output.InsightsAccountID)
 	})
 
 	t.Run("Update succeeds but account not found after update", func(t *testing.T) {
@@ -744,22 +758,22 @@ func TestInsightsAccount(t *testing.T) {
 			DryRun: false,
 			Inputs: InsightsAccountInput{
 				InsightsAccountCore: InsightsAccountCore{
-					OrganizationName: "test-org",
-					AccountName:      "test-account",
+					OrganizationName: gcTestOrg,
+					AccountName:      gcTestAccount,
 					Provider:         CloudProviderAWS,
-					Environment:      "updated-env",
+					Environment:      gcUpdatedEnv,
 					ScanSchedule:     ScanScheduleNone,
 				},
 			},
 			State: InsightsAccountState{
 				InsightsAccountCore: InsightsAccountCore{
-					OrganizationName: "test-org",
-					AccountName:      "test-account",
+					OrganizationName: gcTestOrg,
+					AccountName:      gcTestAccount,
 					Provider:         CloudProviderAWS,
-					Environment:      "old-env",
+					Environment:      gcOldEnv,
 					ScanSchedule:     ScanScheduleDaily,
 				},
-				InsightsAccountID:    "account-id-123",
+				InsightsAccountID:    gcAccountID123,
 				ScheduledScanEnabled: true,
 			},
 		}
@@ -770,7 +784,7 @@ func TestInsightsAccount(t *testing.T) {
 		var initErr infer.ResourceInitFailedError
 		assert.ErrorAs(t, err, &initErr)
 		assert.Contains(t, initErr.Reasons[0], "insights account 'test-account' not found after update")
-		assert.Equal(t, "account-id-123", resp.Output.InsightsAccountID)
+		assert.Equal(t, gcAccountID123, resp.Output.InsightsAccountID)
 	})
 
 	t.Run("Delete successfully", func(t *testing.T) {
@@ -779,8 +793,8 @@ func TestInsightsAccount(t *testing.T) {
 		mockedClient := &InsightsAccountClientMock{
 			deleteInsightsAccountFunc: func(_ context.Context, orgName string, accountName string) error {
 				deleteCalled = true
-				assert.Equal(t, "test-org", orgName)
-				assert.Equal(t, "test-account", accountName)
+				assert.Equal(t, gcTestOrg, orgName)
+				assert.Equal(t, gcTestAccount, accountName)
 				return nil
 			},
 		}
@@ -791,13 +805,13 @@ func TestInsightsAccount(t *testing.T) {
 		req := infer.DeleteRequest[InsightsAccountState]{
 			State: InsightsAccountState{
 				InsightsAccountCore: InsightsAccountCore{
-					OrganizationName: "test-org",
-					AccountName:      "test-account",
+					OrganizationName: gcTestOrg,
+					AccountName:      gcTestAccount,
 					Provider:         CloudProviderAWS,
-					Environment:      "test-env",
+					Environment:      gcTestEnv,
 					ScanSchedule:     scanSchedule,
 				},
-				InsightsAccountID: "account-id-123",
+				InsightsAccountID: gcAccountID123,
 			},
 		}
 
@@ -810,16 +824,16 @@ func TestInsightsAccount(t *testing.T) {
 	t.Run("Read returns tags from API", func(t *testing.T) {
 		t.Parallel()
 		expectedTags := map[string]string{
-			"environment": "production",
-			"team":        "platform",
+			gcEnvironment: gcProduction,
+			gcTeam:        "platform",
 		}
 		mockedClient := &InsightsAccountClientMock{
 			getInsightsAccountFunc: func(_ context.Context, _ string, _ string) (*pulumiapi.InsightsAccount, error) {
 				return &pulumiapi.InsightsAccount{
-					ID:                   "test-account-id",
-					Name:                 "test-account",
-					Provider:             "aws",
-					ProviderEnvRef:       "test-env",
+					ID:                   gcTestAccountID,
+					Name:                 gcTestAccount,
+					Provider:             gcAWS,
+					ProviderEnvRef:       gcTestEnv,
 					ScheduledScanEnabled: true,
 				}, nil
 			},
@@ -832,22 +846,22 @@ func TestInsightsAccount(t *testing.T) {
 
 		ia := &InsightsAccount{}
 		req := infer.ReadRequest[InsightsAccountInput, InsightsAccountState]{
-			ID: "test-org/test-account",
+			ID: gcTestOrgAccount,
 			Inputs: InsightsAccountInput{
 				InsightsAccountCore: InsightsAccountCore{
-					OrganizationName: "test-org",
-					AccountName:      "test-account",
+					OrganizationName: gcTestOrg,
+					AccountName:      gcTestAccount,
 					Provider:         CloudProviderAWS,
-					Environment:      "test-env",
+					Environment:      gcTestEnv,
 					ScanSchedule:     ScanScheduleDaily,
 				},
 			},
 			State: InsightsAccountState{
 				InsightsAccountCore: InsightsAccountCore{
-					OrganizationName: "test-org",
-					AccountName:      "test-account",
+					OrganizationName: gcTestOrg,
+					AccountName:      gcTestAccount,
 					Provider:         CloudProviderAWS,
-					Environment:      "test-env",
+					Environment:      gcTestEnv,
 					ScanSchedule:     ScanScheduleDaily,
 				},
 			},
@@ -865,10 +879,10 @@ func TestInsightsAccount(t *testing.T) {
 		mockedClient := &InsightsAccountClientMock{
 			getInsightsAccountFunc: func(_ context.Context, _ string, _ string) (*pulumiapi.InsightsAccount, error) {
 				return &pulumiapi.InsightsAccount{
-					ID:                   "test-account-id",
-					Name:                 "test-account",
-					Provider:             "aws",
-					ProviderEnvRef:       "test-env",
+					ID:                   gcTestAccountID,
+					Name:                 gcTestAccount,
+					Provider:             gcAWS,
+					ProviderEnvRef:       gcTestEnv,
 					ScheduledScanEnabled: true,
 				}, nil
 			},
@@ -881,13 +895,13 @@ func TestInsightsAccount(t *testing.T) {
 
 		ia := &InsightsAccount{}
 		req := infer.ReadRequest[InsightsAccountInput, InsightsAccountState]{
-			ID: "test-org/test-account",
+			ID: gcTestOrgAccount,
 			Inputs: InsightsAccountInput{
 				InsightsAccountCore: InsightsAccountCore{
-					OrganizationName: "test-org",
-					AccountName:      "test-account",
+					OrganizationName: gcTestOrg,
+					AccountName:      gcTestAccount,
 					Provider:         CloudProviderAWS,
-					Environment:      "test-env",
+					Environment:      gcTestEnv,
 				},
 			},
 			State: InsightsAccountState{},
@@ -910,10 +924,10 @@ func TestInsightsAccount(t *testing.T) {
 			},
 			getInsightsAccountFunc: func(_ context.Context, _ string, accountName string) (*pulumiapi.InsightsAccount, error) {
 				return &pulumiapi.InsightsAccount{
-					ID:                   "account-id-123",
+					ID:                   gcAccountID123,
 					Name:                 accountName,
-					Provider:             "aws",
-					ProviderEnvRef:       "test-env",
+					Provider:             gcAWS,
+					ProviderEnvRef:       gcTestEnv,
 					ScheduledScanEnabled: true,
 				}, nil
 			},
@@ -929,10 +943,10 @@ func TestInsightsAccount(t *testing.T) {
 			DryRun: false,
 			Inputs: InsightsAccountInput{
 				InsightsAccountCore: InsightsAccountCore{
-					OrganizationName: "test-org",
-					AccountName:      "test-account",
+					OrganizationName: gcTestOrg,
+					AccountName:      gcTestAccount,
 					Provider:         CloudProviderAWS,
-					Environment:      "test-env",
+					Environment:      gcTestEnv,
 					ScanSchedule:     ScanScheduleDaily,
 				},
 			},
@@ -942,13 +956,13 @@ func TestInsightsAccount(t *testing.T) {
 
 		require.NoError(t, err)
 		assert.False(t, setTagsCalled, "SetInsightsAccountTags should not be called when Tags is nil/empty")
-		assert.Equal(t, "account-id-123", resp.Output.InsightsAccountID)
+		assert.Equal(t, gcAccountID123, resp.Output.InsightsAccountID)
 	})
 
 	t.Run("Create with tags", func(t *testing.T) {
 		t.Parallel()
 		expectedTags := map[string]string{
-			"environment": "staging",
+			gcEnvironment: gcStaging,
 			"cost-center": "engineering",
 		}
 		var capturedTags map[string]string
@@ -960,10 +974,10 @@ func TestInsightsAccount(t *testing.T) {
 			},
 			getInsightsAccountFunc: func(_ context.Context, _ string, accountName string) (*pulumiapi.InsightsAccount, error) {
 				return &pulumiapi.InsightsAccount{
-					ID:                   "account-id-123",
+					ID:                   gcAccountID123,
 					Name:                 accountName,
-					Provider:             "aws",
-					ProviderEnvRef:       "test-env",
+					Provider:             gcAWS,
+					ProviderEnvRef:       gcTestEnv,
 					ScheduledScanEnabled: true,
 				}, nil
 			},
@@ -979,10 +993,10 @@ func TestInsightsAccount(t *testing.T) {
 			DryRun: false,
 			Inputs: InsightsAccountInput{
 				InsightsAccountCore: InsightsAccountCore{
-					OrganizationName: "test-org",
-					AccountName:      "test-account",
+					OrganizationName: gcTestOrg,
+					AccountName:      gcTestAccount,
 					Provider:         CloudProviderAWS,
-					Environment:      "test-env",
+					Environment:      gcTestEnv,
 					ScanSchedule:     ScanScheduleDaily,
 					Tags:             expectedTags,
 				},
@@ -1015,13 +1029,13 @@ func TestInsightsAccount(t *testing.T) {
 			DryRun: false,
 			Inputs: InsightsAccountInput{
 				InsightsAccountCore: InsightsAccountCore{
-					OrganizationName: "test-org",
-					AccountName:      "test-account",
+					OrganizationName: gcTestOrg,
+					AccountName:      gcTestAccount,
 					Provider:         CloudProviderAWS,
-					Environment:      "test-env",
+					Environment:      gcTestEnv,
 					ScanSchedule:     ScanScheduleDaily,
 					Tags: map[string]string{
-						"environment": "staging",
+						gcEnvironment: gcStaging,
 					},
 				},
 			},
@@ -1033,7 +1047,7 @@ func TestInsightsAccount(t *testing.T) {
 		var initErr infer.ResourceInitFailedError
 		assert.ErrorAs(t, err, &initErr)
 		assert.Contains(t, initErr.Reasons[0], "failed to set tags")
-		assert.Equal(t, "test-org/test-account", resp.ID)
+		assert.Equal(t, gcTestOrgAccount, resp.ID)
 	})
 
 	t.Run("Update with empty tags calls SetInsightsAccountTags to clear them", func(t *testing.T) {
@@ -1048,10 +1062,10 @@ func TestInsightsAccount(t *testing.T) {
 			},
 			getInsightsAccountFunc: func(_ context.Context, _ string, accountName string) (*pulumiapi.InsightsAccount, error) {
 				return &pulumiapi.InsightsAccount{
-					ID:                   "account-id-123",
+					ID:                   gcAccountID123,
 					Name:                 accountName,
-					Provider:             "aws",
-					ProviderEnvRef:       "updated-env",
+					Provider:             gcAWS,
+					ProviderEnvRef:       gcUpdatedEnv,
 					ScheduledScanEnabled: true,
 				}, nil
 			},
@@ -1068,25 +1082,25 @@ func TestInsightsAccount(t *testing.T) {
 			DryRun: false,
 			Inputs: InsightsAccountInput{
 				InsightsAccountCore: InsightsAccountCore{
-					OrganizationName: "test-org",
-					AccountName:      "test-account",
+					OrganizationName: gcTestOrg,
+					AccountName:      gcTestAccount,
 					Provider:         CloudProviderAWS,
-					Environment:      "updated-env",
+					Environment:      gcUpdatedEnv,
 					ScanSchedule:     ScanScheduleDaily,
 				},
 			},
 			State: InsightsAccountState{
 				InsightsAccountCore: InsightsAccountCore{
-					OrganizationName: "test-org",
-					AccountName:      "test-account",
+					OrganizationName: gcTestOrg,
+					AccountName:      gcTestAccount,
 					Provider:         CloudProviderAWS,
-					Environment:      "old-env",
+					Environment:      gcOldEnv,
 					ScanSchedule:     ScanScheduleDaily,
 					Tags: map[string]string{
-						"environment": "staging",
+						gcEnvironment: gcStaging,
 					},
 				},
-				InsightsAccountID:    "account-id-123",
+				InsightsAccountID:    gcAccountID123,
 				ScheduledScanEnabled: true,
 			},
 		}
@@ -1102,8 +1116,8 @@ func TestInsightsAccount(t *testing.T) {
 	t.Run("Update with tags", func(t *testing.T) {
 		t.Parallel()
 		expectedTags := map[string]string{
-			"environment": "production",
-			"team":        "platform",
+			gcEnvironment: gcProduction,
+			gcTeam:        "platform",
 		}
 		var capturedTags map[string]string
 		mockedClient := &InsightsAccountClientMock{
@@ -1114,10 +1128,10 @@ func TestInsightsAccount(t *testing.T) {
 			},
 			getInsightsAccountFunc: func(_ context.Context, _ string, accountName string) (*pulumiapi.InsightsAccount, error) {
 				return &pulumiapi.InsightsAccount{
-					ID:                   "account-id-123",
+					ID:                   gcAccountID123,
 					Name:                 accountName,
-					Provider:             "aws",
-					ProviderEnvRef:       "updated-env",
+					Provider:             gcAWS,
+					ProviderEnvRef:       gcUpdatedEnv,
 					ScheduledScanEnabled: true,
 				}, nil
 			},
@@ -1133,26 +1147,26 @@ func TestInsightsAccount(t *testing.T) {
 			DryRun: false,
 			Inputs: InsightsAccountInput{
 				InsightsAccountCore: InsightsAccountCore{
-					OrganizationName: "test-org",
-					AccountName:      "test-account",
+					OrganizationName: gcTestOrg,
+					AccountName:      gcTestAccount,
 					Provider:         CloudProviderAWS,
-					Environment:      "updated-env",
+					Environment:      gcUpdatedEnv,
 					ScanSchedule:     ScanScheduleDaily,
 					Tags:             expectedTags,
 				},
 			},
 			State: InsightsAccountState{
 				InsightsAccountCore: InsightsAccountCore{
-					OrganizationName: "test-org",
-					AccountName:      "test-account",
+					OrganizationName: gcTestOrg,
+					AccountName:      gcTestAccount,
 					Provider:         CloudProviderAWS,
-					Environment:      "old-env",
+					Environment:      gcOldEnv,
 					ScanSchedule:     ScanScheduleDaily,
 					Tags: map[string]string{
-						"environment": "staging",
+						gcEnvironment: gcStaging,
 					},
 				},
-				InsightsAccountID:    "account-id-123",
+				InsightsAccountID:    gcAccountID123,
 				ScheduledScanEnabled: true,
 			},
 		}
@@ -1183,25 +1197,25 @@ func TestInsightsAccount(t *testing.T) {
 			DryRun: false,
 			Inputs: InsightsAccountInput{
 				InsightsAccountCore: InsightsAccountCore{
-					OrganizationName: "test-org",
-					AccountName:      "test-account",
+					OrganizationName: gcTestOrg,
+					AccountName:      gcTestAccount,
 					Provider:         CloudProviderAWS,
-					Environment:      "updated-env",
+					Environment:      gcUpdatedEnv,
 					ScanSchedule:     ScanScheduleDaily,
 					Tags: map[string]string{
-						"environment": "production",
+						gcEnvironment: gcProduction,
 					},
 				},
 			},
 			State: InsightsAccountState{
 				InsightsAccountCore: InsightsAccountCore{
-					OrganizationName: "test-org",
-					AccountName:      "test-account",
+					OrganizationName: gcTestOrg,
+					AccountName:      gcTestAccount,
 					Provider:         CloudProviderAWS,
-					Environment:      "old-env",
+					Environment:      gcOldEnv,
 					ScanSchedule:     ScanScheduleDaily,
 				},
-				InsightsAccountID:    "account-id-123",
+				InsightsAccountID:    gcAccountID123,
 				ScheduledScanEnabled: true,
 			},
 		}
@@ -1212,7 +1226,7 @@ func TestInsightsAccount(t *testing.T) {
 		var initErr infer.ResourceInitFailedError
 		assert.ErrorAs(t, err, &initErr)
 		assert.Contains(t, initErr.Reasons[0], "failed to set tags")
-		assert.Equal(t, "account-id-123", resp.Output.InsightsAccountID)
+		assert.Equal(t, gcAccountID123, resp.Output.InsightsAccountID)
 	})
 
 }

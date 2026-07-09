@@ -34,7 +34,7 @@ const (
 	EnvironmentPermissionRead  EnvironmentPermission = "read"
 	EnvironmentPermissionOpen  EnvironmentPermission = "open"
 	EnvironmentPermissionWrite EnvironmentPermission = "write"
-	EnvironmentPermissionAdmin EnvironmentPermission = "admin"
+	EnvironmentPermissionAdmin EnvironmentPermission = gcAdmin
 )
 
 func (EnvironmentPermission) Values() []infer.EnumValue[EnvironmentPermission] {
@@ -130,16 +130,16 @@ func (*TeamEnvironmentPermission) Diff(
 	add := func(key string) { diff[key] = p.PropertyDiff{Kind: p.UpdateReplace, InputDiff: true} }
 
 	if req.State.Organization != req.Inputs.Organization {
-		add("organization")
+		add(gcOrganization)
 	}
 	if req.State.Team != req.Inputs.Team {
-		add("team")
+		add(gcTeam)
 	}
 	if req.State.Project != req.Inputs.Project {
-		add("project")
+		add(gcProject)
 	}
 	if req.State.Environment != req.Inputs.Environment {
-		add("environment")
+		add(gcEnvironment)
 	}
 	if req.State.Permission != req.Inputs.Permission {
 		add("permission")

@@ -8,8 +8,9 @@ import (
 )
 
 const (
-	testTeamRolesOrg  = "an-organization"
+	testTeamRolesOrg  = testDeploymentSettingsOrgName
 	testTeamRolesTeam = "a-team"
+	teamRolesPath     = "/api/orgs/an-organization/teams/a-team/roles"
 )
 
 func TestAssignRoleToTeam(t *testing.T) {
@@ -36,7 +37,7 @@ func TestRemoveRoleFromTeam(t *testing.T) {
 			ExpectedReqMethod: http.MethodDelete,
 			ExpectedReqPath:   "/api/orgs/an-organization/teams/a-team/roles/" + testRoleID,
 			ResponseCode:      404,
-			ResponseBody:      ErrorResponse{Message: "not found"},
+			ResponseBody:      ErrorResponse{Message: notFoundError},
 		})
 		assert.NoError(t, c.RemoveRoleFromTeam(ctx, testTeamRolesOrg, testTeamRolesTeam, testRoleID))
 	})
@@ -45,13 +46,13 @@ func TestRemoveRoleFromTeam(t *testing.T) {
 func TestListAndGetTeamRoles(t *testing.T) {
 	roles := listTeamRolesResponse{Roles: []TeamRoleRef{
 		{ID: testRoleID, Name: "devops"},
-		{ID: "other", Name: "other-role"},
+		{ID: otherValue, Name: "other-role"},
 	}}
 
 	t.Run("list", func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodGet,
-			ExpectedReqPath:   "/api/orgs/an-organization/teams/a-team/roles",
+			ExpectedReqPath:   teamRolesPath,
 			ResponseCode:      200,
 			ResponseBody:      roles,
 		})
@@ -63,7 +64,7 @@ func TestListAndGetTeamRoles(t *testing.T) {
 	t.Run("get found", func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodGet,
-			ExpectedReqPath:   "/api/orgs/an-organization/teams/a-team/roles",
+			ExpectedReqPath:   teamRolesPath,
 			ResponseCode:      200,
 			ResponseBody:      roles,
 		})
@@ -77,7 +78,7 @@ func TestListAndGetTeamRoles(t *testing.T) {
 	t.Run("get missing", func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodGet,
-			ExpectedReqPath:   "/api/orgs/an-organization/teams/a-team/roles",
+			ExpectedReqPath:   teamRolesPath,
 			ResponseCode:      200,
 			ResponseBody:      listTeamRolesResponse{Roles: []TeamRoleRef{}},
 		})

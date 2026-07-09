@@ -21,18 +21,22 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+const (
+	gcMyProject = "my-project"
+)
+
 func ptr[T any](v T) *T { return &v }
 
 func TestGenerateWebhookID(t *testing.T) {
 	t.Run("organization scope", func(t *testing.T) {
-		id := generateWebhookID(WebhookInput{OrganizationName: "my-org"}, "hook-1")
+		id := generateWebhookID(WebhookInput{OrganizationName: gcMyOrg}, "hook-1")
 		assert.Equal(t, "my-org/hook-1", id)
 	})
 
 	t.Run("stack scope", func(t *testing.T) {
 		id := generateWebhookID(WebhookInput{
-			OrganizationName: "my-org",
-			ProjectName:      ptr("my-project"),
+			OrganizationName: gcMyOrg,
+			ProjectName:      ptr(gcMyProject),
 			StackName:        ptr("my-stack"),
 		}, "hook-2")
 		assert.Equal(t, "my-org/my-project/my-stack/hook-2", id)
@@ -40,8 +44,8 @@ func TestGenerateWebhookID(t *testing.T) {
 
 	t.Run("environment scope", func(t *testing.T) {
 		id := generateWebhookID(WebhookInput{
-			OrganizationName: "my-org",
-			ProjectName:      ptr("my-project"),
+			OrganizationName: gcMyOrg,
+			ProjectName:      ptr(gcMyProject),
 			EnvironmentName:  ptr("dev"),
 		}, "hook-3")
 		assert.Equal(t, "my-org/environment/my-project/dev/hook-3", id)
@@ -53,7 +57,7 @@ func TestSplitWebhookID(t *testing.T) {
 		got, err := splitWebhookID("my-org/hook-1")
 		require.NoError(t, err)
 		assert.Equal(t, &webhookID{
-			organizationName: "my-org",
+			organizationName: gcMyOrg,
 			webhookName:      "hook-1",
 		}, got)
 	})
@@ -62,8 +66,8 @@ func TestSplitWebhookID(t *testing.T) {
 		got, err := splitWebhookID("my-org/my-project/my-stack/hook-2")
 		require.NoError(t, err)
 		assert.Equal(t, &webhookID{
-			organizationName: "my-org",
-			projectName:      ptr("my-project"),
+			organizationName: gcMyOrg,
+			projectName:      ptr(gcMyProject),
 			stackName:        ptr("my-stack"),
 			webhookName:      "hook-2",
 		}, got)
@@ -73,8 +77,8 @@ func TestSplitWebhookID(t *testing.T) {
 		got, err := splitWebhookID("my-org/environment/my-project/dev/hook-3")
 		require.NoError(t, err)
 		assert.Equal(t, &webhookID{
-			organizationName: "my-org",
-			projectName:      ptr("my-project"),
+			organizationName: gcMyOrg,
+			projectName:      ptr(gcMyProject),
 			environmentName:  ptr("dev"),
 			webhookName:      "hook-3",
 		}, got)
@@ -92,9 +96,9 @@ func TestSplitWebhookID(t *testing.T) {
 	t.Run("round-trip", func(t *testing.T) {
 		// All round-trip cases must produce the same scope-shape on parse.
 		cases := []WebhookInput{
-			{OrganizationName: "org"},
-			{OrganizationName: "org", ProjectName: ptr("proj"), StackName: ptr("stk")},
-			{OrganizationName: "org", ProjectName: ptr("proj"), EnvironmentName: ptr("env")},
+			{OrganizationName: gcOrg},
+			{OrganizationName: gcOrg, ProjectName: ptr("proj"), StackName: ptr("stk")},
+			{OrganizationName: gcOrg, ProjectName: ptr("proj"), EnvironmentName: ptr(gcEnv)},
 		}
 		for _, in := range cases {
 			id := generateWebhookID(in, "hook")

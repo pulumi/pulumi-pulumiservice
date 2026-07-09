@@ -45,6 +45,12 @@ import (
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 )
 
+const (
+	gcObject   = "object"
+	gcType     = "type"
+	gcRequired = "required"
+)
+
 type PolicyPack struct{}
 
 var (
@@ -141,7 +147,7 @@ func (*PolicyPack) Check(
 	}
 	if tag := inputs.VersionTag; tag != "" && !versionTagRegex.MatchString(tag) {
 		failures = append(failures, p.CheckFailure{
-			Property: "versionTag",
+			Property: gcVersionTag,
 			Reason: fmt.Sprintf(
 				"%q is not a valid policy pack version tag (must match %s)",
 				tag, versionTagRegex.String(),
@@ -210,16 +216,16 @@ func (*PolicyPack) Diff(
 	add := func(key string, kind p.DiffKind) { diff[key] = p.PropertyDiff{Kind: kind, InputDiff: true} }
 
 	if req.Inputs.Organization != req.State.Organization {
-		add("organization", p.UpdateReplace)
+		add(gcOrganization, p.UpdateReplace)
 	}
 	if req.Inputs.Name != req.State.Name {
-		add("name", p.UpdateReplace)
+		add(gcName, p.UpdateReplace)
 	}
 	if req.Inputs.VersionTag != req.State.VersionTag {
-		add("versionTag", p.UpdateReplace)
+		add(gcVersionTag, p.UpdateReplace)
 	}
 	if req.Inputs.DisplayName != req.State.DisplayName {
-		add("displayName", p.UpdateReplace)
+		add(gcDisplayName, p.UpdateReplace)
 	}
 	if len(req.Inputs.Policies) > 0 {
 		inResolved := make([]PolicyPackPolicyInput, len(req.Inputs.Policies))
@@ -377,7 +383,7 @@ func convertAnalyzerConfigSchema(s *plugin.AnalyzerPolicyConfigSchema) map[strin
 	if s == nil {
 		return nil
 	}
-	out := map[string]any{"type": "object"}
+	out := map[string]any{gcType: gcObject}
 	if len(s.Properties) > 0 {
 		props := make(map[string]any, len(s.Properties))
 		for k, v := range s.Properties {
@@ -386,7 +392,7 @@ func convertAnalyzerConfigSchema(s *plugin.AnalyzerPolicyConfigSchema) map[strin
 		out["properties"] = props
 	}
 	if len(s.Required) > 0 {
-		out["required"] = s.Required
+		out[gcRequired] = s.Required
 	}
 	return out
 }
@@ -408,14 +414,14 @@ func normalizeConfigSchema(cs map[string]any) map[string]any {
 	if len(cs) == 0 {
 		return cs
 	}
-	if _, ok := cs["type"]; ok {
+	if _, ok := cs[gcType]; ok {
 		return cs
 	}
 	out := make(map[string]any, len(cs)+1)
 	for k, v := range cs {
 		out[k] = v
 	}
-	out["type"] = "object"
+	out[gcType] = gcObject
 	return out
 }
 
@@ -444,12 +450,12 @@ func toAPIConfigSchema(cs map[string]any) *apitype.PolicyConfigSchema {
 		return nil
 	}
 	out := &apitype.PolicyConfigSchema{Type: apitype.Object}
-	if t, ok := cs["type"].(string); ok && t != "" {
+	if t, ok := cs[gcType].(string); ok && t != "" {
 		out.Type = apitype.JSONSchemaType(t)
 	}
-	if req, ok := cs["required"].([]string); ok {
+	if req, ok := cs[gcRequired].([]string); ok {
 		out.Required = append([]string(nil), req...)
-	} else if reqAny, ok := cs["required"].([]any); ok {
+	} else if reqAny, ok := cs[gcRequired].([]any); ok {
 		for _, v := range reqAny {
 			if s, ok := v.(string); ok {
 				out.Required = append(out.Required, s)
@@ -576,7 +582,7 @@ func hashPolicyPackSource(sourcePath string) (string, error) {
 			}
 			hasher.Write([]byte(target))
 		case fi.Mode().IsRegular():
-			f, err := os.Open(p)
+			f, err := os.Open(p) //nolint:gosec // G122: hashing caller's own local policy-pack dir; no boundary crossed
 			if err != nil {
 				return err
 			}

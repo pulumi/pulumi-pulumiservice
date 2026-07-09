@@ -22,6 +22,11 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/property"
 )
 
+const (
+	tokenValueKey = "tokenValue"
+	outputVal     = "output"
+)
+
 // TestBuildSchemaSucceeds catches drift between metadata and spec.json.
 func TestBuildSchemaSucceeds(t *testing.T) {
 	spec, meta := loadFixtures(t)
@@ -52,10 +57,10 @@ func TestPathParamsAreInputOnly(t *testing.T) {
 	if !ok {
 		t.Fatalf("Team resource missing from package: %q", tok)
 	}
-	if _, ok := rs.InputProperties["orgName"]; !ok {
+	if _, ok := rs.InputProperties[orgNameKey]; !ok {
 		t.Errorf("input \"orgName\" missing from Team")
 	}
-	if _, ok := rs.Properties["orgName"]; ok {
+	if _, ok := rs.Properties[orgNameKey]; ok {
 		t.Errorf("output \"orgName\" should not appear on Team — purely-path-param fields are input-only")
 	}
 }
@@ -74,7 +79,7 @@ func TestPathParamInputsAreReplaceOnChanges(t *testing.T) {
 		tok = "pulumiservice:api:Team"
 	}
 	rs := pkg.Resources[tok]
-	for _, name := range []string{"orgName", "name"} {
+	for _, name := range []string{orgNameKey, nameKey} {
 		ps, ok := rs.InputProperties[name]
 		if !ok {
 			t.Fatalf("input %q missing from Team", name)
@@ -113,9 +118,9 @@ func TestSecretFieldsAreMarkedSecret(t *testing.T) {
 		field   string
 		surface string // "output" or "input"
 	}{
-		{"pulumiservice:api:OrgToken", "tokenValue", "output"},
-		{"pulumiservice:api:TeamToken", "tokenValue", "output"},
-		{"pulumiservice:api:PersonalToken", "tokenValue", "output"},
+		{"pulumiservice:api:OrgToken", tokenValueKey, outputVal},
+		{"pulumiservice:api:TeamToken", tokenValueKey, outputVal},
+		{"pulumiservice:api:PersonalToken", tokenValueKey, outputVal},
 		{"pulumiservice:api:OrganizationWebhook", "secret", "input"},
 	}
 	for _, tc := range cases {
@@ -256,15 +261,15 @@ func TestAutoNameNotRequired(t *testing.T) {
 // TestLooksSecret pins the substring set the heuristic recognizes.
 func TestLooksSecret(t *testing.T) {
 	cases := map[string]bool{
-		"tokenValue":       true,
+		tokenValueKey:      true,
 		"webhookSecret":    true,
 		"password":         true,
 		"apiKey":           true,
 		"accessToken":      true,
 		"secretCiphertext": true,
-		"name":             false,
-		"description":      false,
-		"orgName":          false,
+		nameKey:            false,
+		descriptionKey:     false,
+		orgNameKey:         false,
 	}
 	for name, want := range cases {
 		if got := looksSecret(name); got != want {
@@ -276,12 +281,12 @@ func TestLooksSecret(t *testing.T) {
 // TestPulumiNameRoundTrip pins pulumiName ↔ wireSideName.
 func TestPulumiNameRoundTrip(t *testing.T) {
 	renames := map[string]string{
-		"hookName":         "name",
-		"organizationName": "orgName",
+		"hookName":          nameKey,
+		organizationNameVal: orgNameKey,
 	}
 	cases := map[string]string{
-		"name":      "hookName",
-		"orgName":   "organizationName",
+		nameKey:     "hookName",
+		orgNameKey:  organizationNameVal,
 		"untouched": "untouched",
 	}
 	for wire, wantPulumi := range cases {
@@ -305,7 +310,7 @@ func TestCheckEnumCasePreservedForUnknownValue(t *testing.T) {
 	r := fooResource(spec, nil, "", false)
 	for _, in := range []string{"sideways", "Up "} { // not in enum, even after fold
 		bodyProps := flattenedRequestProperties(spec, mustOp(t, spec, "CreateFoo"))
-		out := normalizeValue(property.New(in), "mode", bodyProps, r.meta)
+		out := normalizeValue(property.New(in), modeKey, bodyProps, r.meta)
 		if !out.IsString() || out.AsString() != in {
 			t.Errorf("normalizeValue(%q) = %v; expected unchanged passthrough", in, out)
 		}
@@ -356,20 +361,20 @@ func TestBuildResourceOmitsPathParamsFromOutputs(t *testing.T) {
 	}`
 	spec, _ := ParseSpec([]byte(specJSON))
 	rm := ResourceMeta{
-		Operations: Operations{Create: "CreateThing", Read: "GetThing"},
-		IDFormat:   "{org}/{id}",
+		Operations: Operations{Create: createThingOp, Read: getThingOp},
+		IDFormat:   orgIDFormat,
 	}
 	rs, err := buildResource(spec, nil, "test:index:Thing", rm)
 	if err != nil {
 		t.Fatalf("build: %v", err)
 	}
-	if _, ok := rs.InputProperties["org"]; !ok {
+	if _, ok := rs.InputProperties[orgKey]; !ok {
 		t.Errorf("inputs missing 'org' (path param should be input)")
 	}
-	if _, ok := rs.Properties["org"]; ok {
+	if _, ok := rs.Properties[orgKey]; ok {
 		t.Errorf("outputs should not include 'org' (path param is input-only)")
 	}
-	if _, ok := rs.Properties["name"]; !ok {
+	if _, ok := rs.Properties[nameKey]; !ok {
 		t.Errorf("outputs missing 'name' (body field returned by read should be output)")
 	}
 }
@@ -397,7 +402,7 @@ func TestBuildResourceRejectsPathParamsWithoutIDFormat(t *testing.T) {
 	if err != nil {
 		t.Fatalf("spec: %v", err)
 	}
-	rm := ResourceMeta{Operations: Operations{Create: "CreateThing"}}
+	rm := ResourceMeta{Operations: Operations{Create: createThingOp}}
 	_, err = buildResource(spec, nil, "test:index:Thing", rm)
 	if err == nil || !strings.Contains(err.Error(), "idFormat") {
 		t.Fatalf("expected idFormat error, got: %v", err)
@@ -440,8 +445,8 @@ func TestBuildResourceSurfacesYamlBody(t *testing.T) {
 		t.Fatalf("spec: %v", err)
 	}
 	rm := ResourceMeta{
-		Operations: Operations{Create: "CreateThing", Update: "UpdateThing"},
-		IDFormat:   "{org}/{project}/{name}",
+		Operations: Operations{Create: createThingOp, Update: "UpdateThing"},
+		IDFormat:   orgProjectNameFormat,
 	}
 	rs, err := buildResource(spec, nil, "test:index:Thing", rm)
 	if err != nil {
@@ -484,7 +489,7 @@ func TestBuildResourceAcceptsResourceWithoutPathParams(t *testing.T) {
 	  }
 	}`
 	spec, _ := ParseSpec([]byte(specJSON))
-	rm := ResourceMeta{Operations: Operations{Create: "CreateThing"}}
+	rm := ResourceMeta{Operations: Operations{Create: createThingOp}}
 	if _, err := buildResource(spec, nil, "test:index:Thing", rm); err != nil {
 		t.Errorf("path-param-free resource should build without idFormat: %v", err)
 	}

@@ -9,7 +9,7 @@ import (
 
 var testEnv = EnvironmentIdentifier{
 	OrgName:     "org",
-	ProjectName: "project",
+	ProjectName: projectKey,
 	EnvName:     "env",
 }
 var createEnvironmentRotationScheduleReq = CreateEnvironmentRotationScheduleRequest{
@@ -52,7 +52,7 @@ func TestCreateEnvironmentRotationSchedule(t *testing.T) {
 			ExpectedReqBody:   createEnvironmentRotationScheduleReq,
 			ResponseCode:      401,
 			ResponseBody: ErrorResponse{
-				Message: "unauthorized",
+				Message: unauthorizedError,
 			},
 		})
 		expectedScheduleID, err := c.CreateEnvironmentRotationSchedule(
@@ -90,7 +90,7 @@ func TestGetEnvironmentSchedule(t *testing.T) {
 			ExpectedReqPath:   "/api/esc/environments/org/project/env/schedules/" + testScheduleID,
 			ResponseCode:      401,
 			ResponseBody: ErrorResponse{
-				Message: "unauthorized",
+				Message: unauthorizedError,
 			},
 		})
 		expectedScheduleID, err := c.GetEnvironmentSchedule(ctx, testEnv, testScheduleID)
@@ -109,7 +109,7 @@ func TestGetEnvironmentSchedule(t *testing.T) {
 			ResponseCode:      404,
 			ResponseBody: ErrorResponse{
 				StatusCode: 404,
-				Message:    "not found",
+				Message:    notFoundError,
 			},
 		})
 		expectedScheduleID, err := c.GetEnvironmentSchedule(ctx, testEnv, testScheduleID)
@@ -145,7 +145,7 @@ func TestUpdateEnvironmentRotationSchedule(t *testing.T) {
 			ExpectedReqBody:   createEnvironmentRotationScheduleReq,
 			ResponseCode:      401,
 			ResponseBody: ErrorResponse{
-				Message: "unauthorized",
+				Message: unauthorizedError,
 			},
 		})
 		expectedScheduleID, err := c.UpdateEnvironmentRotationSchedule(
@@ -181,7 +181,7 @@ func TestDeleteEnvironmentSchedule(t *testing.T) {
 			ExpectedReqPath:   "/api/esc/environments/org/project/env/schedules/" + testScheduleID,
 			ResponseCode:      401,
 			ResponseBody: ErrorResponse{
-				Message: "unauthorized",
+				Message: unauthorizedError,
 			},
 		})
 		err := c.DeleteEnvironmentSchedule(ctx, testEnv, testScheduleID)

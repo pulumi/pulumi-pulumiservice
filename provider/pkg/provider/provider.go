@@ -56,6 +56,12 @@ import (
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/rest"
 )
 
+const (
+	respectSchemaVersionKey = "respectSchemaVersion"
+	readmeKey               = "readme"
+	nameKey                 = "name"
+)
+
 //go:embed README.md
 var readme string
 
@@ -188,12 +194,12 @@ func MakeProvider(host *provider.HostClient, name, version string) (pulumirpc.Re
 				"packageReferences": map[string]any{
 					"Pulumi": "3.*",
 				},
-				"respectSchemaVersion": true,
+				respectSchemaVersionKey: true,
 			},
 			"go": map[string]any{
 				"generateResourceContainerTypes": true,
 				"importBasePath":                 "github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice",
-				"respectSchemaVersion":           true,
+				respectSchemaVersionKey:          true,
 			},
 			"java": map[string]any{
 				"basePackage": "",
@@ -205,15 +211,15 @@ func MakeProvider(host *provider.HostClient, name, version string) (pulumirpc.Re
 				},
 				"gradleNexusPublishPluginVersion": "2.0.0",
 				"gradleTest":                      "",
-				"readme":                          readme,
+				readmeKey:                         readme,
 			},
 			"nodejs": map[string]any{
 				"packageName": "@pulumi/pulumiservice",
 				"dependencies": map[string]any{
 					"@pulumi/pulumi": "^3.0.0",
 				},
-				"respectSchemaVersion": true,
-				"readme":               readme,
+				respectSchemaVersionKey: true,
+				readmeKey:               readme,
 			},
 			"python": map[string]any{
 				"packageName": "pulumi_pulumiservice",
@@ -228,8 +234,8 @@ func MakeProvider(host *provider.HostClient, name, version string) (pulumirpc.Re
 				"pyproject": map[string]any{
 					"enabled": true,
 				},
-				"respectSchemaVersion": true,
-				"readme":               readme,
+				respectSchemaVersionKey: true,
+				readmeKey:               readme,
 			},
 		}).Build()
 	if err != nil {
@@ -263,7 +269,9 @@ func (t *authedTransport) Do(_ context.Context, req *http.Request) (*http.Respon
 	}
 	req.Header.Set("X-Pulumi-Source", "provider")
 
-	return t.client.Do(req)
+	// Request host is pinned to the operator-configured Pulumi API base URL
+	// (authedTransport.baseURL), not attacker-controlled per-request input.
+	return t.client.Do(req) //nolint:gosec // G704: host pinned to configured API base URL, not request input
 }
 
 func withCloudApiSchema(prov p.Provider, spec *rest.Spec, metadata *rest.Metadata, pkg string) p.Provider {
@@ -671,7 +679,7 @@ func convertPolicyPacksToProperties(packs []pulumiapi.PolicyPackWithVersions) []
 		}
 
 		result[i] = resource.NewObjectProperty(resource.PropertyMap{
-			"name":        resource.NewStringProperty(pack.Name),
+			nameKey:       resource.NewStringProperty(pack.Name),
 			"displayName": resource.NewStringProperty(pack.DisplayName),
 			"versions":    resource.NewArrayProperty(versions),
 			"versionTags": resource.NewArrayProperty(versionTags),
@@ -682,7 +690,7 @@ func convertPolicyPacksToProperties(packs []pulumiapi.PolicyPackWithVersions) []
 
 func convertPolicyPackDetailToProperties(pack *pulumiapi.PolicyPackDetail) resource.PropertyMap {
 	props := resource.PropertyMap{
-		"name":        resource.NewStringProperty(pack.Name),
+		nameKey:       resource.NewStringProperty(pack.Name),
 		"displayName": resource.NewStringProperty(pack.DisplayName),
 		"version":     resource.NewNumberProperty(float64(pack.Version)),
 	}
@@ -699,7 +707,7 @@ func convertPolicyPackDetailToProperties(pack *pulumiapi.PolicyPackDetail) resou
 		policies := make([]resource.PropertyValue, len(pack.Policies))
 		for i, policy := range pack.Policies {
 			policyProps := resource.PropertyMap{
-				"name": resource.NewStringProperty(policy.Name),
+				nameKey: resource.NewStringProperty(policy.Name),
 			}
 			if policy.DisplayName != "" {
 				policyProps["displayName"] = resource.NewStringProperty(policy.DisplayName)

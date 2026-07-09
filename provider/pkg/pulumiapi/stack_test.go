@@ -11,9 +11,9 @@ import (
 
 func TestCreateStack(t *testing.T) {
 	s := StackIdentifier{
-		OrgName:     "organization",
-		ProjectName: "project",
-		StackName:   "stack",
+		OrgName:     organizationKey,
+		ProjectName: projectKey,
+		StackName:   stackKey,
 	}
 	req := CreateStackRequest{
 		StackName: s.StackName,
@@ -34,7 +34,7 @@ func TestCreateStack(t *testing.T) {
 			ExpectedReqPath:   fmt.Sprintf("/api/stacks/%s/%s", s.OrgName, s.ProjectName),
 			ResponseCode:      http.StatusUnauthorized,
 			ResponseBody: ErrorResponse{
-				Message: "unauthorized",
+				Message: unauthorizedError,
 			},
 		})
 		err := c.CreateStack(ctx, s)
@@ -44,9 +44,9 @@ func TestCreateStack(t *testing.T) {
 
 func TestDeleteStack(t *testing.T) {
 	s := StackIdentifier{
-		OrgName:     "organization",
-		ProjectName: "project",
-		StackName:   "stack",
+		OrgName:     organizationKey,
+		ProjectName: projectKey,
+		StackName:   stackKey,
 	}
 	t.Run("Happy Path", func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{
@@ -61,7 +61,7 @@ func TestDeleteStack(t *testing.T) {
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod:   http.MethodDelete,
 			ExpectedReqPath:     fmt.Sprintf("/api/stacks/%s/%s/%s", s.OrgName, s.ProjectName, s.StackName),
-			ExpectedQueryParams: url.Values{"forceDestroy": {"true"}},
+			ExpectedQueryParams: url.Values{"forceDestroy": {trueValue}},
 			ResponseCode:        http.StatusNoContent,
 		})
 		assert.NoError(t, c.DeleteStack(ctx, s, true))
@@ -73,7 +73,7 @@ func TestDeleteStack(t *testing.T) {
 			ExpectedReqPath:   "/api/stacks/organization/project/stack",
 			ResponseCode:      http.StatusUnauthorized,
 			ResponseBody: ErrorResponse{
-				Message: "unauthorized",
+				Message: unauthorizedError,
 			},
 		})
 		assert.EqualError(t, c.DeleteStack(ctx, s, false), "failed to delete stack: 401 API error: unauthorized")

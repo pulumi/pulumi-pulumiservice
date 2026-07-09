@@ -26,6 +26,7 @@ const (
 	testPolicyGroupName    = "test-policy-group"
 	testPolicyGroupMode    = "audit"
 	testPolicyGroupOrgName = "test-org"
+	policyGroupsPath       = "/api/orgs/test-org/policygroups"
 )
 
 // TestCreatePolicyGroup_HappyPath tests that CreatePolicyGroup sends all required fields
@@ -43,7 +44,7 @@ func TestCreatePolicyGroup_HappyPath(t *testing.T) {
 
 	c := startTestServer(t, testServerConfig{
 		ExpectedReqMethod: http.MethodPost,
-		ExpectedReqPath:   "/api/orgs/test-org/policygroups",
+		ExpectedReqPath:   policyGroupsPath,
 		ExpectedReqBody:   expectedReqBody,
 		ResponseCode:      201,
 		ResponseBody:      nil,
@@ -68,7 +69,7 @@ func TestCreatePolicyGroup_AccountsPreventative(t *testing.T) {
 
 	c := startTestServer(t, testServerConfig{
 		ExpectedReqMethod: http.MethodPost,
-		ExpectedReqPath:   "/api/orgs/test-org/policygroups",
+		ExpectedReqPath:   policyGroupsPath,
 		ExpectedReqBody:   expectedReqBody,
 		ResponseCode:      201,
 		ResponseBody:      nil,
@@ -129,7 +130,7 @@ func TestCreatePolicyGroup_APIError(t *testing.T) {
 
 	c := startTestServer(t, testServerConfig{
 		ExpectedReqMethod: http.MethodPost,
-		ExpectedReqPath:   "/api/orgs/test-org/policygroups",
+		ExpectedReqPath:   policyGroupsPath,
 		ExpectedReqBody:   expectedReqBody,
 		ResponseCode:      400,
 		ResponseBody: ErrorResponse{
@@ -158,18 +159,18 @@ func TestCreatePolicyGroup_Unauthorized(t *testing.T) {
 
 	c := startTestServer(t, testServerConfig{
 		ExpectedReqMethod: http.MethodPost,
-		ExpectedReqPath:   "/api/orgs/test-org/policygroups",
+		ExpectedReqPath:   policyGroupsPath,
 		ExpectedReqBody:   expectedReqBody,
 		ResponseCode:      401,
 		ResponseBody: ErrorResponse{
-			Message: "unauthorized",
+			Message: unauthorizedError,
 		},
 	})
 
 	err := c.CreatePolicyGroup(ctx, orgName, policyGroupName, entityType, mode)
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "failed to create policy group")
-	assert.Contains(t, err.Error(), "unauthorized")
+	assert.Contains(t, err.Error(), unauthorizedError)
 }
 
 // TestBatchUpdatePolicyGroup tests the batch update functionality

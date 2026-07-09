@@ -11,8 +11,12 @@ import (
 )
 
 const (
-	testRoleOrgName = "an-organization"
-	testRoleID      = "11111111-2222-3333-4444-555555555555"
+	testRoleOrgName     = testDeploymentSettingsOrgName
+	testRoleID          = "11111111-2222-3333-4444-555555555555"
+	readOnlyRoleName    = "read-only"
+	readOnlyDescription = "read only access"
+	globalScope         = "global"
+	stackKey            = "stack"
 )
 
 // testRoleDetails is the wire-shape JSON the server speaks. Tests build a
@@ -33,9 +37,9 @@ func TestCreateRole(t *testing.T) {
 		details := mustParseDetails(t)
 		resp := apitype.PermissionDescriptorRecord{
 			PermissionDescriptorBase: apitype.PermissionDescriptorBase{
-				Name:         "read-only",
-				Description:  "read only access",
-				ResourceType: "global",
+				Name:         readOnlyRoleName,
+				Description:  readOnlyDescription,
+				ResourceType: globalScope,
 				UxPurpose:    apitype.PermissionDescriptorUXPurposeRole,
 			},
 			ID:      testRoleID,
@@ -46,9 +50,9 @@ func TestCreateRole(t *testing.T) {
 			ExpectedReqMethod: http.MethodPost,
 			ExpectedReqPath:   "/api/orgs/an-organization/roles",
 			ExpectedReqBody: apitype.PermissionDescriptorBase{
-				Name:         "read-only",
-				Description:  "read only access",
-				ResourceType: "global",
+				Name:         readOnlyRoleName,
+				Description:  readOnlyDescription,
+				ResourceType: globalScope,
 				UxPurpose:    apitype.PermissionDescriptorUXPurposeRole,
 				Details:      details,
 			},
@@ -57,16 +61,16 @@ func TestCreateRole(t *testing.T) {
 		})
 
 		got, err := c.CreateRole(ctx, testRoleOrgName, apitype.PermissionDescriptorBase{
-			Name:         "read-only",
-			Description:  "read only access",
-			ResourceType: "global",
+			Name:         readOnlyRoleName,
+			Description:  readOnlyDescription,
+			ResourceType: globalScope,
 			UxPurpose:    apitype.PermissionDescriptorUXPurposeRole,
 			Details:      details,
 		})
 		assert.NoError(t, err)
 		if assert.NotNil(t, got) {
 			assert.Equal(t, testRoleID, got.ID)
-			assert.Equal(t, "read-only", got.Name)
+			assert.Equal(t, readOnlyRoleName, got.Name)
 		}
 	})
 
@@ -74,7 +78,7 @@ func TestCreateRole(t *testing.T) {
 		c := startTestServer(t, testServerConfig{ResponseCode: 200})
 		_, err := c.CreateRole(ctx, testRoleOrgName, apitype.PermissionDescriptorBase{
 			Name:         "r",
-			ResourceType: "global",
+			ResourceType: globalScope,
 			UxPurpose:    apitype.PermissionDescriptorUXPurposeRole,
 		})
 		assert.EqualError(t, err, "role permissions details must not be empty")
@@ -88,7 +92,7 @@ func TestGetRole(t *testing.T) {
 			ExpectedReqPath:   "/api/orgs/an-organization/roles/" + testRoleID,
 			ResponseCode:      200,
 			ResponseBody: apitype.PermissionDescriptorRecord{
-				PermissionDescriptorBase: apitype.PermissionDescriptorBase{Name: "read-only"},
+				PermissionDescriptorBase: apitype.PermissionDescriptorBase{Name: readOnlyRoleName},
 				ID:                       testRoleID,
 				Version:                  2,
 			},
@@ -105,7 +109,7 @@ func TestGetRole(t *testing.T) {
 			ExpectedReqMethod: http.MethodGet,
 			ExpectedReqPath:   "/api/orgs/an-organization/roles/" + testRoleID,
 			ResponseCode:      404,
-			ResponseBody:      ErrorResponse{Message: "not found"},
+			ResponseBody:      ErrorResponse{Message: notFoundError},
 		})
 		got, err := c.GetRole(ctx, testRoleOrgName, testRoleID)
 		assert.NoError(t, err)
@@ -144,7 +148,7 @@ func TestListAvailableRoleScopes(t *testing.T) {
 		// rbacScope{name, metadata:{description}}. We exercise one bucket with
 		// one group with two scopes.
 		wire := map[string][]rbacScopeGroup{
-			"stack": {
+			stackKey: {
 				{
 					Name: "Stacks",
 					Scopes: []rbacScope{
@@ -162,8 +166,8 @@ func TestListAvailableRoleScopes(t *testing.T) {
 		})
 		got, err := c.ListAvailableRoleScopes(ctx, testRoleOrgName)
 		assert.NoError(t, err)
-		if assert.Contains(t, got, "stack") && assert.Len(t, got["stack"], 1) {
-			group := got["stack"][0]
+		if assert.Contains(t, got, stackKey) && assert.Len(t, got[stackKey], 1) {
+			group := got[stackKey][0]
 			assert.Equal(t, "Stacks", group.Name)
 			if assert.Len(t, group.Scopes, 2) {
 				assert.Equal(t, "stack:read", group.Scopes[0].Name)
@@ -177,7 +181,7 @@ func TestListAvailableRoleScopes(t *testing.T) {
 			ExpectedReqMethod: http.MethodGet,
 			ExpectedReqPath:   "/api/orgs/an-organization/roles/scopes",
 			ResponseCode:      401,
-			ResponseBody:      ErrorResponse{Message: "unauthorized"},
+			ResponseBody:      ErrorResponse{Message: unauthorizedError},
 		})
 		_, err := c.ListAvailableRoleScopes(ctx, testRoleOrgName)
 		assert.ErrorContains(t, err, "failed to list available role scopes")
@@ -189,7 +193,7 @@ func TestDeleteRole(t *testing.T) {
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod:   http.MethodDelete,
 			ExpectedReqPath:     "/api/orgs/an-organization/roles/" + testRoleID,
-			ExpectedQueryParams: map[string][]string{"force": {"true"}},
+			ExpectedQueryParams: map[string][]string{"force": {trueValue}},
 			ResponseCode:        204,
 		})
 		assert.NoError(t, c.DeleteRole(ctx, testRoleOrgName, testRoleID, true))
@@ -200,7 +204,7 @@ func TestDeleteRole(t *testing.T) {
 			ExpectedReqMethod: http.MethodDelete,
 			ExpectedReqPath:   "/api/orgs/an-organization/roles/" + testRoleID,
 			ResponseCode:      404,
-			ResponseBody:      ErrorResponse{Message: "not found"},
+			ResponseBody:      ErrorResponse{Message: notFoundError},
 		})
 		assert.NoError(t, c.DeleteRole(ctx, testRoleOrgName, testRoleID, false))
 	})

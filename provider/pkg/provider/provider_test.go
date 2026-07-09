@@ -39,36 +39,36 @@ func TestDiffConfig(t *testing.T) {
 		{
 			name: "accessToken changed",
 			oldConfig: resource.PropertyMap{
-				"accessToken": resource.NewPropertyValue("old-token-123"),
-				"apiUrl":      resource.NewPropertyValue("https://api.pulumi.com"),
+				accessTokenKey: resource.NewPropertyValue("old-token-123"),
+				apiURLKey:      resource.NewPropertyValue("https://api.pulumi.com"),
 			},
 			newConfig: resource.PropertyMap{
-				"accessToken": resource.NewPropertyValue("new-token-456"),
-				"apiUrl":      resource.NewPropertyValue("https://api.pulumi.com"),
+				accessTokenKey: resource.NewPropertyValue("new-token-456"),
+				apiURLKey:      resource.NewPropertyValue("https://api.pulumi.com"),
 			},
 			expectedChanges: pulumirpc.DiffResponse_DIFF_SOME,
 		},
 		{
 			name: "apiUrl changed",
 			oldConfig: resource.PropertyMap{
-				"accessToken": resource.NewPropertyValue("token-123"),
-				"apiUrl":      resource.NewPropertyValue("https://api.pulumi.com"),
+				accessTokenKey: resource.NewPropertyValue("token-123"),
+				apiURLKey:      resource.NewPropertyValue("https://api.pulumi.com"),
 			},
 			newConfig: resource.PropertyMap{
-				"accessToken": resource.NewPropertyValue("token-123"),
-				"apiUrl":      resource.NewPropertyValue("https://custom.pulumi.example.com"),
+				accessTokenKey: resource.NewPropertyValue("token-123"),
+				apiURLKey:      resource.NewPropertyValue("https://custom.pulumi.example.com"),
 			},
 			expectedChanges: pulumirpc.DiffResponse_DIFF_SOME,
 		},
 		{
 			name: "no changes",
 			oldConfig: resource.PropertyMap{
-				"accessToken": resource.NewPropertyValue("token-123"),
-				"apiUrl":      resource.NewPropertyValue("https://api.pulumi.com"),
+				accessTokenKey: resource.NewPropertyValue("token-123"),
+				apiURLKey:      resource.NewPropertyValue("https://api.pulumi.com"),
 			},
 			newConfig: resource.PropertyMap{
-				"accessToken": resource.NewPropertyValue("token-123"),
-				"apiUrl":      resource.NewPropertyValue("https://api.pulumi.com"),
+				accessTokenKey: resource.NewPropertyValue("token-123"),
+				apiURLKey:      resource.NewPropertyValue("https://api.pulumi.com"),
 			},
 			expectedChanges: pulumirpc.DiffResponse_DIFF_NONE,
 		},
@@ -128,7 +128,7 @@ func TestConfigure_SetsAccessToken(t *testing.T) {
 
 	// Create config with accessToken
 	config := resource.PropertyMap{
-		"accessToken": resource.NewPropertyValue("pul-test0token"),
+		accessTokenKey: resource.NewPropertyValue("pul-test0token"),
 	}
 	props, err := plugin.MarshalProperties(config, plugin.MarshalOptions{})
 	require.NoError(t, err)
@@ -140,7 +140,7 @@ func TestConfigure_SetsAccessToken(t *testing.T) {
 	require.NoError(t, err)
 
 	// Build config variables map as expected by Configure
-	configVars := map[string]string{
+	configVars := map[string]string{ //nolint:gosec // G101: test fixture, not a real credential.
 		"pulumiservice:config:accessToken": "pul-test0token",
 	}
 

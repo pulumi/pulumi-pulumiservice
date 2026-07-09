@@ -12,6 +12,10 @@ import (
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 )
 
+const (
+	gcDevops = "devops"
+)
+
 type teamRoleClientMock struct {
 	config.Client
 	assign func(ctx context.Context, org, team, roleID string) error
@@ -38,13 +42,13 @@ func TestTeamRoleAssignmentCreate(t *testing.T) {
 	mock := &teamRoleClientMock{
 		assign: func(_ context.Context, org, team, roleID string) error {
 			assigned = true
-			assert.Equal(t, "acme", org)
-			assert.Equal(t, "devops", team)
-			assert.Equal(t, "role-123", roleID)
+			assert.Equal(t, gcAcme, org)
+			assert.Equal(t, gcDevops, team)
+			assert.Equal(t, gcRoleID, roleID)
 			return nil
 		},
 		get: func(_ context.Context, _, _, _ string) (*pulumiapi.TeamRoleRef, error) {
-			return &pulumiapi.TeamRoleRef{ID: "role-123", Name: "devops-role"}, nil
+			return &pulumiapi.TeamRoleRef{ID: gcRoleID, Name: "devops-role"}, nil
 		},
 	}
 	ctx := config.WithMockClient(context.Background(), mock)
@@ -52,9 +56,9 @@ func TestTeamRoleAssignmentCreate(t *testing.T) {
 	r := &TeamRoleAssignment{}
 	resp, err := r.Create(ctx, infer.CreateRequest[TeamRoleAssignmentInput]{
 		Inputs: TeamRoleAssignmentInput{
-			OrganizationName: "acme",
-			TeamName:         "devops",
-			RoleId:           "role-123",
+			OrganizationName: gcAcme,
+			TeamName:         gcDevops,
+			RoleId:           gcRoleID,
 		},
 	})
 	assert.NoError(t, err)
@@ -67,7 +71,7 @@ func TestTeamRoleAssignmentRead(t *testing.T) {
 	t.Run("found", func(t *testing.T) {
 		mock := &teamRoleClientMock{
 			get: func(_ context.Context, _, _, _ string) (*pulumiapi.TeamRoleRef, error) {
-				return &pulumiapi.TeamRoleRef{ID: "role-123", Name: "devops"}, nil
+				return &pulumiapi.TeamRoleRef{ID: gcRoleID, Name: gcDevops}, nil
 			},
 		}
 		ctx := config.WithMockClient(context.Background(), mock)
@@ -77,7 +81,7 @@ func TestTeamRoleAssignmentRead(t *testing.T) {
 		})
 		assert.NoError(t, err)
 		assert.Equal(t, "acme/devops/role-123", resp.ID)
-		assert.Equal(t, "role-123", resp.State.RoleId)
+		assert.Equal(t, gcRoleID, resp.State.RoleId)
 	})
 
 	t.Run("not found empties", func(t *testing.T) {
@@ -109,9 +113,9 @@ func TestTeamRoleAssignmentDelete(t *testing.T) {
 	mock := &teamRoleClientMock{
 		remove: func(_ context.Context, org, team, roleID string) error {
 			removed = true
-			assert.Equal(t, "acme", org)
-			assert.Equal(t, "devops", team)
-			assert.Equal(t, "role-123", roleID)
+			assert.Equal(t, gcAcme, org)
+			assert.Equal(t, gcDevops, team)
+			assert.Equal(t, gcRoleID, roleID)
 			return nil
 		},
 	}
@@ -120,9 +124,9 @@ func TestTeamRoleAssignmentDelete(t *testing.T) {
 	_, err := r.Delete(ctx, infer.DeleteRequest[TeamRoleAssignmentState]{
 		State: TeamRoleAssignmentState{
 			TeamRoleAssignmentInput: TeamRoleAssignmentInput{
-				OrganizationName: "acme",
-				TeamName:         "devops",
-				RoleId:           "role-123",
+				OrganizationName: gcAcme,
+				TeamName:         gcDevops,
+				RoleId:           gcRoleID,
 			},
 		},
 	})

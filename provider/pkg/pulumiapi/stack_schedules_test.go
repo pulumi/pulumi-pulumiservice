@@ -8,10 +8,14 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+const (
+	unauthorizedError = "unauthorized"
+)
+
 var testStack = StackIdentifier{
 	OrgName:     "org",
-	ProjectName: "project",
-	StackName:   "stack",
+	ProjectName: projectKey,
+	StackName:   stackKey,
 }
 var testScheduleID = "test-schedule-id"
 var cron = "0 * 0 * 0"
@@ -64,7 +68,7 @@ func TestCreateDeploymentSchedule(t *testing.T) {
 			ExpectedReqBody:   createDeploymentScheduleReq,
 			ResponseCode:      401,
 			ResponseBody: ErrorResponse{
-				Message: "unauthorized",
+				Message: unauthorizedError,
 			},
 		})
 		expectedScheduleID, err := c.CreateDeploymentSchedule(ctx, testStack, createDeploymentScheduleReq)
@@ -98,7 +102,7 @@ func TestGetDeploymentSchedule(t *testing.T) {
 			ExpectedReqPath:   "/api/stacks/org/project/stack/deployments/schedules/" + testScheduleID,
 			ResponseCode:      401,
 			ResponseBody: ErrorResponse{
-				Message: "unauthorized",
+				Message: unauthorizedError,
 			},
 		})
 		expectedScheduleID, err := c.GetStackSchedule(ctx, testStack, testScheduleID)
@@ -117,7 +121,7 @@ func TestGetDeploymentSchedule(t *testing.T) {
 			ResponseCode:      404,
 			ResponseBody: ErrorResponse{
 				StatusCode: 404,
-				Message:    "not found",
+				Message:    notFoundError,
 			},
 		})
 		expectedScheduleID, err := c.GetStackSchedule(ctx, testStack, testScheduleID)
@@ -153,7 +157,7 @@ func TestUpdateDeploymentSchedule(t *testing.T) {
 			ExpectedReqBody:   createDeploymentScheduleReq,
 			ResponseCode:      401,
 			ResponseBody: ErrorResponse{
-				Message: "unauthorized",
+				Message: unauthorizedError,
 			},
 		})
 		expectedScheduleID, err := c.UpdateDeploymentSchedule(
@@ -189,7 +193,7 @@ func TestDeleteSchedule(t *testing.T) {
 			ExpectedReqPath:   "/api/stacks/org/project/stack/deployments/schedules/" + testScheduleID,
 			ResponseCode:      401,
 			ResponseBody: ErrorResponse{
-				Message: "unauthorized",
+				Message: unauthorizedError,
 			},
 		})
 		err := c.DeleteStackSchedule(ctx, testStack, testScheduleID)
@@ -223,7 +227,7 @@ func TestCreateDriftSchedule(t *testing.T) {
 			ExpectedReqBody:   createDriftScheduleReq,
 			ResponseCode:      401,
 			ResponseBody: ErrorResponse{
-				Message: "unauthorized",
+				Message: unauthorizedError,
 			},
 		})
 		expectedScheduleID, err := c.CreateDriftSchedule(ctx, testStack, createDriftScheduleReq)
@@ -258,7 +262,7 @@ func TestUpdateDriftSchedule(t *testing.T) {
 			ExpectedReqBody:   createDriftScheduleReq,
 			ResponseCode:      401,
 			ResponseBody: ErrorResponse{
-				Message: "unauthorized",
+				Message: unauthorizedError,
 			},
 		})
 		expectedScheduleID, err := c.UpdateDriftSchedule(ctx, testStack, createDriftScheduleReq, testScheduleID)
@@ -294,7 +298,7 @@ func TestCreateTTLSchedule(t *testing.T) {
 			ExpectedReqBody:   createTTLScheduleReq,
 			ResponseCode:      401,
 			ResponseBody: ErrorResponse{
-				Message: "unauthorized",
+				Message: unauthorizedError,
 			},
 		})
 		expectedScheduleID, err := c.CreateTTLSchedule(ctx, testStack, createTTLScheduleReq)
@@ -330,7 +334,7 @@ func TestUpdateTTLSchedule(t *testing.T) {
 			ExpectedReqBody:   createTTLScheduleReq,
 			ResponseCode:      401,
 			ResponseBody: ErrorResponse{
-				Message: "unauthorized",
+				Message: unauthorizedError,
 			},
 		})
 		expectedScheduleID, err := c.UpdateTTLSchedule(ctx, testStack, createTTLScheduleReq, testScheduleID)

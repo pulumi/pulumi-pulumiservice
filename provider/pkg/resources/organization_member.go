@@ -95,7 +95,7 @@ func (s *OrganizationMemberState) Annotate(a infer.Annotator) {
 
 const defaultOrgMemberRole = "member"
 
-var validOrgMemberRoles = []string{defaultOrgMemberRole, "admin", "billing-manager"}
+var validOrgMemberRoles = []string{defaultOrgMemberRole, gcAdmin, "billing-manager"}
 
 func (*OrganizationMember) Check(
 	ctx context.Context,

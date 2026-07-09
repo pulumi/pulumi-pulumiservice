@@ -25,7 +25,7 @@ func TestEnvironmentVersionTagID(t *testing.T) {
 	t.Run("formats with all parts", func(t *testing.T) {
 		assert.Equal(t,
 			"my-org/my-proj/my-env/my-tag",
-			environmentVersionTagID("my-org", "my-proj", "my-env", "my-tag"),
+			environmentVersionTagID(gcMyOrg, "my-proj", "my-env", "my-tag"),
 		)
 	})
 }
@@ -34,7 +34,7 @@ func TestSplitEnvironmentVersionTagID(t *testing.T) {
 	t.Run("four-part id", func(t *testing.T) {
 		org, project, env, tag, err := splitEnvironmentVersionTagID("my-org/my-proj/my-env/my-tag")
 		require.NoError(t, err)
-		assert.Equal(t, "my-org", org)
+		assert.Equal(t, gcMyOrg, org)
 		assert.Equal(t, "my-proj", project)
 		assert.Equal(t, "my-env", env)
 		assert.Equal(t, "my-tag", tag)
@@ -43,7 +43,7 @@ func TestSplitEnvironmentVersionTagID(t *testing.T) {
 	t.Run("legacy three-part id assumes default project", func(t *testing.T) {
 		org, project, env, tag, err := splitEnvironmentVersionTagID("my-org/my-env/my-tag")
 		require.NoError(t, err)
-		assert.Equal(t, "my-org", org)
+		assert.Equal(t, gcMyOrg, org)
 		assert.Equal(t, defaultProject, project)
 		assert.Equal(t, "my-env", env)
 		assert.Equal(t, "my-tag", tag)

@@ -51,8 +51,8 @@ func TestCreateAgentPool(t *testing.T) {
 
 	t.Run("Happy Path", func(t *testing.T) {
 		resp := createTokenResponse{
-			ID:         "token_id",
-			TokenValue: "secret",
+			ID:         tokenIDKey,
+			TokenValue: secretKey,
 		}
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPost,
@@ -85,7 +85,7 @@ func TestCreateAgentPool(t *testing.T) {
 			ResponseCode: 401,
 			ResponseBody: ErrorResponse{
 				StatusCode: 401,
-				Message:    "unauthorized",
+				Message:    unauthorizedError,
 			},
 		})
 		token, err := c.CreateAgentPool(teamCtx, orgName, name, desc)
@@ -132,7 +132,7 @@ func TestGetAgentPool(t *testing.T) {
 			ResponseCode:      401,
 			ResponseBody: ErrorResponse{
 				StatusCode: 401,
-				Message:    "unauthorized",
+				Message:    unauthorizedError,
 			},
 		})
 		token, err := c.GetAgentPool(ctx, id, org)

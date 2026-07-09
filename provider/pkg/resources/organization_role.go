@@ -31,6 +31,11 @@ import (
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 )
 
+const (
+	gcPermissions = "permissions"
+	gcGlobal      = "global"
+)
+
 type OrganizationRole struct{}
 
 var (
@@ -137,13 +142,13 @@ func (*OrganizationRole) Check(
 	// the typed Go field decodes to its zero value, which would otherwise
 	// trip the empty checks. Pulumi guarantees these inputs are concrete
 	// by the time Create/Update runs, so the same checks belong there.
-	if !isUnknownInput(req.NewInputs, "name") && in.Name == "" {
-		failures = append(failures, p.CheckFailure{Property: "name", Reason: "name must not be empty"})
+	if !isUnknownInput(req.NewInputs, gcName) && in.Name == "" {
+		failures = append(failures, p.CheckFailure{Property: gcName, Reason: "name must not be empty"})
 	}
-	if !isUnknownInput(req.NewInputs, "permissions") {
+	if !isUnknownInput(req.NewInputs, gcPermissions) {
 		if len(in.Permissions) == 0 {
 			failures = append(failures, p.CheckFailure{
-				Property: "permissions",
+				Property: gcPermissions,
 				Reason:   "permissions must not be empty — supply a PermissionDescriptor tree",
 			})
 		} else if _, err := buildPermissionDescriptorForAPI(in.Permissions); err != nil {
@@ -152,7 +157,7 @@ func (*OrganizationRole) Check(
 			// The typed JSON unmarshaller dispatches on `__type` and
 			// rejects missing/unknown discriminators with a clear message.
 			failures = append(failures, p.CheckFailure{
-				Property: "permissions",
+				Property: gcPermissions,
 				Reason:   err.Error(),
 			})
 		}
@@ -190,7 +195,7 @@ func (*OrganizationRole) Create(
 	}
 	resourceType := util.OrZero(req.Inputs.ResourceType)
 	if resourceType == "" {
-		resourceType = "global"
+		resourceType = gcGlobal
 	}
 
 	client := config.GetClient(ctx)
@@ -370,7 +375,7 @@ func orgRoleCoreFromAPI(
 		ResourceType: prior.ResourceType,
 		Permissions:  prior.Permissions,
 	}
-	if core.ResourceType == nil && role.ResourceType != "" && role.ResourceType != "global" {
+	if core.ResourceType == nil && role.ResourceType != "" && role.ResourceType != gcGlobal {
 		core.ResourceType = util.OrNil(role.ResourceType)
 	}
 	if role.Details != nil {

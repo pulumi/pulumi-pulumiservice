@@ -37,7 +37,7 @@ func (TeamStackPermissionScope) Values() []infer.EnumValue[TeamStackPermissionSc
 	return []infer.EnumValue[TeamStackPermissionScope]{
 		{Name: "read", Value: TeamStackPermissionRead, Description: "Grants read permissions to stack."},
 		{Name: "edit", Value: TeamStackPermissionEdit, Description: "Grants edit permissions to stack."},
-		{Name: "admin", Value: TeamStackPermissionAdmin, Description: "Grants admin permissions to stack."},
+		{Name: gcAdmin, Value: TeamStackPermissionAdmin, Description: "Grants admin permissions to stack."},
 	}
 }
 

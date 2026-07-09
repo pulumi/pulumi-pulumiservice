@@ -80,7 +80,7 @@ func (*TTLSchedule) Check(
 	if i.Timestamp != "" {
 		if _, perr := time.Parse(time.RFC3339, i.Timestamp); perr != nil {
 			failures = append(failures, p.CheckFailure{
-				Property: "timestamp",
+				Property: gcTimestamp,
 				Reason:   fmt.Sprintf("timestamp must be in RFC 3339 format: %s", perr),
 			})
 		}

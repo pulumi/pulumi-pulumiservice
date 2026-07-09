@@ -30,25 +30,25 @@ import (
 func TestAccessTokenLegacyInputsMigration(t *testing.T) {
 	t.Run("migrates legacy state", func(t *testing.T) {
 		legacy := property.NewMap(map[string]property.Value{
-			"__inputs": property.New(property.NewMap(map[string]property.Value{
-				"description": property.New("example token"),
+			gcInputs: property.New(property.NewMap(map[string]property.Value{
+				gcDescription: property.New("example token"),
 			})),
-			"description": property.New("example token"),
-			"value":       property.New("tok-secret-value"),
+			gcDescription: property.New("example token"),
+			gcValue:       property.New(gcTokSecretValue),
 		})
 
 		got, err := migrateAccessTokenLegacyInputs(t.Context(), legacy)
 		require.NoError(t, err)
 		assert.Equal(t, &AccessTokenState{
 			AccessTokenInput: AccessTokenInput{Description: "example token"},
-			Value:            "tok-secret-value",
+			Value:            gcTokSecretValue,
 		}, got.Result)
 	})
 
 	t.Run("no-op for already-migrated state", func(t *testing.T) {
 		current := property.NewMap(map[string]property.Value{
-			"description": property.New("example token"),
-			"value":       property.New("tok-secret-value"),
+			gcDescription: property.New("example token"),
+			gcValue:       property.New(gcTokSecretValue),
 		})
 
 		got, err := migrateAccessTokenLegacyInputs(t.Context(), current)
