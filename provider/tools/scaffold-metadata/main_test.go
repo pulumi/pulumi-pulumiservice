@@ -23,14 +23,14 @@ import (
 // scaffolder relies on it to count modified-but-existing attachments, so a spec
 // change to a derived field isn't silently reported as zero changes.
 func TestMergeAttachmentReportsChange(t *testing.T) {
-	d := attachmentDerivation{
+	d := attachmentDerivation{ //nolint:gosec // G101: test fixture, not a real credential.
 		Token:           "pulumiservice:api:FooBarAttachment",
 		MutationOp:      "UpdateFoo",
 		ReadOp:          "GetFoo",
 		AddField:        "addBar",
 		RemoveField:     "removeBar",
 		MembershipField: "bars",
-		MatchKey:        []string{"name"},
+		MatchKey:        []string{nameFieldKey},
 		IDFormat:        "{orgName}/{foo}/{name}",
 	}
 
@@ -60,14 +60,14 @@ func TestMergeAttachmentReportsChange(t *testing.T) {
 // survives a re-merge even when the derived idFormat differs: the pin wins and
 // the scaffolder logs the divergence rather than silently overwriting it.
 func TestMergeAttachmentPreservesPinnedIDFormat(t *testing.T) {
-	d := attachmentDerivation{
+	d := attachmentDerivation{ //nolint:gosec // G101: test fixture, not a real credential.
 		Token:           "pulumiservice:api:FooBarAttachment",
 		MutationOp:      "UpdateFoo",
 		ReadOp:          "GetFoo",
 		AddField:        "addBar",
 		RemoveField:     "removeBar",
 		MembershipField: "bars",
-		MatchKey:        []string{"name"},
+		MatchKey:        []string{nameFieldKey},
 		IDFormat:        "{orgName}/{foo}/{name}",
 	}
 	existing := json.RawMessage(`{"idFormat":"{orgName}/{name}","token":"pulumiservice:api:FooBarAttachment"}`)

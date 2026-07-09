@@ -42,16 +42,17 @@ func (ia *InsightsAccount) Annotate(a infer.Annotator) {
 type CloudProvider string
 
 const (
-	CloudProviderAWS        CloudProvider = "aws"
+	CloudProviderAWS        CloudProvider = gcAWS
 	CloudProviderAzure      CloudProvider = "azure-native"
 	CloudProviderGCP        CloudProvider = "gcp"
 	CloudProviderKubernetes CloudProvider = "kubernetes"
 	CloudProviderOCI        CloudProvider = "oci"
+	gcRegions                             = "regions"
 )
 
 func (CloudProvider) Values() []infer.EnumValue[CloudProvider] {
 	return []infer.EnumValue[CloudProvider]{
-		{Name: "aws", Value: CloudProviderAWS, Description: "Amazon Web Services"},
+		{Name: gcAWS, Value: CloudProviderAWS, Description: "Amazon Web Services"},
 		{Name: "azure-native", Value: CloudProviderAzure, Description: "Microsoft Azure"},
 		{Name: "gcp", Value: CloudProviderGCP, Description: "Google Cloud Platform"},
 		{Name: "kubernetes", Value: CloudProviderKubernetes, Description: "Kubernetes"},
@@ -318,7 +319,7 @@ func (*InsightsAccount) Update(
 	// If provider config is default (empty or single region for AWS), pass
 	// config with empty regions to ensure API updates correctly
 	if isDefaultProviderConfig(req.Inputs.Provider, providerConfig) {
-		providerConfig = map[string]interface{}{"regions": []string{}}
+		providerConfig = map[string]interface{}{gcRegions: []string{}}
 	}
 
 	updateReq := pulumiapi.UpdateInsightsAccountRequest{
@@ -382,7 +383,7 @@ func isDefaultProviderConfig(provider CloudProvider, config map[string]interface
 		return true
 	}
 	if provider == CloudProviderAWS {
-		if regions, ok := config["regions"]; ok {
+		if regions, ok := config[gcRegions]; ok {
 			if regionsSlice, ok := regions.([]interface{}); ok {
 				return len(regionsSlice) == 0
 			}

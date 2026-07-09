@@ -25,6 +25,10 @@ import (
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 )
 
+const (
+	gcTeamName = "teamName"
+)
+
 type TeamAccessToken struct{}
 
 var (
@@ -154,24 +158,24 @@ func (*TeamAccessToken) StateMigrations(context.Context) []infer.StateMigrationF
 func migrateTeamAccessTokenLegacyInputs(
 	_ context.Context, old property.Map,
 ) (infer.MigrationResult[TeamAccessTokenState], error) {
-	if _, ok := old.GetOk("__inputs"); !ok {
+	if _, ok := old.GetOk(gcInputs); !ok {
 		return infer.MigrationResult[TeamAccessTokenState]{}, nil
 	}
 	state := TeamAccessTokenState{}
-	if v, ok := old.GetOk("name"); ok && v.IsString() {
+	if v, ok := old.GetOk(gcName); ok && v.IsString() {
 		state.Name = v.AsString()
 	}
-	if v, ok := old.GetOk("organizationName"); ok && v.IsString() {
+	if v, ok := old.GetOk(gcOrganizationName); ok && v.IsString() {
 		state.OrganizationName = v.AsString()
 	}
-	if v, ok := old.GetOk("teamName"); ok && v.IsString() {
+	if v, ok := old.GetOk(gcTeamName); ok && v.IsString() {
 		state.TeamName = v.AsString()
 	}
-	if v, ok := old.GetOk("description"); ok && v.IsString() {
+	if v, ok := old.GetOk(gcDescription); ok && v.IsString() {
 		s := v.AsString()
 		state.Description = &s
 	}
-	if v, ok := old.GetOk("value"); ok && v.IsString() {
+	if v, ok := old.GetOk(gcValue); ok && v.IsString() {
 		state.Value = v.AsString()
 	}
 	return infer.MigrationResult[TeamAccessTokenState]{Result: &state}, nil

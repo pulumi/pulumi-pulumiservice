@@ -28,6 +28,16 @@ import (
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 )
 
+const (
+	gcOrg                 = "org"
+	gcTag3                = "tag3"
+	gcTag1                = "tag1"
+	gcTag4                = "tag4"
+	gcOrgProjectStackTags = "org/project/stack/tags"
+	gcTag2                = "tag2"
+	gcV2New               = "v2-new"
+)
+
 // stackTagsClientMock implements the slice of config.Client that StackTags uses.
 type stackTagsClientMock struct {
 	config.Client
@@ -56,7 +66,7 @@ func (m *stackTagsClientMock) GetStackTags(
 
 func TestStackTagsResourceID(t *testing.T) {
 	t.Run("formats id", func(t *testing.T) {
-		assert.Equal(t, "org/proj/stk/tags", stackTagsResourceID("org", "proj", "stk"))
+		assert.Equal(t, "org/proj/stk/tags", stackTagsResourceID(gcOrg, "proj", "stk"))
 	})
 }
 
@@ -64,7 +74,7 @@ func TestParseStackTagsResourceID(t *testing.T) {
 	t.Run("valid", func(t *testing.T) {
 		org, proj, stk, err := parseStackTagsResourceID("org/proj/stk/tags")
 		require.NoError(t, err)
-		assert.Equal(t, "org", org)
+		assert.Equal(t, gcOrg, org)
 		assert.Equal(t, "proj", proj)
 		assert.Equal(t, "stk", stk)
 	})
@@ -98,14 +108,14 @@ func TestStackTagsCreate(t *testing.T) {
 
 		resp, err := (&StackTags{}).Create(ctx, infer.CreateRequest[StackTagsInput]{
 			Inputs: StackTagsInput{
-				Organization: "org",
-				Project:      "project",
-				Stack:        "stack",
+				Organization: gcOrg,
+				Project:      gcProject,
+				Stack:        gcStack,
 				Tags:         map[string]string{"b": "2", "a": "1", "c": "3"},
 			},
 		})
 		require.NoError(t, err)
-		assert.Equal(t, "org/project/stack/tags", resp.ID)
+		assert.Equal(t, gcOrgProjectStackTags, resp.ID)
 		assert.Equal(t, []pulumiapi.StackTag{
 			{Name: "a", Value: "1"},
 			{Name: "b", Value: "2"},
@@ -125,18 +135,18 @@ func TestStackTagsCreate(t *testing.T) {
 		resp, err := (&StackTags{}).Create(ctx, infer.CreateRequest[StackTagsInput]{
 			DryRun: true,
 			Inputs: StackTagsInput{
-				Organization: "org",
-				Project:      "project",
-				Stack:        "stack",
+				Organization: gcOrg,
+				Project:      gcProject,
+				Stack:        gcStack,
 				Tags:         map[string]string{"a": "1"},
 			},
 		})
 		require.NoError(t, err)
-		assert.Equal(t, "org/project/stack/tags", resp.ID)
+		assert.Equal(t, gcOrgProjectStackTags, resp.ID)
 		assert.Equal(t, StackTagsState{
-			Organization: "org",
-			Project:      "project",
-			Stack:        "stack",
+			Organization: gcOrg,
+			Project:      gcProject,
+			Stack:        gcStack,
 			Tags:         map[string]string{"a": "1"},
 		}, resp.Output)
 	})
@@ -144,7 +154,7 @@ func TestStackTagsCreate(t *testing.T) {
 	t.Run("partial failure returns ResourceInitFailedError with successful tags", func(t *testing.T) {
 		mock := &stackTagsClientMock{
 			createStackTagFunc: func(_ context.Context, _ pulumiapi.StackIdentifier, tag pulumiapi.StackTag) error {
-				if tag.Name == "tag3" {
+				if tag.Name == gcTag3 {
 					return errors.New("boom")
 				}
 				return nil
@@ -154,10 +164,10 @@ func TestStackTagsCreate(t *testing.T) {
 
 		resp, err := (&StackTags{}).Create(ctx, infer.CreateRequest[StackTagsInput]{
 			Inputs: StackTagsInput{
-				Organization: "org",
-				Project:      "project",
-				Stack:        "stack",
-				Tags:         map[string]string{"tag1": "v1", "tag2": "v2", "tag3": "v3"},
+				Organization: gcOrg,
+				Project:      gcProject,
+				Stack:        gcStack,
+				Tags:         map[string]string{gcTag1: "v1", gcTag2: "v2", gcTag3: "v3"},
 			},
 		})
 		require.Error(t, err)
@@ -165,30 +175,30 @@ func TestStackTagsCreate(t *testing.T) {
 		var initFailed infer.ResourceInitFailedError
 		require.True(t, errors.As(err, &initFailed))
 		require.Len(t, initFailed.Reasons, 1)
-		assert.Contains(t, initFailed.Reasons[0], "tag3")
-		assert.Equal(t, "org/project/stack/tags", resp.ID)
+		assert.Contains(t, initFailed.Reasons[0], gcTag3)
+		assert.Equal(t, gcOrgProjectStackTags, resp.ID)
 		assert.Equal(t, StackTagsState{
-			Organization: "org",
-			Project:      "project",
-			Stack:        "stack",
-			Tags:         map[string]string{"tag1": "v1", "tag2": "v2"},
+			Organization: gcOrg,
+			Project:      gcProject,
+			Stack:        gcStack,
+			Tags:         map[string]string{gcTag1: "v1", gcTag2: "v2"},
 		}, resp.Output)
 	})
 }
 
 func TestStackTagsUpdate(t *testing.T) {
 	oldState := StackTagsState{
-		Organization: "org",
-		Project:      "project",
-		Stack:        "stack",
-		Tags:         map[string]string{"tag1": "v1", "tag2": "v2", "tag3": "v3"},
+		Organization: gcOrg,
+		Project:      gcProject,
+		Stack:        gcStack,
+		Tags:         map[string]string{gcTag1: "v1", gcTag2: "v2", gcTag3: "v3"},
 	}
 	// Remove tag1, change tag2, add tag4.
 	newInputs := StackTagsInput{
-		Organization: "org",
-		Project:      "project",
-		Stack:        "stack",
-		Tags:         map[string]string{"tag2": "v2-new", "tag3": "v3", "tag4": "v4"},
+		Organization: gcOrg,
+		Project:      gcProject,
+		Stack:        gcStack,
+		Tags:         map[string]string{gcTag2: gcV2New, gcTag3: "v3", gcTag4: "v4"},
 	}
 
 	t.Run("applies add/delete/modify operations", func(t *testing.T) {
@@ -212,11 +222,11 @@ func TestStackTagsUpdate(t *testing.T) {
 		})
 		require.NoError(t, err)
 		// Deletes are sorted: tag1 (removed), tag2 (modified).
-		assert.Equal(t, []string{"tag1", "tag2"}, deletes)
+		assert.Equal(t, []string{gcTag1, gcTag2}, deletes)
 		// Creates are sorted: tag2 (modified), tag4 (added).
 		assert.Equal(t, []pulumiapi.StackTag{
-			{Name: "tag2", Value: "v2-new"},
-			{Name: "tag4", Value: "v4"},
+			{Name: gcTag2, Value: gcV2New},
+			{Name: gcTag4, Value: "v4"},
 		}, creates)
 		assert.Equal(t, newInputs, resp.Output)
 	})
@@ -246,7 +256,7 @@ func TestStackTagsUpdate(t *testing.T) {
 	t.Run("delete failure mid-update returns partial state with surviving tags", func(t *testing.T) {
 		mock := &stackTagsClientMock{
 			deleteStackTagFunc: func(_ context.Context, _ pulumiapi.StackIdentifier, tagName string) error {
-				if tagName == "tag2" {
+				if tagName == gcTag2 {
 					return errors.New("delete boom")
 				}
 				return nil
@@ -268,10 +278,10 @@ func TestStackTagsUpdate(t *testing.T) {
 		// tag1 was successfully deleted; tag2 failed and is still live; tag3
 		// has not been touched yet.
 		assert.Equal(t, StackTagsState{
-			Organization: "org",
-			Project:      "project",
-			Stack:        "stack",
-			Tags:         map[string]string{"tag2": "v2", "tag3": "v3"},
+			Organization: gcOrg,
+			Project:      gcProject,
+			Stack:        gcStack,
+			Tags:         map[string]string{gcTag2: "v2", gcTag3: "v3"},
 		}, resp.Output)
 	})
 
@@ -281,7 +291,7 @@ func TestStackTagsUpdate(t *testing.T) {
 				return nil
 			},
 			createStackTagFunc: func(_ context.Context, _ pulumiapi.StackIdentifier, tag pulumiapi.StackTag) error {
-				if tag.Name == "tag4" {
+				if tag.Name == gcTag4 {
 					return errors.New("create boom")
 				}
 				return nil
@@ -299,10 +309,10 @@ func TestStackTagsUpdate(t *testing.T) {
 		// tag1, tag2 deletes succeeded; tag2 was recreated with the new value;
 		// tag3 is untouched; tag4 create failed.
 		assert.Equal(t, StackTagsState{
-			Organization: "org",
-			Project:      "project",
-			Stack:        "stack",
-			Tags:         map[string]string{"tag2": "v2-new", "tag3": "v3"},
+			Organization: gcOrg,
+			Project:      gcProject,
+			Stack:        gcStack,
+			Tags:         map[string]string{gcTag2: gcV2New, gcTag3: "v3"},
 		}, resp.Output)
 	})
 }
@@ -320,9 +330,9 @@ func TestStackTagsDelete(t *testing.T) {
 
 		_, err := (&StackTags{}).Delete(ctx, infer.DeleteRequest[StackTagsState]{
 			State: StackTagsState{
-				Organization: "org",
-				Project:      "project",
-				Stack:        "stack",
+				Organization: gcOrg,
+				Project:      gcProject,
+				Stack:        gcStack,
 				Tags:         map[string]string{"a": "1", "b": "2"},
 			},
 		})
@@ -340,9 +350,9 @@ func TestStackTagsDelete(t *testing.T) {
 
 		_, err := (&StackTags{}).Delete(ctx, infer.DeleteRequest[StackTagsState]{
 			State: StackTagsState{
-				Organization: "org",
-				Project:      "project",
-				Stack:        "stack",
+				Organization: gcOrg,
+				Project:      gcProject,
+				Stack:        gcStack,
 				Tags:         map[string]string{"a": "1"},
 			},
 		})
@@ -354,29 +364,29 @@ func TestStackTagsRead(t *testing.T) {
 	t.Run("returns only managed tags when prior inputs exist", func(t *testing.T) {
 		mock := &stackTagsClientMock{
 			getStackTagsFunc: func(context.Context, pulumiapi.StackIdentifier) (map[string]string, error) {
-				return map[string]string{"tag1": "v1", "tag2": "v2", "extra": "x"}, nil
+				return map[string]string{gcTag1: "v1", gcTag2: "v2", "extra": "x"}, nil
 			},
 		}
 		ctx := config.WithMockClient(context.Background(), mock)
 
 		resp, err := (&StackTags{}).Read(ctx, infer.ReadRequest[StackTagsInput, StackTagsState]{
-			ID: "org/project/stack/tags",
+			ID: gcOrgProjectStackTags,
 			Inputs: StackTagsInput{
-				Organization: "org",
-				Project:      "project",
-				Stack:        "stack",
-				Tags:         map[string]string{"tag1": "old1", "tag2": "old2"},
+				Organization: gcOrg,
+				Project:      gcProject,
+				Stack:        gcStack,
+				Tags:         map[string]string{gcTag1: "old1", gcTag2: "old2"},
 			},
 		})
 		require.NoError(t, err)
 		expected := StackTagsState{
-			Organization: "org",
-			Project:      "project",
-			Stack:        "stack",
-			Tags:         map[string]string{"tag1": "v1", "tag2": "v2"},
+			Organization: gcOrg,
+			Project:      gcProject,
+			Stack:        gcStack,
+			Tags:         map[string]string{gcTag1: "v1", gcTag2: "v2"},
 		}
 		assert.Equal(t, infer.ReadResponse[StackTagsInput, StackTagsState]{
-			ID:     "org/project/stack/tags",
+			ID:     gcOrgProjectStackTags,
 			Inputs: expected,
 			State:  expected,
 		}, resp)
@@ -391,17 +401,17 @@ func TestStackTagsRead(t *testing.T) {
 		ctx := config.WithMockClient(context.Background(), mock)
 
 		resp, err := (&StackTags{}).Read(ctx, infer.ReadRequest[StackTagsInput, StackTagsState]{
-			ID: "org/project/stack/tags",
+			ID: gcOrgProjectStackTags,
 		})
 		require.NoError(t, err)
 		expected := StackTagsState{
-			Organization: "org",
-			Project:      "project",
-			Stack:        "stack",
+			Organization: gcOrg,
+			Project:      gcProject,
+			Stack:        gcStack,
 			Tags:         map[string]string{"a": "1", "b": "2"},
 		}
 		assert.Equal(t, infer.ReadResponse[StackTagsInput, StackTagsState]{
-			ID:     "org/project/stack/tags",
+			ID:     gcOrgProjectStackTags,
 			Inputs: expected,
 			State:  expected,
 		}, resp)

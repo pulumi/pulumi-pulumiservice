@@ -25,8 +25,8 @@ import (
 
 func TestStackResourceID(t *testing.T) {
 	id := stackResourceID(pulumiapi.StackIdentifier{
-		OrgName:     "my-org",
-		ProjectName: "my-project",
+		OrgName:     gcMyOrg,
+		ProjectName: gcMyProject,
 		StackName:   "my-stack",
 	})
 	assert.Equal(t, "my-org/my-project/my-stack", id)
@@ -36,8 +36,8 @@ func TestSplitStackResourceID(t *testing.T) {
 	t.Run("valid", func(t *testing.T) {
 		org, project, stack, err := splitStackResourceID("my-org/my-project/my-stack")
 		require.NoError(t, err)
-		assert.Equal(t, "my-org", org)
-		assert.Equal(t, "my-project", project)
+		assert.Equal(t, gcMyOrg, org)
+		assert.Equal(t, gcMyProject, project)
 		assert.Equal(t, "my-stack", stack)
 	})
 

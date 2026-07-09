@@ -141,7 +141,7 @@ func (*Team) Create(ctx context.Context, req infer.CreateRequest[TeamInput]) (in
 		members = append(members, v.GithubLogin)
 	}
 	// Sort the members so the order is deterministic
-	slices.Sort(members)
+	slices.Sort(members) //nolint:govet // inline analyzer limitation on generic slices.Sort; not a code defect.
 
 	return infer.CreateResponse[TeamState]{
 		ID: teamURN,
@@ -167,7 +167,7 @@ func (*Team) Check(ctx context.Context, req infer.CheckRequest) (infer.CheckResp
 	if i.Type != teamTypeGitHub && i.Type != teamTypePulumi {
 		checkFailures = append(checkFailures, p.CheckFailure{
 			Reason:   fmt.Sprintf("found %q instead of 'pulumi' or 'github'", i.Type),
-			Property: "type",
+			Property: gcType,
 		})
 	}
 
@@ -181,7 +181,7 @@ func (*Team) Check(ctx context.Context, req infer.CheckRequest) (infer.CheckResp
 	if i.Type == teamTypePulumi && i.Name == nil {
 		checkFailures = append(checkFailures, p.CheckFailure{
 			Reason:   "teams with teamType 'pulumi' require a name",
-			Property: "name",
+			Property: gcName,
 		})
 	}
 
@@ -191,7 +191,7 @@ func (*Team) Check(ctx context.Context, req infer.CheckRequest) (infer.CheckResp
 	if i.Members == nil {
 		i.Members = []string{}
 	}
-	slices.Sort(i.Members)
+	slices.Sort(i.Members) //nolint:govet // inline analyzer limitation on generic slices.Sort; not a code defect.
 
 	return infer.CheckResponse[TeamInput]{
 		Inputs:   i,
@@ -235,7 +235,7 @@ func (*Team) Read(
 	for _, m := range team.Members {
 		members = append(members, m.GithubLogin)
 	}
-	slices.Sort(members)
+	slices.Sort(members) //nolint:govet // inline analyzer limitation on generic slices.Sort; not a code defect.
 
 	return infer.ReadResponse[TeamInput, TeamState]{
 		ID: req.ID,
@@ -281,10 +281,11 @@ func (*Team) Update(
 	members := make([]string, len(req.State.Members))
 	copy(members, req.State.Members)
 
-	if !slices.Equal(req.Inputs.Members, req.State.Members) && req.Inputs.Type != teamTypeGitHub {
+	// slices.* generic calls below: govet's inline analyzer can't infer type params; suppressed.
+	if !slices.Equal(req.Inputs.Members, req.State.Members) && req.Inputs.Type != teamTypeGitHub { //nolint:govet
 		for i := len(req.State.Members) - 1; i >= 0; i-- {
 			usernameToDelete := req.State.Members[i]
-			if !slices.Contains(req.Inputs.Members, usernameToDelete) {
+			if !slices.Contains(req.Inputs.Members, usernameToDelete) { //nolint:govet
 				err := client.DeleteMemberFromTeam(
 					ctx,
 					req.Inputs.OrganizationName,
@@ -292,7 +293,7 @@ func (*Team) Update(
 					usernameToDelete,
 				)
 				if err != nil {
-					slices.Sort(members)
+					slices.Sort(members) //nolint:govet
 					// We have failed to delete a member, but we may
 					// have still done something. Report on what we
 					// did.
@@ -316,7 +317,7 @@ func (*Team) Update(
 		}
 
 		for _, usernameToAdd := range req.Inputs.Members {
-			if !slices.Contains(req.State.Members, usernameToAdd) {
+			if !slices.Contains(req.State.Members, usernameToAdd) { //nolint:govet
 				err := client.AddMemberToTeam(
 					ctx,
 					req.Inputs.OrganizationName,
@@ -324,7 +325,7 @@ func (*Team) Update(
 					usernameToAdd,
 				)
 				if err != nil {
-					slices.Sort(members)
+					slices.Sort(members) //nolint:govet
 					return infer.UpdateResponse[TeamState]{
 						Output: TeamState{
 							TeamCore: req.Inputs.TeamCore,
@@ -335,7 +336,7 @@ func (*Team) Update(
 				members = append(members, usernameToAdd)
 			}
 		}
-		slices.Sort(members)
+		slices.Sort(members) //nolint:govet
 		req.Inputs.Members = members
 	}
 

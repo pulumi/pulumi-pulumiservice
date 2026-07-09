@@ -24,6 +24,12 @@ import (
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 )
 
+const (
+	gcInputs      = "__inputs"
+	gcDescription = "description"
+	gcValue       = "value"
+)
+
 type AccessToken struct{}
 
 var (
@@ -122,14 +128,14 @@ func (*AccessToken) StateMigrations(context.Context) []infer.StateMigrationFunc[
 func migrateAccessTokenLegacyInputs(
 	_ context.Context, old property.Map,
 ) (infer.MigrationResult[AccessTokenState], error) {
-	if _, ok := old.GetOk("__inputs"); !ok {
+	if _, ok := old.GetOk(gcInputs); !ok {
 		return infer.MigrationResult[AccessTokenState]{}, nil
 	}
 	state := AccessTokenState{}
-	if v, ok := old.GetOk("description"); ok && v.IsString() {
+	if v, ok := old.GetOk(gcDescription); ok && v.IsString() {
 		state.Description = v.AsString()
 	}
-	if v, ok := old.GetOk("value"); ok && v.IsString() {
+	if v, ok := old.GetOk(gcValue); ok && v.IsString() {
 		state.Value = v.AsString()
 	}
 	return infer.MigrationResult[AccessTokenState]{Result: &state}, nil

@@ -62,7 +62,7 @@ func TestEveryApiResourceHasExample(t *testing.T) {
 		if filepath.Base(filepath.Dir(path)) != "yaml" {
 			return nil
 		}
-		data, readErr := os.ReadFile(path)
+		data, readErr := os.ReadFile(path) //nolint:gosec // G122: reading repo's own example YAML under test
 		if readErr != nil {
 			return readErr
 		}

@@ -46,8 +46,14 @@ var pathParamPattern = regexp.MustCompile(`\{([^/{}]+)\}`)
 
 // OpenAPI schema "type" discriminator values.
 const (
-	typeArray  = "array"
-	typeString = "string"
+	typeArray    = "array"
+	typeString   = "string"
+	opCreate     = "create"
+	opRead       = "read"
+	opUpdate     = "update"
+	opDelete     = "delete"
+	authModule   = "auth"
+	nameFieldKey = "name"
 )
 
 // unorderedFieldNames is the heuristic set of Pulumi-side field names that the
@@ -70,7 +76,7 @@ var unorderedFieldNames = map[string]bool{
 // deleteBeforeReplace. Path-param renames have already been applied by the
 // time we check, so these names match what the user writes in code.
 var nameLikeBodyFields = map[string]bool{
-	"name":        true,
+	nameFieldKey:  true,
 	"displayName": true,
 	"hookName":    true,
 	"tagName":     true,
@@ -101,11 +107,11 @@ var verbPrefixes = []struct {
 	prefix string
 	slot   string
 }{
-	{"BatchCreate", "create"}, {"BatchUpdate", "update"}, {"BatchDelete", "delete"},
-	{"Create", "create"}, {"Register", "create"}, {"Add", "create"}, {"New", "create"},
-	{"Update", "update"}, {"Patch", "update"}, {"Replace", "update"}, {"Put", "update"},
-	{"Delete", "delete"}, {"Remove", "delete"},
-	{"Get", "read"}, {"Read", "read"}, {"Describe", "read"},
+	{"BatchCreate", opCreate}, {"BatchUpdate", opUpdate}, {"BatchDelete", opDelete},
+	{"Create", opCreate}, {"Register", opCreate}, {"Add", opCreate}, {"New", opCreate},
+	{"Update", opUpdate}, {"Patch", opUpdate}, {"Replace", opUpdate}, {"Put", opUpdate},
+	{"Delete", opDelete}, {"Remove", opDelete},
+	{"Get", opRead}, {"Read", opRead}, {"Describe", opRead},
 	// Non-CRUD verbs: recognized so noun extraction works on action ops.
 	{"List", ""}, {"Search", ""}, {"Find", ""}, {"Cancel", ""}, {"Approve", ""},
 	{"Reject", ""}, {"Reset", ""}, {"Refresh", ""}, {"Restore", ""}, {"Validate", ""},
@@ -135,12 +141,12 @@ var verboseBodyAliases = map[string][]string{
 // scaffolder-internal mapping driven by service URL conventions.
 var moduleAliases = map[string]string{
 	"agent-pools":        "agents",
-	"auth/policies":      "auth",
+	"auth/policies":      authModule,
 	"esc/environments":   "esc",
-	"oidc/issuers":       "auth",
+	"oidc/issuers":       authModule,
 	"preview/agents":     "agents",
 	"preview/insights":   "insights",
-	"saml":               "auth",
+	"saml":               authModule,
 	"stacks/deployments": "deployments",
 	"teams/tokens":       "tokens",
 }
@@ -433,7 +439,7 @@ func inferDeleteBeforeReplace(spec *rest.Spec, ops derivedOps, renames map[strin
 		if pul == "orgName" || pul == "organizationName" {
 			continue
 		}
-		if nameLikeBodyFields[pul] || strings.HasSuffix(pul, "Name") || strings.HasSuffix(pul, "name") {
+		if nameLikeBodyFields[pul] || strings.HasSuffix(pul, "Name") || strings.HasSuffix(pul, nameFieldKey) {
 			return true
 		}
 	}
@@ -571,16 +577,16 @@ func mergeOperations(existing json.RawMessage, ops derivedOps, d derivations) (j
 
 	newOps := map[string]string{}
 	if ops.Create != "" {
-		newOps["create"] = ops.Create
+		newOps[opCreate] = ops.Create
 	}
 	if ops.Read != "" {
-		newOps["read"] = ops.Read
+		newOps[opRead] = ops.Read
 	}
 	if ops.Update != "" {
-		newOps["update"] = ops.Update
+		newOps[opUpdate] = ops.Update
 	}
 	if ops.Delete != "" {
-		newOps["delete"] = ops.Delete
+		newOps[opDelete] = ops.Delete
 	}
 
 	prev, _ := entry["operations"].(map[string]any)
@@ -824,7 +830,7 @@ func detectAttachmentPairs(spec *rest.Spec, updOp, readOp *rest.Operation) ([]at
 				continue
 			}
 			membership, matchKey = m, mk
-		} else if nameField := stringField(spec, addRef, "name"); nameField != "" {
+		} else if nameField := stringField(spec, addRef, nameFieldKey); nameField != "" {
 			if scalarList := findLoneScalarList(resp); scalarList != "" {
 				membership, matchKey = scalarList, []string{nameField}
 			}
@@ -1191,8 +1197,8 @@ func inferRenames(spec *rest.Spec, createOp, readOp, updateOp, deleteOp *rest.Op
 				seen[p] = true
 				continue
 			}
-			if _, claimed := out["name"]; !claimed && requestHasField(spec, createOp, "name") {
-				out["name"] = p
+			if _, claimed := out[nameFieldKey]; !claimed && requestHasField(spec, createOp, nameFieldKey) {
+				out[nameFieldKey] = p
 				seen[p] = true
 				continue
 			}
@@ -1420,14 +1426,14 @@ func derive(paths map[string]map[string]any) (map[string]derivedOps, deriveStats
 			if shorter == longer || !strings.HasPrefix(longer, shorter+"_") {
 				continue
 			}
-			if _, hasCreate := byNoun[shorter]["create"]; hasCreate {
+			if _, hasCreate := byNoun[shorter][opCreate]; hasCreate {
 				continue
 			}
-			c, ok := byNoun[longer]["create"]
+			c, ok := byNoun[longer][opCreate]
 			if !ok {
 				continue
 			}
-			byNoun[shorter]["create"] = c
+			byNoun[shorter][opCreate] = c
 			otherOps[shorter] = append(otherOps[shorter], otherOps[longer]...)
 			delete(byNoun, longer)
 			delete(otherOps, longer)
@@ -1445,7 +1451,7 @@ func derive(paths map[string]map[string]any) (map[string]derivedOps, deriveStats
 			continue
 		}
 		for slot, opID := range byNoun[plural] {
-			if slot == "read" {
+			if slot == opRead {
 				continue
 			}
 			if _, set := byNoun[singular][slot]; !set {
@@ -1454,14 +1460,14 @@ func derive(paths map[string]map[string]any) (map[string]derivedOps, deriveStats
 		}
 		hasOnlyReadLeft := true
 		for slot := range byNoun[plural] {
-			if slot != "read" {
+			if slot != opRead {
 				hasOnlyReadLeft = false
 				break
 			}
 		}
 		otherOps[singular] = append(otherOps[singular], otherOps[plural]...)
 		if hasOnlyReadLeft {
-			otherOps[singular] = append(otherOps[singular], byNoun[plural]["read"])
+			otherOps[singular] = append(otherOps[singular], byNoun[plural][opRead])
 		}
 		delete(byNoun, plural)
 		delete(otherOps, plural)
@@ -1476,7 +1482,7 @@ func derive(paths map[string]map[string]any) (map[string]derivedOps, deriveStats
 		if _, ok := byNoun[bare]; !ok {
 			continue
 		}
-		if _, hasOwnCreate := byNoun[bare]["create"]; hasOwnCreate {
+		if _, hasOwnCreate := byNoun[bare][opCreate]; hasOwnCreate {
 			continue
 		}
 		for slot, opID := range byNoun[scoped] {
@@ -1496,14 +1502,14 @@ func derive(paths map[string]map[string]any) (map[string]derivedOps, deriveStats
 		}
 		final := maps.Clone(o)
 		// Upsert: PUT /resource/{id} acts as create+update.
-		if _, hasCreate := final["create"]; !hasCreate {
-			if u, hasUpdate := final["update"]; hasUpdate {
-				final["create"] = u
+		if _, hasCreate := final[opCreate]; !hasCreate {
+			if u, hasUpdate := final[opUpdate]; hasUpdate {
+				final[opCreate] = u
 			}
 		}
-		_, hasCreate := final["create"]
-		_, hasRead := final["read"]
-		_, hasDelete := final["delete"]
+		_, hasCreate := final[opCreate]
+		_, hasRead := final[opRead]
+		_, hasDelete := final[opDelete]
 		if !hasCreate || (!hasRead && !hasDelete) {
 			slots := make([]string, 0, len(o))
 			for k := range o {
@@ -1514,10 +1520,10 @@ func derive(paths map[string]map[string]any) (map[string]derivedOps, deriveStats
 			continue
 		}
 		candidates["pulumiservice:api:"+noun] = derivedOps{
-			Create: final["create"],
-			Read:   final["read"],
-			Update: final["update"],
-			Delete: final["delete"],
+			Create: final[opCreate],
+			Read:   final[opRead],
+			Update: final[opUpdate],
+			Delete: final[opDelete],
 		}
 	}
 

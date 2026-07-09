@@ -30,9 +30,9 @@ import (
 // to the default set of event-group subscriptions applied when the user has
 // not provided either `filters` or `groups`.
 var defaultWebhookGroups = map[string][]WebhookGroup{
-	"organization": {WebhookGroupDeployments, WebhookGroupEnvironments, WebhookGroupStacks},
-	"stack":        {WebhookGroupDeployments, WebhookGroupStacks},
-	"environment":  {WebhookGroupEnvironments},
+	gcOrganization: {WebhookGroupDeployments, WebhookGroupEnvironments, WebhookGroupStacks},
+	gcStack:        {WebhookGroupDeployments, WebhookGroupStacks},
+	gcEnvironment:  {WebhookGroupEnvironments},
 }
 
 // WebhookFormat is the wire format of webhook payloads.
@@ -43,6 +43,7 @@ const (
 	WebhookFormatSlack             WebhookFormat = "slack"
 	WebhookFormatPulumiDeployments WebhookFormat = "pulumi_deployments"
 	WebhookFormatMicrosoftTeams    WebhookFormat = "ms_teams"
+	gcProjectName                                = "projectName"
 )
 
 func (WebhookFormat) Values() []infer.EnumValue[WebhookFormat] {
@@ -69,7 +70,7 @@ func (WebhookFormat) Values() []infer.EnumValue[WebhookFormat] {
 type WebhookGroup string
 
 const (
-	WebhookGroupStacks       WebhookGroup = "stacks"
+	WebhookGroupStacks       WebhookGroup = gcStacks
 	WebhookGroupDeployments  WebhookGroup = "deployments"
 	WebhookGroupEnvironments WebhookGroup = "environments"
 )
@@ -400,13 +401,13 @@ func (*Webhook) Check(
 
 	if hasStack && !hasProject {
 		failures = append(failures, p.CheckFailure{
-			Property: "projectName",
+			Property: gcProjectName,
 			Reason:   "projectName and stackName must both be specified for stack webhooks",
 		})
 	}
 	if hasEnv && !hasProject {
 		failures = append(failures, p.CheckFailure{
-			Property: "projectName",
+			Property: gcProjectName,
 			Reason:   "projectName and environmentName must both be specified for environment webhooks",
 		})
 	}
@@ -419,7 +420,7 @@ func (*Webhook) Check(
 	}
 	if hasProject && !hasStack && !hasEnv {
 		failures = append(failures, p.CheckFailure{
-			Property: "projectName",
+			Property: gcProjectName,
 			Reason: "projectName needs to be empty if this is meant to be an organization webhook; " +
 				"otherwise provide stackName for stack webhook or environmentName for environment webhook",
 		})
@@ -428,11 +429,11 @@ func (*Webhook) Check(
 	// If neither filters nor groups are specified, apply the scope-appropriate
 	// default group set. This matches legacy provider behavior.
 	if len(i.Filters) == 0 && len(i.Groups) == 0 {
-		scope := "organization"
+		scope := gcOrganization
 		if hasStack {
-			scope = "stack"
+			scope = gcStack
 		} else if hasEnv {
-			scope = "environment"
+			scope = gcEnvironment
 		}
 		i.Groups = append([]WebhookGroup(nil), defaultWebhookGroups[scope]...)
 	}

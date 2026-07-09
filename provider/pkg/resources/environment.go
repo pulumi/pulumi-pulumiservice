@@ -20,6 +20,11 @@ import (
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 )
 
+const (
+	gcProject = "project"
+	gcYaml    = "yaml"
+)
+
 const defaultProject = "default"
 
 type PulumiServiceEnvironmentResource struct {
@@ -42,10 +47,10 @@ type PulumiServiceEnvironmentOutput struct {
 
 func (i *PulumiServiceEnvironmentInput) ToPropertyMap() (resource.PropertyMap, error) {
 	propertyMap := resource.PropertyMap{}
-	propertyMap["organization"] = resource.NewPropertyValue(i.OrgName)
-	propertyMap["project"] = resource.NewPropertyValue(i.ProjectName)
-	propertyMap["name"] = resource.NewPropertyValue(i.EnvName)
-	propertyMap["yaml"] = resource.MakeSecret(resource.NewStringProperty(i.Yaml))
+	propertyMap[gcOrganization] = resource.NewPropertyValue(i.OrgName)
+	propertyMap[gcProject] = resource.NewPropertyValue(i.ProjectName)
+	propertyMap[gcName] = resource.NewPropertyValue(i.EnvName)
+	propertyMap[gcYaml] = resource.MakeSecret(resource.NewStringProperty(i.Yaml))
 
 	return propertyMap, nil
 }
@@ -71,10 +76,10 @@ func ToPulumiServiceEnvironmentInput(properties *structpb.Struct) (*PulumiServic
 	}
 
 	input := PulumiServiceEnvironmentInput{}
-	input.OrgName = inputMap["organization"].StringValue()
-	input.EnvName = inputMap["name"].StringValue()
+	input.OrgName = inputMap[gcOrganization].StringValue()
+	input.EnvName = inputMap[gcName].StringValue()
 
-	inputYaml := inputMap["yaml"]
+	inputYaml := inputMap[gcYaml]
 	if inputYaml.IsAsset() {
 		input.Yaml = inputYaml.AssetValue().Text
 	} else {
@@ -84,7 +89,7 @@ func ToPulumiServiceEnvironmentInput(properties *structpb.Struct) (*PulumiServic
 	// Set project to "default" if not in input
 	input.ProjectName = defaultProject
 
-	inputProject := inputMap["project"]
+	inputProject := inputMap[gcProject]
 	if inputProject.HasValue() && inputProject.IsString() {
 		input.ProjectName = inputProject.StringValue()
 	}
@@ -116,8 +121,8 @@ func (st *PulumiServiceEnvironmentResource) Diff(req *pulumirpc.DiffRequest) (*p
 	}
 
 	// Backfill project for state from pre-0.25.0 which didn't have this field.
-	if !olds["project"].HasValue() {
-		olds["project"] = resource.NewPropertyValue(defaultProject)
+	if !olds[gcProject].HasValue() {
+		olds[gcProject] = resource.NewPropertyValue(defaultProject)
 	}
 
 	news, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
@@ -137,9 +142,9 @@ func (st *PulumiServiceEnvironmentResource) Diff(req *pulumirpc.DiffRequest) (*p
 	detailedDiffs := map[string]*pulumirpc.PropertyDiff{}
 	replaces := []string(nil)
 	replaceProperties := map[string]bool{
-		"organization": true,
-		"project":      true,
-		"name":         true,
+		gcOrganization: true,
+		gcProject:      true,
+		gcName:         true,
 	}
 	for k, v := range dd {
 		if _, ok := replaceProperties[k]; ok {
@@ -284,7 +289,7 @@ func (st *PulumiServiceEnvironmentResource) Check(req *pulumirpc.CheckRequest) (
 	}
 
 	var failures []*pulumirpc.CheckFailure
-	for _, p := range []resource.PropertyKey{"organization", "project", "name", "yaml"} {
+	for _, p := range []resource.PropertyKey{gcOrganization, gcProject, gcName, gcYaml} {
 		input := inputMap[(p)]
 
 		if !input.HasValue() {
@@ -292,7 +297,7 @@ func (st *PulumiServiceEnvironmentResource) Check(req *pulumirpc.CheckRequest) (
 				Reason:   fmt.Sprintf("missing required property '%s'", p),
 				Property: string(p),
 			})
-		} else if p != "yaml" && !input.IsComputed() && strings.Contains(util.GetSecretOrStringValue(input), "/") {
+		} else if p != gcYaml && !input.IsComputed() && strings.Contains(util.GetSecretOrStringValue(input), "/") {
 			failures = append(failures, &pulumirpc.CheckFailure{
 				Reason:   fmt.Sprintf("'%s' property contains `/` illegal character", p),
 				Property: string(p),
@@ -301,7 +306,7 @@ func (st *PulumiServiceEnvironmentResource) Check(req *pulumirpc.CheckRequest) (
 	}
 
 	var stringYaml string
-	inputYaml := inputMap["yaml"]
+	inputYaml := inputMap[gcYaml]
 	if !inputYaml.IsComputed() {
 		if inputYaml.IsSecret() {
 			inputYaml = inputYaml.SecretValue().Element
@@ -322,7 +327,7 @@ func (st *PulumiServiceEnvironmentResource) Check(req *pulumirpc.CheckRequest) (
 	}
 
 	trimmedYaml := strings.TrimSpace(stringYaml)
-	inputMap["yaml"] = resource.MakeSecret(resource.NewStringProperty(trimmedYaml))
+	inputMap[gcYaml] = resource.MakeSecret(resource.NewStringProperty(trimmedYaml))
 
 	inputs, err := plugin.MarshalProperties(
 		inputMap,

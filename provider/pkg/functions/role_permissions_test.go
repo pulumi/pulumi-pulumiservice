@@ -24,6 +24,13 @@ import (
 	"github.com/pulumi/pulumi-go-provider/infer"
 )
 
+const (
+	permEnvironmentOpen     = "environment:open"
+	permEnvironmentRead     = "environment:read"
+	permInsightsAccountRead = "insights_account:read"
+	permStackRead           = "stack:read"
+)
+
 // assertScopedConditionShape verifies a helper's output is the
 // `PermissionDescriptorCondition(Equal(Expression<E>, Literal<E>(id)),
 // Allow(perms))` shape. The wire format and SDK boundary share the
@@ -77,7 +84,7 @@ func TestBuildAllowPermissions(t *testing.T) {
 			context.Background(),
 			infer.FunctionRequest[BuildAllowPermissionsInput]{
 				Input: BuildAllowPermissionsInput{
-					Permissions: []string{"stack:read", "environment:open"},
+					Permissions: []string{permStackRead, permEnvironmentOpen},
 				},
 			},
 		)
@@ -87,7 +94,7 @@ func TestBuildAllowPermissions(t *testing.T) {
 		// Permissions list passes through verbatim.
 		perms, ok := got["permissions"].([]interface{})
 		require.True(t, ok)
-		assert.Equal(t, []interface{}{"stack:read", "environment:open"}, perms)
+		assert.Equal(t, []interface{}{permStackRead, permEnvironmentOpen}, perms)
 	})
 
 	t.Run("rejects empty permissions", func(t *testing.T) {
@@ -112,7 +119,7 @@ func TestBuildEnvironmentScopedPermissions(t *testing.T) {
 			infer.FunctionRequest[BuildEnvironmentScopedPermissionsInput]{
 				Input: BuildEnvironmentScopedPermissionsInput{
 					EnvironmentID: "env-uuid-1",
-					Permissions:   []string{"environment:read", "environment:open"},
+					Permissions:   []string{permEnvironmentRead, permEnvironmentOpen},
 				},
 			},
 		)
@@ -122,7 +129,7 @@ func TestBuildEnvironmentScopedPermissions(t *testing.T) {
 			"PermissionExpressionEnvironment",
 			"PermissionLiteralExpressionEnvironment",
 			"env-uuid-1",
-			[]string{"environment:read", "environment:open"},
+			[]string{permEnvironmentRead, permEnvironmentOpen},
 		)
 	})
 
@@ -132,7 +139,7 @@ func TestBuildEnvironmentScopedPermissions(t *testing.T) {
 			context.Background(),
 			infer.FunctionRequest[BuildEnvironmentScopedPermissionsInput]{
 				Input: BuildEnvironmentScopedPermissionsInput{
-					Permissions: []string{"environment:read"},
+					Permissions: []string{permEnvironmentRead},
 				},
 			},
 		)
@@ -163,7 +170,7 @@ func TestBuildStackScopedPermissions(t *testing.T) {
 			infer.FunctionRequest[BuildStackScopedPermissionsInput]{
 				Input: BuildStackScopedPermissionsInput{
 					StackID:     "stack-id-1",
-					Permissions: []string{"stack:read"},
+					Permissions: []string{permStackRead},
 				},
 			},
 		)
@@ -173,7 +180,7 @@ func TestBuildStackScopedPermissions(t *testing.T) {
 			"PermissionExpressionStack",
 			"PermissionLiteralExpressionStack",
 			"stack-id-1",
-			[]string{"stack:read"},
+			[]string{permStackRead},
 		)
 	})
 
@@ -183,7 +190,7 @@ func TestBuildStackScopedPermissions(t *testing.T) {
 			context.Background(),
 			infer.FunctionRequest[BuildStackScopedPermissionsInput]{
 				Input: BuildStackScopedPermissionsInput{
-					Permissions: []string{"stack:read"},
+					Permissions: []string{permStackRead},
 				},
 			},
 		)
@@ -214,7 +221,7 @@ func TestBuildInsightsAccountScopedPermissions(t *testing.T) {
 			infer.FunctionRequest[BuildInsightsAccountScopedPermissionsInput]{
 				Input: BuildInsightsAccountScopedPermissionsInput{
 					InsightsAccountID: "acct-1",
-					Permissions:       []string{"insights_account:read"},
+					Permissions:       []string{permInsightsAccountRead},
 				},
 			},
 		)
@@ -224,7 +231,7 @@ func TestBuildInsightsAccountScopedPermissions(t *testing.T) {
 			"PermissionExpressionInsightsAccount",
 			"PermissionLiteralExpressionInsightsAccount",
 			"acct-1",
-			[]string{"insights_account:read"},
+			[]string{permInsightsAccountRead},
 		)
 	})
 
@@ -234,7 +241,7 @@ func TestBuildInsightsAccountScopedPermissions(t *testing.T) {
 			context.Background(),
 			infer.FunctionRequest[BuildInsightsAccountScopedPermissionsInput]{
 				Input: BuildInsightsAccountScopedPermissionsInput{
-					Permissions: []string{"insights_account:read"},
+					Permissions: []string{permInsightsAccountRead},
 				},
 			},
 		)
