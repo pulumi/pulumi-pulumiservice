@@ -28,6 +28,11 @@ public final class AuthPolicyDefinition {
      */
     private AuthPolicyDecision decision;
     /**
+     * @return The role ID for organization tokens.
+     * 
+     */
+    private @Nullable String roleID;
+    /**
      * @return OIDC rules to set for this policy.
      * 
      */
@@ -67,6 +72,13 @@ public final class AuthPolicyDefinition {
      */
     public AuthPolicyDecision decision() {
         return this.decision;
+    }
+    /**
+     * @return The role ID for organization tokens.
+     * 
+     */
+    public Optional<String> roleID() {
+        return Optional.ofNullable(this.roleID);
     }
     /**
      * @return OIDC rules to set for this policy.
@@ -115,6 +127,7 @@ public final class AuthPolicyDefinition {
     public static final class Builder {
         private @Nullable List<AuthPolicyPermissionLevel> authorizedPermissions;
         private AuthPolicyDecision decision;
+        private @Nullable String roleID;
         private Map<String,String> rules;
         private @Nullable String runnerID;
         private @Nullable String teamName;
@@ -125,6 +138,7 @@ public final class AuthPolicyDefinition {
     	      Objects.requireNonNull(defaults);
     	      this.authorizedPermissions = defaults.authorizedPermissions;
     	      this.decision = defaults.decision;
+    	      this.roleID = defaults.roleID;
     	      this.rules = defaults.rules;
     	      this.runnerID = defaults.runnerID;
     	      this.teamName = defaults.teamName;
@@ -147,6 +161,12 @@ public final class AuthPolicyDefinition {
               throw new MissingRequiredPropertyException("AuthPolicyDefinition", "decision");
             }
             this.decision = decision;
+            return this;
+        }
+        @CustomType.Setter
+        public Builder roleID(@Nullable String roleID) {
+
+            this.roleID = roleID;
             return this;
         }
         @CustomType.Setter
@@ -187,6 +207,7 @@ public final class AuthPolicyDefinition {
             final var _resultValue = new AuthPolicyDefinition();
             _resultValue.authorizedPermissions = authorizedPermissions;
             _resultValue.decision = decision;
+            _resultValue.roleID = roleID;
             _resultValue.rules = rules;
             _resultValue.runnerID = runnerID;
             _resultValue.teamName = teamName;

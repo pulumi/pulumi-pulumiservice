@@ -19,6 +19,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 )
 
 func TestOidcIssuerID(t *testing.T) {
@@ -42,4 +44,74 @@ func TestSplitOidcIssuerID(t *testing.T) {
 		_, _, err := splitOidcIssuerID("a/b/c")
 		require.Error(t, err)
 	})
+}
+
+func TestOidcIssuerPolicySerialization(t *testing.T) {
+	t.Parallel()
+
+	teamName := "dream-team"
+	userLogin := "testuser"
+	runnerID := "runner-123"
+	roleID := "role-456"
+	audience := "urn:pulumi:org:test-org"
+	sub := "repo:organization/repo:*"
+	defaultRule := map[string]string{
+		"aud": audience,
+		"sub": sub,
+	}
+	maxExpiration := int64(3600)
+
+	input := OidcIssuerInput{
+		Organization:         "test-org",
+		Name:                 "test-issuer",
+		URL:                  "https://example.com",
+		MaxExpirationSeconds: &maxExpiration,
+		Thumbprints:          []string{"thumbprint1", "thumbprint2"},
+		Policies: []AuthPolicyDefinition{
+			{
+				Decision:              AuthPolicyDecisionAllow,
+				TokenType:             AuthPolicyTokenTypeOrganization,
+				AuthorizedPermissions: []AuthPolicyPermissionLevel{AuthPolicyPermissionLevelAdmin},
+				Rules:                 defaultRule,
+			},
+			{
+				Decision:  AuthPolicyDecisionDeny,
+				TokenType: AuthPolicyTokenTypePersonal,
+				UserLogin: &userLogin,
+				Rules: map[string]string{
+					"aud": audience,
+					"sub": "pulumi:deploy:org:test-org:project:test-project:*",
+					"env": "production",
+				},
+			},
+			{
+				Decision:              AuthPolicyDecisionAllow,
+				TokenType:             AuthPolicyTokenTypeTeam,
+				TeamName:              &teamName,
+				AuthorizedPermissions: []AuthPolicyPermissionLevel{AuthPolicyPermissionLevelStandard},
+				Rules:                 defaultRule,
+			},
+			{
+				Decision:  AuthPolicyDecisionAllow,
+				TokenType: AuthPolicyTokenTypeDeploymentRunner,
+				RunnerID:  &runnerID,
+				Rules:     defaultRule,
+			},
+			{
+				Decision:  AuthPolicyDecisionDeny,
+				TokenType: AuthPolicyTokenTypeOrganization,
+				RoleID:    &roleID,
+				Rules:     defaultRule,
+			},
+		},
+	}
+
+	apiRequest := policiesToAPIRequest(input.Policies)
+	apiPoliciesPtr := make([]*pulumiapi.AuthPolicyDefinition, len(apiRequest.Definition))
+	for i := range apiRequest.Definition {
+		apiPoliciesPtr[i] = &apiRequest.Definition[i]
+	}
+
+	resultPolicies := apiPoliciesToInputs(apiPoliciesPtr)
+	assert.Equal(t, input.Policies, resultPolicies)
 }

@@ -165,6 +165,10 @@
           "$ref": "#/types/pulumiservice:index:AuthPolicyDecision",
           "description": "The rule type of this policy definition."
         },
+        "roleID": {
+          "type": "string",
+          "description": "The role ID for organization tokens."
+        },
         "rules": {
           "type": "object",
           "additionalProperties": {
@@ -221,7 +225,7 @@
           "value": "team"
         },
         {
-          "description": "Organization Pulumi token. Requires authorizedPermissions field to be filled.",
+          "description": "Organization Pulumi token. Requires authorizedPermissions or roleID field to be filled.",
           "value": "organization"
         },
         {

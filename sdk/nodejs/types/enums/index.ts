@@ -38,7 +38,7 @@ export const AuthPolicyTokenType = {
      */
     Team: "team",
     /**
-     * Organization Pulumi token. Requires authorizedPermissions field to be filled.
+     * Organization Pulumi token. Requires authorizedPermissions or roleID field to be filled.
      */
     Organization: "organization",
     /**

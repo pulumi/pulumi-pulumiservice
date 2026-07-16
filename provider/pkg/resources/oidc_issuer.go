@@ -76,7 +76,7 @@ func (AuthPolicyTokenType) Values() []infer.EnumValue[AuthPolicyTokenType] {
 		{Value: AuthPolicyTokenTypeTeam, Description: "Team Pulumi token. Requires teamName field to be filled."},
 		{
 			Value:       AuthPolicyTokenTypeOrganization,
-			Description: "Organization Pulumi token. Requires authorizedPermissions field to be filled.",
+			Description: "Organization Pulumi token. Requires authorizedPermissions or roleID field to be filled.",
 		},
 		{
 			Value:       AuthPolicyTokenTypeDeploymentRunner,
@@ -107,6 +107,7 @@ type AuthPolicyDefinition struct {
 	TeamName              *string                     `pulumi:"teamName,optional"`
 	UserLogin             *string                     `pulumi:"userLogin,optional"`
 	RunnerID              *string                     `pulumi:"runnerID,optional"`
+	RoleID                *string                     `pulumi:"roleID,optional"`
 	AuthorizedPermissions []AuthPolicyPermissionLevel `pulumi:"authorizedPermissions,optional"`
 	Rules                 map[string]string           `pulumi:"rules"`
 }
@@ -117,6 +118,7 @@ func (p *AuthPolicyDefinition) Annotate(a infer.Annotator) {
 	a.Describe(&p.TeamName, "The team name for team tokens.")
 	a.Describe(&p.UserLogin, "The user login for personal tokens.")
 	a.Describe(&p.RunnerID, "The runner ID for deployment runner tokens.")
+	a.Describe(&p.RoleID, "The role ID for organization tokens.")
 	a.Describe(&p.AuthorizedPermissions, "The permission level for organization tokens.")
 	a.Describe(&p.Rules, "OIDC rules to set for this policy.")
 }
@@ -361,6 +363,7 @@ func policiesToAPIRequest(policies []AuthPolicyDefinition) pulumiapi.AuthPolicyU
 			TeamName:              policy.TeamName,
 			UserLogin:             policy.UserLogin,
 			RunnerID:              policy.RunnerID,
+			RoleID:                policy.RoleID,
 			AuthorizedPermissions: permissionsToAPI(policy.AuthorizedPermissions),
 			Rules:                 policy.Rules,
 		})
@@ -383,6 +386,7 @@ func apiPoliciesToInputs(policies []*pulumiapi.AuthPolicyDefinition) []AuthPolic
 			TeamName:              policy.TeamName,
 			UserLogin:             policy.UserLogin,
 			RunnerID:              policy.RunnerID,
+			RoleID:                policy.RoleID,
 			AuthorizedPermissions: permissionsToInput(policy.AuthorizedPermissions),
 			Rules:                 policy.Rules,
 		})
