@@ -30,6 +30,7 @@ type getEnvironmentRevisionTagFunc func(
 ) (*client.EnvironmentRevisionTag, error)
 
 type EscClientMock struct {
+	client.Client
 	getEnvironmentFunc            getEnvironmentFunc
 	getEnvironmentRevisionTagFunc getEnvironmentRevisionTagFunc
 }
@@ -390,8 +391,8 @@ func buildEscClientMock(
 	getEnvironmentRevisionTagFunc getEnvironmentRevisionTagFunc,
 ) *EscClientMock {
 	return &EscClientMock{
-		getEnvironmentFunc,
-		getEnvironmentRevisionTagFunc,
+		getEnvironmentFunc:            getEnvironmentFunc,
+		getEnvironmentRevisionTagFunc: getEnvironmentRevisionTagFunc,
 	}
 }
 

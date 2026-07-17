@@ -342,7 +342,7 @@ func introspectPolicyPack(ctx context.Context, sourcePath string) ([]PolicyPackP
 		return nil, fmt.Errorf("resolve sourcePath %q: %w", sourcePath, err)
 	}
 	sink := diag.DefaultSink(io.Discard, io.Discard, diag.FormatOptions{Color: colors.Never})
-	pctx, err := plugin.NewContext(ctx, sink, sink, nil, nil, "", nil, false, nil, nil)
+	pctx, err := plugin.NewContext(ctx, sink, sink, nil, nil, "", nil, false, nil)
 	if err != nil {
 		return nil, fmt.Errorf("init plugin context: %w", err)
 	}
@@ -356,7 +356,7 @@ func introspectPolicyPack(ctx context.Context, sourcePath string) ([]PolicyPackP
 	}
 	defer func() { _ = analyzer.Close() }()
 
-	info, err := analyzer.GetAnalyzerInfo()
+	info, err := analyzer.GetAnalyzerInfo(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("get analyzer info: %w", err)
 	}
