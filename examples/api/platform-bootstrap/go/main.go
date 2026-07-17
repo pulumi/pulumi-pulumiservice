@@ -2,13 +2,13 @@ package main
 
 import (
 	api "github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/api"
-	teams "github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/api/teams"
-	stacks "github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/api/stacks"
-	auth "github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/api/auth"
 	agents "github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/api/agents"
-	tokens "github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/api/tokens"
+	auth "github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/api/auth"
 	deployments "github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/api/deployments"
 	esc "github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/api/esc"
+	stacks "github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/api/stacks"
+	teams "github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/api/teams"
+	tokens "github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/api/tokens"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi/config"
 )
