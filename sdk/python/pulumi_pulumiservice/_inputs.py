@@ -32,10 +32,10 @@ __all__ = [
     'DeploymentSettingsGitAuthBasicAuthArgsDict',
     'DeploymentSettingsGitAuthSSHAuthArgs',
     'DeploymentSettingsGitAuthSSHAuthArgsDict',
-    'DeploymentSettingsGitSourceGitAuthArgs',
-    'DeploymentSettingsGitSourceGitAuthArgsDict',
     'DeploymentSettingsGitSourceArgs',
     'DeploymentSettingsGitSourceArgsDict',
+    'DeploymentSettingsGitSourceGitAuthArgs',
+    'DeploymentSettingsGitSourceGitAuthArgsDict',
     'DeploymentSettingsGithubArgs',
     'DeploymentSettingsGithubArgsDict',
     'DeploymentSettingsOperationContextArgs',
@@ -644,60 +644,6 @@ class DeploymentSettingsGitAuthSSHAuthArgs:
         pulumi.set(self, "password", value)
 
 
-class DeploymentSettingsGitSourceGitAuthArgsDict(TypedDict):
-    """
-    Git source settings for a deployment.
-    """
-    basic_auth: NotRequired[pulumi.Input[Optional['DeploymentSettingsGitAuthBasicAuthArgs']]]
-    """
-    Basic auth for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined.
-    """
-    ssh_auth: NotRequired[pulumi.Input[Optional['DeploymentSettingsGitAuthSSHAuthArgs']]]
-    """
-    SSH auth for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined.
-    """
-
-@pulumi.input_type
-class DeploymentSettingsGitSourceGitAuthArgs:
-    def __init__(__self__, *,
-                 basic_auth: pulumi.Input[Optional['DeploymentSettingsGitAuthBasicAuthArgs']] = None,
-                 ssh_auth: pulumi.Input[Optional['DeploymentSettingsGitAuthSSHAuthArgs']] = None):
-        """
-        Git source settings for a deployment.
-
-        :param pulumi.Input['DeploymentSettingsGitAuthBasicAuthArgs'] basic_auth: Basic auth for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined.
-        :param pulumi.Input['DeploymentSettingsGitAuthSSHAuthArgs'] ssh_auth: SSH auth for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined.
-        """
-        if basic_auth is not None:
-            pulumi.set(__self__, "basic_auth", basic_auth)
-        if ssh_auth is not None:
-            pulumi.set(__self__, "ssh_auth", ssh_auth)
-
-    @_builtins.property
-    @pulumi.getter(name="basicAuth")
-    def basic_auth(self) -> pulumi.Input[Optional['DeploymentSettingsGitAuthBasicAuthArgs']]:
-        """
-        Basic auth for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined.
-        """
-        return pulumi.get(self, "basic_auth")
-
-    @basic_auth.setter
-    def basic_auth(self, value: pulumi.Input[Optional['DeploymentSettingsGitAuthBasicAuthArgs']]):
-        pulumi.set(self, "basic_auth", value)
-
-    @_builtins.property
-    @pulumi.getter(name="sshAuth")
-    def ssh_auth(self) -> pulumi.Input[Optional['DeploymentSettingsGitAuthSSHAuthArgs']]:
-        """
-        SSH auth for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined.
-        """
-        return pulumi.get(self, "ssh_auth")
-
-    @ssh_auth.setter
-    def ssh_auth(self, value: pulumi.Input[Optional['DeploymentSettingsGitAuthSSHAuthArgs']]):
-        pulumi.set(self, "ssh_auth", value)
-
-
 class DeploymentSettingsGitSourceArgsDict(TypedDict):
     """
     Git source settings for a deployment.
@@ -710,7 +656,7 @@ class DeploymentSettingsGitSourceArgsDict(TypedDict):
     """
     The commit to deploy. One of either `branch` or `commit` must be specified.
     """
-    git_auth: NotRequired[pulumi.Input[Optional['DeploymentSettingsGitSourceGitAuthArgs']]]
+    git_auth: NotRequired[pulumi.Input[Optional['DeploymentSettingsGitSourceGitAuthArgsDict']]]
     """
     Git authentication configuration for this deployment. Should not be specified if there are `gitHub` settings for this deployment.
     """
@@ -810,6 +756,60 @@ class DeploymentSettingsGitSourceArgs:
     @repo_url.setter
     def repo_url(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "repo_url", value)
+
+
+class DeploymentSettingsGitSourceGitAuthArgsDict(TypedDict):
+    """
+    Git source settings for a deployment.
+    """
+    basic_auth: NotRequired[pulumi.Input[Optional['DeploymentSettingsGitAuthBasicAuthArgsDict']]]
+    """
+    Basic auth for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined.
+    """
+    ssh_auth: NotRequired[pulumi.Input[Optional['DeploymentSettingsGitAuthSSHAuthArgsDict']]]
+    """
+    SSH auth for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined.
+    """
+
+@pulumi.input_type
+class DeploymentSettingsGitSourceGitAuthArgs:
+    def __init__(__self__, *,
+                 basic_auth: pulumi.Input[Optional['DeploymentSettingsGitAuthBasicAuthArgs']] = None,
+                 ssh_auth: pulumi.Input[Optional['DeploymentSettingsGitAuthSSHAuthArgs']] = None):
+        """
+        Git source settings for a deployment.
+
+        :param pulumi.Input['DeploymentSettingsGitAuthBasicAuthArgs'] basic_auth: Basic auth for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined.
+        :param pulumi.Input['DeploymentSettingsGitAuthSSHAuthArgs'] ssh_auth: SSH auth for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined.
+        """
+        if basic_auth is not None:
+            pulumi.set(__self__, "basic_auth", basic_auth)
+        if ssh_auth is not None:
+            pulumi.set(__self__, "ssh_auth", ssh_auth)
+
+    @_builtins.property
+    @pulumi.getter(name="basicAuth")
+    def basic_auth(self) -> pulumi.Input[Optional['DeploymentSettingsGitAuthBasicAuthArgs']]:
+        """
+        Basic auth for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined.
+        """
+        return pulumi.get(self, "basic_auth")
+
+    @basic_auth.setter
+    def basic_auth(self, value: pulumi.Input[Optional['DeploymentSettingsGitAuthBasicAuthArgs']]):
+        pulumi.set(self, "basic_auth", value)
+
+    @_builtins.property
+    @pulumi.getter(name="sshAuth")
+    def ssh_auth(self) -> pulumi.Input[Optional['DeploymentSettingsGitAuthSSHAuthArgs']]:
+        """
+        SSH auth for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined.
+        """
+        return pulumi.get(self, "ssh_auth")
+
+    @ssh_auth.setter
+    def ssh_auth(self, value: pulumi.Input[Optional['DeploymentSettingsGitAuthSSHAuthArgs']]):
+        pulumi.set(self, "ssh_auth", value)
 
 
 class DeploymentSettingsGithubArgsDict(TypedDict):
@@ -940,11 +940,11 @@ class DeploymentSettingsOperationContextArgsDict(TypedDict):
     """
     Environment variables to set for the deployment.
     """
-    oidc: NotRequired[pulumi.Input[Optional['OperationContextOIDCArgs']]]
+    oidc: NotRequired[pulumi.Input[Optional['OperationContextOIDCArgsDict']]]
     """
     OIDC configuration to use during the deployment.
     """
-    options: NotRequired[pulumi.Input[Optional['OperationContextOptionsArgs']]]
+    options: NotRequired[pulumi.Input[Optional['OperationContextOptionsArgsDict']]]
     """
     Options to override default behavior during the deployment.
     """
@@ -1030,7 +1030,7 @@ class DeploymentSettingsSourceContextArgsDict(TypedDict):
     """
     Settings related to the source of the deployment.
     """
-    git: NotRequired[pulumi.Input[Optional['DeploymentSettingsGitSourceArgs']]]
+    git: NotRequired[pulumi.Input[Optional['DeploymentSettingsGitSourceArgsDict']]]
     """
     Git source settings for a deployment.
     """
@@ -1500,15 +1500,15 @@ class GCPOIDCConfigurationArgs:
 
 
 class OperationContextOIDCArgsDict(TypedDict):
-    aws: NotRequired[pulumi.Input[Optional['AWSOIDCConfigurationArgs']]]
+    aws: NotRequired[pulumi.Input[Optional['AWSOIDCConfigurationArgsDict']]]
     """
     AWS-specific OIDC configuration.
     """
-    azure: NotRequired[pulumi.Input[Optional['AzureOIDCConfigurationArgs']]]
+    azure: NotRequired[pulumi.Input[Optional['AzureOIDCConfigurationArgsDict']]]
     """
     Azure-specific OIDC configuration.
     """
-    gcp: NotRequired[pulumi.Input[Optional['GCPOIDCConfigurationArgs']]]
+    gcp: NotRequired[pulumi.Input[Optional['GCPOIDCConfigurationArgsDict']]]
     """
     GCP-specific OIDC configuration.
     """
@@ -1905,7 +1905,7 @@ class PolicyPackPolicyInputArgsDict(TypedDict):
     """
     One of: advisory, mandatory, remediate, disabled.
     """
-    framework: NotRequired[pulumi.Input[Optional['PolicyPackComplianceFrameworkInputArgs']]]
+    framework: NotRequired[pulumi.Input[Optional['PolicyPackComplianceFrameworkInputArgsDict']]]
     """
     Compliance framework this policy belongs to.
     """

@@ -95,7 +95,7 @@ publishing {
                 inceptionYear = "2022"
                 name = "pulumi-pulumiservice"
                 packaging = "jar"
-                description = "Pulumi Service Provider for Pulumi Cloud."
+                description = $/A native Pulumi package for creating and managing Pulumi Cloud constructs./$
 
                 url = "https://github.com/pulumi/pulumi-pulumiservice"
 

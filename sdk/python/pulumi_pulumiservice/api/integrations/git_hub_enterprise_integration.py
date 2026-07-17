@@ -135,7 +135,6 @@ class GitHubEnterpriseIntegration(pulumi.CustomResource):
         """
         Updates GitHub Enterprise Server integration settings.
 
-
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.bool] disable_code_access_for_reviews: Whether to disable code access for AI reviews
@@ -153,7 +152,6 @@ class GitHubEnterpriseIntegration(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         Updates GitHub Enterprise Server integration settings.
-
 
         :param str resource_name: The name of the resource.
         :param GitHubEnterpriseIntegrationArgs args: The arguments to use to populate this resource's properties.

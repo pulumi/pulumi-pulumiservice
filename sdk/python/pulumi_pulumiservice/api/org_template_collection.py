@@ -117,7 +117,6 @@ class OrgTemplateCollection(pulumi.CustomResource):
         """
         Creates a new template collection (source) for an organization. Template collections define where project templates are sourced from, such as a Git repository. Organization members can use these templates to create new stacks with pre-configured infrastructure code.
 
-
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param Any destination: deprecated - use DestinationURL instead
@@ -134,7 +133,6 @@ class OrgTemplateCollection(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         Creates a new template collection (source) for an organization. Template collections define where project templates are sourced from, such as a Git repository. Organization members can use these templates to create new stacks with pre-configured infrastructure code.
-
 
         :param str resource_name: The name of the resource.
         :param OrgTemplateCollectionArgs args: The arguments to use to populate this resource's properties.

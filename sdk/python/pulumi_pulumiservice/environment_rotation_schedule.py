@@ -117,7 +117,6 @@ class EnvironmentRotationSchedule(pulumi.CustomResource):
         """
         A scheduled recurring or single time environment rotation.
 
-
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] environment: Environment name.
@@ -134,7 +133,6 @@ class EnvironmentRotationSchedule(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         A scheduled recurring or single time environment rotation.
-
 
         :param str resource_name: The name of the resource.
         :param EnvironmentRotationScheduleArgs args: The arguments to use to populate this resource's properties.

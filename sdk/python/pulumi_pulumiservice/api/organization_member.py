@@ -87,7 +87,6 @@ class OrganizationMember(pulumi.CustomResource):
 
         Returns the newly created organization member record. Returns 409 if the user is already a member of the organization.
 
-
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] org_name: The organization name
@@ -106,7 +105,6 @@ class OrganizationMember(pulumi.CustomResource):
         This endpoint only assigns built-in roles. To onboard a user with a custom role, use the organization invite flow (`BatchCreateOrgInviteEmail`) and set `roleId` on the invite — the custom role is applied when the user accepts. Alternatively, add the user here with a built-in role and then call `UpdateOrganizationMember` with `fgaRoleId` to reassign.
 
         Returns the newly created organization member record. Returns 409 if the user is already a member of the organization.
-
 
         :param str resource_name: The name of the resource.
         :param OrganizationMemberArgs args: The arguments to use to populate this resource's properties.

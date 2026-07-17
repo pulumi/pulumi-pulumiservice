@@ -83,7 +83,6 @@ class AuditLogExportConfiguration(pulumi.CustomResource):
         """
         Creates or updates the organization's automated audit log export configuration. Audit log export enables automatic delivery of audit events to an S3 bucket for long-term retention and SIEM integration. The configuration includes the S3 bucket details and IAM role for authentication. This feature is available on Business Critical edition.
 
-
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.bool] new_enabled: Whether the audit log export is enabled.
@@ -98,7 +97,6 @@ class AuditLogExportConfiguration(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         Creates or updates the organization's automated audit log export configuration. Audit log export enables automatic delivery of audit events to an S3 bucket for long-term retention and SIEM integration. The configuration includes the S3 bucket details and IAM role for authentication. This feature is available on Business Critical edition.
-
 
         :param str resource_name: The name of the resource.
         :param AuditLogExportConfigurationArgs args: The arguments to use to populate this resource's properties.

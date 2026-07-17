@@ -241,7 +241,6 @@ class OrganizationWebhook(pulumi.CustomResource):
 
         The optional `secret` field sets the HMAC key for signature verification via the `Pulumi-Webhook-Signature` header. See the [webhook headers documentation](https://www.pulumi.com/docs/pulumi-cloud/webhooks/#headers) for details.
 
-
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.bool] active: Whether the webhook is active and will receive deliveries.
@@ -271,7 +270,6 @@ class OrganizationWebhook(pulumi.CustomResource):
         The `filters` field accepts a list of event types to subscribe to. See the [webhook event filtering documentation](https://www.pulumi.com/docs/pulumi-cloud/webhooks/#event-filtering) for available filters.
 
         The optional `secret` field sets the HMAC key for signature verification via the `Pulumi-Webhook-Signature` header. See the [webhook headers documentation](https://www.pulumi.com/docs/pulumi-cloud/webhooks/#headers) for details.
-
 
         :param str resource_name: The name of the resource.
         :param OrganizationWebhookArgs args: The arguments to use to populate this resource's properties.

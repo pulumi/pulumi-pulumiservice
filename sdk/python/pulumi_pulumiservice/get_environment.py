@@ -89,7 +89,6 @@ def get_environment(name: Optional[_builtins.str] = None,
     """
     Looks up an existing ESC environment by name and returns its UUID. Use this to scope a custom RBAC role to a specific environment — pass the returned UUID into `buildEnvironmentScopedPermissions`, or use it as the `identity` field of a hand-rolled `PermissionLiteralExpressionEnvironment` in `OrganizationRole.permissions`. Errors when the environment is not found.
 
-
     :param _builtins.str name: The environment name.
     :param _builtins.str organization_name: The Pulumi Cloud organization that owns the environment.
     :param _builtins.str project_name: The ESC project name. Defaults to `default`.
@@ -112,7 +111,6 @@ def get_environment_output(name: pulumi.Input[Optional[_builtins.str]] = None,
                            opts: Optional[Union[pulumi.InvokeOptions, pulumi.InvokeOutputOptions]] = None) -> pulumi.Output[GetEnvironmentResult]:
     """
     Looks up an existing ESC environment by name and returns its UUID. Use this to scope a custom RBAC role to a specific environment — pass the returned UUID into `buildEnvironmentScopedPermissions`, or use it as the `identity` field of a hand-rolled `PermissionLiteralExpressionEnvironment` in `OrganizationRole.permissions`. Errors when the environment is not found.
-
 
     :param _builtins.str name: The environment name.
     :param _builtins.str organization_name: The Pulumi Cloud organization that owns the environment.

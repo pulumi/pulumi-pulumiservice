@@ -100,7 +100,6 @@ class Team(pulumi.CustomResource):
         CreatePulumiTeam creates a "Pulumi" team, i.e. one whose membership is managed by Pulumi.
         (As opposed to a GitHub or GitLab-based team.)
 
-
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] description: The description
@@ -117,7 +116,6 @@ class Team(pulumi.CustomResource):
         """
         CreatePulumiTeam creates a "Pulumi" team, i.e. one whose membership is managed by Pulumi.
         (As opposed to a GitHub or GitLab-based team.)
-
 
         :param str resource_name: The name of the resource.
         :param TeamArgs args: The arguments to use to populate this resource's properties.

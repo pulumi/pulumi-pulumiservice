@@ -111,7 +111,6 @@ class Policy(pulumi.CustomResource):
 
         For more information about authorization rules, refer to the [OIDC authorization policies documentation](https://www.pulumi.com/docs/pulumi-cloud/access-management/oidc/client/#configure-the-authorization-policies).
 
-
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] issuer_id: The OIDC issuer identifier
@@ -138,7 +137,6 @@ class Policy(pulumi.CustomResource):
         - `rules`: object defining claim-matching rules for the token
 
         For more information about authorization rules, refer to the [OIDC authorization policies documentation](https://www.pulumi.com/docs/pulumi-cloud/access-management/oidc/client/#configure-the-authorization-policies).
-
 
         :param str resource_name: The name of the resource.
         :param PolicyArgs args: The arguments to use to populate this resource's properties.
