@@ -19,7 +19,7 @@ github_issuer = ps_api.auth.OidcIssuer(
     org_name=organization_name,
     name=f"github_issuer_{issuer_suffix}",
     url="https://token.actions.githubusercontent.com",
-    thumbprints=["b41ae0832808ebc94951437bf7e92b93ccb6479364daf894d46d6001bee7a486"],
+    thumbprints=["39517789ff0132a9212bafea4dc37401eae58b1bfac9756109d14301c90a6ab5"],
     max_expiration=max_expiration,
 )
 

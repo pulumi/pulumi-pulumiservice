@@ -47,7 +47,7 @@ func main() {
 			OrgName:       pulumi.String(organizationName),
 			Name:          pulumi.String("github_issuer_" + suffix),
 			Url:           pulumi.String("https://token.actions.githubusercontent.com"),
-			Thumbprints:   pulumi.StringArray{pulumi.String("b41ae0832808ebc94951437bf7e92b93ccb6479364daf894d46d6001bee7a486")},
+			Thumbprints:   pulumi.StringArray{pulumi.String("39517789ff0132a9212bafea4dc37401eae58b1bfac9756109d14301c90a6ab5")},
 			MaxExpiration: pulumi.Int(3600),
 		}); err != nil {
 			return err

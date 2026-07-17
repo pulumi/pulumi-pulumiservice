@@ -39,7 +39,7 @@ class MyStack : Pulumi.Stack
           Name = "github_issuer",
           Url = "https://token.actions.githubusercontent.com",
           Thumbprints = {
-            "b41ae0832808ebc94951437bf7e92b93ccb6479364daf894d46d6001bee7a486"
+            "39517789ff0132a9212bafea4dc37401eae58b1bfac9756109d14301c90a6ab5"
           },
           Policies = {
             new AuthPolicyDefinitionArgs
