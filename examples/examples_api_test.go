@@ -854,6 +854,8 @@ func oidcIssuerConfig() map[string]string {
 		"organizationName": ServiceProviderTestOrg,
 		"issuerSuffix":     generateRandomFiveDigits(),
 		"maxExpiration":    "3600",
+		"pulumiThumbprint": tlsThumbprint("api.pulumi.com"),
+		"githubThumbprint": tlsThumbprint("token.actions.githubusercontent.com"),
 	}
 }
 

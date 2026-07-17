@@ -49,6 +49,10 @@ func TestDotnetEnvironmentsExamples(t *testing.T) {
 func TestDotnetOidcIssuerExamples(t *testing.T) {
 	integration.ProgramTest(t, &integration.ProgramTestOptions{
 		Dir: path.Join(getCwd(t), "cs-oidc-issuer"),
+		Config: map[string]string{
+			"pulumiThumbprint": tlsThumbprint("api.pulumi.com"),
+			"githubThumbprint": tlsThumbprint("token.actions.githubusercontent.com"),
+		},
 		Dependencies: []string{
 			"Pulumi.PulumiService",
 		},

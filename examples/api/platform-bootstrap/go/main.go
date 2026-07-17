@@ -47,16 +47,14 @@ func main() {
 			OrgName:       pulumi.String(organizationName),
 			Name:          pulumi.String("github_issuer_" + suffix),
 			Url:           pulumi.String("https://token.actions.githubusercontent.com"),
-			Thumbprints:   pulumi.StringArray{pulumi.String("39517789ff0132a9212bafea4dc37401eae58b1bfac9756109d14301c90a6ab5")},
 			MaxExpiration: pulumi.Int(3600),
 		}); err != nil {
 			return err
 		}
 		if _, err := auth.NewOidcIssuer(ctx, "pulumiSelfIssuer", &auth.OidcIssuerArgs{
-			OrgName:     pulumi.String(organizationName),
-			Name:        pulumi.String("pulumi_issuer_" + suffix),
-			Url:         pulumi.String("https://api.pulumi.com/oidc"),
-			Thumbprints: pulumi.StringArray{pulumi.String("57d3e89f6b25dde3c174dc558e2b2623306a9d81f88a12e8ae7090a86c12f1da")},
+			OrgName: pulumi.String(organizationName),
+			Name:    pulumi.String("pulumi_issuer_" + suffix),
+			Url:     pulumi.String("https://api.pulumi.com/oidc"),
 		}); err != nil {
 			return err
 		}

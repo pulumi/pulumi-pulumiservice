@@ -2,6 +2,15 @@ name: yaml-oidc-issuer
 runtime: yaml
 description: A minimal example of provisioning OIDC Issuer via Pulumi YAML
 
+# Thumbprints must match the certificate the issuer currently serves, so they
+# are supplied via config rather than hardcoded. Compute one with:
+#   openssl s_client -connect <issuer-host>:443 </dev/null | openssl x509 -fingerprint -sha256 -noout
+config:
+  pulumiThumbprint:
+    type: string
+  githubThumbprint:
+    type: string
+
 resources:
 # A Pulumi OIDC Issuer with a basic policy
   pulumi_issuer:
@@ -11,7 +20,7 @@ resources:
       name: pulumi_issuer
       url: https://api.pulumi.com/oidc
       thumbprints:
-        - 57d3e89f6b25dde3c174dc558e2b2623306a9d81f88a12e8ae7090a86c12f1da
+        - ${pulumiThumbprint}
       policies:
         - decision: allow
           rules:
@@ -27,7 +36,7 @@ resources:
       name: github_issuer
       url: https://token.actions.githubusercontent.com
       thumbprints:
-        - 39517789ff0132a9212bafea4dc37401eae58b1bfac9756109d14301c90a6ab5
+        - ${githubThumbprint}
       policies:
         - decision: deny
           rules:

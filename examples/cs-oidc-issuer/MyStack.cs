@@ -9,15 +9,20 @@ class MyStack : Pulumi.Stack
     {
         var serviceOrg = "service-provider-test-org3";
 
+        // Thumbprints must match the certificate the issuer currently serves, so they
+        // are supplied via config rather than hardcoded. Compute one with:
+        //   openssl s_client -connect <issuer-host>:443 </dev/null | openssl x509 -fingerprint -sha256 -noout
+        var config = new Pulumi.Config();
+        var pulumiThumbprint = config.Require("pulumiThumbprint");
+        var githubThumbprint = config.Require("githubThumbprint");
+
         // A Pulumi OIDC Issuer with a basic policy
         var pulumiOidcIssuer = new OidcIssuer("pulumi_issuer", new OidcIssuerArgs
         {
             Organization = serviceOrg,
             Name = "pulumi_issuer",
             Url = "https://api.pulumi.com/oidc",
-            Thumbprints = {
-              "57d3e89f6b25dde3c174dc558e2b2623306a9d81f88a12e8ae7090a86c12f1da"
-            },
+            Thumbprints = { pulumiThumbprint },
             Policies = {
               new AuthPolicyDefinitionArgs
               {
@@ -38,9 +43,7 @@ class MyStack : Pulumi.Stack
           Organization = serviceOrg,
           Name = "github_issuer",
           Url = "https://token.actions.githubusercontent.com",
-          Thumbprints = {
-            "39517789ff0132a9212bafea4dc37401eae58b1bfac9756109d14301c90a6ab5"
-          },
+          Thumbprints = { githubThumbprint },
           Policies = {
             new AuthPolicyDefinitionArgs
             {

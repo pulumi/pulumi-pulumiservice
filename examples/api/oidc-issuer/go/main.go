@@ -21,12 +21,17 @@ func main() {
 		if err != nil {
 			maxExpiration = 3600
 		}
+		// Thumbprints must match the certificate the issuer currently serves, so
+		// they have no static default. Compute one with:
+		//   openssl s_client -connect <issuer-host>:443 </dev/null | openssl x509 -fingerprint -sha256 -noout
+		pulumiThumbprint := cfg.Require("pulumiThumbprint")
+		githubThumbprint := cfg.Require("githubThumbprint")
 
 		pulumiIssuer, err := auth.NewOidcIssuer(ctx, "pulumiIssuer", &auth.OidcIssuerArgs{
 			OrgName:     pulumi.String(organizationName),
 			Name:        pulumi.String("pulumi_issuer_" + issuerSuffix),
 			Url:         pulumi.String("https://api.pulumi.com/oidc"),
-			Thumbprints: pulumi.StringArray{pulumi.String("57d3e89f6b25dde3c174dc558e2b2623306a9d81f88a12e8ae7090a86c12f1da")},
+			Thumbprints: pulumi.StringArray{pulumi.String(pulumiThumbprint)},
 		})
 		if err != nil {
 			return err
@@ -36,7 +41,7 @@ func main() {
 			OrgName:       pulumi.String(organizationName),
 			Name:          pulumi.String("github_issuer_" + issuerSuffix),
 			Url:           pulumi.String("https://token.actions.githubusercontent.com"),
-			Thumbprints:   pulumi.StringArray{pulumi.String("39517789ff0132a9212bafea4dc37401eae58b1bfac9756109d14301c90a6ab5")},
+			Thumbprints:   pulumi.StringArray{pulumi.String(githubThumbprint)},
 			MaxExpiration: pulumi.Int(maxExpiration),
 		})
 		if err != nil {

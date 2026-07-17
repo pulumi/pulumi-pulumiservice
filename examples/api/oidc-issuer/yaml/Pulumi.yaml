@@ -10,3 +10,10 @@ config:
   maxExpiration:
     type: integer
     default: 3600
+  # Thumbprints must match the certificate the issuer currently serves, so
+  # they have no static default. Compute one with:
+  #   openssl s_client -connect <issuer-host>:443 </dev/null | openssl x509 -fingerprint -sha256 -noout
+  pulumiThumbprint:
+    type: string
+  githubThumbprint:
+    type: string
