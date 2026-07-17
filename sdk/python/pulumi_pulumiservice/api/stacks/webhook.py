@@ -241,7 +241,6 @@ class Webhook(pulumi.CustomResource):
 
         Returns 409 if a webhook with the same name already exists. Returns 400 if the organization or stack name in the request body does not match the URL path parameters.
 
-
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.bool] active: Whether the webhook is active and will receive deliveries.
@@ -273,7 +272,6 @@ class Webhook(pulumi.CustomResource):
         The optional `secret` field sets the HMAC key for signature verification. See the [webhook headers documentation](https://www.pulumi.com/docs/pulumi-cloud/webhooks/#headers) for details.
 
         Returns 409 if a webhook with the same name already exists. Returns 400 if the organization or stack name in the request body does not match the URL path parameters.
-
 
         :param str resource_name: The name of the resource.
         :param WebhookArgs args: The arguments to use to populate this resource's properties.

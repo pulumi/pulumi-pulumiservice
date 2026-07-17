@@ -117,7 +117,6 @@ class PolicyGroup(pulumi.CustomResource):
         """
         Creates a new Policy Group for an organization. Policy Groups define which Policy Packs are enforced on which stacks or cloud accounts, with configurable enforcement levels (advisory, mandatory, or disabled) per pack. This allows different policy strictness for different environments, such as advisory-only in development and mandatory in production.
 
-
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] agent_pool_id: Agent pool ID for policy evaluation. Defaults to Pulumi hosted pool if not specified.
@@ -134,7 +133,6 @@ class PolicyGroup(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         Creates a new Policy Group for an organization. Policy Groups define which Policy Packs are enforced on which stacks or cloud accounts, with configurable enforcement levels (advisory, mandatory, or disabled) per pack. This allows different policy strictness for different environments, such as advisory-only in development and mandatory in production.
-
 
         :param str resource_name: The name of the resource.
         :param PolicyGroupArgs args: The arguments to use to populate this resource's properties.

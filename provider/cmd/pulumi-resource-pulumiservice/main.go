@@ -17,8 +17,8 @@ package main
 import (
 	_ "embed"
 
-	"github.com/pulumi/pulumi/pkg/v3/resource/provider"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/util/cmdutil"
+	"github.com/pulumi/pulumi/sdk/v3/go/pulumi/provider"
 	rpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 
 	psp "github.com/pulumi/pulumi-pulumiservice/provider/pkg/provider"

@@ -151,7 +151,6 @@ class OidcIssuer(pulumi.CustomResource):
         """
         Registers a new OIDC issuer for an organization, establishing a trust relationship with an external identity provider. Once registered, the identity provider can issue signed, short-lived tokens that are exchanged for temporary Pulumi Cloud credentials during deployments. This eliminates the need to store long-lived access tokens. Supported providers include AWS, Azure, Google Cloud, GitHub Actions, and any OIDC-compliant identity provider. The request must include the issuer URL, and the service will fetch the provider's public signing keys to verify token authenticity.
 
-
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] issuer_id: The OIDC issuer identifier
@@ -170,7 +169,6 @@ class OidcIssuer(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         Registers a new OIDC issuer for an organization, establishing a trust relationship with an external identity provider. Once registered, the identity provider can issue signed, short-lived tokens that are exchanged for temporary Pulumi Cloud credentials during deployments. This eliminates the need to store long-lived access tokens. Supported providers include AWS, Azure, Google Cloud, GitHub Actions, and any OIDC-compliant identity provider. The request must include the issuer URL, and the service will fetch the provider's public signing keys to verify token authenticity.
-
 
         :param str resource_name: The name of the resource.
         :param OidcIssuerArgs args: The arguments to use to populate this resource's properties.

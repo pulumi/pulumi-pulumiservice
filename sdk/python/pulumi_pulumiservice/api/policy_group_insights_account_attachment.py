@@ -79,7 +79,6 @@ class PolicyGroupInsightsAccountAttachment(pulumi.CustomResource):
         """
         Manages a single membership edge through UpdatePolicyGroup (addInsightsAccount / removeInsightsAccount).
 
-
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] org_name: The organization name
@@ -93,7 +92,6 @@ class PolicyGroupInsightsAccountAttachment(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         Manages a single membership edge through UpdatePolicyGroup (addInsightsAccount / removeInsightsAccount).
-
 
         :param str resource_name: The name of the resource.
         :param PolicyGroupInsightsAccountAttachmentArgs args: The arguments to use to populate this resource's properties.

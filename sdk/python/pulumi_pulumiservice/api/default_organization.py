@@ -51,7 +51,6 @@ class DefaultOrganization(pulumi.CustomResource):
         """
         UpdateDefaultOrganization sets the default organization for the current user.
 
-
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] org_name: The organization name
@@ -64,7 +63,6 @@ class DefaultOrganization(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         UpdateDefaultOrganization sets the default organization for the current user.
-
 
         :param str resource_name: The name of the resource.
         :param DefaultOrganizationArgs args: The arguments to use to populate this resource's properties.

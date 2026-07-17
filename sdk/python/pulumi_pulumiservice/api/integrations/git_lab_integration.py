@@ -118,7 +118,6 @@ class GitLabIntegration(pulumi.CustomResource):
         """
         Updates an existing GitLab integration's settings, such as PR comment preferences and AI summary options.
 
-
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.bool] disable_detailed_diff: Whether detailed property-level diffs are disabled for PR comments.
@@ -135,7 +134,6 @@ class GitLabIntegration(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         Updates an existing GitLab integration's settings, such as PR comment preferences and AI summary options.
-
 
         :param str resource_name: The name of the resource.
         :param GitLabIntegrationArgs args: The arguments to use to populate this resource's properties.

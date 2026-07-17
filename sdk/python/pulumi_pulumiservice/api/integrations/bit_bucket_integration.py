@@ -118,7 +118,6 @@ class BitBucketIntegration(pulumi.CustomResource):
         """
         Updates an existing BitBucket integration's settings, such as PR comment preferences and AI summary options.
 
-
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.bool] disable_detailed_diff: If true, disable detailed property-level diffs in PR comments.
@@ -135,7 +134,6 @@ class BitBucketIntegration(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         Updates an existing BitBucket integration's settings, such as PR comment preferences and AI summary options.
-
 
         :param str resource_name: The name of the resource.
         :param BitBucketIntegrationArgs args: The arguments to use to populate this resource's properties.

@@ -171,7 +171,6 @@ class Account(pulumi.CustomResource):
         """
         Creates a new Insights account. An Insights account represents a cloud provider account (e.g., AWS, Azure, OCI) configured for resource discovery.
 
-
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] account_name: The Insights account name
@@ -193,7 +192,6 @@ class Account(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         Creates a new Insights account. An Insights account represents a cloud provider account (e.g., AWS, Azure, OCI) configured for resource discovery.
-
 
         :param str resource_name: The name of the resource.
         :param AccountArgs args: The arguments to use to populate this resource's properties.

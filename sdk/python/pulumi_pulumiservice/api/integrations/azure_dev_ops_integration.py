@@ -118,7 +118,6 @@ class AzureDevOpsIntegration(pulumi.CustomResource):
         """
         Updates an existing Azure DevOps integration's settings. Can modify the Azure DevOps organization, project, or authentication configuration.
 
-
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.bool] disable_detailed_diff: Whether detailed property-level diffs are disabled for PR comments
@@ -135,7 +134,6 @@ class AzureDevOpsIntegration(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         Updates an existing Azure DevOps integration's settings. Can modify the Azure DevOps organization, project, or authentication configuration.
-
 
         :param str resource_name: The name of the resource.
         :param AzureDevOpsIntegrationArgs args: The arguments to use to populate this resource's properties.

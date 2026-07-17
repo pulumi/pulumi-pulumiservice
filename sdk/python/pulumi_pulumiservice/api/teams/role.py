@@ -84,7 +84,6 @@ class Role(pulumi.CustomResource):
         UpdateTeamRoles upserts the role assigned to a team since we currently only support
         a 1:1 mapping of teams to roles.
 
-
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] org_name: The organization name
@@ -100,7 +99,6 @@ class Role(pulumi.CustomResource):
         """
         UpdateTeamRoles upserts the role assigned to a team since we currently only support
         a 1:1 mapping of teams to roles.
-
 
         :param str resource_name: The name of the resource.
         :param RoleArgs args: The arguments to use to populate this resource's properties.

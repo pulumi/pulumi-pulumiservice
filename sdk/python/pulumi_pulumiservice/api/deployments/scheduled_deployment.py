@@ -151,7 +151,6 @@ class ScheduledDeployment(pulumi.CustomResource):
         """
         Creates a custom deployment schedule for a stack using Pulumi Deployments. Custom schedules allow you to automate recurring or one-time Pulumi operations on a stack. The request must include exactly one of 'scheduleCron' (a cron expression for recurring executions, e.g. '0 */4 * * *' for every 4 hours) or 'scheduleOnce' (an ISO 8601 timestamp for a one-time execution). The 'request' field contains the deployment configuration that will be executed on each scheduled run, including the Pulumi operation type and any settings overrides. The stack must have deployment settings configured before a schedule can be created.
 
-
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] org_name: The organization name
@@ -170,7 +169,6 @@ class ScheduledDeployment(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         Creates a custom deployment schedule for a stack using Pulumi Deployments. Custom schedules allow you to automate recurring or one-time Pulumi operations on a stack. The request must include exactly one of 'scheduleCron' (a cron expression for recurring executions, e.g. '0 */4 * * *' for every 4 hours) or 'scheduleOnce' (an ISO 8601 timestamp for a one-time execution). The 'request' field contains the deployment configuration that will be executed on each scheduled run, including the Pulumi operation type and any settings overrides. The stack must have deployment settings configured before a schedule can be created.
-
 
         :param str resource_name: The name of the resource.
         :param ScheduledDeploymentArgs args: The arguments to use to populate this resource's properties.

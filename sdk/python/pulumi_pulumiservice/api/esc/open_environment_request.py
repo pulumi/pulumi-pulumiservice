@@ -132,7 +132,6 @@ class OpenEnvironmentRequest(pulumi.CustomResource):
         """
         Creates an open request for a Pulumi ESC environment that has gated opens enabled. When an environment has open gates configured, opening the environment requires an approval workflow. This endpoint initiates that process by creating an open request, and also creates corresponding open requests for each imported environment that has open gates. Requires the Approvals feature to be enabled for the organization. Returns 400 if the environment does not have gated opens.
 
-
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.int] access_duration_seconds: Total duration that the resulting grant can be used to access the environment open endpoint (after first open)
@@ -150,7 +149,6 @@ class OpenEnvironmentRequest(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         Creates an open request for a Pulumi ESC environment that has gated opens enabled. When an environment has open gates configured, opening the environment requires an approval workflow. This endpoint initiates that process by creating an open request, and also creates corresponding open requests for each imported environment that has open gates. Requires the Approvals feature to be enabled for the organization. Returns 400 if the environment does not have gated opens.
-
 
         :param str resource_name: The name of the resource.
         :param OpenEnvironmentRequestArgs args: The arguments to use to populate this resource's properties.
