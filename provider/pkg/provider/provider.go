@@ -40,11 +40,11 @@ import (
 	"github.com/pulumi/pulumi-go-provider/middleware/dispatch"
 	"github.com/pulumi/pulumi-go-provider/middleware/rpc"
 	"github.com/pulumi/pulumi/pkg/v3/codegen/schema"
-	"github.com/pulumi/pulumi/pkg/v3/resource/provider"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/apitype"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/tokens"
+	"github.com/pulumi/pulumi/sdk/v3/go/pulumi/provider"
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/apiclient"
@@ -369,7 +369,9 @@ func (k *pulumiserviceProvider) Configure(
 
 	sc := PulumiServiceConfig{}
 	sc.Config = make(map[string]string)
-	for key, val := range req.GetVariables() {
+	// Migrating to the non-deprecated GetArgs changes key naming and value
+	// encoding, which is out of scope for a lint fix.
+	for key, val := range req.GetVariables() { //nolint:staticcheck
 		sc.Config[strings.TrimPrefix(key, "pulumiservice:config:")] = val
 	}
 
