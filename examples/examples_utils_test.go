@@ -2,6 +2,8 @@ package examples
 
 import (
 	"context"
+	"crypto/sha256"
+	"crypto/tls"
 	"fmt"
 	"math/rand"
 	"net/http"
@@ -34,6 +36,22 @@ func generateRandomFiveDigits() string {
 // exists" on init.
 func randomStackName() string {
 	return "test-" + uuid.NewString()[:8]
+}
+
+// tlsThumbprint returns the SHA256 fingerprint (hex) of the TLS certificate
+// currently served by host — the value Pulumi Cloud calculates when an OIDC
+// issuer is registered. Issuers rotate certificates (GitHub serves 90-day
+// Let's Encrypt certs as of July 2026), so tests compute thumbprints at
+// runtime instead of pinning literals that go stale on every rotation.
+// Panics on failure so it is usable from apiCase Config funcs, which don't
+// receive a *testing.T.
+func tlsThumbprint(host string) string {
+	conn, err := tls.Dial("tcp", host+":443", nil)
+	if err != nil {
+		panic(fmt.Sprintf("computing TLS thumbprint for %s: %v", host, err))
+	}
+	defer conn.Close()
+	return fmt.Sprintf("%x", sha256.Sum256(conn.ConnectionState().PeerCertificates[0].Raw))
 }
 
 // getOrgName returns the organization name from PULUMI_TEST_OWNER env var,

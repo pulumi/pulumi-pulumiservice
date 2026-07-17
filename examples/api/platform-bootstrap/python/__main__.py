@@ -19,7 +19,6 @@ ps_api.auth.OidcIssuer(
     org_name=organization_name,
     name=f"github_issuer_{suffix}",
     url="https://token.actions.githubusercontent.com",
-    thumbprints=["39517789ff0132a9212bafea4dc37401eae58b1bfac9756109d14301c90a6ab5"],
     max_expiration=3600,
 )
 ps_api.auth.OidcIssuer(
@@ -27,7 +26,6 @@ ps_api.auth.OidcIssuer(
     org_name=organization_name,
     name=f"pulumi_issuer_{suffix}",
     url="https://api.pulumi.com/oidc",
-    thumbprints=["57d3e89f6b25dde3c174dc558e2b2623306a9d81f88a12e8ae7090a86c12f1da"],
 )
 
 platform_team = ps_api.teams.Team(

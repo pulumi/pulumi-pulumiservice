@@ -49,7 +49,6 @@ public class App {
                     .orgName(organizationName)
                     .name("github_issuer_" + suffix)
                     .url("https://token.actions.githubusercontent.com")
-                    .thumbprints(List.of("39517789ff0132a9212bafea4dc37401eae58b1bfac9756109d14301c90a6ab5"))
                     .maxExpiration(3600)
                     .build());
             new OidcIssuer("pulumiSelfIssuer",
@@ -57,7 +56,6 @@ public class App {
                     .orgName(organizationName)
                     .name("pulumi_issuer_" + suffix)
                     .url("https://api.pulumi.com/oidc")
-                    .thumbprints(List.of("57d3e89f6b25dde3c174dc558e2b2623306a9d81f88a12e8ae7090a86c12f1da"))
                     .build());
 
             var platformTeam = new Team("platformTeam",
