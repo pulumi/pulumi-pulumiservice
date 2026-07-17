@@ -103,6 +103,15 @@ jobs:
               ;;
             go)
               make build_go
+              # The go lane replaces the sdk module with the local sdk/, whose
+              # pulumi-plugin.json names the dev provider version. `pulumi
+              # install` resolves plugins from the plugin cache only (it no
+              # longer falls back to $PATH), so seed the cache with the
+              # locally-built binary to keep it from downloading the
+              # unpublished dev version.
+              pulumi plugin install resource pulumiservice \
+                "v$(jq -r .version sdk/go/pulumiservice/pulumi-plugin.json)" \
+                --file bin/pulumi-resource-pulumiservice
               ;;
             csharp)
               make build_dotnet
