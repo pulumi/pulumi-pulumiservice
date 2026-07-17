@@ -56,6 +56,10 @@ export interface AuthPolicyDefinition {
      */
     decision: enums.AuthPolicyDecision;
     /**
+     * The role ID for organization tokens.
+     */
+    roleID?: string;
+    /**
      * OIDC rules to set for this policy.
      */
     rules: {[key: string]: string};

@@ -94,7 +94,7 @@ namespace Pulumi.PulumiService
         /// </summary>
         public static AuthPolicyTokenType Team { get; } = new AuthPolicyTokenType("team");
         /// <summary>
-        /// Organization Pulumi token. Requires authorizedPermissions field to be filled.
+        /// Organization Pulumi token. Requires authorizedPermissions or roleID field to be filled.
         /// </summary>
         public static AuthPolicyTokenType Organization { get; } = new AuthPolicyTokenType("organization");
         /// <summary>

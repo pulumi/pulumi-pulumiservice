@@ -59,7 +59,7 @@ class AuthPolicyTokenType(_builtins.str, Enum):
     """
     ORGANIZATION = "organization"
     """
-    Organization Pulumi token. Requires authorizedPermissions field to be filled.
+    Organization Pulumi token. Requires authorizedPermissions or roleID field to be filled.
     """
     RUNNER = "runner"
     """

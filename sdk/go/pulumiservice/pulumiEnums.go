@@ -396,7 +396,7 @@ const (
 	AuthPolicyTokenTypePersonal = AuthPolicyTokenType("personal")
 	// Team Pulumi token. Requires teamName field to be filled.
 	AuthPolicyTokenTypeTeam = AuthPolicyTokenType("team")
-	// Organization Pulumi token. Requires authorizedPermissions field to be filled.
+	// Organization Pulumi token. Requires authorizedPermissions or roleID field to be filled.
 	AuthPolicyTokenTypeOrganization = AuthPolicyTokenType("organization")
 	// Deployment Runner Pulumi token. Requires runnerID field to be filled.
 	AuthPolicyTokenTypeRunner = AuthPolicyTokenType("runner")
