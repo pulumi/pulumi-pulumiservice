@@ -83,20 +83,21 @@ return await Deployment.RunAsync(() =>
         SourceURL = "https://github.com/pulumi/examples",
     });
 
+    var sharedEnvName = $"credentials-{suffix}";
     var sharedCredentials = new Ps.Api.Esc.Environment("sharedCredentials", new()
     {
         OrgName = organizationName,
         Project = "shared",
-        Name = $"credentials-{suffix}",
+        Name = sharedEnvName,
     });
     new Ps.Api.Esc.EnvironmentTag("stableTag", new()
     {
         OrgName = organizationName,
-        ProjectName = sharedCredentials.Project,
-        EnvName = sharedCredentials.Name,
+        ProjectName = "shared",
+        EnvName = sharedEnvName,
         Name = "stable",
         Value = "1",
-    });
+    }, new CustomResourceOptions { DependsOn = { sharedCredentials } });
 
     var stagingStack = new Ps.Api.Stacks.Stack("stagingStack", new()
     {
@@ -111,7 +112,7 @@ return await Deployment.RunAsync(() =>
         StackName = "prod",
     });
 
-    var sharedEnvRef = Output.Format($"{sharedCredentials.Project}/{sharedCredentials.Name}");
+    var sharedEnvRef = $"shared/{sharedEnvName}";
 
     new Ps.Api.Stacks.Config("stagingConfig", new()
     {
@@ -119,14 +120,14 @@ return await Deployment.RunAsync(() =>
         ProjectName = stagingStack.ProjectName,
         StackName = stagingStack.StackName,
         Environment = sharedEnvRef,
-    });
+    }, new CustomResourceOptions { DependsOn = { sharedCredentials } });
     new Ps.Api.Stacks.Config("prodConfig", new()
     {
         OrgName = organizationName,
         ProjectName = prodStack.ProjectName,
         StackName = prodStack.StackName,
         Environment = sharedEnvRef,
-    });
+    }, new CustomResourceOptions { DependsOn = { sharedCredentials } });
 
     foreach (var (k, v) in new[] {
         ("owner", "platform-team"), ("tier", "gold"), ("cost-center", "platform"),
@@ -194,7 +195,7 @@ return await Deployment.RunAsync(() =>
         Enabled = prodApprovalEnabled,
         Rule = gateRule,
         Target = gateTarget,
-    });
+    }, new CustomResourceOptions { DependsOn = { sharedCredentials } });
 
     var deployRequest = ImmutableDictionary<string, object>.Empty
         .Add("operation", "update")

@@ -129,10 +129,13 @@ resources:
     type: pulumiservice:api/esc:EnvironmentTag
     properties:
       orgName: ${organizationName}
-      projectName: ${sharedCredentials.project}
-      envName: ${sharedCredentials.name}
+      projectName: shared
+      envName: credentials-${suffix}
       name: stable
       value: "1"
+    options:
+      dependsOn:
+        - ${sharedCredentials}
 
   # --- 10. Stacks: staging + prod ------------------------------------------
   stagingStack:
@@ -155,14 +158,20 @@ resources:
       orgName: ${organizationName}
       projectName: ${stagingStack.projectName}
       stackName: ${stagingStack.stackName}
-      environment: ${sharedCredentials.project}/${sharedCredentials.name}
+      environment: shared/credentials-${suffix}
+    options:
+      dependsOn:
+        - ${sharedCredentials}
   prodConfig:
     type: pulumiservice:api/stacks:Config
     properties:
       orgName: ${organizationName}
       projectName: ${prodStack.projectName}
       stackName: ${prodStack.stackName}
-      environment: ${sharedCredentials.project}/${sharedCredentials.name}
+      environment: shared/credentials-${suffix}
+    options:
+      dependsOn:
+        - ${sharedCredentials}
 
   # --- 12. Tags on prod ----------------------------------------------------
   prodOwnerTag:
@@ -242,7 +251,10 @@ resources:
         entityType: environment
         actionTypes:
           - update
-        qualifiedName: ${sharedCredentials.project}/${sharedCredentials.name}
+        qualifiedName: shared/credentials-${suffix}
+    options:
+      dependsOn:
+        - ${sharedCredentials}
 
   # --- 16. ScheduledDeployment: nightly redeploy of prod -------------------
   prodNightlyDeploy:
@@ -291,5 +303,5 @@ outputs:
   ciTokenId: ${ciToken.tokenId}
   agentPoolName: ${runnersPool.name}
   templatesName: ${templates.name}
-  sharedCredsEnv: ${sharedCredentials.project}/${sharedCredentials.name}
+  sharedCredsEnv: shared/credentials-${suffix}
   prodStackId: ${prodStack.id}

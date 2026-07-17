@@ -264,9 +264,9 @@ var apiCases = []apiCase{
 		PreviewOnlyAll: true, // Custom VCS registration needs valid creds in the referenced ESC env.
 	},
 	{
-		Name:       "platform-bootstrap",
-		Config:     platformBootstrapConfig,
-		SkipReason: "Composite demo (~18 resources, ~290 lines yaml) kept around as documentation but not exercised by CI. Resources are individually covered by the focused examples above.",
+		Name:           "platform-bootstrap",
+		Config:         platformBootstrapConfig,
+		PreviewOnlyAll: true,
 	},
 	{
 		Name:    "esc-webhook",
