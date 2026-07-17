@@ -139,25 +139,21 @@ func TestConfigure_SetsAccessToken(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	// Build config variables map as expected by Configure
-	configVars := map[string]string{ //nolint:gosec // G101: test fixture, not a real credential.
-		"pulumiservice:config:accessToken": "pul-test0token",
-	}
+	// Build config args as the engine sends them: plain keys, secrets kept.
+	configArgs, err := plugin.MarshalProperties(resource.PropertyMap{
+		accessTokenKey: resource.MakeSecret(resource.NewStringProperty("pul-test0token")),
+	}, plugin.MarshalOptions{KeepSecrets: true})
+	require.NoError(t, err)
 
-	// Call Configure
-	_, err = provider.Configure(ctx, &pulumirpc.ConfigureRequest{
-		Variables: configVars,
+	// Configure the raw provider directly: MakeProvider wraps it, which
+	// hides the client field this test asserts on.
+	raw := &pulumiserviceProvider{}
+	_, err = raw.Configure(ctx, &pulumirpc.ConfigureRequest{
+		Args: configArgs,
 	})
 	require.NoError(t, err)
 
-	// Assert that AccessToken is set on the provider
-	// We need to cast to the concrete type to access AccessToken field
-	concreteProvider, ok := provider.(*pulumiserviceProvider)
-	if !ok {
-		// The provider is wrapped, so we need to check if client was set instead
-		t.Skip("Provider is wrapped, cannot directly access AccessToken field")
-	}
-	assert.NotNil(t, concreteProvider.client, "client should be initialized after Configure")
+	assert.NotNil(t, raw.client, "client should be initialized after Configure")
 }
 
 // TestProvider_LayeredSchema verifies the unified provider serves three

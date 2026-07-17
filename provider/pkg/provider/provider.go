@@ -21,7 +21,6 @@ import (
 	"net/http"
 	"net/url"
 	"runtime"
-	"strings"
 	"sync/atomic"
 	"time"
 
@@ -369,10 +368,20 @@ func (k *pulumiserviceProvider) Configure(
 
 	sc := PulumiServiceConfig{}
 	sc.Config = make(map[string]string)
-	// Migrating to the non-deprecated GetArgs changes key naming and value
-	// encoding, which is out of scope for a lint fix.
-	for key, val := range req.GetVariables() { //nolint:staticcheck
-		sc.Config[strings.TrimPrefix(key, "pulumiservice:config:")] = val
+	args, err := plugin.UnmarshalProperties(req.GetArgs(), plugin.MarshalOptions{
+		KeepResources: true,
+		SkipNulls:     true,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("unmarshaling configure args: %w", err)
+	}
+	for key, val := range args {
+		// The engine sends the provider "version" alongside the config
+		// properties; only string config values are meaningful here.
+		if key == "version" || !val.IsString() {
+			continue
+		}
+		sc.Config[string(key)] = val.StringValue()
 	}
 
 	httpClient := http.Client{
