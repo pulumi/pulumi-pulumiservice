@@ -32,10 +32,11 @@ import (
 
 	p "github.com/pulumi/pulumi-go-provider"
 	"github.com/pulumi/pulumi-go-provider/infer"
+	pkghost "github.com/pulumi/pulumi/pkg/v3/host"
+	"github.com/pulumi/pulumi/pkg/v3/resource/plugin"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/apitype"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/diag"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/diag/colors"
-	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/tokens"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/util/archive"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/workspace"
@@ -342,7 +343,12 @@ func introspectPolicyPack(ctx context.Context, sourcePath string) ([]PolicyPackP
 		return nil, fmt.Errorf("resolve sourcePath %q: %w", sourcePath, err)
 	}
 	sink := diag.DefaultSink(io.Discard, io.Discard, diag.FormatOptions{Color: colors.Never})
-	pctx, err := plugin.NewContext(ctx, sink, sink, nil, nil, "", nil, false, nil)
+	host, err := pkghost.New(ctx, sink, sink, nil, nil, nil, nil, nil)
+	if err != nil {
+		return nil, fmt.Errorf("init plugin host: %w", err)
+	}
+	defer func() { _ = host.Close() }()
+	pctx, err := plugin.NewContext(ctx, sink, sink, host, nil, "", nil, false, nil)
 	if err != nil {
 		return nil, fmt.Errorf("init plugin context: %w", err)
 	}
