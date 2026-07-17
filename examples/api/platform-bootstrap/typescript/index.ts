@@ -77,18 +77,19 @@ const templates = new ps.api.OrgTemplateCollection("templates", {
 });
 
 // 7. Shared ESC credentials env + a "stable" tag on it.
+const sharedEnvName = `credentials-${suffix}`;
 const sharedCredentials = new ps.api.esc.Environment("sharedCredentials", {
     orgName: organizationName,
     project: "shared",
-    name: `credentials-${suffix}`,
+    name: sharedEnvName,
 });
 new ps.api.esc.EnvironmentTag("stableTag", {
     orgName: organizationName,
-    projectName: sharedCredentials.project,
-    envName: sharedCredentials.name,
+    projectName: "shared",
+    envName: sharedEnvName,
     name: "stable",
     value: "1",
-});
+}, { dependsOn: sharedCredentials });
 
 // 8. Two stacks (staging + prod).
 const stagingStack = new ps.api.stacks.Stack("stagingStack", {
@@ -103,19 +104,19 @@ const prodStack = new ps.api.stacks.Stack("prodStack", {
 });
 
 // 9. StackConfig: bind each stack to the shared ESC env.
-const sharedEnvRef = pulumi.interpolate`${sharedCredentials.project}/${sharedCredentials.name}`;
+const sharedEnvRef = `shared/${sharedEnvName}`;
 new ps.api.stacks.Config("stagingConfig", {
     orgName: organizationName,
     projectName: stagingStack.projectName,
     stackName: stagingStack.stackName,
     environment: sharedEnvRef,
-});
+}, { dependsOn: sharedCredentials });
 new ps.api.stacks.Config("prodConfig", {
     orgName: organizationName,
     projectName: prodStack.projectName,
     stackName: prodStack.stackName,
     environment: sharedEnvRef,
-});
+}, { dependsOn: sharedCredentials });
 
 // 10. Tags on prod.
 for (const [k, v] of Object.entries({
@@ -177,7 +178,7 @@ new ps.api.Gate("credsApprovalGate", {
         actionTypes: ["update"],
         qualifiedName: sharedEnvRef,
     },
-});
+}, { dependsOn: sharedCredentials });
 
 // 14. Nightly redeploy of prod (depends on prodDeploySettings).
 new ps.api.deployments.ScheduledDeployment("prodNightlyDeploy", {

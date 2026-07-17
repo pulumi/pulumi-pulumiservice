@@ -122,21 +122,22 @@ func main() {
 			return err
 		}
 
+		sharedEnvName := "credentials-" + suffix
 		sharedCredentials, err := esc.NewEnvironment(ctx, "sharedCredentials", &esc.EnvironmentArgs{
 			OrgName: pulumi.String(organizationName),
 			Project: pulumi.String("shared"),
-			Name:    pulumi.String("credentials-" + suffix),
+			Name:    pulumi.String(sharedEnvName),
 		})
 		if err != nil {
 			return err
 		}
 		if _, err := esc.NewEnvironmentTag(ctx, "stableTag", &esc.EnvironmentTagArgs{
 			OrgName:     pulumi.String(organizationName),
-			ProjectName: sharedCredentials.Project,
-			EnvName:     sharedCredentials.Name,
+			ProjectName: pulumi.String("shared"),
+			EnvName:     pulumi.String(sharedEnvName),
 			Name:        pulumi.String("stable"),
 			Value:       pulumi.String("1"),
-		}); err != nil {
+		}, pulumi.DependsOn([]pulumi.Resource{sharedCredentials})); err != nil {
 			return err
 		}
 
@@ -157,14 +158,14 @@ func main() {
 			return err
 		}
 
-		sharedEnvRef := pulumi.Sprintf("%s/%s", sharedCredentials.Project, sharedCredentials.Name)
+		sharedEnvRef := pulumi.String("shared/" + sharedEnvName)
 
 		if _, err := stacks.NewConfig(ctx, "stagingConfig", &stacks.ConfigArgs{
 			OrgName:     pulumi.String(organizationName),
 			ProjectName: stagingStack.ProjectName,
 			StackName:   stagingStack.StackName,
 			Environment: sharedEnvRef,
-		}); err != nil {
+		}, pulumi.DependsOn([]pulumi.Resource{sharedCredentials})); err != nil {
 			return err
 		}
 		if _, err := stacks.NewConfig(ctx, "prodConfig", &stacks.ConfigArgs{
@@ -172,7 +173,7 @@ func main() {
 			ProjectName: prodStack.ProjectName,
 			StackName:   prodStack.StackName,
 			Environment: sharedEnvRef,
-		}); err != nil {
+		}, pulumi.DependsOn([]pulumi.Resource{sharedCredentials})); err != nil {
 			return err
 		}
 
@@ -248,7 +249,7 @@ func main() {
 				"actionTypes":   pulumi.StringArray{pulumi.String("update")},
 				"qualifiedName": sharedEnvRef,
 			},
-		}); err != nil {
+		}, pulumi.DependsOn([]pulumi.Resource{sharedCredentials})); err != nil {
 			return err
 		}
 

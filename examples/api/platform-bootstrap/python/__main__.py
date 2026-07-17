@@ -90,10 +90,11 @@ shared_credentials = ps_api.esc.Environment(
 ps_api.esc.EnvironmentTag(
     "stableTag",
     org_name=organization_name,
-    project_name=shared_credentials.project,
-    env_name=shared_credentials.name,
+    project_name="shared",
+    env_name=f"credentials-{suffix}",
     name="stable",
     value="1",
+    opts=pulumi.ResourceOptions(depends_on=[shared_credentials]),
 )
 
 staging_stack = ps_api.stacks.Stack(
@@ -109,7 +110,7 @@ prod_stack = ps_api.stacks.Stack(
     stack_name="prod",
 )
 
-shared_env_ref = pulumi.Output.concat(shared_credentials.project, "/", shared_credentials.name)
+shared_env_ref = f"shared/credentials-{suffix}"
 
 ps_api.stacks.Config(
     "stagingConfig",
@@ -117,6 +118,7 @@ ps_api.stacks.Config(
     project_name=staging_stack.project_name,
     stack_name=staging_stack.stack_name,
     environment=shared_env_ref,
+    opts=pulumi.ResourceOptions(depends_on=[shared_credentials]),
 )
 ps_api.stacks.Config(
     "prodConfig",
@@ -124,6 +126,7 @@ ps_api.stacks.Config(
     project_name=prod_stack.project_name,
     stack_name=prod_stack.stack_name,
     environment=shared_env_ref,
+    opts=pulumi.ResourceOptions(depends_on=[shared_credentials]),
 )
 
 for k, v in [("owner", "platform-team"), ("tier", "gold"), ("cost-center", "platform")]:
@@ -182,6 +185,7 @@ ps_api.Gate(
         "actionTypes": ["update"],
         "qualifiedName": shared_env_ref,
     },
+    opts=pulumi.ResourceOptions(depends_on=[shared_credentials]),
 )
 
 ps_api.deployments.ScheduledDeployment(

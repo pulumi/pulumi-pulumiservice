@@ -110,20 +110,22 @@ public class App {
                     .sourceURL("https://github.com/pulumi/examples")
                     .build());
 
+            var sharedEnvName = "credentials-" + suffix;
             var sharedCredentials = new Environment("sharedCredentials",
                 EnvironmentArgs.builder()
                     .orgName(organizationName)
                     .project("shared")
-                    .name("credentials-" + suffix)
+                    .name(sharedEnvName)
                     .build());
             new EnvironmentTag("stableTag",
                 EnvironmentTagArgs.builder()
                     .orgName(organizationName)
-                    .projectName(sharedCredentials.project())
-                    .envName(sharedCredentials.name())
+                    .projectName("shared")
+                    .envName(sharedEnvName)
                     .name("stable")
                     .value("1")
-                    .build());
+                    .build(),
+                CustomResourceOptions.builder().dependsOn(sharedCredentials).build());
 
             var stagingStack = new Stack("stagingStack",
                 StackArgs.builder()
@@ -138,8 +140,7 @@ public class App {
                     .stackName("prod")
                     .build());
 
-            Output<String> sharedEnvRef = Output.format("%s/%s",
-                sharedCredentials.project(), sharedCredentials.name());
+            String sharedEnvRef = "shared/" + sharedEnvName;
 
             new Config("stagingConfig",
                 ConfigArgs.builder()
@@ -147,14 +148,16 @@ public class App {
                     .projectName(stagingStack.projectName())
                     .stackName(stagingStack.stackName())
                     .environment(sharedEnvRef)
-                    .build());
+                    .build(),
+                CustomResourceOptions.builder().dependsOn(sharedCredentials).build());
             new Config("prodConfig",
                 ConfigArgs.builder()
                     .orgName(organizationName)
                     .projectName(prodStack.projectName())
                     .stackName(prodStack.stackName())
                     .environment(sharedEnvRef)
-                    .build());
+                    .build(),
+                CustomResourceOptions.builder().dependsOn(sharedCredentials).build());
 
             for (var entry : Map.of("owner", "platform-team", "tier", "gold", "cost-center", "platform").entrySet()) {
                 new Tag("prodTag-" + entry.getKey(),
@@ -210,7 +213,8 @@ public class App {
                         "entityType", "environment",
                         "actionTypes", List.of("update"),
                         "qualifiedName", sharedEnvRef))
-                    .build());
+                    .build(),
+                CustomResourceOptions.builder().dependsOn(sharedCredentials).build());
 
             new ScheduledDeployment("prodNightlyDeploy",
                 ScheduledDeploymentArgs.builder()
@@ -243,7 +247,7 @@ public class App {
             ctx.export("ciTokenId", ciToken.tokenId());
             ctx.export("agentPoolName", runnersPool.name());
             ctx.export("templatesName", templates.name());
-            ctx.export("sharedCredsEnv", sharedEnvRef);
+            ctx.export("sharedCredsEnv", Output.of(sharedEnvRef));
             ctx.export("prodStackId", prodStack.id());
         });
     }
