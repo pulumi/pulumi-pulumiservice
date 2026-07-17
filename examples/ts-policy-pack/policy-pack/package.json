@@ -3,6 +3,6 @@
     "version": "1.0.0",
     "main": "index.js",
     "dependencies": {
-        "@pulumi/policy": "^1.5.0"
+        "@pulumi/policy": "1.21.0"
     }
 }
