@@ -69,7 +69,9 @@ const (
 	thing1ID             = "thing-1"
 	createdKey           = "created"
 	envNameKey           = "envName"
+	projectNameKey       = "projectName"
 	myprojVal            = "myproj"
+	myenvVal             = "myenv"
 	ownerVal             = "owner"
 	teamXVal             = "team-x"
 	teamYVal             = "team-y"
@@ -184,11 +186,11 @@ func TestCreateSynthesizesID(t *testing.T) {
 				"POST /api/stacks/test-org/myproj/mystack/tags": {status: 204, body: ""},
 			},
 			inputs: map[string]any{
-				orgNameKey:    testOrgName,
-				"projectName": myprojVal,
-				"stackName":   "mystack",
-				nameKey:       ownerVal, // body field; rename name→tagName for path
-				valueKey:      teamXVal,
+				orgNameKey:     testOrgName,
+				projectNameKey: myprojVal,
+				"stackName":    "mystack",
+				nameKey:        ownerVal, // body field; rename name→tagName for path
+				valueKey:       teamXVal,
 			},
 			wantID: "test-org/myproj/mystack/owner",
 		},
@@ -1479,18 +1481,18 @@ func TestUpdateEnvelopeSendsCurrentAndNewBody(t *testing.T) {
 	ctx := WithTransport(t.Context(), mock)
 
 	prior := propMap(map[string]any{
-		orgNameKey:    testOrgName,
-		"projectName": myprojVal,
-		envNameKey:    "myenv",
-		nameKey:       ownerVal,
-		valueKey:      teamXVal,
+		orgNameKey:     testOrgName,
+		projectNameKey: myprojVal,
+		envNameKey:     myenvVal,
+		nameKey:        ownerVal,
+		valueKey:       teamXVal,
 	})
 	inputs := propMap(map[string]any{
-		orgNameKey:    testOrgName,
-		"projectName": myprojVal,
-		envNameKey:    "myenv",
-		nameKey:       ownerVal,
-		valueKey:      teamYVal,
+		orgNameKey:     testOrgName,
+		projectNameKey: myprojVal,
+		envNameKey:     myenvVal,
+		nameKey:        ownerVal,
+		valueKey:       teamYVal,
 	})
 
 	if _, err := r.Update(ctx, p.UpdateRequest{
@@ -1529,11 +1531,11 @@ func TestUpdateEnvelopeUnknownFieldErrors(t *testing.T) {
 
 	ctx := WithTransport(t.Context(), &mockTransport{})
 	src := propMap(map[string]any{
-		orgNameKey:    testOrgName,
-		"projectName": myprojVal,
-		envNameKey:    "myenv",
-		nameKey:       ownerVal,
-		valueKey:      teamYVal,
+		orgNameKey:     testOrgName,
+		projectNameKey: myprojVal,
+		envNameKey:     myenvVal,
+		nameKey:        ownerVal,
+		valueKey:       teamYVal,
 	})
 	_, err := r.Update(ctx, p.UpdateRequest{
 		ID:        "test-org/myproj/myenv/owner",
