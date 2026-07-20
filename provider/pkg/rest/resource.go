@@ -648,7 +648,13 @@ func (r *Resource) Update(ctx context.Context, req p.UpdateRequest) (p.UpdateRes
 
 	urlSrc := mergeMaps(req.State, req.OldInputs, req.Inputs)
 	bodySrc := mergeMaps(req.Inputs, req.OldInputs, req.State)
-	_, state, err := r.execAndDecodeSplit(ctx, op, urlSrc, bodySrc)
+	var state property.Map
+	if r.meta.UpdateEnvelope != nil {
+		currentSrc := mergeMaps(req.State, req.OldInputs)
+		_, state, err = r.execEnvelopeUpdate(ctx, op, urlSrc, currentSrc, bodySrc)
+	} else {
+		_, state, err = r.execAndDecodeSplit(ctx, op, urlSrc, bodySrc)
+	}
 	if err != nil {
 		return p.UpdateResponse{}, err
 	}
@@ -915,6 +921,87 @@ func (r *Resource) buildRequestBody(op *Operation, inputs property.Map) map[stri
 		}
 	}
 	return out
+}
+
+// execEnvelopeUpdate mirrors execAndDecodeSplit for update ops declared with
+// UpdateEnvelopeMeta: the body is hand-shaped from the prior and desired
+// property values instead of the flat schema-driven mapping, which would
+// match neither wrapper field and send an empty body.
+func (r *Resource) execEnvelopeUpdate(
+	ctx context.Context, op *Operation, urlSrc, currentSrc, newSrc property.Map,
+) ([]byte, property.Map, error) {
+	url, err := r.buildURL(op, urlSrc)
+	if err != nil {
+		return nil, property.Map{}, err
+	}
+	body, err := r.buildEnvelopeBody(op, currentSrc, newSrc)
+	if err != nil {
+		return nil, property.Map{}, err
+	}
+	bodyJSON, err := json.Marshal(body)
+	if err != nil {
+		return nil, property.Map{}, fmt.Errorf("rest: marshal request body for %s: %w", op.ID, err)
+	}
+	return r.roundTrip(ctx, op, url, bytes.NewReader(bodyJSON), contentJSON)
+}
+
+// buildEnvelopeBody constructs {CurrentField: {…}, NewField: {…}} from the
+// update op's request schema. Each wrapper object's schema properties are
+// filled from its source by (renamed) field name — buildRequestBody's
+// convention, applied one level down. A wrapper field missing from the
+// schema is an error: silently sending a partial body would reintroduce
+// the failure mode the envelope exists to fix.
+func (r *Resource) buildEnvelopeBody(op *Operation, currentSrc, newSrc property.Map) (map[string]any, error) {
+	env := r.meta.UpdateEnvelope
+	if op.RequestRef == "" {
+		return nil, fmt.Errorf("rest: updateEnvelope set on %s but the op has no request body schema", op.ID)
+	}
+	bodyProps, _, err := flattenObjectSchema(r.spec, op.RequestRef)
+	if err != nil {
+		return nil, fmt.Errorf("rest: flatten request schema for %s: %w", op.ID, err)
+	}
+	out := map[string]any{}
+	for _, part := range []struct {
+		field string
+		src   property.Map
+	}{
+		{env.CurrentField, currentSrc},
+		{env.NewField, newSrc},
+	} {
+		props, err := envelopeWrapperProps(r.spec, op, bodyProps, part.field)
+		if err != nil {
+			return nil, err
+		}
+		wrapper := map[string]any{}
+		for wireKey := range props {
+			pulKey := pulumiName(wireKey, r.meta.Renames)
+			if v, ok := part.src.GetOk(pulKey); ok {
+				wrapper[wireKey] = propertyValueToAny(v)
+			}
+		}
+		out[part.field] = wrapper
+	}
+	return out, nil
+}
+
+// envelopeWrapperProps resolves the object schema of one envelope wrapper
+// field, following a $ref or reading inline properties.
+func envelopeWrapperProps(spec *Spec, op *Operation, bodyProps map[string]any, field string) (map[string]any, error) {
+	raw, ok := bodyProps[field].(map[string]any)
+	if !ok {
+		return nil, fmt.Errorf("rest: updateEnvelope field %q not found in request schema for %s", field, op.ID)
+	}
+	if ref, ok := raw["$ref"].(string); ok {
+		props, _, err := flattenObjectSchema(spec, ref)
+		if err != nil {
+			return nil, fmt.Errorf("rest: flatten envelope wrapper %q for %s: %w", field, op.ID, err)
+		}
+		return props, nil
+	}
+	if props, ok := raw["properties"].(map[string]any); ok {
+		return props, nil
+	}
+	return nil, fmt.Errorf("rest: updateEnvelope field %q in %s is not an object schema", field, op.ID)
 }
 
 func propertyValueToAny(v property.Value) any {

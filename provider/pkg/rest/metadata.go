@@ -86,6 +86,11 @@ type ResourceMeta struct {
 	// CRUD path doesn't apply; Create/Read/Delete take the attachment branch.
 	Attachment *AttachmentMeta `json:"attachment,omitempty"`
 
+	// UpdateEnvelope, when set, marks the update op's request body as a
+	// current/new envelope that the flat input→body mapping can't express;
+	// Update hand-shapes the body instead. See UpdateEnvelopeMeta.
+	UpdateEnvelope *UpdateEnvelopeMeta `json:"updateEnvelope,omitempty"`
+
 	// TODO
 	// Examples are PCL snippets rendered as `## Example Usage` blocks.
 	// SDK codegen runs `pulumi convert` per target language at gen time.
@@ -121,6 +126,22 @@ type AttachmentMeta struct {
 	// objects), MatchKey names exactly one field, compared directly to each
 	// scalar element.
 	MatchKey []string `json:"matchKey"`
+}
+
+// UpdateEnvelopeMeta describes an update request body that pairs the prior
+// property values with the desired ones for optimistic concurrency — e.g.
+// UpdateEnvironmentTag's {"currentTag": {value}, "newTag": {name, value}}.
+// The generic flat mapping in buildRequestBody matches body fields to inputs
+// by name and can't express "same field, two versions", so it would send an
+// empty body here. Instead, Update fills CurrentField's object from prior
+// state and NewField's from the new inputs, each driven by that wrapper's
+// own schema properties.
+type UpdateEnvelopeMeta struct {
+	// CurrentField is the wire-side request field holding the prior values.
+	CurrentField string `json:"currentField"`
+
+	// NewField is the wire-side request field holding the desired values.
+	NewField string `json:"newField"`
 }
 
 // Operations names the operationIds for each CRUD verb.

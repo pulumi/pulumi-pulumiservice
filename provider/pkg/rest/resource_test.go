@@ -17,10 +17,12 @@ package rest
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"io"
 	"net/http"
 	"os"
 	"path/filepath"
+	"reflect"
 	"runtime"
 	"strings"
 	"testing"
@@ -1443,5 +1445,98 @@ func TestPropertyValueToStringNumberFormatting(t *testing.T) {
 				t.Errorf("propertyValueToString(%v) returned scientific notation %q", tc.in, got)
 			}
 		})
+	}
+}
+
+// TestUpdateEnvelopeSendsCurrentAndNewBody pins the wire contract for update
+// ops declared with updateEnvelope (EnvironmentTag): the PATCH body pairs the
+// prior value under currentField with the desired values under newField. The
+// flat schema-driven mapping would send an empty body here — neither wrapper
+// field matches an input — so in-place value updates would always fail.
+func TestUpdateEnvelopeSendsCurrentAndNewBody(t *testing.T) {
+	spec, meta := loadFixtures(t)
+	resources := Resources(spec, meta)
+	r, ok := resources["pulumiservice:api/esc:EnvironmentTag"]
+	if !ok {
+		t.Fatal("pulumiservice:api/esc:EnvironmentTag not in metadata")
+	}
+	if r.meta.UpdateEnvelope == nil {
+		t.Fatal("EnvironmentTag metadata entry lost its updateEnvelope")
+	}
+
+	var patchBody []byte
+	mock := &mockTransport{responseFn: func(req *http.Request) mockResponse {
+		if req.Method == http.MethodPatch {
+			patchBody, _ = io.ReadAll(req.Body)
+		}
+		return mockResponse{status: 200, body: `{"name":"owner","value":"team-y"}`}
+	}}
+	ctx := WithTransport(t.Context(), mock)
+
+	prior := propMap(map[string]any{
+		orgNameKey:    testOrgName,
+		"projectName": "myproj",
+		"envName":     "myenv",
+		nameKey:       "owner",
+		valueKey:      "team-x",
+	})
+	inputs := propMap(map[string]any{
+		orgNameKey:    testOrgName,
+		"projectName": "myproj",
+		"envName":     "myenv",
+		nameKey:       "owner",
+		valueKey:      "team-y",
+	})
+
+	if _, err := r.Update(ctx, p.UpdateRequest{
+		ID:        "test-org/myproj/myenv/owner",
+		Inputs:    inputs,
+		OldInputs: prior,
+		State:     prior,
+	}); err != nil {
+		t.Fatalf("Update: %v\n  calls: %v", err, mock.calls)
+	}
+
+	wantPatch := "PATCH /api/esc/environments/test-org/myproj/myenv/tags/owner"
+	if len(mock.calls) == 0 || mock.calls[0] != wantPatch {
+		t.Fatalf("expected first call %q; calls: %v", wantPatch, mock.calls)
+	}
+	var got map[string]any
+	if err := json.Unmarshal(patchBody, &got); err != nil {
+		t.Fatalf("unmarshal PATCH body %q: %v", patchBody, err)
+	}
+	want := map[string]any{
+		"currentTag": map[string]any{valueKey: "team-x"},
+		"newTag":     map[string]any{nameKey: "owner", valueKey: "team-y"},
+	}
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("PATCH body = %s, want %v", patchBody, want)
+	}
+}
+
+// TestUpdateEnvelopeUnknownFieldErrors ensures a metadata/spec mismatch
+// surfaces loudly instead of silently sending a partial body.
+func TestUpdateEnvelopeUnknownFieldErrors(t *testing.T) {
+	spec, meta := loadFixtures(t)
+	rm := meta.Resources["pulumiservice:api:EnvironmentTag_esc_environments"]
+	rm.UpdateEnvelope = &UpdateEnvelopeMeta{CurrentField: "nope", NewField: "newTag"}
+	r := &Resource{meta: rm, spec: spec}
+
+	ctx := WithTransport(t.Context(), &mockTransport{})
+	src := propMap(map[string]any{
+		orgNameKey:    testOrgName,
+		"projectName": "myproj",
+		"envName":     "myenv",
+		nameKey:       "owner",
+		valueKey:      "team-y",
+	})
+	_, err := r.Update(ctx, p.UpdateRequest{
+		ID:        "test-org/myproj/myenv/owner",
+		Inputs:    src,
+		OldInputs: src,
+		State:     src,
+	})
+	if err == nil || !strings.Contains(err.Error(), `"nope"`) {
+		t.Fatalf("expected unknown-envelope-field error, got %v", err)
 	}
 }

@@ -180,7 +180,11 @@
       "renames": {
         "name": "tagName"
       },
-      "token": "pulumiservice:api/esc:EnvironmentTag"
+      "token": "pulumiservice:api/esc:EnvironmentTag",
+      "updateEnvelope": {
+        "currentField": "currentTag",
+        "newField": "newTag"
+      }
     },
     "pulumiservice:api:Environment_esc_environments": {
       "deleteBeforeReplace": true,
