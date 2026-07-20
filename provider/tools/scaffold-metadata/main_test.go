@@ -125,6 +125,14 @@ const envelopeSpec = `{
     "ScalarWrappers": {"type": "object", "properties": {
       "currentTag": {"type": "string"},
       "newTag":     {"type": "string"}
+    }},
+    "NonceTag": {"type": "object", "properties": {
+      "value": {"type": "string"},
+      "nonce": {"type": "string"}
+    }, "required": ["nonce"]},
+    "NonceEnvelope": {"type": "object", "properties": {
+      "currentTag": {"$ref": "#/components/schemas/CurrentTag"},
+      "newTag":     {"$ref": "#/components/schemas/NonceTag"}
     }}
   }},
   "paths": {
@@ -149,6 +157,12 @@ const envelopeSpec = `{
       "operationId": "UpdateThreeFields",
       "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "string"}}],
       "requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/ThreeFields"}}}},
+      "responses": {"204": {}}
+    }},
+    "/nonce/{id}": {"patch": {
+      "operationId": "UpdateNonceThing",
+      "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "string"}}],
+      "requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/NonceEnvelope"}}}},
       "responses": {"204": {}}
     }},
     "/scalars/{id}": {"patch": {
@@ -220,10 +234,12 @@ func TestValidateUpdateEnvelope(t *testing.T) {
 		{"identical fields", derivedOps{Create: "C", Update: updateEnvelopeThingOp},
 			&rest.UpdateEnvelopeMeta{CurrentField: newTagField, NewField: newTagField}, "two distinct fields"},
 		{"no update body", derivedOps{Create: "C"}, envelope, "no request body"},
+		{"required wrapper prop unsourceable", derivedOps{Create: "C", Update: "UpdateNonceThing"}, envelope,
+			`requires field "nonce"`},
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			err := validateUpdateEnvelope(spec, tc.ops, tc.env)
+			err := validateUpdateEnvelope(spec, tc.ops, tc.env, nil, nil)
 			if tc.wantErr == "" {
 				if err != nil {
 					t.Fatalf("want nil error, got %v", err)

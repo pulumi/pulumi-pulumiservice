@@ -211,6 +211,11 @@ func main() {
 	brokenEnvelopes := map[string]error{}
 	for tok, ops := range candidates {
 		if excluded[tok] {
+			// Exclusion stops derivation, but a lingering resources entry
+			// still ships to the provider — keep auditing what ships.
+			if entry, ok := doc.Resources[tok]; ok {
+				auditUpdateBody(parsedSpec, ops, tok, entry, unmappedUpdates, brokenEnvelopes)
+			}
 			continue
 		}
 		entry, exists := doc.Resources[tok]
@@ -328,7 +333,6 @@ func main() {
 			fmt.Fprintf(os.Stderr, "    %s\n", o)
 		}
 	}
-	reportUpdateBodyAudit(unmappedUpdates, brokenEnvelopes)
 	if len(autoNameRecommendations) > 0 {
 		fmt.Fprintf(os.Stderr,
 			"  autoName candidates (maxLength from spec; opt in by hand-setting fields[<name>].autoName): %d\n",
@@ -350,6 +354,8 @@ func main() {
 			}
 		}
 	}
+	// Last so a fatal audit outcome cannot suppress the reports above.
+	reportUpdateBodyAudit(unmappedUpdates, brokenEnvelopes)
 }
 
 // inferIDFormat builds a "{paramA}/{paramB}" template from the most
@@ -859,7 +865,7 @@ func auditUpdateBody(
 		fail("parse merged entry for %s: %v", tok, err)
 	}
 	if rm.UpdateEnvelope != nil {
-		if err := validateUpdateEnvelope(spec, ops, rm.UpdateEnvelope); err != nil {
+		if err := validateUpdateEnvelope(spec, ops, rm.UpdateEnvelope, rm.Renames, rm.OutputsExclude); err != nil {
 			broken[tok] = err
 		}
 		return
@@ -874,12 +880,18 @@ func auditUpdateBody(
 // every update of the resource fails at runtime, so it must not ship behind
 // a passing scaffold.
 func reportUpdateBodyAudit(unmapped map[string]unmappedFieldSet, broken map[string]error) {
-	if len(unmapped) > 0 {
+	var withOptional []string
+	for _, tok := range slices.Sorted(maps.Keys(unmapped)) {
+		if len(unmapped[tok].optional) > 0 {
+			withOptional = append(withOptional, tok)
+		}
+	}
+	if len(withOptional) > 0 {
 		fmt.Fprintf(os.Stderr,
 			"  optional update-body fields nothing can populate "+
 				"(silently omitted from PATCHes): %d resources\n",
-			len(unmapped))
-		for _, tok := range slices.Sorted(maps.Keys(unmapped)) {
+			len(withOptional))
+		for _, tok := range withOptional {
 			for _, f := range unmapped[tok].optional {
 				fmt.Fprintf(os.Stderr, "    %s.%s\n", tok, f)
 			}
@@ -893,7 +905,8 @@ func reportUpdateBodyAudit(unmapped map[string]unmappedFieldSet, broken map[stri
 		for _, f := range unmapped[tok].required {
 			fatal = append(fatal, fmt.Sprintf(
 				"%s.%s: REQUIRED update-body field nothing can populate — every update will fail; "+
-					"model the body (updateEnvelope, renames) or add the token to _excluded",
+					"model the body (updateEnvelope, renames), or add the token to _excluded "+
+					"and delete its resources entry",
 				tok, f))
 		}
 	}
@@ -932,11 +945,12 @@ func unmappedUpdateFields(
 	return required, optional
 }
 
-// populatedInputSurface approximates the runtime's update-body population
-// sources (bodySrc = inputs ∪ prior state, resource.go Update): create-body
-// fields and path/query params become schema inputs, and read-response
-// fields land in state, so a same-named update-body field is filled from any
-// of them. Pulumi-side names throughout.
+// populatedInputSurface mirrors the runtime's update-body population sources
+// (bodySrc = inputs ∪ prior state, resource.go Update). Schema inputs come
+// from the create op's body and path/query params plus the read op's path
+// params — the same derivation as schema.go's operationInputs +
+// mergePathParamsAsInputs — and read-response fields land in state.
+// Pulumi-side names throughout.
 func populatedInputSurface(
 	spec *rest.Spec, ops derivedOps, renames map[string]string, outputsExclude []string,
 ) map[string]bool {
@@ -945,13 +959,7 @@ func populatedInputSurface(
 		for wire := range flattenedProps(spec, cr.RequestRef) {
 			surface[wireToPulumi(wire, renames)] = true
 		}
-	}
-	for _, opID := range []string{ops.Create, ops.Read, ops.Update, ops.Delete} {
-		op := opOrNil(spec, opID)
-		if op == nil {
-			continue
-		}
-		for _, p := range op.Parameters {
+		for _, p := range cr.Parameters {
 			if p.In == paramInPath || p.In == paramInQuery {
 				surface[wireToPulumi(p.Name, renames)] = true
 			}
@@ -962,6 +970,9 @@ func populatedInputSurface(
 		excluded[e] = true
 	}
 	if rd := opOrNil(spec, ops.Read); rd != nil {
+		for _, name := range pathParamsOf(rd) {
+			surface[wireToPulumi(name, renames)] = true
+		}
 		for wire := range flattenedProps(spec, rd.ResponseRef) {
 			pul := wireToPulumi(wire, renames)
 			if !excluded[pul] && !excluded[wire] {
@@ -972,11 +983,51 @@ func populatedInputSurface(
 	return surface
 }
 
+// wrapperPropsRequired resolves one wrapper prop node ($ref, allOf, or
+// inline) to its properties and required-field set.
+func wrapperPropsRequired(spec *rest.Spec, prop any) (map[string]any, map[string]bool) {
+	props := map[string]any{}
+	required := map[string]bool{}
+	var walk func(node any)
+	walk = func(node any) {
+		m, ok := node.(map[string]any)
+		if !ok {
+			return
+		}
+		if ref, _ := m["$ref"].(string); ref != "" {
+			p, r := flattenedPropsRequired(spec, ref)
+			maps.Copy(props, p)
+			maps.Copy(required, r)
+			return
+		}
+		if all, ok := m["allOf"].([]any); ok {
+			for _, e := range all {
+				walk(e)
+			}
+		}
+		if rr, ok := m["required"].([]any); ok {
+			for _, x := range rr {
+				if s, ok := x.(string); ok {
+					required[s] = true
+				}
+			}
+		}
+		if pp, ok := m["properties"].(map[string]any); ok {
+			maps.Copy(props, pp)
+		}
+	}
+	walk(prop)
+	return props, required
+}
+
 // validateUpdateEnvelope mirrors the runtime's buildEnvelopeBody checks at
 // regen time: a pinned or previously-derived envelope that no longer matches
 // the spec means every update of that resource fails, so surface the drift
 // here instead of at the first live update.
-func validateUpdateEnvelope(spec *rest.Spec, ops derivedOps, env *rest.UpdateEnvelopeMeta) error {
+func validateUpdateEnvelope(
+	spec *rest.Spec, ops derivedOps, env *rest.UpdateEnvelopeMeta,
+	renames map[string]string, outputsExclude []string,
+) error {
 	upd := opOrNil(spec, ops.Update)
 	if upd == nil || upd.RequestRef == "" {
 		return fmt.Errorf("updateEnvelope declared but the update op has no request body")
@@ -1000,6 +1051,23 @@ func validateUpdateEnvelope(spec *rest.Spec, ops derivedOps, env *rest.UpdateEnv
 	if len(siblings) > 0 {
 		sort.Strings(siblings)
 		return fmt.Errorf("update request body has fields outside the declared envelope: %v", siblings)
+	}
+	// The runtime fills each wrapper from inputs/prior state and hard-errors
+	// on required props it cannot source (buildEnvelopeBody); check the same
+	// reachability here so the gap surfaces at regen, not first live update.
+	surface := populatedInputSurface(spec, ops, renames, outputsExclude)
+	for _, f := range []string{env.CurrentField, env.NewField} {
+		_, wrapperRequired := wrapperPropsRequired(spec, props[f])
+		reqNames := make([]string, 0, len(wrapperRequired))
+		for r := range wrapperRequired {
+			reqNames = append(reqNames, r)
+		}
+		sort.Strings(reqNames)
+		for _, r := range reqNames {
+			if !surface[wireToPulumi(r, renames)] {
+				return fmt.Errorf("wrapper %q requires field %q which no input or state field can populate", f, r)
+			}
+		}
 	}
 	return nil
 }
