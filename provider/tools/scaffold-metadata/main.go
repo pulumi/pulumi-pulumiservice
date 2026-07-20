@@ -216,6 +216,7 @@ func main() {
 			IDFormat:            inferIDFormat(parsedSpec, ops, renames),
 			DeleteBeforeReplace: inferDeleteBeforeReplace(parsedSpec, ops, renames),
 			RequireImport:       inferRequireImport(parsedSpec, ops),
+			UpdateEnvelope:      inferUpdateEnvelope(parsedSpec, ops),
 			EmitOnCreateFields:  inferEmitOnCreate(parsedSpec, ops, renames),
 			UnorderedFields:     inferUnordered(parsedSpec, ops, renames),
 		}
@@ -417,6 +418,53 @@ func inferRequireImport(spec *rest.Spec, ops derivedOps) bool {
 	return false
 }
 
+// inferUpdateEnvelope detects update request bodies that pair the prior
+// values with the desired ones for optimistic concurrency — e.g.
+// UpdateEnvironmentTag's {currentTag, newTag}: exactly two object-typed
+// properties named current<Stem>/new<Stem> with a shared stem. The generic
+// flat input→body mapping matches neither wrapper (it would send an empty
+// body), so the runtime hand-shapes the body from prior state and new
+// inputs; see rest.UpdateEnvelopeMeta.
+func inferUpdateEnvelope(spec *rest.Spec, ops derivedOps) *rest.UpdateEnvelopeMeta {
+	upd := opOrNil(spec, ops.Update)
+	if upd == nil || ops.Update == ops.Create || upd.RequestRef == "" {
+		return nil
+	}
+	props := flattenedProps(spec, upd.RequestRef)
+	if len(props) != 2 {
+		return nil
+	}
+	var currentField, currentStem, newField, newStem string
+	for name := range props {
+		if stem, ok := attachmentStem(name, "current"); ok {
+			currentField, currentStem = name, stem
+		} else if stem, ok := attachmentStem(name, "new"); ok {
+			newField, newStem = name, stem
+		}
+	}
+	if currentField == "" || newField == "" || currentStem != newStem {
+		return nil
+	}
+	if !isObjectProp(spec, props[currentField]) || !isObjectProp(spec, props[newField]) {
+		return nil
+	}
+	return &rest.UpdateEnvelopeMeta{CurrentField: currentField, NewField: newField}
+}
+
+// isObjectProp reports whether prop resolves to an object schema with at
+// least one property, via $ref or inline.
+func isObjectProp(spec *rest.Spec, prop any) bool {
+	if ref := refOf(prop); ref != "" {
+		return len(flattenedProps(spec, ref)) > 0
+	}
+	m, ok := prop.(map[string]any)
+	if !ok {
+		return false
+	}
+	props, ok := m["properties"].(map[string]any)
+	return ok && len(props) > 0
+}
+
 // inferDeleteBeforeReplace returns true when a duplicate create would collide
 // upstream — i.e., POST method with a free-form name in the body or with a
 // resource-name path param. PUT/PATCH-as-create resources (configuration
@@ -557,6 +605,7 @@ type derivations struct {
 	IDFormat            string
 	DeleteBeforeReplace bool
 	RequireImport       bool
+	UpdateEnvelope      *rest.UpdateEnvelopeMeta
 	EmitOnCreateFields  []string // Pulumi-side field names
 	UnorderedFields     []string // Pulumi-side field names
 }
@@ -643,6 +692,14 @@ func mergeOperations(existing json.RawMessage, ops derivedOps, d derivations) (j
 	if d.RequireImport {
 		if _, has := entry["requireImport"]; !has {
 			entry["requireImport"] = true
+		}
+	}
+	if d.UpdateEnvelope != nil {
+		if _, has := entry["updateEnvelope"]; !has {
+			entry["updateEnvelope"] = map[string]any{
+				"currentField": d.UpdateEnvelope.CurrentField,
+				"newField":     d.UpdateEnvelope.NewField,
+			}
 		}
 	}
 	for _, name := range d.EmitOnCreateFields {

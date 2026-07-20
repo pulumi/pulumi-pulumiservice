@@ -88,7 +88,9 @@ type ResourceMeta struct {
 
 	// UpdateEnvelope, when set, marks the update op's request body as a
 	// current/new envelope that the flat input→body mapping can't express;
-	// Update hand-shapes the body instead. See UpdateEnvelopeMeta.
+	// Update hand-shapes the body instead. Detected from the spec by
+	// scaffold-metadata (current<X>/new<X> request shape); hand-edits
+	// survive regen. See UpdateEnvelopeMeta.
 	UpdateEnvelope *UpdateEnvelopeMeta `json:"updateEnvelope,omitempty"`
 
 	// TODO

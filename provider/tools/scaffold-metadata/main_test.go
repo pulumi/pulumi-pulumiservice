@@ -17,6 +17,8 @@ package main
 import (
 	"encoding/json"
 	"testing"
+
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/rest"
 )
 
 // TestMergeAttachmentReportsChange checks mergeAttachment's changed return: the
@@ -82,5 +84,57 @@ func TestMergeAttachmentPreservesPinnedIDFormat(t *testing.T) {
 	}
 	if got := out["idFormat"]; got != "{orgName}/{name}" {
 		t.Errorf("pinned idFormat must be preserved over the derived value, got %v", got)
+	}
+}
+
+// TestInferUpdateEnvelope pins the current<Stem>/new<Stem> detection rule:
+// exactly two object-typed request properties with a shared stem. Anything
+// looser would mis-tag ordinary two-field update bodies, anything stricter
+// would miss the shape the flat body mapping can't express.
+func TestInferUpdateEnvelope(t *testing.T) {
+	const specJSON = `{
+	  "openapi": "3.0.0",
+	  "components": {"schemas": {
+	    "CurrentTag": {"type": "object", "properties": {"value": {"type": "string"}}},
+	    "NewTag":     {"type": "object", "properties": {"name": {"type": "string"}, "value": {"type": "string"}}},
+	    "Envelope":       {"type": "object", "properties": {"currentTag": {"$ref": "#/components/schemas/CurrentTag"}, "newTag": {"$ref": "#/components/schemas/NewTag"}}},
+	    "StemMismatch":   {"type": "object", "properties": {"currentTag": {"$ref": "#/components/schemas/CurrentTag"}, "newThing": {"$ref": "#/components/schemas/NewTag"}}},
+	    "ThreeFields":    {"type": "object", "properties": {"currentTag": {"$ref": "#/components/schemas/CurrentTag"}, "newTag": {"$ref": "#/components/schemas/NewTag"}, "extra": {"type": "string"}}},
+	    "ScalarWrappers": {"type": "object", "properties": {"currentTag": {"type": "string"}, "newTag": {"type": "string"}}}
+	  }},
+	  "paths": {
+	    "/things/{id}":        {"patch": {"operationId": "UpdateEnvelopeThing", "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "string"}}], "requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Envelope"}}}}, "responses": {"204": {}}}},
+	    "/mismatch/{id}":      {"patch": {"operationId": "UpdateStemMismatch", "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "string"}}], "requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/StemMismatch"}}}}, "responses": {"204": {}}}},
+	    "/three/{id}":         {"patch": {"operationId": "UpdateThreeFields", "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "string"}}], "requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/ThreeFields"}}}}, "responses": {"204": {}}}},
+	    "/scalars/{id}":       {"patch": {"operationId": "UpdateScalarWrappers", "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "string"}}], "requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/ScalarWrappers"}}}}, "responses": {"204": {}}}}
+	  }
+	}`
+	spec, err := rest.ParseSpec([]byte(specJSON))
+	if err != nil {
+		t.Fatalf("parse synthetic spec: %v", err)
+	}
+
+	cases := []struct {
+		name string
+		ops  derivedOps
+		want *rest.UpdateEnvelopeMeta
+	}{
+		{"detected", derivedOps{Create: "C", Update: "UpdateEnvelopeThing"},
+			&rest.UpdateEnvelopeMeta{CurrentField: "currentTag", NewField: "newTag"}},
+		{"stem mismatch", derivedOps{Create: "C", Update: "UpdateStemMismatch"}, nil},
+		{"three fields", derivedOps{Create: "C", Update: "UpdateThreeFields"}, nil},
+		{"scalar wrappers", derivedOps{Create: "C", Update: "UpdateScalarWrappers"}, nil},
+		{"no update op", derivedOps{Create: "C"}, nil},
+		{"create==update (upsert)", derivedOps{Create: "UpdateEnvelopeThing", Update: "UpdateEnvelopeThing"}, nil},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			got := inferUpdateEnvelope(spec, tc.ops)
+			switch {
+			case got == nil && tc.want == nil:
+			case got == nil || tc.want == nil || *got != *tc.want:
+				t.Errorf("inferUpdateEnvelope = %+v, want %+v", got, tc.want)
+			}
+		})
 	}
 }
