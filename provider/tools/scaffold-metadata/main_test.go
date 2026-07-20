@@ -138,3 +138,51 @@ func TestInferUpdateEnvelope(t *testing.T) {
 		})
 	}
 }
+
+// TestUnmappedUpdateFields pins the diagnostic that catches update bodies the
+// flat input→body mapping can't serve: fields with no same-named input are
+// silently omitted from PATCHes, so they must be surfaced at regen time.
+func TestUnmappedUpdateFields(t *testing.T) {
+	const specJSON = `{
+	  "openapi": "3.0.0",
+	  "components": {"schemas": {
+	    "CreateThing": {"type": "object", "properties": {"name": {"type": "string"}, "displayName": {"type": "string"}}},
+	    "ActionUnion": {"type": "object", "properties": {"newDisplayName": {"type": "string"}, "memberAction": {"type": "string"}, "token": {"type": "string"}}, "required": ["token"]},
+	    "FlatPatch":   {"type": "object", "properties": {"displayName": {"type": "string"}}}
+	  }},
+	  "paths": {
+	    "/things/{org}/{thingName}": {
+	      "post":  {"operationId": "CreateThing", "parameters": [{"name": "org", "in": "path", "required": true, "schema": {"type": "string"}}, {"name": "thingName", "in": "path", "required": true, "schema": {"type": "string"}}], "requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/CreateThing"}}}}, "responses": {"204": {}}},
+	      "patch": {"operationId": "UpdateThingUnion", "parameters": [{"name": "org", "in": "path", "required": true, "schema": {"type": "string"}}, {"name": "thingName", "in": "path", "required": true, "schema": {"type": "string"}}], "requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/ActionUnion"}}}}, "responses": {"204": {}}}
+	    },
+	    "/flat/{org}": {
+	      "patch": {"operationId": "UpdateThingFlat", "parameters": [{"name": "org", "in": "path", "required": true, "schema": {"type": "string"}}], "requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/FlatPatch"}}}}, "responses": {"204": {}}}
+	    }
+	  }
+	}`
+	spec, err := rest.ParseSpec([]byte(specJSON))
+	if err != nil {
+		t.Fatalf("parse synthetic spec: %v", err)
+	}
+
+	// Action-union update body: every field unmapped, "token" required.
+	req, opt := unmappedUpdateFields(spec, derivedOps{Create: "CreateThing", Update: "UpdateThingUnion"}, map[string]string{"name": "thingName"})
+	if len(req) != 1 || req[0] != "token" {
+		t.Errorf("required = %v, want [token]", req)
+	}
+	if len(opt) != 2 || opt[0] != "memberAction" || opt[1] != "newDisplayName" {
+		t.Errorf("optional = %v, want [memberAction newDisplayName]", opt)
+	}
+
+	// Flat update body whose fields all map to inputs: nothing to report.
+	req, opt = unmappedUpdateFields(spec, derivedOps{Create: "CreateThing", Update: "UpdateThingFlat"}, nil)
+	if len(req)+len(opt) != 0 {
+		t.Errorf("flat body: required=%v optional=%v, want none", req, opt)
+	}
+
+	// Upsert-shaped (create == update) resources are exempt.
+	req, opt = unmappedUpdateFields(spec, derivedOps{Create: "UpdateThingUnion", Update: "UpdateThingUnion"}, nil)
+	if len(req)+len(opt) != 0 {
+		t.Errorf("upsert: required=%v optional=%v, want none", req, opt)
+	}
+}

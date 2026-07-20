@@ -160,6 +160,12 @@ type metadataDoc struct {
 	Resources map[string]json.RawMessage `json:"resources"`
 }
 
+// unmappedFieldSet holds update-body wire fields no input can populate,
+// split by whether the schema marks them required.
+type unmappedFieldSet struct {
+	required, optional []string
+}
+
 type derivedOps struct {
 	Create string `json:"create,omitempty"`
 	Read   string `json:"read,omitempty"`
@@ -199,6 +205,7 @@ func main() {
 
 	added, updated := 0, 0
 	autoNameRecommendations := map[string]map[string]int{}
+	unmappedUpdates := map[string]unmappedFieldSet{}
 	for tok, ops := range candidates {
 		if excluded[tok] {
 			continue
@@ -222,6 +229,11 @@ func main() {
 		}
 		if rec := inferAutoNameRecommendations(parsedSpec, ops, renames); len(rec) > 0 {
 			autoNameRecommendations[tok] = rec
+		}
+		if d.UpdateEnvelope == nil && !rawHasKey(entry, "updateEnvelope") {
+			if reqU, optU := unmappedUpdateFields(parsedSpec, ops, renames); len(reqU)+len(optU) > 0 {
+				unmappedUpdates[tok] = unmappedFieldSet{required: reqU, optional: optU}
+			}
 		}
 		merged, changed, err := mergeOperations(entry, ops, d)
 		if err != nil {
@@ -315,6 +327,20 @@ func main() {
 		fmt.Fprintf(os.Stderr, "  orphans (in metadata.json, not derived from spec): %d\n", len(orphans))
 		for _, o := range orphans {
 			fmt.Fprintf(os.Stderr, "    %s\n", o)
+		}
+	}
+	if len(unmappedUpdates) > 0 {
+		fmt.Fprintf(os.Stderr,
+			"  update-body fields no input can populate (omitted from PATCHes; REQUIRED ones break every update): %d resources\n",
+			len(unmappedUpdates))
+		for _, tok := range slices.Sorted(maps.Keys(unmappedUpdates)) {
+			u := unmappedUpdates[tok]
+			for _, f := range u.required {
+				fmt.Fprintf(os.Stderr, "    %s.%s (REQUIRED)\n", tok, f)
+			}
+			for _, f := range u.optional {
+				fmt.Fprintf(os.Stderr, "    %s.%s\n", tok, f)
+			}
 		}
 	}
 	if len(autoNameRecommendations) > 0 {
@@ -759,10 +785,18 @@ func pathParamsOf(op *rest.Operation) []string {
 // flattenedProps walks a $ref into an object schema and returns its
 // top-level properties, recursively flattening allOf composition.
 func flattenedProps(spec *rest.Spec, ref string) map[string]any {
+	props, _ := flattenedPropsRequired(spec, ref)
+	return props
+}
+
+// flattenedPropsRequired is flattenedProps plus the union of required-field
+// names encountered during the walk.
+func flattenedPropsRequired(spec *rest.Spec, ref string) (map[string]any, map[string]bool) {
 	if ref == "" {
-		return nil
+		return nil, nil
 	}
 	out := map[string]any{}
+	required := map[string]bool{}
 	visited := map[string]bool{}
 	var walk func(node map[string]any)
 	walk = func(node map[string]any) {
@@ -783,6 +817,13 @@ func flattenedProps(spec *rest.Spec, ref string) map[string]any {
 				}
 			}
 		}
+		if rr, ok := node["required"].([]any); ok {
+			for _, r := range rr {
+				if rs, ok := r.(string); ok {
+					required[rs] = true
+				}
+			}
+		}
 		if props, ok := node["properties"].(map[string]any); ok {
 			maps.Copy(out, props)
 		}
@@ -790,7 +831,58 @@ func flattenedProps(spec *rest.Spec, ref string) map[string]any {
 	if root, ok := spec.ResolveSchema(ref); ok {
 		walk(root)
 	}
-	return out
+	return out, required
+}
+
+// unmappedUpdateFields returns the update-op request-body fields (wire-side,
+// sorted) that no resource input can populate. The runtime's flat body
+// mapping silently omits them from PATCHes: a REQUIRED one means every
+// update fails upstream, an optional one is a server capability updates can
+// never exercise. Callers exempt updateEnvelope resources — their body is
+// hand-shaped from prior state and new inputs, not the flat mapping.
+func unmappedUpdateFields(spec *rest.Spec, ops derivedOps, renames map[string]string) (required, optional []string) {
+	upd := opOrNil(spec, ops.Update)
+	if upd == nil || ops.Update == ops.Create || upd.RequestRef == "" {
+		return nil, nil
+	}
+	inputs := map[string]bool{}
+	if cr := opOrNil(spec, ops.Create); cr != nil {
+		for wire := range flattenedProps(spec, cr.RequestRef) {
+			inputs[wireToPulumi(wire, renames)] = true
+		}
+	}
+	for _, opID := range []string{ops.Create, ops.Read, ops.Update, ops.Delete} {
+		for _, name := range pathParamsOf(opOrNil(spec, opID)) {
+			inputs[wireToPulumi(name, renames)] = true
+		}
+	}
+	props, requiredSet := flattenedPropsRequired(spec, upd.RequestRef)
+	for wire := range props {
+		if inputs[wireToPulumi(wire, renames)] {
+			continue
+		}
+		if requiredSet[wire] {
+			required = append(required, wire)
+		} else {
+			optional = append(optional, wire)
+		}
+	}
+	sort.Strings(required)
+	sort.Strings(optional)
+	return required, optional
+}
+
+// rawHasKey reports whether a raw JSON object contains key at the top level.
+func rawHasKey(raw json.RawMessage, key string) bool {
+	if len(raw) == 0 {
+		return false
+	}
+	var m map[string]json.RawMessage
+	if err := json.Unmarshal(raw, &m); err != nil {
+		return false
+	}
+	_, ok := m[key]
+	return ok
 }
 
 func responseHasField(spec *rest.Spec, op *rest.Operation, field string) bool {
