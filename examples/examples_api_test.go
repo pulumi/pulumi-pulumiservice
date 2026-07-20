@@ -122,8 +122,7 @@ var apiCases = []apiCase{
 		FullE2E: true,
 		// Rotate the environment tag value — exercises
 		// UpdateEnvironmentTag_esc_environments' currentTag/newTag envelope
-		// (updateEnvelope metadata) against the live backend. The flat body
-		// mapping used to PATCH {} here, failing every value change.
+		// (updateEnvelope metadata) against the live backend.
 		UpdateOverrides: func() map[string]string {
 			return map[string]string{"tagValue": "env-tag-rotated-" + generateRandomFiveDigits()}
 		},

@@ -5,9 +5,7 @@ resources:
       orgName: ${organizationName}
       project: ${projectName}
       name: testing-environment-${envSuffix}
-  # EnvironmentTag: user-defined key/value label on the environment. The
-  # test rotates ${tagValue} on a second Up to exercise the update PATCH's
-  # currentTag/newTag envelope against the live backend.
+  # EnvironmentTag: user-defined key/value label on the environment.
   environmentTag:
     type: pulumiservice:api/esc:EnvironmentTag
     properties:
@@ -29,6 +27,5 @@ outputs:
   # project, name) follow the program-owns-inputs / cloud-owns-outputs
   # disjointness; recover them from the slash-joined id if needed.
   environmentId: ${environment.id}
-  # Server-echoed tag value; the update test asserts it matches the
-  # rotated config to prove the PATCH landed (not just returned 2xx).
+  # Server-echoed tag value.
   environmentTagValue: ${environmentTag.value}

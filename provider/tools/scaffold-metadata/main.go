@@ -48,6 +48,8 @@ var pathParamPattern = regexp.MustCompile(`\{([^/{}]+)\}`)
 const (
 	typeArray    = "array"
 	typeString   = "string"
+	paramInPath  = "path"
+	paramInQuery = "query"
 	opCreate     = "create"
 	opRead       = "read"
 	opUpdate     = "update"
@@ -206,6 +208,7 @@ func main() {
 	added, updated := 0, 0
 	autoNameRecommendations := map[string]map[string]int{}
 	unmappedUpdates := map[string]unmappedFieldSet{}
+	brokenEnvelopes := map[string]error{}
 	for tok, ops := range candidates {
 		if excluded[tok] {
 			continue
@@ -230,11 +233,6 @@ func main() {
 		if rec := inferAutoNameRecommendations(parsedSpec, ops, renames); len(rec) > 0 {
 			autoNameRecommendations[tok] = rec
 		}
-		if d.UpdateEnvelope == nil && !rawHasKey(entry, "updateEnvelope") {
-			if reqU, optU := unmappedUpdateFields(parsedSpec, ops, renames); len(reqU)+len(optU) > 0 {
-				unmappedUpdates[tok] = unmappedFieldSet{required: reqU, optional: optU}
-			}
-		}
 		merged, changed, err := mergeOperations(entry, ops, d)
 		if err != nil {
 			fail("merge %s: %v", tok, err)
@@ -245,6 +243,24 @@ func main() {
 			updated++
 		}
 		doc.Resources[tok] = merged
+
+		// Post-merge audit against what actually landed: hand-pinned values
+		// win over derivations, so the merged entry — not d — decides which
+		// renames apply and whether an envelope covers the update body.
+		var rm rest.ResourceMeta
+		if err := json.Unmarshal(merged, &rm); err != nil {
+			fail("parse merged entry for %s: %v", tok, err)
+		}
+		if rm.UpdateEnvelope != nil {
+			if err := validateUpdateEnvelope(parsedSpec, ops, rm.UpdateEnvelope); err != nil {
+				brokenEnvelopes[tok] = err
+			}
+		} else {
+			reqU, optU := unmappedUpdateFields(parsedSpec, ops, rm.Renames, rm.OutputsExclude)
+			if len(reqU)+len(optU) > 0 {
+				unmappedUpdates[tok] = unmappedFieldSet{required: reqU, optional: optU}
+			}
+		}
 	}
 
 	// Attachment pass: any resource whose update op carries symmetric
@@ -331,18 +347,32 @@ func main() {
 	}
 	if len(unmappedUpdates) > 0 {
 		fmt.Fprintf(os.Stderr,
-			"  update-body fields no input can populate "+
-				"(omitted from PATCHes; REQUIRED ones break every update): %d resources\n",
+			"  optional update-body fields nothing can populate "+
+				"(silently omitted from PATCHes): %d resources\n",
 			len(unmappedUpdates))
 		for _, tok := range slices.Sorted(maps.Keys(unmappedUpdates)) {
-			u := unmappedUpdates[tok]
-			for _, f := range u.required {
-				fmt.Fprintf(os.Stderr, "    %s.%s (REQUIRED)\n", tok, f)
-			}
-			for _, f := range u.optional {
+			for _, f := range unmappedUpdates[tok].optional {
 				fmt.Fprintf(os.Stderr, "    %s.%s\n", tok, f)
 			}
 		}
+	}
+	// REQUIRED unmapped fields and drifted envelopes mean every update of
+	// the resource fails at runtime — refuse the regen rather than shipping
+	// the breakage behind a passing scaffold.
+	var fatal []string
+	for _, tok := range slices.Sorted(maps.Keys(brokenEnvelopes)) {
+		fatal = append(fatal, fmt.Sprintf("%s: %v", tok, brokenEnvelopes[tok]))
+	}
+	for _, tok := range slices.Sorted(maps.Keys(unmappedUpdates)) {
+		for _, f := range unmappedUpdates[tok].required {
+			fatal = append(fatal, fmt.Sprintf(
+				"%s.%s: REQUIRED update-body field nothing can populate — every update will fail; "+
+					"model the body (updateEnvelope, renames) or add the token to _excluded",
+				tok, f))
+		}
+	}
+	if len(fatal) > 0 {
+		fail("update-body modeling errors:\n  %s", strings.Join(fatal, "\n  "))
 	}
 	if len(autoNameRecommendations) > 0 {
 		fmt.Fprintf(os.Stderr,
@@ -475,17 +505,42 @@ func inferUpdateEnvelope(spec *rest.Spec, ops derivedOps) *rest.UpdateEnvelopeMe
 	if !isObjectProp(spec, props[currentField]) || !isObjectProp(spec, props[newField]) {
 		return nil
 	}
+	// Wrapper fields that are themselves create inputs are user-supplied
+	// values the flat mapping already sends verbatim; hand-shaping them from
+	// prior state would silently change the body. Decline.
+	if cr := opOrNil(spec, ops.Create); cr != nil {
+		createInputs := map[string]bool{}
+		for wire := range flattenedProps(spec, cr.RequestRef) {
+			createInputs[wire] = true
+		}
+		for _, p := range cr.Parameters {
+			if p.In == paramInPath || p.In == paramInQuery {
+				createInputs[p.Name] = true
+			}
+		}
+		if createInputs[currentField] || createInputs[newField] {
+			return nil
+		}
+	}
 	return &rest.UpdateEnvelopeMeta{CurrentField: currentField, NewField: newField}
 }
 
 // isObjectProp reports whether prop resolves to an object schema with at
-// least one property, via $ref or inline.
+// least one property, via $ref, allOf composition, or inline properties.
 func isObjectProp(spec *rest.Spec, prop any) bool {
-	if ref := refOf(prop); ref != "" {
-		return len(flattenedProps(spec, ref)) > 0
-	}
 	m, ok := prop.(map[string]any)
 	if !ok {
+		return false
+	}
+	if ref, _ := m["$ref"].(string); ref != "" {
+		return len(flattenedProps(spec, ref)) > 0
+	}
+	if all, ok := m["allOf"].([]any); ok {
+		for _, e := range all {
+			if isObjectProp(spec, e) {
+				return true
+			}
+		}
 		return false
 	}
 	props, ok := m["properties"].(map[string]any)
@@ -776,7 +831,7 @@ func pathParamsOf(op *rest.Operation) []string {
 	}
 	out := make([]string, 0, len(op.Parameters))
 	for _, p := range op.Parameters {
-		if p.In == "path" {
+		if p.In == paramInPath {
 			out = append(out, p.Name)
 		}
 	}
@@ -836,30 +891,22 @@ func flattenedPropsRequired(spec *rest.Spec, ref string) (map[string]any, map[st
 }
 
 // unmappedUpdateFields returns the update-op request-body fields (wire-side,
-// sorted) that no resource input can populate. The runtime's flat body
-// mapping silently omits them from PATCHes: a REQUIRED one means every
-// update fails upstream, an optional one is a server capability updates can
-// never exercise. Callers exempt updateEnvelope resources — their body is
+// sorted) that nothing can populate at runtime. The flat body mapping
+// silently omits them from PATCHes: a REQUIRED one means every update fails
+// upstream, an optional one is a server capability updates can never
+// exercise. Callers exempt updateEnvelope resources — their body is
 // hand-shaped from prior state and new inputs, not the flat mapping.
-func unmappedUpdateFields(spec *rest.Spec, ops derivedOps, renames map[string]string) (required, optional []string) {
+func unmappedUpdateFields(
+	spec *rest.Spec, ops derivedOps, renames map[string]string, outputsExclude []string,
+) (required, optional []string) {
 	upd := opOrNil(spec, ops.Update)
 	if upd == nil || ops.Update == ops.Create || upd.RequestRef == "" {
 		return nil, nil
 	}
-	inputs := map[string]bool{}
-	if cr := opOrNil(spec, ops.Create); cr != nil {
-		for wire := range flattenedProps(spec, cr.RequestRef) {
-			inputs[wireToPulumi(wire, renames)] = true
-		}
-	}
-	for _, opID := range []string{ops.Create, ops.Read, ops.Update, ops.Delete} {
-		for _, name := range pathParamsOf(opOrNil(spec, opID)) {
-			inputs[wireToPulumi(name, renames)] = true
-		}
-	}
+	surface := populatedInputSurface(spec, ops, renames, outputsExclude)
 	props, requiredSet := flattenedPropsRequired(spec, upd.RequestRef)
 	for wire := range props {
-		if inputs[wireToPulumi(wire, renames)] {
+		if surface[wireToPulumi(wire, renames)] {
 			continue
 		}
 		if requiredSet[wire] {
@@ -873,17 +920,76 @@ func unmappedUpdateFields(spec *rest.Spec, ops derivedOps, renames map[string]st
 	return required, optional
 }
 
-// rawHasKey reports whether a raw JSON object contains key at the top level.
-func rawHasKey(raw json.RawMessage, key string) bool {
-	if len(raw) == 0 {
-		return false
+// populatedInputSurface approximates the runtime's update-body population
+// sources (bodySrc = inputs ∪ prior state, resource.go Update): create-body
+// fields and path/query params become schema inputs, and read-response
+// fields land in state, so a same-named update-body field is filled from any
+// of them. Pulumi-side names throughout.
+func populatedInputSurface(
+	spec *rest.Spec, ops derivedOps, renames map[string]string, outputsExclude []string,
+) map[string]bool {
+	surface := map[string]bool{}
+	if cr := opOrNil(spec, ops.Create); cr != nil {
+		for wire := range flattenedProps(spec, cr.RequestRef) {
+			surface[wireToPulumi(wire, renames)] = true
+		}
 	}
-	var m map[string]json.RawMessage
-	if err := json.Unmarshal(raw, &m); err != nil {
-		return false
+	for _, opID := range []string{ops.Create, ops.Read, ops.Update, ops.Delete} {
+		op := opOrNil(spec, opID)
+		if op == nil {
+			continue
+		}
+		for _, p := range op.Parameters {
+			if p.In == paramInPath || p.In == paramInQuery {
+				surface[wireToPulumi(p.Name, renames)] = true
+			}
+		}
 	}
-	_, ok := m[key]
-	return ok
+	excluded := map[string]bool{}
+	for _, e := range outputsExclude {
+		excluded[e] = true
+	}
+	if rd := opOrNil(spec, ops.Read); rd != nil {
+		for wire := range flattenedProps(spec, rd.ResponseRef) {
+			pul := wireToPulumi(wire, renames)
+			if !excluded[pul] && !excluded[wire] {
+				surface[pul] = true
+			}
+		}
+	}
+	return surface
+}
+
+// validateUpdateEnvelope mirrors the runtime's buildEnvelopeBody checks at
+// regen time: a pinned or previously-derived envelope that no longer matches
+// the spec means every update of that resource fails, so surface the drift
+// here instead of at the first live update.
+func validateUpdateEnvelope(spec *rest.Spec, ops derivedOps, env *rest.UpdateEnvelopeMeta) error {
+	upd := opOrNil(spec, ops.Update)
+	if upd == nil || upd.RequestRef == "" {
+		return fmt.Errorf("updateEnvelope declared but the update op has no request body")
+	}
+	if env.CurrentField == "" || env.NewField == "" || env.CurrentField == env.NewField {
+		return fmt.Errorf("updateEnvelope must name two distinct fields (currentField=%q, newField=%q)",
+			env.CurrentField, env.NewField)
+	}
+	props := flattenedProps(spec, upd.RequestRef)
+	for _, f := range []string{env.CurrentField, env.NewField} {
+		if !isObjectProp(spec, props[f]) {
+			return fmt.Errorf("updateEnvelope field %q is missing from the update request body or is not an object", f)
+		}
+	}
+	var siblings []string
+	for name := range props {
+		if name != env.CurrentField && name != env.NewField {
+			siblings = append(siblings, name)
+		}
+	}
+	if len(siblings) > 0 {
+		sort.Strings(siblings)
+		return fmt.Errorf("update request body has fields outside the declared envelope: %v", siblings)
+	}
+	return nil
 }
 
 func responseHasField(spec *rest.Spec, op *rest.Operation, field string) bool {
