@@ -331,7 +331,8 @@ func main() {
 	}
 	if len(unmappedUpdates) > 0 {
 		fmt.Fprintf(os.Stderr,
-			"  update-body fields no input can populate (omitted from PATCHes; REQUIRED ones break every update): %d resources\n",
+			"  update-body fields no input can populate "+
+				"(omitted from PATCHes; REQUIRED ones break every update): %d resources\n",
 			len(unmappedUpdates))
 		for _, tok := range slices.Sorted(maps.Keys(unmappedUpdates)) {
 			u := unmappedUpdates[tok]

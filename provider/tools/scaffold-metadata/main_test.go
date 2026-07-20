@@ -87,6 +87,12 @@ func TestMergeAttachmentPreservesPinnedIDFormat(t *testing.T) {
 	}
 }
 
+const (
+	updateEnvelopeThingOp = "UpdateEnvelopeThing"
+	updateThingUnionOp    = "UpdateThingUnion"
+	createThingOpID       = "CreateThing"
+)
+
 // TestInferUpdateEnvelope pins the current<Stem>/new<Stem> detection rule:
 // exactly two object-typed request properties with a shared stem. Anything
 // looser would mis-tag ordinary two-field update bodies, anything stricter
@@ -96,17 +102,53 @@ func TestInferUpdateEnvelope(t *testing.T) {
 	  "openapi": "3.0.0",
 	  "components": {"schemas": {
 	    "CurrentTag": {"type": "object", "properties": {"value": {"type": "string"}}},
-	    "NewTag":     {"type": "object", "properties": {"name": {"type": "string"}, "value": {"type": "string"}}},
-	    "Envelope":       {"type": "object", "properties": {"currentTag": {"$ref": "#/components/schemas/CurrentTag"}, "newTag": {"$ref": "#/components/schemas/NewTag"}}},
-	    "StemMismatch":   {"type": "object", "properties": {"currentTag": {"$ref": "#/components/schemas/CurrentTag"}, "newThing": {"$ref": "#/components/schemas/NewTag"}}},
-	    "ThreeFields":    {"type": "object", "properties": {"currentTag": {"$ref": "#/components/schemas/CurrentTag"}, "newTag": {"$ref": "#/components/schemas/NewTag"}, "extra": {"type": "string"}}},
-	    "ScalarWrappers": {"type": "object", "properties": {"currentTag": {"type": "string"}, "newTag": {"type": "string"}}}
+	    "NewTag": {"type": "object", "properties": {
+	      "name":  {"type": "string"},
+	      "value": {"type": "string"}
+	    }},
+	    "Envelope": {"type": "object", "properties": {
+	      "currentTag": {"$ref": "#/components/schemas/CurrentTag"},
+	      "newTag":     {"$ref": "#/components/schemas/NewTag"}
+	    }},
+	    "StemMismatch": {"type": "object", "properties": {
+	      "currentTag": {"$ref": "#/components/schemas/CurrentTag"},
+	      "newThing":   {"$ref": "#/components/schemas/NewTag"}
+	    }},
+	    "ThreeFields": {"type": "object", "properties": {
+	      "currentTag": {"$ref": "#/components/schemas/CurrentTag"},
+	      "newTag":     {"$ref": "#/components/schemas/NewTag"},
+	      "extra":      {"type": "string"}
+	    }},
+	    "ScalarWrappers": {"type": "object", "properties": {
+	      "currentTag": {"type": "string"},
+	      "newTag":     {"type": "string"}
+	    }}
 	  }},
 	  "paths": {
-	    "/things/{id}":        {"patch": {"operationId": "UpdateEnvelopeThing", "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "string"}}], "requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Envelope"}}}}, "responses": {"204": {}}}},
-	    "/mismatch/{id}":      {"patch": {"operationId": "UpdateStemMismatch", "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "string"}}], "requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/StemMismatch"}}}}, "responses": {"204": {}}}},
-	    "/three/{id}":         {"patch": {"operationId": "UpdateThreeFields", "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "string"}}], "requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/ThreeFields"}}}}, "responses": {"204": {}}}},
-	    "/scalars/{id}":       {"patch": {"operationId": "UpdateScalarWrappers", "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "string"}}], "requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/ScalarWrappers"}}}}, "responses": {"204": {}}}}
+	    "/things/{id}": {"patch": {
+	      "operationId": "UpdateEnvelopeThing",
+	      "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "string"}}],
+	      "requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Envelope"}}}},
+	      "responses": {"204": {}}
+	    }},
+	    "/mismatch/{id}": {"patch": {
+	      "operationId": "UpdateStemMismatch",
+	      "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "string"}}],
+	      "requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/StemMismatch"}}}},
+	      "responses": {"204": {}}
+	    }},
+	    "/three/{id}": {"patch": {
+	      "operationId": "UpdateThreeFields",
+	      "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "string"}}],
+	      "requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/ThreeFields"}}}},
+	      "responses": {"204": {}}
+	    }},
+	    "/scalars/{id}": {"patch": {
+	      "operationId": "UpdateScalarWrappers",
+	      "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "string"}}],
+	      "requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/ScalarWrappers"}}}},
+	      "responses": {"204": {}}
+	    }}
 	  }
 	}`
 	spec, err := rest.ParseSpec([]byte(specJSON))
@@ -119,13 +161,13 @@ func TestInferUpdateEnvelope(t *testing.T) {
 		ops  derivedOps
 		want *rest.UpdateEnvelopeMeta
 	}{
-		{"detected", derivedOps{Create: "C", Update: "UpdateEnvelopeThing"},
+		{"detected", derivedOps{Create: "C", Update: updateEnvelopeThingOp},
 			&rest.UpdateEnvelopeMeta{CurrentField: "currentTag", NewField: "newTag"}},
 		{"stem mismatch", derivedOps{Create: "C", Update: "UpdateStemMismatch"}, nil},
 		{"three fields", derivedOps{Create: "C", Update: "UpdateThreeFields"}, nil},
 		{"scalar wrappers", derivedOps{Create: "C", Update: "UpdateScalarWrappers"}, nil},
 		{"no update op", derivedOps{Create: "C"}, nil},
-		{"create==update (upsert)", derivedOps{Create: "UpdateEnvelopeThing", Update: "UpdateEnvelopeThing"}, nil},
+		{"create==update (upsert)", derivedOps{Create: updateEnvelopeThingOp, Update: updateEnvelopeThingOp}, nil},
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
@@ -146,18 +188,44 @@ func TestUnmappedUpdateFields(t *testing.T) {
 	const specJSON = `{
 	  "openapi": "3.0.0",
 	  "components": {"schemas": {
-	    "CreateThing": {"type": "object", "properties": {"name": {"type": "string"}, "displayName": {"type": "string"}}},
-	    "ActionUnion": {"type": "object", "properties": {"newDisplayName": {"type": "string"}, "memberAction": {"type": "string"}, "token": {"type": "string"}}, "required": ["token"]},
-	    "FlatPatch":   {"type": "object", "properties": {"displayName": {"type": "string"}}}
+	    "CreateThing": {"type": "object", "properties": {
+	      "name":        {"type": "string"},
+	      "displayName": {"type": "string"}
+	    }},
+	    "ActionUnion": {"type": "object", "properties": {
+	      "newDisplayName": {"type": "string"},
+	      "memberAction":   {"type": "string"},
+	      "token":          {"type": "string"}
+	    }, "required": ["token"]},
+	    "FlatPatch": {"type": "object", "properties": {"displayName": {"type": "string"}}}
 	  }},
 	  "paths": {
 	    "/things/{org}/{thingName}": {
-	      "post":  {"operationId": "CreateThing", "parameters": [{"name": "org", "in": "path", "required": true, "schema": {"type": "string"}}, {"name": "thingName", "in": "path", "required": true, "schema": {"type": "string"}}], "requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/CreateThing"}}}}, "responses": {"204": {}}},
-	      "patch": {"operationId": "UpdateThingUnion", "parameters": [{"name": "org", "in": "path", "required": true, "schema": {"type": "string"}}, {"name": "thingName", "in": "path", "required": true, "schema": {"type": "string"}}], "requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/ActionUnion"}}}}, "responses": {"204": {}}}
+	      "post": {
+	        "operationId": "CreateThing",
+	        "parameters": [
+	          {"name": "org",       "in": "path", "required": true, "schema": {"type": "string"}},
+	          {"name": "thingName", "in": "path", "required": true, "schema": {"type": "string"}}
+	        ],
+	        "requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/CreateThing"}}}},
+	        "responses": {"204": {}}
+	      },
+	      "patch": {
+	        "operationId": "UpdateThingUnion",
+	        "parameters": [
+	          {"name": "org",       "in": "path", "required": true, "schema": {"type": "string"}},
+	          {"name": "thingName", "in": "path", "required": true, "schema": {"type": "string"}}
+	        ],
+	        "requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/ActionUnion"}}}},
+	        "responses": {"204": {}}
+	      }
 	    },
-	    "/flat/{org}": {
-	      "patch": {"operationId": "UpdateThingFlat", "parameters": [{"name": "org", "in": "path", "required": true, "schema": {"type": "string"}}], "requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/FlatPatch"}}}}, "responses": {"204": {}}}
-	    }
+	    "/flat/{org}": {"patch": {
+	      "operationId": "UpdateThingFlat",
+	      "parameters": [{"name": "org", "in": "path", "required": true, "schema": {"type": "string"}}],
+	      "requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/FlatPatch"}}}},
+	      "responses": {"204": {}}
+	    }}
 	  }
 	}`
 	spec, err := rest.ParseSpec([]byte(specJSON))
@@ -166,7 +234,9 @@ func TestUnmappedUpdateFields(t *testing.T) {
 	}
 
 	// Action-union update body: every field unmapped, "token" required.
-	req, opt := unmappedUpdateFields(spec, derivedOps{Create: "CreateThing", Update: "UpdateThingUnion"}, map[string]string{"name": "thingName"})
+	req, opt := unmappedUpdateFields(spec,
+		derivedOps{Create: createThingOpID, Update: updateThingUnionOp},
+		map[string]string{"name": "thingName"})
 	if len(req) != 1 || req[0] != "token" {
 		t.Errorf("required = %v, want [token]", req)
 	}
@@ -175,13 +245,13 @@ func TestUnmappedUpdateFields(t *testing.T) {
 	}
 
 	// Flat update body whose fields all map to inputs: nothing to report.
-	req, opt = unmappedUpdateFields(spec, derivedOps{Create: "CreateThing", Update: "UpdateThingFlat"}, nil)
+	req, opt = unmappedUpdateFields(spec, derivedOps{Create: createThingOpID, Update: "UpdateThingFlat"}, nil)
 	if len(req)+len(opt) != 0 {
 		t.Errorf("flat body: required=%v optional=%v, want none", req, opt)
 	}
 
 	// Upsert-shaped (create == update) resources are exempt.
-	req, opt = unmappedUpdateFields(spec, derivedOps{Create: "UpdateThingUnion", Update: "UpdateThingUnion"}, nil)
+	req, opt = unmappedUpdateFields(spec, derivedOps{Create: updateThingUnionOp, Update: updateThingUnionOp}, nil)
 	if len(req)+len(opt) != 0 {
 		t.Errorf("upsert: required=%v optional=%v, want none", req, opt)
 	}

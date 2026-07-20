@@ -68,6 +68,11 @@ const (
 	fooVal               = "foo"
 	thing1ID             = "thing-1"
 	createdKey           = "created"
+	envNameKey           = "envName"
+	myprojVal            = "myproj"
+	ownerVal             = "owner"
+	teamXVal             = "team-x"
+	teamYVal             = "team-y"
 )
 
 // mockTransport serves canned responses keyed by "<METHOD> <path>". Set
@@ -180,10 +185,10 @@ func TestCreateSynthesizesID(t *testing.T) {
 			},
 			inputs: map[string]any{
 				orgNameKey:    testOrgName,
-				"projectName": "myproj",
+				"projectName": myprojVal,
 				"stackName":   "mystack",
-				nameKey:       "owner", // body field; rename name→tagName for path
-				valueKey:      "team-x",
+				nameKey:       ownerVal, // body field; rename name→tagName for path
+				valueKey:      teamXVal,
 			},
 			wantID: "test-org/myproj/mystack/owner",
 		},
@@ -1475,17 +1480,17 @@ func TestUpdateEnvelopeSendsCurrentAndNewBody(t *testing.T) {
 
 	prior := propMap(map[string]any{
 		orgNameKey:    testOrgName,
-		"projectName": "myproj",
-		"envName":     "myenv",
-		nameKey:       "owner",
-		valueKey:      "team-x",
+		"projectName": myprojVal,
+		envNameKey:    "myenv",
+		nameKey:       ownerVal,
+		valueKey:      teamXVal,
 	})
 	inputs := propMap(map[string]any{
 		orgNameKey:    testOrgName,
-		"projectName": "myproj",
-		"envName":     "myenv",
-		nameKey:       "owner",
-		valueKey:      "team-y",
+		"projectName": myprojVal,
+		envNameKey:    "myenv",
+		nameKey:       ownerVal,
+		valueKey:      teamYVal,
 	})
 
 	if _, err := r.Update(ctx, p.UpdateRequest{
@@ -1506,8 +1511,8 @@ func TestUpdateEnvelopeSendsCurrentAndNewBody(t *testing.T) {
 		t.Fatalf("unmarshal PATCH body %q: %v", patchBody, err)
 	}
 	want := map[string]any{
-		"currentTag": map[string]any{valueKey: "team-x"},
-		"newTag":     map[string]any{nameKey: "owner", valueKey: "team-y"},
+		"currentTag": map[string]any{valueKey: teamXVal},
+		"newTag":     map[string]any{nameKey: ownerVal, valueKey: teamYVal},
 	}
 	if !reflect.DeepEqual(got, want) {
 		t.Errorf("PATCH body = %s, want %v", patchBody, want)
@@ -1525,10 +1530,10 @@ func TestUpdateEnvelopeUnknownFieldErrors(t *testing.T) {
 	ctx := WithTransport(t.Context(), &mockTransport{})
 	src := propMap(map[string]any{
 		orgNameKey:    testOrgName,
-		"projectName": "myproj",
-		"envName":     "myenv",
-		nameKey:       "owner",
-		valueKey:      "team-y",
+		"projectName": myprojVal,
+		envNameKey:    "myenv",
+		nameKey:       ownerVal,
+		valueKey:      teamYVal,
 	})
 	_, err := r.Update(ctx, p.UpdateRequest{
 		ID:        "test-org/myproj/myenv/owner",
