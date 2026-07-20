@@ -243,24 +243,7 @@ func main() {
 			updated++
 		}
 		doc.Resources[tok] = merged
-
-		// Post-merge audit against what actually landed: hand-pinned values
-		// win over derivations, so the merged entry — not d — decides which
-		// renames apply and whether an envelope covers the update body.
-		var rm rest.ResourceMeta
-		if err := json.Unmarshal(merged, &rm); err != nil {
-			fail("parse merged entry for %s: %v", tok, err)
-		}
-		if rm.UpdateEnvelope != nil {
-			if err := validateUpdateEnvelope(parsedSpec, ops, rm.UpdateEnvelope); err != nil {
-				brokenEnvelopes[tok] = err
-			}
-		} else {
-			reqU, optU := unmappedUpdateFields(parsedSpec, ops, rm.Renames, rm.OutputsExclude)
-			if len(reqU)+len(optU) > 0 {
-				unmappedUpdates[tok] = unmappedFieldSet{required: reqU, optional: optU}
-			}
-		}
+		auditUpdateBody(parsedSpec, ops, tok, merged, unmappedUpdates, brokenEnvelopes)
 	}
 
 	// Attachment pass: any resource whose update op carries symmetric
@@ -345,35 +328,7 @@ func main() {
 			fmt.Fprintf(os.Stderr, "    %s\n", o)
 		}
 	}
-	if len(unmappedUpdates) > 0 {
-		fmt.Fprintf(os.Stderr,
-			"  optional update-body fields nothing can populate "+
-				"(silently omitted from PATCHes): %d resources\n",
-			len(unmappedUpdates))
-		for _, tok := range slices.Sorted(maps.Keys(unmappedUpdates)) {
-			for _, f := range unmappedUpdates[tok].optional {
-				fmt.Fprintf(os.Stderr, "    %s.%s\n", tok, f)
-			}
-		}
-	}
-	// REQUIRED unmapped fields and drifted envelopes mean every update of
-	// the resource fails at runtime — refuse the regen rather than shipping
-	// the breakage behind a passing scaffold.
-	var fatal []string
-	for _, tok := range slices.Sorted(maps.Keys(brokenEnvelopes)) {
-		fatal = append(fatal, fmt.Sprintf("%s: %v", tok, brokenEnvelopes[tok]))
-	}
-	for _, tok := range slices.Sorted(maps.Keys(unmappedUpdates)) {
-		for _, f := range unmappedUpdates[tok].required {
-			fatal = append(fatal, fmt.Sprintf(
-				"%s.%s: REQUIRED update-body field nothing can populate — every update will fail; "+
-					"model the body (updateEnvelope, renames) or add the token to _excluded",
-				tok, f))
-		}
-	}
-	if len(fatal) > 0 {
-		fail("update-body modeling errors:\n  %s", strings.Join(fatal, "\n  "))
-	}
+	reportUpdateBodyAudit(unmappedUpdates, brokenEnvelopes)
 	if len(autoNameRecommendations) > 0 {
 		fmt.Fprintf(os.Stderr,
 			"  autoName candidates (maxLength from spec; opt in by hand-setting fields[<name>].autoName): %d\n",
@@ -888,6 +843,63 @@ func flattenedPropsRequired(spec *rest.Spec, ref string) (map[string]any, map[st
 		walk(root)
 	}
 	return out, required
+}
+
+// auditUpdateBody checks one resource's update-body modeling and records the
+// findings for reportUpdateBodyAudit. It runs against the merged entry — not
+// the fresh derivations — because hand-pinned envelopes and renames win over
+// inference: a declared envelope is validated against the spec, and anything
+// else has its flat-mapping coverage measured by unmappedUpdateFields.
+func auditUpdateBody(
+	spec *rest.Spec, ops derivedOps, tok string, merged json.RawMessage,
+	unmapped map[string]unmappedFieldSet, broken map[string]error,
+) {
+	var rm rest.ResourceMeta
+	if err := json.Unmarshal(merged, &rm); err != nil {
+		fail("parse merged entry for %s: %v", tok, err)
+	}
+	if rm.UpdateEnvelope != nil {
+		if err := validateUpdateEnvelope(spec, ops, rm.UpdateEnvelope); err != nil {
+			broken[tok] = err
+		}
+		return
+	}
+	if reqU, optU := unmappedUpdateFields(spec, ops, rm.Renames, rm.OutputsExclude); len(reqU)+len(optU) > 0 {
+		unmapped[tok] = unmappedFieldSet{required: reqU, optional: optU}
+	}
+}
+
+// reportUpdateBodyAudit prints the optional coverage gaps and refuses the
+// regen on REQUIRED unmapped fields or drifted envelopes — either means
+// every update of the resource fails at runtime, so it must not ship behind
+// a passing scaffold.
+func reportUpdateBodyAudit(unmapped map[string]unmappedFieldSet, broken map[string]error) {
+	if len(unmapped) > 0 {
+		fmt.Fprintf(os.Stderr,
+			"  optional update-body fields nothing can populate "+
+				"(silently omitted from PATCHes): %d resources\n",
+			len(unmapped))
+		for _, tok := range slices.Sorted(maps.Keys(unmapped)) {
+			for _, f := range unmapped[tok].optional {
+				fmt.Fprintf(os.Stderr, "    %s.%s\n", tok, f)
+			}
+		}
+	}
+	var fatal []string
+	for _, tok := range slices.Sorted(maps.Keys(broken)) {
+		fatal = append(fatal, fmt.Sprintf("%s: %v", tok, broken[tok]))
+	}
+	for _, tok := range slices.Sorted(maps.Keys(unmapped)) {
+		for _, f := range unmapped[tok].required {
+			fatal = append(fatal, fmt.Sprintf(
+				"%s.%s: REQUIRED update-body field nothing can populate — every update will fail; "+
+					"model the body (updateEnvelope, renames) or add the token to _excluded",
+				tok, f))
+		}
+	}
+	if len(fatal) > 0 {
+		fail("update-body modeling errors:\n  %s", strings.Join(fatal, "\n  "))
+	}
 }
 
 // unmappedUpdateFields returns the update-op request-body fields (wire-side,
