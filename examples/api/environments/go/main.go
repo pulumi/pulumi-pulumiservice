@@ -21,6 +21,10 @@ func main() {
 		if envSuffix == "" {
 			envSuffix = "dev"
 		}
+		tagValue := cfg.Get("tagValue")
+		if tagValue == "" {
+			tagValue = "env-tag-initial"
+		}
 
 		environment, err := esc.NewEnvironment(ctx, "environment", &esc.EnvironmentArgs{
 			OrgName: pulumi.String(organizationName),
@@ -31,7 +35,19 @@ func main() {
 			return err
 		}
 
+		environmentTag, err := esc.NewEnvironmentTag(ctx, "environmentTag", &esc.EnvironmentTagArgs{
+			OrgName:     pulumi.String(organizationName),
+			ProjectName: pulumi.String(projectName),
+			EnvName:     pulumi.String("testing-environment-" + envSuffix),
+			Name:        pulumi.String("purpose"),
+			Value:       pulumi.String(tagValue),
+		}, pulumi.DependsOn([]pulumi.Resource{environment}))
+		if err != nil {
+			return err
+		}
+
 		ctx.Export("environmentId", environment.ID())
+		ctx.Export("environmentTagValue", environmentTag.Value)
 		return nil
 	})
 }
