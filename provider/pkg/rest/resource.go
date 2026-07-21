@@ -934,7 +934,11 @@ func mapBodyProps(props map[string]any, src property.Map, renames map[string]str
 // execEnvelopeUpdate mirrors execAndDecodeSplit for update ops declared with
 // UpdateEnvelopeMeta (see that type's doc for the rationale).
 func (r *Resource) execEnvelopeUpdate(
-	ctx context.Context, op *Operation, urlSrc, currentSrc, newSrc property.Map,
+	ctx context.Context,
+	op *Operation,
+	urlSrc property.Map,
+	currentSrc property.Map,
+	newSrc property.Map,
 ) ([]byte, property.Map, error) {
 	if !needsBody(op.Method) {
 		return nil, property.Map{}, fmt.Errorf("rest: updateEnvelope on %s: %s requests carry no body", op.ID, op.Method)

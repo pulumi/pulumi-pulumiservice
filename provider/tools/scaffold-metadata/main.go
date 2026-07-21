@@ -455,9 +455,11 @@ func inferUpdateEnvelope(spec *rest.Spec, ops derivedOps) *rest.UpdateEnvelopeMe
 	var currentField, currentStem, newField, newStem string
 	for name := range props {
 		if stem, ok := attachmentStem(name, "current"); ok {
-			currentField, currentStem = name, stem
+			currentField = name
+			currentStem = stem
 		} else if stem, ok := attachmentStem(name, "new"); ok {
-			newField, newStem = name, stem
+			newField = name
+			newStem = stem
 		}
 	}
 	if currentField == "" || newField == "" || currentStem != newStem {
@@ -857,8 +859,12 @@ func flattenedPropsRequired(spec *rest.Spec, ref string) (map[string]any, map[st
 // inference: a declared envelope is validated against the spec, and anything
 // else has its flat-mapping coverage measured by unmappedUpdateFields.
 func auditUpdateBody(
-	spec *rest.Spec, ops derivedOps, tok string, merged json.RawMessage,
-	unmapped map[string]unmappedFieldSet, broken map[string]error,
+	spec *rest.Spec,
+	ops derivedOps,
+	tok string,
+	merged json.RawMessage,
+	unmapped map[string]unmappedFieldSet,
+	broken map[string]error,
 ) {
 	var rm rest.ResourceMeta
 	if err := json.Unmarshal(merged, &rm); err != nil {
@@ -922,7 +928,10 @@ func reportUpdateBodyAudit(unmapped map[string]unmappedFieldSet, broken map[stri
 // exercise. Callers exempt updateEnvelope resources — their body is
 // hand-shaped from prior state and new inputs, not the flat mapping.
 func unmappedUpdateFields(
-	spec *rest.Spec, ops derivedOps, renames map[string]string, outputsExclude []string,
+	spec *rest.Spec,
+	ops derivedOps,
+	renames map[string]string,
+	outputsExclude []string,
 ) (required, optional []string) {
 	upd := opOrNil(spec, ops.Update)
 	if upd == nil || ops.Update == ops.Create || upd.RequestRef == "" {
@@ -952,7 +961,10 @@ func unmappedUpdateFields(
 // mergePathParamsAsInputs — and read-response fields land in state.
 // Pulumi-side names throughout.
 func populatedInputSurface(
-	spec *rest.Spec, ops derivedOps, renames map[string]string, outputsExclude []string,
+	spec *rest.Spec,
+	ops derivedOps,
+	renames map[string]string,
+	outputsExclude []string,
 ) map[string]bool {
 	surface := map[string]bool{}
 	if cr := opOrNil(spec, ops.Create); cr != nil {
@@ -1025,8 +1037,11 @@ func wrapperPropsRequired(spec *rest.Spec, prop any) (map[string]any, map[string
 // the spec means every update of that resource fails, so surface the drift
 // here instead of at the first live update.
 func validateUpdateEnvelope(
-	spec *rest.Spec, ops derivedOps, env *rest.UpdateEnvelopeMeta,
-	renames map[string]string, outputsExclude []string,
+	spec *rest.Spec,
+	ops derivedOps,
+	env *rest.UpdateEnvelopeMeta,
+	renames map[string]string,
+	outputsExclude []string,
 ) error {
 	upd := opOrNil(spec, ops.Update)
 	if upd == nil || upd.RequestRef == "" {
