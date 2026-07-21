@@ -1,6 +1,6 @@
 {
   "package": "pulumiservice",
-  "_note": "Single source of truth for api resource metadata. operations/idFormat/renames/outputsExclude/token/requireImport are derived from spec.json by `go run ./tools/scaffold-metadata` (run via `go generate ./pkg/cloud/...`); module aliases live in the scaffolder source. Hand-curate examples/description/aliases/fields and they round-trip through regen. Add tokens to `_excluded` to keep the scaffolder from re-deriving them.",
+  "_note": "Single source of truth for api resource metadata. operations/idFormat/renames/outputsExclude/token/requireImport/updateEnvelope are derived from spec.json by `go run ./tools/scaffold-metadata` (run via `go generate ./pkg/cloud/...`); module aliases live in the scaffolder source. Hand-curate examples/description/aliases/fields and they round-trip through regen. Add tokens to `_excluded` to keep the scaffolder from re-deriving them.",
   "_excluded": [
     "pulumiservice:api:Environment_preview_environments",
     "pulumiservice:api:EnvironmentTag_preview_environments",
@@ -180,7 +180,11 @@
       "renames": {
         "name": "tagName"
       },
-      "token": "pulumiservice:api/esc:EnvironmentTag"
+      "token": "pulumiservice:api/esc:EnvironmentTag",
+      "updateEnvelope": {
+        "currentField": "currentTag",
+        "newField": "newTag"
+      }
     },
     "pulumiservice:api:Environment_esc_environments": {
       "deleteBeforeReplace": true,

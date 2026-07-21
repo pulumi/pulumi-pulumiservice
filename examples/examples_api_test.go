@@ -38,6 +38,7 @@ import (
 	"github.com/pulumi/providertest/pulumitest/assertpreview"
 	"github.com/pulumi/providertest/pulumitest/assertrefresh"
 	"github.com/pulumi/providertest/pulumitest/opttest"
+	"github.com/pulumi/pulumi/sdk/v3/go/auto"
 )
 
 // apiCase describes how to exercise one example.
@@ -55,6 +56,12 @@ type apiCase struct {
 	// resource needs a multi-step update flow, write a dedicated test.
 	// Only consulted on the yaml lane (where FullE2E runs).
 	UpdateOverrides func() map[string]string
+	// AssertAfterUpdate, when set alongside UpdateOverrides, runs after the
+	// follow-up Up with its result and the applied overrides. Use it to
+	// assert the update actually landed (e.g. a rotated value echoed back
+	// through stack outputs) — a 2xx PATCH that silently no-ops passes the
+	// preview/refresh gates, so success alone proves nothing.
+	AssertAfterUpdate func(t *testing.T, up auto.UpResult, overrides map[string]string)
 	// FullE2E runs up + preview-no-changes + refresh + destroy on the yaml
 	// lane only. Other lanes always run preview-only.
 	FullE2E bool
@@ -113,6 +120,21 @@ var apiCases = []apiCase{
 		Name:    "environments",
 		Config:  environmentsConfig,
 		FullE2E: true,
+		// Rotate the environment tag value — exercises
+		// UpdateEnvironmentTag_esc_environments' currentTag/newTag envelope
+		// (updateEnvelope metadata) against the live backend.
+		UpdateOverrides: func() map[string]string {
+			return map[string]string{"tagValue": "env-tag-rotated-" + generateRandomFiveDigits()}
+		},
+		AssertAfterUpdate: func(t *testing.T, up auto.UpResult, overrides map[string]string) {
+			got, ok := up.Outputs["environmentTagValue"]
+			if !ok {
+				t.Fatal("environmentTagValue missing from stack outputs")
+			}
+			if got.Value != overrides["tagValue"] {
+				t.Errorf("environmentTagValue = %v, want %v — tag PATCH did not land", got.Value, overrides["tagValue"])
+			}
+		},
 	},
 	{
 		Name:    "approval-rules",
@@ -408,10 +430,14 @@ func runApiCase(t *testing.T, ex apiCase, lang string) {
 	// patches the backend; without it, FullE2E only proves Create works.
 	test.Up(t)
 	if ex.UpdateOverrides != nil {
-		for k, v := range ex.UpdateOverrides() {
+		overrides := ex.UpdateOverrides()
+		for k, v := range overrides {
 			test.SetConfig(t, k, v)
 		}
-		test.Up(t)
+		upResult := test.Up(t)
+		if ex.AssertAfterUpdate != nil {
+			ex.AssertAfterUpdate(t, upResult, overrides)
+		}
 	}
 	previewResult := test.Preview(t)
 	assertpreview.HasNoChanges(t, previewResult)
@@ -804,6 +830,7 @@ func environmentsConfig() map[string]string {
 		"organizationName": ServiceProviderTestOrg,
 		"projectName":      "api-envs-" + suffix,
 		"envSuffix":        suffix,
+		"tagValue":         "env-tag-initial",
 	}
 }
 

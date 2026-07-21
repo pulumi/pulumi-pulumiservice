@@ -255,9 +255,9 @@ func buildAttachmentResource(spec *Spec, rm ResourceMeta) (*schema.ResourceSpec,
 		}
 		edgeRequired = am.MatchKey
 	} else {
-		ep, er, e := attachmentEdgeSchema(spec, mut, am.AddField)
+		ep, er, e := requestBodyFieldSchema(spec, mut, am.AddField)
 		if e != nil {
-			return nil, e
+			return nil, fmt.Errorf("attachment edge: %w", e)
 		}
 		edgeProps, edgeRequired = ep, er
 	}
@@ -344,40 +344,29 @@ func attachmentMembershipIsScalar(spec *Spec, am *AttachmentMeta) bool {
 	return t != "" && t != "object"
 }
 
-// attachmentEdgeSchema returns the properties and required fields of the edge:
-// the AddField in the mutation op's request body, dereferenced if it's a $ref
-// (the common case, e.g. addStack → AppPulumiStackReference).
-func attachmentEdgeSchema(spec *Spec, mut *Operation, addField string) (map[string]any, []string, error) {
-	bodyProps, _, err := flattenObjectSchema(spec, mut.RequestRef)
+// requestBodyFieldSchema returns the properties and required fields of one
+// named object field in op's request body — an attachment edge (addStack →
+// AppPulumiStackReference) or an update-envelope wrapper (currentTag/newTag).
+// The field may be a bare $ref, an allOf composition, or inline properties;
+// flattenSchemaNode handles all three uniformly.
+func requestBodyFieldSchema(spec *Spec, op *Operation, field string) (map[string]any, []string, error) {
+	bodyProps, _, err := flattenObjectSchema(spec, op.RequestRef)
 	if err != nil {
-		return nil, nil, fmt.Errorf("attachment edge: request body: %w", err)
+		return nil, nil, fmt.Errorf("request body for %s: %w", op.ID, err)
 	}
-	raw, ok := bodyProps[addField]
+	raw, ok := bodyProps[field]
 	if !ok {
-		return nil, nil, fmt.Errorf("attachment edge: addField %q not in %s request body", addField, mut.ID)
+		return nil, nil, fmt.Errorf("field %q not in %s request body", field, op.ID)
 	}
 	fieldMap, ok := raw.(map[string]any)
 	if !ok {
-		return nil, nil, fmt.Errorf("attachment edge: addField %q is not an object schema", addField)
+		return nil, nil, fmt.Errorf("field %q in %s is not an object schema", field, op.ID)
 	}
-	if ref, ok := fieldMap["$ref"].(string); ok {
-		return flattenObjectSchema(spec, ref)
+	props, required, err := flattenSchemaNode(spec, fieldMap, fmt.Sprintf("%s.%s", op.ID, field))
+	if err != nil {
+		return nil, nil, err
 	}
-	props := map[string]any{}
-	if pp, ok := fieldMap["properties"].(map[string]any); ok {
-		for k, v := range pp {
-			props[k] = v
-		}
-	}
-	var req []string
-	if rr, ok := fieldMap["required"].([]any); ok {
-		for _, x := range rr {
-			if s, ok := x.(string); ok {
-				req = append(req, s)
-			}
-		}
-	}
-	return props, req, nil
+	return props, required, nil
 }
 
 func hasYamlBody(op *Operation) bool {
@@ -527,7 +516,18 @@ func operationOutputs(spec *Spec, op *Operation, rm ResourceMeta) (map[string]sc
 // the merged set of top-level properties and the union of required fields.
 // Returns an error for unsupported OpenAPI constructs (oneOf, anyOf, etc.).
 func flattenObjectSchema(spec *Spec, ref string) (map[string]any, []string, error) {
-	visited := map[string]bool{}
+	root, ok := spec.ResolveSchema(ref)
+	if !ok {
+		return nil, nil, fmt.Errorf("unresolvable $ref %q", ref)
+	}
+	return flattenSchemaNode(spec, root, ref)
+}
+
+// flattenSchemaNode is flattenObjectSchema starting from an already-resolved
+// schema node — the entry point for nested schemas like a request-body field
+// that may itself be a $ref, an allOf composition, or inline properties.
+func flattenSchemaNode(spec *Spec, root map[string]any, source string) (map[string]any, []string, error) {
+	visited := map[string]bool{source: true}
 	props := map[string]any{}
 	required := map[string]bool{}
 
@@ -583,12 +583,7 @@ func flattenObjectSchema(spec *Spec, ref string) (map[string]any, []string, erro
 		return nil
 	}
 
-	root, ok := spec.ResolveSchema(ref)
-	if !ok {
-		return nil, nil, fmt.Errorf("unresolvable $ref %q", ref)
-	}
-	visited[ref] = true
-	if err := walk(root, ref); err != nil {
+	if err := walk(root, source); err != nil {
 		return nil, nil, err
 	}
 

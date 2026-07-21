@@ -17,10 +17,12 @@ package rest
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"io"
 	"net/http"
 	"os"
 	"path/filepath"
+	"reflect"
 	"runtime"
 	"strings"
 	"testing"
@@ -66,6 +68,14 @@ const (
 	fooVal               = "foo"
 	thing1ID             = "thing-1"
 	createdKey           = "created"
+	newTagKey            = "newTag"
+	envNameKey           = "envName"
+	projectNameKey       = "projectName"
+	myprojVal            = "myproj"
+	myenvVal             = "myenv"
+	ownerVal             = "owner"
+	teamXVal             = "team-x"
+	teamYVal             = "team-y"
 )
 
 // mockTransport serves canned responses keyed by "<METHOD> <path>". Set
@@ -177,11 +187,11 @@ func TestCreateSynthesizesID(t *testing.T) {
 				"POST /api/stacks/test-org/myproj/mystack/tags": {status: 204, body: ""},
 			},
 			inputs: map[string]any{
-				orgNameKey:    testOrgName,
-				"projectName": "myproj",
-				"stackName":   "mystack",
-				nameKey:       "owner", // body field; rename name→tagName for path
-				valueKey:      "team-x",
+				orgNameKey:     testOrgName,
+				projectNameKey: myprojVal,
+				"stackName":    "mystack",
+				nameKey:        ownerVal, // body field; rename name→tagName for path
+				valueKey:       teamXVal,
 			},
 			wantID: "test-org/myproj/mystack/owner",
 		},
@@ -1443,5 +1453,184 @@ func TestPropertyValueToStringNumberFormatting(t *testing.T) {
 				t.Errorf("propertyValueToString(%v) returned scientific notation %q", tc.in, got)
 			}
 		})
+	}
+}
+
+// envTagProps builds the standard EnvironmentTag input/state map with the
+// given tag value.
+func envTagProps(value string) property.Map {
+	return propMap(map[string]any{
+		orgNameKey:     testOrgName,
+		projectNameKey: myprojVal,
+		envNameKey:     myenvVal,
+		nameKey:        ownerVal,
+		valueKey:       value,
+	})
+}
+
+// TestUpdateEnvelopeSendsCurrentAndNewBody pins the wire contract for update
+// ops declared with updateEnvelope (EnvironmentTag): the PATCH body pairs the
+// prior value under currentField with the desired values under newField. The
+// flat schema-driven mapping would send an empty body here — neither wrapper
+// field matches an input — so in-place value updates would always fail.
+func TestUpdateEnvelopeSendsCurrentAndNewBody(t *testing.T) {
+	spec, meta := loadFixtures(t)
+	resources := Resources(spec, meta)
+	r, ok := resources["pulumiservice:api/esc:EnvironmentTag"]
+	if !ok {
+		t.Fatal("pulumiservice:api/esc:EnvironmentTag not in metadata")
+	}
+	if r.meta.UpdateEnvelope == nil {
+		t.Fatal("EnvironmentTag metadata entry lost its updateEnvelope")
+	}
+
+	var patchBody []byte
+	mock := &mockTransport{responseFn: func(req *http.Request) mockResponse {
+		if req.Method == http.MethodPatch {
+			patchBody, _ = io.ReadAll(req.Body)
+		}
+		return mockResponse{status: 200, body: `{"name":"owner","value":"team-y"}`}
+	}}
+	ctx := WithTransport(t.Context(), mock)
+
+	if _, err := r.Update(ctx, p.UpdateRequest{
+		ID:        "test-org/myproj/myenv/owner",
+		Inputs:    envTagProps(teamYVal),
+		OldInputs: envTagProps(teamXVal),
+		State:     envTagProps(teamXVal),
+	}); err != nil {
+		t.Fatalf("Update: %v\n  calls: %v", err, mock.calls)
+	}
+
+	wantPatch := "PATCH /api/esc/environments/test-org/myproj/myenv/tags/owner"
+	if len(mock.calls) == 0 || mock.calls[0] != wantPatch {
+		t.Fatalf("expected first call %q; calls: %v", wantPatch, mock.calls)
+	}
+	var got map[string]any
+	if err := json.Unmarshal(patchBody, &got); err != nil {
+		t.Fatalf("unmarshal PATCH body %q: %v", patchBody, err)
+	}
+	want := map[string]any{
+		"currentTag": map[string]any{valueKey: teamXVal},
+		newTagKey:    map[string]any{nameKey: ownerVal, valueKey: teamYVal},
+	}
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("PATCH body = %s, want %v", patchBody, want)
+	}
+}
+
+// TestUpdateEnvelopeValidation pins the loud-failure matrix: any mismatch
+// between the declared envelope and the actual schema or sources must error
+// instead of silently sending a partial body.
+func TestUpdateEnvelopeValidation(t *testing.T) {
+	spec, meta := loadFixtures(t)
+	base := meta.Resources["pulumiservice:api:EnvironmentTag_esc_environments"]
+	if base.UpdateEnvelope == nil {
+		t.Fatal("EnvironmentTag metadata entry lost its updateEnvelope")
+	}
+
+	full := envTagProps(teamYVal)
+	noValue := propMap(map[string]any{
+		orgNameKey:     testOrgName,
+		projectNameKey: myprojVal,
+		envNameKey:     myenvVal,
+		nameKey:        ownerVal,
+	})
+
+	cases := []struct {
+		name     string
+		envelope *UpdateEnvelopeMeta // nil keeps the real metadata envelope
+		src      property.Map
+		wantErr  string
+	}{
+		{"identical wrapper fields", &UpdateEnvelopeMeta{CurrentField: newTagKey, NewField: newTagKey}, full,
+			"two distinct fields"},
+		{"envelope drifted from schema", &UpdateEnvelopeMeta{CurrentField: "nope", NewField: newTagKey}, full,
+			`"currentTag" is outside the declared updateEnvelope`},
+		{"missing required wrapper prop", nil, noValue,
+			`missing required field "value"`},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			rm := base
+			if tc.envelope != nil {
+				rm.UpdateEnvelope = tc.envelope
+			}
+			r := &Resource{meta: rm, spec: spec}
+			ctx := WithTransport(t.Context(), &mockTransport{})
+			_, err := r.Update(ctx, p.UpdateRequest{
+				ID:        "test-org/myproj/myenv/owner",
+				Inputs:    tc.src,
+				OldInputs: tc.src,
+				State:     tc.src,
+			})
+			if err == nil || !strings.Contains(err.Error(), tc.wantErr) {
+				t.Fatalf("want error containing %q, got %v", tc.wantErr, err)
+			}
+		})
+	}
+}
+
+// TestUpdateEnvelopeAllOfWrapper ensures wrapper fields declared as allOf
+// $ref compositions (a common generator idiom for attaching descriptions)
+// resolve the same as bare $refs.
+func TestUpdateEnvelopeAllOfWrapper(t *testing.T) {
+	const specJSON = `{
+	  "openapi": "3.0.0",
+	  "components": {"schemas": {
+	    "CurrentThing": {"type": "object", "properties": {"value": {"type": "string"}}, "required": ["value"]},
+	    "NewThing":     {"type": "object", "properties": {"value": {"type": "string"}}},
+	    "Envelope": {"type": "object", "properties": {
+	      "currentThing": {"allOf": [{"$ref": "#/components/schemas/CurrentThing"}], "description": "prior"},
+	      "newThing":     {"$ref": "#/components/schemas/NewThing"}
+	    }}
+	  }},
+	  "paths": {
+	    "/things/{id}": {"patch": {
+	      "operationId": "UpdateThing",
+	      "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "string"}}],
+	      "requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Envelope"}}}},
+	      "responses": {"204": {}}
+	    }}
+	  }
+	}`
+	spec, err := ParseSpec([]byte(specJSON))
+	if err != nil {
+		t.Fatalf("parse synthetic spec: %v", err)
+	}
+	r := &Resource{
+		spec: spec,
+		meta: ResourceMeta{
+			Operations:     Operations{Update: "UpdateThing"},
+			UpdateEnvelope: &UpdateEnvelopeMeta{CurrentField: "currentThing", NewField: "newThing"},
+		},
+	}
+
+	var patchBody []byte
+	mock := &mockTransport{responseFn: func(req *http.Request) mockResponse {
+		patchBody, _ = io.ReadAll(req.Body)
+		return mockResponse{status: 204, body: ""}
+	}}
+	ctx := WithTransport(t.Context(), mock)
+
+	src := func(v string) property.Map { return propMap(map[string]any{"id": thing1ID, valueKey: v}) }
+	if _, err := r.Update(ctx, p.UpdateRequest{
+		ID:        thing1ID,
+		Inputs:    src(newVal),
+		OldInputs: src(originalVal),
+		State:     src(originalVal),
+	}); err != nil {
+		t.Fatalf("Update: %v", err)
+	}
+	var got map[string]any
+	if err := json.Unmarshal(patchBody, &got); err != nil {
+		t.Fatalf("unmarshal PATCH body %q: %v", patchBody, err)
+	}
+	want := map[string]any{
+		"currentThing": map[string]any{valueKey: originalVal},
+		"newThing":     map[string]any{valueKey: newVal},
+	}
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("PATCH body = %s, want %v", patchBody, want)
 	}
 }

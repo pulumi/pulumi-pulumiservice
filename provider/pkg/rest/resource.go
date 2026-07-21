@@ -24,6 +24,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"maps"
 	"net/http"
 	"net/url"
 	"os"
@@ -648,7 +649,13 @@ func (r *Resource) Update(ctx context.Context, req p.UpdateRequest) (p.UpdateRes
 
 	urlSrc := mergeMaps(req.State, req.OldInputs, req.Inputs)
 	bodySrc := mergeMaps(req.Inputs, req.OldInputs, req.State)
-	_, state, err := r.execAndDecodeSplit(ctx, op, urlSrc, bodySrc)
+	var state property.Map
+	if r.meta.UpdateEnvelope != nil {
+		currentSrc := mergeMaps(req.State, req.OldInputs)
+		_, state, err = r.execEnvelopeUpdate(ctx, op, urlSrc, currentSrc, bodySrc)
+	} else {
+		_, state, err = r.execAndDecodeSplit(ctx, op, urlSrc, bodySrc)
+	}
 	if err != nil {
 		return p.UpdateResponse{}, err
 	}
@@ -907,14 +914,101 @@ func (r *Resource) buildRequestBody(op *Operation, inputs property.Map) map[stri
 	if err != nil {
 		return propertyMapToAny(inputs)
 	}
-	out := make(map[string]any, len(bodyProps))
-	for wireKey := range bodyProps {
-		pulKey := pulumiName(wireKey, r.meta.Renames)
-		if v, ok := inputs.GetOk(pulKey); ok {
+	return mapBodyProps(bodyProps, inputs, r.meta.Renames)
+}
+
+// mapBodyProps fills wire-side schema properties from a property.Map source
+// by (renamed) field name, silently omitting fields the source lacks — the
+// shared mapping convention for request bodies at any nesting level.
+func mapBodyProps(props map[string]any, src property.Map, renames map[string]string) map[string]any {
+	out := make(map[string]any, len(props))
+	for wireKey := range props {
+		pulKey := pulumiName(wireKey, renames)
+		if v, ok := src.GetOk(pulKey); ok {
 			out[wireKey] = propertyValueToAny(v)
 		}
 	}
 	return out
+}
+
+// execEnvelopeUpdate mirrors execAndDecodeSplit for update ops declared with
+// UpdateEnvelopeMeta (see that type's doc for the rationale).
+func (r *Resource) execEnvelopeUpdate(
+	ctx context.Context,
+	op *Operation,
+	urlSrc property.Map,
+	currentSrc property.Map,
+	newSrc property.Map,
+) ([]byte, property.Map, error) {
+	if !needsBody(op.Method) {
+		return nil, property.Map{}, fmt.Errorf("rest: updateEnvelope on %s: %s requests carry no body", op.ID, op.Method)
+	}
+	if op.RequestContentType == contentYAML {
+		return nil, property.Map{}, fmt.Errorf("rest: updateEnvelope on %s: yaml request bodies are not supported", op.ID)
+	}
+	url, err := r.buildURL(op, urlSrc)
+	if err != nil {
+		return nil, property.Map{}, err
+	}
+	body, err := r.buildEnvelopeBody(op, currentSrc, newSrc)
+	if err != nil {
+		return nil, property.Map{}, err
+	}
+	bodyJSON, err := json.Marshal(body)
+	if err != nil {
+		return nil, property.Map{}, fmt.Errorf("rest: marshal request body for %s: %w", op.ID, err)
+	}
+	return r.roundTrip(ctx, op, url, bytes.NewReader(bodyJSON), contentJSON)
+}
+
+// buildEnvelopeBody constructs {CurrentField: {…}, NewField: {…}} from the
+// update op's request schema, filling each wrapper from its source via
+// mapBodyProps. Every mismatch between the declared envelope and the actual
+// schema errors loudly — a misconfigured envelope silently sending a partial
+// body would reintroduce the failure mode the envelope exists to fix.
+func (r *Resource) buildEnvelopeBody(op *Operation, currentSrc, newSrc property.Map) (map[string]any, error) {
+	env := r.meta.UpdateEnvelope
+	if env.CurrentField == "" || env.NewField == "" || env.CurrentField == env.NewField {
+		return nil, fmt.Errorf("rest: updateEnvelope on %s must name two distinct fields (currentField=%q, newField=%q)",
+			op.ID, env.CurrentField, env.NewField)
+	}
+	if op.RequestRef == "" {
+		return nil, fmt.Errorf("rest: updateEnvelope set on %s but the op has no request body schema", op.ID)
+	}
+	bodyProps, _, err := flattenObjectSchema(r.spec, op.RequestRef)
+	if err != nil {
+		return nil, fmt.Errorf("rest: flatten request schema for %s: %w", op.ID, err)
+	}
+	for _, wireKey := range slices.Sorted(maps.Keys(bodyProps)) {
+		if wireKey != env.CurrentField && wireKey != env.NewField {
+			return nil, fmt.Errorf(
+				"rest: %s request body field %q is outside the declared updateEnvelope; re-run scaffold-metadata",
+				op.ID, wireKey)
+		}
+	}
+	out := map[string]any{}
+	for _, part := range []struct {
+		field string
+		src   property.Map
+	}{
+		{env.CurrentField, currentSrc},
+		{env.NewField, newSrc},
+	} {
+		props, required, err := requestBodyFieldSchema(r.spec, op, part.field)
+		if err != nil {
+			return nil, fmt.Errorf("rest: updateEnvelope wrapper: %w", err)
+		}
+		wrapper := mapBodyProps(props, part.src, r.meta.Renames)
+		for _, req := range required {
+			if _, ok := wrapper[req]; !ok {
+				return nil, fmt.Errorf(
+					"rest: updateEnvelope wrapper %q for %s is missing required field %q (absent from prior state and inputs)",
+					part.field, op.ID, req)
+			}
+		}
+		out[part.field] = wrapper
+	}
+	return out, nil
 }
 
 func propertyValueToAny(v property.Value) any {

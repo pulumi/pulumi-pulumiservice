@@ -5,6 +5,18 @@ resources:
       orgName: ${organizationName}
       project: ${projectName}
       name: testing-environment-${envSuffix}
+  # EnvironmentTag: user-defined key/value label on the environment.
+  environmentTag:
+    type: pulumiservice:api/esc:EnvironmentTag
+    properties:
+      orgName: ${organizationName}
+      projectName: ${projectName}
+      envName: testing-environment-${envSuffix}
+      name: purpose
+      value: ${tagValue}
+    options:
+      dependsOn:
+        - ${environment}
 # Note: pulumiservice:api/esc:RevisionTag isn't covered here because tagging
 # requires an existing revision, and a freshly-created environment has
 # no definition (and therefore no revisions). To exercise tags we'd
@@ -15,3 +27,5 @@ outputs:
   # project, name) follow the program-owns-inputs / cloud-owns-outputs
   # disjointness; recover them from the slash-joined id if needed.
   environmentId: ${environment.id}
+  # Server-echoed tag value.
+  environmentTagValue: ${environmentTag.value}

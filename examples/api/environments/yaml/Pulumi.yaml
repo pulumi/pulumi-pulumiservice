@@ -10,3 +10,6 @@ config:
   envSuffix:
     type: string
     default: dev
+  tagValue:
+    type: string
+    default: env-tag-initial
