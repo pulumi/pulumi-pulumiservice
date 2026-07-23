@@ -9,7 +9,7 @@
   <ItemGroup>
     <PackageReference Include="Pulumi" Version="3.10*" />
     <PackageReference Include="Pulumi.PulumiService" />
-    <PackageReference Include="Pulumi.Random" Version="4.21.0" />
+    <PackageReference Include="Pulumi.Random" Version="4.21.1" />
   </ItemGroup>
 
 </Project>
