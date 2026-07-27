@@ -194,3 +194,55 @@ func TestProvider_LayeredSchema(t *testing.T) {
 	}
 
 }
+
+// getPolicyPacks' result must be a named type, not an inline object.
+//
+// Pulumi's schema format only supports $ref in array items — an inline object is
+// flattened to a bare `{"type": "object"}` during schema generation, which is why
+// every SDK used to render policyPacks as an untyped string map. If this reverts,
+// source and publisher silently stop reaching typed SDKs even though the provider
+// still puts them on the wire.
+func TestProvider_PolicyPackSummaryIsANamedType(t *testing.T) {
+	provider, err := MakeProvider(nil, "pulumiservice", "1.0.0")
+	require.NoError(t, err)
+
+	resp, err := provider.GetSchema(context.Background(), &pulumirpc.GetSchemaRequest{})
+	require.NoError(t, err)
+
+	var spec schema.PackageSpec
+	require.NoError(t, json.Unmarshal([]byte(resp.Schema), &spec))
+
+	// FunctionSpec.UnmarshalJSON parses `outputs` into ReturnType, leaving the
+	// deprecated Outputs field nil.
+	fn, ok := spec.Functions["pulumiservice:index:getPolicyPacks"]
+	require.True(t, ok, "getPolicyPacks should be present")
+	require.NotNil(t, fn.ReturnType)
+	require.NotNil(t, fn.ReturnType.ObjectTypeSpec)
+
+	packs, ok := fn.ReturnType.ObjectTypeSpec.Properties[policyPacksKey]
+	require.True(t, ok, "policyPacks output should be present")
+	require.NotNil(t, packs.Items, "policyPacks items should survive schema generation")
+	assert.Equal(t, "#/types/pulumiservice:index:PolicyPackSummary", packs.Items.Ref)
+
+	summary, ok := spec.Types["pulumiservice:index:PolicyPackSummary"]
+	require.True(t, ok, "PolicyPackSummary type should be present")
+
+	for _, field := range []string{nameKey, displayNameKey, versionsKey, versionTagsKey, sourceKey, publisherKey} {
+		_, ok := summary.Properties[field]
+		assert.Truef(t, ok, "PolicyPackSummary should declare %q", field)
+	}
+
+	// Optional so a degraded lookup is distinguishable from real data in typed SDKs.
+	assert.NotContains(t, summary.Required, sourceKey)
+	assert.NotContains(t, summary.Required, publisherKey)
+
+	single, ok := spec.Functions["pulumiservice:index:getPolicyPack"]
+	require.True(t, ok, "getPolicyPack should be present")
+	require.NotNil(t, single.ReturnType)
+	require.NotNil(t, single.ReturnType.ObjectTypeSpec)
+	for _, field := range []string{sourceKey, publisherKey} {
+		_, ok := single.ReturnType.ObjectTypeSpec.Properties[field]
+		assert.Truef(t, ok, "getPolicyPack should declare %q", field)
+		assert.NotContains(t, single.ReturnType.ObjectTypeSpec.Required, field)
+	}
+}

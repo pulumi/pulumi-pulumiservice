@@ -40,6 +40,7 @@ import (
 	"github.com/pulumi/pulumi-go-provider/middleware/rpc"
 	"github.com/pulumi/pulumi/pkg/v3/codegen/schema"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/apitype"
+	"github.com/pulumi/pulumi/sdk/v3/go/common/diag"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/tokens"
@@ -59,6 +60,13 @@ const (
 	respectSchemaVersionKey = "respectSchemaVersion"
 	readmeKey               = "readme"
 	nameKey                 = "name"
+	displayNameKey          = "displayName"
+	versionKey              = "version"
+	versionsKey             = "versions"
+	versionTagsKey          = "versionTags"
+	policyPacksKey          = "policyPacks"
+	sourceKey               = "source"
+	publisherKey            = "publisher"
 )
 
 //go:embed README.md
@@ -378,7 +386,7 @@ func (k *pulumiserviceProvider) Configure(
 	for key, val := range args {
 		// The engine sends the provider "version" alongside the config
 		// properties; only string config values are meaningful here.
-		if key == "version" || !val.IsString() {
+		if key == versionKey || !val.IsString() {
 			continue
 		}
 		sc.Config[string(key)] = val.StringValue()
@@ -599,15 +607,23 @@ func (k *pulumiserviceProvider) invokeFunctionGetPolicyPacks(
 		return nil, fmt.Errorf("organizationName is required")
 	}
 
-	// Call the API
-	policyPacks, err := k.client.ListPolicyPacks(ctx, orgName)
+	// Call the API. Registry provenance (source/publisher) comes from a second
+	// endpoint joined on pack name; any failure other than the route being absent
+	// is fatal, so a program filtering on publisher can't silently match nothing
+	// and attach zero policy packs.
+	policyPacks, registryUnavailable, err := k.client.ListPolicyPacksWithRegistryMetadata(ctx, orgName)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list policy packs: %w", err)
+	}
+	if registryUnavailable && k.host != nil {
+		_ = k.host.Log(ctx, diag.Warning, "",
+			"this Pulumi backend does not serve the policy pack registry; "+
+				"`source` and `publisher` will be absent from getPolicyPacks results")
 	}
 
 	// Build output
 	outputProps := resource.PropertyMap{
-		"policyPacks": resource.NewPropertyValue(convertPolicyPacksToProperties(policyPacks)),
+		policyPacksKey: resource.NewPropertyValue(convertPolicyPacksToProperties(policyPacks)),
 	}
 
 	outputProperties, err := plugin.MarshalProperties(outputProps, plugin.MarshalOptions{})
@@ -662,8 +678,28 @@ func (k *pulumiserviceProvider) invokeFunctionGetPolicyPack(
 		return nil, fmt.Errorf("policy pack not found")
 	}
 
+	// Look the pack up by the version tag we just resolved. Provenance is version
+	// independent, but the tag is not optional in practice: omitting it makes the
+	// service look for the literal tag `latest`, which packs do not carry, so
+	// source and publisher would come back empty for effectively every pack.
+	//
+	// Note the deliberate asymmetry with getPolicyPacks, which treats a registry
+	// failure as fatal: there, a failed lookup silently empties a publisher filter
+	// and the program attaches nothing. Here the caller already named the pack, so
+	// that hazard doesn't exist and failing would only deny them a result the
+	// provider could already produce in full before this feature. Don't "fix" one
+	// to match the other.
+	registryPack, registryErr := k.client.GetRegistryPolicyPack(ctx, orgName, policyPackName, policyPack.VersionTag)
+	if registryErr != nil {
+		if k.host != nil {
+			_ = k.host.Log(ctx, diag.Warning, "", fmt.Sprintf(
+				"could not read registry metadata for policy pack %q: %v", policyPackName, registryErr))
+		}
+		registryPack = nil
+	}
+
 	// Build output
-	outputProps := convertPolicyPackDetailToProperties(policyPack)
+	outputProps := convertPolicyPackDetailToProperties(policyPack, registryPack)
 
 	outputProperties, err := plugin.MarshalProperties(outputProps, plugin.MarshalOptions{})
 	if err != nil {
@@ -676,7 +712,7 @@ func (k *pulumiserviceProvider) invokeFunctionGetPolicyPack(
 }
 
 // Helper functions to convert API types to property values
-func convertPolicyPacksToProperties(packs []pulumiapi.PolicyPackWithVersions) []resource.PropertyValue {
+func convertPolicyPacksToProperties(packs []pulumiapi.PolicyPackWithRegistryMetadata) []resource.PropertyValue {
 	result := make([]resource.PropertyValue, len(packs))
 	for i, pack := range packs {
 		versions := make([]resource.PropertyValue, len(pack.Versions))
@@ -689,25 +725,52 @@ func convertPolicyPacksToProperties(packs []pulumiapi.PolicyPackWithVersions) []
 			versionTags[j] = resource.NewStringProperty(vt)
 		}
 
-		result[i] = resource.NewObjectProperty(resource.PropertyMap{
-			nameKey:       resource.NewStringProperty(pack.Name),
-			"displayName": resource.NewStringProperty(pack.DisplayName),
-			"versions":    resource.NewArrayProperty(versions),
-			"versionTags": resource.NewArrayProperty(versionTags),
-		})
+		props := resource.PropertyMap{
+			nameKey:        resource.NewStringProperty(pack.Name),
+			displayNameKey: resource.NewStringProperty(pack.DisplayName),
+			versionsKey:    resource.NewArrayProperty(versions),
+			versionTagsKey: resource.NewArrayProperty(versionTags),
+		}
+
+		// Omit rather than emit "" when provenance is unknown, so the schema's
+		// optional fields surface as absent/nil in typed SDKs. An empty string
+		// would read as a real value and compare equal to nothing.
+		if pack.Source != "" {
+			props[sourceKey] = resource.NewStringProperty(pack.Source)
+		}
+		if pack.Publisher != "" {
+			props[publisherKey] = resource.NewStringProperty(pack.Publisher)
+		}
+
+		result[i] = resource.NewObjectProperty(props)
 	}
 	return result
 }
 
-func convertPolicyPackDetailToProperties(pack *pulumiapi.PolicyPackDetail) resource.PropertyMap {
+// convertPolicyPackDetailToProperties renders a policy pack for the getPolicyPack
+// invoke. registry carries the pack's Pulumi Registry provenance and may be nil
+// when that lookup was unavailable; source and publisher are then omitted.
+func convertPolicyPackDetailToProperties(
+	pack *pulumiapi.PolicyPackDetail,
+	registry *pulumiapi.RegistryPolicyPack,
+) resource.PropertyMap {
 	props := resource.PropertyMap{
-		nameKey:       resource.NewStringProperty(pack.Name),
-		"displayName": resource.NewStringProperty(pack.DisplayName),
-		"version":     resource.NewNumberProperty(float64(pack.Version)),
+		nameKey:        resource.NewStringProperty(pack.Name),
+		displayNameKey: resource.NewStringProperty(pack.DisplayName),
+		versionKey:     resource.NewNumberProperty(float64(pack.Version)),
 	}
 
 	if pack.VersionTag != "" {
 		props["versionTag"] = resource.NewStringProperty(pack.VersionTag)
+	}
+
+	if registry != nil {
+		if registry.Source != "" {
+			props[sourceKey] = resource.NewStringProperty(registry.Source)
+		}
+		if registry.Publisher != "" {
+			props[publisherKey] = resource.NewStringProperty(registry.Publisher)
+		}
 	}
 
 	if pack.Config != nil {
@@ -721,7 +784,7 @@ func convertPolicyPackDetailToProperties(pack *pulumiapi.PolicyPackDetail) resou
 				nameKey: resource.NewStringProperty(policy.Name),
 			}
 			if policy.DisplayName != "" {
-				policyProps["displayName"] = resource.NewStringProperty(policy.DisplayName)
+				policyProps[displayNameKey] = resource.NewStringProperty(policy.DisplayName)
 			}
 			if policy.Description != "" {
 				policyProps["description"] = resource.NewStringProperty(policy.Description)

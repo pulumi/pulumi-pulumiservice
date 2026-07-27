@@ -892,6 +892,48 @@
         "name"
       ]
     },
+    "pulumiservice:index:PolicyPackSummary": {
+      "description": "Summary metadata for a policy pack available to an organization, including its Pulumi Registry provenance.",
+      "properties": {
+        "displayName": {
+          "type": "string",
+          "description": "The display name of the policy pack."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the policy pack."
+        },
+        "publisher": {
+          "type": "string",
+          "description": "The organization or user that published the policy pack. `pulumi` for Pulumi-published packs, otherwise the publishing organization's name. Omitted when the provider could not determine registry metadata for this pack."
+        },
+        "source": {
+          "type": "string",
+          "description": "Where the policy pack is hosted in the Pulumi Registry: `pulumi` for packs published by Pulumi (for example `cis-aws`), `private` for packs published by an organization. Omitted when the provider could not determine registry metadata for this pack."
+        },
+        "versionTags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of version tags for this policy pack."
+        },
+        "versions": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          },
+          "description": "List of version numbers for this policy pack."
+        }
+      },
+      "type": "object",
+      "required": [
+        "name",
+        "displayName",
+        "versions",
+        "versionTags"
+      ]
+    },
     "pulumiservice:index:PulumiOperation": {
       "type": "string",
       "enum": [
@@ -7319,6 +7361,14 @@
             },
             "type": "array"
           },
+          "publisher": {
+            "description": "The organization or user that published the policy pack. `pulumi` for Pulumi-published packs, otherwise the publishing organization's name. Omitted when the provider could not determine registry metadata for this pack.",
+            "type": "string"
+          },
+          "source": {
+            "description": "Where the policy pack is hosted in the Pulumi Registry: `pulumi` for packs published by Pulumi (for example `cis-aws`), `private` for packs published by an organization. Omitted when the provider could not determine registry metadata for this pack.",
+            "type": "string"
+          },
           "version": {
             "description": "The version number.",
             "type": "integer"
@@ -7353,7 +7403,7 @@
           "policyPacks": {
             "description": "List of policy packs in the organization.",
             "items": {
-              "type": "object"
+              "$ref": "#/types/pulumiservice:index:PolicyPackSummary"
             },
             "type": "array"
           }

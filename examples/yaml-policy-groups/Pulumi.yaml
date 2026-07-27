@@ -9,8 +9,11 @@ config:
     default: service-provider-test-org
 
 variables:
-  # Query all available policy packs in the organization
-  # This demonstrates using the getPolicyPacks data source
+  # Query all available policy packs in the organization.
+  # This demonstrates using the getPolicyPacks data source. Each entry carries
+  # `source` and `publisher`, so a program can tell Pulumi-published packs
+  # (source: pulumi) from ones the organization published itself
+  # (source: private) without matching on pack names.
   policyPacks:
     fn::invoke:
       function: pulumiservice:index:getPolicyPacks
@@ -59,3 +62,6 @@ resources:
 outputs:
   # Export the policy group name and the list of available policy packs
   policyGroupName: ${testPolicyGroup.name}
+  # Exported so the integration test can assert every pack carries its registry
+  # provenance — the one thing unit tests can't verify against the real API.
+  policyPacks: ${policyPacks}

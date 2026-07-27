@@ -478,6 +478,46 @@ func TestYamlPolicyGroupsExample(t *testing.T) {
 			"digits":           digits,
 			"organizationName": os.Getenv("PULUMI_TEST_OWNER"),
 		},
+		ExtraRuntimeValidation: func(t *testing.T, stack integration.RuntimeValidationStackInfo) {
+			// getPolicyPacks joins the org policy pack list against the registry
+			// to attach provenance. Unit tests cover the join in isolation; only
+			// a real org proves the registry actually returns entries for the
+			// packs the org can see, and that the join is pointed at a route
+			// that exists — a wrong path 404s, which the client reads as "no
+			// registry on this backend" and degrades to zero annotations.
+			packs, ok := stack.Outputs["policyPacks"].([]interface{})
+			if !ok {
+				t.Fatalf("expected policyPacks output to be a list, got %T", stack.Outputs["policyPacks"])
+			}
+			if len(packs) == 0 {
+				t.Skip("organization has no policy packs; nothing to assert provenance on")
+			}
+			// Annotation is per pack and best effort by design, so don't require
+			// every pack to carry it: the test org accumulates packs from other
+			// tests, and one absent from the registry shouldn't fail this. The
+			// regression being guarded is the join matching *nothing*, so assert
+			// that some pack resolved and that whatever did resolve is sane.
+			annotated := 0
+			for _, raw := range packs {
+				pack, ok := raw.(map[string]interface{})
+				if !ok {
+					t.Fatalf("expected each policy pack to be an object, got %T", raw)
+				}
+				if pack["publisher"] == nil && pack["source"] == nil {
+					continue
+				}
+				annotated++
+				name := pack["name"]
+				assert.NotEmptyf(t, pack["publisher"], "policy pack %v has no publisher", name)
+				// Don't assert a Pulumi-published pack exists — that depends on
+				// which packs the test org has added, and would be brittle.
+				assert.Containsf(t, []interface{}{"pulumi", "private"}, pack["source"],
+					"policy pack %v has unexpected source %v", name, pack["source"])
+			}
+			assert.Positivef(t, annotated,
+				"no policy pack carried registry provenance; the registry join matched "+
+					"nothing across %d packs", len(packs))
+		},
 	})
 }
 

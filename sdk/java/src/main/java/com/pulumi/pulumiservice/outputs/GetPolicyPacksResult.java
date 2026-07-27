@@ -5,9 +5,8 @@ package com.pulumi.pulumiservice.outputs;
 
 import com.pulumi.core.annotations.CustomType;
 import com.pulumi.exceptions.MissingRequiredPropertyException;
-import java.lang.String;
+import com.pulumi.pulumiservice.outputs.PolicyPackSummary;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 @CustomType
@@ -16,14 +15,14 @@ public final class GetPolicyPacksResult {
      * @return List of policy packs in the organization.
      * 
      */
-    private List<Map<String,String>> policyPacks;
+    private List<PolicyPackSummary> policyPacks;
 
     private GetPolicyPacksResult() {}
     /**
      * @return List of policy packs in the organization.
      * 
      */
-    public List<Map<String,String>> policyPacks() {
+    public List<PolicyPackSummary> policyPacks() {
         return this.policyPacks;
     }
 
@@ -36,7 +35,7 @@ public final class GetPolicyPacksResult {
     }
     @CustomType.Builder
     public static final class Builder {
-        private List<Map<String,String>> policyPacks;
+        private List<PolicyPackSummary> policyPacks;
         public Builder() {}
         public Builder(GetPolicyPacksResult defaults) {
     	      Objects.requireNonNull(defaults);
@@ -44,12 +43,15 @@ public final class GetPolicyPacksResult {
         }
 
         @CustomType.Setter
-        public Builder policyPacks(List<Map<String,String>> policyPacks) {
+        public Builder policyPacks(List<PolicyPackSummary> policyPacks) {
             if (policyPacks == null) {
               throw new MissingRequiredPropertyException("GetPolicyPacksResult", "policyPacks");
             }
             this.policyPacks = policyPacks;
             return this;
+        }
+        public Builder policyPacks(PolicyPackSummary... policyPacks) {
+            return policyPacks(List.of(policyPacks));
         }
         public GetPolicyPacksResult build() {
             final var _resultValue = new GetPolicyPacksResult();

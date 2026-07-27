@@ -4,6 +4,13 @@
 
 ### Breaking Changes
 
+- `getPolicyPacks.policyPacks` is now a list of typed `PolicyPackSummary` objects instead of an untyped string map (`[]map[string]string` in Go, `{[key: string]: string}[]` in TypeScript, `Sequence[Mapping[str, str]]` in Python). The wire format is unchanged. The previous SDK type came from an inline object in the schema's array `items`, which schema generation flattens to a bare `object` — so it could not represent `versions` (a list of integers) or `versionTags` (a list of strings), and could not have carried the new `source`/`publisher` fields at all. Migration by language:
+  - **Go**: `pack["name"]` → `pack.Name`. Note this surface was previously non-functional rather than merely mistyped: `versions` arrives as a list of integers, which does not fit `map[string]string`, so every pack was silently dropped during deserialization and `getPolicyPacks` returned an **empty list with no error**. Go programs that appeared to work were reading nothing.
+  - **Python**: values are now a generated `PolicyPackSummary` (a `dict` subclass) keyed by snake_case rather than the raw camelCase wire keys. `pack["displayName"]` raises `KeyError`; use `pack.display_name` or `pack["display_name"]`. Single-word keys like `pack["name"]` are unaffected.
+  - **TypeScript**: compile-time only. `pack.name` keeps working. Dynamic indexing (`pack[someVariable]`) and assigning the array to a `{[key: string]: string}[]` parameter no longer type-check.
+  - **.NET / Java**: dictionary access is replaced by typed properties on `PolicyPackSummary`.
+
+  Invoke results are not persisted in state, so there is no state migration, refresh drift, or import impact. [#1013](https://github.com/pulumi/pulumi-pulumiservice/issues/1013)
 - Removed the numeric `version` field from `PolicyGroup.policyPacks` inputs; it is now output-only, since the value is server-derived from `versionTag`. Use `versionTag` to pin pack versions. [#737](https://github.com/pulumi/pulumi-pulumiservice/issues/737)
 - `OrganizationRole.permissions` discriminator field is now the wire-format `__type` at every level. Programs that adopted the unreleased intermediate names (`kind:` from [#778](https://github.com/pulumi/pulumi-pulumiservice/pull/778), then `discriminator:`) need to rename to `__type:` everywhere in the descriptor tree. The discriminator _values_ (`PermissionDescriptorAllow`, `PermissionDescriptorCompose`, etc.) are unchanged. Migration:
   ```yaml
@@ -27,6 +34,7 @@
 
 ### Improvements
 
+- `getPolicyPacks` and `getPolicyPack` now return `source` and `publisher` for each policy pack, so programs can distinguish packs published by Pulumi (`source: pulumi`, `publisher: pulumi` — e.g. `cis-aws`) from packs published by your own organization (`source: private`) without matching on Pulumi's `<framework>-<cloud>` name convention, which silently goes stale whenever Pulumi publishes a pack that doesn't fit the pattern. Both fields are optional and are omitted when the provider cannot determine registry metadata for a pack, so treat an absent value as unknown rather than as "not published by Pulumi". On a backend that does not serve the policy pack registry (an older or self-hosted Pulumi Cloud), the fields are omitted for every pack and a warning is emitted; any other registry failure fails the invoke rather than silently returning packs with no publisher. [#1013](https://github.com/pulumi/pulumi-pulumiservice/issues/1013)
 - Added `EnvironmentRotationSucceeded` and `EnvironmentRotationFailed` webhook filters.
 - Added `PolicyPack` resource for publishing policy packs to Pulumi Cloud directly from a Pulumi program. The source directory is tarballed and uploaded on Create; the pack's policy metadata is auto-extracted by running its language analyzer plugin (matching `pulumi policy publish` behavior) and may be overridden inline.
 - Added `PolicyGroupStackAttachment` and `PolicyGroupInsightsAccountAttachment` resources for managing a single stack or Insights-account membership of a Policy Group as a standalone resource, rather than declaring the full membership list on the group.

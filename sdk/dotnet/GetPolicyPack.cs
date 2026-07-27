@@ -104,6 +104,14 @@ namespace Pulumi.PulumiService
         /// </summary>
         public readonly ImmutableArray<ImmutableDictionary<string, string>> Policies;
         /// <summary>
+        /// The organization or user that published the policy pack. `pulumi` for Pulumi-published packs, otherwise the publishing organization's name. Omitted when the provider could not determine registry metadata for this pack.
+        /// </summary>
+        public readonly string? Publisher;
+        /// <summary>
+        /// Where the policy pack is hosted in the Pulumi Registry: `pulumi` for packs published by Pulumi (for example `cis-aws`), `private` for packs published by an organization. Omitted when the provider could not determine registry metadata for this pack.
+        /// </summary>
+        public readonly string? Source;
+        /// <summary>
         /// The version number.
         /// </summary>
         public readonly int Version;
@@ -122,6 +130,10 @@ namespace Pulumi.PulumiService
 
             ImmutableArray<ImmutableDictionary<string, string>> policies,
 
+            string? publisher,
+
+            string? source,
+
             int version,
 
             string? versionTag)
@@ -130,6 +142,8 @@ namespace Pulumi.PulumiService
             DisplayName = displayName;
             Name = name;
             Policies = policies;
+            Publisher = publisher;
+            Source = source;
             Version = version;
             VersionTag = versionTag;
         }
