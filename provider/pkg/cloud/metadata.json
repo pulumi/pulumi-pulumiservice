@@ -4,6 +4,7 @@
   "_excluded": [
     "pulumiservice:api:Environment_preview_environments",
     "pulumiservice:api:EnvironmentTag_preview_environments",
+    "pulumiservice:api:NeoMemberUsageCap",
     "pulumiservice:api:PolicyIssue",
     "pulumiservice:api:PolicyPack",
     "pulumiservice:api:RevisionTag_preview_environments",
@@ -247,16 +248,6 @@
       },
       "requireImport": true,
       "token": "pulumiservice:api/integrations:GitLabIntegration"
-    },
-    "pulumiservice:api:NeoMemberUsageCap": {
-      "idFormat": "{orgName}/{userID}",
-      "operations": {
-        "create": "UpdateNeoMemberUsageCap",
-        "delete": "DeleteNeoMemberUsageCap",
-        "update": "UpdateNeoMemberUsageCap"
-      },
-      "requireImport": true,
-      "token": "pulumiservice:api/neo:MemberUsageCap"
     },
     "pulumiservice:api:NeoUsageCap": {
       "idFormat": "{orgName}",

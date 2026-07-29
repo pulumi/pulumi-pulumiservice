@@ -6,5 +6,4 @@ import builtins as _builtins
 from ... import _utilities
 import typing
 # Export this package's modules as members:
-from .member_usage_cap import *
 from .usage_cap import *

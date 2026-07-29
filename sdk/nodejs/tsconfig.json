@@ -56,7 +56,6 @@
         "api/integrations/gitLabIntegration.ts",
         "api/integrations/index.ts",
         "api/neo/index.ts",
-        "api/neo/memberUsageCap.ts",
         "api/neo/usageCap.ts",
         "api/orgTemplateCollection.ts",
         "api/organizationMember.ts",

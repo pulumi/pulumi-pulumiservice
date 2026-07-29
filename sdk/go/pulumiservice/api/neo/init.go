@@ -21,8 +21,6 @@ func (m *module) Version() semver.Version {
 
 func (m *module) Construct(ctx *pulumi.Context, name, typ, urn string) (r pulumi.Resource, err error) {
 	switch typ {
-	case "pulumiservice:api/neo:MemberUsageCap":
-		r = &MemberUsageCap{}
 	case "pulumiservice:api/neo:UsageCap":
 		r = &UsageCap{}
 	default:

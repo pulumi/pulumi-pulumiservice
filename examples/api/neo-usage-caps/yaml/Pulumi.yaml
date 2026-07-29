@@ -9,8 +9,3 @@ config:
   capCents:
     type: integer
     default: 1000
-  # No default: a member cap is keyed on an opaque per-user UUID that varies by
-  # organization, and no data source in this provider returns one. Read it from
-  # GET /api/console/orgs/{org}/neo/member-usage-caps before running.
-  memberUserID:
-    type: string

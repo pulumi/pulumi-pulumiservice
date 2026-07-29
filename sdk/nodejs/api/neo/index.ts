@@ -5,11 +5,6 @@ import * as pulumi from "@pulumi/pulumi";
 import * as utilities from "../../utilities";
 
 // Export members:
-export { MemberUsageCapArgs } from "./memberUsageCap";
-export type MemberUsageCap = import("./memberUsageCap").MemberUsageCap;
-export const MemberUsageCap: typeof import("./memberUsageCap").MemberUsageCap = null as any;
-utilities.lazyLoad(exports, ["MemberUsageCap"], () => require("./memberUsageCap"));
-
 export { UsageCapArgs } from "./usageCap";
 export type UsageCap = import("./usageCap").UsageCap;
 export const UsageCap: typeof import("./usageCap").UsageCap = null as any;
@@ -20,8 +15,6 @@ const _module = {
     version: utilities.getVersion(),
     construct: (name: string, type: string, urn: string): pulumi.Resource => {
         switch (type) {
-            case "pulumiservice:api/neo:MemberUsageCap":
-                return new MemberUsageCap(name, <any>undefined, { urn })
             case "pulumiservice:api/neo:UsageCap":
                 return new UsageCap(name, <any>undefined, { urn })
             default:

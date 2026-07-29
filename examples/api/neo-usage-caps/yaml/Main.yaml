@@ -1,15 +1,20 @@
-# Neo usage caps bound monthly Neo spend for an organization, or for one member
-# of it. Both are singletons rather than collections: the org cap is keyed on
-# {orgName} and the member cap on {orgName}/{userID}, and the underlying API is
+# UsageCap bounds monthly Neo spend for an organization. It is a singleton
+# rather than a collection: it is keyed on {orgName}, and the underlying API is
 # PUT-shaped, so create and update are the same call.
 #
-# Both are marked requireImport, so `pulumi up` refuses to adopt a cap that
-# already exists out-of-band. Import it instead:
+# It is marked requireImport, so `pulumi up` refuses to adopt a cap that already
+# exists out-of-band. Import it instead:
 #
 #   pulumi import pulumiservice:api/neo:UsageCap orgCap <org>
 #
-# Deleting either resource removes the cap entirely; it does not restore a
-# previous value.
+# Deleting the resource removes the cap entirely; it does not restore a previous
+# value.
+#
+# The per-member counterpart (api/neo:MemberUsageCap) is deliberately absent
+# from the provider surface. Pulumi Cloud exposes only a collection GET for
+# member caps, so the resource would have no read operation, which in turn
+# leaves it unable to refresh, unable to import, and unable to honor
+# requireImport. See _excluded in provider/pkg/cloud/metadata.json.
 resources:
   orgCap:
     type: pulumiservice:api/neo:UsageCap
@@ -19,19 +24,9 @@ resources:
       # Sends threshold-warning email to billing admins at 50/80/95/100%.
       notificationsEnabled: true
 
-  memberCap:
-    type: pulumiservice:api/neo:MemberUsageCap
-    properties:
-      orgName: ${organizationName}
-      userID: ${memberUserID}
-      capCents: ${capCents}
-
 outputs:
-  # orgName and userID are path parameters and input-only on the org cap, so
-  # reference the config value rather than a non-existent output.
+  # orgName is a path parameter and input-only, so reference the config value
+  # rather than a non-existent output.
   organization: ${organizationName}
   orgCapCents: ${orgCap.capCents}
   orgCapUpdatedAt: ${orgCap.updatedAt}
-  # userID is echoed back as an output on the member cap.
-  memberCapUserId: ${memberCap.userID}
-  memberCapCents: ${memberCap.capCents}

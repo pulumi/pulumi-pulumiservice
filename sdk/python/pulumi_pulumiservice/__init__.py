@@ -152,7 +152,6 @@ _utilities.register(
   "mod": "api/neo",
   "fqn": "pulumi_pulumiservice.api.neo",
   "classes": {
-   "pulumiservice:api/neo:MemberUsageCap": "MemberUsageCap",
    "pulumiservice:api/neo:UsageCap": "UsageCap"
   }
  },

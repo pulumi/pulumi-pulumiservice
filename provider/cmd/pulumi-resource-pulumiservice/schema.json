@@ -3370,52 +3370,6 @@
         "orgName"
       ]
     },
-    "pulumiservice:api/neo:MemberUsageCap": {
-      "description": "Creates or replaces the monthly Neo usage cap for a single member of an organization. The cap must be at least $10/month. To remove the cap, call DeleteNeoMemberUsageCap.",
-      "properties": {
-        "capCents": {
-          "type": "integer",
-          "description": "Monthly cap in US-dollar cents. Always strictly positive; \"no cap\" is the absence of a row (removed via DeleteNeoMemberUsageCap)."
-        },
-        "updatedAt": {
-          "type": "string",
-          "description": "Time when the cap was last updated."
-        },
-        "userID": {
-          "type": "string",
-          "description": "The user the cap applies to."
-        }
-      },
-      "type": "object",
-      "required": [
-        "capCents",
-        "updatedAt",
-        "userID"
-      ],
-      "inputProperties": {
-        "capCents": {
-          "type": "integer",
-          "description": "Monthly cap in US-dollar cents. Must be at least 1000 ($10, the self-serve floor) and at most 100_000_000 ($1M). Outside that range the call returns 400."
-        },
-        "orgName": {
-          "type": "string",
-          "description": "The organization name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "userID": {
-          "type": "string",
-          "description": "The member's user ID",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        }
-      },
-      "requiredInputs": [
-        "capCents",
-        "orgName",
-        "userID"
-      ]
-    },
     "pulumiservice:api/neo:UsageCap": {
       "description": "Creates or replaces the monthly Neo usage cap for an organization. The cap must be at least $10/month. To remove the cap, call DeleteNeoUsageCap.",
       "properties": {
