@@ -104,8 +104,14 @@ jobs:
         run: |
           set -euo pipefail
           git show main:provider/pkg/cloud/metadata.json > /tmp/metadata.before.json
-          BEFORE=$(jq -r 'keys[] | select(startswith("_") | not)' /tmp/metadata.before.json | sort)
-          AFTER=$(jq -r 'keys[] | select(startswith("_") | not)' provider/pkg/cloud/metadata.json | sort)
+          # Tokens live under .resources; the top-level keys are only _excluded,
+          # _note, package and resources, so reading them never reports a change.
+          # Report .token rather than the entry key: they diverge for every
+          # module-scoped resource (key pulumiservice:api:Account vs token
+          # pulumiservice:api/insights:Account) and only the token is a real type.
+          TOKENS='.resources | to_entries[] | (.value.token // .key)'
+          BEFORE=$(jq -r "$TOKENS" /tmp/metadata.before.json | sort)
+          AFTER=$(jq -r "$TOKENS" provider/pkg/cloud/metadata.json | sort)
           NEW=$(comm -13 <(echo "$BEFORE") <(echo "$AFTER") || true)
           {
             echo "tokens<<DELIM"
