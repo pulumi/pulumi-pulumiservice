@@ -1,0 +1,16 @@
+name: pulumicloud-api-neo-usage-caps
+runtime: yaml
+config:
+  organizationName:
+    type: string
+    default: service-provider-test-org
+  # Monthly cap in US-dollar cents. The service floor is 1000 ($10); anything
+  # below it is rejected with a 400.
+  capCents:
+    type: integer
+    default: 1000
+  # No default: a member cap is keyed on an opaque per-user UUID that varies by
+  # organization, and no data source in this provider returns one. Read it from
+  # GET /api/console/orgs/{org}/neo/member-usage-caps before running.
+  memberUserID:
+    type: string

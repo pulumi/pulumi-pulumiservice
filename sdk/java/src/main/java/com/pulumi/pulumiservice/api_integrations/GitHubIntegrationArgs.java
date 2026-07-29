@@ -48,6 +48,21 @@ public final class GitHubIntegrationArgs extends com.pulumi.resources.ResourceAr
     }
 
     /**
+     * Whether to disable PR comments while a pull request is in draft
+     * 
+     */
+    @Import(name="disableDraftPRComments")
+    private @Nullable Output<Boolean> disableDraftPRComments;
+
+    /**
+     * @return Whether to disable PR comments while a pull request is in draft
+     * 
+     */
+    public Optional<Output<Boolean>> disableDraftPRComments() {
+        return Optional.ofNullable(this.disableDraftPRComments);
+    }
+
+    /**
      * Whether to disable Neo AI summaries on PRs
      * 
      */
@@ -75,6 +90,21 @@ public final class GitHubIntegrationArgs extends com.pulumi.resources.ResourceAr
      */
     public Optional<Output<Boolean>> disablePRComments() {
         return Optional.ofNullable(this.disablePRComments);
+    }
+
+    /**
+     * Whether per-user (individual) GitHub Enterprise authentication is enabled. Only applies to self-hosted GitHub Enterprise installations.
+     * 
+     */
+    @Import(name="individualAuthEnabled")
+    private @Nullable Output<Boolean> individualAuthEnabled;
+
+    /**
+     * @return Whether per-user (individual) GitHub Enterprise authentication is enabled. Only applies to self-hosted GitHub Enterprise installations.
+     * 
+     */
+    public Optional<Output<Boolean>> individualAuthEnabled() {
+        return Optional.ofNullable(this.individualAuthEnabled);
     }
 
     /**
@@ -112,8 +142,10 @@ public final class GitHubIntegrationArgs extends com.pulumi.resources.ResourceAr
     private GitHubIntegrationArgs(GitHubIntegrationArgs $) {
         this.disableCodeAccessForReviews = $.disableCodeAccessForReviews;
         this.disableDetailedDiff = $.disableDetailedDiff;
+        this.disableDraftPRComments = $.disableDraftPRComments;
         this.disableNeoSummaries = $.disableNeoSummaries;
         this.disablePRComments = $.disablePRComments;
+        this.individualAuthEnabled = $.individualAuthEnabled;
         this.integrationId = $.integrationId;
         this.orgName = $.orgName;
     }
@@ -179,6 +211,27 @@ public final class GitHubIntegrationArgs extends com.pulumi.resources.ResourceAr
         }
 
         /**
+         * @param disableDraftPRComments Whether to disable PR comments while a pull request is in draft
+         * 
+         * @return builder
+         * 
+         */
+        public Builder disableDraftPRComments(@Nullable Output<Boolean> disableDraftPRComments) {
+            $.disableDraftPRComments = disableDraftPRComments;
+            return this;
+        }
+
+        /**
+         * @param disableDraftPRComments Whether to disable PR comments while a pull request is in draft
+         * 
+         * @return builder
+         * 
+         */
+        public Builder disableDraftPRComments(Boolean disableDraftPRComments) {
+            return disableDraftPRComments(Output.of(disableDraftPRComments));
+        }
+
+        /**
          * @param disableNeoSummaries Whether to disable Neo AI summaries on PRs
          * 
          * @return builder
@@ -218,6 +271,27 @@ public final class GitHubIntegrationArgs extends com.pulumi.resources.ResourceAr
          */
         public Builder disablePRComments(Boolean disablePRComments) {
             return disablePRComments(Output.of(disablePRComments));
+        }
+
+        /**
+         * @param individualAuthEnabled Whether per-user (individual) GitHub Enterprise authentication is enabled. Only applies to self-hosted GitHub Enterprise installations.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder individualAuthEnabled(@Nullable Output<Boolean> individualAuthEnabled) {
+            $.individualAuthEnabled = individualAuthEnabled;
+            return this;
+        }
+
+        /**
+         * @param individualAuthEnabled Whether per-user (individual) GitHub Enterprise authentication is enabled. Only applies to self-hosted GitHub Enterprise installations.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder individualAuthEnabled(Boolean individualAuthEnabled) {
+            return individualAuthEnabled(Output.of(individualAuthEnabled));
         }
 
         /**

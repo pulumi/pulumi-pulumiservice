@@ -23,8 +23,10 @@ class GitHubIntegrationArgs:
                  org_name: pulumi.Input[_builtins.str],
                  disable_code_access_for_reviews: pulumi.Input[Optional[_builtins.bool]] = None,
                  disable_detailed_diff: pulumi.Input[Optional[_builtins.bool]] = None,
+                 disable_draft_pr_comments: pulumi.Input[Optional[_builtins.bool]] = None,
                  disable_neo_summaries: pulumi.Input[Optional[_builtins.bool]] = None,
-                 disable_pr_comments: pulumi.Input[Optional[_builtins.bool]] = None):
+                 disable_pr_comments: pulumi.Input[Optional[_builtins.bool]] = None,
+                 individual_auth_enabled: pulumi.Input[Optional[_builtins.bool]] = None):
         """
         The set of arguments for constructing a GitHubIntegration resource.
 
@@ -32,8 +34,10 @@ class GitHubIntegrationArgs:
         :param pulumi.Input[_builtins.str] org_name: The organization name
         :param pulumi.Input[_builtins.bool] disable_code_access_for_reviews: Whether to disable code access for AI reviews
         :param pulumi.Input[_builtins.bool] disable_detailed_diff: Whether to disable detailed property-level diffs in PR comments
+        :param pulumi.Input[_builtins.bool] disable_draft_pr_comments: Whether to disable PR comments while a pull request is in draft
         :param pulumi.Input[_builtins.bool] disable_neo_summaries: Whether to disable Neo AI summaries on PRs
         :param pulumi.Input[_builtins.bool] disable_pr_comments: Whether to disable PR comments from the Pulumi GitHub App
+        :param pulumi.Input[_builtins.bool] individual_auth_enabled: Whether per-user (individual) GitHub Enterprise authentication is enabled. Only applies to self-hosted GitHub Enterprise installations.
         """
         pulumi.set(__self__, "integration_id", integration_id)
         pulumi.set(__self__, "org_name", org_name)
@@ -41,10 +45,14 @@ class GitHubIntegrationArgs:
             pulumi.set(__self__, "disable_code_access_for_reviews", disable_code_access_for_reviews)
         if disable_detailed_diff is not None:
             pulumi.set(__self__, "disable_detailed_diff", disable_detailed_diff)
+        if disable_draft_pr_comments is not None:
+            pulumi.set(__self__, "disable_draft_pr_comments", disable_draft_pr_comments)
         if disable_neo_summaries is not None:
             pulumi.set(__self__, "disable_neo_summaries", disable_neo_summaries)
         if disable_pr_comments is not None:
             pulumi.set(__self__, "disable_pr_comments", disable_pr_comments)
+        if individual_auth_enabled is not None:
+            pulumi.set(__self__, "individual_auth_enabled", individual_auth_enabled)
 
     @_builtins.property
     @pulumi.getter(name="integrationId")
@@ -95,6 +103,18 @@ class GitHubIntegrationArgs:
         pulumi.set(self, "disable_detailed_diff", value)
 
     @_builtins.property
+    @pulumi.getter(name="disableDraftPRComments")
+    def disable_draft_pr_comments(self) -> pulumi.Input[Optional[_builtins.bool]]:
+        """
+        Whether to disable PR comments while a pull request is in draft
+        """
+        return pulumi.get(self, "disable_draft_pr_comments")
+
+    @disable_draft_pr_comments.setter
+    def disable_draft_pr_comments(self, value: pulumi.Input[Optional[_builtins.bool]]):
+        pulumi.set(self, "disable_draft_pr_comments", value)
+
+    @_builtins.property
     @pulumi.getter(name="disableNeoSummaries")
     def disable_neo_summaries(self) -> pulumi.Input[Optional[_builtins.bool]]:
         """
@@ -118,6 +138,18 @@ class GitHubIntegrationArgs:
     def disable_pr_comments(self, value: pulumi.Input[Optional[_builtins.bool]]):
         pulumi.set(self, "disable_pr_comments", value)
 
+    @_builtins.property
+    @pulumi.getter(name="individualAuthEnabled")
+    def individual_auth_enabled(self) -> pulumi.Input[Optional[_builtins.bool]]:
+        """
+        Whether per-user (individual) GitHub Enterprise authentication is enabled. Only applies to self-hosted GitHub Enterprise installations.
+        """
+        return pulumi.get(self, "individual_auth_enabled")
+
+    @individual_auth_enabled.setter
+    def individual_auth_enabled(self, value: pulumi.Input[Optional[_builtins.bool]]):
+        pulumi.set(self, "individual_auth_enabled", value)
+
 
 @pulumi.type_token("pulumiservice:api/integrations:GitHubIntegration")
 class GitHubIntegration(pulumi.CustomResource):
@@ -127,8 +159,10 @@ class GitHubIntegration(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None,
                  disable_code_access_for_reviews: pulumi.Input[Optional[_builtins.bool]] = None,
                  disable_detailed_diff: pulumi.Input[Optional[_builtins.bool]] = None,
+                 disable_draft_pr_comments: pulumi.Input[Optional[_builtins.bool]] = None,
                  disable_neo_summaries: pulumi.Input[Optional[_builtins.bool]] = None,
                  disable_pr_comments: pulumi.Input[Optional[_builtins.bool]] = None,
+                 individual_auth_enabled: pulumi.Input[Optional[_builtins.bool]] = None,
                  integration_id: pulumi.Input[Optional[_builtins.str]] = None,
                  org_name: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
@@ -139,8 +173,10 @@ class GitHubIntegration(pulumi.CustomResource):
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.bool] disable_code_access_for_reviews: Whether to disable code access for AI reviews
         :param pulumi.Input[_builtins.bool] disable_detailed_diff: Whether to disable detailed property-level diffs in PR comments
+        :param pulumi.Input[_builtins.bool] disable_draft_pr_comments: Whether to disable PR comments while a pull request is in draft
         :param pulumi.Input[_builtins.bool] disable_neo_summaries: Whether to disable Neo AI summaries on PRs
         :param pulumi.Input[_builtins.bool] disable_pr_comments: Whether to disable PR comments from the Pulumi GitHub App
+        :param pulumi.Input[_builtins.bool] individual_auth_enabled: Whether per-user (individual) GitHub Enterprise authentication is enabled. Only applies to self-hosted GitHub Enterprise installations.
         :param pulumi.Input[_builtins.str] integration_id: The GitHub App integration identifier
         :param pulumi.Input[_builtins.str] org_name: The organization name
         """
@@ -170,8 +206,10 @@ class GitHubIntegration(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None,
                  disable_code_access_for_reviews: pulumi.Input[Optional[_builtins.bool]] = None,
                  disable_detailed_diff: pulumi.Input[Optional[_builtins.bool]] = None,
+                 disable_draft_pr_comments: pulumi.Input[Optional[_builtins.bool]] = None,
                  disable_neo_summaries: pulumi.Input[Optional[_builtins.bool]] = None,
                  disable_pr_comments: pulumi.Input[Optional[_builtins.bool]] = None,
+                 individual_auth_enabled: pulumi.Input[Optional[_builtins.bool]] = None,
                  integration_id: pulumi.Input[Optional[_builtins.str]] = None,
                  org_name: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
@@ -185,8 +223,10 @@ class GitHubIntegration(pulumi.CustomResource):
 
             __props__.__dict__["disable_code_access_for_reviews"] = disable_code_access_for_reviews
             __props__.__dict__["disable_detailed_diff"] = disable_detailed_diff
+            __props__.__dict__["disable_draft_pr_comments"] = disable_draft_pr_comments
             __props__.__dict__["disable_neo_summaries"] = disable_neo_summaries
             __props__.__dict__["disable_pr_comments"] = disable_pr_comments
+            __props__.__dict__["individual_auth_enabled"] = individual_auth_enabled
             if integration_id is None and not opts.urn:
                 raise TypeError("Missing required property 'integration_id'")
             __props__.__dict__["integration_id"] = integration_id
@@ -232,11 +272,13 @@ class GitHubIntegration(pulumi.CustomResource):
         __props__.__dict__["created"] = None
         __props__.__dict__["disable_code_access_for_reviews"] = None
         __props__.__dict__["disable_detailed_diff"] = None
+        __props__.__dict__["disable_draft_pr_comments"] = None
         __props__.__dict__["disable_neo_summaries"] = None
         __props__.__dict__["disable_pr_comments"] = None
         __props__.__dict__["gh_urls"] = None
         __props__.__dict__["has_contents_permission"] = None
         __props__.__dict__["has_members_permission"] = None
+        __props__.__dict__["individual_auth_enabled"] = None
         __props__.__dict__["installation_id"] = None
         __props__.__dict__["is_organization"] = None
         __props__.__dict__["is_self_hosted"] = None
@@ -292,6 +334,14 @@ class GitHubIntegration(pulumi.CustomResource):
         return pulumi.get(self, "disable_detailed_diff")
 
     @_builtins.property
+    @pulumi.getter(name="disableDraftPRComments")
+    def disable_draft_pr_comments(self) -> pulumi.Output[Optional[_builtins.bool]]:
+        """
+        Whether PR comments are disabled while a pull request is in draft.
+        """
+        return pulumi.get(self, "disable_draft_pr_comments")
+
+    @_builtins.property
     @pulumi.getter(name="disableNeoSummaries")
     def disable_neo_summaries(self) -> pulumi.Output[_builtins.bool]:
         """
@@ -330,6 +380,14 @@ class GitHubIntegration(pulumi.CustomResource):
         Whether the installation has the 'members' permission (only relevant for organization accounts).
         """
         return pulumi.get(self, "has_members_permission")
+
+    @_builtins.property
+    @pulumi.getter(name="individualAuthEnabled")
+    def individual_auth_enabled(self) -> pulumi.Output[Optional[_builtins.bool]]:
+        """
+        Whether per-user (individual) GitHub Enterprise authentication is enabled. Only applies to self-hosted GitHub Enterprise installations.
+        """
+        return pulumi.get(self, "individual_auth_enabled")
 
     @_builtins.property
     @pulumi.getter(name="installationID")

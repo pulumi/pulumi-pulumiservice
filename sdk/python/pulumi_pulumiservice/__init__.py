@@ -149,6 +149,15 @@ _utilities.register(
  },
  {
   "pkg": "pulumiservice",
+  "mod": "api/neo",
+  "fqn": "pulumi_pulumiservice.api.neo",
+  "classes": {
+   "pulumiservice:api/neo:MemberUsageCap": "MemberUsageCap",
+   "pulumiservice:api/neo:UsageCap": "UsageCap"
+  }
+ },
+ {
+  "pkg": "pulumiservice",
   "mod": "api/services",
   "fqn": "pulumi_pulumiservice.api.services",
   "classes": {

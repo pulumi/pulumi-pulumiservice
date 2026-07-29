@@ -5,7 +5,7 @@ import * as pulumi from "@pulumi/pulumi";
 import * as utilities from "../../utilities";
 
 /**
- * Creates a new agent task for the specified organization. The request must include a prompt (the user event message) that initiates the task. Set the 'permissionMode' field in the request body to restrict the agent to read-only operations. Returns the created task details including task ID, name, status, and timestamp.
+ * Creates a new agent task for the specified organization. The request must include a prompt (the user event message) that initiates the task. The message is a user message, so its discriminator field must be set to "type": "user_message". Set the 'permissionMode' field in the request body to restrict the agent to read-only operations. Returns the created task details including task ID, name, status, and timestamp.
  */
 export class Task extends pulumi.CustomResource {
     /**
@@ -87,6 +87,10 @@ export class Task extends pulumi.CustomResource {
      */
     declare public readonly planMode: pulumi.Output<boolean>;
     /**
+     * The id of the RBAC role this task assumes. Null when the task runs with the creating user's own permissions (no assumed role).
+     */
+    declare public readonly role: pulumi.Output<string | undefined>;
+    /**
      * The current runtime phase for this task. Null until the runtime checks in.
      */
     declare public /*out*/ readonly runtimePhase: pulumi.Output<string | undefined>;
@@ -95,7 +99,7 @@ export class Task extends pulumi.CustomResource {
      */
     declare public /*out*/ readonly sharedAt: pulumi.Output<string | undefined>;
     /**
-     * The origin that triggered this task. Valid values: 'console', 'cli', 'slack', 'schedule', 'api', 'github'.
+     * The origin that triggered this task. Valid values: 'console', 'cli', 'slack', 'schedule', 'api', 'github', 'code-review'.
      */
     declare public readonly source: pulumi.Output<string | undefined>;
     /**
@@ -118,6 +122,10 @@ export class Task extends pulumi.CustomResource {
      * Where tools are executed for this task. Valid values: 'cloud', 'cli'.
      */
     declare public readonly toolExecutionMode: pulumi.Output<string | undefined>;
+    /**
+     * The version control system this task operates against. Set for tasks that target a specific VCS platform (e.g. code reviews). Null for tasks with no VCS context.
+     */
+    declare public /*out*/ readonly vcsProvider: pulumi.Output<string | undefined>;
 
     /**
      * Create a Task resource with the given unique name, arguments, and options.
@@ -140,6 +148,7 @@ export class Task extends pulumi.CustomResource {
             resourceInputs["orgName"] = args?.orgName;
             resourceInputs["permissionMode"] = args?.permissionMode;
             resourceInputs["planMode"] = args?.planMode;
+            resourceInputs["role"] = args?.role;
             resourceInputs["source"] = args?.source;
             resourceInputs["taskID"] = args?.taskID;
             resourceInputs["toolExecutionMode"] = args?.toolExecutionMode;
@@ -159,6 +168,7 @@ export class Task extends pulumi.CustomResource {
             resourceInputs["status"] = undefined /*out*/;
             resourceInputs["taskType"] = undefined /*out*/;
             resourceInputs["tokensUsed"] = undefined /*out*/;
+            resourceInputs["vcsProvider"] = undefined /*out*/;
         } else {
             resourceInputs["approvalMode"] = undefined /*out*/;
             resourceInputs["asyncTriggerType"] = undefined /*out*/;
@@ -173,6 +183,7 @@ export class Task extends pulumi.CustomResource {
             resourceInputs["name"] = undefined /*out*/;
             resourceInputs["permissionMode"] = undefined /*out*/;
             resourceInputs["planMode"] = undefined /*out*/;
+            resourceInputs["role"] = undefined /*out*/;
             resourceInputs["runtimePhase"] = undefined /*out*/;
             resourceInputs["sharedAt"] = undefined /*out*/;
             resourceInputs["source"] = undefined /*out*/;
@@ -181,6 +192,7 @@ export class Task extends pulumi.CustomResource {
             resourceInputs["taskType"] = undefined /*out*/;
             resourceInputs["tokensUsed"] = undefined /*out*/;
             resourceInputs["toolExecutionMode"] = undefined /*out*/;
+            resourceInputs["vcsProvider"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
         super(Task.__pulumiType, name, resourceInputs, opts);
@@ -204,7 +216,7 @@ export interface TaskArgs {
      */
     enabledIntegrations?: pulumi.Input<any[] | undefined>;
     /**
-     * The message content
+     * The message content. This is the first event in the conversation and must be a user message, so its discriminator field must be set to "type": "user_message".
      */
     message?: any | undefined;
     /**
@@ -219,6 +231,10 @@ export interface TaskArgs {
      * Whether to enable plan mode for this task.
      */
     planMode?: pulumi.Input<boolean | undefined>;
+    /**
+     * Optional RBAC role the task assumes, identified by role id. When set, the task operates with that role's permissions in place of the creating user's own assignments. You may only assume a role that is assigned to you, directly or through a team; a role you do not hold is rejected with a 403. Omitted/null means no assumed role: the task uses the creating user's full permissions. Orthogonal to permissionMode, which controls the read-only behavior posture independently.
+     */
+    role?: pulumi.Input<string | undefined>;
     /**
      * The origin that triggered this task. Defaults to 'api' if omitted.
      */

@@ -22,7 +22,7 @@ namespace Pulumi.PulumiService.Api.Stacks
     public partial class Stack : global::Pulumi.CustomResource
     {
         /// <summary>
-        /// The active update
+        /// UUID of the most recent update on this stack, either completed or in-progress.
         /// </summary>
         [Output("activeUpdate")]
         public Output<string> ActiveUpdate { get; private set; } = null!;
@@ -35,7 +35,7 @@ namespace Pulumi.PulumiService.Api.Stacks
         public Output<object?> Config { get; private set; } = null!;
 
         /// <summary>
-        /// CurrentOperation provides information about a stack operation in-progress, as applicable.
+        /// Information about a live operation currently running for the stack, its kind, the author who initiated it, and its start time. Null when no operation is in flight.
         /// </summary>
         [Output("currentOperation")]
         public Output<object?> CurrentOperation { get; private set; } = null!;

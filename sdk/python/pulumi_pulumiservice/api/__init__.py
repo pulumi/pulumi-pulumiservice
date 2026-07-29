@@ -31,6 +31,8 @@ if typing.TYPE_CHECKING:
     insights = __insights
     import pulumi_pulumiservice.api.integrations as __integrations
     integrations = __integrations
+    import pulumi_pulumiservice.api.neo as __neo
+    neo = __neo
     import pulumi_pulumiservice.api.services as __services
     services = __services
     import pulumi_pulumiservice.api.stacks as __stacks
@@ -46,6 +48,7 @@ else:
     esc = _utilities.lazy_import('pulumi_pulumiservice.api.esc')
     insights = _utilities.lazy_import('pulumi_pulumiservice.api.insights')
     integrations = _utilities.lazy_import('pulumi_pulumiservice.api.integrations')
+    neo = _utilities.lazy_import('pulumi_pulumiservice.api.neo')
     services = _utilities.lazy_import('pulumi_pulumiservice.api.services')
     stacks = _utilities.lazy_import('pulumi_pulumiservice.api.stacks')
     teams = _utilities.lazy_import('pulumi_pulumiservice.api.teams')

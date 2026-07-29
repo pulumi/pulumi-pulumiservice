@@ -26,6 +26,7 @@ class TaskArgs:
                  message: Optional[Any] = None,
                  permission_mode: pulumi.Input[Optional[_builtins.str]] = None,
                  plan_mode: pulumi.Input[Optional[_builtins.bool]] = None,
+                 role: pulumi.Input[Optional[_builtins.str]] = None,
                  source: pulumi.Input[Optional[_builtins.str]] = None,
                  task_id: pulumi.Input[Optional[_builtins.str]] = None,
                  tool_execution_mode: pulumi.Input[Optional[_builtins.str]] = None):
@@ -36,9 +37,10 @@ class TaskArgs:
         :param pulumi.Input[_builtins.str] approval_mode: Optional approval mode override for this task. If omitted, org default is used.
         :param pulumi.Input[Sequence[Any]] cli_integrations: Optional filter for CLI integrations to enable for this task. Semantics: omitted/null → enable all CLI integrations connected for the org; empty list → explicit opt-out (no CLI integrations for this task); populated list → whitelist by (catalogId, name) of the configured instances to enable. Entries with missing or unknown catalogId, missing name, or referencing a (catalogId, name) pair that is not connected for the organization are rejected with a 400 response. catalogId matching is case-insensitive.
         :param pulumi.Input[Sequence[Any]] enabled_integrations: Optional list of integrations to enable for this task. Semantics: omitted/null → inherit all org-enabled integrations; empty list → explicit opt-out (no integration credentials for this task); populated list → whitelist of specific integrations by ID. Modeled as an object array rather than a bare string array so multi-instance support (instance_name, scope, etc.) can be added later without a wire break.
-        :param Any message: The message content
+        :param Any message: The message content. This is the first event in the conversation and must be a user message, so its discriminator field must be set to "type": "user_message".
         :param pulumi.Input[_builtins.str] permission_mode: Controls the permission scope for the task. When omitted, defaults to 'default' (the agent uses the creating user's full permissions).
         :param pulumi.Input[_builtins.bool] plan_mode: Whether to enable plan mode for this task.
+        :param pulumi.Input[_builtins.str] role: Optional RBAC role the task assumes, identified by role id. When set, the task operates with that role's permissions in place of the creating user's own assignments. You may only assume a role that is assigned to you, directly or through a team; a role you do not hold is rejected with a 403. Omitted/null means no assumed role: the task uses the creating user's full permissions. Orthogonal to permissionMode, which controls the read-only behavior posture independently.
         :param pulumi.Input[_builtins.str] source: The origin that triggered this task. Defaults to 'api' if omitted.
         :param pulumi.Input[_builtins.str] task_id: The agent task identifier
         :param pulumi.Input[_builtins.str] tool_execution_mode: Where tools should be executed. Defaults to 'cloud' if omitted.
@@ -56,6 +58,8 @@ class TaskArgs:
             pulumi.set(__self__, "permission_mode", permission_mode)
         if plan_mode is not None:
             pulumi.set(__self__, "plan_mode", plan_mode)
+        if role is not None:
+            pulumi.set(__self__, "role", role)
         if source is not None:
             pulumi.set(__self__, "source", source)
         if task_id is not None:
@@ -115,7 +119,7 @@ class TaskArgs:
     @pulumi.getter
     def message(self) -> Optional[Any]:
         """
-        The message content
+        The message content. This is the first event in the conversation and must be a user message, so its discriminator field must be set to "type": "user_message".
         """
         return pulumi.get(self, "message")
 
@@ -146,6 +150,18 @@ class TaskArgs:
     @plan_mode.setter
     def plan_mode(self, value: pulumi.Input[Optional[_builtins.bool]]):
         pulumi.set(self, "plan_mode", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def role(self) -> pulumi.Input[Optional[_builtins.str]]:
+        """
+        Optional RBAC role the task assumes, identified by role id. When set, the task operates with that role's permissions in place of the creating user's own assignments. You may only assume a role that is assigned to you, directly or through a team; a role you do not hold is rejected with a 403. Omitted/null means no assumed role: the task uses the creating user's full permissions. Orthogonal to permissionMode, which controls the read-only behavior posture independently.
+        """
+        return pulumi.get(self, "role")
+
+    @role.setter
+    def role(self, value: pulumi.Input[Optional[_builtins.str]]):
+        pulumi.set(self, "role", value)
 
     @_builtins.property
     @pulumi.getter
@@ -197,22 +213,24 @@ class Task(pulumi.CustomResource):
                  org_name: pulumi.Input[Optional[_builtins.str]] = None,
                  permission_mode: pulumi.Input[Optional[_builtins.str]] = None,
                  plan_mode: pulumi.Input[Optional[_builtins.bool]] = None,
+                 role: pulumi.Input[Optional[_builtins.str]] = None,
                  source: pulumi.Input[Optional[_builtins.str]] = None,
                  task_id: pulumi.Input[Optional[_builtins.str]] = None,
                  tool_execution_mode: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         """
-        Creates a new agent task for the specified organization. The request must include a prompt (the user event message) that initiates the task. Set the 'permissionMode' field in the request body to restrict the agent to read-only operations. Returns the created task details including task ID, name, status, and timestamp.
+        Creates a new agent task for the specified organization. The request must include a prompt (the user event message) that initiates the task. The message is a user message, so its discriminator field must be set to "type": "user_message". Set the 'permissionMode' field in the request body to restrict the agent to read-only operations. Returns the created task details including task ID, name, status, and timestamp.
 
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] approval_mode: Optional approval mode override for this task. If omitted, org default is used.
         :param pulumi.Input[Sequence[Any]] cli_integrations: Optional filter for CLI integrations to enable for this task. Semantics: omitted/null → enable all CLI integrations connected for the org; empty list → explicit opt-out (no CLI integrations for this task); populated list → whitelist by (catalogId, name) of the configured instances to enable. Entries with missing or unknown catalogId, missing name, or referencing a (catalogId, name) pair that is not connected for the organization are rejected with a 400 response. catalogId matching is case-insensitive.
         :param pulumi.Input[Sequence[Any]] enabled_integrations: Optional list of integrations to enable for this task. Semantics: omitted/null → inherit all org-enabled integrations; empty list → explicit opt-out (no integration credentials for this task); populated list → whitelist of specific integrations by ID. Modeled as an object array rather than a bare string array so multi-instance support (instance_name, scope, etc.) can be added later without a wire break.
-        :param Any message: The message content
+        :param Any message: The message content. This is the first event in the conversation and must be a user message, so its discriminator field must be set to "type": "user_message".
         :param pulumi.Input[_builtins.str] org_name: The organization name
         :param pulumi.Input[_builtins.str] permission_mode: Controls the permission scope for the task. When omitted, defaults to 'default' (the agent uses the creating user's full permissions).
         :param pulumi.Input[_builtins.bool] plan_mode: Whether to enable plan mode for this task.
+        :param pulumi.Input[_builtins.str] role: Optional RBAC role the task assumes, identified by role id. When set, the task operates with that role's permissions in place of the creating user's own assignments. You may only assume a role that is assigned to you, directly or through a team; a role you do not hold is rejected with a 403. Omitted/null means no assumed role: the task uses the creating user's full permissions. Orthogonal to permissionMode, which controls the read-only behavior posture independently.
         :param pulumi.Input[_builtins.str] source: The origin that triggered this task. Defaults to 'api' if omitted.
         :param pulumi.Input[_builtins.str] task_id: The agent task identifier
         :param pulumi.Input[_builtins.str] tool_execution_mode: Where tools should be executed. Defaults to 'cloud' if omitted.
@@ -224,7 +242,7 @@ class Task(pulumi.CustomResource):
                  args: TaskArgs,
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
-        Creates a new agent task for the specified organization. The request must include a prompt (the user event message) that initiates the task. Set the 'permissionMode' field in the request body to restrict the agent to read-only operations. Returns the created task details including task ID, name, status, and timestamp.
+        Creates a new agent task for the specified organization. The request must include a prompt (the user event message) that initiates the task. The message is a user message, so its discriminator field must be set to "type": "user_message". Set the 'permissionMode' field in the request body to restrict the agent to read-only operations. Returns the created task details including task ID, name, status, and timestamp.
 
         :param str resource_name: The name of the resource.
         :param TaskArgs args: The arguments to use to populate this resource's properties.
@@ -248,6 +266,7 @@ class Task(pulumi.CustomResource):
                  org_name: pulumi.Input[Optional[_builtins.str]] = None,
                  permission_mode: pulumi.Input[Optional[_builtins.str]] = None,
                  plan_mode: pulumi.Input[Optional[_builtins.bool]] = None,
+                 role: pulumi.Input[Optional[_builtins.str]] = None,
                  source: pulumi.Input[Optional[_builtins.str]] = None,
                  task_id: pulumi.Input[Optional[_builtins.str]] = None,
                  tool_execution_mode: pulumi.Input[Optional[_builtins.str]] = None,
@@ -269,6 +288,7 @@ class Task(pulumi.CustomResource):
             __props__.__dict__["org_name"] = org_name
             __props__.__dict__["permission_mode"] = permission_mode
             __props__.__dict__["plan_mode"] = plan_mode
+            __props__.__dict__["role"] = role
             __props__.__dict__["source"] = source
             __props__.__dict__["task_id"] = task_id
             __props__.__dict__["tool_execution_mode"] = tool_execution_mode
@@ -288,6 +308,7 @@ class Task(pulumi.CustomResource):
             __props__.__dict__["status"] = None
             __props__.__dict__["task_type"] = None
             __props__.__dict__["tokens_used"] = None
+            __props__.__dict__["vcs_provider"] = None
         super(Task, __self__).__init__(
             'pulumiservice:api/agents:Task',
             resource_name,
@@ -323,6 +344,7 @@ class Task(pulumi.CustomResource):
         __props__.__dict__["name"] = None
         __props__.__dict__["permission_mode"] = None
         __props__.__dict__["plan_mode"] = None
+        __props__.__dict__["role"] = None
         __props__.__dict__["runtime_phase"] = None
         __props__.__dict__["shared_at"] = None
         __props__.__dict__["source"] = None
@@ -331,6 +353,7 @@ class Task(pulumi.CustomResource):
         __props__.__dict__["task_type"] = None
         __props__.__dict__["tokens_used"] = None
         __props__.__dict__["tool_execution_mode"] = None
+        __props__.__dict__["vcs_provider"] = None
         return Task(resource_name, opts=opts, __props__=__props__)
 
     @_builtins.property
@@ -438,6 +461,14 @@ class Task(pulumi.CustomResource):
         return pulumi.get(self, "plan_mode")
 
     @_builtins.property
+    @pulumi.getter
+    def role(self) -> pulumi.Output[Optional[_builtins.str]]:
+        """
+        The id of the RBAC role this task assumes. Null when the task runs with the creating user's own permissions (no assumed role).
+        """
+        return pulumi.get(self, "role")
+
+    @_builtins.property
     @pulumi.getter(name="runtimePhase")
     def runtime_phase(self) -> pulumi.Output[Optional[_builtins.str]]:
         """
@@ -457,7 +488,7 @@ class Task(pulumi.CustomResource):
     @pulumi.getter
     def source(self) -> pulumi.Output[Optional[_builtins.str]]:
         """
-        The origin that triggered this task. Valid values: 'console', 'cli', 'slack', 'schedule', 'api', 'github'.
+        The origin that triggered this task. Valid values: 'console', 'cli', 'slack', 'schedule', 'api', 'github', 'code-review'.
         """
         return pulumi.get(self, "source")
 
@@ -500,4 +531,12 @@ class Task(pulumi.CustomResource):
         Where tools are executed for this task. Valid values: 'cloud', 'cli'.
         """
         return pulumi.get(self, "tool_execution_mode")
+
+    @_builtins.property
+    @pulumi.getter(name="vcsProvider")
+    def vcs_provider(self) -> pulumi.Output[Optional[_builtins.str]]:
+        """
+        The version control system this task operates against. Set for tasks that target a specific VCS platform (e.g. code reviews). Null for tasks with no VCS context.
+        """
+        return pulumi.get(self, "vcs_provider")
 
