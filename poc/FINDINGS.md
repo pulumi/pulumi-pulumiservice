@@ -3,6 +3,32 @@
 Branch `claude/union-poc`. Everything below was produced and verified locally on
 2026-07-30 with pulumi v3.242.0.
 
+## Update: the generator now produces this automatically
+
+`provider/pkg/rest/types.go` implements the demand-driven type registry inside
+`BuildSchema`: named types for every reachable component schema, discriminated bases as
+inline `oneOf` + `discriminator` over const-tagged flattened variants, 1-variant bases as
+definite types, cycle-safe recursion, module assignment by reachability (shared types hoist
+to `api`), resource-token collisions suffixed `Properties`, and a hard error on 2-member
+object unions. The committed `schema.json` is now `pulumi package get-schema ./bin/...`
+output, no hand patch, and the `POC_SCHEMA_FILE` hook is gone.
+
+Mechanical run over the full spec:
+
+- **146 named api types** across 9 modules, **19 discriminated union sites** (the hand
+  patch had 11 types / 4 sites). New unions the patch never covered: 3-member
+  `ApprovalRuleEligibility` on Gate, 4-member `AgentEntity` on Task, and the recursive
+  **17-member `PermissionExpression`** tree.
+- `Role.details` is byte-equal to the hand patch (modulo descriptions);
+  `Gate.rule` correctly collapsed to the definite `ChangeGateApprovalRuleInput` (1-variant
+  rule); previously-`Any` nested objects (`operationContext`, `cacheOptions`, ...) are now
+  named types.
+- Zero generator errors, zero guard trips; all existing provider tests pass (10 packages),
+  including scaffold idempotency and example coverage.
+- All 5 SDKs regenerate; TS/Go/.NET compile checked; the TS example previews with tags
+  intact; `pulumi convert` binds the provider's own GetSchema with no override and
+  reproduces the same per-language results (including the Go `__type` bug).
+
 ## What the POC is
 
 `poc/patch_schema.py` rewrites the committed schema
