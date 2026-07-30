@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"os"
 	"runtime"
 	"strings"
 	"sync/atomic"
@@ -265,6 +266,15 @@ func (t *authedTransport) Do(_ context.Context, req *http.Request) (*http.Respon
 func withCloudApiSchema(prov p.Provider, spec *rest.Spec, metadata *rest.Metadata, pkg string) p.Provider {
 	inner := prov.GetSchema
 	prov.GetSchema = func(ctx context.Context, req p.GetSchemaRequest) (p.GetSchemaResponse, error) {
+		// POC ONLY: serve a schema file verbatim so convert/import can bind
+		// against experimental schema shapes. Remove before merge.
+		if f := os.Getenv("POC_SCHEMA_FILE"); f != "" {
+			raw, rerr := os.ReadFile(f)
+			if rerr != nil {
+				return p.GetSchemaResponse{}, fmt.Errorf("POC_SCHEMA_FILE: %w", rerr)
+			}
+			return p.GetSchemaResponse{Schema: string(raw)}, nil
+		}
 		resp, err := inner(ctx, req)
 		if err != nil {
 			return resp, err

@@ -38,14 +38,14 @@
       },
       "gradleNexusPublishPluginVersion": "2.0.0",
       "gradleTest": "",
-      "readme": "# Pulumi Service Provider\n\n[![Slack](http://www.pulumi.com/images/docs/badges/slack.svg)](https://slack.pulumi.com)\n[![NPM version](https://badge.fury.io/js/%40pulumi%2Fpulumiservice.svg)](https://www.npmjs.com/package/@pulumi/pulumiservice)\n[![Python version](https://badge.fury.io/py/pulumi-pulumiservice.svg)](https://pypi.org/project/pulumi-pulumiservice)\n[![NuGet version](https://badge.fury.io/nu/pulumi.pulumiservice.svg)](https://badge.fury.io/nu/pulumi.pulumiservice)\n[![PkgGoDev](https://pkg.go.dev/badge/github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice)](https://pkg.go.dev/github.com/pulumi/pulumi-pulumiservice/sdk/go)\n[![License](https://img.shields.io/npm/l/%40pulumi%2Fpulumiservice.svg)](https://github.com/pulumi/pulumi-pulumiservice/blob/main/LICENSE)\n\nPulumi Service Provider for creating Pulumi Cloud resources.\n\nThe Pulumi Service Provider (PSP) is built on top of the [Pulumi Cloud REST API](https://www.pulumi.com/docs/pulumi-cloud/reference/cloud-rest-api/), allowing Pulumi customers to create Pulumi Cloud resources using Pulumi programs. That includes Stacks, Environments, Teams, Tokens, Webhooks, Tags, Deployment Settings, Deployment Schedules and much more! Pulumi Service Provider is especially powerful when used in combination with the [Automation API](https://pulumi.com/automation).\n\nFor a full list of supported resources, visit the [Pulumi Registry](https://www.pulumi.com/registry/packages/pulumiservice/). For the REST API reference documentation, visit [Pulumi Cloud API Documentation](https://www.pulumi.com/docs/pulumi-cloud/reference/cloud-rest-api/).\n\nFor now, PSP is in public preview, but we're working on releasing v1.0 in the near future.\n\n## Resource surfaces\n\nResources are organized into two surfaces under one package:\n\n- **v0 (package root)** — Mature, hand-maintained resources accessible directly off the package import (e.g. `pulumiservice.Stack`). **In maintenance mode**: bug fixes and security updates only; no new resources or features. Existing programs continue to work without any code changes.\n- **api (`pulumiservice.api`)** — **Preview.** Actively developed, generated at runtime from the public Pulumi Cloud OpenAPI specification. Resource shape and module layout may change before GA; not yet recommended for production. Coverage expands as new operations are mapped from the spec.\n\nResources from both surfaces can be used in the same program. There is no forced migration: existing users stay on v0 indefinitely, or migrate individual resources to the api surface by updating their IaC code (resource type + input shape) and adding Pulumi `aliases` on the new api declaration so state rebinds in place. v0 has known coverage gaps relative to the full Cloud API; the api surface closes those gaps over time.\n\n## Installing\n\nThis package is available in many languages in the standard packaging formats.\n\n### Node.js (Javascript/TypeScript)\n\nTo use from JavaScript or TypeScript in Node.js, install using either `npm`:\n\n```sh\nnpm install @pulumi/pulumiservice\n```\n\nor `yarn`:\n\n```sh\nyarn add @pulumi/pulumiservice\n```\n\n### Python\n\nTo use from Python, install using `pip`:\n\n```sh\npip install pulumi_pulumiservice\n```\n\n### Go\n\nTo use from Go, use `go get` to grab the latest version of the library\n\n```sh\ngo get github.com/pulumi/pulumi-pulumiservice/sdk/go\n```\n\n### .NET\n\nTo use from .NET, install using `dotnet add package`:\n\n```sh\ndotnet add package Pulumi.PulumiService\n```\n\n### Java\n\nTo use from Java, add an entry to your `build.gradle` file:\n\n```groovy\nimplementation 'com.pulumi:pulumiservice:%Fill in latest version from the badge up top%'\n```\n\nOr to your `pom.xml` file:\n\n```xml\n<dependency>\n    <groupId>com.pulumi</groupId>\n    <artifactId>pulumiservice</artifactId>\n    <version>%Fill in latest version from the badge up top%</version>\n</dependency>\n```\n\n## Setup\n\nEnsure that you have ran `pulumi login`. Run `pulumi whoami` to verify that you are logged in.\n\n### Configuration Options\n\nUse `pulumi config set pulumiservice:<option>` or pass options to the [constructor of `new pulumiservice.Provider`][1].\n\n| Option        | Environment Variable Name | Required/Optional | Description                                                                           |\n|---------------|---------------------------|-------------------|---------------------------------------------------------------------------------------|\n| `accessToken` | `PULUMI_ACCESS_TOKEN`     | Optional          | Overrides [Pulumi Service Access Tokens][2]                                           |\n| `apiUrl`      | `PULUMI_BACKEND_URL`      | Optional          | Allows overriding default [Pulumi Service API URL][3] for [self hosted customers][4]. |\n|               |                           |                   |                                                                                       |\n\n## Examples\n\n```typescript\nimport * as aws from \"@pulumi/awsx\"\nimport * as pulumi from \"@pulumi/pulumi\";\nimport * as service from \"@pulumi/pulumiservice\";\n\nconst team = new service.Team(\"team\", {\n    name: \"pulumi-service-team\",\n    displayName: \"Pulumi Service\",\n    description: \"The Pulumi Service Team\",\n    organizationName: \"pulumi\",\n    teamType: \"pulumi\",\n    members: [\n        \"piers\",\n        \"bryce\",\n        \"casey\"\n        \"evan\",\n        \"devon\",\n        \"meagan\",\n        \"myles\",\n        \"steve\"\n    ],\n});\n\nexport const members = team.members;\n```\n\nCheck out the [examples/](examples/) directory for more examples.\n\n[1]: https://www.pulumi.com/registry/packages/pulumiservice/api-docs/provider/\n[2]: https://www.pulumi.com/docs/pulumi-cloud/access-management/access-tokens/\n[3]: https://www.pulumi.com/docs/pulumi-cloud/reference/cloud-rest-api/\n[4]: https://www.pulumi.com/docs/pulumi-cloud/self-hosted/\n"
+      "readme": "# Pulumi Service Provider\n\n[![Slack](http://www.pulumi.com/images/docs/badges/slack.svg)](https://slack.pulumi.com)\n[![NPM version](https://badge.fury.io/js/%40pulumi%2Fpulumiservice.svg)](https://www.npmjs.com/package/@pulumi/pulumiservice)\n[![Python version](https://badge.fury.io/py/pulumi-pulumiservice.svg)](https://pypi.org/project/pulumi-pulumiservice)\n[![NuGet version](https://badge.fury.io/nu/pulumi.pulumiservice.svg)](https://badge.fury.io/nu/pulumi.pulumiservice)\n[![PkgGoDev](https://pkg.go.dev/badge/github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice)](https://pkg.go.dev/github.com/pulumi/pulumi-pulumiservice/sdk/go)\n[![License](https://img.shields.io/npm/l/%40pulumi%2Fpulumiservice.svg)](https://github.com/pulumi/pulumi-pulumiservice/blob/main/LICENSE)\n\nPulumi Service Provider for creating Pulumi Cloud resources.\n\nThe Pulumi Service Provider (PSP) is built on top of the [Pulumi Cloud REST API](https://www.pulumi.com/docs/pulumi-cloud/reference/cloud-rest-api/), allowing Pulumi customers to create Pulumi Cloud resources using Pulumi programs. That includes Stacks, Environments, Teams, Tokens, Webhooks, Tags, Deployment Settings, Deployment Schedules and much more! Pulumi Service Provider is especially powerful when used in combination with the\u00a0[Automation API](https://pulumi.com/automation).\n\nFor a full list of supported resources, visit the [Pulumi Registry](https://www.pulumi.com/registry/packages/pulumiservice/). For the REST API reference documentation, visit [Pulumi Cloud API Documentation](https://www.pulumi.com/docs/pulumi-cloud/reference/cloud-rest-api/).\n\nFor now, PSP is in public preview, but we're working on releasing v1.0 in the near future.\n\n## Resource surfaces\n\nResources are organized into two surfaces under one package:\n\n- **v0 (package root)** \u2014 Mature, hand-maintained resources accessible directly off the package import (e.g. `pulumiservice.Stack`). **In maintenance mode**: bug fixes and security updates only; no new resources or features. Existing programs continue to work without any code changes.\n- **api (`pulumiservice.api`)** \u2014 **Preview.** Actively developed, generated at runtime from the public Pulumi Cloud OpenAPI specification. Resource shape and module layout may change before GA; not yet recommended for production. Coverage expands as new operations are mapped from the spec.\n\nResources from both surfaces can be used in the same program. There is no forced migration: existing users stay on v0 indefinitely, or migrate individual resources to the api surface by updating their IaC code (resource type + input shape) and adding Pulumi `aliases` on the new api declaration so state rebinds in place. v0 has known coverage gaps relative to the full Cloud API; the api surface closes those gaps over time.\n\n## Installing\n\nThis package is available in many languages in the standard packaging formats.\n\n### Node.js (Javascript/TypeScript)\n\nTo use from JavaScript or TypeScript in Node.js, install using either `npm`:\n\n```sh\nnpm install @pulumi/pulumiservice\n```\n\nor `yarn`:\n\n```sh\nyarn add @pulumi/pulumiservice\n```\n\n### Python\n\nTo use from Python, install using `pip`:\n\n```sh\npip install pulumi_pulumiservice\n```\n\n### Go\n\nTo use from Go, use `go get` to grab the latest version of the library\n\n```sh\ngo get github.com/pulumi/pulumi-pulumiservice/sdk/go\n```\n\n### .NET\n\nTo use from .NET, install using `dotnet add package`:\n\n```sh\ndotnet add package Pulumi.PulumiService\n```\n\n### Java\n\nTo use from Java, add an entry to your `build.gradle` file:\n\n```groovy\nimplementation 'com.pulumi:pulumiservice:%Fill in latest version from the badge up top%'\n```\n\nOr to your `pom.xml` file:\n\n```xml\n<dependency>\n    <groupId>com.pulumi</groupId>\n    <artifactId>pulumiservice</artifactId>\n    <version>%Fill in latest version from the badge up top%</version>\n</dependency>\n```\n\n## Setup\n\nEnsure that you have ran `pulumi login`. Run `pulumi whoami` to verify that you are logged in.\n\n### Configuration Options\n\nUse `pulumi config set pulumiservice:<option>` or pass options to the [constructor of `new pulumiservice.Provider`][1].\n\n| Option        | Environment Variable Name | Required/Optional | Description                                                                           |\n|---------------|---------------------------|-------------------|---------------------------------------------------------------------------------------|\n| `accessToken` | `PULUMI_ACCESS_TOKEN`     | Optional          | Overrides [Pulumi Service Access Tokens][2]                                           |\n| `apiUrl`      | `PULUMI_BACKEND_URL`      | Optional          | Allows overriding default [Pulumi Service API URL][3] for [self hosted customers][4]. |\n|               |                           |                   |                                                                                       |\n\n## Examples\n\n```typescript\nimport * as aws from \"@pulumi/awsx\"\nimport * as pulumi from \"@pulumi/pulumi\";\nimport * as service from \"@pulumi/pulumiservice\";\n\nconst team = new service.Team(\"team\", {\n    name: \"pulumi-service-team\",\n    displayName: \"Pulumi Service\",\n    description: \"The Pulumi Service Team\",\n    organizationName: \"pulumi\",\n    teamType: \"pulumi\",\n    members: [\n        \"piers\",\n        \"bryce\",\n        \"casey\"\n        \"evan\",\n        \"devon\",\n        \"meagan\",\n        \"myles\",\n        \"steve\"\n    ],\n});\n\nexport const members = team.members;\n```\n\nCheck out the [examples/](examples/) directory for more examples.\n\n[1]: https://www.pulumi.com/registry/packages/pulumiservice/api-docs/provider/\n[2]: https://www.pulumi.com/docs/pulumi-cloud/access-management/access-tokens/\n[3]: https://www.pulumi.com/docs/pulumi-cloud/reference/cloud-rest-api/\n[4]: https://www.pulumi.com/docs/pulumi-cloud/self-hosted/\n"
     },
     "nodejs": {
       "dependencies": {
         "@pulumi/pulumi": "^3.0.0"
       },
       "packageName": "@pulumi/pulumiservice",
-      "readme": "# Pulumi Service Provider\n\n[![Slack](http://www.pulumi.com/images/docs/badges/slack.svg)](https://slack.pulumi.com)\n[![NPM version](https://badge.fury.io/js/%40pulumi%2Fpulumiservice.svg)](https://www.npmjs.com/package/@pulumi/pulumiservice)\n[![Python version](https://badge.fury.io/py/pulumi-pulumiservice.svg)](https://pypi.org/project/pulumi-pulumiservice)\n[![NuGet version](https://badge.fury.io/nu/pulumi.pulumiservice.svg)](https://badge.fury.io/nu/pulumi.pulumiservice)\n[![PkgGoDev](https://pkg.go.dev/badge/github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice)](https://pkg.go.dev/github.com/pulumi/pulumi-pulumiservice/sdk/go)\n[![License](https://img.shields.io/npm/l/%40pulumi%2Fpulumiservice.svg)](https://github.com/pulumi/pulumi-pulumiservice/blob/main/LICENSE)\n\nPulumi Service Provider for creating Pulumi Cloud resources.\n\nThe Pulumi Service Provider (PSP) is built on top of the [Pulumi Cloud REST API](https://www.pulumi.com/docs/pulumi-cloud/reference/cloud-rest-api/), allowing Pulumi customers to create Pulumi Cloud resources using Pulumi programs. That includes Stacks, Environments, Teams, Tokens, Webhooks, Tags, Deployment Settings, Deployment Schedules and much more! Pulumi Service Provider is especially powerful when used in combination with the [Automation API](https://pulumi.com/automation).\n\nFor a full list of supported resources, visit the [Pulumi Registry](https://www.pulumi.com/registry/packages/pulumiservice/). For the REST API reference documentation, visit [Pulumi Cloud API Documentation](https://www.pulumi.com/docs/pulumi-cloud/reference/cloud-rest-api/).\n\nFor now, PSP is in public preview, but we're working on releasing v1.0 in the near future.\n\n## Resource surfaces\n\nResources are organized into two surfaces under one package:\n\n- **v0 (package root)** — Mature, hand-maintained resources accessible directly off the package import (e.g. `pulumiservice.Stack`). **In maintenance mode**: bug fixes and security updates only; no new resources or features. Existing programs continue to work without any code changes.\n- **api (`pulumiservice.api`)** — **Preview.** Actively developed, generated at runtime from the public Pulumi Cloud OpenAPI specification. Resource shape and module layout may change before GA; not yet recommended for production. Coverage expands as new operations are mapped from the spec.\n\nResources from both surfaces can be used in the same program. There is no forced migration: existing users stay on v0 indefinitely, or migrate individual resources to the api surface by updating their IaC code (resource type + input shape) and adding Pulumi `aliases` on the new api declaration so state rebinds in place. v0 has known coverage gaps relative to the full Cloud API; the api surface closes those gaps over time.\n\n## Installing\n\nThis package is available in many languages in the standard packaging formats.\n\n### Node.js (Javascript/TypeScript)\n\nTo use from JavaScript or TypeScript in Node.js, install using either `npm`:\n\n```sh\nnpm install @pulumi/pulumiservice\n```\n\nor `yarn`:\n\n```sh\nyarn add @pulumi/pulumiservice\n```\n\n### Python\n\nTo use from Python, install using `pip`:\n\n```sh\npip install pulumi_pulumiservice\n```\n\n### Go\n\nTo use from Go, use `go get` to grab the latest version of the library\n\n```sh\ngo get github.com/pulumi/pulumi-pulumiservice/sdk/go\n```\n\n### .NET\n\nTo use from .NET, install using `dotnet add package`:\n\n```sh\ndotnet add package Pulumi.PulumiService\n```\n\n### Java\n\nTo use from Java, add an entry to your `build.gradle` file:\n\n```groovy\nimplementation 'com.pulumi:pulumiservice:%Fill in latest version from the badge up top%'\n```\n\nOr to your `pom.xml` file:\n\n```xml\n<dependency>\n    <groupId>com.pulumi</groupId>\n    <artifactId>pulumiservice</artifactId>\n    <version>%Fill in latest version from the badge up top%</version>\n</dependency>\n```\n\n## Setup\n\nEnsure that you have ran `pulumi login`. Run `pulumi whoami` to verify that you are logged in.\n\n### Configuration Options\n\nUse `pulumi config set pulumiservice:<option>` or pass options to the [constructor of `new pulumiservice.Provider`][1].\n\n| Option        | Environment Variable Name | Required/Optional | Description                                                                           |\n|---------------|---------------------------|-------------------|---------------------------------------------------------------------------------------|\n| `accessToken` | `PULUMI_ACCESS_TOKEN`     | Optional          | Overrides [Pulumi Service Access Tokens][2]                                           |\n| `apiUrl`      | `PULUMI_BACKEND_URL`      | Optional          | Allows overriding default [Pulumi Service API URL][3] for [self hosted customers][4]. |\n|               |                           |                   |                                                                                       |\n\n## Examples\n\n```typescript\nimport * as aws from \"@pulumi/awsx\"\nimport * as pulumi from \"@pulumi/pulumi\";\nimport * as service from \"@pulumi/pulumiservice\";\n\nconst team = new service.Team(\"team\", {\n    name: \"pulumi-service-team\",\n    displayName: \"Pulumi Service\",\n    description: \"The Pulumi Service Team\",\n    organizationName: \"pulumi\",\n    teamType: \"pulumi\",\n    members: [\n        \"piers\",\n        \"bryce\",\n        \"casey\"\n        \"evan\",\n        \"devon\",\n        \"meagan\",\n        \"myles\",\n        \"steve\"\n    ],\n});\n\nexport const members = team.members;\n```\n\nCheck out the [examples/](examples/) directory for more examples.\n\n[1]: https://www.pulumi.com/registry/packages/pulumiservice/api-docs/provider/\n[2]: https://www.pulumi.com/docs/pulumi-cloud/access-management/access-tokens/\n[3]: https://www.pulumi.com/docs/pulumi-cloud/reference/cloud-rest-api/\n[4]: https://www.pulumi.com/docs/pulumi-cloud/self-hosted/\n",
+      "readme": "# Pulumi Service Provider\n\n[![Slack](http://www.pulumi.com/images/docs/badges/slack.svg)](https://slack.pulumi.com)\n[![NPM version](https://badge.fury.io/js/%40pulumi%2Fpulumiservice.svg)](https://www.npmjs.com/package/@pulumi/pulumiservice)\n[![Python version](https://badge.fury.io/py/pulumi-pulumiservice.svg)](https://pypi.org/project/pulumi-pulumiservice)\n[![NuGet version](https://badge.fury.io/nu/pulumi.pulumiservice.svg)](https://badge.fury.io/nu/pulumi.pulumiservice)\n[![PkgGoDev](https://pkg.go.dev/badge/github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice)](https://pkg.go.dev/github.com/pulumi/pulumi-pulumiservice/sdk/go)\n[![License](https://img.shields.io/npm/l/%40pulumi%2Fpulumiservice.svg)](https://github.com/pulumi/pulumi-pulumiservice/blob/main/LICENSE)\n\nPulumi Service Provider for creating Pulumi Cloud resources.\n\nThe Pulumi Service Provider (PSP) is built on top of the [Pulumi Cloud REST API](https://www.pulumi.com/docs/pulumi-cloud/reference/cloud-rest-api/), allowing Pulumi customers to create Pulumi Cloud resources using Pulumi programs. That includes Stacks, Environments, Teams, Tokens, Webhooks, Tags, Deployment Settings, Deployment Schedules and much more! Pulumi Service Provider is especially powerful when used in combination with the\u00a0[Automation API](https://pulumi.com/automation).\n\nFor a full list of supported resources, visit the [Pulumi Registry](https://www.pulumi.com/registry/packages/pulumiservice/). For the REST API reference documentation, visit [Pulumi Cloud API Documentation](https://www.pulumi.com/docs/pulumi-cloud/reference/cloud-rest-api/).\n\nFor now, PSP is in public preview, but we're working on releasing v1.0 in the near future.\n\n## Resource surfaces\n\nResources are organized into two surfaces under one package:\n\n- **v0 (package root)** \u2014 Mature, hand-maintained resources accessible directly off the package import (e.g. `pulumiservice.Stack`). **In maintenance mode**: bug fixes and security updates only; no new resources or features. Existing programs continue to work without any code changes.\n- **api (`pulumiservice.api`)** \u2014 **Preview.** Actively developed, generated at runtime from the public Pulumi Cloud OpenAPI specification. Resource shape and module layout may change before GA; not yet recommended for production. Coverage expands as new operations are mapped from the spec.\n\nResources from both surfaces can be used in the same program. There is no forced migration: existing users stay on v0 indefinitely, or migrate individual resources to the api surface by updating their IaC code (resource type + input shape) and adding Pulumi `aliases` on the new api declaration so state rebinds in place. v0 has known coverage gaps relative to the full Cloud API; the api surface closes those gaps over time.\n\n## Installing\n\nThis package is available in many languages in the standard packaging formats.\n\n### Node.js (Javascript/TypeScript)\n\nTo use from JavaScript or TypeScript in Node.js, install using either `npm`:\n\n```sh\nnpm install @pulumi/pulumiservice\n```\n\nor `yarn`:\n\n```sh\nyarn add @pulumi/pulumiservice\n```\n\n### Python\n\nTo use from Python, install using `pip`:\n\n```sh\npip install pulumi_pulumiservice\n```\n\n### Go\n\nTo use from Go, use `go get` to grab the latest version of the library\n\n```sh\ngo get github.com/pulumi/pulumi-pulumiservice/sdk/go\n```\n\n### .NET\n\nTo use from .NET, install using `dotnet add package`:\n\n```sh\ndotnet add package Pulumi.PulumiService\n```\n\n### Java\n\nTo use from Java, add an entry to your `build.gradle` file:\n\n```groovy\nimplementation 'com.pulumi:pulumiservice:%Fill in latest version from the badge up top%'\n```\n\nOr to your `pom.xml` file:\n\n```xml\n<dependency>\n    <groupId>com.pulumi</groupId>\n    <artifactId>pulumiservice</artifactId>\n    <version>%Fill in latest version from the badge up top%</version>\n</dependency>\n```\n\n## Setup\n\nEnsure that you have ran `pulumi login`. Run `pulumi whoami` to verify that you are logged in.\n\n### Configuration Options\n\nUse `pulumi config set pulumiservice:<option>` or pass options to the [constructor of `new pulumiservice.Provider`][1].\n\n| Option        | Environment Variable Name | Required/Optional | Description                                                                           |\n|---------------|---------------------------|-------------------|---------------------------------------------------------------------------------------|\n| `accessToken` | `PULUMI_ACCESS_TOKEN`     | Optional          | Overrides [Pulumi Service Access Tokens][2]                                           |\n| `apiUrl`      | `PULUMI_BACKEND_URL`      | Optional          | Allows overriding default [Pulumi Service API URL][3] for [self hosted customers][4]. |\n|               |                           |                   |                                                                                       |\n\n## Examples\n\n```typescript\nimport * as aws from \"@pulumi/awsx\"\nimport * as pulumi from \"@pulumi/pulumi\";\nimport * as service from \"@pulumi/pulumiservice\";\n\nconst team = new service.Team(\"team\", {\n    name: \"pulumi-service-team\",\n    displayName: \"Pulumi Service\",\n    description: \"The Pulumi Service Team\",\n    organizationName: \"pulumi\",\n    teamType: \"pulumi\",\n    members: [\n        \"piers\",\n        \"bryce\",\n        \"casey\"\n        \"evan\",\n        \"devon\",\n        \"meagan\",\n        \"myles\",\n        \"steve\"\n    ],\n});\n\nexport const members = team.members;\n```\n\nCheck out the [examples/](examples/) directory for more examples.\n\n[1]: https://www.pulumi.com/registry/packages/pulumiservice/api-docs/provider/\n[2]: https://www.pulumi.com/docs/pulumi-cloud/access-management/access-tokens/\n[3]: https://www.pulumi.com/docs/pulumi-cloud/reference/cloud-rest-api/\n[4]: https://www.pulumi.com/docs/pulumi-cloud/self-hosted/\n",
       "respectSchemaVersion": true
     },
     "python": {
@@ -53,7 +53,7 @@
       "pyproject": {
         "enabled": true
       },
-      "readme": "# Pulumi Service Provider\n\n[![Slack](http://www.pulumi.com/images/docs/badges/slack.svg)](https://slack.pulumi.com)\n[![NPM version](https://badge.fury.io/js/%40pulumi%2Fpulumiservice.svg)](https://www.npmjs.com/package/@pulumi/pulumiservice)\n[![Python version](https://badge.fury.io/py/pulumi-pulumiservice.svg)](https://pypi.org/project/pulumi-pulumiservice)\n[![NuGet version](https://badge.fury.io/nu/pulumi.pulumiservice.svg)](https://badge.fury.io/nu/pulumi.pulumiservice)\n[![PkgGoDev](https://pkg.go.dev/badge/github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice)](https://pkg.go.dev/github.com/pulumi/pulumi-pulumiservice/sdk/go)\n[![License](https://img.shields.io/npm/l/%40pulumi%2Fpulumiservice.svg)](https://github.com/pulumi/pulumi-pulumiservice/blob/main/LICENSE)\n\nPulumi Service Provider for creating Pulumi Cloud resources.\n\nThe Pulumi Service Provider (PSP) is built on top of the [Pulumi Cloud REST API](https://www.pulumi.com/docs/pulumi-cloud/reference/cloud-rest-api/), allowing Pulumi customers to create Pulumi Cloud resources using Pulumi programs. That includes Stacks, Environments, Teams, Tokens, Webhooks, Tags, Deployment Settings, Deployment Schedules and much more! Pulumi Service Provider is especially powerful when used in combination with the [Automation API](https://pulumi.com/automation).\n\nFor a full list of supported resources, visit the [Pulumi Registry](https://www.pulumi.com/registry/packages/pulumiservice/). For the REST API reference documentation, visit [Pulumi Cloud API Documentation](https://www.pulumi.com/docs/pulumi-cloud/reference/cloud-rest-api/).\n\nFor now, PSP is in public preview, but we're working on releasing v1.0 in the near future.\n\n## Resource surfaces\n\nResources are organized into two surfaces under one package:\n\n- **v0 (package root)** — Mature, hand-maintained resources accessible directly off the package import (e.g. `pulumiservice.Stack`). **In maintenance mode**: bug fixes and security updates only; no new resources or features. Existing programs continue to work without any code changes.\n- **api (`pulumiservice.api`)** — **Preview.** Actively developed, generated at runtime from the public Pulumi Cloud OpenAPI specification. Resource shape and module layout may change before GA; not yet recommended for production. Coverage expands as new operations are mapped from the spec.\n\nResources from both surfaces can be used in the same program. There is no forced migration: existing users stay on v0 indefinitely, or migrate individual resources to the api surface by updating their IaC code (resource type + input shape) and adding Pulumi `aliases` on the new api declaration so state rebinds in place. v0 has known coverage gaps relative to the full Cloud API; the api surface closes those gaps over time.\n\n## Installing\n\nThis package is available in many languages in the standard packaging formats.\n\n### Node.js (Javascript/TypeScript)\n\nTo use from JavaScript or TypeScript in Node.js, install using either `npm`:\n\n```sh\nnpm install @pulumi/pulumiservice\n```\n\nor `yarn`:\n\n```sh\nyarn add @pulumi/pulumiservice\n```\n\n### Python\n\nTo use from Python, install using `pip`:\n\n```sh\npip install pulumi_pulumiservice\n```\n\n### Go\n\nTo use from Go, use `go get` to grab the latest version of the library\n\n```sh\ngo get github.com/pulumi/pulumi-pulumiservice/sdk/go\n```\n\n### .NET\n\nTo use from .NET, install using `dotnet add package`:\n\n```sh\ndotnet add package Pulumi.PulumiService\n```\n\n### Java\n\nTo use from Java, add an entry to your `build.gradle` file:\n\n```groovy\nimplementation 'com.pulumi:pulumiservice:%Fill in latest version from the badge up top%'\n```\n\nOr to your `pom.xml` file:\n\n```xml\n<dependency>\n    <groupId>com.pulumi</groupId>\n    <artifactId>pulumiservice</artifactId>\n    <version>%Fill in latest version from the badge up top%</version>\n</dependency>\n```\n\n## Setup\n\nEnsure that you have ran `pulumi login`. Run `pulumi whoami` to verify that you are logged in.\n\n### Configuration Options\n\nUse `pulumi config set pulumiservice:<option>` or pass options to the [constructor of `new pulumiservice.Provider`][1].\n\n| Option        | Environment Variable Name | Required/Optional | Description                                                                           |\n|---------------|---------------------------|-------------------|---------------------------------------------------------------------------------------|\n| `accessToken` | `PULUMI_ACCESS_TOKEN`     | Optional          | Overrides [Pulumi Service Access Tokens][2]                                           |\n| `apiUrl`      | `PULUMI_BACKEND_URL`      | Optional          | Allows overriding default [Pulumi Service API URL][3] for [self hosted customers][4]. |\n|               |                           |                   |                                                                                       |\n\n## Examples\n\n```typescript\nimport * as aws from \"@pulumi/awsx\"\nimport * as pulumi from \"@pulumi/pulumi\";\nimport * as service from \"@pulumi/pulumiservice\";\n\nconst team = new service.Team(\"team\", {\n    name: \"pulumi-service-team\",\n    displayName: \"Pulumi Service\",\n    description: \"The Pulumi Service Team\",\n    organizationName: \"pulumi\",\n    teamType: \"pulumi\",\n    members: [\n        \"piers\",\n        \"bryce\",\n        \"casey\"\n        \"evan\",\n        \"devon\",\n        \"meagan\",\n        \"myles\",\n        \"steve\"\n    ],\n});\n\nexport const members = team.members;\n```\n\nCheck out the [examples/](examples/) directory for more examples.\n\n[1]: https://www.pulumi.com/registry/packages/pulumiservice/api-docs/provider/\n[2]: https://www.pulumi.com/docs/pulumi-cloud/access-management/access-tokens/\n[3]: https://www.pulumi.com/docs/pulumi-cloud/reference/cloud-rest-api/\n[4]: https://www.pulumi.com/docs/pulumi-cloud/self-hosted/\n",
+      "readme": "# Pulumi Service Provider\n\n[![Slack](http://www.pulumi.com/images/docs/badges/slack.svg)](https://slack.pulumi.com)\n[![NPM version](https://badge.fury.io/js/%40pulumi%2Fpulumiservice.svg)](https://www.npmjs.com/package/@pulumi/pulumiservice)\n[![Python version](https://badge.fury.io/py/pulumi-pulumiservice.svg)](https://pypi.org/project/pulumi-pulumiservice)\n[![NuGet version](https://badge.fury.io/nu/pulumi.pulumiservice.svg)](https://badge.fury.io/nu/pulumi.pulumiservice)\n[![PkgGoDev](https://pkg.go.dev/badge/github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice)](https://pkg.go.dev/github.com/pulumi/pulumi-pulumiservice/sdk/go)\n[![License](https://img.shields.io/npm/l/%40pulumi%2Fpulumiservice.svg)](https://github.com/pulumi/pulumi-pulumiservice/blob/main/LICENSE)\n\nPulumi Service Provider for creating Pulumi Cloud resources.\n\nThe Pulumi Service Provider (PSP) is built on top of the [Pulumi Cloud REST API](https://www.pulumi.com/docs/pulumi-cloud/reference/cloud-rest-api/), allowing Pulumi customers to create Pulumi Cloud resources using Pulumi programs. That includes Stacks, Environments, Teams, Tokens, Webhooks, Tags, Deployment Settings, Deployment Schedules and much more! Pulumi Service Provider is especially powerful when used in combination with the\u00a0[Automation API](https://pulumi.com/automation).\n\nFor a full list of supported resources, visit the [Pulumi Registry](https://www.pulumi.com/registry/packages/pulumiservice/). For the REST API reference documentation, visit [Pulumi Cloud API Documentation](https://www.pulumi.com/docs/pulumi-cloud/reference/cloud-rest-api/).\n\nFor now, PSP is in public preview, but we're working on releasing v1.0 in the near future.\n\n## Resource surfaces\n\nResources are organized into two surfaces under one package:\n\n- **v0 (package root)** \u2014 Mature, hand-maintained resources accessible directly off the package import (e.g. `pulumiservice.Stack`). **In maintenance mode**: bug fixes and security updates only; no new resources or features. Existing programs continue to work without any code changes.\n- **api (`pulumiservice.api`)** \u2014 **Preview.** Actively developed, generated at runtime from the public Pulumi Cloud OpenAPI specification. Resource shape and module layout may change before GA; not yet recommended for production. Coverage expands as new operations are mapped from the spec.\n\nResources from both surfaces can be used in the same program. There is no forced migration: existing users stay on v0 indefinitely, or migrate individual resources to the api surface by updating their IaC code (resource type + input shape) and adding Pulumi `aliases` on the new api declaration so state rebinds in place. v0 has known coverage gaps relative to the full Cloud API; the api surface closes those gaps over time.\n\n## Installing\n\nThis package is available in many languages in the standard packaging formats.\n\n### Node.js (Javascript/TypeScript)\n\nTo use from JavaScript or TypeScript in Node.js, install using either `npm`:\n\n```sh\nnpm install @pulumi/pulumiservice\n```\n\nor `yarn`:\n\n```sh\nyarn add @pulumi/pulumiservice\n```\n\n### Python\n\nTo use from Python, install using `pip`:\n\n```sh\npip install pulumi_pulumiservice\n```\n\n### Go\n\nTo use from Go, use `go get` to grab the latest version of the library\n\n```sh\ngo get github.com/pulumi/pulumi-pulumiservice/sdk/go\n```\n\n### .NET\n\nTo use from .NET, install using `dotnet add package`:\n\n```sh\ndotnet add package Pulumi.PulumiService\n```\n\n### Java\n\nTo use from Java, add an entry to your `build.gradle` file:\n\n```groovy\nimplementation 'com.pulumi:pulumiservice:%Fill in latest version from the badge up top%'\n```\n\nOr to your `pom.xml` file:\n\n```xml\n<dependency>\n    <groupId>com.pulumi</groupId>\n    <artifactId>pulumiservice</artifactId>\n    <version>%Fill in latest version from the badge up top%</version>\n</dependency>\n```\n\n## Setup\n\nEnsure that you have ran `pulumi login`. Run `pulumi whoami` to verify that you are logged in.\n\n### Configuration Options\n\nUse `pulumi config set pulumiservice:<option>` or pass options to the [constructor of `new pulumiservice.Provider`][1].\n\n| Option        | Environment Variable Name | Required/Optional | Description                                                                           |\n|---------------|---------------------------|-------------------|---------------------------------------------------------------------------------------|\n| `accessToken` | `PULUMI_ACCESS_TOKEN`     | Optional          | Overrides [Pulumi Service Access Tokens][2]                                           |\n| `apiUrl`      | `PULUMI_BACKEND_URL`      | Optional          | Allows overriding default [Pulumi Service API URL][3] for [self hosted customers][4]. |\n|               |                           |                   |                                                                                       |\n\n## Examples\n\n```typescript\nimport * as aws from \"@pulumi/awsx\"\nimport * as pulumi from \"@pulumi/pulumi\";\nimport * as service from \"@pulumi/pulumiservice\";\n\nconst team = new service.Team(\"team\", {\n    name: \"pulumi-service-team\",\n    displayName: \"Pulumi Service\",\n    description: \"The Pulumi Service Team\",\n    organizationName: \"pulumi\",\n    teamType: \"pulumi\",\n    members: [\n        \"piers\",\n        \"bryce\",\n        \"casey\"\n        \"evan\",\n        \"devon\",\n        \"meagan\",\n        \"myles\",\n        \"steve\"\n    ],\n});\n\nexport const members = team.members;\n```\n\nCheck out the [examples/](examples/) directory for more examples.\n\n[1]: https://www.pulumi.com/registry/packages/pulumiservice/api-docs/provider/\n[2]: https://www.pulumi.com/docs/pulumi-cloud/access-management/access-tokens/\n[3]: https://www.pulumi.com/docs/pulumi-cloud/reference/cloud-rest-api/\n[4]: https://www.pulumi.com/docs/pulumi-cloud/self-hosted/\n",
       "requires": {
         "pulumi": ">=3.235.0,<4.0.0"
       },
@@ -85,7 +85,7 @@
       "properties": {
         "duration": {
           "type": "string",
-          "description": "Duration of the assume-role session in “XhYmZs” format"
+          "description": "Duration of the assume-role session in \u201cXhYmZs\u201d format"
         },
         "policyARNs": {
           "type": "array",
@@ -586,7 +586,7 @@
         },
         "tokenLifetime": {
           "type": "string",
-          "description": "The lifetime of the temporary credentials in “XhYmZs” format."
+          "description": "The lifetime of the temporary credentials in \u201cXhYmZs\u201d format."
         },
         "workloadPoolId": {
           "type": "string",
@@ -703,7 +703,7 @@
       "properties": {
         "role": {
           "type": "string",
-          "description": "The member's built-in role (member, admin, billing-manager). Absent when a custom role is assigned — check `roleId` in that case."
+          "description": "The member's built-in role (member, admin, billing-manager). Absent when a custom role is assigned \u2014 check `roleId` in that case."
         },
         "roleId": {
           "type": "string",
@@ -1232,6 +1232,522 @@
           "value": "environments"
         }
       ]
+    },
+    "pulumiservice:api:PermissionDescriptorAllow": {
+      "type": "object",
+      "description": "Base type for permission descriptors.",
+      "properties": {
+        "__type": {
+          "type": "string",
+          "const": "PermissionDescriptorAllow",
+          "description": "Expected value is 'PermissionDescriptorAllow'."
+        },
+        "constraints": {
+          "description": "Optional contextual constraints for the permissions",
+          "$ref": "pulumi.json#/Any"
+        },
+        "permissions": {
+          "description": "List of permissions to allow",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "__type"
+      ]
+    },
+    "pulumiservice:api:PermissionDescriptorCompose": {
+      "type": "object",
+      "description": "Base type for permission descriptors.",
+      "properties": {
+        "__type": {
+          "type": "string",
+          "const": "PermissionDescriptorCompose",
+          "description": "Expected value is 'PermissionDescriptorCompose'."
+        },
+        "permissionDescriptors": {
+          "description": "References to other descriptors to include in the tree",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "__type"
+      ]
+    },
+    "pulumiservice:api:PermissionDescriptorCondition": {
+      "type": "object",
+      "description": "Base type for permission descriptors.",
+      "properties": {
+        "__type": {
+          "type": "string",
+          "const": "PermissionDescriptorCondition",
+          "description": "Expected value is 'PermissionDescriptorCondition'."
+        },
+        "condition": {
+          "description": "The boolean condition to evaluate.",
+          "$ref": "pulumi.json#/Any"
+        },
+        "subNode": {
+          "description": "The permission descriptor to apply when the condition is true.",
+          "oneOf": [
+            {
+              "type": "object",
+              "$ref": "#/types/pulumiservice:api:PermissionDescriptorAllow"
+            },
+            {
+              "type": "object",
+              "$ref": "#/types/pulumiservice:api:PermissionDescriptorCompose"
+            },
+            {
+              "type": "object",
+              "$ref": "#/types/pulumiservice:api:PermissionDescriptorCondition"
+            },
+            {
+              "type": "object",
+              "$ref": "#/types/pulumiservice:api:PermissionDescriptorGroup"
+            },
+            {
+              "type": "object",
+              "$ref": "#/types/pulumiservice:api:PermissionDescriptorIfThenElse"
+            },
+            {
+              "type": "object",
+              "$ref": "#/types/pulumiservice:api:PermissionDescriptorSelect"
+            }
+          ],
+          "discriminator": {
+            "propertyName": "__type",
+            "mapping": {
+              "PermissionDescriptorAllow": "#/types/pulumiservice:api:PermissionDescriptorAllow",
+              "PermissionDescriptorCompose": "#/types/pulumiservice:api:PermissionDescriptorCompose",
+              "PermissionDescriptorCondition": "#/types/pulumiservice:api:PermissionDescriptorCondition",
+              "PermissionDescriptorGroup": "#/types/pulumiservice:api:PermissionDescriptorGroup",
+              "PermissionDescriptorIfThenElse": "#/types/pulumiservice:api:PermissionDescriptorIfThenElse",
+              "PermissionDescriptorSelect": "#/types/pulumiservice:api:PermissionDescriptorSelect"
+            }
+          }
+        }
+      },
+      "required": [
+        "__type"
+      ]
+    },
+    "pulumiservice:api:PermissionDescriptorGroup": {
+      "type": "object",
+      "description": "Base type for permission descriptors.",
+      "properties": {
+        "__type": {
+          "type": "string",
+          "const": "PermissionDescriptorGroup",
+          "description": "Expected value is 'PermissionDescriptorGroup'."
+        },
+        "entries": {
+          "description": "The list of permission descriptor entries in this group.",
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "type": "object",
+                "$ref": "#/types/pulumiservice:api:PermissionDescriptorAllow"
+              },
+              {
+                "type": "object",
+                "$ref": "#/types/pulumiservice:api:PermissionDescriptorCompose"
+              },
+              {
+                "type": "object",
+                "$ref": "#/types/pulumiservice:api:PermissionDescriptorCondition"
+              },
+              {
+                "type": "object",
+                "$ref": "#/types/pulumiservice:api:PermissionDescriptorGroup"
+              },
+              {
+                "type": "object",
+                "$ref": "#/types/pulumiservice:api:PermissionDescriptorIfThenElse"
+              },
+              {
+                "type": "object",
+                "$ref": "#/types/pulumiservice:api:PermissionDescriptorSelect"
+              }
+            ],
+            "discriminator": {
+              "propertyName": "__type",
+              "mapping": {
+                "PermissionDescriptorAllow": "#/types/pulumiservice:api:PermissionDescriptorAllow",
+                "PermissionDescriptorCompose": "#/types/pulumiservice:api:PermissionDescriptorCompose",
+                "PermissionDescriptorCondition": "#/types/pulumiservice:api:PermissionDescriptorCondition",
+                "PermissionDescriptorGroup": "#/types/pulumiservice:api:PermissionDescriptorGroup",
+                "PermissionDescriptorIfThenElse": "#/types/pulumiservice:api:PermissionDescriptorIfThenElse",
+                "PermissionDescriptorSelect": "#/types/pulumiservice:api:PermissionDescriptorSelect"
+              }
+            }
+          }
+        }
+      },
+      "required": [
+        "__type"
+      ]
+    },
+    "pulumiservice:api:PermissionDescriptorIfThenElse": {
+      "type": "object",
+      "description": "Base type for permission descriptors.",
+      "properties": {
+        "__type": {
+          "type": "string",
+          "const": "PermissionDescriptorIfThenElse",
+          "description": "Expected value is 'PermissionDescriptorIfThenElse'."
+        },
+        "condition": {
+          "description": "The boolean condition to evaluate.",
+          "$ref": "pulumi.json#/Any"
+        },
+        "subNodeForFalse": {
+          "description": "The permission descriptor to apply when the condition is false.",
+          "oneOf": [
+            {
+              "type": "object",
+              "$ref": "#/types/pulumiservice:api:PermissionDescriptorAllow"
+            },
+            {
+              "type": "object",
+              "$ref": "#/types/pulumiservice:api:PermissionDescriptorCompose"
+            },
+            {
+              "type": "object",
+              "$ref": "#/types/pulumiservice:api:PermissionDescriptorCondition"
+            },
+            {
+              "type": "object",
+              "$ref": "#/types/pulumiservice:api:PermissionDescriptorGroup"
+            },
+            {
+              "type": "object",
+              "$ref": "#/types/pulumiservice:api:PermissionDescriptorIfThenElse"
+            },
+            {
+              "type": "object",
+              "$ref": "#/types/pulumiservice:api:PermissionDescriptorSelect"
+            }
+          ],
+          "discriminator": {
+            "propertyName": "__type",
+            "mapping": {
+              "PermissionDescriptorAllow": "#/types/pulumiservice:api:PermissionDescriptorAllow",
+              "PermissionDescriptorCompose": "#/types/pulumiservice:api:PermissionDescriptorCompose",
+              "PermissionDescriptorCondition": "#/types/pulumiservice:api:PermissionDescriptorCondition",
+              "PermissionDescriptorGroup": "#/types/pulumiservice:api:PermissionDescriptorGroup",
+              "PermissionDescriptorIfThenElse": "#/types/pulumiservice:api:PermissionDescriptorIfThenElse",
+              "PermissionDescriptorSelect": "#/types/pulumiservice:api:PermissionDescriptorSelect"
+            }
+          }
+        },
+        "subNodeForTrue": {
+          "description": "The permission descriptor to apply when the condition is true.",
+          "oneOf": [
+            {
+              "type": "object",
+              "$ref": "#/types/pulumiservice:api:PermissionDescriptorAllow"
+            },
+            {
+              "type": "object",
+              "$ref": "#/types/pulumiservice:api:PermissionDescriptorCompose"
+            },
+            {
+              "type": "object",
+              "$ref": "#/types/pulumiservice:api:PermissionDescriptorCondition"
+            },
+            {
+              "type": "object",
+              "$ref": "#/types/pulumiservice:api:PermissionDescriptorGroup"
+            },
+            {
+              "type": "object",
+              "$ref": "#/types/pulumiservice:api:PermissionDescriptorIfThenElse"
+            },
+            {
+              "type": "object",
+              "$ref": "#/types/pulumiservice:api:PermissionDescriptorSelect"
+            }
+          ],
+          "discriminator": {
+            "propertyName": "__type",
+            "mapping": {
+              "PermissionDescriptorAllow": "#/types/pulumiservice:api:PermissionDescriptorAllow",
+              "PermissionDescriptorCompose": "#/types/pulumiservice:api:PermissionDescriptorCompose",
+              "PermissionDescriptorCondition": "#/types/pulumiservice:api:PermissionDescriptorCondition",
+              "PermissionDescriptorGroup": "#/types/pulumiservice:api:PermissionDescriptorGroup",
+              "PermissionDescriptorIfThenElse": "#/types/pulumiservice:api:PermissionDescriptorIfThenElse",
+              "PermissionDescriptorSelect": "#/types/pulumiservice:api:PermissionDescriptorSelect"
+            }
+          }
+        }
+      },
+      "required": [
+        "__type"
+      ]
+    },
+    "pulumiservice:api:PermissionDescriptorSelect": {
+      "type": "object",
+      "description": "Base type for permission descriptors.",
+      "properties": {
+        "__type": {
+          "type": "string",
+          "const": "PermissionDescriptorSelect",
+          "description": "Expected value is 'PermissionDescriptorSelect'."
+        },
+        "options": {
+          "description": "The available options to select from based on the selector expression.",
+          "type": "array",
+          "items": {
+            "$ref": "pulumi.json#/Any"
+          }
+        },
+        "selector": {
+          "description": "The expression used to select which option to apply.",
+          "$ref": "pulumi.json#/Any"
+        }
+      },
+      "required": [
+        "__type"
+      ]
+    },
+    "pulumiservice:api/deployments:DeploymentSettingsVCSAzureDevOps": {
+      "type": "object",
+      "description": "Azure DevOps-specific VCS deployment settings.",
+      "properties": {
+        "deployCommits": {
+          "description": "Whether to deploy all commits to the default branch",
+          "type": "boolean"
+        },
+        "deployPullRequest": {
+          "description": "Specific pull request number to deploy (overrides automatic deployment)",
+          "type": "integer"
+        },
+        "installationId": {
+          "description": "VCS installation/integration ID linking to the VCS provider",
+          "type": "string"
+        },
+        "paths": {
+          "description": "Paths within the repository that trigger deployments when changed",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "previewPullRequests": {
+          "description": "Whether to create preview deployments for pull requests",
+          "type": "boolean"
+        },
+        "provider": {
+          "type": "string",
+          "const": "azure_devops",
+          "description": "Expected value is 'azure_devops'."
+        },
+        "pullRequestTemplate": {
+          "description": "Whether to use pull request templates for deployment PRs",
+          "type": "boolean"
+        },
+        "repository": {
+          "description": "The VCS repository reference (format varies by provider)",
+          "type": "string"
+        }
+      },
+      "required": [
+        "provider"
+      ]
+    },
+    "pulumiservice:api/deployments:DeploymentSettingsVCSBitbucket": {
+      "type": "object",
+      "description": "Bitbucket-specific VCS deployment settings.",
+      "properties": {
+        "deployCommits": {
+          "description": "Whether to deploy all commits to the default branch",
+          "type": "boolean"
+        },
+        "deployPullRequest": {
+          "description": "Specific pull request number to deploy (overrides automatic deployment)",
+          "type": "integer"
+        },
+        "installationId": {
+          "description": "VCS installation/integration ID linking to the VCS provider",
+          "type": "string"
+        },
+        "paths": {
+          "description": "Paths within the repository that trigger deployments when changed",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "previewPullRequests": {
+          "description": "Whether to create preview deployments for pull requests",
+          "type": "boolean"
+        },
+        "provider": {
+          "type": "string",
+          "const": "bitbucket",
+          "description": "Expected value is 'bitbucket'."
+        },
+        "pullRequestTemplate": {
+          "description": "Whether to use pull request templates for deployment PRs",
+          "type": "boolean"
+        },
+        "repository": {
+          "description": "The VCS repository reference (format varies by provider)",
+          "type": "string"
+        }
+      },
+      "required": [
+        "provider"
+      ]
+    },
+    "pulumiservice:api/deployments:DeploymentSettingsVCSCustom": {
+      "type": "object",
+      "description": "Custom VCS deployment settings for user-managed version control systems.",
+      "properties": {
+        "deployCommits": {
+          "description": "Whether to deploy all commits to the default branch",
+          "type": "boolean"
+        },
+        "deployPullRequest": {
+          "description": "Specific pull request number to deploy (overrides automatic deployment)",
+          "type": "integer"
+        },
+        "installationId": {
+          "description": "VCS installation/integration ID linking to the VCS provider",
+          "type": "string"
+        },
+        "paths": {
+          "description": "Paths within the repository that trigger deployments when changed",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "previewPullRequests": {
+          "description": "Whether to create preview deployments for pull requests",
+          "type": "boolean"
+        },
+        "provider": {
+          "type": "string",
+          "const": "custom",
+          "description": "Expected value is 'custom'."
+        },
+        "pullRequestTemplate": {
+          "description": "Whether to use pull request templates for deployment PRs",
+          "type": "boolean"
+        },
+        "repository": {
+          "description": "The VCS repository reference (format varies by provider)",
+          "type": "string"
+        }
+      },
+      "required": [
+        "provider"
+      ]
+    },
+    "pulumiservice:api/deployments:DeploymentSettingsVCSGitHub": {
+      "type": "object",
+      "description": "GitHub-specific VCS deployment settings.",
+      "properties": {
+        "deployCommits": {
+          "description": "Whether to deploy all commits to the default branch",
+          "type": "boolean"
+        },
+        "deployPullRequest": {
+          "description": "Specific pull request number to deploy (overrides automatic deployment)",
+          "type": "integer"
+        },
+        "installationId": {
+          "description": "VCS installation/integration ID linking to the VCS provider",
+          "type": "string"
+        },
+        "paths": {
+          "description": "Paths within the repository that trigger deployments when changed",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "previewPullRequests": {
+          "description": "Whether to create preview deployments for pull requests",
+          "type": "boolean"
+        },
+        "provider": {
+          "type": "string",
+          "const": "github",
+          "description": "Expected value is 'github'."
+        },
+        "pullRequestTemplate": {
+          "description": "Whether to use pull request templates for deployment PRs",
+          "type": "boolean"
+        },
+        "repository": {
+          "description": "The VCS repository reference (format varies by provider)",
+          "type": "string"
+        },
+        "reviewStackLabels": {
+          "description": "Gates review stack creation. When set, only pull requests carrying a matching label (exact, case-sensitive) create a review stack.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "provider"
+      ]
+    },
+    "pulumiservice:api/deployments:DeploymentSettingsVCSGitLab": {
+      "type": "object",
+      "description": "GitLab-specific VCS deployment settings.",
+      "properties": {
+        "deployCommits": {
+          "description": "Whether to deploy all commits to the default branch",
+          "type": "boolean"
+        },
+        "deployPullRequest": {
+          "description": "Specific pull request number to deploy (overrides automatic deployment)",
+          "type": "integer"
+        },
+        "installationId": {
+          "description": "VCS installation/integration ID linking to the VCS provider",
+          "type": "string"
+        },
+        "paths": {
+          "description": "Paths within the repository that trigger deployments when changed",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "previewPullRequests": {
+          "description": "Whether to create preview deployments for pull requests",
+          "type": "boolean"
+        },
+        "provider": {
+          "type": "string",
+          "const": "gitlab",
+          "description": "Expected value is 'gitlab'."
+        },
+        "pullRequestTemplate": {
+          "description": "Whether to use pull request templates for deployment PRs",
+          "type": "boolean"
+        },
+        "repository": {
+          "description": "The VCS repository reference (format varies by provider)",
+          "type": "string"
+        }
+      },
+      "required": [
+        "provider"
+      ]
     }
   },
   "provider": {
@@ -1425,7 +1941,7 @@
         },
         "tokensUsed": {
           "type": "integer",
-          "description": "Total Neo tokens consumed across all model invocations for this task. Neo tokens are the priced unit used for billing — distinct from the raw model input tokens surfaced in contextUsedTokens / contextWindowTokens."
+          "description": "Total Neo tokens consumed across all model invocations for this task. Neo tokens are the priced unit used for billing \u2014 distinct from the raw model input tokens surfaced in contextUsedTokens / contextWindowTokens."
         },
         "toolExecutionMode": {
           "type": "string",
@@ -1455,14 +1971,14 @@
           "items": {
             "$ref": "pulumi.json#/Any"
           },
-          "description": "Optional filter for CLI integrations to enable for this task. Semantics: omitted/null → enable all CLI integrations connected for the org; empty list → explicit opt-out (no CLI integrations for this task); populated list → whitelist by (catalogId, name) of the configured instances to enable. Entries with missing or unknown catalogId, missing name, or referencing a (catalogId, name) pair that is not connected for the organization are rejected with a 400 response. catalogId matching is case-insensitive."
+          "description": "Optional filter for CLI integrations to enable for this task. Semantics: omitted/null \u2192 enable all CLI integrations connected for the org; empty list \u2192 explicit opt-out (no CLI integrations for this task); populated list \u2192 whitelist by (catalogId, name) of the configured instances to enable. Entries with missing or unknown catalogId, missing name, or referencing a (catalogId, name) pair that is not connected for the organization are rejected with a 400 response. catalogId matching is case-insensitive."
         },
         "enabledIntegrations": {
           "type": "array",
           "items": {
             "$ref": "pulumi.json#/Any"
           },
-          "description": "Optional list of integrations to enable for this task. Semantics: omitted/null → inherit all org-enabled integrations; empty list → explicit opt-out (no integration credentials for this task); populated list → whitelist of specific integrations by ID. Modeled as an object array rather than a bare string array so multi-instance support (instance_name, scope, etc.) can be added later without a wire break."
+          "description": "Optional list of integrations to enable for this task. Semantics: omitted/null \u2192 inherit all org-enabled integrations; empty list \u2192 explicit opt-out (no integration credentials for this task); populated list \u2192 whitelist of specific integrations by ID. Modeled as an object array rather than a bare string array so multi-instance support (instance_name, scope, etc.) can be added later without a wire break."
         },
         "message": {
           "$ref": "pulumi.json#/Any",
@@ -1860,7 +2376,38 @@
           "description": "A tag to identify the deployment settings configuration."
         },
         "vcs": {
-          "$ref": "pulumi.json#/Any",
+          "oneOf": [
+            {
+              "type": "object",
+              "$ref": "#/types/pulumiservice:api/deployments:DeploymentSettingsVCSAzureDevOps"
+            },
+            {
+              "type": "object",
+              "$ref": "#/types/pulumiservice:api/deployments:DeploymentSettingsVCSBitbucket"
+            },
+            {
+              "type": "object",
+              "$ref": "#/types/pulumiservice:api/deployments:DeploymentSettingsVCSCustom"
+            },
+            {
+              "type": "object",
+              "$ref": "#/types/pulumiservice:api/deployments:DeploymentSettingsVCSGitHub"
+            },
+            {
+              "type": "object",
+              "$ref": "#/types/pulumiservice:api/deployments:DeploymentSettingsVCSGitLab"
+            }
+          ],
+          "discriminator": {
+            "propertyName": "provider",
+            "mapping": {
+              "azure_devops": "#/types/pulumiservice:api/deployments:DeploymentSettingsVCSAzureDevOps",
+              "bitbucket": "#/types/pulumiservice:api/deployments:DeploymentSettingsVCSBitbucket",
+              "custom": "#/types/pulumiservice:api/deployments:DeploymentSettingsVCSCustom",
+              "github": "#/types/pulumiservice:api/deployments:DeploymentSettingsVCSGitHub",
+              "gitlab": "#/types/pulumiservice:api/deployments:DeploymentSettingsVCSGitLab"
+            }
+          },
           "description": "VCS provider settings"
         },
         "version": {
@@ -1917,7 +2464,38 @@
           "description": "A tag to identify the deployment settings configuration."
         },
         "vcs": {
-          "$ref": "pulumi.json#/Any",
+          "oneOf": [
+            {
+              "type": "object",
+              "$ref": "#/types/pulumiservice:api/deployments:DeploymentSettingsVCSAzureDevOps"
+            },
+            {
+              "type": "object",
+              "$ref": "#/types/pulumiservice:api/deployments:DeploymentSettingsVCSBitbucket"
+            },
+            {
+              "type": "object",
+              "$ref": "#/types/pulumiservice:api/deployments:DeploymentSettingsVCSCustom"
+            },
+            {
+              "type": "object",
+              "$ref": "#/types/pulumiservice:api/deployments:DeploymentSettingsVCSGitHub"
+            },
+            {
+              "type": "object",
+              "$ref": "#/types/pulumiservice:api/deployments:DeploymentSettingsVCSGitLab"
+            }
+          ],
+          "discriminator": {
+            "propertyName": "provider",
+            "mapping": {
+              "azure_devops": "#/types/pulumiservice:api/deployments:DeploymentSettingsVCSAzureDevOps",
+              "bitbucket": "#/types/pulumiservice:api/deployments:DeploymentSettingsVCSBitbucket",
+              "custom": "#/types/pulumiservice:api/deployments:DeploymentSettingsVCSCustom",
+              "github": "#/types/pulumiservice:api/deployments:DeploymentSettingsVCSGitHub",
+              "gitlab": "#/types/pulumiservice:api/deployments:DeploymentSettingsVCSGitLab"
+            }
+          },
           "description": "VCS provider settings"
         }
       },
@@ -4303,7 +4881,7 @@
       ]
     },
     "pulumiservice:api:OrganizationMember": {
-      "description": "Adds an existing Pulumi user to an organization with a built-in role. **Important:** The user must have already signed up for a Pulumi account before they can be added to an organization.\n\nThis endpoint only assigns built-in roles. To onboard a user with a custom role, use the organization invite flow (`BatchCreateOrgInviteEmail`) and set `roleId` on the invite — the custom role is applied when the user accepts. Alternatively, add the user here with a built-in role and then call `UpdateOrganizationMember` with `fgaRoleId` to reassign.\n\nReturns the newly created organization member record. Returns 409 if the user is already a member of the organization.",
+      "description": "Adds an existing Pulumi user to an organization with a built-in role. **Important:** The user must have already signed up for a Pulumi account before they can be added to an organization.\n\nThis endpoint only assigns built-in roles. To onboard a user with a custom role, use the organization invite flow (`BatchCreateOrgInviteEmail`) and set `roleId` on the invite \u2014 the custom role is applied when the user accepts. Alternatively, add the user here with a built-in role and then call `UpdateOrganizationMember` with `fgaRoleId` to reassign.\n\nReturns the newly created organization member record. Returns 409 if the user is already a member of the organization.",
       "properties": {
         "created": {
           "type": "string",
@@ -4311,7 +4889,7 @@
         },
         "fgaRole": {
           "$ref": "pulumi.json#/Any",
-          "description": "The role currently assigned to this member — either a built-in role (member, admin, billingManager) or a custom role. Falls back to the organization's default role if no role is assigned directly."
+          "description": "The role currently assigned to this member \u2014 either a built-in role (member, admin, billingManager) or a custom role. Falls back to the organization's default role if no role is assigned directly."
         },
         "knownToPulumi": {
           "type": "boolean",
@@ -4714,7 +5292,7 @@
       ]
     },
     "pulumiservice:api:Role": {
-      "description": "Creates a new custom role for an organization. Custom roles define fine-grained permission sets that can be assigned to organization members and teams, enabling precise access control beyond the built-in admin and member roles. Optionally, an associated policy and role binding can be created alongside the role. Role definitions are subject to two limits: a permission descriptor group may contain at most 500 entries (each directly-specified entity counts as one entry), and the total serialized size of the role definition may not exceed 1 MB. Exceeding either limit returns a 400 error. If you need to grant access to more than 500 individually listed resources, use tag-based (ABAC) rules instead.",
+      "description": "Creates a new custom role for an organization. Custom roles define fine-grained permission sets that can be assigned to organization members and teams, enabling precise access control beyond the built-in admin and member roles. Optionally, an associated policy and role binding can be created alongside the role. Role definitions are subject to two limits: a permission descriptor group may contain at most 500 entries (each directly-specified entity counts as one entry), and the total serialized size of the role definition may not exceed 1 MB. Exceeding either limit returns a 400 error. If you need to grant access to more than 500 individually listed resources, use tag-based (ABAC) rules instead.\n\n## Example Usage\n\n```pulumi\nresource role \"pulumiservice:api:Role\" {\n  orgName = \"my-org\"\n  name = \"platform-team-role\"\n  uxPurpose = \"set\"\n  resourceType = \"global\"\n  details = {\n    __type = \"PermissionDescriptorAllow\"\n    permissions = [\"organization:read_usage\"]\n  }\n}\n```\n",
       "properties": {
         "created": {
           "type": "string",
@@ -4729,7 +5307,43 @@
           "description": "A human-readable description of the permission descriptor."
         },
         "details": {
-          "$ref": "pulumi.json#/Any",
+          "oneOf": [
+            {
+              "type": "object",
+              "$ref": "#/types/pulumiservice:api:PermissionDescriptorAllow"
+            },
+            {
+              "type": "object",
+              "$ref": "#/types/pulumiservice:api:PermissionDescriptorCompose"
+            },
+            {
+              "type": "object",
+              "$ref": "#/types/pulumiservice:api:PermissionDescriptorCondition"
+            },
+            {
+              "type": "object",
+              "$ref": "#/types/pulumiservice:api:PermissionDescriptorGroup"
+            },
+            {
+              "type": "object",
+              "$ref": "#/types/pulumiservice:api:PermissionDescriptorIfThenElse"
+            },
+            {
+              "type": "object",
+              "$ref": "#/types/pulumiservice:api:PermissionDescriptorSelect"
+            }
+          ],
+          "discriminator": {
+            "propertyName": "__type",
+            "mapping": {
+              "PermissionDescriptorAllow": "#/types/pulumiservice:api:PermissionDescriptorAllow",
+              "PermissionDescriptorCompose": "#/types/pulumiservice:api:PermissionDescriptorCompose",
+              "PermissionDescriptorCondition": "#/types/pulumiservice:api:PermissionDescriptorCondition",
+              "PermissionDescriptorGroup": "#/types/pulumiservice:api:PermissionDescriptorGroup",
+              "PermissionDescriptorIfThenElse": "#/types/pulumiservice:api:PermissionDescriptorIfThenElse",
+              "PermissionDescriptorSelect": "#/types/pulumiservice:api:PermissionDescriptorSelect"
+            }
+          },
           "description": "The detailed permission descriptor tree."
         },
         "isOrgDefault": {
@@ -4786,7 +5400,43 @@
           "description": "A human-readable description of the permission descriptor."
         },
         "details": {
-          "$ref": "pulumi.json#/Any",
+          "oneOf": [
+            {
+              "type": "object",
+              "$ref": "#/types/pulumiservice:api:PermissionDescriptorAllow"
+            },
+            {
+              "type": "object",
+              "$ref": "#/types/pulumiservice:api:PermissionDescriptorCompose"
+            },
+            {
+              "type": "object",
+              "$ref": "#/types/pulumiservice:api:PermissionDescriptorCondition"
+            },
+            {
+              "type": "object",
+              "$ref": "#/types/pulumiservice:api:PermissionDescriptorGroup"
+            },
+            {
+              "type": "object",
+              "$ref": "#/types/pulumiservice:api:PermissionDescriptorIfThenElse"
+            },
+            {
+              "type": "object",
+              "$ref": "#/types/pulumiservice:api:PermissionDescriptorSelect"
+            }
+          ],
+          "discriminator": {
+            "propertyName": "__type",
+            "mapping": {
+              "PermissionDescriptorAllow": "#/types/pulumiservice:api:PermissionDescriptorAllow",
+              "PermissionDescriptorCompose": "#/types/pulumiservice:api:PermissionDescriptorCompose",
+              "PermissionDescriptorCondition": "#/types/pulumiservice:api:PermissionDescriptorCondition",
+              "PermissionDescriptorGroup": "#/types/pulumiservice:api:PermissionDescriptorGroup",
+              "PermissionDescriptorIfThenElse": "#/types/pulumiservice:api:PermissionDescriptorIfThenElse",
+              "PermissionDescriptorSelect": "#/types/pulumiservice:api:PermissionDescriptorSelect"
+            }
+          },
           "description": "The detailed permission descriptor tree."
         },
         "name": {
@@ -5773,7 +6423,7 @@
           "additionalProperties": {
             "$ref": "pulumi.json#/Any"
           },
-          "description": "The role's permission descriptor tree, expressed in the Pulumi Cloud wire grammar. The provider exposes the descriptor as `map[string]Any` and passes it through verbatim — the wire-format `__type` discriminator is used at every level (SDK and API alike).\n\nCommon top-level descriptors:\n- `PermissionDescriptorAllow` — `{__type: \"PermissionDescriptorAllow\", permissions: [\"<scope>\", ...]}` grants the listed scopes.\n- `PermissionDescriptorGroup` — `{__type: \"PermissionDescriptorGroup\", entries: [{__type: \"PermissionDescriptorAllow\", ...}, ...]}` composes multiple descriptors; the role grants the union of every entry.\n- `PermissionDescriptorCondition` — `{__type: \"PermissionDescriptorCondition\", condition: {__type: ...}, subNode: {__type: ...}}` gates a sub-descriptor on a boolean expression.\n- `PermissionDescriptorCompose` — references other roles by ID; `{__type: \"PermissionDescriptorCompose\", permissionDescriptors: [<roleId>, ...]}`.\n\nPulumi Cloud's REST API also accepts `PermissionDescriptorIfThenElse`, `PermissionDescriptorSelect`, and the `PermissionExpression*` / `PermissionLiteralExpression*` boolean operators (And, Or, Not, Equal, Environment, Stack, Team, InsightsAccount, …); the provider does not inspect anything below the top, so future Cloud additions work without a provider release.\n\nFor the common case of granting a set of scopes on one entity, prefer the `buildAllowPermissions`, `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, and `buildInsightsAccountScopedPermissions` helpers, which build the descriptor tree for you. To grant a role to a team, use the `TeamRoleAssignment` resource — roles are *associated with* teams, not gated on them via a permission descriptor.\n\nNote: the `__type` field name uses Pulumi's `__`-prefixed-key passthrough (pulumi/pulumi#22834, available in pulumi 3.235.0+). Earlier pulumi runtimes will drop these keys at the SDK boundary; the Python SDK pins the minimum runtime version automatically."
+          "description": "The role's permission descriptor tree, expressed in the Pulumi Cloud wire grammar. The provider exposes the descriptor as `map[string]Any` and passes it through verbatim \u2014 the wire-format `__type` discriminator is used at every level (SDK and API alike).\n\nCommon top-level descriptors:\n- `PermissionDescriptorAllow` \u2014 `{__type: \"PermissionDescriptorAllow\", permissions: [\"<scope>\", ...]}` grants the listed scopes.\n- `PermissionDescriptorGroup` \u2014 `{__type: \"PermissionDescriptorGroup\", entries: [{__type: \"PermissionDescriptorAllow\", ...}, ...]}` composes multiple descriptors; the role grants the union of every entry.\n- `PermissionDescriptorCondition` \u2014 `{__type: \"PermissionDescriptorCondition\", condition: {__type: ...}, subNode: {__type: ...}}` gates a sub-descriptor on a boolean expression.\n- `PermissionDescriptorCompose` \u2014 references other roles by ID; `{__type: \"PermissionDescriptorCompose\", permissionDescriptors: [<roleId>, ...]}`.\n\nPulumi Cloud's REST API also accepts `PermissionDescriptorIfThenElse`, `PermissionDescriptorSelect`, and the `PermissionExpression*` / `PermissionLiteralExpression*` boolean operators (And, Or, Not, Equal, Environment, Stack, Team, InsightsAccount, \u2026); the provider does not inspect anything below the top, so future Cloud additions work without a provider release.\n\nFor the common case of granting a set of scopes on one entity, prefer the `buildAllowPermissions`, `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, and `buildInsightsAccountScopedPermissions` helpers, which build the descriptor tree for you. To grant a role to a team, use the `TeamRoleAssignment` resource \u2014 roles are *associated with* teams, not gated on them via a permission descriptor.\n\nNote: the `__type` field name uses Pulumi's `__`-prefixed-key passthrough (pulumi/pulumi#22834, available in pulumi 3.235.0+). Earlier pulumi runtimes will drop these keys at the SDK boundary; the Python SDK pins the minimum runtime version automatically."
         },
         "resourceType": {
           "type": "string",
@@ -5814,7 +6464,7 @@
           "additionalProperties": {
             "$ref": "pulumi.json#/Any"
           },
-          "description": "The role's permission descriptor tree, expressed in the Pulumi Cloud wire grammar. The provider exposes the descriptor as `map[string]Any` and passes it through verbatim — the wire-format `__type` discriminator is used at every level (SDK and API alike).\n\nCommon top-level descriptors:\n- `PermissionDescriptorAllow` — `{__type: \"PermissionDescriptorAllow\", permissions: [\"<scope>\", ...]}` grants the listed scopes.\n- `PermissionDescriptorGroup` — `{__type: \"PermissionDescriptorGroup\", entries: [{__type: \"PermissionDescriptorAllow\", ...}, ...]}` composes multiple descriptors; the role grants the union of every entry.\n- `PermissionDescriptorCondition` — `{__type: \"PermissionDescriptorCondition\", condition: {__type: ...}, subNode: {__type: ...}}` gates a sub-descriptor on a boolean expression.\n- `PermissionDescriptorCompose` — references other roles by ID; `{__type: \"PermissionDescriptorCompose\", permissionDescriptors: [<roleId>, ...]}`.\n\nPulumi Cloud's REST API also accepts `PermissionDescriptorIfThenElse`, `PermissionDescriptorSelect`, and the `PermissionExpression*` / `PermissionLiteralExpression*` boolean operators (And, Or, Not, Equal, Environment, Stack, Team, InsightsAccount, …); the provider does not inspect anything below the top, so future Cloud additions work without a provider release.\n\nFor the common case of granting a set of scopes on one entity, prefer the `buildAllowPermissions`, `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, and `buildInsightsAccountScopedPermissions` helpers, which build the descriptor tree for you. To grant a role to a team, use the `TeamRoleAssignment` resource — roles are *associated with* teams, not gated on them via a permission descriptor.\n\nNote: the `__type` field name uses Pulumi's `__`-prefixed-key passthrough (pulumi/pulumi#22834, available in pulumi 3.235.0+). Earlier pulumi runtimes will drop these keys at the SDK boundary; the Python SDK pins the minimum runtime version automatically."
+          "description": "The role's permission descriptor tree, expressed in the Pulumi Cloud wire grammar. The provider exposes the descriptor as `map[string]Any` and passes it through verbatim \u2014 the wire-format `__type` discriminator is used at every level (SDK and API alike).\n\nCommon top-level descriptors:\n- `PermissionDescriptorAllow` \u2014 `{__type: \"PermissionDescriptorAllow\", permissions: [\"<scope>\", ...]}` grants the listed scopes.\n- `PermissionDescriptorGroup` \u2014 `{__type: \"PermissionDescriptorGroup\", entries: [{__type: \"PermissionDescriptorAllow\", ...}, ...]}` composes multiple descriptors; the role grants the union of every entry.\n- `PermissionDescriptorCondition` \u2014 `{__type: \"PermissionDescriptorCondition\", condition: {__type: ...}, subNode: {__type: ...}}` gates a sub-descriptor on a boolean expression.\n- `PermissionDescriptorCompose` \u2014 references other roles by ID; `{__type: \"PermissionDescriptorCompose\", permissionDescriptors: [<roleId>, ...]}`.\n\nPulumi Cloud's REST API also accepts `PermissionDescriptorIfThenElse`, `PermissionDescriptorSelect`, and the `PermissionExpression*` / `PermissionLiteralExpression*` boolean operators (And, Or, Not, Equal, Environment, Stack, Team, InsightsAccount, \u2026); the provider does not inspect anything below the top, so future Cloud additions work without a provider release.\n\nFor the common case of granting a set of scopes on one entity, prefer the `buildAllowPermissions`, `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, and `buildInsightsAccountScopedPermissions` helpers, which build the descriptor tree for you. To grant a role to a team, use the `TeamRoleAssignment` resource \u2014 roles are *associated with* teams, not gated on them via a permission descriptor.\n\nNote: the `__type` field name uses Pulumi's `__`-prefixed-key passthrough (pulumi/pulumi#22834, available in pulumi 3.235.0+). Earlier pulumi runtimes will drop these keys at the SDK boundary; the Python SDK pins the minimum runtime version automatically."
         },
         "resourceType": {
           "type": "string",
@@ -6134,7 +6784,7 @@
       ]
     },
     "pulumiservice:index:StackTags": {
-      "description": "Manages a set of stack tags as a single resource via a `tags` map, instead of one `StackTag` per key — useful for YAML programs.\n\nOnly tags declared in `tags` are managed; tags added out-of-band (CLI, pulumibot, a singular `StackTag` resource) are left alone. Tag values are immutable in Pulumi Cloud, so a value change is implemented as delete-and-recreate.\n\nImporting with ID `{organization}/{project}/{stack}/tags` adopts every tag currently on the stack; declare `tags` explicitly after import so subsequent updates match your intent. See the [registry docs](https://www.pulumi.com/registry/packages/pulumiservice/api-docs/stacktags/) for full usage and examples.\n",
+      "description": "Manages a set of stack tags as a single resource via a `tags` map, instead of one `StackTag` per key \u2014 useful for YAML programs.\n\nOnly tags declared in `tags` are managed; tags added out-of-band (CLI, pulumibot, a singular `StackTag` resource) are left alone. Tag values are immutable in Pulumi Cloud, so a value change is implemented as delete-and-recreate.\n\nImporting with ID `{organization}/{project}/{stack}/tags` adopts every tag currently on the stack; declare `tags` explicitly after import so subsequent updates match your intent. See the [registry docs](https://www.pulumi.com/registry/packages/pulumiservice/api-docs/stacktags/) for full usage and examples.\n",
       "properties": {
         "organization": {
           "type": "string",
@@ -6801,7 +7451,7 @@
   },
   "functions": {
     "pulumiservice:index:buildAllowPermissions": {
-      "description": "Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes globally — i.e. on every entity of the matching resource type. This is the simplest descriptor: a flat `PermissionDescriptorAllow`. Use this helper instead of hand-authoring the descriptor literal so the wire-format `__type` discriminator stays an implementation detail. For grants scoped to a specific entity, see `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, or `buildInsightsAccountScopedPermissions`. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls the output of each helper.",
+      "description": "Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes globally \u2014 i.e. on every entity of the matching resource type. This is the simplest descriptor: a flat `PermissionDescriptorAllow`. Use this helper instead of hand-authoring the descriptor literal so the wire-format `__type` discriminator stays an implementation detail. For grants scoped to a specific entity, see `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, or `buildInsightsAccountScopedPermissions`. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls the output of each helper.",
       "inputs": {
         "properties": {
           "permissions": {
@@ -6910,7 +7560,7 @@
       }
     },
     "pulumiservice:index:buildStackScopedPermissions": {
-      "description": "Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named stack. The `stackId` is the stack's opaque Pulumi Cloud identifier — distinct from the `organization/project/stack` triple. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls the output of each helper.",
+      "description": "Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named stack. The `stackId` is the stack's opaque Pulumi Cloud identifier \u2014 distinct from the `organization/project/stack` triple. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls the output of each helper.",
       "inputs": {
         "properties": {
           "permissions": {
@@ -6981,7 +7631,7 @@
       }
     },
     "pulumiservice:index:getEnvironment": {
-      "description": "Looks up an existing ESC environment by name and returns its UUID. Use this to scope a custom RBAC role to a specific environment — pass the returned UUID into `buildEnvironmentScopedPermissions`, or use it as the `identity` field of a hand-rolled `PermissionLiteralExpressionEnvironment` in `OrganizationRole.permissions`. Errors when the environment is not found.",
+      "description": "Looks up an existing ESC environment by name and returns its UUID. Use this to scope a custom RBAC role to a specific environment \u2014 pass the returned UUID into `buildEnvironmentScopedPermissions`, or use it as the `identity` field of a hand-rolled `PermissionLiteralExpressionEnvironment` in `OrganizationRole.permissions`. Errors when the environment is not found.",
       "inputs": {
         "properties": {
           "name": {
@@ -7159,7 +7809,7 @@
       "outputs": {
         "properties": {
           "role": {
-            "description": "The member's built-in role (member, admin, billing-manager). Absent when a custom role is assigned — check `roleId` in that case.",
+            "description": "The member's built-in role (member, admin, billing-manager). Absent when a custom role is assigned \u2014 check `roleId` in that case.",
             "type": "string"
           },
           "roleId": {

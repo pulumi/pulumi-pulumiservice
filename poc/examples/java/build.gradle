@@ -1,0 +1,17 @@
+plugins {
+    id 'application'
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'com.pulumi:pulumi:1.16.2'
+    implementation 'com.pulumi:pulumiservice:1.999.0-alpha.poc'
+}
+
+application {
+    mainClass = 'poc.App'
+}

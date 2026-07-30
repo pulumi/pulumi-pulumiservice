@@ -1,0 +1,7 @@
+name: poc-union-cs
+runtime: dotnet
+description: POC discriminated unions (C#)
+plugins:
+  providers:
+    - name: pulumiservice
+      path: ../../../bin

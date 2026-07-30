@@ -1,0 +1,7 @@
+name: poc-union-go
+runtime: go
+description: POC discriminated unions (Go)
+plugins:
+  providers:
+    - name: pulumiservice
+      path: ../../../bin

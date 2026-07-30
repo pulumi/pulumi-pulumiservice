@@ -1,0 +1,11 @@
+name: poc-union-py
+runtime:
+  name: python
+  options:
+    toolchain: pip
+    virtualenv: ../../venv
+description: POC discriminated unions (Python)
+plugins:
+  providers:
+    - name: pulumiservice
+      path: ../../../bin

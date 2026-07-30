@@ -1,0 +1,7 @@
+name: poc-union-java
+runtime: java
+description: POC discriminated unions (Java)
+plugins:
+  providers:
+    - name: pulumiservice
+      path: ../../../bin

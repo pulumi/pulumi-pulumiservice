@@ -1,0 +1,13 @@
+venv/
+state/
+convert/out-*/
+examples/*/node_modules/
+examples/*/bin/
+examples/*/obj/
+examples/*/.gradle/
+examples/*/build/
+examples/*/plan.json
+examples/*/preview.log
+examples/go/poc-union-go
+examples/py/__pycache__/
+examples/ts/package-lock.json

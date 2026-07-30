@@ -1,0 +1,6 @@
+name: poc-convert
+runtime: yaml
+plugins:
+  providers:
+    - name: pulumiservice
+      path: /Users/lukeward/Workspace/psp/pulumi-pulumiservice/.claude/worktrees/union-poc/bin

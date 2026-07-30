@@ -1,0 +1,12 @@
+{
+    "name": "poc-union-ts",
+    "main": "index.ts",
+    "devDependencies": {
+        "@types/node": "^18"
+    },
+    "dependencies": {
+        "@pulumi/pulumi": "^3.0.0",
+        "@pulumi/pulumiservice": "file:../../../sdk-poc/nodejs/bin",
+        "typescript": "^5.0.0"
+    }
+}
