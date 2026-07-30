@@ -23,14 +23,16 @@ func main() {
 			PolicyId: pulumi.String(policyId),
 			Policies: pulumi.Array{
 				pulumi.Map{
-					"decision":   pulumi.String("allow"),
-					"permission": pulumi.String("read"),
-					"tokenType":  pulumi.String("organization"),
+					"decision":              pulumi.String("allow"),
+					"tokenType":             pulumi.String("organization"),
+					"authorizedPermissions": pulumi.ToStringArray([]string{"standard"}),
+					"rules":                 pulumi.Map{},
 				},
 				pulumi.Map{
-					"decision":   pulumi.String("deny"),
-					"permission": pulumi.String("admin"),
-					"tokenType":  pulumi.String("organization"),
+					"decision":              pulumi.String("deny"),
+					"tokenType":             pulumi.String("organization"),
+					"authorizedPermissions": pulumi.ToStringArray([]string{"admin"}),
+					"rules":                 pulumi.Map{},
 				},
 			},
 		})

@@ -24,6 +24,18 @@ import (
 
 const schemaRefPrefix = "#/components/schemas/"
 
+const refKey = "$ref"
+
+const (
+	anyRef      = "pulumi.json#/Any"
+	typeObject  = "object"
+	typeArray   = "array"
+	typeString  = "string"
+	typeInteger = "integer"
+	typeNumber  = "number"
+	typeBoolean = "boolean"
+)
+
 // typeRegistry emits named Pulumi types for component schemas on demand and
 // renders discriminated bases as inline oneOf unions over const-tagged
 // variants (the azure-native shape). Emission is memoized and cycle-safe:
@@ -31,6 +43,7 @@ const schemaRefPrefix = "#/components/schemas/"
 type typeRegistry struct {
 	spec           *Spec
 	pkg            string
+	typeMeta       map[string]TypeMeta
 	modules        map[string]map[string]bool // schema name -> referencing modules
 	tokens         map[string]string          // schema name -> resolved token
 	types          map[string]schema.ComplexTypeSpec
@@ -48,6 +61,7 @@ func newTypeRegistry(spec *Spec, metadata *Metadata, pkg string) *typeRegistry {
 	r := &typeRegistry{
 		spec:           spec,
 		pkg:            pkg,
+		typeMeta:       metadata.Types,
 		modules:        map[string]map[string]bool{},
 		tokens:         map[string]string{},
 		types:          map[string]schema.ComplexTypeSpec{},
@@ -119,7 +133,7 @@ func (r *typeRegistry) markReachable(name, module string, seen map[string]bool) 
 	}
 	var visit func(n map[string]any)
 	visit = func(n map[string]any) {
-		if ref, ok := n["$ref"].(string); ok {
+		if ref, ok := n[refKey].(string); ok {
 			r.markReachable(refSchemaName(ref), module, seen)
 			return
 		}
@@ -214,7 +228,7 @@ func discriminatorOf(node map[string]any) (string, map[string]string) {
 func (r *typeRegistry) property(node any) schema.PropertySpec {
 	nm, ok := node.(map[string]any)
 	if !ok {
-		return schema.PropertySpec{TypeSpec: schema.TypeSpec{Ref: "pulumi.json#/Any"}}
+		return schema.PropertySpec{TypeSpec: schema.TypeSpec{Ref: anyRef}}
 	}
 	ts := r.typeSpec(nm)
 	desc, _ := nm["description"].(string)
@@ -222,7 +236,7 @@ func (r *typeRegistry) property(node any) schema.PropertySpec {
 }
 
 func anyTypeSpec() schema.TypeSpec {
-	return schema.TypeSpec{Ref: "pulumi.json#/Any"}
+	return schema.TypeSpec{Ref: anyRef}
 }
 
 func (r *typeRegistry) refTo(token string) schema.TypeSpec {
@@ -230,12 +244,23 @@ func (r *typeRegistry) refTo(token string) schema.TypeSpec {
 }
 
 func (r *typeRegistry) typeSpec(nm map[string]any) schema.TypeSpec {
-	if ref, ok := nm["$ref"].(string); ok {
+	if ref, ok := nm[refKey].(string); ok {
 		name := refSchemaName(ref)
 		target, found := r.spec.ResolveSchema(ref)
 		if !found {
 			r.errorf("unresolvable $ref %q", ref)
 			return anyTypeSpec()
+		}
+		if tm, ok := r.typeMeta[name]; ok {
+			if tm.Any {
+				return anyTypeSpec()
+			}
+			if tm.ScalarShorthand != "" {
+				return schema.TypeSpec{OneOf: []schema.TypeSpec{
+					{Type: tm.ScalarShorthand},
+					r.refTo(r.emitNamed(name)),
+				}}
+			}
 		}
 		if tagProp, mapping := discriminatorOf(target); tagProp != "" {
 			switch len(mapping) {
@@ -267,9 +292,9 @@ func (r *typeRegistry) typeSpec(nm map[string]any) schema.TypeSpec {
 	}
 	t, _ := nm["type"].(string)
 	switch t {
-	case "string", "integer", "number", "boolean":
+	case typeString, typeInteger, typeNumber, typeBoolean:
 		return schema.TypeSpec{Type: t}
-	case "array":
+	case typeArray:
 		items, _ := nm["items"].(map[string]any)
 		var itemTS schema.TypeSpec
 		if items != nil {
@@ -277,21 +302,21 @@ func (r *typeRegistry) typeSpec(nm map[string]any) schema.TypeSpec {
 		} else {
 			itemTS = anyTypeSpec()
 		}
-		return schema.TypeSpec{Type: "array", Items: &itemTS}
-	case "object", "":
+		return schema.TypeSpec{Type: typeArray, Items: &itemTS}
+	case typeObject, "":
 		if ap, ok := nm["additionalProperties"].(map[string]any); ok {
 			elem := r.typeSpec(ap)
-			return schema.TypeSpec{Type: "object", AdditionalProperties: &elem}
+			return schema.TypeSpec{Type: typeObject, AdditionalProperties: &elem}
 		}
 		// Anonymous inline object: stays free-form (phase 1 rule).
-		return schema.TypeSpec{Type: "object", AdditionalProperties: &schema.TypeSpec{Ref: "pulumi.json#/Any"}}
+		return schema.TypeSpec{Type: typeObject, AdditionalProperties: &schema.TypeSpec{Ref: anyRef}}
 	default:
 		return anyTypeSpec()
 	}
 }
 
 func isObjectSchema(node map[string]any) bool {
-	if t, ok := node["type"].(string); ok && t != "object" && t != "" {
+	if t, ok := node["type"].(string); ok && t != typeObject && t != "" {
 		return false
 	}
 	if _, ok := node["properties"]; ok {
@@ -301,7 +326,7 @@ func isObjectSchema(node map[string]any) bool {
 		return true
 	}
 	t, _ := node["type"].(string)
-	return t == "object"
+	return t == typeObject
 }
 
 // scalarTypeSpec renders a named non-object schema (a string/array alias)
@@ -309,13 +334,13 @@ func isObjectSchema(node map[string]any) bool {
 func scalarTypeSpec(node map[string]any) schema.TypeSpec {
 	t, _ := node["type"].(string)
 	switch t {
-	case "string", "integer", "number", "boolean":
+	case typeString, typeInteger, typeNumber, typeBoolean:
 		return schema.TypeSpec{Type: t}
-	case "array":
+	case typeArray:
 		if items, ok := node["items"].(map[string]any); ok {
-			if _, isRef := items["$ref"]; !isRef {
+			if _, isRef := items[refKey]; !isRef {
 				it := scalarTypeSpec(items)
-				return schema.TypeSpec{Type: "array", Items: &it}
+				return schema.TypeSpec{Type: typeArray, Items: &it}
 			}
 		}
 	}
@@ -335,7 +360,8 @@ func soleKey(m map[string]string) string {
 // Java SDK deserializers pick the wrong member / null at that arity.
 func (r *typeRegistry) unionTypeSpec(baseName, tagProp string, mapping map[string]string) schema.TypeSpec {
 	if len(mapping) == 2 {
-		r.errorf("%s: 2-member object unions are not allowed (broken .NET/Java output deserialization); flatten or wait for upstream fixes", baseName)
+		r.errorf("%s: 2-member object unions are not allowed "+
+			"(broken .NET/Java output deserialization); flatten or wait for upstream fixes", baseName)
 		return anyTypeSpec()
 	}
 	tags := make([]string, 0, len(mapping))
@@ -403,6 +429,9 @@ func (r *typeRegistry) emit(name, tagProp, tag string) string {
 			reqSet[rr] = true
 		}
 	}
+	for _, opt := range r.typeMeta[name].Optional {
+		delete(reqSet, opt)
+	}
 
 	if tagProp != "" {
 		desc := fmt.Sprintf("Expected value is '%s'.", tag)
@@ -410,7 +439,7 @@ func (r *typeRegistry) emit(name, tagProp, tag string) string {
 			desc = prev.Description + " " + desc
 		}
 		pprops[tagProp] = schema.PropertySpec{
-			TypeSpec:    schema.TypeSpec{Type: "string"},
+			TypeSpec:    schema.TypeSpec{Type: typeString},
 			Const:       tag,
 			Description: desc,
 		}
@@ -424,7 +453,7 @@ func (r *typeRegistry) emit(name, tagProp, tag string) string {
 
 	r.types[token] = schema.ComplexTypeSpec{
 		ObjectTypeSpec: schema.ObjectTypeSpec{
-			Type:        "object",
+			Type:        typeObject,
 			Description: desc,
 			Properties:  pprops,
 			Required:    sortedKeys(reqSet),

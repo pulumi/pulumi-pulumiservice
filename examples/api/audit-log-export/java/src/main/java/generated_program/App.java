@@ -12,16 +12,14 @@ public class App {
             var config = ctx.config();
             var organizationName = config.get("organizationName").orElse("service-provider-test-org");
             var bucketName = config.get("bucketName").orElse("pulumi-audit-log-archive");
-            var region = config.get("region").orElse("us-west-2");
 
             var exportConfig = new AuditLogExportConfiguration("exportConfig",
                 AuditLogExportConfigurationArgs.builder()
                     .orgName(organizationName)
                     .newEnabled(true)
                     .newS3Configuration(Map.of(
-                        "bucketName", bucketName,
-                        "region", region,
-                        "roleArn", "arn:aws:iam::123456789012:role/PulumiAuditLogExportRole"))
+                        "s3BucketName", bucketName,
+                        "iamRoleArn", "arn:aws:iam::123456789012:role/PulumiAuditLogExportRole"))
                     .build());
 
             ctx.export("exportEnabled", exportConfig.enabled());
