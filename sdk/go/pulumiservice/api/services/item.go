@@ -12,7 +12,9 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
-// Adds items (such as access tokens, team memberships, or stack permissions) to an existing service account. Service accounts provide programmatic, non-human access to Pulumi Cloud resources and are scoped to an organization. Items define what the service account can access and what credentials it holds. Returns the updated service details.
+// Adds items (such as access tokens, team memberships, or stack permissions) to an existing service account. Service accounts provide programmatic, non-human access to Pulumi Cloud resources and are scoped to an organization. Items define what the service account can access and what credentials it holds. Returns the updated service details with the first page of items; if `continuationToken` is set on the response, pass it to `GetService` to fetch the remaining pages.
+//
+// Prefer `AddServiceItemsV2`, then `GetService` to read the items.
 type Item struct {
 	pulumi.CustomResourceState
 
@@ -82,6 +84,8 @@ func (ItemState) ElementType() reflect.Type {
 type itemArgs struct {
 	// List of items
 	Items []interface{} `pulumi:"items"`
+	// Maximum number of items to return on the first page (max 1000)
+	MaxResults *int `pulumi:"maxResults"`
 	// The organization name
 	OrgName string `pulumi:"orgName"`
 	// The owner name
@@ -96,6 +100,8 @@ type itemArgs struct {
 type ItemArgs struct {
 	// List of items
 	Items pulumi.ArrayInput
+	// Maximum number of items to return on the first page (max 1000)
+	MaxResults pulumi.IntPtrInput
 	// The organization name
 	OrgName pulumi.StringInput
 	// The owner name

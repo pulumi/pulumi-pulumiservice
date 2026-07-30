@@ -12,7 +12,7 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
-// Creates a new agent task for the specified organization. The request must include a prompt (the user event message) that initiates the task. Set the 'permissionMode' field in the request body to restrict the agent to read-only operations. Returns the created task details including task ID, name, status, and timestamp.
+// Creates a new agent task for the specified organization. The request must include a prompt (the user event message) that initiates the task. The message is a user message, so its discriminator field must be set to "type": "user_message". Set the 'permissionMode' field in the request body to restrict the agent to read-only operations. Returns the created task details including task ID, name, status, and timestamp.
 type Task struct {
 	pulumi.CustomResourceState
 
@@ -42,11 +42,13 @@ type Task struct {
 	PermissionMode pulumi.StringPtrOutput `pulumi:"permissionMode"`
 	// Whether the task is in plan mode. Set based on the first user message.
 	PlanMode pulumi.BoolOutput `pulumi:"planMode"`
+	// The id of the RBAC role this task assumes. Null when the task runs with the creating user's own permissions (no assumed role).
+	Role pulumi.StringPtrOutput `pulumi:"role"`
 	// The current runtime phase for this task. Null until the runtime checks in.
 	RuntimePhase pulumi.StringPtrOutput `pulumi:"runtimePhase"`
 	// When the task was first shared. Null if never shared.
 	SharedAt pulumi.StringPtrOutput `pulumi:"sharedAt"`
-	// The origin that triggered this task. Valid values: 'console', 'cli', 'slack', 'schedule', 'api', 'github'.
+	// The origin that triggered this task. Valid values: 'console', 'cli', 'slack', 'schedule', 'api', 'github', 'code-review'.
 	Source pulumi.StringPtrOutput `pulumi:"source"`
 	// The automation that spawned this task, if the task was created by an automation run.
 	SourceAutomationID pulumi.StringPtrOutput `pulumi:"sourceAutomationID"`
@@ -58,6 +60,8 @@ type Task struct {
 	TokensUsed pulumi.IntOutput `pulumi:"tokensUsed"`
 	// Where tools are executed for this task. Valid values: 'cloud', 'cli'.
 	ToolExecutionMode pulumi.StringPtrOutput `pulumi:"toolExecutionMode"`
+	// The version control system this task operates against. Set for tasks that target a specific VCS platform (e.g. code reviews). Null for tasks with no VCS context.
+	VcsProvider pulumi.StringPtrOutput `pulumi:"vcsProvider"`
 }
 
 // NewTask registers a new resource with the given unique name, arguments, and options.
@@ -109,7 +113,7 @@ type taskArgs struct {
 	CliIntegrations []interface{} `pulumi:"cliIntegrations"`
 	// Optional list of integrations to enable for this task. Semantics: omitted/null → inherit all org-enabled integrations; empty list → explicit opt-out (no integration credentials for this task); populated list → whitelist of specific integrations by ID. Modeled as an object array rather than a bare string array so multi-instance support (instance_name, scope, etc.) can be added later without a wire break.
 	EnabledIntegrations []interface{} `pulumi:"enabledIntegrations"`
-	// The message content
+	// The message content. This is the first event in the conversation and must be a user message, so its discriminator field must be set to "type": "user_message".
 	Message interface{} `pulumi:"message"`
 	// The organization name
 	OrgName string `pulumi:"orgName"`
@@ -117,6 +121,8 @@ type taskArgs struct {
 	PermissionMode *string `pulumi:"permissionMode"`
 	// Whether to enable plan mode for this task.
 	PlanMode *bool `pulumi:"planMode"`
+	// Optional RBAC role the task assumes, identified by role id. When set, the task operates with that role's permissions in place of the creating user's own assignments. You may only assume a role that is assigned to you, directly or through a team; a role you do not hold is rejected with a 403. Omitted/null means no assumed role: the task uses the creating user's full permissions. Orthogonal to permissionMode, which controls the read-only behavior posture independently.
+	Role *string `pulumi:"role"`
 	// The origin that triggered this task. Defaults to 'api' if omitted.
 	Source *string `pulumi:"source"`
 	// The agent task identifier
@@ -133,7 +139,7 @@ type TaskArgs struct {
 	CliIntegrations pulumi.ArrayInput
 	// Optional list of integrations to enable for this task. Semantics: omitted/null → inherit all org-enabled integrations; empty list → explicit opt-out (no integration credentials for this task); populated list → whitelist of specific integrations by ID. Modeled as an object array rather than a bare string array so multi-instance support (instance_name, scope, etc.) can be added later without a wire break.
 	EnabledIntegrations pulumi.ArrayInput
-	// The message content
+	// The message content. This is the first event in the conversation and must be a user message, so its discriminator field must be set to "type": "user_message".
 	Message pulumi.Input
 	// The organization name
 	OrgName pulumi.StringInput
@@ -141,6 +147,8 @@ type TaskArgs struct {
 	PermissionMode pulumi.StringPtrInput
 	// Whether to enable plan mode for this task.
 	PlanMode pulumi.BoolPtrInput
+	// Optional RBAC role the task assumes, identified by role id. When set, the task operates with that role's permissions in place of the creating user's own assignments. You may only assume a role that is assigned to you, directly or through a team; a role you do not hold is rejected with a 403. Omitted/null means no assumed role: the task uses the creating user's full permissions. Orthogonal to permissionMode, which controls the read-only behavior posture independently.
+	Role pulumi.StringPtrInput
 	// The origin that triggered this task. Defaults to 'api' if omitted.
 	Source pulumi.StringPtrInput
 	// The agent task identifier
@@ -301,6 +309,11 @@ func (o TaskOutput) PlanMode() pulumi.BoolOutput {
 	return o.ApplyT(func(v *Task) pulumi.BoolOutput { return v.PlanMode }).(pulumi.BoolOutput)
 }
 
+// The id of the RBAC role this task assumes. Null when the task runs with the creating user's own permissions (no assumed role).
+func (o TaskOutput) Role() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *Task) pulumi.StringPtrOutput { return v.Role }).(pulumi.StringPtrOutput)
+}
+
 // The current runtime phase for this task. Null until the runtime checks in.
 func (o TaskOutput) RuntimePhase() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *Task) pulumi.StringPtrOutput { return v.RuntimePhase }).(pulumi.StringPtrOutput)
@@ -311,7 +324,7 @@ func (o TaskOutput) SharedAt() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *Task) pulumi.StringPtrOutput { return v.SharedAt }).(pulumi.StringPtrOutput)
 }
 
-// The origin that triggered this task. Valid values: 'console', 'cli', 'slack', 'schedule', 'api', 'github'.
+// The origin that triggered this task. Valid values: 'console', 'cli', 'slack', 'schedule', 'api', 'github', 'code-review'.
 func (o TaskOutput) Source() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *Task) pulumi.StringPtrOutput { return v.Source }).(pulumi.StringPtrOutput)
 }
@@ -339,6 +352,11 @@ func (o TaskOutput) TokensUsed() pulumi.IntOutput {
 // Where tools are executed for this task. Valid values: 'cloud', 'cli'.
 func (o TaskOutput) ToolExecutionMode() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *Task) pulumi.StringPtrOutput { return v.ToolExecutionMode }).(pulumi.StringPtrOutput)
+}
+
+// The version control system this task operates against. Set for tasks that target a specific VCS platform (e.g. code reviews). Null for tasks with no VCS context.
+func (o TaskOutput) VcsProvider() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *Task) pulumi.StringPtrOutput { return v.VcsProvider }).(pulumi.StringPtrOutput)
 }
 
 type TaskArrayOutput struct{ *pulumi.OutputState }

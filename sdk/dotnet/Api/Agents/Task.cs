@@ -10,7 +10,7 @@ using Pulumi.Serialization;
 namespace Pulumi.PulumiService.Api.Agents
 {
     /// <summary>
-    /// Creates a new agent task for the specified organization. The request must include a prompt (the user event message) that initiates the task. Set the 'permissionMode' field in the request body to restrict the agent to read-only operations. Returns the created task details including task ID, name, status, and timestamp.
+    /// Creates a new agent task for the specified organization. The request must include a prompt (the user event message) that initiates the task. The message is a user message, so its discriminator field must be set to "type": "user_message". Set the 'permissionMode' field in the request body to restrict the agent to read-only operations. Returns the created task details including task ID, name, status, and timestamp.
     /// </summary>
     [PulumiServiceResourceType("pulumiservice:api/agents:Task")]
     public partial class Task : global::Pulumi.CustomResource
@@ -94,6 +94,12 @@ namespace Pulumi.PulumiService.Api.Agents
         public Output<bool> PlanMode { get; private set; } = null!;
 
         /// <summary>
+        /// The id of the RBAC role this task assumes. Null when the task runs with the creating user's own permissions (no assumed role).
+        /// </summary>
+        [Output("role")]
+        public Output<string?> Role { get; private set; } = null!;
+
+        /// <summary>
         /// The current runtime phase for this task. Null until the runtime checks in.
         /// </summary>
         [Output("runtimePhase")]
@@ -106,7 +112,7 @@ namespace Pulumi.PulumiService.Api.Agents
         public Output<string?> SharedAt { get; private set; } = null!;
 
         /// <summary>
-        /// The origin that triggered this task. Valid values: 'console', 'cli', 'slack', 'schedule', 'api', 'github'.
+        /// The origin that triggered this task. Valid values: 'console', 'cli', 'slack', 'schedule', 'api', 'github', 'code-review'.
         /// </summary>
         [Output("source")]
         public Output<string?> Source { get; private set; } = null!;
@@ -140,6 +146,12 @@ namespace Pulumi.PulumiService.Api.Agents
         /// </summary>
         [Output("toolExecutionMode")]
         public Output<string?> ToolExecutionMode { get; private set; } = null!;
+
+        /// <summary>
+        /// The version control system this task operates against. Set for tasks that target a specific VCS platform (e.g. code reviews). Null for tasks with no VCS context.
+        /// </summary>
+        [Output("vcsProvider")]
+        public Output<string?> VcsProvider { get; private set; } = null!;
 
 
         /// <summary>
@@ -217,7 +229,7 @@ namespace Pulumi.PulumiService.Api.Agents
         }
 
         /// <summary>
-        /// The message content
+        /// The message content. This is the first event in the conversation and must be a user message, so its discriminator field must be set to "type": "user_message".
         /// </summary>
         [Input("message")]
         public Input<object>? Message { get; set; }
@@ -239,6 +251,12 @@ namespace Pulumi.PulumiService.Api.Agents
         /// </summary>
         [Input("planMode")]
         public Input<bool>? PlanMode { get; set; }
+
+        /// <summary>
+        /// Optional RBAC role the task assumes, identified by role id. When set, the task operates with that role's permissions in place of the creating user's own assignments. You may only assume a role that is assigned to you, directly or through a team; a role you do not hold is rejected with a 403. Omitted/null means no assumed role: the task uses the creating user's full permissions. Orthogonal to permissionMode, which controls the read-only behavior posture independently.
+        /// </summary>
+        [Input("role")]
+        public Input<string>? Role { get; set; }
 
         /// <summary>
         /// The origin that triggered this task. Defaults to 'api' if omitted.

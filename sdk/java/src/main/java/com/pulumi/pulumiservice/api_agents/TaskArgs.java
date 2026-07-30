@@ -65,14 +65,14 @@ public final class TaskArgs extends com.pulumi.resources.ResourceArgs {
     }
 
     /**
-     * The message content
+     * The message content. This is the first event in the conversation and must be a user message, so its discriminator field must be set to &#34;type&#34;: &#34;user_message&#34;.
      * 
      */
     @Import(name="message")
     private @Nullable Output<Object> message;
 
     /**
-     * @return The message content
+     * @return The message content. This is the first event in the conversation and must be a user message, so its discriminator field must be set to &#34;type&#34;: &#34;user_message&#34;.
      * 
      */
     public Optional<Output<Object>> message() {
@@ -122,6 +122,21 @@ public final class TaskArgs extends com.pulumi.resources.ResourceArgs {
      */
     public Optional<Output<Boolean>> planMode() {
         return Optional.ofNullable(this.planMode);
+    }
+
+    /**
+     * Optional RBAC role the task assumes, identified by role id. When set, the task operates with that role&#39;s permissions in place of the creating user&#39;s own assignments. You may only assume a role that is assigned to you, directly or through a team; a role you do not hold is rejected with a 403. Omitted/null means no assumed role: the task uses the creating user&#39;s full permissions. Orthogonal to permissionMode, which controls the read-only behavior posture independently.
+     * 
+     */
+    @Import(name="role")
+    private @Nullable Output<String> role;
+
+    /**
+     * @return Optional RBAC role the task assumes, identified by role id. When set, the task operates with that role&#39;s permissions in place of the creating user&#39;s own assignments. You may only assume a role that is assigned to you, directly or through a team; a role you do not hold is rejected with a 403. Omitted/null means no assumed role: the task uses the creating user&#39;s full permissions. Orthogonal to permissionMode, which controls the read-only behavior posture independently.
+     * 
+     */
+    public Optional<Output<String>> role() {
+        return Optional.ofNullable(this.role);
     }
 
     /**
@@ -179,6 +194,7 @@ public final class TaskArgs extends com.pulumi.resources.ResourceArgs {
         this.orgName = $.orgName;
         this.permissionMode = $.permissionMode;
         this.planMode = $.planMode;
+        this.role = $.role;
         this.source = $.source;
         this.taskID = $.taskID;
         this.toolExecutionMode = $.toolExecutionMode;
@@ -286,7 +302,7 @@ public final class TaskArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param message The message content
+         * @param message The message content. This is the first event in the conversation and must be a user message, so its discriminator field must be set to &#34;type&#34;: &#34;user_message&#34;.
          * 
          * @return builder
          * 
@@ -297,7 +313,7 @@ public final class TaskArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param message The message content
+         * @param message The message content. This is the first event in the conversation and must be a user message, so its discriminator field must be set to &#34;type&#34;: &#34;user_message&#34;.
          * 
          * @return builder
          * 
@@ -367,6 +383,27 @@ public final class TaskArgs extends com.pulumi.resources.ResourceArgs {
          */
         public Builder planMode(Boolean planMode) {
             return planMode(Output.of(planMode));
+        }
+
+        /**
+         * @param role Optional RBAC role the task assumes, identified by role id. When set, the task operates with that role&#39;s permissions in place of the creating user&#39;s own assignments. You may only assume a role that is assigned to you, directly or through a team; a role you do not hold is rejected with a 403. Omitted/null means no assumed role: the task uses the creating user&#39;s full permissions. Orthogonal to permissionMode, which controls the read-only behavior posture independently.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder role(@Nullable Output<String> role) {
+            $.role = role;
+            return this;
+        }
+
+        /**
+         * @param role Optional RBAC role the task assumes, identified by role id. When set, the task operates with that role&#39;s permissions in place of the creating user&#39;s own assignments. You may only assume a role that is assigned to you, directly or through a team; a role you do not hold is rejected with a 403. Omitted/null means no assumed role: the task uses the creating user&#39;s full permissions. Orthogonal to permissionMode, which controls the read-only behavior posture independently.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder role(String role) {
+            return role(Output.of(role));
         }
 
         /**

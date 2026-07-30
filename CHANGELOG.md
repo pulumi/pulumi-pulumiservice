@@ -27,6 +27,11 @@
 
 ### Improvements
 
+- Refreshed the embedded Pulumi Cloud OpenAPI spec. The previous spec still described the `/api/preview/registry/policypacks` routes, which Pulumi Cloud has since removed in favor of the GA `/api/registry/policypacks` routes; code written against the vendored spec was calling routes that no longer resolve.
+- Added `pulumiservice.api.neo.UsageCap` for capping an organization's monthly Neo spend. It is a `PUT`-shaped singleton keyed on `{orgName}`, so create and update are the same call, and it requires `import` to adopt a cap that already exists rather than overwriting it. Deleting the resource removes the cap rather than restoring a prior value. The per-member equivalent is intentionally not exposed: Pulumi Cloud offers only a collection GET for member caps, leaving the resource with no read operation and therefore no refresh, no import, and no working `requireImport` guard.
+- `api.agents.Task` gained a `role` input/output for running a task under an assumed RBAC role, and a `vcsProvider` output identifying the version control system a task targets.
+- `api.integrations.GitHubIntegration` and `api.integrations.GitHubEnterpriseIntegration` gained `disableDraftPRComments` and `individualAuthEnabled`.
+- `api.services.Item` gained a `maxResults` input.
 - Added `EnvironmentRotationSucceeded` and `EnvironmentRotationFailed` webhook filters.
 - Added `PolicyPack` resource for publishing policy packs to Pulumi Cloud directly from a Pulumi program. The source directory is tarballed and uploaded on Create; the pack's policy metadata is auto-extracted by running its language analyzer plugin (matching `pulumi policy publish` behavior) and may be overridden inline.
 - Added `PolicyGroupStackAttachment` and `PolicyGroupInsightsAccountAttachment` resources for managing a single stack or Insights-account membership of a Policy Group as a standalone resource, rather than declaring the full membership list on the group.

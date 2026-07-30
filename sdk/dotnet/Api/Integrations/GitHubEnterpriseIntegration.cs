@@ -52,6 +52,12 @@ namespace Pulumi.PulumiService.Api.Integrations
         public Output<bool> DisableDetailedDiff { get; private set; } = null!;
 
         /// <summary>
+        /// Whether PR comments are disabled while a pull request is in draft.
+        /// </summary>
+        [Output("disableDraftPRComments")]
+        public Output<bool?> DisableDraftPRComments { get; private set; } = null!;
+
+        /// <summary>
         /// Whether Neo AI summaries are disabled for this installation.
         /// </summary>
         [Output("disableNeoSummaries")]
@@ -80,6 +86,12 @@ namespace Pulumi.PulumiService.Api.Integrations
         /// </summary>
         [Output("hasMembersPermission")]
         public Output<bool> HasMembersPermission { get; private set; } = null!;
+
+        /// <summary>
+        /// Whether per-user (individual) GitHub Enterprise authentication is enabled. Only applies to self-hosted GitHub Enterprise installations.
+        /// </summary>
+        [Output("individualAuthEnabled")]
+        public Output<bool?> IndividualAuthEnabled { get; private set; } = null!;
 
         /// <summary>
         /// The GitHub installation ID.
@@ -163,6 +175,12 @@ namespace Pulumi.PulumiService.Api.Integrations
         public Input<bool>? DisableDetailedDiff { get; set; }
 
         /// <summary>
+        /// Whether to disable PR comments while a pull request is in draft
+        /// </summary>
+        [Input("disableDraftPRComments")]
+        public Input<bool>? DisableDraftPRComments { get; set; }
+
+        /// <summary>
         /// Whether to disable Neo AI summaries on PRs
         /// </summary>
         [Input("disableNeoSummaries")]
@@ -173,6 +191,12 @@ namespace Pulumi.PulumiService.Api.Integrations
         /// </summary>
         [Input("disablePRComments")]
         public Input<bool>? DisablePRComments { get; set; }
+
+        /// <summary>
+        /// Whether per-user (individual) GitHub Enterprise authentication is enabled. Only applies to self-hosted GitHub Enterprise installations.
+        /// </summary>
+        [Input("individualAuthEnabled")]
+        public Input<bool>? IndividualAuthEnabled { get; set; }
 
         /// <summary>
         /// The GitHub Enterprise integration identifier

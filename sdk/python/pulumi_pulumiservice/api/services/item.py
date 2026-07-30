@@ -23,7 +23,8 @@ class ItemArgs:
                  org_name: pulumi.Input[_builtins.str],
                  owner_name: pulumi.Input[_builtins.str],
                  owner_type: pulumi.Input[_builtins.str],
-                 service_name: pulumi.Input[_builtins.str]):
+                 service_name: pulumi.Input[_builtins.str],
+                 max_results: pulumi.Input[Optional[_builtins.int]] = None):
         """
         The set of arguments for constructing a Item resource.
 
@@ -32,12 +33,15 @@ class ItemArgs:
         :param pulumi.Input[_builtins.str] owner_name: The owner name
         :param pulumi.Input[_builtins.str] owner_type: The owner type
         :param pulumi.Input[_builtins.str] service_name: The service name
+        :param pulumi.Input[_builtins.int] max_results: Maximum number of items to return on the first page (max 1000)
         """
         pulumi.set(__self__, "items", items)
         pulumi.set(__self__, "org_name", org_name)
         pulumi.set(__self__, "owner_name", owner_name)
         pulumi.set(__self__, "owner_type", owner_type)
         pulumi.set(__self__, "service_name", service_name)
+        if max_results is not None:
+            pulumi.set(__self__, "max_results", max_results)
 
     @_builtins.property
     @pulumi.getter
@@ -99,6 +103,18 @@ class ItemArgs:
     def service_name(self, value: pulumi.Input[_builtins.str]):
         pulumi.set(self, "service_name", value)
 
+    @_builtins.property
+    @pulumi.getter(name="maxResults")
+    def max_results(self) -> pulumi.Input[Optional[_builtins.int]]:
+        """
+        Maximum number of items to return on the first page (max 1000)
+        """
+        return pulumi.get(self, "max_results")
+
+    @max_results.setter
+    def max_results(self, value: pulumi.Input[Optional[_builtins.int]]):
+        pulumi.set(self, "max_results", value)
+
 
 @pulumi.type_token("pulumiservice:api/services:Item")
 class Item(pulumi.CustomResource):
@@ -107,17 +123,21 @@ class Item(pulumi.CustomResource):
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
                  items: pulumi.Input[Optional[Sequence[Any]]] = None,
+                 max_results: pulumi.Input[Optional[_builtins.int]] = None,
                  org_name: pulumi.Input[Optional[_builtins.str]] = None,
                  owner_name: pulumi.Input[Optional[_builtins.str]] = None,
                  owner_type: pulumi.Input[Optional[_builtins.str]] = None,
                  service_name: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         """
-        Adds items (such as access tokens, team memberships, or stack permissions) to an existing service account. Service accounts provide programmatic, non-human access to Pulumi Cloud resources and are scoped to an organization. Items define what the service account can access and what credentials it holds. Returns the updated service details.
+        Adds items (such as access tokens, team memberships, or stack permissions) to an existing service account. Service accounts provide programmatic, non-human access to Pulumi Cloud resources and are scoped to an organization. Items define what the service account can access and what credentials it holds. Returns the updated service details with the first page of items; if `continuationToken` is set on the response, pass it to `GetService` to fetch the remaining pages.
+
+        Prefer `AddServiceItemsV2`, then `GetService` to read the items.
 
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[Sequence[Any]] items: List of items
+        :param pulumi.Input[_builtins.int] max_results: Maximum number of items to return on the first page (max 1000)
         :param pulumi.Input[_builtins.str] org_name: The organization name
         :param pulumi.Input[_builtins.str] owner_name: The owner name
         :param pulumi.Input[_builtins.str] owner_type: The owner type
@@ -130,7 +150,9 @@ class Item(pulumi.CustomResource):
                  args: ItemArgs,
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
-        Adds items (such as access tokens, team memberships, or stack permissions) to an existing service account. Service accounts provide programmatic, non-human access to Pulumi Cloud resources and are scoped to an organization. Items define what the service account can access and what credentials it holds. Returns the updated service details.
+        Adds items (such as access tokens, team memberships, or stack permissions) to an existing service account. Service accounts provide programmatic, non-human access to Pulumi Cloud resources and are scoped to an organization. Items define what the service account can access and what credentials it holds. Returns the updated service details with the first page of items; if `continuationToken` is set on the response, pass it to `GetService` to fetch the remaining pages.
+
+        Prefer `AddServiceItemsV2`, then `GetService` to read the items.
 
         :param str resource_name: The name of the resource.
         :param ItemArgs args: The arguments to use to populate this resource's properties.
@@ -148,6 +170,7 @@ class Item(pulumi.CustomResource):
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
                  items: pulumi.Input[Optional[Sequence[Any]]] = None,
+                 max_results: pulumi.Input[Optional[_builtins.int]] = None,
                  org_name: pulumi.Input[Optional[_builtins.str]] = None,
                  owner_name: pulumi.Input[Optional[_builtins.str]] = None,
                  owner_type: pulumi.Input[Optional[_builtins.str]] = None,
@@ -164,6 +187,7 @@ class Item(pulumi.CustomResource):
             if items is None and not opts.urn:
                 raise TypeError("Missing required property 'items'")
             __props__.__dict__["items"] = items
+            __props__.__dict__["max_results"] = max_results
             if org_name is None and not opts.urn:
                 raise TypeError("Missing required property 'org_name'")
             __props__.__dict__["org_name"] = org_name

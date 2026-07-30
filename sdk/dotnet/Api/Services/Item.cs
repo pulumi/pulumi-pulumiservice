@@ -10,7 +10,9 @@ using Pulumi.Serialization;
 namespace Pulumi.PulumiService.Api.Services
 {
     /// <summary>
-    /// Adds items (such as access tokens, team memberships, or stack permissions) to an existing service account. Service accounts provide programmatic, non-human access to Pulumi Cloud resources and are scoped to an organization. Items define what the service account can access and what credentials it holds. Returns the updated service details.
+    /// Adds items (such as access tokens, team memberships, or stack permissions) to an existing service account. Service accounts provide programmatic, non-human access to Pulumi Cloud resources and are scoped to an organization. Items define what the service account can access and what credentials it holds. Returns the updated service details with the first page of items; if `continuationToken` is set on the response, pass it to `GetService` to fetch the remaining pages.
+    /// 
+    /// Prefer `AddServiceItemsV2`, then `GetService` to read the items.
     /// </summary>
     [PulumiServiceResourceType("pulumiservice:api/services:Item")]
     public partial class Item : global::Pulumi.CustomResource
@@ -90,6 +92,12 @@ namespace Pulumi.PulumiService.Api.Services
             get => _items ?? (_items = new InputList<object>());
             set => _items = value;
         }
+
+        /// <summary>
+        /// Maximum number of items to return on the first page (max 1000)
+        /// </summary>
+        [Input("maxResults")]
+        public Input<int>? MaxResults { get; set; }
 
         /// <summary>
         /// The organization name
