@@ -3,9 +3,11 @@
 
 package com.pulumi.pulumiservice.api_deployments.inputs;
 
+import com.pulumi.core.Either;
 import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
 import com.pulumi.pulumiservice.api_deployments.inputs.SecretValueArgs;
+import java.lang.String;
 import java.util.Objects;
 import java.util.Optional;
 import javax.annotation.Nullable;
@@ -24,13 +26,13 @@ public final class SSHAuthRequestArgs extends com.pulumi.resources.ResourceArgs 
      * 
      */
     @Import(name="password")
-    private @Nullable Output<SecretValueArgs> password;
+    private @Nullable Output<Either<String,SecretValueArgs>> password;
 
     /**
      * @return An optional password for the SSH private key.
      * 
      */
-    public Optional<Output<SecretValueArgs>> password() {
+    public Optional<Output<Either<String,SecretValueArgs>>> password() {
         return Optional.ofNullable(this.password);
     }
 
@@ -39,13 +41,13 @@ public final class SSHAuthRequestArgs extends com.pulumi.resources.ResourceArgs 
      * 
      */
     @Import(name="sshPrivateKey")
-    private @Nullable Output<SecretValueArgs> sshPrivateKey;
+    private @Nullable Output<Either<String,SecretValueArgs>> sshPrivateKey;
 
     /**
      * @return The SSH private key for authentication.
      * 
      */
-    public Optional<Output<SecretValueArgs>> sshPrivateKey() {
+    public Optional<Output<Either<String,SecretValueArgs>>> sshPrivateKey() {
         return Optional.ofNullable(this.sshPrivateKey);
     }
 
@@ -80,7 +82,7 @@ public final class SSHAuthRequestArgs extends com.pulumi.resources.ResourceArgs 
          * @return builder
          * 
          */
-        public Builder password(@Nullable Output<SecretValueArgs> password) {
+        public Builder password(@Nullable Output<Either<String,SecretValueArgs>> password) {
             $.password = password;
             return this;
         }
@@ -91,8 +93,28 @@ public final class SSHAuthRequestArgs extends com.pulumi.resources.ResourceArgs 
          * @return builder
          * 
          */
-        public Builder password(SecretValueArgs password) {
+        public Builder password(Either<String,SecretValueArgs> password) {
             return password(Output.of(password));
+        }
+
+        /**
+         * @param password An optional password for the SSH private key.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder password(String password) {
+            return password(Either.ofLeft(password));
+        }
+
+        /**
+         * @param password An optional password for the SSH private key.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder password(SecretValueArgs password) {
+            return password(Either.ofRight(password));
         }
 
         /**
@@ -101,7 +123,7 @@ public final class SSHAuthRequestArgs extends com.pulumi.resources.ResourceArgs 
          * @return builder
          * 
          */
-        public Builder sshPrivateKey(@Nullable Output<SecretValueArgs> sshPrivateKey) {
+        public Builder sshPrivateKey(@Nullable Output<Either<String,SecretValueArgs>> sshPrivateKey) {
             $.sshPrivateKey = sshPrivateKey;
             return this;
         }
@@ -112,8 +134,28 @@ public final class SSHAuthRequestArgs extends com.pulumi.resources.ResourceArgs 
          * @return builder
          * 
          */
-        public Builder sshPrivateKey(SecretValueArgs sshPrivateKey) {
+        public Builder sshPrivateKey(Either<String,SecretValueArgs> sshPrivateKey) {
             return sshPrivateKey(Output.of(sshPrivateKey));
+        }
+
+        /**
+         * @param sshPrivateKey The SSH private key for authentication.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder sshPrivateKey(String sshPrivateKey) {
+            return sshPrivateKey(Either.ofLeft(sshPrivateKey));
+        }
+
+        /**
+         * @param sshPrivateKey The SSH private key for authentication.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder sshPrivateKey(SecretValueArgs sshPrivateKey) {
+            return sshPrivateKey(Either.ofRight(sshPrivateKey));
         }
 
         public SSHAuthRequestArgs build() {

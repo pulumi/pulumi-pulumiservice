@@ -73,11 +73,11 @@ class BasicAuthRequestArgsDict(TypedDict):
     """
     Request body for basic auth.
     """
-    password: NotRequired[pulumi.Input[Optional['SecretValueArgsDict']]]
+    password: NotRequired[pulumi.Input[Optional[Union[_builtins.str, 'SecretValueArgsDict']]]]
     """
     The password
     """
-    user_name: NotRequired[pulumi.Input[Optional['SecretValueArgsDict']]]
+    user_name: NotRequired[pulumi.Input[Optional[Union[_builtins.str, 'SecretValueArgsDict']]]]
     """
     The user name
     """
@@ -85,13 +85,13 @@ class BasicAuthRequestArgsDict(TypedDict):
 @pulumi.input_type
 class BasicAuthRequestArgs:
     def __init__(__self__, *,
-                 password: pulumi.Input[Optional['SecretValueArgs']] = None,
-                 user_name: pulumi.Input[Optional['SecretValueArgs']] = None):
+                 password: pulumi.Input[Optional[Union[_builtins.str, 'SecretValueArgs']]] = None,
+                 user_name: pulumi.Input[Optional[Union[_builtins.str, 'SecretValueArgs']]] = None):
         """
         Request body for basic auth.
 
-        :param pulumi.Input['SecretValueArgs'] password: The password
-        :param pulumi.Input['SecretValueArgs'] user_name: The user name
+        :param pulumi.Input[Union[_builtins.str, 'SecretValueArgs']] password: The password
+        :param pulumi.Input[Union[_builtins.str, 'SecretValueArgs']] user_name: The user name
         """
         if password is not None:
             pulumi.set(__self__, "password", password)
@@ -100,26 +100,26 @@ class BasicAuthRequestArgs:
 
     @_builtins.property
     @pulumi.getter
-    def password(self) -> pulumi.Input[Optional['SecretValueArgs']]:
+    def password(self) -> pulumi.Input[Optional[Union[_builtins.str, 'SecretValueArgs']]]:
         """
         The password
         """
         return pulumi.get(self, "password")
 
     @password.setter
-    def password(self, value: pulumi.Input[Optional['SecretValueArgs']]):
+    def password(self, value: pulumi.Input[Optional[Union[_builtins.str, 'SecretValueArgs']]]):
         pulumi.set(self, "password", value)
 
     @_builtins.property
     @pulumi.getter(name="userName")
-    def user_name(self) -> pulumi.Input[Optional['SecretValueArgs']]:
+    def user_name(self) -> pulumi.Input[Optional[Union[_builtins.str, 'SecretValueArgs']]]:
         """
         The user name
         """
         return pulumi.get(self, "user_name")
 
     @user_name.setter
-    def user_name(self, value: pulumi.Input[Optional['SecretValueArgs']]):
+    def user_name(self, value: pulumi.Input[Optional[Union[_builtins.str, 'SecretValueArgs']]]):
         pulumi.set(self, "user_name", value)
 
 
@@ -1717,7 +1717,7 @@ class DockerImageCredentialsRequestArgsDict(TypedDict):
     """
     DockerImageCredentialsRequest is the request body for specifying Docker registry credentials.
     """
-    password: NotRequired[pulumi.Input[Optional['SecretValueArgsDict']]]
+    password: NotRequired[pulumi.Input[Optional[Union[_builtins.str, 'SecretValueArgsDict']]]]
     """
     The password for authenticating with the Docker registry.
     """
@@ -1729,12 +1729,12 @@ class DockerImageCredentialsRequestArgsDict(TypedDict):
 @pulumi.input_type
 class DockerImageCredentialsRequestArgs:
     def __init__(__self__, *,
-                 password: pulumi.Input[Optional['SecretValueArgs']] = None,
+                 password: pulumi.Input[Optional[Union[_builtins.str, 'SecretValueArgs']]] = None,
                  username: pulumi.Input[Optional[_builtins.str]] = None):
         """
         DockerImageCredentialsRequest is the request body for specifying Docker registry credentials.
 
-        :param pulumi.Input['SecretValueArgs'] password: The password for authenticating with the Docker registry.
+        :param pulumi.Input[Union[_builtins.str, 'SecretValueArgs']] password: The password for authenticating with the Docker registry.
         :param pulumi.Input[_builtins.str] username: The username for authenticating with the Docker registry.
         """
         if password is not None:
@@ -1744,14 +1744,14 @@ class DockerImageCredentialsRequestArgs:
 
     @_builtins.property
     @pulumi.getter
-    def password(self) -> pulumi.Input[Optional['SecretValueArgs']]:
+    def password(self) -> pulumi.Input[Optional[Union[_builtins.str, 'SecretValueArgs']]]:
         """
         The password for authenticating with the Docker registry.
         """
         return pulumi.get(self, "password")
 
     @password.setter
-    def password(self, value: pulumi.Input[Optional['SecretValueArgs']]):
+    def password(self, value: pulumi.Input[Optional[Union[_builtins.str, 'SecretValueArgs']]]):
         pulumi.set(self, "password", value)
 
     @_builtins.property
@@ -1825,7 +1825,7 @@ class ExecutorSettingsRequestArgsDict(TypedDict):
     """
     ExecutorSettingsRequest is the request body for configuring the execution environment settings.
     """
-    executor_image: NotRequired[pulumi.Input[Optional['DockerImageRequestArgsDict']]]
+    executor_image: NotRequired[pulumi.Input[Optional[Union[_builtins.str, 'DockerImageRequestArgsDict']]]]
     """
     The Docker image to use for the execution environment.
     """
@@ -1837,12 +1837,12 @@ class ExecutorSettingsRequestArgsDict(TypedDict):
 @pulumi.input_type
 class ExecutorSettingsRequestArgs:
     def __init__(__self__, *,
-                 executor_image: pulumi.Input[Optional['DockerImageRequestArgs']] = None,
+                 executor_image: pulumi.Input[Optional[Union[_builtins.str, 'DockerImageRequestArgs']]] = None,
                  executor_root_path: pulumi.Input[Optional[_builtins.str]] = None):
         """
         ExecutorSettingsRequest is the request body for configuring the execution environment settings.
 
-        :param pulumi.Input['DockerImageRequestArgs'] executor_image: The Docker image to use for the execution environment.
+        :param pulumi.Input[Union[_builtins.str, 'DockerImageRequestArgs']] executor_image: The Docker image to use for the execution environment.
         :param pulumi.Input[_builtins.str] executor_root_path: The root path for the executor binary and working directory.
         """
         if executor_image is not None:
@@ -1852,14 +1852,14 @@ class ExecutorSettingsRequestArgs:
 
     @_builtins.property
     @pulumi.getter(name="executorImage")
-    def executor_image(self) -> pulumi.Input[Optional['DockerImageRequestArgs']]:
+    def executor_image(self) -> pulumi.Input[Optional[Union[_builtins.str, 'DockerImageRequestArgs']]]:
         """
         The Docker image to use for the execution environment.
         """
         return pulumi.get(self, "executor_image")
 
     @executor_image.setter
-    def executor_image(self, value: pulumi.Input[Optional['DockerImageRequestArgs']]):
+    def executor_image(self, value: pulumi.Input[Optional[Union[_builtins.str, 'DockerImageRequestArgs']]]):
         pulumi.set(self, "executor_image", value)
 
     @_builtins.property
@@ -1879,7 +1879,7 @@ class GitAuthConfigRequestArgsDict(TypedDict):
     """
     Request body for configuring git authentication options.
     """
-    access_token: NotRequired[pulumi.Input[Optional['SecretValueArgsDict']]]
+    access_token: NotRequired[pulumi.Input[Optional[Union[_builtins.str, 'SecretValueArgsDict']]]]
     """
     Personal access token for git authentication
     """
@@ -1895,13 +1895,13 @@ class GitAuthConfigRequestArgsDict(TypedDict):
 @pulumi.input_type
 class GitAuthConfigRequestArgs:
     def __init__(__self__, *,
-                 access_token: pulumi.Input[Optional['SecretValueArgs']] = None,
+                 access_token: pulumi.Input[Optional[Union[_builtins.str, 'SecretValueArgs']]] = None,
                  basic_auth: pulumi.Input[Optional['BasicAuthRequestArgs']] = None,
                  ssh_auth: pulumi.Input[Optional['SSHAuthRequestArgs']] = None):
         """
         Request body for configuring git authentication options.
 
-        :param pulumi.Input['SecretValueArgs'] access_token: Personal access token for git authentication
+        :param pulumi.Input[Union[_builtins.str, 'SecretValueArgs']] access_token: Personal access token for git authentication
         :param pulumi.Input['BasicAuthRequestArgs'] basic_auth: Basic authentication configuration
         :param pulumi.Input['SSHAuthRequestArgs'] ssh_auth: SSH authentication configuration
         """
@@ -1914,14 +1914,14 @@ class GitAuthConfigRequestArgs:
 
     @_builtins.property
     @pulumi.getter(name="accessToken")
-    def access_token(self) -> pulumi.Input[Optional['SecretValueArgs']]:
+    def access_token(self) -> pulumi.Input[Optional[Union[_builtins.str, 'SecretValueArgs']]]:
         """
         Personal access token for git authentication
         """
         return pulumi.get(self, "access_token")
 
     @access_token.setter
-    def access_token(self, value: pulumi.Input[Optional['SecretValueArgs']]):
+    def access_token(self, value: pulumi.Input[Optional[Union[_builtins.str, 'SecretValueArgs']]]):
         pulumi.set(self, "access_token", value)
 
     @_builtins.property
@@ -2443,7 +2443,7 @@ class OperationContextRequestArgsDict(TypedDict):
     """
     Request body for updating an operation context.
     """
-    environment_variables: NotRequired[pulumi.Input[Optional[Mapping[str, pulumi.Input['SecretValueArgsDict']]]]]
+    environment_variables: NotRequired[pulumi.Input[Optional[Mapping[str, pulumi.Input[Union[_builtins.str, 'SecretValueArgsDict']]]]]]
     """
     Environment variables to apply during execution.
     """
@@ -2471,7 +2471,7 @@ class OperationContextRequestArgsDict(TypedDict):
 @pulumi.input_type
 class OperationContextRequestArgs:
     def __init__(__self__, *,
-                 environment_variables: pulumi.Input[Optional[Mapping[str, pulumi.Input['SecretValueArgs']]]] = None,
+                 environment_variables: pulumi.Input[Optional[Mapping[str, pulumi.Input[Union[_builtins.str, 'SecretValueArgs']]]]] = None,
                  oidc: pulumi.Input[Optional['OperationContextOIDCConfigurationRequestArgs']] = None,
                  operation: pulumi.Input[Optional[_builtins.str]] = None,
                  options: pulumi.Input[Optional['OperationContextOptionsRequestArgs']] = None,
@@ -2480,7 +2480,7 @@ class OperationContextRequestArgs:
         """
         Request body for updating an operation context.
 
-        :param pulumi.Input[Mapping[str, pulumi.Input['SecretValueArgs']]] environment_variables: Environment variables to apply during execution.
+        :param pulumi.Input[Mapping[str, pulumi.Input[Union[_builtins.str, 'SecretValueArgs']]]] environment_variables: Environment variables to apply during execution.
         :param pulumi.Input['OperationContextOIDCConfigurationRequestArgs'] oidc: The OIDC configuration for the operation.
         :param pulumi.Input[_builtins.str] operation: The Pulumi operation to perform (e.g. update, preview, destroy).
         :param pulumi.Input['OperationContextOptionsRequestArgs'] options: Options to specify or override default behavior.
@@ -2502,14 +2502,14 @@ class OperationContextRequestArgs:
 
     @_builtins.property
     @pulumi.getter(name="environmentVariables")
-    def environment_variables(self) -> pulumi.Input[Optional[Mapping[str, pulumi.Input['SecretValueArgs']]]]:
+    def environment_variables(self) -> pulumi.Input[Optional[Mapping[str, pulumi.Input[Union[_builtins.str, 'SecretValueArgs']]]]]:
         """
         Environment variables to apply during execution.
         """
         return pulumi.get(self, "environment_variables")
 
     @environment_variables.setter
-    def environment_variables(self, value: pulumi.Input[Optional[Mapping[str, pulumi.Input['SecretValueArgs']]]]):
+    def environment_variables(self, value: pulumi.Input[Optional[Mapping[str, pulumi.Input[Union[_builtins.str, 'SecretValueArgs']]]]]):
         pulumi.set(self, "environment_variables", value)
 
     @_builtins.property
@@ -2577,11 +2577,11 @@ class SSHAuthRequestArgsDict(TypedDict):
     """
     Request to configure SSH-based authentication for git operations.
     """
-    password: NotRequired[pulumi.Input[Optional['SecretValueArgsDict']]]
+    password: NotRequired[pulumi.Input[Optional[Union[_builtins.str, 'SecretValueArgsDict']]]]
     """
     An optional password for the SSH private key.
     """
-    ssh_private_key: NotRequired[pulumi.Input[Optional['SecretValueArgsDict']]]
+    ssh_private_key: NotRequired[pulumi.Input[Optional[Union[_builtins.str, 'SecretValueArgsDict']]]]
     """
     The SSH private key for authentication.
     """
@@ -2589,13 +2589,13 @@ class SSHAuthRequestArgsDict(TypedDict):
 @pulumi.input_type
 class SSHAuthRequestArgs:
     def __init__(__self__, *,
-                 password: pulumi.Input[Optional['SecretValueArgs']] = None,
-                 ssh_private_key: pulumi.Input[Optional['SecretValueArgs']] = None):
+                 password: pulumi.Input[Optional[Union[_builtins.str, 'SecretValueArgs']]] = None,
+                 ssh_private_key: pulumi.Input[Optional[Union[_builtins.str, 'SecretValueArgs']]] = None):
         """
         Request to configure SSH-based authentication for git operations.
 
-        :param pulumi.Input['SecretValueArgs'] password: An optional password for the SSH private key.
-        :param pulumi.Input['SecretValueArgs'] ssh_private_key: The SSH private key for authentication.
+        :param pulumi.Input[Union[_builtins.str, 'SecretValueArgs']] password: An optional password for the SSH private key.
+        :param pulumi.Input[Union[_builtins.str, 'SecretValueArgs']] ssh_private_key: The SSH private key for authentication.
         """
         if password is not None:
             pulumi.set(__self__, "password", password)
@@ -2604,26 +2604,26 @@ class SSHAuthRequestArgs:
 
     @_builtins.property
     @pulumi.getter
-    def password(self) -> pulumi.Input[Optional['SecretValueArgs']]:
+    def password(self) -> pulumi.Input[Optional[Union[_builtins.str, 'SecretValueArgs']]]:
         """
         An optional password for the SSH private key.
         """
         return pulumi.get(self, "password")
 
     @password.setter
-    def password(self, value: pulumi.Input[Optional['SecretValueArgs']]):
+    def password(self, value: pulumi.Input[Optional[Union[_builtins.str, 'SecretValueArgs']]]):
         pulumi.set(self, "password", value)
 
     @_builtins.property
     @pulumi.getter(name="sshPrivateKey")
-    def ssh_private_key(self) -> pulumi.Input[Optional['SecretValueArgs']]:
+    def ssh_private_key(self) -> pulumi.Input[Optional[Union[_builtins.str, 'SecretValueArgs']]]:
         """
         The SSH private key for authentication.
         """
         return pulumi.get(self, "ssh_private_key")
 
     @ssh_private_key.setter
-    def ssh_private_key(self, value: pulumi.Input[Optional['SecretValueArgs']]):
+    def ssh_private_key(self, value: pulumi.Input[Optional[Union[_builtins.str, 'SecretValueArgs']]]):
         pulumi.set(self, "ssh_private_key", value)
 
 

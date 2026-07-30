@@ -107,7 +107,7 @@ export interface ServiceArgs {
     /**
      * an optional list of items to add during service creation
      */
-    items: pulumi.Input<pulumi.Input<inputs.api.services.AddServiceItemArgs>[]>;
+    items: pulumi.Input<any[]>;
     /**
      * the name of the service
      */

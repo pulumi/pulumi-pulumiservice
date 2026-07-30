@@ -8,6 +8,8 @@ import com.pulumi.exceptions.MissingRequiredPropertyException;
 import java.lang.Integer;
 import java.lang.String;
 import java.util.Objects;
+import java.util.Optional;
+import javax.annotation.Nullable;
 
 @CustomType
 public final class ServiceProperty {
@@ -20,12 +22,12 @@ public final class ServiceProperty {
      * @return the position of the property
      * 
      */
-    private Integer order;
+    private @Nullable Integer order;
     /**
      * @return the type of the property
      * 
      */
-    private String type;
+    private @Nullable String type;
     /**
      * @return the value of the property
      * 
@@ -44,15 +46,15 @@ public final class ServiceProperty {
      * @return the position of the property
      * 
      */
-    public Integer order() {
-        return this.order;
+    public Optional<Integer> order() {
+        return Optional.ofNullable(this.order);
     }
     /**
      * @return the type of the property
      * 
      */
-    public String type() {
-        return this.type;
+    public Optional<String> type() {
+        return Optional.ofNullable(this.type);
     }
     /**
      * @return the value of the property
@@ -72,8 +74,8 @@ public final class ServiceProperty {
     @CustomType.Builder
     public static final class Builder {
         private String key;
-        private Integer order;
-        private String type;
+        private @Nullable Integer order;
+        private @Nullable String type;
         private String value;
         public Builder() {}
         public Builder(ServiceProperty defaults) {
@@ -93,18 +95,14 @@ public final class ServiceProperty {
             return this;
         }
         @CustomType.Setter
-        public Builder order(Integer order) {
-            if (order == null) {
-              throw new MissingRequiredPropertyException("ServiceProperty", "order");
-            }
+        public Builder order(@Nullable Integer order) {
+
             this.order = order;
             return this;
         }
         @CustomType.Setter
-        public Builder type(String type) {
-            if (type == null) {
-              throw new MissingRequiredPropertyException("ServiceProperty", "type");
-            }
+        public Builder type(@Nullable String type) {
+
             this.type = type;
             return this;
         }

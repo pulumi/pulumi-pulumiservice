@@ -16,18 +16,18 @@ namespace Pulumi.PulumiService.Api.Deployments.Inputs
     public sealed class BasicAuthRequestArgs : global::Pulumi.ResourceArgs
     {
         [Input("password")]
-        private Input<Inputs.SecretValueArgs>? _password;
+        private InputUnion<string, Inputs.SecretValueArgs>? _password;
 
         /// <summary>
         /// The password
         /// </summary>
-        public Input<Inputs.SecretValueArgs>? Password
+        public InputUnion<string, Inputs.SecretValueArgs>? Password
         {
             get => _password;
             set
             {
                 var emptySecret = Output.CreateSecret(0);
-                _password = Output.Tuple<Input<Inputs.SecretValueArgs>?, int>(value, emptySecret).Apply(t => t.Item1);
+                _password = Output.Tuple<InputUnion<string, Inputs.SecretValueArgs>?, int>(value, emptySecret).Apply(t => t.Item1);
             }
         }
 
@@ -35,7 +35,7 @@ namespace Pulumi.PulumiService.Api.Deployments.Inputs
         /// The user name
         /// </summary>
         [Input("userName")]
-        public Input<Inputs.SecretValueArgs>? UserName { get; set; }
+        public InputUnion<string, Inputs.SecretValueArgs>? UserName { get; set; }
 
         public BasicAuthRequestArgs()
         {

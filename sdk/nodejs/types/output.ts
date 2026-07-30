@@ -2032,11 +2032,11 @@ export namespace api {
             /**
              * The password
              */
-            password: outputs.api.deployments.SecretValue;
+            password: string | outputs.api.deployments.SecretValue;
             /**
              * The user name
              */
-            userName: outputs.api.deployments.SecretValue;
+            userName: string | outputs.api.deployments.SecretValue;
         }
 
         /**
@@ -2358,7 +2358,7 @@ export namespace api {
             /**
              * The password for authenticating with the Docker registry.
              */
-            password: outputs.api.deployments.SecretValue;
+            password: string | outputs.api.deployments.SecretValue;
             /**
              * The username for authenticating with the Docker registry.
              */
@@ -2391,7 +2391,7 @@ export namespace api {
             /**
              * Personal access token for git authentication
              */
-            accessToken?: outputs.api.deployments.SecretValue;
+            accessToken?: string | outputs.api.deployments.SecretValue;
             /**
              * Basic auth username and password configuration
              */
@@ -2409,7 +2409,7 @@ export namespace api {
             /**
              * EnvironmentVariables contains environment variables to be applied during the execution.
              */
-            environmentVariables?: {[key: string]: outputs.api.deployments.SecretValue};
+            environmentVariables?: {[key: string]: string | outputs.api.deployments.SecretValue};
             /**
              * OIDC contains the OIDC configuration for the operation.
              */
@@ -2566,11 +2566,11 @@ export namespace api {
             /**
              * An optional password or passphrase for the SSH private key.
              */
-            password?: outputs.api.deployments.SecretValue;
+            password?: string | outputs.api.deployments.SecretValue;
             /**
              * The SSH private key used for authentication.
              */
-            sshPrivateKey: outputs.api.deployments.SecretValue;
+            sshPrivateKey: string | outputs.api.deployments.SecretValue;
         }
 
         /**
@@ -3083,11 +3083,11 @@ export namespace api {
             /**
              * the position of the property
              */
-            order: number;
+            order?: number;
             /**
              * the type of the property
              */
-            type: string;
+            type?: string;
             /**
              * the value of the property
              */

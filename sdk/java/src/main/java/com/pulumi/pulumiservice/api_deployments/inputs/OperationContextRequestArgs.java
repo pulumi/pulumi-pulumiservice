@@ -3,6 +3,7 @@
 
 package com.pulumi.pulumiservice.api_deployments.inputs;
 
+import com.pulumi.core.Either;
 import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
 import com.pulumi.pulumiservice.api_deployments.inputs.DeploymentRoleRequestArgs;
@@ -30,13 +31,13 @@ public final class OperationContextRequestArgs extends com.pulumi.resources.Reso
      * 
      */
     @Import(name="environmentVariables")
-    private @Nullable Output<Map<String,SecretValueArgs>> environmentVariables;
+    private @Nullable Output<Map<String,Either<String,SecretValueArgs>>> environmentVariables;
 
     /**
      * @return Environment variables to apply during execution.
      * 
      */
-    public Optional<Output<Map<String,SecretValueArgs>>> environmentVariables() {
+    public Optional<Output<Map<String,Either<String,SecretValueArgs>>>> environmentVariables() {
         return Optional.ofNullable(this.environmentVariables);
     }
 
@@ -150,7 +151,7 @@ public final class OperationContextRequestArgs extends com.pulumi.resources.Reso
          * @return builder
          * 
          */
-        public Builder environmentVariables(@Nullable Output<Map<String,SecretValueArgs>> environmentVariables) {
+        public Builder environmentVariables(@Nullable Output<Map<String,Either<String,SecretValueArgs>>> environmentVariables) {
             $.environmentVariables = environmentVariables;
             return this;
         }
@@ -161,7 +162,7 @@ public final class OperationContextRequestArgs extends com.pulumi.resources.Reso
          * @return builder
          * 
          */
-        public Builder environmentVariables(Map<String,SecretValueArgs> environmentVariables) {
+        public Builder environmentVariables(Map<String,Either<String,SecretValueArgs>> environmentVariables) {
             return environmentVariables(Output.of(environmentVariables));
         }
 

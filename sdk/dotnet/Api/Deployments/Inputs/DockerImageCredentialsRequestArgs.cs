@@ -16,18 +16,18 @@ namespace Pulumi.PulumiService.Api.Deployments.Inputs
     public sealed class DockerImageCredentialsRequestArgs : global::Pulumi.ResourceArgs
     {
         [Input("password")]
-        private Input<Inputs.SecretValueArgs>? _password;
+        private InputUnion<string, Inputs.SecretValueArgs>? _password;
 
         /// <summary>
         /// The password for authenticating with the Docker registry.
         /// </summary>
-        public Input<Inputs.SecretValueArgs>? Password
+        public InputUnion<string, Inputs.SecretValueArgs>? Password
         {
             get => _password;
             set
             {
                 var emptySecret = Output.CreateSecret(0);
-                _password = Output.Tuple<Input<Inputs.SecretValueArgs>?, int>(value, emptySecret).Apply(t => t.Item1);
+                _password = Output.Tuple<InputUnion<string, Inputs.SecretValueArgs>?, int>(value, emptySecret).Apply(t => t.Item1);
             }
         }
 

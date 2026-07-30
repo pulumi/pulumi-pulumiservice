@@ -16,18 +16,18 @@ namespace Pulumi.PulumiService.Api.Deployments.Inputs
     public sealed class SSHAuthRequestArgs : global::Pulumi.ResourceArgs
     {
         [Input("password")]
-        private Input<Inputs.SecretValueArgs>? _password;
+        private InputUnion<string, Inputs.SecretValueArgs>? _password;
 
         /// <summary>
         /// An optional password for the SSH private key.
         /// </summary>
-        public Input<Inputs.SecretValueArgs>? Password
+        public InputUnion<string, Inputs.SecretValueArgs>? Password
         {
             get => _password;
             set
             {
                 var emptySecret = Output.CreateSecret(0);
-                _password = Output.Tuple<Input<Inputs.SecretValueArgs>?, int>(value, emptySecret).Apply(t => t.Item1);
+                _password = Output.Tuple<InputUnion<string, Inputs.SecretValueArgs>?, int>(value, emptySecret).Apply(t => t.Item1);
             }
         }
 
@@ -35,7 +35,7 @@ namespace Pulumi.PulumiService.Api.Deployments.Inputs
         /// The SSH private key for authentication.
         /// </summary>
         [Input("sshPrivateKey")]
-        public Input<Inputs.SecretValueArgs>? SshPrivateKey { get; set; }
+        public InputUnion<string, Inputs.SecretValueArgs>? SshPrivateKey { get; set; }
 
         public SSHAuthRequestArgs()
         {

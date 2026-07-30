@@ -22,7 +22,7 @@ __all__ = ['ServiceArgs', 'Service']
 class ServiceArgs:
     def __init__(__self__, *,
                  description: pulumi.Input[_builtins.str],
-                 items: pulumi.Input[Sequence[pulumi.Input['AddServiceItemArgs']]],
+                 items: pulumi.Input[Sequence[Any]],
                  name: pulumi.Input[_builtins.str],
                  org_name: pulumi.Input[_builtins.str],
                  owner_name: pulumi.Input[_builtins.str],
@@ -32,7 +32,7 @@ class ServiceArgs:
         The set of arguments for constructing a Service resource.
 
         :param pulumi.Input[_builtins.str] description: an optional description of the service
-        :param pulumi.Input[Sequence[pulumi.Input['AddServiceItemArgs']]] items: an optional list of items to add during service creation
+        :param pulumi.Input[Sequence[Any]] items: an optional list of items to add during service creation
         :param pulumi.Input[_builtins.str] name: the name of the service
         :param pulumi.Input[_builtins.str] org_name: The organization name
         :param pulumi.Input[_builtins.str] owner_name: the service owner name
@@ -61,14 +61,14 @@ class ServiceArgs:
 
     @_builtins.property
     @pulumi.getter
-    def items(self) -> pulumi.Input[Sequence[pulumi.Input['AddServiceItemArgs']]]:
+    def items(self) -> pulumi.Input[Sequence[Any]]:
         """
         an optional list of items to add during service creation
         """
         return pulumi.get(self, "items")
 
     @items.setter
-    def items(self, value: pulumi.Input[Sequence[pulumi.Input['AddServiceItemArgs']]]):
+    def items(self, value: pulumi.Input[Sequence[Any]]):
         pulumi.set(self, "items", value)
 
     @_builtins.property
@@ -139,7 +139,7 @@ class Service(pulumi.CustomResource):
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
                  description: pulumi.Input[Optional[_builtins.str]] = None,
-                 items: pulumi.Input[Optional[Sequence[pulumi.Input[Union['AddServiceItemArgs', 'AddServiceItemArgsDict']]]]] = None,
+                 items: pulumi.Input[Optional[Sequence[Any]]] = None,
                  name: pulumi.Input[Optional[_builtins.str]] = None,
                  org_name: pulumi.Input[Optional[_builtins.str]] = None,
                  owner_name: pulumi.Input[Optional[_builtins.str]] = None,
@@ -153,7 +153,7 @@ class Service(pulumi.CustomResource):
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] description: an optional description of the service
-        :param pulumi.Input[Sequence[pulumi.Input[Union['AddServiceItemArgs', 'AddServiceItemArgsDict']]]] items: an optional list of items to add during service creation
+        :param pulumi.Input[Sequence[Any]] items: an optional list of items to add during service creation
         :param pulumi.Input[_builtins.str] name: the name of the service
         :param pulumi.Input[_builtins.str] org_name: The organization name
         :param pulumi.Input[_builtins.str] owner_name: the service owner name
@@ -186,7 +186,7 @@ class Service(pulumi.CustomResource):
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
                  description: pulumi.Input[Optional[_builtins.str]] = None,
-                 items: pulumi.Input[Optional[Sequence[pulumi.Input[Union['AddServiceItemArgs', 'AddServiceItemArgsDict']]]]] = None,
+                 items: pulumi.Input[Optional[Sequence[Any]]] = None,
                  name: pulumi.Input[Optional[_builtins.str]] = None,
                  org_name: pulumi.Input[Optional[_builtins.str]] = None,
                  owner_name: pulumi.Input[Optional[_builtins.str]] = None,

@@ -67,21 +67,21 @@ class BasicAuth(dict):
         return super().get(key, default)
 
     def __init__(__self__, *,
-                 password: 'outputs.SecretValue',
-                 user_name: 'outputs.SecretValue'):
+                 password: Any,
+                 user_name: Any):
         """
         BasicAuth configures git authentication through basic auth —
         i.e. username and password. Both UserName and Password are required.
 
-        :param 'SecretValue' password: The password
-        :param 'SecretValue' user_name: The user name
+        :param Union[_builtins.str, 'SecretValue'] password: The password
+        :param Union[_builtins.str, 'SecretValue'] user_name: The user name
         """
         pulumi.set(__self__, "password", password)
         pulumi.set(__self__, "user_name", user_name)
 
     @_builtins.property
     @pulumi.getter
-    def password(self) -> 'outputs.SecretValue':
+    def password(self) -> Any:
         """
         The password
         """
@@ -89,7 +89,7 @@ class BasicAuth(dict):
 
     @_builtins.property
     @pulumi.getter(name="userName")
-    def user_name(self) -> 'outputs.SecretValue':
+    def user_name(self) -> Any:
         """
         The user name
         """
@@ -1207,12 +1207,12 @@ class DockerImageCredentials(dict):
     DockerImageCredentials describes the credentials needed to access a Docker repository.
     """
     def __init__(__self__, *,
-                 password: 'outputs.SecretValue',
+                 password: Any,
                  username: _builtins.str):
         """
         DockerImageCredentials describes the credentials needed to access a Docker repository.
 
-        :param 'SecretValue' password: The password for authenticating with the Docker registry.
+        :param Union[_builtins.str, 'SecretValue'] password: The password for authenticating with the Docker registry.
         :param _builtins.str username: The username for authenticating with the Docker registry.
         """
         pulumi.set(__self__, "password", password)
@@ -1220,7 +1220,7 @@ class DockerImageCredentials(dict):
 
     @_builtins.property
     @pulumi.getter
-    def password(self) -> 'outputs.SecretValue':
+    def password(self) -> Any:
         """
         The password for authenticating with the Docker registry.
         """
@@ -1322,7 +1322,7 @@ class GitAuthConfig(dict):
         return super().get(key, default)
 
     def __init__(__self__, *,
-                 access_token: Optional['outputs.SecretValue'] = None,
+                 access_token: Optional[Any] = None,
                  basic_auth: Optional['outputs.BasicAuth'] = None,
                  ssh_auth: Optional['outputs.SSHAuth'] = None):
         """
@@ -1333,7 +1333,7 @@ class GitAuthConfig(dict):
         - Basic auth username and password
         Only 1 authentication mode is valid.
 
-        :param 'SecretValue' access_token: Personal access token for git authentication
+        :param Union[_builtins.str, 'SecretValue'] access_token: Personal access token for git authentication
         :param 'BasicAuth' basic_auth: Basic auth username and password configuration
         :param 'SSHAuth' ssh_auth: SSH private key authentication configuration
         """
@@ -1346,7 +1346,7 @@ class GitAuthConfig(dict):
 
     @_builtins.property
     @pulumi.getter(name="accessToken")
-    def access_token(self) -> Optional['outputs.SecretValue']:
+    def access_token(self) -> Optional[Any]:
         """
         Personal access token for git authentication
         """
@@ -1394,7 +1394,7 @@ class OperationContext(dict):
         return super().get(key, default)
 
     def __init__(__self__, *,
-                 environment_variables: Optional[Mapping[str, 'outputs.SecretValue']] = None,
+                 environment_variables: Optional[Mapping[str, Any]] = None,
                  oidc: Optional['outputs.OperationContextOIDCConfiguration'] = None,
                  operation: Optional[_builtins.str] = None,
                  options: Optional['outputs.OperationContextOptions'] = None,
@@ -1403,7 +1403,7 @@ class OperationContext(dict):
         """
         OperationContext describes what to do.
 
-        :param Mapping[str, 'SecretValue'] environment_variables: EnvironmentVariables contains environment variables to be applied during the execution.
+        :param Mapping[str, Union[_builtins.str, 'SecretValue']] environment_variables: EnvironmentVariables contains environment variables to be applied during the execution.
         :param 'OperationContextOIDCConfiguration' oidc: OIDC contains the OIDC configuration for the operation.
         :param _builtins.str operation: The Pulumi operation to perform (e.g. update, preview, refresh, destroy).
         :param 'OperationContextOptions' options: Options is a bag of settings to specify or override default behavior
@@ -1426,7 +1426,7 @@ class OperationContext(dict):
 
     @_builtins.property
     @pulumi.getter(name="environmentVariables")
-    def environment_variables(self) -> Optional[Mapping[str, 'outputs.SecretValue']]:
+    def environment_variables(self) -> Optional[Mapping[str, Any]]:
         """
         EnvironmentVariables contains environment variables to be applied during the execution.
         """
@@ -1916,14 +1916,14 @@ class SSHAuth(dict):
         return super().get(key, default)
 
     def __init__(__self__, *,
-                 ssh_private_key: 'outputs.SecretValue',
-                 password: Optional['outputs.SecretValue'] = None):
+                 ssh_private_key: Any,
+                 password: Optional[Any] = None):
         """
         SSHAuth configures ssh-based auth for git authentication.
         SSHPrivateKey is required but password is optional.
 
-        :param 'SecretValue' ssh_private_key: The SSH private key used for authentication.
-        :param 'SecretValue' password: An optional password or passphrase for the SSH private key.
+        :param Union[_builtins.str, 'SecretValue'] ssh_private_key: The SSH private key used for authentication.
+        :param Union[_builtins.str, 'SecretValue'] password: An optional password or passphrase for the SSH private key.
         """
         pulumi.set(__self__, "ssh_private_key", ssh_private_key)
         if password is not None:
@@ -1931,7 +1931,7 @@ class SSHAuth(dict):
 
     @_builtins.property
     @pulumi.getter(name="sshPrivateKey")
-    def ssh_private_key(self) -> 'outputs.SecretValue':
+    def ssh_private_key(self) -> Any:
         """
         The SSH private key used for authentication.
         """
@@ -1939,7 +1939,7 @@ class SSHAuth(dict):
 
     @_builtins.property
     @pulumi.getter
-    def password(self) -> Optional['outputs.SecretValue']:
+    def password(self) -> Optional[Any]:
         """
         An optional password or passphrase for the SSH private key.
         """

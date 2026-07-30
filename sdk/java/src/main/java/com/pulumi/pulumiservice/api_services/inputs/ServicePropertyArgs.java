@@ -9,6 +9,8 @@ import com.pulumi.exceptions.MissingRequiredPropertyException;
 import java.lang.Integer;
 import java.lang.String;
 import java.util.Objects;
+import java.util.Optional;
+import javax.annotation.Nullable;
 
 
 /**
@@ -38,30 +40,30 @@ public final class ServicePropertyArgs extends com.pulumi.resources.ResourceArgs
      * the position of the property
      * 
      */
-    @Import(name="order", required=true)
-    private Output<Integer> order;
+    @Import(name="order")
+    private @Nullable Output<Integer> order;
 
     /**
      * @return the position of the property
      * 
      */
-    public Output<Integer> order() {
-        return this.order;
+    public Optional<Output<Integer>> order() {
+        return Optional.ofNullable(this.order);
     }
 
     /**
      * the type of the property
      * 
      */
-    @Import(name="type", required=true)
-    private Output<String> type;
+    @Import(name="type")
+    private @Nullable Output<String> type;
 
     /**
      * @return the type of the property
      * 
      */
-    public Output<String> type() {
-        return this.type;
+    public Optional<Output<String>> type() {
+        return Optional.ofNullable(this.type);
     }
 
     /**
@@ -133,7 +135,7 @@ public final class ServicePropertyArgs extends com.pulumi.resources.ResourceArgs
          * @return builder
          * 
          */
-        public Builder order(Output<Integer> order) {
+        public Builder order(@Nullable Output<Integer> order) {
             $.order = order;
             return this;
         }
@@ -154,7 +156,7 @@ public final class ServicePropertyArgs extends com.pulumi.resources.ResourceArgs
          * @return builder
          * 
          */
-        public Builder type(Output<String> type) {
+        public Builder type(@Nullable Output<String> type) {
             $.type = type;
             return this;
         }
@@ -193,12 +195,6 @@ public final class ServicePropertyArgs extends com.pulumi.resources.ResourceArgs
         public ServicePropertyArgs build() {
             if ($.key == null) {
                 throw new MissingRequiredPropertyException("ServicePropertyArgs", "key");
-            }
-            if ($.order == null) {
-                throw new MissingRequiredPropertyException("ServicePropertyArgs", "order");
-            }
-            if ($.type == null) {
-                throw new MissingRequiredPropertyException("ServicePropertyArgs", "type");
             }
             if ($.value == null) {
                 throw new MissingRequiredPropertyException("ServicePropertyArgs", "value");

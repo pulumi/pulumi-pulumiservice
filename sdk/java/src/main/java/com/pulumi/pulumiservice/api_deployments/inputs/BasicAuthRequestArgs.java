@@ -3,9 +3,11 @@
 
 package com.pulumi.pulumiservice.api_deployments.inputs;
 
+import com.pulumi.core.Either;
 import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
 import com.pulumi.pulumiservice.api_deployments.inputs.SecretValueArgs;
+import java.lang.String;
 import java.util.Objects;
 import java.util.Optional;
 import javax.annotation.Nullable;
@@ -24,13 +26,13 @@ public final class BasicAuthRequestArgs extends com.pulumi.resources.ResourceArg
      * 
      */
     @Import(name="password")
-    private @Nullable Output<SecretValueArgs> password;
+    private @Nullable Output<Either<String,SecretValueArgs>> password;
 
     /**
      * @return The password
      * 
      */
-    public Optional<Output<SecretValueArgs>> password() {
+    public Optional<Output<Either<String,SecretValueArgs>>> password() {
         return Optional.ofNullable(this.password);
     }
 
@@ -39,13 +41,13 @@ public final class BasicAuthRequestArgs extends com.pulumi.resources.ResourceArg
      * 
      */
     @Import(name="userName")
-    private @Nullable Output<SecretValueArgs> userName;
+    private @Nullable Output<Either<String,SecretValueArgs>> userName;
 
     /**
      * @return The user name
      * 
      */
-    public Optional<Output<SecretValueArgs>> userName() {
+    public Optional<Output<Either<String,SecretValueArgs>>> userName() {
         return Optional.ofNullable(this.userName);
     }
 
@@ -80,7 +82,7 @@ public final class BasicAuthRequestArgs extends com.pulumi.resources.ResourceArg
          * @return builder
          * 
          */
-        public Builder password(@Nullable Output<SecretValueArgs> password) {
+        public Builder password(@Nullable Output<Either<String,SecretValueArgs>> password) {
             $.password = password;
             return this;
         }
@@ -91,8 +93,28 @@ public final class BasicAuthRequestArgs extends com.pulumi.resources.ResourceArg
          * @return builder
          * 
          */
-        public Builder password(SecretValueArgs password) {
+        public Builder password(Either<String,SecretValueArgs> password) {
             return password(Output.of(password));
+        }
+
+        /**
+         * @param password The password
+         * 
+         * @return builder
+         * 
+         */
+        public Builder password(String password) {
+            return password(Either.ofLeft(password));
+        }
+
+        /**
+         * @param password The password
+         * 
+         * @return builder
+         * 
+         */
+        public Builder password(SecretValueArgs password) {
+            return password(Either.ofRight(password));
         }
 
         /**
@@ -101,7 +123,7 @@ public final class BasicAuthRequestArgs extends com.pulumi.resources.ResourceArg
          * @return builder
          * 
          */
-        public Builder userName(@Nullable Output<SecretValueArgs> userName) {
+        public Builder userName(@Nullable Output<Either<String,SecretValueArgs>> userName) {
             $.userName = userName;
             return this;
         }
@@ -112,8 +134,28 @@ public final class BasicAuthRequestArgs extends com.pulumi.resources.ResourceArg
          * @return builder
          * 
          */
-        public Builder userName(SecretValueArgs userName) {
+        public Builder userName(Either<String,SecretValueArgs> userName) {
             return userName(Output.of(userName));
+        }
+
+        /**
+         * @param userName The user name
+         * 
+         * @return builder
+         * 
+         */
+        public Builder userName(String userName) {
+            return userName(Either.ofLeft(userName));
+        }
+
+        /**
+         * @param userName The user name
+         * 
+         * @return builder
+         * 
+         */
+        public Builder userName(SecretValueArgs userName) {
+            return userName(Either.ofRight(userName));
         }
 
         public BasicAuthRequestArgs build() {

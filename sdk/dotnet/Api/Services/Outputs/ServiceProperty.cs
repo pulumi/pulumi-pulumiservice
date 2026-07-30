@@ -23,11 +23,11 @@ namespace Pulumi.PulumiService.Api.Services.Outputs
         /// <summary>
         /// the position of the property
         /// </summary>
-        public readonly int Order;
+        public readonly int? Order;
         /// <summary>
         /// the type of the property
         /// </summary>
-        public readonly string Type;
+        public readonly string? Type;
         /// <summary>
         /// the value of the property
         /// </summary>
@@ -37,9 +37,9 @@ namespace Pulumi.PulumiService.Api.Services.Outputs
         private ServiceProperty(
             string key,
 
-            int order,
+            int? order,
 
-            string type,
+            string? type,
 
             string value)
         {

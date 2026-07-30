@@ -80,14 +80,14 @@ namespace Pulumi.PulumiService.Api.Services
         public Input<string> Description { get; set; } = null!;
 
         [Input("items", required: true)]
-        private InputList<Inputs.AddServiceItemArgs>? _items;
+        private InputList<object>? _items;
 
         /// <summary>
         /// an optional list of items to add during service creation
         /// </summary>
-        public InputList<Inputs.AddServiceItemArgs> Items
+        public InputList<object> Items
         {
-            get => _items ?? (_items = new InputList<Inputs.AddServiceItemArgs>());
+            get => _items ?? (_items = new InputList<object>());
             set => _items = value;
         }
 

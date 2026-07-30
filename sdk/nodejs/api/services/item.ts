@@ -104,7 +104,7 @@ export interface ItemArgs {
     /**
      * List of items
      */
-    items: pulumi.Input<pulumi.Input<inputs.api.services.AddServiceItemArgs>[]>;
+    items: pulumi.Input<any[]>;
     /**
      * Maximum number of items to return on the first page (max 1000)
      */

@@ -24,7 +24,7 @@ namespace Pulumi.PulumiService.Api.Deployments.Outputs
         /// <summary>
         /// Personal access token for git authentication
         /// </summary>
-        public readonly Outputs.SecretValue? AccessToken;
+        public readonly Union<string, Outputs.SecretValue>? AccessToken;
         /// <summary>
         /// Basic auth username and password configuration
         /// </summary>
@@ -36,7 +36,7 @@ namespace Pulumi.PulumiService.Api.Deployments.Outputs
 
         [OutputConstructor]
         private GitAuthConfig(
-            Outputs.SecretValue? accessToken,
+            Union<string, Outputs.SecretValue>? accessToken,
 
             Outputs.BasicAuth? basicAuth,
 
