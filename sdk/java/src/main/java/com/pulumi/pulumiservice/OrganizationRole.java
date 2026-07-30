@@ -22,6 +22,8 @@ import javax.annotation.Nullable;
  * 
  * Requires the Custom Roles feature to be enabled on the organization. See the [Pulumi Cloud RBAC docs](https://www.pulumi.com/docs/pulumi-cloud/access-management/rbac/) for the shape of the `permissions` descriptor.
  * 
+ * This resource manages only permission descriptors with `uxPurpose=&#34;role&#34;`. Pulumi Cloud uses `uxPurpose` to split the permission-descriptor table into roles and other kinds (for example `policy`). Use `pulumiservice:api:Role`, which exposes `uxPurpose` directly, to manage the other kinds.
+ * 
  */
 @ResourceType(type="pulumiservice:index:OrganizationRole")
 public class OrganizationRole extends com.pulumi.resources.CustomResource {
