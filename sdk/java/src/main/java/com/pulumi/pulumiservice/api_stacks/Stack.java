@@ -29,14 +29,14 @@ import javax.annotation.Nullable;
 @ResourceType(type="pulumiservice:api/stacks:Stack")
 public class Stack extends com.pulumi.resources.CustomResource {
     /**
-     * The active update
+     * UUID of the most recent update on this stack, either completed or in-progress.
      * 
      */
     @Export(name="activeUpdate", refs={String.class}, tree="[0]")
     private Output<String> activeUpdate;
 
     /**
-     * @return The active update
+     * @return UUID of the most recent update on this stack, either completed or in-progress.
      * 
      */
     public Output<String> activeUpdate() {
@@ -59,14 +59,14 @@ public class Stack extends com.pulumi.resources.CustomResource {
         return Codegen.optional(this.config);
     }
     /**
-     * CurrentOperation provides information about a stack operation in-progress, as applicable.
+     * Information about a live operation currently running for the stack, its kind, the author who initiated it, and its start time. Null when no operation is in flight.
      * 
      */
     @Export(name="currentOperation", refs={Object.class}, tree="[0]")
     private Output</* @Nullable */ Object> currentOperation;
 
     /**
-     * @return CurrentOperation provides information about a stack operation in-progress, as applicable.
+     * @return Information about a live operation currently running for the stack, its kind, the author who initiated it, and its start time. Null when no operation is in flight.
      * 
      */
     public Output<Optional<Object>> currentOperation() {

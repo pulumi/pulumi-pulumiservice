@@ -18,7 +18,7 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 
 /**
- * Creates a new agent task for the specified organization. The request must include a prompt (the user event message) that initiates the task. Set the &#39;permissionMode&#39; field in the request body to restrict the agent to read-only operations. Returns the created task details including task ID, name, status, and timestamp.
+ * Creates a new agent task for the specified organization. The request must include a prompt (the user event message) that initiates the task. The message is a user message, so its discriminator field must be set to &#34;type&#34;: &#34;user_message&#34;. Set the &#39;permissionMode&#39; field in the request body to restrict the agent to read-only operations. Returns the created task details including task ID, name, status, and timestamp.
  * 
  */
 @ResourceType(type="pulumiservice:api/agents:Task")
@@ -206,6 +206,20 @@ public class Task extends com.pulumi.resources.CustomResource {
         return this.planMode;
     }
     /**
+     * The id of the RBAC role this task assumes. Null when the task runs with the creating user&#39;s own permissions (no assumed role).
+     * 
+     */
+    @Export(name="role", refs={String.class}, tree="[0]")
+    private Output</* @Nullable */ String> role;
+
+    /**
+     * @return The id of the RBAC role this task assumes. Null when the task runs with the creating user&#39;s own permissions (no assumed role).
+     * 
+     */
+    public Output<Optional<String>> role() {
+        return Codegen.optional(this.role);
+    }
+    /**
      * The current runtime phase for this task. Null until the runtime checks in.
      * 
      */
@@ -234,14 +248,14 @@ public class Task extends com.pulumi.resources.CustomResource {
         return Codegen.optional(this.sharedAt);
     }
     /**
-     * The origin that triggered this task. Valid values: &#39;console&#39;, &#39;cli&#39;, &#39;slack&#39;, &#39;schedule&#39;, &#39;api&#39;, &#39;github&#39;.
+     * The origin that triggered this task. Valid values: &#39;console&#39;, &#39;cli&#39;, &#39;slack&#39;, &#39;schedule&#39;, &#39;api&#39;, &#39;github&#39;, &#39;code-review&#39;.
      * 
      */
     @Export(name="source", refs={String.class}, tree="[0]")
     private Output</* @Nullable */ String> source;
 
     /**
-     * @return The origin that triggered this task. Valid values: &#39;console&#39;, &#39;cli&#39;, &#39;slack&#39;, &#39;schedule&#39;, &#39;api&#39;, &#39;github&#39;.
+     * @return The origin that triggered this task. Valid values: &#39;console&#39;, &#39;cli&#39;, &#39;slack&#39;, &#39;schedule&#39;, &#39;api&#39;, &#39;github&#39;, &#39;code-review&#39;.
      * 
      */
     public Output<Optional<String>> source() {
@@ -316,6 +330,20 @@ public class Task extends com.pulumi.resources.CustomResource {
      */
     public Output<Optional<String>> toolExecutionMode() {
         return Codegen.optional(this.toolExecutionMode);
+    }
+    /**
+     * The version control system this task operates against. Set for tasks that target a specific VCS platform (e.g. code reviews). Null for tasks with no VCS context.
+     * 
+     */
+    @Export(name="vcsProvider", refs={String.class}, tree="[0]")
+    private Output</* @Nullable */ String> vcsProvider;
+
+    /**
+     * @return The version control system this task operates against. Set for tasks that target a specific VCS platform (e.g. code reviews). Null for tasks with no VCS context.
+     * 
+     */
+    public Output<Optional<String>> vcsProvider() {
+        return Codegen.optional(this.vcsProvider);
     }
 
     /**

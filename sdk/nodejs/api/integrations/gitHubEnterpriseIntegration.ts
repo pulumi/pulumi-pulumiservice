@@ -59,6 +59,10 @@ export class GitHubEnterpriseIntegration extends pulumi.CustomResource {
      */
     declare public readonly disableDetailedDiff: pulumi.Output<boolean>;
     /**
+     * Whether PR comments are disabled while a pull request is in draft.
+     */
+    declare public readonly disableDraftPRComments: pulumi.Output<boolean | undefined>;
+    /**
      * Whether Neo AI summaries are disabled for this installation.
      */
     declare public readonly disableNeoSummaries: pulumi.Output<boolean>;
@@ -78,6 +82,10 @@ export class GitHubEnterpriseIntegration extends pulumi.CustomResource {
      * Whether the installation has the 'members' permission (only relevant for organization accounts).
      */
     declare public /*out*/ readonly hasMembersPermission: pulumi.Output<boolean>;
+    /**
+     * Whether per-user (individual) GitHub Enterprise authentication is enabled. Only applies to self-hosted GitHub Enterprise installations.
+     */
+    declare public readonly individualAuthEnabled: pulumi.Output<boolean | undefined>;
     /**
      * The GitHub installation ID.
      */
@@ -114,8 +122,10 @@ export class GitHubEnterpriseIntegration extends pulumi.CustomResource {
             }
             resourceInputs["disableCodeAccessForReviews"] = args?.disableCodeAccessForReviews;
             resourceInputs["disableDetailedDiff"] = args?.disableDetailedDiff;
+            resourceInputs["disableDraftPRComments"] = args?.disableDraftPRComments;
             resourceInputs["disableNeoSummaries"] = args?.disableNeoSummaries;
             resourceInputs["disablePRComments"] = args?.disablePRComments;
+            resourceInputs["individualAuthEnabled"] = args?.individualAuthEnabled;
             resourceInputs["integrationId"] = args?.integrationId;
             resourceInputs["orgName"] = args?.orgName;
             resourceInputs["accountID"] = undefined /*out*/;
@@ -136,11 +146,13 @@ export class GitHubEnterpriseIntegration extends pulumi.CustomResource {
             resourceInputs["created"] = undefined /*out*/;
             resourceInputs["disableCodeAccessForReviews"] = undefined /*out*/;
             resourceInputs["disableDetailedDiff"] = undefined /*out*/;
+            resourceInputs["disableDraftPRComments"] = undefined /*out*/;
             resourceInputs["disableNeoSummaries"] = undefined /*out*/;
             resourceInputs["disablePRComments"] = undefined /*out*/;
             resourceInputs["ghUrls"] = undefined /*out*/;
             resourceInputs["hasContentsPermission"] = undefined /*out*/;
             resourceInputs["hasMembersPermission"] = undefined /*out*/;
+            resourceInputs["individualAuthEnabled"] = undefined /*out*/;
             resourceInputs["installationID"] = undefined /*out*/;
             resourceInputs["isOrganization"] = undefined /*out*/;
             resourceInputs["isSelfHosted"] = undefined /*out*/;
@@ -164,6 +176,10 @@ export interface GitHubEnterpriseIntegrationArgs {
      */
     disableDetailedDiff?: pulumi.Input<boolean | undefined>;
     /**
+     * Whether to disable PR comments while a pull request is in draft
+     */
+    disableDraftPRComments?: pulumi.Input<boolean | undefined>;
+    /**
      * Whether to disable Neo AI summaries on PRs
      */
     disableNeoSummaries?: pulumi.Input<boolean | undefined>;
@@ -171,6 +187,10 @@ export interface GitHubEnterpriseIntegrationArgs {
      * Whether to disable PR comments from the Pulumi GitHub App
      */
     disablePRComments?: pulumi.Input<boolean | undefined>;
+    /**
+     * Whether per-user (individual) GitHub Enterprise authentication is enabled. Only applies to self-hosted GitHub Enterprise installations.
+     */
+    individualAuthEnabled?: pulumi.Input<boolean | undefined>;
     /**
      * The GitHub Enterprise integration identifier
      */

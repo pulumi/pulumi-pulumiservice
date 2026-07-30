@@ -1401,7 +1401,7 @@
       ]
     },
     "pulumiservice:api/agents:Task": {
-      "description": "Creates a new agent task for the specified organization. The request must include a prompt (the user event message) that initiates the task. Set the 'permissionMode' field in the request body to restrict the agent to read-only operations. Returns the created task details including task ID, name, status, and timestamp.",
+      "description": "Creates a new agent task for the specified organization. The request must include a prompt (the user event message) that initiates the task. The message is a user message, so its discriminator field must be set to \"type\": \"user_message\". Set the 'permissionMode' field in the request body to restrict the agent to read-only operations. Returns the created task details including task ID, name, status, and timestamp.",
       "properties": {
         "approvalMode": {
           "type": "string",
@@ -1458,6 +1458,10 @@
           "type": "boolean",
           "description": "Whether the task is in plan mode. Set based on the first user message."
         },
+        "role": {
+          "type": "string",
+          "description": "The id of the RBAC role this task assumes. Null when the task runs with the creating user's own permissions (no assumed role)."
+        },
         "runtimePhase": {
           "type": "string",
           "description": "The current runtime phase for this task. Null until the runtime checks in."
@@ -1468,7 +1472,7 @@
         },
         "source": {
           "type": "string",
-          "description": "The origin that triggered this task. Valid values: 'console', 'cli', 'slack', 'schedule', 'api', 'github'."
+          "description": "The origin that triggered this task. Valid values: 'console', 'cli', 'slack', 'schedule', 'api', 'github', 'code-review'."
         },
         "sourceAutomationID": {
           "type": "string",
@@ -1489,6 +1493,10 @@
         "toolExecutionMode": {
           "type": "string",
           "description": "Where tools are executed for this task. Valid values: 'cloud', 'cli'."
+        },
+        "vcsProvider": {
+          "type": "string",
+          "description": "The version control system this task operates against. Set for tasks that target a specific VCS platform (e.g. code reviews). Null for tasks with no VCS context."
         }
       },
       "type": "object",
@@ -1525,7 +1533,7 @@
         },
         "message": {
           "$ref": "pulumi.json#/Any",
-          "description": "The message content"
+          "description": "The message content. This is the first event in the conversation and must be a user message, so its discriminator field must be set to \"type\": \"user_message\"."
         },
         "orgName": {
           "type": "string",
@@ -1540,6 +1548,10 @@
         "planMode": {
           "type": "boolean",
           "description": "Whether to enable plan mode for this task."
+        },
+        "role": {
+          "type": "string",
+          "description": "Optional RBAC role the task assumes, identified by role id. When set, the task operates with that role's permissions in place of the creating user's own assignments. You may only assume a role that is assigned to you, directly or through a team; a role you do not hold is rejected with a 403. Omitted/null means no assumed role: the task uses the creating user's full permissions. Orthogonal to permissionMode, which controls the read-only behavior posture independently."
         },
         "source": {
           "type": "string",
@@ -3074,6 +3086,10 @@
           "type": "boolean",
           "description": "Whether detailed property-level diffs are disabled for PR comments."
         },
+        "disableDraftPRComments": {
+          "type": "boolean",
+          "description": "Whether PR comments are disabled while a pull request is in draft."
+        },
         "disableNeoSummaries": {
           "type": "boolean",
           "description": "Whether Neo AI summaries are disabled for this installation."
@@ -3093,6 +3109,10 @@
         "hasMembersPermission": {
           "type": "boolean",
           "description": "Whether the installation has the 'members' permission (only relevant for organization accounts)."
+        },
+        "individualAuthEnabled": {
+          "type": "boolean",
+          "description": "Whether per-user (individual) GitHub Enterprise authentication is enabled. Only applies to self-hosted GitHub Enterprise installations."
         },
         "installationID": {
           "type": "integer",
@@ -3135,6 +3155,10 @@
           "type": "boolean",
           "description": "Whether to disable detailed property-level diffs in PR comments"
         },
+        "disableDraftPRComments": {
+          "type": "boolean",
+          "description": "Whether to disable PR comments while a pull request is in draft"
+        },
         "disableNeoSummaries": {
           "type": "boolean",
           "description": "Whether to disable Neo AI summaries on PRs"
@@ -3142,6 +3166,10 @@
         "disablePRComments": {
           "type": "boolean",
           "description": "Whether to disable PR comments from the Pulumi GitHub App"
+        },
+        "individualAuthEnabled": {
+          "type": "boolean",
+          "description": "Whether per-user (individual) GitHub Enterprise authentication is enabled. Only applies to self-hosted GitHub Enterprise installations."
         },
         "integrationId": {
           "type": "string",
@@ -3188,6 +3216,10 @@
           "type": "boolean",
           "description": "Whether detailed property-level diffs are disabled for PR comments."
         },
+        "disableDraftPRComments": {
+          "type": "boolean",
+          "description": "Whether PR comments are disabled while a pull request is in draft."
+        },
         "disableNeoSummaries": {
           "type": "boolean",
           "description": "Whether Neo AI summaries are disabled for this installation."
@@ -3207,6 +3239,10 @@
         "hasMembersPermission": {
           "type": "boolean",
           "description": "Whether the installation has the 'members' permission (only relevant for organization accounts)."
+        },
+        "individualAuthEnabled": {
+          "type": "boolean",
+          "description": "Whether per-user (individual) GitHub Enterprise authentication is enabled. Only applies to self-hosted GitHub Enterprise installations."
         },
         "installationID": {
           "type": "integer",
@@ -3249,6 +3285,10 @@
           "type": "boolean",
           "description": "Whether to disable detailed property-level diffs in PR comments"
         },
+        "disableDraftPRComments": {
+          "type": "boolean",
+          "description": "Whether to disable PR comments while a pull request is in draft"
+        },
         "disableNeoSummaries": {
           "type": "boolean",
           "description": "Whether to disable Neo AI summaries on PRs"
@@ -3256,6 +3296,10 @@
         "disablePRComments": {
           "type": "boolean",
           "description": "Whether to disable PR comments from the Pulumi GitHub App"
+        },
+        "individualAuthEnabled": {
+          "type": "boolean",
+          "description": "Whether per-user (individual) GitHub Enterprise authentication is enabled. Only applies to self-hosted GitHub Enterprise installations."
         },
         "integrationId": {
           "type": "string",
@@ -3368,8 +3412,51 @@
         "orgName"
       ]
     },
+    "pulumiservice:api/neo:UsageCap": {
+      "description": "Creates or replaces the monthly Neo usage cap for an organization. The cap must be at least $10/month. To remove the cap, call DeleteNeoUsageCap.",
+      "properties": {
+        "capCents": {
+          "type": "integer",
+          "description": "Monthly cap in US-dollar cents. Always strictly positive; \"no cap\" is the absence of a row (GetNeoUsageCap returns 204)."
+        },
+        "notificationsEnabled": {
+          "type": "boolean",
+          "description": "Whether threshold-warning emails (50/80/95/100% of the cap) are sent to billing admins. True unless the admin has turned them off."
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Time when the cap was last updated."
+        }
+      },
+      "type": "object",
+      "required": [
+        "capCents",
+        "notificationsEnabled",
+        "updatedAt"
+      ],
+      "inputProperties": {
+        "capCents": {
+          "type": "integer",
+          "description": "Monthly cap in US-dollar cents. Must be at least 1000 ($10, the self-serve floor) and at most 100_000_000 ($1M). Outside that range the call returns 400."
+        },
+        "notificationsEnabled": {
+          "type": "boolean",
+          "description": "Whether to send threshold-warning emails (50/80/95/100% of the cap) to billing admins. Omit (null) to leave the current setting unchanged; new caps default to enabled."
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        }
+      },
+      "requiredInputs": [
+        "capCents",
+        "orgName"
+      ]
+    },
     "pulumiservice:api/services:Item": {
-      "description": "Adds items (such as access tokens, team memberships, or stack permissions) to an existing service account. Service accounts provide programmatic, non-human access to Pulumi Cloud resources and are scoped to an organization. Items define what the service account can access and what credentials it holds. Returns the updated service details.",
+      "description": "Adds items (such as access tokens, team memberships, or stack permissions) to an existing service account. Service accounts provide programmatic, non-human access to Pulumi Cloud resources and are scoped to an organization. Items define what the service account can access and what credentials it holds. Returns the updated service details with the first page of items; if `continuationToken` is set on the response, pass it to `GetService` to fetch the remaining pages.\n\nPrefer `AddServiceItemsV2`, then `GetService` to read the items.",
       "properties": {
         "continuationToken": {
           "type": "string",
@@ -3399,6 +3486,12 @@
             "$ref": "pulumi.json#/Any"
           },
           "description": "List of items"
+        },
+        "maxResults": {
+          "type": "integer",
+          "description": "Maximum number of items to return on the first page (max 1000)",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
         },
         "orgName": {
           "type": "string",
@@ -3580,7 +3673,7 @@
       "properties": {
         "activeUpdate": {
           "type": "string",
-          "description": "The active update"
+          "description": "UUID of the most recent update on this stack, either completed or in-progress."
         },
         "config": {
           "$ref": "pulumi.json#/Any",
@@ -3588,7 +3681,7 @@
         },
         "currentOperation": {
           "$ref": "pulumi.json#/Any",
-          "description": "CurrentOperation provides information about a stack operation in-progress, as applicable."
+          "description": "Information about a live operation currently running for the stack, its kind, the author who initiated it, and its start time. Null when no operation is in flight."
         },
         "orgName": {
           "type": "string",
@@ -4773,7 +4866,7 @@
       ]
     },
     "pulumiservice:api:Role": {
-      "description": "Creates a new custom role for an organization. Custom roles define fine-grained permission sets that can be assigned to organization members and teams, enabling precise access control beyond the built-in admin and member roles. Optionally, an associated policy and role binding can be created alongside the role. Role definitions are subject to two limits: a permission descriptor group may contain at most 500 entries (each directly-specified entity counts as one entry), and the total serialized size of the role definition may not exceed 1 MB. Exceeding either limit returns a 400 error. If you need to grant access to more than 500 individually listed resources, use tag-based (ABAC) rules instead.",
+      "description": "Creates a new custom role for an organization. Custom roles define fine-grained permission sets that can be assigned to organization members and teams, enabling precise access control beyond the built-in admin and member roles. Optionally, an associated policy and role binding can be created alongside the role. Role definitions are subject to two limits: a permission descriptor group may contain at most 2000 entries (each directly-specified entity counts as one entry), and the total serialized size of the role definition may not exceed 1 MB. Exceeding either limit returns a 400 error. If you need to grant access to more than 2000 individually listed resources, use tag-based (ABAC) rules instead.",
       "properties": {
         "created": {
           "type": "string",
@@ -5813,7 +5906,7 @@
       ]
     },
     "pulumiservice:index:OrganizationRole": {
-      "description": "A custom (fine-grained) role defined on a Pulumi Cloud organization. Custom roles allow precise permission control beyond the built-in `admin` / `member` / `billing-manager` roles. Assign them to members via the `OrganizationMember.roleId` field or to teams via `TeamRoleAssignment`.\n\nRequires the Custom Roles feature to be enabled on the organization. See the [Pulumi Cloud RBAC docs](https://www.pulumi.com/docs/pulumi-cloud/access-management/rbac/) for the shape of the `permissions` descriptor.",
+      "description": "A custom (fine-grained) role defined on a Pulumi Cloud organization. Custom roles allow precise permission control beyond the built-in `admin` / `member` / `billing-manager` roles. Assign them to members via the `OrganizationMember.roleId` field or to teams via `TeamRoleAssignment`.\n\nRequires the Custom Roles feature to be enabled on the organization. See the [Pulumi Cloud RBAC docs](https://www.pulumi.com/docs/pulumi-cloud/access-management/rbac/) for the shape of the `permissions` descriptor.\n\nThis resource manages only permission descriptors with `uxPurpose=\"role\"`. Pulumi Cloud uses `uxPurpose` to split the permission-descriptor table into roles and other kinds (for example `policy`). Use `pulumiservice:api:Role`, which exposes `uxPurpose` directly, to manage the other kinds.",
       "properties": {
         "description": {
           "type": "string",

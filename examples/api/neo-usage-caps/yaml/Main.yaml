@@ -1,0 +1,32 @@
+# UsageCap bounds monthly Neo spend for an organization. It is a singleton
+# rather than a collection: it is keyed on {orgName}, and the underlying API is
+# PUT-shaped, so create and update are the same call.
+#
+# It is marked requireImport, so `pulumi up` refuses to adopt a cap that already
+# exists out-of-band. Import it instead:
+#
+#   pulumi import pulumiservice:api/neo:UsageCap orgCap <org>
+#
+# Deleting the resource removes the cap entirely; it does not restore a previous
+# value.
+#
+# The per-member counterpart (api/neo:MemberUsageCap) is deliberately absent
+# from the provider surface. Pulumi Cloud exposes only a collection GET for
+# member caps, so the resource would have no read operation, which in turn
+# leaves it unable to refresh, unable to import, and unable to honor
+# requireImport. See _excluded in provider/pkg/cloud/metadata.json.
+resources:
+  orgCap:
+    type: pulumiservice:api/neo:UsageCap
+    properties:
+      orgName: ${organizationName}
+      capCents: ${capCents}
+      # Sends threshold-warning email to billing admins at 50/80/95/100%.
+      notificationsEnabled: true
+
+outputs:
+  # orgName is a path parameter and input-only, so reference the config value
+  # rather than a non-existent output.
+  organization: ${organizationName}
+  orgCapCents: ${orgCap.capCents}
+  orgCapUpdatedAt: ${orgCap.updatedAt}

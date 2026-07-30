@@ -6,10 +6,13 @@ package com.pulumi.pulumiservice.api_services;
 import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
 import com.pulumi.exceptions.MissingRequiredPropertyException;
+import java.lang.Integer;
 import java.lang.Object;
 import java.lang.String;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import javax.annotation.Nullable;
 
 
 public final class ItemArgs extends com.pulumi.resources.ResourceArgs {
@@ -29,6 +32,21 @@ public final class ItemArgs extends com.pulumi.resources.ResourceArgs {
      */
     public Output<List<Object>> items() {
         return this.items;
+    }
+
+    /**
+     * Maximum number of items to return on the first page (max 1000)
+     * 
+     */
+    @Import(name="maxResults")
+    private @Nullable Output<Integer> maxResults;
+
+    /**
+     * @return Maximum number of items to return on the first page (max 1000)
+     * 
+     */
+    public Optional<Output<Integer>> maxResults() {
+        return Optional.ofNullable(this.maxResults);
     }
 
     /**
@@ -95,6 +113,7 @@ public final class ItemArgs extends com.pulumi.resources.ResourceArgs {
 
     private ItemArgs(ItemArgs $) {
         this.items = $.items;
+        this.maxResults = $.maxResults;
         this.orgName = $.orgName;
         this.ownerName = $.ownerName;
         this.ownerType = $.ownerType;
@@ -148,6 +167,27 @@ public final class ItemArgs extends com.pulumi.resources.ResourceArgs {
          */
         public Builder items(Object... items) {
             return items(List.of(items));
+        }
+
+        /**
+         * @param maxResults Maximum number of items to return on the first page (max 1000)
+         * 
+         * @return builder
+         * 
+         */
+        public Builder maxResults(@Nullable Output<Integer> maxResults) {
+            $.maxResults = maxResults;
+            return this;
+        }
+
+        /**
+         * @param maxResults Maximum number of items to return on the first page (max 1000)
+         * 
+         * @return builder
+         * 
+         */
+        public Builder maxResults(Integer maxResults) {
+            return maxResults(Output.of(maxResults));
         }
 
         /**

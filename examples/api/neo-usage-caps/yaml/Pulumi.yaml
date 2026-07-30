@@ -1,0 +1,11 @@
+name: pulumicloud-api-neo-usage-caps
+runtime: yaml
+config:
+  organizationName:
+    type: string
+    default: service-provider-test-org
+  # Monthly cap in US-dollar cents. The service floor is 1000 ($10); anything
+  # below it is rejected with a 400.
+  capCents:
+    type: integer
+    default: 1000

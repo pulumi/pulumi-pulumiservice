@@ -108,6 +108,20 @@ public class GitHubIntegration extends com.pulumi.resources.CustomResource {
         return this.disableDetailedDiff;
     }
     /**
+     * Whether PR comments are disabled while a pull request is in draft.
+     * 
+     */
+    @Export(name="disableDraftPRComments", refs={Boolean.class}, tree="[0]")
+    private Output</* @Nullable */ Boolean> disableDraftPRComments;
+
+    /**
+     * @return Whether PR comments are disabled while a pull request is in draft.
+     * 
+     */
+    public Output<Optional<Boolean>> disableDraftPRComments() {
+        return Codegen.optional(this.disableDraftPRComments);
+    }
+    /**
      * Whether Neo AI summaries are disabled for this installation.
      * 
      */
@@ -176,6 +190,20 @@ public class GitHubIntegration extends com.pulumi.resources.CustomResource {
      */
     public Output<Boolean> hasMembersPermission() {
         return this.hasMembersPermission;
+    }
+    /**
+     * Whether per-user (individual) GitHub Enterprise authentication is enabled. Only applies to self-hosted GitHub Enterprise installations.
+     * 
+     */
+    @Export(name="individualAuthEnabled", refs={Boolean.class}, tree="[0]")
+    private Output</* @Nullable */ Boolean> individualAuthEnabled;
+
+    /**
+     * @return Whether per-user (individual) GitHub Enterprise authentication is enabled. Only applies to self-hosted GitHub Enterprise installations.
+     * 
+     */
+    public Output<Optional<Boolean>> individualAuthEnabled() {
+        return Codegen.optional(this.individualAuthEnabled);
     }
     /**
      * The GitHub installation ID.

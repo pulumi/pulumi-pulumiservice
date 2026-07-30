@@ -41,7 +41,7 @@ export class Stack extends pulumi.CustomResource {
     }
 
     /**
-     * The active update
+     * UUID of the most recent update on this stack, either completed or in-progress.
      */
     declare public /*out*/ readonly activeUpdate: pulumi.Output<string>;
     /**
@@ -50,7 +50,7 @@ export class Stack extends pulumi.CustomResource {
      */
     declare public readonly config: pulumi.Output<any | undefined>;
     /**
-     * CurrentOperation provides information about a stack operation in-progress, as applicable.
+     * Information about a live operation currently running for the stack, its kind, the author who initiated it, and its start time. Null when no operation is in flight.
      */
     declare public /*out*/ readonly currentOperation: pulumi.Output<any | undefined>;
     /**

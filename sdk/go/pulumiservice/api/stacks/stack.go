@@ -22,12 +22,12 @@ import (
 type Stack struct {
 	pulumi.CustomResourceState
 
-	// The active update
+	// UUID of the most recent update on this stack, either completed or in-progress.
 	ActiveUpdate pulumi.StringOutput `pulumi:"activeUpdate"`
 	// Optional cloud-persisted stack configuration.
 	// If set, then the stack's configuration is loaded from the cloud and not a file on disk.
 	Config pulumi.AnyOutput `pulumi:"config"`
-	// CurrentOperation provides information about a stack operation in-progress, as applicable.
+	// Information about a live operation currently running for the stack, its kind, the author who initiated it, and its start time. Null when no operation is in flight.
 	CurrentOperation pulumi.AnyOutput `pulumi:"currentOperation"`
 	// The organization name
 	OrgName pulumi.StringOutput `pulumi:"orgName"`
@@ -211,7 +211,7 @@ func (o StackOutput) ToStackOutputWithContext(ctx context.Context) StackOutput {
 	return o
 }
 
-// The active update
+// UUID of the most recent update on this stack, either completed or in-progress.
 func (o StackOutput) ActiveUpdate() pulumi.StringOutput {
 	return o.ApplyT(func(v *Stack) pulumi.StringOutput { return v.ActiveUpdate }).(pulumi.StringOutput)
 }
@@ -222,7 +222,7 @@ func (o StackOutput) Config() pulumi.AnyOutput {
 	return o.ApplyT(func(v *Stack) pulumi.AnyOutput { return v.Config }).(pulumi.AnyOutput)
 }
 
-// CurrentOperation provides information about a stack operation in-progress, as applicable.
+// Information about a live operation currently running for the stack, its kind, the author who initiated it, and its start time. Null when no operation is in flight.
 func (o StackOutput) CurrentOperation() pulumi.AnyOutput {
 	return o.ApplyT(func(v *Stack) pulumi.AnyOutput { return v.CurrentOperation }).(pulumi.AnyOutput)
 }

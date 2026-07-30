@@ -54,7 +54,11 @@ func (*OrganizationRole) Annotate(a infer.Annotator) {
 			"to members via the `OrganizationMember.roleId` field or to teams via `TeamRoleAssignment`.\n\n"+
 			"Requires the Custom Roles feature to be enabled on the organization. See the "+
 			"[Pulumi Cloud RBAC docs](https://www.pulumi.com/docs/pulumi-cloud/access-management/rbac/) for "+
-			"the shape of the `permissions` descriptor.",
+			"the shape of the `permissions` descriptor.\n\n"+
+			"This resource manages only permission descriptors with `uxPurpose=\"role\"`. Pulumi Cloud uses "+
+			"`uxPurpose` to split the permission-descriptor table into roles and other kinds (for example "+
+			"`policy`). Use `pulumiservice:api:Role`, which exposes `uxPurpose` directly, to manage the "+
+			"other kinds.",
 	)
 }
 
@@ -361,7 +365,8 @@ func orgRoleCoreFromAPI(
 	if role.UxPurpose != "" && role.UxPurpose != apitype.PermissionDescriptorUXPurposeRole {
 		return OrganizationRoleCore{}, fmt.Errorf(
 			"descriptor %q is not a role (uxPurpose=%q); `OrganizationRole` "+
-				"only manages entries with uxPurpose=\"role\"",
+				"only manages entries with uxPurpose=\"role\". Use `pulumiservice:api:Role`, "+
+				"which exposes `uxPurpose`, to manage this descriptor",
 			role.ID, role.UxPurpose,
 		)
 	}

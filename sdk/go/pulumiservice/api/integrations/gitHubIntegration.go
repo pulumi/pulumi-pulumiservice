@@ -28,6 +28,8 @@ type GitHubIntegration struct {
 	DisableCodeAccessForReviews pulumi.BoolOutput `pulumi:"disableCodeAccessForReviews"`
 	// Whether detailed property-level diffs are disabled for PR comments.
 	DisableDetailedDiff pulumi.BoolOutput `pulumi:"disableDetailedDiff"`
+	// Whether PR comments are disabled while a pull request is in draft.
+	DisableDraftPRComments pulumi.BoolPtrOutput `pulumi:"disableDraftPRComments"`
 	// Whether Neo AI summaries are disabled for this installation.
 	DisableNeoSummaries pulumi.BoolOutput `pulumi:"disableNeoSummaries"`
 	// Whether PR comments are disabled for this installation.
@@ -38,6 +40,8 @@ type GitHubIntegration struct {
 	HasContentsPermission pulumi.BoolOutput `pulumi:"hasContentsPermission"`
 	// Whether the installation has the 'members' permission (only relevant for organization accounts).
 	HasMembersPermission pulumi.BoolOutput `pulumi:"hasMembersPermission"`
+	// Whether per-user (individual) GitHub Enterprise authentication is enabled. Only applies to self-hosted GitHub Enterprise installations.
+	IndividualAuthEnabled pulumi.BoolPtrOutput `pulumi:"individualAuthEnabled"`
 	// The GitHub installation ID.
 	InstallationID pulumi.IntOutput `pulumi:"installationID"`
 	// Whether the GitHub account is an organization (as opposed to a personal account).
@@ -98,10 +102,14 @@ type gitHubIntegrationArgs struct {
 	DisableCodeAccessForReviews *bool `pulumi:"disableCodeAccessForReviews"`
 	// Whether to disable detailed property-level diffs in PR comments
 	DisableDetailedDiff *bool `pulumi:"disableDetailedDiff"`
+	// Whether to disable PR comments while a pull request is in draft
+	DisableDraftPRComments *bool `pulumi:"disableDraftPRComments"`
 	// Whether to disable Neo AI summaries on PRs
 	DisableNeoSummaries *bool `pulumi:"disableNeoSummaries"`
 	// Whether to disable PR comments from the Pulumi GitHub App
 	DisablePRComments *bool `pulumi:"disablePRComments"`
+	// Whether per-user (individual) GitHub Enterprise authentication is enabled. Only applies to self-hosted GitHub Enterprise installations.
+	IndividualAuthEnabled *bool `pulumi:"individualAuthEnabled"`
 	// The GitHub App integration identifier
 	IntegrationId string `pulumi:"integrationId"`
 	// The organization name
@@ -114,10 +122,14 @@ type GitHubIntegrationArgs struct {
 	DisableCodeAccessForReviews pulumi.BoolPtrInput
 	// Whether to disable detailed property-level diffs in PR comments
 	DisableDetailedDiff pulumi.BoolPtrInput
+	// Whether to disable PR comments while a pull request is in draft
+	DisableDraftPRComments pulumi.BoolPtrInput
 	// Whether to disable Neo AI summaries on PRs
 	DisableNeoSummaries pulumi.BoolPtrInput
 	// Whether to disable PR comments from the Pulumi GitHub App
 	DisablePRComments pulumi.BoolPtrInput
+	// Whether per-user (individual) GitHub Enterprise authentication is enabled. Only applies to self-hosted GitHub Enterprise installations.
+	IndividualAuthEnabled pulumi.BoolPtrInput
 	// The GitHub App integration identifier
 	IntegrationId pulumi.StringInput
 	// The organization name
@@ -241,6 +253,11 @@ func (o GitHubIntegrationOutput) DisableDetailedDiff() pulumi.BoolOutput {
 	return o.ApplyT(func(v *GitHubIntegration) pulumi.BoolOutput { return v.DisableDetailedDiff }).(pulumi.BoolOutput)
 }
 
+// Whether PR comments are disabled while a pull request is in draft.
+func (o GitHubIntegrationOutput) DisableDraftPRComments() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v *GitHubIntegration) pulumi.BoolPtrOutput { return v.DisableDraftPRComments }).(pulumi.BoolPtrOutput)
+}
+
 // Whether Neo AI summaries are disabled for this installation.
 func (o GitHubIntegrationOutput) DisableNeoSummaries() pulumi.BoolOutput {
 	return o.ApplyT(func(v *GitHubIntegration) pulumi.BoolOutput { return v.DisableNeoSummaries }).(pulumi.BoolOutput)
@@ -264,6 +281,11 @@ func (o GitHubIntegrationOutput) HasContentsPermission() pulumi.BoolOutput {
 // Whether the installation has the 'members' permission (only relevant for organization accounts).
 func (o GitHubIntegrationOutput) HasMembersPermission() pulumi.BoolOutput {
 	return o.ApplyT(func(v *GitHubIntegration) pulumi.BoolOutput { return v.HasMembersPermission }).(pulumi.BoolOutput)
+}
+
+// Whether per-user (individual) GitHub Enterprise authentication is enabled. Only applies to self-hosted GitHub Enterprise installations.
+func (o GitHubIntegrationOutput) IndividualAuthEnabled() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v *GitHubIntegration) pulumi.BoolPtrOutput { return v.IndividualAuthEnabled }).(pulumi.BoolPtrOutput)
 }
 
 // The GitHub installation ID.
