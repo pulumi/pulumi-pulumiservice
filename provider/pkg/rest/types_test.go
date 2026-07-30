@@ -28,6 +28,7 @@ const (
 	widgetRequest  = "WidgetRequest"
 	tagCircle      = "circle"
 	propsKey       = "properties"
+	typeKey        = "type"
 	circleRef      = schemaRefPrefix + "Circle"
 )
 
@@ -92,7 +93,7 @@ func buildSynth(t *testing.T, schemas map[string]any) *schema.PackageSpec {
 }
 
 func obj(props map[string]any, required ...string) map[string]any {
-	out := map[string]any{"type": typeObject, propsKey: props}
+	out := map[string]any{typeKey: typeObject, propsKey: props}
 	if len(required) > 0 {
 		req := make([]any, len(required))
 		for i, r := range required {
@@ -113,9 +114,9 @@ func TestNamedTypeEmission(t *testing.T) {
 			"config": sref("WidgetConfig"),
 		}),
 		"WidgetConfig": obj(map[string]any{
-			"size":     map[string]any{"type": typeInteger},
-			"apiKey":   map[string]any{"type": typeString},
-			"metadata": map[string]any{"type": typeObject},
+			"size":     map[string]any{typeKey: typeInteger},
+			"apiKey":   map[string]any{typeKey: typeString},
+			"metadata": map[string]any{typeKey: typeObject},
 		}, "size"),
 	})
 
@@ -143,8 +144,8 @@ func TestRecursiveTypeTerminates(t *testing.T) {
 	pkg := buildSynth(t, map[string]any{
 		widgetRequest: obj(map[string]any{"node": sref("TreeNode")}),
 		"TreeNode": obj(map[string]any{
-			"value":    map[string]any{"type": typeString},
-			"children": map[string]any{"type": typeArray, "items": sref("TreeNode")},
+			"value":    map[string]any{typeKey: typeString},
+			"children": map[string]any{typeKey: typeArray, "items": sref("TreeNode")},
 		}),
 	})
 	ct, ok := pkg.Types["pulumiservice:api:TreeNode"]
@@ -161,7 +162,7 @@ func TestResourceTokenCollisionSuffixed(t *testing.T) {
 	// A component schema named Widget collides with the resource token.
 	pkg := buildSynth(t, map[string]any{
 		widgetRequest: obj(map[string]any{"inner": sref("Widget")}),
-		"Widget":      obj(map[string]any{"name": map[string]any{"type": typeString}}),
+		"Widget":      obj(map[string]any{"name": map[string]any{typeKey: typeString}}),
 	})
 	if _, clash := pkg.Types["pulumiservice:api:Widget"]; clash {
 		t.Fatalf("type token must not collide with the resource token")
@@ -176,12 +177,12 @@ func TestResourceTokenCollisionSuffixed(t *testing.T) {
 }
 
 func discBase(tagProp string, mapping map[string]any, extraProps map[string]any) map[string]any {
-	props := map[string]any{tagProp: map[string]any{"type": typeString}}
+	props := map[string]any{tagProp: map[string]any{typeKey: typeString}}
 	for k, v := range extraProps {
 		props[k] = v
 	}
 	return map[string]any{
-		"type":     typeObject,
+		typeKey:    typeObject,
 		propsKey:   props,
 		"required": []any{tagProp},
 		"discriminator": map[string]any{
@@ -192,7 +193,7 @@ func discBase(tagProp string, mapping map[string]any, extraProps map[string]any)
 }
 
 func variant(base string, extraProps map[string]any, required ...string) map[string]any {
-	second := map[string]any{"type": typeObject, propsKey: extraProps}
+	second := map[string]any{typeKey: typeObject, propsKey: extraProps}
 	if len(required) > 0 {
 		req := make([]any, len(required))
 		for i, r := range required {
@@ -210,11 +211,11 @@ func unionSchemas() map[string]any {
 			tagCircle: circleRef,
 			"square":  schemaRefPrefix + "Square",
 			"blob":    schemaRefPrefix + "Blob",
-		}, map[string]any{"label": map[string]any{"type": typeString}}),
-		"Circle": variant("Shape", map[string]any{"radius": map[string]any{"type": typeNumber}}, "radius"),
-		"Square": variant("Shape", map[string]any{"side": map[string]any{"type": typeNumber}}),
+		}, map[string]any{"label": map[string]any{typeKey: typeString}}),
+		"Circle": variant("Shape", map[string]any{"radius": map[string]any{typeKey: typeNumber}}, "radius"),
+		"Square": variant("Shape", map[string]any{"side": map[string]any{typeKey: typeNumber}}),
 		"Blob": variant("Shape", map[string]any{
-			"points": map[string]any{"type": typeArray, "items": map[string]any{"type": typeNumber}},
+			"points": map[string]any{typeKey: typeArray, "items": map[string]any{typeKey: typeNumber}},
 		}),
 	}
 }
@@ -314,7 +315,7 @@ func TestRecursiveUnionTerminates(t *testing.T) {
 func TestSharedTypeHoistsToApi(t *testing.T) {
 	spec := synthSpec(t, map[string]any{
 		widgetRequest: obj(map[string]any{"shared": sref("SharedThing")}),
-		"SharedThing": obj(map[string]any{"x": map[string]any{"type": typeString}}),
+		"SharedThing": obj(map[string]any{"x": map[string]any{typeKey: typeString}}),
 	})
 	meta := &Metadata{Resources: map[string]ResourceMeta{
 		"pulumiservice:api/alpha:Widget": {Operations: Operations{Create: opCreateWidget}},
@@ -332,7 +333,7 @@ func TestSharedTypeHoistsToApi(t *testing.T) {
 func TestSoleModuleTypeStaysInModule(t *testing.T) {
 	spec := synthSpec(t, map[string]any{
 		widgetRequest: obj(map[string]any{"cfg": sref("OnlyHere")}),
-		"OnlyHere":    obj(map[string]any{"x": map[string]any{"type": typeString}}),
+		"OnlyHere":    obj(map[string]any{"x": map[string]any{typeKey: typeString}}),
 	})
 	meta := &Metadata{Resources: map[string]ResourceMeta{
 		"pulumiservice:api/alpha:Widget": {Operations: Operations{Create: opCreateWidget}},
