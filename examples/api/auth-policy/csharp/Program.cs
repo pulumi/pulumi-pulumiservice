@@ -10,12 +10,14 @@ return await Deployment.RunAsync(() =>
 
     var allowPolicy = ImmutableDictionary<string, object>.Empty
         .Add("decision", "allow")
-        .Add("permission", "read")
-        .Add("tokenType", "organization");
+        .Add("tokenType", "organization")
+        .Add("authorizedPermissions", new[] { "standard" })
+        .Add("rules", ImmutableDictionary<string, object>.Empty);
     var denyPolicy = ImmutableDictionary<string, object>.Empty
         .Add("decision", "deny")
-        .Add("permission", "admin")
-        .Add("tokenType", "organization");
+        .Add("tokenType", "organization")
+        .Add("authorizedPermissions", new[] { "admin" })
+        .Add("rules", ImmutableDictionary<string, object>.Empty);
 
     new Ps.Api.Auth.Policy("policy", new()
     {

@@ -21,12 +21,14 @@ public class App {
                     .policies(List.of(
                         Map.of(
                             "decision", "allow",
-                            "permission", "read",
-                            "tokenType", "organization"),
+                            "tokenType", "organization",
+                            "authorizedPermissions", List.of("standard"),
+                            "rules", Map.of()),
                         Map.of(
                             "decision", "deny",
-                            "permission", "admin",
-                            "tokenType", "organization")))
+                            "tokenType", "organization",
+                            "authorizedPermissions", List.of("admin"),
+                            "rules", Map.of())))
                     .build());
         });
     }

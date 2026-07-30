@@ -31,6 +31,26 @@ type Metadata struct {
 
 	// Functions keyed by fully-qualified Pulumi token. Reserved for future use.
 	Functions map[string]ResourceMeta `json:"functions,omitempty"`
+
+	// Types holds per-component-schema overrides for named-type emission,
+	// keyed by OpenAPI component schema name.
+	Types map[string]TypeMeta `json:"types,omitempty"`
+}
+
+// TypeMeta carries Pulumi-only overrides for one component schema.
+type TypeMeta struct {
+	// ScalarShorthand relaxes the type to `oneOf: [<scalar>, <named type>]`.
+	// Use where the service's deserializer accepts a scalar shorthand the
+	// spec model doesn't express (e.g. executorImage as a bare string).
+	ScalarShorthand string `json:"scalarShorthand,omitempty"`
+
+	// Any degrades references to this schema to pulumi.json#/Any. Escape
+	// hatch for spec models that don't match the wire contract.
+	Any bool `json:"any,omitempty"`
+
+	// Optional strips fields from the emitted type's required list. Use
+	// where the spec marks fields required that the service defaults.
+	Optional []string `json:"optional,omitempty"`
 }
 
 // ResourceMeta describes one Pulumi resource derived from OpenAPI operations.

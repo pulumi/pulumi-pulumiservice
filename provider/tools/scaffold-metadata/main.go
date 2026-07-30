@@ -160,6 +160,9 @@ type metadataDoc struct {
 	Note      string                     `json:"_note,omitempty"`
 	Excluded  []string                   `json:"_excluded,omitempty"`
 	Resources map[string]json.RawMessage `json:"resources"`
+	// Types carries hand-written per-schema overrides; the scaffolder
+	// round-trips it untouched.
+	Types json.RawMessage `json:"types,omitempty"`
 }
 
 // unmappedFieldSet holds update-body wire fields no input can populate,
@@ -1692,7 +1695,16 @@ func writeMetadata(path string, doc *metadataDoc) error {
 	if len(tokens) > 0 {
 		b.WriteString("\n  ")
 	}
-	b.WriteString("}\n}\n")
+	b.WriteString("}")
+	if len(doc.Types) > 0 {
+		ty, err := indentJSON(doc.Types, "  ")
+		if err != nil {
+			return err
+		}
+		b.WriteString(",\n  \"types\": ")
+		b.Write(ty)
+	}
+	b.WriteString("\n}\n")
 
 	return atomicWriteFile(path, []byte(b.String()), 0o600)
 }

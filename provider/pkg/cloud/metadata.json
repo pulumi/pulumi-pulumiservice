@@ -625,5 +625,22 @@
       },
       "token": "pulumiservice:api/esc:Webhook"
     }
+  },
+  "types": {
+    "AddServiceItem": {
+      "any": true
+    },
+    "DockerImageRequest": {
+      "scalarShorthand": "string"
+    },
+    "SecretValue": {
+      "scalarShorthand": "string"
+    },
+    "ServiceProperty": {
+      "optional": [
+        "order",
+        "type"
+      ]
+    }
   }
 }
