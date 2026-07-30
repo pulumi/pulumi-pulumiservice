@@ -20,17 +20,17 @@ namespace Pulumi.PulumiService.Api.Deployments.Outputs
         /// <summary>
         /// The password
         /// </summary>
-        public readonly Union<string, Outputs.SecretValue> Password;
+        public readonly object Password;
         /// <summary>
         /// The user name
         /// </summary>
-        public readonly Union<string, Outputs.SecretValue> UserName;
+        public readonly object UserName;
 
         [OutputConstructor]
         private BasicAuth(
-            Union<string, Outputs.SecretValue> password,
+            object password,
 
-            Union<string, Outputs.SecretValue> userName)
+            object userName)
         {
             Password = password;
             UserName = userName;

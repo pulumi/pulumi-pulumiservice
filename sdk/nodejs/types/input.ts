@@ -1569,11 +1569,11 @@ export namespace api {
             /**
              * The password
              */
-            password?: pulumi.Input<string | inputs.api.deployments.SecretValueArgs | undefined>;
+            password?: any | undefined;
             /**
              * The user name
              */
-            userName?: pulumi.Input<string | inputs.api.deployments.SecretValueArgs | undefined>;
+            userName?: any | undefined;
         }
 
         /**
@@ -1919,7 +1919,7 @@ export namespace api {
             /**
              * The password for authenticating with the Docker registry.
              */
-            password?: pulumi.Input<string | inputs.api.deployments.SecretValueArgs | undefined>;
+            password?: any | undefined;
             /**
              * The username for authenticating with the Docker registry.
              */
@@ -1961,7 +1961,7 @@ export namespace api {
             /**
              * Personal access token for git authentication
              */
-            accessToken?: pulumi.Input<string | inputs.api.deployments.SecretValueArgs | undefined>;
+            accessToken?: any | undefined;
             /**
              * Basic authentication configuration
              */
@@ -2093,7 +2093,7 @@ export namespace api {
             /**
              * Environment variables to apply during execution.
              */
-            environmentVariables?: pulumi.Input<{[key: string]: pulumi.Input<string | inputs.api.deployments.SecretValueArgs>} | undefined>;
+            environmentVariables?: pulumi.Input<{[key: string]: any} | undefined>;
             /**
              * The OIDC configuration for the operation.
              */
@@ -2123,29 +2123,11 @@ export namespace api {
             /**
              * An optional password for the SSH private key.
              */
-            password?: pulumi.Input<string | inputs.api.deployments.SecretValueArgs | undefined>;
+            password?: any | undefined;
             /**
              * The SSH private key for authentication.
              */
-            sshPrivateKey?: pulumi.Input<string | inputs.api.deployments.SecretValueArgs | undefined>;
-        }
-
-        /**
-         * A SecretValue describes a secret value on the wire. The JSON representation is an object with a required 'secret' field containing the plaintext and an optional 'ciphertext' field containing the encrypted representation.
-         */
-        export interface SecretValueArgs {
-            /**
-             * The encrypted representation of the secret value.
-             */
-            ciphertext?: pulumi.Input<pulumi.Input<string>[] | undefined>;
-            /**
-             * Not a sensitive value, just plaintext.
-             */
-            plaintext?: pulumi.Input<string | undefined>;
-            /**
-             * The secret value in plaintext.
-             */
-            secret: pulumi.Input<string>;
+            sshPrivateKey?: any | undefined;
         }
 
         /**

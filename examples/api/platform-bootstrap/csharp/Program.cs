@@ -153,8 +153,13 @@ return await Deployment.RunAsync(() =>
         Format = "raw",
     });
 
-    var stagingExecutor = ImmutableDictionary<string, object>.Empty
-        .Add("executorImage", ImmutableDictionary<string, object>.Empty.Add("reference", "pulumi/pulumi:latest"));
+    var stagingExecutor = new Ps.Api.Deployments.Inputs.ExecutorSettingsRequestArgs
+    {
+        ExecutorImage = new Ps.Api.Deployments.Inputs.DockerImageRequestArgs
+        {
+            Reference = "pulumi/pulumi:latest",
+        },
+    };
     new Ps.Api.Deployments.Settings("stagingDeploySettings", new()
     {
         OrgName = organizationName,
@@ -162,8 +167,13 @@ return await Deployment.RunAsync(() =>
         StackName = stagingStack.StackName,
         ExecutorContext = stagingExecutor,
     });
-    var prodExecutor = ImmutableDictionary<string, object>.Empty
-        .Add("executorImage", ImmutableDictionary<string, object>.Empty.Add("reference", "pulumi/pulumi:3-nonroot"));
+    var prodExecutor = new Ps.Api.Deployments.Inputs.ExecutorSettingsRequestArgs
+    {
+        ExecutorImage = new Ps.Api.Deployments.Inputs.DockerImageRequestArgs
+        {
+            Reference = "pulumi/pulumi:3-nonroot",
+        },
+    };
     var prodDeploySettings = new Ps.Api.Deployments.Settings("prodDeploySettings", new()
     {
         OrgName = organizationName,
@@ -172,20 +182,24 @@ return await Deployment.RunAsync(() =>
         ExecutorContext = prodExecutor,
     });
 
-    var gateRule = ImmutableDictionary<string, object>.Empty
-        .Add("ruleType", "approval_required")
-        .Add("numApprovalsRequired", 1)
-        .Add("allowSelfApproval", false)
-        .Add("requireReapprovalOnChange", true)
-        .Add("eligibleApprovers", new[] {
+    var gateRule = new Ps.Api.Inputs.ChangeGateApprovalRuleInputArgs
+    {
+        RuleType = "approval_required",
+        NumApprovalsRequired = 1,
+        AllowSelfApproval = false,
+        RequireReapprovalOnChange = true,
+        EligibleApprovers = new object[] {
             ImmutableDictionary<string, object>.Empty
                 .Add("eligibilityType", "team_member")
                 .Add("teamName", platformTeam.Name),
-        });
-    var gateTarget = ImmutableDictionary<string, object>.Empty
-        .Add("entityType", "environment")
-        .Add("actionTypes", new[] { "update" })
-        .Add("qualifiedName", sharedEnvRef);
+        },
+    };
+    var gateTarget = new Ps.Api.Inputs.ChangeGateTargetInputArgs
+    {
+        EntityType = "environment",
+        ActionTypes = new[] { "update" },
+        QualifiedName = sharedEnvRef,
+    };
     new Ps.Api.Gate("credsApprovalGate", new()
     {
         OrgName = organizationName,
@@ -195,9 +209,11 @@ return await Deployment.RunAsync(() =>
         Target = gateTarget,
     }, new CustomResourceOptions { DependsOn = { sharedCredentials } });
 
-    var deployRequest = ImmutableDictionary<string, object>.Empty
-        .Add("operation", "update")
-        .Add("inheritSettings", true);
+    var deployRequest = new Ps.Api.Deployments.Inputs.CreateDeploymentRequestArgs
+    {
+        Operation = "update",
+        InheritSettings = true,
+    };
     new Ps.Api.Deployments.ScheduledDeployment("prodNightlyDeploy", new()
     {
         OrgName = organizationName,

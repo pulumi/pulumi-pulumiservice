@@ -100,7 +100,6 @@ def get_organization_member(organization_name: Optional[_builtins.str] = None,
     """
     Looks up a single member of a Pulumi Cloud organization by username (the backing identity-provider login, e.g. GitHub login). Returns an error when the member is not found.
 
-
     :param _builtins.str organization_name: The name of the Pulumi organization.
     :param _builtins.str username: The Pulumi Cloud username (backing identity-provider login) to look up.
     """
@@ -121,7 +120,6 @@ def get_organization_member_output(organization_name: pulumi.Input[Optional[_bui
                                    opts: Optional[Union[pulumi.InvokeOptions, pulumi.InvokeOutputOptions]] = None) -> pulumi.Output[GetOrganizationMemberResult]:
     """
     Looks up a single member of a Pulumi Cloud organization by username (the backing identity-provider login, e.g. GitHub login). Returns an error when the member is not found.
-
 
     :param _builtins.str organization_name: The name of the Pulumi organization.
     :param _builtins.str username: The Pulumi Cloud username (backing identity-provider login) to look up.

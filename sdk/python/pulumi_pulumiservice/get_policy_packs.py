@@ -52,7 +52,6 @@ def get_policy_packs(organization_name: Optional[_builtins.str] = None,
     """
     Get a list of all policy packs for an organization.
 
-
     :param _builtins.str organization_name: The name of the Pulumi organization.
     """
     __args__ = dict()
@@ -66,7 +65,6 @@ def get_policy_packs_output(organization_name: pulumi.Input[Optional[_builtins.s
                             opts: Optional[Union[pulumi.InvokeOptions, pulumi.InvokeOutputOptions]] = None) -> pulumi.Output[GetPolicyPacksResult]:
     """
     Get a list of all policy packs for an organization.
-
 
     :param _builtins.str organization_name: The name of the Pulumi organization.
     """

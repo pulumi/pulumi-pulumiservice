@@ -30,7 +30,7 @@ func main() {
 			OrgName:     pulumi.String(organizationName),
 			ProjectName: pulumi.String(projectName),
 			StackName:   pulumi.String(stackName),
-			Tags: pulumi.Map{
+			Tags: pulumi.StringMap{
 				"owner":   pulumi.String("pulumicloud-api-example"),
 				"purpose": pulumi.String(stackPurpose),
 			},

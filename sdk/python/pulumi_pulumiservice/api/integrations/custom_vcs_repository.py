@@ -100,7 +100,6 @@ class CustomVCSRepository(pulumi.CustomResource):
         """
         Adds a repository to a custom VCS integration. The repository name must be unique within the integration. Returns 409 Conflict if a repository with the same name is already configured.
 
-
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] display_name: Human-readable display name for the repository. If not provided, the name is used for display purposes.
@@ -116,7 +115,6 @@ class CustomVCSRepository(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         Adds a repository to a custom VCS integration. The repository name must be unique within the integration. Returns 409 Conflict if a repository with the same name is already configured.
-
 
         :param str resource_name: The name of the resource.
         :param CustomVCSRepositoryArgs args: The arguments to use to populate this resource's properties.

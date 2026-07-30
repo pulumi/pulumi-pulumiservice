@@ -16,18 +16,18 @@ namespace Pulumi.PulumiService.Api.Deployments.Inputs
     public sealed class GitAuthConfigRequestArgs : global::Pulumi.ResourceArgs
     {
         [Input("accessToken")]
-        private InputUnion<string, Inputs.SecretValueArgs>? _accessToken;
+        private Input<object>? _accessToken;
 
         /// <summary>
         /// Personal access token for git authentication
         /// </summary>
-        public InputUnion<string, Inputs.SecretValueArgs>? AccessToken
+        public Input<object>? AccessToken
         {
             get => _accessToken;
             set
             {
                 var emptySecret = Output.CreateSecret(0);
-                _accessToken = Output.Tuple<InputUnion<string, Inputs.SecretValueArgs>?, int>(value, emptySecret).Apply(t => t.Item1);
+                _accessToken = Output.Tuple<Input<object>?, int>(value, emptySecret).Apply(t => t.Item1);
             }
         }
 

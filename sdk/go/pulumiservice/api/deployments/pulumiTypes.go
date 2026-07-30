@@ -6350,184 +6350,6 @@ func (o SSHAuthRequestPtrOutput) SshPrivateKey() pulumi.AnyOutput {
 	}).(pulumi.AnyOutput)
 }
 
-// A SecretValue describes a secret value on the wire. The JSON representation is an object with a required 'secret' field containing the plaintext and an optional 'ciphertext' field containing the encrypted representation.
-type SecretValue struct {
-	// The encrypted representation of the secret value.
-	Ciphertext []string `pulumi:"ciphertext"`
-	// Not a sensitive value, just plaintext.
-	Plaintext *string `pulumi:"plaintext"`
-	// The secret value in plaintext.
-	Secret string `pulumi:"secret"`
-}
-
-// SecretValueInput is an input type that accepts SecretValueArgs and SecretValueOutput values.
-// You can construct a concrete instance of `SecretValueInput` via:
-//
-//	SecretValueArgs{...}
-type SecretValueInput interface {
-	pulumi.Input
-
-	ToSecretValueOutput() SecretValueOutput
-	ToSecretValueOutputWithContext(context.Context) SecretValueOutput
-}
-
-// A SecretValue describes a secret value on the wire. The JSON representation is an object with a required 'secret' field containing the plaintext and an optional 'ciphertext' field containing the encrypted representation.
-type SecretValueArgs struct {
-	// The encrypted representation of the secret value.
-	Ciphertext pulumi.StringArrayInput `pulumi:"ciphertext"`
-	// Not a sensitive value, just plaintext.
-	Plaintext pulumi.StringPtrInput `pulumi:"plaintext"`
-	// The secret value in plaintext.
-	Secret pulumi.StringInput `pulumi:"secret"`
-}
-
-func (SecretValueArgs) ElementType() reflect.Type {
-	return reflect.TypeOf((*SecretValue)(nil)).Elem()
-}
-
-func (i SecretValueArgs) ToSecretValueOutput() SecretValueOutput {
-	return i.ToSecretValueOutputWithContext(context.Background())
-}
-
-func (i SecretValueArgs) ToSecretValueOutputWithContext(ctx context.Context) SecretValueOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(SecretValueOutput)
-}
-
-func (i SecretValueArgs) ToSecretValuePtrOutput() SecretValuePtrOutput {
-	return i.ToSecretValuePtrOutputWithContext(context.Background())
-}
-
-func (i SecretValueArgs) ToSecretValuePtrOutputWithContext(ctx context.Context) SecretValuePtrOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(SecretValueOutput).ToSecretValuePtrOutputWithContext(ctx)
-}
-
-// SecretValuePtrInput is an input type that accepts SecretValueArgs, SecretValuePtr and SecretValuePtrOutput values.
-// You can construct a concrete instance of `SecretValuePtrInput` via:
-//
-//	        SecretValueArgs{...}
-//
-//	or:
-//
-//	        nil
-type SecretValuePtrInput interface {
-	pulumi.Input
-
-	ToSecretValuePtrOutput() SecretValuePtrOutput
-	ToSecretValuePtrOutputWithContext(context.Context) SecretValuePtrOutput
-}
-
-type secretValuePtrType SecretValueArgs
-
-func SecretValuePtr(v *SecretValueArgs) SecretValuePtrInput {
-	return (*secretValuePtrType)(v)
-}
-
-func (*secretValuePtrType) ElementType() reflect.Type {
-	return reflect.TypeOf((**SecretValue)(nil)).Elem()
-}
-
-func (i *secretValuePtrType) ToSecretValuePtrOutput() SecretValuePtrOutput {
-	return i.ToSecretValuePtrOutputWithContext(context.Background())
-}
-
-func (i *secretValuePtrType) ToSecretValuePtrOutputWithContext(ctx context.Context) SecretValuePtrOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(SecretValuePtrOutput)
-}
-
-// A SecretValue describes a secret value on the wire. The JSON representation is an object with a required 'secret' field containing the plaintext and an optional 'ciphertext' field containing the encrypted representation.
-type SecretValueOutput struct{ *pulumi.OutputState }
-
-func (SecretValueOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((*SecretValue)(nil)).Elem()
-}
-
-func (o SecretValueOutput) ToSecretValueOutput() SecretValueOutput {
-	return o
-}
-
-func (o SecretValueOutput) ToSecretValueOutputWithContext(ctx context.Context) SecretValueOutput {
-	return o
-}
-
-func (o SecretValueOutput) ToSecretValuePtrOutput() SecretValuePtrOutput {
-	return o.ToSecretValuePtrOutputWithContext(context.Background())
-}
-
-func (o SecretValueOutput) ToSecretValuePtrOutputWithContext(ctx context.Context) SecretValuePtrOutput {
-	return o.ApplyTWithContext(ctx, func(_ context.Context, v SecretValue) *SecretValue {
-		return &v
-	}).(SecretValuePtrOutput)
-}
-
-// The encrypted representation of the secret value.
-func (o SecretValueOutput) Ciphertext() pulumi.StringArrayOutput {
-	return o.ApplyT(func(v SecretValue) []string { return v.Ciphertext }).(pulumi.StringArrayOutput)
-}
-
-// Not a sensitive value, just plaintext.
-func (o SecretValueOutput) Plaintext() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v SecretValue) *string { return v.Plaintext }).(pulumi.StringPtrOutput)
-}
-
-// The secret value in plaintext.
-func (o SecretValueOutput) Secret() pulumi.StringOutput {
-	return o.ApplyT(func(v SecretValue) string { return v.Secret }).(pulumi.StringOutput)
-}
-
-type SecretValuePtrOutput struct{ *pulumi.OutputState }
-
-func (SecretValuePtrOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((**SecretValue)(nil)).Elem()
-}
-
-func (o SecretValuePtrOutput) ToSecretValuePtrOutput() SecretValuePtrOutput {
-	return o
-}
-
-func (o SecretValuePtrOutput) ToSecretValuePtrOutputWithContext(ctx context.Context) SecretValuePtrOutput {
-	return o
-}
-
-func (o SecretValuePtrOutput) Elem() SecretValueOutput {
-	return o.ApplyT(func(v *SecretValue) SecretValue {
-		if v != nil {
-			return *v
-		}
-		var ret SecretValue
-		return ret
-	}).(SecretValueOutput)
-}
-
-// The encrypted representation of the secret value.
-func (o SecretValuePtrOutput) Ciphertext() pulumi.StringArrayOutput {
-	return o.ApplyT(func(v *SecretValue) []string {
-		if v == nil {
-			return nil
-		}
-		return v.Ciphertext
-	}).(pulumi.StringArrayOutput)
-}
-
-// Not a sensitive value, just plaintext.
-func (o SecretValuePtrOutput) Plaintext() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *SecretValue) *string {
-		if v == nil {
-			return nil
-		}
-		return v.Plaintext
-	}).(pulumi.StringPtrOutput)
-}
-
-// The secret value in plaintext.
-func (o SecretValuePtrOutput) Secret() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *SecretValue) *string {
-		if v == nil {
-			return nil
-		}
-		return &v.Secret
-	}).(pulumi.StringPtrOutput)
-}
-
 // SourceContext describes some source code, and how to obtain it.
 type SourceContext struct {
 	// Git-based source context for obtaining source code from a repository.
@@ -7977,8 +7799,6 @@ func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*OperationContextRequestPtrInput)(nil)).Elem(), OperationContextRequestArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*SSHAuthRequestInput)(nil)).Elem(), SSHAuthRequestArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*SSHAuthRequestPtrInput)(nil)).Elem(), SSHAuthRequestArgs{})
-	pulumi.RegisterInputType(reflect.TypeOf((*SecretValueInput)(nil)).Elem(), SecretValueArgs{})
-	pulumi.RegisterInputType(reflect.TypeOf((*SecretValuePtrInput)(nil)).Elem(), SecretValueArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*SourceContextGitRequestInput)(nil)).Elem(), SourceContextGitRequestArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*SourceContextGitRequestPtrInput)(nil)).Elem(), SourceContextGitRequestArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*SourceContextHgRequestInput)(nil)).Elem(), SourceContextHgRequestArgs{})
@@ -8059,8 +7879,6 @@ func init() {
 	pulumi.RegisterOutputType(SSHAuthPtrOutput{})
 	pulumi.RegisterOutputType(SSHAuthRequestOutput{})
 	pulumi.RegisterOutputType(SSHAuthRequestPtrOutput{})
-	pulumi.RegisterOutputType(SecretValueOutput{})
-	pulumi.RegisterOutputType(SecretValuePtrOutput{})
 	pulumi.RegisterOutputType(SourceContextOutput{})
 	pulumi.RegisterOutputType(SourceContextPtrOutput{})
 	pulumi.RegisterOutputType(SourceContextGitOutput{})

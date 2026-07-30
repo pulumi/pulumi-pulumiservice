@@ -26,6 +26,8 @@ import (
 const (
 	opCreateWidget = "CreateWidget"
 	widgetRequest  = "WidgetRequest"
+	tagCircle      = "circle"
+	propsKey       = "properties"
 	circleRef      = schemaRefPrefix + "Circle"
 )
 
@@ -90,7 +92,7 @@ func buildSynth(t *testing.T, schemas map[string]any) *schema.PackageSpec {
 }
 
 func obj(props map[string]any, required ...string) map[string]any {
-	out := map[string]any{"type": typeObject, "properties": props}
+	out := map[string]any{"type": typeObject, propsKey: props}
 	if len(required) > 0 {
 		req := make([]any, len(required))
 		for i, r := range required {
@@ -179,9 +181,9 @@ func discBase(tagProp string, mapping map[string]any, extraProps map[string]any)
 		props[k] = v
 	}
 	return map[string]any{
-		"type":       typeObject,
-		"properties": props,
-		"required":   []any{tagProp},
+		"type":     typeObject,
+		propsKey:   props,
+		"required": []any{tagProp},
 		"discriminator": map[string]any{
 			"propertyName": tagProp,
 			"mapping":      mapping,
@@ -190,7 +192,7 @@ func discBase(tagProp string, mapping map[string]any, extraProps map[string]any)
 }
 
 func variant(base string, extraProps map[string]any, required ...string) map[string]any {
-	second := map[string]any{"type": typeObject, "properties": extraProps}
+	second := map[string]any{"type": typeObject, propsKey: extraProps}
 	if len(required) > 0 {
 		req := make([]any, len(required))
 		for i, r := range required {
@@ -205,9 +207,9 @@ func unionSchemas() map[string]any {
 	return map[string]any{
 		widgetRequest: obj(map[string]any{"shape": sref("Shape")}),
 		"Shape": discBase("kind", map[string]any{
-			"circle": circleRef,
-			"square": schemaRefPrefix + "Square",
-			"blob":   schemaRefPrefix + "Blob",
+			tagCircle: circleRef,
+			"square":  schemaRefPrefix + "Square",
+			"blob":    schemaRefPrefix + "Blob",
 		}, map[string]any{"label": map[string]any{"type": typeString}}),
 		"Circle": variant("Shape", map[string]any{"radius": map[string]any{"type": typeNumber}}, "radius"),
 		"Square": variant("Shape", map[string]any{"side": map[string]any{"type": typeNumber}}),
@@ -228,7 +230,7 @@ func TestDiscriminatedUnion(t *testing.T) {
 	if disc == nil || disc.PropertyName != "kind" {
 		t.Fatalf("discriminator: got %+v", disc)
 	}
-	if got, want := disc.Mapping["circle"], "#/types/pulumiservice:api:Circle"; got != want {
+	if got, want := disc.Mapping[tagCircle], "#/types/pulumiservice:api:Circle"; got != want {
 		t.Errorf("mapping[circle]: got %q, want %q", got, want)
 	}
 
@@ -246,7 +248,7 @@ func TestDiscriminatedUnion(t *testing.T) {
 		t.Errorf("base property label should flatten into Circle")
 	}
 	kind := circle.Properties["kind"]
-	if kind.Const != "circle" {
+	if kind.Const != tagCircle {
 		t.Errorf("kind const: got %v, want circle", kind.Const)
 	}
 	if !strings.Contains(kind.Description, "Expected value is 'circle'.") {
@@ -260,7 +262,7 @@ func TestDiscriminatedUnion(t *testing.T) {
 func TestSingleVariantBecomesDefiniteType(t *testing.T) {
 	schemas := unionSchemas()
 	schemas["Shape"].(map[string]any)["discriminator"].(map[string]any)["mapping"] = map[string]any{
-		"circle": circleRef,
+		tagCircle: circleRef,
 	}
 	pkg := buildSynth(t, schemas)
 	in := pkg.Resources["pulumiservice:api:Widget"].InputProperties["shape"]
@@ -285,8 +287,8 @@ func TestEmptyMappingFallsBackToNamedType(t *testing.T) {
 func TestTwoMemberObjectUnionRejected(t *testing.T) {
 	schemas := unionSchemas()
 	schemas["Shape"].(map[string]any)["discriminator"].(map[string]any)["mapping"] = map[string]any{
-		"circle": circleRef,
-		"square": schemaRefPrefix + "Square",
+		tagCircle: circleRef,
+		"square":  schemaRefPrefix + "Square",
 	}
 	_, err := BuildSchema(synthSpec(t, schemas), widgetMetadata(), "pulumiservice")
 	if err == nil {

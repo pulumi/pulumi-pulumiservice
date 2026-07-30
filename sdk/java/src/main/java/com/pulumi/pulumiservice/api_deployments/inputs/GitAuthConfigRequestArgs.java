@@ -3,13 +3,11 @@
 
 package com.pulumi.pulumiservice.api_deployments.inputs;
 
-import com.pulumi.core.Either;
 import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
 import com.pulumi.pulumiservice.api_deployments.inputs.BasicAuthRequestArgs;
 import com.pulumi.pulumiservice.api_deployments.inputs.SSHAuthRequestArgs;
-import com.pulumi.pulumiservice.api_deployments.inputs.SecretValueArgs;
-import java.lang.String;
+import java.lang.Object;
 import java.util.Objects;
 import java.util.Optional;
 import javax.annotation.Nullable;
@@ -28,13 +26,13 @@ public final class GitAuthConfigRequestArgs extends com.pulumi.resources.Resourc
      * 
      */
     @Import(name="accessToken")
-    private @Nullable Output<Either<String,SecretValueArgs>> accessToken;
+    private @Nullable Output<Object> accessToken;
 
     /**
      * @return Personal access token for git authentication
      * 
      */
-    public Optional<Output<Either<String,SecretValueArgs>>> accessToken() {
+    public Optional<Output<Object>> accessToken() {
         return Optional.ofNullable(this.accessToken);
     }
 
@@ -100,7 +98,7 @@ public final class GitAuthConfigRequestArgs extends com.pulumi.resources.Resourc
          * @return builder
          * 
          */
-        public Builder accessToken(@Nullable Output<Either<String,SecretValueArgs>> accessToken) {
+        public Builder accessToken(@Nullable Output<Object> accessToken) {
             $.accessToken = accessToken;
             return this;
         }
@@ -111,28 +109,8 @@ public final class GitAuthConfigRequestArgs extends com.pulumi.resources.Resourc
          * @return builder
          * 
          */
-        public Builder accessToken(Either<String,SecretValueArgs> accessToken) {
+        public Builder accessToken(Object accessToken) {
             return accessToken(Output.of(accessToken));
-        }
-
-        /**
-         * @param accessToken Personal access token for git authentication
-         * 
-         * @return builder
-         * 
-         */
-        public Builder accessToken(String accessToken) {
-            return accessToken(Either.ofLeft(accessToken));
-        }
-
-        /**
-         * @param accessToken Personal access token for git authentication
-         * 
-         * @return builder
-         * 
-         */
-        public Builder accessToken(SecretValueArgs accessToken) {
-            return accessToken(Either.ofRight(accessToken));
         }
 
         /**

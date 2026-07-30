@@ -134,7 +134,6 @@ class Gate(pulumi.CustomResource):
         """
         Creates a new change gate for an entity in the organization. Change gates enforce approval workflows by requiring one or more approvals before infrastructure changes can be applied to the protected resource.
 
-
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.bool] enabled: Whether the change gate is enabled
@@ -152,7 +151,6 @@ class Gate(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         Creates a new change gate for an entity in the organization. Change gates enforce approval workflows by requiring one or more approvals before infrastructure changes can be applied to the protected resource.
-
 
         :param str resource_name: The name of the resource.
         :param GateArgs args: The arguments to use to populate this resource's properties.

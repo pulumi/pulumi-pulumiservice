@@ -21,9 +21,9 @@ func main() {
 		exportConfig, err := api.NewAuditLogExportConfiguration(ctx, "exportConfig", &api.AuditLogExportConfigurationArgs{
 			OrgName:    pulumi.String(organizationName),
 			NewEnabled: pulumi.Bool(true),
-			NewS3Configuration: pulumi.Map{
-				"s3BucketName": pulumi.String(bucketName),
-				"iamRoleArn":   pulumi.String("arn:aws:iam::123456789012:role/PulumiAuditLogExportRole"),
+			NewS3Configuration: api.AuditLogsExportS3ConfigArgs{
+				S3BucketName: pulumi.String(bucketName),
+				IamRoleArn:   pulumi.String("arn:aws:iam::123456789012:role/PulumiAuditLogExportRole"),
 			},
 		})
 		if err != nil {

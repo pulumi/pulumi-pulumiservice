@@ -208,8 +208,8 @@ func main() {
 			OrgName:     pulumi.String(organizationName),
 			ProjectName: stagingStack.ProjectName,
 			StackName:   stagingStack.StackName,
-			ExecutorContext: pulumi.Map{
-				"executorImage": pulumi.Map{"reference": pulumi.String("pulumi/pulumi:latest")},
+			ExecutorContext: &deployments.ExecutorSettingsRequestArgs{
+				ExecutorImage: deployments.DockerImageRequestArgs{Reference: pulumi.String("pulumi/pulumi:latest")},
 			},
 		}); err != nil {
 			return err
@@ -218,8 +218,8 @@ func main() {
 			OrgName:     pulumi.String(organizationName),
 			ProjectName: prodStack.ProjectName,
 			StackName:   prodStack.StackName,
-			ExecutorContext: pulumi.Map{
-				"executorImage": pulumi.Map{"reference": pulumi.String("pulumi/pulumi:3-nonroot")},
+			ExecutorContext: &deployments.ExecutorSettingsRequestArgs{
+				ExecutorImage: deployments.DockerImageRequestArgs{Reference: pulumi.String("pulumi/pulumi:3-nonroot")},
 			},
 		})
 		if err != nil {
@@ -230,22 +230,22 @@ func main() {
 			OrgName: pulumi.String(organizationName),
 			Name:    pulumi.String("creds-approval-" + suffix),
 			Enabled: pulumi.Bool(prodApprovalEnabled),
-			Rule: pulumi.Map{
-				"ruleType":                  pulumi.String("approval_required"),
-				"numApprovalsRequired":      pulumi.Int(1),
-				"allowSelfApproval":         pulumi.Bool(false),
-				"requireReapprovalOnChange": pulumi.Bool(true),
-				"eligibleApprovers": pulumi.Array{
+			Rule: api.ChangeGateApprovalRuleInputArgs{
+				RuleType:                  pulumi.String("approval_required"),
+				NumApprovalsRequired:      pulumi.Int(1),
+				AllowSelfApproval:         pulumi.Bool(false),
+				RequireReapprovalOnChange: pulumi.Bool(true),
+				EligibleApprovers: pulumi.Array{
 					pulumi.Map{
 						"eligibilityType": pulumi.String("team_member"),
 						"teamName":        platformTeam.Name,
 					},
 				},
 			},
-			Target: pulumi.Map{
-				"entityType":    pulumi.String("environment"),
-				"actionTypes":   pulumi.StringArray{pulumi.String("update")},
-				"qualifiedName": sharedEnvRef,
+			Target: api.ChangeGateTargetInputArgs{
+				EntityType:    pulumi.String("environment"),
+				ActionTypes:   pulumi.StringArray{pulumi.String("update")},
+				QualifiedName: sharedEnvRef,
 			},
 		}, pulumi.DependsOn([]pulumi.Resource{sharedCredentials})); err != nil {
 			return err
@@ -256,9 +256,9 @@ func main() {
 			ProjectName:  prodStack.ProjectName,
 			StackName:    prodStack.StackName,
 			ScheduleCron: pulumi.String("0 7 * * *"),
-			Request: pulumi.Map{
-				"operation":       pulumi.String("update"),
-				"inheritSettings": pulumi.Bool(true),
+			Request: &deployments.CreateDeploymentRequestArgs{
+				Operation:       pulumi.String("update"),
+				InheritSettings: pulumi.Bool(true),
 			},
 		}, pulumi.DependsOn([]pulumi.Resource{prodDeploySettings})); err != nil {
 			return err

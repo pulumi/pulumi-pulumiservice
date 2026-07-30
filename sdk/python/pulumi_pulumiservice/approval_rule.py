@@ -118,7 +118,6 @@ class ApprovalRule(pulumi.CustomResource):
         """
         An approval rule for environment deployments.
 
-
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[Union['ApprovalRuleConfigArgs', 'ApprovalRuleConfigArgsDict']] approval_rule_config: The approval rule configuration.
@@ -135,7 +134,6 @@ class ApprovalRule(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         An approval rule for environment deployments.
-
 
         :param str resource_name: The name of the resource.
         :param ApprovalRuleArgs args: The arguments to use to populate this resource's properties.

@@ -2062,11 +2062,11 @@ export namespace api {
             /**
              * The password
              */
-            password: string | outputs.api.deployments.SecretValue;
+            password: any;
             /**
              * The user name
              */
-            userName: string | outputs.api.deployments.SecretValue;
+            userName: any;
         }
 
         /**
@@ -2388,7 +2388,7 @@ export namespace api {
             /**
              * The password for authenticating with the Docker registry.
              */
-            password: string | outputs.api.deployments.SecretValue;
+            password: any;
             /**
              * The username for authenticating with the Docker registry.
              */
@@ -2415,13 +2415,13 @@ export namespace api {
          * - Personal access token
          * - SSH private key (and its optional password)
          * - Basic auth username and password
-         * Only 1 authentication mode is valid.
+         *   Only 1 authentication mode is valid.
          */
         export interface GitAuthConfig {
             /**
              * Personal access token for git authentication
              */
-            accessToken?: string | outputs.api.deployments.SecretValue;
+            accessToken?: any;
             /**
              * Basic auth username and password configuration
              */
@@ -2439,7 +2439,7 @@ export namespace api {
             /**
              * EnvironmentVariables contains environment variables to be applied during the execution.
              */
-            environmentVariables?: {[key: string]: string | outputs.api.deployments.SecretValue};
+            environmentVariables?: {[key: string]: any};
             /**
              * OIDC contains the OIDC configuration for the operation.
              */
@@ -2596,29 +2596,11 @@ export namespace api {
             /**
              * An optional password or passphrase for the SSH private key.
              */
-            password?: string | outputs.api.deployments.SecretValue;
+            password?: any;
             /**
              * The SSH private key used for authentication.
              */
-            sshPrivateKey: string | outputs.api.deployments.SecretValue;
-        }
-
-        /**
-         * A SecretValue describes a secret value on the wire. The JSON representation is an object with a required 'secret' field containing the plaintext and an optional 'ciphertext' field containing the encrypted representation.
-         */
-        export interface SecretValue {
-            /**
-             * The encrypted representation of the secret value.
-             */
-            ciphertext?: string[];
-            /**
-             * Not a sensitive value, just plaintext.
-             */
-            plaintext?: string;
-            /**
-             * The secret value in plaintext.
-             */
-            secret: string;
+            sshPrivateKey: any;
         }
 
         /**
@@ -2658,9 +2640,9 @@ export namespace api {
              *   * SSH private key (and its optional password)
              *   * Personal access token
              *   * Basic auth username and password
-             * Only one authentication mode will be considered if more than one option is specified,
-             * with ssh private key/password preferred first, then personal access token, and finally
-             * basic auth credentials.
+             *     Only one authentication mode will be considered if more than one option is specified,
+             *     with ssh private key/password preferred first, then personal access token, and finally
+             *     basic auth credentials.
              */
             gitAuth?: outputs.api.deployments.GitAuthConfig;
             /**
@@ -2693,9 +2675,9 @@ export namespace api {
              *   * SSH private key (and its optional password)
              *   * Personal access token
              *   * Basic auth username and password
-             * Only one authentication mode will be considered if more than one option is specified,
-             * with ssh private key/password preferred first, then personal access token, and finally
-             * basic auth credentials.
+             *     Only one authentication mode will be considered if more than one option is specified,
+             *     with ssh private key/password preferred first, then personal access token, and finally
+             *     basic auth credentials.
              */
             hgAuth?: outputs.api.deployments.GitAuthConfig;
             /**

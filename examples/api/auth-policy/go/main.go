@@ -21,18 +21,18 @@ func main() {
 		_, err := auth.NewPolicy(ctx, "policy", &auth.PolicyArgs{
 			OrgName:  pulumi.String(organizationName),
 			PolicyId: pulumi.String(policyId),
-			Policies: pulumi.Array{
-				pulumi.Map{
-					"decision":              pulumi.String("allow"),
-					"tokenType":             pulumi.String("organization"),
-					"authorizedPermissions": pulumi.ToStringArray([]string{"standard"}),
-					"rules":                 pulumi.Map{},
+			Policies: auth.AuthPolicyDefinitionArray{
+				auth.AuthPolicyDefinitionArgs{
+					Decision:              pulumi.String("allow"),
+					TokenType:             pulumi.String("organization"),
+					AuthorizedPermissions: pulumi.ToStringArray([]string{"standard"}),
+					Rules:                 pulumi.MapMap{},
 				},
-				pulumi.Map{
-					"decision":              pulumi.String("deny"),
-					"tokenType":             pulumi.String("organization"),
-					"authorizedPermissions": pulumi.ToStringArray([]string{"admin"}),
-					"rules":                 pulumi.Map{},
+				auth.AuthPolicyDefinitionArgs{
+					Decision:              pulumi.String("deny"),
+					TokenType:             pulumi.String("organization"),
+					AuthorizedPermissions: pulumi.ToStringArray([]string{"admin"}),
+					Rules:                 pulumi.MapMap{},
 				},
 			},
 		})

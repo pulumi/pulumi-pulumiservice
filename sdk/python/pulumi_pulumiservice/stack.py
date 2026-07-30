@@ -100,7 +100,6 @@ class Stack(pulumi.CustomResource):
         """
         A stack is a collection of resources that share a common lifecycle. Stacks are uniquely identified by their name and the project they belong to.
 
-
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.bool] force_destroy: Optional. Flag indicating whether to delete the stack even if it still contains resources.
@@ -116,7 +115,6 @@ class Stack(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         A stack is a collection of resources that share a common lifecycle. Stacks are uniquely identified by their name and the project they belong to.
-
 
         :param str resource_name: The name of the resource.
         :param StackArgs args: The arguments to use to populate this resource's properties.

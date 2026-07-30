@@ -3,12 +3,10 @@
 
 package com.pulumi.pulumiservice.api_deployments.outputs;
 
-import com.pulumi.core.Either;
 import com.pulumi.core.annotations.CustomType;
 import com.pulumi.pulumiservice.api_deployments.outputs.BasicAuth;
 import com.pulumi.pulumiservice.api_deployments.outputs.SSHAuth;
-import com.pulumi.pulumiservice.api_deployments.outputs.SecretValue;
-import java.lang.String;
+import java.lang.Object;
 import java.util.Objects;
 import java.util.Optional;
 import javax.annotation.Nullable;
@@ -19,7 +17,7 @@ public final class GitAuthConfig {
      * @return Personal access token for git authentication
      * 
      */
-    private @Nullable Either<String,SecretValue> accessToken;
+    private @Nullable Object accessToken;
     /**
      * @return Basic auth username and password configuration
      * 
@@ -36,7 +34,7 @@ public final class GitAuthConfig {
      * @return Personal access token for git authentication
      * 
      */
-    public Optional<Either<String,SecretValue>> accessToken() {
+    public Optional<Object> accessToken() {
         return Optional.ofNullable(this.accessToken);
     }
     /**
@@ -63,7 +61,7 @@ public final class GitAuthConfig {
     }
     @CustomType.Builder
     public static final class Builder {
-        private @Nullable Either<String,SecretValue> accessToken;
+        private @Nullable Object accessToken;
         private @Nullable BasicAuth basicAuth;
         private @Nullable SSHAuth sshAuth;
         public Builder() {}
@@ -75,7 +73,7 @@ public final class GitAuthConfig {
         }
 
         @CustomType.Setter
-        public Builder accessToken(@Nullable Either<String,SecretValue> accessToken) {
+        public Builder accessToken(@Nullable Object accessToken) {
 
             this.accessToken = accessToken;
             return this;
