@@ -13,13 +13,15 @@ if sys.version_info >= (3, 11):
 else:
     from typing_extensions import NotRequired, TypedDict, TypeAlias
 from ... import _utilities
+from . import outputs
+from ._inputs import *
 
 __all__ = ['ItemArgs', 'Item']
 
 @pulumi.input_type
 class ItemArgs:
     def __init__(__self__, *,
-                 items: pulumi.Input[Sequence[Any]],
+                 items: pulumi.Input[Sequence[pulumi.Input['AddServiceItemArgs']]],
                  org_name: pulumi.Input[_builtins.str],
                  owner_name: pulumi.Input[_builtins.str],
                  owner_type: pulumi.Input[_builtins.str],
@@ -28,7 +30,7 @@ class ItemArgs:
         """
         The set of arguments for constructing a Item resource.
 
-        :param pulumi.Input[Sequence[Any]] items: List of items
+        :param pulumi.Input[Sequence[pulumi.Input['AddServiceItemArgs']]] items: List of items
         :param pulumi.Input[_builtins.str] org_name: The organization name
         :param pulumi.Input[_builtins.str] owner_name: The owner name
         :param pulumi.Input[_builtins.str] owner_type: The owner type
@@ -45,14 +47,14 @@ class ItemArgs:
 
     @_builtins.property
     @pulumi.getter
-    def items(self) -> pulumi.Input[Sequence[Any]]:
+    def items(self) -> pulumi.Input[Sequence[pulumi.Input['AddServiceItemArgs']]]:
         """
         List of items
         """
         return pulumi.get(self, "items")
 
     @items.setter
-    def items(self, value: pulumi.Input[Sequence[Any]]):
+    def items(self, value: pulumi.Input[Sequence[pulumi.Input['AddServiceItemArgs']]]):
         pulumi.set(self, "items", value)
 
     @_builtins.property
@@ -122,7 +124,7 @@ class Item(pulumi.CustomResource):
     def __init__(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 items: pulumi.Input[Optional[Sequence[Any]]] = None,
+                 items: pulumi.Input[Optional[Sequence[pulumi.Input[Union['AddServiceItemArgs', 'AddServiceItemArgsDict']]]]] = None,
                  max_results: pulumi.Input[Optional[_builtins.int]] = None,
                  org_name: pulumi.Input[Optional[_builtins.str]] = None,
                  owner_name: pulumi.Input[Optional[_builtins.str]] = None,
@@ -134,9 +136,10 @@ class Item(pulumi.CustomResource):
 
         Prefer `AddServiceItemsV2`, then `GetService` to read the items.
 
+
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
-        :param pulumi.Input[Sequence[Any]] items: List of items
+        :param pulumi.Input[Sequence[pulumi.Input[Union['AddServiceItemArgs', 'AddServiceItemArgsDict']]]] items: List of items
         :param pulumi.Input[_builtins.int] max_results: Maximum number of items to return on the first page (max 1000)
         :param pulumi.Input[_builtins.str] org_name: The organization name
         :param pulumi.Input[_builtins.str] owner_name: The owner name
@@ -154,6 +157,7 @@ class Item(pulumi.CustomResource):
 
         Prefer `AddServiceItemsV2`, then `GetService` to read the items.
 
+
         :param str resource_name: The name of the resource.
         :param ItemArgs args: The arguments to use to populate this resource's properties.
         :param pulumi.ResourceOptions opts: Options for the resource.
@@ -169,7 +173,7 @@ class Item(pulumi.CustomResource):
     def _internal_init(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 items: pulumi.Input[Optional[Sequence[Any]]] = None,
+                 items: pulumi.Input[Optional[Sequence[pulumi.Input[Union['AddServiceItemArgs', 'AddServiceItemArgsDict']]]]] = None,
                  max_results: pulumi.Input[Optional[_builtins.int]] = None,
                  org_name: pulumi.Input[Optional[_builtins.str]] = None,
                  owner_name: pulumi.Input[Optional[_builtins.str]] = None,
@@ -240,7 +244,7 @@ class Item(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter
-    def items(self) -> pulumi.Output[Sequence[Any]]:
+    def items(self) -> pulumi.Output[Sequence['outputs.ServiceItem']]:
         """
         The list of service items
         """
@@ -248,7 +252,7 @@ class Item(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter
-    def service(self) -> pulumi.Output[Any]:
+    def service(self) -> pulumi.Output['outputs.ServiceProperties']:
         """
         The service details
         """

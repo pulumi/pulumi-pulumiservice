@@ -13,6 +13,7 @@ if sys.version_info >= (3, 11):
 else:
     from typing_extensions import NotRequired, TypedDict, TypeAlias
 from .. import _utilities
+from . import outputs
 
 __all__ = ['OrganizationMemberArgs', 'OrganizationMember']
 
@@ -87,6 +88,7 @@ class OrganizationMember(pulumi.CustomResource):
 
         Returns the newly created organization member record. Returns 409 if the user is already a member of the organization.
 
+
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] org_name: The organization name
@@ -105,6 +107,7 @@ class OrganizationMember(pulumi.CustomResource):
         This endpoint only assigns built-in roles. To onboard a user with a custom role, use the organization invite flow (`BatchCreateOrgInviteEmail`) and set `roleId` on the invite — the custom role is applied when the user accepts. Alternatively, add the user here with a built-in role and then call `UpdateOrganizationMember` with `fgaRoleId` to reassign.
 
         Returns the newly created organization member record. Returns 409 if the user is already a member of the organization.
+
 
         :param str resource_name: The name of the resource.
         :param OrganizationMemberArgs args: The arguments to use to populate this resource's properties.
@@ -191,7 +194,7 @@ class OrganizationMember(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter(name="fgaRole")
-    def fga_role(self) -> pulumi.Output[Any]:
+    def fga_role(self) -> pulumi.Output['outputs.FGARole']:
         """
         The role currently assigned to this member — either a built-in role (member, admin, billingManager) or a custom role. Falls back to the organization's default role if no role is assigned directly.
         """
@@ -207,7 +210,7 @@ class OrganizationMember(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter
-    def links(self) -> pulumi.Output[Optional[Any]]:
+    def links(self) -> pulumi.Output[Optional['outputs.MemberLinks']]:
         """
         Links to the member in the Pulumi Console
         """
@@ -231,7 +234,7 @@ class OrganizationMember(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter
-    def user(self) -> pulumi.Output[Any]:
+    def user(self) -> pulumi.Output['outputs.UserInfo']:
         """
         The user information for this organization member.
         """

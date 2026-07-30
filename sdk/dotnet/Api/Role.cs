@@ -148,7 +148,7 @@ namespace Pulumi.PulumiService.Api
         /// The detailed permission descriptor tree.
         /// </summary>
         [Input("details")]
-        public Input<object>? Details { get; set; }
+        public object? Details { get; set; }
 
         /// <summary>
         /// The name of the permission descriptor.

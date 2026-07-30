@@ -13,6 +13,7 @@ if sys.version_info >= (3, 11):
 else:
     from typing_extensions import NotRequired, TypedDict, TypeAlias
 from .. import _utilities
+from . import outputs
 
 __all__ = ['PolicyGroupArgs', 'PolicyGroup']
 
@@ -117,6 +118,7 @@ class PolicyGroup(pulumi.CustomResource):
         """
         Creates a new Policy Group for an organization. Policy Groups define which Policy Packs are enforced on which stacks or cloud accounts, with configurable enforcement levels (advisory, mandatory, or disabled) per pack. This allows different policy strictness for different environments, such as advisory-only in development and mandatory in production.
 
+
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] agent_pool_id: Agent pool ID for policy evaluation. Defaults to Pulumi hosted pool if not specified.
@@ -133,6 +135,7 @@ class PolicyGroup(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         Creates a new Policy Group for an organization. Policy Groups define which Policy Packs are enforced on which stacks or cloud accounts, with configurable enforcement levels (advisory, mandatory, or disabled) per pack. This allows different policy strictness for different environments, such as advisory-only in development and mandatory in production.
+
 
         :param str resource_name: The name of the resource.
         :param PolicyGroupArgs args: The arguments to use to populate this resource's properties.
@@ -228,7 +231,7 @@ class PolicyGroup(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter(name="appliedPolicyPacks")
-    def applied_policy_packs(self) -> pulumi.Output[Sequence[Any]]:
+    def applied_policy_packs(self) -> pulumi.Output[Sequence['outputs.AppPolicyPackMetadata']]:
         """
         List of policy packs that are applied to this policy group.
         """
@@ -268,7 +271,7 @@ class PolicyGroup(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter
-    def stacks(self) -> pulumi.Output[Sequence[Any]]:
+    def stacks(self) -> pulumi.Output[Sequence['outputs.AppPulumiStackReference']]:
         """
         List of stacks that are members of this policy group.
         """

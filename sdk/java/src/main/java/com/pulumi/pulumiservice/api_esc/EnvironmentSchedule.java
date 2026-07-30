@@ -40,14 +40,14 @@ public class EnvironmentSchedule extends com.pulumi.resources.CustomResource {
      * The action definition, which varies based on the action kind.
      * 
      */
-    @Export(name="definition", refs={Map.class,String.class,Object.class}, tree="[0,1,2]")
-    private Output<Map<String,Object>> definition;
+    @Export(name="definition", refs={Map.class,String.class,Object.class}, tree="[0,1,[0,1,2]]")
+    private Output<Map<String,Map<String,Object>>> definition;
 
     /**
      * @return The action definition, which varies based on the action kind.
      * 
      */
-    public Output<Map<String,Object>> definition() {
+    public Output<Map<String,Map<String,Object>>> definition() {
         return this.definition;
     }
     /**

@@ -32,10 +32,10 @@ __all__ = [
     'DeploymentSettingsGitAuthBasicAuthArgsDict',
     'DeploymentSettingsGitAuthSSHAuthArgs',
     'DeploymentSettingsGitAuthSSHAuthArgsDict',
-    'DeploymentSettingsGitSourceArgs',
-    'DeploymentSettingsGitSourceArgsDict',
     'DeploymentSettingsGitSourceGitAuthArgs',
     'DeploymentSettingsGitSourceGitAuthArgsDict',
+    'DeploymentSettingsGitSourceArgs',
+    'DeploymentSettingsGitSourceArgsDict',
     'DeploymentSettingsGithubArgs',
     'DeploymentSettingsGithubArgsDict',
     'DeploymentSettingsOperationContextArgs',
@@ -644,6 +644,60 @@ class DeploymentSettingsGitAuthSSHAuthArgs:
         pulumi.set(self, "password", value)
 
 
+class DeploymentSettingsGitSourceGitAuthArgsDict(TypedDict):
+    """
+    Git source settings for a deployment.
+    """
+    basic_auth: NotRequired[pulumi.Input[Optional['DeploymentSettingsGitAuthBasicAuthArgsDict']]]
+    """
+    Basic auth for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined.
+    """
+    ssh_auth: NotRequired[pulumi.Input[Optional['DeploymentSettingsGitAuthSSHAuthArgsDict']]]
+    """
+    SSH auth for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined.
+    """
+
+@pulumi.input_type
+class DeploymentSettingsGitSourceGitAuthArgs:
+    def __init__(__self__, *,
+                 basic_auth: pulumi.Input[Optional['DeploymentSettingsGitAuthBasicAuthArgs']] = None,
+                 ssh_auth: pulumi.Input[Optional['DeploymentSettingsGitAuthSSHAuthArgs']] = None):
+        """
+        Git source settings for a deployment.
+
+        :param pulumi.Input['DeploymentSettingsGitAuthBasicAuthArgs'] basic_auth: Basic auth for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined.
+        :param pulumi.Input['DeploymentSettingsGitAuthSSHAuthArgs'] ssh_auth: SSH auth for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined.
+        """
+        if basic_auth is not None:
+            pulumi.set(__self__, "basic_auth", basic_auth)
+        if ssh_auth is not None:
+            pulumi.set(__self__, "ssh_auth", ssh_auth)
+
+    @_builtins.property
+    @pulumi.getter(name="basicAuth")
+    def basic_auth(self) -> pulumi.Input[Optional['DeploymentSettingsGitAuthBasicAuthArgs']]:
+        """
+        Basic auth for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined.
+        """
+        return pulumi.get(self, "basic_auth")
+
+    @basic_auth.setter
+    def basic_auth(self, value: pulumi.Input[Optional['DeploymentSettingsGitAuthBasicAuthArgs']]):
+        pulumi.set(self, "basic_auth", value)
+
+    @_builtins.property
+    @pulumi.getter(name="sshAuth")
+    def ssh_auth(self) -> pulumi.Input[Optional['DeploymentSettingsGitAuthSSHAuthArgs']]:
+        """
+        SSH auth for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined.
+        """
+        return pulumi.get(self, "ssh_auth")
+
+    @ssh_auth.setter
+    def ssh_auth(self, value: pulumi.Input[Optional['DeploymentSettingsGitAuthSSHAuthArgs']]):
+        pulumi.set(self, "ssh_auth", value)
+
+
 class DeploymentSettingsGitSourceArgsDict(TypedDict):
     """
     Git source settings for a deployment.
@@ -756,60 +810,6 @@ class DeploymentSettingsGitSourceArgs:
     @repo_url.setter
     def repo_url(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "repo_url", value)
-
-
-class DeploymentSettingsGitSourceGitAuthArgsDict(TypedDict):
-    """
-    Git source settings for a deployment.
-    """
-    basic_auth: NotRequired[pulumi.Input[Optional['DeploymentSettingsGitAuthBasicAuthArgsDict']]]
-    """
-    Basic auth for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined.
-    """
-    ssh_auth: NotRequired[pulumi.Input[Optional['DeploymentSettingsGitAuthSSHAuthArgsDict']]]
-    """
-    SSH auth for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined.
-    """
-
-@pulumi.input_type
-class DeploymentSettingsGitSourceGitAuthArgs:
-    def __init__(__self__, *,
-                 basic_auth: pulumi.Input[Optional['DeploymentSettingsGitAuthBasicAuthArgs']] = None,
-                 ssh_auth: pulumi.Input[Optional['DeploymentSettingsGitAuthSSHAuthArgs']] = None):
-        """
-        Git source settings for a deployment.
-
-        :param pulumi.Input['DeploymentSettingsGitAuthBasicAuthArgs'] basic_auth: Basic auth for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined.
-        :param pulumi.Input['DeploymentSettingsGitAuthSSHAuthArgs'] ssh_auth: SSH auth for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined.
-        """
-        if basic_auth is not None:
-            pulumi.set(__self__, "basic_auth", basic_auth)
-        if ssh_auth is not None:
-            pulumi.set(__self__, "ssh_auth", ssh_auth)
-
-    @_builtins.property
-    @pulumi.getter(name="basicAuth")
-    def basic_auth(self) -> pulumi.Input[Optional['DeploymentSettingsGitAuthBasicAuthArgs']]:
-        """
-        Basic auth for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined.
-        """
-        return pulumi.get(self, "basic_auth")
-
-    @basic_auth.setter
-    def basic_auth(self, value: pulumi.Input[Optional['DeploymentSettingsGitAuthBasicAuthArgs']]):
-        pulumi.set(self, "basic_auth", value)
-
-    @_builtins.property
-    @pulumi.getter(name="sshAuth")
-    def ssh_auth(self) -> pulumi.Input[Optional['DeploymentSettingsGitAuthSSHAuthArgs']]:
-        """
-        SSH auth for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined.
-        """
-        return pulumi.get(self, "ssh_auth")
-
-    @ssh_auth.setter
-    def ssh_auth(self, value: pulumi.Input[Optional['DeploymentSettingsGitAuthSSHAuthArgs']]):
-        pulumi.set(self, "ssh_auth", value)
 
 
 class DeploymentSettingsGithubArgsDict(TypedDict):

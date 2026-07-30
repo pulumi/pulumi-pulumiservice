@@ -9,9 +9,10 @@ import com.pulumi.core.annotations.ResourceType;
 import com.pulumi.core.internal.Codegen;
 import com.pulumi.pulumiservice.Utilities;
 import com.pulumi.pulumiservice.api_integrations.GitHubIntegrationArgs;
+import com.pulumi.pulumiservice.api_integrations.outputs.GitHubAppPermissionRequirement;
+import com.pulumi.pulumiservice.api_integrations.outputs.GitHubAppURLs;
 import java.lang.Boolean;
 import java.lang.Integer;
-import java.lang.Object;
 import java.lang.String;
 import java.util.List;
 import java.util.Optional;
@@ -153,14 +154,14 @@ public class GitHubIntegration extends com.pulumi.resources.CustomResource {
      * URL to configure repository access for this GitHub App installation.
      * 
      */
-    @Export(name="ghUrls", refs={Object.class}, tree="[0]")
-    private Output</* @Nullable */ Object> ghUrls;
+    @Export(name="ghUrls", refs={GitHubAppURLs.class}, tree="[0]")
+    private Output</* @Nullable */ GitHubAppURLs> ghUrls;
 
     /**
      * @return URL to configure repository access for this GitHub App installation.
      * 
      */
-    public Output<Optional<Object>> ghUrls() {
+    public Output<Optional<GitHubAppURLs>> ghUrls() {
         return Codegen.optional(this.ghUrls);
     }
     /**
@@ -251,14 +252,14 @@ public class GitHubIntegration extends com.pulumi.resources.CustomResource {
      * Neo GitHub App permission requirements for this installation.
      * 
      */
-    @Export(name="neoGitHubAppPermissionRequirements", refs={List.class,Object.class}, tree="[0,1]")
-    private Output</* @Nullable */ List<Object>> neoGitHubAppPermissionRequirements;
+    @Export(name="neoGitHubAppPermissionRequirements", refs={List.class,GitHubAppPermissionRequirement.class}, tree="[0,1]")
+    private Output</* @Nullable */ List<GitHubAppPermissionRequirement>> neoGitHubAppPermissionRequirements;
 
     /**
      * @return Neo GitHub App permission requirements for this installation.
      * 
      */
-    public Output<Optional<List<Object>>> neoGitHubAppPermissionRequirements() {
+    public Output<Optional<List<GitHubAppPermissionRequirement>>> neoGitHubAppPermissionRequirements() {
         return Codegen.optional(this.neoGitHubAppPermissionRequirements);
     }
 

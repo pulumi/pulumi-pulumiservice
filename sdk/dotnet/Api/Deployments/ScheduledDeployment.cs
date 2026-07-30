@@ -25,7 +25,7 @@ namespace Pulumi.PulumiService.Api.Deployments
         /// The action definition, which varies based on the action kind.
         /// </summary>
         [Output("definition")]
-        public Output<ImmutableDictionary<string, object>> Definition { get; private set; } = null!;
+        public Output<ImmutableDictionary<string, ImmutableDictionary<string, object>>> Definition { get; private set; } = null!;
 
         /// <summary>
         /// The kind of action to be executed.
@@ -142,7 +142,7 @@ namespace Pulumi.PulumiService.Api.Deployments
         /// Deployment request payload to execute when the schedule fires. This has the same shape and semantics as CreateDeploymentRequest used for immediate deployments.
         /// </summary>
         [Input("request")]
-        public Input<object>? Request { get; set; }
+        public Input<Inputs.CreateDeploymentRequestArgs>? Request { get; set; }
 
         /// <summary>
         /// Cron expression defining a recurring schedule for this deployment. When set, scheduleOnce must be null. Uses standard 5-field cron syntax (MIN HOUR DOM MON DOW) and is evaluated in UTC.

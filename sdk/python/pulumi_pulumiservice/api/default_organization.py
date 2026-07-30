@@ -13,6 +13,7 @@ if sys.version_info >= (3, 11):
 else:
     from typing_extensions import NotRequired, TypedDict, TypeAlias
 from .. import _utilities
+from . import outputs
 
 __all__ = ['DefaultOrganizationArgs', 'DefaultOrganization']
 
@@ -51,6 +52,7 @@ class DefaultOrganization(pulumi.CustomResource):
         """
         UpdateDefaultOrganization sets the default organization for the current user.
 
+
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] org_name: The organization name
@@ -63,6 +65,7 @@ class DefaultOrganization(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         UpdateDefaultOrganization sets the default organization for the current user.
+
 
         :param str resource_name: The name of the resource.
         :param DefaultOrganizationArgs args: The arguments to use to populate this resource's properties.
@@ -130,7 +133,7 @@ class DefaultOrganization(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter(name="Messages")
-    def messages(self) -> pulumi.Output[Sequence[Any]]:
+    def messages(self) -> pulumi.Output[Sequence['outputs.AppMessage']]:
         """
         Messages is a list of messages that should be displayed to the user that contextualize
         the default org; for example: warning new users if their default org as returned by the

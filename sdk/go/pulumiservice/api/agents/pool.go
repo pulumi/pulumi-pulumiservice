@@ -17,7 +17,7 @@ type Pool struct {
 	pulumi.CustomResourceState
 
 	// The agents
-	Agents pulumi.ArrayOutput `pulumi:"agents"`
+	Agents DeploymentAgentMetadataArrayOutput `pulumi:"agents"`
 	// The creation timestamp
 	Created pulumi.IntOutput `pulumi:"created"`
 	// The description
@@ -193,8 +193,8 @@ func (o PoolOutput) ToPoolOutputWithContext(ctx context.Context) PoolOutput {
 }
 
 // The agents
-func (o PoolOutput) Agents() pulumi.ArrayOutput {
-	return o.ApplyT(func(v *Pool) pulumi.ArrayOutput { return v.Agents }).(pulumi.ArrayOutput)
+func (o PoolOutput) Agents() DeploymentAgentMetadataArrayOutput {
+	return o.ApplyT(func(v *Pool) DeploymentAgentMetadataArrayOutput { return v.Agents }).(DeploymentAgentMetadataArrayOutput)
 }
 
 // The creation timestamp

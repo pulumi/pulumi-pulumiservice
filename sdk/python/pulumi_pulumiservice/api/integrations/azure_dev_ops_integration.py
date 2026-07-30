@@ -13,6 +13,7 @@ if sys.version_info >= (3, 11):
 else:
     from typing_extensions import NotRequired, TypedDict, TypeAlias
 from ... import _utilities
+from . import outputs
 
 __all__ = ['AzureDevOpsIntegrationArgs', 'AzureDevOpsIntegration']
 
@@ -118,6 +119,7 @@ class AzureDevOpsIntegration(pulumi.CustomResource):
         """
         Updates an existing Azure DevOps integration's settings. Can modify the Azure DevOps organization, project, or authentication configuration.
 
+
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.bool] disable_detailed_diff: Whether detailed property-level diffs are disabled for PR comments
@@ -134,6 +136,7 @@ class AzureDevOpsIntegration(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         Updates an existing Azure DevOps integration's settings. Can modify the Azure DevOps organization, project, or authentication configuration.
+
 
         :param str resource_name: The name of the resource.
         :param AzureDevOpsIntegrationArgs args: The arguments to use to populate this resource's properties.
@@ -212,7 +215,7 @@ class AzureDevOpsIntegration(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter(name="authUser")
-    def auth_user(self) -> pulumi.Output[Optional[Any]]:
+    def auth_user(self) -> pulumi.Output[Optional['outputs.User']]:
         """
         The Pulumi user whose Azure DevOps authentication token is being used
         """
@@ -252,7 +255,7 @@ class AzureDevOpsIntegration(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter
-    def organization(self) -> pulumi.Output[Optional[Any]]:
+    def organization(self) -> pulumi.Output[Optional['outputs.AzureDevOpsOrganization']]:
         """
         Metadata about the Azure DevOps organization linked to the Pulumi organization
         """
@@ -260,7 +263,7 @@ class AzureDevOpsIntegration(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter
-    def project(self) -> pulumi.Output[Optional[Any]]:
+    def project(self) -> pulumi.Output[Optional['outputs.AzureDevOpsProject']]:
         """
         Metadata about the Azure DevOps project linked to the Pulumi organization
         """

@@ -13,6 +13,8 @@ if sys.version_info >= (3, 11):
 else:
     from typing_extensions import NotRequired, TypedDict, TypeAlias
 from ... import _utilities
+from . import outputs
+from ._inputs import *
 
 __all__ = ['OidcIssuerArgs', 'OidcIssuer']
 
@@ -23,7 +25,7 @@ class OidcIssuerArgs:
                  org_name: pulumi.Input[_builtins.str],
                  url: pulumi.Input[_builtins.str],
                  issuer_id: pulumi.Input[Optional[_builtins.str]] = None,
-                 jwks: Optional[Any] = None,
+                 jwks: pulumi.Input[Optional['JSONWebKeySetArgs']] = None,
                  max_expiration: pulumi.Input[Optional[_builtins.int]] = None,
                  thumbprints: pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]] = None):
         """
@@ -33,7 +35,7 @@ class OidcIssuerArgs:
         :param pulumi.Input[_builtins.str] org_name: The organization name
         :param pulumi.Input[_builtins.str] url: The URL of the OIDC issuer.
         :param pulumi.Input[_builtins.str] issuer_id: The OIDC issuer identifier
-        :param Any jwks: The JSON Web Key Set for the OIDC issuer.
+        :param pulumi.Input['JSONWebKeySetArgs'] jwks: The JSON Web Key Set for the OIDC issuer.
         :param pulumi.Input[_builtins.int] max_expiration: The maximum token expiration time in seconds.
         :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] thumbprints: SHA-1 certificate thumbprints used to verify the OIDC issuer's TLS certificate.
         """
@@ -99,14 +101,14 @@ class OidcIssuerArgs:
 
     @_builtins.property
     @pulumi.getter
-    def jwks(self) -> Optional[Any]:
+    def jwks(self) -> pulumi.Input[Optional['JSONWebKeySetArgs']]:
         """
         The JSON Web Key Set for the OIDC issuer.
         """
         return pulumi.get(self, "jwks")
 
     @jwks.setter
-    def jwks(self, value: Optional[Any]):
+    def jwks(self, value: pulumi.Input[Optional['JSONWebKeySetArgs']]):
         pulumi.set(self, "jwks", value)
 
     @_builtins.property
@@ -141,7 +143,7 @@ class OidcIssuer(pulumi.CustomResource):
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
                  issuer_id: pulumi.Input[Optional[_builtins.str]] = None,
-                 jwks: Optional[Any] = None,
+                 jwks: pulumi.Input[Optional[Union['JSONWebKeySetArgs', 'JSONWebKeySetArgsDict']]] = None,
                  max_expiration: pulumi.Input[Optional[_builtins.int]] = None,
                  name: pulumi.Input[Optional[_builtins.str]] = None,
                  org_name: pulumi.Input[Optional[_builtins.str]] = None,
@@ -151,10 +153,11 @@ class OidcIssuer(pulumi.CustomResource):
         """
         Registers a new OIDC issuer for an organization, establishing a trust relationship with an external identity provider. Once registered, the identity provider can issue signed, short-lived tokens that are exchanged for temporary Pulumi Cloud credentials during deployments. This eliminates the need to store long-lived access tokens. Supported providers include AWS, Azure, Google Cloud, GitHub Actions, and any OIDC-compliant identity provider. The request must include the issuer URL, and the service will fetch the provider's public signing keys to verify token authenticity.
 
+
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] issuer_id: The OIDC issuer identifier
-        :param Any jwks: The JSON Web Key Set for the OIDC issuer.
+        :param pulumi.Input[Union['JSONWebKeySetArgs', 'JSONWebKeySetArgsDict']] jwks: The JSON Web Key Set for the OIDC issuer.
         :param pulumi.Input[_builtins.int] max_expiration: The maximum token expiration time in seconds.
         :param pulumi.Input[_builtins.str] name: The display name of the OIDC issuer.
         :param pulumi.Input[_builtins.str] org_name: The organization name
@@ -169,6 +172,7 @@ class OidcIssuer(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         Registers a new OIDC issuer for an organization, establishing a trust relationship with an external identity provider. Once registered, the identity provider can issue signed, short-lived tokens that are exchanged for temporary Pulumi Cloud credentials during deployments. This eliminates the need to store long-lived access tokens. Supported providers include AWS, Azure, Google Cloud, GitHub Actions, and any OIDC-compliant identity provider. The request must include the issuer URL, and the service will fetch the provider's public signing keys to verify token authenticity.
+
 
         :param str resource_name: The name of the resource.
         :param OidcIssuerArgs args: The arguments to use to populate this resource's properties.
@@ -186,7 +190,7 @@ class OidcIssuer(pulumi.CustomResource):
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
                  issuer_id: pulumi.Input[Optional[_builtins.str]] = None,
-                 jwks: Optional[Any] = None,
+                 jwks: pulumi.Input[Optional[Union['JSONWebKeySetArgs', 'JSONWebKeySetArgsDict']]] = None,
                  max_expiration: pulumi.Input[Optional[_builtins.int]] = None,
                  name: pulumi.Input[Optional[_builtins.str]] = None,
                  org_name: pulumi.Input[Optional[_builtins.str]] = None,
@@ -278,7 +282,7 @@ class OidcIssuer(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter
-    def jwks(self) -> pulumi.Output[Optional[Any]]:
+    def jwks(self) -> pulumi.Output[Optional['outputs.JSONWebKeySet']]:
         """
         The JSON Web Key Set for the OIDC issuer.
         """

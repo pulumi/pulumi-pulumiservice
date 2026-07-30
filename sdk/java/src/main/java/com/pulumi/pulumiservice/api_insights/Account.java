@@ -8,6 +8,8 @@ import com.pulumi.core.annotations.Export;
 import com.pulumi.core.annotations.ResourceType;
 import com.pulumi.core.internal.Codegen;
 import com.pulumi.pulumiservice.Utilities;
+import com.pulumi.pulumiservice.api.outputs.ScanStatus;
+import com.pulumi.pulumiservice.api.outputs.UserInfo;
 import com.pulumi.pulumiservice.api_insights.AccountArgs;
 import java.lang.Boolean;
 import java.lang.Object;
@@ -56,14 +58,14 @@ public class Account extends com.pulumi.resources.CustomResource {
      * The user with ownership of this Insights account
      * 
      */
-    @Export(name="ownedBy", refs={Object.class}, tree="[0]")
-    private Output<Object> ownedBy;
+    @Export(name="ownedBy", refs={UserInfo.class}, tree="[0]")
+    private Output<UserInfo> ownedBy;
 
     /**
      * @return The user with ownership of this Insights account
      * 
      */
-    public Output<Object> ownedBy() {
+    public Output<UserInfo> ownedBy() {
         return this.ownedBy;
     }
     /**
@@ -128,14 +130,14 @@ public class Account extends com.pulumi.resources.CustomResource {
      * Status of the last discovery scan for this account.
      * 
      */
-    @Export(name="scanStatus", refs={Object.class}, tree="[0]")
-    private Output</* @Nullable */ Object> scanStatus;
+    @Export(name="scanStatus", refs={ScanStatus.class}, tree="[0]")
+    private Output</* @Nullable */ ScanStatus> scanStatus;
 
     /**
      * @return Status of the last discovery scan for this account.
      * 
      */
-    public Output<Optional<Object>> scanStatus() {
+    public Output<Optional<ScanStatus>> scanStatus() {
         return Codegen.optional(this.scanStatus);
     }
     /**

@@ -8,3 +8,5 @@ import typing
 # Export this package's modules as members:
 from .pool import *
 from .task import *
+from ._inputs import *
+from . import outputs

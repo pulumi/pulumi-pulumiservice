@@ -13,6 +13,7 @@ if sys.version_info >= (3, 11):
 else:
     from typing_extensions import NotRequired, TypedDict, TypeAlias
 from ... import _utilities
+from . import outputs
 
 __all__ = ['CustomVCSIntegrationArgs', 'CustomVCSIntegration']
 
@@ -133,6 +134,7 @@ class CustomVCSIntegration(pulumi.CustomResource):
         """
         Creates a new custom VCS integration for an organization. Custom VCS integrations allow connecting self-hosted or third-party version control systems (e.g. Gitea, Forgejo, Bitbucket Server) to Pulumi Deployments. Credentials are managed via ESC environments, and deployments are triggered by inbound webhooks. Returns the created integration including its webhook URL and HMAC secret for signature verification.
 
+
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] base_url: URL prefix for repositories covered by this integration (e.g. 'https://gitea.example.com/myorg'). Used to match repositories to integrations.
@@ -150,6 +152,7 @@ class CustomVCSIntegration(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         Creates a new custom VCS integration for an organization. Custom VCS integrations allow connecting self-hosted or third-party version control systems (e.g. Gitea, Forgejo, Bitbucket Server) to Pulumi Deployments. Credentials are managed via ESC environments, and deployments are triggered by inbound webhooks. Returns the created integration including its webhook URL and HMAC secret for signature verification.
+
 
         :param str resource_name: The name of the resource.
         :param CustomVCSIntegrationArgs args: The arguments to use to populate this resource's properties.
@@ -286,7 +289,7 @@ class CustomVCSIntegration(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter
-    def repositories(self) -> pulumi.Output[Optional[Sequence[Any]]]:
+    def repositories(self) -> pulumi.Output[Optional[Sequence['outputs.CustomVCSRepositoryProperties']]]:
         """
         List of repositories configured on this integration
         """

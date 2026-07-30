@@ -26,9 +26,9 @@ type Stack struct {
 	ActiveUpdate pulumi.StringOutput `pulumi:"activeUpdate"`
 	// Optional cloud-persisted stack configuration.
 	// If set, then the stack's configuration is loaded from the cloud and not a file on disk.
-	Config pulumi.AnyOutput `pulumi:"config"`
+	Config AppStackConfigPtrOutput `pulumi:"config"`
 	// Information about a live operation currently running for the stack, its kind, the author who initiated it, and its start time. Null when no operation is in flight.
-	CurrentOperation pulumi.AnyOutput `pulumi:"currentOperation"`
+	CurrentOperation AppOperationStatusPtrOutput `pulumi:"currentOperation"`
 	// The organization name
 	OrgName pulumi.StringOutput `pulumi:"orgName"`
 	// The project name
@@ -36,7 +36,7 @@ type Stack struct {
 	// The stack name
 	StackName pulumi.StringOutput `pulumi:"stackName"`
 	// Map of tags
-	Tags pulumi.MapOutput `pulumi:"tags"`
+	Tags pulumi.StringMapOutput `pulumi:"tags"`
 	// The version number
 	Version pulumi.IntOutput `pulumi:"version"`
 }
@@ -91,7 +91,7 @@ func (StackState) ElementType() reflect.Type {
 
 type stackArgs struct {
 	// The configuration for the new stack.
-	Config interface{} `pulumi:"config"`
+	Config *AppStackConfig `pulumi:"config"`
 	// The organization name
 	OrgName string `pulumi:"orgName"`
 	// The project name
@@ -99,9 +99,9 @@ type stackArgs struct {
 	// The name of the stack being created.
 	StackName string `pulumi:"stackName"`
 	// An optional state to initialize the stack with.
-	State interface{} `pulumi:"state"`
+	State *AppUntypedDeployment `pulumi:"state"`
 	// An optional set of tags to apply to the stack.
-	Tags map[string]interface{} `pulumi:"tags"`
+	Tags map[string]string `pulumi:"tags"`
 	// An optional set of teams to assign to the stack.
 	Teams []string `pulumi:"teams"`
 }
@@ -109,7 +109,7 @@ type stackArgs struct {
 // The set of arguments for constructing a Stack resource.
 type StackArgs struct {
 	// The configuration for the new stack.
-	Config pulumi.Input
+	Config AppStackConfigPtrInput
 	// The organization name
 	OrgName pulumi.StringInput
 	// The project name
@@ -117,9 +117,9 @@ type StackArgs struct {
 	// The name of the stack being created.
 	StackName pulumi.StringInput
 	// An optional state to initialize the stack with.
-	State pulumi.Input
+	State AppUntypedDeploymentPtrInput
 	// An optional set of tags to apply to the stack.
-	Tags pulumi.MapInput
+	Tags pulumi.StringMapInput
 	// An optional set of teams to assign to the stack.
 	Teams pulumi.StringArrayInput
 }
@@ -218,13 +218,13 @@ func (o StackOutput) ActiveUpdate() pulumi.StringOutput {
 
 // Optional cloud-persisted stack configuration.
 // If set, then the stack's configuration is loaded from the cloud and not a file on disk.
-func (o StackOutput) Config() pulumi.AnyOutput {
-	return o.ApplyT(func(v *Stack) pulumi.AnyOutput { return v.Config }).(pulumi.AnyOutput)
+func (o StackOutput) Config() AppStackConfigPtrOutput {
+	return o.ApplyT(func(v *Stack) AppStackConfigPtrOutput { return v.Config }).(AppStackConfigPtrOutput)
 }
 
 // Information about a live operation currently running for the stack, its kind, the author who initiated it, and its start time. Null when no operation is in flight.
-func (o StackOutput) CurrentOperation() pulumi.AnyOutput {
-	return o.ApplyT(func(v *Stack) pulumi.AnyOutput { return v.CurrentOperation }).(pulumi.AnyOutput)
+func (o StackOutput) CurrentOperation() AppOperationStatusPtrOutput {
+	return o.ApplyT(func(v *Stack) AppOperationStatusPtrOutput { return v.CurrentOperation }).(AppOperationStatusPtrOutput)
 }
 
 // The organization name
@@ -243,8 +243,8 @@ func (o StackOutput) StackName() pulumi.StringOutput {
 }
 
 // Map of tags
-func (o StackOutput) Tags() pulumi.MapOutput {
-	return o.ApplyT(func(v *Stack) pulumi.MapOutput { return v.Tags }).(pulumi.MapOutput)
+func (o StackOutput) Tags() pulumi.StringMapOutput {
+	return o.ApplyT(func(v *Stack) pulumi.StringMapOutput { return v.Tags }).(pulumi.StringMapOutput)
 }
 
 // The version number

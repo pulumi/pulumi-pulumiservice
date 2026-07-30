@@ -13,6 +13,7 @@ if sys.version_info >= (3, 11):
 else:
     from typing_extensions import NotRequired, TypedDict, TypeAlias
 from ... import _utilities
+from . import outputs
 
 __all__ = ['GitHubEnterpriseIntegrationArgs', 'GitHubEnterpriseIntegration']
 
@@ -169,6 +170,7 @@ class GitHubEnterpriseIntegration(pulumi.CustomResource):
         """
         Updates GitHub Enterprise Server integration settings.
 
+
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.bool] disable_code_access_for_reviews: Whether to disable code access for AI reviews
@@ -188,6 +190,7 @@ class GitHubEnterpriseIntegration(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         Updates GitHub Enterprise Server integration settings.
+
 
         :param str resource_name: The name of the resource.
         :param GitHubEnterpriseIntegrationArgs args: The arguments to use to populate this resource's properties.
@@ -359,7 +362,7 @@ class GitHubEnterpriseIntegration(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter(name="ghUrls")
-    def gh_urls(self) -> pulumi.Output[Optional[Any]]:
+    def gh_urls(self) -> pulumi.Output[Optional['outputs.GitHubAppURLs']]:
         """
         URL to configure repository access for this GitHub App installation.
         """
@@ -415,7 +418,7 @@ class GitHubEnterpriseIntegration(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter(name="neoGitHubAppPermissionRequirements")
-    def neo_git_hub_app_permission_requirements(self) -> pulumi.Output[Optional[Sequence[Any]]]:
+    def neo_git_hub_app_permission_requirements(self) -> pulumi.Output[Optional[Sequence['outputs.GitHubAppPermissionRequirement']]]:
         """
         Neo GitHub App permission requirements for this installation.
         """

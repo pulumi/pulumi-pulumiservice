@@ -2,6 +2,9 @@
 // *** Do not edit by hand unless you're certain you know what you are doing! ***
 
 import * as pulumi from "@pulumi/pulumi";
+import * as inputs from "../../types/input";
+import * as outputs from "../../types/output";
+import * as enums from "../../types/enums";
 import * as utilities from "../../utilities";
 
 /**
@@ -48,11 +51,11 @@ export class Stack extends pulumi.CustomResource {
      * Optional cloud-persisted stack configuration.
      * If set, then the stack's configuration is loaded from the cloud and not a file on disk.
      */
-    declare public readonly config: pulumi.Output<any | undefined>;
+    declare public readonly config: pulumi.Output<outputs.api.stacks.AppStackConfig | undefined>;
     /**
      * Information about a live operation currently running for the stack, its kind, the author who initiated it, and its start time. Null when no operation is in flight.
      */
-    declare public /*out*/ readonly currentOperation: pulumi.Output<any | undefined>;
+    declare public /*out*/ readonly currentOperation: pulumi.Output<outputs.api.stacks.AppOperationStatus | undefined>;
     /**
      * The organization name
      */
@@ -68,7 +71,7 @@ export class Stack extends pulumi.CustomResource {
     /**
      * Map of tags
      */
-    declare public readonly tags: pulumi.Output<{[key: string]: any} | undefined>;
+    declare public readonly tags: pulumi.Output<{[key: string]: string} | undefined>;
     /**
      * The version number
      */
@@ -126,7 +129,7 @@ export interface StackArgs {
     /**
      * The configuration for the new stack.
      */
-    config?: any | undefined;
+    config?: pulumi.Input<inputs.api.stacks.AppStackConfigArgs | undefined>;
     /**
      * The organization name
      */
@@ -142,11 +145,11 @@ export interface StackArgs {
     /**
      * An optional state to initialize the stack with.
      */
-    state?: any | undefined;
+    state?: pulumi.Input<inputs.api.stacks.AppUntypedDeploymentArgs | undefined>;
     /**
      * An optional set of tags to apply to the stack.
      */
-    tags?: pulumi.Input<{[key: string]: any} | undefined>;
+    tags?: pulumi.Input<{[key: string]: pulumi.Input<string>} | undefined>;
     /**
      * An optional set of teams to assign to the stack.
      */

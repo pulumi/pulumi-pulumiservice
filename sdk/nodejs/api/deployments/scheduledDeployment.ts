@@ -2,6 +2,9 @@
 // *** Do not edit by hand unless you're certain you know what you are doing! ***
 
 import * as pulumi from "@pulumi/pulumi";
+import * as inputs from "../../types/input";
+import * as outputs from "../../types/output";
+import * as enums from "../../types/enums";
 import * as utilities from "../../utilities";
 
 /**
@@ -41,7 +44,7 @@ export class ScheduledDeployment extends pulumi.CustomResource {
     /**
      * The action definition, which varies based on the action kind.
      */
-    declare public /*out*/ readonly definition: pulumi.Output<{[key: string]: any}>;
+    declare public /*out*/ readonly definition: pulumi.Output<{[key: string]: {[key: string]: any}}>;
     /**
      * The kind of action to be executed.
      */
@@ -147,7 +150,7 @@ export interface ScheduledDeploymentArgs {
     /**
      * Deployment request payload to execute when the schedule fires. This has the same shape and semantics as CreateDeploymentRequest used for immediate deployments.
      */
-    request?: any | undefined;
+    request?: pulumi.Input<inputs.api.deployments.CreateDeploymentRequestArgs | undefined>;
     /**
      * Cron expression defining a recurring schedule for this deployment. When set, scheduleOnce must be null. Uses standard 5-field cron syntax (MIN HOUR DOM MON DOW) and is evaluated in UTC.
      */
