@@ -1394,12 +1394,26 @@
       "description": "BasicAuth configures git authentication through basic auth —\ni.e. username and password. Both UserName and Password are required.",
       "properties": {
         "password": {
-          "$ref": "#/types/pulumiservice:api/deployments:SecretValue",
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api/deployments:SecretValue"
+            }
+          ],
           "description": "The password",
           "secret": true
         },
         "userName": {
-          "$ref": "#/types/pulumiservice:api/deployments:SecretValue",
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api/deployments:SecretValue"
+            }
+          ],
           "description": "The user name"
         }
       },
@@ -1413,12 +1427,26 @@
       "description": "Request body for basic auth.",
       "properties": {
         "password": {
-          "$ref": "#/types/pulumiservice:api/deployments:SecretValue",
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api/deployments:SecretValue"
+            }
+          ],
           "description": "The password",
           "secret": true
         },
         "userName": {
-          "$ref": "#/types/pulumiservice:api/deployments:SecretValue",
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api/deployments:SecretValue"
+            }
+          ],
           "description": "The user name"
         }
       },
@@ -1977,7 +2005,14 @@
       "description": "DockerImageCredentials describes the credentials needed to access a Docker repository.",
       "properties": {
         "password": {
-          "$ref": "#/types/pulumiservice:api/deployments:SecretValue",
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api/deployments:SecretValue"
+            }
+          ],
           "description": "The password for authenticating with the Docker registry.",
           "secret": true
         },
@@ -1996,7 +2031,14 @@
       "description": "DockerImageCredentialsRequest is the request body for specifying Docker registry credentials.",
       "properties": {
         "password": {
-          "$ref": "#/types/pulumiservice:api/deployments:SecretValue",
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api/deployments:SecretValue"
+            }
+          ],
           "description": "The password for authenticating with the Docker registry.",
           "secret": true
         },
@@ -2039,7 +2081,14 @@
       "description": "ExecutorSettingsRequest is the request body for configuring the execution environment settings.",
       "properties": {
         "executorImage": {
-          "$ref": "#/types/pulumiservice:api/deployments:DockerImageRequest",
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api/deployments:DockerImageRequest"
+            }
+          ],
           "description": "The Docker image to use for the execution environment."
         },
         "executorRootPath": {
@@ -2053,7 +2102,14 @@
       "description": "GitAuthConfig specifies git authentication configuration options.\nThere are 3 different authentication options:\n- Personal access token\n- SSH private key (and its optional password)\n- Basic auth username and password\nOnly 1 authentication mode is valid.",
       "properties": {
         "accessToken": {
-          "$ref": "#/types/pulumiservice:api/deployments:SecretValue",
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api/deployments:SecretValue"
+            }
+          ],
           "description": "Personal access token for git authentication",
           "secret": true
         },
@@ -2072,7 +2128,14 @@
       "description": "Request body for configuring git authentication options.",
       "properties": {
         "accessToken": {
-          "$ref": "#/types/pulumiservice:api/deployments:SecretValue",
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api/deployments:SecretValue"
+            }
+          ],
           "description": "Personal access token for git authentication",
           "secret": true
         },
@@ -2093,7 +2156,14 @@
         "environmentVariables": {
           "type": "object",
           "additionalProperties": {
-            "$ref": "#/types/pulumiservice:api/deployments:SecretValue"
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "$ref": "#/types/pulumiservice:api/deployments:SecretValue"
+              }
+            ]
           },
           "description": "EnvironmentVariables contains environment variables to be applied during the execution."
         },
@@ -2373,7 +2443,14 @@
         "environmentVariables": {
           "type": "object",
           "additionalProperties": {
-            "$ref": "#/types/pulumiservice:api/deployments:SecretValue"
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "$ref": "#/types/pulumiservice:api/deployments:SecretValue"
+              }
+            ]
           },
           "description": "Environment variables to apply during execution."
         },
@@ -2407,12 +2484,26 @@
       "description": "SSHAuth configures ssh-based auth for git authentication.\nSSHPrivateKey is required but password is optional.",
       "properties": {
         "password": {
-          "$ref": "#/types/pulumiservice:api/deployments:SecretValue",
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api/deployments:SecretValue"
+            }
+          ],
           "description": "An optional password or passphrase for the SSH private key.",
           "secret": true
         },
         "sshPrivateKey": {
-          "$ref": "#/types/pulumiservice:api/deployments:SecretValue",
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api/deployments:SecretValue"
+            }
+          ],
           "description": "The SSH private key used for authentication."
         }
       },
@@ -2425,12 +2516,26 @@
       "description": "Request to configure SSH-based authentication for git operations.",
       "properties": {
         "password": {
-          "$ref": "#/types/pulumiservice:api/deployments:SecretValue",
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api/deployments:SecretValue"
+            }
+          ],
           "description": "An optional password for the SSH private key.",
           "secret": true
         },
         "sshPrivateKey": {
-          "$ref": "#/types/pulumiservice:api/deployments:SecretValue",
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api/deployments:SecretValue"
+            }
+          ],
           "description": "The SSH private key for authentication."
         }
       },
@@ -2945,24 +3050,6 @@
         "organizations"
       ]
     },
-    "pulumiservice:api/services:AddServiceItem": {
-      "description": "A simple struct representing the metadata needed to add an item via user-facing information.",
-      "properties": {
-        "name": {
-          "type": "string",
-          "description": "the name (including any namespacing) of the item"
-        },
-        "type": {
-          "type": "string",
-          "description": "the type of the item to add"
-        }
-      },
-      "type": "object",
-      "required": [
-        "name",
-        "type"
-      ]
-    },
     "pulumiservice:api/services:ServiceItem": {
       "description": "An item within a service.",
       "properties": {
@@ -3132,8 +3219,6 @@
       "type": "object",
       "required": [
         "key",
-        "order",
-        "type",
         "value"
       ]
     },
@@ -8346,7 +8431,7 @@
         "items": {
           "type": "array",
           "items": {
-            "$ref": "#/types/pulumiservice:api/services:AddServiceItem"
+            "$ref": "pulumi.json#/Any"
           },
           "description": "List of items"
         },
@@ -8416,7 +8501,7 @@
         "items": {
           "type": "array",
           "items": {
-            "$ref": "#/types/pulumiservice:api/services:AddServiceItem"
+            "$ref": "pulumi.json#/Any"
           },
           "description": "an optional list of items to add during service creation"
         },

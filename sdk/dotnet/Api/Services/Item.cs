@@ -82,14 +82,14 @@ namespace Pulumi.PulumiService.Api.Services
     public sealed class ItemArgs : global::Pulumi.ResourceArgs
     {
         [Input("items", required: true)]
-        private InputList<Inputs.AddServiceItemArgs>? _items;
+        private InputList<object>? _items;
 
         /// <summary>
         /// List of items
         /// </summary>
-        public InputList<Inputs.AddServiceItemArgs> Items
+        public InputList<object> Items
         {
-            get => _items ?? (_items = new InputList<Inputs.AddServiceItemArgs>());
+            get => _items ?? (_items = new InputList<object>());
             set => _items = value;
         }
 

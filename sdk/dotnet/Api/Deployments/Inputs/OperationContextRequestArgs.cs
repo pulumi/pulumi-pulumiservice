@@ -16,14 +16,14 @@ namespace Pulumi.PulumiService.Api.Deployments.Inputs
     public sealed class OperationContextRequestArgs : global::Pulumi.ResourceArgs
     {
         [Input("environmentVariables")]
-        private InputMap<Inputs.SecretValueArgs>? _environmentVariables;
+        private InputMap<Union<string, Inputs.SecretValueArgs>>? _environmentVariables;
 
         /// <summary>
         /// Environment variables to apply during execution.
         /// </summary>
-        public InputMap<Inputs.SecretValueArgs> EnvironmentVariables
+        public InputMap<Union<string, Inputs.SecretValueArgs>> EnvironmentVariables
         {
-            get => _environmentVariables ?? (_environmentVariables = new InputMap<Inputs.SecretValueArgs>());
+            get => _environmentVariables ?? (_environmentVariables = new InputMap<Union<string, Inputs.SecretValueArgs>>());
             set => _environmentVariables = value;
         }
 

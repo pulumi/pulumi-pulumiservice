@@ -17,9 +17,9 @@ var _ = internal.GetEnvOrDefault
 // i.e. username and password. Both UserName and Password are required.
 type BasicAuth struct {
 	// The password
-	Password SecretValue `pulumi:"password"`
+	Password interface{} `pulumi:"password"`
 	// The user name
-	UserName SecretValue `pulumi:"userName"`
+	UserName interface{} `pulumi:"userName"`
 }
 
 // BasicAuth configures git authentication through basic auth —
@@ -39,13 +39,13 @@ func (o BasicAuthOutput) ToBasicAuthOutputWithContext(ctx context.Context) Basic
 }
 
 // The password
-func (o BasicAuthOutput) Password() SecretValueOutput {
-	return o.ApplyT(func(v BasicAuth) SecretValue { return v.Password }).(SecretValueOutput)
+func (o BasicAuthOutput) Password() pulumi.AnyOutput {
+	return o.ApplyT(func(v BasicAuth) interface{} { return v.Password }).(pulumi.AnyOutput)
 }
 
 // The user name
-func (o BasicAuthOutput) UserName() SecretValueOutput {
-	return o.ApplyT(func(v BasicAuth) SecretValue { return v.UserName }).(SecretValueOutput)
+func (o BasicAuthOutput) UserName() pulumi.AnyOutput {
+	return o.ApplyT(func(v BasicAuth) interface{} { return v.UserName }).(pulumi.AnyOutput)
 }
 
 type BasicAuthPtrOutput struct{ *pulumi.OutputState }
@@ -73,31 +73,31 @@ func (o BasicAuthPtrOutput) Elem() BasicAuthOutput {
 }
 
 // The password
-func (o BasicAuthPtrOutput) Password() SecretValuePtrOutput {
-	return o.ApplyT(func(v *BasicAuth) *SecretValue {
+func (o BasicAuthPtrOutput) Password() pulumi.AnyOutput {
+	return o.ApplyT(func(v *BasicAuth) interface{} {
 		if v == nil {
 			return nil
 		}
-		return &v.Password
-	}).(SecretValuePtrOutput)
+		return v.Password
+	}).(pulumi.AnyOutput)
 }
 
 // The user name
-func (o BasicAuthPtrOutput) UserName() SecretValuePtrOutput {
-	return o.ApplyT(func(v *BasicAuth) *SecretValue {
+func (o BasicAuthPtrOutput) UserName() pulumi.AnyOutput {
+	return o.ApplyT(func(v *BasicAuth) interface{} {
 		if v == nil {
 			return nil
 		}
-		return &v.UserName
-	}).(SecretValuePtrOutput)
+		return v.UserName
+	}).(pulumi.AnyOutput)
 }
 
 // Request body for basic auth.
 type BasicAuthRequest struct {
 	// The password
-	Password *SecretValue `pulumi:"password"`
+	Password interface{} `pulumi:"password"`
 	// The user name
-	UserName *SecretValue `pulumi:"userName"`
+	UserName interface{} `pulumi:"userName"`
 }
 
 // BasicAuthRequestInput is an input type that accepts BasicAuthRequestArgs and BasicAuthRequestOutput values.
@@ -114,9 +114,9 @@ type BasicAuthRequestInput interface {
 // Request body for basic auth.
 type BasicAuthRequestArgs struct {
 	// The password
-	Password SecretValuePtrInput `pulumi:"password"`
+	Password pulumi.Input `pulumi:"password"`
 	// The user name
-	UserName SecretValuePtrInput `pulumi:"userName"`
+	UserName pulumi.Input `pulumi:"userName"`
 }
 
 func (BasicAuthRequestArgs) ElementType() reflect.Type {
@@ -198,13 +198,13 @@ func (o BasicAuthRequestOutput) ToBasicAuthRequestPtrOutputWithContext(ctx conte
 }
 
 // The password
-func (o BasicAuthRequestOutput) Password() SecretValuePtrOutput {
-	return o.ApplyT(func(v BasicAuthRequest) *SecretValue { return v.Password }).(SecretValuePtrOutput)
+func (o BasicAuthRequestOutput) Password() pulumi.AnyOutput {
+	return o.ApplyT(func(v BasicAuthRequest) interface{} { return v.Password }).(pulumi.AnyOutput)
 }
 
 // The user name
-func (o BasicAuthRequestOutput) UserName() SecretValuePtrOutput {
-	return o.ApplyT(func(v BasicAuthRequest) *SecretValue { return v.UserName }).(SecretValuePtrOutput)
+func (o BasicAuthRequestOutput) UserName() pulumi.AnyOutput {
+	return o.ApplyT(func(v BasicAuthRequest) interface{} { return v.UserName }).(pulumi.AnyOutput)
 }
 
 type BasicAuthRequestPtrOutput struct{ *pulumi.OutputState }
@@ -232,23 +232,23 @@ func (o BasicAuthRequestPtrOutput) Elem() BasicAuthRequestOutput {
 }
 
 // The password
-func (o BasicAuthRequestPtrOutput) Password() SecretValuePtrOutput {
-	return o.ApplyT(func(v *BasicAuthRequest) *SecretValue {
+func (o BasicAuthRequestPtrOutput) Password() pulumi.AnyOutput {
+	return o.ApplyT(func(v *BasicAuthRequest) interface{} {
 		if v == nil {
 			return nil
 		}
 		return v.Password
-	}).(SecretValuePtrOutput)
+	}).(pulumi.AnyOutput)
 }
 
 // The user name
-func (o BasicAuthRequestPtrOutput) UserName() SecretValuePtrOutput {
-	return o.ApplyT(func(v *BasicAuthRequest) *SecretValue {
+func (o BasicAuthRequestPtrOutput) UserName() pulumi.AnyOutput {
+	return o.ApplyT(func(v *BasicAuthRequest) interface{} {
 		if v == nil {
 			return nil
 		}
 		return v.UserName
-	}).(SecretValuePtrOutput)
+	}).(pulumi.AnyOutput)
 }
 
 // Configuration options for deployment build caching.
@@ -3214,7 +3214,7 @@ func (o DockerImagePtrOutput) Reference() pulumi.StringPtrOutput {
 // DockerImageCredentials describes the credentials needed to access a Docker repository.
 type DockerImageCredentials struct {
 	// The password for authenticating with the Docker registry.
-	Password SecretValue `pulumi:"password"`
+	Password interface{} `pulumi:"password"`
 	// The username for authenticating with the Docker registry.
 	Username string `pulumi:"username"`
 }
@@ -3235,8 +3235,8 @@ func (o DockerImageCredentialsOutput) ToDockerImageCredentialsOutputWithContext(
 }
 
 // The password for authenticating with the Docker registry.
-func (o DockerImageCredentialsOutput) Password() SecretValueOutput {
-	return o.ApplyT(func(v DockerImageCredentials) SecretValue { return v.Password }).(SecretValueOutput)
+func (o DockerImageCredentialsOutput) Password() pulumi.AnyOutput {
+	return o.ApplyT(func(v DockerImageCredentials) interface{} { return v.Password }).(pulumi.AnyOutput)
 }
 
 // The username for authenticating with the Docker registry.
@@ -3269,13 +3269,13 @@ func (o DockerImageCredentialsPtrOutput) Elem() DockerImageCredentialsOutput {
 }
 
 // The password for authenticating with the Docker registry.
-func (o DockerImageCredentialsPtrOutput) Password() SecretValuePtrOutput {
-	return o.ApplyT(func(v *DockerImageCredentials) *SecretValue {
+func (o DockerImageCredentialsPtrOutput) Password() pulumi.AnyOutput {
+	return o.ApplyT(func(v *DockerImageCredentials) interface{} {
 		if v == nil {
 			return nil
 		}
-		return &v.Password
-	}).(SecretValuePtrOutput)
+		return v.Password
+	}).(pulumi.AnyOutput)
 }
 
 // The username for authenticating with the Docker registry.
@@ -3291,7 +3291,7 @@ func (o DockerImageCredentialsPtrOutput) Username() pulumi.StringPtrOutput {
 // DockerImageCredentialsRequest is the request body for specifying Docker registry credentials.
 type DockerImageCredentialsRequest struct {
 	// The password for authenticating with the Docker registry.
-	Password *SecretValue `pulumi:"password"`
+	Password interface{} `pulumi:"password"`
 	// The username for authenticating with the Docker registry.
 	Username *string `pulumi:"username"`
 }
@@ -3310,7 +3310,7 @@ type DockerImageCredentialsRequestInput interface {
 // DockerImageCredentialsRequest is the request body for specifying Docker registry credentials.
 type DockerImageCredentialsRequestArgs struct {
 	// The password for authenticating with the Docker registry.
-	Password SecretValuePtrInput `pulumi:"password"`
+	Password pulumi.Input `pulumi:"password"`
 	// The username for authenticating with the Docker registry.
 	Username pulumi.StringPtrInput `pulumi:"username"`
 }
@@ -3394,8 +3394,8 @@ func (o DockerImageCredentialsRequestOutput) ToDockerImageCredentialsRequestPtrO
 }
 
 // The password for authenticating with the Docker registry.
-func (o DockerImageCredentialsRequestOutput) Password() SecretValuePtrOutput {
-	return o.ApplyT(func(v DockerImageCredentialsRequest) *SecretValue { return v.Password }).(SecretValuePtrOutput)
+func (o DockerImageCredentialsRequestOutput) Password() pulumi.AnyOutput {
+	return o.ApplyT(func(v DockerImageCredentialsRequest) interface{} { return v.Password }).(pulumi.AnyOutput)
 }
 
 // The username for authenticating with the Docker registry.
@@ -3428,13 +3428,13 @@ func (o DockerImageCredentialsRequestPtrOutput) Elem() DockerImageCredentialsReq
 }
 
 // The password for authenticating with the Docker registry.
-func (o DockerImageCredentialsRequestPtrOutput) Password() SecretValuePtrOutput {
-	return o.ApplyT(func(v *DockerImageCredentialsRequest) *SecretValue {
+func (o DockerImageCredentialsRequestPtrOutput) Password() pulumi.AnyOutput {
+	return o.ApplyT(func(v *DockerImageCredentialsRequest) interface{} {
 		if v == nil {
 			return nil
 		}
 		return v.Password
-	}).(SecretValuePtrOutput)
+	}).(pulumi.AnyOutput)
 }
 
 // The username for authenticating with the Docker registry.
@@ -3686,7 +3686,7 @@ func (o ExecutorContextPtrOutput) ExecutorRootPath() pulumi.StringPtrOutput {
 // ExecutorSettingsRequest is the request body for configuring the execution environment settings.
 type ExecutorSettingsRequest struct {
 	// The Docker image to use for the execution environment.
-	ExecutorImage *DockerImageRequest `pulumi:"executorImage"`
+	ExecutorImage interface{} `pulumi:"executorImage"`
 	// The root path for the executor binary and working directory.
 	ExecutorRootPath *string `pulumi:"executorRootPath"`
 }
@@ -3705,7 +3705,7 @@ type ExecutorSettingsRequestInput interface {
 // ExecutorSettingsRequest is the request body for configuring the execution environment settings.
 type ExecutorSettingsRequestArgs struct {
 	// The Docker image to use for the execution environment.
-	ExecutorImage DockerImageRequestPtrInput `pulumi:"executorImage"`
+	ExecutorImage pulumi.Input `pulumi:"executorImage"`
 	// The root path for the executor binary and working directory.
 	ExecutorRootPath pulumi.StringPtrInput `pulumi:"executorRootPath"`
 }
@@ -3789,8 +3789,8 @@ func (o ExecutorSettingsRequestOutput) ToExecutorSettingsRequestPtrOutputWithCon
 }
 
 // The Docker image to use for the execution environment.
-func (o ExecutorSettingsRequestOutput) ExecutorImage() DockerImageRequestPtrOutput {
-	return o.ApplyT(func(v ExecutorSettingsRequest) *DockerImageRequest { return v.ExecutorImage }).(DockerImageRequestPtrOutput)
+func (o ExecutorSettingsRequestOutput) ExecutorImage() pulumi.AnyOutput {
+	return o.ApplyT(func(v ExecutorSettingsRequest) interface{} { return v.ExecutorImage }).(pulumi.AnyOutput)
 }
 
 // The root path for the executor binary and working directory.
@@ -3823,13 +3823,13 @@ func (o ExecutorSettingsRequestPtrOutput) Elem() ExecutorSettingsRequestOutput {
 }
 
 // The Docker image to use for the execution environment.
-func (o ExecutorSettingsRequestPtrOutput) ExecutorImage() DockerImageRequestPtrOutput {
-	return o.ApplyT(func(v *ExecutorSettingsRequest) *DockerImageRequest {
+func (o ExecutorSettingsRequestPtrOutput) ExecutorImage() pulumi.AnyOutput {
+	return o.ApplyT(func(v *ExecutorSettingsRequest) interface{} {
 		if v == nil {
 			return nil
 		}
 		return v.ExecutorImage
-	}).(DockerImageRequestPtrOutput)
+	}).(pulumi.AnyOutput)
 }
 
 // The root path for the executor binary and working directory.
@@ -3850,7 +3850,7 @@ func (o ExecutorSettingsRequestPtrOutput) ExecutorRootPath() pulumi.StringPtrOut
 //     Only 1 authentication mode is valid.
 type GitAuthConfig struct {
 	// Personal access token for git authentication
-	AccessToken *SecretValue `pulumi:"accessToken"`
+	AccessToken interface{} `pulumi:"accessToken"`
 	// Basic auth username and password configuration
 	BasicAuth *BasicAuth `pulumi:"basicAuth"`
 	// SSH private key authentication configuration
@@ -3878,8 +3878,8 @@ func (o GitAuthConfigOutput) ToGitAuthConfigOutputWithContext(ctx context.Contex
 }
 
 // Personal access token for git authentication
-func (o GitAuthConfigOutput) AccessToken() SecretValuePtrOutput {
-	return o.ApplyT(func(v GitAuthConfig) *SecretValue { return v.AccessToken }).(SecretValuePtrOutput)
+func (o GitAuthConfigOutput) AccessToken() pulumi.AnyOutput {
+	return o.ApplyT(func(v GitAuthConfig) interface{} { return v.AccessToken }).(pulumi.AnyOutput)
 }
 
 // Basic auth username and password configuration
@@ -3917,13 +3917,13 @@ func (o GitAuthConfigPtrOutput) Elem() GitAuthConfigOutput {
 }
 
 // Personal access token for git authentication
-func (o GitAuthConfigPtrOutput) AccessToken() SecretValuePtrOutput {
-	return o.ApplyT(func(v *GitAuthConfig) *SecretValue {
+func (o GitAuthConfigPtrOutput) AccessToken() pulumi.AnyOutput {
+	return o.ApplyT(func(v *GitAuthConfig) interface{} {
 		if v == nil {
 			return nil
 		}
 		return v.AccessToken
-	}).(SecretValuePtrOutput)
+	}).(pulumi.AnyOutput)
 }
 
 // Basic auth username and password configuration
@@ -3949,7 +3949,7 @@ func (o GitAuthConfigPtrOutput) SshAuth() SSHAuthPtrOutput {
 // Request body for configuring git authentication options.
 type GitAuthConfigRequest struct {
 	// Personal access token for git authentication
-	AccessToken *SecretValue `pulumi:"accessToken"`
+	AccessToken interface{} `pulumi:"accessToken"`
 	// Basic authentication configuration
 	BasicAuth *BasicAuthRequest `pulumi:"basicAuth"`
 	// SSH authentication configuration
@@ -3970,7 +3970,7 @@ type GitAuthConfigRequestInput interface {
 // Request body for configuring git authentication options.
 type GitAuthConfigRequestArgs struct {
 	// Personal access token for git authentication
-	AccessToken SecretValuePtrInput `pulumi:"accessToken"`
+	AccessToken pulumi.Input `pulumi:"accessToken"`
 	// Basic authentication configuration
 	BasicAuth BasicAuthRequestPtrInput `pulumi:"basicAuth"`
 	// SSH authentication configuration
@@ -4056,8 +4056,8 @@ func (o GitAuthConfigRequestOutput) ToGitAuthConfigRequestPtrOutputWithContext(c
 }
 
 // Personal access token for git authentication
-func (o GitAuthConfigRequestOutput) AccessToken() SecretValuePtrOutput {
-	return o.ApplyT(func(v GitAuthConfigRequest) *SecretValue { return v.AccessToken }).(SecretValuePtrOutput)
+func (o GitAuthConfigRequestOutput) AccessToken() pulumi.AnyOutput {
+	return o.ApplyT(func(v GitAuthConfigRequest) interface{} { return v.AccessToken }).(pulumi.AnyOutput)
 }
 
 // Basic authentication configuration
@@ -4095,13 +4095,13 @@ func (o GitAuthConfigRequestPtrOutput) Elem() GitAuthConfigRequestOutput {
 }
 
 // Personal access token for git authentication
-func (o GitAuthConfigRequestPtrOutput) AccessToken() SecretValuePtrOutput {
-	return o.ApplyT(func(v *GitAuthConfigRequest) *SecretValue {
+func (o GitAuthConfigRequestPtrOutput) AccessToken() pulumi.AnyOutput {
+	return o.ApplyT(func(v *GitAuthConfigRequest) interface{} {
 		if v == nil {
 			return nil
 		}
 		return v.AccessToken
-	}).(SecretValuePtrOutput)
+	}).(pulumi.AnyOutput)
 }
 
 // Basic authentication configuration
@@ -4127,7 +4127,7 @@ func (o GitAuthConfigRequestPtrOutput) SshAuth() SSHAuthRequestPtrOutput {
 // OperationContext describes what to do.
 type OperationContext struct {
 	// EnvironmentVariables contains environment variables to be applied during the execution.
-	EnvironmentVariables map[string]SecretValue `pulumi:"environmentVariables"`
+	EnvironmentVariables map[string]interface{} `pulumi:"environmentVariables"`
 	// OIDC contains the OIDC configuration for the operation.
 	Oidc *OperationContextOIDCConfiguration `pulumi:"oidc"`
 	// The Pulumi operation to perform (e.g. update, preview, refresh, destroy).
@@ -4157,8 +4157,8 @@ func (o OperationContextOutput) ToOperationContextOutputWithContext(ctx context.
 }
 
 // EnvironmentVariables contains environment variables to be applied during the execution.
-func (o OperationContextOutput) EnvironmentVariables() SecretValueMapOutput {
-	return o.ApplyT(func(v OperationContext) map[string]SecretValue { return v.EnvironmentVariables }).(SecretValueMapOutput)
+func (o OperationContextOutput) EnvironmentVariables() pulumi.MapOutput {
+	return o.ApplyT(func(v OperationContext) map[string]interface{} { return v.EnvironmentVariables }).(pulumi.MapOutput)
 }
 
 // OIDC contains the OIDC configuration for the operation.
@@ -4212,13 +4212,13 @@ func (o OperationContextPtrOutput) Elem() OperationContextOutput {
 }
 
 // EnvironmentVariables contains environment variables to be applied during the execution.
-func (o OperationContextPtrOutput) EnvironmentVariables() SecretValueMapOutput {
-	return o.ApplyT(func(v *OperationContext) map[string]SecretValue {
+func (o OperationContextPtrOutput) EnvironmentVariables() pulumi.MapOutput {
+	return o.ApplyT(func(v *OperationContext) map[string]interface{} {
 		if v == nil {
 			return nil
 		}
 		return v.EnvironmentVariables
-	}).(SecretValueMapOutput)
+	}).(pulumi.MapOutput)
 }
 
 // OIDC contains the OIDC configuration for the operation.
@@ -5880,7 +5880,7 @@ func (o OperationContextOptionsRequestPtrOutput) SkipIntermediateDeployments() p
 // Request body for updating an operation context.
 type OperationContextRequest struct {
 	// Environment variables to apply during execution.
-	EnvironmentVariables map[string]SecretValue `pulumi:"environmentVariables"`
+	EnvironmentVariables map[string]interface{} `pulumi:"environmentVariables"`
 	// The OIDC configuration for the operation.
 	Oidc *OperationContextOIDCConfigurationRequest `pulumi:"oidc"`
 	// The Pulumi operation to perform (e.g. update, preview, destroy).
@@ -5907,7 +5907,7 @@ type OperationContextRequestInput interface {
 // Request body for updating an operation context.
 type OperationContextRequestArgs struct {
 	// Environment variables to apply during execution.
-	EnvironmentVariables SecretValueMapInput `pulumi:"environmentVariables"`
+	EnvironmentVariables pulumi.MapInput `pulumi:"environmentVariables"`
 	// The OIDC configuration for the operation.
 	Oidc OperationContextOIDCConfigurationRequestPtrInput `pulumi:"oidc"`
 	// The Pulumi operation to perform (e.g. update, preview, destroy).
@@ -5999,8 +5999,8 @@ func (o OperationContextRequestOutput) ToOperationContextRequestPtrOutputWithCon
 }
 
 // Environment variables to apply during execution.
-func (o OperationContextRequestOutput) EnvironmentVariables() SecretValueMapOutput {
-	return o.ApplyT(func(v OperationContextRequest) map[string]SecretValue { return v.EnvironmentVariables }).(SecretValueMapOutput)
+func (o OperationContextRequestOutput) EnvironmentVariables() pulumi.MapOutput {
+	return o.ApplyT(func(v OperationContextRequest) map[string]interface{} { return v.EnvironmentVariables }).(pulumi.MapOutput)
 }
 
 // The OIDC configuration for the operation.
@@ -6053,13 +6053,13 @@ func (o OperationContextRequestPtrOutput) Elem() OperationContextRequestOutput {
 }
 
 // Environment variables to apply during execution.
-func (o OperationContextRequestPtrOutput) EnvironmentVariables() SecretValueMapOutput {
-	return o.ApplyT(func(v *OperationContextRequest) map[string]SecretValue {
+func (o OperationContextRequestPtrOutput) EnvironmentVariables() pulumi.MapOutput {
+	return o.ApplyT(func(v *OperationContextRequest) map[string]interface{} {
 		if v == nil {
 			return nil
 		}
 		return v.EnvironmentVariables
-	}).(SecretValueMapOutput)
+	}).(pulumi.MapOutput)
 }
 
 // The OIDC configuration for the operation.
@@ -6116,9 +6116,9 @@ func (o OperationContextRequestPtrOutput) Role() DeploymentRoleRequestPtrOutput 
 // SSHPrivateKey is required but password is optional.
 type SSHAuth struct {
 	// An optional password or passphrase for the SSH private key.
-	Password *SecretValue `pulumi:"password"`
+	Password interface{} `pulumi:"password"`
 	// The SSH private key used for authentication.
-	SshPrivateKey SecretValue `pulumi:"sshPrivateKey"`
+	SshPrivateKey interface{} `pulumi:"sshPrivateKey"`
 }
 
 // SSHAuth configures ssh-based auth for git authentication.
@@ -6138,13 +6138,13 @@ func (o SSHAuthOutput) ToSSHAuthOutputWithContext(ctx context.Context) SSHAuthOu
 }
 
 // An optional password or passphrase for the SSH private key.
-func (o SSHAuthOutput) Password() SecretValuePtrOutput {
-	return o.ApplyT(func(v SSHAuth) *SecretValue { return v.Password }).(SecretValuePtrOutput)
+func (o SSHAuthOutput) Password() pulumi.AnyOutput {
+	return o.ApplyT(func(v SSHAuth) interface{} { return v.Password }).(pulumi.AnyOutput)
 }
 
 // The SSH private key used for authentication.
-func (o SSHAuthOutput) SshPrivateKey() SecretValueOutput {
-	return o.ApplyT(func(v SSHAuth) SecretValue { return v.SshPrivateKey }).(SecretValueOutput)
+func (o SSHAuthOutput) SshPrivateKey() pulumi.AnyOutput {
+	return o.ApplyT(func(v SSHAuth) interface{} { return v.SshPrivateKey }).(pulumi.AnyOutput)
 }
 
 type SSHAuthPtrOutput struct{ *pulumi.OutputState }
@@ -6172,31 +6172,31 @@ func (o SSHAuthPtrOutput) Elem() SSHAuthOutput {
 }
 
 // An optional password or passphrase for the SSH private key.
-func (o SSHAuthPtrOutput) Password() SecretValuePtrOutput {
-	return o.ApplyT(func(v *SSHAuth) *SecretValue {
+func (o SSHAuthPtrOutput) Password() pulumi.AnyOutput {
+	return o.ApplyT(func(v *SSHAuth) interface{} {
 		if v == nil {
 			return nil
 		}
 		return v.Password
-	}).(SecretValuePtrOutput)
+	}).(pulumi.AnyOutput)
 }
 
 // The SSH private key used for authentication.
-func (o SSHAuthPtrOutput) SshPrivateKey() SecretValuePtrOutput {
-	return o.ApplyT(func(v *SSHAuth) *SecretValue {
+func (o SSHAuthPtrOutput) SshPrivateKey() pulumi.AnyOutput {
+	return o.ApplyT(func(v *SSHAuth) interface{} {
 		if v == nil {
 			return nil
 		}
-		return &v.SshPrivateKey
-	}).(SecretValuePtrOutput)
+		return v.SshPrivateKey
+	}).(pulumi.AnyOutput)
 }
 
 // Request to configure SSH-based authentication for git operations.
 type SSHAuthRequest struct {
 	// An optional password for the SSH private key.
-	Password *SecretValue `pulumi:"password"`
+	Password interface{} `pulumi:"password"`
 	// The SSH private key for authentication.
-	SshPrivateKey *SecretValue `pulumi:"sshPrivateKey"`
+	SshPrivateKey interface{} `pulumi:"sshPrivateKey"`
 }
 
 // SSHAuthRequestInput is an input type that accepts SSHAuthRequestArgs and SSHAuthRequestOutput values.
@@ -6213,9 +6213,9 @@ type SSHAuthRequestInput interface {
 // Request to configure SSH-based authentication for git operations.
 type SSHAuthRequestArgs struct {
 	// An optional password for the SSH private key.
-	Password SecretValuePtrInput `pulumi:"password"`
+	Password pulumi.Input `pulumi:"password"`
 	// The SSH private key for authentication.
-	SshPrivateKey SecretValuePtrInput `pulumi:"sshPrivateKey"`
+	SshPrivateKey pulumi.Input `pulumi:"sshPrivateKey"`
 }
 
 func (SSHAuthRequestArgs) ElementType() reflect.Type {
@@ -6297,13 +6297,13 @@ func (o SSHAuthRequestOutput) ToSSHAuthRequestPtrOutputWithContext(ctx context.C
 }
 
 // An optional password for the SSH private key.
-func (o SSHAuthRequestOutput) Password() SecretValuePtrOutput {
-	return o.ApplyT(func(v SSHAuthRequest) *SecretValue { return v.Password }).(SecretValuePtrOutput)
+func (o SSHAuthRequestOutput) Password() pulumi.AnyOutput {
+	return o.ApplyT(func(v SSHAuthRequest) interface{} { return v.Password }).(pulumi.AnyOutput)
 }
 
 // The SSH private key for authentication.
-func (o SSHAuthRequestOutput) SshPrivateKey() SecretValuePtrOutput {
-	return o.ApplyT(func(v SSHAuthRequest) *SecretValue { return v.SshPrivateKey }).(SecretValuePtrOutput)
+func (o SSHAuthRequestOutput) SshPrivateKey() pulumi.AnyOutput {
+	return o.ApplyT(func(v SSHAuthRequest) interface{} { return v.SshPrivateKey }).(pulumi.AnyOutput)
 }
 
 type SSHAuthRequestPtrOutput struct{ *pulumi.OutputState }
@@ -6331,23 +6331,23 @@ func (o SSHAuthRequestPtrOutput) Elem() SSHAuthRequestOutput {
 }
 
 // An optional password for the SSH private key.
-func (o SSHAuthRequestPtrOutput) Password() SecretValuePtrOutput {
-	return o.ApplyT(func(v *SSHAuthRequest) *SecretValue {
+func (o SSHAuthRequestPtrOutput) Password() pulumi.AnyOutput {
+	return o.ApplyT(func(v *SSHAuthRequest) interface{} {
 		if v == nil {
 			return nil
 		}
 		return v.Password
-	}).(SecretValuePtrOutput)
+	}).(pulumi.AnyOutput)
 }
 
 // The SSH private key for authentication.
-func (o SSHAuthRequestPtrOutput) SshPrivateKey() SecretValuePtrOutput {
-	return o.ApplyT(func(v *SSHAuthRequest) *SecretValue {
+func (o SSHAuthRequestPtrOutput) SshPrivateKey() pulumi.AnyOutput {
+	return o.ApplyT(func(v *SSHAuthRequest) interface{} {
 		if v == nil {
 			return nil
 		}
 		return v.SshPrivateKey
-	}).(SecretValuePtrOutput)
+	}).(pulumi.AnyOutput)
 }
 
 // A SecretValue describes a secret value on the wire. The JSON representation is an object with a required 'secret' field containing the plaintext and an optional 'ciphertext' field containing the encrypted representation.
@@ -6432,31 +6432,6 @@ func (i *secretValuePtrType) ToSecretValuePtrOutput() SecretValuePtrOutput {
 
 func (i *secretValuePtrType) ToSecretValuePtrOutputWithContext(ctx context.Context) SecretValuePtrOutput {
 	return pulumi.ToOutputWithContext(ctx, i).(SecretValuePtrOutput)
-}
-
-// SecretValueMapInput is an input type that accepts SecretValueMap and SecretValueMapOutput values.
-// You can construct a concrete instance of `SecretValueMapInput` via:
-//
-//	SecretValueMap{ "key": SecretValueArgs{...} }
-type SecretValueMapInput interface {
-	pulumi.Input
-
-	ToSecretValueMapOutput() SecretValueMapOutput
-	ToSecretValueMapOutputWithContext(context.Context) SecretValueMapOutput
-}
-
-type SecretValueMap map[string]SecretValueInput
-
-func (SecretValueMap) ElementType() reflect.Type {
-	return reflect.TypeOf((*map[string]SecretValue)(nil)).Elem()
-}
-
-func (i SecretValueMap) ToSecretValueMapOutput() SecretValueMapOutput {
-	return i.ToSecretValueMapOutputWithContext(context.Background())
-}
-
-func (i SecretValueMap) ToSecretValueMapOutputWithContext(ctx context.Context) SecretValueMapOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(SecretValueMapOutput)
 }
 
 // A SecretValue describes a secret value on the wire. The JSON representation is an object with a required 'secret' field containing the plaintext and an optional 'ciphertext' field containing the encrypted representation.
@@ -6551,26 +6526,6 @@ func (o SecretValuePtrOutput) Secret() pulumi.StringPtrOutput {
 		}
 		return &v.Secret
 	}).(pulumi.StringPtrOutput)
-}
-
-type SecretValueMapOutput struct{ *pulumi.OutputState }
-
-func (SecretValueMapOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((*map[string]SecretValue)(nil)).Elem()
-}
-
-func (o SecretValueMapOutput) ToSecretValueMapOutput() SecretValueMapOutput {
-	return o
-}
-
-func (o SecretValueMapOutput) ToSecretValueMapOutputWithContext(ctx context.Context) SecretValueMapOutput {
-	return o
-}
-
-func (o SecretValueMapOutput) MapIndex(k pulumi.StringInput) SecretValueOutput {
-	return pulumi.All(o, k).ApplyT(func(vs []interface{}) SecretValue {
-		return vs[0].(map[string]SecretValue)[vs[1].(string)]
-	}).(SecretValueOutput)
 }
 
 // SourceContext describes some source code, and how to obtain it.
@@ -8024,7 +7979,6 @@ func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*SSHAuthRequestPtrInput)(nil)).Elem(), SSHAuthRequestArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*SecretValueInput)(nil)).Elem(), SecretValueArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*SecretValuePtrInput)(nil)).Elem(), SecretValueArgs{})
-	pulumi.RegisterInputType(reflect.TypeOf((*SecretValueMapInput)(nil)).Elem(), SecretValueMap{})
 	pulumi.RegisterInputType(reflect.TypeOf((*SourceContextGitRequestInput)(nil)).Elem(), SourceContextGitRequestArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*SourceContextGitRequestPtrInput)(nil)).Elem(), SourceContextGitRequestArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*SourceContextHgRequestInput)(nil)).Elem(), SourceContextHgRequestArgs{})
@@ -8107,7 +8061,6 @@ func init() {
 	pulumi.RegisterOutputType(SSHAuthRequestPtrOutput{})
 	pulumi.RegisterOutputType(SecretValueOutput{})
 	pulumi.RegisterOutputType(SecretValuePtrOutput{})
-	pulumi.RegisterOutputType(SecretValueMapOutput{})
 	pulumi.RegisterOutputType(SourceContextOutput{})
 	pulumi.RegisterOutputType(SourceContextPtrOutput{})
 	pulumi.RegisterOutputType(SourceContextGitOutput{})

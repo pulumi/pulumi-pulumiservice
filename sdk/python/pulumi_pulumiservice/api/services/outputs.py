@@ -388,21 +388,23 @@ class ServiceProperty(dict):
     """
     def __init__(__self__, *,
                  key: _builtins.str,
-                 order: _builtins.int,
-                 type: _builtins.str,
-                 value: _builtins.str):
+                 value: _builtins.str,
+                 order: Optional[_builtins.int] = None,
+                 type: Optional[_builtins.str] = None):
         """
         A property that the service will show in it's metadata.
 
         :param _builtins.str key: the name of the property
+        :param _builtins.str value: the value of the property
         :param _builtins.int order: the position of the property
         :param _builtins.str type: the type of the property
-        :param _builtins.str value: the value of the property
         """
         pulumi.set(__self__, "key", key)
-        pulumi.set(__self__, "order", order)
-        pulumi.set(__self__, "type", type)
         pulumi.set(__self__, "value", value)
+        if order is not None:
+            pulumi.set(__self__, "order", order)
+        if type is not None:
+            pulumi.set(__self__, "type", type)
 
     @_builtins.property
     @pulumi.getter
@@ -414,7 +416,15 @@ class ServiceProperty(dict):
 
     @_builtins.property
     @pulumi.getter
-    def order(self) -> _builtins.int:
+    def value(self) -> _builtins.str:
+        """
+        the value of the property
+        """
+        return pulumi.get(self, "value")
+
+    @_builtins.property
+    @pulumi.getter
+    def order(self) -> Optional[_builtins.int]:
         """
         the position of the property
         """
@@ -422,18 +432,10 @@ class ServiceProperty(dict):
 
     @_builtins.property
     @pulumi.getter
-    def type(self) -> _builtins.str:
+    def type(self) -> Optional[_builtins.str]:
         """
         the type of the property
         """
         return pulumi.get(self, "type")
-
-    @_builtins.property
-    @pulumi.getter
-    def value(self) -> _builtins.str:
-        """
-        the value of the property
-        """
-        return pulumi.get(self, "value")
 
 

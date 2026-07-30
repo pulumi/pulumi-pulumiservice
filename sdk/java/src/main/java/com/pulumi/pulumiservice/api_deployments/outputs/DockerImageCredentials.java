@@ -3,6 +3,7 @@
 
 package com.pulumi.pulumiservice.api_deployments.outputs;
 
+import com.pulumi.core.Either;
 import com.pulumi.core.annotations.CustomType;
 import com.pulumi.exceptions.MissingRequiredPropertyException;
 import com.pulumi.pulumiservice.api_deployments.outputs.SecretValue;
@@ -15,7 +16,7 @@ public final class DockerImageCredentials {
      * @return The password for authenticating with the Docker registry.
      * 
      */
-    private SecretValue password;
+    private Either<String,SecretValue> password;
     /**
      * @return The username for authenticating with the Docker registry.
      * 
@@ -27,7 +28,7 @@ public final class DockerImageCredentials {
      * @return The password for authenticating with the Docker registry.
      * 
      */
-    public SecretValue password() {
+    public Either<String,SecretValue> password() {
         return this.password;
     }
     /**
@@ -47,7 +48,7 @@ public final class DockerImageCredentials {
     }
     @CustomType.Builder
     public static final class Builder {
-        private SecretValue password;
+        private Either<String,SecretValue> password;
         private String username;
         public Builder() {}
         public Builder(DockerImageCredentials defaults) {
@@ -57,7 +58,7 @@ public final class DockerImageCredentials {
         }
 
         @CustomType.Setter
-        public Builder password(SecretValue password) {
+        public Builder password(Either<String,SecretValue> password) {
             if (password == null) {
               throw new MissingRequiredPropertyException("DockerImageCredentials", "password");
             }

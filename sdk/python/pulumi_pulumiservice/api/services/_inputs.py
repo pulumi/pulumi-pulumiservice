@@ -15,63 +15,9 @@ else:
 from ... import _utilities
 
 __all__ = [
-    'AddServiceItemArgs',
-    'AddServiceItemArgsDict',
     'ServicePropertyArgs',
     'ServicePropertyArgsDict',
 ]
-
-class AddServiceItemArgsDict(TypedDict):
-    """
-    A simple struct representing the metadata needed to add an item via user-facing information.
-    """
-    name: pulumi.Input[_builtins.str]
-    """
-    the name (including any namespacing) of the item
-    """
-    type: pulumi.Input[_builtins.str]
-    """
-    the type of the item to add
-    """
-
-@pulumi.input_type
-class AddServiceItemArgs:
-    def __init__(__self__, *,
-                 name: pulumi.Input[_builtins.str],
-                 type: pulumi.Input[_builtins.str]):
-        """
-        A simple struct representing the metadata needed to add an item via user-facing information.
-
-        :param pulumi.Input[_builtins.str] name: the name (including any namespacing) of the item
-        :param pulumi.Input[_builtins.str] type: the type of the item to add
-        """
-        pulumi.set(__self__, "name", name)
-        pulumi.set(__self__, "type", type)
-
-    @_builtins.property
-    @pulumi.getter
-    def name(self) -> pulumi.Input[_builtins.str]:
-        """
-        the name (including any namespacing) of the item
-        """
-        return pulumi.get(self, "name")
-
-    @name.setter
-    def name(self, value: pulumi.Input[_builtins.str]):
-        pulumi.set(self, "name", value)
-
-    @_builtins.property
-    @pulumi.getter
-    def type(self) -> pulumi.Input[_builtins.str]:
-        """
-        the type of the item to add
-        """
-        return pulumi.get(self, "type")
-
-    @type.setter
-    def type(self, value: pulumi.Input[_builtins.str]):
-        pulumi.set(self, "type", value)
-
 
 class ServicePropertyArgsDict(TypedDict):
     """
@@ -81,38 +27,40 @@ class ServicePropertyArgsDict(TypedDict):
     """
     the name of the property
     """
-    order: pulumi.Input[_builtins.int]
-    """
-    the position of the property
-    """
-    type: pulumi.Input[_builtins.str]
-    """
-    the type of the property
-    """
     value: pulumi.Input[_builtins.str]
     """
     the value of the property
+    """
+    order: NotRequired[pulumi.Input[Optional[_builtins.int]]]
+    """
+    the position of the property
+    """
+    type: NotRequired[pulumi.Input[Optional[_builtins.str]]]
+    """
+    the type of the property
     """
 
 @pulumi.input_type
 class ServicePropertyArgs:
     def __init__(__self__, *,
                  key: pulumi.Input[_builtins.str],
-                 order: pulumi.Input[_builtins.int],
-                 type: pulumi.Input[_builtins.str],
-                 value: pulumi.Input[_builtins.str]):
+                 value: pulumi.Input[_builtins.str],
+                 order: pulumi.Input[Optional[_builtins.int]] = None,
+                 type: pulumi.Input[Optional[_builtins.str]] = None):
         """
         A property that the service will show in it's metadata.
 
         :param pulumi.Input[_builtins.str] key: the name of the property
+        :param pulumi.Input[_builtins.str] value: the value of the property
         :param pulumi.Input[_builtins.int] order: the position of the property
         :param pulumi.Input[_builtins.str] type: the type of the property
-        :param pulumi.Input[_builtins.str] value: the value of the property
         """
         pulumi.set(__self__, "key", key)
-        pulumi.set(__self__, "order", order)
-        pulumi.set(__self__, "type", type)
         pulumi.set(__self__, "value", value)
+        if order is not None:
+            pulumi.set(__self__, "order", order)
+        if type is not None:
+            pulumi.set(__self__, "type", type)
 
     @_builtins.property
     @pulumi.getter
@@ -128,30 +76,6 @@ class ServicePropertyArgs:
 
     @_builtins.property
     @pulumi.getter
-    def order(self) -> pulumi.Input[_builtins.int]:
-        """
-        the position of the property
-        """
-        return pulumi.get(self, "order")
-
-    @order.setter
-    def order(self, value: pulumi.Input[_builtins.int]):
-        pulumi.set(self, "order", value)
-
-    @_builtins.property
-    @pulumi.getter
-    def type(self) -> pulumi.Input[_builtins.str]:
-        """
-        the type of the property
-        """
-        return pulumi.get(self, "type")
-
-    @type.setter
-    def type(self, value: pulumi.Input[_builtins.str]):
-        pulumi.set(self, "type", value)
-
-    @_builtins.property
-    @pulumi.getter
     def value(self) -> pulumi.Input[_builtins.str]:
         """
         the value of the property
@@ -161,5 +85,29 @@ class ServicePropertyArgs:
     @value.setter
     def value(self, value: pulumi.Input[_builtins.str]):
         pulumi.set(self, "value", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def order(self) -> pulumi.Input[Optional[_builtins.int]]:
+        """
+        the position of the property
+        """
+        return pulumi.get(self, "order")
+
+    @order.setter
+    def order(self, value: pulumi.Input[Optional[_builtins.int]]):
+        pulumi.set(self, "order", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def type(self) -> pulumi.Input[Optional[_builtins.str]]:
+        """
+        the type of the property
+        """
+        return pulumi.get(self, "type")
+
+    @type.setter
+    def type(self, value: pulumi.Input[Optional[_builtins.str]]):
+        pulumi.set(self, "type", value)
 
 

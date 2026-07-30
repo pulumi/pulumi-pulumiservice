@@ -13,115 +13,6 @@ import (
 
 var _ = internal.GetEnvOrDefault
 
-// A simple struct representing the metadata needed to add an item via user-facing information.
-type AddServiceItem struct {
-	// the name (including any namespacing) of the item
-	Name string `pulumi:"name"`
-	// the type of the item to add
-	Type string `pulumi:"type"`
-}
-
-// AddServiceItemInput is an input type that accepts AddServiceItemArgs and AddServiceItemOutput values.
-// You can construct a concrete instance of `AddServiceItemInput` via:
-//
-//	AddServiceItemArgs{...}
-type AddServiceItemInput interface {
-	pulumi.Input
-
-	ToAddServiceItemOutput() AddServiceItemOutput
-	ToAddServiceItemOutputWithContext(context.Context) AddServiceItemOutput
-}
-
-// A simple struct representing the metadata needed to add an item via user-facing information.
-type AddServiceItemArgs struct {
-	// the name (including any namespacing) of the item
-	Name pulumi.StringInput `pulumi:"name"`
-	// the type of the item to add
-	Type pulumi.StringInput `pulumi:"type"`
-}
-
-func (AddServiceItemArgs) ElementType() reflect.Type {
-	return reflect.TypeOf((*AddServiceItem)(nil)).Elem()
-}
-
-func (i AddServiceItemArgs) ToAddServiceItemOutput() AddServiceItemOutput {
-	return i.ToAddServiceItemOutputWithContext(context.Background())
-}
-
-func (i AddServiceItemArgs) ToAddServiceItemOutputWithContext(ctx context.Context) AddServiceItemOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(AddServiceItemOutput)
-}
-
-// AddServiceItemArrayInput is an input type that accepts AddServiceItemArray and AddServiceItemArrayOutput values.
-// You can construct a concrete instance of `AddServiceItemArrayInput` via:
-//
-//	AddServiceItemArray{ AddServiceItemArgs{...} }
-type AddServiceItemArrayInput interface {
-	pulumi.Input
-
-	ToAddServiceItemArrayOutput() AddServiceItemArrayOutput
-	ToAddServiceItemArrayOutputWithContext(context.Context) AddServiceItemArrayOutput
-}
-
-type AddServiceItemArray []AddServiceItemInput
-
-func (AddServiceItemArray) ElementType() reflect.Type {
-	return reflect.TypeOf((*[]AddServiceItem)(nil)).Elem()
-}
-
-func (i AddServiceItemArray) ToAddServiceItemArrayOutput() AddServiceItemArrayOutput {
-	return i.ToAddServiceItemArrayOutputWithContext(context.Background())
-}
-
-func (i AddServiceItemArray) ToAddServiceItemArrayOutputWithContext(ctx context.Context) AddServiceItemArrayOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(AddServiceItemArrayOutput)
-}
-
-// A simple struct representing the metadata needed to add an item via user-facing information.
-type AddServiceItemOutput struct{ *pulumi.OutputState }
-
-func (AddServiceItemOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((*AddServiceItem)(nil)).Elem()
-}
-
-func (o AddServiceItemOutput) ToAddServiceItemOutput() AddServiceItemOutput {
-	return o
-}
-
-func (o AddServiceItemOutput) ToAddServiceItemOutputWithContext(ctx context.Context) AddServiceItemOutput {
-	return o
-}
-
-// the name (including any namespacing) of the item
-func (o AddServiceItemOutput) Name() pulumi.StringOutput {
-	return o.ApplyT(func(v AddServiceItem) string { return v.Name }).(pulumi.StringOutput)
-}
-
-// the type of the item to add
-func (o AddServiceItemOutput) Type() pulumi.StringOutput {
-	return o.ApplyT(func(v AddServiceItem) string { return v.Type }).(pulumi.StringOutput)
-}
-
-type AddServiceItemArrayOutput struct{ *pulumi.OutputState }
-
-func (AddServiceItemArrayOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((*[]AddServiceItem)(nil)).Elem()
-}
-
-func (o AddServiceItemArrayOutput) ToAddServiceItemArrayOutput() AddServiceItemArrayOutput {
-	return o
-}
-
-func (o AddServiceItemArrayOutput) ToAddServiceItemArrayOutputWithContext(ctx context.Context) AddServiceItemArrayOutput {
-	return o
-}
-
-func (o AddServiceItemArrayOutput) Index(i pulumi.IntInput) AddServiceItemOutput {
-	return pulumi.All(o, i).ApplyT(func(vs []interface{}) AddServiceItem {
-		return vs[0].([]AddServiceItem)[vs[1].(int)]
-	}).(AddServiceItemOutput)
-}
-
 // An item within a service.
 type ServiceItem struct {
 	// who added the item reference to the service - this will always be a user
@@ -509,9 +400,9 @@ type ServiceProperty struct {
 	// the name of the property
 	Key string `pulumi:"key"`
 	// the position of the property
-	Order int `pulumi:"order"`
+	Order *int `pulumi:"order"`
 	// the type of the property
-	Type string `pulumi:"type"`
+	Type *string `pulumi:"type"`
 	// the value of the property
 	Value string `pulumi:"value"`
 }
@@ -532,9 +423,9 @@ type ServicePropertyArgs struct {
 	// the name of the property
 	Key pulumi.StringInput `pulumi:"key"`
 	// the position of the property
-	Order pulumi.IntInput `pulumi:"order"`
+	Order pulumi.IntPtrInput `pulumi:"order"`
 	// the type of the property
-	Type pulumi.StringInput `pulumi:"type"`
+	Type pulumi.StringPtrInput `pulumi:"type"`
 	// the value of the property
 	Value pulumi.StringInput `pulumi:"value"`
 }
@@ -597,13 +488,13 @@ func (o ServicePropertyOutput) Key() pulumi.StringOutput {
 }
 
 // the position of the property
-func (o ServicePropertyOutput) Order() pulumi.IntOutput {
-	return o.ApplyT(func(v ServiceProperty) int { return v.Order }).(pulumi.IntOutput)
+func (o ServicePropertyOutput) Order() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v ServiceProperty) *int { return v.Order }).(pulumi.IntPtrOutput)
 }
 
 // the type of the property
-func (o ServicePropertyOutput) Type() pulumi.StringOutput {
-	return o.ApplyT(func(v ServiceProperty) string { return v.Type }).(pulumi.StringOutput)
+func (o ServicePropertyOutput) Type() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v ServiceProperty) *string { return v.Type }).(pulumi.StringPtrOutput)
 }
 
 // the value of the property
@@ -632,12 +523,8 @@ func (o ServicePropertyArrayOutput) Index(i pulumi.IntInput) ServicePropertyOutp
 }
 
 func init() {
-	pulumi.RegisterInputType(reflect.TypeOf((*AddServiceItemInput)(nil)).Elem(), AddServiceItemArgs{})
-	pulumi.RegisterInputType(reflect.TypeOf((*AddServiceItemArrayInput)(nil)).Elem(), AddServiceItemArray{})
 	pulumi.RegisterInputType(reflect.TypeOf((*ServicePropertyInput)(nil)).Elem(), ServicePropertyArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*ServicePropertyArrayInput)(nil)).Elem(), ServicePropertyArray{})
-	pulumi.RegisterOutputType(AddServiceItemOutput{})
-	pulumi.RegisterOutputType(AddServiceItemArrayOutput{})
 	pulumi.RegisterOutputType(ServiceItemOutput{})
 	pulumi.RegisterOutputType(ServiceItemArrayOutput{})
 	pulumi.RegisterOutputType(ServiceItemUpdateOutput{})

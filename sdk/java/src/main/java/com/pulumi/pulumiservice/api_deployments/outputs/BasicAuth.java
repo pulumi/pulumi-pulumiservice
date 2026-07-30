@@ -3,9 +3,11 @@
 
 package com.pulumi.pulumiservice.api_deployments.outputs;
 
+import com.pulumi.core.Either;
 import com.pulumi.core.annotations.CustomType;
 import com.pulumi.exceptions.MissingRequiredPropertyException;
 import com.pulumi.pulumiservice.api_deployments.outputs.SecretValue;
+import java.lang.String;
 import java.util.Objects;
 
 @CustomType
@@ -14,26 +16,26 @@ public final class BasicAuth {
      * @return The password
      * 
      */
-    private SecretValue password;
+    private Either<String,SecretValue> password;
     /**
      * @return The user name
      * 
      */
-    private SecretValue userName;
+    private Either<String,SecretValue> userName;
 
     private BasicAuth() {}
     /**
      * @return The password
      * 
      */
-    public SecretValue password() {
+    public Either<String,SecretValue> password() {
         return this.password;
     }
     /**
      * @return The user name
      * 
      */
-    public SecretValue userName() {
+    public Either<String,SecretValue> userName() {
         return this.userName;
     }
 
@@ -46,8 +48,8 @@ public final class BasicAuth {
     }
     @CustomType.Builder
     public static final class Builder {
-        private SecretValue password;
-        private SecretValue userName;
+        private Either<String,SecretValue> password;
+        private Either<String,SecretValue> userName;
         public Builder() {}
         public Builder(BasicAuth defaults) {
     	      Objects.requireNonNull(defaults);
@@ -56,7 +58,7 @@ public final class BasicAuth {
         }
 
         @CustomType.Setter
-        public Builder password(SecretValue password) {
+        public Builder password(Either<String,SecretValue> password) {
             if (password == null) {
               throw new MissingRequiredPropertyException("BasicAuth", "password");
             }
@@ -64,7 +66,7 @@ public final class BasicAuth {
             return this;
         }
         @CustomType.Setter
-        public Builder userName(SecretValue userName) {
+        public Builder userName(Either<String,SecretValue> userName) {
             if (userName == null) {
               throw new MissingRequiredPropertyException("BasicAuth", "userName");
             }

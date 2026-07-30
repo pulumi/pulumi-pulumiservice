@@ -3,9 +3,11 @@
 
 package com.pulumi.pulumiservice.api_deployments.outputs;
 
+import com.pulumi.core.Either;
 import com.pulumi.core.annotations.CustomType;
 import com.pulumi.exceptions.MissingRequiredPropertyException;
 import com.pulumi.pulumiservice.api_deployments.outputs.SecretValue;
+import java.lang.String;
 import java.util.Objects;
 import java.util.Optional;
 import javax.annotation.Nullable;
@@ -16,26 +18,26 @@ public final class SSHAuth {
      * @return An optional password or passphrase for the SSH private key.
      * 
      */
-    private @Nullable SecretValue password;
+    private @Nullable Either<String,SecretValue> password;
     /**
      * @return The SSH private key used for authentication.
      * 
      */
-    private SecretValue sshPrivateKey;
+    private Either<String,SecretValue> sshPrivateKey;
 
     private SSHAuth() {}
     /**
      * @return An optional password or passphrase for the SSH private key.
      * 
      */
-    public Optional<SecretValue> password() {
+    public Optional<Either<String,SecretValue>> password() {
         return Optional.ofNullable(this.password);
     }
     /**
      * @return The SSH private key used for authentication.
      * 
      */
-    public SecretValue sshPrivateKey() {
+    public Either<String,SecretValue> sshPrivateKey() {
         return this.sshPrivateKey;
     }
 
@@ -48,8 +50,8 @@ public final class SSHAuth {
     }
     @CustomType.Builder
     public static final class Builder {
-        private @Nullable SecretValue password;
-        private SecretValue sshPrivateKey;
+        private @Nullable Either<String,SecretValue> password;
+        private Either<String,SecretValue> sshPrivateKey;
         public Builder() {}
         public Builder(SSHAuth defaults) {
     	      Objects.requireNonNull(defaults);
@@ -58,13 +60,13 @@ public final class SSHAuth {
         }
 
         @CustomType.Setter
-        public Builder password(@Nullable SecretValue password) {
+        public Builder password(@Nullable Either<String,SecretValue> password) {
 
             this.password = password;
             return this;
         }
         @CustomType.Setter
-        public Builder sshPrivateKey(SecretValue sshPrivateKey) {
+        public Builder sshPrivateKey(Either<String,SecretValue> sshPrivateKey) {
             if (sshPrivateKey == null) {
               throw new MissingRequiredPropertyException("SSHAuth", "sshPrivateKey");
             }

@@ -24,14 +24,14 @@ namespace Pulumi.PulumiService.Api.Services.Inputs
         /// <summary>
         /// the position of the property
         /// </summary>
-        [Input("order", required: true)]
-        public Input<int> Order { get; set; } = null!;
+        [Input("order")]
+        public Input<int>? Order { get; set; }
 
         /// <summary>
         /// the type of the property
         /// </summary>
-        [Input("type", required: true)]
-        public Input<string> Type { get; set; } = null!;
+        [Input("type")]
+        public Input<string>? Type { get; set; }
 
         /// <summary>
         /// the value of the property

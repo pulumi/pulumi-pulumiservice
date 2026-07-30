@@ -3,6 +3,7 @@
 
 package com.pulumi.pulumiservice.api_deployments.inputs;
 
+import com.pulumi.core.Either;
 import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
 import com.pulumi.pulumiservice.api_deployments.inputs.DockerImageRequestArgs;
@@ -25,13 +26,13 @@ public final class ExecutorSettingsRequestArgs extends com.pulumi.resources.Reso
      * 
      */
     @Import(name="executorImage")
-    private @Nullable Output<DockerImageRequestArgs> executorImage;
+    private @Nullable Output<Either<String,DockerImageRequestArgs>> executorImage;
 
     /**
      * @return The Docker image to use for the execution environment.
      * 
      */
-    public Optional<Output<DockerImageRequestArgs>> executorImage() {
+    public Optional<Output<Either<String,DockerImageRequestArgs>>> executorImage() {
         return Optional.ofNullable(this.executorImage);
     }
 
@@ -81,7 +82,7 @@ public final class ExecutorSettingsRequestArgs extends com.pulumi.resources.Reso
          * @return builder
          * 
          */
-        public Builder executorImage(@Nullable Output<DockerImageRequestArgs> executorImage) {
+        public Builder executorImage(@Nullable Output<Either<String,DockerImageRequestArgs>> executorImage) {
             $.executorImage = executorImage;
             return this;
         }
@@ -92,8 +93,28 @@ public final class ExecutorSettingsRequestArgs extends com.pulumi.resources.Reso
          * @return builder
          * 
          */
-        public Builder executorImage(DockerImageRequestArgs executorImage) {
+        public Builder executorImage(Either<String,DockerImageRequestArgs> executorImage) {
             return executorImage(Output.of(executorImage));
+        }
+
+        /**
+         * @param executorImage The Docker image to use for the execution environment.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder executorImage(String executorImage) {
+            return executorImage(Either.ofLeft(executorImage));
+        }
+
+        /**
+         * @param executorImage The Docker image to use for the execution environment.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder executorImage(DockerImageRequestArgs executorImage) {
+            return executorImage(Either.ofRight(executorImage));
         }
 
         /**

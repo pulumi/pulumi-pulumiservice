@@ -1569,11 +1569,11 @@ export namespace api {
             /**
              * The password
              */
-            password?: pulumi.Input<inputs.api.deployments.SecretValueArgs | undefined>;
+            password?: pulumi.Input<string | inputs.api.deployments.SecretValueArgs | undefined>;
             /**
              * The user name
              */
-            userName?: pulumi.Input<inputs.api.deployments.SecretValueArgs | undefined>;
+            userName?: pulumi.Input<string | inputs.api.deployments.SecretValueArgs | undefined>;
         }
 
         /**
@@ -1919,7 +1919,7 @@ export namespace api {
             /**
              * The password for authenticating with the Docker registry.
              */
-            password?: pulumi.Input<inputs.api.deployments.SecretValueArgs | undefined>;
+            password?: pulumi.Input<string | inputs.api.deployments.SecretValueArgs | undefined>;
             /**
              * The username for authenticating with the Docker registry.
              */
@@ -1947,7 +1947,7 @@ export namespace api {
             /**
              * The Docker image to use for the execution environment.
              */
-            executorImage?: pulumi.Input<inputs.api.deployments.DockerImageRequestArgs | undefined>;
+            executorImage?: pulumi.Input<string | inputs.api.deployments.DockerImageRequestArgs | undefined>;
             /**
              * The root path for the executor binary and working directory.
              */
@@ -1961,7 +1961,7 @@ export namespace api {
             /**
              * Personal access token for git authentication
              */
-            accessToken?: pulumi.Input<inputs.api.deployments.SecretValueArgs | undefined>;
+            accessToken?: pulumi.Input<string | inputs.api.deployments.SecretValueArgs | undefined>;
             /**
              * Basic authentication configuration
              */
@@ -2093,7 +2093,7 @@ export namespace api {
             /**
              * Environment variables to apply during execution.
              */
-            environmentVariables?: pulumi.Input<{[key: string]: pulumi.Input<inputs.api.deployments.SecretValueArgs>} | undefined>;
+            environmentVariables?: pulumi.Input<{[key: string]: pulumi.Input<string | inputs.api.deployments.SecretValueArgs>} | undefined>;
             /**
              * The OIDC configuration for the operation.
              */
@@ -2123,11 +2123,11 @@ export namespace api {
             /**
              * An optional password for the SSH private key.
              */
-            password?: pulumi.Input<inputs.api.deployments.SecretValueArgs | undefined>;
+            password?: pulumi.Input<string | inputs.api.deployments.SecretValueArgs | undefined>;
             /**
              * The SSH private key for authentication.
              */
-            sshPrivateKey?: pulumi.Input<inputs.api.deployments.SecretValueArgs | undefined>;
+            sshPrivateKey?: pulumi.Input<string | inputs.api.deployments.SecretValueArgs | undefined>;
         }
 
         /**
@@ -2269,20 +2269,6 @@ export namespace api {
 
     export namespace services {
         /**
-         * A simple struct representing the metadata needed to add an item via user-facing information.
-         */
-        export interface AddServiceItemArgs {
-            /**
-             * the name (including any namespacing) of the item
-             */
-            name: pulumi.Input<string>;
-            /**
-             * the type of the item to add
-             */
-            type: pulumi.Input<string>;
-        }
-
-        /**
          * A property that the service will show in it's metadata.
          */
         export interface ServicePropertyArgs {
@@ -2293,11 +2279,11 @@ export namespace api {
             /**
              * the position of the property
              */
-            order: pulumi.Input<number>;
+            order?: pulumi.Input<number | undefined>;
             /**
              * the type of the property
              */
-            type: pulumi.Input<string>;
+            type?: pulumi.Input<string | undefined>;
             /**
              * the value of the property
              */

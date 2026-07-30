@@ -19,7 +19,7 @@ namespace Pulumi.PulumiService.Api.Deployments.Inputs
         /// The Docker image to use for the execution environment.
         /// </summary>
         [Input("executorImage")]
-        public Input<Inputs.DockerImageRequestArgs>? ExecutorImage { get; set; }
+        public InputUnion<string, Inputs.DockerImageRequestArgs>? ExecutorImage { get; set; }
 
         /// <summary>
         /// The root path for the executor binary and working directory.

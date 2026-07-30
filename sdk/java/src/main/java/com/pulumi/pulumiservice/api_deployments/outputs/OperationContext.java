@@ -3,6 +3,7 @@
 
 package com.pulumi.pulumiservice.api_deployments.outputs;
 
+import com.pulumi.core.Either;
 import com.pulumi.core.annotations.CustomType;
 import com.pulumi.pulumiservice.api_deployments.outputs.DeploymentRole;
 import com.pulumi.pulumiservice.api_deployments.outputs.OperationContextOIDCConfiguration;
@@ -21,7 +22,7 @@ public final class OperationContext {
      * @return EnvironmentVariables contains environment variables to be applied during the execution.
      * 
      */
-    private @Nullable Map<String,SecretValue> environmentVariables;
+    private @Nullable Map<String,Either<String,SecretValue>> environmentVariables;
     /**
      * @return OIDC contains the OIDC configuration for the operation.
      * 
@@ -54,7 +55,7 @@ public final class OperationContext {
      * @return EnvironmentVariables contains environment variables to be applied during the execution.
      * 
      */
-    public Map<String,SecretValue> environmentVariables() {
+    public Map<String,Either<String,SecretValue>> environmentVariables() {
         return this.environmentVariables == null ? Map.of() : this.environmentVariables;
     }
     /**
@@ -103,7 +104,7 @@ public final class OperationContext {
     }
     @CustomType.Builder
     public static final class Builder {
-        private @Nullable Map<String,SecretValue> environmentVariables;
+        private @Nullable Map<String,Either<String,SecretValue>> environmentVariables;
         private @Nullable OperationContextOIDCConfiguration oidc;
         private @Nullable String operation;
         private @Nullable OperationContextOptions options;
@@ -121,7 +122,7 @@ public final class OperationContext {
         }
 
         @CustomType.Setter
-        public Builder environmentVariables(@Nullable Map<String,SecretValue> environmentVariables) {
+        public Builder environmentVariables(@Nullable Map<String,Either<String,SecretValue>> environmentVariables) {
 
             this.environmentVariables = environmentVariables;
             return this;

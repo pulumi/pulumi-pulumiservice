@@ -20,17 +20,17 @@ namespace Pulumi.PulumiService.Api.Deployments.Outputs
         /// <summary>
         /// An optional password or passphrase for the SSH private key.
         /// </summary>
-        public readonly Outputs.SecretValue? Password;
+        public readonly Union<string, Outputs.SecretValue>? Password;
         /// <summary>
         /// The SSH private key used for authentication.
         /// </summary>
-        public readonly Outputs.SecretValue SshPrivateKey;
+        public readonly Union<string, Outputs.SecretValue> SshPrivateKey;
 
         [OutputConstructor]
         private SSHAuth(
-            Outputs.SecretValue? password,
+            Union<string, Outputs.SecretValue>? password,
 
-            Outputs.SecretValue sshPrivateKey)
+            Union<string, Outputs.SecretValue> sshPrivateKey)
         {
             Password = password;
             SshPrivateKey = sshPrivateKey;

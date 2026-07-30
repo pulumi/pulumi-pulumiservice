@@ -83,7 +83,7 @@ func (ItemState) ElementType() reflect.Type {
 
 type itemArgs struct {
 	// List of items
-	Items []AddServiceItem `pulumi:"items"`
+	Items []interface{} `pulumi:"items"`
 	// Maximum number of items to return on the first page (max 1000)
 	MaxResults *int `pulumi:"maxResults"`
 	// The organization name
@@ -99,7 +99,7 @@ type itemArgs struct {
 // The set of arguments for constructing a Item resource.
 type ItemArgs struct {
 	// List of items
-	Items AddServiceItemArrayInput
+	Items pulumi.ArrayInput
 	// Maximum number of items to return on the first page (max 1000)
 	MaxResults pulumi.IntPtrInput
 	// The organization name

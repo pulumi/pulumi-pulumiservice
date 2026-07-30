@@ -3,6 +3,7 @@
 
 package com.pulumi.pulumiservice.api_deployments.inputs;
 
+import com.pulumi.core.Either;
 import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
 import com.pulumi.pulumiservice.api_deployments.inputs.SecretValueArgs;
@@ -25,13 +26,13 @@ public final class DockerImageCredentialsRequestArgs extends com.pulumi.resource
      * 
      */
     @Import(name="password")
-    private @Nullable Output<SecretValueArgs> password;
+    private @Nullable Output<Either<String,SecretValueArgs>> password;
 
     /**
      * @return The password for authenticating with the Docker registry.
      * 
      */
-    public Optional<Output<SecretValueArgs>> password() {
+    public Optional<Output<Either<String,SecretValueArgs>>> password() {
         return Optional.ofNullable(this.password);
     }
 
@@ -81,7 +82,7 @@ public final class DockerImageCredentialsRequestArgs extends com.pulumi.resource
          * @return builder
          * 
          */
-        public Builder password(@Nullable Output<SecretValueArgs> password) {
+        public Builder password(@Nullable Output<Either<String,SecretValueArgs>> password) {
             $.password = password;
             return this;
         }
@@ -92,8 +93,28 @@ public final class DockerImageCredentialsRequestArgs extends com.pulumi.resource
          * @return builder
          * 
          */
-        public Builder password(SecretValueArgs password) {
+        public Builder password(Either<String,SecretValueArgs> password) {
             return password(Output.of(password));
+        }
+
+        /**
+         * @param password The password for authenticating with the Docker registry.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder password(String password) {
+            return password(Either.ofLeft(password));
+        }
+
+        /**
+         * @param password The password for authenticating with the Docker registry.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder password(SecretValueArgs password) {
+            return password(Either.ofRight(password));
         }
 
         /**
