@@ -32,29 +32,33 @@ func BuildSchema(spec *Spec, metadata *Metadata, pkg string) (*schema.PackageSpe
 		Functions: map[string]schema.FunctionSpec{},
 	}
 
+	reg := newTypeRegistry(spec, metadata, pkg)
+
 	var errs []string
 	for key, rm := range metadata.Resources {
 		token := key
 		if rm.Token != "" {
 			token = rm.Token
 		}
-		rs, err := buildResource(spec, metadata, token, rm)
+		rs, err := buildResource(spec, reg, token, rm)
 		if err != nil {
 			errs = append(errs, fmt.Sprintf("%s: %v", token, err))
 			continue
 		}
 		out.Resources[token] = *rs
 	}
+	errs = append(errs, reg.errs...)
 
 	if len(errs) > 0 {
 		return nil, fmt.Errorf("rest: build schema:\n  - %s", strings.Join(errs, "\n  - "))
 	}
+	out.Types = reg.types
 	return out, nil
 }
 
-func buildResource(spec *Spec, _ *Metadata, _ string, rm ResourceMeta) (*schema.ResourceSpec, error) {
+func buildResource(spec *Spec, reg *typeRegistry, _ string, rm ResourceMeta) (*schema.ResourceSpec, error) {
 	if rm.Attachment != nil {
-		return buildAttachmentResource(spec, rm)
+		return buildAttachmentResource(spec, reg, rm)
 	}
 	createID := rm.Operations.Create
 	readID := rm.Operations.Read
@@ -104,7 +108,7 @@ func buildResource(spec *Spec, _ *Metadata, _ string, rm ResourceMeta) (*schema.
 
 	// Inputs: create op's path params + request body, plus path params from
 	// other ops (forceNew by default).
-	inputs, requiredInputs, err := operationInputs(spec, create, rm)
+	inputs, requiredInputs, err := operationInputs(spec, reg, create, rm)
 	if err != nil {
 		return nil, fmt.Errorf("inputs: %w", err)
 	}
@@ -135,12 +139,12 @@ func buildResource(spec *Spec, _ *Metadata, _ string, rm ResourceMeta) (*schema.
 
 	// Outputs come from the read op (source of truth for state), falling
 	// back to create's response.
-	outputs, requiredOutputs, err := operationOutputs(spec, read, rm)
+	outputs, requiredOutputs, err := operationOutputs(spec, reg, read, rm)
 	if err != nil {
 		return nil, fmt.Errorf("outputs: %w", err)
 	}
 	if len(outputs) == 0 {
-		outputs, requiredOutputs, err = operationOutputs(spec, create, rm)
+		outputs, requiredOutputs, err = operationOutputs(spec, reg, create, rm)
 		if err != nil {
 			return nil, fmt.Errorf("outputs (fallback to create): %w", err)
 		}
@@ -163,7 +167,7 @@ func buildResource(spec *Spec, _ *Metadata, _ string, rm ResourceMeta) (*schema.
 		}
 	}
 
-	if err := mergeEmitOnCreateOutputs(spec, create, rm, outputs); err != nil {
+	if err := mergeEmitOnCreateOutputs(spec, reg, create, rm, outputs); err != nil {
 		return nil, fmt.Errorf("outputs (emitOnCreate): %w", err)
 	}
 
@@ -206,7 +210,7 @@ func buildResource(spec *Spec, _ *Metadata, _ string, rm ResourceMeta) (*schema.
 // inputs are the mutation op's parent path params plus the edge fields (the
 // AddField's object schema), all replace-on-change. Outputs mirror inputs,
 // matching what Read reconstructs from the parent's membership list.
-func buildAttachmentResource(spec *Spec, rm ResourceMeta) (*schema.ResourceSpec, error) {
+func buildAttachmentResource(spec *Spec, reg *typeRegistry, rm ResourceMeta) (*schema.ResourceSpec, error) {
 	am := rm.Attachment
 	mut, ok := spec.Op(am.MutationOp)
 	if !ok {
@@ -263,7 +267,7 @@ func buildAttachmentResource(spec *Spec, rm ResourceMeta) (*schema.ResourceSpec,
 	}
 	for k, raw := range edgeProps {
 		name := pulumiName(k, rm.Renames)
-		ps := openAPIToProperty(raw)
+		ps := reg.property(raw)
 		ps.WillReplaceOnChanges = true
 		ps.ReplaceOnChanges = true
 		applyFieldMeta(&ps, rm.Fields[name], false)
@@ -388,7 +392,7 @@ func opOrNil(spec *Spec, id string) *Operation {
 
 // operationInputs builds the input PropertySpec map: path/query parameters
 // plus the request body schema's top-level properties.
-func operationInputs(spec *Spec, op *Operation, rm ResourceMeta) (map[string]schema.PropertySpec, []string, error) {
+func operationInputs(spec *Spec, reg *typeRegistry, op *Operation, rm ResourceMeta) (map[string]schema.PropertySpec, []string, error) {
 	props := map[string]schema.PropertySpec{}
 	required := map[string]bool{}
 
@@ -420,7 +424,7 @@ func operationInputs(spec *Spec, op *Operation, rm ResourceMeta) (map[string]sch
 		}
 		for k, p := range bodyProps {
 			name := pulumiName(k, rm.Renames)
-			ps := openAPIToProperty(p)
+			ps := reg.property(p)
 			applyFieldMeta(&ps, rm.Fields[name], false)
 			if looksSecret(name) {
 				ps.Secret = true
@@ -468,7 +472,7 @@ func mergePathParamsAsInputs(inputs map[string]schema.PropertySpec, required *[]
 
 // operationOutputs builds the State output PropertySpec map from an op's
 // response body, applying the metadata allowlist or denylist.
-func operationOutputs(spec *Spec, op *Operation, rm ResourceMeta) (map[string]schema.PropertySpec, []string, error) {
+func operationOutputs(spec *Spec, reg *typeRegistry, op *Operation, rm ResourceMeta) (map[string]schema.PropertySpec, []string, error) {
 	if op == nil || op.ResponseRef == "" {
 		return nil, nil, nil
 	}
@@ -496,7 +500,7 @@ func operationOutputs(spec *Spec, op *Operation, rm ResourceMeta) (map[string]sc
 		} else if _, blocked := denylist[name]; blocked {
 			continue
 		}
-		ps := openAPIToProperty(p)
+		ps := reg.property(p)
 		applyFieldMeta(&ps, rm.Fields[name], false)
 		if looksSecret(name) {
 			ps.Secret = true
@@ -727,7 +731,7 @@ func sortedKeys(m map[string]bool) []string {
 // mergeEmitOnCreateOutputs adds emitOnCreate fields from the create-op
 // response into outputs. Fields absent from the create response are
 // silently skipped (no shape to emit).
-func mergeEmitOnCreateOutputs(spec *Spec, create *Operation, rm ResourceMeta, outputs map[string]schema.PropertySpec) error {
+func mergeEmitOnCreateOutputs(spec *Spec, reg *typeRegistry, create *Operation, rm ResourceMeta, outputs map[string]schema.PropertySpec) error {
 	hasAny := false
 	for _, fm := range rm.Fields {
 		if fm.EmitOnCreate {
@@ -754,7 +758,7 @@ func mergeEmitOnCreateOutputs(spec *Spec, create *Operation, rm ResourceMeta, ou
 		if !ok {
 			continue
 		}
-		ps := openAPIToProperty(raw)
+		ps := reg.property(raw)
 		applyFieldMeta(&ps, fm, false)
 		if looksSecret(name) {
 			ps.Secret = true
