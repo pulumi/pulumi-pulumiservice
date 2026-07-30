@@ -13,3 +13,4 @@ from .custom_vcs_repository import *
 from .git_hub_enterprise_integration import *
 from .git_hub_integration import *
 from .git_lab_integration import *
+from . import outputs

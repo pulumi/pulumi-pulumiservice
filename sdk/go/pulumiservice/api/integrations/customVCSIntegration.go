@@ -29,7 +29,7 @@ type CustomVCSIntegration struct {
 	// Human-readable name for the integration
 	Name pulumi.StringOutput `pulumi:"name"`
 	// List of repositories configured on this integration
-	Repositories pulumi.ArrayOutput `pulumi:"repositories"`
+	Repositories CustomVCSRepositoryPropertiesArrayOutput `pulumi:"repositories"`
 	// Version control system type
 	VcsType pulumi.StringOutput `pulumi:"vcsType"`
 	// HMAC secret for webhook signature verification. Only returned on integration creation; subsequent GET requests omit this field.
@@ -242,8 +242,8 @@ func (o CustomVCSIntegrationOutput) Name() pulumi.StringOutput {
 }
 
 // List of repositories configured on this integration
-func (o CustomVCSIntegrationOutput) Repositories() pulumi.ArrayOutput {
-	return o.ApplyT(func(v *CustomVCSIntegration) pulumi.ArrayOutput { return v.Repositories }).(pulumi.ArrayOutput)
+func (o CustomVCSIntegrationOutput) Repositories() CustomVCSRepositoryPropertiesArrayOutput {
+	return o.ApplyT(func(v *CustomVCSIntegration) CustomVCSRepositoryPropertiesArrayOutput { return v.Repositories }).(CustomVCSRepositoryPropertiesArrayOutput)
 }
 
 // Version control system type

@@ -13,6 +13,8 @@ if sys.version_info >= (3, 11):
 else:
     from typing_extensions import NotRequired, TypedDict, TypeAlias
 from .. import _utilities
+from . import outputs
+from ._inputs import *
 
 __all__ = ['RoleArgs', 'Role']
 
@@ -22,7 +24,7 @@ class RoleArgs:
                  org_name: pulumi.Input[_builtins.str],
                  create_policy_and_role: pulumi.Input[Optional[_builtins.bool]] = None,
                  description: pulumi.Input[Optional[_builtins.str]] = None,
-                 details: Optional[Any] = None,
+                 details: pulumi.Input[Optional[Union['PermissionDescriptorAllowArgs', 'PermissionDescriptorComposeArgs', 'PermissionDescriptorConditionArgs', 'PermissionDescriptorGroupArgs', 'PermissionDescriptorIfThenElseArgs', 'PermissionDescriptorSelectArgs']]] = None,
                  name: pulumi.Input[Optional[_builtins.str]] = None,
                  resource_type: pulumi.Input[Optional[_builtins.str]] = None,
                  role_id: pulumi.Input[Optional[_builtins.str]] = None,
@@ -33,7 +35,7 @@ class RoleArgs:
         :param pulumi.Input[_builtins.str] org_name: The organization name
         :param pulumi.Input[_builtins.bool] create_policy_and_role: Also create an associated policy and role binding alongside the role
         :param pulumi.Input[_builtins.str] description: A human-readable description of the permission descriptor.
-        :param Any details: The detailed permission descriptor tree.
+        :param pulumi.Input[Union['PermissionDescriptorAllowArgs', 'PermissionDescriptorComposeArgs', 'PermissionDescriptorConditionArgs', 'PermissionDescriptorGroupArgs', 'PermissionDescriptorIfThenElseArgs', 'PermissionDescriptorSelectArgs']] details: The detailed permission descriptor tree.
         :param pulumi.Input[_builtins.str] name: The name of the permission descriptor.
         :param pulumi.Input[_builtins.str] resource_type: The resource type this permission descriptor applies to.
         :param pulumi.Input[_builtins.str] role_id: The role identifier
@@ -93,14 +95,14 @@ class RoleArgs:
 
     @_builtins.property
     @pulumi.getter
-    def details(self) -> Optional[Any]:
+    def details(self) -> pulumi.Input[Optional[Union['PermissionDescriptorAllowArgs', 'PermissionDescriptorComposeArgs', 'PermissionDescriptorConditionArgs', 'PermissionDescriptorGroupArgs', 'PermissionDescriptorIfThenElseArgs', 'PermissionDescriptorSelectArgs']]]:
         """
         The detailed permission descriptor tree.
         """
         return pulumi.get(self, "details")
 
     @details.setter
-    def details(self, value: Optional[Any]):
+    def details(self, value: pulumi.Input[Optional[Union['PermissionDescriptorAllowArgs', 'PermissionDescriptorComposeArgs', 'PermissionDescriptorConditionArgs', 'PermissionDescriptorGroupArgs', 'PermissionDescriptorIfThenElseArgs', 'PermissionDescriptorSelectArgs']]]):
         pulumi.set(self, "details", value)
 
     @_builtins.property
@@ -160,7 +162,7 @@ class Role(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None,
                  create_policy_and_role: pulumi.Input[Optional[_builtins.bool]] = None,
                  description: pulumi.Input[Optional[_builtins.str]] = None,
-                 details: Optional[Any] = None,
+                 details: pulumi.Input[Optional[Union[Union['PermissionDescriptorAllowArgs', 'PermissionDescriptorAllowArgsDict'], Union['PermissionDescriptorComposeArgs', 'PermissionDescriptorComposeArgsDict'], Union['PermissionDescriptorConditionArgs', 'PermissionDescriptorConditionArgsDict'], Union['PermissionDescriptorGroupArgs', 'PermissionDescriptorGroupArgsDict'], Union['PermissionDescriptorIfThenElseArgs', 'PermissionDescriptorIfThenElseArgsDict'], Union['PermissionDescriptorSelectArgs', 'PermissionDescriptorSelectArgsDict']]]] = None,
                  name: pulumi.Input[Optional[_builtins.str]] = None,
                  org_name: pulumi.Input[Optional[_builtins.str]] = None,
                  resource_type: pulumi.Input[Optional[_builtins.str]] = None,
@@ -170,11 +172,12 @@ class Role(pulumi.CustomResource):
         """
         Creates a new custom role for an organization. Custom roles define fine-grained permission sets that can be assigned to organization members and teams, enabling precise access control beyond the built-in admin and member roles. Optionally, an associated policy and role binding can be created alongside the role. Role definitions are subject to two limits: a permission descriptor group may contain at most 2000 entries (each directly-specified entity counts as one entry), and the total serialized size of the role definition may not exceed 1 MB. Exceeding either limit returns a 400 error. If you need to grant access to more than 2000 individually listed resources, use tag-based (ABAC) rules instead.
 
+
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.bool] create_policy_and_role: Also create an associated policy and role binding alongside the role
         :param pulumi.Input[_builtins.str] description: A human-readable description of the permission descriptor.
-        :param Any details: The detailed permission descriptor tree.
+        :param pulumi.Input[Union[Union['PermissionDescriptorAllowArgs', 'PermissionDescriptorAllowArgsDict'], Union['PermissionDescriptorComposeArgs', 'PermissionDescriptorComposeArgsDict'], Union['PermissionDescriptorConditionArgs', 'PermissionDescriptorConditionArgsDict'], Union['PermissionDescriptorGroupArgs', 'PermissionDescriptorGroupArgsDict'], Union['PermissionDescriptorIfThenElseArgs', 'PermissionDescriptorIfThenElseArgsDict'], Union['PermissionDescriptorSelectArgs', 'PermissionDescriptorSelectArgsDict']]] details: The detailed permission descriptor tree.
         :param pulumi.Input[_builtins.str] name: The name of the permission descriptor.
         :param pulumi.Input[_builtins.str] org_name: The organization name
         :param pulumi.Input[_builtins.str] resource_type: The resource type this permission descriptor applies to.
@@ -189,6 +192,7 @@ class Role(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         Creates a new custom role for an organization. Custom roles define fine-grained permission sets that can be assigned to organization members and teams, enabling precise access control beyond the built-in admin and member roles. Optionally, an associated policy and role binding can be created alongside the role. Role definitions are subject to two limits: a permission descriptor group may contain at most 2000 entries (each directly-specified entity counts as one entry), and the total serialized size of the role definition may not exceed 1 MB. Exceeding either limit returns a 400 error. If you need to grant access to more than 2000 individually listed resources, use tag-based (ABAC) rules instead.
+
 
         :param str resource_name: The name of the resource.
         :param RoleArgs args: The arguments to use to populate this resource's properties.
@@ -207,7 +211,7 @@ class Role(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None,
                  create_policy_and_role: pulumi.Input[Optional[_builtins.bool]] = None,
                  description: pulumi.Input[Optional[_builtins.str]] = None,
-                 details: Optional[Any] = None,
+                 details: pulumi.Input[Optional[Union[Union['PermissionDescriptorAllowArgs', 'PermissionDescriptorAllowArgsDict'], Union['PermissionDescriptorComposeArgs', 'PermissionDescriptorComposeArgsDict'], Union['PermissionDescriptorConditionArgs', 'PermissionDescriptorConditionArgsDict'], Union['PermissionDescriptorGroupArgs', 'PermissionDescriptorGroupArgsDict'], Union['PermissionDescriptorIfThenElseArgs', 'PermissionDescriptorIfThenElseArgsDict'], Union['PermissionDescriptorSelectArgs', 'PermissionDescriptorSelectArgsDict']]]] = None,
                  name: pulumi.Input[Optional[_builtins.str]] = None,
                  org_name: pulumi.Input[Optional[_builtins.str]] = None,
                  resource_type: pulumi.Input[Optional[_builtins.str]] = None,

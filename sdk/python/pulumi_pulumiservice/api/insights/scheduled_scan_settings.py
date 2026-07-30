@@ -168,6 +168,7 @@ class ScheduledScanSettings(pulumi.CustomResource):
         """
         Updates the scheduled scan configuration for an Insights account, such as scan frequency and schedule.
 
+
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] account_name: The Insights account name
@@ -187,6 +188,7 @@ class ScheduledScanSettings(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         Updates the scheduled scan configuration for an Insights account, such as scan frequency and schedule.
+
 
         :param str resource_name: The name of the resource.
         :param ScheduledScanSettingsArgs args: The arguments to use to populate this resource's properties.

@@ -29,7 +29,7 @@ namespace Pulumi.PulumiService.Api
         /// Can be possibly empty.
         /// </summary>
         [Output("Messages")]
-        public Output<ImmutableArray<object>> Messages { get; private set; } = null!;
+        public Output<ImmutableArray<Outputs.AppMessage>> Messages { get; private set; } = null!;
 
 
         /// <summary>

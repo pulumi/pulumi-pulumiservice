@@ -19,7 +19,7 @@ type ScheduledDeployment struct {
 	// The timestamp when this scheduled action was created.
 	Created pulumi.StringOutput `pulumi:"created"`
 	// The action definition, which varies based on the action kind.
-	Definition pulumi.MapOutput `pulumi:"definition"`
+	Definition pulumi.MapMapOutput `pulumi:"definition"`
 	// The kind of action to be executed.
 	Kind pulumi.StringOutput `pulumi:"kind"`
 	// The timestamp of the last execution, if any.
@@ -94,7 +94,7 @@ type scheduledDeploymentArgs struct {
 	// The project name
 	ProjectName string `pulumi:"projectName"`
 	// Deployment request payload to execute when the schedule fires. This has the same shape and semantics as CreateDeploymentRequest used for immediate deployments.
-	Request interface{} `pulumi:"request"`
+	Request *CreateDeploymentRequest `pulumi:"request"`
 	// Cron expression defining a recurring schedule for this deployment. When set, scheduleOnce must be null. Uses standard 5-field cron syntax (MIN HOUR DOM MON DOW) and is evaluated in UTC.
 	ScheduleCron *string `pulumi:"scheduleCron"`
 	// The schedule identifier
@@ -112,7 +112,7 @@ type ScheduledDeploymentArgs struct {
 	// The project name
 	ProjectName pulumi.StringInput
 	// Deployment request payload to execute when the schedule fires. This has the same shape and semantics as CreateDeploymentRequest used for immediate deployments.
-	Request pulumi.Input
+	Request CreateDeploymentRequestPtrInput
 	// Cron expression defining a recurring schedule for this deployment. When set, scheduleOnce must be null. Uses standard 5-field cron syntax (MIN HOUR DOM MON DOW) and is evaluated in UTC.
 	ScheduleCron pulumi.StringPtrInput
 	// The schedule identifier
@@ -216,8 +216,8 @@ func (o ScheduledDeploymentOutput) Created() pulumi.StringOutput {
 }
 
 // The action definition, which varies based on the action kind.
-func (o ScheduledDeploymentOutput) Definition() pulumi.MapOutput {
-	return o.ApplyT(func(v *ScheduledDeployment) pulumi.MapOutput { return v.Definition }).(pulumi.MapOutput)
+func (o ScheduledDeploymentOutput) Definition() pulumi.MapMapOutput {
+	return o.ApplyT(func(v *ScheduledDeployment) pulumi.MapMapOutput { return v.Definition }).(pulumi.MapMapOutput)
 }
 
 // The kind of action to be executed.

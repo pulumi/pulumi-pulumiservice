@@ -13,6 +13,7 @@ if sys.version_info >= (3, 11):
 else:
     from typing_extensions import NotRequired, TypedDict, TypeAlias
 from ... import _utilities
+from ._inputs import *
 
 __all__ = ['ScheduledDeploymentArgs', 'ScheduledDeployment']
 
@@ -22,7 +23,7 @@ class ScheduledDeploymentArgs:
                  org_name: pulumi.Input[_builtins.str],
                  project_name: pulumi.Input[_builtins.str],
                  stack_name: pulumi.Input[_builtins.str],
-                 request: Optional[Any] = None,
+                 request: pulumi.Input[Optional['CreateDeploymentRequestArgs']] = None,
                  schedule_cron: pulumi.Input[Optional[_builtins.str]] = None,
                  schedule_id: pulumi.Input[Optional[_builtins.str]] = None,
                  schedule_once: pulumi.Input[Optional[_builtins.str]] = None):
@@ -32,7 +33,7 @@ class ScheduledDeploymentArgs:
         :param pulumi.Input[_builtins.str] org_name: The organization name
         :param pulumi.Input[_builtins.str] project_name: The project name
         :param pulumi.Input[_builtins.str] stack_name: The stack name
-        :param Any request: Deployment request payload to execute when the schedule fires. This has the same shape and semantics as CreateDeploymentRequest used for immediate deployments.
+        :param pulumi.Input['CreateDeploymentRequestArgs'] request: Deployment request payload to execute when the schedule fires. This has the same shape and semantics as CreateDeploymentRequest used for immediate deployments.
         :param pulumi.Input[_builtins.str] schedule_cron: Cron expression defining a recurring schedule for this deployment. When set, scheduleOnce must be null. Uses standard 5-field cron syntax (MIN HOUR DOM MON DOW) and is evaluated in UTC.
         :param pulumi.Input[_builtins.str] schedule_id: The schedule identifier
         :param pulumi.Input[_builtins.str] schedule_once: Single point-in-time schedule for this deployment. When set, scheduleCron must be null. The value must be an ISO 8601 timestamp with timezone.
@@ -87,14 +88,14 @@ class ScheduledDeploymentArgs:
 
     @_builtins.property
     @pulumi.getter
-    def request(self) -> Optional[Any]:
+    def request(self) -> pulumi.Input[Optional['CreateDeploymentRequestArgs']]:
         """
         Deployment request payload to execute when the schedule fires. This has the same shape and semantics as CreateDeploymentRequest used for immediate deployments.
         """
         return pulumi.get(self, "request")
 
     @request.setter
-    def request(self, value: Optional[Any]):
+    def request(self, value: pulumi.Input[Optional['CreateDeploymentRequestArgs']]):
         pulumi.set(self, "request", value)
 
     @_builtins.property
@@ -142,7 +143,7 @@ class ScheduledDeployment(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None,
                  org_name: pulumi.Input[Optional[_builtins.str]] = None,
                  project_name: pulumi.Input[Optional[_builtins.str]] = None,
-                 request: Optional[Any] = None,
+                 request: pulumi.Input[Optional[Union['CreateDeploymentRequestArgs', 'CreateDeploymentRequestArgsDict']]] = None,
                  schedule_cron: pulumi.Input[Optional[_builtins.str]] = None,
                  schedule_id: pulumi.Input[Optional[_builtins.str]] = None,
                  schedule_once: pulumi.Input[Optional[_builtins.str]] = None,
@@ -151,11 +152,12 @@ class ScheduledDeployment(pulumi.CustomResource):
         """
         Creates a custom deployment schedule for a stack using Pulumi Deployments. Custom schedules allow you to automate recurring or one-time Pulumi operations on a stack. The request must include exactly one of 'scheduleCron' (a cron expression for recurring executions, e.g. '0 */4 * * *' for every 4 hours) or 'scheduleOnce' (an ISO 8601 timestamp for a one-time execution). The 'request' field contains the deployment configuration that will be executed on each scheduled run, including the Pulumi operation type and any settings overrides. The stack must have deployment settings configured before a schedule can be created.
 
+
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] org_name: The organization name
         :param pulumi.Input[_builtins.str] project_name: The project name
-        :param Any request: Deployment request payload to execute when the schedule fires. This has the same shape and semantics as CreateDeploymentRequest used for immediate deployments.
+        :param pulumi.Input[Union['CreateDeploymentRequestArgs', 'CreateDeploymentRequestArgsDict']] request: Deployment request payload to execute when the schedule fires. This has the same shape and semantics as CreateDeploymentRequest used for immediate deployments.
         :param pulumi.Input[_builtins.str] schedule_cron: Cron expression defining a recurring schedule for this deployment. When set, scheduleOnce must be null. Uses standard 5-field cron syntax (MIN HOUR DOM MON DOW) and is evaluated in UTC.
         :param pulumi.Input[_builtins.str] schedule_id: The schedule identifier
         :param pulumi.Input[_builtins.str] schedule_once: Single point-in-time schedule for this deployment. When set, scheduleCron must be null. The value must be an ISO 8601 timestamp with timezone.
@@ -169,6 +171,7 @@ class ScheduledDeployment(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         Creates a custom deployment schedule for a stack using Pulumi Deployments. Custom schedules allow you to automate recurring or one-time Pulumi operations on a stack. The request must include exactly one of 'scheduleCron' (a cron expression for recurring executions, e.g. '0 */4 * * *' for every 4 hours) or 'scheduleOnce' (an ISO 8601 timestamp for a one-time execution). The 'request' field contains the deployment configuration that will be executed on each scheduled run, including the Pulumi operation type and any settings overrides. The stack must have deployment settings configured before a schedule can be created.
+
 
         :param str resource_name: The name of the resource.
         :param ScheduledDeploymentArgs args: The arguments to use to populate this resource's properties.
@@ -187,7 +190,7 @@ class ScheduledDeployment(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None,
                  org_name: pulumi.Input[Optional[_builtins.str]] = None,
                  project_name: pulumi.Input[Optional[_builtins.str]] = None,
-                 request: Optional[Any] = None,
+                 request: pulumi.Input[Optional[Union['CreateDeploymentRequestArgs', 'CreateDeploymentRequestArgsDict']]] = None,
                  schedule_cron: pulumi.Input[Optional[_builtins.str]] = None,
                  schedule_id: pulumi.Input[Optional[_builtins.str]] = None,
                  schedule_once: pulumi.Input[Optional[_builtins.str]] = None,
@@ -267,7 +270,7 @@ class ScheduledDeployment(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter
-    def definition(self) -> pulumi.Output[Mapping[str, Any]]:
+    def definition(self) -> pulumi.Output[Mapping[str, Mapping[str, Any]]]:
         """
         The action definition, which varies based on the action kind.
         """

@@ -2,6 +2,9 @@
 // *** Do not edit by hand unless you're certain you know what you are doing! ***
 
 import * as pulumi from "@pulumi/pulumi";
+import * as inputs from "../../types/input";
+import * as outputs from "../../types/output";
+import * as enums from "../../types/enums";
 import * as utilities from "../../utilities";
 
 /**
@@ -46,7 +49,7 @@ export class Account extends pulumi.CustomResource {
     /**
      * The user with ownership of this Insights account
      */
-    declare public /*out*/ readonly ownedBy: pulumi.Output<any>;
+    declare public /*out*/ readonly ownedBy: pulumi.Output<outputs.api.UserInfo>;
     /**
      * The cloud provider for the account (e.g., aws, gcp, azure-native).
      */
@@ -67,7 +70,7 @@ export class Account extends pulumi.CustomResource {
     /**
      * Status of the last discovery scan for this account.
      */
-    declare public /*out*/ readonly scanStatus: pulumi.Output<any | undefined>;
+    declare public /*out*/ readonly scanStatus: pulumi.Output<outputs.api.ScanStatus | undefined>;
     /**
      * If true, the account is scheduled for recurring discovery.
      */

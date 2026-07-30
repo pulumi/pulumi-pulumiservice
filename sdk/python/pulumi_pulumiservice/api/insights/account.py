@@ -13,6 +13,7 @@ if sys.version_info >= (3, 11):
 else:
     from typing_extensions import NotRequired, TypedDict, TypeAlias
 from ... import _utilities
+from ... import api as _api
 
 __all__ = ['AccountArgs', 'Account']
 
@@ -171,6 +172,7 @@ class Account(pulumi.CustomResource):
         """
         Creates a new Insights account. An Insights account represents a cloud provider account (e.g., AWS, Azure, OCI) configured for resource discovery.
 
+
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] account_name: The Insights account name
@@ -192,6 +194,7 @@ class Account(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         Creates a new Insights account. An Insights account represents a cloud provider account (e.g., AWS, Azure, OCI) configured for resource discovery.
+
 
         :param str resource_name: The name of the resource.
         :param AccountArgs args: The arguments to use to populate this resource's properties.
@@ -299,7 +302,7 @@ class Account(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter(name="ownedBy")
-    def owned_by(self) -> pulumi.Output[Any]:
+    def owned_by(self) -> pulumi.Output['_api.outputs.UserInfo']:
         """
         The user with ownership of this Insights account
         """
@@ -340,7 +343,7 @@ class Account(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter(name="scanStatus")
-    def scan_status(self) -> pulumi.Output[Optional[Any]]:
+    def scan_status(self) -> pulumi.Output[Optional['_api.outputs.ScanStatus']]:
         """
         Status of the last discovery scan for this account.
         """

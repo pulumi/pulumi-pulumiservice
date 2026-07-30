@@ -21,7 +21,7 @@ type PolicyGroup struct {
 	// Agent pool ID for audit policy evaluation. Defaults to Pulumi hosted pool if not specified.
 	AgentPoolId pulumi.StringPtrOutput `pulumi:"agentPoolId"`
 	// List of policy packs that are applied to this policy group.
-	AppliedPolicyPacks pulumi.ArrayOutput `pulumi:"appliedPolicyPacks"`
+	AppliedPolicyPacks AppPolicyPackMetadataArrayOutput `pulumi:"appliedPolicyPacks"`
 	// The type of entities this policy group applies to (stacks or accounts).
 	EntityType pulumi.StringOutput `pulumi:"entityType"`
 	// True if this is either the default stacks or default accounts policy group for the organization.
@@ -31,7 +31,7 @@ type PolicyGroup struct {
 	// The name of the policy group.
 	Name pulumi.StringOutput `pulumi:"name"`
 	// List of stacks that are members of this policy group.
-	Stacks pulumi.ArrayOutput `pulumi:"stacks"`
+	Stacks AppPulumiStackReferenceArrayOutput `pulumi:"stacks"`
 }
 
 // NewPolicyGroup registers a new resource with the given unique name, arguments, and options.
@@ -207,8 +207,8 @@ func (o PolicyGroupOutput) AgentPoolId() pulumi.StringPtrOutput {
 }
 
 // List of policy packs that are applied to this policy group.
-func (o PolicyGroupOutput) AppliedPolicyPacks() pulumi.ArrayOutput {
-	return o.ApplyT(func(v *PolicyGroup) pulumi.ArrayOutput { return v.AppliedPolicyPacks }).(pulumi.ArrayOutput)
+func (o PolicyGroupOutput) AppliedPolicyPacks() AppPolicyPackMetadataArrayOutput {
+	return o.ApplyT(func(v *PolicyGroup) AppPolicyPackMetadataArrayOutput { return v.AppliedPolicyPacks }).(AppPolicyPackMetadataArrayOutput)
 }
 
 // The type of entities this policy group applies to (stacks or accounts).
@@ -232,8 +232,8 @@ func (o PolicyGroupOutput) Name() pulumi.StringOutput {
 }
 
 // List of stacks that are members of this policy group.
-func (o PolicyGroupOutput) Stacks() pulumi.ArrayOutput {
-	return o.ApplyT(func(v *PolicyGroup) pulumi.ArrayOutput { return v.Stacks }).(pulumi.ArrayOutput)
+func (o PolicyGroupOutput) Stacks() AppPulumiStackReferenceArrayOutput {
+	return o.ApplyT(func(v *PolicyGroup) AppPulumiStackReferenceArrayOutput { return v.Stacks }).(AppPulumiStackReferenceArrayOutput)
 }
 
 type PolicyGroupArrayOutput struct{ *pulumi.OutputState }

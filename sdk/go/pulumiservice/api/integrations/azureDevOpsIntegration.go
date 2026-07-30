@@ -17,7 +17,7 @@ type AzureDevOpsIntegration struct {
 	pulumi.CustomResourceState
 
 	// The Pulumi user whose Azure DevOps authentication token is being used
-	AuthUser pulumi.AnyOutput `pulumi:"authUser"`
+	AuthUser UserPtrOutput `pulumi:"authUser"`
 	// Whether detailed property-level diffs are disabled for PR comments
 	DisableDetailedDiff pulumi.BoolPtrOutput `pulumi:"disableDetailedDiff"`
 	// Whether Neo AI summaries are disabled for this integration
@@ -27,9 +27,9 @@ type AzureDevOpsIntegration struct {
 	// Does the org have an Azure DevOps app integration configured
 	Installed pulumi.BoolOutput `pulumi:"installed"`
 	// Metadata about the Azure DevOps organization linked to the Pulumi organization
-	Organization pulumi.AnyOutput `pulumi:"organization"`
+	Organization AzureDevOpsOrganizationPtrOutput `pulumi:"organization"`
 	// Metadata about the Azure DevOps project linked to the Pulumi organization
-	Project pulumi.AnyOutput `pulumi:"project"`
+	Project AzureDevOpsProjectPtrOutput `pulumi:"project"`
 	// Is the app integration valid
 	Valid pulumi.BoolOutput `pulumi:"valid"`
 }
@@ -194,8 +194,8 @@ func (o AzureDevOpsIntegrationOutput) ToAzureDevOpsIntegrationOutputWithContext(
 }
 
 // The Pulumi user whose Azure DevOps authentication token is being used
-func (o AzureDevOpsIntegrationOutput) AuthUser() pulumi.AnyOutput {
-	return o.ApplyT(func(v *AzureDevOpsIntegration) pulumi.AnyOutput { return v.AuthUser }).(pulumi.AnyOutput)
+func (o AzureDevOpsIntegrationOutput) AuthUser() UserPtrOutput {
+	return o.ApplyT(func(v *AzureDevOpsIntegration) UserPtrOutput { return v.AuthUser }).(UserPtrOutput)
 }
 
 // Whether detailed property-level diffs are disabled for PR comments
@@ -219,13 +219,13 @@ func (o AzureDevOpsIntegrationOutput) Installed() pulumi.BoolOutput {
 }
 
 // Metadata about the Azure DevOps organization linked to the Pulumi organization
-func (o AzureDevOpsIntegrationOutput) Organization() pulumi.AnyOutput {
-	return o.ApplyT(func(v *AzureDevOpsIntegration) pulumi.AnyOutput { return v.Organization }).(pulumi.AnyOutput)
+func (o AzureDevOpsIntegrationOutput) Organization() AzureDevOpsOrganizationPtrOutput {
+	return o.ApplyT(func(v *AzureDevOpsIntegration) AzureDevOpsOrganizationPtrOutput { return v.Organization }).(AzureDevOpsOrganizationPtrOutput)
 }
 
 // Metadata about the Azure DevOps project linked to the Pulumi organization
-func (o AzureDevOpsIntegrationOutput) Project() pulumi.AnyOutput {
-	return o.ApplyT(func(v *AzureDevOpsIntegration) pulumi.AnyOutput { return v.Project }).(pulumi.AnyOutput)
+func (o AzureDevOpsIntegrationOutput) Project() AzureDevOpsProjectPtrOutput {
+	return o.ApplyT(func(v *AzureDevOpsIntegration) AzureDevOpsProjectPtrOutput { return v.Project }).(AzureDevOpsProjectPtrOutput)
 }
 
 // Is the app integration valid

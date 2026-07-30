@@ -100,6 +100,7 @@ class EnvironmentSettings(pulumi.CustomResource):
         """
         Updates settings for a Pulumi ESC environment using a partial update (patch) approach. Currently supports toggling deletion protection via the deletionProtected field. When deletionProtected is set to true, the environment cannot be deleted until the setting is explicitly disabled. Only the fields included in the request body are modified; omitted fields retain their current values.
 
+
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.bool] deletion_protected: DeletionProtected indicates whether deletion protection should be enabled for this environment. Null means no change.
@@ -115,6 +116,7 @@ class EnvironmentSettings(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         Updates settings for a Pulumi ESC environment using a partial update (patch) approach. Currently supports toggling deletion protection via the deletionProtected field. When deletionProtected is set to true, the environment cannot be deleted until the setting is explicitly disabled. Only the fields included in the request body are modified; omitted fields retain their current values.
+
 
         :param str resource_name: The name of the resource.
         :param EnvironmentSettingsArgs args: The arguments to use to populate this resource's properties.

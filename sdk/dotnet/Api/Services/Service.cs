@@ -26,7 +26,7 @@ namespace Pulumi.PulumiService.Api.Services
         /// The list of service items
         /// </summary>
         [Output("items")]
-        public Output<ImmutableArray<object>> Items { get; private set; } = null!;
+        public Output<ImmutableArray<Outputs.ServiceItem>> Items { get; private set; } = null!;
 
 
         /// <summary>
@@ -80,14 +80,14 @@ namespace Pulumi.PulumiService.Api.Services
         public Input<string> Description { get; set; } = null!;
 
         [Input("items", required: true)]
-        private InputList<object>? _items;
+        private InputList<Inputs.AddServiceItemArgs>? _items;
 
         /// <summary>
         /// an optional list of items to add during service creation
         /// </summary>
-        public InputList<object> Items
+        public InputList<Inputs.AddServiceItemArgs> Items
         {
-            get => _items ?? (_items = new InputList<object>());
+            get => _items ?? (_items = new InputList<Inputs.AddServiceItemArgs>());
             set => _items = value;
         }
 
@@ -116,14 +116,14 @@ namespace Pulumi.PulumiService.Api.Services
         public Input<string> OwnerType { get; set; } = null!;
 
         [Input("properties", required: true)]
-        private InputList<object>? _properties;
+        private InputList<Inputs.ServicePropertyArgs>? _properties;
 
         /// <summary>
         /// an optional list of properties to set on the service
         /// </summary>
-        public InputList<object> Properties
+        public InputList<Inputs.ServicePropertyArgs> Properties
         {
-            get => _properties ?? (_properties = new InputList<object>());
+            get => _properties ?? (_properties = new InputList<Inputs.ServicePropertyArgs>());
             set => _properties = value;
         }
 

@@ -2,6 +2,9 @@
 // *** Do not edit by hand unless you're certain you know what you are doing! ***
 
 import * as pulumi from "@pulumi/pulumi";
+import * as inputs from "../types/input";
+import * as outputs from "../types/output";
+import * as enums from "../types/enums";
 import * as utilities from "../utilities";
 
 /**
@@ -45,7 +48,7 @@ export class OrganizationMember extends pulumi.CustomResource {
     /**
      * The role currently assigned to this member — either a built-in role (member, admin, billingManager) or a custom role. Falls back to the organization's default role if no role is assigned directly.
      */
-    declare public /*out*/ readonly fgaRole: pulumi.Output<any>;
+    declare public /*out*/ readonly fgaRole: pulumi.Output<outputs.api.FGARole>;
     /**
      * KnownToPulumi returns if the organization member has a Pulumi account.
      */
@@ -53,7 +56,7 @@ export class OrganizationMember extends pulumi.CustomResource {
     /**
      * Links to the member in the Pulumi Console
      */
-    declare public /*out*/ readonly links: pulumi.Output<any | undefined>;
+    declare public /*out*/ readonly links: pulumi.Output<outputs.api.MemberLinks | undefined>;
     /**
      * **Deprecated:** Use `fgaRole` instead. The member's built-in role within the organization. For members assigned a custom role, this is the closest built-in projection (`member`, `admin`, or `billingManager`) and may lose detail; `fgaRole` is authoritative.
      */
@@ -65,7 +68,7 @@ export class OrganizationMember extends pulumi.CustomResource {
     /**
      * The user information for this organization member.
      */
-    declare public /*out*/ readonly user: pulumi.Output<any>;
+    declare public /*out*/ readonly user: pulumi.Output<outputs.api.UserInfo>;
     /**
      * VirtualAdmin indicates that the member does not have admin access on the
      * backing identity provider, but does have admin access to the Pulumi organization.

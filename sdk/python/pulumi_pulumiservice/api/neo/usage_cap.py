@@ -84,6 +84,7 @@ class UsageCap(pulumi.CustomResource):
         """
         Creates or replaces the monthly Neo usage cap for an organization. The cap must be at least $10/month. To remove the cap, call DeleteNeoUsageCap.
 
+
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.int] cap_cents: Monthly cap in US-dollar cents. Must be at least 1000 ($10, the self-serve floor) and at most 100_000_000 ($1M). Outside that range the call returns 400.
@@ -98,6 +99,7 @@ class UsageCap(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         Creates or replaces the monthly Neo usage cap for an organization. The cap must be at least $10/month. To remove the cap, call DeleteNeoUsageCap.
+
 
         :param str resource_name: The name of the resource.
         :param UsageCapArgs args: The arguments to use to populate this resource's properties.

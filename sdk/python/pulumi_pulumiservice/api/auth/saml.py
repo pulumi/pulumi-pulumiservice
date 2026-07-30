@@ -13,6 +13,7 @@ if sys.version_info >= (3, 11):
 else:
     from typing_extensions import NotRequired, TypedDict, TypeAlias
 from ... import _utilities
+from . import outputs
 
 __all__ = ['SAMLArgs', 'SAML']
 
@@ -68,6 +69,7 @@ class SAML(pulumi.CustomResource):
         """
         Updates the SAML configuration for a SAML-backed organization, including the identity provider SSO descriptor, attribute mappings, and other SAML settings. The new IDP SSO descriptor is required in the update request.
 
+
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] new_idp_sso_descriptor: The new IDP SSO descriptor XML for the SAML configuration.
@@ -81,6 +83,7 @@ class SAML(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         Updates the SAML configuration for a SAML-backed organization, including the identity provider SSO descriptor, attribute mappings, and other SAML settings. The new IDP SSO descriptor is required in the update request.
+
 
         :param str resource_name: The name of the resource.
         :param SAMLArgs args: The arguments to use to populate this resource's properties.
@@ -177,7 +180,7 @@ class SAML(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter
-    def organization(self) -> pulumi.Output[Any]:
+    def organization(self) -> pulumi.Output['outputs.Organization']:
         """
         The Pulumi organization.
         """

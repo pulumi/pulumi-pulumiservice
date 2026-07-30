@@ -13,6 +13,7 @@ if sys.version_info >= (3, 11):
 else:
     from typing_extensions import NotRequired, TypedDict, TypeAlias
 from ... import _utilities
+from . import outputs
 
 __all__ = ['TeamArgs', 'Team']
 
@@ -100,6 +101,7 @@ class Team(pulumi.CustomResource):
         CreatePulumiTeam creates a "Pulumi" team, i.e. one whose membership is managed by Pulumi.
         (As opposed to a GitHub or GitLab-based team.)
 
+
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] description: The description
@@ -116,6 +118,7 @@ class Team(pulumi.CustomResource):
         """
         CreatePulumiTeam creates a "Pulumi" team, i.e. one whose membership is managed by Pulumi.
         (As opposed to a GitHub or GitLab-based team.)
+
 
         :param str resource_name: The name of the resource.
         :param TeamArgs args: The arguments to use to populate this resource's properties.
@@ -202,7 +205,7 @@ class Team(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter
-    def accounts(self) -> pulumi.Output[Optional[Sequence[Any]]]:
+    def accounts(self) -> pulumi.Output[Optional[Sequence['outputs.TeamAccountPermission']]]:
         """
         The list of account permissions granted to the team.
         """
@@ -226,7 +229,7 @@ class Team(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter
-    def environments(self) -> pulumi.Output[Optional[Sequence[Any]]]:
+    def environments(self) -> pulumi.Output[Optional[Sequence['outputs.TeamEnvironmentSettings']]]:
         """
         The list of environment settings for the team.
         """
@@ -252,7 +255,7 @@ class Team(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter
-    def members(self) -> pulumi.Output[Optional[Sequence[Any]]]:
+    def members(self) -> pulumi.Output[Optional[Sequence['outputs.TeamMemberInfo']]]:
         """
         The list of team members.
         """
@@ -277,7 +280,7 @@ class Team(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter
-    def stacks(self) -> pulumi.Output[Optional[Sequence[Any]]]:
+    def stacks(self) -> pulumi.Output[Optional[Sequence['outputs.TeamStackPermission']]]:
         """
         The list of stack permissions granted to the team.
         """
