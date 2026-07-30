@@ -116,7 +116,6 @@ class RevisionTag(pulumi.CustomResource):
         """
         Creates a new revision tag for a Pulumi ESC environment. Revision tags are named references that point to specific revision numbers, similar to Git tags. They allow pinning a stable reference to a known-good version of an environment. Tagged versions can be used in imports and Pulumi stack configuration (e.g., myproject/env@prod) to ensure stable references unaffected by subsequent changes. The built-in 'latest' tag always points to the most recent revision.
 
-
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] env_name: The environment name
@@ -133,7 +132,6 @@ class RevisionTag(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         Creates a new revision tag for a Pulumi ESC environment. Revision tags are named references that point to specific revision numbers, similar to Git tags. They allow pinning a stable reference to a known-good version of an environment. Tagged versions can be used in imports and Pulumi stack configuration (e.g., myproject/env@prod) to ensure stable references unaffected by subsequent changes. The built-in 'latest' tag always points to the most recent revision.
-
 
         :param str resource_name: The name of the resource.
         :param RevisionTagArgs args: The arguments to use to populate this resource's properties.

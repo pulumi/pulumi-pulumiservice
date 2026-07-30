@@ -52,7 +52,6 @@ def build_environment_scoped_permissions(environment_id: Optional[_builtins.str]
     """
     Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named environment. Pair with `Environment.environmentId` (or the `getEnvironment` data source) to avoid hand-rolling the `PermissionDescriptorCondition` tree yourself. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls the output of each helper.
 
-
     :param _builtins.str environment_id: The target environment's UUID. Use the `environmentId` output of an `Environment` resource or the `getEnvironment` data source.
     :param Sequence[_builtins.str] permissions: The set of `environment:*` scopes to grant on the target environment (e.g. `environment:read`, `environment:open`, `environment:update`). Discover valid scope names via the `getOrganizationRoleScopes` data source.
     """
@@ -69,7 +68,6 @@ def build_environment_scoped_permissions_output(environment_id: pulumi.Input[Opt
                                                 opts: Optional[Union[pulumi.InvokeOptions, pulumi.InvokeOutputOptions]] = None) -> pulumi.Output[BuildEnvironmentScopedPermissionsResult]:
     """
     Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named environment. Pair with `Environment.environmentId` (or the `getEnvironment` data source) to avoid hand-rolling the `PermissionDescriptorCondition` tree yourself. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls the output of each helper.
-
 
     :param _builtins.str environment_id: The target environment's UUID. Use the `environmentId` output of an `Environment` resource or the `getEnvironment` data source.
     :param Sequence[_builtins.str] permissions: The set of `environment:*` scopes to grant on the target environment (e.g. `environment:read`, `environment:open`, `environment:update`). Discover valid scope names via the `getOrganizationRoleScopes` data source.

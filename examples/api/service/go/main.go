@@ -30,9 +30,9 @@ func main() {
 					"ref":  pulumi.String("service-provider-test-org/example-app/dev"),
 				},
 			},
-			Properties: pulumi.Array{
-				pulumi.Map{"key": pulumi.String("tier"), "value": pulumi.String("gold")},
-				pulumi.Map{"key": pulumi.String("oncall"), "value": pulumi.String("platform-ops")},
+			Properties: services.ServicePropertyArray{
+				services.ServicePropertyArgs{Key: pulumi.String("tier"), Value: pulumi.String("gold")},
+				services.ServicePropertyArgs{Key: pulumi.String("oncall"), Value: pulumi.String("platform-ops")},
 			},
 		})
 		return err

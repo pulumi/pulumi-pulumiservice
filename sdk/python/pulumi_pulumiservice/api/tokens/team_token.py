@@ -136,7 +136,6 @@ class TeamToken(pulumi.CustomResource):
 
         **Important:** The token value in the response is only returned once at creation time and cannot be retrieved later.
 
-
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] description: The description
@@ -158,7 +157,6 @@ class TeamToken(pulumi.CustomResource):
         The `name` field must be unique across the organization (including deleted tokens) and cannot exceed 40 characters. The `expires` field accepts a unix epoch timestamp up to two years from the present, or `0` for no expiry (default).
 
         **Important:** The token value in the response is only returned once at creation time and cannot be retrieved later.
-
 
         :param str resource_name: The name of the resource.
         :param TeamTokenArgs args: The arguments to use to populate this resource's properties.

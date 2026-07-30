@@ -17,10 +17,10 @@ from ... import _utilities
 __all__ = [
     'AuthPolicyDefinitionArgs',
     'AuthPolicyDefinitionArgsDict',
-    'JSONWebKeySetArgs',
-    'JSONWebKeySetArgsDict',
     'JSONWebKeyArgs',
     'JSONWebKeyArgsDict',
+    'JSONWebKeySetArgs',
+    'JSONWebKeySetArgsDict',
     'NetIPNetArgs',
     'NetIPNetArgsDict',
     'NetURLArgs',
@@ -207,39 +207,6 @@ class AuthPolicyDefinitionArgs:
         pulumi.set(self, "user_login", value)
 
 
-class JSONWebKeySetArgsDict(TypedDict):
-    """
-    A JSON Web Key Set (JWKS) as defined by RFC 7517.
-    """
-    keys: pulumi.Input[Sequence[pulumi.Input['JSONWebKeyArgsDict']]]
-    """
-    The set of JSON Web Keys
-    """
-
-@pulumi.input_type
-class JSONWebKeySetArgs:
-    def __init__(__self__, *,
-                 keys: pulumi.Input[Sequence[pulumi.Input['JSONWebKeyArgs']]]):
-        """
-        A JSON Web Key Set (JWKS) as defined by RFC 7517.
-
-        :param pulumi.Input[Sequence[pulumi.Input['JSONWebKeyArgs']]] keys: The set of JSON Web Keys
-        """
-        pulumi.set(__self__, "keys", keys)
-
-    @_builtins.property
-    @pulumi.getter
-    def keys(self) -> pulumi.Input[Sequence[pulumi.Input['JSONWebKeyArgs']]]:
-        """
-        The set of JSON Web Keys
-        """
-        return pulumi.get(self, "keys")
-
-    @keys.setter
-    def keys(self, value: pulumi.Input[Sequence[pulumi.Input['JSONWebKeyArgs']]]):
-        pulumi.set(self, "keys", value)
-
-
 class JSONWebKeyArgsDict(TypedDict):
     """
     A JSON Web Key (JWK) as defined by RFC 7517.
@@ -404,6 +371,39 @@ class JSONWebKeyArgs:
     @use.setter
     def use(self, value: pulumi.Input[_builtins.str]):
         pulumi.set(self, "use", value)
+
+
+class JSONWebKeySetArgsDict(TypedDict):
+    """
+    A JSON Web Key Set (JWKS) as defined by RFC 7517.
+    """
+    keys: pulumi.Input[Sequence[pulumi.Input['JSONWebKeyArgsDict']]]
+    """
+    The set of JSON Web Keys
+    """
+
+@pulumi.input_type
+class JSONWebKeySetArgs:
+    def __init__(__self__, *,
+                 keys: pulumi.Input[Sequence[pulumi.Input['JSONWebKeyArgs']]]):
+        """
+        A JSON Web Key Set (JWKS) as defined by RFC 7517.
+
+        :param pulumi.Input[Sequence[pulumi.Input['JSONWebKeyArgs']]] keys: The set of JSON Web Keys
+        """
+        pulumi.set(__self__, "keys", keys)
+
+    @_builtins.property
+    @pulumi.getter
+    def keys(self) -> pulumi.Input[Sequence[pulumi.Input['JSONWebKeyArgs']]]:
+        """
+        The set of JSON Web Keys
+        """
+        return pulumi.get(self, "keys")
+
+    @keys.setter
+    def keys(self, value: pulumi.Input[Sequence[pulumi.Input['JSONWebKeyArgs']]]):
+        pulumi.set(self, "keys", value)
 
 
 class NetIPNetArgsDict(TypedDict):

@@ -19,7 +19,7 @@ namespace Pulumi.PulumiService.Api.Deployments.Outputs
         /// <summary>
         /// EnvironmentVariables contains environment variables to be applied during the execution.
         /// </summary>
-        public readonly ImmutableDictionary<string, Union<string, Outputs.SecretValue>>? EnvironmentVariables;
+        public readonly ImmutableDictionary<string, object>? EnvironmentVariables;
         /// <summary>
         /// OIDC contains the OIDC configuration for the operation.
         /// </summary>
@@ -44,7 +44,7 @@ namespace Pulumi.PulumiService.Api.Deployments.Outputs
 
         [OutputConstructor]
         private OperationContext(
-            ImmutableDictionary<string, Union<string, Outputs.SecretValue>>? environmentVariables,
+            ImmutableDictionary<string, object>? environmentVariables,
 
             Outputs.OperationContextOIDCConfiguration? oidc,
 

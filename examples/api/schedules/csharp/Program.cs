@@ -23,14 +23,14 @@ return await Deployment.RunAsync(() =>
         OrgName = organizationName,
         ProjectName = projectName,
         StackName = stackName,
-        SourceContext = ImmutableDictionary.CreateRange(new[]
+        SourceContext = new Ps.Api.Deployments.Inputs.SourceContextRequestArgs
         {
-            new KeyValuePair<string, object>("git", ImmutableDictionary.CreateRange(new[]
+            Git = new Ps.Api.Deployments.Inputs.SourceContextGitRequestArgs
             {
-                new KeyValuePair<string, object>("repoUrl", "https://github.com/example/example.git"),
-                new KeyValuePair<string, object>("branch", "refs/heads/main"),
-            })),
-        }),
+                RepoUrl = "https://github.com/example/example.git",
+                Branch = "refs/heads/main",
+            },
+        },
     }, new CustomResourceOptions { DependsOn = { parentStack } });
 
     var nightlyDeploy = new Ps.Api.Deployments.ScheduledDeployment("nightlyDeploy", new()
@@ -39,10 +39,10 @@ return await Deployment.RunAsync(() =>
         ProjectName = projectName,
         StackName = stackName,
         ScheduleCron = scheduleCron,
-        Request = ImmutableDictionary.CreateRange(new[]
+        Request = new Ps.Api.Deployments.Inputs.CreateDeploymentRequestArgs
         {
-            new KeyValuePair<string, object>("operation", "update"),
-        }),
+            Operation = "update",
+        },
     }, new CustomResourceOptions { DependsOn = { parentSettings } });
 
     return new Dictionary<string, object?>

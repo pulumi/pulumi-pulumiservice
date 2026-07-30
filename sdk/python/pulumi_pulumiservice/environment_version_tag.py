@@ -118,7 +118,6 @@ class EnvironmentVersionTag(pulumi.CustomResource):
         """
         A tag on a specific revision of an environment.
 
-
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] environment: Environment name.
@@ -135,7 +134,6 @@ class EnvironmentVersionTag(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         A tag on a specific revision of an environment.
-
 
         :param str resource_name: The name of the resource.
         :param EnvironmentVersionTagArgs args: The arguments to use to populate this resource's properties.

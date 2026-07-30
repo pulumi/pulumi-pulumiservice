@@ -153,7 +153,6 @@ class OrgToken(pulumi.CustomResource):
 
         **Important:** The token value in the response is only returned once at creation time and cannot be retrieved later. Audit logs for actions performed with organization tokens are attributed to the organization rather than an individual user.
 
-
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.bool] admin: Whether the entity has admin privileges
@@ -176,7 +175,6 @@ class OrgToken(pulumi.CustomResource):
         The `name` field must be unique across the organization (including deleted tokens) and cannot exceed 40 characters. The `expires` field accepts a unix epoch timestamp up to two years from the present, or `0` for no expiry (default).
 
         **Important:** The token value in the response is only returned once at creation time and cannot be retrieved later. Audit logs for actions performed with organization tokens are attributed to the organization rather than an individual user.
-
 
         :param str resource_name: The name of the resource.
         :param OrgTokenArgs args: The arguments to use to populate this resource's properties.

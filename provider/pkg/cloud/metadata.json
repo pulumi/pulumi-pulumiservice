@@ -634,7 +634,7 @@
       "scalarShorthand": "string"
     },
     "SecretValue": {
-      "scalarShorthand": "string"
+      "any": true
     },
     "ServiceProperty": {
       "optional": [

@@ -113,7 +113,6 @@ def get_policy_pack(organization_name: Optional[_builtins.str] = None,
     """
     Get details about a specific version of a policy pack.
 
-
     :param _builtins.str organization_name: The name of the Pulumi organization.
     :param _builtins.str policy_pack_name: The name of the policy pack.
     :param _builtins.int version: The version number of the policy pack. If not specified, returns the latest version.
@@ -138,7 +137,6 @@ def get_policy_pack_output(organization_name: pulumi.Input[Optional[_builtins.st
                            opts: Optional[Union[pulumi.InvokeOptions, pulumi.InvokeOutputOptions]] = None) -> pulumi.Output[GetPolicyPackResult]:
     """
     Get details about a specific version of a policy pack.
-
 
     :param _builtins.str organization_name: The name of the Pulumi organization.
     :param _builtins.str policy_pack_name: The name of the policy pack.

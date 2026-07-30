@@ -13,11 +13,11 @@ return await Deployment.RunAsync(() =>
     {
         OrgName = organizationName,
         NewEnabled = true,
-        NewS3Configuration = new Dictionary<string, object?>
+        NewS3Configuration = new Ps.Api.Inputs.AuditLogsExportS3ConfigArgs
         {
-            ["s3BucketName"] = bucketName,
-            ["iamRoleArn"] = "arn:aws:iam::123456789012:role/PulumiAuditLogExportRole",
-        }.ToImmutableDictionary(),
+            S3BucketName = bucketName,
+            IamRoleArn = "arn:aws:iam::123456789012:role/PulumiAuditLogExportRole",
+        },
     });
 
     return new Dictionary<string, object?>

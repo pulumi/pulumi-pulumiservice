@@ -100,7 +100,6 @@ class EnvironmentDraft(pulumi.CustomResource):
         """
         Creates a new draft change request for a Pulumi ESC environment. Drafts allow proposing changes to an environment definition that can be reviewed and approved before being applied. This is part of the approvals workflow for environments. Returns a ChangeRequestRef containing the draft identifier. Requires the Approvals feature to be enabled for the organization.
 
-
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] change_request_id: The change request ID
@@ -116,7 +115,6 @@ class EnvironmentDraft(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         Creates a new draft change request for a Pulumi ESC environment. Drafts allow proposing changes to an environment definition that can be reviewed and approved before being applied. This is part of the approvals workflow for environments. Returns a ChangeRequestRef containing the draft identifier. Requires the Approvals feature to be enabled for the organization.
-
 
         :param str resource_name: The name of the resource.
         :param EnvironmentDraftArgs args: The arguments to use to populate this resource's properties.

@@ -36,7 +36,6 @@ __all__ = [
     'OperationContextOIDCConfiguration',
     'OperationContextOptions',
     'SSHAuth',
-    'SecretValue',
     'SourceContext',
     'SourceContextGit',
     'SourceContextHg',
@@ -73,8 +72,8 @@ class BasicAuth(dict):
         BasicAuth configures git authentication through basic auth —
         i.e. username and password. Both UserName and Password are required.
 
-        :param Union[_builtins.str, 'SecretValue'] password: The password
-        :param Union[_builtins.str, 'SecretValue'] user_name: The user name
+        :param Any password: The password
+        :param Any user_name: The user name
         """
         pulumi.set(__self__, "password", password)
         pulumi.set(__self__, "user_name", user_name)
@@ -1212,7 +1211,7 @@ class DockerImageCredentials(dict):
         """
         DockerImageCredentials describes the credentials needed to access a Docker repository.
 
-        :param Union[_builtins.str, 'SecretValue'] password: The password for authenticating with the Docker registry.
+        :param Any password: The password for authenticating with the Docker registry.
         :param _builtins.str username: The username for authenticating with the Docker registry.
         """
         pulumi.set(__self__, "password", password)
@@ -1298,7 +1297,7 @@ class GitAuthConfig(dict):
     - Personal access token
     - SSH private key (and its optional password)
     - Basic auth username and password
-    Only 1 authentication mode is valid.
+      Only 1 authentication mode is valid.
     """
     @staticmethod
     def __key_warning(key: str):
@@ -1331,9 +1330,9 @@ class GitAuthConfig(dict):
         - Personal access token
         - SSH private key (and its optional password)
         - Basic auth username and password
-        Only 1 authentication mode is valid.
+          Only 1 authentication mode is valid.
 
-        :param Union[_builtins.str, 'SecretValue'] access_token: Personal access token for git authentication
+        :param Any access_token: Personal access token for git authentication
         :param 'BasicAuth' basic_auth: Basic auth username and password configuration
         :param 'SSHAuth' ssh_auth: SSH private key authentication configuration
         """
@@ -1403,7 +1402,7 @@ class OperationContext(dict):
         """
         OperationContext describes what to do.
 
-        :param Mapping[str, Union[_builtins.str, 'SecretValue']] environment_variables: EnvironmentVariables contains environment variables to be applied during the execution.
+        :param Mapping[str, Any] environment_variables: EnvironmentVariables contains environment variables to be applied during the execution.
         :param 'OperationContextOIDCConfiguration' oidc: OIDC contains the OIDC configuration for the operation.
         :param _builtins.str operation: The Pulumi operation to perform (e.g. update, preview, refresh, destroy).
         :param 'OperationContextOptions' options: Options is a bag of settings to specify or override default behavior
@@ -1922,8 +1921,8 @@ class SSHAuth(dict):
         SSHAuth configures ssh-based auth for git authentication.
         SSHPrivateKey is required but password is optional.
 
-        :param Union[_builtins.str, 'SecretValue'] ssh_private_key: The SSH private key used for authentication.
-        :param Union[_builtins.str, 'SecretValue'] password: An optional password or passphrase for the SSH private key.
+        :param Any ssh_private_key: The SSH private key used for authentication.
+        :param Any password: An optional password or passphrase for the SSH private key.
         """
         pulumi.set(__self__, "ssh_private_key", ssh_private_key)
         if password is not None:
@@ -1944,53 +1943,6 @@ class SSHAuth(dict):
         An optional password or passphrase for the SSH private key.
         """
         return pulumi.get(self, "password")
-
-
-@pulumi.output_type
-class SecretValue(dict):
-    """
-    A SecretValue describes a secret value on the wire. The JSON representation is an object with a required 'secret' field containing the plaintext and an optional 'ciphertext' field containing the encrypted representation.
-    """
-    def __init__(__self__, *,
-                 secret: _builtins.str,
-                 ciphertext: Optional[Sequence[_builtins.str]] = None,
-                 plaintext: Optional[_builtins.str] = None):
-        """
-        A SecretValue describes a secret value on the wire. The JSON representation is an object with a required 'secret' field containing the plaintext and an optional 'ciphertext' field containing the encrypted representation.
-
-        :param _builtins.str secret: The secret value in plaintext.
-        :param Sequence[_builtins.str] ciphertext: The encrypted representation of the secret value.
-        :param _builtins.str plaintext: Not a sensitive value, just plaintext.
-        """
-        pulumi.set(__self__, "secret", secret)
-        if ciphertext is not None:
-            pulumi.set(__self__, "ciphertext", ciphertext)
-        if plaintext is not None:
-            pulumi.set(__self__, "plaintext", plaintext)
-
-    @_builtins.property
-    @pulumi.getter
-    def secret(self) -> _builtins.str:
-        """
-        The secret value in plaintext.
-        """
-        return pulumi.get(self, "secret")
-
-    @_builtins.property
-    @pulumi.getter
-    def ciphertext(self) -> Optional[Sequence[_builtins.str]]:
-        """
-        The encrypted representation of the secret value.
-        """
-        return pulumi.get(self, "ciphertext")
-
-    @_builtins.property
-    @pulumi.getter
-    def plaintext(self) -> Optional[_builtins.str]:
-        """
-        Not a sensitive value, just plaintext.
-        """
-        return pulumi.get(self, "plaintext")
 
 
 @pulumi.output_type
@@ -2085,9 +2037,9 @@ class SourceContextGit(dict):
                  * SSH private key (and its optional password)
                  * Personal access token
                  * Basic auth username and password
-               Only one authentication mode will be considered if more than one option is specified,
-               with ssh private key/password preferred first, then personal access token, and finally
-               basic auth credentials.
+                   Only one authentication mode will be considered if more than one option is specified,
+                   with ssh private key/password preferred first, then personal access token, and finally
+                   basic auth credentials.
         :param _builtins.str repo_dir: (optional) RepoDir is the directory to work from in the project's source repository
                where Pulumi.yaml is located. It is used in case Pulumi.yaml is not
                in the project source root.
@@ -2133,9 +2085,9 @@ class SourceContextGit(dict):
           * SSH private key (and its optional password)
           * Personal access token
           * Basic auth username and password
-        Only one authentication mode will be considered if more than one option is specified,
-        with ssh private key/password preferred first, then personal access token, and finally
-        basic auth credentials.
+            Only one authentication mode will be considered if more than one option is specified,
+            with ssh private key/password preferred first, then personal access token, and finally
+            basic auth credentials.
         """
         return pulumi.get(self, "git_auth")
 
@@ -2207,9 +2159,9 @@ class SourceContextHg(dict):
                  * SSH private key (and its optional password)
                  * Personal access token
                  * Basic auth username and password
-               Only one authentication mode will be considered if more than one option is specified,
-               with ssh private key/password preferred first, then personal access token, and finally
-               basic auth credentials.
+                   Only one authentication mode will be considered if more than one option is specified,
+                   with ssh private key/password preferred first, then personal access token, and finally
+                   basic auth credentials.
         :param _builtins.str repo_dir: (optional) RepoDir is the directory to work from in the project's source repository
                where Pulumi.yaml is located. It is used in case Pulumi.yaml is not
                in the project source root.
@@ -2246,9 +2198,9 @@ class SourceContextHg(dict):
           * SSH private key (and its optional password)
           * Personal access token
           * Basic auth username and password
-        Only one authentication mode will be considered if more than one option is specified,
-        with ssh private key/password preferred first, then personal access token, and finally
-        basic auth credentials.
+            Only one authentication mode will be considered if more than one option is specified,
+            with ssh private key/password preferred first, then personal access token, and finally
+            basic auth credentials.
         """
         return pulumi.get(self, "hg_auth")
 

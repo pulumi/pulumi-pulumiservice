@@ -19,7 +19,7 @@ namespace Pulumi.PulumiService.Api.Deployments.Outputs
         /// <summary>
         /// The password for authenticating with the Docker registry.
         /// </summary>
-        public readonly Union<string, Outputs.SecretValue> Password;
+        public readonly object Password;
         /// <summary>
         /// The username for authenticating with the Docker registry.
         /// </summary>
@@ -27,7 +27,7 @@ namespace Pulumi.PulumiService.Api.Deployments.Outputs
 
         [OutputConstructor]
         private DockerImageCredentials(
-            Union<string, Outputs.SecretValue> password,
+            object password,
 
             string username)
         {

@@ -135,7 +135,6 @@ class PolicyPack(pulumi.CustomResource):
         """
         A Policy Pack published to Pulumi Cloud. The source directory is tarballed and uploaded on Create; changing source content publishes a new version (replace).
 
-
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] display_name: Optional display name. Changing it requires a new versionTag (policy pack versions are immutable in Pulumi Cloud).
@@ -153,7 +152,6 @@ class PolicyPack(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         A Policy Pack published to Pulumi Cloud. The source directory is tarballed and uploaded on Create; changing source content publishes a new version (replace).
-
 
         :param str resource_name: The name of the resource.
         :param PolicyPackArgs args: The arguments to use to populate this resource's properties.

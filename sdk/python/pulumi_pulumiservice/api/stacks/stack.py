@@ -159,7 +159,6 @@ class Stack(pulumi.CustomResource):
         - `encryptedKey`: KMS-encrypted ciphertext for the data key (cloud-based secrets providers only)
         - `encryptionSalt`: base64-encoded encryption salt (passphrase-based secrets providers only)
 
-
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[Union['AppStackConfigArgs', 'AppStackConfigArgsDict']] config: The configuration for the new stack.
@@ -184,7 +183,6 @@ class Stack(pulumi.CustomResource):
         - `secretsProvider`: the secrets provider for the stack
         - `encryptedKey`: KMS-encrypted ciphertext for the data key (cloud-based secrets providers only)
         - `encryptionSalt`: base64-encoded encryption salt (passphrase-based secrets providers only)
-
 
         :param str resource_name: The name of the resource.
         :param StackArgs args: The arguments to use to populate this resource's properties.

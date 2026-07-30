@@ -135,7 +135,6 @@ class Item(pulumi.CustomResource):
 
         Prefer `AddServiceItemsV2`, then `GetService` to read the items.
 
-
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[Sequence[Any]] items: List of items
@@ -155,7 +154,6 @@ class Item(pulumi.CustomResource):
         Adds items (such as access tokens, team memberships, or stack permissions) to an existing service account. Service accounts provide programmatic, non-human access to Pulumi Cloud resources and are scoped to an organization. Items define what the service account can access and what credentials it holds. Returns the updated service details with the first page of items; if `continuationToken` is set on the response, pass it to `GetService` to fetch the remaining pages.
 
         Prefer `AddServiceItemsV2`, then `GetService` to read the items.
-
 
         :param str resource_name: The name of the resource.
         :param ItemArgs args: The arguments to use to populate this resource's properties.

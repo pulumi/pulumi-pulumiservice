@@ -8,7 +8,7 @@ plugins {
     id("io.github.gradle-nexus.publish-plugin") version "2.0.0"
 }
 
-group = "com.pulumi"
+group = "com.pulumi."
 
 def resolvedVersion = System.getenv("PACKAGE_VERSION") ?:
     (project.version == "unspecified"
@@ -84,7 +84,7 @@ jar.configure {
 publishing {
     publications {
         mainPublication(MavenPublication) {
-            groupId = "com.pulumi"
+            groupId = "com.pulumi."
             artifactId = "pulumiservice"
             version = resolvedVersion
             from components.java
@@ -95,7 +95,7 @@ publishing {
                 inceptionYear = "2022"
                 name = "pulumi-pulumiservice"
                 packaging = "jar"
-                description = "A native Pulumi package for creating and managing Pulumi Cloud constructs."
+                description = $/A native Pulumi package for creating and managing Pulumi Cloud constructs./$
 
                 url = "https://github.com/pulumi/pulumi-pulumiservice"
 

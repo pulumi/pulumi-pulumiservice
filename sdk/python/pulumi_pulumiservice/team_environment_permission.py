@@ -136,7 +136,6 @@ class TeamEnvironmentPermission(pulumi.CustomResource):
         """
         A permission for a team to use an environment.
 
-
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] environment: Environment name.
@@ -154,7 +153,6 @@ class TeamEnvironmentPermission(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         A permission for a team to use an environment.
-
 
         :param str resource_name: The name of the resource.
         :param TeamEnvironmentPermissionArgs args: The arguments to use to populate this resource's properties.
