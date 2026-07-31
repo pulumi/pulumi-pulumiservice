@@ -53,7 +53,7 @@ var variantWaivers = map[string]string{
 	// makes it unwaivable without false staleness.)
 	"type=policy_issue": waiverAgentEntity,
 	"type=pull_request": waiverAgentEntity,
-	"type=repository":   "agent entity diff shape; task example covers the resource",
+	"type=repository":   waiverAgentEntity,
 
 	// ApprovalRuleEligibility variants beyond the team_member entry that
 	// platform-bootstrap uses.
@@ -64,9 +64,9 @@ var variantWaivers = map[string]string{
 	// VCS providers beyond the github block deployment-settings carries:
 	// wire-identical modulo the tag.
 	"provider=azure_devops": waiverVCSTag,
-	"provider=bitbucket":    "wire-identical to github modulo tag",
-	"provider=custom":       "wire-identical to github modulo tag",
-	"provider=gitlab":       "wire-identical to github modulo tag",
+	"provider=bitbucket":    waiverVCSTag,
+	"provider=custom":       waiverVCSTag,
+	"provider=gitlab":       waiverVCSTag,
 }
 
 // TestEveryUnionVariantHasExample walks every discriminator in the generated
