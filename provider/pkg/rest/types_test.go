@@ -29,6 +29,7 @@ const (
 	tagCircle      = "circle"
 	propsKey       = "properties"
 	typeKey        = "type"
+	tagKind        = "kind"
 	circleRef      = schemaRefPrefix + "Circle"
 )
 
@@ -201,13 +202,13 @@ func variant(base string, extraProps map[string]any, required ...string) map[str
 		}
 		second["required"] = req
 	}
-	return map[string]any{"allOf": []any{sref(base), second}}
+	return map[string]any{allOfKey: []any{sref(base), second}}
 }
 
 func unionSchemas() map[string]any {
 	return map[string]any{
 		widgetRequest: obj(map[string]any{"shape": sref("Shape")}),
-		"Shape": discBase("kind", map[string]any{
+		"Shape": discBase(tagKind, map[string]any{
 			tagCircle: circleRef,
 			"square":  schemaRefPrefix + "Square",
 			"blob":    schemaRefPrefix + "Blob",
@@ -228,7 +229,7 @@ func TestDiscriminatedUnion(t *testing.T) {
 		t.Fatalf("oneOf members: got %d, want %d", got, want)
 	}
 	disc := in.Discriminator
-	if disc == nil || disc.PropertyName != "kind" {
+	if disc == nil || disc.PropertyName != tagKind {
 		t.Fatalf("discriminator: got %+v", disc)
 	}
 	if got, want := disc.Mapping[tagCircle], "#/types/pulumiservice:api:Circle"; got != want {
@@ -317,7 +318,7 @@ func TestMarkerSubtypeRendersBaseUnion(t *testing.T) {
 	// property referencing it must get Shape's union, not a closed
 	// {kind}-only type.
 	schemas := unionSchemas()
-	schemas["BoolShape"] = map[string]any{"allOf": []any{
+	schemas["BoolShape"] = map[string]any{allOfKey: []any{
 		sref("Shape"),
 		map[string]any{"description": "marker", typeKey: typeObject},
 	}}
@@ -339,7 +340,7 @@ func TestMarkerWithOwnPropertiesStaysNamed(t *testing.T) {
 	// A subtype that adds its own properties is a real shape, not a
 	// marker; it must stay a named type.
 	schemas := unionSchemas()
-	schemas["FatShape"] = map[string]any{"allOf": []any{
+	schemas["FatShape"] = map[string]any{allOfKey: []any{
 		sref("Shape"),
 		obj(map[string]any{"extra": map[string]any{"type": typeString}}),
 	}}

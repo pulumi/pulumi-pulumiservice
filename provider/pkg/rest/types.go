@@ -24,7 +24,10 @@ import (
 
 const schemaRefPrefix = "#/components/schemas/"
 
-const refKey = "$ref"
+const (
+	refKey   = "$ref"
+	allOfKey = "allOf"
+)
 
 const (
 	anyRef      = "pulumi.json#/Any"
@@ -137,7 +140,7 @@ func (r *typeRegistry) markReachable(name, module string, seen map[string]bool) 
 			r.markReachable(refSchemaName(ref), module, seen)
 			return
 		}
-		for _, key := range []string{"allOf", "oneOf", "anyOf"} {
+		for _, key := range []string{allOfKey, "oneOf", "anyOf"} {
 			if list, ok := n[key].([]any); ok {
 				for _, m := range list {
 					if mm, ok := m.(map[string]any); ok {
@@ -294,7 +297,7 @@ func (r *typeRegistry) typeSpec(nm map[string]any) schema.TypeSpec {
 	if _, ok := nm["anyOf"]; ok {
 		return anyTypeSpec()
 	}
-	if _, ok := nm["allOf"]; ok {
+	if _, ok := nm[allOfKey]; ok {
 		return anyTypeSpec()
 	}
 	t, _ := nm["type"].(string)
@@ -329,7 +332,7 @@ func isObjectSchema(node map[string]any) bool {
 	if _, ok := node["properties"]; ok {
 		return true
 	}
-	if _, ok := node["allOf"]; ok {
+	if _, ok := node[allOfKey]; ok {
 		return true
 	}
 	t, _ := node["type"].(string)
@@ -369,7 +372,7 @@ func (r *typeRegistry) markerUnionBase(name string, node map[string]any) (string
 	seen := map[string]bool{name: true}
 	cur := node
 	for {
-		all, ok := cur["allOf"].([]any)
+		all, ok := cur[allOfKey].([]any)
 		if !ok {
 			return "", "", nil
 		}
