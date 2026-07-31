@@ -5,7 +5,23 @@ package com.pulumi.pulumiservice.api.outputs;
 
 import com.pulumi.core.annotations.CustomType;
 import com.pulumi.exceptions.MissingRequiredPropertyException;
-import com.pulumi.pulumiservice.api.outputs.PermissionBooleanExpression;
+import com.pulumi.pulumiservice.api.outputs.PermissionExpressionAnd;
+import com.pulumi.pulumiservice.api.outputs.PermissionExpressionEnvironment;
+import com.pulumi.pulumiservice.api.outputs.PermissionExpressionEqual;
+import com.pulumi.pulumiservice.api.outputs.PermissionExpressionHasTag;
+import com.pulumi.pulumiservice.api.outputs.PermissionExpressionInsightsAccount;
+import com.pulumi.pulumiservice.api.outputs.PermissionExpressionOr;
+import com.pulumi.pulumiservice.api.outputs.PermissionExpressionStack;
+import com.pulumi.pulumiservice.api.outputs.PermissionExpressionTag;
+import com.pulumi.pulumiservice.api.outputs.PermissionExpressionTeam;
+import com.pulumi.pulumiservice.api.outputs.PermissionLiteralExpressionBool;
+import com.pulumi.pulumiservice.api.outputs.PermissionLiteralExpressionEnvironment;
+import com.pulumi.pulumiservice.api.outputs.PermissionLiteralExpressionInsightsAccount;
+import com.pulumi.pulumiservice.api.outputs.PermissionLiteralExpressionNumber;
+import com.pulumi.pulumiservice.api.outputs.PermissionLiteralExpressionStack;
+import com.pulumi.pulumiservice.api.outputs.PermissionLiteralExpressionString;
+import com.pulumi.pulumiservice.api.outputs.PermissionLiteralExpressionTeam;
+import java.lang.Object;
 import java.lang.String;
 import java.util.Objects;
 import java.util.Optional;
@@ -22,7 +38,7 @@ public final class PermissionExpressionNot {
      * @return The operand of the unary boolean expression.
      * 
      */
-    private @Nullable PermissionBooleanExpression node;
+    private @Nullable Object node;
 
     private PermissionExpressionNot() {}
     /**
@@ -36,7 +52,7 @@ public final class PermissionExpressionNot {
      * @return The operand of the unary boolean expression.
      * 
      */
-    public Optional<PermissionBooleanExpression> node() {
+    public Optional<Object> node() {
         return Optional.ofNullable(this.node);
     }
 
@@ -50,7 +66,7 @@ public final class PermissionExpressionNot {
     @CustomType.Builder
     public static final class Builder {
         private String __type;
-        private @Nullable PermissionBooleanExpression node;
+        private @Nullable Object node;
         public Builder() {}
         public Builder(PermissionExpressionNot defaults) {
     	      Objects.requireNonNull(defaults);
@@ -67,7 +83,7 @@ public final class PermissionExpressionNot {
             return this;
         }
         @CustomType.Setter
-        public Builder node(@Nullable PermissionBooleanExpression node) {
+        public Builder node(@Nullable Object node) {
 
             this.node = node;
             return this;

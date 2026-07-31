@@ -22,7 +22,7 @@ namespace Pulumi.PulumiService.Api.Inputs
         /// The operand of the unary boolean expression.
         /// </summary>
         [Input("node")]
-        public Input<Inputs.PermissionBooleanExpressionArgs>? Node { get; set; }
+        public object? Node { get; set; }
 
         public PermissionExpressionNotArgs()
         {

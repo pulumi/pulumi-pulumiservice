@@ -20,7 +20,7 @@ namespace Pulumi.PulumiService.Api.Outputs
         /// <summary>
         /// The boolean condition to evaluate.
         /// </summary>
-        public readonly Outputs.PermissionBooleanExpression? Condition;
+        public readonly object? Condition;
         /// <summary>
         /// The permission descriptor to apply when the condition is true.
         /// </summary>
@@ -30,7 +30,7 @@ namespace Pulumi.PulumiService.Api.Outputs
         private PermissionDescriptorCondition(
             string __type,
 
-            Outputs.PermissionBooleanExpression? condition,
+            object? condition,
 
             object? subNode)
         {

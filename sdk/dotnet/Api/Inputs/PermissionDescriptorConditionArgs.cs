@@ -22,7 +22,7 @@ namespace Pulumi.PulumiService.Api.Inputs
         /// The boolean condition to evaluate.
         /// </summary>
         [Input("condition")]
-        public Input<Inputs.PermissionBooleanExpressionArgs>? Condition { get; set; }
+        public object? Condition { get; set; }
 
         /// <summary>
         /// The permission descriptor to apply when the condition is true.

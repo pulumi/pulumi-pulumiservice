@@ -29,8 +29,6 @@ __all__ = [
     'FGARole',
     'JobRun',
     'MemberLinks',
-    'PermissionBooleanExpression',
-    'PermissionContextExpression',
     'PermissionDescriptorAllow',
     'PermissionDescriptorCompose',
     'PermissionDescriptorCondition',
@@ -857,30 +855,6 @@ class MemberLinks(dict):
 
 
 @pulumi.output_type
-class PermissionBooleanExpression(dict):
-    def __init__(__self__, *,
-                 __type: _builtins.str):
-        pulumi.set(__self__, "__type", __type)
-
-    @_builtins.property
-    @pulumi.getter
-    def __type(self) -> _builtins.str:
-        return pulumi.get(self, "__type")
-
-
-@pulumi.output_type
-class PermissionContextExpression(dict):
-    def __init__(__self__, *,
-                 __type: _builtins.str):
-        pulumi.set(__self__, "__type", __type)
-
-    @_builtins.property
-    @pulumi.getter
-    def __type(self) -> _builtins.str:
-        return pulumi.get(self, "__type")
-
-
-@pulumi.output_type
 class PermissionDescriptorAllow(dict):
     def __init__(__self__, *,
                  __type: _builtins.str,
@@ -990,11 +964,11 @@ class PermissionDescriptorCondition(dict):
 
     def __init__(__self__, *,
                  __type: _builtins.str,
-                 condition: Optional['outputs.PermissionBooleanExpression'] = None,
+                 condition: Optional[Any] = None,
                  sub_node: Optional[Any] = None):
         """
         :param _builtins.str __type: Expected value is 'PermissionDescriptorCondition'.
-        :param 'PermissionBooleanExpression' condition: The boolean condition to evaluate.
+        :param Union['PermissionExpressionAnd', 'PermissionExpressionEnvironment', 'PermissionExpressionEqual', 'PermissionExpressionHasTag', 'PermissionExpressionInsightsAccount', 'PermissionExpressionNot', 'PermissionExpressionOr', 'PermissionExpressionStack', 'PermissionExpressionTag', 'PermissionExpressionTeam', 'PermissionLiteralExpressionBool', 'PermissionLiteralExpressionEnvironment', 'PermissionLiteralExpressionInsightsAccount', 'PermissionLiteralExpressionNumber', 'PermissionLiteralExpressionStack', 'PermissionLiteralExpressionString', 'PermissionLiteralExpressionTeam'] condition: The boolean condition to evaluate.
         :param Union['PermissionDescriptorAllow', 'PermissionDescriptorCompose', 'PermissionDescriptorCondition', 'PermissionDescriptorGroup', 'PermissionDescriptorIfThenElse', 'PermissionDescriptorSelect'] sub_node: The permission descriptor to apply when the condition is true.
         """
         pulumi.set(__self__, "__type", 'PermissionDescriptorCondition')
@@ -1013,7 +987,7 @@ class PermissionDescriptorCondition(dict):
 
     @_builtins.property
     @pulumi.getter
-    def condition(self) -> Optional['outputs.PermissionBooleanExpression']:
+    def condition(self) -> Optional[Any]:
         """
         The boolean condition to evaluate.
         """
@@ -1081,12 +1055,12 @@ class PermissionDescriptorIfThenElse(dict):
 
     def __init__(__self__, *,
                  __type: _builtins.str,
-                 condition: Optional['outputs.PermissionBooleanExpression'] = None,
+                 condition: Optional[Any] = None,
                  sub_node_for_false: Optional[Any] = None,
                  sub_node_for_true: Optional[Any] = None):
         """
         :param _builtins.str __type: Expected value is 'PermissionDescriptorIfThenElse'.
-        :param 'PermissionBooleanExpression' condition: The boolean condition to evaluate.
+        :param Union['PermissionExpressionAnd', 'PermissionExpressionEnvironment', 'PermissionExpressionEqual', 'PermissionExpressionHasTag', 'PermissionExpressionInsightsAccount', 'PermissionExpressionNot', 'PermissionExpressionOr', 'PermissionExpressionStack', 'PermissionExpressionTag', 'PermissionExpressionTeam', 'PermissionLiteralExpressionBool', 'PermissionLiteralExpressionEnvironment', 'PermissionLiteralExpressionInsightsAccount', 'PermissionLiteralExpressionNumber', 'PermissionLiteralExpressionStack', 'PermissionLiteralExpressionString', 'PermissionLiteralExpressionTeam'] condition: The boolean condition to evaluate.
         :param Union['PermissionDescriptorAllow', 'PermissionDescriptorCompose', 'PermissionDescriptorCondition', 'PermissionDescriptorGroup', 'PermissionDescriptorIfThenElse', 'PermissionDescriptorSelect'] sub_node_for_false: The permission descriptor to apply when the condition is false.
         :param Union['PermissionDescriptorAllow', 'PermissionDescriptorCompose', 'PermissionDescriptorCondition', 'PermissionDescriptorGroup', 'PermissionDescriptorIfThenElse', 'PermissionDescriptorSelect'] sub_node_for_true: The permission descriptor to apply when the condition is true.
         """
@@ -1108,7 +1082,7 @@ class PermissionDescriptorIfThenElse(dict):
 
     @_builtins.property
     @pulumi.getter
-    def condition(self) -> Optional['outputs.PermissionBooleanExpression']:
+    def condition(self) -> Optional[Any]:
         """
         The boolean condition to evaluate.
         """
@@ -1177,12 +1151,12 @@ class PermissionDescriptorSelect(dict):
 class PermissionExpressionAnd(dict):
     def __init__(__self__, *,
                  __type: _builtins.str,
-                 left: Optional['outputs.PermissionBooleanExpression'] = None,
-                 right: Optional['outputs.PermissionBooleanExpression'] = None):
+                 left: Optional[Any] = None,
+                 right: Optional[Any] = None):
         """
         :param _builtins.str __type: Expected value is 'PermissionExpressionAnd'.
-        :param 'PermissionBooleanExpression' left: The left operand of the binary boolean expression.
-        :param 'PermissionBooleanExpression' right: The right operand of the binary boolean expression.
+        :param Union['PermissionExpressionAnd', 'PermissionExpressionEnvironment', 'PermissionExpressionEqual', 'PermissionExpressionHasTag', 'PermissionExpressionInsightsAccount', 'PermissionExpressionNot', 'PermissionExpressionOr', 'PermissionExpressionStack', 'PermissionExpressionTag', 'PermissionExpressionTeam', 'PermissionLiteralExpressionBool', 'PermissionLiteralExpressionEnvironment', 'PermissionLiteralExpressionInsightsAccount', 'PermissionLiteralExpressionNumber', 'PermissionLiteralExpressionStack', 'PermissionLiteralExpressionString', 'PermissionLiteralExpressionTeam'] left: The left operand of the binary boolean expression.
+        :param Union['PermissionExpressionAnd', 'PermissionExpressionEnvironment', 'PermissionExpressionEqual', 'PermissionExpressionHasTag', 'PermissionExpressionInsightsAccount', 'PermissionExpressionNot', 'PermissionExpressionOr', 'PermissionExpressionStack', 'PermissionExpressionTag', 'PermissionExpressionTeam', 'PermissionLiteralExpressionBool', 'PermissionLiteralExpressionEnvironment', 'PermissionLiteralExpressionInsightsAccount', 'PermissionLiteralExpressionNumber', 'PermissionLiteralExpressionStack', 'PermissionLiteralExpressionString', 'PermissionLiteralExpressionTeam'] right: The right operand of the binary boolean expression.
         """
         pulumi.set(__self__, "__type", 'PermissionExpressionAnd')
         if left is not None:
@@ -1200,7 +1174,7 @@ class PermissionExpressionAnd(dict):
 
     @_builtins.property
     @pulumi.getter
-    def left(self) -> Optional['outputs.PermissionBooleanExpression']:
+    def left(self) -> Optional[Any]:
         """
         The left operand of the binary boolean expression.
         """
@@ -1208,7 +1182,7 @@ class PermissionExpressionAnd(dict):
 
     @_builtins.property
     @pulumi.getter
-    def right(self) -> Optional['outputs.PermissionBooleanExpression']:
+    def right(self) -> Optional[Any]:
         """
         The right operand of the binary boolean expression.
         """
@@ -1279,14 +1253,14 @@ class PermissionExpressionEqual(dict):
 class PermissionExpressionHasTag(dict):
     def __init__(__self__, *,
                  __type: _builtins.str,
-                 context: Optional['outputs.PermissionContextExpression'] = None,
+                 context: Optional[Any] = None,
                  key: Optional[_builtins.str] = None,
-                 node: Optional['outputs.PermissionBooleanExpression'] = None):
+                 node: Optional[Any] = None):
         """
         :param _builtins.str __type: Expected value is 'PermissionExpressionHasTag'.
-        :param 'PermissionContextExpression' context: The context expression to check for the tag.
+        :param Union['PermissionExpressionAnd', 'PermissionExpressionEnvironment', 'PermissionExpressionEqual', 'PermissionExpressionHasTag', 'PermissionExpressionInsightsAccount', 'PermissionExpressionNot', 'PermissionExpressionOr', 'PermissionExpressionStack', 'PermissionExpressionTag', 'PermissionExpressionTeam', 'PermissionLiteralExpressionBool', 'PermissionLiteralExpressionEnvironment', 'PermissionLiteralExpressionInsightsAccount', 'PermissionLiteralExpressionNumber', 'PermissionLiteralExpressionStack', 'PermissionLiteralExpressionString', 'PermissionLiteralExpressionTeam'] context: The context expression to check for the tag.
         :param _builtins.str key: The tag key to check for.
-        :param 'PermissionBooleanExpression' node: The operand of the unary boolean expression.
+        :param Union['PermissionExpressionAnd', 'PermissionExpressionEnvironment', 'PermissionExpressionEqual', 'PermissionExpressionHasTag', 'PermissionExpressionInsightsAccount', 'PermissionExpressionNot', 'PermissionExpressionOr', 'PermissionExpressionStack', 'PermissionExpressionTag', 'PermissionExpressionTeam', 'PermissionLiteralExpressionBool', 'PermissionLiteralExpressionEnvironment', 'PermissionLiteralExpressionInsightsAccount', 'PermissionLiteralExpressionNumber', 'PermissionLiteralExpressionStack', 'PermissionLiteralExpressionString', 'PermissionLiteralExpressionTeam'] node: The operand of the unary boolean expression.
         """
         pulumi.set(__self__, "__type", 'PermissionExpressionHasTag')
         if context is not None:
@@ -1306,7 +1280,7 @@ class PermissionExpressionHasTag(dict):
 
     @_builtins.property
     @pulumi.getter
-    def context(self) -> Optional['outputs.PermissionContextExpression']:
+    def context(self) -> Optional[Any]:
         """
         The context expression to check for the tag.
         """
@@ -1322,7 +1296,7 @@ class PermissionExpressionHasTag(dict):
 
     @_builtins.property
     @pulumi.getter
-    def node(self) -> Optional['outputs.PermissionBooleanExpression']:
+    def node(self) -> Optional[Any]:
         """
         The operand of the unary boolean expression.
         """
@@ -1351,10 +1325,10 @@ class PermissionExpressionInsightsAccount(dict):
 class PermissionExpressionNot(dict):
     def __init__(__self__, *,
                  __type: _builtins.str,
-                 node: Optional['outputs.PermissionBooleanExpression'] = None):
+                 node: Optional[Any] = None):
         """
         :param _builtins.str __type: Expected value is 'PermissionExpressionNot'.
-        :param 'PermissionBooleanExpression' node: The operand of the unary boolean expression.
+        :param Union['PermissionExpressionAnd', 'PermissionExpressionEnvironment', 'PermissionExpressionEqual', 'PermissionExpressionHasTag', 'PermissionExpressionInsightsAccount', 'PermissionExpressionNot', 'PermissionExpressionOr', 'PermissionExpressionStack', 'PermissionExpressionTag', 'PermissionExpressionTeam', 'PermissionLiteralExpressionBool', 'PermissionLiteralExpressionEnvironment', 'PermissionLiteralExpressionInsightsAccount', 'PermissionLiteralExpressionNumber', 'PermissionLiteralExpressionStack', 'PermissionLiteralExpressionString', 'PermissionLiteralExpressionTeam'] node: The operand of the unary boolean expression.
         """
         pulumi.set(__self__, "__type", 'PermissionExpressionNot')
         if node is not None:
@@ -1370,7 +1344,7 @@ class PermissionExpressionNot(dict):
 
     @_builtins.property
     @pulumi.getter
-    def node(self) -> Optional['outputs.PermissionBooleanExpression']:
+    def node(self) -> Optional[Any]:
         """
         The operand of the unary boolean expression.
         """
@@ -1381,12 +1355,12 @@ class PermissionExpressionNot(dict):
 class PermissionExpressionOr(dict):
     def __init__(__self__, *,
                  __type: _builtins.str,
-                 left: Optional['outputs.PermissionBooleanExpression'] = None,
-                 right: Optional['outputs.PermissionBooleanExpression'] = None):
+                 left: Optional[Any] = None,
+                 right: Optional[Any] = None):
         """
         :param _builtins.str __type: Expected value is 'PermissionExpressionOr'.
-        :param 'PermissionBooleanExpression' left: The left operand of the binary boolean expression.
-        :param 'PermissionBooleanExpression' right: The right operand of the binary boolean expression.
+        :param Union['PermissionExpressionAnd', 'PermissionExpressionEnvironment', 'PermissionExpressionEqual', 'PermissionExpressionHasTag', 'PermissionExpressionInsightsAccount', 'PermissionExpressionNot', 'PermissionExpressionOr', 'PermissionExpressionStack', 'PermissionExpressionTag', 'PermissionExpressionTeam', 'PermissionLiteralExpressionBool', 'PermissionLiteralExpressionEnvironment', 'PermissionLiteralExpressionInsightsAccount', 'PermissionLiteralExpressionNumber', 'PermissionLiteralExpressionStack', 'PermissionLiteralExpressionString', 'PermissionLiteralExpressionTeam'] left: The left operand of the binary boolean expression.
+        :param Union['PermissionExpressionAnd', 'PermissionExpressionEnvironment', 'PermissionExpressionEqual', 'PermissionExpressionHasTag', 'PermissionExpressionInsightsAccount', 'PermissionExpressionNot', 'PermissionExpressionOr', 'PermissionExpressionStack', 'PermissionExpressionTag', 'PermissionExpressionTeam', 'PermissionLiteralExpressionBool', 'PermissionLiteralExpressionEnvironment', 'PermissionLiteralExpressionInsightsAccount', 'PermissionLiteralExpressionNumber', 'PermissionLiteralExpressionStack', 'PermissionLiteralExpressionString', 'PermissionLiteralExpressionTeam'] right: The right operand of the binary boolean expression.
         """
         pulumi.set(__self__, "__type", 'PermissionExpressionOr')
         if left is not None:
@@ -1404,7 +1378,7 @@ class PermissionExpressionOr(dict):
 
     @_builtins.property
     @pulumi.getter
-    def left(self) -> Optional['outputs.PermissionBooleanExpression']:
+    def left(self) -> Optional[Any]:
         """
         The left operand of the binary boolean expression.
         """
@@ -1412,7 +1386,7 @@ class PermissionExpressionOr(dict):
 
     @_builtins.property
     @pulumi.getter
-    def right(self) -> Optional['outputs.PermissionBooleanExpression']:
+    def right(self) -> Optional[Any]:
         """
         The right operand of the binary boolean expression.
         """
@@ -1441,11 +1415,11 @@ class PermissionExpressionStack(dict):
 class PermissionExpressionTag(dict):
     def __init__(__self__, *,
                  __type: _builtins.str,
-                 context: Optional['outputs.PermissionContextExpression'] = None,
+                 context: Optional[Any] = None,
                  key: Optional[_builtins.str] = None):
         """
         :param _builtins.str __type: Expected value is 'PermissionExpressionTag'.
-        :param 'PermissionContextExpression' context: The context expression identifying the resource to look up the tag on.
+        :param Union['PermissionExpressionAnd', 'PermissionExpressionEnvironment', 'PermissionExpressionEqual', 'PermissionExpressionHasTag', 'PermissionExpressionInsightsAccount', 'PermissionExpressionNot', 'PermissionExpressionOr', 'PermissionExpressionStack', 'PermissionExpressionTag', 'PermissionExpressionTeam', 'PermissionLiteralExpressionBool', 'PermissionLiteralExpressionEnvironment', 'PermissionLiteralExpressionInsightsAccount', 'PermissionLiteralExpressionNumber', 'PermissionLiteralExpressionStack', 'PermissionLiteralExpressionString', 'PermissionLiteralExpressionTeam'] context: The context expression identifying the resource to look up the tag on.
         :param _builtins.str key: The tag key to retrieve.
         """
         pulumi.set(__self__, "__type", 'PermissionExpressionTag')
@@ -1464,7 +1438,7 @@ class PermissionExpressionTag(dict):
 
     @_builtins.property
     @pulumi.getter
-    def context(self) -> Optional['outputs.PermissionContextExpression']:
+    def context(self) -> Optional[Any]:
         """
         The context expression identifying the resource to look up the tag on.
         """

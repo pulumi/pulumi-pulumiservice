@@ -7,7 +7,23 @@ import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
 import com.pulumi.core.internal.Codegen;
 import com.pulumi.exceptions.MissingRequiredPropertyException;
-import com.pulumi.pulumiservice.api.inputs.PermissionBooleanExpressionArgs;
+import com.pulumi.pulumiservice.api.inputs.PermissionExpressionEnvironmentArgs;
+import com.pulumi.pulumiservice.api.inputs.PermissionExpressionEqualArgs;
+import com.pulumi.pulumiservice.api.inputs.PermissionExpressionHasTagArgs;
+import com.pulumi.pulumiservice.api.inputs.PermissionExpressionInsightsAccountArgs;
+import com.pulumi.pulumiservice.api.inputs.PermissionExpressionNotArgs;
+import com.pulumi.pulumiservice.api.inputs.PermissionExpressionOrArgs;
+import com.pulumi.pulumiservice.api.inputs.PermissionExpressionStackArgs;
+import com.pulumi.pulumiservice.api.inputs.PermissionExpressionTagArgs;
+import com.pulumi.pulumiservice.api.inputs.PermissionExpressionTeamArgs;
+import com.pulumi.pulumiservice.api.inputs.PermissionLiteralExpressionBoolArgs;
+import com.pulumi.pulumiservice.api.inputs.PermissionLiteralExpressionEnvironmentArgs;
+import com.pulumi.pulumiservice.api.inputs.PermissionLiteralExpressionInsightsAccountArgs;
+import com.pulumi.pulumiservice.api.inputs.PermissionLiteralExpressionNumberArgs;
+import com.pulumi.pulumiservice.api.inputs.PermissionLiteralExpressionStackArgs;
+import com.pulumi.pulumiservice.api.inputs.PermissionLiteralExpressionStringArgs;
+import com.pulumi.pulumiservice.api.inputs.PermissionLiteralExpressionTeamArgs;
+import java.lang.Object;
 import java.lang.String;
 import java.util.Objects;
 import java.util.Optional;
@@ -38,13 +54,13 @@ public final class PermissionExpressionAndArgs extends com.pulumi.resources.Reso
      * 
      */
     @Import(name="left")
-    private @Nullable Output<PermissionBooleanExpressionArgs> left;
+    private @Nullable Output<Object> left;
 
     /**
      * @return The left operand of the binary boolean expression.
      * 
      */
-    public Optional<Output<PermissionBooleanExpressionArgs>> left() {
+    public Optional<Output<Object>> left() {
         return Optional.ofNullable(this.left);
     }
 
@@ -53,13 +69,13 @@ public final class PermissionExpressionAndArgs extends com.pulumi.resources.Reso
      * 
      */
     @Import(name="right")
-    private @Nullable Output<PermissionBooleanExpressionArgs> right;
+    private @Nullable Output<Object> right;
 
     /**
      * @return The right operand of the binary boolean expression.
      * 
      */
-    public Optional<Output<PermissionBooleanExpressionArgs>> right() {
+    public Optional<Output<Object>> right() {
         return Optional.ofNullable(this.right);
     }
 
@@ -116,7 +132,7 @@ public final class PermissionExpressionAndArgs extends com.pulumi.resources.Reso
          * @return builder
          * 
          */
-        public Builder left(@Nullable Output<PermissionBooleanExpressionArgs> left) {
+        public Builder left(@Nullable Output<Object> left) {
             $.left = left;
             return this;
         }
@@ -127,7 +143,7 @@ public final class PermissionExpressionAndArgs extends com.pulumi.resources.Reso
          * @return builder
          * 
          */
-        public Builder left(PermissionBooleanExpressionArgs left) {
+        public Builder left(Object left) {
             return left(Output.of(left));
         }
 
@@ -137,7 +153,7 @@ public final class PermissionExpressionAndArgs extends com.pulumi.resources.Reso
          * @return builder
          * 
          */
-        public Builder right(@Nullable Output<PermissionBooleanExpressionArgs> right) {
+        public Builder right(@Nullable Output<Object> right) {
             $.right = right;
             return this;
         }
@@ -148,7 +164,7 @@ public final class PermissionExpressionAndArgs extends com.pulumi.resources.Reso
          * @return builder
          * 
          */
-        public Builder right(PermissionBooleanExpressionArgs right) {
+        public Builder right(Object right) {
             return right(Output.of(right));
         }
 

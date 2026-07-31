@@ -3751,28 +3751,6 @@
       },
       "type": "object"
     },
-    "pulumiservice:api:PermissionBooleanExpression": {
-      "properties": {
-        "__type": {
-          "type": "string"
-        }
-      },
-      "type": "object",
-      "required": [
-        "__type"
-      ]
-    },
-    "pulumiservice:api:PermissionContextExpression": {
-      "properties": {
-        "__type": {
-          "type": "string"
-        }
-      },
-      "type": "object",
-      "required": [
-        "__type"
-      ]
-    },
     "pulumiservice:api:PermissionDescriptorAllow": {
       "properties": {
         "__type": {
@@ -3825,7 +3803,81 @@
           "const": "PermissionDescriptorCondition"
         },
         "condition": {
-          "$ref": "#/types/pulumiservice:api:PermissionBooleanExpression",
+          "oneOf": [
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionAnd"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionEnvironment"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionEqual"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionHasTag"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionInsightsAccount"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionNot"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionOr"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionStack"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionTag"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionTeam"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionLiteralExpressionBool"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionLiteralExpressionEnvironment"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionLiteralExpressionInsightsAccount"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionLiteralExpressionNumber"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionLiteralExpressionStack"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionLiteralExpressionString"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionLiteralExpressionTeam"
+            }
+          ],
+          "discriminator": {
+            "propertyName": "__type",
+            "mapping": {
+              "PermissionExpressionAnd": "#/types/pulumiservice:api:PermissionExpressionAnd",
+              "PermissionExpressionEnvironment": "#/types/pulumiservice:api:PermissionExpressionEnvironment",
+              "PermissionExpressionEqual": "#/types/pulumiservice:api:PermissionExpressionEqual",
+              "PermissionExpressionHasTag": "#/types/pulumiservice:api:PermissionExpressionHasTag",
+              "PermissionExpressionInsightsAccount": "#/types/pulumiservice:api:PermissionExpressionInsightsAccount",
+              "PermissionExpressionNot": "#/types/pulumiservice:api:PermissionExpressionNot",
+              "PermissionExpressionOr": "#/types/pulumiservice:api:PermissionExpressionOr",
+              "PermissionExpressionStack": "#/types/pulumiservice:api:PermissionExpressionStack",
+              "PermissionExpressionTag": "#/types/pulumiservice:api:PermissionExpressionTag",
+              "PermissionExpressionTeam": "#/types/pulumiservice:api:PermissionExpressionTeam",
+              "PermissionLiteralExpressionBool": "#/types/pulumiservice:api:PermissionLiteralExpressionBool",
+              "PermissionLiteralExpressionEnvironment": "#/types/pulumiservice:api:PermissionLiteralExpressionEnvironment",
+              "PermissionLiteralExpressionInsightsAccount": "#/types/pulumiservice:api:PermissionLiteralExpressionInsightsAccount",
+              "PermissionLiteralExpressionNumber": "#/types/pulumiservice:api:PermissionLiteralExpressionNumber",
+              "PermissionLiteralExpressionStack": "#/types/pulumiservice:api:PermissionLiteralExpressionStack",
+              "PermissionLiteralExpressionString": "#/types/pulumiservice:api:PermissionLiteralExpressionString",
+              "PermissionLiteralExpressionTeam": "#/types/pulumiservice:api:PermissionLiteralExpressionTeam"
+            }
+          },
           "description": "The boolean condition to evaluate."
         },
         "subNode": {
@@ -3926,7 +3978,81 @@
           "const": "PermissionDescriptorIfThenElse"
         },
         "condition": {
-          "$ref": "#/types/pulumiservice:api:PermissionBooleanExpression",
+          "oneOf": [
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionAnd"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionEnvironment"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionEqual"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionHasTag"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionInsightsAccount"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionNot"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionOr"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionStack"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionTag"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionTeam"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionLiteralExpressionBool"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionLiteralExpressionEnvironment"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionLiteralExpressionInsightsAccount"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionLiteralExpressionNumber"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionLiteralExpressionStack"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionLiteralExpressionString"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionLiteralExpressionTeam"
+            }
+          ],
+          "discriminator": {
+            "propertyName": "__type",
+            "mapping": {
+              "PermissionExpressionAnd": "#/types/pulumiservice:api:PermissionExpressionAnd",
+              "PermissionExpressionEnvironment": "#/types/pulumiservice:api:PermissionExpressionEnvironment",
+              "PermissionExpressionEqual": "#/types/pulumiservice:api:PermissionExpressionEqual",
+              "PermissionExpressionHasTag": "#/types/pulumiservice:api:PermissionExpressionHasTag",
+              "PermissionExpressionInsightsAccount": "#/types/pulumiservice:api:PermissionExpressionInsightsAccount",
+              "PermissionExpressionNot": "#/types/pulumiservice:api:PermissionExpressionNot",
+              "PermissionExpressionOr": "#/types/pulumiservice:api:PermissionExpressionOr",
+              "PermissionExpressionStack": "#/types/pulumiservice:api:PermissionExpressionStack",
+              "PermissionExpressionTag": "#/types/pulumiservice:api:PermissionExpressionTag",
+              "PermissionExpressionTeam": "#/types/pulumiservice:api:PermissionExpressionTeam",
+              "PermissionLiteralExpressionBool": "#/types/pulumiservice:api:PermissionLiteralExpressionBool",
+              "PermissionLiteralExpressionEnvironment": "#/types/pulumiservice:api:PermissionLiteralExpressionEnvironment",
+              "PermissionLiteralExpressionInsightsAccount": "#/types/pulumiservice:api:PermissionLiteralExpressionInsightsAccount",
+              "PermissionLiteralExpressionNumber": "#/types/pulumiservice:api:PermissionLiteralExpressionNumber",
+              "PermissionLiteralExpressionStack": "#/types/pulumiservice:api:PermissionLiteralExpressionStack",
+              "PermissionLiteralExpressionString": "#/types/pulumiservice:api:PermissionLiteralExpressionString",
+              "PermissionLiteralExpressionTeam": "#/types/pulumiservice:api:PermissionLiteralExpressionTeam"
+            }
+          },
           "description": "The boolean condition to evaluate."
         },
         "subNodeForFalse": {
@@ -4109,11 +4235,159 @@
           "const": "PermissionExpressionAnd"
         },
         "left": {
-          "$ref": "#/types/pulumiservice:api:PermissionBooleanExpression",
+          "oneOf": [
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionAnd"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionEnvironment"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionEqual"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionHasTag"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionInsightsAccount"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionNot"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionOr"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionStack"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionTag"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionTeam"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionLiteralExpressionBool"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionLiteralExpressionEnvironment"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionLiteralExpressionInsightsAccount"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionLiteralExpressionNumber"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionLiteralExpressionStack"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionLiteralExpressionString"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionLiteralExpressionTeam"
+            }
+          ],
+          "discriminator": {
+            "propertyName": "__type",
+            "mapping": {
+              "PermissionExpressionAnd": "#/types/pulumiservice:api:PermissionExpressionAnd",
+              "PermissionExpressionEnvironment": "#/types/pulumiservice:api:PermissionExpressionEnvironment",
+              "PermissionExpressionEqual": "#/types/pulumiservice:api:PermissionExpressionEqual",
+              "PermissionExpressionHasTag": "#/types/pulumiservice:api:PermissionExpressionHasTag",
+              "PermissionExpressionInsightsAccount": "#/types/pulumiservice:api:PermissionExpressionInsightsAccount",
+              "PermissionExpressionNot": "#/types/pulumiservice:api:PermissionExpressionNot",
+              "PermissionExpressionOr": "#/types/pulumiservice:api:PermissionExpressionOr",
+              "PermissionExpressionStack": "#/types/pulumiservice:api:PermissionExpressionStack",
+              "PermissionExpressionTag": "#/types/pulumiservice:api:PermissionExpressionTag",
+              "PermissionExpressionTeam": "#/types/pulumiservice:api:PermissionExpressionTeam",
+              "PermissionLiteralExpressionBool": "#/types/pulumiservice:api:PermissionLiteralExpressionBool",
+              "PermissionLiteralExpressionEnvironment": "#/types/pulumiservice:api:PermissionLiteralExpressionEnvironment",
+              "PermissionLiteralExpressionInsightsAccount": "#/types/pulumiservice:api:PermissionLiteralExpressionInsightsAccount",
+              "PermissionLiteralExpressionNumber": "#/types/pulumiservice:api:PermissionLiteralExpressionNumber",
+              "PermissionLiteralExpressionStack": "#/types/pulumiservice:api:PermissionLiteralExpressionStack",
+              "PermissionLiteralExpressionString": "#/types/pulumiservice:api:PermissionLiteralExpressionString",
+              "PermissionLiteralExpressionTeam": "#/types/pulumiservice:api:PermissionLiteralExpressionTeam"
+            }
+          },
           "description": "The left operand of the binary boolean expression."
         },
         "right": {
-          "$ref": "#/types/pulumiservice:api:PermissionBooleanExpression",
+          "oneOf": [
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionAnd"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionEnvironment"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionEqual"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionHasTag"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionInsightsAccount"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionNot"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionOr"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionStack"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionTag"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionTeam"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionLiteralExpressionBool"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionLiteralExpressionEnvironment"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionLiteralExpressionInsightsAccount"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionLiteralExpressionNumber"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionLiteralExpressionStack"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionLiteralExpressionString"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionLiteralExpressionTeam"
+            }
+          ],
+          "discriminator": {
+            "propertyName": "__type",
+            "mapping": {
+              "PermissionExpressionAnd": "#/types/pulumiservice:api:PermissionExpressionAnd",
+              "PermissionExpressionEnvironment": "#/types/pulumiservice:api:PermissionExpressionEnvironment",
+              "PermissionExpressionEqual": "#/types/pulumiservice:api:PermissionExpressionEqual",
+              "PermissionExpressionHasTag": "#/types/pulumiservice:api:PermissionExpressionHasTag",
+              "PermissionExpressionInsightsAccount": "#/types/pulumiservice:api:PermissionExpressionInsightsAccount",
+              "PermissionExpressionNot": "#/types/pulumiservice:api:PermissionExpressionNot",
+              "PermissionExpressionOr": "#/types/pulumiservice:api:PermissionExpressionOr",
+              "PermissionExpressionStack": "#/types/pulumiservice:api:PermissionExpressionStack",
+              "PermissionExpressionTag": "#/types/pulumiservice:api:PermissionExpressionTag",
+              "PermissionExpressionTeam": "#/types/pulumiservice:api:PermissionExpressionTeam",
+              "PermissionLiteralExpressionBool": "#/types/pulumiservice:api:PermissionLiteralExpressionBool",
+              "PermissionLiteralExpressionEnvironment": "#/types/pulumiservice:api:PermissionLiteralExpressionEnvironment",
+              "PermissionLiteralExpressionInsightsAccount": "#/types/pulumiservice:api:PermissionLiteralExpressionInsightsAccount",
+              "PermissionLiteralExpressionNumber": "#/types/pulumiservice:api:PermissionLiteralExpressionNumber",
+              "PermissionLiteralExpressionStack": "#/types/pulumiservice:api:PermissionLiteralExpressionStack",
+              "PermissionLiteralExpressionString": "#/types/pulumiservice:api:PermissionLiteralExpressionString",
+              "PermissionLiteralExpressionTeam": "#/types/pulumiservice:api:PermissionLiteralExpressionTeam"
+            }
+          },
           "description": "The right operand of the binary boolean expression."
         }
       },
@@ -4312,7 +4586,81 @@
           "const": "PermissionExpressionHasTag"
         },
         "context": {
-          "$ref": "#/types/pulumiservice:api:PermissionContextExpression",
+          "oneOf": [
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionAnd"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionEnvironment"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionEqual"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionHasTag"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionInsightsAccount"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionNot"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionOr"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionStack"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionTag"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionTeam"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionLiteralExpressionBool"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionLiteralExpressionEnvironment"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionLiteralExpressionInsightsAccount"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionLiteralExpressionNumber"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionLiteralExpressionStack"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionLiteralExpressionString"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionLiteralExpressionTeam"
+            }
+          ],
+          "discriminator": {
+            "propertyName": "__type",
+            "mapping": {
+              "PermissionExpressionAnd": "#/types/pulumiservice:api:PermissionExpressionAnd",
+              "PermissionExpressionEnvironment": "#/types/pulumiservice:api:PermissionExpressionEnvironment",
+              "PermissionExpressionEqual": "#/types/pulumiservice:api:PermissionExpressionEqual",
+              "PermissionExpressionHasTag": "#/types/pulumiservice:api:PermissionExpressionHasTag",
+              "PermissionExpressionInsightsAccount": "#/types/pulumiservice:api:PermissionExpressionInsightsAccount",
+              "PermissionExpressionNot": "#/types/pulumiservice:api:PermissionExpressionNot",
+              "PermissionExpressionOr": "#/types/pulumiservice:api:PermissionExpressionOr",
+              "PermissionExpressionStack": "#/types/pulumiservice:api:PermissionExpressionStack",
+              "PermissionExpressionTag": "#/types/pulumiservice:api:PermissionExpressionTag",
+              "PermissionExpressionTeam": "#/types/pulumiservice:api:PermissionExpressionTeam",
+              "PermissionLiteralExpressionBool": "#/types/pulumiservice:api:PermissionLiteralExpressionBool",
+              "PermissionLiteralExpressionEnvironment": "#/types/pulumiservice:api:PermissionLiteralExpressionEnvironment",
+              "PermissionLiteralExpressionInsightsAccount": "#/types/pulumiservice:api:PermissionLiteralExpressionInsightsAccount",
+              "PermissionLiteralExpressionNumber": "#/types/pulumiservice:api:PermissionLiteralExpressionNumber",
+              "PermissionLiteralExpressionStack": "#/types/pulumiservice:api:PermissionLiteralExpressionStack",
+              "PermissionLiteralExpressionString": "#/types/pulumiservice:api:PermissionLiteralExpressionString",
+              "PermissionLiteralExpressionTeam": "#/types/pulumiservice:api:PermissionLiteralExpressionTeam"
+            }
+          },
           "description": "The context expression to check for the tag."
         },
         "key": {
@@ -4320,7 +4668,81 @@
           "description": "The tag key to check for."
         },
         "node": {
-          "$ref": "#/types/pulumiservice:api:PermissionBooleanExpression",
+          "oneOf": [
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionAnd"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionEnvironment"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionEqual"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionHasTag"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionInsightsAccount"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionNot"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionOr"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionStack"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionTag"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionTeam"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionLiteralExpressionBool"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionLiteralExpressionEnvironment"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionLiteralExpressionInsightsAccount"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionLiteralExpressionNumber"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionLiteralExpressionStack"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionLiteralExpressionString"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionLiteralExpressionTeam"
+            }
+          ],
+          "discriminator": {
+            "propertyName": "__type",
+            "mapping": {
+              "PermissionExpressionAnd": "#/types/pulumiservice:api:PermissionExpressionAnd",
+              "PermissionExpressionEnvironment": "#/types/pulumiservice:api:PermissionExpressionEnvironment",
+              "PermissionExpressionEqual": "#/types/pulumiservice:api:PermissionExpressionEqual",
+              "PermissionExpressionHasTag": "#/types/pulumiservice:api:PermissionExpressionHasTag",
+              "PermissionExpressionInsightsAccount": "#/types/pulumiservice:api:PermissionExpressionInsightsAccount",
+              "PermissionExpressionNot": "#/types/pulumiservice:api:PermissionExpressionNot",
+              "PermissionExpressionOr": "#/types/pulumiservice:api:PermissionExpressionOr",
+              "PermissionExpressionStack": "#/types/pulumiservice:api:PermissionExpressionStack",
+              "PermissionExpressionTag": "#/types/pulumiservice:api:PermissionExpressionTag",
+              "PermissionExpressionTeam": "#/types/pulumiservice:api:PermissionExpressionTeam",
+              "PermissionLiteralExpressionBool": "#/types/pulumiservice:api:PermissionLiteralExpressionBool",
+              "PermissionLiteralExpressionEnvironment": "#/types/pulumiservice:api:PermissionLiteralExpressionEnvironment",
+              "PermissionLiteralExpressionInsightsAccount": "#/types/pulumiservice:api:PermissionLiteralExpressionInsightsAccount",
+              "PermissionLiteralExpressionNumber": "#/types/pulumiservice:api:PermissionLiteralExpressionNumber",
+              "PermissionLiteralExpressionStack": "#/types/pulumiservice:api:PermissionLiteralExpressionStack",
+              "PermissionLiteralExpressionString": "#/types/pulumiservice:api:PermissionLiteralExpressionString",
+              "PermissionLiteralExpressionTeam": "#/types/pulumiservice:api:PermissionLiteralExpressionTeam"
+            }
+          },
           "description": "The operand of the unary boolean expression."
         }
       },
@@ -4350,7 +4772,81 @@
           "const": "PermissionExpressionNot"
         },
         "node": {
-          "$ref": "#/types/pulumiservice:api:PermissionBooleanExpression",
+          "oneOf": [
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionAnd"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionEnvironment"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionEqual"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionHasTag"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionInsightsAccount"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionNot"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionOr"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionStack"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionTag"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionTeam"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionLiteralExpressionBool"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionLiteralExpressionEnvironment"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionLiteralExpressionInsightsAccount"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionLiteralExpressionNumber"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionLiteralExpressionStack"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionLiteralExpressionString"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionLiteralExpressionTeam"
+            }
+          ],
+          "discriminator": {
+            "propertyName": "__type",
+            "mapping": {
+              "PermissionExpressionAnd": "#/types/pulumiservice:api:PermissionExpressionAnd",
+              "PermissionExpressionEnvironment": "#/types/pulumiservice:api:PermissionExpressionEnvironment",
+              "PermissionExpressionEqual": "#/types/pulumiservice:api:PermissionExpressionEqual",
+              "PermissionExpressionHasTag": "#/types/pulumiservice:api:PermissionExpressionHasTag",
+              "PermissionExpressionInsightsAccount": "#/types/pulumiservice:api:PermissionExpressionInsightsAccount",
+              "PermissionExpressionNot": "#/types/pulumiservice:api:PermissionExpressionNot",
+              "PermissionExpressionOr": "#/types/pulumiservice:api:PermissionExpressionOr",
+              "PermissionExpressionStack": "#/types/pulumiservice:api:PermissionExpressionStack",
+              "PermissionExpressionTag": "#/types/pulumiservice:api:PermissionExpressionTag",
+              "PermissionExpressionTeam": "#/types/pulumiservice:api:PermissionExpressionTeam",
+              "PermissionLiteralExpressionBool": "#/types/pulumiservice:api:PermissionLiteralExpressionBool",
+              "PermissionLiteralExpressionEnvironment": "#/types/pulumiservice:api:PermissionLiteralExpressionEnvironment",
+              "PermissionLiteralExpressionInsightsAccount": "#/types/pulumiservice:api:PermissionLiteralExpressionInsightsAccount",
+              "PermissionLiteralExpressionNumber": "#/types/pulumiservice:api:PermissionLiteralExpressionNumber",
+              "PermissionLiteralExpressionStack": "#/types/pulumiservice:api:PermissionLiteralExpressionStack",
+              "PermissionLiteralExpressionString": "#/types/pulumiservice:api:PermissionLiteralExpressionString",
+              "PermissionLiteralExpressionTeam": "#/types/pulumiservice:api:PermissionLiteralExpressionTeam"
+            }
+          },
           "description": "The operand of the unary boolean expression."
         }
       },
@@ -4367,11 +4863,159 @@
           "const": "PermissionExpressionOr"
         },
         "left": {
-          "$ref": "#/types/pulumiservice:api:PermissionBooleanExpression",
+          "oneOf": [
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionAnd"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionEnvironment"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionEqual"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionHasTag"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionInsightsAccount"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionNot"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionOr"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionStack"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionTag"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionTeam"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionLiteralExpressionBool"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionLiteralExpressionEnvironment"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionLiteralExpressionInsightsAccount"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionLiteralExpressionNumber"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionLiteralExpressionStack"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionLiteralExpressionString"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionLiteralExpressionTeam"
+            }
+          ],
+          "discriminator": {
+            "propertyName": "__type",
+            "mapping": {
+              "PermissionExpressionAnd": "#/types/pulumiservice:api:PermissionExpressionAnd",
+              "PermissionExpressionEnvironment": "#/types/pulumiservice:api:PermissionExpressionEnvironment",
+              "PermissionExpressionEqual": "#/types/pulumiservice:api:PermissionExpressionEqual",
+              "PermissionExpressionHasTag": "#/types/pulumiservice:api:PermissionExpressionHasTag",
+              "PermissionExpressionInsightsAccount": "#/types/pulumiservice:api:PermissionExpressionInsightsAccount",
+              "PermissionExpressionNot": "#/types/pulumiservice:api:PermissionExpressionNot",
+              "PermissionExpressionOr": "#/types/pulumiservice:api:PermissionExpressionOr",
+              "PermissionExpressionStack": "#/types/pulumiservice:api:PermissionExpressionStack",
+              "PermissionExpressionTag": "#/types/pulumiservice:api:PermissionExpressionTag",
+              "PermissionExpressionTeam": "#/types/pulumiservice:api:PermissionExpressionTeam",
+              "PermissionLiteralExpressionBool": "#/types/pulumiservice:api:PermissionLiteralExpressionBool",
+              "PermissionLiteralExpressionEnvironment": "#/types/pulumiservice:api:PermissionLiteralExpressionEnvironment",
+              "PermissionLiteralExpressionInsightsAccount": "#/types/pulumiservice:api:PermissionLiteralExpressionInsightsAccount",
+              "PermissionLiteralExpressionNumber": "#/types/pulumiservice:api:PermissionLiteralExpressionNumber",
+              "PermissionLiteralExpressionStack": "#/types/pulumiservice:api:PermissionLiteralExpressionStack",
+              "PermissionLiteralExpressionString": "#/types/pulumiservice:api:PermissionLiteralExpressionString",
+              "PermissionLiteralExpressionTeam": "#/types/pulumiservice:api:PermissionLiteralExpressionTeam"
+            }
+          },
           "description": "The left operand of the binary boolean expression."
         },
         "right": {
-          "$ref": "#/types/pulumiservice:api:PermissionBooleanExpression",
+          "oneOf": [
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionAnd"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionEnvironment"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionEqual"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionHasTag"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionInsightsAccount"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionNot"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionOr"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionStack"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionTag"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionTeam"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionLiteralExpressionBool"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionLiteralExpressionEnvironment"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionLiteralExpressionInsightsAccount"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionLiteralExpressionNumber"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionLiteralExpressionStack"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionLiteralExpressionString"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionLiteralExpressionTeam"
+            }
+          ],
+          "discriminator": {
+            "propertyName": "__type",
+            "mapping": {
+              "PermissionExpressionAnd": "#/types/pulumiservice:api:PermissionExpressionAnd",
+              "PermissionExpressionEnvironment": "#/types/pulumiservice:api:PermissionExpressionEnvironment",
+              "PermissionExpressionEqual": "#/types/pulumiservice:api:PermissionExpressionEqual",
+              "PermissionExpressionHasTag": "#/types/pulumiservice:api:PermissionExpressionHasTag",
+              "PermissionExpressionInsightsAccount": "#/types/pulumiservice:api:PermissionExpressionInsightsAccount",
+              "PermissionExpressionNot": "#/types/pulumiservice:api:PermissionExpressionNot",
+              "PermissionExpressionOr": "#/types/pulumiservice:api:PermissionExpressionOr",
+              "PermissionExpressionStack": "#/types/pulumiservice:api:PermissionExpressionStack",
+              "PermissionExpressionTag": "#/types/pulumiservice:api:PermissionExpressionTag",
+              "PermissionExpressionTeam": "#/types/pulumiservice:api:PermissionExpressionTeam",
+              "PermissionLiteralExpressionBool": "#/types/pulumiservice:api:PermissionLiteralExpressionBool",
+              "PermissionLiteralExpressionEnvironment": "#/types/pulumiservice:api:PermissionLiteralExpressionEnvironment",
+              "PermissionLiteralExpressionInsightsAccount": "#/types/pulumiservice:api:PermissionLiteralExpressionInsightsAccount",
+              "PermissionLiteralExpressionNumber": "#/types/pulumiservice:api:PermissionLiteralExpressionNumber",
+              "PermissionLiteralExpressionStack": "#/types/pulumiservice:api:PermissionLiteralExpressionStack",
+              "PermissionLiteralExpressionString": "#/types/pulumiservice:api:PermissionLiteralExpressionString",
+              "PermissionLiteralExpressionTeam": "#/types/pulumiservice:api:PermissionLiteralExpressionTeam"
+            }
+          },
           "description": "The right operand of the binary boolean expression."
         }
       },
@@ -4401,7 +5045,81 @@
           "const": "PermissionExpressionTag"
         },
         "context": {
-          "$ref": "#/types/pulumiservice:api:PermissionContextExpression",
+          "oneOf": [
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionAnd"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionEnvironment"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionEqual"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionHasTag"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionInsightsAccount"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionNot"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionOr"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionStack"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionTag"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionExpressionTeam"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionLiteralExpressionBool"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionLiteralExpressionEnvironment"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionLiteralExpressionInsightsAccount"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionLiteralExpressionNumber"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionLiteralExpressionStack"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionLiteralExpressionString"
+            },
+            {
+              "$ref": "#/types/pulumiservice:api:PermissionLiteralExpressionTeam"
+            }
+          ],
+          "discriminator": {
+            "propertyName": "__type",
+            "mapping": {
+              "PermissionExpressionAnd": "#/types/pulumiservice:api:PermissionExpressionAnd",
+              "PermissionExpressionEnvironment": "#/types/pulumiservice:api:PermissionExpressionEnvironment",
+              "PermissionExpressionEqual": "#/types/pulumiservice:api:PermissionExpressionEqual",
+              "PermissionExpressionHasTag": "#/types/pulumiservice:api:PermissionExpressionHasTag",
+              "PermissionExpressionInsightsAccount": "#/types/pulumiservice:api:PermissionExpressionInsightsAccount",
+              "PermissionExpressionNot": "#/types/pulumiservice:api:PermissionExpressionNot",
+              "PermissionExpressionOr": "#/types/pulumiservice:api:PermissionExpressionOr",
+              "PermissionExpressionStack": "#/types/pulumiservice:api:PermissionExpressionStack",
+              "PermissionExpressionTag": "#/types/pulumiservice:api:PermissionExpressionTag",
+              "PermissionExpressionTeam": "#/types/pulumiservice:api:PermissionExpressionTeam",
+              "PermissionLiteralExpressionBool": "#/types/pulumiservice:api:PermissionLiteralExpressionBool",
+              "PermissionLiteralExpressionEnvironment": "#/types/pulumiservice:api:PermissionLiteralExpressionEnvironment",
+              "PermissionLiteralExpressionInsightsAccount": "#/types/pulumiservice:api:PermissionLiteralExpressionInsightsAccount",
+              "PermissionLiteralExpressionNumber": "#/types/pulumiservice:api:PermissionLiteralExpressionNumber",
+              "PermissionLiteralExpressionStack": "#/types/pulumiservice:api:PermissionLiteralExpressionStack",
+              "PermissionLiteralExpressionString": "#/types/pulumiservice:api:PermissionLiteralExpressionString",
+              "PermissionLiteralExpressionTeam": "#/types/pulumiservice:api:PermissionLiteralExpressionTeam"
+            }
+          },
           "description": "The context expression identifying the resource to look up the tag on."
         },
         "key": {

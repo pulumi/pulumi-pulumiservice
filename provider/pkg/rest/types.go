@@ -276,6 +276,13 @@ func (r *typeRegistry) typeSpec(nm map[string]any) schema.TypeSpec {
 				return r.unionTypeSpec(name, tagProp, mapping)
 			}
 		}
+		// Marker subtypes (allOf over a discriminated base, no properties of
+		// their own — e.g. PermissionBooleanExpression over
+		// PermissionExpression) render as the base's union; a closed
+		// {tag}-only type would make every variant unassignable.
+		if base, tagProp, mapping := r.markerUnionBase(name, target); base != "" && len(mapping) >= 2 {
+			return r.unionTypeSpec(base, tagProp, mapping)
+		}
 		if isObjectSchema(target) {
 			return r.refTo(r.emitNamed(name))
 		}
@@ -352,6 +359,51 @@ func soleKey(m map[string]string) string {
 		return k
 	}
 	return ""
+}
+
+// markerUnionBase resolves a schema that is a pure marker over a
+// discriminated ancestor: its allOf chain reaches a discriminator and it
+// adds no properties beyond that ancestor's. Returns the ancestor name,
+// tag property, and mapping; an empty base means the rule does not apply.
+func (r *typeRegistry) markerUnionBase(name string, node map[string]any) (string, string, map[string]string) {
+	seen := map[string]bool{name: true}
+	cur := node
+	for {
+		all, ok := cur["allOf"].([]any)
+		if !ok {
+			return "", "", nil
+		}
+		var parentRef string
+		for _, m := range all {
+			mm, ok := m.(map[string]any)
+			if !ok {
+				continue
+			}
+			if ref, ok := mm[refKey].(string); ok && parentRef == "" {
+				parentRef = ref
+			}
+			// Own properties disqualify a marker.
+			if props, ok := mm["properties"].(map[string]any); ok && len(props) > 0 {
+				return "", "", nil
+			}
+		}
+		if parentRef == "" {
+			return "", "", nil
+		}
+		parentName := refSchemaName(parentRef)
+		if seen[parentName] {
+			return "", "", nil
+		}
+		seen[parentName] = true
+		parent, ok := r.spec.ResolveSchema(parentRef)
+		if !ok {
+			return "", "", nil
+		}
+		if tagProp, mapping := discriminatorOf(parent); tagProp != "" {
+			return parentName, tagProp, mapping
+		}
+		cur = parent
+	}
 }
 
 // unionTypeSpec renders a discriminated base as an inline oneOf +

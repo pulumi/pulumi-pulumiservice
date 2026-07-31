@@ -22,7 +22,7 @@ namespace Pulumi.PulumiService.Api.Inputs
         /// The context expression identifying the resource to look up the tag on.
         /// </summary>
         [Input("context")]
-        public Input<Inputs.PermissionContextExpressionArgs>? Context { get; set; }
+        public object? Context { get; set; }
 
         /// <summary>
         /// The tag key to retrieve.

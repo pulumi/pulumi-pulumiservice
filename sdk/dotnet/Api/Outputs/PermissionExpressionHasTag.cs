@@ -20,7 +20,7 @@ namespace Pulumi.PulumiService.Api.Outputs
         /// <summary>
         /// The context expression to check for the tag.
         /// </summary>
-        public readonly Outputs.PermissionContextExpression? Context;
+        public readonly object? Context;
         /// <summary>
         /// The tag key to check for.
         /// </summary>
@@ -28,17 +28,17 @@ namespace Pulumi.PulumiService.Api.Outputs
         /// <summary>
         /// The operand of the unary boolean expression.
         /// </summary>
-        public readonly Outputs.PermissionBooleanExpression? Node;
+        public readonly object? Node;
 
         [OutputConstructor]
         private PermissionExpressionHasTag(
             string __type,
 
-            Outputs.PermissionContextExpression? context,
+            object? context,
 
             string? key,
 
-            Outputs.PermissionBooleanExpression? node)
+            object? node)
         {
             this.__type = __type;
             Context = context;
