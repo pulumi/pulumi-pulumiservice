@@ -20,13 +20,13 @@ namespace Pulumi.PulumiService.Api.Outputs
         /// <summary>
         /// The operand of the unary boolean expression.
         /// </summary>
-        public readonly Outputs.PermissionBooleanExpression? Node;
+        public readonly object? Node;
 
         [OutputConstructor]
         private PermissionExpressionNot(
             string __type,
 
-            Outputs.PermissionBooleanExpression? node)
+            object? node)
         {
             this.__type = __type;
             Node = node;

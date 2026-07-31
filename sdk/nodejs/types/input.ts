@@ -594,14 +594,6 @@ export namespace api {
         qualifiedName?: pulumi.Input<string | undefined>;
     }
 
-    export interface PermissionBooleanExpressionArgs {
-        __type: pulumi.Input<string>;
-    }
-
-    export interface PermissionContextExpressionArgs {
-        __type: pulumi.Input<string>;
-    }
-
     export interface PermissionDescriptorAllowArgs {
         /**
          * Expected value is 'PermissionDescriptorAllow'.
@@ -636,7 +628,7 @@ export namespace api {
         /**
          * The boolean condition to evaluate.
          */
-        condition?: pulumi.Input<inputs.api.PermissionBooleanExpressionArgs | undefined>;
+        condition?: pulumi.Input<inputs.api.PermissionExpressionAndArgs | inputs.api.PermissionExpressionEnvironmentArgs | inputs.api.PermissionExpressionEqualArgs | inputs.api.PermissionExpressionHasTagArgs | inputs.api.PermissionExpressionInsightsAccountArgs | inputs.api.PermissionExpressionNotArgs | inputs.api.PermissionExpressionOrArgs | inputs.api.PermissionExpressionStackArgs | inputs.api.PermissionExpressionTagArgs | inputs.api.PermissionExpressionTeamArgs | inputs.api.PermissionLiteralExpressionBoolArgs | inputs.api.PermissionLiteralExpressionEnvironmentArgs | inputs.api.PermissionLiteralExpressionInsightsAccountArgs | inputs.api.PermissionLiteralExpressionNumberArgs | inputs.api.PermissionLiteralExpressionStackArgs | inputs.api.PermissionLiteralExpressionStringArgs | inputs.api.PermissionLiteralExpressionTeamArgs | undefined>;
         /**
          * The permission descriptor to apply when the condition is true.
          */
@@ -662,7 +654,7 @@ export namespace api {
         /**
          * The boolean condition to evaluate.
          */
-        condition?: pulumi.Input<inputs.api.PermissionBooleanExpressionArgs | undefined>;
+        condition?: pulumi.Input<inputs.api.PermissionExpressionAndArgs | inputs.api.PermissionExpressionEnvironmentArgs | inputs.api.PermissionExpressionEqualArgs | inputs.api.PermissionExpressionHasTagArgs | inputs.api.PermissionExpressionInsightsAccountArgs | inputs.api.PermissionExpressionNotArgs | inputs.api.PermissionExpressionOrArgs | inputs.api.PermissionExpressionStackArgs | inputs.api.PermissionExpressionTagArgs | inputs.api.PermissionExpressionTeamArgs | inputs.api.PermissionLiteralExpressionBoolArgs | inputs.api.PermissionLiteralExpressionEnvironmentArgs | inputs.api.PermissionLiteralExpressionInsightsAccountArgs | inputs.api.PermissionLiteralExpressionNumberArgs | inputs.api.PermissionLiteralExpressionStackArgs | inputs.api.PermissionLiteralExpressionStringArgs | inputs.api.PermissionLiteralExpressionTeamArgs | undefined>;
         /**
          * The permission descriptor to apply when the condition is false.
          */
@@ -696,11 +688,11 @@ export namespace api {
         /**
          * The left operand of the binary boolean expression.
          */
-        left?: pulumi.Input<inputs.api.PermissionBooleanExpressionArgs | undefined>;
+        left?: pulumi.Input<inputs.api.PermissionExpressionAndArgs | inputs.api.PermissionExpressionEnvironmentArgs | inputs.api.PermissionExpressionEqualArgs | inputs.api.PermissionExpressionHasTagArgs | inputs.api.PermissionExpressionInsightsAccountArgs | inputs.api.PermissionExpressionNotArgs | inputs.api.PermissionExpressionOrArgs | inputs.api.PermissionExpressionStackArgs | inputs.api.PermissionExpressionTagArgs | inputs.api.PermissionExpressionTeamArgs | inputs.api.PermissionLiteralExpressionBoolArgs | inputs.api.PermissionLiteralExpressionEnvironmentArgs | inputs.api.PermissionLiteralExpressionInsightsAccountArgs | inputs.api.PermissionLiteralExpressionNumberArgs | inputs.api.PermissionLiteralExpressionStackArgs | inputs.api.PermissionLiteralExpressionStringArgs | inputs.api.PermissionLiteralExpressionTeamArgs | undefined>;
         /**
          * The right operand of the binary boolean expression.
          */
-        right?: pulumi.Input<inputs.api.PermissionBooleanExpressionArgs | undefined>;
+        right?: pulumi.Input<inputs.api.PermissionExpressionAndArgs | inputs.api.PermissionExpressionEnvironmentArgs | inputs.api.PermissionExpressionEqualArgs | inputs.api.PermissionExpressionHasTagArgs | inputs.api.PermissionExpressionInsightsAccountArgs | inputs.api.PermissionExpressionNotArgs | inputs.api.PermissionExpressionOrArgs | inputs.api.PermissionExpressionStackArgs | inputs.api.PermissionExpressionTagArgs | inputs.api.PermissionExpressionTeamArgs | inputs.api.PermissionLiteralExpressionBoolArgs | inputs.api.PermissionLiteralExpressionEnvironmentArgs | inputs.api.PermissionLiteralExpressionInsightsAccountArgs | inputs.api.PermissionLiteralExpressionNumberArgs | inputs.api.PermissionLiteralExpressionStackArgs | inputs.api.PermissionLiteralExpressionStringArgs | inputs.api.PermissionLiteralExpressionTeamArgs | undefined>;
     }
 
     export interface PermissionExpressionEnvironmentArgs {
@@ -733,7 +725,7 @@ export namespace api {
         /**
          * The context expression to check for the tag.
          */
-        context?: pulumi.Input<inputs.api.PermissionContextExpressionArgs | undefined>;
+        context?: pulumi.Input<inputs.api.PermissionExpressionAndArgs | inputs.api.PermissionExpressionEnvironmentArgs | inputs.api.PermissionExpressionEqualArgs | inputs.api.PermissionExpressionHasTagArgs | inputs.api.PermissionExpressionInsightsAccountArgs | inputs.api.PermissionExpressionNotArgs | inputs.api.PermissionExpressionOrArgs | inputs.api.PermissionExpressionStackArgs | inputs.api.PermissionExpressionTagArgs | inputs.api.PermissionExpressionTeamArgs | inputs.api.PermissionLiteralExpressionBoolArgs | inputs.api.PermissionLiteralExpressionEnvironmentArgs | inputs.api.PermissionLiteralExpressionInsightsAccountArgs | inputs.api.PermissionLiteralExpressionNumberArgs | inputs.api.PermissionLiteralExpressionStackArgs | inputs.api.PermissionLiteralExpressionStringArgs | inputs.api.PermissionLiteralExpressionTeamArgs | undefined>;
         /**
          * The tag key to check for.
          */
@@ -741,7 +733,7 @@ export namespace api {
         /**
          * The operand of the unary boolean expression.
          */
-        node?: pulumi.Input<inputs.api.PermissionBooleanExpressionArgs | undefined>;
+        node?: pulumi.Input<inputs.api.PermissionExpressionAndArgs | inputs.api.PermissionExpressionEnvironmentArgs | inputs.api.PermissionExpressionEqualArgs | inputs.api.PermissionExpressionHasTagArgs | inputs.api.PermissionExpressionInsightsAccountArgs | inputs.api.PermissionExpressionNotArgs | inputs.api.PermissionExpressionOrArgs | inputs.api.PermissionExpressionStackArgs | inputs.api.PermissionExpressionTagArgs | inputs.api.PermissionExpressionTeamArgs | inputs.api.PermissionLiteralExpressionBoolArgs | inputs.api.PermissionLiteralExpressionEnvironmentArgs | inputs.api.PermissionLiteralExpressionInsightsAccountArgs | inputs.api.PermissionLiteralExpressionNumberArgs | inputs.api.PermissionLiteralExpressionStackArgs | inputs.api.PermissionLiteralExpressionStringArgs | inputs.api.PermissionLiteralExpressionTeamArgs | undefined>;
     }
 
     export interface PermissionExpressionInsightsAccountArgs {
@@ -759,7 +751,7 @@ export namespace api {
         /**
          * The operand of the unary boolean expression.
          */
-        node?: pulumi.Input<inputs.api.PermissionBooleanExpressionArgs | undefined>;
+        node?: pulumi.Input<inputs.api.PermissionExpressionAndArgs | inputs.api.PermissionExpressionEnvironmentArgs | inputs.api.PermissionExpressionEqualArgs | inputs.api.PermissionExpressionHasTagArgs | inputs.api.PermissionExpressionInsightsAccountArgs | inputs.api.PermissionExpressionNotArgs | inputs.api.PermissionExpressionOrArgs | inputs.api.PermissionExpressionStackArgs | inputs.api.PermissionExpressionTagArgs | inputs.api.PermissionExpressionTeamArgs | inputs.api.PermissionLiteralExpressionBoolArgs | inputs.api.PermissionLiteralExpressionEnvironmentArgs | inputs.api.PermissionLiteralExpressionInsightsAccountArgs | inputs.api.PermissionLiteralExpressionNumberArgs | inputs.api.PermissionLiteralExpressionStackArgs | inputs.api.PermissionLiteralExpressionStringArgs | inputs.api.PermissionLiteralExpressionTeamArgs | undefined>;
     }
 
     export interface PermissionExpressionOrArgs {
@@ -770,11 +762,11 @@ export namespace api {
         /**
          * The left operand of the binary boolean expression.
          */
-        left?: pulumi.Input<inputs.api.PermissionBooleanExpressionArgs | undefined>;
+        left?: pulumi.Input<inputs.api.PermissionExpressionAndArgs | inputs.api.PermissionExpressionEnvironmentArgs | inputs.api.PermissionExpressionEqualArgs | inputs.api.PermissionExpressionHasTagArgs | inputs.api.PermissionExpressionInsightsAccountArgs | inputs.api.PermissionExpressionNotArgs | inputs.api.PermissionExpressionOrArgs | inputs.api.PermissionExpressionStackArgs | inputs.api.PermissionExpressionTagArgs | inputs.api.PermissionExpressionTeamArgs | inputs.api.PermissionLiteralExpressionBoolArgs | inputs.api.PermissionLiteralExpressionEnvironmentArgs | inputs.api.PermissionLiteralExpressionInsightsAccountArgs | inputs.api.PermissionLiteralExpressionNumberArgs | inputs.api.PermissionLiteralExpressionStackArgs | inputs.api.PermissionLiteralExpressionStringArgs | inputs.api.PermissionLiteralExpressionTeamArgs | undefined>;
         /**
          * The right operand of the binary boolean expression.
          */
-        right?: pulumi.Input<inputs.api.PermissionBooleanExpressionArgs | undefined>;
+        right?: pulumi.Input<inputs.api.PermissionExpressionAndArgs | inputs.api.PermissionExpressionEnvironmentArgs | inputs.api.PermissionExpressionEqualArgs | inputs.api.PermissionExpressionHasTagArgs | inputs.api.PermissionExpressionInsightsAccountArgs | inputs.api.PermissionExpressionNotArgs | inputs.api.PermissionExpressionOrArgs | inputs.api.PermissionExpressionStackArgs | inputs.api.PermissionExpressionTagArgs | inputs.api.PermissionExpressionTeamArgs | inputs.api.PermissionLiteralExpressionBoolArgs | inputs.api.PermissionLiteralExpressionEnvironmentArgs | inputs.api.PermissionLiteralExpressionInsightsAccountArgs | inputs.api.PermissionLiteralExpressionNumberArgs | inputs.api.PermissionLiteralExpressionStackArgs | inputs.api.PermissionLiteralExpressionStringArgs | inputs.api.PermissionLiteralExpressionTeamArgs | undefined>;
     }
 
     export interface PermissionExpressionStackArgs {
@@ -792,7 +784,7 @@ export namespace api {
         /**
          * The context expression identifying the resource to look up the tag on.
          */
-        context?: pulumi.Input<inputs.api.PermissionContextExpressionArgs | undefined>;
+        context?: pulumi.Input<inputs.api.PermissionExpressionAndArgs | inputs.api.PermissionExpressionEnvironmentArgs | inputs.api.PermissionExpressionEqualArgs | inputs.api.PermissionExpressionHasTagArgs | inputs.api.PermissionExpressionInsightsAccountArgs | inputs.api.PermissionExpressionNotArgs | inputs.api.PermissionExpressionOrArgs | inputs.api.PermissionExpressionStackArgs | inputs.api.PermissionExpressionTagArgs | inputs.api.PermissionExpressionTeamArgs | inputs.api.PermissionLiteralExpressionBoolArgs | inputs.api.PermissionLiteralExpressionEnvironmentArgs | inputs.api.PermissionLiteralExpressionInsightsAccountArgs | inputs.api.PermissionLiteralExpressionNumberArgs | inputs.api.PermissionLiteralExpressionStackArgs | inputs.api.PermissionLiteralExpressionStringArgs | inputs.api.PermissionLiteralExpressionTeamArgs | undefined>;
         /**
          * The tag key to retrieve.
          */

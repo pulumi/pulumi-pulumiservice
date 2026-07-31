@@ -22,7 +22,7 @@ namespace Pulumi.PulumiService.Api.Inputs
         /// The context expression to check for the tag.
         /// </summary>
         [Input("context")]
-        public Input<Inputs.PermissionContextExpressionArgs>? Context { get; set; }
+        public object? Context { get; set; }
 
         /// <summary>
         /// The tag key to check for.
@@ -34,7 +34,7 @@ namespace Pulumi.PulumiService.Api.Inputs
         /// The operand of the unary boolean expression.
         /// </summary>
         [Input("node")]
-        public Input<Inputs.PermissionBooleanExpressionArgs>? Node { get; set; }
+        public object? Node { get; set; }
 
         public PermissionExpressionHasTagArgs()
         {

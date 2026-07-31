@@ -5,12 +5,28 @@ package com.pulumi.pulumiservice.api.outputs;
 
 import com.pulumi.core.annotations.CustomType;
 import com.pulumi.exceptions.MissingRequiredPropertyException;
-import com.pulumi.pulumiservice.api.outputs.PermissionBooleanExpression;
 import com.pulumi.pulumiservice.api.outputs.PermissionDescriptorAllow;
 import com.pulumi.pulumiservice.api.outputs.PermissionDescriptorCompose;
 import com.pulumi.pulumiservice.api.outputs.PermissionDescriptorGroup;
 import com.pulumi.pulumiservice.api.outputs.PermissionDescriptorIfThenElse;
 import com.pulumi.pulumiservice.api.outputs.PermissionDescriptorSelect;
+import com.pulumi.pulumiservice.api.outputs.PermissionExpressionAnd;
+import com.pulumi.pulumiservice.api.outputs.PermissionExpressionEnvironment;
+import com.pulumi.pulumiservice.api.outputs.PermissionExpressionEqual;
+import com.pulumi.pulumiservice.api.outputs.PermissionExpressionHasTag;
+import com.pulumi.pulumiservice.api.outputs.PermissionExpressionInsightsAccount;
+import com.pulumi.pulumiservice.api.outputs.PermissionExpressionNot;
+import com.pulumi.pulumiservice.api.outputs.PermissionExpressionOr;
+import com.pulumi.pulumiservice.api.outputs.PermissionExpressionStack;
+import com.pulumi.pulumiservice.api.outputs.PermissionExpressionTag;
+import com.pulumi.pulumiservice.api.outputs.PermissionExpressionTeam;
+import com.pulumi.pulumiservice.api.outputs.PermissionLiteralExpressionBool;
+import com.pulumi.pulumiservice.api.outputs.PermissionLiteralExpressionEnvironment;
+import com.pulumi.pulumiservice.api.outputs.PermissionLiteralExpressionInsightsAccount;
+import com.pulumi.pulumiservice.api.outputs.PermissionLiteralExpressionNumber;
+import com.pulumi.pulumiservice.api.outputs.PermissionLiteralExpressionStack;
+import com.pulumi.pulumiservice.api.outputs.PermissionLiteralExpressionString;
+import com.pulumi.pulumiservice.api.outputs.PermissionLiteralExpressionTeam;
 import java.lang.Object;
 import java.lang.String;
 import java.util.Objects;
@@ -28,7 +44,7 @@ public final class PermissionDescriptorCondition {
      * @return The boolean condition to evaluate.
      * 
      */
-    private @Nullable PermissionBooleanExpression condition;
+    private @Nullable Object condition;
     /**
      * @return The permission descriptor to apply when the condition is true.
      * 
@@ -47,7 +63,7 @@ public final class PermissionDescriptorCondition {
      * @return The boolean condition to evaluate.
      * 
      */
-    public Optional<PermissionBooleanExpression> condition() {
+    public Optional<Object> condition() {
         return Optional.ofNullable(this.condition);
     }
     /**
@@ -68,7 +84,7 @@ public final class PermissionDescriptorCondition {
     @CustomType.Builder
     public static final class Builder {
         private String __type;
-        private @Nullable PermissionBooleanExpression condition;
+        private @Nullable Object condition;
         private @Nullable Object subNode;
         public Builder() {}
         public Builder(PermissionDescriptorCondition defaults) {
@@ -87,7 +103,7 @@ public final class PermissionDescriptorCondition {
             return this;
         }
         @CustomType.Setter
-        public Builder condition(@Nullable PermissionBooleanExpression condition) {
+        public Builder condition(@Nullable Object condition) {
 
             this.condition = condition;
             return this;

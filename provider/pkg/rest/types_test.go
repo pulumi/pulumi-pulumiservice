@@ -312,6 +312,45 @@ func TestRecursiveUnionTerminates(t *testing.T) {
 	}
 }
 
+func TestMarkerSubtypeRendersBaseUnion(t *testing.T) {
+	// BoolShape is a pure marker over the discriminated Shape base; a
+	// property referencing it must get Shape's union, not a closed
+	// {kind}-only type.
+	schemas := unionSchemas()
+	schemas["BoolShape"] = map[string]any{"allOf": []any{
+		sref("Shape"),
+		map[string]any{"description": "marker", typeKey: typeObject},
+	}}
+	schemas[widgetRequest] = obj(map[string]any{"cond": sref("BoolShape")})
+	pkg := buildSynth(t, schemas)
+	in := pkg.Resources["pulumiservice:api:Widget"].InputProperties["cond"]
+	if got, want := len(in.OneOf), 3; got != want {
+		t.Fatalf("marker should render base union, got %+v", in.TypeSpec)
+	}
+	if in.Discriminator == nil || in.Discriminator.PropertyName != "kind" {
+		t.Fatalf("marker union lost discriminator: %+v", in.Discriminator)
+	}
+	if _, ok := pkg.Types["pulumiservice:api:BoolShape"]; ok {
+		t.Errorf("marker type must not be emitted")
+	}
+}
+
+func TestMarkerWithOwnPropertiesStaysNamed(t *testing.T) {
+	// A subtype that adds its own properties is a real shape, not a
+	// marker; it must stay a named type.
+	schemas := unionSchemas()
+	schemas["FatShape"] = map[string]any{"allOf": []any{
+		sref("Shape"),
+		obj(map[string]any{"extra": map[string]any{"type": typeString}}),
+	}}
+	schemas[widgetRequest] = obj(map[string]any{"cond": sref("FatShape")})
+	pkg := buildSynth(t, schemas)
+	in := pkg.Resources["pulumiservice:api:Widget"].InputProperties["cond"]
+	if got, want := in.Ref, "#/types/pulumiservice:api:FatShape"; got != want {
+		t.Fatalf("non-marker subtype should stay named, got %+v", in.TypeSpec)
+	}
+}
+
 func TestSharedTypeHoistsToApi(t *testing.T) {
 	spec := synthSpec(t, map[string]any{
 		widgetRequest: obj(map[string]any{"shared": sref("SharedThing")}),

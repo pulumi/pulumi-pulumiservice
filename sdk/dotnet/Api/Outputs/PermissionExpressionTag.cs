@@ -20,7 +20,7 @@ namespace Pulumi.PulumiService.Api.Outputs
         /// <summary>
         /// The context expression identifying the resource to look up the tag on.
         /// </summary>
-        public readonly Outputs.PermissionContextExpression? Context;
+        public readonly object? Context;
         /// <summary>
         /// The tag key to retrieve.
         /// </summary>
@@ -30,7 +30,7 @@ namespace Pulumi.PulumiService.Api.Outputs
         private PermissionExpressionTag(
             string __type,
 
-            Outputs.PermissionContextExpression? context,
+            object? context,
 
             string? key)
         {

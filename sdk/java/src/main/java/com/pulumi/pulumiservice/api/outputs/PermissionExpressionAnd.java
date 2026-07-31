@@ -5,7 +5,23 @@ package com.pulumi.pulumiservice.api.outputs;
 
 import com.pulumi.core.annotations.CustomType;
 import com.pulumi.exceptions.MissingRequiredPropertyException;
-import com.pulumi.pulumiservice.api.outputs.PermissionBooleanExpression;
+import com.pulumi.pulumiservice.api.outputs.PermissionExpressionEnvironment;
+import com.pulumi.pulumiservice.api.outputs.PermissionExpressionEqual;
+import com.pulumi.pulumiservice.api.outputs.PermissionExpressionHasTag;
+import com.pulumi.pulumiservice.api.outputs.PermissionExpressionInsightsAccount;
+import com.pulumi.pulumiservice.api.outputs.PermissionExpressionNot;
+import com.pulumi.pulumiservice.api.outputs.PermissionExpressionOr;
+import com.pulumi.pulumiservice.api.outputs.PermissionExpressionStack;
+import com.pulumi.pulumiservice.api.outputs.PermissionExpressionTag;
+import com.pulumi.pulumiservice.api.outputs.PermissionExpressionTeam;
+import com.pulumi.pulumiservice.api.outputs.PermissionLiteralExpressionBool;
+import com.pulumi.pulumiservice.api.outputs.PermissionLiteralExpressionEnvironment;
+import com.pulumi.pulumiservice.api.outputs.PermissionLiteralExpressionInsightsAccount;
+import com.pulumi.pulumiservice.api.outputs.PermissionLiteralExpressionNumber;
+import com.pulumi.pulumiservice.api.outputs.PermissionLiteralExpressionStack;
+import com.pulumi.pulumiservice.api.outputs.PermissionLiteralExpressionString;
+import com.pulumi.pulumiservice.api.outputs.PermissionLiteralExpressionTeam;
+import java.lang.Object;
 import java.lang.String;
 import java.util.Objects;
 import java.util.Optional;
@@ -22,12 +38,12 @@ public final class PermissionExpressionAnd {
      * @return The left operand of the binary boolean expression.
      * 
      */
-    private @Nullable PermissionBooleanExpression left;
+    private @Nullable Object left;
     /**
      * @return The right operand of the binary boolean expression.
      * 
      */
-    private @Nullable PermissionBooleanExpression right;
+    private @Nullable Object right;
 
     private PermissionExpressionAnd() {}
     /**
@@ -41,14 +57,14 @@ public final class PermissionExpressionAnd {
      * @return The left operand of the binary boolean expression.
      * 
      */
-    public Optional<PermissionBooleanExpression> left() {
+    public Optional<Object> left() {
         return Optional.ofNullable(this.left);
     }
     /**
      * @return The right operand of the binary boolean expression.
      * 
      */
-    public Optional<PermissionBooleanExpression> right() {
+    public Optional<Object> right() {
         return Optional.ofNullable(this.right);
     }
 
@@ -62,8 +78,8 @@ public final class PermissionExpressionAnd {
     @CustomType.Builder
     public static final class Builder {
         private String __type;
-        private @Nullable PermissionBooleanExpression left;
-        private @Nullable PermissionBooleanExpression right;
+        private @Nullable Object left;
+        private @Nullable Object right;
         public Builder() {}
         public Builder(PermissionExpressionAnd defaults) {
     	      Objects.requireNonNull(defaults);
@@ -81,13 +97,13 @@ public final class PermissionExpressionAnd {
             return this;
         }
         @CustomType.Setter
-        public Builder left(@Nullable PermissionBooleanExpression left) {
+        public Builder left(@Nullable Object left) {
 
             this.left = left;
             return this;
         }
         @CustomType.Setter
-        public Builder right(@Nullable PermissionBooleanExpression right) {
+        public Builder right(@Nullable Object right) {
 
             this.right = right;
             return this;

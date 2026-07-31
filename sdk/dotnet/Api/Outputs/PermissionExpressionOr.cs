@@ -20,19 +20,19 @@ namespace Pulumi.PulumiService.Api.Outputs
         /// <summary>
         /// The left operand of the binary boolean expression.
         /// </summary>
-        public readonly Outputs.PermissionBooleanExpression? Left;
+        public readonly object? Left;
         /// <summary>
         /// The right operand of the binary boolean expression.
         /// </summary>
-        public readonly Outputs.PermissionBooleanExpression? Right;
+        public readonly object? Right;
 
         [OutputConstructor]
         private PermissionExpressionOr(
             string __type,
 
-            Outputs.PermissionBooleanExpression? left,
+            object? left,
 
-            Outputs.PermissionBooleanExpression? right)
+            object? right)
         {
             this.__type = __type;
             Left = left;

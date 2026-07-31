@@ -7,12 +7,28 @@ import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
 import com.pulumi.core.internal.Codegen;
 import com.pulumi.exceptions.MissingRequiredPropertyException;
-import com.pulumi.pulumiservice.api.inputs.PermissionBooleanExpressionArgs;
 import com.pulumi.pulumiservice.api.inputs.PermissionDescriptorAllowArgs;
 import com.pulumi.pulumiservice.api.inputs.PermissionDescriptorComposeArgs;
 import com.pulumi.pulumiservice.api.inputs.PermissionDescriptorGroupArgs;
 import com.pulumi.pulumiservice.api.inputs.PermissionDescriptorIfThenElseArgs;
 import com.pulumi.pulumiservice.api.inputs.PermissionDescriptorSelectArgs;
+import com.pulumi.pulumiservice.api.inputs.PermissionExpressionAndArgs;
+import com.pulumi.pulumiservice.api.inputs.PermissionExpressionEnvironmentArgs;
+import com.pulumi.pulumiservice.api.inputs.PermissionExpressionEqualArgs;
+import com.pulumi.pulumiservice.api.inputs.PermissionExpressionHasTagArgs;
+import com.pulumi.pulumiservice.api.inputs.PermissionExpressionInsightsAccountArgs;
+import com.pulumi.pulumiservice.api.inputs.PermissionExpressionNotArgs;
+import com.pulumi.pulumiservice.api.inputs.PermissionExpressionOrArgs;
+import com.pulumi.pulumiservice.api.inputs.PermissionExpressionStackArgs;
+import com.pulumi.pulumiservice.api.inputs.PermissionExpressionTagArgs;
+import com.pulumi.pulumiservice.api.inputs.PermissionExpressionTeamArgs;
+import com.pulumi.pulumiservice.api.inputs.PermissionLiteralExpressionBoolArgs;
+import com.pulumi.pulumiservice.api.inputs.PermissionLiteralExpressionEnvironmentArgs;
+import com.pulumi.pulumiservice.api.inputs.PermissionLiteralExpressionInsightsAccountArgs;
+import com.pulumi.pulumiservice.api.inputs.PermissionLiteralExpressionNumberArgs;
+import com.pulumi.pulumiservice.api.inputs.PermissionLiteralExpressionStackArgs;
+import com.pulumi.pulumiservice.api.inputs.PermissionLiteralExpressionStringArgs;
+import com.pulumi.pulumiservice.api.inputs.PermissionLiteralExpressionTeamArgs;
 import java.lang.Object;
 import java.lang.String;
 import java.util.Objects;
@@ -44,13 +60,13 @@ public final class PermissionDescriptorConditionArgs extends com.pulumi.resource
      * 
      */
     @Import(name="condition")
-    private @Nullable Output<PermissionBooleanExpressionArgs> condition;
+    private @Nullable Output<Object> condition;
 
     /**
      * @return The boolean condition to evaluate.
      * 
      */
-    public Optional<Output<PermissionBooleanExpressionArgs>> condition() {
+    public Optional<Output<Object>> condition() {
         return Optional.ofNullable(this.condition);
     }
 
@@ -122,7 +138,7 @@ public final class PermissionDescriptorConditionArgs extends com.pulumi.resource
          * @return builder
          * 
          */
-        public Builder condition(@Nullable Output<PermissionBooleanExpressionArgs> condition) {
+        public Builder condition(@Nullable Output<Object> condition) {
             $.condition = condition;
             return this;
         }
@@ -133,7 +149,7 @@ public final class PermissionDescriptorConditionArgs extends com.pulumi.resource
          * @return builder
          * 
          */
-        public Builder condition(PermissionBooleanExpressionArgs condition) {
+        public Builder condition(Object condition) {
             return condition(Output.of(condition));
         }
 

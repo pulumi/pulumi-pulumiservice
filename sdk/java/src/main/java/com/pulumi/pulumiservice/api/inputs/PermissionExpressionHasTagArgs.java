@@ -7,8 +7,23 @@ import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
 import com.pulumi.core.internal.Codegen;
 import com.pulumi.exceptions.MissingRequiredPropertyException;
-import com.pulumi.pulumiservice.api.inputs.PermissionBooleanExpressionArgs;
-import com.pulumi.pulumiservice.api.inputs.PermissionContextExpressionArgs;
+import com.pulumi.pulumiservice.api.inputs.PermissionExpressionAndArgs;
+import com.pulumi.pulumiservice.api.inputs.PermissionExpressionEnvironmentArgs;
+import com.pulumi.pulumiservice.api.inputs.PermissionExpressionEqualArgs;
+import com.pulumi.pulumiservice.api.inputs.PermissionExpressionInsightsAccountArgs;
+import com.pulumi.pulumiservice.api.inputs.PermissionExpressionNotArgs;
+import com.pulumi.pulumiservice.api.inputs.PermissionExpressionOrArgs;
+import com.pulumi.pulumiservice.api.inputs.PermissionExpressionStackArgs;
+import com.pulumi.pulumiservice.api.inputs.PermissionExpressionTagArgs;
+import com.pulumi.pulumiservice.api.inputs.PermissionExpressionTeamArgs;
+import com.pulumi.pulumiservice.api.inputs.PermissionLiteralExpressionBoolArgs;
+import com.pulumi.pulumiservice.api.inputs.PermissionLiteralExpressionEnvironmentArgs;
+import com.pulumi.pulumiservice.api.inputs.PermissionLiteralExpressionInsightsAccountArgs;
+import com.pulumi.pulumiservice.api.inputs.PermissionLiteralExpressionNumberArgs;
+import com.pulumi.pulumiservice.api.inputs.PermissionLiteralExpressionStackArgs;
+import com.pulumi.pulumiservice.api.inputs.PermissionLiteralExpressionStringArgs;
+import com.pulumi.pulumiservice.api.inputs.PermissionLiteralExpressionTeamArgs;
+import java.lang.Object;
 import java.lang.String;
 import java.util.Objects;
 import java.util.Optional;
@@ -39,13 +54,13 @@ public final class PermissionExpressionHasTagArgs extends com.pulumi.resources.R
      * 
      */
     @Import(name="context")
-    private @Nullable Output<PermissionContextExpressionArgs> context;
+    private @Nullable Output<Object> context;
 
     /**
      * @return The context expression to check for the tag.
      * 
      */
-    public Optional<Output<PermissionContextExpressionArgs>> context() {
+    public Optional<Output<Object>> context() {
         return Optional.ofNullable(this.context);
     }
 
@@ -69,13 +84,13 @@ public final class PermissionExpressionHasTagArgs extends com.pulumi.resources.R
      * 
      */
     @Import(name="node")
-    private @Nullable Output<PermissionBooleanExpressionArgs> node;
+    private @Nullable Output<Object> node;
 
     /**
      * @return The operand of the unary boolean expression.
      * 
      */
-    public Optional<Output<PermissionBooleanExpressionArgs>> node() {
+    public Optional<Output<Object>> node() {
         return Optional.ofNullable(this.node);
     }
 
@@ -133,7 +148,7 @@ public final class PermissionExpressionHasTagArgs extends com.pulumi.resources.R
          * @return builder
          * 
          */
-        public Builder context(@Nullable Output<PermissionContextExpressionArgs> context) {
+        public Builder context(@Nullable Output<Object> context) {
             $.context = context;
             return this;
         }
@@ -144,7 +159,7 @@ public final class PermissionExpressionHasTagArgs extends com.pulumi.resources.R
          * @return builder
          * 
          */
-        public Builder context(PermissionContextExpressionArgs context) {
+        public Builder context(Object context) {
             return context(Output.of(context));
         }
 
@@ -175,7 +190,7 @@ public final class PermissionExpressionHasTagArgs extends com.pulumi.resources.R
          * @return builder
          * 
          */
-        public Builder node(@Nullable Output<PermissionBooleanExpressionArgs> node) {
+        public Builder node(@Nullable Output<Object> node) {
             $.node = node;
             return this;
         }
@@ -186,7 +201,7 @@ public final class PermissionExpressionHasTagArgs extends com.pulumi.resources.R
          * @return builder
          * 
          */
-        public Builder node(PermissionBooleanExpressionArgs node) {
+        public Builder node(Object node) {
             return node(Output.of(node));
         }
 

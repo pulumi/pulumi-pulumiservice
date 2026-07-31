@@ -22,13 +22,13 @@ namespace Pulumi.PulumiService.Api.Inputs
         /// The left operand of the binary boolean expression.
         /// </summary>
         [Input("left")]
-        public Input<Inputs.PermissionBooleanExpressionArgs>? Left { get; set; }
+        public object? Left { get; set; }
 
         /// <summary>
         /// The right operand of the binary boolean expression.
         /// </summary>
         [Input("right")]
-        public Input<Inputs.PermissionBooleanExpressionArgs>? Right { get; set; }
+        public object? Right { get; set; }
 
         public PermissionExpressionOrArgs()
         {

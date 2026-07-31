@@ -7,7 +7,23 @@ import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
 import com.pulumi.core.internal.Codegen;
 import com.pulumi.exceptions.MissingRequiredPropertyException;
-import com.pulumi.pulumiservice.api.inputs.PermissionContextExpressionArgs;
+import com.pulumi.pulumiservice.api.inputs.PermissionExpressionAndArgs;
+import com.pulumi.pulumiservice.api.inputs.PermissionExpressionEnvironmentArgs;
+import com.pulumi.pulumiservice.api.inputs.PermissionExpressionEqualArgs;
+import com.pulumi.pulumiservice.api.inputs.PermissionExpressionHasTagArgs;
+import com.pulumi.pulumiservice.api.inputs.PermissionExpressionInsightsAccountArgs;
+import com.pulumi.pulumiservice.api.inputs.PermissionExpressionNotArgs;
+import com.pulumi.pulumiservice.api.inputs.PermissionExpressionOrArgs;
+import com.pulumi.pulumiservice.api.inputs.PermissionExpressionStackArgs;
+import com.pulumi.pulumiservice.api.inputs.PermissionExpressionTeamArgs;
+import com.pulumi.pulumiservice.api.inputs.PermissionLiteralExpressionBoolArgs;
+import com.pulumi.pulumiservice.api.inputs.PermissionLiteralExpressionEnvironmentArgs;
+import com.pulumi.pulumiservice.api.inputs.PermissionLiteralExpressionInsightsAccountArgs;
+import com.pulumi.pulumiservice.api.inputs.PermissionLiteralExpressionNumberArgs;
+import com.pulumi.pulumiservice.api.inputs.PermissionLiteralExpressionStackArgs;
+import com.pulumi.pulumiservice.api.inputs.PermissionLiteralExpressionStringArgs;
+import com.pulumi.pulumiservice.api.inputs.PermissionLiteralExpressionTeamArgs;
+import java.lang.Object;
 import java.lang.String;
 import java.util.Objects;
 import java.util.Optional;
@@ -38,13 +54,13 @@ public final class PermissionExpressionTagArgs extends com.pulumi.resources.Reso
      * 
      */
     @Import(name="context")
-    private @Nullable Output<PermissionContextExpressionArgs> context;
+    private @Nullable Output<Object> context;
 
     /**
      * @return The context expression identifying the resource to look up the tag on.
      * 
      */
-    public Optional<Output<PermissionContextExpressionArgs>> context() {
+    public Optional<Output<Object>> context() {
         return Optional.ofNullable(this.context);
     }
 
@@ -116,7 +132,7 @@ public final class PermissionExpressionTagArgs extends com.pulumi.resources.Reso
          * @return builder
          * 
          */
-        public Builder context(@Nullable Output<PermissionContextExpressionArgs> context) {
+        public Builder context(@Nullable Output<Object> context) {
             $.context = context;
             return this;
         }
@@ -127,7 +143,7 @@ public final class PermissionExpressionTagArgs extends com.pulumi.resources.Reso
          * @return builder
          * 
          */
-        public Builder context(PermissionContextExpressionArgs context) {
+        public Builder context(Object context) {
             return context(Output.of(context));
         }
 

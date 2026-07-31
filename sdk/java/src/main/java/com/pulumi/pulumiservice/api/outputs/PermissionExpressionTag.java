@@ -5,7 +5,23 @@ package com.pulumi.pulumiservice.api.outputs;
 
 import com.pulumi.core.annotations.CustomType;
 import com.pulumi.exceptions.MissingRequiredPropertyException;
-import com.pulumi.pulumiservice.api.outputs.PermissionContextExpression;
+import com.pulumi.pulumiservice.api.outputs.PermissionExpressionAnd;
+import com.pulumi.pulumiservice.api.outputs.PermissionExpressionEnvironment;
+import com.pulumi.pulumiservice.api.outputs.PermissionExpressionEqual;
+import com.pulumi.pulumiservice.api.outputs.PermissionExpressionHasTag;
+import com.pulumi.pulumiservice.api.outputs.PermissionExpressionInsightsAccount;
+import com.pulumi.pulumiservice.api.outputs.PermissionExpressionNot;
+import com.pulumi.pulumiservice.api.outputs.PermissionExpressionOr;
+import com.pulumi.pulumiservice.api.outputs.PermissionExpressionStack;
+import com.pulumi.pulumiservice.api.outputs.PermissionExpressionTeam;
+import com.pulumi.pulumiservice.api.outputs.PermissionLiteralExpressionBool;
+import com.pulumi.pulumiservice.api.outputs.PermissionLiteralExpressionEnvironment;
+import com.pulumi.pulumiservice.api.outputs.PermissionLiteralExpressionInsightsAccount;
+import com.pulumi.pulumiservice.api.outputs.PermissionLiteralExpressionNumber;
+import com.pulumi.pulumiservice.api.outputs.PermissionLiteralExpressionStack;
+import com.pulumi.pulumiservice.api.outputs.PermissionLiteralExpressionString;
+import com.pulumi.pulumiservice.api.outputs.PermissionLiteralExpressionTeam;
+import java.lang.Object;
 import java.lang.String;
 import java.util.Objects;
 import java.util.Optional;
@@ -22,7 +38,7 @@ public final class PermissionExpressionTag {
      * @return The context expression identifying the resource to look up the tag on.
      * 
      */
-    private @Nullable PermissionContextExpression context;
+    private @Nullable Object context;
     /**
      * @return The tag key to retrieve.
      * 
@@ -41,7 +57,7 @@ public final class PermissionExpressionTag {
      * @return The context expression identifying the resource to look up the tag on.
      * 
      */
-    public Optional<PermissionContextExpression> context() {
+    public Optional<Object> context() {
         return Optional.ofNullable(this.context);
     }
     /**
@@ -62,7 +78,7 @@ public final class PermissionExpressionTag {
     @CustomType.Builder
     public static final class Builder {
         private String __type;
-        private @Nullable PermissionContextExpression context;
+        private @Nullable Object context;
         private @Nullable String key;
         public Builder() {}
         public Builder(PermissionExpressionTag defaults) {
@@ -81,7 +97,7 @@ public final class PermissionExpressionTag {
             return this;
         }
         @CustomType.Setter
-        public Builder context(@Nullable PermissionContextExpression context) {
+        public Builder context(@Nullable Object context) {
 
             this.context = context;
             return this;
