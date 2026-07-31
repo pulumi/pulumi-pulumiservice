@@ -188,7 +188,10 @@ func main() {
 		fail("read spec: %v", err)
 	}
 	var rawSpec struct {
-		Paths map[string]map[string]any `json:"paths"`
+		Paths      map[string]map[string]any `json:"paths"`
+		Components struct {
+			Schemas map[string]map[string]any `json:"schemas"`
+		} `json:"components"`
 	}
 	if err := json.Unmarshal(specBytes, &rawSpec); err != nil {
 		fail("parse spec: %v", err)
@@ -330,6 +333,7 @@ func main() {
 	fmt.Fprintf(os.Stderr, "  skipped (no Create+Read|Delete): %d\n", len(stats.skipped))
 	fmt.Fprintf(os.Stderr, "  attachment resources emitted: %d new, %d updated (add/remove pairs skipped: %d)\n",
 		attachAdded, attachChanged, attachSkipped)
+	printUnionCensus(rawSpec.Components.Schemas)
 	if len(orphans) > 0 {
 		fmt.Fprintf(os.Stderr, "  orphans (in metadata.json, not derived from spec): %d\n", len(orphans))
 		for _, o := range orphans {
@@ -2071,4 +2075,63 @@ func mapKeys(m map[string]map[string]string) []string {
 	}
 	sort.Strings(out)
 	return out
+}
+
+// printUnionCensus summarizes the discriminated-union surface of the spec so
+// refresh PRs surface union changes: bases with tag and arity, pure marker
+// subtypes, and a warning for any 2-member base (that arity fails BuildSchema
+// on output positions until the upstream .NET/Java deserializers are fixed).
+const (
+	censusDiscKey  = "discriminator"
+	censusAllOfKey = "allOf"
+	censusRefKey   = "$ref"
+	censusPropsKey = "properties"
+)
+
+func printUnionCensus(schemas map[string]map[string]any) {
+	type base struct {
+		name, tag string
+		arity     int
+	}
+	var bases []base
+	var markers []string
+	for name, node := range schemas {
+		if disc, ok := node[censusDiscKey].(map[string]any); ok {
+			tag, _ := disc["propertyName"].(string)
+			arity := 0
+			if mapping, ok := disc["mapping"].(map[string]any); ok {
+				arity = len(mapping)
+			}
+			bases = append(bases, base{name, tag, arity})
+			continue
+		}
+		if all, ok := node[censusAllOfKey].([]any); ok {
+			hasRef, hasProps := false, false
+			for _, m := range all {
+				mm, ok := m.(map[string]any)
+				if !ok {
+					continue
+				}
+				if _, ok := mm[censusRefKey]; ok {
+					hasRef = true
+				}
+				if props, ok := mm[censusPropsKey].(map[string]any); ok && len(props) > 0 {
+					hasProps = true
+				}
+			}
+			if hasRef && !hasProps {
+				markers = append(markers, name)
+			}
+		}
+	}
+	sort.Slice(bases, func(i, j int) bool { return bases[i].name < bases[j].name })
+	sort.Strings(markers)
+	fmt.Fprintf(os.Stderr, "  discriminated bases: %d (marker subtypes: %d)\n", len(bases), len(markers))
+	for _, b := range bases {
+		warn := ""
+		if b.arity == 2 {
+			warn = "  <-- WARNING: 2-member unions fail BuildSchema on outputs (broken upstream .NET/Java deserialization)"
+		}
+		fmt.Fprintf(os.Stderr, "    %-34s tag=%-16s variants=%d%s\n", b.name, b.tag, b.arity, warn)
+	}
 }

@@ -22,9 +22,13 @@ resources:
           TEST_VAR: foo
         options:
           skipInstallDependencies: true
+      # With a GitHub VCS integration the repository comes from `vcs`;
+      # repoUrl is rejected in that combination.
+      vcs:
+        provider: github
+        repository: example/example
       sourceContext:
         git:
-          repoUrl: https://github.com/example/example.git
           branch: refs/heads/main
     options:
       dependsOn:
