@@ -151,6 +151,15 @@ var apiCases = []apiCase{
 		},
 	},
 	{
+		Name:    "rbac-scoped",
+		Config:  rbacScopedConfig,
+		FullE2E: true, // exercises the deep union tree: Group/Condition/And/Not/Equal.
+		// Rotate the description — exercises UpdateRole on a scoped tree.
+		UpdateOverrides: func() map[string]string {
+			return map[string]string{"roleDescription": "Updated description from rbac-scoped update test."}
+		},
+	},
+	{
 		Name:    "schedules",
 		Config:  schedulesConfig,
 		FullE2E: true,
@@ -840,6 +849,12 @@ func rbacConfig() map[string]string {
 		"nameSuffix":       generateRandomFiveDigits(),
 		"roleDescription":  "Read-only access to stacks, created by the api rbac example.",
 	}
+}
+
+func rbacScopedConfig() map[string]string {
+	cfg := rbacConfig()
+	cfg["roleDescription"] = "Environment-scoped read access, created by the api rbac-scoped example."
+	return cfg
 }
 
 func schedulesConfig() map[string]string {
