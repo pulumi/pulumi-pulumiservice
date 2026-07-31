@@ -10,14 +10,20 @@ import (
 	"strings"
 	"testing"
 
+	pschema "github.com/pulumi/pulumi/pkg/v3/codegen/schema"
+
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/cloud"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/rest"
-	pschema "github.com/pulumi/pulumi/pkg/v3/codegen/schema"
 )
 
 // variantWaivers lists union variants no example exercises, with the reason.
 // A waived variant that gains example coverage fails the test until the
 // waiver is removed, so this list only ever shrinks.
+const (
+	waiverAgentEntity = "agent entity diff shape; task example covers the resource"
+	waiverVCSTag      = "wire-identical to github modulo tag"
+)
+
 var variantWaivers = map[string]string{
 	// PermissionDescriptor exotics: Compose references other descriptors by
 	// name and Select/IfThenElse express org-specific routing; the
@@ -45,8 +51,8 @@ var variantWaivers = map[string]string{
 	// example exercises the message flow, not entity diffs. (`type=stack`
 	// matches incidentally elsewhere in the corpus; the generic tag name
 	// makes it unwaivable without false staleness.)
-	"type=policy_issue": "agent entity diff shape; task example covers the resource",
-	"type=pull_request": "agent entity diff shape; task example covers the resource",
+	"type=policy_issue": waiverAgentEntity,
+	"type=pull_request": waiverAgentEntity,
 	"type=repository":   "agent entity diff shape; task example covers the resource",
 
 	// ApprovalRuleEligibility variants beyond the team_member entry that
@@ -57,7 +63,7 @@ var variantWaivers = map[string]string{
 
 	// VCS providers beyond the github block deployment-settings carries:
 	// wire-identical modulo the tag.
-	"provider=azure_devops": "wire-identical to github modulo tag",
+	"provider=azure_devops": waiverVCSTag,
 	"provider=bitbucket":    "wire-identical to github modulo tag",
 	"provider=custom":       "wire-identical to github modulo tag",
 	"provider=gitlab":       "wire-identical to github modulo tag",
