@@ -36,6 +36,7 @@ const (
 	schemaBlob      = "Blob"
 	schemaBoolShape = "BoolShape"
 	condProp        = "cond"
+	circleTypeRef   = "#/types/pulumiservice:api:Circle"
 	widgetTok       = "pulumiservice:api:Widget"
 )
 
@@ -238,7 +239,7 @@ func TestDiscriminatedUnion(t *testing.T) {
 	if disc == nil || disc.PropertyName != tagKind {
 		t.Fatalf("discriminator: got %+v", disc)
 	}
-	if got, want := disc.Mapping[tagCircle], "#/types/pulumiservice:api:Circle"; got != want {
+	if got, want := disc.Mapping[tagCircle], circleTypeRef; got != want {
 		t.Errorf("mapping[circle]: got %q, want %q", got, want)
 	}
 
@@ -277,7 +278,7 @@ func TestSingleVariantBecomesDefiniteType(t *testing.T) {
 	if len(in.OneOf) != 0 {
 		t.Fatalf("single-variant base must not produce a oneOf")
 	}
-	if got, want := in.Ref, "#/types/pulumiservice:api:Circle"; got != want {
+	if got, want := in.Ref, circleTypeRef; got != want {
 		t.Errorf("shape ref: got %q, want %q", got, want)
 	}
 }
@@ -374,7 +375,7 @@ func TestMarkerSubsetSingleVariantBecomesDefinite(t *testing.T) {
 	repointOutsideMarker(schemas, schemaSquare, schemaBlob)
 	pkg := buildSynth(t, schemas)
 	in := pkg.Resources[widgetTok].InputProperties[condProp]
-	if got, want := in.Ref, "#/types/pulumiservice:api:Circle"; got != want {
+	if got, want := in.Ref, circleTypeRef; got != want {
 		t.Errorf("single-descendant marker should be the definite variant, got %+v", in.TypeSpec)
 	}
 }
@@ -404,7 +405,7 @@ func TestVariantReferenceBecomesDefiniteType(t *testing.T) {
 	schemas[widgetRequest] = obj(map[string]any{"one": sref("Circle")})
 	pkg := buildSynth(t, schemas)
 	in := pkg.Resources[widgetTok].InputProperties["one"]
-	if got, want := in.Ref, "#/types/pulumiservice:api:Circle"; got != want {
+	if got, want := in.Ref, circleTypeRef; got != want {
 		t.Fatalf("variant ref: got %+v, want %q", in.TypeSpec, want)
 	}
 	circle := pkg.Types["pulumiservice:api:Circle"]
