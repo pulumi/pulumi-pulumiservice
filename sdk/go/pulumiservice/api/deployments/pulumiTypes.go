@@ -471,6 +471,8 @@ type CreateDeploymentRequest struct {
 	// A tag to identify the deployment settings configuration.
 	Tag *string `pulumi:"tag"`
 	// VCS provider settings
+	//
+	// Valid `provider` values: azure_devops, bitbucket, custom, github, gitlab.
 	Vcs interface{} `pulumi:"vcs"`
 }
 
@@ -505,6 +507,8 @@ type CreateDeploymentRequestArgs struct {
 	// A tag to identify the deployment settings configuration.
 	Tag pulumi.StringPtrInput `pulumi:"tag"`
 	// VCS provider settings
+	//
+	// Valid `provider` values: azure_devops, bitbucket, custom, github, gitlab.
 	Vcs pulumi.Input `pulumi:"vcs"`
 }
 
@@ -631,6 +635,8 @@ func (o CreateDeploymentRequestOutput) Tag() pulumi.StringPtrOutput {
 }
 
 // VCS provider settings
+//
+// Valid `provider` values: azure_devops, bitbucket, custom, github, gitlab.
 func (o CreateDeploymentRequestOutput) Vcs() pulumi.AnyOutput {
 	return o.ApplyT(func(v CreateDeploymentRequest) interface{} { return v.Vcs }).(pulumi.AnyOutput)
 }
@@ -750,6 +756,8 @@ func (o CreateDeploymentRequestPtrOutput) Tag() pulumi.StringPtrOutput {
 }
 
 // VCS provider settings
+//
+// Valid `provider` values: azure_devops, bitbucket, custom, github, gitlab.
 func (o CreateDeploymentRequestPtrOutput) Vcs() pulumi.AnyOutput {
 	return o.ApplyT(func(v *CreateDeploymentRequest) interface{} {
 		if v == nil {

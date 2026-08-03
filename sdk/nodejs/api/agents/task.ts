@@ -67,6 +67,8 @@ export class Task extends pulumi.CustomResource {
     declare public /*out*/ readonly createdBy: pulumi.Output<outputs.api.UserInfo>;
     /**
      * Pulumi entities (stacks, projects, etc.) that provide context for the agent.
+     *
+     * Valid `type` values: policy_issue, pull_request, repository, stack.
      */
     declare public /*out*/ readonly entities: pulumi.Output<(outputs.api.agents.AgentEntityPolicyIssue | outputs.api.agents.AgentEntityPR | outputs.api.agents.AgentEntityRepository | outputs.api.agents.AgentEntityStack)[]>;
     /**

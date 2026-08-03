@@ -17,12 +17,16 @@ namespace Pulumi.PulumiService.Api.Inputs
     {
         /// <summary>
         /// The permission descriptor to apply when this value matches.
+        /// 
+        /// Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
         /// </summary>
         [Input("node")]
         public object? Node { get; set; }
 
         /// <summary>
         /// The value expression to match against the selector.
+        /// 
+        /// Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
         /// </summary>
         [Input("value")]
         public object? Value { get; set; }

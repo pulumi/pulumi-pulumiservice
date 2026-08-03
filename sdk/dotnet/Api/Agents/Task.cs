@@ -59,6 +59,8 @@ namespace Pulumi.PulumiService.Api.Agents
 
         /// <summary>
         /// Pulumi entities (stacks, projects, etc.) that provide context for the agent.
+        /// 
+        /// Valid `type` values: policy_issue, pull_request, repository, stack.
         /// </summary>
         [Output("entities")]
         public Output<ImmutableArray<object>> Entities { get; private set; } = null!;

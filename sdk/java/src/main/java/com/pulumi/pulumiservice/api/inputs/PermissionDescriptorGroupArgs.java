@@ -42,12 +42,16 @@ public final class PermissionDescriptorGroupArgs extends com.pulumi.resources.Re
     /**
      * The list of permission descriptor entries in this group.
      * 
+     * Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
+     * 
      */
     @Import(name="entries")
     private @Nullable Output<List<Object>> entries;
 
     /**
      * @return The list of permission descriptor entries in this group.
+     * 
+     * Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
      * 
      */
     public Optional<Output<List<Object>>> entries() {
@@ -103,6 +107,8 @@ public final class PermissionDescriptorGroupArgs extends com.pulumi.resources.Re
         /**
          * @param entries The list of permission descriptor entries in this group.
          * 
+         * Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
+         * 
          * @return builder
          * 
          */
@@ -114,6 +120,8 @@ public final class PermissionDescriptorGroupArgs extends com.pulumi.resources.Re
         /**
          * @param entries The list of permission descriptor entries in this group.
          * 
+         * Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
+         * 
          * @return builder
          * 
          */
@@ -123,6 +131,8 @@ public final class PermissionDescriptorGroupArgs extends com.pulumi.resources.Re
 
         /**
          * @param entries The list of permission descriptor entries in this group.
+         * 
+         * Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
          * 
          * @return builder
          * 

@@ -29,6 +29,9 @@ namespace Pulumi.PulumiService.Api.Agents.Outputs
         /// The organization that the repository is contained within
         /// </summary>
         public readonly string Org;
+        /// <summary>
+        /// Expected value is 'repository'.
+        /// </summary>
         public readonly string Type;
 
         [OutputConstructor]

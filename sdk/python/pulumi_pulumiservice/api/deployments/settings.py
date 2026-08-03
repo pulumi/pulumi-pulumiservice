@@ -46,6 +46,8 @@ class SettingsArgs:
         :param pulumi.Input['SourceContextRequestArgs'] source_context: The source context defining where the source code is located.
         :param pulumi.Input[_builtins.str] tag: A tag to identify the deployment settings configuration.
         :param pulumi.Input[Union['DeploymentSettingsVCSAzureDevOpsArgs', 'DeploymentSettingsVCSBitbucketArgs', 'DeploymentSettingsVCSCustomArgs', 'DeploymentSettingsVCSGitHubArgs', 'DeploymentSettingsVCSGitLabArgs']] vcs: VCS provider settings
+               
+               Valid `provider` values: azure_devops, bitbucket, custom, github, gitlab.
         """
         pulumi.set(__self__, "org_name", org_name)
         pulumi.set(__self__, "project_name", project_name)
@@ -192,6 +194,8 @@ class SettingsArgs:
     def vcs(self) -> pulumi.Input[Optional[Union['DeploymentSettingsVCSAzureDevOpsArgs', 'DeploymentSettingsVCSBitbucketArgs', 'DeploymentSettingsVCSCustomArgs', 'DeploymentSettingsVCSGitHubArgs', 'DeploymentSettingsVCSGitLabArgs']]]:
         """
         VCS provider settings
+
+        Valid `provider` values: azure_devops, bitbucket, custom, github, gitlab.
         """
         return pulumi.get(self, "vcs")
 
@@ -234,6 +238,8 @@ class Settings(pulumi.CustomResource):
         :param pulumi.Input[_builtins.str] stack_name: The stack name
         :param pulumi.Input[_builtins.str] tag: A tag to identify the deployment settings configuration.
         :param pulumi.Input[Union[Union['DeploymentSettingsVCSAzureDevOpsArgs', 'DeploymentSettingsVCSAzureDevOpsArgsDict'], Union['DeploymentSettingsVCSBitbucketArgs', 'DeploymentSettingsVCSBitbucketArgsDict'], Union['DeploymentSettingsVCSCustomArgs', 'DeploymentSettingsVCSCustomArgsDict'], Union['DeploymentSettingsVCSGitHubArgs', 'DeploymentSettingsVCSGitHubArgsDict'], Union['DeploymentSettingsVCSGitLabArgs', 'DeploymentSettingsVCSGitLabArgsDict']]] vcs: VCS provider settings
+               
+               Valid `provider` values: azure_devops, bitbucket, custom, github, gitlab.
         """
         ...
     @overload
@@ -401,6 +407,8 @@ class Settings(pulumi.CustomResource):
     def vcs(self) -> pulumi.Output[Optional[Any]]:
         """
         VCS provider settings
+
+        Valid `provider` values: azure_devops, bitbucket, custom, github, gitlab.
         """
         return pulumi.get(self, "vcs")
 

@@ -733,6 +733,8 @@ export namespace api {
         allowSelfApproval: boolean;
         /**
          * List of eligible approvers
+         *
+         * Valid `eligibilityType` values: has_permission_on_target, specific_user, team_member.
          */
         eligibleApprovers: (outputs.api.ApprovalRuleEligibilityOutputPermission | outputs.api.ApprovalRuleEligibilityOutputUser | outputs.api.ApprovalRuleEligibilityOutputTeam)[];
         /**
@@ -862,10 +864,14 @@ export namespace api {
         __type: "PermissionDescriptorCondition";
         /**
          * The boolean condition to evaluate.
+         *
+         * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
          */
-        condition?: outputs.api.PermissionExpressionAnd | outputs.api.PermissionExpressionEnvironment | outputs.api.PermissionExpressionEqual | outputs.api.PermissionExpressionHasTag | outputs.api.PermissionExpressionInsightsAccount | outputs.api.PermissionExpressionNot | outputs.api.PermissionExpressionOr | outputs.api.PermissionExpressionStack | outputs.api.PermissionExpressionTag | outputs.api.PermissionExpressionTeam | outputs.api.PermissionLiteralExpressionBool | outputs.api.PermissionLiteralExpressionEnvironment | outputs.api.PermissionLiteralExpressionInsightsAccount | outputs.api.PermissionLiteralExpressionNumber | outputs.api.PermissionLiteralExpressionStack | outputs.api.PermissionLiteralExpressionString | outputs.api.PermissionLiteralExpressionTeam;
+        condition?: outputs.api.PermissionExpressionAnd | outputs.api.PermissionExpressionEqual | outputs.api.PermissionExpressionHasTag | outputs.api.PermissionExpressionNot | outputs.api.PermissionExpressionOr;
         /**
          * The permission descriptor to apply when the condition is true.
+         *
+         * Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
          */
         subNode?: outputs.api.PermissionDescriptorAllow | outputs.api.PermissionDescriptorCompose | outputs.api.PermissionDescriptorCondition | outputs.api.PermissionDescriptorGroup | outputs.api.PermissionDescriptorIfThenElse | outputs.api.PermissionDescriptorSelect;
     }
@@ -877,6 +883,8 @@ export namespace api {
         __type: "PermissionDescriptorGroup";
         /**
          * The list of permission descriptor entries in this group.
+         *
+         * Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
          */
         entries?: (outputs.api.PermissionDescriptorAllow | outputs.api.PermissionDescriptorCompose | outputs.api.PermissionDescriptorCondition | outputs.api.PermissionDescriptorGroup | outputs.api.PermissionDescriptorIfThenElse | outputs.api.PermissionDescriptorSelect)[];
     }
@@ -888,14 +896,20 @@ export namespace api {
         __type: "PermissionDescriptorIfThenElse";
         /**
          * The boolean condition to evaluate.
+         *
+         * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
          */
-        condition?: outputs.api.PermissionExpressionAnd | outputs.api.PermissionExpressionEnvironment | outputs.api.PermissionExpressionEqual | outputs.api.PermissionExpressionHasTag | outputs.api.PermissionExpressionInsightsAccount | outputs.api.PermissionExpressionNot | outputs.api.PermissionExpressionOr | outputs.api.PermissionExpressionStack | outputs.api.PermissionExpressionTag | outputs.api.PermissionExpressionTeam | outputs.api.PermissionLiteralExpressionBool | outputs.api.PermissionLiteralExpressionEnvironment | outputs.api.PermissionLiteralExpressionInsightsAccount | outputs.api.PermissionLiteralExpressionNumber | outputs.api.PermissionLiteralExpressionStack | outputs.api.PermissionLiteralExpressionString | outputs.api.PermissionLiteralExpressionTeam;
+        condition?: outputs.api.PermissionExpressionAnd | outputs.api.PermissionExpressionEqual | outputs.api.PermissionExpressionHasTag | outputs.api.PermissionExpressionNot | outputs.api.PermissionExpressionOr;
         /**
          * The permission descriptor to apply when the condition is false.
+         *
+         * Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
          */
         subNodeForFalse?: outputs.api.PermissionDescriptorAllow | outputs.api.PermissionDescriptorCompose | outputs.api.PermissionDescriptorCondition | outputs.api.PermissionDescriptorGroup | outputs.api.PermissionDescriptorIfThenElse | outputs.api.PermissionDescriptorSelect;
         /**
          * The permission descriptor to apply when the condition is true.
+         *
+         * Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
          */
         subNodeForTrue?: outputs.api.PermissionDescriptorAllow | outputs.api.PermissionDescriptorCompose | outputs.api.PermissionDescriptorCondition | outputs.api.PermissionDescriptorGroup | outputs.api.PermissionDescriptorIfThenElse | outputs.api.PermissionDescriptorSelect;
     }
@@ -911,6 +925,8 @@ export namespace api {
         options?: outputs.api.PermissionSelectvalue[];
         /**
          * The expression used to select which option to apply.
+         *
+         * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
          */
         selector?: outputs.api.PermissionExpressionAnd | outputs.api.PermissionExpressionEnvironment | outputs.api.PermissionExpressionEqual | outputs.api.PermissionExpressionHasTag | outputs.api.PermissionExpressionInsightsAccount | outputs.api.PermissionExpressionNot | outputs.api.PermissionExpressionOr | outputs.api.PermissionExpressionStack | outputs.api.PermissionExpressionTag | outputs.api.PermissionExpressionTeam | outputs.api.PermissionLiteralExpressionBool | outputs.api.PermissionLiteralExpressionEnvironment | outputs.api.PermissionLiteralExpressionInsightsAccount | outputs.api.PermissionLiteralExpressionNumber | outputs.api.PermissionLiteralExpressionStack | outputs.api.PermissionLiteralExpressionString | outputs.api.PermissionLiteralExpressionTeam;
     }
@@ -922,12 +938,16 @@ export namespace api {
         __type: "PermissionExpressionAnd";
         /**
          * The left operand of the binary boolean expression.
+         *
+         * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
          */
-        left?: outputs.api.PermissionExpressionAnd | outputs.api.PermissionExpressionEnvironment | outputs.api.PermissionExpressionEqual | outputs.api.PermissionExpressionHasTag | outputs.api.PermissionExpressionInsightsAccount | outputs.api.PermissionExpressionNot | outputs.api.PermissionExpressionOr | outputs.api.PermissionExpressionStack | outputs.api.PermissionExpressionTag | outputs.api.PermissionExpressionTeam | outputs.api.PermissionLiteralExpressionBool | outputs.api.PermissionLiteralExpressionEnvironment | outputs.api.PermissionLiteralExpressionInsightsAccount | outputs.api.PermissionLiteralExpressionNumber | outputs.api.PermissionLiteralExpressionStack | outputs.api.PermissionLiteralExpressionString | outputs.api.PermissionLiteralExpressionTeam;
+        left?: outputs.api.PermissionExpressionAnd | outputs.api.PermissionExpressionEqual | outputs.api.PermissionExpressionHasTag | outputs.api.PermissionExpressionNot | outputs.api.PermissionExpressionOr;
         /**
          * The right operand of the binary boolean expression.
+         *
+         * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
          */
-        right?: outputs.api.PermissionExpressionAnd | outputs.api.PermissionExpressionEnvironment | outputs.api.PermissionExpressionEqual | outputs.api.PermissionExpressionHasTag | outputs.api.PermissionExpressionInsightsAccount | outputs.api.PermissionExpressionNot | outputs.api.PermissionExpressionOr | outputs.api.PermissionExpressionStack | outputs.api.PermissionExpressionTag | outputs.api.PermissionExpressionTeam | outputs.api.PermissionLiteralExpressionBool | outputs.api.PermissionLiteralExpressionEnvironment | outputs.api.PermissionLiteralExpressionInsightsAccount | outputs.api.PermissionLiteralExpressionNumber | outputs.api.PermissionLiteralExpressionStack | outputs.api.PermissionLiteralExpressionString | outputs.api.PermissionLiteralExpressionTeam;
+        right?: outputs.api.PermissionExpressionAnd | outputs.api.PermissionExpressionEqual | outputs.api.PermissionExpressionHasTag | outputs.api.PermissionExpressionNot | outputs.api.PermissionExpressionOr;
     }
 
     export interface PermissionExpressionEnvironment {
@@ -944,10 +964,14 @@ export namespace api {
         __type: "PermissionExpressionEqual";
         /**
          * The left operand of the equality comparison.
+         *
+         * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
          */
         left?: outputs.api.PermissionExpressionAnd | outputs.api.PermissionExpressionEnvironment | outputs.api.PermissionExpressionEqual | outputs.api.PermissionExpressionHasTag | outputs.api.PermissionExpressionInsightsAccount | outputs.api.PermissionExpressionNot | outputs.api.PermissionExpressionOr | outputs.api.PermissionExpressionStack | outputs.api.PermissionExpressionTag | outputs.api.PermissionExpressionTeam | outputs.api.PermissionLiteralExpressionBool | outputs.api.PermissionLiteralExpressionEnvironment | outputs.api.PermissionLiteralExpressionInsightsAccount | outputs.api.PermissionLiteralExpressionNumber | outputs.api.PermissionLiteralExpressionStack | outputs.api.PermissionLiteralExpressionString | outputs.api.PermissionLiteralExpressionTeam;
         /**
          * The right operand of the equality comparison.
+         *
+         * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
          */
         right?: outputs.api.PermissionExpressionAnd | outputs.api.PermissionExpressionEnvironment | outputs.api.PermissionExpressionEqual | outputs.api.PermissionExpressionHasTag | outputs.api.PermissionExpressionInsightsAccount | outputs.api.PermissionExpressionNot | outputs.api.PermissionExpressionOr | outputs.api.PermissionExpressionStack | outputs.api.PermissionExpressionTag | outputs.api.PermissionExpressionTeam | outputs.api.PermissionLiteralExpressionBool | outputs.api.PermissionLiteralExpressionEnvironment | outputs.api.PermissionLiteralExpressionInsightsAccount | outputs.api.PermissionLiteralExpressionNumber | outputs.api.PermissionLiteralExpressionStack | outputs.api.PermissionLiteralExpressionString | outputs.api.PermissionLiteralExpressionTeam;
     }
@@ -959,16 +983,20 @@ export namespace api {
         __type: "PermissionExpressionHasTag";
         /**
          * The context expression to check for the tag.
+         *
+         * Valid `__type` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
          */
-        context?: outputs.api.PermissionExpressionAnd | outputs.api.PermissionExpressionEnvironment | outputs.api.PermissionExpressionEqual | outputs.api.PermissionExpressionHasTag | outputs.api.PermissionExpressionInsightsAccount | outputs.api.PermissionExpressionNot | outputs.api.PermissionExpressionOr | outputs.api.PermissionExpressionStack | outputs.api.PermissionExpressionTag | outputs.api.PermissionExpressionTeam | outputs.api.PermissionLiteralExpressionBool | outputs.api.PermissionLiteralExpressionEnvironment | outputs.api.PermissionLiteralExpressionInsightsAccount | outputs.api.PermissionLiteralExpressionNumber | outputs.api.PermissionLiteralExpressionStack | outputs.api.PermissionLiteralExpressionString | outputs.api.PermissionLiteralExpressionTeam;
+        context?: outputs.api.PermissionExpressionEnvironment | outputs.api.PermissionExpressionInsightsAccount | outputs.api.PermissionExpressionStack | outputs.api.PermissionExpressionTeam;
         /**
          * The tag key to check for.
          */
         key?: string;
         /**
          * The operand of the unary boolean expression.
+         *
+         * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
          */
-        node?: outputs.api.PermissionExpressionAnd | outputs.api.PermissionExpressionEnvironment | outputs.api.PermissionExpressionEqual | outputs.api.PermissionExpressionHasTag | outputs.api.PermissionExpressionInsightsAccount | outputs.api.PermissionExpressionNot | outputs.api.PermissionExpressionOr | outputs.api.PermissionExpressionStack | outputs.api.PermissionExpressionTag | outputs.api.PermissionExpressionTeam | outputs.api.PermissionLiteralExpressionBool | outputs.api.PermissionLiteralExpressionEnvironment | outputs.api.PermissionLiteralExpressionInsightsAccount | outputs.api.PermissionLiteralExpressionNumber | outputs.api.PermissionLiteralExpressionStack | outputs.api.PermissionLiteralExpressionString | outputs.api.PermissionLiteralExpressionTeam;
+        node?: outputs.api.PermissionExpressionAnd | outputs.api.PermissionExpressionEqual | outputs.api.PermissionExpressionHasTag | outputs.api.PermissionExpressionNot | outputs.api.PermissionExpressionOr;
     }
 
     export interface PermissionExpressionInsightsAccount {
@@ -985,8 +1013,10 @@ export namespace api {
         __type: "PermissionExpressionNot";
         /**
          * The operand of the unary boolean expression.
+         *
+         * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
          */
-        node?: outputs.api.PermissionExpressionAnd | outputs.api.PermissionExpressionEnvironment | outputs.api.PermissionExpressionEqual | outputs.api.PermissionExpressionHasTag | outputs.api.PermissionExpressionInsightsAccount | outputs.api.PermissionExpressionNot | outputs.api.PermissionExpressionOr | outputs.api.PermissionExpressionStack | outputs.api.PermissionExpressionTag | outputs.api.PermissionExpressionTeam | outputs.api.PermissionLiteralExpressionBool | outputs.api.PermissionLiteralExpressionEnvironment | outputs.api.PermissionLiteralExpressionInsightsAccount | outputs.api.PermissionLiteralExpressionNumber | outputs.api.PermissionLiteralExpressionStack | outputs.api.PermissionLiteralExpressionString | outputs.api.PermissionLiteralExpressionTeam;
+        node?: outputs.api.PermissionExpressionAnd | outputs.api.PermissionExpressionEqual | outputs.api.PermissionExpressionHasTag | outputs.api.PermissionExpressionNot | outputs.api.PermissionExpressionOr;
     }
 
     export interface PermissionExpressionOr {
@@ -996,12 +1026,16 @@ export namespace api {
         __type: "PermissionExpressionOr";
         /**
          * The left operand of the binary boolean expression.
+         *
+         * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
          */
-        left?: outputs.api.PermissionExpressionAnd | outputs.api.PermissionExpressionEnvironment | outputs.api.PermissionExpressionEqual | outputs.api.PermissionExpressionHasTag | outputs.api.PermissionExpressionInsightsAccount | outputs.api.PermissionExpressionNot | outputs.api.PermissionExpressionOr | outputs.api.PermissionExpressionStack | outputs.api.PermissionExpressionTag | outputs.api.PermissionExpressionTeam | outputs.api.PermissionLiteralExpressionBool | outputs.api.PermissionLiteralExpressionEnvironment | outputs.api.PermissionLiteralExpressionInsightsAccount | outputs.api.PermissionLiteralExpressionNumber | outputs.api.PermissionLiteralExpressionStack | outputs.api.PermissionLiteralExpressionString | outputs.api.PermissionLiteralExpressionTeam;
+        left?: outputs.api.PermissionExpressionAnd | outputs.api.PermissionExpressionEqual | outputs.api.PermissionExpressionHasTag | outputs.api.PermissionExpressionNot | outputs.api.PermissionExpressionOr;
         /**
          * The right operand of the binary boolean expression.
+         *
+         * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
          */
-        right?: outputs.api.PermissionExpressionAnd | outputs.api.PermissionExpressionEnvironment | outputs.api.PermissionExpressionEqual | outputs.api.PermissionExpressionHasTag | outputs.api.PermissionExpressionInsightsAccount | outputs.api.PermissionExpressionNot | outputs.api.PermissionExpressionOr | outputs.api.PermissionExpressionStack | outputs.api.PermissionExpressionTag | outputs.api.PermissionExpressionTeam | outputs.api.PermissionLiteralExpressionBool | outputs.api.PermissionLiteralExpressionEnvironment | outputs.api.PermissionLiteralExpressionInsightsAccount | outputs.api.PermissionLiteralExpressionNumber | outputs.api.PermissionLiteralExpressionStack | outputs.api.PermissionLiteralExpressionString | outputs.api.PermissionLiteralExpressionTeam;
+        right?: outputs.api.PermissionExpressionAnd | outputs.api.PermissionExpressionEqual | outputs.api.PermissionExpressionHasTag | outputs.api.PermissionExpressionNot | outputs.api.PermissionExpressionOr;
     }
 
     export interface PermissionExpressionStack {
@@ -1018,8 +1052,10 @@ export namespace api {
         __type: "PermissionExpressionTag";
         /**
          * The context expression identifying the resource to look up the tag on.
+         *
+         * Valid `__type` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
          */
-        context?: outputs.api.PermissionExpressionAnd | outputs.api.PermissionExpressionEnvironment | outputs.api.PermissionExpressionEqual | outputs.api.PermissionExpressionHasTag | outputs.api.PermissionExpressionInsightsAccount | outputs.api.PermissionExpressionNot | outputs.api.PermissionExpressionOr | outputs.api.PermissionExpressionStack | outputs.api.PermissionExpressionTag | outputs.api.PermissionExpressionTeam | outputs.api.PermissionLiteralExpressionBool | outputs.api.PermissionLiteralExpressionEnvironment | outputs.api.PermissionLiteralExpressionInsightsAccount | outputs.api.PermissionLiteralExpressionNumber | outputs.api.PermissionLiteralExpressionStack | outputs.api.PermissionLiteralExpressionString | outputs.api.PermissionLiteralExpressionTeam;
+        context?: outputs.api.PermissionExpressionEnvironment | outputs.api.PermissionExpressionInsightsAccount | outputs.api.PermissionExpressionStack | outputs.api.PermissionExpressionTeam;
         /**
          * The tag key to retrieve.
          */
@@ -1116,10 +1152,14 @@ export namespace api {
     export interface PermissionSelectvalue {
         /**
          * The permission descriptor to apply when this value matches.
+         *
+         * Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
          */
         node?: outputs.api.PermissionDescriptorAllow | outputs.api.PermissionDescriptorCompose | outputs.api.PermissionDescriptorCondition | outputs.api.PermissionDescriptorGroup | outputs.api.PermissionDescriptorIfThenElse | outputs.api.PermissionDescriptorSelect;
         /**
          * The value expression to match against the selector.
+         *
+         * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
          */
         value?: outputs.api.PermissionExpressionAnd | outputs.api.PermissionExpressionEnvironment | outputs.api.PermissionExpressionEqual | outputs.api.PermissionExpressionHasTag | outputs.api.PermissionExpressionInsightsAccount | outputs.api.PermissionExpressionNot | outputs.api.PermissionExpressionOr | outputs.api.PermissionExpressionStack | outputs.api.PermissionExpressionTag | outputs.api.PermissionExpressionTeam | outputs.api.PermissionLiteralExpressionBool | outputs.api.PermissionLiteralExpressionEnvironment | outputs.api.PermissionLiteralExpressionInsightsAccount | outputs.api.PermissionLiteralExpressionNumber | outputs.api.PermissionLiteralExpressionStack | outputs.api.PermissionLiteralExpressionString | outputs.api.PermissionLiteralExpressionTeam;
     }
@@ -1304,7 +1344,10 @@ export namespace api {
              * The organization that the repository is contained within
              */
             org: string;
-            type: string;
+            /**
+             * Expected value is 'repository'.
+             */
+            type: "repository";
         }
 
         export interface AgentEntityStack {

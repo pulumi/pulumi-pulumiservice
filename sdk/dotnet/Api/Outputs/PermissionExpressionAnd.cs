@@ -19,10 +19,14 @@ namespace Pulumi.PulumiService.Api.Outputs
         public readonly string __type;
         /// <summary>
         /// The left operand of the binary boolean expression.
+        /// 
+        /// Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
         /// </summary>
         public readonly object? Left;
         /// <summary>
         /// The right operand of the binary boolean expression.
+        /// 
+        /// Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
         /// </summary>
         public readonly object? Right;
 

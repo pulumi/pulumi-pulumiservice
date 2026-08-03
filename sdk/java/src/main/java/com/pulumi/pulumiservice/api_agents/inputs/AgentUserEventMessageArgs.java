@@ -5,6 +5,7 @@ package com.pulumi.pulumiservice.api_agents.inputs;
 
 import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
+import com.pulumi.core.internal.Codegen;
 import com.pulumi.exceptions.MissingRequiredPropertyException;
 import com.pulumi.pulumiservice.api_agents.inputs.AgentEntityDiffArgs;
 import com.pulumi.pulumiservice.api_agents.inputs.AgentSlashCommandArgs;
@@ -95,9 +96,17 @@ public final class AgentUserEventMessageArgs extends com.pulumi.resources.Resour
         return this.timestamp;
     }
 
+    /**
+     * Expected value is &#39;user_message&#39;.
+     * 
+     */
     @Import(name="type", required=true)
     private Output<String> type;
 
+    /**
+     * @return Expected value is &#39;user_message&#39;.
+     * 
+     */
     public Output<String> type() {
         return this.type;
     }
@@ -236,11 +245,23 @@ public final class AgentUserEventMessageArgs extends com.pulumi.resources.Resour
             return timestamp(Output.of(timestamp));
         }
 
+        /**
+         * @param type Expected value is &#39;user_message&#39;.
+         * 
+         * @return builder
+         * 
+         */
         public Builder type(Output<String> type) {
             $.type = type;
             return this;
         }
 
+        /**
+         * @param type Expected value is &#39;user_message&#39;.
+         * 
+         * @return builder
+         * 
+         */
         public Builder type(String type) {
             return type(Output.of(type));
         }
@@ -252,9 +273,7 @@ public final class AgentUserEventMessageArgs extends com.pulumi.resources.Resour
             if ($.timestamp == null) {
                 throw new MissingRequiredPropertyException("AgentUserEventMessageArgs", "timestamp");
             }
-            if ($.type == null) {
-                throw new MissingRequiredPropertyException("AgentUserEventMessageArgs", "type");
-            }
+            $.type = Codegen.stringProp("type").output().arg($.type).require();
             return $;
         }
     }

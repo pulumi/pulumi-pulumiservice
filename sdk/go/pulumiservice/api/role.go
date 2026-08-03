@@ -23,6 +23,8 @@ type Role struct {
 	// A human-readable description of the permission descriptor.
 	Description pulumi.StringPtrOutput `pulumi:"description"`
 	// The detailed permission descriptor tree.
+	//
+	// Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
 	Details pulumi.AnyOutput `pulumi:"details"`
 	// Whether this role is the organization default.
 	IsOrgDefault pulumi.BoolOutput `pulumi:"isOrgDefault"`
@@ -90,6 +92,8 @@ type roleArgs struct {
 	// A human-readable description of the permission descriptor.
 	Description *string `pulumi:"description"`
 	// The detailed permission descriptor tree.
+	//
+	// Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
 	Details interface{} `pulumi:"details"`
 	// The name of the permission descriptor.
 	Name *string `pulumi:"name"`
@@ -110,6 +114,8 @@ type RoleArgs struct {
 	// A human-readable description of the permission descriptor.
 	Description pulumi.StringPtrInput
 	// The detailed permission descriptor tree.
+	//
+	// Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
 	Details pulumi.Input
 	// The name of the permission descriptor.
 	Name pulumi.StringPtrInput
@@ -226,6 +232,8 @@ func (o RoleOutput) Description() pulumi.StringPtrOutput {
 }
 
 // The detailed permission descriptor tree.
+//
+// Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
 func (o RoleOutput) Details() pulumi.AnyOutput {
 	return o.ApplyT(func(v *Role) pulumi.AnyOutput { return v.Details }).(pulumi.AnyOutput)
 }

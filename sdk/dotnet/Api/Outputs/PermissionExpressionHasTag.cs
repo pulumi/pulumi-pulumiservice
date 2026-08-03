@@ -19,6 +19,8 @@ namespace Pulumi.PulumiService.Api.Outputs
         public readonly string __type;
         /// <summary>
         /// The context expression to check for the tag.
+        /// 
+        /// Valid `__type` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
         /// </summary>
         public readonly object? Context;
         /// <summary>
@@ -27,6 +29,8 @@ namespace Pulumi.PulumiService.Api.Outputs
         public readonly string? Key;
         /// <summary>
         /// The operand of the unary boolean expression.
+        /// 
+        /// Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
         /// </summary>
         public readonly object? Node;
 

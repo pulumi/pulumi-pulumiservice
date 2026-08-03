@@ -71,6 +71,8 @@ export class Settings extends pulumi.CustomResource {
     declare public readonly tag: pulumi.Output<string | undefined>;
     /**
      * VCS provider settings
+     *
+     * Valid `provider` values: azure_devops, bitbucket, custom, github, gitlab.
      */
     declare public readonly vcs: pulumi.Output<outputs.api.deployments.DeploymentSettingsVCSAzureDevOps | outputs.api.deployments.DeploymentSettingsVCSBitbucket | outputs.api.deployments.DeploymentSettingsVCSCustom | outputs.api.deployments.DeploymentSettingsVCSGitHub | outputs.api.deployments.DeploymentSettingsVCSGitLab | undefined>;
     /**
@@ -174,6 +176,8 @@ export interface SettingsArgs {
     tag?: pulumi.Input<string | undefined>;
     /**
      * VCS provider settings
+     *
+     * Valid `provider` values: azure_devops, bitbucket, custom, github, gitlab.
      */
     vcs?: pulumi.Input<inputs.api.deployments.DeploymentSettingsVCSAzureDevOpsArgs | inputs.api.deployments.DeploymentSettingsVCSBitbucketArgs | inputs.api.deployments.DeploymentSettingsVCSCustomArgs | inputs.api.deployments.DeploymentSettingsVCSGitHubArgs | inputs.api.deployments.DeploymentSettingsVCSGitLabArgs | undefined>;
 }

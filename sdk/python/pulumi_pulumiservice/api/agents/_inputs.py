@@ -45,10 +45,14 @@ class AgentEntityDiffArgsDict(TypedDict):
     """
     Entities to add to the Agent's context.
     Entities must be valid, and will be automatically deleted if they are invalid.
+
+    Valid `type` values: policy_issue, pull_request, repository, stack.
     """
     remove: NotRequired[pulumi.Input[Optional[Sequence[pulumi.Input[Union['AgentEntityPolicyIssueArgsDict', 'AgentEntityPRArgsDict', 'AgentEntityRepositoryArgsDict', 'AgentEntityStackArgsDict']]]]]]
     """
     Entities to remove from the Agent's context.
+
+    Valid `type` values: policy_issue, pull_request, repository, stack.
     """
 
 @pulumi.input_type
@@ -61,7 +65,11 @@ class AgentEntityDiffArgs:
 
         :param pulumi.Input[Sequence[pulumi.Input[Union['AgentEntityPolicyIssueArgs', 'AgentEntityPRArgs', 'AgentEntityRepositoryArgs', 'AgentEntityStackArgs']]]] add: Entities to add to the Agent's context.
                Entities must be valid, and will be automatically deleted if they are invalid.
+               
+               Valid `type` values: policy_issue, pull_request, repository, stack.
         :param pulumi.Input[Sequence[pulumi.Input[Union['AgentEntityPolicyIssueArgs', 'AgentEntityPRArgs', 'AgentEntityRepositoryArgs', 'AgentEntityStackArgs']]]] remove: Entities to remove from the Agent's context.
+               
+               Valid `type` values: policy_issue, pull_request, repository, stack.
         """
         if add is not None:
             pulumi.set(__self__, "add", add)
@@ -74,6 +82,8 @@ class AgentEntityDiffArgs:
         """
         Entities to add to the Agent's context.
         Entities must be valid, and will be automatically deleted if they are invalid.
+
+        Valid `type` values: policy_issue, pull_request, repository, stack.
         """
         return pulumi.get(self, "add")
 
@@ -86,6 +96,8 @@ class AgentEntityDiffArgs:
     def remove(self) -> pulumi.Input[Optional[Sequence[pulumi.Input[Union['AgentEntityPolicyIssueArgs', 'AgentEntityPRArgs', 'AgentEntityRepositoryArgs', 'AgentEntityStackArgs']]]]]:
         """
         Entities to remove from the Agent's context.
+
+        Valid `type` values: policy_issue, pull_request, repository, stack.
         """
         return pulumi.get(self, "remove")
 
@@ -256,6 +268,9 @@ class AgentEntityRepositoryArgsDict(TypedDict):
     The organization that the repository is contained within
     """
     type: pulumi.Input[_builtins.str]
+    """
+    Expected value is 'repository'.
+    """
     forge: NotRequired[pulumi.Input[Optional[_builtins.str]]]
     """
     The forge/provider where the repository is hosted
@@ -276,12 +291,13 @@ class AgentEntityRepositoryArgs:
         """
         :param pulumi.Input[_builtins.str] name: The name of the repository.
         :param pulumi.Input[_builtins.str] org: The organization that the repository is contained within
+        :param pulumi.Input[_builtins.str] type: Expected value is 'repository'.
         :param pulumi.Input[_builtins.str] forge: The forge/provider where the repository is hosted
         :param pulumi.Input[_builtins.str] host: The hostname for the repository, used for self-hosted providers such as GitHub Enterprise
         """
         pulumi.set(__self__, "name", name)
         pulumi.set(__self__, "org", org)
-        pulumi.set(__self__, "type", type)
+        pulumi.set(__self__, "type", 'repository')
         if forge is not None:
             pulumi.set(__self__, "forge", forge)
         if host is not None:
@@ -314,6 +330,9 @@ class AgentEntityRepositoryArgs:
     @_builtins.property
     @pulumi.getter
     def type(self) -> pulumi.Input[_builtins.str]:
+        """
+        Expected value is 'repository'.
+        """
         return pulumi.get(self, "type")
 
     @type.setter
@@ -582,6 +601,9 @@ class AgentUserEventMessageArgsDict(TypedDict):
     When the event occurred.
     """
     type: pulumi.Input[_builtins.str]
+    """
+    Expected value is 'user_message'.
+    """
     commands: NotRequired[pulumi.Input[Optional[Mapping[str, pulumi.Input['AgentSlashCommandArgsDict']]]]]
     """
     Slash Commands the user selected when creating their message.
@@ -607,13 +629,14 @@ class AgentUserEventMessageArgs:
         """
         :param pulumi.Input[_builtins.str] content: The exact natural language instruction from the user.
         :param pulumi.Input[_builtins.str] timestamp: When the event occurred.
+        :param pulumi.Input[_builtins.str] type: Expected value is 'user_message'.
         :param pulumi.Input[Mapping[str, pulumi.Input['AgentSlashCommandArgs']]] commands: Slash Commands the user selected when creating their message.
         :param pulumi.Input['AgentEntityDiffArgs'] entity_diff: Entities to add or remove from the agent.
         :param pulumi.Input['PageContextArgs'] page_context: Optional Pulumi Cloud page the user has the Neo pane open on at the moment they sent this event. Persisted with the event so cold-start replay can reproduce per-turn page context exactly. Omitted by clients with no concept of a current page (CLI, scheduled tasks, Slack, GitHub triggers, API consumers).
         """
         pulumi.set(__self__, "content", content)
         pulumi.set(__self__, "timestamp", timestamp)
-        pulumi.set(__self__, "type", type)
+        pulumi.set(__self__, "type", 'user_message')
         if commands is not None:
             pulumi.set(__self__, "commands", commands)
         if entity_diff is not None:
@@ -648,6 +671,9 @@ class AgentUserEventMessageArgs:
     @_builtins.property
     @pulumi.getter
     def type(self) -> pulumi.Input[_builtins.str]:
+        """
+        Expected value is 'user_message'.
+        """
         return pulumi.get(self, "type")
 
     @type.setter

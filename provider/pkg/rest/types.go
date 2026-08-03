@@ -235,7 +235,30 @@ func (r *typeRegistry) property(node any) schema.PropertySpec {
 	}
 	ts := r.typeSpec(nm)
 	desc, _ := nm["description"].(string)
-	return schema.PropertySpec{TypeSpec: ts, Description: desc}
+	return schema.PropertySpec{TypeSpec: ts, Description: withUnionDoc(desc, ts)}
+}
+
+// withUnionDoc appends the valid discriminator values to a union-typed
+// property's description so SDKs that degrade unions to object still name
+// the choices.
+func withUnionDoc(desc string, ts schema.TypeSpec) string {
+	d := ts.Discriminator
+	if d == nil && ts.Type == typeArray && ts.Items != nil {
+		d = ts.Items.Discriminator
+	}
+	if d == nil {
+		return desc
+	}
+	tags := make([]string, 0, len(d.Mapping))
+	for tag := range d.Mapping {
+		tags = append(tags, tag)
+	}
+	slices.Sort(tags)
+	line := fmt.Sprintf("Valid `%s` values: %s.", d.PropertyName, strings.Join(tags, ", "))
+	if desc == "" {
+		return line
+	}
+	return desc + "\n\n" + line
 }
 
 func anyTypeSpec() schema.TypeSpec {
@@ -279,12 +302,31 @@ func (r *typeRegistry) typeSpec(nm map[string]any) schema.TypeSpec {
 				return r.unionTypeSpec(name, tagProp, mapping)
 			}
 		}
+		// A reference to a mapped variant is the definite const-tagged
+		// variant type, regardless of how the variant is shaped. Without
+		// this, direct references would emit an untagged twin of the union
+		// member under the same token, and the winner would depend on
+		// emission order.
+		if tagProp, tag, ok := r.variantTagFor(name); ok {
+			return r.refTo(r.emitVariant(name, tagProp, tag))
+		}
 		// Marker subtypes (allOf over a discriminated base, no properties of
 		// their own — e.g. PermissionBooleanExpression over
-		// PermissionExpression) render as the base's union; a closed
-		// {tag}-only type would make every variant unassignable.
-		if base, tagProp, mapping := r.markerUnionBase(name, target); base != "" && len(mapping) >= 2 {
-			return r.unionTypeSpec(base, tagProp, mapping)
+		// PermissionExpression) render as the union of the mapped variants
+		// whose allOf chain passes through the marker: the wire contract is
+		// the marker's class hierarchy, not the whole base algebra.
+		if base, tagProp, mapping := r.markerUnionBase(name, target); base != "" && len(mapping) > 0 {
+			subset := r.markerSubset(name, mapping)
+			switch len(subset) {
+			case 0:
+				r.errorf("marker %s: no variants in %s's mapping descend through it", name, base)
+				return anyTypeSpec()
+			case 1:
+				tag := soleKey(subset)
+				return r.refTo(r.emitVariant(refSchemaName(subset[tag]), tagProp, tag))
+			default:
+				return r.unionTypeSpec(name, tagProp, subset)
+			}
 		}
 		if isObjectSchema(target) {
 			return r.refTo(r.emitNamed(name))
@@ -407,6 +449,108 @@ func (r *typeRegistry) markerUnionBase(name string, node map[string]any) (string
 		}
 		cur = parent
 	}
+}
+
+// variantTagFor resolves the tag under which name is mapped by its nearest
+// discriminated ancestor, walking first-parent allOf refs. Unlike
+// markerUnionBase this ignores intermediate properties: concrete variants
+// (And, Or) inherit their fields from property-carrying hops.
+func (r *typeRegistry) variantTagFor(name string) (string, string, bool) {
+	seen := map[string]bool{name: true}
+	cur, ok := r.spec.ResolveSchema(schemaRefPrefix + name)
+	if !ok {
+		return "", "", false
+	}
+	for {
+		all, ok := cur[allOfKey].([]any)
+		if !ok {
+			return "", "", false
+		}
+		parentRef := ""
+		for _, m := range all {
+			if mm, ok := m.(map[string]any); ok {
+				if ref, ok := mm[refKey].(string); ok {
+					parentRef = ref
+					break
+				}
+			}
+		}
+		if parentRef == "" {
+			return "", "", false
+		}
+		parentName := refSchemaName(parentRef)
+		if seen[parentName] {
+			return "", "", false
+		}
+		seen[parentName] = true
+		parent, ok := r.spec.ResolveSchema(parentRef)
+		if !ok {
+			return "", "", false
+		}
+		if tagProp, mapping := discriminatorOf(parent); tagProp != "" {
+			tags := make([]string, 0, len(mapping))
+			for tag := range mapping {
+				tags = append(tags, tag)
+			}
+			slices.Sort(tags)
+			for _, tag := range tags {
+				if refSchemaName(mapping[tag]) == name {
+					return tagProp, tag, true
+				}
+			}
+			return "", "", false
+		}
+		cur = parent
+	}
+}
+
+// markerSubset filters a discriminated base's mapping to the variants whose
+// allOf chain passes through marker.
+func (r *typeRegistry) markerSubset(marker string, mapping map[string]string) map[string]string {
+	out := map[string]string{}
+	for tag, ref := range mapping {
+		if r.hasAncestor(refSchemaName(ref), marker) {
+			out[tag] = ref
+		}
+	}
+	return out
+}
+
+// hasAncestor reports whether name's allOf chain transitively references
+// ancestor.
+func (r *typeRegistry) hasAncestor(name, ancestor string) bool {
+	seen := map[string]bool{}
+	var walk func(n string) bool
+	walk = func(n string) bool {
+		if seen[n] {
+			return false
+		}
+		seen[n] = true
+		node, ok := r.spec.ResolveSchema(schemaRefPrefix + n)
+		if !ok {
+			return false
+		}
+		all, ok := node[allOfKey].([]any)
+		if !ok {
+			return false
+		}
+		for _, m := range all {
+			mm, ok := m.(map[string]any)
+			if !ok {
+				continue
+			}
+			ref, ok := mm[refKey].(string)
+			if !ok {
+				continue
+			}
+			parent := refSchemaName(ref)
+			if parent == ancestor || walk(parent) {
+				return true
+			}
+		}
+		return false
+	}
+	return walk(name)
 }
 
 // unionTypeSpec renders a discriminated base as an inline oneOf +

@@ -32,6 +32,8 @@ type Task struct {
 	// Information about the user who created this task.
 	CreatedBy api.UserInfoOutput `pulumi:"createdBy"`
 	// Pulumi entities (stacks, projects, etc.) that provide context for the agent.
+	//
+	// Valid `type` values: policy_issue, pull_request, repository, stack.
 	Entities pulumi.ArrayOutput `pulumi:"entities"`
 	// Whether this task is shared with other org members.
 	IsShared pulumi.BoolOutput `pulumi:"isShared"`
@@ -281,6 +283,8 @@ func (o TaskOutput) CreatedBy() api.UserInfoOutput {
 }
 
 // Pulumi entities (stacks, projects, etc.) that provide context for the agent.
+//
+// Valid `type` values: policy_issue, pull_request, repository, stack.
 func (o TaskOutput) Entities() pulumi.ArrayOutput {
 	return o.ApplyT(func(v *Task) pulumi.ArrayOutput { return v.Entities }).(pulumi.ArrayOutput)
 }

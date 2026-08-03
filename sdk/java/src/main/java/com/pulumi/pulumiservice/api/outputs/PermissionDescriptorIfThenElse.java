@@ -11,22 +11,10 @@ import com.pulumi.pulumiservice.api.outputs.PermissionDescriptorCondition;
 import com.pulumi.pulumiservice.api.outputs.PermissionDescriptorGroup;
 import com.pulumi.pulumiservice.api.outputs.PermissionDescriptorSelect;
 import com.pulumi.pulumiservice.api.outputs.PermissionExpressionAnd;
-import com.pulumi.pulumiservice.api.outputs.PermissionExpressionEnvironment;
 import com.pulumi.pulumiservice.api.outputs.PermissionExpressionEqual;
 import com.pulumi.pulumiservice.api.outputs.PermissionExpressionHasTag;
-import com.pulumi.pulumiservice.api.outputs.PermissionExpressionInsightsAccount;
 import com.pulumi.pulumiservice.api.outputs.PermissionExpressionNot;
 import com.pulumi.pulumiservice.api.outputs.PermissionExpressionOr;
-import com.pulumi.pulumiservice.api.outputs.PermissionExpressionStack;
-import com.pulumi.pulumiservice.api.outputs.PermissionExpressionTag;
-import com.pulumi.pulumiservice.api.outputs.PermissionExpressionTeam;
-import com.pulumi.pulumiservice.api.outputs.PermissionLiteralExpressionBool;
-import com.pulumi.pulumiservice.api.outputs.PermissionLiteralExpressionEnvironment;
-import com.pulumi.pulumiservice.api.outputs.PermissionLiteralExpressionInsightsAccount;
-import com.pulumi.pulumiservice.api.outputs.PermissionLiteralExpressionNumber;
-import com.pulumi.pulumiservice.api.outputs.PermissionLiteralExpressionStack;
-import com.pulumi.pulumiservice.api.outputs.PermissionLiteralExpressionString;
-import com.pulumi.pulumiservice.api.outputs.PermissionLiteralExpressionTeam;
 import java.lang.Object;
 import java.lang.String;
 import java.util.Objects;
@@ -43,15 +31,21 @@ public final class PermissionDescriptorIfThenElse {
     /**
      * @return The boolean condition to evaluate.
      * 
+     * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+     * 
      */
     private @Nullable Object condition;
     /**
      * @return The permission descriptor to apply when the condition is false.
      * 
+     * Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
+     * 
      */
     private @Nullable Object subNodeForFalse;
     /**
      * @return The permission descriptor to apply when the condition is true.
+     * 
+     * Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
      * 
      */
     private @Nullable Object subNodeForTrue;
@@ -67,6 +61,8 @@ public final class PermissionDescriptorIfThenElse {
     /**
      * @return The boolean condition to evaluate.
      * 
+     * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+     * 
      */
     public Optional<Object> condition() {
         return Optional.ofNullable(this.condition);
@@ -74,12 +70,16 @@ public final class PermissionDescriptorIfThenElse {
     /**
      * @return The permission descriptor to apply when the condition is false.
      * 
+     * Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
+     * 
      */
     public Optional<Object> subNodeForFalse() {
         return Optional.ofNullable(this.subNodeForFalse);
     }
     /**
      * @return The permission descriptor to apply when the condition is true.
+     * 
+     * Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
      * 
      */
     public Optional<Object> subNodeForTrue() {

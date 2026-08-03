@@ -538,6 +538,8 @@ class ChangeGateApprovalRuleOutput(dict):
         """
         :param _builtins.bool allow_self_approval: Whether self approval is allowed
         :param Sequence[Union['ApprovalRuleEligibilityOutputPermission', 'ApprovalRuleEligibilityOutputUser', 'ApprovalRuleEligibilityOutputTeam']] eligible_approvers: List of eligible approvers
+               
+               Valid `eligibilityType` values: has_permission_on_target, specific_user, team_member.
         :param _builtins.int num_approvals_required: Number of approvals required
         :param _builtins.bool require_reapproval_on_change: Whether reapproval is required when the change request is modified
         :param _builtins.str rule_type: Expected value is 'approval_required'.
@@ -561,6 +563,8 @@ class ChangeGateApprovalRuleOutput(dict):
     def eligible_approvers(self) -> Sequence[Any]:
         """
         List of eligible approvers
+
+        Valid `eligibilityType` values: has_permission_on_target, specific_user, team_member.
         """
         return pulumi.get(self, "eligible_approvers")
 
@@ -968,8 +972,12 @@ class PermissionDescriptorCondition(dict):
                  sub_node: Optional[Any] = None):
         """
         :param _builtins.str __type: Expected value is 'PermissionDescriptorCondition'.
-        :param Union['PermissionExpressionAnd', 'PermissionExpressionEnvironment', 'PermissionExpressionEqual', 'PermissionExpressionHasTag', 'PermissionExpressionInsightsAccount', 'PermissionExpressionNot', 'PermissionExpressionOr', 'PermissionExpressionStack', 'PermissionExpressionTag', 'PermissionExpressionTeam', 'PermissionLiteralExpressionBool', 'PermissionLiteralExpressionEnvironment', 'PermissionLiteralExpressionInsightsAccount', 'PermissionLiteralExpressionNumber', 'PermissionLiteralExpressionStack', 'PermissionLiteralExpressionString', 'PermissionLiteralExpressionTeam'] condition: The boolean condition to evaluate.
+        :param Union['PermissionExpressionAnd', 'PermissionExpressionEqual', 'PermissionExpressionHasTag', 'PermissionExpressionNot', 'PermissionExpressionOr'] condition: The boolean condition to evaluate.
+               
+               Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
         :param Union['PermissionDescriptorAllow', 'PermissionDescriptorCompose', 'PermissionDescriptorCondition', 'PermissionDescriptorGroup', 'PermissionDescriptorIfThenElse', 'PermissionDescriptorSelect'] sub_node: The permission descriptor to apply when the condition is true.
+               
+               Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
         """
         pulumi.set(__self__, "__type", 'PermissionDescriptorCondition')
         if condition is not None:
@@ -990,6 +998,8 @@ class PermissionDescriptorCondition(dict):
     def condition(self) -> Optional[Any]:
         """
         The boolean condition to evaluate.
+
+        Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
         """
         return pulumi.get(self, "condition")
 
@@ -998,6 +1008,8 @@ class PermissionDescriptorCondition(dict):
     def sub_node(self) -> Optional[Any]:
         """
         The permission descriptor to apply when the condition is true.
+
+        Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
         """
         return pulumi.get(self, "sub_node")
 
@@ -1010,6 +1022,8 @@ class PermissionDescriptorGroup(dict):
         """
         :param _builtins.str __type: Expected value is 'PermissionDescriptorGroup'.
         :param Sequence[Union['PermissionDescriptorAllow', 'PermissionDescriptorCompose', 'PermissionDescriptorCondition', 'PermissionDescriptorGroup', 'PermissionDescriptorIfThenElse', 'PermissionDescriptorSelect']] entries: The list of permission descriptor entries in this group.
+               
+               Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
         """
         pulumi.set(__self__, "__type", 'PermissionDescriptorGroup')
         if entries is not None:
@@ -1028,6 +1042,8 @@ class PermissionDescriptorGroup(dict):
     def entries(self) -> Optional[Sequence[Any]]:
         """
         The list of permission descriptor entries in this group.
+
+        Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
         """
         return pulumi.get(self, "entries")
 
@@ -1060,9 +1076,15 @@ class PermissionDescriptorIfThenElse(dict):
                  sub_node_for_true: Optional[Any] = None):
         """
         :param _builtins.str __type: Expected value is 'PermissionDescriptorIfThenElse'.
-        :param Union['PermissionExpressionAnd', 'PermissionExpressionEnvironment', 'PermissionExpressionEqual', 'PermissionExpressionHasTag', 'PermissionExpressionInsightsAccount', 'PermissionExpressionNot', 'PermissionExpressionOr', 'PermissionExpressionStack', 'PermissionExpressionTag', 'PermissionExpressionTeam', 'PermissionLiteralExpressionBool', 'PermissionLiteralExpressionEnvironment', 'PermissionLiteralExpressionInsightsAccount', 'PermissionLiteralExpressionNumber', 'PermissionLiteralExpressionStack', 'PermissionLiteralExpressionString', 'PermissionLiteralExpressionTeam'] condition: The boolean condition to evaluate.
+        :param Union['PermissionExpressionAnd', 'PermissionExpressionEqual', 'PermissionExpressionHasTag', 'PermissionExpressionNot', 'PermissionExpressionOr'] condition: The boolean condition to evaluate.
+               
+               Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
         :param Union['PermissionDescriptorAllow', 'PermissionDescriptorCompose', 'PermissionDescriptorCondition', 'PermissionDescriptorGroup', 'PermissionDescriptorIfThenElse', 'PermissionDescriptorSelect'] sub_node_for_false: The permission descriptor to apply when the condition is false.
+               
+               Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
         :param Union['PermissionDescriptorAllow', 'PermissionDescriptorCompose', 'PermissionDescriptorCondition', 'PermissionDescriptorGroup', 'PermissionDescriptorIfThenElse', 'PermissionDescriptorSelect'] sub_node_for_true: The permission descriptor to apply when the condition is true.
+               
+               Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
         """
         pulumi.set(__self__, "__type", 'PermissionDescriptorIfThenElse')
         if condition is not None:
@@ -1085,6 +1107,8 @@ class PermissionDescriptorIfThenElse(dict):
     def condition(self) -> Optional[Any]:
         """
         The boolean condition to evaluate.
+
+        Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
         """
         return pulumi.get(self, "condition")
 
@@ -1093,6 +1117,8 @@ class PermissionDescriptorIfThenElse(dict):
     def sub_node_for_false(self) -> Optional[Any]:
         """
         The permission descriptor to apply when the condition is false.
+
+        Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
         """
         return pulumi.get(self, "sub_node_for_false")
 
@@ -1101,6 +1127,8 @@ class PermissionDescriptorIfThenElse(dict):
     def sub_node_for_true(self) -> Optional[Any]:
         """
         The permission descriptor to apply when the condition is true.
+
+        Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
         """
         return pulumi.get(self, "sub_node_for_true")
 
@@ -1115,6 +1143,8 @@ class PermissionDescriptorSelect(dict):
         :param _builtins.str __type: Expected value is 'PermissionDescriptorSelect'.
         :param Sequence['PermissionSelectvalue'] options: The available options to select from based on the selector expression.
         :param Union['PermissionExpressionAnd', 'PermissionExpressionEnvironment', 'PermissionExpressionEqual', 'PermissionExpressionHasTag', 'PermissionExpressionInsightsAccount', 'PermissionExpressionNot', 'PermissionExpressionOr', 'PermissionExpressionStack', 'PermissionExpressionTag', 'PermissionExpressionTeam', 'PermissionLiteralExpressionBool', 'PermissionLiteralExpressionEnvironment', 'PermissionLiteralExpressionInsightsAccount', 'PermissionLiteralExpressionNumber', 'PermissionLiteralExpressionStack', 'PermissionLiteralExpressionString', 'PermissionLiteralExpressionTeam'] selector: The expression used to select which option to apply.
+               
+               Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
         """
         pulumi.set(__self__, "__type", 'PermissionDescriptorSelect')
         if options is not None:
@@ -1143,6 +1173,8 @@ class PermissionDescriptorSelect(dict):
     def selector(self) -> Optional[Any]:
         """
         The expression used to select which option to apply.
+
+        Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
         """
         return pulumi.get(self, "selector")
 
@@ -1155,8 +1187,12 @@ class PermissionExpressionAnd(dict):
                  right: Optional[Any] = None):
         """
         :param _builtins.str __type: Expected value is 'PermissionExpressionAnd'.
-        :param Union['PermissionExpressionAnd', 'PermissionExpressionEnvironment', 'PermissionExpressionEqual', 'PermissionExpressionHasTag', 'PermissionExpressionInsightsAccount', 'PermissionExpressionNot', 'PermissionExpressionOr', 'PermissionExpressionStack', 'PermissionExpressionTag', 'PermissionExpressionTeam', 'PermissionLiteralExpressionBool', 'PermissionLiteralExpressionEnvironment', 'PermissionLiteralExpressionInsightsAccount', 'PermissionLiteralExpressionNumber', 'PermissionLiteralExpressionStack', 'PermissionLiteralExpressionString', 'PermissionLiteralExpressionTeam'] left: The left operand of the binary boolean expression.
-        :param Union['PermissionExpressionAnd', 'PermissionExpressionEnvironment', 'PermissionExpressionEqual', 'PermissionExpressionHasTag', 'PermissionExpressionInsightsAccount', 'PermissionExpressionNot', 'PermissionExpressionOr', 'PermissionExpressionStack', 'PermissionExpressionTag', 'PermissionExpressionTeam', 'PermissionLiteralExpressionBool', 'PermissionLiteralExpressionEnvironment', 'PermissionLiteralExpressionInsightsAccount', 'PermissionLiteralExpressionNumber', 'PermissionLiteralExpressionStack', 'PermissionLiteralExpressionString', 'PermissionLiteralExpressionTeam'] right: The right operand of the binary boolean expression.
+        :param Union['PermissionExpressionAnd', 'PermissionExpressionEqual', 'PermissionExpressionHasTag', 'PermissionExpressionNot', 'PermissionExpressionOr'] left: The left operand of the binary boolean expression.
+               
+               Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+        :param Union['PermissionExpressionAnd', 'PermissionExpressionEqual', 'PermissionExpressionHasTag', 'PermissionExpressionNot', 'PermissionExpressionOr'] right: The right operand of the binary boolean expression.
+               
+               Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
         """
         pulumi.set(__self__, "__type", 'PermissionExpressionAnd')
         if left is not None:
@@ -1177,6 +1213,8 @@ class PermissionExpressionAnd(dict):
     def left(self) -> Optional[Any]:
         """
         The left operand of the binary boolean expression.
+
+        Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
         """
         return pulumi.get(self, "left")
 
@@ -1185,6 +1223,8 @@ class PermissionExpressionAnd(dict):
     def right(self) -> Optional[Any]:
         """
         The right operand of the binary boolean expression.
+
+        Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
         """
         return pulumi.get(self, "right")
 
@@ -1216,7 +1256,11 @@ class PermissionExpressionEqual(dict):
         """
         :param _builtins.str __type: Expected value is 'PermissionExpressionEqual'.
         :param Union['PermissionExpressionAnd', 'PermissionExpressionEnvironment', 'PermissionExpressionEqual', 'PermissionExpressionHasTag', 'PermissionExpressionInsightsAccount', 'PermissionExpressionNot', 'PermissionExpressionOr', 'PermissionExpressionStack', 'PermissionExpressionTag', 'PermissionExpressionTeam', 'PermissionLiteralExpressionBool', 'PermissionLiteralExpressionEnvironment', 'PermissionLiteralExpressionInsightsAccount', 'PermissionLiteralExpressionNumber', 'PermissionLiteralExpressionStack', 'PermissionLiteralExpressionString', 'PermissionLiteralExpressionTeam'] left: The left operand of the equality comparison.
+               
+               Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
         :param Union['PermissionExpressionAnd', 'PermissionExpressionEnvironment', 'PermissionExpressionEqual', 'PermissionExpressionHasTag', 'PermissionExpressionInsightsAccount', 'PermissionExpressionNot', 'PermissionExpressionOr', 'PermissionExpressionStack', 'PermissionExpressionTag', 'PermissionExpressionTeam', 'PermissionLiteralExpressionBool', 'PermissionLiteralExpressionEnvironment', 'PermissionLiteralExpressionInsightsAccount', 'PermissionLiteralExpressionNumber', 'PermissionLiteralExpressionStack', 'PermissionLiteralExpressionString', 'PermissionLiteralExpressionTeam'] right: The right operand of the equality comparison.
+               
+               Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
         """
         pulumi.set(__self__, "__type", 'PermissionExpressionEqual')
         if left is not None:
@@ -1237,6 +1281,8 @@ class PermissionExpressionEqual(dict):
     def left(self) -> Optional[Any]:
         """
         The left operand of the equality comparison.
+
+        Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
         """
         return pulumi.get(self, "left")
 
@@ -1245,6 +1291,8 @@ class PermissionExpressionEqual(dict):
     def right(self) -> Optional[Any]:
         """
         The right operand of the equality comparison.
+
+        Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
         """
         return pulumi.get(self, "right")
 
@@ -1258,9 +1306,13 @@ class PermissionExpressionHasTag(dict):
                  node: Optional[Any] = None):
         """
         :param _builtins.str __type: Expected value is 'PermissionExpressionHasTag'.
-        :param Union['PermissionExpressionAnd', 'PermissionExpressionEnvironment', 'PermissionExpressionEqual', 'PermissionExpressionHasTag', 'PermissionExpressionInsightsAccount', 'PermissionExpressionNot', 'PermissionExpressionOr', 'PermissionExpressionStack', 'PermissionExpressionTag', 'PermissionExpressionTeam', 'PermissionLiteralExpressionBool', 'PermissionLiteralExpressionEnvironment', 'PermissionLiteralExpressionInsightsAccount', 'PermissionLiteralExpressionNumber', 'PermissionLiteralExpressionStack', 'PermissionLiteralExpressionString', 'PermissionLiteralExpressionTeam'] context: The context expression to check for the tag.
+        :param Union['PermissionExpressionEnvironment', 'PermissionExpressionInsightsAccount', 'PermissionExpressionStack', 'PermissionExpressionTeam'] context: The context expression to check for the tag.
+               
+               Valid `__type` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
         :param _builtins.str key: The tag key to check for.
-        :param Union['PermissionExpressionAnd', 'PermissionExpressionEnvironment', 'PermissionExpressionEqual', 'PermissionExpressionHasTag', 'PermissionExpressionInsightsAccount', 'PermissionExpressionNot', 'PermissionExpressionOr', 'PermissionExpressionStack', 'PermissionExpressionTag', 'PermissionExpressionTeam', 'PermissionLiteralExpressionBool', 'PermissionLiteralExpressionEnvironment', 'PermissionLiteralExpressionInsightsAccount', 'PermissionLiteralExpressionNumber', 'PermissionLiteralExpressionStack', 'PermissionLiteralExpressionString', 'PermissionLiteralExpressionTeam'] node: The operand of the unary boolean expression.
+        :param Union['PermissionExpressionAnd', 'PermissionExpressionEqual', 'PermissionExpressionHasTag', 'PermissionExpressionNot', 'PermissionExpressionOr'] node: The operand of the unary boolean expression.
+               
+               Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
         """
         pulumi.set(__self__, "__type", 'PermissionExpressionHasTag')
         if context is not None:
@@ -1283,6 +1335,8 @@ class PermissionExpressionHasTag(dict):
     def context(self) -> Optional[Any]:
         """
         The context expression to check for the tag.
+
+        Valid `__type` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
         """
         return pulumi.get(self, "context")
 
@@ -1299,6 +1353,8 @@ class PermissionExpressionHasTag(dict):
     def node(self) -> Optional[Any]:
         """
         The operand of the unary boolean expression.
+
+        Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
         """
         return pulumi.get(self, "node")
 
@@ -1328,7 +1384,9 @@ class PermissionExpressionNot(dict):
                  node: Optional[Any] = None):
         """
         :param _builtins.str __type: Expected value is 'PermissionExpressionNot'.
-        :param Union['PermissionExpressionAnd', 'PermissionExpressionEnvironment', 'PermissionExpressionEqual', 'PermissionExpressionHasTag', 'PermissionExpressionInsightsAccount', 'PermissionExpressionNot', 'PermissionExpressionOr', 'PermissionExpressionStack', 'PermissionExpressionTag', 'PermissionExpressionTeam', 'PermissionLiteralExpressionBool', 'PermissionLiteralExpressionEnvironment', 'PermissionLiteralExpressionInsightsAccount', 'PermissionLiteralExpressionNumber', 'PermissionLiteralExpressionStack', 'PermissionLiteralExpressionString', 'PermissionLiteralExpressionTeam'] node: The operand of the unary boolean expression.
+        :param Union['PermissionExpressionAnd', 'PermissionExpressionEqual', 'PermissionExpressionHasTag', 'PermissionExpressionNot', 'PermissionExpressionOr'] node: The operand of the unary boolean expression.
+               
+               Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
         """
         pulumi.set(__self__, "__type", 'PermissionExpressionNot')
         if node is not None:
@@ -1347,6 +1405,8 @@ class PermissionExpressionNot(dict):
     def node(self) -> Optional[Any]:
         """
         The operand of the unary boolean expression.
+
+        Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
         """
         return pulumi.get(self, "node")
 
@@ -1359,8 +1419,12 @@ class PermissionExpressionOr(dict):
                  right: Optional[Any] = None):
         """
         :param _builtins.str __type: Expected value is 'PermissionExpressionOr'.
-        :param Union['PermissionExpressionAnd', 'PermissionExpressionEnvironment', 'PermissionExpressionEqual', 'PermissionExpressionHasTag', 'PermissionExpressionInsightsAccount', 'PermissionExpressionNot', 'PermissionExpressionOr', 'PermissionExpressionStack', 'PermissionExpressionTag', 'PermissionExpressionTeam', 'PermissionLiteralExpressionBool', 'PermissionLiteralExpressionEnvironment', 'PermissionLiteralExpressionInsightsAccount', 'PermissionLiteralExpressionNumber', 'PermissionLiteralExpressionStack', 'PermissionLiteralExpressionString', 'PermissionLiteralExpressionTeam'] left: The left operand of the binary boolean expression.
-        :param Union['PermissionExpressionAnd', 'PermissionExpressionEnvironment', 'PermissionExpressionEqual', 'PermissionExpressionHasTag', 'PermissionExpressionInsightsAccount', 'PermissionExpressionNot', 'PermissionExpressionOr', 'PermissionExpressionStack', 'PermissionExpressionTag', 'PermissionExpressionTeam', 'PermissionLiteralExpressionBool', 'PermissionLiteralExpressionEnvironment', 'PermissionLiteralExpressionInsightsAccount', 'PermissionLiteralExpressionNumber', 'PermissionLiteralExpressionStack', 'PermissionLiteralExpressionString', 'PermissionLiteralExpressionTeam'] right: The right operand of the binary boolean expression.
+        :param Union['PermissionExpressionAnd', 'PermissionExpressionEqual', 'PermissionExpressionHasTag', 'PermissionExpressionNot', 'PermissionExpressionOr'] left: The left operand of the binary boolean expression.
+               
+               Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+        :param Union['PermissionExpressionAnd', 'PermissionExpressionEqual', 'PermissionExpressionHasTag', 'PermissionExpressionNot', 'PermissionExpressionOr'] right: The right operand of the binary boolean expression.
+               
+               Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
         """
         pulumi.set(__self__, "__type", 'PermissionExpressionOr')
         if left is not None:
@@ -1381,6 +1445,8 @@ class PermissionExpressionOr(dict):
     def left(self) -> Optional[Any]:
         """
         The left operand of the binary boolean expression.
+
+        Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
         """
         return pulumi.get(self, "left")
 
@@ -1389,6 +1455,8 @@ class PermissionExpressionOr(dict):
     def right(self) -> Optional[Any]:
         """
         The right operand of the binary boolean expression.
+
+        Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
         """
         return pulumi.get(self, "right")
 
@@ -1419,7 +1487,9 @@ class PermissionExpressionTag(dict):
                  key: Optional[_builtins.str] = None):
         """
         :param _builtins.str __type: Expected value is 'PermissionExpressionTag'.
-        :param Union['PermissionExpressionAnd', 'PermissionExpressionEnvironment', 'PermissionExpressionEqual', 'PermissionExpressionHasTag', 'PermissionExpressionInsightsAccount', 'PermissionExpressionNot', 'PermissionExpressionOr', 'PermissionExpressionStack', 'PermissionExpressionTag', 'PermissionExpressionTeam', 'PermissionLiteralExpressionBool', 'PermissionLiteralExpressionEnvironment', 'PermissionLiteralExpressionInsightsAccount', 'PermissionLiteralExpressionNumber', 'PermissionLiteralExpressionStack', 'PermissionLiteralExpressionString', 'PermissionLiteralExpressionTeam'] context: The context expression identifying the resource to look up the tag on.
+        :param Union['PermissionExpressionEnvironment', 'PermissionExpressionInsightsAccount', 'PermissionExpressionStack', 'PermissionExpressionTeam'] context: The context expression identifying the resource to look up the tag on.
+               
+               Valid `__type` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
         :param _builtins.str key: The tag key to retrieve.
         """
         pulumi.set(__self__, "__type", 'PermissionExpressionTag')
@@ -1441,6 +1511,8 @@ class PermissionExpressionTag(dict):
     def context(self) -> Optional[Any]:
         """
         The context expression identifying the resource to look up the tag on.
+
+        Valid `__type` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
         """
         return pulumi.get(self, "context")
 
@@ -1693,7 +1765,11 @@ class PermissionSelectvalue(dict):
         PermissionSelectvalue pairs a value expression with its corresponding permission descriptor node.
 
         :param Union['PermissionDescriptorAllow', 'PermissionDescriptorCompose', 'PermissionDescriptorCondition', 'PermissionDescriptorGroup', 'PermissionDescriptorIfThenElse', 'PermissionDescriptorSelect'] node: The permission descriptor to apply when this value matches.
+               
+               Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
         :param Union['PermissionExpressionAnd', 'PermissionExpressionEnvironment', 'PermissionExpressionEqual', 'PermissionExpressionHasTag', 'PermissionExpressionInsightsAccount', 'PermissionExpressionNot', 'PermissionExpressionOr', 'PermissionExpressionStack', 'PermissionExpressionTag', 'PermissionExpressionTeam', 'PermissionLiteralExpressionBool', 'PermissionLiteralExpressionEnvironment', 'PermissionLiteralExpressionInsightsAccount', 'PermissionLiteralExpressionNumber', 'PermissionLiteralExpressionStack', 'PermissionLiteralExpressionString', 'PermissionLiteralExpressionTeam'] value: The value expression to match against the selector.
+               
+               Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
         """
         if node is not None:
             pulumi.set(__self__, "node", node)
@@ -1705,6 +1781,8 @@ class PermissionSelectvalue(dict):
     def node(self) -> Optional[Any]:
         """
         The permission descriptor to apply when this value matches.
+
+        Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
         """
         return pulumi.get(self, "node")
 
@@ -1713,6 +1791,8 @@ class PermissionSelectvalue(dict):
     def value(self) -> Optional[Any]:
         """
         The value expression to match against the selector.
+
+        Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
         """
         return pulumi.get(self, "value")
 

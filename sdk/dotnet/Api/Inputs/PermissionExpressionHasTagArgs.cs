@@ -20,6 +20,8 @@ namespace Pulumi.PulumiService.Api.Inputs
 
         /// <summary>
         /// The context expression to check for the tag.
+        /// 
+        /// Valid `__type` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
         /// </summary>
         [Input("context")]
         public object? Context { get; set; }
@@ -32,6 +34,8 @@ namespace Pulumi.PulumiService.Api.Inputs
 
         /// <summary>
         /// The operand of the unary boolean expression.
+        /// 
+        /// Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
         /// </summary>
         [Input("node")]
         public object? Node { get; set; }

@@ -7,22 +7,10 @@ import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
 import com.pulumi.core.internal.Codegen;
 import com.pulumi.exceptions.MissingRequiredPropertyException;
-import com.pulumi.pulumiservice.api.inputs.PermissionExpressionAndArgs;
 import com.pulumi.pulumiservice.api.inputs.PermissionExpressionEnvironmentArgs;
-import com.pulumi.pulumiservice.api.inputs.PermissionExpressionEqualArgs;
-import com.pulumi.pulumiservice.api.inputs.PermissionExpressionHasTagArgs;
 import com.pulumi.pulumiservice.api.inputs.PermissionExpressionInsightsAccountArgs;
-import com.pulumi.pulumiservice.api.inputs.PermissionExpressionNotArgs;
-import com.pulumi.pulumiservice.api.inputs.PermissionExpressionOrArgs;
 import com.pulumi.pulumiservice.api.inputs.PermissionExpressionStackArgs;
 import com.pulumi.pulumiservice.api.inputs.PermissionExpressionTeamArgs;
-import com.pulumi.pulumiservice.api.inputs.PermissionLiteralExpressionBoolArgs;
-import com.pulumi.pulumiservice.api.inputs.PermissionLiteralExpressionEnvironmentArgs;
-import com.pulumi.pulumiservice.api.inputs.PermissionLiteralExpressionInsightsAccountArgs;
-import com.pulumi.pulumiservice.api.inputs.PermissionLiteralExpressionNumberArgs;
-import com.pulumi.pulumiservice.api.inputs.PermissionLiteralExpressionStackArgs;
-import com.pulumi.pulumiservice.api.inputs.PermissionLiteralExpressionStringArgs;
-import com.pulumi.pulumiservice.api.inputs.PermissionLiteralExpressionTeamArgs;
 import java.lang.Object;
 import java.lang.String;
 import java.util.Objects;
@@ -52,12 +40,16 @@ public final class PermissionExpressionTagArgs extends com.pulumi.resources.Reso
     /**
      * The context expression identifying the resource to look up the tag on.
      * 
+     * Valid `__type` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
+     * 
      */
     @Import(name="context")
     private @Nullable Output<Object> context;
 
     /**
      * @return The context expression identifying the resource to look up the tag on.
+     * 
+     * Valid `__type` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
      * 
      */
     public Optional<Output<Object>> context() {
@@ -129,6 +121,8 @@ public final class PermissionExpressionTagArgs extends com.pulumi.resources.Reso
         /**
          * @param context The context expression identifying the resource to look up the tag on.
          * 
+         * Valid `__type` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
+         * 
          * @return builder
          * 
          */
@@ -139,6 +133,8 @@ public final class PermissionExpressionTagArgs extends com.pulumi.resources.Reso
 
         /**
          * @param context The context expression identifying the resource to look up the tag on.
+         * 
+         * Valid `__type` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
          * 
          * @return builder
          * 

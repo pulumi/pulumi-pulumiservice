@@ -12,15 +12,7 @@ import com.pulumi.pulumiservice.api.outputs.PermissionExpressionInsightsAccount;
 import com.pulumi.pulumiservice.api.outputs.PermissionExpressionNot;
 import com.pulumi.pulumiservice.api.outputs.PermissionExpressionOr;
 import com.pulumi.pulumiservice.api.outputs.PermissionExpressionStack;
-import com.pulumi.pulumiservice.api.outputs.PermissionExpressionTag;
 import com.pulumi.pulumiservice.api.outputs.PermissionExpressionTeam;
-import com.pulumi.pulumiservice.api.outputs.PermissionLiteralExpressionBool;
-import com.pulumi.pulumiservice.api.outputs.PermissionLiteralExpressionEnvironment;
-import com.pulumi.pulumiservice.api.outputs.PermissionLiteralExpressionInsightsAccount;
-import com.pulumi.pulumiservice.api.outputs.PermissionLiteralExpressionNumber;
-import com.pulumi.pulumiservice.api.outputs.PermissionLiteralExpressionStack;
-import com.pulumi.pulumiservice.api.outputs.PermissionLiteralExpressionString;
-import com.pulumi.pulumiservice.api.outputs.PermissionLiteralExpressionTeam;
 import java.lang.Object;
 import java.lang.String;
 import java.util.Objects;
@@ -37,6 +29,8 @@ public final class PermissionExpressionHasTag {
     /**
      * @return The context expression to check for the tag.
      * 
+     * Valid `__type` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
+     * 
      */
     private @Nullable Object context;
     /**
@@ -46,6 +40,8 @@ public final class PermissionExpressionHasTag {
     private @Nullable String key;
     /**
      * @return The operand of the unary boolean expression.
+     * 
+     * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
      * 
      */
     private @Nullable Object node;
@@ -61,6 +57,8 @@ public final class PermissionExpressionHasTag {
     /**
      * @return The context expression to check for the tag.
      * 
+     * Valid `__type` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
+     * 
      */
     public Optional<Object> context() {
         return Optional.ofNullable(this.context);
@@ -74,6 +72,8 @@ public final class PermissionExpressionHasTag {
     }
     /**
      * @return The operand of the unary boolean expression.
+     * 
+     * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
      * 
      */
     public Optional<Object> node() {

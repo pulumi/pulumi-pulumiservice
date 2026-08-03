@@ -24,13 +24,19 @@ import (
 )
 
 const (
-	opCreateWidget = "CreateWidget"
-	widgetRequest  = "WidgetRequest"
-	tagCircle      = "circle"
-	propsKey       = "properties"
-	typeKey        = "type"
-	tagKind        = "kind"
-	circleRef      = schemaRefPrefix + "Circle"
+	opCreateWidget  = "CreateWidget"
+	widgetRequest   = "WidgetRequest"
+	tagCircle       = "circle"
+	propsKey        = "properties"
+	typeKey         = "type"
+	tagKind         = "kind"
+	circleRef       = schemaRefPrefix + "Circle"
+	schemaShape     = "Shape"
+	schemaSquare    = "Square"
+	schemaBlob      = "Blob"
+	schemaBoolShape = "BoolShape"
+	condProp        = "cond"
+	widgetTok       = "pulumiservice:api:Widget"
 )
 
 // synthSpec builds a minimal OpenAPI spec with one POST /widget operation
@@ -313,26 +319,105 @@ func TestRecursiveUnionTerminates(t *testing.T) {
 	}
 }
 
-func TestMarkerSubtypeRendersBaseUnion(t *testing.T) {
-	// BoolShape is a pure marker over the discriminated Shape base; a
-	// property referencing it must get Shape's union, not a closed
-	// {kind}-only type.
+// markerSchemas extends unionSchemas with a BoolShape marker over Shape:
+// circle, square, and blob chain through the marker; dot descends from Shape
+// directly. The request references the marker.
+func markerSchemas() map[string]any {
 	schemas := unionSchemas()
-	schemas["BoolShape"] = map[string]any{allOfKey: []any{
-		sref("Shape"),
+	mapping := schemas[schemaShape].(map[string]any)["discriminator"].(map[string]any)["mapping"].(map[string]any)
+	mapping["dot"] = schemaRefPrefix + "Dot"
+	schemas[schemaBoolShape] = map[string]any{allOfKey: []any{
+		sref(schemaShape),
 		map[string]any{"description": "marker", typeKey: typeObject},
 	}}
-	schemas[widgetRequest] = obj(map[string]any{"cond": sref("BoolShape")})
-	pkg := buildSynth(t, schemas)
-	in := pkg.Resources["pulumiservice:api:Widget"].InputProperties["cond"]
-	if got, want := len(in.OneOf), 3; got != want {
-		t.Fatalf("marker should render base union, got %+v", in.TypeSpec)
+	for _, n := range []string{"Circle", schemaSquare, schemaBlob} {
+		schemas[n] = variant(schemaBoolShape, map[string]any{
+			strings.ToLower(n): map[string]any{typeKey: typeNumber},
+		})
 	}
-	if in.Discriminator == nil || in.Discriminator.PropertyName != "kind" {
+	schemas["Dot"] = variant(schemaShape, map[string]any{"x": map[string]any{typeKey: typeNumber}})
+	schemas[widgetRequest] = obj(map[string]any{condProp: sref(schemaBoolShape)})
+	return schemas
+}
+
+// repointOutsideMarker moves variants to descend from Shape directly, taking
+// them out of the BoolShape marker's subset.
+func repointOutsideMarker(schemas map[string]any, names ...string) {
+	for _, n := range names {
+		schemas[n] = variant(schemaShape, map[string]any{
+			strings.ToLower(n): map[string]any{typeKey: typeNumber},
+		})
+	}
+}
+
+func TestMarkerRendersDescendantSubsetUnion(t *testing.T) {
+	// A property referencing a pure marker gets the union of the variants
+	// that chain through the marker, not the base's full mapping.
+	pkg := buildSynth(t, markerSchemas())
+	in := pkg.Resources[widgetTok].InputProperties[condProp]
+	if got, want := len(in.OneOf), 3; got != want {
+		t.Fatalf("marker union members: got %d, want %d (%+v)", got, want, in.TypeSpec)
+	}
+	if in.Discriminator == nil || in.Discriminator.PropertyName != tagKind {
 		t.Fatalf("marker union lost discriminator: %+v", in.Discriminator)
+	}
+	if _, ok := in.Discriminator.Mapping["dot"]; ok {
+		t.Errorf("dot does not descend through the marker and must not appear")
 	}
 	if _, ok := pkg.Types["pulumiservice:api:BoolShape"]; ok {
 		t.Errorf("marker type must not be emitted")
+	}
+}
+
+func TestMarkerSubsetSingleVariantBecomesDefinite(t *testing.T) {
+	schemas := markerSchemas()
+	repointOutsideMarker(schemas, schemaSquare, schemaBlob)
+	pkg := buildSynth(t, schemas)
+	in := pkg.Resources[widgetTok].InputProperties[condProp]
+	if got, want := in.Ref, "#/types/pulumiservice:api:Circle"; got != want {
+		t.Errorf("single-descendant marker should be the definite variant, got %+v", in.TypeSpec)
+	}
+}
+
+func TestMarkerSubsetTwoMembersRejected(t *testing.T) {
+	schemas := markerSchemas()
+	repointOutsideMarker(schemas, schemaBlob)
+	_, err := BuildSchema(synthSpec(t, schemas), widgetMetadata(), "pulumiservice")
+	if err == nil || !strings.Contains(err.Error(), "2-member object unions") {
+		t.Fatalf("expected 2-member marker subset to fail BuildSchema, got %v", err)
+	}
+}
+
+func TestMarkerWithNoDescendantsErrors(t *testing.T) {
+	schemas := markerSchemas()
+	repointOutsideMarker(schemas, "Circle", schemaSquare, schemaBlob)
+	_, err := BuildSchema(synthSpec(t, schemas), widgetMetadata(), "pulumiservice")
+	if err == nil || !strings.Contains(err.Error(), "no variants") {
+		t.Fatalf("expected empty marker subset to fail BuildSchema, got %v", err)
+	}
+}
+
+func TestVariantReferenceBecomesDefiniteType(t *testing.T) {
+	// A property referencing a mapped variant directly gets the definite
+	// const-tagged variant type, identical to the union-member emission.
+	schemas := unionSchemas()
+	schemas[widgetRequest] = obj(map[string]any{"one": sref("Circle")})
+	pkg := buildSynth(t, schemas)
+	in := pkg.Resources[widgetTok].InputProperties["one"]
+	if got, want := in.Ref, "#/types/pulumiservice:api:Circle"; got != want {
+		t.Fatalf("variant ref: got %+v, want %q", in.TypeSpec, want)
+	}
+	circle := pkg.Types["pulumiservice:api:Circle"]
+	if circle.Properties[tagKind].Const != tagCircle {
+		t.Errorf("directly-referenced variant must stay const-tagged, got %+v", circle.Properties[tagKind])
+	}
+}
+
+func TestUnionPropertyDocListsTags(t *testing.T) {
+	pkg := buildSynth(t, unionSchemas())
+	in := pkg.Resources[widgetTok].InputProperties["shape"]
+	if want := "Valid `kind` values: blob, circle, square."; !strings.Contains(in.Description, want) {
+		t.Errorf("union property description missing tag list: %q", in.Description)
 	}
 }
 

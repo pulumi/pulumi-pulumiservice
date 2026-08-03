@@ -28,6 +28,8 @@ public final class AgentEntityDiffArgs extends com.pulumi.resources.ResourceArgs
      * Entities to add to the Agent&#39;s context.
      * Entities must be valid, and will be automatically deleted if they are invalid.
      * 
+     * Valid `type` values: policy_issue, pull_request, repository, stack.
+     * 
      */
     @Import(name="add")
     private @Nullable Output<List<Object>> add;
@@ -35,6 +37,8 @@ public final class AgentEntityDiffArgs extends com.pulumi.resources.ResourceArgs
     /**
      * @return Entities to add to the Agent&#39;s context.
      * Entities must be valid, and will be automatically deleted if they are invalid.
+     * 
+     * Valid `type` values: policy_issue, pull_request, repository, stack.
      * 
      */
     public Optional<Output<List<Object>>> add() {
@@ -44,12 +48,16 @@ public final class AgentEntityDiffArgs extends com.pulumi.resources.ResourceArgs
     /**
      * Entities to remove from the Agent&#39;s context.
      * 
+     * Valid `type` values: policy_issue, pull_request, repository, stack.
+     * 
      */
     @Import(name="remove")
     private @Nullable Output<List<Object>> remove;
 
     /**
      * @return Entities to remove from the Agent&#39;s context.
+     * 
+     * Valid `type` values: policy_issue, pull_request, repository, stack.
      * 
      */
     public Optional<Output<List<Object>>> remove() {
@@ -85,6 +93,8 @@ public final class AgentEntityDiffArgs extends com.pulumi.resources.ResourceArgs
          * @param add Entities to add to the Agent&#39;s context.
          * Entities must be valid, and will be automatically deleted if they are invalid.
          * 
+         * Valid `type` values: policy_issue, pull_request, repository, stack.
+         * 
          * @return builder
          * 
          */
@@ -97,6 +107,8 @@ public final class AgentEntityDiffArgs extends com.pulumi.resources.ResourceArgs
          * @param add Entities to add to the Agent&#39;s context.
          * Entities must be valid, and will be automatically deleted if they are invalid.
          * 
+         * Valid `type` values: policy_issue, pull_request, repository, stack.
+         * 
          * @return builder
          * 
          */
@@ -108,6 +120,8 @@ public final class AgentEntityDiffArgs extends com.pulumi.resources.ResourceArgs
          * @param add Entities to add to the Agent&#39;s context.
          * Entities must be valid, and will be automatically deleted if they are invalid.
          * 
+         * Valid `type` values: policy_issue, pull_request, repository, stack.
+         * 
          * @return builder
          * 
          */
@@ -117,6 +131,8 @@ public final class AgentEntityDiffArgs extends com.pulumi.resources.ResourceArgs
 
         /**
          * @param remove Entities to remove from the Agent&#39;s context.
+         * 
+         * Valid `type` values: policy_issue, pull_request, repository, stack.
          * 
          * @return builder
          * 
@@ -129,6 +145,8 @@ public final class AgentEntityDiffArgs extends com.pulumi.resources.ResourceArgs
         /**
          * @param remove Entities to remove from the Agent&#39;s context.
          * 
+         * Valid `type` values: policy_issue, pull_request, repository, stack.
+         * 
          * @return builder
          * 
          */
@@ -138,6 +156,8 @@ public final class AgentEntityDiffArgs extends com.pulumi.resources.ResourceArgs
 
         /**
          * @param remove Entities to remove from the Agent&#39;s context.
+         * 
+         * Valid `type` values: policy_issue, pull_request, repository, stack.
          * 
          * @return builder
          * 

@@ -5,6 +5,7 @@ package com.pulumi.pulumiservice.api_agents.inputs;
 
 import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
+import com.pulumi.core.internal.Codegen;
 import com.pulumi.exceptions.MissingRequiredPropertyException;
 import java.lang.String;
 import java.util.Objects;
@@ -76,9 +77,17 @@ public final class AgentEntityRepositoryArgs extends com.pulumi.resources.Resour
         return this.org;
     }
 
+    /**
+     * Expected value is &#39;repository&#39;.
+     * 
+     */
     @Import(name="type", required=true)
     private Output<String> type;
 
+    /**
+     * @return Expected value is &#39;repository&#39;.
+     * 
+     */
     public Output<String> type() {
         return this.type;
     }
@@ -195,11 +204,23 @@ public final class AgentEntityRepositoryArgs extends com.pulumi.resources.Resour
             return org(Output.of(org));
         }
 
+        /**
+         * @param type Expected value is &#39;repository&#39;.
+         * 
+         * @return builder
+         * 
+         */
         public Builder type(Output<String> type) {
             $.type = type;
             return this;
         }
 
+        /**
+         * @param type Expected value is &#39;repository&#39;.
+         * 
+         * @return builder
+         * 
+         */
         public Builder type(String type) {
             return type(Output.of(type));
         }
@@ -211,9 +232,7 @@ public final class AgentEntityRepositoryArgs extends com.pulumi.resources.Resour
             if ($.org == null) {
                 throw new MissingRequiredPropertyException("AgentEntityRepositoryArgs", "org");
             }
-            if ($.type == null) {
-                throw new MissingRequiredPropertyException("AgentEntityRepositoryArgs", "type");
-            }
+            $.type = Codegen.stringProp("type").output().arg($.type).require();
             return $;
         }
     }

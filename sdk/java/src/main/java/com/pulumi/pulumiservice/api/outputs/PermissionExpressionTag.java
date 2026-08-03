@@ -5,22 +5,10 @@ package com.pulumi.pulumiservice.api.outputs;
 
 import com.pulumi.core.annotations.CustomType;
 import com.pulumi.exceptions.MissingRequiredPropertyException;
-import com.pulumi.pulumiservice.api.outputs.PermissionExpressionAnd;
 import com.pulumi.pulumiservice.api.outputs.PermissionExpressionEnvironment;
-import com.pulumi.pulumiservice.api.outputs.PermissionExpressionEqual;
-import com.pulumi.pulumiservice.api.outputs.PermissionExpressionHasTag;
 import com.pulumi.pulumiservice.api.outputs.PermissionExpressionInsightsAccount;
-import com.pulumi.pulumiservice.api.outputs.PermissionExpressionNot;
-import com.pulumi.pulumiservice.api.outputs.PermissionExpressionOr;
 import com.pulumi.pulumiservice.api.outputs.PermissionExpressionStack;
 import com.pulumi.pulumiservice.api.outputs.PermissionExpressionTeam;
-import com.pulumi.pulumiservice.api.outputs.PermissionLiteralExpressionBool;
-import com.pulumi.pulumiservice.api.outputs.PermissionLiteralExpressionEnvironment;
-import com.pulumi.pulumiservice.api.outputs.PermissionLiteralExpressionInsightsAccount;
-import com.pulumi.pulumiservice.api.outputs.PermissionLiteralExpressionNumber;
-import com.pulumi.pulumiservice.api.outputs.PermissionLiteralExpressionStack;
-import com.pulumi.pulumiservice.api.outputs.PermissionLiteralExpressionString;
-import com.pulumi.pulumiservice.api.outputs.PermissionLiteralExpressionTeam;
 import java.lang.Object;
 import java.lang.String;
 import java.util.Objects;
@@ -36,6 +24,8 @@ public final class PermissionExpressionTag {
     private String __type;
     /**
      * @return The context expression identifying the resource to look up the tag on.
+     * 
+     * Valid `__type` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
      * 
      */
     private @Nullable Object context;
@@ -55,6 +45,8 @@ public final class PermissionExpressionTag {
     }
     /**
      * @return The context expression identifying the resource to look up the tag on.
+     * 
+     * Valid `__type` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
      * 
      */
     public Optional<Object> context() {

@@ -195,6 +195,8 @@ class CreateDeploymentRequestArgsDict(TypedDict):
     vcs: NotRequired[pulumi.Input[Optional[Union['DeploymentSettingsVCSAzureDevOpsArgsDict', 'DeploymentSettingsVCSBitbucketArgsDict', 'DeploymentSettingsVCSCustomArgsDict', 'DeploymentSettingsVCSGitHubArgsDict', 'DeploymentSettingsVCSGitLabArgsDict']]]]
     """
     VCS provider settings
+
+    Valid `provider` values: azure_devops, bitbucket, custom, github, gitlab.
     """
 
 @pulumi.input_type
@@ -221,6 +223,8 @@ class CreateDeploymentRequestArgs:
         :param pulumi.Input['SourceContextRequestArgs'] source_context: The source context defining where the source code is located.
         :param pulumi.Input[_builtins.str] tag: A tag to identify the deployment settings configuration.
         :param pulumi.Input[Union['DeploymentSettingsVCSAzureDevOpsArgs', 'DeploymentSettingsVCSBitbucketArgs', 'DeploymentSettingsVCSCustomArgs', 'DeploymentSettingsVCSGitHubArgs', 'DeploymentSettingsVCSGitLabArgs']] vcs: VCS provider settings
+               
+               Valid `provider` values: azure_devops, bitbucket, custom, github, gitlab.
         """
         if agent_pool_id is not None:
             pulumi.set(__self__, "agent_pool_id", agent_pool_id)
@@ -356,6 +360,8 @@ class CreateDeploymentRequestArgs:
     def vcs(self) -> pulumi.Input[Optional[Union['DeploymentSettingsVCSAzureDevOpsArgs', 'DeploymentSettingsVCSBitbucketArgs', 'DeploymentSettingsVCSCustomArgs', 'DeploymentSettingsVCSGitHubArgs', 'DeploymentSettingsVCSGitLabArgs']]]:
         """
         VCS provider settings
+
+        Valid `provider` values: azure_devops, bitbucket, custom, github, gitlab.
         """
         return pulumi.get(self, "vcs")
 

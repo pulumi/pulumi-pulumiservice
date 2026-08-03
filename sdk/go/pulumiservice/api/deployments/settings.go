@@ -33,6 +33,8 @@ type Settings struct {
 	// A tag to identify the deployment settings configuration.
 	Tag pulumi.StringPtrOutput `pulumi:"tag"`
 	// VCS provider settings
+	//
+	// Valid `provider` values: azure_devops, bitbucket, custom, github, gitlab.
 	Vcs pulumi.AnyOutput `pulumi:"vcs"`
 	// The version of the deployment settings.
 	Version pulumi.IntPtrOutput `pulumi:"version"`
@@ -108,6 +110,8 @@ type settingsArgs struct {
 	// A tag to identify the deployment settings configuration.
 	Tag *string `pulumi:"tag"`
 	// VCS provider settings
+	//
+	// Valid `provider` values: azure_devops, bitbucket, custom, github, gitlab.
 	Vcs interface{} `pulumi:"vcs"`
 }
 
@@ -134,6 +138,8 @@ type SettingsArgs struct {
 	// A tag to identify the deployment settings configuration.
 	Tag pulumi.StringPtrInput
 	// VCS provider settings
+	//
+	// Valid `provider` values: azure_devops, bitbucket, custom, github, gitlab.
 	Vcs pulumi.Input
 }
 
@@ -265,6 +271,8 @@ func (o SettingsOutput) Tag() pulumi.StringPtrOutput {
 }
 
 // VCS provider settings
+//
+// Valid `provider` values: azure_devops, bitbucket, custom, github, gitlab.
 func (o SettingsOutput) Vcs() pulumi.AnyOutput {
 	return o.ApplyT(func(v *Settings) pulumi.AnyOutput { return v.Vcs }).(pulumi.AnyOutput)
 }

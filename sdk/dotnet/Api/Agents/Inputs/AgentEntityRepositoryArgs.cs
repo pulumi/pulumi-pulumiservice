@@ -36,6 +36,9 @@ namespace Pulumi.PulumiService.Api.Agents.Inputs
         [Input("org", required: true)]
         public Input<string> Org { get; set; } = null!;
 
+        /// <summary>
+        /// Expected value is 'repository'.
+        /// </summary>
         [Input("type", required: true)]
         public Input<string> Type { get; set; } = null!;
 

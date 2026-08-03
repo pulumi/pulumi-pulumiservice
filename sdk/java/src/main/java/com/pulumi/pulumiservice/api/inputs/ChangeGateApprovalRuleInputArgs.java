@@ -40,12 +40,16 @@ public final class ChangeGateApprovalRuleInputArgs extends com.pulumi.resources.
     /**
      * List of eligible approvers
      * 
+     * Valid `eligibilityType` values: has_permission_on_target, specific_user, team_member.
+     * 
      */
     @Import(name="eligibleApprovers", required=true)
     private Output<List<Object>> eligibleApprovers;
 
     /**
      * @return List of eligible approvers
+     * 
+     * Valid `eligibilityType` values: has_permission_on_target, specific_user, team_member.
      * 
      */
     public Output<List<Object>> eligibleApprovers() {
@@ -149,6 +153,8 @@ public final class ChangeGateApprovalRuleInputArgs extends com.pulumi.resources.
         /**
          * @param eligibleApprovers List of eligible approvers
          * 
+         * Valid `eligibilityType` values: has_permission_on_target, specific_user, team_member.
+         * 
          * @return builder
          * 
          */
@@ -160,6 +166,8 @@ public final class ChangeGateApprovalRuleInputArgs extends com.pulumi.resources.
         /**
          * @param eligibleApprovers List of eligible approvers
          * 
+         * Valid `eligibilityType` values: has_permission_on_target, specific_user, team_member.
+         * 
          * @return builder
          * 
          */
@@ -169,6 +177,8 @@ public final class ChangeGateApprovalRuleInputArgs extends com.pulumi.resources.
 
         /**
          * @param eligibleApprovers List of eligible approvers
+         * 
+         * Valid `eligibilityType` values: has_permission_on_target, specific_user, team_member.
          * 
          * @return builder
          * 

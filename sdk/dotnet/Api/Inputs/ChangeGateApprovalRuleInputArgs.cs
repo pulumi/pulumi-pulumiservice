@@ -23,6 +23,8 @@ namespace Pulumi.PulumiService.Api.Inputs
 
         /// <summary>
         /// List of eligible approvers
+        /// 
+        /// Valid `eligibilityType` values: has_permission_on_target, specific_user, team_member.
         /// </summary>
         public InputList<object> EligibleApprovers
         {

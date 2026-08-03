@@ -21,6 +21,8 @@ namespace Pulumi.PulumiService.Api.Agents.Inputs
         /// <summary>
         /// Entities to add to the Agent's context.
         /// Entities must be valid, and will be automatically deleted if they are invalid.
+        /// 
+        /// Valid `type` values: policy_issue, pull_request, repository, stack.
         /// </summary>
         public InputList<object> Add
         {
@@ -33,6 +35,8 @@ namespace Pulumi.PulumiService.Api.Agents.Inputs
 
         /// <summary>
         /// Entities to remove from the Agent's context.
+        /// 
+        /// Valid `type` values: policy_issue, pull_request, repository, stack.
         /// </summary>
         public InputList<object> Remove
         {
