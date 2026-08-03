@@ -59,7 +59,7 @@ func TestEveryApiResourceHasExample(t *testing.T) {
 		if !strings.HasSuffix(strings.ToLower(path), ".yaml") {
 			return nil
 		}
-		if filepath.Base(filepath.Dir(path)) != "yaml" {
+		if filepath.Base(filepath.Dir(path)) != yamlDirName {
 			return nil
 		}
 		data, readErr := os.ReadFile(path) //nolint:gosec // G122: reading repo's own example YAML under test

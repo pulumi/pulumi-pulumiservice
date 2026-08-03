@@ -21,6 +21,8 @@ import (
 
 	p "github.com/pulumi/pulumi-go-provider"
 	"github.com/pulumi/pulumi/sdk/v3/go/property"
+
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 )
 
 // ValidateInputs walks the create-op request body schema over the checked
@@ -29,7 +31,9 @@ import (
 // shape mismatches. It stays lenient everywhere the service is lenient:
 // required fields and enum membership are not enforced, and unknown
 // (computed) values skip their subtree.
-func ValidateInputs(spec *Spec, typeMeta map[string]TypeMeta, op *Operation, meta ResourceMeta, inputs property.Map) []p.CheckFailure {
+func ValidateInputs(
+	spec *Spec, typeMeta map[string]TypeMeta, op *Operation, meta ResourceMeta, inputs property.Map,
+) []p.CheckFailure {
 	if op == nil || op.RequestRef == "" {
 		return nil
 	}
@@ -145,6 +149,9 @@ func (v *inputValidator) walkRef(path string, val property.Value, name string) {
 // name one of the allowed variants, then the value is checked as that
 // variant.
 func (v *inputValidator) walkUnion(path string, val property.Value, tagProp string, mapping map[string]string) {
+	// tagProp arrives wire-side from the spec. Everything below reads user
+	// input and builds user-facing messages, so quote the name they write.
+	tagProp = util.ToSchemaName(tagProp)
 	if !val.IsMap() {
 		v.failf(path, "expected an object with a %q discriminator, got %s", tagProp, valueKind(val))
 		return
@@ -179,6 +186,7 @@ func (v *inputValidator) walkUnion(path string, val property.Value, tagProp stri
 // walkVariant validates a definite-variant position: the tag, when present,
 // must be the variant's own.
 func (v *inputValidator) walkVariant(path string, val property.Value, tagProp, tag, name string) {
+	tagProp = util.ToSchemaName(tagProp)
 	if !val.IsMap() {
 		v.failf(path, "expected an object (%s), got %s", name, valueKind(val))
 		return
@@ -208,13 +216,19 @@ func (v *inputValidator) walkObject(path string, val property.Value, name, tagPr
 	if err != nil {
 		return
 	}
+	// Re-key the spec's wire-side properties to the names the schema exposes,
+	// so a user writing `type__` is neither reported as an unknown field nor
+	// offered `__type` as the nearest match.
+	schemaProps := make(map[string]any, len(props))
 	known := make([]string, 0, len(props))
-	for k := range props {
-		known = append(known, k)
+	for k, node := range props {
+		sk := util.ToSchemaName(k)
+		schemaProps[sk] = node
+		known = append(known, sk)
 	}
 	slices.Sort(known)
 	val.AsMap().AllStable(func(k string, elem property.Value) bool {
-		node, ok := props[k].(map[string]any)
+		node, ok := schemaProps[k].(map[string]any)
 		if !ok {
 			msg := fmt.Sprintf("unknown field %q on %s (the service drops unknown fields silently)", k, name)
 			if s := nearestName(k, known); s != "" {

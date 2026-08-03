@@ -22,6 +22,14 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/property"
 )
 
+const (
+	typoTag      = "circl"
+	imageProp    = "image"
+	shapeProp    = "shape"
+	oneProp      = "one"
+	metadataProp = "metadata"
+)
+
 // pv converts plain Go data into a property.Value for readable test tables.
 func pv(x any) property.Value {
 	switch t := x.(type) {
@@ -52,7 +60,9 @@ func pv(x any) property.Value {
 	}
 }
 
-func validateWidget(t *testing.T, schemas map[string]any, typeMeta map[string]TypeMeta, inputs map[string]any) []p.CheckFailure {
+func validateWidget(
+	t *testing.T, schemas map[string]any, typeMeta map[string]TypeMeta, inputs map[string]any,
+) []p.CheckFailure {
 	t.Helper()
 	spec := synthSpec(t, schemas)
 	op, ok := spec.Op(opCreateWidget)
@@ -67,11 +77,11 @@ func validateWidget(t *testing.T, schemas map[string]any, typeMeta map[string]Ty
 }
 
 func circleShape() map[string]any {
-	return map[string]any{tagKind: tagCircle, "radius": 3, "label": "a"}
+	return map[string]any{tagKind: tagCircle, propRadius: 3, "label": "a"}
 }
 
 func TestValidateAcceptsValidUnion(t *testing.T) {
-	failures := validateWidget(t, unionSchemas(), nil, map[string]any{"shape": circleShape()})
+	failures := validateWidget(t, unionSchemas(), nil, map[string]any{shapeProp: circleShape()})
 	if len(failures) != 0 {
 		t.Fatalf("unexpected failures: %+v", failures)
 	}
@@ -79,7 +89,7 @@ func TestValidateAcceptsValidUnion(t *testing.T) {
 
 func TestValidateUnknownTagSuggests(t *testing.T) {
 	failures := validateWidget(t, unionSchemas(), nil, map[string]any{
-		"shape": map[string]any{tagKind: "circl", "radius": 3},
+		shapeProp: map[string]any{tagKind: typoTag, propRadius: 3},
 	})
 	if len(failures) != 1 {
 		t.Fatalf("want 1 failure, got %+v", failures)
@@ -97,7 +107,7 @@ func TestValidateUnknownTagSuggests(t *testing.T) {
 
 func TestValidateMissingTag(t *testing.T) {
 	failures := validateWidget(t, unionSchemas(), nil, map[string]any{
-		"shape": map[string]any{"radius": 3},
+		shapeProp: map[string]any{propRadius: 3},
 	})
 	if len(failures) != 1 || !strings.Contains(failures[0].Reason, `missing "kind"`) {
 		t.Fatalf("want missing-tag failure, got %+v", failures)
@@ -106,7 +116,7 @@ func TestValidateMissingTag(t *testing.T) {
 
 func TestValidateUnknownFieldSuggests(t *testing.T) {
 	failures := validateWidget(t, unionSchemas(), nil, map[string]any{
-		"shape": map[string]any{tagKind: tagCircle, "radiuss": 3},
+		shapeProp: map[string]any{tagKind: tagCircle, "radiuss": 3},
 	})
 	if len(failures) != 1 {
 		t.Fatalf("want 1 failure, got %+v", failures)
@@ -124,13 +134,13 @@ func TestValidateUnknownFieldSuggests(t *testing.T) {
 
 func TestValidateSkipsComputed(t *testing.T) {
 	failures := validateWidget(t, unionSchemas(), nil, map[string]any{
-		"shape": property.New(property.Computed),
+		shapeProp: property.New(property.Computed),
 	})
 	if len(failures) != 0 {
 		t.Fatalf("computed value must skip validation, got %+v", failures)
 	}
 	failures = validateWidget(t, unionSchemas(), nil, map[string]any{
-		"shape": map[string]any{tagKind: property.New(property.Computed), "radius": 3},
+		shapeProp: map[string]any{tagKind: property.New(property.Computed), propRadius: 3},
 	})
 	if len(failures) != 0 {
 		t.Fatalf("computed tag must skip validation, got %+v", failures)
@@ -139,7 +149,7 @@ func TestValidateSkipsComputed(t *testing.T) {
 
 func TestValidateSecretsAreWalked(t *testing.T) {
 	failures := validateWidget(t, unionSchemas(), nil, map[string]any{
-		"shape": pv(map[string]any{tagKind: "circl", "radius": 3}).WithSecret(true),
+		shapeProp: pv(map[string]any{tagKind: typoTag, propRadius: 3}).WithSecret(true),
 	})
 	if len(failures) != 1 {
 		t.Fatalf("secret values must still validate, got %+v", failures)
@@ -147,7 +157,7 @@ func TestValidateSecretsAreWalked(t *testing.T) {
 }
 
 func TestValidateWrongShapeKind(t *testing.T) {
-	failures := validateWidget(t, unionSchemas(), nil, map[string]any{"shape": "circle"})
+	failures := validateWidget(t, unionSchemas(), nil, map[string]any{shapeProp: "circle"})
 	if len(failures) != 1 || !strings.Contains(failures[0].Reason, `expected an object with a "kind" discriminator`) {
 		t.Fatalf("want shape-kind failure, got %+v", failures)
 	}
@@ -167,9 +177,9 @@ func TestValidateMarkerSubsetRejectsOutOfSubsetTag(t *testing.T) {
 
 func TestValidateDefiniteVariantTag(t *testing.T) {
 	schemas := unionSchemas()
-	schemas[widgetRequest] = obj(map[string]any{"one": sref("Circle")})
+	schemas[widgetRequest] = obj(map[string]any{oneProp: sref("Circle")})
 	failures := validateWidget(t, schemas, nil, map[string]any{
-		"one": map[string]any{tagKind: "square", "radius": 3},
+		oneProp: map[string]any{tagKind: tagSquare, propRadius: 3},
 	})
 	if len(failures) != 1 || !strings.Contains(failures[0].Reason, `"kind" must be "circle" here`) {
 		t.Fatalf("want definite-variant tag failure, got %+v", failures)
@@ -179,10 +189,10 @@ func TestValidateDefiniteVariantTag(t *testing.T) {
 func TestValidateArrayElementPaths(t *testing.T) {
 	schemas := unionSchemas()
 	schemas[widgetRequest] = obj(map[string]any{
-		"shapes": map[string]any{typeKey: typeArray, "items": sref(schemaShape)},
+		"shapes": map[string]any{typeKey: typeArray, itemsKey: sref(schemaShape)},
 	})
 	failures := validateWidget(t, schemas, nil, map[string]any{
-		"shapes": []any{circleShape(), map[string]any{tagKind: "nope"}},
+		"shapes": []any{circleShape(), map[string]any{tagKind: "hexagon"}},
 	})
 	if len(failures) != 1 {
 		t.Fatalf("want 1 failure, got %+v", failures)
@@ -195,10 +205,10 @@ func TestValidateArrayElementPaths(t *testing.T) {
 func TestValidateFreeFormObjectAccepted(t *testing.T) {
 	failures := validateWidget(t, map[string]any{
 		widgetRequest: obj(map[string]any{
-			"metadata": map[string]any{typeKey: typeObject},
+			metadataProp: map[string]any{typeKey: typeObject},
 		}),
 	}, nil, map[string]any{
-		"metadata": map[string]any{"anything": "goes", "nested": map[string]any{"too": 1}},
+		metadataProp: map[string]any{"anything": "goes", "nested": map[string]any{"too": 1}},
 	})
 	if len(failures) != 0 {
 		t.Fatalf("free-form objects must accept anything, got %+v", failures)
@@ -209,7 +219,7 @@ func TestValidateTypeMetaAnySkips(t *testing.T) {
 	failures := validateWidget(t, unionSchemas(), map[string]TypeMeta{
 		schemaShape: {Any: true},
 	}, map[string]any{
-		"shape": map[string]any{tagKind: "nope"},
+		shapeProp: map[string]any{tagKind: "hexagon"},
 	})
 	if len(failures) != 0 {
 		t.Fatalf("TypeMeta.Any must skip validation, got %+v", failures)
@@ -218,14 +228,15 @@ func TestValidateTypeMetaAnySkips(t *testing.T) {
 
 func TestValidateScalarShorthandAcceptsBothForms(t *testing.T) {
 	schemas := map[string]any{
-		widgetRequest: obj(map[string]any{"image": sref("Image")}),
+		widgetRequest: obj(map[string]any{imageProp: sref("Image")}),
 		"Image":       obj(map[string]any{"name": map[string]any{typeKey: typeString}}),
 	}
 	tm := map[string]TypeMeta{"Image": {ScalarShorthand: typeString}}
-	if failures := validateWidget(t, schemas, tm, map[string]any{"image": "nginx:latest"}); len(failures) != 0 {
+	if failures := validateWidget(t, schemas, tm, map[string]any{imageProp: "nginx:latest"}); len(failures) != 0 {
 		t.Fatalf("scalar form must pass, got %+v", failures)
 	}
-	if failures := validateWidget(t, schemas, tm, map[string]any{"image": map[string]any{"nam": "x"}}); len(failures) != 1 {
+	badObj := map[string]any{imageProp: map[string]any{"nam": "x"}}
+	if failures := validateWidget(t, schemas, tm, badObj); len(failures) != 1 {
 		t.Fatalf("object form must still validate fields, got %+v", failures)
 	}
 }
@@ -238,7 +249,7 @@ func TestCheckSurfacesValidationFailures(t *testing.T) {
 	}
 	resp, err := r.Check(t.Context(), p.CheckRequest{
 		Inputs: property.NewMap(map[string]property.Value{
-			"shape": pv(map[string]any{tagKind: "circl", "radius": 3}),
+			shapeProp: pv(map[string]any{tagKind: typoTag, propRadius: 3}),
 		}),
 	})
 	if err != nil {

@@ -174,7 +174,7 @@ func yamlExampleCorpus(t *testing.T) []byte {
 		if info.IsDir() || !strings.HasSuffix(strings.ToLower(path), ".yaml") {
 			return nil
 		}
-		if filepath.Base(filepath.Dir(path)) != "yaml" {
+		if filepath.Base(filepath.Dir(path)) != yamlDirName {
 			return nil
 		}
 		data, readErr := os.ReadFile(path) //nolint:gosec // G304: reading repo's own example YAML under test

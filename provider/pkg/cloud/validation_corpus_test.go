@@ -7,17 +7,20 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/pulumi/pulumi/sdk/v3/go/property"
 	"gopkg.in/yaml.v3"
+
+	"github.com/pulumi/pulumi/sdk/v3/go/property"
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/cloud"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/rest"
 )
 
 const (
-	discKey    = "__type"
-	detailsKey = "details"
-	roleToken  = "pulumiservice:api:Role"
+	discKey       = "type__"
+	detailsKey    = "details"
+	apiRoleType   = "pulumiservice:api:Role"
+	yamlDirName   = "yaml"
+	permStackRead = "stack:read"
 )
 
 // TestValidatorAcceptsEveryYamlExample runs the Check-time input validator
@@ -49,7 +52,8 @@ func TestValidatorAcceptsEveryYamlExample(t *testing.T) {
 			}
 			failures := rest.ValidateInputs(spec, meta.Types, op, rm, property.NewMap(inputs))
 			for _, f := range failures {
-				t.Errorf("%s: resource %q (%s): %s: %s", filepath.Base(filepath.Dir(filepath.Dir(path))), resName, token, f.Property, f.Reason)
+				example := filepath.Base(filepath.Dir(filepath.Dir(path)))
+				t.Errorf("%s: resource %q (%s): %s: %s", example, resName, token, f.Property, f.Reason)
 			}
 			checked++
 		}
@@ -76,11 +80,11 @@ func TestValidatorRejectsKnownBadShapes(t *testing.T) {
 	}{
 		{
 			name:  "out-of-subset literal in Condition.condition",
-			token: roleToken,
+			token: apiRoleType,
 			inputs: map[string]any{detailsKey: map[string]any{
 				discKey:     "PermissionDescriptorCondition",
 				"condition": map[string]any{discKey: "PermissionLiteralExpressionBool", "value": true},
-				"subNode":   map[string]any{discKey: "PermissionDescriptorAllow", "permissions": []any{"stack:read"}},
+				"subNode":   map[string]any{discKey: "PermissionDescriptorAllow", "permissions": []any{permStackRead}},
 			}},
 			wantIn: "expected one of: PermissionExpressionAnd, PermissionExpressionEqual, " +
 				"PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr",
@@ -88,9 +92,9 @@ func TestValidatorRejectsKnownBadShapes(t *testing.T) {
 		},
 		{
 			name:  "misspelled discriminator tag",
-			token: roleToken,
+			token: apiRoleType,
 			inputs: map[string]any{detailsKey: map[string]any{
-				discKey: "PermissionDescriptorAllw", "permissions": []any{"stack:read"},
+				discKey: "PermissionDescriptorAllw", "permissions": []any{permStackRead},
 			}},
 			wantIn: `did you mean "PermissionDescriptorAllow"`,
 			wantAt: "details." + discKey,
@@ -101,12 +105,26 @@ func TestValidatorRejectsKnownBadShapes(t *testing.T) {
 		// positions the schema cannot reject at the top level.
 		{
 			name:  "misspelled field the service drops silently",
-			token: roleToken,
+			token: apiRoleType,
 			inputs: map[string]any{detailsKey: map[string]any{
-				discKey: "PermissionDescriptorAllow", "permission": []any{"stack:read"},
+				discKey: "PermissionDescriptorAllow", "permission": []any{permStackRead},
 			}},
 			wantIn: `did you mean "permissions"`,
 			wantAt: "details.permission",
+		},
+		// The wire spelling is what Pulumi Cloud's REST docs show, so users
+		// reach for it. The engine strips `__`-prefixed keys before Check
+		// runs, so the tag would simply be absent: the validator must say the
+		// discriminator is missing and name the form the user can actually
+		// write, never echo `__type` back at them.
+		{
+			name:  "wire-form discriminator is not accepted",
+			token: apiRoleType,
+			inputs: map[string]any{detailsKey: map[string]any{
+				"__type": "PermissionDescriptorAllow", "permissions": []any{permStackRead},
+			}},
+			wantIn: `missing "type__"`,
+			wantAt: "details." + discKey,
 		},
 	}
 
@@ -179,7 +197,7 @@ func walkYamlExamples(t *testing.T, fn func(path string, doc map[string]any)) {
 		if info.IsDir() || !strings.HasSuffix(strings.ToLower(path), ".yaml") {
 			return nil
 		}
-		if filepath.Base(filepath.Dir(path)) != "yaml" {
+		if filepath.Base(filepath.Dir(path)) != yamlDirName {
 			return nil
 		}
 		data, readErr := os.ReadFile(path) //nolint:gosec // G304: reading repo's own example YAML under test
