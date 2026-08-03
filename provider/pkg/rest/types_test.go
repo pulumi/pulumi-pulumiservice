@@ -36,6 +36,12 @@ const (
 	schemaBlob      = "Blob"
 	schemaBoolShape = "BoolShape"
 	condProp        = "cond"
+	shapeProp       = "shape"
+	radiusProp      = "radius"
+	tagSquare       = "square"
+	oneProp         = "one"
+	itemsKey        = "items"
+	metadataProp    = "metadata"
 	circleTypeRef   = "#/types/pulumiservice:api:Circle"
 	widgetTok       = "pulumiservice:api:Widget"
 )
@@ -122,9 +128,9 @@ func TestNamedTypeEmission(t *testing.T) {
 			"config": sref("WidgetConfig"),
 		}),
 		"WidgetConfig": obj(map[string]any{
-			"size":     map[string]any{typeKey: typeInteger},
-			"apiKey":   map[string]any{typeKey: typeString},
-			"metadata": map[string]any{typeKey: typeObject},
+			"size":       map[string]any{typeKey: typeInteger},
+			"apiKey":     map[string]any{typeKey: typeString},
+			metadataProp: map[string]any{typeKey: typeObject},
 		}, "size"),
 	})
 
@@ -153,7 +159,7 @@ func TestRecursiveTypeTerminates(t *testing.T) {
 		widgetRequest: obj(map[string]any{"node": sref("TreeNode")}),
 		"TreeNode": obj(map[string]any{
 			"value":    map[string]any{typeKey: typeString},
-			"children": map[string]any{typeKey: typeArray, "items": sref("TreeNode")},
+			"children": map[string]any{typeKey: typeArray, itemsKey: sref("TreeNode")},
 		}),
 	})
 	ct, ok := pkg.Types["pulumiservice:api:TreeNode"]
@@ -214,16 +220,16 @@ func variant(base string, extraProps map[string]any, required ...string) map[str
 
 func unionSchemas() map[string]any {
 	return map[string]any{
-		widgetRequest: obj(map[string]any{"shape": sref("Shape")}),
+		widgetRequest: obj(map[string]any{shapeProp: sref("Shape")}),
 		"Shape": discBase(tagKind, map[string]any{
 			tagCircle: circleRef,
-			"square":  schemaRefPrefix + "Square",
+			tagSquare: schemaRefPrefix + "Square",
 			"blob":    schemaRefPrefix + "Blob",
 		}, map[string]any{"label": map[string]any{typeKey: typeString}}),
-		"Circle": variant("Shape", map[string]any{"radius": map[string]any{typeKey: typeNumber}}, "radius"),
+		"Circle": variant("Shape", map[string]any{radiusProp: map[string]any{typeKey: typeNumber}}, radiusProp),
 		"Square": variant("Shape", map[string]any{"side": map[string]any{typeKey: typeNumber}}),
 		"Blob": variant("Shape", map[string]any{
-			"points": map[string]any{typeKey: typeArray, "items": map[string]any{typeKey: typeNumber}},
+			"points": map[string]any{typeKey: typeArray, itemsKey: map[string]any{typeKey: typeNumber}},
 		}),
 	}
 }
@@ -231,7 +237,7 @@ func unionSchemas() map[string]any {
 func TestDiscriminatedUnion(t *testing.T) {
 	pkg := buildSynth(t, unionSchemas())
 
-	in := pkg.Resources["pulumiservice:api:Widget"].InputProperties["shape"]
+	in := pkg.Resources["pulumiservice:api:Widget"].InputProperties[shapeProp]
 	if got, want := len(in.OneOf), 3; got != want {
 		t.Fatalf("oneOf members: got %d, want %d", got, want)
 	}
@@ -263,7 +269,7 @@ func TestDiscriminatedUnion(t *testing.T) {
 	if !strings.Contains(kind.Description, "Expected value is 'circle'.") {
 		t.Errorf("kind description missing expected-value hint: %q", kind.Description)
 	}
-	if got, want := circle.Required, []string{"kind", "radius"}; !slicesEqual(got, want) {
+	if got, want := circle.Required, []string{"kind", radiusProp}; !slicesEqual(got, want) {
 		t.Errorf("Circle required: got %v, want %v", got, want)
 	}
 }
@@ -274,7 +280,7 @@ func TestSingleVariantBecomesDefiniteType(t *testing.T) {
 		tagCircle: circleRef,
 	}
 	pkg := buildSynth(t, schemas)
-	in := pkg.Resources["pulumiservice:api:Widget"].InputProperties["shape"]
+	in := pkg.Resources["pulumiservice:api:Widget"].InputProperties[shapeProp]
 	if len(in.OneOf) != 0 {
 		t.Fatalf("single-variant base must not produce a oneOf")
 	}
@@ -287,7 +293,7 @@ func TestEmptyMappingFallsBackToNamedType(t *testing.T) {
 	schemas := unionSchemas()
 	schemas["Shape"].(map[string]any)["discriminator"].(map[string]any)["mapping"] = map[string]any{}
 	pkg := buildSynth(t, schemas)
-	in := pkg.Resources["pulumiservice:api:Widget"].InputProperties["shape"]
+	in := pkg.Resources["pulumiservice:api:Widget"].InputProperties[shapeProp]
 	if got, want := in.Ref, "#/types/pulumiservice:api:Shape"; got != want {
 		t.Errorf("shape ref: got %q, want %q", got, want)
 	}
@@ -297,7 +303,7 @@ func TestTwoMemberObjectUnionRejected(t *testing.T) {
 	schemas := unionSchemas()
 	schemas["Shape"].(map[string]any)["discriminator"].(map[string]any)["mapping"] = map[string]any{
 		tagCircle: circleRef,
-		"square":  schemaRefPrefix + "Square",
+		tagSquare: schemaRefPrefix + "Square",
 	}
 	_, err := BuildSchema(synthSpec(t, schemas), widgetMetadata(), "pulumiservice")
 	if err == nil {
@@ -402,9 +408,9 @@ func TestVariantReferenceBecomesDefiniteType(t *testing.T) {
 	// A property referencing a mapped variant directly gets the definite
 	// const-tagged variant type, identical to the union-member emission.
 	schemas := unionSchemas()
-	schemas[widgetRequest] = obj(map[string]any{"one": sref("Circle")})
+	schemas[widgetRequest] = obj(map[string]any{oneProp: sref("Circle")})
 	pkg := buildSynth(t, schemas)
-	in := pkg.Resources[widgetTok].InputProperties["one"]
+	in := pkg.Resources[widgetTok].InputProperties[oneProp]
 	if got, want := in.Ref, circleTypeRef; got != want {
 		t.Fatalf("variant ref: got %+v, want %q", in.TypeSpec, want)
 	}
@@ -416,7 +422,7 @@ func TestVariantReferenceBecomesDefiniteType(t *testing.T) {
 
 func TestUnionPropertyDocListsTags(t *testing.T) {
 	pkg := buildSynth(t, unionSchemas())
-	in := pkg.Resources[widgetTok].InputProperties["shape"]
+	in := pkg.Resources[widgetTok].InputProperties[shapeProp]
 	if want := "Valid `kind` values: blob, circle, square."; !strings.Contains(in.Description, want) {
 		t.Errorf("union property description missing tag list: %q", in.Description)
 	}

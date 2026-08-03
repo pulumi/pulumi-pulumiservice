@@ -29,7 +29,9 @@ import (
 // shape mismatches. It stays lenient everywhere the service is lenient:
 // required fields and enum membership are not enforced, and unknown
 // (computed) values skip their subtree.
-func ValidateInputs(spec *Spec, typeMeta map[string]TypeMeta, op *Operation, meta ResourceMeta, inputs property.Map) []p.CheckFailure {
+func ValidateInputs(
+	spec *Spec, typeMeta map[string]TypeMeta, op *Operation, meta ResourceMeta, inputs property.Map,
+) []p.CheckFailure {
 	if op == nil || op.RequestRef == "" {
 		return nil
 	}
