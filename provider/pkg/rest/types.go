@@ -307,7 +307,7 @@ func (r *typeRegistry) typeSpec(nm map[string]any) schema.TypeSpec {
 		// this, direct references would emit an untagged twin of the union
 		// member under the same token, and the winner would depend on
 		// emission order.
-		if tagProp, tag, ok := r.variantTagFor(name); ok {
+		if tagProp, tag, ok := variantTagFor(r.spec, name); ok {
 			return r.refTo(r.emitVariant(name, tagProp, tag))
 		}
 		// Marker subtypes (allOf over a discriminated base, no properties of
@@ -315,8 +315,8 @@ func (r *typeRegistry) typeSpec(nm map[string]any) schema.TypeSpec {
 		// PermissionExpression) render as the union of the mapped variants
 		// whose allOf chain passes through the marker: the wire contract is
 		// the marker's class hierarchy, not the whole base algebra.
-		if base, tagProp, mapping := r.markerUnionBase(name, target); base != "" && len(mapping) > 0 {
-			subset := r.markerSubset(name, mapping)
+		if base, tagProp, mapping := markerUnionBase(r.spec, name, target); base != "" && len(mapping) > 0 {
+			subset := markerSubset(r.spec, name, mapping)
 			switch len(subset) {
 			case 0:
 				r.errorf("marker %s: no variants in %s's mapping descend through it", name, base)
@@ -410,7 +410,7 @@ func soleKey(m map[string]string) string {
 // discriminated ancestor: its allOf chain reaches a discriminator and it
 // adds no properties beyond that ancestor's. Returns the ancestor name,
 // tag property, and mapping; an empty base means the rule does not apply.
-func (r *typeRegistry) markerUnionBase(name string, node map[string]any) (string, string, map[string]string) {
+func markerUnionBase(spec *Spec, name string, node map[string]any) (string, string, map[string]string) {
 	seen := map[string]bool{name: true}
 	cur := node
 	for {
@@ -440,7 +440,7 @@ func (r *typeRegistry) markerUnionBase(name string, node map[string]any) (string
 			return "", "", nil
 		}
 		seen[parentName] = true
-		parent, ok := r.spec.ResolveSchema(parentRef)
+		parent, ok := spec.ResolveSchema(parentRef)
 		if !ok {
 			return "", "", nil
 		}
@@ -455,9 +455,9 @@ func (r *typeRegistry) markerUnionBase(name string, node map[string]any) (string
 // discriminated ancestor, walking first-parent allOf refs. Unlike
 // markerUnionBase this ignores intermediate properties: concrete variants
 // (And, Or) inherit their fields from property-carrying hops.
-func (r *typeRegistry) variantTagFor(name string) (string, string, bool) {
+func variantTagFor(spec *Spec, name string) (string, string, bool) {
 	seen := map[string]bool{name: true}
-	cur, ok := r.spec.ResolveSchema(schemaRefPrefix + name)
+	cur, ok := spec.ResolveSchema(schemaRefPrefix + name)
 	if !ok {
 		return "", "", false
 	}
@@ -483,7 +483,7 @@ func (r *typeRegistry) variantTagFor(name string) (string, string, bool) {
 			return "", "", false
 		}
 		seen[parentName] = true
-		parent, ok := r.spec.ResolveSchema(parentRef)
+		parent, ok := spec.ResolveSchema(parentRef)
 		if !ok {
 			return "", "", false
 		}
@@ -506,10 +506,10 @@ func (r *typeRegistry) variantTagFor(name string) (string, string, bool) {
 
 // markerSubset filters a discriminated base's mapping to the variants whose
 // allOf chain passes through marker.
-func (r *typeRegistry) markerSubset(marker string, mapping map[string]string) map[string]string {
+func markerSubset(spec *Spec, marker string, mapping map[string]string) map[string]string {
 	out := map[string]string{}
 	for tag, ref := range mapping {
-		if r.hasAncestor(refSchemaName(ref), marker) {
+		if hasAncestorSchema(spec, refSchemaName(ref), marker) {
 			out[tag] = ref
 		}
 	}
@@ -518,7 +518,7 @@ func (r *typeRegistry) markerSubset(marker string, mapping map[string]string) ma
 
 // hasAncestor reports whether name's allOf chain transitively references
 // ancestor.
-func (r *typeRegistry) hasAncestor(name, ancestor string) bool {
+func hasAncestorSchema(spec *Spec, name, ancestor string) bool {
 	seen := map[string]bool{}
 	var walk func(n string) bool
 	walk = func(n string) bool {
@@ -526,7 +526,7 @@ func (r *typeRegistry) hasAncestor(name, ancestor string) bool {
 			return false
 		}
 		seen[n] = true
-		node, ok := r.spec.ResolveSchema(schemaRefPrefix + n)
+		node, ok := spec.ResolveSchema(schemaRefPrefix + n)
 		if !ok {
 			return false
 		}
