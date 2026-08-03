@@ -129,12 +129,16 @@ public class Task extends com.pulumi.resources.CustomResource {
     /**
      * Pulumi entities (stacks, projects, etc.) that provide context for the agent.
      * 
+     * Valid `type` values: policy_issue, pull_request, repository, stack.
+     * 
      */
     @Export(name="entities", refs={List.class,Object.class}, tree="[0,1]")
     private Output<List<Object>> entities;
 
     /**
      * @return Pulumi entities (stacks, projects, etc.) that provide context for the agent.
+     * 
+     * Valid `type` values: policy_issue, pull_request, repository, stack.
      * 
      */
     public Output<List<Object>> entities() {

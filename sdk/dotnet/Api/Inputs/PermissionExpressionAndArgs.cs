@@ -20,12 +20,16 @@ namespace Pulumi.PulumiService.Api.Inputs
 
         /// <summary>
         /// The left operand of the binary boolean expression.
+        /// 
+        /// Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
         /// </summary>
         [Input("left")]
         public object? Left { get; set; }
 
         /// <summary>
         /// The right operand of the binary boolean expression.
+        /// 
+        /// Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
         /// </summary>
         [Input("right")]
         public object? Right { get; set; }

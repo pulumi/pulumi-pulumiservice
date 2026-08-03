@@ -560,6 +560,8 @@ export namespace api {
         allowSelfApproval: pulumi.Input<boolean>;
         /**
          * List of eligible approvers
+         *
+         * Valid `eligibilityType` values: has_permission_on_target, specific_user, team_member.
          */
         eligibleApprovers: pulumi.Input<pulumi.Input<inputs.api.ApprovalRuleEligibilityInputPermissionArgs | inputs.api.ApprovalRuleEligibilityInputUserArgs | inputs.api.ApprovalRuleEligibilityInputTeamArgs>[]>;
         /**
@@ -627,10 +629,14 @@ export namespace api {
         __type: pulumi.Input<"PermissionDescriptorCondition">;
         /**
          * The boolean condition to evaluate.
+         *
+         * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
          */
-        condition?: pulumi.Input<inputs.api.PermissionExpressionAndArgs | inputs.api.PermissionExpressionEnvironmentArgs | inputs.api.PermissionExpressionEqualArgs | inputs.api.PermissionExpressionHasTagArgs | inputs.api.PermissionExpressionInsightsAccountArgs | inputs.api.PermissionExpressionNotArgs | inputs.api.PermissionExpressionOrArgs | inputs.api.PermissionExpressionStackArgs | inputs.api.PermissionExpressionTagArgs | inputs.api.PermissionExpressionTeamArgs | inputs.api.PermissionLiteralExpressionBoolArgs | inputs.api.PermissionLiteralExpressionEnvironmentArgs | inputs.api.PermissionLiteralExpressionInsightsAccountArgs | inputs.api.PermissionLiteralExpressionNumberArgs | inputs.api.PermissionLiteralExpressionStackArgs | inputs.api.PermissionLiteralExpressionStringArgs | inputs.api.PermissionLiteralExpressionTeamArgs | undefined>;
+        condition?: pulumi.Input<inputs.api.PermissionExpressionAndArgs | inputs.api.PermissionExpressionEqualArgs | inputs.api.PermissionExpressionHasTagArgs | inputs.api.PermissionExpressionNotArgs | inputs.api.PermissionExpressionOrArgs | undefined>;
         /**
          * The permission descriptor to apply when the condition is true.
+         *
+         * Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
          */
         subNode?: pulumi.Input<inputs.api.PermissionDescriptorAllowArgs | inputs.api.PermissionDescriptorComposeArgs | inputs.api.PermissionDescriptorConditionArgs | inputs.api.PermissionDescriptorGroupArgs | inputs.api.PermissionDescriptorIfThenElseArgs | inputs.api.PermissionDescriptorSelectArgs | undefined>;
     }
@@ -642,6 +648,8 @@ export namespace api {
         __type: pulumi.Input<"PermissionDescriptorGroup">;
         /**
          * The list of permission descriptor entries in this group.
+         *
+         * Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
          */
         entries?: pulumi.Input<pulumi.Input<inputs.api.PermissionDescriptorAllowArgs | inputs.api.PermissionDescriptorComposeArgs | inputs.api.PermissionDescriptorConditionArgs | inputs.api.PermissionDescriptorGroupArgs | inputs.api.PermissionDescriptorIfThenElseArgs | inputs.api.PermissionDescriptorSelectArgs>[] | undefined>;
     }
@@ -653,14 +661,20 @@ export namespace api {
         __type: pulumi.Input<"PermissionDescriptorIfThenElse">;
         /**
          * The boolean condition to evaluate.
+         *
+         * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
          */
-        condition?: pulumi.Input<inputs.api.PermissionExpressionAndArgs | inputs.api.PermissionExpressionEnvironmentArgs | inputs.api.PermissionExpressionEqualArgs | inputs.api.PermissionExpressionHasTagArgs | inputs.api.PermissionExpressionInsightsAccountArgs | inputs.api.PermissionExpressionNotArgs | inputs.api.PermissionExpressionOrArgs | inputs.api.PermissionExpressionStackArgs | inputs.api.PermissionExpressionTagArgs | inputs.api.PermissionExpressionTeamArgs | inputs.api.PermissionLiteralExpressionBoolArgs | inputs.api.PermissionLiteralExpressionEnvironmentArgs | inputs.api.PermissionLiteralExpressionInsightsAccountArgs | inputs.api.PermissionLiteralExpressionNumberArgs | inputs.api.PermissionLiteralExpressionStackArgs | inputs.api.PermissionLiteralExpressionStringArgs | inputs.api.PermissionLiteralExpressionTeamArgs | undefined>;
+        condition?: pulumi.Input<inputs.api.PermissionExpressionAndArgs | inputs.api.PermissionExpressionEqualArgs | inputs.api.PermissionExpressionHasTagArgs | inputs.api.PermissionExpressionNotArgs | inputs.api.PermissionExpressionOrArgs | undefined>;
         /**
          * The permission descriptor to apply when the condition is false.
+         *
+         * Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
          */
         subNodeForFalse?: pulumi.Input<inputs.api.PermissionDescriptorAllowArgs | inputs.api.PermissionDescriptorComposeArgs | inputs.api.PermissionDescriptorConditionArgs | inputs.api.PermissionDescriptorGroupArgs | inputs.api.PermissionDescriptorIfThenElseArgs | inputs.api.PermissionDescriptorSelectArgs | undefined>;
         /**
          * The permission descriptor to apply when the condition is true.
+         *
+         * Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
          */
         subNodeForTrue?: pulumi.Input<inputs.api.PermissionDescriptorAllowArgs | inputs.api.PermissionDescriptorComposeArgs | inputs.api.PermissionDescriptorConditionArgs | inputs.api.PermissionDescriptorGroupArgs | inputs.api.PermissionDescriptorIfThenElseArgs | inputs.api.PermissionDescriptorSelectArgs | undefined>;
     }
@@ -676,6 +690,8 @@ export namespace api {
         options?: pulumi.Input<pulumi.Input<inputs.api.PermissionSelectvalueArgs>[] | undefined>;
         /**
          * The expression used to select which option to apply.
+         *
+         * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
          */
         selector?: pulumi.Input<inputs.api.PermissionExpressionAndArgs | inputs.api.PermissionExpressionEnvironmentArgs | inputs.api.PermissionExpressionEqualArgs | inputs.api.PermissionExpressionHasTagArgs | inputs.api.PermissionExpressionInsightsAccountArgs | inputs.api.PermissionExpressionNotArgs | inputs.api.PermissionExpressionOrArgs | inputs.api.PermissionExpressionStackArgs | inputs.api.PermissionExpressionTagArgs | inputs.api.PermissionExpressionTeamArgs | inputs.api.PermissionLiteralExpressionBoolArgs | inputs.api.PermissionLiteralExpressionEnvironmentArgs | inputs.api.PermissionLiteralExpressionInsightsAccountArgs | inputs.api.PermissionLiteralExpressionNumberArgs | inputs.api.PermissionLiteralExpressionStackArgs | inputs.api.PermissionLiteralExpressionStringArgs | inputs.api.PermissionLiteralExpressionTeamArgs | undefined>;
     }
@@ -687,12 +703,16 @@ export namespace api {
         __type: pulumi.Input<"PermissionExpressionAnd">;
         /**
          * The left operand of the binary boolean expression.
+         *
+         * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
          */
-        left?: pulumi.Input<inputs.api.PermissionExpressionAndArgs | inputs.api.PermissionExpressionEnvironmentArgs | inputs.api.PermissionExpressionEqualArgs | inputs.api.PermissionExpressionHasTagArgs | inputs.api.PermissionExpressionInsightsAccountArgs | inputs.api.PermissionExpressionNotArgs | inputs.api.PermissionExpressionOrArgs | inputs.api.PermissionExpressionStackArgs | inputs.api.PermissionExpressionTagArgs | inputs.api.PermissionExpressionTeamArgs | inputs.api.PermissionLiteralExpressionBoolArgs | inputs.api.PermissionLiteralExpressionEnvironmentArgs | inputs.api.PermissionLiteralExpressionInsightsAccountArgs | inputs.api.PermissionLiteralExpressionNumberArgs | inputs.api.PermissionLiteralExpressionStackArgs | inputs.api.PermissionLiteralExpressionStringArgs | inputs.api.PermissionLiteralExpressionTeamArgs | undefined>;
+        left?: pulumi.Input<inputs.api.PermissionExpressionAndArgs | inputs.api.PermissionExpressionEqualArgs | inputs.api.PermissionExpressionHasTagArgs | inputs.api.PermissionExpressionNotArgs | inputs.api.PermissionExpressionOrArgs | undefined>;
         /**
          * The right operand of the binary boolean expression.
+         *
+         * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
          */
-        right?: pulumi.Input<inputs.api.PermissionExpressionAndArgs | inputs.api.PermissionExpressionEnvironmentArgs | inputs.api.PermissionExpressionEqualArgs | inputs.api.PermissionExpressionHasTagArgs | inputs.api.PermissionExpressionInsightsAccountArgs | inputs.api.PermissionExpressionNotArgs | inputs.api.PermissionExpressionOrArgs | inputs.api.PermissionExpressionStackArgs | inputs.api.PermissionExpressionTagArgs | inputs.api.PermissionExpressionTeamArgs | inputs.api.PermissionLiteralExpressionBoolArgs | inputs.api.PermissionLiteralExpressionEnvironmentArgs | inputs.api.PermissionLiteralExpressionInsightsAccountArgs | inputs.api.PermissionLiteralExpressionNumberArgs | inputs.api.PermissionLiteralExpressionStackArgs | inputs.api.PermissionLiteralExpressionStringArgs | inputs.api.PermissionLiteralExpressionTeamArgs | undefined>;
+        right?: pulumi.Input<inputs.api.PermissionExpressionAndArgs | inputs.api.PermissionExpressionEqualArgs | inputs.api.PermissionExpressionHasTagArgs | inputs.api.PermissionExpressionNotArgs | inputs.api.PermissionExpressionOrArgs | undefined>;
     }
 
     export interface PermissionExpressionEnvironmentArgs {
@@ -709,10 +729,14 @@ export namespace api {
         __type: pulumi.Input<"PermissionExpressionEqual">;
         /**
          * The left operand of the equality comparison.
+         *
+         * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
          */
         left?: pulumi.Input<inputs.api.PermissionExpressionAndArgs | inputs.api.PermissionExpressionEnvironmentArgs | inputs.api.PermissionExpressionEqualArgs | inputs.api.PermissionExpressionHasTagArgs | inputs.api.PermissionExpressionInsightsAccountArgs | inputs.api.PermissionExpressionNotArgs | inputs.api.PermissionExpressionOrArgs | inputs.api.PermissionExpressionStackArgs | inputs.api.PermissionExpressionTagArgs | inputs.api.PermissionExpressionTeamArgs | inputs.api.PermissionLiteralExpressionBoolArgs | inputs.api.PermissionLiteralExpressionEnvironmentArgs | inputs.api.PermissionLiteralExpressionInsightsAccountArgs | inputs.api.PermissionLiteralExpressionNumberArgs | inputs.api.PermissionLiteralExpressionStackArgs | inputs.api.PermissionLiteralExpressionStringArgs | inputs.api.PermissionLiteralExpressionTeamArgs | undefined>;
         /**
          * The right operand of the equality comparison.
+         *
+         * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
          */
         right?: pulumi.Input<inputs.api.PermissionExpressionAndArgs | inputs.api.PermissionExpressionEnvironmentArgs | inputs.api.PermissionExpressionEqualArgs | inputs.api.PermissionExpressionHasTagArgs | inputs.api.PermissionExpressionInsightsAccountArgs | inputs.api.PermissionExpressionNotArgs | inputs.api.PermissionExpressionOrArgs | inputs.api.PermissionExpressionStackArgs | inputs.api.PermissionExpressionTagArgs | inputs.api.PermissionExpressionTeamArgs | inputs.api.PermissionLiteralExpressionBoolArgs | inputs.api.PermissionLiteralExpressionEnvironmentArgs | inputs.api.PermissionLiteralExpressionInsightsAccountArgs | inputs.api.PermissionLiteralExpressionNumberArgs | inputs.api.PermissionLiteralExpressionStackArgs | inputs.api.PermissionLiteralExpressionStringArgs | inputs.api.PermissionLiteralExpressionTeamArgs | undefined>;
     }
@@ -724,16 +748,20 @@ export namespace api {
         __type: pulumi.Input<"PermissionExpressionHasTag">;
         /**
          * The context expression to check for the tag.
+         *
+         * Valid `__type` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
          */
-        context?: pulumi.Input<inputs.api.PermissionExpressionAndArgs | inputs.api.PermissionExpressionEnvironmentArgs | inputs.api.PermissionExpressionEqualArgs | inputs.api.PermissionExpressionHasTagArgs | inputs.api.PermissionExpressionInsightsAccountArgs | inputs.api.PermissionExpressionNotArgs | inputs.api.PermissionExpressionOrArgs | inputs.api.PermissionExpressionStackArgs | inputs.api.PermissionExpressionTagArgs | inputs.api.PermissionExpressionTeamArgs | inputs.api.PermissionLiteralExpressionBoolArgs | inputs.api.PermissionLiteralExpressionEnvironmentArgs | inputs.api.PermissionLiteralExpressionInsightsAccountArgs | inputs.api.PermissionLiteralExpressionNumberArgs | inputs.api.PermissionLiteralExpressionStackArgs | inputs.api.PermissionLiteralExpressionStringArgs | inputs.api.PermissionLiteralExpressionTeamArgs | undefined>;
+        context?: pulumi.Input<inputs.api.PermissionExpressionEnvironmentArgs | inputs.api.PermissionExpressionInsightsAccountArgs | inputs.api.PermissionExpressionStackArgs | inputs.api.PermissionExpressionTeamArgs | undefined>;
         /**
          * The tag key to check for.
          */
         key?: pulumi.Input<string | undefined>;
         /**
          * The operand of the unary boolean expression.
+         *
+         * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
          */
-        node?: pulumi.Input<inputs.api.PermissionExpressionAndArgs | inputs.api.PermissionExpressionEnvironmentArgs | inputs.api.PermissionExpressionEqualArgs | inputs.api.PermissionExpressionHasTagArgs | inputs.api.PermissionExpressionInsightsAccountArgs | inputs.api.PermissionExpressionNotArgs | inputs.api.PermissionExpressionOrArgs | inputs.api.PermissionExpressionStackArgs | inputs.api.PermissionExpressionTagArgs | inputs.api.PermissionExpressionTeamArgs | inputs.api.PermissionLiteralExpressionBoolArgs | inputs.api.PermissionLiteralExpressionEnvironmentArgs | inputs.api.PermissionLiteralExpressionInsightsAccountArgs | inputs.api.PermissionLiteralExpressionNumberArgs | inputs.api.PermissionLiteralExpressionStackArgs | inputs.api.PermissionLiteralExpressionStringArgs | inputs.api.PermissionLiteralExpressionTeamArgs | undefined>;
+        node?: pulumi.Input<inputs.api.PermissionExpressionAndArgs | inputs.api.PermissionExpressionEqualArgs | inputs.api.PermissionExpressionHasTagArgs | inputs.api.PermissionExpressionNotArgs | inputs.api.PermissionExpressionOrArgs | undefined>;
     }
 
     export interface PermissionExpressionInsightsAccountArgs {
@@ -750,8 +778,10 @@ export namespace api {
         __type: pulumi.Input<"PermissionExpressionNot">;
         /**
          * The operand of the unary boolean expression.
+         *
+         * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
          */
-        node?: pulumi.Input<inputs.api.PermissionExpressionAndArgs | inputs.api.PermissionExpressionEnvironmentArgs | inputs.api.PermissionExpressionEqualArgs | inputs.api.PermissionExpressionHasTagArgs | inputs.api.PermissionExpressionInsightsAccountArgs | inputs.api.PermissionExpressionNotArgs | inputs.api.PermissionExpressionOrArgs | inputs.api.PermissionExpressionStackArgs | inputs.api.PermissionExpressionTagArgs | inputs.api.PermissionExpressionTeamArgs | inputs.api.PermissionLiteralExpressionBoolArgs | inputs.api.PermissionLiteralExpressionEnvironmentArgs | inputs.api.PermissionLiteralExpressionInsightsAccountArgs | inputs.api.PermissionLiteralExpressionNumberArgs | inputs.api.PermissionLiteralExpressionStackArgs | inputs.api.PermissionLiteralExpressionStringArgs | inputs.api.PermissionLiteralExpressionTeamArgs | undefined>;
+        node?: pulumi.Input<inputs.api.PermissionExpressionAndArgs | inputs.api.PermissionExpressionEqualArgs | inputs.api.PermissionExpressionHasTagArgs | inputs.api.PermissionExpressionNotArgs | inputs.api.PermissionExpressionOrArgs | undefined>;
     }
 
     export interface PermissionExpressionOrArgs {
@@ -761,12 +791,16 @@ export namespace api {
         __type: pulumi.Input<"PermissionExpressionOr">;
         /**
          * The left operand of the binary boolean expression.
+         *
+         * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
          */
-        left?: pulumi.Input<inputs.api.PermissionExpressionAndArgs | inputs.api.PermissionExpressionEnvironmentArgs | inputs.api.PermissionExpressionEqualArgs | inputs.api.PermissionExpressionHasTagArgs | inputs.api.PermissionExpressionInsightsAccountArgs | inputs.api.PermissionExpressionNotArgs | inputs.api.PermissionExpressionOrArgs | inputs.api.PermissionExpressionStackArgs | inputs.api.PermissionExpressionTagArgs | inputs.api.PermissionExpressionTeamArgs | inputs.api.PermissionLiteralExpressionBoolArgs | inputs.api.PermissionLiteralExpressionEnvironmentArgs | inputs.api.PermissionLiteralExpressionInsightsAccountArgs | inputs.api.PermissionLiteralExpressionNumberArgs | inputs.api.PermissionLiteralExpressionStackArgs | inputs.api.PermissionLiteralExpressionStringArgs | inputs.api.PermissionLiteralExpressionTeamArgs | undefined>;
+        left?: pulumi.Input<inputs.api.PermissionExpressionAndArgs | inputs.api.PermissionExpressionEqualArgs | inputs.api.PermissionExpressionHasTagArgs | inputs.api.PermissionExpressionNotArgs | inputs.api.PermissionExpressionOrArgs | undefined>;
         /**
          * The right operand of the binary boolean expression.
+         *
+         * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
          */
-        right?: pulumi.Input<inputs.api.PermissionExpressionAndArgs | inputs.api.PermissionExpressionEnvironmentArgs | inputs.api.PermissionExpressionEqualArgs | inputs.api.PermissionExpressionHasTagArgs | inputs.api.PermissionExpressionInsightsAccountArgs | inputs.api.PermissionExpressionNotArgs | inputs.api.PermissionExpressionOrArgs | inputs.api.PermissionExpressionStackArgs | inputs.api.PermissionExpressionTagArgs | inputs.api.PermissionExpressionTeamArgs | inputs.api.PermissionLiteralExpressionBoolArgs | inputs.api.PermissionLiteralExpressionEnvironmentArgs | inputs.api.PermissionLiteralExpressionInsightsAccountArgs | inputs.api.PermissionLiteralExpressionNumberArgs | inputs.api.PermissionLiteralExpressionStackArgs | inputs.api.PermissionLiteralExpressionStringArgs | inputs.api.PermissionLiteralExpressionTeamArgs | undefined>;
+        right?: pulumi.Input<inputs.api.PermissionExpressionAndArgs | inputs.api.PermissionExpressionEqualArgs | inputs.api.PermissionExpressionHasTagArgs | inputs.api.PermissionExpressionNotArgs | inputs.api.PermissionExpressionOrArgs | undefined>;
     }
 
     export interface PermissionExpressionStackArgs {
@@ -783,8 +817,10 @@ export namespace api {
         __type: pulumi.Input<"PermissionExpressionTag">;
         /**
          * The context expression identifying the resource to look up the tag on.
+         *
+         * Valid `__type` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
          */
-        context?: pulumi.Input<inputs.api.PermissionExpressionAndArgs | inputs.api.PermissionExpressionEnvironmentArgs | inputs.api.PermissionExpressionEqualArgs | inputs.api.PermissionExpressionHasTagArgs | inputs.api.PermissionExpressionInsightsAccountArgs | inputs.api.PermissionExpressionNotArgs | inputs.api.PermissionExpressionOrArgs | inputs.api.PermissionExpressionStackArgs | inputs.api.PermissionExpressionTagArgs | inputs.api.PermissionExpressionTeamArgs | inputs.api.PermissionLiteralExpressionBoolArgs | inputs.api.PermissionLiteralExpressionEnvironmentArgs | inputs.api.PermissionLiteralExpressionInsightsAccountArgs | inputs.api.PermissionLiteralExpressionNumberArgs | inputs.api.PermissionLiteralExpressionStackArgs | inputs.api.PermissionLiteralExpressionStringArgs | inputs.api.PermissionLiteralExpressionTeamArgs | undefined>;
+        context?: pulumi.Input<inputs.api.PermissionExpressionEnvironmentArgs | inputs.api.PermissionExpressionInsightsAccountArgs | inputs.api.PermissionExpressionStackArgs | inputs.api.PermissionExpressionTeamArgs | undefined>;
         /**
          * The tag key to retrieve.
          */
@@ -881,10 +917,14 @@ export namespace api {
     export interface PermissionSelectvalueArgs {
         /**
          * The permission descriptor to apply when this value matches.
+         *
+         * Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
          */
         node?: pulumi.Input<inputs.api.PermissionDescriptorAllowArgs | inputs.api.PermissionDescriptorComposeArgs | inputs.api.PermissionDescriptorConditionArgs | inputs.api.PermissionDescriptorGroupArgs | inputs.api.PermissionDescriptorIfThenElseArgs | inputs.api.PermissionDescriptorSelectArgs | undefined>;
         /**
          * The value expression to match against the selector.
+         *
+         * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
          */
         value?: pulumi.Input<inputs.api.PermissionExpressionAndArgs | inputs.api.PermissionExpressionEnvironmentArgs | inputs.api.PermissionExpressionEqualArgs | inputs.api.PermissionExpressionHasTagArgs | inputs.api.PermissionExpressionInsightsAccountArgs | inputs.api.PermissionExpressionNotArgs | inputs.api.PermissionExpressionOrArgs | inputs.api.PermissionExpressionStackArgs | inputs.api.PermissionExpressionTagArgs | inputs.api.PermissionExpressionTeamArgs | inputs.api.PermissionLiteralExpressionBoolArgs | inputs.api.PermissionLiteralExpressionEnvironmentArgs | inputs.api.PermissionLiteralExpressionInsightsAccountArgs | inputs.api.PermissionLiteralExpressionNumberArgs | inputs.api.PermissionLiteralExpressionStackArgs | inputs.api.PermissionLiteralExpressionStringArgs | inputs.api.PermissionLiteralExpressionTeamArgs | undefined>;
     }
@@ -917,10 +957,14 @@ export namespace api {
             /**
              * Entities to add to the Agent's context.
              * Entities must be valid, and will be automatically deleted if they are invalid.
+             *
+             * Valid `type` values: policy_issue, pull_request, repository, stack.
              */
             add?: pulumi.Input<pulumi.Input<inputs.api.agents.AgentEntityPolicyIssueArgs | inputs.api.agents.AgentEntityPRArgs | inputs.api.agents.AgentEntityRepositoryArgs | inputs.api.agents.AgentEntityStackArgs>[] | undefined>;
             /**
              * Entities to remove from the Agent's context.
+             *
+             * Valid `type` values: policy_issue, pull_request, repository, stack.
              */
             remove?: pulumi.Input<pulumi.Input<inputs.api.agents.AgentEntityPolicyIssueArgs | inputs.api.agents.AgentEntityPRArgs | inputs.api.agents.AgentEntityRepositoryArgs | inputs.api.agents.AgentEntityStackArgs>[] | undefined>;
         }
@@ -976,7 +1020,10 @@ export namespace api {
              * The organization that the repository is contained within
              */
             org: pulumi.Input<string>;
-            type: pulumi.Input<string>;
+            /**
+             * Expected value is 'repository'.
+             */
+            type: pulumi.Input<"repository">;
         }
 
         export interface AgentEntityStackArgs {
@@ -1055,7 +1102,10 @@ export namespace api {
              * When the event occurred.
              */
             timestamp: pulumi.Input<string>;
-            type: pulumi.Input<string>;
+            /**
+             * Expected value is 'user_message'.
+             */
+            type: pulumi.Input<"user_message">;
         }
 
         /**
@@ -1617,6 +1667,8 @@ export namespace api {
             tag?: pulumi.Input<string | undefined>;
             /**
              * VCS provider settings
+             *
+             * Valid `provider` values: azure_devops, bitbucket, custom, github, gitlab.
              */
             vcs?: pulumi.Input<inputs.api.deployments.DeploymentSettingsVCSAzureDevOpsArgs | inputs.api.deployments.DeploymentSettingsVCSBitbucketArgs | inputs.api.deployments.DeploymentSettingsVCSCustomArgs | inputs.api.deployments.DeploymentSettingsVCSGitHubArgs | inputs.api.deployments.DeploymentSettingsVCSGitLabArgs | undefined>;
         }

@@ -302,6 +302,8 @@ class ChangeGateApprovalRuleInputArgsDict(TypedDict):
     eligible_approvers: pulumi.Input[Sequence[pulumi.Input[Union['ApprovalRuleEligibilityInputPermissionArgsDict', 'ApprovalRuleEligibilityInputUserArgsDict', 'ApprovalRuleEligibilityInputTeamArgsDict']]]]
     """
     List of eligible approvers
+
+    Valid `eligibilityType` values: has_permission_on_target, specific_user, team_member.
     """
     num_approvals_required: pulumi.Input[_builtins.int]
     """
@@ -327,6 +329,8 @@ class ChangeGateApprovalRuleInputArgs:
         """
         :param pulumi.Input[_builtins.bool] allow_self_approval: Whether self approval is allowed, (assuming the author matches approver eligibility criteria)
         :param pulumi.Input[Sequence[pulumi.Input[Union['ApprovalRuleEligibilityInputPermissionArgs', 'ApprovalRuleEligibilityInputUserArgs', 'ApprovalRuleEligibilityInputTeamArgs']]]] eligible_approvers: List of eligible approvers
+               
+               Valid `eligibilityType` values: has_permission_on_target, specific_user, team_member.
         :param pulumi.Input[_builtins.int] num_approvals_required: Number of approvals required
         :param pulumi.Input[_builtins.bool] require_reapproval_on_change: Whether reapproval is required when the change request is modified
         :param pulumi.Input[_builtins.str] rule_type: Expected value is 'approval_required'.
@@ -354,6 +358,8 @@ class ChangeGateApprovalRuleInputArgs:
     def eligible_approvers(self) -> pulumi.Input[Sequence[pulumi.Input[Union['ApprovalRuleEligibilityInputPermissionArgs', 'ApprovalRuleEligibilityInputUserArgs', 'ApprovalRuleEligibilityInputTeamArgs']]]]:
         """
         List of eligible approvers
+
+        Valid `eligibilityType` values: has_permission_on_target, specific_user, team_member.
         """
         return pulumi.get(self, "eligible_approvers")
 
@@ -591,25 +597,33 @@ class PermissionDescriptorConditionArgsDict(TypedDict):
     """
     Expected value is 'PermissionDescriptorCondition'.
     """
-    condition: NotRequired[pulumi.Input[Optional[Union['PermissionExpressionAndArgsDict', 'PermissionExpressionEnvironmentArgsDict', 'PermissionExpressionEqualArgsDict', 'PermissionExpressionHasTagArgsDict', 'PermissionExpressionInsightsAccountArgsDict', 'PermissionExpressionNotArgsDict', 'PermissionExpressionOrArgsDict', 'PermissionExpressionStackArgsDict', 'PermissionExpressionTagArgsDict', 'PermissionExpressionTeamArgsDict', 'PermissionLiteralExpressionBoolArgsDict', 'PermissionLiteralExpressionEnvironmentArgsDict', 'PermissionLiteralExpressionInsightsAccountArgsDict', 'PermissionLiteralExpressionNumberArgsDict', 'PermissionLiteralExpressionStackArgsDict', 'PermissionLiteralExpressionStringArgsDict', 'PermissionLiteralExpressionTeamArgsDict']]]]
+    condition: NotRequired[pulumi.Input[Optional[Union['PermissionExpressionAndArgsDict', 'PermissionExpressionEqualArgsDict', 'PermissionExpressionHasTagArgsDict', 'PermissionExpressionNotArgsDict', 'PermissionExpressionOrArgsDict']]]]
     """
     The boolean condition to evaluate.
+
+    Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
     """
     sub_node: NotRequired[pulumi.Input[Optional[Union['PermissionDescriptorAllowArgsDict', 'PermissionDescriptorComposeArgsDict', 'PermissionDescriptorConditionArgsDict', 'PermissionDescriptorGroupArgsDict', 'PermissionDescriptorIfThenElseArgsDict', 'PermissionDescriptorSelectArgsDict']]]]
     """
     The permission descriptor to apply when the condition is true.
+
+    Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
     """
 
 @pulumi.input_type
 class PermissionDescriptorConditionArgs:
     def __init__(__self__, *,
                  __type: pulumi.Input[_builtins.str],
-                 condition: pulumi.Input[Optional[Union['PermissionExpressionAndArgs', 'PermissionExpressionEnvironmentArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionInsightsAccountArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs', 'PermissionExpressionStackArgs', 'PermissionExpressionTagArgs', 'PermissionExpressionTeamArgs', 'PermissionLiteralExpressionBoolArgs', 'PermissionLiteralExpressionEnvironmentArgs', 'PermissionLiteralExpressionInsightsAccountArgs', 'PermissionLiteralExpressionNumberArgs', 'PermissionLiteralExpressionStackArgs', 'PermissionLiteralExpressionStringArgs', 'PermissionLiteralExpressionTeamArgs']]] = None,
+                 condition: pulumi.Input[Optional[Union['PermissionExpressionAndArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs']]] = None,
                  sub_node: pulumi.Input[Optional[Union['PermissionDescriptorAllowArgs', 'PermissionDescriptorComposeArgs', 'PermissionDescriptorConditionArgs', 'PermissionDescriptorGroupArgs', 'PermissionDescriptorIfThenElseArgs', 'PermissionDescriptorSelectArgs']]] = None):
         """
         :param pulumi.Input[_builtins.str] __type: Expected value is 'PermissionDescriptorCondition'.
-        :param pulumi.Input[Union['PermissionExpressionAndArgs', 'PermissionExpressionEnvironmentArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionInsightsAccountArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs', 'PermissionExpressionStackArgs', 'PermissionExpressionTagArgs', 'PermissionExpressionTeamArgs', 'PermissionLiteralExpressionBoolArgs', 'PermissionLiteralExpressionEnvironmentArgs', 'PermissionLiteralExpressionInsightsAccountArgs', 'PermissionLiteralExpressionNumberArgs', 'PermissionLiteralExpressionStackArgs', 'PermissionLiteralExpressionStringArgs', 'PermissionLiteralExpressionTeamArgs']] condition: The boolean condition to evaluate.
+        :param pulumi.Input[Union['PermissionExpressionAndArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs']] condition: The boolean condition to evaluate.
+               
+               Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
         :param pulumi.Input[Union['PermissionDescriptorAllowArgs', 'PermissionDescriptorComposeArgs', 'PermissionDescriptorConditionArgs', 'PermissionDescriptorGroupArgs', 'PermissionDescriptorIfThenElseArgs', 'PermissionDescriptorSelectArgs']] sub_node: The permission descriptor to apply when the condition is true.
+               
+               Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
         """
         pulumi.set(__self__, "__type", 'PermissionDescriptorCondition')
         if condition is not None:
@@ -631,14 +645,16 @@ class PermissionDescriptorConditionArgs:
 
     @_builtins.property
     @pulumi.getter
-    def condition(self) -> pulumi.Input[Optional[Union['PermissionExpressionAndArgs', 'PermissionExpressionEnvironmentArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionInsightsAccountArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs', 'PermissionExpressionStackArgs', 'PermissionExpressionTagArgs', 'PermissionExpressionTeamArgs', 'PermissionLiteralExpressionBoolArgs', 'PermissionLiteralExpressionEnvironmentArgs', 'PermissionLiteralExpressionInsightsAccountArgs', 'PermissionLiteralExpressionNumberArgs', 'PermissionLiteralExpressionStackArgs', 'PermissionLiteralExpressionStringArgs', 'PermissionLiteralExpressionTeamArgs']]]:
+    def condition(self) -> pulumi.Input[Optional[Union['PermissionExpressionAndArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs']]]:
         """
         The boolean condition to evaluate.
+
+        Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
         """
         return pulumi.get(self, "condition")
 
     @condition.setter
-    def condition(self, value: pulumi.Input[Optional[Union['PermissionExpressionAndArgs', 'PermissionExpressionEnvironmentArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionInsightsAccountArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs', 'PermissionExpressionStackArgs', 'PermissionExpressionTagArgs', 'PermissionExpressionTeamArgs', 'PermissionLiteralExpressionBoolArgs', 'PermissionLiteralExpressionEnvironmentArgs', 'PermissionLiteralExpressionInsightsAccountArgs', 'PermissionLiteralExpressionNumberArgs', 'PermissionLiteralExpressionStackArgs', 'PermissionLiteralExpressionStringArgs', 'PermissionLiteralExpressionTeamArgs']]]):
+    def condition(self, value: pulumi.Input[Optional[Union['PermissionExpressionAndArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs']]]):
         pulumi.set(self, "condition", value)
 
     @_builtins.property
@@ -646,6 +662,8 @@ class PermissionDescriptorConditionArgs:
     def sub_node(self) -> pulumi.Input[Optional[Union['PermissionDescriptorAllowArgs', 'PermissionDescriptorComposeArgs', 'PermissionDescriptorConditionArgs', 'PermissionDescriptorGroupArgs', 'PermissionDescriptorIfThenElseArgs', 'PermissionDescriptorSelectArgs']]]:
         """
         The permission descriptor to apply when the condition is true.
+
+        Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
         """
         return pulumi.get(self, "sub_node")
 
@@ -662,6 +680,8 @@ class PermissionDescriptorGroupArgsDict(TypedDict):
     entries: NotRequired[pulumi.Input[Optional[Sequence[pulumi.Input[Union['PermissionDescriptorAllowArgsDict', 'PermissionDescriptorComposeArgsDict', 'PermissionDescriptorConditionArgsDict', 'PermissionDescriptorGroupArgsDict', 'PermissionDescriptorIfThenElseArgsDict', 'PermissionDescriptorSelectArgsDict']]]]]]
     """
     The list of permission descriptor entries in this group.
+
+    Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
     """
 
 @pulumi.input_type
@@ -672,6 +692,8 @@ class PermissionDescriptorGroupArgs:
         """
         :param pulumi.Input[_builtins.str] __type: Expected value is 'PermissionDescriptorGroup'.
         :param pulumi.Input[Sequence[pulumi.Input[Union['PermissionDescriptorAllowArgs', 'PermissionDescriptorComposeArgs', 'PermissionDescriptorConditionArgs', 'PermissionDescriptorGroupArgs', 'PermissionDescriptorIfThenElseArgs', 'PermissionDescriptorSelectArgs']]]] entries: The list of permission descriptor entries in this group.
+               
+               Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
         """
         pulumi.set(__self__, "__type", 'PermissionDescriptorGroup')
         if entries is not None:
@@ -694,6 +716,8 @@ class PermissionDescriptorGroupArgs:
     def entries(self) -> pulumi.Input[Optional[Sequence[pulumi.Input[Union['PermissionDescriptorAllowArgs', 'PermissionDescriptorComposeArgs', 'PermissionDescriptorConditionArgs', 'PermissionDescriptorGroupArgs', 'PermissionDescriptorIfThenElseArgs', 'PermissionDescriptorSelectArgs']]]]]:
         """
         The list of permission descriptor entries in this group.
+
+        Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
         """
         return pulumi.get(self, "entries")
 
@@ -707,31 +731,43 @@ class PermissionDescriptorIfThenElseArgsDict(TypedDict):
     """
     Expected value is 'PermissionDescriptorIfThenElse'.
     """
-    condition: NotRequired[pulumi.Input[Optional[Union['PermissionExpressionAndArgsDict', 'PermissionExpressionEnvironmentArgsDict', 'PermissionExpressionEqualArgsDict', 'PermissionExpressionHasTagArgsDict', 'PermissionExpressionInsightsAccountArgsDict', 'PermissionExpressionNotArgsDict', 'PermissionExpressionOrArgsDict', 'PermissionExpressionStackArgsDict', 'PermissionExpressionTagArgsDict', 'PermissionExpressionTeamArgsDict', 'PermissionLiteralExpressionBoolArgsDict', 'PermissionLiteralExpressionEnvironmentArgsDict', 'PermissionLiteralExpressionInsightsAccountArgsDict', 'PermissionLiteralExpressionNumberArgsDict', 'PermissionLiteralExpressionStackArgsDict', 'PermissionLiteralExpressionStringArgsDict', 'PermissionLiteralExpressionTeamArgsDict']]]]
+    condition: NotRequired[pulumi.Input[Optional[Union['PermissionExpressionAndArgsDict', 'PermissionExpressionEqualArgsDict', 'PermissionExpressionHasTagArgsDict', 'PermissionExpressionNotArgsDict', 'PermissionExpressionOrArgsDict']]]]
     """
     The boolean condition to evaluate.
+
+    Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
     """
     sub_node_for_false: NotRequired[pulumi.Input[Optional[Union['PermissionDescriptorAllowArgsDict', 'PermissionDescriptorComposeArgsDict', 'PermissionDescriptorConditionArgsDict', 'PermissionDescriptorGroupArgsDict', 'PermissionDescriptorIfThenElseArgsDict', 'PermissionDescriptorSelectArgsDict']]]]
     """
     The permission descriptor to apply when the condition is false.
+
+    Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
     """
     sub_node_for_true: NotRequired[pulumi.Input[Optional[Union['PermissionDescriptorAllowArgsDict', 'PermissionDescriptorComposeArgsDict', 'PermissionDescriptorConditionArgsDict', 'PermissionDescriptorGroupArgsDict', 'PermissionDescriptorIfThenElseArgsDict', 'PermissionDescriptorSelectArgsDict']]]]
     """
     The permission descriptor to apply when the condition is true.
+
+    Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
     """
 
 @pulumi.input_type
 class PermissionDescriptorIfThenElseArgs:
     def __init__(__self__, *,
                  __type: pulumi.Input[_builtins.str],
-                 condition: pulumi.Input[Optional[Union['PermissionExpressionAndArgs', 'PermissionExpressionEnvironmentArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionInsightsAccountArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs', 'PermissionExpressionStackArgs', 'PermissionExpressionTagArgs', 'PermissionExpressionTeamArgs', 'PermissionLiteralExpressionBoolArgs', 'PermissionLiteralExpressionEnvironmentArgs', 'PermissionLiteralExpressionInsightsAccountArgs', 'PermissionLiteralExpressionNumberArgs', 'PermissionLiteralExpressionStackArgs', 'PermissionLiteralExpressionStringArgs', 'PermissionLiteralExpressionTeamArgs']]] = None,
+                 condition: pulumi.Input[Optional[Union['PermissionExpressionAndArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs']]] = None,
                  sub_node_for_false: pulumi.Input[Optional[Union['PermissionDescriptorAllowArgs', 'PermissionDescriptorComposeArgs', 'PermissionDescriptorConditionArgs', 'PermissionDescriptorGroupArgs', 'PermissionDescriptorIfThenElseArgs', 'PermissionDescriptorSelectArgs']]] = None,
                  sub_node_for_true: pulumi.Input[Optional[Union['PermissionDescriptorAllowArgs', 'PermissionDescriptorComposeArgs', 'PermissionDescriptorConditionArgs', 'PermissionDescriptorGroupArgs', 'PermissionDescriptorIfThenElseArgs', 'PermissionDescriptorSelectArgs']]] = None):
         """
         :param pulumi.Input[_builtins.str] __type: Expected value is 'PermissionDescriptorIfThenElse'.
-        :param pulumi.Input[Union['PermissionExpressionAndArgs', 'PermissionExpressionEnvironmentArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionInsightsAccountArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs', 'PermissionExpressionStackArgs', 'PermissionExpressionTagArgs', 'PermissionExpressionTeamArgs', 'PermissionLiteralExpressionBoolArgs', 'PermissionLiteralExpressionEnvironmentArgs', 'PermissionLiteralExpressionInsightsAccountArgs', 'PermissionLiteralExpressionNumberArgs', 'PermissionLiteralExpressionStackArgs', 'PermissionLiteralExpressionStringArgs', 'PermissionLiteralExpressionTeamArgs']] condition: The boolean condition to evaluate.
+        :param pulumi.Input[Union['PermissionExpressionAndArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs']] condition: The boolean condition to evaluate.
+               
+               Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
         :param pulumi.Input[Union['PermissionDescriptorAllowArgs', 'PermissionDescriptorComposeArgs', 'PermissionDescriptorConditionArgs', 'PermissionDescriptorGroupArgs', 'PermissionDescriptorIfThenElseArgs', 'PermissionDescriptorSelectArgs']] sub_node_for_false: The permission descriptor to apply when the condition is false.
+               
+               Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
         :param pulumi.Input[Union['PermissionDescriptorAllowArgs', 'PermissionDescriptorComposeArgs', 'PermissionDescriptorConditionArgs', 'PermissionDescriptorGroupArgs', 'PermissionDescriptorIfThenElseArgs', 'PermissionDescriptorSelectArgs']] sub_node_for_true: The permission descriptor to apply when the condition is true.
+               
+               Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
         """
         pulumi.set(__self__, "__type", 'PermissionDescriptorIfThenElse')
         if condition is not None:
@@ -755,14 +791,16 @@ class PermissionDescriptorIfThenElseArgs:
 
     @_builtins.property
     @pulumi.getter
-    def condition(self) -> pulumi.Input[Optional[Union['PermissionExpressionAndArgs', 'PermissionExpressionEnvironmentArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionInsightsAccountArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs', 'PermissionExpressionStackArgs', 'PermissionExpressionTagArgs', 'PermissionExpressionTeamArgs', 'PermissionLiteralExpressionBoolArgs', 'PermissionLiteralExpressionEnvironmentArgs', 'PermissionLiteralExpressionInsightsAccountArgs', 'PermissionLiteralExpressionNumberArgs', 'PermissionLiteralExpressionStackArgs', 'PermissionLiteralExpressionStringArgs', 'PermissionLiteralExpressionTeamArgs']]]:
+    def condition(self) -> pulumi.Input[Optional[Union['PermissionExpressionAndArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs']]]:
         """
         The boolean condition to evaluate.
+
+        Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
         """
         return pulumi.get(self, "condition")
 
     @condition.setter
-    def condition(self, value: pulumi.Input[Optional[Union['PermissionExpressionAndArgs', 'PermissionExpressionEnvironmentArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionInsightsAccountArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs', 'PermissionExpressionStackArgs', 'PermissionExpressionTagArgs', 'PermissionExpressionTeamArgs', 'PermissionLiteralExpressionBoolArgs', 'PermissionLiteralExpressionEnvironmentArgs', 'PermissionLiteralExpressionInsightsAccountArgs', 'PermissionLiteralExpressionNumberArgs', 'PermissionLiteralExpressionStackArgs', 'PermissionLiteralExpressionStringArgs', 'PermissionLiteralExpressionTeamArgs']]]):
+    def condition(self, value: pulumi.Input[Optional[Union['PermissionExpressionAndArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs']]]):
         pulumi.set(self, "condition", value)
 
     @_builtins.property
@@ -770,6 +808,8 @@ class PermissionDescriptorIfThenElseArgs:
     def sub_node_for_false(self) -> pulumi.Input[Optional[Union['PermissionDescriptorAllowArgs', 'PermissionDescriptorComposeArgs', 'PermissionDescriptorConditionArgs', 'PermissionDescriptorGroupArgs', 'PermissionDescriptorIfThenElseArgs', 'PermissionDescriptorSelectArgs']]]:
         """
         The permission descriptor to apply when the condition is false.
+
+        Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
         """
         return pulumi.get(self, "sub_node_for_false")
 
@@ -782,6 +822,8 @@ class PermissionDescriptorIfThenElseArgs:
     def sub_node_for_true(self) -> pulumi.Input[Optional[Union['PermissionDescriptorAllowArgs', 'PermissionDescriptorComposeArgs', 'PermissionDescriptorConditionArgs', 'PermissionDescriptorGroupArgs', 'PermissionDescriptorIfThenElseArgs', 'PermissionDescriptorSelectArgs']]]:
         """
         The permission descriptor to apply when the condition is true.
+
+        Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
         """
         return pulumi.get(self, "sub_node_for_true")
 
@@ -802,6 +844,8 @@ class PermissionDescriptorSelectArgsDict(TypedDict):
     selector: NotRequired[pulumi.Input[Optional[Union['PermissionExpressionAndArgsDict', 'PermissionExpressionEnvironmentArgsDict', 'PermissionExpressionEqualArgsDict', 'PermissionExpressionHasTagArgsDict', 'PermissionExpressionInsightsAccountArgsDict', 'PermissionExpressionNotArgsDict', 'PermissionExpressionOrArgsDict', 'PermissionExpressionStackArgsDict', 'PermissionExpressionTagArgsDict', 'PermissionExpressionTeamArgsDict', 'PermissionLiteralExpressionBoolArgsDict', 'PermissionLiteralExpressionEnvironmentArgsDict', 'PermissionLiteralExpressionInsightsAccountArgsDict', 'PermissionLiteralExpressionNumberArgsDict', 'PermissionLiteralExpressionStackArgsDict', 'PermissionLiteralExpressionStringArgsDict', 'PermissionLiteralExpressionTeamArgsDict']]]]
     """
     The expression used to select which option to apply.
+
+    Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
     """
 
 @pulumi.input_type
@@ -814,6 +858,8 @@ class PermissionDescriptorSelectArgs:
         :param pulumi.Input[_builtins.str] __type: Expected value is 'PermissionDescriptorSelect'.
         :param pulumi.Input[Sequence[pulumi.Input['PermissionSelectvalueArgs']]] options: The available options to select from based on the selector expression.
         :param pulumi.Input[Union['PermissionExpressionAndArgs', 'PermissionExpressionEnvironmentArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionInsightsAccountArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs', 'PermissionExpressionStackArgs', 'PermissionExpressionTagArgs', 'PermissionExpressionTeamArgs', 'PermissionLiteralExpressionBoolArgs', 'PermissionLiteralExpressionEnvironmentArgs', 'PermissionLiteralExpressionInsightsAccountArgs', 'PermissionLiteralExpressionNumberArgs', 'PermissionLiteralExpressionStackArgs', 'PermissionLiteralExpressionStringArgs', 'PermissionLiteralExpressionTeamArgs']] selector: The expression used to select which option to apply.
+               
+               Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
         """
         pulumi.set(__self__, "__type", 'PermissionDescriptorSelect')
         if options is not None:
@@ -850,6 +896,8 @@ class PermissionDescriptorSelectArgs:
     def selector(self) -> pulumi.Input[Optional[Union['PermissionExpressionAndArgs', 'PermissionExpressionEnvironmentArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionInsightsAccountArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs', 'PermissionExpressionStackArgs', 'PermissionExpressionTagArgs', 'PermissionExpressionTeamArgs', 'PermissionLiteralExpressionBoolArgs', 'PermissionLiteralExpressionEnvironmentArgs', 'PermissionLiteralExpressionInsightsAccountArgs', 'PermissionLiteralExpressionNumberArgs', 'PermissionLiteralExpressionStackArgs', 'PermissionLiteralExpressionStringArgs', 'PermissionLiteralExpressionTeamArgs']]]:
         """
         The expression used to select which option to apply.
+
+        Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
         """
         return pulumi.get(self, "selector")
 
@@ -863,25 +911,33 @@ class PermissionExpressionAndArgsDict(TypedDict):
     """
     Expected value is 'PermissionExpressionAnd'.
     """
-    left: NotRequired[pulumi.Input[Optional[Union['PermissionExpressionAndArgsDict', 'PermissionExpressionEnvironmentArgsDict', 'PermissionExpressionEqualArgsDict', 'PermissionExpressionHasTagArgsDict', 'PermissionExpressionInsightsAccountArgsDict', 'PermissionExpressionNotArgsDict', 'PermissionExpressionOrArgsDict', 'PermissionExpressionStackArgsDict', 'PermissionExpressionTagArgsDict', 'PermissionExpressionTeamArgsDict', 'PermissionLiteralExpressionBoolArgsDict', 'PermissionLiteralExpressionEnvironmentArgsDict', 'PermissionLiteralExpressionInsightsAccountArgsDict', 'PermissionLiteralExpressionNumberArgsDict', 'PermissionLiteralExpressionStackArgsDict', 'PermissionLiteralExpressionStringArgsDict', 'PermissionLiteralExpressionTeamArgsDict']]]]
+    left: NotRequired[pulumi.Input[Optional[Union['PermissionExpressionAndArgsDict', 'PermissionExpressionEqualArgsDict', 'PermissionExpressionHasTagArgsDict', 'PermissionExpressionNotArgsDict', 'PermissionExpressionOrArgsDict']]]]
     """
     The left operand of the binary boolean expression.
+
+    Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
     """
-    right: NotRequired[pulumi.Input[Optional[Union['PermissionExpressionAndArgsDict', 'PermissionExpressionEnvironmentArgsDict', 'PermissionExpressionEqualArgsDict', 'PermissionExpressionHasTagArgsDict', 'PermissionExpressionInsightsAccountArgsDict', 'PermissionExpressionNotArgsDict', 'PermissionExpressionOrArgsDict', 'PermissionExpressionStackArgsDict', 'PermissionExpressionTagArgsDict', 'PermissionExpressionTeamArgsDict', 'PermissionLiteralExpressionBoolArgsDict', 'PermissionLiteralExpressionEnvironmentArgsDict', 'PermissionLiteralExpressionInsightsAccountArgsDict', 'PermissionLiteralExpressionNumberArgsDict', 'PermissionLiteralExpressionStackArgsDict', 'PermissionLiteralExpressionStringArgsDict', 'PermissionLiteralExpressionTeamArgsDict']]]]
+    right: NotRequired[pulumi.Input[Optional[Union['PermissionExpressionAndArgsDict', 'PermissionExpressionEqualArgsDict', 'PermissionExpressionHasTagArgsDict', 'PermissionExpressionNotArgsDict', 'PermissionExpressionOrArgsDict']]]]
     """
     The right operand of the binary boolean expression.
+
+    Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
     """
 
 @pulumi.input_type
 class PermissionExpressionAndArgs:
     def __init__(__self__, *,
                  __type: pulumi.Input[_builtins.str],
-                 left: pulumi.Input[Optional[Union['PermissionExpressionAndArgs', 'PermissionExpressionEnvironmentArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionInsightsAccountArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs', 'PermissionExpressionStackArgs', 'PermissionExpressionTagArgs', 'PermissionExpressionTeamArgs', 'PermissionLiteralExpressionBoolArgs', 'PermissionLiteralExpressionEnvironmentArgs', 'PermissionLiteralExpressionInsightsAccountArgs', 'PermissionLiteralExpressionNumberArgs', 'PermissionLiteralExpressionStackArgs', 'PermissionLiteralExpressionStringArgs', 'PermissionLiteralExpressionTeamArgs']]] = None,
-                 right: pulumi.Input[Optional[Union['PermissionExpressionAndArgs', 'PermissionExpressionEnvironmentArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionInsightsAccountArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs', 'PermissionExpressionStackArgs', 'PermissionExpressionTagArgs', 'PermissionExpressionTeamArgs', 'PermissionLiteralExpressionBoolArgs', 'PermissionLiteralExpressionEnvironmentArgs', 'PermissionLiteralExpressionInsightsAccountArgs', 'PermissionLiteralExpressionNumberArgs', 'PermissionLiteralExpressionStackArgs', 'PermissionLiteralExpressionStringArgs', 'PermissionLiteralExpressionTeamArgs']]] = None):
+                 left: pulumi.Input[Optional[Union['PermissionExpressionAndArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs']]] = None,
+                 right: pulumi.Input[Optional[Union['PermissionExpressionAndArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs']]] = None):
         """
         :param pulumi.Input[_builtins.str] __type: Expected value is 'PermissionExpressionAnd'.
-        :param pulumi.Input[Union['PermissionExpressionAndArgs', 'PermissionExpressionEnvironmentArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionInsightsAccountArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs', 'PermissionExpressionStackArgs', 'PermissionExpressionTagArgs', 'PermissionExpressionTeamArgs', 'PermissionLiteralExpressionBoolArgs', 'PermissionLiteralExpressionEnvironmentArgs', 'PermissionLiteralExpressionInsightsAccountArgs', 'PermissionLiteralExpressionNumberArgs', 'PermissionLiteralExpressionStackArgs', 'PermissionLiteralExpressionStringArgs', 'PermissionLiteralExpressionTeamArgs']] left: The left operand of the binary boolean expression.
-        :param pulumi.Input[Union['PermissionExpressionAndArgs', 'PermissionExpressionEnvironmentArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionInsightsAccountArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs', 'PermissionExpressionStackArgs', 'PermissionExpressionTagArgs', 'PermissionExpressionTeamArgs', 'PermissionLiteralExpressionBoolArgs', 'PermissionLiteralExpressionEnvironmentArgs', 'PermissionLiteralExpressionInsightsAccountArgs', 'PermissionLiteralExpressionNumberArgs', 'PermissionLiteralExpressionStackArgs', 'PermissionLiteralExpressionStringArgs', 'PermissionLiteralExpressionTeamArgs']] right: The right operand of the binary boolean expression.
+        :param pulumi.Input[Union['PermissionExpressionAndArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs']] left: The left operand of the binary boolean expression.
+               
+               Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+        :param pulumi.Input[Union['PermissionExpressionAndArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs']] right: The right operand of the binary boolean expression.
+               
+               Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
         """
         pulumi.set(__self__, "__type", 'PermissionExpressionAnd')
         if left is not None:
@@ -903,26 +959,30 @@ class PermissionExpressionAndArgs:
 
     @_builtins.property
     @pulumi.getter
-    def left(self) -> pulumi.Input[Optional[Union['PermissionExpressionAndArgs', 'PermissionExpressionEnvironmentArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionInsightsAccountArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs', 'PermissionExpressionStackArgs', 'PermissionExpressionTagArgs', 'PermissionExpressionTeamArgs', 'PermissionLiteralExpressionBoolArgs', 'PermissionLiteralExpressionEnvironmentArgs', 'PermissionLiteralExpressionInsightsAccountArgs', 'PermissionLiteralExpressionNumberArgs', 'PermissionLiteralExpressionStackArgs', 'PermissionLiteralExpressionStringArgs', 'PermissionLiteralExpressionTeamArgs']]]:
+    def left(self) -> pulumi.Input[Optional[Union['PermissionExpressionAndArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs']]]:
         """
         The left operand of the binary boolean expression.
+
+        Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
         """
         return pulumi.get(self, "left")
 
     @left.setter
-    def left(self, value: pulumi.Input[Optional[Union['PermissionExpressionAndArgs', 'PermissionExpressionEnvironmentArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionInsightsAccountArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs', 'PermissionExpressionStackArgs', 'PermissionExpressionTagArgs', 'PermissionExpressionTeamArgs', 'PermissionLiteralExpressionBoolArgs', 'PermissionLiteralExpressionEnvironmentArgs', 'PermissionLiteralExpressionInsightsAccountArgs', 'PermissionLiteralExpressionNumberArgs', 'PermissionLiteralExpressionStackArgs', 'PermissionLiteralExpressionStringArgs', 'PermissionLiteralExpressionTeamArgs']]]):
+    def left(self, value: pulumi.Input[Optional[Union['PermissionExpressionAndArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs']]]):
         pulumi.set(self, "left", value)
 
     @_builtins.property
     @pulumi.getter
-    def right(self) -> pulumi.Input[Optional[Union['PermissionExpressionAndArgs', 'PermissionExpressionEnvironmentArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionInsightsAccountArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs', 'PermissionExpressionStackArgs', 'PermissionExpressionTagArgs', 'PermissionExpressionTeamArgs', 'PermissionLiteralExpressionBoolArgs', 'PermissionLiteralExpressionEnvironmentArgs', 'PermissionLiteralExpressionInsightsAccountArgs', 'PermissionLiteralExpressionNumberArgs', 'PermissionLiteralExpressionStackArgs', 'PermissionLiteralExpressionStringArgs', 'PermissionLiteralExpressionTeamArgs']]]:
+    def right(self) -> pulumi.Input[Optional[Union['PermissionExpressionAndArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs']]]:
         """
         The right operand of the binary boolean expression.
+
+        Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
         """
         return pulumi.get(self, "right")
 
     @right.setter
-    def right(self, value: pulumi.Input[Optional[Union['PermissionExpressionAndArgs', 'PermissionExpressionEnvironmentArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionInsightsAccountArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs', 'PermissionExpressionStackArgs', 'PermissionExpressionTagArgs', 'PermissionExpressionTeamArgs', 'PermissionLiteralExpressionBoolArgs', 'PermissionLiteralExpressionEnvironmentArgs', 'PermissionLiteralExpressionInsightsAccountArgs', 'PermissionLiteralExpressionNumberArgs', 'PermissionLiteralExpressionStackArgs', 'PermissionLiteralExpressionStringArgs', 'PermissionLiteralExpressionTeamArgs']]]):
+    def right(self, value: pulumi.Input[Optional[Union['PermissionExpressionAndArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs']]]):
         pulumi.set(self, "right", value)
 
 
@@ -962,10 +1022,14 @@ class PermissionExpressionEqualArgsDict(TypedDict):
     left: NotRequired[pulumi.Input[Optional[Union['PermissionExpressionAndArgsDict', 'PermissionExpressionEnvironmentArgsDict', 'PermissionExpressionEqualArgsDict', 'PermissionExpressionHasTagArgsDict', 'PermissionExpressionInsightsAccountArgsDict', 'PermissionExpressionNotArgsDict', 'PermissionExpressionOrArgsDict', 'PermissionExpressionStackArgsDict', 'PermissionExpressionTagArgsDict', 'PermissionExpressionTeamArgsDict', 'PermissionLiteralExpressionBoolArgsDict', 'PermissionLiteralExpressionEnvironmentArgsDict', 'PermissionLiteralExpressionInsightsAccountArgsDict', 'PermissionLiteralExpressionNumberArgsDict', 'PermissionLiteralExpressionStackArgsDict', 'PermissionLiteralExpressionStringArgsDict', 'PermissionLiteralExpressionTeamArgsDict']]]]
     """
     The left operand of the equality comparison.
+
+    Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
     """
     right: NotRequired[pulumi.Input[Optional[Union['PermissionExpressionAndArgsDict', 'PermissionExpressionEnvironmentArgsDict', 'PermissionExpressionEqualArgsDict', 'PermissionExpressionHasTagArgsDict', 'PermissionExpressionInsightsAccountArgsDict', 'PermissionExpressionNotArgsDict', 'PermissionExpressionOrArgsDict', 'PermissionExpressionStackArgsDict', 'PermissionExpressionTagArgsDict', 'PermissionExpressionTeamArgsDict', 'PermissionLiteralExpressionBoolArgsDict', 'PermissionLiteralExpressionEnvironmentArgsDict', 'PermissionLiteralExpressionInsightsAccountArgsDict', 'PermissionLiteralExpressionNumberArgsDict', 'PermissionLiteralExpressionStackArgsDict', 'PermissionLiteralExpressionStringArgsDict', 'PermissionLiteralExpressionTeamArgsDict']]]]
     """
     The right operand of the equality comparison.
+
+    Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
     """
 
 @pulumi.input_type
@@ -977,7 +1041,11 @@ class PermissionExpressionEqualArgs:
         """
         :param pulumi.Input[_builtins.str] __type: Expected value is 'PermissionExpressionEqual'.
         :param pulumi.Input[Union['PermissionExpressionAndArgs', 'PermissionExpressionEnvironmentArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionInsightsAccountArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs', 'PermissionExpressionStackArgs', 'PermissionExpressionTagArgs', 'PermissionExpressionTeamArgs', 'PermissionLiteralExpressionBoolArgs', 'PermissionLiteralExpressionEnvironmentArgs', 'PermissionLiteralExpressionInsightsAccountArgs', 'PermissionLiteralExpressionNumberArgs', 'PermissionLiteralExpressionStackArgs', 'PermissionLiteralExpressionStringArgs', 'PermissionLiteralExpressionTeamArgs']] left: The left operand of the equality comparison.
+               
+               Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
         :param pulumi.Input[Union['PermissionExpressionAndArgs', 'PermissionExpressionEnvironmentArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionInsightsAccountArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs', 'PermissionExpressionStackArgs', 'PermissionExpressionTagArgs', 'PermissionExpressionTeamArgs', 'PermissionLiteralExpressionBoolArgs', 'PermissionLiteralExpressionEnvironmentArgs', 'PermissionLiteralExpressionInsightsAccountArgs', 'PermissionLiteralExpressionNumberArgs', 'PermissionLiteralExpressionStackArgs', 'PermissionLiteralExpressionStringArgs', 'PermissionLiteralExpressionTeamArgs']] right: The right operand of the equality comparison.
+               
+               Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
         """
         pulumi.set(__self__, "__type", 'PermissionExpressionEqual')
         if left is not None:
@@ -1002,6 +1070,8 @@ class PermissionExpressionEqualArgs:
     def left(self) -> pulumi.Input[Optional[Union['PermissionExpressionAndArgs', 'PermissionExpressionEnvironmentArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionInsightsAccountArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs', 'PermissionExpressionStackArgs', 'PermissionExpressionTagArgs', 'PermissionExpressionTeamArgs', 'PermissionLiteralExpressionBoolArgs', 'PermissionLiteralExpressionEnvironmentArgs', 'PermissionLiteralExpressionInsightsAccountArgs', 'PermissionLiteralExpressionNumberArgs', 'PermissionLiteralExpressionStackArgs', 'PermissionLiteralExpressionStringArgs', 'PermissionLiteralExpressionTeamArgs']]]:
         """
         The left operand of the equality comparison.
+
+        Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
         """
         return pulumi.get(self, "left")
 
@@ -1014,6 +1084,8 @@ class PermissionExpressionEqualArgs:
     def right(self) -> pulumi.Input[Optional[Union['PermissionExpressionAndArgs', 'PermissionExpressionEnvironmentArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionInsightsAccountArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs', 'PermissionExpressionStackArgs', 'PermissionExpressionTagArgs', 'PermissionExpressionTeamArgs', 'PermissionLiteralExpressionBoolArgs', 'PermissionLiteralExpressionEnvironmentArgs', 'PermissionLiteralExpressionInsightsAccountArgs', 'PermissionLiteralExpressionNumberArgs', 'PermissionLiteralExpressionStackArgs', 'PermissionLiteralExpressionStringArgs', 'PermissionLiteralExpressionTeamArgs']]]:
         """
         The right operand of the equality comparison.
+
+        Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
         """
         return pulumi.get(self, "right")
 
@@ -1027,31 +1099,39 @@ class PermissionExpressionHasTagArgsDict(TypedDict):
     """
     Expected value is 'PermissionExpressionHasTag'.
     """
-    context: NotRequired[pulumi.Input[Optional[Union['PermissionExpressionAndArgsDict', 'PermissionExpressionEnvironmentArgsDict', 'PermissionExpressionEqualArgsDict', 'PermissionExpressionHasTagArgsDict', 'PermissionExpressionInsightsAccountArgsDict', 'PermissionExpressionNotArgsDict', 'PermissionExpressionOrArgsDict', 'PermissionExpressionStackArgsDict', 'PermissionExpressionTagArgsDict', 'PermissionExpressionTeamArgsDict', 'PermissionLiteralExpressionBoolArgsDict', 'PermissionLiteralExpressionEnvironmentArgsDict', 'PermissionLiteralExpressionInsightsAccountArgsDict', 'PermissionLiteralExpressionNumberArgsDict', 'PermissionLiteralExpressionStackArgsDict', 'PermissionLiteralExpressionStringArgsDict', 'PermissionLiteralExpressionTeamArgsDict']]]]
+    context: NotRequired[pulumi.Input[Optional[Union['PermissionExpressionEnvironmentArgsDict', 'PermissionExpressionInsightsAccountArgsDict', 'PermissionExpressionStackArgsDict', 'PermissionExpressionTeamArgsDict']]]]
     """
     The context expression to check for the tag.
+
+    Valid `__type` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
     """
     key: NotRequired[pulumi.Input[Optional[_builtins.str]]]
     """
     The tag key to check for.
     """
-    node: NotRequired[pulumi.Input[Optional[Union['PermissionExpressionAndArgsDict', 'PermissionExpressionEnvironmentArgsDict', 'PermissionExpressionEqualArgsDict', 'PermissionExpressionHasTagArgsDict', 'PermissionExpressionInsightsAccountArgsDict', 'PermissionExpressionNotArgsDict', 'PermissionExpressionOrArgsDict', 'PermissionExpressionStackArgsDict', 'PermissionExpressionTagArgsDict', 'PermissionExpressionTeamArgsDict', 'PermissionLiteralExpressionBoolArgsDict', 'PermissionLiteralExpressionEnvironmentArgsDict', 'PermissionLiteralExpressionInsightsAccountArgsDict', 'PermissionLiteralExpressionNumberArgsDict', 'PermissionLiteralExpressionStackArgsDict', 'PermissionLiteralExpressionStringArgsDict', 'PermissionLiteralExpressionTeamArgsDict']]]]
+    node: NotRequired[pulumi.Input[Optional[Union['PermissionExpressionAndArgsDict', 'PermissionExpressionEqualArgsDict', 'PermissionExpressionHasTagArgsDict', 'PermissionExpressionNotArgsDict', 'PermissionExpressionOrArgsDict']]]]
     """
     The operand of the unary boolean expression.
+
+    Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
     """
 
 @pulumi.input_type
 class PermissionExpressionHasTagArgs:
     def __init__(__self__, *,
                  __type: pulumi.Input[_builtins.str],
-                 context: pulumi.Input[Optional[Union['PermissionExpressionAndArgs', 'PermissionExpressionEnvironmentArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionInsightsAccountArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs', 'PermissionExpressionStackArgs', 'PermissionExpressionTagArgs', 'PermissionExpressionTeamArgs', 'PermissionLiteralExpressionBoolArgs', 'PermissionLiteralExpressionEnvironmentArgs', 'PermissionLiteralExpressionInsightsAccountArgs', 'PermissionLiteralExpressionNumberArgs', 'PermissionLiteralExpressionStackArgs', 'PermissionLiteralExpressionStringArgs', 'PermissionLiteralExpressionTeamArgs']]] = None,
+                 context: pulumi.Input[Optional[Union['PermissionExpressionEnvironmentArgs', 'PermissionExpressionInsightsAccountArgs', 'PermissionExpressionStackArgs', 'PermissionExpressionTeamArgs']]] = None,
                  key: pulumi.Input[Optional[_builtins.str]] = None,
-                 node: pulumi.Input[Optional[Union['PermissionExpressionAndArgs', 'PermissionExpressionEnvironmentArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionInsightsAccountArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs', 'PermissionExpressionStackArgs', 'PermissionExpressionTagArgs', 'PermissionExpressionTeamArgs', 'PermissionLiteralExpressionBoolArgs', 'PermissionLiteralExpressionEnvironmentArgs', 'PermissionLiteralExpressionInsightsAccountArgs', 'PermissionLiteralExpressionNumberArgs', 'PermissionLiteralExpressionStackArgs', 'PermissionLiteralExpressionStringArgs', 'PermissionLiteralExpressionTeamArgs']]] = None):
+                 node: pulumi.Input[Optional[Union['PermissionExpressionAndArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs']]] = None):
         """
         :param pulumi.Input[_builtins.str] __type: Expected value is 'PermissionExpressionHasTag'.
-        :param pulumi.Input[Union['PermissionExpressionAndArgs', 'PermissionExpressionEnvironmentArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionInsightsAccountArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs', 'PermissionExpressionStackArgs', 'PermissionExpressionTagArgs', 'PermissionExpressionTeamArgs', 'PermissionLiteralExpressionBoolArgs', 'PermissionLiteralExpressionEnvironmentArgs', 'PermissionLiteralExpressionInsightsAccountArgs', 'PermissionLiteralExpressionNumberArgs', 'PermissionLiteralExpressionStackArgs', 'PermissionLiteralExpressionStringArgs', 'PermissionLiteralExpressionTeamArgs']] context: The context expression to check for the tag.
+        :param pulumi.Input[Union['PermissionExpressionEnvironmentArgs', 'PermissionExpressionInsightsAccountArgs', 'PermissionExpressionStackArgs', 'PermissionExpressionTeamArgs']] context: The context expression to check for the tag.
+               
+               Valid `__type` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
         :param pulumi.Input[_builtins.str] key: The tag key to check for.
-        :param pulumi.Input[Union['PermissionExpressionAndArgs', 'PermissionExpressionEnvironmentArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionInsightsAccountArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs', 'PermissionExpressionStackArgs', 'PermissionExpressionTagArgs', 'PermissionExpressionTeamArgs', 'PermissionLiteralExpressionBoolArgs', 'PermissionLiteralExpressionEnvironmentArgs', 'PermissionLiteralExpressionInsightsAccountArgs', 'PermissionLiteralExpressionNumberArgs', 'PermissionLiteralExpressionStackArgs', 'PermissionLiteralExpressionStringArgs', 'PermissionLiteralExpressionTeamArgs']] node: The operand of the unary boolean expression.
+        :param pulumi.Input[Union['PermissionExpressionAndArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs']] node: The operand of the unary boolean expression.
+               
+               Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
         """
         pulumi.set(__self__, "__type", 'PermissionExpressionHasTag')
         if context is not None:
@@ -1075,14 +1155,16 @@ class PermissionExpressionHasTagArgs:
 
     @_builtins.property
     @pulumi.getter
-    def context(self) -> pulumi.Input[Optional[Union['PermissionExpressionAndArgs', 'PermissionExpressionEnvironmentArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionInsightsAccountArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs', 'PermissionExpressionStackArgs', 'PermissionExpressionTagArgs', 'PermissionExpressionTeamArgs', 'PermissionLiteralExpressionBoolArgs', 'PermissionLiteralExpressionEnvironmentArgs', 'PermissionLiteralExpressionInsightsAccountArgs', 'PermissionLiteralExpressionNumberArgs', 'PermissionLiteralExpressionStackArgs', 'PermissionLiteralExpressionStringArgs', 'PermissionLiteralExpressionTeamArgs']]]:
+    def context(self) -> pulumi.Input[Optional[Union['PermissionExpressionEnvironmentArgs', 'PermissionExpressionInsightsAccountArgs', 'PermissionExpressionStackArgs', 'PermissionExpressionTeamArgs']]]:
         """
         The context expression to check for the tag.
+
+        Valid `__type` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
         """
         return pulumi.get(self, "context")
 
     @context.setter
-    def context(self, value: pulumi.Input[Optional[Union['PermissionExpressionAndArgs', 'PermissionExpressionEnvironmentArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionInsightsAccountArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs', 'PermissionExpressionStackArgs', 'PermissionExpressionTagArgs', 'PermissionExpressionTeamArgs', 'PermissionLiteralExpressionBoolArgs', 'PermissionLiteralExpressionEnvironmentArgs', 'PermissionLiteralExpressionInsightsAccountArgs', 'PermissionLiteralExpressionNumberArgs', 'PermissionLiteralExpressionStackArgs', 'PermissionLiteralExpressionStringArgs', 'PermissionLiteralExpressionTeamArgs']]]):
+    def context(self, value: pulumi.Input[Optional[Union['PermissionExpressionEnvironmentArgs', 'PermissionExpressionInsightsAccountArgs', 'PermissionExpressionStackArgs', 'PermissionExpressionTeamArgs']]]):
         pulumi.set(self, "context", value)
 
     @_builtins.property
@@ -1099,14 +1181,16 @@ class PermissionExpressionHasTagArgs:
 
     @_builtins.property
     @pulumi.getter
-    def node(self) -> pulumi.Input[Optional[Union['PermissionExpressionAndArgs', 'PermissionExpressionEnvironmentArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionInsightsAccountArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs', 'PermissionExpressionStackArgs', 'PermissionExpressionTagArgs', 'PermissionExpressionTeamArgs', 'PermissionLiteralExpressionBoolArgs', 'PermissionLiteralExpressionEnvironmentArgs', 'PermissionLiteralExpressionInsightsAccountArgs', 'PermissionLiteralExpressionNumberArgs', 'PermissionLiteralExpressionStackArgs', 'PermissionLiteralExpressionStringArgs', 'PermissionLiteralExpressionTeamArgs']]]:
+    def node(self) -> pulumi.Input[Optional[Union['PermissionExpressionAndArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs']]]:
         """
         The operand of the unary boolean expression.
+
+        Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
         """
         return pulumi.get(self, "node")
 
     @node.setter
-    def node(self, value: pulumi.Input[Optional[Union['PermissionExpressionAndArgs', 'PermissionExpressionEnvironmentArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionInsightsAccountArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs', 'PermissionExpressionStackArgs', 'PermissionExpressionTagArgs', 'PermissionExpressionTeamArgs', 'PermissionLiteralExpressionBoolArgs', 'PermissionLiteralExpressionEnvironmentArgs', 'PermissionLiteralExpressionInsightsAccountArgs', 'PermissionLiteralExpressionNumberArgs', 'PermissionLiteralExpressionStackArgs', 'PermissionLiteralExpressionStringArgs', 'PermissionLiteralExpressionTeamArgs']]]):
+    def node(self, value: pulumi.Input[Optional[Union['PermissionExpressionAndArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs']]]):
         pulumi.set(self, "node", value)
 
 
@@ -1143,19 +1227,23 @@ class PermissionExpressionNotArgsDict(TypedDict):
     """
     Expected value is 'PermissionExpressionNot'.
     """
-    node: NotRequired[pulumi.Input[Optional[Union['PermissionExpressionAndArgsDict', 'PermissionExpressionEnvironmentArgsDict', 'PermissionExpressionEqualArgsDict', 'PermissionExpressionHasTagArgsDict', 'PermissionExpressionInsightsAccountArgsDict', 'PermissionExpressionNotArgsDict', 'PermissionExpressionOrArgsDict', 'PermissionExpressionStackArgsDict', 'PermissionExpressionTagArgsDict', 'PermissionExpressionTeamArgsDict', 'PermissionLiteralExpressionBoolArgsDict', 'PermissionLiteralExpressionEnvironmentArgsDict', 'PermissionLiteralExpressionInsightsAccountArgsDict', 'PermissionLiteralExpressionNumberArgsDict', 'PermissionLiteralExpressionStackArgsDict', 'PermissionLiteralExpressionStringArgsDict', 'PermissionLiteralExpressionTeamArgsDict']]]]
+    node: NotRequired[pulumi.Input[Optional[Union['PermissionExpressionAndArgsDict', 'PermissionExpressionEqualArgsDict', 'PermissionExpressionHasTagArgsDict', 'PermissionExpressionNotArgsDict', 'PermissionExpressionOrArgsDict']]]]
     """
     The operand of the unary boolean expression.
+
+    Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
     """
 
 @pulumi.input_type
 class PermissionExpressionNotArgs:
     def __init__(__self__, *,
                  __type: pulumi.Input[_builtins.str],
-                 node: pulumi.Input[Optional[Union['PermissionExpressionAndArgs', 'PermissionExpressionEnvironmentArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionInsightsAccountArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs', 'PermissionExpressionStackArgs', 'PermissionExpressionTagArgs', 'PermissionExpressionTeamArgs', 'PermissionLiteralExpressionBoolArgs', 'PermissionLiteralExpressionEnvironmentArgs', 'PermissionLiteralExpressionInsightsAccountArgs', 'PermissionLiteralExpressionNumberArgs', 'PermissionLiteralExpressionStackArgs', 'PermissionLiteralExpressionStringArgs', 'PermissionLiteralExpressionTeamArgs']]] = None):
+                 node: pulumi.Input[Optional[Union['PermissionExpressionAndArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs']]] = None):
         """
         :param pulumi.Input[_builtins.str] __type: Expected value is 'PermissionExpressionNot'.
-        :param pulumi.Input[Union['PermissionExpressionAndArgs', 'PermissionExpressionEnvironmentArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionInsightsAccountArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs', 'PermissionExpressionStackArgs', 'PermissionExpressionTagArgs', 'PermissionExpressionTeamArgs', 'PermissionLiteralExpressionBoolArgs', 'PermissionLiteralExpressionEnvironmentArgs', 'PermissionLiteralExpressionInsightsAccountArgs', 'PermissionLiteralExpressionNumberArgs', 'PermissionLiteralExpressionStackArgs', 'PermissionLiteralExpressionStringArgs', 'PermissionLiteralExpressionTeamArgs']] node: The operand of the unary boolean expression.
+        :param pulumi.Input[Union['PermissionExpressionAndArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs']] node: The operand of the unary boolean expression.
+               
+               Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
         """
         pulumi.set(__self__, "__type", 'PermissionExpressionNot')
         if node is not None:
@@ -1175,14 +1263,16 @@ class PermissionExpressionNotArgs:
 
     @_builtins.property
     @pulumi.getter
-    def node(self) -> pulumi.Input[Optional[Union['PermissionExpressionAndArgs', 'PermissionExpressionEnvironmentArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionInsightsAccountArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs', 'PermissionExpressionStackArgs', 'PermissionExpressionTagArgs', 'PermissionExpressionTeamArgs', 'PermissionLiteralExpressionBoolArgs', 'PermissionLiteralExpressionEnvironmentArgs', 'PermissionLiteralExpressionInsightsAccountArgs', 'PermissionLiteralExpressionNumberArgs', 'PermissionLiteralExpressionStackArgs', 'PermissionLiteralExpressionStringArgs', 'PermissionLiteralExpressionTeamArgs']]]:
+    def node(self) -> pulumi.Input[Optional[Union['PermissionExpressionAndArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs']]]:
         """
         The operand of the unary boolean expression.
+
+        Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
         """
         return pulumi.get(self, "node")
 
     @node.setter
-    def node(self, value: pulumi.Input[Optional[Union['PermissionExpressionAndArgs', 'PermissionExpressionEnvironmentArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionInsightsAccountArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs', 'PermissionExpressionStackArgs', 'PermissionExpressionTagArgs', 'PermissionExpressionTeamArgs', 'PermissionLiteralExpressionBoolArgs', 'PermissionLiteralExpressionEnvironmentArgs', 'PermissionLiteralExpressionInsightsAccountArgs', 'PermissionLiteralExpressionNumberArgs', 'PermissionLiteralExpressionStackArgs', 'PermissionLiteralExpressionStringArgs', 'PermissionLiteralExpressionTeamArgs']]]):
+    def node(self, value: pulumi.Input[Optional[Union['PermissionExpressionAndArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs']]]):
         pulumi.set(self, "node", value)
 
 
@@ -1191,25 +1281,33 @@ class PermissionExpressionOrArgsDict(TypedDict):
     """
     Expected value is 'PermissionExpressionOr'.
     """
-    left: NotRequired[pulumi.Input[Optional[Union['PermissionExpressionAndArgsDict', 'PermissionExpressionEnvironmentArgsDict', 'PermissionExpressionEqualArgsDict', 'PermissionExpressionHasTagArgsDict', 'PermissionExpressionInsightsAccountArgsDict', 'PermissionExpressionNotArgsDict', 'PermissionExpressionOrArgsDict', 'PermissionExpressionStackArgsDict', 'PermissionExpressionTagArgsDict', 'PermissionExpressionTeamArgsDict', 'PermissionLiteralExpressionBoolArgsDict', 'PermissionLiteralExpressionEnvironmentArgsDict', 'PermissionLiteralExpressionInsightsAccountArgsDict', 'PermissionLiteralExpressionNumberArgsDict', 'PermissionLiteralExpressionStackArgsDict', 'PermissionLiteralExpressionStringArgsDict', 'PermissionLiteralExpressionTeamArgsDict']]]]
+    left: NotRequired[pulumi.Input[Optional[Union['PermissionExpressionAndArgsDict', 'PermissionExpressionEqualArgsDict', 'PermissionExpressionHasTagArgsDict', 'PermissionExpressionNotArgsDict', 'PermissionExpressionOrArgsDict']]]]
     """
     The left operand of the binary boolean expression.
+
+    Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
     """
-    right: NotRequired[pulumi.Input[Optional[Union['PermissionExpressionAndArgsDict', 'PermissionExpressionEnvironmentArgsDict', 'PermissionExpressionEqualArgsDict', 'PermissionExpressionHasTagArgsDict', 'PermissionExpressionInsightsAccountArgsDict', 'PermissionExpressionNotArgsDict', 'PermissionExpressionOrArgsDict', 'PermissionExpressionStackArgsDict', 'PermissionExpressionTagArgsDict', 'PermissionExpressionTeamArgsDict', 'PermissionLiteralExpressionBoolArgsDict', 'PermissionLiteralExpressionEnvironmentArgsDict', 'PermissionLiteralExpressionInsightsAccountArgsDict', 'PermissionLiteralExpressionNumberArgsDict', 'PermissionLiteralExpressionStackArgsDict', 'PermissionLiteralExpressionStringArgsDict', 'PermissionLiteralExpressionTeamArgsDict']]]]
+    right: NotRequired[pulumi.Input[Optional[Union['PermissionExpressionAndArgsDict', 'PermissionExpressionEqualArgsDict', 'PermissionExpressionHasTagArgsDict', 'PermissionExpressionNotArgsDict', 'PermissionExpressionOrArgsDict']]]]
     """
     The right operand of the binary boolean expression.
+
+    Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
     """
 
 @pulumi.input_type
 class PermissionExpressionOrArgs:
     def __init__(__self__, *,
                  __type: pulumi.Input[_builtins.str],
-                 left: pulumi.Input[Optional[Union['PermissionExpressionAndArgs', 'PermissionExpressionEnvironmentArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionInsightsAccountArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs', 'PermissionExpressionStackArgs', 'PermissionExpressionTagArgs', 'PermissionExpressionTeamArgs', 'PermissionLiteralExpressionBoolArgs', 'PermissionLiteralExpressionEnvironmentArgs', 'PermissionLiteralExpressionInsightsAccountArgs', 'PermissionLiteralExpressionNumberArgs', 'PermissionLiteralExpressionStackArgs', 'PermissionLiteralExpressionStringArgs', 'PermissionLiteralExpressionTeamArgs']]] = None,
-                 right: pulumi.Input[Optional[Union['PermissionExpressionAndArgs', 'PermissionExpressionEnvironmentArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionInsightsAccountArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs', 'PermissionExpressionStackArgs', 'PermissionExpressionTagArgs', 'PermissionExpressionTeamArgs', 'PermissionLiteralExpressionBoolArgs', 'PermissionLiteralExpressionEnvironmentArgs', 'PermissionLiteralExpressionInsightsAccountArgs', 'PermissionLiteralExpressionNumberArgs', 'PermissionLiteralExpressionStackArgs', 'PermissionLiteralExpressionStringArgs', 'PermissionLiteralExpressionTeamArgs']]] = None):
+                 left: pulumi.Input[Optional[Union['PermissionExpressionAndArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs']]] = None,
+                 right: pulumi.Input[Optional[Union['PermissionExpressionAndArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs']]] = None):
         """
         :param pulumi.Input[_builtins.str] __type: Expected value is 'PermissionExpressionOr'.
-        :param pulumi.Input[Union['PermissionExpressionAndArgs', 'PermissionExpressionEnvironmentArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionInsightsAccountArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs', 'PermissionExpressionStackArgs', 'PermissionExpressionTagArgs', 'PermissionExpressionTeamArgs', 'PermissionLiteralExpressionBoolArgs', 'PermissionLiteralExpressionEnvironmentArgs', 'PermissionLiteralExpressionInsightsAccountArgs', 'PermissionLiteralExpressionNumberArgs', 'PermissionLiteralExpressionStackArgs', 'PermissionLiteralExpressionStringArgs', 'PermissionLiteralExpressionTeamArgs']] left: The left operand of the binary boolean expression.
-        :param pulumi.Input[Union['PermissionExpressionAndArgs', 'PermissionExpressionEnvironmentArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionInsightsAccountArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs', 'PermissionExpressionStackArgs', 'PermissionExpressionTagArgs', 'PermissionExpressionTeamArgs', 'PermissionLiteralExpressionBoolArgs', 'PermissionLiteralExpressionEnvironmentArgs', 'PermissionLiteralExpressionInsightsAccountArgs', 'PermissionLiteralExpressionNumberArgs', 'PermissionLiteralExpressionStackArgs', 'PermissionLiteralExpressionStringArgs', 'PermissionLiteralExpressionTeamArgs']] right: The right operand of the binary boolean expression.
+        :param pulumi.Input[Union['PermissionExpressionAndArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs']] left: The left operand of the binary boolean expression.
+               
+               Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+        :param pulumi.Input[Union['PermissionExpressionAndArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs']] right: The right operand of the binary boolean expression.
+               
+               Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
         """
         pulumi.set(__self__, "__type", 'PermissionExpressionOr')
         if left is not None:
@@ -1231,26 +1329,30 @@ class PermissionExpressionOrArgs:
 
     @_builtins.property
     @pulumi.getter
-    def left(self) -> pulumi.Input[Optional[Union['PermissionExpressionAndArgs', 'PermissionExpressionEnvironmentArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionInsightsAccountArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs', 'PermissionExpressionStackArgs', 'PermissionExpressionTagArgs', 'PermissionExpressionTeamArgs', 'PermissionLiteralExpressionBoolArgs', 'PermissionLiteralExpressionEnvironmentArgs', 'PermissionLiteralExpressionInsightsAccountArgs', 'PermissionLiteralExpressionNumberArgs', 'PermissionLiteralExpressionStackArgs', 'PermissionLiteralExpressionStringArgs', 'PermissionLiteralExpressionTeamArgs']]]:
+    def left(self) -> pulumi.Input[Optional[Union['PermissionExpressionAndArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs']]]:
         """
         The left operand of the binary boolean expression.
+
+        Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
         """
         return pulumi.get(self, "left")
 
     @left.setter
-    def left(self, value: pulumi.Input[Optional[Union['PermissionExpressionAndArgs', 'PermissionExpressionEnvironmentArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionInsightsAccountArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs', 'PermissionExpressionStackArgs', 'PermissionExpressionTagArgs', 'PermissionExpressionTeamArgs', 'PermissionLiteralExpressionBoolArgs', 'PermissionLiteralExpressionEnvironmentArgs', 'PermissionLiteralExpressionInsightsAccountArgs', 'PermissionLiteralExpressionNumberArgs', 'PermissionLiteralExpressionStackArgs', 'PermissionLiteralExpressionStringArgs', 'PermissionLiteralExpressionTeamArgs']]]):
+    def left(self, value: pulumi.Input[Optional[Union['PermissionExpressionAndArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs']]]):
         pulumi.set(self, "left", value)
 
     @_builtins.property
     @pulumi.getter
-    def right(self) -> pulumi.Input[Optional[Union['PermissionExpressionAndArgs', 'PermissionExpressionEnvironmentArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionInsightsAccountArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs', 'PermissionExpressionStackArgs', 'PermissionExpressionTagArgs', 'PermissionExpressionTeamArgs', 'PermissionLiteralExpressionBoolArgs', 'PermissionLiteralExpressionEnvironmentArgs', 'PermissionLiteralExpressionInsightsAccountArgs', 'PermissionLiteralExpressionNumberArgs', 'PermissionLiteralExpressionStackArgs', 'PermissionLiteralExpressionStringArgs', 'PermissionLiteralExpressionTeamArgs']]]:
+    def right(self) -> pulumi.Input[Optional[Union['PermissionExpressionAndArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs']]]:
         """
         The right operand of the binary boolean expression.
+
+        Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
         """
         return pulumi.get(self, "right")
 
     @right.setter
-    def right(self, value: pulumi.Input[Optional[Union['PermissionExpressionAndArgs', 'PermissionExpressionEnvironmentArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionInsightsAccountArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs', 'PermissionExpressionStackArgs', 'PermissionExpressionTagArgs', 'PermissionExpressionTeamArgs', 'PermissionLiteralExpressionBoolArgs', 'PermissionLiteralExpressionEnvironmentArgs', 'PermissionLiteralExpressionInsightsAccountArgs', 'PermissionLiteralExpressionNumberArgs', 'PermissionLiteralExpressionStackArgs', 'PermissionLiteralExpressionStringArgs', 'PermissionLiteralExpressionTeamArgs']]]):
+    def right(self, value: pulumi.Input[Optional[Union['PermissionExpressionAndArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs']]]):
         pulumi.set(self, "right", value)
 
 
@@ -1287,9 +1389,11 @@ class PermissionExpressionTagArgsDict(TypedDict):
     """
     Expected value is 'PermissionExpressionTag'.
     """
-    context: NotRequired[pulumi.Input[Optional[Union['PermissionExpressionAndArgsDict', 'PermissionExpressionEnvironmentArgsDict', 'PermissionExpressionEqualArgsDict', 'PermissionExpressionHasTagArgsDict', 'PermissionExpressionInsightsAccountArgsDict', 'PermissionExpressionNotArgsDict', 'PermissionExpressionOrArgsDict', 'PermissionExpressionStackArgsDict', 'PermissionExpressionTagArgsDict', 'PermissionExpressionTeamArgsDict', 'PermissionLiteralExpressionBoolArgsDict', 'PermissionLiteralExpressionEnvironmentArgsDict', 'PermissionLiteralExpressionInsightsAccountArgsDict', 'PermissionLiteralExpressionNumberArgsDict', 'PermissionLiteralExpressionStackArgsDict', 'PermissionLiteralExpressionStringArgsDict', 'PermissionLiteralExpressionTeamArgsDict']]]]
+    context: NotRequired[pulumi.Input[Optional[Union['PermissionExpressionEnvironmentArgsDict', 'PermissionExpressionInsightsAccountArgsDict', 'PermissionExpressionStackArgsDict', 'PermissionExpressionTeamArgsDict']]]]
     """
     The context expression identifying the resource to look up the tag on.
+
+    Valid `__type` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
     """
     key: NotRequired[pulumi.Input[Optional[_builtins.str]]]
     """
@@ -1300,11 +1404,13 @@ class PermissionExpressionTagArgsDict(TypedDict):
 class PermissionExpressionTagArgs:
     def __init__(__self__, *,
                  __type: pulumi.Input[_builtins.str],
-                 context: pulumi.Input[Optional[Union['PermissionExpressionAndArgs', 'PermissionExpressionEnvironmentArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionInsightsAccountArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs', 'PermissionExpressionStackArgs', 'PermissionExpressionTagArgs', 'PermissionExpressionTeamArgs', 'PermissionLiteralExpressionBoolArgs', 'PermissionLiteralExpressionEnvironmentArgs', 'PermissionLiteralExpressionInsightsAccountArgs', 'PermissionLiteralExpressionNumberArgs', 'PermissionLiteralExpressionStackArgs', 'PermissionLiteralExpressionStringArgs', 'PermissionLiteralExpressionTeamArgs']]] = None,
+                 context: pulumi.Input[Optional[Union['PermissionExpressionEnvironmentArgs', 'PermissionExpressionInsightsAccountArgs', 'PermissionExpressionStackArgs', 'PermissionExpressionTeamArgs']]] = None,
                  key: pulumi.Input[Optional[_builtins.str]] = None):
         """
         :param pulumi.Input[_builtins.str] __type: Expected value is 'PermissionExpressionTag'.
-        :param pulumi.Input[Union['PermissionExpressionAndArgs', 'PermissionExpressionEnvironmentArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionInsightsAccountArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs', 'PermissionExpressionStackArgs', 'PermissionExpressionTagArgs', 'PermissionExpressionTeamArgs', 'PermissionLiteralExpressionBoolArgs', 'PermissionLiteralExpressionEnvironmentArgs', 'PermissionLiteralExpressionInsightsAccountArgs', 'PermissionLiteralExpressionNumberArgs', 'PermissionLiteralExpressionStackArgs', 'PermissionLiteralExpressionStringArgs', 'PermissionLiteralExpressionTeamArgs']] context: The context expression identifying the resource to look up the tag on.
+        :param pulumi.Input[Union['PermissionExpressionEnvironmentArgs', 'PermissionExpressionInsightsAccountArgs', 'PermissionExpressionStackArgs', 'PermissionExpressionTeamArgs']] context: The context expression identifying the resource to look up the tag on.
+               
+               Valid `__type` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
         :param pulumi.Input[_builtins.str] key: The tag key to retrieve.
         """
         pulumi.set(__self__, "__type", 'PermissionExpressionTag')
@@ -1327,14 +1433,16 @@ class PermissionExpressionTagArgs:
 
     @_builtins.property
     @pulumi.getter
-    def context(self) -> pulumi.Input[Optional[Union['PermissionExpressionAndArgs', 'PermissionExpressionEnvironmentArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionInsightsAccountArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs', 'PermissionExpressionStackArgs', 'PermissionExpressionTagArgs', 'PermissionExpressionTeamArgs', 'PermissionLiteralExpressionBoolArgs', 'PermissionLiteralExpressionEnvironmentArgs', 'PermissionLiteralExpressionInsightsAccountArgs', 'PermissionLiteralExpressionNumberArgs', 'PermissionLiteralExpressionStackArgs', 'PermissionLiteralExpressionStringArgs', 'PermissionLiteralExpressionTeamArgs']]]:
+    def context(self) -> pulumi.Input[Optional[Union['PermissionExpressionEnvironmentArgs', 'PermissionExpressionInsightsAccountArgs', 'PermissionExpressionStackArgs', 'PermissionExpressionTeamArgs']]]:
         """
         The context expression identifying the resource to look up the tag on.
+
+        Valid `__type` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
         """
         return pulumi.get(self, "context")
 
     @context.setter
-    def context(self, value: pulumi.Input[Optional[Union['PermissionExpressionAndArgs', 'PermissionExpressionEnvironmentArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionInsightsAccountArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs', 'PermissionExpressionStackArgs', 'PermissionExpressionTagArgs', 'PermissionExpressionTeamArgs', 'PermissionLiteralExpressionBoolArgs', 'PermissionLiteralExpressionEnvironmentArgs', 'PermissionLiteralExpressionInsightsAccountArgs', 'PermissionLiteralExpressionNumberArgs', 'PermissionLiteralExpressionStackArgs', 'PermissionLiteralExpressionStringArgs', 'PermissionLiteralExpressionTeamArgs']]]):
+    def context(self, value: pulumi.Input[Optional[Union['PermissionExpressionEnvironmentArgs', 'PermissionExpressionInsightsAccountArgs', 'PermissionExpressionStackArgs', 'PermissionExpressionTeamArgs']]]):
         pulumi.set(self, "context", value)
 
     @_builtins.property
@@ -1721,10 +1829,14 @@ class PermissionSelectvalueArgsDict(TypedDict):
     node: NotRequired[pulumi.Input[Optional[Union['PermissionDescriptorAllowArgsDict', 'PermissionDescriptorComposeArgsDict', 'PermissionDescriptorConditionArgsDict', 'PermissionDescriptorGroupArgsDict', 'PermissionDescriptorIfThenElseArgsDict', 'PermissionDescriptorSelectArgsDict']]]]
     """
     The permission descriptor to apply when this value matches.
+
+    Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
     """
     value: NotRequired[pulumi.Input[Optional[Union['PermissionExpressionAndArgsDict', 'PermissionExpressionEnvironmentArgsDict', 'PermissionExpressionEqualArgsDict', 'PermissionExpressionHasTagArgsDict', 'PermissionExpressionInsightsAccountArgsDict', 'PermissionExpressionNotArgsDict', 'PermissionExpressionOrArgsDict', 'PermissionExpressionStackArgsDict', 'PermissionExpressionTagArgsDict', 'PermissionExpressionTeamArgsDict', 'PermissionLiteralExpressionBoolArgsDict', 'PermissionLiteralExpressionEnvironmentArgsDict', 'PermissionLiteralExpressionInsightsAccountArgsDict', 'PermissionLiteralExpressionNumberArgsDict', 'PermissionLiteralExpressionStackArgsDict', 'PermissionLiteralExpressionStringArgsDict', 'PermissionLiteralExpressionTeamArgsDict']]]]
     """
     The value expression to match against the selector.
+
+    Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
     """
 
 @pulumi.input_type
@@ -1736,7 +1848,11 @@ class PermissionSelectvalueArgs:
         PermissionSelectvalue pairs a value expression with its corresponding permission descriptor node.
 
         :param pulumi.Input[Union['PermissionDescriptorAllowArgs', 'PermissionDescriptorComposeArgs', 'PermissionDescriptorConditionArgs', 'PermissionDescriptorGroupArgs', 'PermissionDescriptorIfThenElseArgs', 'PermissionDescriptorSelectArgs']] node: The permission descriptor to apply when this value matches.
+               
+               Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
         :param pulumi.Input[Union['PermissionExpressionAndArgs', 'PermissionExpressionEnvironmentArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionInsightsAccountArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs', 'PermissionExpressionStackArgs', 'PermissionExpressionTagArgs', 'PermissionExpressionTeamArgs', 'PermissionLiteralExpressionBoolArgs', 'PermissionLiteralExpressionEnvironmentArgs', 'PermissionLiteralExpressionInsightsAccountArgs', 'PermissionLiteralExpressionNumberArgs', 'PermissionLiteralExpressionStackArgs', 'PermissionLiteralExpressionStringArgs', 'PermissionLiteralExpressionTeamArgs']] value: The value expression to match against the selector.
+               
+               Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
         """
         if node is not None:
             pulumi.set(__self__, "node", node)
@@ -1748,6 +1864,8 @@ class PermissionSelectvalueArgs:
     def node(self) -> pulumi.Input[Optional[Union['PermissionDescriptorAllowArgs', 'PermissionDescriptorComposeArgs', 'PermissionDescriptorConditionArgs', 'PermissionDescriptorGroupArgs', 'PermissionDescriptorIfThenElseArgs', 'PermissionDescriptorSelectArgs']]]:
         """
         The permission descriptor to apply when this value matches.
+
+        Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
         """
         return pulumi.get(self, "node")
 
@@ -1760,6 +1878,8 @@ class PermissionSelectvalueArgs:
     def value(self) -> pulumi.Input[Optional[Union['PermissionExpressionAndArgs', 'PermissionExpressionEnvironmentArgs', 'PermissionExpressionEqualArgs', 'PermissionExpressionHasTagArgs', 'PermissionExpressionInsightsAccountArgs', 'PermissionExpressionNotArgs', 'PermissionExpressionOrArgs', 'PermissionExpressionStackArgs', 'PermissionExpressionTagArgs', 'PermissionExpressionTeamArgs', 'PermissionLiteralExpressionBoolArgs', 'PermissionLiteralExpressionEnvironmentArgs', 'PermissionLiteralExpressionInsightsAccountArgs', 'PermissionLiteralExpressionNumberArgs', 'PermissionLiteralExpressionStackArgs', 'PermissionLiteralExpressionStringArgs', 'PermissionLiteralExpressionTeamArgs']]]:
         """
         The value expression to match against the selector.
+
+        Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
         """
         return pulumi.get(self, "value")
 

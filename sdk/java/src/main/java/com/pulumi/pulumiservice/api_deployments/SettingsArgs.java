@@ -180,12 +180,16 @@ public final class SettingsArgs extends com.pulumi.resources.ResourceArgs {
     /**
      * VCS provider settings
      * 
+     * Valid `provider` values: azure_devops, bitbucket, custom, github, gitlab.
+     * 
      */
     @Import(name="vcs")
     private @Nullable Output<Object> vcs;
 
     /**
      * @return VCS provider settings
+     * 
+     * Valid `provider` values: azure_devops, bitbucket, custom, github, gitlab.
      * 
      */
     public Optional<Output<Object>> vcs() {
@@ -439,6 +443,8 @@ public final class SettingsArgs extends com.pulumi.resources.ResourceArgs {
         /**
          * @param vcs VCS provider settings
          * 
+         * Valid `provider` values: azure_devops, bitbucket, custom, github, gitlab.
+         * 
          * @return builder
          * 
          */
@@ -449,6 +455,8 @@ public final class SettingsArgs extends com.pulumi.resources.ResourceArgs {
 
         /**
          * @param vcs VCS provider settings
+         * 
+         * Valid `provider` values: azure_devops, bitbucket, custom, github, gitlab.
          * 
          * @return builder
          * 

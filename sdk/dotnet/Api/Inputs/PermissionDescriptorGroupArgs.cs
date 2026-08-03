@@ -23,6 +23,8 @@ namespace Pulumi.PulumiService.Api.Inputs
 
         /// <summary>
         /// The list of permission descriptor entries in this group.
+        /// 
+        /// Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
         /// </summary>
         public InputList<object> Entries
         {

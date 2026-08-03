@@ -25,6 +25,8 @@ public final class ChangeGateApprovalRuleOutput {
     /**
      * @return List of eligible approvers
      * 
+     * Valid `eligibilityType` values: has_permission_on_target, specific_user, team_member.
+     * 
      */
     private List<Object> eligibleApprovers;
     /**
@@ -53,6 +55,8 @@ public final class ChangeGateApprovalRuleOutput {
     }
     /**
      * @return List of eligible approvers
+     * 
+     * Valid `eligibilityType` values: has_permission_on_target, specific_user, team_member.
      * 
      */
     public List<Object> eligibleApprovers() {

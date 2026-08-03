@@ -20,6 +20,8 @@ namespace Pulumi.PulumiService.Api.Inputs
 
         /// <summary>
         /// The context expression identifying the resource to look up the tag on.
+        /// 
+        /// Valid `__type` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
         /// </summary>
         [Input("context")]
         public object? Context { get; set; }

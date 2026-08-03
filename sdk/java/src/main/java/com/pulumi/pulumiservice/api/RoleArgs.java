@@ -57,12 +57,16 @@ public final class RoleArgs extends com.pulumi.resources.ResourceArgs {
     /**
      * The detailed permission descriptor tree.
      * 
+     * Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
+     * 
      */
     @Import(name="details")
     private @Nullable Output<Object> details;
 
     /**
      * @return The detailed permission descriptor tree.
+     * 
+     * Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
      * 
      */
     public Optional<Output<Object>> details() {
@@ -220,6 +224,8 @@ public final class RoleArgs extends com.pulumi.resources.ResourceArgs {
         /**
          * @param details The detailed permission descriptor tree.
          * 
+         * Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
+         * 
          * @return builder
          * 
          */
@@ -230,6 +236,8 @@ public final class RoleArgs extends com.pulumi.resources.ResourceArgs {
 
         /**
          * @param details The detailed permission descriptor tree.
+         * 
+         * Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
          * 
          * @return builder
          * 

@@ -13,22 +13,10 @@ import com.pulumi.pulumiservice.api.inputs.PermissionDescriptorGroupArgs;
 import com.pulumi.pulumiservice.api.inputs.PermissionDescriptorIfThenElseArgs;
 import com.pulumi.pulumiservice.api.inputs.PermissionDescriptorSelectArgs;
 import com.pulumi.pulumiservice.api.inputs.PermissionExpressionAndArgs;
-import com.pulumi.pulumiservice.api.inputs.PermissionExpressionEnvironmentArgs;
 import com.pulumi.pulumiservice.api.inputs.PermissionExpressionEqualArgs;
 import com.pulumi.pulumiservice.api.inputs.PermissionExpressionHasTagArgs;
-import com.pulumi.pulumiservice.api.inputs.PermissionExpressionInsightsAccountArgs;
 import com.pulumi.pulumiservice.api.inputs.PermissionExpressionNotArgs;
 import com.pulumi.pulumiservice.api.inputs.PermissionExpressionOrArgs;
-import com.pulumi.pulumiservice.api.inputs.PermissionExpressionStackArgs;
-import com.pulumi.pulumiservice.api.inputs.PermissionExpressionTagArgs;
-import com.pulumi.pulumiservice.api.inputs.PermissionExpressionTeamArgs;
-import com.pulumi.pulumiservice.api.inputs.PermissionLiteralExpressionBoolArgs;
-import com.pulumi.pulumiservice.api.inputs.PermissionLiteralExpressionEnvironmentArgs;
-import com.pulumi.pulumiservice.api.inputs.PermissionLiteralExpressionInsightsAccountArgs;
-import com.pulumi.pulumiservice.api.inputs.PermissionLiteralExpressionNumberArgs;
-import com.pulumi.pulumiservice.api.inputs.PermissionLiteralExpressionStackArgs;
-import com.pulumi.pulumiservice.api.inputs.PermissionLiteralExpressionStringArgs;
-import com.pulumi.pulumiservice.api.inputs.PermissionLiteralExpressionTeamArgs;
 import java.lang.Object;
 import java.lang.String;
 import java.util.Objects;
@@ -58,12 +46,16 @@ public final class PermissionDescriptorConditionArgs extends com.pulumi.resource
     /**
      * The boolean condition to evaluate.
      * 
+     * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+     * 
      */
     @Import(name="condition")
     private @Nullable Output<Object> condition;
 
     /**
      * @return The boolean condition to evaluate.
+     * 
+     * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
      * 
      */
     public Optional<Output<Object>> condition() {
@@ -73,12 +65,16 @@ public final class PermissionDescriptorConditionArgs extends com.pulumi.resource
     /**
      * The permission descriptor to apply when the condition is true.
      * 
+     * Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
+     * 
      */
     @Import(name="subNode")
     private @Nullable Output<Object> subNode;
 
     /**
      * @return The permission descriptor to apply when the condition is true.
+     * 
+     * Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
      * 
      */
     public Optional<Output<Object>> subNode() {
@@ -135,6 +131,8 @@ public final class PermissionDescriptorConditionArgs extends com.pulumi.resource
         /**
          * @param condition The boolean condition to evaluate.
          * 
+         * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+         * 
          * @return builder
          * 
          */
@@ -146,6 +144,8 @@ public final class PermissionDescriptorConditionArgs extends com.pulumi.resource
         /**
          * @param condition The boolean condition to evaluate.
          * 
+         * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+         * 
          * @return builder
          * 
          */
@@ -155,6 +155,8 @@ public final class PermissionDescriptorConditionArgs extends com.pulumi.resource
 
         /**
          * @param subNode The permission descriptor to apply when the condition is true.
+         * 
+         * Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
          * 
          * @return builder
          * 
@@ -166,6 +168,8 @@ public final class PermissionDescriptorConditionArgs extends com.pulumi.resource
 
         /**
          * @param subNode The permission descriptor to apply when the condition is true.
+         * 
+         * Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
          * 
          * @return builder
          * 

@@ -17,8 +17,12 @@ var _ = internal.GetEnvOrDefault
 type AgentEntityDiff struct {
 	// Entities to add to the Agent's context.
 	// Entities must be valid, and will be automatically deleted if they are invalid.
+	//
+	// Valid `type` values: policy_issue, pull_request, repository, stack.
 	Add []interface{} `pulumi:"add"`
 	// Entities to remove from the Agent's context.
+	//
+	// Valid `type` values: policy_issue, pull_request, repository, stack.
 	Remove []interface{} `pulumi:"remove"`
 }
 
@@ -37,8 +41,12 @@ type AgentEntityDiffInput interface {
 type AgentEntityDiffArgs struct {
 	// Entities to add to the Agent's context.
 	// Entities must be valid, and will be automatically deleted if they are invalid.
+	//
+	// Valid `type` values: policy_issue, pull_request, repository, stack.
 	Add pulumi.ArrayInput `pulumi:"add"`
 	// Entities to remove from the Agent's context.
+	//
+	// Valid `type` values: policy_issue, pull_request, repository, stack.
 	Remove pulumi.ArrayInput `pulumi:"remove"`
 }
 
@@ -122,11 +130,15 @@ func (o AgentEntityDiffOutput) ToAgentEntityDiffPtrOutputWithContext(ctx context
 
 // Entities to add to the Agent's context.
 // Entities must be valid, and will be automatically deleted if they are invalid.
+//
+// Valid `type` values: policy_issue, pull_request, repository, stack.
 func (o AgentEntityDiffOutput) Add() pulumi.ArrayOutput {
 	return o.ApplyT(func(v AgentEntityDiff) []interface{} { return v.Add }).(pulumi.ArrayOutput)
 }
 
 // Entities to remove from the Agent's context.
+//
+// Valid `type` values: policy_issue, pull_request, repository, stack.
 func (o AgentEntityDiffOutput) Remove() pulumi.ArrayOutput {
 	return o.ApplyT(func(v AgentEntityDiff) []interface{} { return v.Remove }).(pulumi.ArrayOutput)
 }
@@ -157,6 +169,8 @@ func (o AgentEntityDiffPtrOutput) Elem() AgentEntityDiffOutput {
 
 // Entities to add to the Agent's context.
 // Entities must be valid, and will be automatically deleted if they are invalid.
+//
+// Valid `type` values: policy_issue, pull_request, repository, stack.
 func (o AgentEntityDiffPtrOutput) Add() pulumi.ArrayOutput {
 	return o.ApplyT(func(v *AgentEntityDiff) []interface{} {
 		if v == nil {
@@ -167,6 +181,8 @@ func (o AgentEntityDiffPtrOutput) Add() pulumi.ArrayOutput {
 }
 
 // Entities to remove from the Agent's context.
+//
+// Valid `type` values: policy_issue, pull_request, repository, stack.
 func (o AgentEntityDiffPtrOutput) Remove() pulumi.ArrayOutput {
 	return o.ApplyT(func(v *AgentEntityDiff) []interface{} {
 		if v == nil {
@@ -333,7 +349,8 @@ type AgentEntityRepository struct {
 	// The name of the repository.
 	Name string `pulumi:"name"`
 	// The organization that the repository is contained within
-	Org  string `pulumi:"org"`
+	Org string `pulumi:"org"`
+	// Expected value is 'repository'.
 	Type string `pulumi:"type"`
 }
 
@@ -356,7 +373,8 @@ type AgentEntityRepositoryArgs struct {
 	// The name of the repository.
 	Name pulumi.StringInput `pulumi:"name"`
 	// The organization that the repository is contained within
-	Org  pulumi.StringInput `pulumi:"org"`
+	Org pulumi.StringInput `pulumi:"org"`
+	// Expected value is 'repository'.
 	Type pulumi.StringInput `pulumi:"type"`
 }
 
@@ -406,6 +424,7 @@ func (o AgentEntityRepositoryOutput) Org() pulumi.StringOutput {
 	return o.ApplyT(func(v AgentEntityRepository) string { return v.Org }).(pulumi.StringOutput)
 }
 
+// Expected value is 'repository'.
 func (o AgentEntityRepositoryOutput) Type() pulumi.StringOutput {
 	return o.ApplyT(func(v AgentEntityRepository) string { return v.Type }).(pulumi.StringOutput)
 }
@@ -736,7 +755,8 @@ type AgentUserEventMessage struct {
 	PageContext *PageContext `pulumi:"pageContext"`
 	// When the event occurred.
 	Timestamp string `pulumi:"timestamp"`
-	Type      string `pulumi:"type"`
+	// Expected value is 'user_message'.
+	Type string `pulumi:"type"`
 }
 
 // AgentUserEventMessageInput is an input type that accepts AgentUserEventMessageArgs and AgentUserEventMessageOutput values.
@@ -761,7 +781,8 @@ type AgentUserEventMessageArgs struct {
 	PageContext PageContextPtrInput `pulumi:"pageContext"`
 	// When the event occurred.
 	Timestamp pulumi.StringInput `pulumi:"timestamp"`
-	Type      pulumi.StringInput `pulumi:"type"`
+	// Expected value is 'user_message'.
+	Type pulumi.StringInput `pulumi:"type"`
 }
 
 func (AgentUserEventMessageArgs) ElementType() reflect.Type {
@@ -866,6 +887,7 @@ func (o AgentUserEventMessageOutput) Timestamp() pulumi.StringOutput {
 	return o.ApplyT(func(v AgentUserEventMessage) string { return v.Timestamp }).(pulumi.StringOutput)
 }
 
+// Expected value is 'user_message'.
 func (o AgentUserEventMessageOutput) Type() pulumi.StringOutput {
 	return o.ApplyT(func(v AgentUserEventMessage) string { return v.Type }).(pulumi.StringOutput)
 }
@@ -944,6 +966,7 @@ func (o AgentUserEventMessagePtrOutput) Timestamp() pulumi.StringPtrOutput {
 	}).(pulumi.StringPtrOutput)
 }
 
+// Expected value is 'user_message'.
 func (o AgentUserEventMessagePtrOutput) Type() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *AgentUserEventMessage) *string {
 		if v == nil {

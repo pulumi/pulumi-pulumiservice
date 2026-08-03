@@ -65,6 +65,8 @@ namespace Pulumi.PulumiService.Api.Deployments
 
         /// <summary>
         /// VCS provider settings
+        /// 
+        /// Valid `provider` values: azure_devops, bitbucket, custom, github, gitlab.
         /// </summary>
         [Output("vcs")]
         public Output<object?> Vcs { get; private set; } = null!;
@@ -182,6 +184,8 @@ namespace Pulumi.PulumiService.Api.Deployments
 
         /// <summary>
         /// VCS provider settings
+        /// 
+        /// Valid `provider` values: azure_devops, bitbucket, custom, github, gitlab.
         /// </summary>
         [Input("vcs")]
         public object? Vcs { get; set; }

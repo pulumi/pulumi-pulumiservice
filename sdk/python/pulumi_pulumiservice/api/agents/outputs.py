@@ -126,12 +126,13 @@ class AgentEntityRepository(dict):
         """
         :param _builtins.str name: The name of the repository.
         :param _builtins.str org: The organization that the repository is contained within
+        :param _builtins.str type: Expected value is 'repository'.
         :param _builtins.str forge: The forge/provider where the repository is hosted
         :param _builtins.str host: The hostname for the repository, used for self-hosted providers such as GitHub Enterprise
         """
         pulumi.set(__self__, "name", name)
         pulumi.set(__self__, "org", org)
-        pulumi.set(__self__, "type", type)
+        pulumi.set(__self__, "type", 'repository')
         if forge is not None:
             pulumi.set(__self__, "forge", forge)
         if host is not None:
@@ -156,6 +157,9 @@ class AgentEntityRepository(dict):
     @_builtins.property
     @pulumi.getter
     def type(self) -> _builtins.str:
+        """
+        Expected value is 'repository'.
+        """
         return pulumi.get(self, "type")
 
     @_builtins.property

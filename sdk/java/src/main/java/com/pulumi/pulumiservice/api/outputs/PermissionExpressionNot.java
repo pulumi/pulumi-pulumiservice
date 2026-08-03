@@ -6,21 +6,9 @@ package com.pulumi.pulumiservice.api.outputs;
 import com.pulumi.core.annotations.CustomType;
 import com.pulumi.exceptions.MissingRequiredPropertyException;
 import com.pulumi.pulumiservice.api.outputs.PermissionExpressionAnd;
-import com.pulumi.pulumiservice.api.outputs.PermissionExpressionEnvironment;
 import com.pulumi.pulumiservice.api.outputs.PermissionExpressionEqual;
 import com.pulumi.pulumiservice.api.outputs.PermissionExpressionHasTag;
-import com.pulumi.pulumiservice.api.outputs.PermissionExpressionInsightsAccount;
 import com.pulumi.pulumiservice.api.outputs.PermissionExpressionOr;
-import com.pulumi.pulumiservice.api.outputs.PermissionExpressionStack;
-import com.pulumi.pulumiservice.api.outputs.PermissionExpressionTag;
-import com.pulumi.pulumiservice.api.outputs.PermissionExpressionTeam;
-import com.pulumi.pulumiservice.api.outputs.PermissionLiteralExpressionBool;
-import com.pulumi.pulumiservice.api.outputs.PermissionLiteralExpressionEnvironment;
-import com.pulumi.pulumiservice.api.outputs.PermissionLiteralExpressionInsightsAccount;
-import com.pulumi.pulumiservice.api.outputs.PermissionLiteralExpressionNumber;
-import com.pulumi.pulumiservice.api.outputs.PermissionLiteralExpressionStack;
-import com.pulumi.pulumiservice.api.outputs.PermissionLiteralExpressionString;
-import com.pulumi.pulumiservice.api.outputs.PermissionLiteralExpressionTeam;
 import java.lang.Object;
 import java.lang.String;
 import java.util.Objects;
@@ -37,6 +25,8 @@ public final class PermissionExpressionNot {
     /**
      * @return The operand of the unary boolean expression.
      * 
+     * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+     * 
      */
     private @Nullable Object node;
 
@@ -50,6 +40,8 @@ public final class PermissionExpressionNot {
     }
     /**
      * @return The operand of the unary boolean expression.
+     * 
+     * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
      * 
      */
     public Optional<Object> node() {

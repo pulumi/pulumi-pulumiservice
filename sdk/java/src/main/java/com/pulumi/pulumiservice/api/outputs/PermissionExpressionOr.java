@@ -6,21 +6,9 @@ package com.pulumi.pulumiservice.api.outputs;
 import com.pulumi.core.annotations.CustomType;
 import com.pulumi.exceptions.MissingRequiredPropertyException;
 import com.pulumi.pulumiservice.api.outputs.PermissionExpressionAnd;
-import com.pulumi.pulumiservice.api.outputs.PermissionExpressionEnvironment;
 import com.pulumi.pulumiservice.api.outputs.PermissionExpressionEqual;
 import com.pulumi.pulumiservice.api.outputs.PermissionExpressionHasTag;
-import com.pulumi.pulumiservice.api.outputs.PermissionExpressionInsightsAccount;
 import com.pulumi.pulumiservice.api.outputs.PermissionExpressionNot;
-import com.pulumi.pulumiservice.api.outputs.PermissionExpressionStack;
-import com.pulumi.pulumiservice.api.outputs.PermissionExpressionTag;
-import com.pulumi.pulumiservice.api.outputs.PermissionExpressionTeam;
-import com.pulumi.pulumiservice.api.outputs.PermissionLiteralExpressionBool;
-import com.pulumi.pulumiservice.api.outputs.PermissionLiteralExpressionEnvironment;
-import com.pulumi.pulumiservice.api.outputs.PermissionLiteralExpressionInsightsAccount;
-import com.pulumi.pulumiservice.api.outputs.PermissionLiteralExpressionNumber;
-import com.pulumi.pulumiservice.api.outputs.PermissionLiteralExpressionStack;
-import com.pulumi.pulumiservice.api.outputs.PermissionLiteralExpressionString;
-import com.pulumi.pulumiservice.api.outputs.PermissionLiteralExpressionTeam;
 import java.lang.Object;
 import java.lang.String;
 import java.util.Objects;
@@ -37,10 +25,14 @@ public final class PermissionExpressionOr {
     /**
      * @return The left operand of the binary boolean expression.
      * 
+     * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+     * 
      */
     private @Nullable Object left;
     /**
      * @return The right operand of the binary boolean expression.
+     * 
+     * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
      * 
      */
     private @Nullable Object right;
@@ -56,12 +48,16 @@ public final class PermissionExpressionOr {
     /**
      * @return The left operand of the binary boolean expression.
      * 
+     * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+     * 
      */
     public Optional<Object> left() {
         return Optional.ofNullable(this.left);
     }
     /**
      * @return The right operand of the binary boolean expression.
+     * 
+     * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
      * 
      */
     public Optional<Object> right() {

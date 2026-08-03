@@ -146,12 +146,16 @@ public class Settings extends com.pulumi.resources.CustomResource {
     /**
      * VCS provider settings
      * 
+     * Valid `provider` values: azure_devops, bitbucket, custom, github, gitlab.
+     * 
      */
     @Export(name="vcs", refs={Object.class}, tree="[0]")
     private Output</* @Nullable */ Object> vcs;
 
     /**
      * @return VCS provider settings
+     * 
+     * Valid `provider` values: azure_devops, bitbucket, custom, github, gitlab.
      * 
      */
     public Output<Optional<Object>> vcs() {

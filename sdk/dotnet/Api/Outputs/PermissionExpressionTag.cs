@@ -19,6 +19,8 @@ namespace Pulumi.PulumiService.Api.Outputs
         public readonly string __type;
         /// <summary>
         /// The context expression identifying the resource to look up the tag on.
+        /// 
+        /// Valid `__type` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
         /// </summary>
         public readonly object? Context;
         /// <summary>

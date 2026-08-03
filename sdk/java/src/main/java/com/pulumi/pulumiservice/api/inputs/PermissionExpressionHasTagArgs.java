@@ -14,15 +14,7 @@ import com.pulumi.pulumiservice.api.inputs.PermissionExpressionInsightsAccountAr
 import com.pulumi.pulumiservice.api.inputs.PermissionExpressionNotArgs;
 import com.pulumi.pulumiservice.api.inputs.PermissionExpressionOrArgs;
 import com.pulumi.pulumiservice.api.inputs.PermissionExpressionStackArgs;
-import com.pulumi.pulumiservice.api.inputs.PermissionExpressionTagArgs;
 import com.pulumi.pulumiservice.api.inputs.PermissionExpressionTeamArgs;
-import com.pulumi.pulumiservice.api.inputs.PermissionLiteralExpressionBoolArgs;
-import com.pulumi.pulumiservice.api.inputs.PermissionLiteralExpressionEnvironmentArgs;
-import com.pulumi.pulumiservice.api.inputs.PermissionLiteralExpressionInsightsAccountArgs;
-import com.pulumi.pulumiservice.api.inputs.PermissionLiteralExpressionNumberArgs;
-import com.pulumi.pulumiservice.api.inputs.PermissionLiteralExpressionStackArgs;
-import com.pulumi.pulumiservice.api.inputs.PermissionLiteralExpressionStringArgs;
-import com.pulumi.pulumiservice.api.inputs.PermissionLiteralExpressionTeamArgs;
 import java.lang.Object;
 import java.lang.String;
 import java.util.Objects;
@@ -52,12 +44,16 @@ public final class PermissionExpressionHasTagArgs extends com.pulumi.resources.R
     /**
      * The context expression to check for the tag.
      * 
+     * Valid `__type` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
+     * 
      */
     @Import(name="context")
     private @Nullable Output<Object> context;
 
     /**
      * @return The context expression to check for the tag.
+     * 
+     * Valid `__type` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
      * 
      */
     public Optional<Output<Object>> context() {
@@ -82,12 +78,16 @@ public final class PermissionExpressionHasTagArgs extends com.pulumi.resources.R
     /**
      * The operand of the unary boolean expression.
      * 
+     * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+     * 
      */
     @Import(name="node")
     private @Nullable Output<Object> node;
 
     /**
      * @return The operand of the unary boolean expression.
+     * 
+     * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
      * 
      */
     public Optional<Output<Object>> node() {
@@ -145,6 +145,8 @@ public final class PermissionExpressionHasTagArgs extends com.pulumi.resources.R
         /**
          * @param context The context expression to check for the tag.
          * 
+         * Valid `__type` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
+         * 
          * @return builder
          * 
          */
@@ -155,6 +157,8 @@ public final class PermissionExpressionHasTagArgs extends com.pulumi.resources.R
 
         /**
          * @param context The context expression to check for the tag.
+         * 
+         * Valid `__type` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
          * 
          * @return builder
          * 
@@ -187,6 +191,8 @@ public final class PermissionExpressionHasTagArgs extends com.pulumi.resources.R
         /**
          * @param node The operand of the unary boolean expression.
          * 
+         * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+         * 
          * @return builder
          * 
          */
@@ -197,6 +203,8 @@ public final class PermissionExpressionHasTagArgs extends com.pulumi.resources.R
 
         /**
          * @param node The operand of the unary boolean expression.
+         * 
+         * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
          * 
          * @return builder
          * 

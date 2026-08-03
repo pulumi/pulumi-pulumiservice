@@ -20,18 +20,24 @@ namespace Pulumi.PulumiService.Api.Inputs
 
         /// <summary>
         /// The boolean condition to evaluate.
+        /// 
+        /// Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
         /// </summary>
         [Input("condition")]
         public object? Condition { get; set; }
 
         /// <summary>
         /// The permission descriptor to apply when the condition is false.
+        /// 
+        /// Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
         /// </summary>
         [Input("subNodeForFalse")]
         public object? SubNodeForFalse { get; set; }
 
         /// <summary>
         /// The permission descriptor to apply when the condition is true.
+        /// 
+        /// Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
         /// </summary>
         [Input("subNodeForTrue")]
         public object? SubNodeForTrue { get; set; }

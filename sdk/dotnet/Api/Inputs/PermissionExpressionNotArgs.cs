@@ -20,6 +20,8 @@ namespace Pulumi.PulumiService.Api.Inputs
 
         /// <summary>
         /// The operand of the unary boolean expression.
+        /// 
+        /// Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
         /// </summary>
         [Input("node")]
         public object? Node { get; set; }

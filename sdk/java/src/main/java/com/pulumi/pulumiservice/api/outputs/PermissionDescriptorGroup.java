@@ -26,6 +26,8 @@ public final class PermissionDescriptorGroup {
     /**
      * @return The list of permission descriptor entries in this group.
      * 
+     * Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
+     * 
      */
     private @Nullable List<Object> entries;
 
@@ -39,6 +41,8 @@ public final class PermissionDescriptorGroup {
     }
     /**
      * @return The list of permission descriptor entries in this group.
+     * 
+     * Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
      * 
      */
     public List<Object> entries() {

@@ -32,6 +32,10 @@ public final class AgentEntityRepository {
      * 
      */
     private String org;
+    /**
+     * @return Expected value is &#39;repository&#39;.
+     * 
+     */
     private String type;
 
     private AgentEntityRepository() {}
@@ -63,6 +67,10 @@ public final class AgentEntityRepository {
     public String org() {
         return this.org;
     }
+    /**
+     * @return Expected value is &#39;repository&#39;.
+     * 
+     */
     public String type() {
         return this.type;
     }

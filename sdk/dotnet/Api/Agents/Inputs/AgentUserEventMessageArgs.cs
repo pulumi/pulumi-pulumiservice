@@ -48,6 +48,9 @@ namespace Pulumi.PulumiService.Api.Agents.Inputs
         [Input("timestamp", required: true)]
         public Input<string> Timestamp { get; set; } = null!;
 
+        /// <summary>
+        /// Expected value is 'user_message'.
+        /// </summary>
         [Input("type", required: true)]
         public Input<string> Type { get; set; } = null!;
 

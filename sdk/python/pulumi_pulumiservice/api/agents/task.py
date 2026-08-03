@@ -420,6 +420,8 @@ class Task(pulumi.CustomResource):
     def entities(self) -> pulumi.Output[Sequence[Any]]:
         """
         Pulumi entities (stacks, projects, etc.) that provide context for the agent.
+
+        Valid `type` values: policy_issue, pull_request, repository, stack.
         """
         return pulumi.get(self, "entities")
 

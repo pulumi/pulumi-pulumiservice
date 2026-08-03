@@ -19,6 +19,8 @@ namespace Pulumi.PulumiService.Api.Outputs
         public readonly string __type;
         /// <summary>
         /// The list of permission descriptor entries in this group.
+        /// 
+        /// Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
         /// </summary>
         public readonly ImmutableArray<object> Entries;
 

@@ -19,6 +19,8 @@ namespace Pulumi.PulumiService.Api.Outputs
         public readonly bool AllowSelfApproval;
         /// <summary>
         /// List of eligible approvers
+        /// 
+        /// Valid `eligibilityType` values: has_permission_on_target, specific_user, team_member.
         /// </summary>
         public readonly ImmutableArray<object> EligibleApprovers;
         /// <summary>
