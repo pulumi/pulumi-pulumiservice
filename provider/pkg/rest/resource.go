@@ -89,7 +89,7 @@ func Resources(spec *Spec, metadata *Metadata) map[string]*Resource {
 				"rest: %s has create==update operationId %q but requireImport is unset; re-run scaffold-metadata\n",
 				token, rm.Operations.Create)
 		}
-		out[token] = &Resource{meta: rm, spec: spec}
+		out[token] = &Resource{meta: rm, spec: spec, typeMeta: metadata.Types}
 	}
 	return out
 }
@@ -97,8 +97,9 @@ func Resources(spec *Spec, metadata *Metadata) map[string]*Resource {
 // Resource is a metadata-driven CRUD handler. Operation IDs resolve at
 // call time, not at construction.
 type Resource struct {
-	meta ResourceMeta
-	spec *Spec
+	meta     ResourceMeta
+	spec     *Spec
+	typeMeta map[string]TypeMeta
 }
 
 // resolveOp looks up an operation ID. Returns (nil, nil) when id is empty.
@@ -140,7 +141,11 @@ func (r *Resource) Check(_ context.Context, req p.CheckRequest) (p.CheckResponse
 		}
 		out[name] = property.New(generateAutoName(string(req.Urn), req.RandomSeed, fm.AutoName))
 	}
-	return p.CheckResponse{Inputs: property.NewMap(out)}, nil
+	checked := property.NewMap(out)
+	return p.CheckResponse{
+		Inputs:   checked,
+		Failures: ValidateInputs(r.spec, r.typeMeta, op, r.meta, checked),
+	}, nil
 }
 
 // normalizeValue canonicalizes one input: enum case-fold for strings,
