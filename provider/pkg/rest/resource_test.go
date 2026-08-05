@@ -470,6 +470,217 @@ func TestReadDecodesYamlResponseBody(t *testing.T) {
 	}
 }
 
+// TestReadRefreshProjectsRemoteDriftIntoInputs: on refresh (non-empty
+// req.Inputs), values the server reports differently are projected into
+// the returned Inputs so the engine's input-driven refresh diff surfaces
+// drift (#938). Keys absent from the response (write-only fields) keep
+// their prior input values; response-only keys are never added.
+func TestReadRefreshProjectsRemoteDriftIntoInputs(t *testing.T) {
+	const specJSON = `{
+	  "openapi": "3.0.0",
+	  "components": {"schemas": {
+	    "Body": {"type": "object", "properties": {
+	      "name":     {"type": "string"},
+	      "value":    {"type": "string"},
+	      "password": {"type": "string"},
+	      "tags":     {"type": "array", "items": {"type": "string"}}
+	    }},
+	    "Thing": {"type": "object", "properties": {
+	      "id":     {"type": "string"},
+	      "name":   {"type": "string"},
+	      "value":  {"type": "string"},
+	      "tags":   {"type": "array", "items": {"type": "string"}},
+	      "status": {"type": "string"}
+	    }}
+	  }},
+	  "paths": {
+	    "/things/{org}": {
+	      "post": {
+	        "operationId": "CreateThing",
+	        "parameters": [{"name": "org", "in": "path", "required": true, "schema": {"type": "string"}}],
+	        "requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Body"}}}},
+	        "responses": {"200": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Thing"}}}}}
+	      }
+	    },
+	    "/things/{org}/{id}": {
+	      "get": {
+	        "operationId": "GetThing",
+	        "parameters": [
+	          {"name": "org", "in": "path", "required": true, "schema": {"type": "string"}},
+	          {"name": "id",  "in": "path", "required": true, "schema": {"type": "string"}}
+	        ],
+	        "responses": {"200": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Thing"}}}}}
+	      }
+	    }
+	  }
+	}`
+	spec, err := ParseSpec([]byte(specJSON))
+	if err != nil {
+		t.Fatalf("parse spec: %v", err)
+	}
+	r := &Resource{
+		spec: spec,
+		meta: ResourceMeta{
+			Operations: Operations{Create: createThingOp, Read: getThingOp},
+			IDFormat:   orgIDFormat,
+			Fields:     map[string]FieldMeta{"tags": {Unordered: true}},
+		},
+	}
+
+	mock := &mockTransport{responses: map[string]mockResponse{
+		getThingPath: {
+			status: 200,
+			body:   `{"id":"thing-1","name":"n1","value":"remote","tags":["z","a"],"status":"ok"}`,
+		},
+	}}
+	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
+
+	oldInputs := property.NewMap(map[string]property.Value{
+		orgKey:     property.New(acmeVal),
+		nameKey:    property.New("n1"),
+		valueKey:   property.New("local").WithSecret(true),
+		"password": property.New("hunter2"),
+		"tags": property.New(property.NewArray([]property.Value{
+			property.New("a"), property.New("b"),
+		})),
+	})
+	resp, err := r.Read(t.Context(), p.ReadRequest{
+		ID:     "acme/thing-1",
+		Inputs: oldInputs,
+		Properties: propMap(map[string]any{
+			"id": thing1ID, nameKey: "n1", valueKey: "local", "status": "ok",
+		}),
+	})
+	if err != nil {
+		t.Fatalf("read: %v\n  calls: %v", err, mock.calls)
+	}
+
+	if v, ok := resp.Inputs.GetOk(valueKey); !ok || v.AsString() != "remote" {
+		t.Errorf("inputs.value: got %#v, want remote drift projected", v)
+	} else if !v.Secret() {
+		t.Errorf("inputs.value lost its secret marking")
+	}
+	if v, ok := resp.Inputs.GetOk("password"); !ok || v.AsString() != "hunter2" {
+		t.Errorf("inputs.password: got %#v, want prior value preserved", v)
+	}
+	if v, ok := resp.Inputs.GetOk(orgKey); !ok || v.AsString() != acmeVal {
+		t.Errorf("inputs.org: got %#v, want %q", v, acmeVal)
+	}
+	for _, k := range []string{"status", "id"} {
+		if _, ok := resp.Inputs.GetOk(k); ok {
+			t.Errorf("inputs gained response-only key %q", k)
+		}
+	}
+	tags, ok := resp.Inputs.GetOk("tags")
+	if !ok {
+		t.Fatalf("inputs.tags missing")
+	}
+	var gotTags []string
+	for _, v := range tags.AsArray().AsSlice() {
+		gotTags = append(gotTags, v.AsString())
+	}
+	if !reflect.DeepEqual(gotTags, []string{"a", "z"}) {
+		t.Errorf("inputs.tags: got %v, want [a z] projected and unordered-sorted", gotTags)
+	}
+}
+
+// TestRefreshChainSurfacesRoleDetailsDrift replays the engine's refresh
+// sequence for api:Role against the real spec: Read, then Diff with the
+// Read-returned inputs as OldInputs (mirroring diffResource in
+// pulumi/pulumi's RefreshStep). Out-of-band permission edits must surface
+// as a diff on `details` (#938), and an unchanged server response must
+// stay quiet.
+func TestRefreshChainSurfacesRoleDetailsDrift(t *testing.T) {
+	spec, meta := loadFixtures(t)
+	resources := Resources(spec, meta)
+	r, ok := resources["pulumiservice:api:Role"]
+	if !ok {
+		t.Fatalf("api:Role resource not found")
+	}
+
+	oldInputs := propMap(map[string]any{
+		orgNameKey:     testOrgName,
+		nameKey:        "perm-set",
+		"uxPurpose":    "set",
+		"resourceType": "global",
+		"details": map[string]any{
+			"__type":      "PermissionDescriptorAllow",
+			"permissions": []any{"organization:read_usage"},
+		},
+	})
+	oldState := propMap(map[string]any{
+		"roleID":       "role-123",
+		nameKey:        "perm-set",
+		"uxPurpose":    "set",
+		"resourceType": "global",
+		"details": map[string]any{
+			"__type":      "PermissionDescriptorAllow",
+			"permissions": []any{"organization:read_usage"},
+		},
+	})
+
+	cases := []struct {
+		name       string
+		details    string
+		wantDrift  bool
+		driftedKey string
+	}{
+		{
+			name:       "console edit drifts details",
+			details:    `{"__type":"PermissionDescriptorAllow","permissions":["organization:read_usage","organization:admin"]}`,
+			wantDrift:  true,
+			driftedKey: "details",
+		},
+		{
+			name:      "unchanged server state stays quiet",
+			details:   `{"__type":"PermissionDescriptorAllow","permissions":["organization:read_usage"]}`,
+			wantDrift: false,
+		},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			mock := &mockTransport{responses: map[string]mockResponse{
+				"GET /api/orgs/test-org/roles/role-123": {
+					status: 200,
+					body: `{"id":"role-123","name":"perm-set","uxPurpose":"set","resourceType":"global",` +
+						`"details":` + tc.details + `,"version":2,"orgId":"o1"}`,
+				},
+			}}
+			SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
+
+			readResp, err := r.Read(t.Context(), p.ReadRequest{
+				ID:         "test-org/role-123",
+				Inputs:     oldInputs,
+				Properties: oldState,
+			})
+			if err != nil {
+				t.Fatalf("read: %v\n  calls: %v", err, mock.calls)
+			}
+
+			// RefreshStep passes the freshly-read inputs as OldInputs and the
+			// pre-refresh inputs as Inputs, then inverts the result for display.
+			diffResp, err := r.Diff(t.Context(), p.DiffRequest{
+				ID:        "test-org/role-123",
+				OldInputs: readResp.Inputs,
+				State:     readResp.Properties,
+				Inputs:    oldInputs,
+			})
+			if err != nil {
+				t.Fatalf("diff: %v", err)
+			}
+			if diffResp.HasChanges != tc.wantDrift {
+				t.Fatalf("HasChanges: got %v, want %v (detailed: %#v)",
+					diffResp.HasChanges, tc.wantDrift, diffResp.DetailedDiff)
+			}
+			if tc.wantDrift {
+				if _, ok := diffResp.DetailedDiff[tc.driftedKey]; !ok {
+					t.Errorf("detailed diff missing %q: %#v", tc.driftedKey, diffResp.DetailedDiff)
+				}
+			}
+		})
+	}
+}
+
 // TestCreateReadAfterCreateSourcesFromInputs: the read URL is built from
 // user inputs, not from the (potentially sparse) create response.
 func TestCreateReadAfterCreateSourcesFromInputs(t *testing.T) {

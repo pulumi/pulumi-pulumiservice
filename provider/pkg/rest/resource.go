@@ -559,10 +559,12 @@ func hasPathParams(op *Operation) bool {
 //
 // The returned Inputs differ between import and refresh: on import
 // (req.Inputs empty), we surface the parsed-ID values so the user gets
-// a usable program-input reconstruction; on refresh we preserve the
-// caller's existing Inputs verbatim. Otherwise the parsed-ID values —
-// which the user never wrote in their program — show up as a diff on
-// every refresh ("+issuerId" etc).
+// a usable program-input reconstruction; on refresh we project the
+// freshly-read state onto the existing input keys so out-of-band edits
+// surface in the engine's input-driven refresh diff (#938). Keys stay
+// limited to what the program already set: parsed-ID values the user
+// never wrote must not show up as a diff on every refresh ("+issuerId"
+// etc).
 //
 // EmitOnCreate fields are preserved from prior state.
 func (r *Resource) Read(ctx context.Context, req p.ReadRequest) (p.ReadResponse, error) {
@@ -583,7 +585,35 @@ func (r *Resource) Read(ctx context.Context, req p.ReadRequest) (p.ReadResponse,
 		// No read op declared: refresh is a no-op, return prior state.
 		return p.ReadResponse{ID: req.ID, Inputs: returnedInputs, Properties: req.Properties}, nil
 	}
+	if req.Inputs.Len() > 0 {
+		returnedInputs = r.projectStateOntoInputs(req.Inputs, state)
+	}
 	return p.ReadResponse{ID: req.ID, Properties: state, Inputs: returnedInputs}, nil
+}
+
+// projectStateOntoInputs overlays freshly-read state onto prior inputs.
+// Only keys already present in the inputs are considered: response-only
+// fields stay out, and fields the read response omits (write-only values)
+// keep their prior values. Projected values get the same normalization as
+// Check (enum case, Unordered sort) so server ordering doesn't read as
+// drift, and they keep the prior value's secret marking.
+func (r *Resource) projectStateOntoInputs(inputs, state property.Map) property.Map {
+	op, _ := r.spec.Op(r.meta.Operations.Create)
+	bodyProps := flattenedRequestProperties(r.spec, op)
+	out := map[string]property.Value{}
+	for k, prior := range inputs.AllStable {
+		v, ok := state.GetOk(k)
+		if !ok {
+			out[k] = prior
+			continue
+		}
+		v = normalizeValue(v, k, bodyProps, r.meta)
+		if prior.Secret() {
+			v = v.WithSecret(true)
+		}
+		out[k] = v
+	}
+	return property.NewMap(out)
 }
 
 // fetchState runs the read op and merges EmitOnCreate fields from prior.
