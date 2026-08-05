@@ -6,21 +6,14 @@ package com.pulumi.pulumiservice.outputs;
 import com.pulumi.core.annotations.CustomType;
 import com.pulumi.exceptions.MissingRequiredPropertyException;
 import java.lang.Integer;
-import java.lang.Object;
 import java.lang.String;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import javax.annotation.Nullable;
 
 @CustomType
-public final class GetPolicyPackResult {
-    /**
-     * @return Configuration for the policy pack.
-     * 
-     */
-    private @Nullable Map<String,Object> config;
+public final class PolicyPackSummary {
     /**
      * @return The display name of the policy pack.
      * 
@@ -32,11 +25,6 @@ public final class GetPolicyPackResult {
      */
     private String name;
     /**
-     * @return List of policies in this pack.
-     * 
-     */
-    private @Nullable List<Map<String,String>> policies;
-    /**
      * @return The organization or user that published the policy pack. `pulumi` for Pulumi-published packs, otherwise the publishing organization&#39;s name. Omitted when the provider could not determine registry metadata for this pack.
      * 
      */
@@ -47,24 +35,17 @@ public final class GetPolicyPackResult {
      */
     private @Nullable String source;
     /**
-     * @return The version number.
+     * @return List of version tags for this policy pack.
      * 
      */
-    private Integer version;
+    private List<String> versionTags;
     /**
-     * @return The version tag (if any).
+     * @return List of version numbers for this policy pack.
      * 
      */
-    private @Nullable String versionTag;
+    private List<Integer> versions;
 
-    private GetPolicyPackResult() {}
-    /**
-     * @return Configuration for the policy pack.
-     * 
-     */
-    public Map<String,Object> config() {
-        return this.config == null ? Map.of() : this.config;
-    }
+    private PolicyPackSummary() {}
     /**
      * @return The display name of the policy pack.
      * 
@@ -78,13 +59,6 @@ public final class GetPolicyPackResult {
      */
     public String name() {
         return this.name;
-    }
-    /**
-     * @return List of policies in this pack.
-     * 
-     */
-    public List<Map<String,String>> policies() {
-        return this.policies == null ? List.of() : this.policies;
     }
     /**
      * @return The organization or user that published the policy pack. `pulumi` for Pulumi-published packs, otherwise the publishing organization&#39;s name. Omitted when the provider could not determine registry metadata for this pack.
@@ -101,60 +75,50 @@ public final class GetPolicyPackResult {
         return Optional.ofNullable(this.source);
     }
     /**
-     * @return The version number.
+     * @return List of version tags for this policy pack.
      * 
      */
-    public Integer version() {
-        return this.version;
+    public List<String> versionTags() {
+        return this.versionTags;
     }
     /**
-     * @return The version tag (if any).
+     * @return List of version numbers for this policy pack.
      * 
      */
-    public Optional<String> versionTag() {
-        return Optional.ofNullable(this.versionTag);
+    public List<Integer> versions() {
+        return this.versions;
     }
 
     public static Builder builder() {
         return new Builder();
     }
 
-    public static Builder builder(GetPolicyPackResult defaults) {
+    public static Builder builder(PolicyPackSummary defaults) {
         return new Builder(defaults);
     }
     @CustomType.Builder
     public static final class Builder {
-        private @Nullable Map<String,Object> config;
         private String displayName;
         private String name;
-        private @Nullable List<Map<String,String>> policies;
         private @Nullable String publisher;
         private @Nullable String source;
-        private Integer version;
-        private @Nullable String versionTag;
+        private List<String> versionTags;
+        private List<Integer> versions;
         public Builder() {}
-        public Builder(GetPolicyPackResult defaults) {
+        public Builder(PolicyPackSummary defaults) {
     	      Objects.requireNonNull(defaults);
-    	      this.config = defaults.config;
     	      this.displayName = defaults.displayName;
     	      this.name = defaults.name;
-    	      this.policies = defaults.policies;
     	      this.publisher = defaults.publisher;
     	      this.source = defaults.source;
-    	      this.version = defaults.version;
-    	      this.versionTag = defaults.versionTag;
+    	      this.versionTags = defaults.versionTags;
+    	      this.versions = defaults.versions;
         }
 
-        @CustomType.Setter
-        public Builder config(@Nullable Map<String,Object> config) {
-
-            this.config = config;
-            return this;
-        }
         @CustomType.Setter
         public Builder displayName(String displayName) {
             if (displayName == null) {
-              throw new MissingRequiredPropertyException("GetPolicyPackResult", "displayName");
+              throw new MissingRequiredPropertyException("PolicyPackSummary", "displayName");
             }
             this.displayName = displayName;
             return this;
@@ -162,15 +126,9 @@ public final class GetPolicyPackResult {
         @CustomType.Setter
         public Builder name(String name) {
             if (name == null) {
-              throw new MissingRequiredPropertyException("GetPolicyPackResult", "name");
+              throw new MissingRequiredPropertyException("PolicyPackSummary", "name");
             }
             this.name = name;
-            return this;
-        }
-        @CustomType.Setter
-        public Builder policies(@Nullable List<Map<String,String>> policies) {
-
-            this.policies = policies;
             return this;
         }
         @CustomType.Setter
@@ -186,29 +144,35 @@ public final class GetPolicyPackResult {
             return this;
         }
         @CustomType.Setter
-        public Builder version(Integer version) {
-            if (version == null) {
-              throw new MissingRequiredPropertyException("GetPolicyPackResult", "version");
+        public Builder versionTags(List<String> versionTags) {
+            if (versionTags == null) {
+              throw new MissingRequiredPropertyException("PolicyPackSummary", "versionTags");
             }
-            this.version = version;
+            this.versionTags = versionTags;
             return this;
+        }
+        public Builder versionTags(String... versionTags) {
+            return versionTags(List.of(versionTags));
         }
         @CustomType.Setter
-        public Builder versionTag(@Nullable String versionTag) {
-
-            this.versionTag = versionTag;
+        public Builder versions(List<Integer> versions) {
+            if (versions == null) {
+              throw new MissingRequiredPropertyException("PolicyPackSummary", "versions");
+            }
+            this.versions = versions;
             return this;
         }
-        public GetPolicyPackResult build() {
-            final var _resultValue = new GetPolicyPackResult();
-            _resultValue.config = config;
+        public Builder versions(Integer... versions) {
+            return versions(List.of(versions));
+        }
+        public PolicyPackSummary build() {
+            final var _resultValue = new PolicyPackSummary();
             _resultValue.displayName = displayName;
             _resultValue.name = name;
-            _resultValue.policies = policies;
             _resultValue.publisher = publisher;
             _resultValue.source = source;
-            _resultValue.version = version;
-            _resultValue.versionTag = versionTag;
+            _resultValue.versionTags = versionTags;
+            _resultValue.versions = versions;
             return _resultValue;
         }
     }

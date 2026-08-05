@@ -42,6 +42,7 @@ __all__ = [
     'PolicyGroupStackReference',
     'PolicyPackComplianceFrameworkInput',
     'PolicyPackPolicyInput',
+    'PolicyPackSummary',
     'RoleScopeInfo',
     'TemplateSourceDestination',
 ]
@@ -1860,6 +1861,86 @@ class PolicyPackPolicyInput(dict):
         URL with more information about the policy.
         """
         return pulumi.get(self, "url")
+
+
+@pulumi.output_type
+class PolicyPackSummary(dict):
+    """
+    Summary metadata for a policy pack available to an organization, including its Pulumi Registry provenance.
+    """
+    def __init__(__self__, *,
+                 display_name: _builtins.str,
+                 name: _builtins.str,
+                 version_tags: Sequence[_builtins.str],
+                 versions: Sequence[_builtins.int],
+                 publisher: Optional[_builtins.str] = None,
+                 source: Optional[_builtins.str] = None):
+        """
+        Summary metadata for a policy pack available to an organization, including its Pulumi Registry provenance.
+
+        :param _builtins.str display_name: The display name of the policy pack.
+        :param _builtins.str name: The name of the policy pack.
+        :param Sequence[_builtins.str] version_tags: List of version tags for this policy pack.
+        :param Sequence[_builtins.int] versions: List of version numbers for this policy pack.
+        :param _builtins.str publisher: The organization or user that published the policy pack. `pulumi` for Pulumi-published packs, otherwise the publishing organization's name. Omitted when the provider could not determine registry metadata for this pack.
+        :param _builtins.str source: Where the policy pack is hosted in the Pulumi Registry: `pulumi` for packs published by Pulumi (for example `cis-aws`), `private` for packs published by an organization. Omitted when the provider could not determine registry metadata for this pack.
+        """
+        pulumi.set(__self__, "display_name", display_name)
+        pulumi.set(__self__, "name", name)
+        pulumi.set(__self__, "version_tags", version_tags)
+        pulumi.set(__self__, "versions", versions)
+        if publisher is not None:
+            pulumi.set(__self__, "publisher", publisher)
+        if source is not None:
+            pulumi.set(__self__, "source", source)
+
+    @_builtins.property
+    @pulumi.getter(name="displayName")
+    def display_name(self) -> _builtins.str:
+        """
+        The display name of the policy pack.
+        """
+        return pulumi.get(self, "display_name")
+
+    @_builtins.property
+    @pulumi.getter
+    def name(self) -> _builtins.str:
+        """
+        The name of the policy pack.
+        """
+        return pulumi.get(self, "name")
+
+    @_builtins.property
+    @pulumi.getter(name="versionTags")
+    def version_tags(self) -> Sequence[_builtins.str]:
+        """
+        List of version tags for this policy pack.
+        """
+        return pulumi.get(self, "version_tags")
+
+    @_builtins.property
+    @pulumi.getter
+    def versions(self) -> Sequence[_builtins.int]:
+        """
+        List of version numbers for this policy pack.
+        """
+        return pulumi.get(self, "versions")
+
+    @_builtins.property
+    @pulumi.getter
+    def publisher(self) -> Optional[_builtins.str]:
+        """
+        The organization or user that published the policy pack. `pulumi` for Pulumi-published packs, otherwise the publishing organization's name. Omitted when the provider could not determine registry metadata for this pack.
+        """
+        return pulumi.get(self, "publisher")
+
+    @_builtins.property
+    @pulumi.getter
+    def source(self) -> Optional[_builtins.str]:
+        """
+        Where the policy pack is hosted in the Pulumi Registry: `pulumi` for packs published by Pulumi (for example `cis-aws`), `private` for packs published by an organization. Omitted when the provider could not determine registry metadata for this pack.
+        """
+        return pulumi.get(self, "source")
 
 
 @pulumi.output_type

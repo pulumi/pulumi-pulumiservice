@@ -45,9 +45,9 @@ func TestListPolicyPacks(t *testing.T) {
 		want := []PolicyPackWithVersions{
 			{
 				Name:        alphaPolicyPack,
-				DisplayName: "Alpha",
+				DisplayName: alphaDisplayName,
 				Versions:    []int{1, 2},
-				VersionTags: []string{policyPackVersion, "1.1.0"},
+				VersionTags: []string{policyPackVersion, policyPackVersion110},
 			},
 		}
 		c := startTestServer(t, testServerConfig{
@@ -70,7 +70,7 @@ func TestListPolicyPacks(t *testing.T) {
 
 func TestGetPolicyPack(t *testing.T) {
 	t.Run("happy path", func(t *testing.T) {
-		want := &PolicyPackDetail{Name: alphaPolicyPack, Version: 2, VersionTag: "1.1.0"}
+		want := &PolicyPackDetail{Name: alphaPolicyPack, Version: 2, VersionTag: policyPackVersion110}
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodGet,
 			ExpectedReqPath:   "/api/orgs/anOrg/policypacks/alpha/versions/2",

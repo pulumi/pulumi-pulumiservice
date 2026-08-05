@@ -40,6 +40,10 @@ type LookupPolicyPackResult struct {
 	Name string `pulumi:"name"`
 	// List of policies in this pack.
 	Policies []map[string]string `pulumi:"policies"`
+	// The organization or user that published the policy pack. `pulumi` for Pulumi-published packs, otherwise the publishing organization's name. Omitted when the provider could not determine registry metadata for this pack.
+	Publisher *string `pulumi:"publisher"`
+	// Where the policy pack is hosted in the Pulumi Registry: `pulumi` for packs published by Pulumi (for example `cis-aws`), `private` for packs published by an organization. Omitted when the provider could not determine registry metadata for this pack.
+	Source *string `pulumi:"source"`
 	// The version number.
 	Version int `pulumi:"version"`
 	// The version tag (if any).
@@ -100,6 +104,16 @@ func (o LookupPolicyPackResultOutput) Name() pulumi.StringOutput {
 // List of policies in this pack.
 func (o LookupPolicyPackResultOutput) Policies() pulumi.StringMapArrayOutput {
 	return o.ApplyT(func(v LookupPolicyPackResult) []map[string]string { return v.Policies }).(pulumi.StringMapArrayOutput)
+}
+
+// The organization or user that published the policy pack. `pulumi` for Pulumi-published packs, otherwise the publishing organization's name. Omitted when the provider could not determine registry metadata for this pack.
+func (o LookupPolicyPackResultOutput) Publisher() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v LookupPolicyPackResult) *string { return v.Publisher }).(pulumi.StringPtrOutput)
+}
+
+// Where the policy pack is hosted in the Pulumi Registry: `pulumi` for packs published by Pulumi (for example `cis-aws`), `private` for packs published by an organization. Omitted when the provider could not determine registry metadata for this pack.
+func (o LookupPolicyPackResultOutput) Source() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v LookupPolicyPackResult) *string { return v.Source }).(pulumi.StringPtrOutput)
 }
 
 // The version number.

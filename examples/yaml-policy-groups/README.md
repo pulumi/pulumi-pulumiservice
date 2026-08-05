@@ -5,6 +5,22 @@ This example demonstrates:
 - Using the `getPolicyPacks` data source to list all policy packs in an organization
 - Using the `getPolicyPack` data source to get details about a specific policy pack (commented out - requires existing policy pack)
 
+## Policy Pack Provenance
+
+Both data sources return the pack's Pulumi Registry provenance:
+
+- **source**: `pulumi` for packs published by Pulumi (for example `cis-aws`), `private` for packs published by your own organization
+- **publisher**: `pulumi` for Pulumi-published packs, otherwise the publishing organization's name
+
+Use these to filter packs by who published them — "apply Pulumi's compliance
+packs, leave ours alone" becomes `publisher == "pulumi"` instead of a name-matching
+heuristic against Pulumi's `<framework>-<cloud>` convention, which goes stale
+whenever Pulumi publishes a pack that doesn't fit the pattern.
+
+Both fields are optional and are omitted when the provider could not determine
+registry metadata for a pack, so treat an absent value as unknown rather than
+as "not published by Pulumi".
+
 ## New Policy Fields (v0.32.0+)
 
 The `getPolicyPack` function now returns enhanced policy metadata including:

@@ -23,7 +23,7 @@ __all__ = [
 
 @pulumi.output_type
 class GetPolicyPackResult:
-    def __init__(__self__, config=None, display_name=None, name=None, policies=None, version=None, version_tag=None):
+    def __init__(__self__, config=None, display_name=None, name=None, policies=None, publisher=None, source=None, version=None, version_tag=None):
         if config and not isinstance(config, dict):
             raise TypeError("Expected argument 'config' to be a dict")
         pulumi.set(__self__, "config", config)
@@ -36,6 +36,12 @@ class GetPolicyPackResult:
         if policies and not isinstance(policies, list):
             raise TypeError("Expected argument 'policies' to be a list")
         pulumi.set(__self__, "policies", policies)
+        if publisher and not isinstance(publisher, str):
+            raise TypeError("Expected argument 'publisher' to be a str")
+        pulumi.set(__self__, "publisher", publisher)
+        if source and not isinstance(source, str):
+            raise TypeError("Expected argument 'source' to be a str")
+        pulumi.set(__self__, "source", source)
         if version and not isinstance(version, int):
             raise TypeError("Expected argument 'version' to be a int")
         pulumi.set(__self__, "version", version)
@@ -77,6 +83,22 @@ class GetPolicyPackResult:
 
     @_builtins.property
     @pulumi.getter
+    def publisher(self) -> Optional[_builtins.str]:
+        """
+        The organization or user that published the policy pack. `pulumi` for Pulumi-published packs, otherwise the publishing organization's name. Omitted when the provider could not determine registry metadata for this pack.
+        """
+        return pulumi.get(self, "publisher")
+
+    @_builtins.property
+    @pulumi.getter
+    def source(self) -> Optional[_builtins.str]:
+        """
+        Where the policy pack is hosted in the Pulumi Registry: `pulumi` for packs published by Pulumi (for example `cis-aws`), `private` for packs published by an organization. Omitted when the provider could not determine registry metadata for this pack.
+        """
+        return pulumi.get(self, "source")
+
+    @_builtins.property
+    @pulumi.getter
     def version(self) -> _builtins.int:
         """
         The version number.
@@ -102,6 +124,8 @@ class AwaitableGetPolicyPackResult(GetPolicyPackResult):
             display_name=self.display_name,
             name=self.name,
             policies=self.policies,
+            publisher=self.publisher,
+            source=self.source,
             version=self.version,
             version_tag=self.version_tag)
 
@@ -129,6 +153,8 @@ def get_policy_pack(organization_name: Optional[_builtins.str] = None,
         display_name=pulumi.get(__ret__, 'display_name'),
         name=pulumi.get(__ret__, 'name'),
         policies=pulumi.get(__ret__, 'policies'),
+        publisher=pulumi.get(__ret__, 'publisher'),
+        source=pulumi.get(__ret__, 'source'),
         version=pulumi.get(__ret__, 'version'),
         version_tag=pulumi.get(__ret__, 'version_tag'))
 def get_policy_pack_output(organization_name: pulumi.Input[Optional[_builtins.str]] = None,
@@ -153,5 +179,7 @@ def get_policy_pack_output(organization_name: pulumi.Input[Optional[_builtins.st
         display_name=pulumi.get(__response__, 'display_name'),
         name=pulumi.get(__response__, 'name'),
         policies=pulumi.get(__response__, 'policies'),
+        publisher=pulumi.get(__response__, 'publisher'),
+        source=pulumi.get(__response__, 'source'),
         version=pulumi.get(__response__, 'version'),
         version_tag=pulumi.get(__response__, 'version_tag')))

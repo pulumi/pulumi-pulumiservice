@@ -29,7 +29,7 @@ type GetPolicyPacksArgs struct {
 
 type GetPolicyPacksResult struct {
 	// List of policy packs in the organization.
-	PolicyPacks []map[string]string `pulumi:"policyPacks"`
+	PolicyPacks []PolicyPackSummary `pulumi:"policyPacks"`
 }
 
 func GetPolicyPacksOutput(ctx *pulumi.Context, args GetPolicyPacksOutputArgs, opts ...pulumi.InvokeOption) GetPolicyPacksResultOutput {
@@ -65,8 +65,8 @@ func (o GetPolicyPacksResultOutput) ToGetPolicyPacksResultOutputWithContext(ctx 
 }
 
 // List of policy packs in the organization.
-func (o GetPolicyPacksResultOutput) PolicyPacks() pulumi.StringMapArrayOutput {
-	return o.ApplyT(func(v GetPolicyPacksResult) []map[string]string { return v.PolicyPacks }).(pulumi.StringMapArrayOutput)
+func (o GetPolicyPacksResultOutput) PolicyPacks() PolicyPackSummaryArrayOutput {
+	return o.ApplyT(func(v GetPolicyPacksResult) []PolicyPackSummary { return v.PolicyPacks }).(PolicyPackSummaryArrayOutput)
 }
 
 func init() {

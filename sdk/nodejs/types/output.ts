@@ -570,6 +570,36 @@ export interface PolicyPackPolicyInput {
     url?: string;
 }
 
+/**
+ * Summary metadata for a policy pack available to an organization, including its Pulumi Registry provenance.
+ */
+export interface PolicyPackSummary {
+    /**
+     * The display name of the policy pack.
+     */
+    displayName: string;
+    /**
+     * The name of the policy pack.
+     */
+    name: string;
+    /**
+     * The organization or user that published the policy pack. `pulumi` for Pulumi-published packs, otherwise the publishing organization's name. Omitted when the provider could not determine registry metadata for this pack.
+     */
+    publisher?: string;
+    /**
+     * Where the policy pack is hosted in the Pulumi Registry: `pulumi` for packs published by Pulumi (for example `cis-aws`), `private` for packs published by an organization. Omitted when the provider could not determine registry metadata for this pack.
+     */
+    source?: string;
+    /**
+     * List of version tags for this policy pack.
+     */
+    versionTags: string[];
+    /**
+     * List of version numbers for this policy pack.
+     */
+    versions: number[];
+}
+
 export interface RoleScopeInfo {
     /**
      * Human-readable description of what the scope grants.

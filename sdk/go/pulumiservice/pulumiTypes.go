@@ -4172,6 +4172,87 @@ func (o PolicyPackPolicyInputArrayOutput) Index(i pulumi.IntInput) PolicyPackPol
 	}).(PolicyPackPolicyInputOutput)
 }
 
+// Summary metadata for a policy pack available to an organization, including its Pulumi Registry provenance.
+type PolicyPackSummary struct {
+	// The display name of the policy pack.
+	DisplayName string `pulumi:"displayName"`
+	// The name of the policy pack.
+	Name string `pulumi:"name"`
+	// The organization or user that published the policy pack. `pulumi` for Pulumi-published packs, otherwise the publishing organization's name. Omitted when the provider could not determine registry metadata for this pack.
+	Publisher *string `pulumi:"publisher"`
+	// Where the policy pack is hosted in the Pulumi Registry: `pulumi` for packs published by Pulumi (for example `cis-aws`), `private` for packs published by an organization. Omitted when the provider could not determine registry metadata for this pack.
+	Source *string `pulumi:"source"`
+	// List of version tags for this policy pack.
+	VersionTags []string `pulumi:"versionTags"`
+	// List of version numbers for this policy pack.
+	Versions []int `pulumi:"versions"`
+}
+
+// Summary metadata for a policy pack available to an organization, including its Pulumi Registry provenance.
+type PolicyPackSummaryOutput struct{ *pulumi.OutputState }
+
+func (PolicyPackSummaryOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*PolicyPackSummary)(nil)).Elem()
+}
+
+func (o PolicyPackSummaryOutput) ToPolicyPackSummaryOutput() PolicyPackSummaryOutput {
+	return o
+}
+
+func (o PolicyPackSummaryOutput) ToPolicyPackSummaryOutputWithContext(ctx context.Context) PolicyPackSummaryOutput {
+	return o
+}
+
+// The display name of the policy pack.
+func (o PolicyPackSummaryOutput) DisplayName() pulumi.StringOutput {
+	return o.ApplyT(func(v PolicyPackSummary) string { return v.DisplayName }).(pulumi.StringOutput)
+}
+
+// The name of the policy pack.
+func (o PolicyPackSummaryOutput) Name() pulumi.StringOutput {
+	return o.ApplyT(func(v PolicyPackSummary) string { return v.Name }).(pulumi.StringOutput)
+}
+
+// The organization or user that published the policy pack. `pulumi` for Pulumi-published packs, otherwise the publishing organization's name. Omitted when the provider could not determine registry metadata for this pack.
+func (o PolicyPackSummaryOutput) Publisher() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v PolicyPackSummary) *string { return v.Publisher }).(pulumi.StringPtrOutput)
+}
+
+// Where the policy pack is hosted in the Pulumi Registry: `pulumi` for packs published by Pulumi (for example `cis-aws`), `private` for packs published by an organization. Omitted when the provider could not determine registry metadata for this pack.
+func (o PolicyPackSummaryOutput) Source() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v PolicyPackSummary) *string { return v.Source }).(pulumi.StringPtrOutput)
+}
+
+// List of version tags for this policy pack.
+func (o PolicyPackSummaryOutput) VersionTags() pulumi.StringArrayOutput {
+	return o.ApplyT(func(v PolicyPackSummary) []string { return v.VersionTags }).(pulumi.StringArrayOutput)
+}
+
+// List of version numbers for this policy pack.
+func (o PolicyPackSummaryOutput) Versions() pulumi.IntArrayOutput {
+	return o.ApplyT(func(v PolicyPackSummary) []int { return v.Versions }).(pulumi.IntArrayOutput)
+}
+
+type PolicyPackSummaryArrayOutput struct{ *pulumi.OutputState }
+
+func (PolicyPackSummaryArrayOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]PolicyPackSummary)(nil)).Elem()
+}
+
+func (o PolicyPackSummaryArrayOutput) ToPolicyPackSummaryArrayOutput() PolicyPackSummaryArrayOutput {
+	return o
+}
+
+func (o PolicyPackSummaryArrayOutput) ToPolicyPackSummaryArrayOutputWithContext(ctx context.Context) PolicyPackSummaryArrayOutput {
+	return o
+}
+
+func (o PolicyPackSummaryArrayOutput) Index(i pulumi.IntInput) PolicyPackSummaryOutput {
+	return pulumi.All(o, i).ApplyT(func(vs []interface{}) PolicyPackSummary {
+		return vs[0].([]PolicyPackSummary)[vs[1].(int)]
+	}).(PolicyPackSummaryOutput)
+}
+
 type RoleScopeInfo struct {
 	// Human-readable description of what the scope grants.
 	Description string `pulumi:"description"`
@@ -4471,6 +4552,8 @@ func init() {
 	pulumi.RegisterOutputType(PolicyPackComplianceFrameworkInputPtrOutput{})
 	pulumi.RegisterOutputType(PolicyPackPolicyInputOutput{})
 	pulumi.RegisterOutputType(PolicyPackPolicyInputArrayOutput{})
+	pulumi.RegisterOutputType(PolicyPackSummaryOutput{})
+	pulumi.RegisterOutputType(PolicyPackSummaryArrayOutput{})
 	pulumi.RegisterOutputType(RoleScopeInfoOutput{})
 	pulumi.RegisterOutputType(RoleScopeInfoArrayOutput{})
 	pulumi.RegisterOutputType(TemplateSourceDestinationOutput{})

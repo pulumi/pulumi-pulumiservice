@@ -102,7 +102,7 @@ func TestCreateTeamAccessToken(t *testing.T) {
 func TestGetTeamAccessToken(t *testing.T) {
 	id := "uuid"
 	desc := "token description"
-	org := "anOrg"
+	org := testOrgName
 	team := "aTeam"
 	lastUsed := 123
 	t.Run("Happy Path", func(t *testing.T) {

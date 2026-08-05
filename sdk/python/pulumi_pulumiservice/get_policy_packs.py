@@ -13,6 +13,7 @@ if sys.version_info >= (3, 11):
 else:
     from typing_extensions import NotRequired, TypedDict, TypeAlias
 from . import _utilities
+from . import outputs
 
 __all__ = [
     'GetPolicyPacksResult',
@@ -30,7 +31,7 @@ class GetPolicyPacksResult:
 
     @_builtins.property
     @pulumi.getter(name="policyPacks")
-    def policy_packs(self) -> Sequence[Mapping[str, _builtins.str]]:
+    def policy_packs(self) -> Sequence['outputs.PolicyPackSummary']:
         """
         List of policy packs in the organization.
         """

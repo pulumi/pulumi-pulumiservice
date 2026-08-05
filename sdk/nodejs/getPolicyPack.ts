@@ -49,6 +49,14 @@ export interface GetPolicyPackResult {
      */
     readonly policies?: {[key: string]: string}[];
     /**
+     * The organization or user that published the policy pack. `pulumi` for Pulumi-published packs, otherwise the publishing organization's name. Omitted when the provider could not determine registry metadata for this pack.
+     */
+    readonly publisher?: string;
+    /**
+     * Where the policy pack is hosted in the Pulumi Registry: `pulumi` for packs published by Pulumi (for example `cis-aws`), `private` for packs published by an organization. Omitted when the provider could not determine registry metadata for this pack.
+     */
+    readonly source?: string;
+    /**
      * The version number.
      */
     readonly version: number;

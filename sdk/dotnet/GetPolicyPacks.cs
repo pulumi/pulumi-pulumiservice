@@ -66,10 +66,10 @@ namespace Pulumi.PulumiService
         /// <summary>
         /// List of policy packs in the organization.
         /// </summary>
-        public readonly ImmutableArray<ImmutableDictionary<string, string>> PolicyPacks;
+        public readonly ImmutableArray<Outputs.PolicyPackSummary> PolicyPacks;
 
         [OutputConstructor]
-        private GetPolicyPacksResult(ImmutableArray<ImmutableDictionary<string, string>> policyPacks)
+        private GetPolicyPacksResult(ImmutableArray<Outputs.PolicyPackSummary> policyPacks)
         {
             PolicyPacks = policyPacks;
         }

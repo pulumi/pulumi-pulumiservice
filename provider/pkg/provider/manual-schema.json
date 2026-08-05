@@ -385,6 +385,48 @@
         "routingProject"
       ]
     },
+    "pulumiservice:index:PolicyPackSummary": {
+      "type": "object",
+      "description": "Summary metadata for a policy pack available to an organization, including its Pulumi Registry provenance.",
+      "properties": {
+        "name": {
+          "description": "The name of the policy pack.",
+          "type": "string"
+        },
+        "displayName": {
+          "description": "The display name of the policy pack.",
+          "type": "string"
+        },
+        "versions": {
+          "description": "List of version numbers for this policy pack.",
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        },
+        "versionTags": {
+          "description": "List of version tags for this policy pack.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "source": {
+          "description": "Where the policy pack is hosted in the Pulumi Registry: `pulumi` for packs published by Pulumi (for example `cis-aws`), `private` for packs published by an organization. Omitted when the provider could not determine registry metadata for this pack.",
+          "type": "string"
+        },
+        "publisher": {
+          "description": "The organization or user that published the policy pack. `pulumi` for Pulumi-published packs, otherwise the publishing organization's name. Omitted when the provider could not determine registry metadata for this pack.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "displayName",
+        "versions",
+        "versionTags"
+      ]
+    },
     "pulumiservice:index:PolicyGroupPolicyPackReference": {
       "type": "object",
       "description": "A reference to a policy pack within a policy group.",
@@ -771,37 +813,7 @@
             "type": "array",
             "description": "List of policy packs in the organization.",
             "items": {
-              "type": "object",
-              "properties": {
-                "name": {
-                  "type": "string",
-                  "description": "The name of the policy pack."
-                },
-                "displayName": {
-                  "type": "string",
-                  "description": "The display name of the policy pack."
-                },
-                "versions": {
-                  "type": "array",
-                  "description": "List of version numbers for this policy pack.",
-                  "items": {
-                    "type": "integer"
-                  }
-                },
-                "versionTags": {
-                  "type": "array",
-                  "description": "List of version tags for this policy pack.",
-                  "items": {
-                    "type": "string"
-                  }
-                }
-              },
-              "required": [
-                "name",
-                "displayName",
-                "versions",
-                "versionTags"
-              ]
+              "$ref": "#/types/pulumiservice:index:PolicyPackSummary"
             }
           }
         },
@@ -849,6 +861,14 @@
           "versionTag": {
             "type": "string",
             "description": "The version tag (if any)."
+          },
+          "source": {
+            "type": "string",
+            "description": "Where the policy pack is hosted in the Pulumi Registry: `pulumi` for packs published by Pulumi (for example `cis-aws`), `private` for packs published by an organization. Omitted when the provider could not determine registry metadata for this pack."
+          },
+          "publisher": {
+            "type": "string",
+            "description": "The organization or user that published the policy pack. `pulumi` for Pulumi-published packs, otherwise the publishing organization's name. Omitted when the provider could not determine registry metadata for this pack."
           },
           "config": {
             "type": "object",
