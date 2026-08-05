@@ -263,7 +263,7 @@ func TestLooksSecret(t *testing.T) {
 	cases := map[string]bool{
 		tokenValueKey:      true,
 		"webhookSecret":    true,
-		"password":         true,
+		passwordKey:        true,
 		"apiKey":           true,
 		"accessToken":      true,
 		"secretCiphertext": true,

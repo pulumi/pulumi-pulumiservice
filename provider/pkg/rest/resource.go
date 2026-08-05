@@ -607,13 +607,35 @@ func (r *Resource) projectStateOntoInputs(inputs, state property.Map) property.M
 			out[k] = prior
 			continue
 		}
-		v = normalizeValue(v, k, bodyProps, r.meta)
+		v = normalizeValue(projectValue(prior, v), k, bodyProps, r.meta)
 		if prior.Secret() {
 			v = v.WithSecret(true)
 		}
 		out[k] = v
 	}
 	return property.NewMap(out)
+}
+
+// projectValue picks the state-side replacement for one prior input value.
+// Map pairs recurse key-wise — the program owns only the keys it wrote, so
+// server-populated siblings (e.g. system stack tags on GetStack) don't leak
+// into inputs as phantom refresh drift. Anything else takes the state value
+// wholesale.
+func projectValue(prior, state property.Value) property.Value {
+	if !prior.IsMap() || !state.IsMap() {
+		return state
+	}
+	stateMap := state.AsMap()
+	out := map[string]property.Value{}
+	for k, pv := range prior.AsMap().AllStable {
+		sv, ok := stateMap.GetOk(k)
+		if !ok {
+			out[k] = pv
+			continue
+		}
+		out[k] = projectValue(pv, sv)
+	}
+	return property.New(property.NewMap(out))
 }
 
 // fetchState runs the read op and merges EmitOnCreate fields from prior.
@@ -684,7 +706,7 @@ func (r *Resource) Update(ctx context.Context, req p.UpdateRequest) (p.UpdateRes
 		currentSrc := mergeMaps(req.State, req.OldInputs)
 		_, state, err = r.execEnvelopeUpdate(ctx, op, urlSrc, currentSrc, bodySrc)
 	} else {
-		_, state, err = r.execAndDecodeSplit(ctx, op, urlSrc, bodySrc)
+		_, state, err = r.execAndDecodeSplit(ctx, op, urlSrc, r.aliasFlatNewFields(op, bodySrc))
 	}
 	if err != nil {
 		return p.UpdateResponse{}, err
@@ -699,6 +721,37 @@ func (r *Resource) Update(ctx context.Context, req p.UpdateRequest) (p.UpdateRes
 		state = mergeMaps(state, req.State)
 	}
 	return p.UpdateResponse{Properties: state}, nil
+}
+
+// aliasFlatNewFields sources flat new<Stem>-convention update body fields
+// from their base-named inputs. Several Pulumi Cloud update schemas rename
+// the field they mutate (UpdateTeamRequest.newDescription mutates
+// description, AppUpdatePolicyGroupRequest.newName mutates name); the
+// by-name body mapping finds no input under the new* name, silently sends
+// nothing, and the update becomes a server-side no-op. The paired
+// current<Stem>/new<Stem> shape is UpdateEnvelope's job and never reaches
+// this path. Aliases only fill fields that have no direct source, so an
+// explicit input under the wire name still wins.
+func (r *Resource) aliasFlatNewFields(op *Operation, bodySrc property.Map) property.Map {
+	bodyProps := flattenedRequestProperties(r.spec, op)
+	aliased := map[string]property.Value{}
+	for wireKey := range bodyProps {
+		stem, found := strings.CutPrefix(wireKey, "new")
+		if !found || stem == "" || stem[0] < 'A' || stem[0] > 'Z' {
+			continue
+		}
+		if _, ok := bodySrc.GetOk(pulumiName(wireKey, r.meta.Renames)); ok {
+			continue
+		}
+		base := pulumiName(strings.ToLower(stem[:1])+stem[1:], r.meta.Renames)
+		if v, ok := bodySrc.GetOk(base); ok {
+			aliased[pulumiName(wireKey, r.meta.Renames)] = v
+		}
+	}
+	if len(aliased) == 0 {
+		return bodySrc
+	}
+	return mergeMaps(bodySrc, property.NewMap(aliased))
 }
 
 // Delete fires the delete op (if declared). Without one the engine drops
