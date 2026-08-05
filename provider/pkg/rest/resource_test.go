@@ -71,6 +71,8 @@ const (
 	statusKey            = "status"
 	passwordKey          = "password" //nolint:gosec // property name, not a credential
 	detailsKey           = "details"
+	tagsKey              = "tags"
+	newDescVal           = "new desc"
 	newTagKey            = "newTag"
 	envNameKey           = "envName"
 	projectNameKey       = "projectName"
@@ -526,7 +528,7 @@ func TestReadRefreshProjectsRemoteDriftIntoInputs(t *testing.T) {
 		meta: ResourceMeta{
 			Operations: Operations{Create: createThingOp, Read: getThingOp},
 			IDFormat:   orgIDFormat,
-			Fields:     map[string]FieldMeta{"tags": {Unordered: true}},
+			Fields:     map[string]FieldMeta{tagsKey: {Unordered: true}},
 		},
 	}
 
@@ -543,7 +545,7 @@ func TestReadRefreshProjectsRemoteDriftIntoInputs(t *testing.T) {
 		nameKey:     property.New("n1"),
 		valueKey:    property.New("local").WithSecret(true),
 		passwordKey: property.New("hunter2"),
-		"tags": property.New(property.NewArray([]property.Value{
+		tagsKey: property.New(property.NewArray([]property.Value{
 			property.New("a"), property.New("b"),
 		})),
 	})
@@ -574,7 +576,7 @@ func TestReadRefreshProjectsRemoteDriftIntoInputs(t *testing.T) {
 			t.Errorf("inputs gained response-only key %q", k)
 		}
 	}
-	tags, ok := resp.Inputs.GetOk("tags")
+	tags, ok := resp.Inputs.GetOk(tagsKey)
 	if !ok {
 		t.Fatalf("inputs.tags missing")
 	}
@@ -700,7 +702,7 @@ func TestRefreshChainIgnoresServerAddedStackTags(t *testing.T) {
 		orgNameKey:     testOrgName,
 		projectNameKey: myprojVal,
 		"stackName":    "dev",
-		"tags":         map[string]any{ownerVal: "platform", "purpose": "demo"},
+		tagsKey:        map[string]any{ownerVal: "platform", "purpose": "demo"},
 	})
 
 	cases := []struct {
@@ -752,7 +754,7 @@ func TestRefreshChainIgnoresServerAddedStackTags(t *testing.T) {
 					diffResp.HasChanges, tc.wantDrift, diffResp.DetailedDiff)
 			}
 			if tc.wantDrift {
-				if _, ok := diffResp.DetailedDiff["tags"]; !ok {
+				if _, ok := diffResp.DetailedDiff[tagsKey]; !ok {
 					t.Errorf("detailed diff missing tags: %#v", diffResp.DetailedDiff)
 				}
 			}
@@ -800,7 +802,7 @@ func TestUpdateAliasesFlatNewFields(t *testing.T) {
 		orgNameKey:     testOrgName,
 		nameKey:        infraVal,
 		"displayName":  "New Display",
-		descriptionKey: "new desc",
+		descriptionKey: newDescVal,
 	})
 	resp, err := r.Update(t.Context(), p.UpdateRequest{
 		ID:        "test-org/infra",
@@ -812,7 +814,7 @@ func TestUpdateAliasesFlatNewFields(t *testing.T) {
 		t.Fatalf("update: %v\n  calls: %v", err, mock.calls)
 	}
 
-	if got := patchBody["newDescription"]; got != "new desc" {
+	if got := patchBody["newDescription"]; got != newDescVal {
 		t.Errorf("patch newDescription: got %#v, want new desc", got)
 	}
 	if got := patchBody["newDisplayName"]; got != "New Display" {
@@ -821,7 +823,7 @@ func TestUpdateAliasesFlatNewFields(t *testing.T) {
 	if _, ok := patchBody[descriptionKey]; ok {
 		t.Errorf("patch body carries off-schema %q key: %#v", descriptionKey, patchBody)
 	}
-	if v, ok := resp.Properties.GetOk(descriptionKey); !ok || v.AsString() != "new desc" {
+	if v, ok := resp.Properties.GetOk(descriptionKey); !ok || v.AsString() != newDescVal {
 		t.Errorf("state description: got %#v, want new desc", v)
 	}
 }
