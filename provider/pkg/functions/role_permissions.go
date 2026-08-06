@@ -22,6 +22,7 @@ import (
 	"github.com/pulumi/pulumi-go-provider/infer"
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/apitype"
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 )
 
 // scopedPermissionsHelpDoc is the shared epilogue for the helpers'
@@ -34,20 +35,19 @@ const scopedPermissionsHelpDoc = "The result is directly assignable to " +
 // descriptorToSDKMap marshals a typed apitype.PermissionDescriptor to the
 // SDK-boundary map shape the provider expects on
 // `OrganizationRole.permissions`. The typed Marshaler emits the wire format
-// directly (`__type` discriminator at every level), which is exactly what
-// the SDK boundary now uses — the Python SDK preserves `__`-prefixed keys
-// across resource inputs as of pulumi/pulumi#22834 (3.235.0+, pinned via
-// the Python SDK's runtime requirement), so no rename is needed.
+// (`__type` discriminator at every level); ToSchemaTree renames it to the
+// `type__` the schema exposes, so a helper's output is assignable to
+// `permissions` and diffs against a hand-authored tree.
 func descriptorToSDKMap(descriptor apitype.PermissionDescriptor) (map[string]any, error) {
 	raw, err := json.Marshal(descriptor)
 	if err != nil {
 		return nil, fmt.Errorf("marshalling typed descriptor: %w", err)
 	}
-	var out map[string]any
-	if err := json.Unmarshal(raw, &out); err != nil {
+	var wire map[string]any
+	if err := json.Unmarshal(raw, &wire); err != nil {
 		return nil, fmt.Errorf("decoding descriptor JSON: %w", err)
 	}
-	return out, nil
+	return util.ToSchemaTree(wire), nil
 }
 
 // rbacPermissionSlice converts a []string of scope names to the typed
@@ -78,7 +78,7 @@ func rbacPermissionSlice(scopes []string) (apitype.RbacPermissionSlice, error) {
 // (Environment, Stack, InsightsAccount) supplies its own typed
 // expression/literal pair; this routine assembles the typed
 // `PermissionDescriptorCondition` via the apitype builders, then converts
-// it to the SDK boundary's `__type`-discriminated map.
+// it to the SDK boundary's `type__`-discriminated map.
 //
 // Note: there is intentionally no "team" scoping helper. Roles are
 // *associated with* teams via the TeamRoleAssignment resource, not gated
@@ -128,7 +128,7 @@ func (BuildAllowPermissionsFunction) Annotate(a infer.Annotator) {
 			"supplied scopes globally — i.e. on every entity of the matching "+
 			"resource type. This is the simplest descriptor: a flat "+
 			"`PermissionDescriptorAllow`. Use this helper instead of hand-"+
-			"authoring the descriptor literal so the wire-format `__type` "+
+			"authoring the descriptor literal so the `type__` "+
 			"discriminator stays an implementation detail. For grants scoped "+
 			"to a specific entity, see `buildEnvironmentScopedPermissions`, "+
 			"`buildStackScopedPermissions`, or "+

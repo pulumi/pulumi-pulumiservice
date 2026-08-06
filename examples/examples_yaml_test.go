@@ -637,13 +637,13 @@ func TestYamlRbacExample(t *testing.T) {
 
 // TestYamlRbacComposeImport pins the headline regression: a Pulumi
 // Cloud role authored with `PermissionDescriptorCompose` (the variant
-// an earlier structural translator rejected with "unknown __type")
+// an earlier structural translator rejected as an unknown discriminator)
 // must import cleanly into PSP. The unit-level proof lives in
 // TestImportRepro_Compose; this test exercises the full pipeline —
 // Cloud has the role, `pulumi import` calls the resource's Read, the
-// engine generates well-formed program code carrying the `__type`
-// discriminator unchanged, and a follow-up preview against that
-// generated program shows no drift.
+// engine generates well-formed program code carrying the `type__`
+// discriminator, and a follow-up preview against that generated program
+// shows no drift.
 //
 // Cloud requires a `uxPurpose:"role"` entry to reference
 // `uxPurpose:"policy"` entries via Compose's `permissionDescriptors`;
@@ -652,10 +652,11 @@ func TestYamlRbacExample(t *testing.T) {
 // fixture and the Compose role directly via `pulumiapi.Client`
 // (bypassing PSP's resource layer).
 //
-// Requires pulumi >= 3.237.0 — earlier versions of `pkg/importer/hcl2.go`
-// strip `__`-prefixed map keys as "internal properties" during import
-// codegen, which would drop the `__type` line from the generated
-// source and break the round-trip ([pulumi/pulumi#22856] fixed this).
+// This round-trip used to depend on pulumi >= 3.237.0: `pkg/importer/hcl2.go`
+// strips `__`-prefixed map keys as "internal properties" during import
+// codegen, which dropped the discriminator line from the generated source
+// ([pulumi/pulumi#22856]). The schema now exposes `type__`, which no
+// importer rule touches, so the import path carries no version floor.
 //
 // Flow:
 //
@@ -670,7 +671,8 @@ func TestYamlRbacExample(t *testing.T) {
 //     <org>/<roleId> --out <tmpdir>/imported.yaml` against an empty
 //     target stack.
 //  5. Assert: import succeeded; generated YAML carries
-//     `__type: PermissionDescriptorCompose` and the policy id.
+//     `type__: PermissionDescriptorCompose` and the policy id, and no
+//     `__`-prefixed key survives into the program.
 //  6. Drift check: append the imported `resources:` block to the
 //     target stack's existing Pulumi.yaml and run `pulumi preview` —
 //     any `~` on `permissions` would mean the descriptor
@@ -778,16 +780,21 @@ func TestYamlRbacComposeImport(t *testing.T) {
 		importResult.Stdout, importResult.Stderr)
 
 	// Step 5: assert the generated YAML carries the Compose descriptor
-	// with the wire-format `__type` discriminator preserved. Substring
-	// checks tolerate quoting variations in the codegen output.
+	// under the schema-side `type__` discriminator. Substring checks
+	// tolerate quoting variations in the codegen output.
 	contents, err := os.ReadFile(outFile)
 	require.NoError(t, err, "must be able to read the import --out file")
 	imported := string(contents)
 
 	assert.Contains(t, imported, "PermissionDescriptorCompose",
 		"imported program must carry the Compose descriptor value")
-	assert.Contains(t, imported, "__type:",
-		"imported program must use the wire-format `__type` discriminator")
+	assert.Contains(t, imported, "type__:",
+		"imported program must use the `type__` discriminator")
+	// The importer drops `__`-prefixed keys as internal properties. Seeing
+	// one here means the provider leaked a wire name into schema-side state,
+	// and the generated program would be missing its discriminator.
+	assert.NotContains(t, imported, "__type",
+		"no wire-format discriminator may reach the generated program")
 	assert.Contains(t, imported, policy.ID,
 		"imported program must reference the policy id inside permissionDescriptors")
 

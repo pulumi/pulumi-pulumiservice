@@ -23,6 +23,12 @@ const (
 	wireType   = "__type"
 	schemaType = "type__"
 	allowTag   = "PermissionDescriptorAllow"
+	groupTag   = "PermissionDescriptorGroup"
+	nameKey    = "name"
+	entriesKey = "entries"
+	permsKey   = "permissions"
+	valueVal   = "value"
+	stackRead  = "stack:read"
 )
 
 func TestToSchemaNameRewritesOnlyPrefixedNames(t *testing.T) {
@@ -30,7 +36,7 @@ func TestToSchemaNameRewritesOnlyPrefixedNames(t *testing.T) {
 	cases := []struct{ wire, want string }{
 		{wireType, schemaType},
 		{"__kind", "kind__"},
-		{"name", "name"},
+		{nameKey, nameKey},
 		{"__", "__"},           // no base left over; not a rename candidate
 		{"___type", "_type__"}, // one prefix stripped, remainder is the base
 		{"type__", "type__"},   // already schema-side; unchanged
@@ -44,7 +50,7 @@ func TestToSchemaNameRewritesOnlyPrefixedNames(t *testing.T) {
 
 func TestToWireNameInvertsToSchemaName(t *testing.T) {
 	t.Parallel()
-	for _, wire := range []string{wireType, "__kind", "name", "__"} {
+	for _, wire := range []string{wireType, "__kind", nameKey, "__"} {
 		if got := ToWireName(ToSchemaName(wire)); got != wire {
 			t.Errorf("ToWireName(ToSchemaName(%q)) = %q, want %q", wire, got, wire)
 		}
@@ -56,7 +62,7 @@ func TestToWireNameInvertsToSchemaName(t *testing.T) {
 // then walks the whole tree. A second application must be a no-op.
 func TestToWireNameIsIdempotent(t *testing.T) {
 	t.Parallel()
-	for _, name := range []string{schemaType, wireType, "name", "__"} {
+	for _, name := range []string{schemaType, wireType, nameKey, "__"} {
 		once := ToWireName(name)
 		if twice := ToWireName(once); twice != once {
 			t.Errorf("ToWireName(%q) not idempotent: %q then %q", name, once, twice)
@@ -68,7 +74,7 @@ func TestToWireNameIsIdempotent(t *testing.T) {
 // covers the top level and ToSchemaTree covers every depth.
 func TestToSchemaNameIsIdempotent(t *testing.T) {
 	t.Parallel()
-	for _, name := range []string{wireType, schemaType, "name", "__"} {
+	for _, name := range []string{wireType, schemaType, nameKey, "__"} {
 		once := ToSchemaName(name)
 		if twice := ToSchemaName(once); twice != once {
 			t.Errorf("ToSchemaName(%q) not idempotent: %q then %q", name, once, twice)
@@ -79,25 +85,25 @@ func TestToSchemaNameIsIdempotent(t *testing.T) {
 func TestRenameTreeRecursesThroughObjectsAndArrays(t *testing.T) {
 	t.Parallel()
 	schemaSide := map[string]any{
-		schemaType: "PermissionDescriptorGroup",
-		"entries": []any{
+		schemaType: groupTag,
+		entriesKey: []any{
 			map[string]any{
 				schemaType:   "PermissionDescriptorCondition",
 				"condition":  map[string]any{schemaType: "PermissionExpressionNot"},
-				"subNode":    map[string]any{schemaType: allowTag, "permissions": []any{"stack:read"}},
-				"unaffected": "value",
+				"subNode":    map[string]any{schemaType: allowTag, permsKey: []any{stackRead}},
+				"unaffected": valueVal,
 			},
 			map[string]any{schemaType: allowTag},
 		},
 	}
 	wireSide := map[string]any{
-		wireType: "PermissionDescriptorGroup",
-		"entries": []any{
+		wireType: groupTag,
+		entriesKey: []any{
 			map[string]any{
 				wireType:     "PermissionDescriptorCondition",
 				"condition":  map[string]any{wireType: "PermissionExpressionNot"},
-				"subNode":    map[string]any{wireType: allowTag, "permissions": []any{"stack:read"}},
-				"unaffected": "value",
+				"subNode":    map[string]any{wireType: allowTag, permsKey: []any{stackRead}},
+				"unaffected": valueVal,
 			},
 			map[string]any{wireType: allowTag},
 		},
@@ -131,12 +137,12 @@ func TestRenameTreeRoundTrips(t *testing.T) {
 func TestRenameTreeLeavesOrdinaryKeysAlone(t *testing.T) {
 	t.Parallel()
 	in := map[string]any{
-		"name":        "infra",
-		"count":       float64(3),
-		"enabled":     true,
-		"missing":     nil,
-		"tags":        map[string]any{"owner": "platform", "_internal": "x"},
-		"permissions": []any{"stack:read", "stack:write"},
+		nameKey:   "infra",
+		"count":   float64(3),
+		"enabled": true,
+		"missing": nil,
+		"tags":    map[string]any{"owner": "platform", "_internal": "x"},
+		permsKey:  []any{stackRead, "stack:write"},
 	}
 	if got := ToWireTree(in); !reflect.DeepEqual(got, in) {
 		t.Errorf("ToWireTree mutated an unrelated tree:\n%#v", got)
@@ -151,7 +157,7 @@ func TestRenameTreeLeavesOrdinaryKeysAlone(t *testing.T) {
 func TestRenameTreeDoesNotMutateInput(t *testing.T) {
 	t.Parallel()
 	nested := map[string]any{wireType: allowTag}
-	in := map[string]any{wireType: "PermissionDescriptorGroup", "entries": []any{nested}}
+	in := map[string]any{wireType: groupTag, entriesKey: []any{nested}}
 	ToSchemaTree(in)
 	if _, ok := in[wireType]; !ok {
 		t.Error("ToSchemaTree rewrote the caller's top-level key in place")

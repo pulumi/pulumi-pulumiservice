@@ -29,8 +29,11 @@ const (
 	tagCircle       = "circle"
 	propsKey        = "properties"
 	tagKind         = "kind"
-	circleRef       = schemaRefPrefix + "Circle"
+	circleRef       = schemaRefPrefix + schemaCircle
 	schemaShape     = "Shape"
+	schemaCircle    = "Circle"
+	propRadius      = "radius"
+	tagSquare       = "square"
 	schemaSquare    = "Square"
 	schemaBlob      = "Blob"
 	schemaBoolShape = "BoolShape"
@@ -216,11 +219,11 @@ func unionSchemas() map[string]any {
 		widgetRequest: obj(map[string]any{"shape": sref("Shape")}),
 		"Shape": discBase(tagKind, map[string]any{
 			tagCircle: circleRef,
-			"square":  schemaRefPrefix + "Square",
+			tagSquare: schemaRefPrefix + schemaSquare,
 			"blob":    schemaRefPrefix + "Blob",
 		}, map[string]any{"label": map[string]any{typeKey: typeString}}),
-		"Circle": variant("Shape", map[string]any{"radius": map[string]any{typeKey: typeNumber}}, "radius"),
-		"Square": variant("Shape", map[string]any{"side": map[string]any{typeKey: typeNumber}}),
+		schemaCircle: variant("Shape", map[string]any{propRadius: map[string]any{typeKey: typeNumber}}, propRadius),
+		"Square":     variant("Shape", map[string]any{"side": map[string]any{typeKey: typeNumber}}),
 		"Blob": variant("Shape", map[string]any{
 			"points": map[string]any{typeKey: typeArray, "items": map[string]any{typeKey: typeNumber}},
 		}),
@@ -262,7 +265,7 @@ func TestDiscriminatedUnion(t *testing.T) {
 	if !strings.Contains(kind.Description, "Expected value is 'circle'.") {
 		t.Errorf("kind description missing expected-value hint: %q", kind.Description)
 	}
-	if got, want := circle.Required, []string{"kind", "radius"}; !slicesEqual(got, want) {
+	if got, want := circle.Required, []string{"kind", propRadius}; !slicesEqual(got, want) {
 		t.Errorf("Circle required: got %v, want %v", got, want)
 	}
 }
@@ -330,7 +333,7 @@ func markerSchemas() map[string]any {
 		sref(schemaShape),
 		map[string]any{"description": "marker", typeKey: typeObject},
 	}}
-	for _, n := range []string{"Circle", schemaSquare, schemaBlob} {
+	for _, n := range []string{schemaCircle, schemaSquare, schemaBlob} {
 		schemas[n] = variant(schemaBoolShape, map[string]any{
 			strings.ToLower(n): map[string]any{typeKey: typeNumber},
 		})
@@ -390,7 +393,7 @@ func TestMarkerSubsetTwoMembersRejected(t *testing.T) {
 
 func TestMarkerWithNoDescendantsErrors(t *testing.T) {
 	schemas := markerSchemas()
-	repointOutsideMarker(schemas, "Circle", schemaSquare, schemaBlob)
+	repointOutsideMarker(schemas, schemaCircle, schemaSquare, schemaBlob)
 	_, err := BuildSchema(synthSpec(t, schemas), widgetMetadata(), "pulumiservice")
 	if err == nil || !strings.Contains(err.Error(), "no variants") {
 		t.Fatalf("expected empty marker subset to fail BuildSchema, got %v", err)
@@ -401,7 +404,7 @@ func TestVariantReferenceBecomesDefiniteType(t *testing.T) {
 	// A property referencing a mapped variant directly gets the definite
 	// const-tagged variant type, identical to the union-member emission.
 	schemas := unionSchemas()
-	schemas[widgetRequest] = obj(map[string]any{"one": sref("Circle")})
+	schemas[widgetRequest] = obj(map[string]any{"one": sref(schemaCircle)})
 	pkg := buildSynth(t, schemas)
 	in := pkg.Resources[widgetTok].InputProperties["one"]
 	if got, want := in.Ref, circleTypeRef; got != want {
@@ -433,7 +436,7 @@ func TestUnderscoreDiscriminatorUsesSuffixForm(t *testing.T) {
 			"square":  schemaRefPrefix + schemaSquare,
 			"blob":    schemaRefPrefix + schemaBlob,
 		}, map[string]any{"__label": map[string]any{typeKey: typeString}}),
-		"Circle":     variant(schemaShape, map[string]any{"radius": map[string]any{typeKey: typeNumber}}),
+		schemaCircle: variant(schemaShape, map[string]any{propRadius: map[string]any{typeKey: typeNumber}}),
 		schemaSquare: variant(schemaShape, map[string]any{"side": map[string]any{typeKey: typeNumber}}),
 		schemaBlob:   variant(schemaShape, map[string]any{"blobby": map[string]any{typeKey: typeBoolean}}),
 	})

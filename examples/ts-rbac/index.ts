@@ -7,10 +7,9 @@ const targetUsername = config.require("targetUsername");
 const nameSuffix = config.get("nameSuffix") ?? "manual";
 
 // A custom organization-level role that grants stack read access. The
-// simplest descriptor: a flat `PermissionDescriptorAllow`. The SDK
-// exposes the descriptor as a free-form map and uses the wire format's
-// `__type` field directly at every level — Pulumi's Python SDK preserves
-// `__`-prefixed keys as of pulumi/pulumi#22834 (3.235.0+).
+// simplest descriptor: a flat `PermissionDescriptorAllow`. The SDK exposes
+// the descriptor as a free-form map keyed by `type__` at every level; the
+// provider rewrites that to Pulumi Cloud's `__type` on the wire.
 //
 // For the common case of "grant these scopes" use the
 // `buildAllowPermissions` / `buildEnvironmentScopedPermissions` /
@@ -21,7 +20,7 @@ const readOnlyRole = new service.OrganizationRole("readOnlyRole", {
     name: `ts-rbac-read-only-${nameSuffix}`,
     description: "Read-only access to stacks, created by the ts-rbac example.",
     permissions: {
-        __type: "PermissionDescriptorAllow",
+        type__: "PermissionDescriptorAllow",
         permissions: ["stack:read"],
     },
 });
@@ -76,8 +75,8 @@ const scopedEnv = new service.Environment("scopedEnv", {
 // "global"); the permission tree is gated on the environment's UUID.
 //
 // `buildEnvironmentScopedPermissions` returns a
-// `PermissionDescriptorCondition(Equal(...), Allow)` tree using the wire
-// format's `__type` discriminator at every level, ready to assign.
+// `PermissionDescriptorCondition(Equal(...), Allow)` tree keyed by `type__`
+// at every level, ready to assign.
 const scopedReadOnlyRole = new service.OrganizationRole("scopedReadOnlyRole", {
     organizationName,
     name: `ts-rbac-scoped-read-only-${nameSuffix}`,

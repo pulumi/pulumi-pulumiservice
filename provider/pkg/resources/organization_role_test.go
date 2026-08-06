@@ -17,9 +17,14 @@ import (
 )
 
 const (
-	gcTypeMeta = "__type"
-	gcRoleID   = "role-123"
-	gcReadOnly = "read-only"
+	// The discriminator has two spellings: `__type` on the Pulumi Cloud wire,
+	// `type__` everywhere a user or the SDK can see it. Assertions below pick
+	// the one matching the side of the boundary under test.
+	gcWireType   = "__type"
+	gcSchemaType = "type__"
+	gcRoleID     = "role-123"
+	gcReadOnly   = "read-only"
+	gcRoleURN    = "acme/role-123"
 )
 
 type orgRoleClientMock struct {
@@ -67,7 +72,7 @@ func mustParseDescriptor(t *testing.T, wireJSON string) apitype.PermissionDescri
 }
 
 var testPermissions = map[string]interface{}{
-	gcTypeMeta:    "PermissionDescriptorAllow",
+	gcSchemaType:  "PermissionDescriptorAllow",
 	gcPermissions: []interface{}{"stack:read"},
 }
 
@@ -83,14 +88,14 @@ func TestOrganizationRoleCreate(t *testing.T) {
 			assert.Equal(t, gcGlobal, req.ResourceType)
 			assert.Equal(t, apitype.PermissionDescriptorUXPurposeRole, req.UxPurpose)
 			require.NotNil(t, req.Details, "Details must be a typed descriptor")
-			// Round-trip the typed descriptor back through JSON to assert
-			// the wire shape uses `__type` (the wire format and SDK boundary
-			// share this discriminator now).
+			// Round-trip the typed descriptor back through JSON to assert the
+			// request still carries the wire spelling, even though the user
+			// wrote `type__` in testPermissions.
 			raw, err := json.Marshal(req.Details)
 			require.NoError(t, err)
 			var parsed map[string]interface{}
 			require.NoError(t, json.Unmarshal(raw, &parsed))
-			assert.Equal(t, "PermissionDescriptorAllow", parsed[gcTypeMeta])
+			assert.Equal(t, "PermissionDescriptorAllow", parsed[gcWireType])
 			return &apitype.PermissionDescriptorRecord{
 				PermissionDescriptorBase: apitype.PermissionDescriptorBase{
 					Name:    req.Name,
@@ -114,7 +119,7 @@ func TestOrganizationRoleCreate(t *testing.T) {
 		},
 	})
 	assert.NoError(t, err)
-	assert.Equal(t, "acme/role-123", resp.ID)
+	assert.Equal(t, gcRoleURN, resp.ID)
 	assert.Equal(t, gcRoleID, resp.Output.RoleId)
 }
 
@@ -126,15 +131,15 @@ func TestOrganizationRoleRead(t *testing.T) {
 		ctx := config.WithMockClient(context.Background(), mock)
 		r := &OrganizationRole{}
 		resp, err := r.Read(ctx, infer.ReadRequest[OrganizationRoleInput, OrganizationRoleState]{
-			ID: "acme/role-123",
+			ID: gcRoleURN,
 		})
 		assert.NoError(t, err)
 		assert.Equal(t, "", resp.ID)
 	})
 
 	t.Run("found parses details", func(t *testing.T) {
-		// The API returns wire format with __type; the provider passes it
-		// through unchanged — the SDK boundary uses `__type` too.
+		// The API returns wire format with `__type`; the provider renames it
+		// to `type__` before the descriptor reaches state.
 		details := mustParseDescriptor(t,
 			`{"__type":"PermissionDescriptorAllow","permissions":["stack:read"]}`)
 		mock := &orgRoleClientMock{
@@ -155,11 +160,11 @@ func TestOrganizationRoleRead(t *testing.T) {
 		ctx := config.WithMockClient(context.Background(), mock)
 		r := &OrganizationRole{}
 		resp, err := r.Read(ctx, infer.ReadRequest[OrganizationRoleInput, OrganizationRoleState]{
-			ID: "acme/role-123",
+			ID: gcRoleURN,
 		})
 		assert.NoError(t, err)
-		assert.Equal(t, "acme/role-123", resp.ID)
-		assert.Equal(t, "PermissionDescriptorAllow", resp.State.Permissions[gcTypeMeta])
+		assert.Equal(t, gcRoleURN, resp.ID)
+		assert.Equal(t, "PermissionDescriptorAllow", resp.State.Permissions[gcSchemaType])
 	})
 
 	// Pulumi Cloud's permission-descriptor table holds entries for both
@@ -192,6 +197,104 @@ func TestOrganizationRoleRead(t *testing.T) {
 		assert.Contains(t, err.Error(), "policy",
 			"error must name the actual uxPurpose so the user knows what they pointed at")
 	})
+}
+
+// TestOrganizationRoleDiscriminatorRenameIsRecursive pins the rename at every
+// depth of the descriptor tree, in both directions. A top-level-only
+// implementation passes the Create and Read cases above but sends `type__`
+// verbatim to the API from the second level down, which the service rejects.
+func TestOrganizationRoleDiscriminatorRenameIsRecursive(t *testing.T) {
+	nested := map[string]interface{}{
+		gcSchemaType: "PermissionDescriptorCondition",
+		"condition": map[string]interface{}{
+			gcSchemaType: "PermissionExpressionEqual",
+			"left":       map[string]interface{}{gcSchemaType: "PermissionExpressionEnvironment"},
+			"right": map[string]interface{}{
+				gcSchemaType: "PermissionLiteralExpressionEnvironment",
+				"identity":   "acme/prod",
+			},
+		},
+		"subNode": map[string]interface{}{
+			gcSchemaType:  "PermissionDescriptorAllow",
+			gcPermissions: []interface{}{"environment:open"},
+		},
+	}
+
+	var sent map[string]interface{}
+	mock := &orgRoleClientMock{
+		create: func(
+			_ context.Context, _ string, req apitype.PermissionDescriptorBase,
+		) (*apitype.PermissionDescriptorRecord, error) {
+			raw, err := json.Marshal(req.Details)
+			require.NoError(t, err)
+			require.NoError(t, json.Unmarshal(raw, &sent))
+			return &apitype.PermissionDescriptorRecord{
+				PermissionDescriptorBase: apitype.PermissionDescriptorBase{
+					Name:      gcReadOnly,
+					UxPurpose: apitype.PermissionDescriptorUXPurposeRole,
+					Details:   req.Details,
+				},
+				ID:      gcRoleID,
+				Version: 1,
+			}, nil
+		},
+	}
+	ctx := config.WithMockClient(context.Background(), mock)
+	r := &OrganizationRole{}
+
+	_, err := r.Create(ctx, infer.CreateRequest[OrganizationRoleInput]{
+		Inputs: OrganizationRoleInput{
+			OrganizationRoleCore: OrganizationRoleCore{
+				OrganizationName: gcAcme,
+				Name:             gcReadOnly,
+				Permissions:      nested,
+			},
+		},
+	})
+	require.NoError(t, err)
+
+	// Request side: every level carries the wire spelling and none carries
+	// the schema spelling.
+	cond, ok := sent["condition"].(map[string]interface{})
+	require.True(t, ok, "condition must survive as a map; got %T", sent["condition"])
+	left, ok := cond["left"].(map[string]interface{})
+	require.True(t, ok, "condition.left must survive as a map; got %T", cond["left"])
+	sub, ok := sent["subNode"].(map[string]interface{})
+	require.True(t, ok, "subNode must survive as a map; got %T", sent["subNode"])
+	for _, level := range []map[string]interface{}{sent, cond, left, sub} {
+		assert.NotEmpty(t, level[gcWireType], "every level must carry `__type` on the wire")
+		assert.Nil(t, level[gcSchemaType], "no level may leak `type__` to the API")
+	}
+	assert.Equal(t, "PermissionExpressionEnvironment", left[gcWireType])
+
+	// Response side: reading the same descriptor back restores `type__` at
+	// every level, so state matches what the user wrote.
+	getMock := &orgRoleClientMock{
+		get: func(_ context.Context, _, _ string) (*apitype.PermissionDescriptorRecord, error) {
+			details := mustParseDescriptor(t, string(mustMarshal(t, sent)))
+			return &apitype.PermissionDescriptorRecord{
+				PermissionDescriptorBase: apitype.PermissionDescriptorBase{
+					Name:      gcReadOnly,
+					UxPurpose: apitype.PermissionDescriptorUXPurposeRole,
+					Details:   details,
+				},
+				ID:      gcRoleID,
+				Version: 1,
+			}, nil
+		},
+	}
+	resp, err := r.Read(config.WithMockClient(context.Background(), getMock),
+		infer.ReadRequest[OrganizationRoleInput, OrganizationRoleState]{ID: gcRoleURN})
+	require.NoError(t, err)
+	assert.Equal(t, nested, resp.State.Permissions,
+		"a descriptor read back must equal the tree the user authored")
+}
+
+func mustMarshal(t *testing.T, v any) []byte {
+	t.Helper()
+	raw, err := json.Marshal(v)
+	require.NoError(t, err)
+	return raw
 }
 
 // TestOrganizationRoleDelete_InUseConflict pins the graceful handling of
@@ -386,7 +489,7 @@ func TestOrganizationRoleCheck(t *testing.T) {
 				gcOrganizationName: property.New(gcAcme),
 				gcName:             property.New(property.Computed),
 				gcPermissions: property.New(property.NewMap(map[string]property.Value{
-					gcTypeMeta: property.New("allow"),
+					gcSchemaType: property.New("allow"),
 				})),
 			}),
 		})
@@ -397,19 +500,19 @@ func TestOrganizationRoleCheck(t *testing.T) {
 		}
 	})
 
-	// The provider validates `__type` against the typed
+	// The provider validates `type__` against the typed
 	// `apitype.PermissionDescriptor` discriminator catalogue (generated
 	// from the OpenAPI spec the API uses). Unknown variants are rejected
 	// at preview with a clear "type 'X' not recognized" message rather
 	// than blindly forwarded to the API. New variants Pulumi Cloud adds
 	// reach this provider through `apitype` regen.
-	t.Run("rejects unknown __type values", func(t *testing.T) {
+	t.Run("rejects unknown type__ values", func(t *testing.T) {
 		resp, err := r.Check(context.Background(), infer.CheckRequest{
 			NewInputs: property.NewMap(map[string]property.Value{
 				gcOrganizationName: property.New(gcAcme),
 				gcName:             property.New("r"),
 				gcPermissions: property.New(property.NewMap(map[string]property.Value{
-					gcTypeMeta: property.New("PermissionDescriptorWhateverFutureCloudVariant"),
+					gcSchemaType: property.New("PermissionDescriptorWhateverFutureCloudVariant"),
 				})),
 			}),
 		})
@@ -424,10 +527,10 @@ func TestOrganizationRoleCheck(t *testing.T) {
 			"Check must surface the typed unmarshaller's diagnostic")
 	})
 
-	// A descriptor missing the top-level `__type` discriminator is
+	// A descriptor missing the top-level `type__` discriminator is
 	// rejected at preview by the typed unmarshaller (`type '' not
 	// recognized`) rather than reaching the API.
-	t.Run("rejects descriptor missing __type", func(t *testing.T) {
+	t.Run("rejects descriptor missing type__", func(t *testing.T) {
 		resp, err := r.Check(context.Background(), infer.CheckRequest{
 			NewInputs: property.NewMap(map[string]property.Value{
 				gcOrganizationName: property.New(gcAcme),
@@ -445,6 +548,6 @@ func TestOrganizationRoleCheck(t *testing.T) {
 			props[f.Property] = f.Reason
 		}
 		assert.Contains(t, props[gcPermissions], "not recognized",
-			"Check must reject a descriptor with no `__type` discriminator")
+			"Check must reject a descriptor with no `type__` discriminator")
 	})
 }
