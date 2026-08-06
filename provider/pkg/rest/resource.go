@@ -617,25 +617,48 @@ func (r *Resource) projectStateOntoInputs(inputs, state property.Map) property.M
 }
 
 // projectValue picks the state-side replacement for one prior input value.
-// Map pairs recurse key-wise — the program owns only the keys it wrote, so
-// server-populated siblings (e.g. system stack tags on GetStack) don't leak
-// into inputs as phantom refresh drift. Anything else takes the state value
-// wholesale.
+// Map pairs recurse key-wise and array pairs element-wise — the program owns
+// only the keys and elements it wrote, so server-populated siblings (system
+// stack tags on GetStack, the response-only half of GetService's items) don't
+// leak into inputs as phantom refresh drift. State elements past the end of
+// the prior array are adopted whole: nothing program-side describes their
+// shape, and the drift they report is a real server-side addition. Anything
+// else takes the state value wholesale.
 func projectValue(prior, state property.Value) property.Value {
-	if !prior.IsMap() || !state.IsMap() {
-		return state
-	}
-	stateMap := state.AsMap()
-	out := map[string]property.Value{}
-	for k, pv := range prior.AsMap().AllStable {
-		sv, ok := stateMap.GetOk(k)
-		if !ok {
-			out[k] = pv
-			continue
+	switch {
+	case prior.IsMap() && state.IsMap():
+		stateMap := state.AsMap()
+		out := map[string]property.Value{}
+		for k, pv := range prior.AsMap().AllStable {
+			sv, ok := stateMap.GetOk(k)
+			if !ok {
+				out[k] = pv
+				continue
+			}
+			out[k] = projectValue(pv, sv)
 		}
-		out[k] = projectValue(pv, sv)
+		return keepSecret(prior, property.New(property.NewMap(out)))
+	case prior.IsArray() && state.IsArray():
+		priorArr, stateArr := prior.AsArray(), state.AsArray()
+		out := make([]property.Value, stateArr.Len())
+		for i := range out {
+			out[i] = stateArr.Get(i)
+			if i < priorArr.Len() {
+				out[i] = projectValue(priorArr.Get(i), out[i])
+			}
+		}
+		return keepSecret(prior, property.New(property.NewArray(out)))
 	}
-	return property.New(property.NewMap(out))
+	return keepSecret(prior, state)
+}
+
+// keepSecret re-applies prior's secret marking to v. Value.Secret() is not
+// recursive, so every level projectValue rebuilds has to restore it itself.
+func keepSecret(prior, v property.Value) property.Value {
+	if prior.Secret() {
+		return v.WithSecret(true)
+	}
+	return v
 }
 
 // fetchState runs the read op and merges EmitOnCreate fields from prior.
@@ -732,8 +755,14 @@ func (r *Resource) Update(ctx context.Context, req p.UpdateRequest) (p.UpdateRes
 // current<Stem>/new<Stem> shape is UpdateEnvelope's job and never reaches
 // this path. Aliases only fill fields that have no direct source, so an
 // explicit input under the wire name still wins.
+//
+// Replace-triggering base fields are skipped: Diff already replaces when they
+// change, so Update only ever sees them unchanged and the alias would inject
+// a no-op mutation (PolicyGroup's name is the {policyGroup} path param, so
+// newName is unreachable for the rename it was meant to carry).
 func (r *Resource) aliasFlatNewFields(op *Operation, bodySrc property.Map) property.Map {
 	bodyProps := flattenedRequestProperties(r.spec, op)
+	replaces := r.replaceTriggeringFields()
 	aliased := map[string]property.Value{}
 	for wireKey := range bodyProps {
 		stem, found := strings.CutPrefix(wireKey, "new")
@@ -744,6 +773,9 @@ func (r *Resource) aliasFlatNewFields(op *Operation, bodySrc property.Map) prope
 			continue
 		}
 		base := pulumiName(strings.ToLower(stem[:1])+stem[1:], r.meta.Renames)
+		if replaces[base] {
+			continue
+		}
 		if v, ok := bodySrc.GetOk(base); ok {
 			aliased[pulumiName(wireKey, r.meta.Renames)] = v
 		}
