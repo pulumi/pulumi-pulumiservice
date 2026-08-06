@@ -81,6 +81,13 @@ const (
 	ownerVal             = "owner"
 	teamXVal             = "team-x"
 	teamYVal             = "team-y"
+	typeKey              = "type"
+	cloudCountKey        = "cloudCount"
+	stackVal             = "stack"
+	testOrgInfraID       = "test-org/infra"
+	itemsKey             = "items"
+	envVarsKey           = "environmentVariables"
+	newDescriptionKey    = "newDescription"
 )
 
 // mockTransport serves canned responses keyed by "<METHOD> <path>". Set
@@ -218,7 +225,7 @@ func TestCreateSynthesizesID(t *testing.T) {
 				nameKey:        infraVal, // body; renames map name→teamName for path
 				descriptionKey: infraTeamVal,
 			},
-			wantID: "test-org/infra",
+			wantID: testOrgInfraID,
 		},
 		{ //nolint:gosec // G101: test fixture, not a real credential.
 			// DefaultOrganization: requireImport singleton; GET returns 404
@@ -805,7 +812,7 @@ func TestUpdateAliasesFlatNewFields(t *testing.T) {
 		descriptionKey: newDescVal,
 	})
 	resp, err := r.Update(t.Context(), p.UpdateRequest{
-		ID:        "test-org/infra",
+		ID:        testOrgInfraID,
 		OldInputs: prior,
 		State:     prior,
 		Inputs:    newInputs,
@@ -814,7 +821,7 @@ func TestUpdateAliasesFlatNewFields(t *testing.T) {
 		t.Fatalf("update: %v\n  calls: %v", err, mock.calls)
 	}
 
-	if got := patchBody["newDescription"]; got != newDescVal {
+	if got := patchBody[newDescriptionKey]; got != newDescVal {
 		t.Errorf("patch newDescription: got %#v, want new desc", got)
 	}
 	if got := patchBody["newDisplayName"]; got != "New Display" {
@@ -1998,12 +2005,12 @@ func TestUpdateEnvelopeAllOfWrapper(t *testing.T) {
 // CreateServiceRequest.items (AddServiceItem), so adopting the state array
 // wholesale writes response-only fields into inputs as permanent drift.
 func TestProjectValueArrayElements(t *testing.T) {
-	prior := anyToPropertyValue([]any{map[string]any{nameKey: infraVal, "type": "stack"}})
+	prior := anyToPropertyValue([]any{map[string]any{nameKey: infraVal, typeKey: stackVal}})
 	state := anyToPropertyValue([]any{map[string]any{
-		nameKey:      infraVal,
-		"type":       "stack",
-		createdKey:   createdTimestamp,
-		"cloudCount": 3.0,
+		nameKey:       infraVal,
+		typeKey:       stackVal,
+		createdKey:    createdTimestamp,
+		cloudCountKey: 3.0,
 	}})
 
 	got := projectValue(prior, state)
@@ -2014,7 +2021,7 @@ func TestProjectValueArrayElements(t *testing.T) {
 	if !elem.IsMap() {
 		t.Fatalf("element is not a map: %v", elem)
 	}
-	for _, k := range []string{createdKey, "cloudCount"} {
+	for _, k := range []string{createdKey, cloudCountKey} {
 		if _, ok := elem.AsMap().GetOk(k); ok {
 			t.Errorf("response-only key %q leaked into projected inputs: %v", k, elem)
 		}
@@ -2029,18 +2036,18 @@ func TestProjectValueArrayElements(t *testing.T) {
 // secret marking or a user's pulumi.secret() value silently goes plaintext.
 func TestProjectValuePreservesNestedSecrets(t *testing.T) {
 	prior := property.New(property.NewMap(map[string]property.Value{
-		"environmentVariables": property.New(property.NewMap(map[string]property.Value{
+		envVarsKey: property.New(property.NewMap(map[string]property.Value{
 			passwordKey: property.New("s3cret").WithSecret(true),
 		})),
 	}))
 	state := property.New(property.NewMap(map[string]property.Value{
-		"environmentVariables": property.New(property.NewMap(map[string]property.Value{
+		envVarsKey: property.New(property.NewMap(map[string]property.Value{
 			passwordKey: property.New("s3cret"),
 		})),
 	}))
 
 	got := projectValue(prior, state)
-	leaf := got.AsMap().Get("environmentVariables").AsMap().Get(passwordKey)
+	leaf := got.AsMap().Get(envVarsKey).AsMap().Get(passwordKey)
 	if !leaf.Secret() {
 		t.Errorf("nested secret marking dropped: %v", got)
 	}
@@ -2119,15 +2126,15 @@ func TestUpdateExplicitWireNameWinsOverAlias(t *testing.T) {
 	})
 	newInputs := propMap(map[string]any{
 		orgNameKey: testOrgName, nameKey: infraVal,
-		descriptionKey:   newDescVal,
-		"newDescription": "explicit desc",
+		descriptionKey:    newDescVal,
+		newDescriptionKey: "explicit desc",
 	})
 	if _, err := r.Update(t.Context(), p.UpdateRequest{
-		ID: "test-org/infra", OldInputs: prior, State: prior, Inputs: newInputs,
+		ID: testOrgInfraID, OldInputs: prior, State: prior, Inputs: newInputs,
 	}); err != nil {
 		t.Fatalf("update: %v\n  calls: %v", err, mock.calls)
 	}
-	if got := patchBody["newDescription"]; got != "explicit desc" {
+	if got := patchBody[newDescriptionKey]; got != "explicit desc" {
 		t.Errorf("explicit newDescription overridden by alias: got %#v, want explicit desc", got)
 	}
 }
@@ -2157,7 +2164,7 @@ func TestReadKeepsResponseOnlyItemFieldsOutOfInputs(t *testing.T) {
 		"ownerType": "team",
 		"ownerName": teamXVal,
 		nameKey:     "svc-1",
-		"items":     []any{map[string]any{nameKey: infraVal, "type": "stack"}},
+		itemsKey:    []any{map[string]any{nameKey: infraVal, typeKey: stackVal}},
 	})
 	resp, err := r.Read(t.Context(), p.ReadRequest{
 		ID: "test-org/team/team-x/svc-1", Inputs: inputs, Properties: inputs,
@@ -2165,8 +2172,8 @@ func TestReadKeepsResponseOnlyItemFieldsOutOfInputs(t *testing.T) {
 	if err != nil {
 		t.Fatalf("read: %v", err)
 	}
-	item := resp.Inputs.Get("items").AsArray().Get(0)
-	for _, k := range []string{createdKey, "cloudCount"} {
+	item := resp.Inputs.Get(itemsKey).AsArray().Get(0)
+	for _, k := range []string{createdKey, cloudCountKey} {
 		if _, ok := item.AsMap().GetOk(k); ok {
 			t.Errorf("response-only key %q leaked into inputs: %v", k, item)
 		}
