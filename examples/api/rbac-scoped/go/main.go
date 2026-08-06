@@ -10,10 +10,10 @@ import (
 // double-underscore field names in Go codegen.
 func envMatch(identity string) pulumi.Map {
 	return pulumi.Map{
-		"__type": pulumi.String("PermissionExpressionEqual"),
-		"left":   pulumi.Map{"__type": pulumi.String("PermissionExpressionEnvironment")},
+		"type__": pulumi.String("PermissionExpressionEqual"),
+		"left":   pulumi.Map{"type__": pulumi.String("PermissionExpressionEnvironment")},
 		"right": pulumi.Map{
-			"__type":   pulumi.String("PermissionLiteralExpressionEnvironment"),
+			"type__":   pulumi.String("PermissionLiteralExpressionEnvironment"),
 			"identity": pulumi.String(identity),
 		},
 	}
@@ -49,20 +49,20 @@ func main() {
 			Description: pulumi.String(roleDescription),
 			UxPurpose:   pulumi.String("role"),
 			Details: pulumi.Map{
-				"__type": pulumi.String("PermissionDescriptorGroup"),
+				"type__": pulumi.String("PermissionDescriptorGroup"),
 				"entries": pulumi.Array{
 					pulumi.Map{
-						"__type": pulumi.String("PermissionDescriptorCondition"),
+						"type__": pulumi.String("PermissionDescriptorCondition"),
 						"condition": pulumi.Map{
-							"__type": pulumi.String("PermissionExpressionAnd"),
+							"type__": pulumi.String("PermissionExpressionAnd"),
 							"left":   envMatch(allowedEnvironmentID),
 							"right": pulumi.Map{
-								"__type": pulumi.String("PermissionExpressionNot"),
+								"type__": pulumi.String("PermissionExpressionNot"),
 								"node":   envMatch(deniedEnvironmentID),
 							},
 						},
 						"subNode": pulumi.Map{
-							"__type": pulumi.String("PermissionDescriptorAllow"),
+							"type__": pulumi.String("PermissionDescriptorAllow"),
 							"permissions": pulumi.ToStringArray([]string{
 								"environment:read", "environment:open",
 							}),

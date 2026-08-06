@@ -14,15 +14,15 @@ public final class PermissionExpressionTeam {
      * @return Expected value is &#39;PermissionExpressionTeam&#39;.
      * 
      */
-    private String __type;
+    private String type__;
 
     private PermissionExpressionTeam() {}
     /**
      * @return Expected value is &#39;PermissionExpressionTeam&#39;.
      * 
      */
-    public String __type() {
-        return this.__type;
+    public String type__() {
+        return this.type__;
     }
 
     public static Builder builder() {
@@ -34,24 +34,24 @@ public final class PermissionExpressionTeam {
     }
     @CustomType.Builder
     public static final class Builder {
-        private String __type;
+        private String type__;
         public Builder() {}
         public Builder(PermissionExpressionTeam defaults) {
     	      Objects.requireNonNull(defaults);
-    	      this.__type = defaults.__type;
+    	      this.type__ = defaults.type__;
         }
 
         @CustomType.Setter
-        public Builder __type(String __type) {
-            if (__type == null) {
-              throw new MissingRequiredPropertyException("PermissionExpressionTeam", "__type");
+        public Builder type__(String type__) {
+            if (type__ == null) {
+              throw new MissingRequiredPropertyException("PermissionExpressionTeam", "type__");
             }
-            this.__type = __type;
+            this.type__ = type__;
             return this;
         }
         public PermissionExpressionTeam build() {
             final var _resultValue = new PermissionExpressionTeam();
-            _resultValue.__type = __type;
+            _resultValue.type__ = type__;
             return _resultValue;
         }
     }

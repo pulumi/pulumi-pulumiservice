@@ -13,15 +13,9 @@ namespace Pulumi.PulumiService.Api.Inputs
     public sealed class PermissionExpressionEqualArgs : global::Pulumi.ResourceArgs
     {
         /// <summary>
-        /// Expected value is 'PermissionExpressionEqual'.
-        /// </summary>
-        [Input("__type", required: true)]
-        public Input<string> __type { get; set; } = null!;
-
-        /// <summary>
         /// The left operand of the equality comparison.
         /// 
-        /// Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
+        /// Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
         /// </summary>
         [Input("left")]
         public object? Left { get; set; }
@@ -29,10 +23,16 @@ namespace Pulumi.PulumiService.Api.Inputs
         /// <summary>
         /// The right operand of the equality comparison.
         /// 
-        /// Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
+        /// Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
         /// </summary>
         [Input("right")]
         public object? Right { get; set; }
+
+        /// <summary>
+        /// Expected value is 'PermissionExpressionEqual'.
+        /// </summary>
+        [Input("type__", required: true)]
+        public Input<string> Type__ { get; set; } = null!;
 
         public PermissionExpressionEqualArgs()
         {

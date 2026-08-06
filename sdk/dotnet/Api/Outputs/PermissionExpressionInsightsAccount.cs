@@ -16,12 +16,12 @@ namespace Pulumi.PulumiService.Api.Outputs
         /// <summary>
         /// Expected value is 'PermissionExpressionInsightsAccount'.
         /// </summary>
-        public readonly string __type;
+        public readonly string Type__;
 
         [OutputConstructor]
-        private PermissionExpressionInsightsAccount(string __type)
+        private PermissionExpressionInsightsAccount(string type__)
         {
-            this.__type = __type;
+            Type__ = type__;
         }
     }
 }

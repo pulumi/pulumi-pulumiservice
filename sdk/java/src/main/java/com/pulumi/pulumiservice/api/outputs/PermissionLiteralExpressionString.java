@@ -16,7 +16,7 @@ public final class PermissionLiteralExpressionString {
      * @return Expected value is &#39;PermissionLiteralExpressionString&#39;.
      * 
      */
-    private String __type;
+    private String type__;
     /**
      * @return The string literal value.
      * 
@@ -28,8 +28,8 @@ public final class PermissionLiteralExpressionString {
      * @return Expected value is &#39;PermissionLiteralExpressionString&#39;.
      * 
      */
-    public String __type() {
-        return this.__type;
+    public String type__() {
+        return this.type__;
     }
     /**
      * @return The string literal value.
@@ -48,21 +48,21 @@ public final class PermissionLiteralExpressionString {
     }
     @CustomType.Builder
     public static final class Builder {
-        private String __type;
+        private String type__;
         private @Nullable String value;
         public Builder() {}
         public Builder(PermissionLiteralExpressionString defaults) {
     	      Objects.requireNonNull(defaults);
-    	      this.__type = defaults.__type;
+    	      this.type__ = defaults.type__;
     	      this.value = defaults.value;
         }
 
         @CustomType.Setter
-        public Builder __type(String __type) {
-            if (__type == null) {
-              throw new MissingRequiredPropertyException("PermissionLiteralExpressionString", "__type");
+        public Builder type__(String type__) {
+            if (type__ == null) {
+              throw new MissingRequiredPropertyException("PermissionLiteralExpressionString", "type__");
             }
-            this.__type = __type;
+            this.type__ = type__;
             return this;
         }
         @CustomType.Setter
@@ -73,7 +73,7 @@ public final class PermissionLiteralExpressionString {
         }
         public PermissionLiteralExpressionString build() {
             final var _resultValue = new PermissionLiteralExpressionString();
-            _resultValue.__type = __type;
+            _resultValue.type__ = type__;
             _resultValue.value = value;
             return _resultValue;
         }

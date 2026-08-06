@@ -13,18 +13,18 @@ namespace Pulumi.PulumiService.Api.Inputs
     public sealed class PermissionExpressionNotArgs : global::Pulumi.ResourceArgs
     {
         /// <summary>
-        /// Expected value is 'PermissionExpressionNot'.
-        /// </summary>
-        [Input("__type", required: true)]
-        public Input<string> __type { get; set; } = null!;
-
-        /// <summary>
         /// The operand of the unary boolean expression.
         /// 
-        /// Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+        /// Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
         /// </summary>
         [Input("node")]
         public object? Node { get; set; }
+
+        /// <summary>
+        /// Expected value is 'PermissionExpressionNot'.
+        /// </summary>
+        [Input("type__", required: true)]
+        public Input<string> Type__ { get; set; } = null!;
 
         public PermissionExpressionNotArgs()
         {

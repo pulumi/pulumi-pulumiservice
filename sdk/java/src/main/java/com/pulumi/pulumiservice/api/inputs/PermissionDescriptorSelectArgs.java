@@ -38,21 +38,6 @@ public final class PermissionDescriptorSelectArgs extends com.pulumi.resources.R
     public static final PermissionDescriptorSelectArgs Empty = new PermissionDescriptorSelectArgs();
 
     /**
-     * Expected value is &#39;PermissionDescriptorSelect&#39;.
-     * 
-     */
-    @Import(name="__type", required=true)
-    private Output<String> __type;
-
-    /**
-     * @return Expected value is &#39;PermissionDescriptorSelect&#39;.
-     * 
-     */
-    public Output<String> __type() {
-        return this.__type;
-    }
-
-    /**
      * The available options to select from based on the selector expression.
      * 
      */
@@ -70,7 +55,7 @@ public final class PermissionDescriptorSelectArgs extends com.pulumi.resources.R
     /**
      * The expression used to select which option to apply.
      * 
-     * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
+     * Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
      * 
      */
     @Import(name="selector")
@@ -79,19 +64,34 @@ public final class PermissionDescriptorSelectArgs extends com.pulumi.resources.R
     /**
      * @return The expression used to select which option to apply.
      * 
-     * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
+     * Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
      * 
      */
     public Optional<Output<Object>> selector() {
         return Optional.ofNullable(this.selector);
     }
 
+    /**
+     * Expected value is &#39;PermissionDescriptorSelect&#39;.
+     * 
+     */
+    @Import(name="type__", required=true)
+    private Output<String> type__;
+
+    /**
+     * @return Expected value is &#39;PermissionDescriptorSelect&#39;.
+     * 
+     */
+    public Output<String> type__() {
+        return this.type__;
+    }
+
     private PermissionDescriptorSelectArgs() {}
 
     private PermissionDescriptorSelectArgs(PermissionDescriptorSelectArgs $) {
-        this.__type = $.__type;
         this.options = $.options;
         this.selector = $.selector;
+        this.type__ = $.type__;
     }
 
     public static Builder builder() {
@@ -110,27 +110,6 @@ public final class PermissionDescriptorSelectArgs extends com.pulumi.resources.R
 
         public Builder(PermissionDescriptorSelectArgs defaults) {
             $ = new PermissionDescriptorSelectArgs(Objects.requireNonNull(defaults));
-        }
-
-        /**
-         * @param __type Expected value is &#39;PermissionDescriptorSelect&#39;.
-         * 
-         * @return builder
-         * 
-         */
-        public Builder __type(Output<String> __type) {
-            $.__type = __type;
-            return this;
-        }
-
-        /**
-         * @param __type Expected value is &#39;PermissionDescriptorSelect&#39;.
-         * 
-         * @return builder
-         * 
-         */
-        public Builder __type(String __type) {
-            return __type(Output.of(__type));
         }
 
         /**
@@ -167,7 +146,7 @@ public final class PermissionDescriptorSelectArgs extends com.pulumi.resources.R
         /**
          * @param selector The expression used to select which option to apply.
          * 
-         * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
+         * Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
          * 
          * @return builder
          * 
@@ -180,7 +159,7 @@ public final class PermissionDescriptorSelectArgs extends com.pulumi.resources.R
         /**
          * @param selector The expression used to select which option to apply.
          * 
-         * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
+         * Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
          * 
          * @return builder
          * 
@@ -189,8 +168,29 @@ public final class PermissionDescriptorSelectArgs extends com.pulumi.resources.R
             return selector(Output.of(selector));
         }
 
+        /**
+         * @param type__ Expected value is &#39;PermissionDescriptorSelect&#39;.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder type__(Output<String> type__) {
+            $.type__ = type__;
+            return this;
+        }
+
+        /**
+         * @param type__ Expected value is &#39;PermissionDescriptorSelect&#39;.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder type__(String type__) {
+            return type__(Output.of(type__));
+        }
+
         public PermissionDescriptorSelectArgs build() {
-            $.__type = Codegen.stringProp("__type").output().arg($.__type).require();
+            $.type__ = Codegen.stringProp("type__").output().arg($.type__).require();
             return $;
         }
     }

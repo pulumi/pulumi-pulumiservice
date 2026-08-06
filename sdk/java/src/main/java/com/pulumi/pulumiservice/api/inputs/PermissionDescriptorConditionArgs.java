@@ -29,24 +29,9 @@ public final class PermissionDescriptorConditionArgs extends com.pulumi.resource
     public static final PermissionDescriptorConditionArgs Empty = new PermissionDescriptorConditionArgs();
 
     /**
-     * Expected value is &#39;PermissionDescriptorCondition&#39;.
-     * 
-     */
-    @Import(name="__type", required=true)
-    private Output<String> __type;
-
-    /**
-     * @return Expected value is &#39;PermissionDescriptorCondition&#39;.
-     * 
-     */
-    public Output<String> __type() {
-        return this.__type;
-    }
-
-    /**
      * The boolean condition to evaluate.
      * 
-     * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+     * Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
      * 
      */
     @Import(name="condition")
@@ -55,7 +40,7 @@ public final class PermissionDescriptorConditionArgs extends com.pulumi.resource
     /**
      * @return The boolean condition to evaluate.
      * 
-     * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+     * Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
      * 
      */
     public Optional<Output<Object>> condition() {
@@ -65,7 +50,7 @@ public final class PermissionDescriptorConditionArgs extends com.pulumi.resource
     /**
      * The permission descriptor to apply when the condition is true.
      * 
-     * Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
+     * Valid `type__` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
      * 
      */
     @Import(name="subNode")
@@ -74,19 +59,34 @@ public final class PermissionDescriptorConditionArgs extends com.pulumi.resource
     /**
      * @return The permission descriptor to apply when the condition is true.
      * 
-     * Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
+     * Valid `type__` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
      * 
      */
     public Optional<Output<Object>> subNode() {
         return Optional.ofNullable(this.subNode);
     }
 
+    /**
+     * Expected value is &#39;PermissionDescriptorCondition&#39;.
+     * 
+     */
+    @Import(name="type__", required=true)
+    private Output<String> type__;
+
+    /**
+     * @return Expected value is &#39;PermissionDescriptorCondition&#39;.
+     * 
+     */
+    public Output<String> type__() {
+        return this.type__;
+    }
+
     private PermissionDescriptorConditionArgs() {}
 
     private PermissionDescriptorConditionArgs(PermissionDescriptorConditionArgs $) {
-        this.__type = $.__type;
         this.condition = $.condition;
         this.subNode = $.subNode;
+        this.type__ = $.type__;
     }
 
     public static Builder builder() {
@@ -108,30 +108,9 @@ public final class PermissionDescriptorConditionArgs extends com.pulumi.resource
         }
 
         /**
-         * @param __type Expected value is &#39;PermissionDescriptorCondition&#39;.
-         * 
-         * @return builder
-         * 
-         */
-        public Builder __type(Output<String> __type) {
-            $.__type = __type;
-            return this;
-        }
-
-        /**
-         * @param __type Expected value is &#39;PermissionDescriptorCondition&#39;.
-         * 
-         * @return builder
-         * 
-         */
-        public Builder __type(String __type) {
-            return __type(Output.of(__type));
-        }
-
-        /**
          * @param condition The boolean condition to evaluate.
          * 
-         * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+         * Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
          * 
          * @return builder
          * 
@@ -144,7 +123,7 @@ public final class PermissionDescriptorConditionArgs extends com.pulumi.resource
         /**
          * @param condition The boolean condition to evaluate.
          * 
-         * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+         * Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
          * 
          * @return builder
          * 
@@ -156,7 +135,7 @@ public final class PermissionDescriptorConditionArgs extends com.pulumi.resource
         /**
          * @param subNode The permission descriptor to apply when the condition is true.
          * 
-         * Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
+         * Valid `type__` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
          * 
          * @return builder
          * 
@@ -169,7 +148,7 @@ public final class PermissionDescriptorConditionArgs extends com.pulumi.resource
         /**
          * @param subNode The permission descriptor to apply when the condition is true.
          * 
-         * Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
+         * Valid `type__` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
          * 
          * @return builder
          * 
@@ -178,8 +157,29 @@ public final class PermissionDescriptorConditionArgs extends com.pulumi.resource
             return subNode(Output.of(subNode));
         }
 
+        /**
+         * @param type__ Expected value is &#39;PermissionDescriptorCondition&#39;.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder type__(Output<String> type__) {
+            $.type__ = type__;
+            return this;
+        }
+
+        /**
+         * @param type__ Expected value is &#39;PermissionDescriptorCondition&#39;.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder type__(String type__) {
+            return type__(Output.of(type__));
+        }
+
         public PermissionDescriptorConditionArgs build() {
-            $.__type = Codegen.stringProp("__type").output().arg($.__type).require();
+            $.type__ = Codegen.stringProp("type__").output().arg($.type__).require();
             return $;
         }
     }

@@ -18,7 +18,7 @@ return await Deployment.RunAsync(() =>
         UxPurpose = "role",
         Details = new Ps.Api.Inputs.PermissionDescriptorAllowArgs
         {
-            __type = "PermissionDescriptorAllow",
+            Type__ = "PermissionDescriptorAllow",
             Permissions = new[] { "stack:read" },
         },
     });

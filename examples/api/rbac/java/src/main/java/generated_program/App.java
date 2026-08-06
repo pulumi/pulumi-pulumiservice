@@ -25,7 +25,7 @@ public class App {
                     .description(roleDescription)
                     .uxPurpose("role")
                     .details(PermissionDescriptorAllowArgs.builder()
-                        .__type("PermissionDescriptorAllow")
+                        .type__("PermissionDescriptorAllow")
                         .permissions("stack:read")
                         .build())
                     .build());

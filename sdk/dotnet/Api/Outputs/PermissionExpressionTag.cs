@@ -14,31 +14,31 @@ namespace Pulumi.PulumiService.Api.Outputs
     public sealed class PermissionExpressionTag
     {
         /// <summary>
-        /// Expected value is 'PermissionExpressionTag'.
-        /// </summary>
-        public readonly string __type;
-        /// <summary>
         /// The context expression identifying the resource to look up the tag on.
         /// 
-        /// Valid `__type` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
+        /// Valid `type__` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
         /// </summary>
         public readonly object? Context;
         /// <summary>
         /// The tag key to retrieve.
         /// </summary>
         public readonly string? Key;
+        /// <summary>
+        /// Expected value is 'PermissionExpressionTag'.
+        /// </summary>
+        public readonly string Type__;
 
         [OutputConstructor]
         private PermissionExpressionTag(
-            string __type,
-
             object? context,
 
-            string? key)
+            string? key,
+
+            string type__)
         {
-            this.__type = __type;
             Context = context;
             Key = key;
+            Type__ = type__;
         }
     }
 }

@@ -14,15 +14,15 @@ public final class PermissionExpressionStack {
      * @return Expected value is &#39;PermissionExpressionStack&#39;.
      * 
      */
-    private String __type;
+    private String type__;
 
     private PermissionExpressionStack() {}
     /**
      * @return Expected value is &#39;PermissionExpressionStack&#39;.
      * 
      */
-    public String __type() {
-        return this.__type;
+    public String type__() {
+        return this.type__;
     }
 
     public static Builder builder() {
@@ -34,24 +34,24 @@ public final class PermissionExpressionStack {
     }
     @CustomType.Builder
     public static final class Builder {
-        private String __type;
+        private String type__;
         public Builder() {}
         public Builder(PermissionExpressionStack defaults) {
     	      Objects.requireNonNull(defaults);
-    	      this.__type = defaults.__type;
+    	      this.type__ = defaults.type__;
         }
 
         @CustomType.Setter
-        public Builder __type(String __type) {
-            if (__type == null) {
-              throw new MissingRequiredPropertyException("PermissionExpressionStack", "__type");
+        public Builder type__(String type__) {
+            if (type__ == null) {
+              throw new MissingRequiredPropertyException("PermissionExpressionStack", "type__");
             }
-            this.__type = __type;
+            this.type__ = type__;
             return this;
         }
         public PermissionExpressionStack build() {
             final var _resultValue = new PermissionExpressionStack();
-            _resultValue.__type = __type;
+            _resultValue.type__ = type__;
             return _resultValue;
         }
     }

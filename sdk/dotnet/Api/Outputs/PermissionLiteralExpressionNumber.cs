@@ -16,7 +16,7 @@ namespace Pulumi.PulumiService.Api.Outputs
         /// <summary>
         /// Expected value is 'PermissionLiteralExpressionNumber'.
         /// </summary>
-        public readonly string __type;
+        public readonly string Type__;
         /// <summary>
         /// The numeric literal value.
         /// </summary>
@@ -24,11 +24,11 @@ namespace Pulumi.PulumiService.Api.Outputs
 
         [OutputConstructor]
         private PermissionLiteralExpressionNumber(
-            string __type,
+            string type__,
 
             double? value)
         {
-            this.__type = __type;
+            Type__ = type__;
             Value = value;
         }
     }

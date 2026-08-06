@@ -14,14 +14,14 @@ return await Deployment.RunAsync(() =>
     // Every level is a typed discriminated-union variant class.
     Ps.Api.Inputs.PermissionExpressionEqualArgs EnvMatch(string identity) => new()
     {
-        __type = "PermissionExpressionEqual",
+        Type__ = "PermissionExpressionEqual",
         Left = new Ps.Api.Inputs.PermissionExpressionEnvironmentArgs
         {
-            __type = "PermissionExpressionEnvironment",
+            Type__ = "PermissionExpressionEnvironment",
         },
         Right = new Ps.Api.Inputs.PermissionLiteralExpressionEnvironmentArgs
         {
-            __type = "PermissionLiteralExpressionEnvironment",
+            Type__ = "PermissionLiteralExpressionEnvironment",
             Identity = identity,
         },
     };
@@ -34,25 +34,25 @@ return await Deployment.RunAsync(() =>
         UxPurpose = "role",
         Details = new Ps.Api.Inputs.PermissionDescriptorGroupArgs
         {
-            __type = "PermissionDescriptorGroup",
+            Type__ = "PermissionDescriptorGroup",
             Entries = new object[]
             {
                 new Ps.Api.Inputs.PermissionDescriptorConditionArgs
                 {
-                    __type = "PermissionDescriptorCondition",
+                    Type__ = "PermissionDescriptorCondition",
                     Condition = new Ps.Api.Inputs.PermissionExpressionAndArgs
                     {
-                        __type = "PermissionExpressionAnd",
+                        Type__ = "PermissionExpressionAnd",
                         Left = EnvMatch(allowedEnvironmentId),
                         Right = new Ps.Api.Inputs.PermissionExpressionNotArgs
                         {
-                            __type = "PermissionExpressionNot",
+                            Type__ = "PermissionExpressionNot",
                             Node = EnvMatch(deniedEnvironmentId),
                         },
                     },
                     SubNode = new Ps.Api.Inputs.PermissionDescriptorAllowArgs
                     {
-                        __type = "PermissionDescriptorAllow",
+                        Type__ = "PermissionDescriptorAllow",
                         Permissions = new[] { "environment:read", "environment:open" },
                     },
                 },

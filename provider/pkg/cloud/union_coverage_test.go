@@ -28,24 +28,24 @@ var variantWaivers = map[string]string{
 	// PermissionDescriptor exotics: Compose references other descriptors by
 	// name and Select/IfThenElse express org-specific routing; the
 	// rbac-scoped example covers the load-bearing Allow/Group/Condition path.
-	"__type=PermissionDescriptorCompose":    "references sibling descriptors by name; no self-contained example shape",
-	"__type=PermissionDescriptorIfThenElse": "routing variant; Condition covers the gating path",
-	"__type=PermissionDescriptorSelect":     "routing variant; Condition covers the gating path",
+	"type__=PermissionDescriptorCompose":    "references sibling descriptors by name; no self-contained example shape",
+	"type__=PermissionDescriptorIfThenElse": "routing variant; Condition covers the gating path",
+	"type__=PermissionDescriptorSelect":     "routing variant; Condition covers the gating path",
 
 	// PermissionExpression algebra beyond what rbac-scoped exercises
 	// (And/Not/Equal + environment context/literal are covered there).
-	"__type=PermissionExpressionHasTag":                 "tag-based (ABAC) scoping; needs org tag fixtures",
-	"__type=PermissionExpressionTag":                    "tag-based (ABAC) scoping; needs org tag fixtures",
-	"__type=PermissionExpressionOr":                     "boolean algebra covered by And/Not in rbac-scoped",
-	"__type=PermissionExpressionStack":                  "stack scoping mirrors the environment-scoped example",
-	"__type=PermissionExpressionTeam":                   "team scoping mirrors the environment-scoped example",
-	"__type=PermissionExpressionInsightsAccount":        "insights scoping mirrors the environment-scoped example",
-	"__type=PermissionLiteralExpressionBool":            "literal for boolean algebra corners",
-	"__type=PermissionLiteralExpressionNumber":          "literal for numeric comparisons; no numeric context today",
-	"__type=PermissionLiteralExpressionString":          "literal for string comparisons; no string context today",
-	"__type=PermissionLiteralExpressionStack":           "stack scoping mirrors the environment-scoped example",
-	"__type=PermissionLiteralExpressionTeam":            "team scoping mirrors the environment-scoped example",
-	"__type=PermissionLiteralExpressionInsightsAccount": "insights scoping mirrors the environment-scoped example",
+	"type__=PermissionExpressionHasTag":                 "tag-based (ABAC) scoping; needs org tag fixtures",
+	"type__=PermissionExpressionTag":                    "tag-based (ABAC) scoping; needs org tag fixtures",
+	"type__=PermissionExpressionOr":                     "boolean algebra covered by And/Not in rbac-scoped",
+	"type__=PermissionExpressionStack":                  "stack scoping mirrors the environment-scoped example",
+	"type__=PermissionExpressionTeam":                   "team scoping mirrors the environment-scoped example",
+	"type__=PermissionExpressionInsightsAccount":        "insights scoping mirrors the environment-scoped example",
+	"type__=PermissionLiteralExpressionBool":            "literal for boolean algebra corners",
+	"type__=PermissionLiteralExpressionNumber":          "literal for numeric comparisons; no numeric context today",
+	"type__=PermissionLiteralExpressionString":          "literal for string comparisons; no string context today",
+	"type__=PermissionLiteralExpressionStack":           "stack scoping mirrors the environment-scoped example",
+	"type__=PermissionLiteralExpressionTeam":            "team scoping mirrors the environment-scoped example",
+	"type__=PermissionLiteralExpressionInsightsAccount": "insights scoping mirrors the environment-scoped example",
 
 	// AgentEntity/AgentUserEvent variants ride on api/agents:Task, whose
 	// example exercises the message flow, not entity diffs. (`type=stack`

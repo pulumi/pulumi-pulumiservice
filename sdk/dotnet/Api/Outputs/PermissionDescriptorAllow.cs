@@ -14,10 +14,6 @@ namespace Pulumi.PulumiService.Api.Outputs
     public sealed class PermissionDescriptorAllow
     {
         /// <summary>
-        /// Expected value is 'PermissionDescriptorAllow'.
-        /// </summary>
-        public readonly string __type;
-        /// <summary>
         /// Optional contextual constraints for the permissions
         /// </summary>
         public readonly Outputs.RbacPermissionConstraints? Constraints;
@@ -25,18 +21,22 @@ namespace Pulumi.PulumiService.Api.Outputs
         /// List of permissions to allow
         /// </summary>
         public readonly ImmutableArray<string> Permissions;
+        /// <summary>
+        /// Expected value is 'PermissionDescriptorAllow'.
+        /// </summary>
+        public readonly string Type__;
 
         [OutputConstructor]
         private PermissionDescriptorAllow(
-            string __type,
-
             Outputs.RbacPermissionConstraints? constraints,
 
-            ImmutableArray<string> permissions)
+            ImmutableArray<string> permissions,
+
+            string type__)
         {
-            this.__type = __type;
             Constraints = constraints;
             Permissions = permissions;
+            Type__ = type__;
         }
     }
 }

@@ -73,7 +73,7 @@ public class Role extends com.pulumi.resources.CustomResource {
     /**
      * The detailed permission descriptor tree.
      * 
-     * Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
+     * Valid `type__` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
      * 
      */
     @Export(name="details", refs={Object.class}, tree="[0]")
@@ -82,7 +82,7 @@ public class Role extends com.pulumi.resources.CustomResource {
     /**
      * @return The detailed permission descriptor tree.
      * 
-     * Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
+     * Valid `type__` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
      * 
      */
     public Output<Optional<Object>> details() {

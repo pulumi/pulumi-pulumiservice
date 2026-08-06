@@ -13,9 +13,9 @@ denied_environment_id = config.get("deniedEnvironmentId") or "3cb9b7ad-0848-4e0d
 # double-underscore property names in Python codegen.
 def env_match(identity):
     return {
-        "__type": "PermissionExpressionEqual",
-        "left": {"__type": "PermissionExpressionEnvironment"},
-        "right": {"__type": "PermissionLiteralExpressionEnvironment", "identity": identity},
+        "type__": "PermissionExpressionEqual",
+        "left": {"type__": "PermissionExpressionEnvironment"},
+        "right": {"type__": "PermissionLiteralExpressionEnvironment", "identity": identity},
     }
 
 
@@ -26,20 +26,20 @@ scoped_role = pulumiservice.api.Role(
     description=role_description,
     ux_purpose="role",
     details={
-        "__type": "PermissionDescriptorGroup",
+        "type__": "PermissionDescriptorGroup",
         "entries": [
             {
-                "__type": "PermissionDescriptorCondition",
+                "type__": "PermissionDescriptorCondition",
                 "condition": {
-                    "__type": "PermissionExpressionAnd",
+                    "type__": "PermissionExpressionAnd",
                     "left": env_match(allowed_environment_id),
                     "right": {
-                        "__type": "PermissionExpressionNot",
+                        "type__": "PermissionExpressionNot",
                         "node": env_match(denied_environment_id),
                     },
                 },
                 "subNode": {
-                    "__type": "PermissionDescriptorAllow",
+                    "type__": "PermissionDescriptorAllow",
                     "permissions": ["environment:read", "environment:open"],
                 },
             }

@@ -19,21 +19,21 @@ public final class PermissionExpressionStackArgs extends com.pulumi.resources.Re
      * Expected value is &#39;PermissionExpressionStack&#39;.
      * 
      */
-    @Import(name="__type", required=true)
-    private Output<String> __type;
+    @Import(name="type__", required=true)
+    private Output<String> type__;
 
     /**
      * @return Expected value is &#39;PermissionExpressionStack&#39;.
      * 
      */
-    public Output<String> __type() {
-        return this.__type;
+    public Output<String> type__() {
+        return this.type__;
     }
 
     private PermissionExpressionStackArgs() {}
 
     private PermissionExpressionStackArgs(PermissionExpressionStackArgs $) {
-        this.__type = $.__type;
+        this.type__ = $.type__;
     }
 
     public static Builder builder() {
@@ -55,28 +55,28 @@ public final class PermissionExpressionStackArgs extends com.pulumi.resources.Re
         }
 
         /**
-         * @param __type Expected value is &#39;PermissionExpressionStack&#39;.
+         * @param type__ Expected value is &#39;PermissionExpressionStack&#39;.
          * 
          * @return builder
          * 
          */
-        public Builder __type(Output<String> __type) {
-            $.__type = __type;
+        public Builder type__(Output<String> type__) {
+            $.type__ = type__;
             return this;
         }
 
         /**
-         * @param __type Expected value is &#39;PermissionExpressionStack&#39;.
+         * @param type__ Expected value is &#39;PermissionExpressionStack&#39;.
          * 
          * @return builder
          * 
          */
-        public Builder __type(String __type) {
-            return __type(Output.of(__type));
+        public Builder type__(String type__) {
+            return type__(Output.of(type__));
         }
 
         public PermissionExpressionStackArgs build() {
-            $.__type = Codegen.stringProp("__type").output().arg($.__type).require();
+            $.type__ = Codegen.stringProp("type__").output().arg($.type__).require();
             return $;
         }
     }

@@ -13,16 +13,16 @@ namespace Pulumi.PulumiService.Api.Inputs
     public sealed class PermissionLiteralExpressionInsightsAccountArgs : global::Pulumi.ResourceArgs
     {
         /// <summary>
-        /// Expected value is 'PermissionLiteralExpressionInsightsAccount'.
-        /// </summary>
-        [Input("__type", required: true)]
-        public Input<string> __type { get; set; } = null!;
-
-        /// <summary>
         /// The identity of the Insights account.
         /// </summary>
         [Input("identity")]
         public Input<string>? Identity { get; set; }
+
+        /// <summary>
+        /// Expected value is 'PermissionLiteralExpressionInsightsAccount'.
+        /// </summary>
+        [Input("type__", required: true)]
+        public Input<string> Type__ { get; set; } = null!;
 
         public PermissionLiteralExpressionInsightsAccountArgs()
         {

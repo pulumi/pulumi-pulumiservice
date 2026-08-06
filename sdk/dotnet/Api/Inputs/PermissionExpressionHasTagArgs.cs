@@ -13,15 +13,9 @@ namespace Pulumi.PulumiService.Api.Inputs
     public sealed class PermissionExpressionHasTagArgs : global::Pulumi.ResourceArgs
     {
         /// <summary>
-        /// Expected value is 'PermissionExpressionHasTag'.
-        /// </summary>
-        [Input("__type", required: true)]
-        public Input<string> __type { get; set; } = null!;
-
-        /// <summary>
         /// The context expression to check for the tag.
         /// 
-        /// Valid `__type` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
+        /// Valid `type__` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
         /// </summary>
         [Input("context")]
         public object? Context { get; set; }
@@ -35,10 +29,16 @@ namespace Pulumi.PulumiService.Api.Inputs
         /// <summary>
         /// The operand of the unary boolean expression.
         /// 
-        /// Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+        /// Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
         /// </summary>
         [Input("node")]
         public object? Node { get; set; }
+
+        /// <summary>
+        /// Expected value is 'PermissionExpressionHasTag'.
+        /// </summary>
+        [Input("type__", required: true)]
+        public Input<string> Type__ { get; set; } = null!;
 
         public PermissionExpressionHasTagArgs()
         {

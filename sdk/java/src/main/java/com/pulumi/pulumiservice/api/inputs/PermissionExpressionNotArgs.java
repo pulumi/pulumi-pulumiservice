@@ -23,24 +23,9 @@ public final class PermissionExpressionNotArgs extends com.pulumi.resources.Reso
     public static final PermissionExpressionNotArgs Empty = new PermissionExpressionNotArgs();
 
     /**
-     * Expected value is &#39;PermissionExpressionNot&#39;.
-     * 
-     */
-    @Import(name="__type", required=true)
-    private Output<String> __type;
-
-    /**
-     * @return Expected value is &#39;PermissionExpressionNot&#39;.
-     * 
-     */
-    public Output<String> __type() {
-        return this.__type;
-    }
-
-    /**
      * The operand of the unary boolean expression.
      * 
-     * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+     * Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
      * 
      */
     @Import(name="node")
@@ -49,18 +34,33 @@ public final class PermissionExpressionNotArgs extends com.pulumi.resources.Reso
     /**
      * @return The operand of the unary boolean expression.
      * 
-     * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+     * Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
      * 
      */
     public Optional<Output<Object>> node() {
         return Optional.ofNullable(this.node);
     }
 
+    /**
+     * Expected value is &#39;PermissionExpressionNot&#39;.
+     * 
+     */
+    @Import(name="type__", required=true)
+    private Output<String> type__;
+
+    /**
+     * @return Expected value is &#39;PermissionExpressionNot&#39;.
+     * 
+     */
+    public Output<String> type__() {
+        return this.type__;
+    }
+
     private PermissionExpressionNotArgs() {}
 
     private PermissionExpressionNotArgs(PermissionExpressionNotArgs $) {
-        this.__type = $.__type;
         this.node = $.node;
+        this.type__ = $.type__;
     }
 
     public static Builder builder() {
@@ -82,30 +82,9 @@ public final class PermissionExpressionNotArgs extends com.pulumi.resources.Reso
         }
 
         /**
-         * @param __type Expected value is &#39;PermissionExpressionNot&#39;.
-         * 
-         * @return builder
-         * 
-         */
-        public Builder __type(Output<String> __type) {
-            $.__type = __type;
-            return this;
-        }
-
-        /**
-         * @param __type Expected value is &#39;PermissionExpressionNot&#39;.
-         * 
-         * @return builder
-         * 
-         */
-        public Builder __type(String __type) {
-            return __type(Output.of(__type));
-        }
-
-        /**
          * @param node The operand of the unary boolean expression.
          * 
-         * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+         * Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
          * 
          * @return builder
          * 
@@ -118,7 +97,7 @@ public final class PermissionExpressionNotArgs extends com.pulumi.resources.Reso
         /**
          * @param node The operand of the unary boolean expression.
          * 
-         * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+         * Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
          * 
          * @return builder
          * 
@@ -127,8 +106,29 @@ public final class PermissionExpressionNotArgs extends com.pulumi.resources.Reso
             return node(Output.of(node));
         }
 
+        /**
+         * @param type__ Expected value is &#39;PermissionExpressionNot&#39;.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder type__(Output<String> type__) {
+            $.type__ = type__;
+            return this;
+        }
+
+        /**
+         * @param type__ Expected value is &#39;PermissionExpressionNot&#39;.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder type__(String type__) {
+            return type__(Output.of(type__));
+        }
+
         public PermissionExpressionNotArgs build() {
-            $.__type = Codegen.stringProp("__type").output().arg($.__type).require();
+            $.type__ = Codegen.stringProp("type__").output().arg($.type__).require();
             return $;
         }
     }

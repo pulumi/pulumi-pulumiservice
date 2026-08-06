@@ -12,25 +12,25 @@ const deniedEnvironmentId = config.get("deniedEnvironmentId") ?? "3cb9b7ad-0848-
 // the descriptor layer (Group/Condition/Allow) and the expression layer
 // (And/Not/Equal + context/literal environment expressions).
 const envMatch = (identity: pulumi.Input<string>): ps.types.input.api.PermissionExpressionEqualArgs => ({
-    __type: "PermissionExpressionEqual",
-    left: { __type: "PermissionExpressionEnvironment" },
-    right: { __type: "PermissionLiteralExpressionEnvironment", identity },
+    type__: "PermissionExpressionEqual",
+    left: { type__: "PermissionExpressionEnvironment" },
+    right: { type__: "PermissionLiteralExpressionEnvironment", identity },
 });
 
 const details: ps.types.input.api.PermissionDescriptorGroupArgs = {
-    __type: "PermissionDescriptorGroup",
+    type__: "PermissionDescriptorGroup",
     entries: [{
-        __type: "PermissionDescriptorCondition",
+        type__: "PermissionDescriptorCondition",
         condition: {
-            __type: "PermissionExpressionAnd",
+            type__: "PermissionExpressionAnd",
             left: envMatch(allowedEnvironmentId),
             right: {
-                __type: "PermissionExpressionNot",
+                type__: "PermissionExpressionNot",
                 node: envMatch(deniedEnvironmentId),
             },
         },
         subNode: {
-            __type: "PermissionDescriptorAllow",
+            type__: "PermissionDescriptorAllow",
             permissions: ["environment:read", "environment:open"],
         },
     }],

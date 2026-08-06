@@ -12,12 +12,6 @@ namespace Pulumi.PulumiService.Api.Inputs
 
     public sealed class PermissionDescriptorSelectArgs : global::Pulumi.ResourceArgs
     {
-        /// <summary>
-        /// Expected value is 'PermissionDescriptorSelect'.
-        /// </summary>
-        [Input("__type", required: true)]
-        public Input<string> __type { get; set; } = null!;
-
         [Input("options")]
         private InputList<Inputs.PermissionSelectvalueArgs>? _options;
 
@@ -33,10 +27,16 @@ namespace Pulumi.PulumiService.Api.Inputs
         /// <summary>
         /// The expression used to select which option to apply.
         /// 
-        /// Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
+        /// Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
         /// </summary>
         [Input("selector")]
         public object? Selector { get; set; }
+
+        /// <summary>
+        /// Expected value is 'PermissionDescriptorSelect'.
+        /// </summary>
+        [Input("type__", required: true)]
+        public Input<string> Type__ { get; set; } = null!;
 
         public PermissionDescriptorSelectArgs()
         {

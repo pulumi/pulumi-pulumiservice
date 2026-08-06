@@ -18,37 +18,30 @@ import javax.annotation.Nullable;
 @CustomType
 public final class PermissionExpressionAnd {
     /**
-     * @return Expected value is &#39;PermissionExpressionAnd&#39;.
-     * 
-     */
-    private String __type;
-    /**
      * @return The left operand of the binary boolean expression.
      * 
-     * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+     * Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
      * 
      */
     private @Nullable Object left;
     /**
      * @return The right operand of the binary boolean expression.
      * 
-     * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+     * Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
      * 
      */
     private @Nullable Object right;
-
-    private PermissionExpressionAnd() {}
     /**
      * @return Expected value is &#39;PermissionExpressionAnd&#39;.
      * 
      */
-    public String __type() {
-        return this.__type;
-    }
+    private String type__;
+
+    private PermissionExpressionAnd() {}
     /**
      * @return The left operand of the binary boolean expression.
      * 
-     * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+     * Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
      * 
      */
     public Optional<Object> left() {
@@ -57,11 +50,18 @@ public final class PermissionExpressionAnd {
     /**
      * @return The right operand of the binary boolean expression.
      * 
-     * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+     * Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
      * 
      */
     public Optional<Object> right() {
         return Optional.ofNullable(this.right);
+    }
+    /**
+     * @return Expected value is &#39;PermissionExpressionAnd&#39;.
+     * 
+     */
+    public String type__() {
+        return this.type__;
     }
 
     public static Builder builder() {
@@ -73,25 +73,17 @@ public final class PermissionExpressionAnd {
     }
     @CustomType.Builder
     public static final class Builder {
-        private String __type;
         private @Nullable Object left;
         private @Nullable Object right;
+        private String type__;
         public Builder() {}
         public Builder(PermissionExpressionAnd defaults) {
     	      Objects.requireNonNull(defaults);
-    	      this.__type = defaults.__type;
     	      this.left = defaults.left;
     	      this.right = defaults.right;
+    	      this.type__ = defaults.type__;
         }
 
-        @CustomType.Setter
-        public Builder __type(String __type) {
-            if (__type == null) {
-              throw new MissingRequiredPropertyException("PermissionExpressionAnd", "__type");
-            }
-            this.__type = __type;
-            return this;
-        }
         @CustomType.Setter
         public Builder left(@Nullable Object left) {
 
@@ -104,11 +96,19 @@ public final class PermissionExpressionAnd {
             this.right = right;
             return this;
         }
+        @CustomType.Setter
+        public Builder type__(String type__) {
+            if (type__ == null) {
+              throw new MissingRequiredPropertyException("PermissionExpressionAnd", "type__");
+            }
+            this.type__ = type__;
+            return this;
+        }
         public PermissionExpressionAnd build() {
             final var _resultValue = new PermissionExpressionAnd();
-            _resultValue.__type = __type;
             _resultValue.left = left;
             _resultValue.right = right;
+            _resultValue.type__ = type__;
             return _resultValue;
         }
     }

@@ -13,15 +13,9 @@ namespace Pulumi.PulumiService.Api.Inputs
     public sealed class PermissionDescriptorConditionArgs : global::Pulumi.ResourceArgs
     {
         /// <summary>
-        /// Expected value is 'PermissionDescriptorCondition'.
-        /// </summary>
-        [Input("__type", required: true)]
-        public Input<string> __type { get; set; } = null!;
-
-        /// <summary>
         /// The boolean condition to evaluate.
         /// 
-        /// Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+        /// Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
         /// </summary>
         [Input("condition")]
         public object? Condition { get; set; }
@@ -29,10 +23,16 @@ namespace Pulumi.PulumiService.Api.Inputs
         /// <summary>
         /// The permission descriptor to apply when the condition is true.
         /// 
-        /// Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
+        /// Valid `type__` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
         /// </summary>
         [Input("subNode")]
         public object? SubNode { get; set; }
+
+        /// <summary>
+        /// Expected value is 'PermissionDescriptorCondition'.
+        /// </summary>
+        [Input("type__", required: true)]
+        public Input<string> Type__ { get; set; } = null!;
 
         public PermissionDescriptorConditionArgs()
         {

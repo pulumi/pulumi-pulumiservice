@@ -20,6 +20,8 @@ import (
 	"strings"
 
 	"github.com/pulumi/pulumi/pkg/v3/codegen/schema"
+
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 )
 
 // BuildSchema produces a Pulumi PackageSpec from spec + metadata. Per-resource
@@ -691,7 +693,7 @@ func pulumiName(name string, renames map[string]string) string {
 			return pul
 		}
 	}
-	return name
+	return util.ToSchemaName(name)
 }
 
 func stringSet(ss []string) map[string]struct{} {

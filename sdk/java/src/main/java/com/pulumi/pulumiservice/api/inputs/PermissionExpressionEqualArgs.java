@@ -35,24 +35,9 @@ public final class PermissionExpressionEqualArgs extends com.pulumi.resources.Re
     public static final PermissionExpressionEqualArgs Empty = new PermissionExpressionEqualArgs();
 
     /**
-     * Expected value is &#39;PermissionExpressionEqual&#39;.
-     * 
-     */
-    @Import(name="__type", required=true)
-    private Output<String> __type;
-
-    /**
-     * @return Expected value is &#39;PermissionExpressionEqual&#39;.
-     * 
-     */
-    public Output<String> __type() {
-        return this.__type;
-    }
-
-    /**
      * The left operand of the equality comparison.
      * 
-     * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
+     * Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
      * 
      */
     @Import(name="left")
@@ -61,7 +46,7 @@ public final class PermissionExpressionEqualArgs extends com.pulumi.resources.Re
     /**
      * @return The left operand of the equality comparison.
      * 
-     * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
+     * Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
      * 
      */
     public Optional<Output<Object>> left() {
@@ -71,7 +56,7 @@ public final class PermissionExpressionEqualArgs extends com.pulumi.resources.Re
     /**
      * The right operand of the equality comparison.
      * 
-     * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
+     * Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
      * 
      */
     @Import(name="right")
@@ -80,19 +65,34 @@ public final class PermissionExpressionEqualArgs extends com.pulumi.resources.Re
     /**
      * @return The right operand of the equality comparison.
      * 
-     * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
+     * Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
      * 
      */
     public Optional<Output<Object>> right() {
         return Optional.ofNullable(this.right);
     }
 
+    /**
+     * Expected value is &#39;PermissionExpressionEqual&#39;.
+     * 
+     */
+    @Import(name="type__", required=true)
+    private Output<String> type__;
+
+    /**
+     * @return Expected value is &#39;PermissionExpressionEqual&#39;.
+     * 
+     */
+    public Output<String> type__() {
+        return this.type__;
+    }
+
     private PermissionExpressionEqualArgs() {}
 
     private PermissionExpressionEqualArgs(PermissionExpressionEqualArgs $) {
-        this.__type = $.__type;
         this.left = $.left;
         this.right = $.right;
+        this.type__ = $.type__;
     }
 
     public static Builder builder() {
@@ -114,30 +114,9 @@ public final class PermissionExpressionEqualArgs extends com.pulumi.resources.Re
         }
 
         /**
-         * @param __type Expected value is &#39;PermissionExpressionEqual&#39;.
-         * 
-         * @return builder
-         * 
-         */
-        public Builder __type(Output<String> __type) {
-            $.__type = __type;
-            return this;
-        }
-
-        /**
-         * @param __type Expected value is &#39;PermissionExpressionEqual&#39;.
-         * 
-         * @return builder
-         * 
-         */
-        public Builder __type(String __type) {
-            return __type(Output.of(__type));
-        }
-
-        /**
          * @param left The left operand of the equality comparison.
          * 
-         * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
+         * Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
          * 
          * @return builder
          * 
@@ -150,7 +129,7 @@ public final class PermissionExpressionEqualArgs extends com.pulumi.resources.Re
         /**
          * @param left The left operand of the equality comparison.
          * 
-         * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
+         * Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
          * 
          * @return builder
          * 
@@ -162,7 +141,7 @@ public final class PermissionExpressionEqualArgs extends com.pulumi.resources.Re
         /**
          * @param right The right operand of the equality comparison.
          * 
-         * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
+         * Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
          * 
          * @return builder
          * 
@@ -175,7 +154,7 @@ public final class PermissionExpressionEqualArgs extends com.pulumi.resources.Re
         /**
          * @param right The right operand of the equality comparison.
          * 
-         * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
+         * Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
          * 
          * @return builder
          * 
@@ -184,8 +163,29 @@ public final class PermissionExpressionEqualArgs extends com.pulumi.resources.Re
             return right(Output.of(right));
         }
 
+        /**
+         * @param type__ Expected value is &#39;PermissionExpressionEqual&#39;.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder type__(Output<String> type__) {
+            $.type__ = type__;
+            return this;
+        }
+
+        /**
+         * @param type__ Expected value is &#39;PermissionExpressionEqual&#39;.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder type__(String type__) {
+            return type__(Output.of(type__));
+        }
+
         public PermissionExpressionEqualArgs build() {
-            $.__type = Codegen.stringProp("__type").output().arg($.__type).require();
+            $.type__ = Codegen.stringProp("type__").output().arg($.type__).require();
             return $;
         }
     }

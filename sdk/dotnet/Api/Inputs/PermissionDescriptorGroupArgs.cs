@@ -12,25 +12,25 @@ namespace Pulumi.PulumiService.Api.Inputs
 
     public sealed class PermissionDescriptorGroupArgs : global::Pulumi.ResourceArgs
     {
-        /// <summary>
-        /// Expected value is 'PermissionDescriptorGroup'.
-        /// </summary>
-        [Input("__type", required: true)]
-        public Input<string> __type { get; set; } = null!;
-
         [Input("entries")]
         private InputList<object>? _entries;
 
         /// <summary>
         /// The list of permission descriptor entries in this group.
         /// 
-        /// Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
+        /// Valid `type__` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
         /// </summary>
         public InputList<object> Entries
         {
             get => _entries ?? (_entries = new InputList<object>());
             set => _entries = value;
         }
+
+        /// <summary>
+        /// Expected value is 'PermissionDescriptorGroup'.
+        /// </summary>
+        [Input("type__", required: true)]
+        public Input<string> Type__ { get; set; } = null!;
 
         public PermissionDescriptorGroupArgs()
         {

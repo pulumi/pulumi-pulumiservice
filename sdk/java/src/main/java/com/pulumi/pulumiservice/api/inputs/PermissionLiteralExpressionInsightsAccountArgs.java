@@ -18,21 +18,6 @@ public final class PermissionLiteralExpressionInsightsAccountArgs extends com.pu
     public static final PermissionLiteralExpressionInsightsAccountArgs Empty = new PermissionLiteralExpressionInsightsAccountArgs();
 
     /**
-     * Expected value is &#39;PermissionLiteralExpressionInsightsAccount&#39;.
-     * 
-     */
-    @Import(name="__type", required=true)
-    private Output<String> __type;
-
-    /**
-     * @return Expected value is &#39;PermissionLiteralExpressionInsightsAccount&#39;.
-     * 
-     */
-    public Output<String> __type() {
-        return this.__type;
-    }
-
-    /**
      * The identity of the Insights account.
      * 
      */
@@ -47,11 +32,26 @@ public final class PermissionLiteralExpressionInsightsAccountArgs extends com.pu
         return Optional.ofNullable(this.identity);
     }
 
+    /**
+     * Expected value is &#39;PermissionLiteralExpressionInsightsAccount&#39;.
+     * 
+     */
+    @Import(name="type__", required=true)
+    private Output<String> type__;
+
+    /**
+     * @return Expected value is &#39;PermissionLiteralExpressionInsightsAccount&#39;.
+     * 
+     */
+    public Output<String> type__() {
+        return this.type__;
+    }
+
     private PermissionLiteralExpressionInsightsAccountArgs() {}
 
     private PermissionLiteralExpressionInsightsAccountArgs(PermissionLiteralExpressionInsightsAccountArgs $) {
-        this.__type = $.__type;
         this.identity = $.identity;
+        this.type__ = $.type__;
     }
 
     public static Builder builder() {
@@ -70,27 +70,6 @@ public final class PermissionLiteralExpressionInsightsAccountArgs extends com.pu
 
         public Builder(PermissionLiteralExpressionInsightsAccountArgs defaults) {
             $ = new PermissionLiteralExpressionInsightsAccountArgs(Objects.requireNonNull(defaults));
-        }
-
-        /**
-         * @param __type Expected value is &#39;PermissionLiteralExpressionInsightsAccount&#39;.
-         * 
-         * @return builder
-         * 
-         */
-        public Builder __type(Output<String> __type) {
-            $.__type = __type;
-            return this;
-        }
-
-        /**
-         * @param __type Expected value is &#39;PermissionLiteralExpressionInsightsAccount&#39;.
-         * 
-         * @return builder
-         * 
-         */
-        public Builder __type(String __type) {
-            return __type(Output.of(__type));
         }
 
         /**
@@ -114,8 +93,29 @@ public final class PermissionLiteralExpressionInsightsAccountArgs extends com.pu
             return identity(Output.of(identity));
         }
 
+        /**
+         * @param type__ Expected value is &#39;PermissionLiteralExpressionInsightsAccount&#39;.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder type__(Output<String> type__) {
+            $.type__ = type__;
+            return this;
+        }
+
+        /**
+         * @param type__ Expected value is &#39;PermissionLiteralExpressionInsightsAccount&#39;.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder type__(String type__) {
+            return type__(Output.of(type__));
+        }
+
         public PermissionLiteralExpressionInsightsAccountArgs build() {
-            $.__type = Codegen.stringProp("__type").output().arg($.__type).require();
+            $.type__ = Codegen.stringProp("type__").output().arg($.type__).require();
             return $;
         }
     }

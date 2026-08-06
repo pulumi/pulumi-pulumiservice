@@ -14,22 +14,22 @@ namespace Pulumi.PulumiService.Api.Outputs
     public sealed class PermissionLiteralExpressionInsightsAccount
     {
         /// <summary>
-        /// Expected value is 'PermissionLiteralExpressionInsightsAccount'.
-        /// </summary>
-        public readonly string __type;
-        /// <summary>
         /// The identity of the Insights account.
         /// </summary>
         public readonly string? Identity;
+        /// <summary>
+        /// Expected value is 'PermissionLiteralExpressionInsightsAccount'.
+        /// </summary>
+        public readonly string Type__;
 
         [OutputConstructor]
         private PermissionLiteralExpressionInsightsAccount(
-            string __type,
+            string? identity,
 
-            string? identity)
+            string type__)
         {
-            this.__type = __type;
             Identity = identity;
+            Type__ = type__;
         }
     }
 }

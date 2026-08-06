@@ -16,12 +16,12 @@ namespace Pulumi.PulumiService.Api.Outputs
         /// <summary>
         /// Expected value is 'PermissionExpressionStack'.
         /// </summary>
-        public readonly string __type;
+        public readonly string Type__;
 
         [OutputConstructor]
-        private PermissionExpressionStack(string __type)
+        private PermissionExpressionStack(string type__)
         {
-            this.__type = __type;
+            Type__ = type__;
         }
     }
 }

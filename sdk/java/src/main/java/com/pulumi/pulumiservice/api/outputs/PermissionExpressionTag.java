@@ -18,14 +18,9 @@ import javax.annotation.Nullable;
 @CustomType
 public final class PermissionExpressionTag {
     /**
-     * @return Expected value is &#39;PermissionExpressionTag&#39;.
-     * 
-     */
-    private String __type;
-    /**
      * @return The context expression identifying the resource to look up the tag on.
      * 
-     * Valid `__type` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
+     * Valid `type__` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
      * 
      */
     private @Nullable Object context;
@@ -34,19 +29,17 @@ public final class PermissionExpressionTag {
      * 
      */
     private @Nullable String key;
-
-    private PermissionExpressionTag() {}
     /**
      * @return Expected value is &#39;PermissionExpressionTag&#39;.
      * 
      */
-    public String __type() {
-        return this.__type;
-    }
+    private String type__;
+
+    private PermissionExpressionTag() {}
     /**
      * @return The context expression identifying the resource to look up the tag on.
      * 
-     * Valid `__type` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
+     * Valid `type__` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
      * 
      */
     public Optional<Object> context() {
@@ -59,6 +52,13 @@ public final class PermissionExpressionTag {
     public Optional<String> key() {
         return Optional.ofNullable(this.key);
     }
+    /**
+     * @return Expected value is &#39;PermissionExpressionTag&#39;.
+     * 
+     */
+    public String type__() {
+        return this.type__;
+    }
 
     public static Builder builder() {
         return new Builder();
@@ -69,25 +69,17 @@ public final class PermissionExpressionTag {
     }
     @CustomType.Builder
     public static final class Builder {
-        private String __type;
         private @Nullable Object context;
         private @Nullable String key;
+        private String type__;
         public Builder() {}
         public Builder(PermissionExpressionTag defaults) {
     	      Objects.requireNonNull(defaults);
-    	      this.__type = defaults.__type;
     	      this.context = defaults.context;
     	      this.key = defaults.key;
+    	      this.type__ = defaults.type__;
         }
 
-        @CustomType.Setter
-        public Builder __type(String __type) {
-            if (__type == null) {
-              throw new MissingRequiredPropertyException("PermissionExpressionTag", "__type");
-            }
-            this.__type = __type;
-            return this;
-        }
         @CustomType.Setter
         public Builder context(@Nullable Object context) {
 
@@ -100,11 +92,19 @@ public final class PermissionExpressionTag {
             this.key = key;
             return this;
         }
+        @CustomType.Setter
+        public Builder type__(String type__) {
+            if (type__ == null) {
+              throw new MissingRequiredPropertyException("PermissionExpressionTag", "type__");
+            }
+            this.type__ = type__;
+            return this;
+        }
         public PermissionExpressionTag build() {
             final var _resultValue = new PermissionExpressionTag();
-            _resultValue.__type = __type;
             _resultValue.context = context;
             _resultValue.key = key;
+            _resultValue.type__ = type__;
             return _resultValue;
         }
     }

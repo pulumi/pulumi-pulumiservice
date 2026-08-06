@@ -39,7 +39,7 @@ return await Deployment.RunAsync(() =>
     });
 
     var roleDetails = ImmutableDictionary<string, object>.Empty
-        .Add("__type", "PermissionDescriptorAllow")
+        .Add("type__", "PermissionDescriptorAllow")
         .Add("permissions", new[] { "stack:read" });
     new Ps.Api.Role("stackReadonlyRole", new()
     {

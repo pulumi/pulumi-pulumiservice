@@ -14,33 +14,33 @@ namespace Pulumi.PulumiService.Api.Outputs
     public sealed class PermissionDescriptorCondition
     {
         /// <summary>
-        /// Expected value is 'PermissionDescriptorCondition'.
-        /// </summary>
-        public readonly string __type;
-        /// <summary>
         /// The boolean condition to evaluate.
         /// 
-        /// Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+        /// Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
         /// </summary>
         public readonly object? Condition;
         /// <summary>
         /// The permission descriptor to apply when the condition is true.
         /// 
-        /// Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
+        /// Valid `type__` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
         /// </summary>
         public readonly object? SubNode;
+        /// <summary>
+        /// Expected value is 'PermissionDescriptorCondition'.
+        /// </summary>
+        public readonly string Type__;
 
         [OutputConstructor]
         private PermissionDescriptorCondition(
-            string __type,
-
             object? condition,
 
-            object? subNode)
+            object? subNode,
+
+            string type__)
         {
-            this.__type = __type;
             Condition = condition;
             SubNode = subNode;
+            Type__ = type__;
         }
     }
 }

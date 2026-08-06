@@ -15,11 +15,6 @@ import javax.annotation.Nullable;
 @CustomType
 public final class PermissionDescriptorAllow {
     /**
-     * @return Expected value is &#39;PermissionDescriptorAllow&#39;.
-     * 
-     */
-    private String __type;
-    /**
      * @return Optional contextual constraints for the permissions
      * 
      */
@@ -29,15 +24,13 @@ public final class PermissionDescriptorAllow {
      * 
      */
     private @Nullable List<String> permissions;
-
-    private PermissionDescriptorAllow() {}
     /**
      * @return Expected value is &#39;PermissionDescriptorAllow&#39;.
      * 
      */
-    public String __type() {
-        return this.__type;
-    }
+    private String type__;
+
+    private PermissionDescriptorAllow() {}
     /**
      * @return Optional contextual constraints for the permissions
      * 
@@ -52,6 +45,13 @@ public final class PermissionDescriptorAllow {
     public List<String> permissions() {
         return this.permissions == null ? List.of() : this.permissions;
     }
+    /**
+     * @return Expected value is &#39;PermissionDescriptorAllow&#39;.
+     * 
+     */
+    public String type__() {
+        return this.type__;
+    }
 
     public static Builder builder() {
         return new Builder();
@@ -62,25 +62,17 @@ public final class PermissionDescriptorAllow {
     }
     @CustomType.Builder
     public static final class Builder {
-        private String __type;
         private @Nullable RbacPermissionConstraints constraints;
         private @Nullable List<String> permissions;
+        private String type__;
         public Builder() {}
         public Builder(PermissionDescriptorAllow defaults) {
     	      Objects.requireNonNull(defaults);
-    	      this.__type = defaults.__type;
     	      this.constraints = defaults.constraints;
     	      this.permissions = defaults.permissions;
+    	      this.type__ = defaults.type__;
         }
 
-        @CustomType.Setter
-        public Builder __type(String __type) {
-            if (__type == null) {
-              throw new MissingRequiredPropertyException("PermissionDescriptorAllow", "__type");
-            }
-            this.__type = __type;
-            return this;
-        }
         @CustomType.Setter
         public Builder constraints(@Nullable RbacPermissionConstraints constraints) {
 
@@ -96,11 +88,19 @@ public final class PermissionDescriptorAllow {
         public Builder permissions(String... permissions) {
             return permissions(List.of(permissions));
         }
+        @CustomType.Setter
+        public Builder type__(String type__) {
+            if (type__ == null) {
+              throw new MissingRequiredPropertyException("PermissionDescriptorAllow", "type__");
+            }
+            this.type__ = type__;
+            return this;
+        }
         public PermissionDescriptorAllow build() {
             final var _resultValue = new PermissionDescriptorAllow();
-            _resultValue.__type = __type;
             _resultValue.constraints = constraints;
             _resultValue.permissions = permissions;
+            _resultValue.type__ = type__;
             return _resultValue;
         }
     }

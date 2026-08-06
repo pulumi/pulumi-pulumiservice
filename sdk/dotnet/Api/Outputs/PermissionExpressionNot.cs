@@ -14,24 +14,24 @@ namespace Pulumi.PulumiService.Api.Outputs
     public sealed class PermissionExpressionNot
     {
         /// <summary>
-        /// Expected value is 'PermissionExpressionNot'.
-        /// </summary>
-        public readonly string __type;
-        /// <summary>
         /// The operand of the unary boolean expression.
         /// 
-        /// Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+        /// Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
         /// </summary>
         public readonly object? Node;
+        /// <summary>
+        /// Expected value is 'PermissionExpressionNot'.
+        /// </summary>
+        public readonly string Type__;
 
         [OutputConstructor]
         private PermissionExpressionNot(
-            string __type,
+            object? node,
 
-            object? node)
+            string type__)
         {
-            this.__type = __type;
             Node = node;
+            Type__ = type__;
         }
     }
 }

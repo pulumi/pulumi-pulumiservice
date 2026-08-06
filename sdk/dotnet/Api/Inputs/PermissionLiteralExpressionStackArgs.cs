@@ -13,16 +13,16 @@ namespace Pulumi.PulumiService.Api.Inputs
     public sealed class PermissionLiteralExpressionStackArgs : global::Pulumi.ResourceArgs
     {
         /// <summary>
-        /// Expected value is 'PermissionLiteralExpressionStack'.
-        /// </summary>
-        [Input("__type", required: true)]
-        public Input<string> __type { get; set; } = null!;
-
-        /// <summary>
         /// The identity of the stack.
         /// </summary>
         [Input("identity")]
         public Input<string>? Identity { get; set; }
+
+        /// <summary>
+        /// Expected value is 'PermissionLiteralExpressionStack'.
+        /// </summary>
+        [Input("type__", required: true)]
+        public Input<string> Type__ { get; set; } = null!;
 
         public PermissionLiteralExpressionStackArgs()
         {

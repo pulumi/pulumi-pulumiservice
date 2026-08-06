@@ -37,7 +37,7 @@ class RoleArgs:
         :param pulumi.Input[_builtins.str] description: A human-readable description of the permission descriptor.
         :param pulumi.Input[Union['PermissionDescriptorAllowArgs', 'PermissionDescriptorComposeArgs', 'PermissionDescriptorConditionArgs', 'PermissionDescriptorGroupArgs', 'PermissionDescriptorIfThenElseArgs', 'PermissionDescriptorSelectArgs']] details: The detailed permission descriptor tree.
                
-               Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
+               Valid `type__` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
         :param pulumi.Input[_builtins.str] name: The name of the permission descriptor.
         :param pulumi.Input[_builtins.str] resource_type: The resource type this permission descriptor applies to.
         :param pulumi.Input[_builtins.str] role_id: The role identifier
@@ -101,7 +101,7 @@ class RoleArgs:
         """
         The detailed permission descriptor tree.
 
-        Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
+        Valid `type__` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
         """
         return pulumi.get(self, "details")
 
@@ -182,7 +182,7 @@ class Role(pulumi.CustomResource):
         :param pulumi.Input[_builtins.str] description: A human-readable description of the permission descriptor.
         :param pulumi.Input[Union[Union['PermissionDescriptorAllowArgs', 'PermissionDescriptorAllowArgsDict'], Union['PermissionDescriptorComposeArgs', 'PermissionDescriptorComposeArgsDict'], Union['PermissionDescriptorConditionArgs', 'PermissionDescriptorConditionArgsDict'], Union['PermissionDescriptorGroupArgs', 'PermissionDescriptorGroupArgsDict'], Union['PermissionDescriptorIfThenElseArgs', 'PermissionDescriptorIfThenElseArgsDict'], Union['PermissionDescriptorSelectArgs', 'PermissionDescriptorSelectArgsDict']]] details: The detailed permission descriptor tree.
                
-               Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
+               Valid `type__` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
         :param pulumi.Input[_builtins.str] name: The name of the permission descriptor.
         :param pulumi.Input[_builtins.str] org_name: The organization name
         :param pulumi.Input[_builtins.str] resource_type: The resource type this permission descriptor applies to.
@@ -312,7 +312,7 @@ class Role(pulumi.CustomResource):
         """
         The detailed permission descriptor tree.
 
-        Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
+        Valid `type__` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
         """
         return pulumi.get(self, "details")
 

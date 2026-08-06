@@ -13,12 +13,6 @@ namespace Pulumi.PulumiService.Api.Inputs
     public sealed class PermissionDescriptorAllowArgs : global::Pulumi.ResourceArgs
     {
         /// <summary>
-        /// Expected value is 'PermissionDescriptorAllow'.
-        /// </summary>
-        [Input("__type", required: true)]
-        public Input<string> __type { get; set; } = null!;
-
-        /// <summary>
         /// Optional contextual constraints for the permissions
         /// </summary>
         [Input("constraints")]
@@ -35,6 +29,12 @@ namespace Pulumi.PulumiService.Api.Inputs
             get => _permissions ?? (_permissions = new InputList<string>());
             set => _permissions = value;
         }
+
+        /// <summary>
+        /// Expected value is 'PermissionDescriptorAllow'.
+        /// </summary>
+        [Input("type__", required: true)]
+        public Input<string> Type__ { get; set; } = null!;
 
         public PermissionDescriptorAllowArgs()
         {

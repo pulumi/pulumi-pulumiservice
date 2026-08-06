@@ -13,15 +13,9 @@ namespace Pulumi.PulumiService.Api.Inputs
     public sealed class PermissionExpressionAndArgs : global::Pulumi.ResourceArgs
     {
         /// <summary>
-        /// Expected value is 'PermissionExpressionAnd'.
-        /// </summary>
-        [Input("__type", required: true)]
-        public Input<string> __type { get; set; } = null!;
-
-        /// <summary>
         /// The left operand of the binary boolean expression.
         /// 
-        /// Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+        /// Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
         /// </summary>
         [Input("left")]
         public object? Left { get; set; }
@@ -29,10 +23,16 @@ namespace Pulumi.PulumiService.Api.Inputs
         /// <summary>
         /// The right operand of the binary boolean expression.
         /// 
-        /// Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+        /// Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
         /// </summary>
         [Input("right")]
         public object? Right { get; set; }
+
+        /// <summary>
+        /// Expected value is 'PermissionExpressionAnd'.
+        /// </summary>
+        [Input("type__", required: true)]
+        public Input<string> Type__ { get; set; } = null!;
 
         public PermissionExpressionAndArgs()
         {

@@ -15,8 +15,8 @@ namespace Pulumi.PulumiService.Api.Inputs
         /// <summary>
         /// Expected value is 'PermissionLiteralExpressionString'.
         /// </summary>
-        [Input("__type", required: true)]
-        public Input<string> __type { get; set; } = null!;
+        [Input("type__", required: true)]
+        public Input<string> Type__ { get; set; } = null!;
 
         /// <summary>
         /// The string literal value.

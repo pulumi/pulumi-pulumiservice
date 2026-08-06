@@ -24,37 +24,30 @@ import javax.annotation.Nullable;
 @CustomType
 public final class PermissionDescriptorCondition {
     /**
-     * @return Expected value is &#39;PermissionDescriptorCondition&#39;.
-     * 
-     */
-    private String __type;
-    /**
      * @return The boolean condition to evaluate.
      * 
-     * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+     * Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
      * 
      */
     private @Nullable Object condition;
     /**
      * @return The permission descriptor to apply when the condition is true.
      * 
-     * Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
+     * Valid `type__` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
      * 
      */
     private @Nullable Object subNode;
-
-    private PermissionDescriptorCondition() {}
     /**
      * @return Expected value is &#39;PermissionDescriptorCondition&#39;.
      * 
      */
-    public String __type() {
-        return this.__type;
-    }
+    private String type__;
+
+    private PermissionDescriptorCondition() {}
     /**
      * @return The boolean condition to evaluate.
      * 
-     * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+     * Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
      * 
      */
     public Optional<Object> condition() {
@@ -63,11 +56,18 @@ public final class PermissionDescriptorCondition {
     /**
      * @return The permission descriptor to apply when the condition is true.
      * 
-     * Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
+     * Valid `type__` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
      * 
      */
     public Optional<Object> subNode() {
         return Optional.ofNullable(this.subNode);
+    }
+    /**
+     * @return Expected value is &#39;PermissionDescriptorCondition&#39;.
+     * 
+     */
+    public String type__() {
+        return this.type__;
     }
 
     public static Builder builder() {
@@ -79,25 +79,17 @@ public final class PermissionDescriptorCondition {
     }
     @CustomType.Builder
     public static final class Builder {
-        private String __type;
         private @Nullable Object condition;
         private @Nullable Object subNode;
+        private String type__;
         public Builder() {}
         public Builder(PermissionDescriptorCondition defaults) {
     	      Objects.requireNonNull(defaults);
-    	      this.__type = defaults.__type;
     	      this.condition = defaults.condition;
     	      this.subNode = defaults.subNode;
+    	      this.type__ = defaults.type__;
         }
 
-        @CustomType.Setter
-        public Builder __type(String __type) {
-            if (__type == null) {
-              throw new MissingRequiredPropertyException("PermissionDescriptorCondition", "__type");
-            }
-            this.__type = __type;
-            return this;
-        }
         @CustomType.Setter
         public Builder condition(@Nullable Object condition) {
 
@@ -110,11 +102,19 @@ public final class PermissionDescriptorCondition {
             this.subNode = subNode;
             return this;
         }
+        @CustomType.Setter
+        public Builder type__(String type__) {
+            if (type__ == null) {
+              throw new MissingRequiredPropertyException("PermissionDescriptorCondition", "type__");
+            }
+            this.type__ = type__;
+            return this;
+        }
         public PermissionDescriptorCondition build() {
             final var _resultValue = new PermissionDescriptorCondition();
-            _resultValue.__type = __type;
             _resultValue.condition = condition;
             _resultValue.subNode = subNode;
+            _resultValue.type__ = type__;
             return _resultValue;
         }
     }

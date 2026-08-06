@@ -27,24 +27,9 @@ public final class PermissionExpressionHasTagArgs extends com.pulumi.resources.R
     public static final PermissionExpressionHasTagArgs Empty = new PermissionExpressionHasTagArgs();
 
     /**
-     * Expected value is &#39;PermissionExpressionHasTag&#39;.
-     * 
-     */
-    @Import(name="__type", required=true)
-    private Output<String> __type;
-
-    /**
-     * @return Expected value is &#39;PermissionExpressionHasTag&#39;.
-     * 
-     */
-    public Output<String> __type() {
-        return this.__type;
-    }
-
-    /**
      * The context expression to check for the tag.
      * 
-     * Valid `__type` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
+     * Valid `type__` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
      * 
      */
     @Import(name="context")
@@ -53,7 +38,7 @@ public final class PermissionExpressionHasTagArgs extends com.pulumi.resources.R
     /**
      * @return The context expression to check for the tag.
      * 
-     * Valid `__type` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
+     * Valid `type__` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
      * 
      */
     public Optional<Output<Object>> context() {
@@ -78,7 +63,7 @@ public final class PermissionExpressionHasTagArgs extends com.pulumi.resources.R
     /**
      * The operand of the unary boolean expression.
      * 
-     * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+     * Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
      * 
      */
     @Import(name="node")
@@ -87,20 +72,35 @@ public final class PermissionExpressionHasTagArgs extends com.pulumi.resources.R
     /**
      * @return The operand of the unary boolean expression.
      * 
-     * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+     * Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
      * 
      */
     public Optional<Output<Object>> node() {
         return Optional.ofNullable(this.node);
     }
 
+    /**
+     * Expected value is &#39;PermissionExpressionHasTag&#39;.
+     * 
+     */
+    @Import(name="type__", required=true)
+    private Output<String> type__;
+
+    /**
+     * @return Expected value is &#39;PermissionExpressionHasTag&#39;.
+     * 
+     */
+    public Output<String> type__() {
+        return this.type__;
+    }
+
     private PermissionExpressionHasTagArgs() {}
 
     private PermissionExpressionHasTagArgs(PermissionExpressionHasTagArgs $) {
-        this.__type = $.__type;
         this.context = $.context;
         this.key = $.key;
         this.node = $.node;
+        this.type__ = $.type__;
     }
 
     public static Builder builder() {
@@ -122,30 +122,9 @@ public final class PermissionExpressionHasTagArgs extends com.pulumi.resources.R
         }
 
         /**
-         * @param __type Expected value is &#39;PermissionExpressionHasTag&#39;.
-         * 
-         * @return builder
-         * 
-         */
-        public Builder __type(Output<String> __type) {
-            $.__type = __type;
-            return this;
-        }
-
-        /**
-         * @param __type Expected value is &#39;PermissionExpressionHasTag&#39;.
-         * 
-         * @return builder
-         * 
-         */
-        public Builder __type(String __type) {
-            return __type(Output.of(__type));
-        }
-
-        /**
          * @param context The context expression to check for the tag.
          * 
-         * Valid `__type` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
+         * Valid `type__` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
          * 
          * @return builder
          * 
@@ -158,7 +137,7 @@ public final class PermissionExpressionHasTagArgs extends com.pulumi.resources.R
         /**
          * @param context The context expression to check for the tag.
          * 
-         * Valid `__type` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
+         * Valid `type__` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
          * 
          * @return builder
          * 
@@ -191,7 +170,7 @@ public final class PermissionExpressionHasTagArgs extends com.pulumi.resources.R
         /**
          * @param node The operand of the unary boolean expression.
          * 
-         * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+         * Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
          * 
          * @return builder
          * 
@@ -204,7 +183,7 @@ public final class PermissionExpressionHasTagArgs extends com.pulumi.resources.R
         /**
          * @param node The operand of the unary boolean expression.
          * 
-         * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+         * Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
          * 
          * @return builder
          * 
@@ -213,8 +192,29 @@ public final class PermissionExpressionHasTagArgs extends com.pulumi.resources.R
             return node(Output.of(node));
         }
 
+        /**
+         * @param type__ Expected value is &#39;PermissionExpressionHasTag&#39;.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder type__(Output<String> type__) {
+            $.type__ = type__;
+            return this;
+        }
+
+        /**
+         * @param type__ Expected value is &#39;PermissionExpressionHasTag&#39;.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder type__(String type__) {
+            return type__(Output.of(type__));
+        }
+
         public PermissionExpressionHasTagArgs build() {
-            $.__type = Codegen.stringProp("__type").output().arg($.__type).require();
+            $.type__ = Codegen.stringProp("type__").output().arg($.type__).require();
             return $;
         }
     }

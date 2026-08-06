@@ -14,15 +14,15 @@ public final class PermissionExpressionEnvironment {
      * @return Expected value is &#39;PermissionExpressionEnvironment&#39;.
      * 
      */
-    private String __type;
+    private String type__;
 
     private PermissionExpressionEnvironment() {}
     /**
      * @return Expected value is &#39;PermissionExpressionEnvironment&#39;.
      * 
      */
-    public String __type() {
-        return this.__type;
+    public String type__() {
+        return this.type__;
     }
 
     public static Builder builder() {
@@ -34,24 +34,24 @@ public final class PermissionExpressionEnvironment {
     }
     @CustomType.Builder
     public static final class Builder {
-        private String __type;
+        private String type__;
         public Builder() {}
         public Builder(PermissionExpressionEnvironment defaults) {
     	      Objects.requireNonNull(defaults);
-    	      this.__type = defaults.__type;
+    	      this.type__ = defaults.type__;
         }
 
         @CustomType.Setter
-        public Builder __type(String __type) {
-            if (__type == null) {
-              throw new MissingRequiredPropertyException("PermissionExpressionEnvironment", "__type");
+        public Builder type__(String type__) {
+            if (type__ == null) {
+              throw new MissingRequiredPropertyException("PermissionExpressionEnvironment", "type__");
             }
-            this.__type = __type;
+            this.type__ = type__;
             return this;
         }
         public PermissionExpressionEnvironment build() {
             final var _resultValue = new PermissionExpressionEnvironment();
-            _resultValue.__type = __type;
+            _resultValue.type__ = type__;
             return _resultValue;
         }
     }

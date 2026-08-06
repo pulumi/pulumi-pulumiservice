@@ -863,10 +863,6 @@ export namespace api {
 
     export interface PermissionDescriptorAllow {
         /**
-         * Expected value is 'PermissionDescriptorAllow'.
-         */
-        __type: "PermissionDescriptorAllow";
-        /**
          * Optional contextual constraints for the permissions
          */
         constraints?: outputs.api.RbacPermissionConstraints;
@@ -874,81 +870,81 @@ export namespace api {
          * List of permissions to allow
          */
         permissions?: string[];
+        /**
+         * Expected value is 'PermissionDescriptorAllow'.
+         */
+        type__: "PermissionDescriptorAllow";
     }
 
     export interface PermissionDescriptorCompose {
         /**
-         * Expected value is 'PermissionDescriptorCompose'.
-         */
-        __type: "PermissionDescriptorCompose";
-        /**
          * References to other descriptors to include in the tree
          */
         permissionDescriptors?: string[];
+        /**
+         * Expected value is 'PermissionDescriptorCompose'.
+         */
+        type__: "PermissionDescriptorCompose";
     }
 
     export interface PermissionDescriptorCondition {
         /**
-         * Expected value is 'PermissionDescriptorCondition'.
-         */
-        __type: "PermissionDescriptorCondition";
-        /**
          * The boolean condition to evaluate.
          *
-         * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+         * Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
          */
         condition?: outputs.api.PermissionExpressionAnd | outputs.api.PermissionExpressionEqual | outputs.api.PermissionExpressionHasTag | outputs.api.PermissionExpressionNot | outputs.api.PermissionExpressionOr;
         /**
          * The permission descriptor to apply when the condition is true.
          *
-         * Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
+         * Valid `type__` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
          */
         subNode?: outputs.api.PermissionDescriptorAllow | outputs.api.PermissionDescriptorCompose | outputs.api.PermissionDescriptorCondition | outputs.api.PermissionDescriptorGroup | outputs.api.PermissionDescriptorIfThenElse | outputs.api.PermissionDescriptorSelect;
+        /**
+         * Expected value is 'PermissionDescriptorCondition'.
+         */
+        type__: "PermissionDescriptorCondition";
     }
 
     export interface PermissionDescriptorGroup {
         /**
-         * Expected value is 'PermissionDescriptorGroup'.
-         */
-        __type: "PermissionDescriptorGroup";
-        /**
          * The list of permission descriptor entries in this group.
          *
-         * Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
+         * Valid `type__` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
          */
         entries?: (outputs.api.PermissionDescriptorAllow | outputs.api.PermissionDescriptorCompose | outputs.api.PermissionDescriptorCondition | outputs.api.PermissionDescriptorGroup | outputs.api.PermissionDescriptorIfThenElse | outputs.api.PermissionDescriptorSelect)[];
+        /**
+         * Expected value is 'PermissionDescriptorGroup'.
+         */
+        type__: "PermissionDescriptorGroup";
     }
 
     export interface PermissionDescriptorIfThenElse {
         /**
-         * Expected value is 'PermissionDescriptorIfThenElse'.
-         */
-        __type: "PermissionDescriptorIfThenElse";
-        /**
          * The boolean condition to evaluate.
          *
-         * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+         * Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
          */
         condition?: outputs.api.PermissionExpressionAnd | outputs.api.PermissionExpressionEqual | outputs.api.PermissionExpressionHasTag | outputs.api.PermissionExpressionNot | outputs.api.PermissionExpressionOr;
         /**
          * The permission descriptor to apply when the condition is false.
          *
-         * Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
+         * Valid `type__` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
          */
         subNodeForFalse?: outputs.api.PermissionDescriptorAllow | outputs.api.PermissionDescriptorCompose | outputs.api.PermissionDescriptorCondition | outputs.api.PermissionDescriptorGroup | outputs.api.PermissionDescriptorIfThenElse | outputs.api.PermissionDescriptorSelect;
         /**
          * The permission descriptor to apply when the condition is true.
          *
-         * Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
+         * Valid `type__` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
          */
         subNodeForTrue?: outputs.api.PermissionDescriptorAllow | outputs.api.PermissionDescriptorCompose | outputs.api.PermissionDescriptorCondition | outputs.api.PermissionDescriptorGroup | outputs.api.PermissionDescriptorIfThenElse | outputs.api.PermissionDescriptorSelect;
+        /**
+         * Expected value is 'PermissionDescriptorIfThenElse'.
+         */
+        type__: "PermissionDescriptorIfThenElse";
     }
 
     export interface PermissionDescriptorSelect {
-        /**
-         * Expected value is 'PermissionDescriptorSelect'.
-         */
-        __type: "PermissionDescriptorSelect";
         /**
          * The available options to select from based on the selector expression.
          */
@@ -956,65 +952,65 @@ export namespace api {
         /**
          * The expression used to select which option to apply.
          *
-         * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
+         * Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
          */
         selector?: outputs.api.PermissionExpressionAnd | outputs.api.PermissionExpressionEnvironment | outputs.api.PermissionExpressionEqual | outputs.api.PermissionExpressionHasTag | outputs.api.PermissionExpressionInsightsAccount | outputs.api.PermissionExpressionNot | outputs.api.PermissionExpressionOr | outputs.api.PermissionExpressionStack | outputs.api.PermissionExpressionTag | outputs.api.PermissionExpressionTeam | outputs.api.PermissionLiteralExpressionBool | outputs.api.PermissionLiteralExpressionEnvironment | outputs.api.PermissionLiteralExpressionInsightsAccount | outputs.api.PermissionLiteralExpressionNumber | outputs.api.PermissionLiteralExpressionStack | outputs.api.PermissionLiteralExpressionString | outputs.api.PermissionLiteralExpressionTeam;
+        /**
+         * Expected value is 'PermissionDescriptorSelect'.
+         */
+        type__: "PermissionDescriptorSelect";
     }
 
     export interface PermissionExpressionAnd {
         /**
-         * Expected value is 'PermissionExpressionAnd'.
-         */
-        __type: "PermissionExpressionAnd";
-        /**
          * The left operand of the binary boolean expression.
          *
-         * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+         * Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
          */
         left?: outputs.api.PermissionExpressionAnd | outputs.api.PermissionExpressionEqual | outputs.api.PermissionExpressionHasTag | outputs.api.PermissionExpressionNot | outputs.api.PermissionExpressionOr;
         /**
          * The right operand of the binary boolean expression.
          *
-         * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+         * Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
          */
         right?: outputs.api.PermissionExpressionAnd | outputs.api.PermissionExpressionEqual | outputs.api.PermissionExpressionHasTag | outputs.api.PermissionExpressionNot | outputs.api.PermissionExpressionOr;
+        /**
+         * Expected value is 'PermissionExpressionAnd'.
+         */
+        type__: "PermissionExpressionAnd";
     }
 
     export interface PermissionExpressionEnvironment {
         /**
          * Expected value is 'PermissionExpressionEnvironment'.
          */
-        __type: "PermissionExpressionEnvironment";
+        type__: "PermissionExpressionEnvironment";
     }
 
     export interface PermissionExpressionEqual {
         /**
-         * Expected value is 'PermissionExpressionEqual'.
-         */
-        __type: "PermissionExpressionEqual";
-        /**
          * The left operand of the equality comparison.
          *
-         * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
+         * Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
          */
         left?: outputs.api.PermissionExpressionAnd | outputs.api.PermissionExpressionEnvironment | outputs.api.PermissionExpressionEqual | outputs.api.PermissionExpressionHasTag | outputs.api.PermissionExpressionInsightsAccount | outputs.api.PermissionExpressionNot | outputs.api.PermissionExpressionOr | outputs.api.PermissionExpressionStack | outputs.api.PermissionExpressionTag | outputs.api.PermissionExpressionTeam | outputs.api.PermissionLiteralExpressionBool | outputs.api.PermissionLiteralExpressionEnvironment | outputs.api.PermissionLiteralExpressionInsightsAccount | outputs.api.PermissionLiteralExpressionNumber | outputs.api.PermissionLiteralExpressionStack | outputs.api.PermissionLiteralExpressionString | outputs.api.PermissionLiteralExpressionTeam;
         /**
          * The right operand of the equality comparison.
          *
-         * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
+         * Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
          */
         right?: outputs.api.PermissionExpressionAnd | outputs.api.PermissionExpressionEnvironment | outputs.api.PermissionExpressionEqual | outputs.api.PermissionExpressionHasTag | outputs.api.PermissionExpressionInsightsAccount | outputs.api.PermissionExpressionNot | outputs.api.PermissionExpressionOr | outputs.api.PermissionExpressionStack | outputs.api.PermissionExpressionTag | outputs.api.PermissionExpressionTeam | outputs.api.PermissionLiteralExpressionBool | outputs.api.PermissionLiteralExpressionEnvironment | outputs.api.PermissionLiteralExpressionInsightsAccount | outputs.api.PermissionLiteralExpressionNumber | outputs.api.PermissionLiteralExpressionStack | outputs.api.PermissionLiteralExpressionString | outputs.api.PermissionLiteralExpressionTeam;
+        /**
+         * Expected value is 'PermissionExpressionEqual'.
+         */
+        type__: "PermissionExpressionEqual";
     }
 
     export interface PermissionExpressionHasTag {
         /**
-         * Expected value is 'PermissionExpressionHasTag'.
-         */
-        __type: "PermissionExpressionHasTag";
-        /**
          * The context expression to check for the tag.
          *
-         * Valid `__type` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
+         * Valid `type__` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
          */
         context?: outputs.api.PermissionExpressionEnvironment | outputs.api.PermissionExpressionInsightsAccount | outputs.api.PermissionExpressionStack | outputs.api.PermissionExpressionTeam;
         /**
@@ -1024,86 +1020,90 @@ export namespace api {
         /**
          * The operand of the unary boolean expression.
          *
-         * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+         * Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
          */
         node?: outputs.api.PermissionExpressionAnd | outputs.api.PermissionExpressionEqual | outputs.api.PermissionExpressionHasTag | outputs.api.PermissionExpressionNot | outputs.api.PermissionExpressionOr;
+        /**
+         * Expected value is 'PermissionExpressionHasTag'.
+         */
+        type__: "PermissionExpressionHasTag";
     }
 
     export interface PermissionExpressionInsightsAccount {
         /**
          * Expected value is 'PermissionExpressionInsightsAccount'.
          */
-        __type: "PermissionExpressionInsightsAccount";
+        type__: "PermissionExpressionInsightsAccount";
     }
 
     export interface PermissionExpressionNot {
         /**
-         * Expected value is 'PermissionExpressionNot'.
-         */
-        __type: "PermissionExpressionNot";
-        /**
          * The operand of the unary boolean expression.
          *
-         * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+         * Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
          */
         node?: outputs.api.PermissionExpressionAnd | outputs.api.PermissionExpressionEqual | outputs.api.PermissionExpressionHasTag | outputs.api.PermissionExpressionNot | outputs.api.PermissionExpressionOr;
+        /**
+         * Expected value is 'PermissionExpressionNot'.
+         */
+        type__: "PermissionExpressionNot";
     }
 
     export interface PermissionExpressionOr {
         /**
-         * Expected value is 'PermissionExpressionOr'.
-         */
-        __type: "PermissionExpressionOr";
-        /**
          * The left operand of the binary boolean expression.
          *
-         * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+         * Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
          */
         left?: outputs.api.PermissionExpressionAnd | outputs.api.PermissionExpressionEqual | outputs.api.PermissionExpressionHasTag | outputs.api.PermissionExpressionNot | outputs.api.PermissionExpressionOr;
         /**
          * The right operand of the binary boolean expression.
          *
-         * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+         * Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
          */
         right?: outputs.api.PermissionExpressionAnd | outputs.api.PermissionExpressionEqual | outputs.api.PermissionExpressionHasTag | outputs.api.PermissionExpressionNot | outputs.api.PermissionExpressionOr;
+        /**
+         * Expected value is 'PermissionExpressionOr'.
+         */
+        type__: "PermissionExpressionOr";
     }
 
     export interface PermissionExpressionStack {
         /**
          * Expected value is 'PermissionExpressionStack'.
          */
-        __type: "PermissionExpressionStack";
+        type__: "PermissionExpressionStack";
     }
 
     export interface PermissionExpressionTag {
         /**
-         * Expected value is 'PermissionExpressionTag'.
-         */
-        __type: "PermissionExpressionTag";
-        /**
          * The context expression identifying the resource to look up the tag on.
          *
-         * Valid `__type` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
+         * Valid `type__` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
          */
         context?: outputs.api.PermissionExpressionEnvironment | outputs.api.PermissionExpressionInsightsAccount | outputs.api.PermissionExpressionStack | outputs.api.PermissionExpressionTeam;
         /**
          * The tag key to retrieve.
          */
         key?: string;
+        /**
+         * Expected value is 'PermissionExpressionTag'.
+         */
+        type__: "PermissionExpressionTag";
     }
 
     export interface PermissionExpressionTeam {
         /**
          * Expected value is 'PermissionExpressionTeam'.
          */
-        __type: "PermissionExpressionTeam";
+        type__: "PermissionExpressionTeam";
     }
 
     export interface PermissionLiteralExpressionBool {
         /**
          * Expected value is 'PermissionLiteralExpressionBool'.
          */
-        __type: "PermissionLiteralExpressionBool";
+        type__: "PermissionLiteralExpressionBool";
         /**
          * The boolean literal value.
          */
@@ -1112,31 +1112,31 @@ export namespace api {
 
     export interface PermissionLiteralExpressionEnvironment {
         /**
-         * Expected value is 'PermissionLiteralExpressionEnvironment'.
-         */
-        __type: "PermissionLiteralExpressionEnvironment";
-        /**
          * The identity of the environment.
          */
         identity?: string;
+        /**
+         * Expected value is 'PermissionLiteralExpressionEnvironment'.
+         */
+        type__: "PermissionLiteralExpressionEnvironment";
     }
 
     export interface PermissionLiteralExpressionInsightsAccount {
         /**
-         * Expected value is 'PermissionLiteralExpressionInsightsAccount'.
-         */
-        __type: "PermissionLiteralExpressionInsightsAccount";
-        /**
          * The identity of the Insights account.
          */
         identity?: string;
+        /**
+         * Expected value is 'PermissionLiteralExpressionInsightsAccount'.
+         */
+        type__: "PermissionLiteralExpressionInsightsAccount";
     }
 
     export interface PermissionLiteralExpressionNumber {
         /**
          * Expected value is 'PermissionLiteralExpressionNumber'.
          */
-        __type: "PermissionLiteralExpressionNumber";
+        type__: "PermissionLiteralExpressionNumber";
         /**
          * The numeric literal value.
          */
@@ -1145,20 +1145,20 @@ export namespace api {
 
     export interface PermissionLiteralExpressionStack {
         /**
-         * Expected value is 'PermissionLiteralExpressionStack'.
-         */
-        __type: "PermissionLiteralExpressionStack";
-        /**
          * The identity of the stack.
          */
         identity?: string;
+        /**
+         * Expected value is 'PermissionLiteralExpressionStack'.
+         */
+        type__: "PermissionLiteralExpressionStack";
     }
 
     export interface PermissionLiteralExpressionString {
         /**
          * Expected value is 'PermissionLiteralExpressionString'.
          */
-        __type: "PermissionLiteralExpressionString";
+        type__: "PermissionLiteralExpressionString";
         /**
          * The string literal value.
          */
@@ -1167,13 +1167,13 @@ export namespace api {
 
     export interface PermissionLiteralExpressionTeam {
         /**
-         * Expected value is 'PermissionLiteralExpressionTeam'.
-         */
-        __type: "PermissionLiteralExpressionTeam";
-        /**
          * The identity of the team.
          */
         identity?: string;
+        /**
+         * Expected value is 'PermissionLiteralExpressionTeam'.
+         */
+        type__: "PermissionLiteralExpressionTeam";
     }
 
     /**
@@ -1183,13 +1183,13 @@ export namespace api {
         /**
          * The permission descriptor to apply when this value matches.
          *
-         * Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
+         * Valid `type__` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
          */
         node?: outputs.api.PermissionDescriptorAllow | outputs.api.PermissionDescriptorCompose | outputs.api.PermissionDescriptorCondition | outputs.api.PermissionDescriptorGroup | outputs.api.PermissionDescriptorIfThenElse | outputs.api.PermissionDescriptorSelect;
         /**
          * The value expression to match against the selector.
          *
-         * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
+         * Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
          */
         value?: outputs.api.PermissionExpressionAnd | outputs.api.PermissionExpressionEnvironment | outputs.api.PermissionExpressionEqual | outputs.api.PermissionExpressionHasTag | outputs.api.PermissionExpressionInsightsAccount | outputs.api.PermissionExpressionNot | outputs.api.PermissionExpressionOr | outputs.api.PermissionExpressionStack | outputs.api.PermissionExpressionTag | outputs.api.PermissionExpressionTeam | outputs.api.PermissionLiteralExpressionBool | outputs.api.PermissionLiteralExpressionEnvironment | outputs.api.PermissionLiteralExpressionInsightsAccount | outputs.api.PermissionLiteralExpressionNumber | outputs.api.PermissionLiteralExpressionStack | outputs.api.PermissionLiteralExpressionString | outputs.api.PermissionLiteralExpressionTeam;
     }

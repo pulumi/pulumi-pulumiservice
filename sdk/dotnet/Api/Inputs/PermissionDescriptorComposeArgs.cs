@@ -12,12 +12,6 @@ namespace Pulumi.PulumiService.Api.Inputs
 
     public sealed class PermissionDescriptorComposeArgs : global::Pulumi.ResourceArgs
     {
-        /// <summary>
-        /// Expected value is 'PermissionDescriptorCompose'.
-        /// </summary>
-        [Input("__type", required: true)]
-        public Input<string> __type { get; set; } = null!;
-
         [Input("permissionDescriptors")]
         private InputList<string>? _permissionDescriptors;
 
@@ -29,6 +23,12 @@ namespace Pulumi.PulumiService.Api.Inputs
             get => _permissionDescriptors ?? (_permissionDescriptors = new InputList<string>());
             set => _permissionDescriptors = value;
         }
+
+        /// <summary>
+        /// Expected value is 'PermissionDescriptorCompose'.
+        /// </summary>
+        [Input("type__", required: true)]
+        public Input<string> Type__ { get; set; } = null!;
 
         public PermissionDescriptorComposeArgs()
         {

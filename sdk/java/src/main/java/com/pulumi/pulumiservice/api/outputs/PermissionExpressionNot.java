@@ -18,34 +18,34 @@ import javax.annotation.Nullable;
 @CustomType
 public final class PermissionExpressionNot {
     /**
-     * @return Expected value is &#39;PermissionExpressionNot&#39;.
-     * 
-     */
-    private String __type;
-    /**
      * @return The operand of the unary boolean expression.
      * 
-     * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+     * Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
      * 
      */
     private @Nullable Object node;
-
-    private PermissionExpressionNot() {}
     /**
      * @return Expected value is &#39;PermissionExpressionNot&#39;.
      * 
      */
-    public String __type() {
-        return this.__type;
-    }
+    private String type__;
+
+    private PermissionExpressionNot() {}
     /**
      * @return The operand of the unary boolean expression.
      * 
-     * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+     * Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
      * 
      */
     public Optional<Object> node() {
         return Optional.ofNullable(this.node);
+    }
+    /**
+     * @return Expected value is &#39;PermissionExpressionNot&#39;.
+     * 
+     */
+    public String type__() {
+        return this.type__;
     }
 
     public static Builder builder() {
@@ -57,33 +57,33 @@ public final class PermissionExpressionNot {
     }
     @CustomType.Builder
     public static final class Builder {
-        private String __type;
         private @Nullable Object node;
+        private String type__;
         public Builder() {}
         public Builder(PermissionExpressionNot defaults) {
     	      Objects.requireNonNull(defaults);
-    	      this.__type = defaults.__type;
     	      this.node = defaults.node;
+    	      this.type__ = defaults.type__;
         }
 
-        @CustomType.Setter
-        public Builder __type(String __type) {
-            if (__type == null) {
-              throw new MissingRequiredPropertyException("PermissionExpressionNot", "__type");
-            }
-            this.__type = __type;
-            return this;
-        }
         @CustomType.Setter
         public Builder node(@Nullable Object node) {
 
             this.node = node;
             return this;
         }
+        @CustomType.Setter
+        public Builder type__(String type__) {
+            if (type__ == null) {
+              throw new MissingRequiredPropertyException("PermissionExpressionNot", "type__");
+            }
+            this.type__ = type__;
+            return this;
+        }
         public PermissionExpressionNot build() {
             final var _resultValue = new PermissionExpressionNot();
-            _resultValue.__type = __type;
             _resultValue.node = node;
+            _resultValue.type__ = type__;
             return _resultValue;
         }
     }

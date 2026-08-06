@@ -1045,12 +1045,12 @@ func (o MemberLinksPtrOutput) Self() pulumi.StringPtrOutput {
 }
 
 type PermissionDescriptorAllow struct {
-	// Expected value is 'PermissionDescriptorAllow'.
-	__type string `pulumi:"__type"`
 	// Optional contextual constraints for the permissions
 	Constraints *RbacPermissionConstraints `pulumi:"constraints"`
 	// List of permissions to allow
 	Permissions []string `pulumi:"permissions"`
+	// Expected value is 'PermissionDescriptorAllow'.
+	Type__ string `pulumi:"type__"`
 }
 
 // PermissionDescriptorAllowInput is an input type that accepts PermissionDescriptorAllowArgs and PermissionDescriptorAllowOutput values.
@@ -1065,12 +1065,12 @@ type PermissionDescriptorAllowInput interface {
 }
 
 type PermissionDescriptorAllowArgs struct {
-	// Expected value is 'PermissionDescriptorAllow'.
-	__type pulumi.StringInput `pulumi:"__type"`
 	// Optional contextual constraints for the permissions
 	Constraints RbacPermissionConstraintsPtrInput `pulumi:"constraints"`
 	// List of permissions to allow
 	Permissions pulumi.StringArrayInput `pulumi:"permissions"`
+	// Expected value is 'PermissionDescriptorAllow'.
+	Type__ pulumi.StringInput `pulumi:"type__"`
 }
 
 func (PermissionDescriptorAllowArgs) ElementType() reflect.Type {
@@ -1150,11 +1150,6 @@ func (o PermissionDescriptorAllowOutput) ToPermissionDescriptorAllowPtrOutputWit
 	}).(PermissionDescriptorAllowPtrOutput)
 }
 
-// Expected value is 'PermissionDescriptorAllow'.
-func (o PermissionDescriptorAllowOutput) __type() pulumi.StringOutput {
-	return o.ApplyT(func(v PermissionDescriptorAllow) string { return v.__type }).(pulumi.StringOutput)
-}
-
 // Optional contextual constraints for the permissions
 func (o PermissionDescriptorAllowOutput) Constraints() RbacPermissionConstraintsPtrOutput {
 	return o.ApplyT(func(v PermissionDescriptorAllow) *RbacPermissionConstraints { return v.Constraints }).(RbacPermissionConstraintsPtrOutput)
@@ -1163,6 +1158,11 @@ func (o PermissionDescriptorAllowOutput) Constraints() RbacPermissionConstraints
 // List of permissions to allow
 func (o PermissionDescriptorAllowOutput) Permissions() pulumi.StringArrayOutput {
 	return o.ApplyT(func(v PermissionDescriptorAllow) []string { return v.Permissions }).(pulumi.StringArrayOutput)
+}
+
+// Expected value is 'PermissionDescriptorAllow'.
+func (o PermissionDescriptorAllowOutput) Type__() pulumi.StringOutput {
+	return o.ApplyT(func(v PermissionDescriptorAllow) string { return v.Type__ }).(pulumi.StringOutput)
 }
 
 type PermissionDescriptorAllowPtrOutput struct{ *pulumi.OutputState }
@@ -1189,16 +1189,6 @@ func (o PermissionDescriptorAllowPtrOutput) Elem() PermissionDescriptorAllowOutp
 	}).(PermissionDescriptorAllowOutput)
 }
 
-// Expected value is 'PermissionDescriptorAllow'.
-func (o PermissionDescriptorAllowPtrOutput) __type() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *PermissionDescriptorAllow) *string {
-		if v == nil {
-			return nil
-		}
-		return &v.__type
-	}).(pulumi.StringPtrOutput)
-}
-
 // Optional contextual constraints for the permissions
 func (o PermissionDescriptorAllowPtrOutput) Constraints() RbacPermissionConstraintsPtrOutput {
 	return o.ApplyT(func(v *PermissionDescriptorAllow) *RbacPermissionConstraints {
@@ -1219,11 +1209,21 @@ func (o PermissionDescriptorAllowPtrOutput) Permissions() pulumi.StringArrayOutp
 	}).(pulumi.StringArrayOutput)
 }
 
+// Expected value is 'PermissionDescriptorAllow'.
+func (o PermissionDescriptorAllowPtrOutput) Type__() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *PermissionDescriptorAllow) *string {
+		if v == nil {
+			return nil
+		}
+		return &v.Type__
+	}).(pulumi.StringPtrOutput)
+}
+
 type PermissionDescriptorCompose struct {
-	// Expected value is 'PermissionDescriptorCompose'.
-	__type string `pulumi:"__type"`
 	// References to other descriptors to include in the tree
 	PermissionDescriptors []string `pulumi:"permissionDescriptors"`
+	// Expected value is 'PermissionDescriptorCompose'.
+	Type__ string `pulumi:"type__"`
 }
 
 // PermissionDescriptorComposeInput is an input type that accepts PermissionDescriptorComposeArgs and PermissionDescriptorComposeOutput values.
@@ -1238,10 +1238,10 @@ type PermissionDescriptorComposeInput interface {
 }
 
 type PermissionDescriptorComposeArgs struct {
-	// Expected value is 'PermissionDescriptorCompose'.
-	__type pulumi.StringInput `pulumi:"__type"`
 	// References to other descriptors to include in the tree
 	PermissionDescriptors pulumi.StringArrayInput `pulumi:"permissionDescriptors"`
+	// Expected value is 'PermissionDescriptorCompose'.
+	Type__ pulumi.StringInput `pulumi:"type__"`
 }
 
 func (PermissionDescriptorComposeArgs) ElementType() reflect.Type {
@@ -1321,14 +1321,14 @@ func (o PermissionDescriptorComposeOutput) ToPermissionDescriptorComposePtrOutpu
 	}).(PermissionDescriptorComposePtrOutput)
 }
 
-// Expected value is 'PermissionDescriptorCompose'.
-func (o PermissionDescriptorComposeOutput) __type() pulumi.StringOutput {
-	return o.ApplyT(func(v PermissionDescriptorCompose) string { return v.__type }).(pulumi.StringOutput)
-}
-
 // References to other descriptors to include in the tree
 func (o PermissionDescriptorComposeOutput) PermissionDescriptors() pulumi.StringArrayOutput {
 	return o.ApplyT(func(v PermissionDescriptorCompose) []string { return v.PermissionDescriptors }).(pulumi.StringArrayOutput)
+}
+
+// Expected value is 'PermissionDescriptorCompose'.
+func (o PermissionDescriptorComposeOutput) Type__() pulumi.StringOutput {
+	return o.ApplyT(func(v PermissionDescriptorCompose) string { return v.Type__ }).(pulumi.StringOutput)
 }
 
 type PermissionDescriptorComposePtrOutput struct{ *pulumi.OutputState }
@@ -1355,16 +1355,6 @@ func (o PermissionDescriptorComposePtrOutput) Elem() PermissionDescriptorCompose
 	}).(PermissionDescriptorComposeOutput)
 }
 
-// Expected value is 'PermissionDescriptorCompose'.
-func (o PermissionDescriptorComposePtrOutput) __type() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *PermissionDescriptorCompose) *string {
-		if v == nil {
-			return nil
-		}
-		return &v.__type
-	}).(pulumi.StringPtrOutput)
-}
-
 // References to other descriptors to include in the tree
 func (o PermissionDescriptorComposePtrOutput) PermissionDescriptors() pulumi.StringArrayOutput {
 	return o.ApplyT(func(v *PermissionDescriptorCompose) []string {
@@ -1375,17 +1365,27 @@ func (o PermissionDescriptorComposePtrOutput) PermissionDescriptors() pulumi.Str
 	}).(pulumi.StringArrayOutput)
 }
 
+// Expected value is 'PermissionDescriptorCompose'.
+func (o PermissionDescriptorComposePtrOutput) Type__() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *PermissionDescriptorCompose) *string {
+		if v == nil {
+			return nil
+		}
+		return &v.Type__
+	}).(pulumi.StringPtrOutput)
+}
+
 type PermissionDescriptorCondition struct {
-	// Expected value is 'PermissionDescriptorCondition'.
-	__type string `pulumi:"__type"`
 	// The boolean condition to evaluate.
 	//
-	// Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+	// Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
 	Condition interface{} `pulumi:"condition"`
 	// The permission descriptor to apply when the condition is true.
 	//
-	// Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
+	// Valid `type__` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
 	SubNode interface{} `pulumi:"subNode"`
+	// Expected value is 'PermissionDescriptorCondition'.
+	Type__ string `pulumi:"type__"`
 }
 
 // PermissionDescriptorConditionInput is an input type that accepts PermissionDescriptorConditionArgs and PermissionDescriptorConditionOutput values.
@@ -1400,16 +1400,16 @@ type PermissionDescriptorConditionInput interface {
 }
 
 type PermissionDescriptorConditionArgs struct {
-	// Expected value is 'PermissionDescriptorCondition'.
-	__type pulumi.StringInput `pulumi:"__type"`
 	// The boolean condition to evaluate.
 	//
-	// Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+	// Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
 	Condition pulumi.Input `pulumi:"condition"`
 	// The permission descriptor to apply when the condition is true.
 	//
-	// Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
+	// Valid `type__` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
 	SubNode pulumi.Input `pulumi:"subNode"`
+	// Expected value is 'PermissionDescriptorCondition'.
+	Type__ pulumi.StringInput `pulumi:"type__"`
 }
 
 func (PermissionDescriptorConditionArgs) ElementType() reflect.Type {
@@ -1489,23 +1489,23 @@ func (o PermissionDescriptorConditionOutput) ToPermissionDescriptorConditionPtrO
 	}).(PermissionDescriptorConditionPtrOutput)
 }
 
-// Expected value is 'PermissionDescriptorCondition'.
-func (o PermissionDescriptorConditionOutput) __type() pulumi.StringOutput {
-	return o.ApplyT(func(v PermissionDescriptorCondition) string { return v.__type }).(pulumi.StringOutput)
-}
-
 // The boolean condition to evaluate.
 //
-// Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+// Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
 func (o PermissionDescriptorConditionOutput) Condition() pulumi.AnyOutput {
 	return o.ApplyT(func(v PermissionDescriptorCondition) interface{} { return v.Condition }).(pulumi.AnyOutput)
 }
 
 // The permission descriptor to apply when the condition is true.
 //
-// Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
+// Valid `type__` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
 func (o PermissionDescriptorConditionOutput) SubNode() pulumi.AnyOutput {
 	return o.ApplyT(func(v PermissionDescriptorCondition) interface{} { return v.SubNode }).(pulumi.AnyOutput)
+}
+
+// Expected value is 'PermissionDescriptorCondition'.
+func (o PermissionDescriptorConditionOutput) Type__() pulumi.StringOutput {
+	return o.ApplyT(func(v PermissionDescriptorCondition) string { return v.Type__ }).(pulumi.StringOutput)
 }
 
 type PermissionDescriptorConditionPtrOutput struct{ *pulumi.OutputState }
@@ -1532,19 +1532,9 @@ func (o PermissionDescriptorConditionPtrOutput) Elem() PermissionDescriptorCondi
 	}).(PermissionDescriptorConditionOutput)
 }
 
-// Expected value is 'PermissionDescriptorCondition'.
-func (o PermissionDescriptorConditionPtrOutput) __type() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *PermissionDescriptorCondition) *string {
-		if v == nil {
-			return nil
-		}
-		return &v.__type
-	}).(pulumi.StringPtrOutput)
-}
-
 // The boolean condition to evaluate.
 //
-// Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+// Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
 func (o PermissionDescriptorConditionPtrOutput) Condition() pulumi.AnyOutput {
 	return o.ApplyT(func(v *PermissionDescriptorCondition) interface{} {
 		if v == nil {
@@ -1556,7 +1546,7 @@ func (o PermissionDescriptorConditionPtrOutput) Condition() pulumi.AnyOutput {
 
 // The permission descriptor to apply when the condition is true.
 //
-// Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
+// Valid `type__` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
 func (o PermissionDescriptorConditionPtrOutput) SubNode() pulumi.AnyOutput {
 	return o.ApplyT(func(v *PermissionDescriptorCondition) interface{} {
 		if v == nil {
@@ -1566,13 +1556,23 @@ func (o PermissionDescriptorConditionPtrOutput) SubNode() pulumi.AnyOutput {
 	}).(pulumi.AnyOutput)
 }
 
+// Expected value is 'PermissionDescriptorCondition'.
+func (o PermissionDescriptorConditionPtrOutput) Type__() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *PermissionDescriptorCondition) *string {
+		if v == nil {
+			return nil
+		}
+		return &v.Type__
+	}).(pulumi.StringPtrOutput)
+}
+
 type PermissionDescriptorGroup struct {
-	// Expected value is 'PermissionDescriptorGroup'.
-	__type string `pulumi:"__type"`
 	// The list of permission descriptor entries in this group.
 	//
-	// Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
+	// Valid `type__` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
 	Entries []interface{} `pulumi:"entries"`
+	// Expected value is 'PermissionDescriptorGroup'.
+	Type__ string `pulumi:"type__"`
 }
 
 // PermissionDescriptorGroupInput is an input type that accepts PermissionDescriptorGroupArgs and PermissionDescriptorGroupOutput values.
@@ -1587,12 +1587,12 @@ type PermissionDescriptorGroupInput interface {
 }
 
 type PermissionDescriptorGroupArgs struct {
-	// Expected value is 'PermissionDescriptorGroup'.
-	__type pulumi.StringInput `pulumi:"__type"`
 	// The list of permission descriptor entries in this group.
 	//
-	// Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
+	// Valid `type__` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
 	Entries pulumi.ArrayInput `pulumi:"entries"`
+	// Expected value is 'PermissionDescriptorGroup'.
+	Type__ pulumi.StringInput `pulumi:"type__"`
 }
 
 func (PermissionDescriptorGroupArgs) ElementType() reflect.Type {
@@ -1672,16 +1672,16 @@ func (o PermissionDescriptorGroupOutput) ToPermissionDescriptorGroupPtrOutputWit
 	}).(PermissionDescriptorGroupPtrOutput)
 }
 
-// Expected value is 'PermissionDescriptorGroup'.
-func (o PermissionDescriptorGroupOutput) __type() pulumi.StringOutput {
-	return o.ApplyT(func(v PermissionDescriptorGroup) string { return v.__type }).(pulumi.StringOutput)
-}
-
 // The list of permission descriptor entries in this group.
 //
-// Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
+// Valid `type__` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
 func (o PermissionDescriptorGroupOutput) Entries() pulumi.ArrayOutput {
 	return o.ApplyT(func(v PermissionDescriptorGroup) []interface{} { return v.Entries }).(pulumi.ArrayOutput)
+}
+
+// Expected value is 'PermissionDescriptorGroup'.
+func (o PermissionDescriptorGroupOutput) Type__() pulumi.StringOutput {
+	return o.ApplyT(func(v PermissionDescriptorGroup) string { return v.Type__ }).(pulumi.StringOutput)
 }
 
 type PermissionDescriptorGroupPtrOutput struct{ *pulumi.OutputState }
@@ -1708,19 +1708,9 @@ func (o PermissionDescriptorGroupPtrOutput) Elem() PermissionDescriptorGroupOutp
 	}).(PermissionDescriptorGroupOutput)
 }
 
-// Expected value is 'PermissionDescriptorGroup'.
-func (o PermissionDescriptorGroupPtrOutput) __type() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *PermissionDescriptorGroup) *string {
-		if v == nil {
-			return nil
-		}
-		return &v.__type
-	}).(pulumi.StringPtrOutput)
-}
-
 // The list of permission descriptor entries in this group.
 //
-// Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
+// Valid `type__` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
 func (o PermissionDescriptorGroupPtrOutput) Entries() pulumi.ArrayOutput {
 	return o.ApplyT(func(v *PermissionDescriptorGroup) []interface{} {
 		if v == nil {
@@ -1730,21 +1720,31 @@ func (o PermissionDescriptorGroupPtrOutput) Entries() pulumi.ArrayOutput {
 	}).(pulumi.ArrayOutput)
 }
 
+// Expected value is 'PermissionDescriptorGroup'.
+func (o PermissionDescriptorGroupPtrOutput) Type__() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *PermissionDescriptorGroup) *string {
+		if v == nil {
+			return nil
+		}
+		return &v.Type__
+	}).(pulumi.StringPtrOutput)
+}
+
 type PermissionDescriptorIfThenElse struct {
-	// Expected value is 'PermissionDescriptorIfThenElse'.
-	__type string `pulumi:"__type"`
 	// The boolean condition to evaluate.
 	//
-	// Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+	// Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
 	Condition interface{} `pulumi:"condition"`
 	// The permission descriptor to apply when the condition is false.
 	//
-	// Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
+	// Valid `type__` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
 	SubNodeForFalse interface{} `pulumi:"subNodeForFalse"`
 	// The permission descriptor to apply when the condition is true.
 	//
-	// Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
+	// Valid `type__` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
 	SubNodeForTrue interface{} `pulumi:"subNodeForTrue"`
+	// Expected value is 'PermissionDescriptorIfThenElse'.
+	Type__ string `pulumi:"type__"`
 }
 
 // PermissionDescriptorIfThenElseInput is an input type that accepts PermissionDescriptorIfThenElseArgs and PermissionDescriptorIfThenElseOutput values.
@@ -1759,20 +1759,20 @@ type PermissionDescriptorIfThenElseInput interface {
 }
 
 type PermissionDescriptorIfThenElseArgs struct {
-	// Expected value is 'PermissionDescriptorIfThenElse'.
-	__type pulumi.StringInput `pulumi:"__type"`
 	// The boolean condition to evaluate.
 	//
-	// Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+	// Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
 	Condition pulumi.Input `pulumi:"condition"`
 	// The permission descriptor to apply when the condition is false.
 	//
-	// Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
+	// Valid `type__` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
 	SubNodeForFalse pulumi.Input `pulumi:"subNodeForFalse"`
 	// The permission descriptor to apply when the condition is true.
 	//
-	// Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
+	// Valid `type__` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
 	SubNodeForTrue pulumi.Input `pulumi:"subNodeForTrue"`
+	// Expected value is 'PermissionDescriptorIfThenElse'.
+	Type__ pulumi.StringInput `pulumi:"type__"`
 }
 
 func (PermissionDescriptorIfThenElseArgs) ElementType() reflect.Type {
@@ -1852,30 +1852,30 @@ func (o PermissionDescriptorIfThenElseOutput) ToPermissionDescriptorIfThenElsePt
 	}).(PermissionDescriptorIfThenElsePtrOutput)
 }
 
-// Expected value is 'PermissionDescriptorIfThenElse'.
-func (o PermissionDescriptorIfThenElseOutput) __type() pulumi.StringOutput {
-	return o.ApplyT(func(v PermissionDescriptorIfThenElse) string { return v.__type }).(pulumi.StringOutput)
-}
-
 // The boolean condition to evaluate.
 //
-// Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+// Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
 func (o PermissionDescriptorIfThenElseOutput) Condition() pulumi.AnyOutput {
 	return o.ApplyT(func(v PermissionDescriptorIfThenElse) interface{} { return v.Condition }).(pulumi.AnyOutput)
 }
 
 // The permission descriptor to apply when the condition is false.
 //
-// Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
+// Valid `type__` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
 func (o PermissionDescriptorIfThenElseOutput) SubNodeForFalse() pulumi.AnyOutput {
 	return o.ApplyT(func(v PermissionDescriptorIfThenElse) interface{} { return v.SubNodeForFalse }).(pulumi.AnyOutput)
 }
 
 // The permission descriptor to apply when the condition is true.
 //
-// Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
+// Valid `type__` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
 func (o PermissionDescriptorIfThenElseOutput) SubNodeForTrue() pulumi.AnyOutput {
 	return o.ApplyT(func(v PermissionDescriptorIfThenElse) interface{} { return v.SubNodeForTrue }).(pulumi.AnyOutput)
+}
+
+// Expected value is 'PermissionDescriptorIfThenElse'.
+func (o PermissionDescriptorIfThenElseOutput) Type__() pulumi.StringOutput {
+	return o.ApplyT(func(v PermissionDescriptorIfThenElse) string { return v.Type__ }).(pulumi.StringOutput)
 }
 
 type PermissionDescriptorIfThenElsePtrOutput struct{ *pulumi.OutputState }
@@ -1902,19 +1902,9 @@ func (o PermissionDescriptorIfThenElsePtrOutput) Elem() PermissionDescriptorIfTh
 	}).(PermissionDescriptorIfThenElseOutput)
 }
 
-// Expected value is 'PermissionDescriptorIfThenElse'.
-func (o PermissionDescriptorIfThenElsePtrOutput) __type() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *PermissionDescriptorIfThenElse) *string {
-		if v == nil {
-			return nil
-		}
-		return &v.__type
-	}).(pulumi.StringPtrOutput)
-}
-
 // The boolean condition to evaluate.
 //
-// Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+// Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
 func (o PermissionDescriptorIfThenElsePtrOutput) Condition() pulumi.AnyOutput {
 	return o.ApplyT(func(v *PermissionDescriptorIfThenElse) interface{} {
 		if v == nil {
@@ -1926,7 +1916,7 @@ func (o PermissionDescriptorIfThenElsePtrOutput) Condition() pulumi.AnyOutput {
 
 // The permission descriptor to apply when the condition is false.
 //
-// Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
+// Valid `type__` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
 func (o PermissionDescriptorIfThenElsePtrOutput) SubNodeForFalse() pulumi.AnyOutput {
 	return o.ApplyT(func(v *PermissionDescriptorIfThenElse) interface{} {
 		if v == nil {
@@ -1938,7 +1928,7 @@ func (o PermissionDescriptorIfThenElsePtrOutput) SubNodeForFalse() pulumi.AnyOut
 
 // The permission descriptor to apply when the condition is true.
 //
-// Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
+// Valid `type__` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
 func (o PermissionDescriptorIfThenElsePtrOutput) SubNodeForTrue() pulumi.AnyOutput {
 	return o.ApplyT(func(v *PermissionDescriptorIfThenElse) interface{} {
 		if v == nil {
@@ -1948,15 +1938,25 @@ func (o PermissionDescriptorIfThenElsePtrOutput) SubNodeForTrue() pulumi.AnyOutp
 	}).(pulumi.AnyOutput)
 }
 
+// Expected value is 'PermissionDescriptorIfThenElse'.
+func (o PermissionDescriptorIfThenElsePtrOutput) Type__() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *PermissionDescriptorIfThenElse) *string {
+		if v == nil {
+			return nil
+		}
+		return &v.Type__
+	}).(pulumi.StringPtrOutput)
+}
+
 type PermissionDescriptorSelect struct {
-	// Expected value is 'PermissionDescriptorSelect'.
-	__type string `pulumi:"__type"`
 	// The available options to select from based on the selector expression.
 	Options []PermissionSelectvalue `pulumi:"options"`
 	// The expression used to select which option to apply.
 	//
-	// Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
+	// Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
 	Selector interface{} `pulumi:"selector"`
+	// Expected value is 'PermissionDescriptorSelect'.
+	Type__ string `pulumi:"type__"`
 }
 
 // PermissionDescriptorSelectInput is an input type that accepts PermissionDescriptorSelectArgs and PermissionDescriptorSelectOutput values.
@@ -1971,14 +1971,14 @@ type PermissionDescriptorSelectInput interface {
 }
 
 type PermissionDescriptorSelectArgs struct {
-	// Expected value is 'PermissionDescriptorSelect'.
-	__type pulumi.StringInput `pulumi:"__type"`
 	// The available options to select from based on the selector expression.
 	Options PermissionSelectvalueArrayInput `pulumi:"options"`
 	// The expression used to select which option to apply.
 	//
-	// Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
+	// Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
 	Selector pulumi.Input `pulumi:"selector"`
+	// Expected value is 'PermissionDescriptorSelect'.
+	Type__ pulumi.StringInput `pulumi:"type__"`
 }
 
 func (PermissionDescriptorSelectArgs) ElementType() reflect.Type {
@@ -2058,11 +2058,6 @@ func (o PermissionDescriptorSelectOutput) ToPermissionDescriptorSelectPtrOutputW
 	}).(PermissionDescriptorSelectPtrOutput)
 }
 
-// Expected value is 'PermissionDescriptorSelect'.
-func (o PermissionDescriptorSelectOutput) __type() pulumi.StringOutput {
-	return o.ApplyT(func(v PermissionDescriptorSelect) string { return v.__type }).(pulumi.StringOutput)
-}
-
 // The available options to select from based on the selector expression.
 func (o PermissionDescriptorSelectOutput) Options() PermissionSelectvalueArrayOutput {
 	return o.ApplyT(func(v PermissionDescriptorSelect) []PermissionSelectvalue { return v.Options }).(PermissionSelectvalueArrayOutput)
@@ -2070,9 +2065,14 @@ func (o PermissionDescriptorSelectOutput) Options() PermissionSelectvalueArrayOu
 
 // The expression used to select which option to apply.
 //
-// Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
+// Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
 func (o PermissionDescriptorSelectOutput) Selector() pulumi.AnyOutput {
 	return o.ApplyT(func(v PermissionDescriptorSelect) interface{} { return v.Selector }).(pulumi.AnyOutput)
+}
+
+// Expected value is 'PermissionDescriptorSelect'.
+func (o PermissionDescriptorSelectOutput) Type__() pulumi.StringOutput {
+	return o.ApplyT(func(v PermissionDescriptorSelect) string { return v.Type__ }).(pulumi.StringOutput)
 }
 
 type PermissionDescriptorSelectPtrOutput struct{ *pulumi.OutputState }
@@ -2099,16 +2099,6 @@ func (o PermissionDescriptorSelectPtrOutput) Elem() PermissionDescriptorSelectOu
 	}).(PermissionDescriptorSelectOutput)
 }
 
-// Expected value is 'PermissionDescriptorSelect'.
-func (o PermissionDescriptorSelectPtrOutput) __type() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *PermissionDescriptorSelect) *string {
-		if v == nil {
-			return nil
-		}
-		return &v.__type
-	}).(pulumi.StringPtrOutput)
-}
-
 // The available options to select from based on the selector expression.
 func (o PermissionDescriptorSelectPtrOutput) Options() PermissionSelectvalueArrayOutput {
 	return o.ApplyT(func(v *PermissionDescriptorSelect) []PermissionSelectvalue {
@@ -2121,7 +2111,7 @@ func (o PermissionDescriptorSelectPtrOutput) Options() PermissionSelectvalueArra
 
 // The expression used to select which option to apply.
 //
-// Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
+// Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
 func (o PermissionDescriptorSelectPtrOutput) Selector() pulumi.AnyOutput {
 	return o.ApplyT(func(v *PermissionDescriptorSelect) interface{} {
 		if v == nil {
@@ -2131,17 +2121,27 @@ func (o PermissionDescriptorSelectPtrOutput) Selector() pulumi.AnyOutput {
 	}).(pulumi.AnyOutput)
 }
 
+// Expected value is 'PermissionDescriptorSelect'.
+func (o PermissionDescriptorSelectPtrOutput) Type__() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *PermissionDescriptorSelect) *string {
+		if v == nil {
+			return nil
+		}
+		return &v.Type__
+	}).(pulumi.StringPtrOutput)
+}
+
 type PermissionExpressionAnd struct {
-	// Expected value is 'PermissionExpressionAnd'.
-	__type string `pulumi:"__type"`
 	// The left operand of the binary boolean expression.
 	//
-	// Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+	// Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
 	Left interface{} `pulumi:"left"`
 	// The right operand of the binary boolean expression.
 	//
-	// Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+	// Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
 	Right interface{} `pulumi:"right"`
+	// Expected value is 'PermissionExpressionAnd'.
+	Type__ string `pulumi:"type__"`
 }
 
 // PermissionExpressionAndInput is an input type that accepts PermissionExpressionAndArgs and PermissionExpressionAndOutput values.
@@ -2156,16 +2156,16 @@ type PermissionExpressionAndInput interface {
 }
 
 type PermissionExpressionAndArgs struct {
-	// Expected value is 'PermissionExpressionAnd'.
-	__type pulumi.StringInput `pulumi:"__type"`
 	// The left operand of the binary boolean expression.
 	//
-	// Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+	// Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
 	Left pulumi.Input `pulumi:"left"`
 	// The right operand of the binary boolean expression.
 	//
-	// Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+	// Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
 	Right pulumi.Input `pulumi:"right"`
+	// Expected value is 'PermissionExpressionAnd'.
+	Type__ pulumi.StringInput `pulumi:"type__"`
 }
 
 func (PermissionExpressionAndArgs) ElementType() reflect.Type {
@@ -2245,23 +2245,23 @@ func (o PermissionExpressionAndOutput) ToPermissionExpressionAndPtrOutputWithCon
 	}).(PermissionExpressionAndPtrOutput)
 }
 
-// Expected value is 'PermissionExpressionAnd'.
-func (o PermissionExpressionAndOutput) __type() pulumi.StringOutput {
-	return o.ApplyT(func(v PermissionExpressionAnd) string { return v.__type }).(pulumi.StringOutput)
-}
-
 // The left operand of the binary boolean expression.
 //
-// Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+// Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
 func (o PermissionExpressionAndOutput) Left() pulumi.AnyOutput {
 	return o.ApplyT(func(v PermissionExpressionAnd) interface{} { return v.Left }).(pulumi.AnyOutput)
 }
 
 // The right operand of the binary boolean expression.
 //
-// Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+// Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
 func (o PermissionExpressionAndOutput) Right() pulumi.AnyOutput {
 	return o.ApplyT(func(v PermissionExpressionAnd) interface{} { return v.Right }).(pulumi.AnyOutput)
+}
+
+// Expected value is 'PermissionExpressionAnd'.
+func (o PermissionExpressionAndOutput) Type__() pulumi.StringOutput {
+	return o.ApplyT(func(v PermissionExpressionAnd) string { return v.Type__ }).(pulumi.StringOutput)
 }
 
 type PermissionExpressionAndPtrOutput struct{ *pulumi.OutputState }
@@ -2288,19 +2288,9 @@ func (o PermissionExpressionAndPtrOutput) Elem() PermissionExpressionAndOutput {
 	}).(PermissionExpressionAndOutput)
 }
 
-// Expected value is 'PermissionExpressionAnd'.
-func (o PermissionExpressionAndPtrOutput) __type() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *PermissionExpressionAnd) *string {
-		if v == nil {
-			return nil
-		}
-		return &v.__type
-	}).(pulumi.StringPtrOutput)
-}
-
 // The left operand of the binary boolean expression.
 //
-// Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+// Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
 func (o PermissionExpressionAndPtrOutput) Left() pulumi.AnyOutput {
 	return o.ApplyT(func(v *PermissionExpressionAnd) interface{} {
 		if v == nil {
@@ -2312,7 +2302,7 @@ func (o PermissionExpressionAndPtrOutput) Left() pulumi.AnyOutput {
 
 // The right operand of the binary boolean expression.
 //
-// Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+// Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
 func (o PermissionExpressionAndPtrOutput) Right() pulumi.AnyOutput {
 	return o.ApplyT(func(v *PermissionExpressionAnd) interface{} {
 		if v == nil {
@@ -2322,9 +2312,19 @@ func (o PermissionExpressionAndPtrOutput) Right() pulumi.AnyOutput {
 	}).(pulumi.AnyOutput)
 }
 
+// Expected value is 'PermissionExpressionAnd'.
+func (o PermissionExpressionAndPtrOutput) Type__() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *PermissionExpressionAnd) *string {
+		if v == nil {
+			return nil
+		}
+		return &v.Type__
+	}).(pulumi.StringPtrOutput)
+}
+
 type PermissionExpressionEnvironment struct {
 	// Expected value is 'PermissionExpressionEnvironment'.
-	__type string `pulumi:"__type"`
+	Type__ string `pulumi:"type__"`
 }
 
 // PermissionExpressionEnvironmentInput is an input type that accepts PermissionExpressionEnvironmentArgs and PermissionExpressionEnvironmentOutput values.
@@ -2340,7 +2340,7 @@ type PermissionExpressionEnvironmentInput interface {
 
 type PermissionExpressionEnvironmentArgs struct {
 	// Expected value is 'PermissionExpressionEnvironment'.
-	__type pulumi.StringInput `pulumi:"__type"`
+	Type__ pulumi.StringInput `pulumi:"type__"`
 }
 
 func (PermissionExpressionEnvironmentArgs) ElementType() reflect.Type {
@@ -2421,8 +2421,8 @@ func (o PermissionExpressionEnvironmentOutput) ToPermissionExpressionEnvironment
 }
 
 // Expected value is 'PermissionExpressionEnvironment'.
-func (o PermissionExpressionEnvironmentOutput) __type() pulumi.StringOutput {
-	return o.ApplyT(func(v PermissionExpressionEnvironment) string { return v.__type }).(pulumi.StringOutput)
+func (o PermissionExpressionEnvironmentOutput) Type__() pulumi.StringOutput {
+	return o.ApplyT(func(v PermissionExpressionEnvironment) string { return v.Type__ }).(pulumi.StringOutput)
 }
 
 type PermissionExpressionEnvironmentPtrOutput struct{ *pulumi.OutputState }
@@ -2450,26 +2450,26 @@ func (o PermissionExpressionEnvironmentPtrOutput) Elem() PermissionExpressionEnv
 }
 
 // Expected value is 'PermissionExpressionEnvironment'.
-func (o PermissionExpressionEnvironmentPtrOutput) __type() pulumi.StringPtrOutput {
+func (o PermissionExpressionEnvironmentPtrOutput) Type__() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *PermissionExpressionEnvironment) *string {
 		if v == nil {
 			return nil
 		}
-		return &v.__type
+		return &v.Type__
 	}).(pulumi.StringPtrOutput)
 }
 
 type PermissionExpressionEqual struct {
-	// Expected value is 'PermissionExpressionEqual'.
-	__type string `pulumi:"__type"`
 	// The left operand of the equality comparison.
 	//
-	// Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
+	// Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
 	Left interface{} `pulumi:"left"`
 	// The right operand of the equality comparison.
 	//
-	// Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
+	// Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
 	Right interface{} `pulumi:"right"`
+	// Expected value is 'PermissionExpressionEqual'.
+	Type__ string `pulumi:"type__"`
 }
 
 // PermissionExpressionEqualInput is an input type that accepts PermissionExpressionEqualArgs and PermissionExpressionEqualOutput values.
@@ -2484,16 +2484,16 @@ type PermissionExpressionEqualInput interface {
 }
 
 type PermissionExpressionEqualArgs struct {
-	// Expected value is 'PermissionExpressionEqual'.
-	__type pulumi.StringInput `pulumi:"__type"`
 	// The left operand of the equality comparison.
 	//
-	// Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
+	// Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
 	Left pulumi.Input `pulumi:"left"`
 	// The right operand of the equality comparison.
 	//
-	// Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
+	// Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
 	Right pulumi.Input `pulumi:"right"`
+	// Expected value is 'PermissionExpressionEqual'.
+	Type__ pulumi.StringInput `pulumi:"type__"`
 }
 
 func (PermissionExpressionEqualArgs) ElementType() reflect.Type {
@@ -2573,23 +2573,23 @@ func (o PermissionExpressionEqualOutput) ToPermissionExpressionEqualPtrOutputWit
 	}).(PermissionExpressionEqualPtrOutput)
 }
 
-// Expected value is 'PermissionExpressionEqual'.
-func (o PermissionExpressionEqualOutput) __type() pulumi.StringOutput {
-	return o.ApplyT(func(v PermissionExpressionEqual) string { return v.__type }).(pulumi.StringOutput)
-}
-
 // The left operand of the equality comparison.
 //
-// Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
+// Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
 func (o PermissionExpressionEqualOutput) Left() pulumi.AnyOutput {
 	return o.ApplyT(func(v PermissionExpressionEqual) interface{} { return v.Left }).(pulumi.AnyOutput)
 }
 
 // The right operand of the equality comparison.
 //
-// Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
+// Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
 func (o PermissionExpressionEqualOutput) Right() pulumi.AnyOutput {
 	return o.ApplyT(func(v PermissionExpressionEqual) interface{} { return v.Right }).(pulumi.AnyOutput)
+}
+
+// Expected value is 'PermissionExpressionEqual'.
+func (o PermissionExpressionEqualOutput) Type__() pulumi.StringOutput {
+	return o.ApplyT(func(v PermissionExpressionEqual) string { return v.Type__ }).(pulumi.StringOutput)
 }
 
 type PermissionExpressionEqualPtrOutput struct{ *pulumi.OutputState }
@@ -2616,19 +2616,9 @@ func (o PermissionExpressionEqualPtrOutput) Elem() PermissionExpressionEqualOutp
 	}).(PermissionExpressionEqualOutput)
 }
 
-// Expected value is 'PermissionExpressionEqual'.
-func (o PermissionExpressionEqualPtrOutput) __type() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *PermissionExpressionEqual) *string {
-		if v == nil {
-			return nil
-		}
-		return &v.__type
-	}).(pulumi.StringPtrOutput)
-}
-
 // The left operand of the equality comparison.
 //
-// Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
+// Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
 func (o PermissionExpressionEqualPtrOutput) Left() pulumi.AnyOutput {
 	return o.ApplyT(func(v *PermissionExpressionEqual) interface{} {
 		if v == nil {
@@ -2640,7 +2630,7 @@ func (o PermissionExpressionEqualPtrOutput) Left() pulumi.AnyOutput {
 
 // The right operand of the equality comparison.
 //
-// Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
+// Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
 func (o PermissionExpressionEqualPtrOutput) Right() pulumi.AnyOutput {
 	return o.ApplyT(func(v *PermissionExpressionEqual) interface{} {
 		if v == nil {
@@ -2650,19 +2640,29 @@ func (o PermissionExpressionEqualPtrOutput) Right() pulumi.AnyOutput {
 	}).(pulumi.AnyOutput)
 }
 
+// Expected value is 'PermissionExpressionEqual'.
+func (o PermissionExpressionEqualPtrOutput) Type__() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *PermissionExpressionEqual) *string {
+		if v == nil {
+			return nil
+		}
+		return &v.Type__
+	}).(pulumi.StringPtrOutput)
+}
+
 type PermissionExpressionHasTag struct {
-	// Expected value is 'PermissionExpressionHasTag'.
-	__type string `pulumi:"__type"`
 	// The context expression to check for the tag.
 	//
-	// Valid `__type` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
+	// Valid `type__` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
 	Context interface{} `pulumi:"context"`
 	// The tag key to check for.
 	Key *string `pulumi:"key"`
 	// The operand of the unary boolean expression.
 	//
-	// Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+	// Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
 	Node interface{} `pulumi:"node"`
+	// Expected value is 'PermissionExpressionHasTag'.
+	Type__ string `pulumi:"type__"`
 }
 
 // PermissionExpressionHasTagInput is an input type that accepts PermissionExpressionHasTagArgs and PermissionExpressionHasTagOutput values.
@@ -2677,18 +2677,18 @@ type PermissionExpressionHasTagInput interface {
 }
 
 type PermissionExpressionHasTagArgs struct {
-	// Expected value is 'PermissionExpressionHasTag'.
-	__type pulumi.StringInput `pulumi:"__type"`
 	// The context expression to check for the tag.
 	//
-	// Valid `__type` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
+	// Valid `type__` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
 	Context pulumi.Input `pulumi:"context"`
 	// The tag key to check for.
 	Key pulumi.StringPtrInput `pulumi:"key"`
 	// The operand of the unary boolean expression.
 	//
-	// Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+	// Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
 	Node pulumi.Input `pulumi:"node"`
+	// Expected value is 'PermissionExpressionHasTag'.
+	Type__ pulumi.StringInput `pulumi:"type__"`
 }
 
 func (PermissionExpressionHasTagArgs) ElementType() reflect.Type {
@@ -2768,14 +2768,9 @@ func (o PermissionExpressionHasTagOutput) ToPermissionExpressionHasTagPtrOutputW
 	}).(PermissionExpressionHasTagPtrOutput)
 }
 
-// Expected value is 'PermissionExpressionHasTag'.
-func (o PermissionExpressionHasTagOutput) __type() pulumi.StringOutput {
-	return o.ApplyT(func(v PermissionExpressionHasTag) string { return v.__type }).(pulumi.StringOutput)
-}
-
 // The context expression to check for the tag.
 //
-// Valid `__type` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
+// Valid `type__` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
 func (o PermissionExpressionHasTagOutput) Context() pulumi.AnyOutput {
 	return o.ApplyT(func(v PermissionExpressionHasTag) interface{} { return v.Context }).(pulumi.AnyOutput)
 }
@@ -2787,9 +2782,14 @@ func (o PermissionExpressionHasTagOutput) Key() pulumi.StringPtrOutput {
 
 // The operand of the unary boolean expression.
 //
-// Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+// Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
 func (o PermissionExpressionHasTagOutput) Node() pulumi.AnyOutput {
 	return o.ApplyT(func(v PermissionExpressionHasTag) interface{} { return v.Node }).(pulumi.AnyOutput)
+}
+
+// Expected value is 'PermissionExpressionHasTag'.
+func (o PermissionExpressionHasTagOutput) Type__() pulumi.StringOutput {
+	return o.ApplyT(func(v PermissionExpressionHasTag) string { return v.Type__ }).(pulumi.StringOutput)
 }
 
 type PermissionExpressionHasTagPtrOutput struct{ *pulumi.OutputState }
@@ -2816,19 +2816,9 @@ func (o PermissionExpressionHasTagPtrOutput) Elem() PermissionExpressionHasTagOu
 	}).(PermissionExpressionHasTagOutput)
 }
 
-// Expected value is 'PermissionExpressionHasTag'.
-func (o PermissionExpressionHasTagPtrOutput) __type() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *PermissionExpressionHasTag) *string {
-		if v == nil {
-			return nil
-		}
-		return &v.__type
-	}).(pulumi.StringPtrOutput)
-}
-
 // The context expression to check for the tag.
 //
-// Valid `__type` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
+// Valid `type__` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
 func (o PermissionExpressionHasTagPtrOutput) Context() pulumi.AnyOutput {
 	return o.ApplyT(func(v *PermissionExpressionHasTag) interface{} {
 		if v == nil {
@@ -2850,7 +2840,7 @@ func (o PermissionExpressionHasTagPtrOutput) Key() pulumi.StringPtrOutput {
 
 // The operand of the unary boolean expression.
 //
-// Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+// Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
 func (o PermissionExpressionHasTagPtrOutput) Node() pulumi.AnyOutput {
 	return o.ApplyT(func(v *PermissionExpressionHasTag) interface{} {
 		if v == nil {
@@ -2860,9 +2850,19 @@ func (o PermissionExpressionHasTagPtrOutput) Node() pulumi.AnyOutput {
 	}).(pulumi.AnyOutput)
 }
 
+// Expected value is 'PermissionExpressionHasTag'.
+func (o PermissionExpressionHasTagPtrOutput) Type__() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *PermissionExpressionHasTag) *string {
+		if v == nil {
+			return nil
+		}
+		return &v.Type__
+	}).(pulumi.StringPtrOutput)
+}
+
 type PermissionExpressionInsightsAccount struct {
 	// Expected value is 'PermissionExpressionInsightsAccount'.
-	__type string `pulumi:"__type"`
+	Type__ string `pulumi:"type__"`
 }
 
 // PermissionExpressionInsightsAccountInput is an input type that accepts PermissionExpressionInsightsAccountArgs and PermissionExpressionInsightsAccountOutput values.
@@ -2878,7 +2878,7 @@ type PermissionExpressionInsightsAccountInput interface {
 
 type PermissionExpressionInsightsAccountArgs struct {
 	// Expected value is 'PermissionExpressionInsightsAccount'.
-	__type pulumi.StringInput `pulumi:"__type"`
+	Type__ pulumi.StringInput `pulumi:"type__"`
 }
 
 func (PermissionExpressionInsightsAccountArgs) ElementType() reflect.Type {
@@ -2959,8 +2959,8 @@ func (o PermissionExpressionInsightsAccountOutput) ToPermissionExpressionInsight
 }
 
 // Expected value is 'PermissionExpressionInsightsAccount'.
-func (o PermissionExpressionInsightsAccountOutput) __type() pulumi.StringOutput {
-	return o.ApplyT(func(v PermissionExpressionInsightsAccount) string { return v.__type }).(pulumi.StringOutput)
+func (o PermissionExpressionInsightsAccountOutput) Type__() pulumi.StringOutput {
+	return o.ApplyT(func(v PermissionExpressionInsightsAccount) string { return v.Type__ }).(pulumi.StringOutput)
 }
 
 type PermissionExpressionInsightsAccountPtrOutput struct{ *pulumi.OutputState }
@@ -2988,22 +2988,22 @@ func (o PermissionExpressionInsightsAccountPtrOutput) Elem() PermissionExpressio
 }
 
 // Expected value is 'PermissionExpressionInsightsAccount'.
-func (o PermissionExpressionInsightsAccountPtrOutput) __type() pulumi.StringPtrOutput {
+func (o PermissionExpressionInsightsAccountPtrOutput) Type__() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *PermissionExpressionInsightsAccount) *string {
 		if v == nil {
 			return nil
 		}
-		return &v.__type
+		return &v.Type__
 	}).(pulumi.StringPtrOutput)
 }
 
 type PermissionExpressionNot struct {
-	// Expected value is 'PermissionExpressionNot'.
-	__type string `pulumi:"__type"`
 	// The operand of the unary boolean expression.
 	//
-	// Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+	// Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
 	Node interface{} `pulumi:"node"`
+	// Expected value is 'PermissionExpressionNot'.
+	Type__ string `pulumi:"type__"`
 }
 
 // PermissionExpressionNotInput is an input type that accepts PermissionExpressionNotArgs and PermissionExpressionNotOutput values.
@@ -3018,12 +3018,12 @@ type PermissionExpressionNotInput interface {
 }
 
 type PermissionExpressionNotArgs struct {
-	// Expected value is 'PermissionExpressionNot'.
-	__type pulumi.StringInput `pulumi:"__type"`
 	// The operand of the unary boolean expression.
 	//
-	// Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+	// Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
 	Node pulumi.Input `pulumi:"node"`
+	// Expected value is 'PermissionExpressionNot'.
+	Type__ pulumi.StringInput `pulumi:"type__"`
 }
 
 func (PermissionExpressionNotArgs) ElementType() reflect.Type {
@@ -3103,16 +3103,16 @@ func (o PermissionExpressionNotOutput) ToPermissionExpressionNotPtrOutputWithCon
 	}).(PermissionExpressionNotPtrOutput)
 }
 
-// Expected value is 'PermissionExpressionNot'.
-func (o PermissionExpressionNotOutput) __type() pulumi.StringOutput {
-	return o.ApplyT(func(v PermissionExpressionNot) string { return v.__type }).(pulumi.StringOutput)
-}
-
 // The operand of the unary boolean expression.
 //
-// Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+// Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
 func (o PermissionExpressionNotOutput) Node() pulumi.AnyOutput {
 	return o.ApplyT(func(v PermissionExpressionNot) interface{} { return v.Node }).(pulumi.AnyOutput)
+}
+
+// Expected value is 'PermissionExpressionNot'.
+func (o PermissionExpressionNotOutput) Type__() pulumi.StringOutput {
+	return o.ApplyT(func(v PermissionExpressionNot) string { return v.Type__ }).(pulumi.StringOutput)
 }
 
 type PermissionExpressionNotPtrOutput struct{ *pulumi.OutputState }
@@ -3139,19 +3139,9 @@ func (o PermissionExpressionNotPtrOutput) Elem() PermissionExpressionNotOutput {
 	}).(PermissionExpressionNotOutput)
 }
 
-// Expected value is 'PermissionExpressionNot'.
-func (o PermissionExpressionNotPtrOutput) __type() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *PermissionExpressionNot) *string {
-		if v == nil {
-			return nil
-		}
-		return &v.__type
-	}).(pulumi.StringPtrOutput)
-}
-
 // The operand of the unary boolean expression.
 //
-// Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+// Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
 func (o PermissionExpressionNotPtrOutput) Node() pulumi.AnyOutput {
 	return o.ApplyT(func(v *PermissionExpressionNot) interface{} {
 		if v == nil {
@@ -3161,17 +3151,27 @@ func (o PermissionExpressionNotPtrOutput) Node() pulumi.AnyOutput {
 	}).(pulumi.AnyOutput)
 }
 
+// Expected value is 'PermissionExpressionNot'.
+func (o PermissionExpressionNotPtrOutput) Type__() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *PermissionExpressionNot) *string {
+		if v == nil {
+			return nil
+		}
+		return &v.Type__
+	}).(pulumi.StringPtrOutput)
+}
+
 type PermissionExpressionOr struct {
-	// Expected value is 'PermissionExpressionOr'.
-	__type string `pulumi:"__type"`
 	// The left operand of the binary boolean expression.
 	//
-	// Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+	// Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
 	Left interface{} `pulumi:"left"`
 	// The right operand of the binary boolean expression.
 	//
-	// Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+	// Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
 	Right interface{} `pulumi:"right"`
+	// Expected value is 'PermissionExpressionOr'.
+	Type__ string `pulumi:"type__"`
 }
 
 // PermissionExpressionOrInput is an input type that accepts PermissionExpressionOrArgs and PermissionExpressionOrOutput values.
@@ -3186,16 +3186,16 @@ type PermissionExpressionOrInput interface {
 }
 
 type PermissionExpressionOrArgs struct {
-	// Expected value is 'PermissionExpressionOr'.
-	__type pulumi.StringInput `pulumi:"__type"`
 	// The left operand of the binary boolean expression.
 	//
-	// Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+	// Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
 	Left pulumi.Input `pulumi:"left"`
 	// The right operand of the binary boolean expression.
 	//
-	// Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+	// Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
 	Right pulumi.Input `pulumi:"right"`
+	// Expected value is 'PermissionExpressionOr'.
+	Type__ pulumi.StringInput `pulumi:"type__"`
 }
 
 func (PermissionExpressionOrArgs) ElementType() reflect.Type {
@@ -3275,23 +3275,23 @@ func (o PermissionExpressionOrOutput) ToPermissionExpressionOrPtrOutputWithConte
 	}).(PermissionExpressionOrPtrOutput)
 }
 
-// Expected value is 'PermissionExpressionOr'.
-func (o PermissionExpressionOrOutput) __type() pulumi.StringOutput {
-	return o.ApplyT(func(v PermissionExpressionOr) string { return v.__type }).(pulumi.StringOutput)
-}
-
 // The left operand of the binary boolean expression.
 //
-// Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+// Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
 func (o PermissionExpressionOrOutput) Left() pulumi.AnyOutput {
 	return o.ApplyT(func(v PermissionExpressionOr) interface{} { return v.Left }).(pulumi.AnyOutput)
 }
 
 // The right operand of the binary boolean expression.
 //
-// Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+// Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
 func (o PermissionExpressionOrOutput) Right() pulumi.AnyOutput {
 	return o.ApplyT(func(v PermissionExpressionOr) interface{} { return v.Right }).(pulumi.AnyOutput)
+}
+
+// Expected value is 'PermissionExpressionOr'.
+func (o PermissionExpressionOrOutput) Type__() pulumi.StringOutput {
+	return o.ApplyT(func(v PermissionExpressionOr) string { return v.Type__ }).(pulumi.StringOutput)
 }
 
 type PermissionExpressionOrPtrOutput struct{ *pulumi.OutputState }
@@ -3318,19 +3318,9 @@ func (o PermissionExpressionOrPtrOutput) Elem() PermissionExpressionOrOutput {
 	}).(PermissionExpressionOrOutput)
 }
 
-// Expected value is 'PermissionExpressionOr'.
-func (o PermissionExpressionOrPtrOutput) __type() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *PermissionExpressionOr) *string {
-		if v == nil {
-			return nil
-		}
-		return &v.__type
-	}).(pulumi.StringPtrOutput)
-}
-
 // The left operand of the binary boolean expression.
 //
-// Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+// Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
 func (o PermissionExpressionOrPtrOutput) Left() pulumi.AnyOutput {
 	return o.ApplyT(func(v *PermissionExpressionOr) interface{} {
 		if v == nil {
@@ -3342,7 +3332,7 @@ func (o PermissionExpressionOrPtrOutput) Left() pulumi.AnyOutput {
 
 // The right operand of the binary boolean expression.
 //
-// Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+// Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
 func (o PermissionExpressionOrPtrOutput) Right() pulumi.AnyOutput {
 	return o.ApplyT(func(v *PermissionExpressionOr) interface{} {
 		if v == nil {
@@ -3352,9 +3342,19 @@ func (o PermissionExpressionOrPtrOutput) Right() pulumi.AnyOutput {
 	}).(pulumi.AnyOutput)
 }
 
+// Expected value is 'PermissionExpressionOr'.
+func (o PermissionExpressionOrPtrOutput) Type__() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *PermissionExpressionOr) *string {
+		if v == nil {
+			return nil
+		}
+		return &v.Type__
+	}).(pulumi.StringPtrOutput)
+}
+
 type PermissionExpressionStack struct {
 	// Expected value is 'PermissionExpressionStack'.
-	__type string `pulumi:"__type"`
+	Type__ string `pulumi:"type__"`
 }
 
 // PermissionExpressionStackInput is an input type that accepts PermissionExpressionStackArgs and PermissionExpressionStackOutput values.
@@ -3370,7 +3370,7 @@ type PermissionExpressionStackInput interface {
 
 type PermissionExpressionStackArgs struct {
 	// Expected value is 'PermissionExpressionStack'.
-	__type pulumi.StringInput `pulumi:"__type"`
+	Type__ pulumi.StringInput `pulumi:"type__"`
 }
 
 func (PermissionExpressionStackArgs) ElementType() reflect.Type {
@@ -3451,8 +3451,8 @@ func (o PermissionExpressionStackOutput) ToPermissionExpressionStackPtrOutputWit
 }
 
 // Expected value is 'PermissionExpressionStack'.
-func (o PermissionExpressionStackOutput) __type() pulumi.StringOutput {
-	return o.ApplyT(func(v PermissionExpressionStack) string { return v.__type }).(pulumi.StringOutput)
+func (o PermissionExpressionStackOutput) Type__() pulumi.StringOutput {
+	return o.ApplyT(func(v PermissionExpressionStack) string { return v.Type__ }).(pulumi.StringOutput)
 }
 
 type PermissionExpressionStackPtrOutput struct{ *pulumi.OutputState }
@@ -3480,24 +3480,24 @@ func (o PermissionExpressionStackPtrOutput) Elem() PermissionExpressionStackOutp
 }
 
 // Expected value is 'PermissionExpressionStack'.
-func (o PermissionExpressionStackPtrOutput) __type() pulumi.StringPtrOutput {
+func (o PermissionExpressionStackPtrOutput) Type__() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *PermissionExpressionStack) *string {
 		if v == nil {
 			return nil
 		}
-		return &v.__type
+		return &v.Type__
 	}).(pulumi.StringPtrOutput)
 }
 
 type PermissionExpressionTag struct {
-	// Expected value is 'PermissionExpressionTag'.
-	__type string `pulumi:"__type"`
 	// The context expression identifying the resource to look up the tag on.
 	//
-	// Valid `__type` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
+	// Valid `type__` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
 	Context interface{} `pulumi:"context"`
 	// The tag key to retrieve.
 	Key *string `pulumi:"key"`
+	// Expected value is 'PermissionExpressionTag'.
+	Type__ string `pulumi:"type__"`
 }
 
 // PermissionExpressionTagInput is an input type that accepts PermissionExpressionTagArgs and PermissionExpressionTagOutput values.
@@ -3512,14 +3512,14 @@ type PermissionExpressionTagInput interface {
 }
 
 type PermissionExpressionTagArgs struct {
-	// Expected value is 'PermissionExpressionTag'.
-	__type pulumi.StringInput `pulumi:"__type"`
 	// The context expression identifying the resource to look up the tag on.
 	//
-	// Valid `__type` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
+	// Valid `type__` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
 	Context pulumi.Input `pulumi:"context"`
 	// The tag key to retrieve.
 	Key pulumi.StringPtrInput `pulumi:"key"`
+	// Expected value is 'PermissionExpressionTag'.
+	Type__ pulumi.StringInput `pulumi:"type__"`
 }
 
 func (PermissionExpressionTagArgs) ElementType() reflect.Type {
@@ -3599,14 +3599,9 @@ func (o PermissionExpressionTagOutput) ToPermissionExpressionTagPtrOutputWithCon
 	}).(PermissionExpressionTagPtrOutput)
 }
 
-// Expected value is 'PermissionExpressionTag'.
-func (o PermissionExpressionTagOutput) __type() pulumi.StringOutput {
-	return o.ApplyT(func(v PermissionExpressionTag) string { return v.__type }).(pulumi.StringOutput)
-}
-
 // The context expression identifying the resource to look up the tag on.
 //
-// Valid `__type` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
+// Valid `type__` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
 func (o PermissionExpressionTagOutput) Context() pulumi.AnyOutput {
 	return o.ApplyT(func(v PermissionExpressionTag) interface{} { return v.Context }).(pulumi.AnyOutput)
 }
@@ -3614,6 +3609,11 @@ func (o PermissionExpressionTagOutput) Context() pulumi.AnyOutput {
 // The tag key to retrieve.
 func (o PermissionExpressionTagOutput) Key() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v PermissionExpressionTag) *string { return v.Key }).(pulumi.StringPtrOutput)
+}
+
+// Expected value is 'PermissionExpressionTag'.
+func (o PermissionExpressionTagOutput) Type__() pulumi.StringOutput {
+	return o.ApplyT(func(v PermissionExpressionTag) string { return v.Type__ }).(pulumi.StringOutput)
 }
 
 type PermissionExpressionTagPtrOutput struct{ *pulumi.OutputState }
@@ -3640,19 +3640,9 @@ func (o PermissionExpressionTagPtrOutput) Elem() PermissionExpressionTagOutput {
 	}).(PermissionExpressionTagOutput)
 }
 
-// Expected value is 'PermissionExpressionTag'.
-func (o PermissionExpressionTagPtrOutput) __type() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *PermissionExpressionTag) *string {
-		if v == nil {
-			return nil
-		}
-		return &v.__type
-	}).(pulumi.StringPtrOutput)
-}
-
 // The context expression identifying the resource to look up the tag on.
 //
-// Valid `__type` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
+// Valid `type__` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
 func (o PermissionExpressionTagPtrOutput) Context() pulumi.AnyOutput {
 	return o.ApplyT(func(v *PermissionExpressionTag) interface{} {
 		if v == nil {
@@ -3672,9 +3662,19 @@ func (o PermissionExpressionTagPtrOutput) Key() pulumi.StringPtrOutput {
 	}).(pulumi.StringPtrOutput)
 }
 
+// Expected value is 'PermissionExpressionTag'.
+func (o PermissionExpressionTagPtrOutput) Type__() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *PermissionExpressionTag) *string {
+		if v == nil {
+			return nil
+		}
+		return &v.Type__
+	}).(pulumi.StringPtrOutput)
+}
+
 type PermissionExpressionTeam struct {
 	// Expected value is 'PermissionExpressionTeam'.
-	__type string `pulumi:"__type"`
+	Type__ string `pulumi:"type__"`
 }
 
 // PermissionExpressionTeamInput is an input type that accepts PermissionExpressionTeamArgs and PermissionExpressionTeamOutput values.
@@ -3690,7 +3690,7 @@ type PermissionExpressionTeamInput interface {
 
 type PermissionExpressionTeamArgs struct {
 	// Expected value is 'PermissionExpressionTeam'.
-	__type pulumi.StringInput `pulumi:"__type"`
+	Type__ pulumi.StringInput `pulumi:"type__"`
 }
 
 func (PermissionExpressionTeamArgs) ElementType() reflect.Type {
@@ -3771,8 +3771,8 @@ func (o PermissionExpressionTeamOutput) ToPermissionExpressionTeamPtrOutputWithC
 }
 
 // Expected value is 'PermissionExpressionTeam'.
-func (o PermissionExpressionTeamOutput) __type() pulumi.StringOutput {
-	return o.ApplyT(func(v PermissionExpressionTeam) string { return v.__type }).(pulumi.StringOutput)
+func (o PermissionExpressionTeamOutput) Type__() pulumi.StringOutput {
+	return o.ApplyT(func(v PermissionExpressionTeam) string { return v.Type__ }).(pulumi.StringOutput)
 }
 
 type PermissionExpressionTeamPtrOutput struct{ *pulumi.OutputState }
@@ -3800,18 +3800,18 @@ func (o PermissionExpressionTeamPtrOutput) Elem() PermissionExpressionTeamOutput
 }
 
 // Expected value is 'PermissionExpressionTeam'.
-func (o PermissionExpressionTeamPtrOutput) __type() pulumi.StringPtrOutput {
+func (o PermissionExpressionTeamPtrOutput) Type__() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *PermissionExpressionTeam) *string {
 		if v == nil {
 			return nil
 		}
-		return &v.__type
+		return &v.Type__
 	}).(pulumi.StringPtrOutput)
 }
 
 type PermissionLiteralExpressionBool struct {
 	// Expected value is 'PermissionLiteralExpressionBool'.
-	__type string `pulumi:"__type"`
+	Type__ string `pulumi:"type__"`
 	// The boolean literal value.
 	Value *bool `pulumi:"value"`
 }
@@ -3829,7 +3829,7 @@ type PermissionLiteralExpressionBoolInput interface {
 
 type PermissionLiteralExpressionBoolArgs struct {
 	// Expected value is 'PermissionLiteralExpressionBool'.
-	__type pulumi.StringInput `pulumi:"__type"`
+	Type__ pulumi.StringInput `pulumi:"type__"`
 	// The boolean literal value.
 	Value pulumi.BoolPtrInput `pulumi:"value"`
 }
@@ -3912,8 +3912,8 @@ func (o PermissionLiteralExpressionBoolOutput) ToPermissionLiteralExpressionBool
 }
 
 // Expected value is 'PermissionLiteralExpressionBool'.
-func (o PermissionLiteralExpressionBoolOutput) __type() pulumi.StringOutput {
-	return o.ApplyT(func(v PermissionLiteralExpressionBool) string { return v.__type }).(pulumi.StringOutput)
+func (o PermissionLiteralExpressionBoolOutput) Type__() pulumi.StringOutput {
+	return o.ApplyT(func(v PermissionLiteralExpressionBool) string { return v.Type__ }).(pulumi.StringOutput)
 }
 
 // The boolean literal value.
@@ -3946,12 +3946,12 @@ func (o PermissionLiteralExpressionBoolPtrOutput) Elem() PermissionLiteralExpres
 }
 
 // Expected value is 'PermissionLiteralExpressionBool'.
-func (o PermissionLiteralExpressionBoolPtrOutput) __type() pulumi.StringPtrOutput {
+func (o PermissionLiteralExpressionBoolPtrOutput) Type__() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *PermissionLiteralExpressionBool) *string {
 		if v == nil {
 			return nil
 		}
-		return &v.__type
+		return &v.Type__
 	}).(pulumi.StringPtrOutput)
 }
 
@@ -3966,10 +3966,10 @@ func (o PermissionLiteralExpressionBoolPtrOutput) Value() pulumi.BoolPtrOutput {
 }
 
 type PermissionLiteralExpressionEnvironment struct {
-	// Expected value is 'PermissionLiteralExpressionEnvironment'.
-	__type string `pulumi:"__type"`
 	// The identity of the environment.
 	Identity *string `pulumi:"identity"`
+	// Expected value is 'PermissionLiteralExpressionEnvironment'.
+	Type__ string `pulumi:"type__"`
 }
 
 // PermissionLiteralExpressionEnvironmentInput is an input type that accepts PermissionLiteralExpressionEnvironmentArgs and PermissionLiteralExpressionEnvironmentOutput values.
@@ -3984,10 +3984,10 @@ type PermissionLiteralExpressionEnvironmentInput interface {
 }
 
 type PermissionLiteralExpressionEnvironmentArgs struct {
-	// Expected value is 'PermissionLiteralExpressionEnvironment'.
-	__type pulumi.StringInput `pulumi:"__type"`
 	// The identity of the environment.
 	Identity pulumi.StringPtrInput `pulumi:"identity"`
+	// Expected value is 'PermissionLiteralExpressionEnvironment'.
+	Type__ pulumi.StringInput `pulumi:"type__"`
 }
 
 func (PermissionLiteralExpressionEnvironmentArgs) ElementType() reflect.Type {
@@ -4067,14 +4067,14 @@ func (o PermissionLiteralExpressionEnvironmentOutput) ToPermissionLiteralExpress
 	}).(PermissionLiteralExpressionEnvironmentPtrOutput)
 }
 
-// Expected value is 'PermissionLiteralExpressionEnvironment'.
-func (o PermissionLiteralExpressionEnvironmentOutput) __type() pulumi.StringOutput {
-	return o.ApplyT(func(v PermissionLiteralExpressionEnvironment) string { return v.__type }).(pulumi.StringOutput)
-}
-
 // The identity of the environment.
 func (o PermissionLiteralExpressionEnvironmentOutput) Identity() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v PermissionLiteralExpressionEnvironment) *string { return v.Identity }).(pulumi.StringPtrOutput)
+}
+
+// Expected value is 'PermissionLiteralExpressionEnvironment'.
+func (o PermissionLiteralExpressionEnvironmentOutput) Type__() pulumi.StringOutput {
+	return o.ApplyT(func(v PermissionLiteralExpressionEnvironment) string { return v.Type__ }).(pulumi.StringOutput)
 }
 
 type PermissionLiteralExpressionEnvironmentPtrOutput struct{ *pulumi.OutputState }
@@ -4101,16 +4101,6 @@ func (o PermissionLiteralExpressionEnvironmentPtrOutput) Elem() PermissionLitera
 	}).(PermissionLiteralExpressionEnvironmentOutput)
 }
 
-// Expected value is 'PermissionLiteralExpressionEnvironment'.
-func (o PermissionLiteralExpressionEnvironmentPtrOutput) __type() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *PermissionLiteralExpressionEnvironment) *string {
-		if v == nil {
-			return nil
-		}
-		return &v.__type
-	}).(pulumi.StringPtrOutput)
-}
-
 // The identity of the environment.
 func (o PermissionLiteralExpressionEnvironmentPtrOutput) Identity() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *PermissionLiteralExpressionEnvironment) *string {
@@ -4121,11 +4111,21 @@ func (o PermissionLiteralExpressionEnvironmentPtrOutput) Identity() pulumi.Strin
 	}).(pulumi.StringPtrOutput)
 }
 
+// Expected value is 'PermissionLiteralExpressionEnvironment'.
+func (o PermissionLiteralExpressionEnvironmentPtrOutput) Type__() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *PermissionLiteralExpressionEnvironment) *string {
+		if v == nil {
+			return nil
+		}
+		return &v.Type__
+	}).(pulumi.StringPtrOutput)
+}
+
 type PermissionLiteralExpressionInsightsAccount struct {
-	// Expected value is 'PermissionLiteralExpressionInsightsAccount'.
-	__type string `pulumi:"__type"`
 	// The identity of the Insights account.
 	Identity *string `pulumi:"identity"`
+	// Expected value is 'PermissionLiteralExpressionInsightsAccount'.
+	Type__ string `pulumi:"type__"`
 }
 
 // PermissionLiteralExpressionInsightsAccountInput is an input type that accepts PermissionLiteralExpressionInsightsAccountArgs and PermissionLiteralExpressionInsightsAccountOutput values.
@@ -4140,10 +4140,10 @@ type PermissionLiteralExpressionInsightsAccountInput interface {
 }
 
 type PermissionLiteralExpressionInsightsAccountArgs struct {
-	// Expected value is 'PermissionLiteralExpressionInsightsAccount'.
-	__type pulumi.StringInput `pulumi:"__type"`
 	// The identity of the Insights account.
 	Identity pulumi.StringPtrInput `pulumi:"identity"`
+	// Expected value is 'PermissionLiteralExpressionInsightsAccount'.
+	Type__ pulumi.StringInput `pulumi:"type__"`
 }
 
 func (PermissionLiteralExpressionInsightsAccountArgs) ElementType() reflect.Type {
@@ -4223,14 +4223,14 @@ func (o PermissionLiteralExpressionInsightsAccountOutput) ToPermissionLiteralExp
 	}).(PermissionLiteralExpressionInsightsAccountPtrOutput)
 }
 
-// Expected value is 'PermissionLiteralExpressionInsightsAccount'.
-func (o PermissionLiteralExpressionInsightsAccountOutput) __type() pulumi.StringOutput {
-	return o.ApplyT(func(v PermissionLiteralExpressionInsightsAccount) string { return v.__type }).(pulumi.StringOutput)
-}
-
 // The identity of the Insights account.
 func (o PermissionLiteralExpressionInsightsAccountOutput) Identity() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v PermissionLiteralExpressionInsightsAccount) *string { return v.Identity }).(pulumi.StringPtrOutput)
+}
+
+// Expected value is 'PermissionLiteralExpressionInsightsAccount'.
+func (o PermissionLiteralExpressionInsightsAccountOutput) Type__() pulumi.StringOutput {
+	return o.ApplyT(func(v PermissionLiteralExpressionInsightsAccount) string { return v.Type__ }).(pulumi.StringOutput)
 }
 
 type PermissionLiteralExpressionInsightsAccountPtrOutput struct{ *pulumi.OutputState }
@@ -4257,16 +4257,6 @@ func (o PermissionLiteralExpressionInsightsAccountPtrOutput) Elem() PermissionLi
 	}).(PermissionLiteralExpressionInsightsAccountOutput)
 }
 
-// Expected value is 'PermissionLiteralExpressionInsightsAccount'.
-func (o PermissionLiteralExpressionInsightsAccountPtrOutput) __type() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *PermissionLiteralExpressionInsightsAccount) *string {
-		if v == nil {
-			return nil
-		}
-		return &v.__type
-	}).(pulumi.StringPtrOutput)
-}
-
 // The identity of the Insights account.
 func (o PermissionLiteralExpressionInsightsAccountPtrOutput) Identity() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *PermissionLiteralExpressionInsightsAccount) *string {
@@ -4277,9 +4267,19 @@ func (o PermissionLiteralExpressionInsightsAccountPtrOutput) Identity() pulumi.S
 	}).(pulumi.StringPtrOutput)
 }
 
+// Expected value is 'PermissionLiteralExpressionInsightsAccount'.
+func (o PermissionLiteralExpressionInsightsAccountPtrOutput) Type__() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *PermissionLiteralExpressionInsightsAccount) *string {
+		if v == nil {
+			return nil
+		}
+		return &v.Type__
+	}).(pulumi.StringPtrOutput)
+}
+
 type PermissionLiteralExpressionNumber struct {
 	// Expected value is 'PermissionLiteralExpressionNumber'.
-	__type string `pulumi:"__type"`
+	Type__ string `pulumi:"type__"`
 	// The numeric literal value.
 	Value *float64 `pulumi:"value"`
 }
@@ -4297,7 +4297,7 @@ type PermissionLiteralExpressionNumberInput interface {
 
 type PermissionLiteralExpressionNumberArgs struct {
 	// Expected value is 'PermissionLiteralExpressionNumber'.
-	__type pulumi.StringInput `pulumi:"__type"`
+	Type__ pulumi.StringInput `pulumi:"type__"`
 	// The numeric literal value.
 	Value pulumi.Float64PtrInput `pulumi:"value"`
 }
@@ -4380,8 +4380,8 @@ func (o PermissionLiteralExpressionNumberOutput) ToPermissionLiteralExpressionNu
 }
 
 // Expected value is 'PermissionLiteralExpressionNumber'.
-func (o PermissionLiteralExpressionNumberOutput) __type() pulumi.StringOutput {
-	return o.ApplyT(func(v PermissionLiteralExpressionNumber) string { return v.__type }).(pulumi.StringOutput)
+func (o PermissionLiteralExpressionNumberOutput) Type__() pulumi.StringOutput {
+	return o.ApplyT(func(v PermissionLiteralExpressionNumber) string { return v.Type__ }).(pulumi.StringOutput)
 }
 
 // The numeric literal value.
@@ -4414,12 +4414,12 @@ func (o PermissionLiteralExpressionNumberPtrOutput) Elem() PermissionLiteralExpr
 }
 
 // Expected value is 'PermissionLiteralExpressionNumber'.
-func (o PermissionLiteralExpressionNumberPtrOutput) __type() pulumi.StringPtrOutput {
+func (o PermissionLiteralExpressionNumberPtrOutput) Type__() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *PermissionLiteralExpressionNumber) *string {
 		if v == nil {
 			return nil
 		}
-		return &v.__type
+		return &v.Type__
 	}).(pulumi.StringPtrOutput)
 }
 
@@ -4434,10 +4434,10 @@ func (o PermissionLiteralExpressionNumberPtrOutput) Value() pulumi.Float64PtrOut
 }
 
 type PermissionLiteralExpressionStack struct {
-	// Expected value is 'PermissionLiteralExpressionStack'.
-	__type string `pulumi:"__type"`
 	// The identity of the stack.
 	Identity *string `pulumi:"identity"`
+	// Expected value is 'PermissionLiteralExpressionStack'.
+	Type__ string `pulumi:"type__"`
 }
 
 // PermissionLiteralExpressionStackInput is an input type that accepts PermissionLiteralExpressionStackArgs and PermissionLiteralExpressionStackOutput values.
@@ -4452,10 +4452,10 @@ type PermissionLiteralExpressionStackInput interface {
 }
 
 type PermissionLiteralExpressionStackArgs struct {
-	// Expected value is 'PermissionLiteralExpressionStack'.
-	__type pulumi.StringInput `pulumi:"__type"`
 	// The identity of the stack.
 	Identity pulumi.StringPtrInput `pulumi:"identity"`
+	// Expected value is 'PermissionLiteralExpressionStack'.
+	Type__ pulumi.StringInput `pulumi:"type__"`
 }
 
 func (PermissionLiteralExpressionStackArgs) ElementType() reflect.Type {
@@ -4535,14 +4535,14 @@ func (o PermissionLiteralExpressionStackOutput) ToPermissionLiteralExpressionSta
 	}).(PermissionLiteralExpressionStackPtrOutput)
 }
 
-// Expected value is 'PermissionLiteralExpressionStack'.
-func (o PermissionLiteralExpressionStackOutput) __type() pulumi.StringOutput {
-	return o.ApplyT(func(v PermissionLiteralExpressionStack) string { return v.__type }).(pulumi.StringOutput)
-}
-
 // The identity of the stack.
 func (o PermissionLiteralExpressionStackOutput) Identity() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v PermissionLiteralExpressionStack) *string { return v.Identity }).(pulumi.StringPtrOutput)
+}
+
+// Expected value is 'PermissionLiteralExpressionStack'.
+func (o PermissionLiteralExpressionStackOutput) Type__() pulumi.StringOutput {
+	return o.ApplyT(func(v PermissionLiteralExpressionStack) string { return v.Type__ }).(pulumi.StringOutput)
 }
 
 type PermissionLiteralExpressionStackPtrOutput struct{ *pulumi.OutputState }
@@ -4569,16 +4569,6 @@ func (o PermissionLiteralExpressionStackPtrOutput) Elem() PermissionLiteralExpre
 	}).(PermissionLiteralExpressionStackOutput)
 }
 
-// Expected value is 'PermissionLiteralExpressionStack'.
-func (o PermissionLiteralExpressionStackPtrOutput) __type() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *PermissionLiteralExpressionStack) *string {
-		if v == nil {
-			return nil
-		}
-		return &v.__type
-	}).(pulumi.StringPtrOutput)
-}
-
 // The identity of the stack.
 func (o PermissionLiteralExpressionStackPtrOutput) Identity() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *PermissionLiteralExpressionStack) *string {
@@ -4589,9 +4579,19 @@ func (o PermissionLiteralExpressionStackPtrOutput) Identity() pulumi.StringPtrOu
 	}).(pulumi.StringPtrOutput)
 }
 
+// Expected value is 'PermissionLiteralExpressionStack'.
+func (o PermissionLiteralExpressionStackPtrOutput) Type__() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *PermissionLiteralExpressionStack) *string {
+		if v == nil {
+			return nil
+		}
+		return &v.Type__
+	}).(pulumi.StringPtrOutput)
+}
+
 type PermissionLiteralExpressionString struct {
 	// Expected value is 'PermissionLiteralExpressionString'.
-	__type string `pulumi:"__type"`
+	Type__ string `pulumi:"type__"`
 	// The string literal value.
 	Value *string `pulumi:"value"`
 }
@@ -4609,7 +4609,7 @@ type PermissionLiteralExpressionStringInput interface {
 
 type PermissionLiteralExpressionStringArgs struct {
 	// Expected value is 'PermissionLiteralExpressionString'.
-	__type pulumi.StringInput `pulumi:"__type"`
+	Type__ pulumi.StringInput `pulumi:"type__"`
 	// The string literal value.
 	Value pulumi.StringPtrInput `pulumi:"value"`
 }
@@ -4692,8 +4692,8 @@ func (o PermissionLiteralExpressionStringOutput) ToPermissionLiteralExpressionSt
 }
 
 // Expected value is 'PermissionLiteralExpressionString'.
-func (o PermissionLiteralExpressionStringOutput) __type() pulumi.StringOutput {
-	return o.ApplyT(func(v PermissionLiteralExpressionString) string { return v.__type }).(pulumi.StringOutput)
+func (o PermissionLiteralExpressionStringOutput) Type__() pulumi.StringOutput {
+	return o.ApplyT(func(v PermissionLiteralExpressionString) string { return v.Type__ }).(pulumi.StringOutput)
 }
 
 // The string literal value.
@@ -4726,12 +4726,12 @@ func (o PermissionLiteralExpressionStringPtrOutput) Elem() PermissionLiteralExpr
 }
 
 // Expected value is 'PermissionLiteralExpressionString'.
-func (o PermissionLiteralExpressionStringPtrOutput) __type() pulumi.StringPtrOutput {
+func (o PermissionLiteralExpressionStringPtrOutput) Type__() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *PermissionLiteralExpressionString) *string {
 		if v == nil {
 			return nil
 		}
-		return &v.__type
+		return &v.Type__
 	}).(pulumi.StringPtrOutput)
 }
 
@@ -4746,10 +4746,10 @@ func (o PermissionLiteralExpressionStringPtrOutput) Value() pulumi.StringPtrOutp
 }
 
 type PermissionLiteralExpressionTeam struct {
-	// Expected value is 'PermissionLiteralExpressionTeam'.
-	__type string `pulumi:"__type"`
 	// The identity of the team.
 	Identity *string `pulumi:"identity"`
+	// Expected value is 'PermissionLiteralExpressionTeam'.
+	Type__ string `pulumi:"type__"`
 }
 
 // PermissionLiteralExpressionTeamInput is an input type that accepts PermissionLiteralExpressionTeamArgs and PermissionLiteralExpressionTeamOutput values.
@@ -4764,10 +4764,10 @@ type PermissionLiteralExpressionTeamInput interface {
 }
 
 type PermissionLiteralExpressionTeamArgs struct {
-	// Expected value is 'PermissionLiteralExpressionTeam'.
-	__type pulumi.StringInput `pulumi:"__type"`
 	// The identity of the team.
 	Identity pulumi.StringPtrInput `pulumi:"identity"`
+	// Expected value is 'PermissionLiteralExpressionTeam'.
+	Type__ pulumi.StringInput `pulumi:"type__"`
 }
 
 func (PermissionLiteralExpressionTeamArgs) ElementType() reflect.Type {
@@ -4847,14 +4847,14 @@ func (o PermissionLiteralExpressionTeamOutput) ToPermissionLiteralExpressionTeam
 	}).(PermissionLiteralExpressionTeamPtrOutput)
 }
 
-// Expected value is 'PermissionLiteralExpressionTeam'.
-func (o PermissionLiteralExpressionTeamOutput) __type() pulumi.StringOutput {
-	return o.ApplyT(func(v PermissionLiteralExpressionTeam) string { return v.__type }).(pulumi.StringOutput)
-}
-
 // The identity of the team.
 func (o PermissionLiteralExpressionTeamOutput) Identity() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v PermissionLiteralExpressionTeam) *string { return v.Identity }).(pulumi.StringPtrOutput)
+}
+
+// Expected value is 'PermissionLiteralExpressionTeam'.
+func (o PermissionLiteralExpressionTeamOutput) Type__() pulumi.StringOutput {
+	return o.ApplyT(func(v PermissionLiteralExpressionTeam) string { return v.Type__ }).(pulumi.StringOutput)
 }
 
 type PermissionLiteralExpressionTeamPtrOutput struct{ *pulumi.OutputState }
@@ -4881,16 +4881,6 @@ func (o PermissionLiteralExpressionTeamPtrOutput) Elem() PermissionLiteralExpres
 	}).(PermissionLiteralExpressionTeamOutput)
 }
 
-// Expected value is 'PermissionLiteralExpressionTeam'.
-func (o PermissionLiteralExpressionTeamPtrOutput) __type() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *PermissionLiteralExpressionTeam) *string {
-		if v == nil {
-			return nil
-		}
-		return &v.__type
-	}).(pulumi.StringPtrOutput)
-}
-
 // The identity of the team.
 func (o PermissionLiteralExpressionTeamPtrOutput) Identity() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *PermissionLiteralExpressionTeam) *string {
@@ -4901,15 +4891,25 @@ func (o PermissionLiteralExpressionTeamPtrOutput) Identity() pulumi.StringPtrOut
 	}).(pulumi.StringPtrOutput)
 }
 
+// Expected value is 'PermissionLiteralExpressionTeam'.
+func (o PermissionLiteralExpressionTeamPtrOutput) Type__() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *PermissionLiteralExpressionTeam) *string {
+		if v == nil {
+			return nil
+		}
+		return &v.Type__
+	}).(pulumi.StringPtrOutput)
+}
+
 // PermissionSelectvalue pairs a value expression with its corresponding permission descriptor node.
 type PermissionSelectvalue struct {
 	// The permission descriptor to apply when this value matches.
 	//
-	// Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
+	// Valid `type__` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
 	Node interface{} `pulumi:"node"`
 	// The value expression to match against the selector.
 	//
-	// Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
+	// Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
 	Value interface{} `pulumi:"value"`
 }
 
@@ -4928,11 +4928,11 @@ type PermissionSelectvalueInput interface {
 type PermissionSelectvalueArgs struct {
 	// The permission descriptor to apply when this value matches.
 	//
-	// Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
+	// Valid `type__` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
 	Node pulumi.Input `pulumi:"node"`
 	// The value expression to match against the selector.
 	//
-	// Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
+	// Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
 	Value pulumi.Input `pulumi:"value"`
 }
 
@@ -4990,14 +4990,14 @@ func (o PermissionSelectvalueOutput) ToPermissionSelectvalueOutputWithContext(ct
 
 // The permission descriptor to apply when this value matches.
 //
-// Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
+// Valid `type__` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
 func (o PermissionSelectvalueOutput) Node() pulumi.AnyOutput {
 	return o.ApplyT(func(v PermissionSelectvalue) interface{} { return v.Node }).(pulumi.AnyOutput)
 }
 
 // The value expression to match against the selector.
 //
-// Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
+// Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
 func (o PermissionSelectvalueOutput) Value() pulumi.AnyOutput {
 	return o.ApplyT(func(v PermissionSelectvalue) interface{} { return v.Value }).(pulumi.AnyOutput)
 }

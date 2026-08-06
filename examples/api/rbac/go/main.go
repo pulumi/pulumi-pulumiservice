@@ -29,7 +29,7 @@ func main() {
 			Description: pulumi.String(roleDescription),
 			UxPurpose:   pulumi.String("role"),
 			Details: pulumi.Map{
-				"__type":      pulumi.String("PermissionDescriptorAllow"),
+				"type__":      pulumi.String("PermissionDescriptorAllow"),
 				"permissions": pulumi.StringArray{pulumi.String("stack:read")},
 			},
 		})

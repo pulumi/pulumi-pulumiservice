@@ -33,11 +33,6 @@ import javax.annotation.Nullable;
 @CustomType
 public final class PermissionDescriptorSelect {
     /**
-     * @return Expected value is &#39;PermissionDescriptorSelect&#39;.
-     * 
-     */
-    private String __type;
-    /**
      * @return The available options to select from based on the selector expression.
      * 
      */
@@ -45,19 +40,17 @@ public final class PermissionDescriptorSelect {
     /**
      * @return The expression used to select which option to apply.
      * 
-     * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
+     * Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
      * 
      */
     private @Nullable Object selector;
-
-    private PermissionDescriptorSelect() {}
     /**
      * @return Expected value is &#39;PermissionDescriptorSelect&#39;.
      * 
      */
-    public String __type() {
-        return this.__type;
-    }
+    private String type__;
+
+    private PermissionDescriptorSelect() {}
     /**
      * @return The available options to select from based on the selector expression.
      * 
@@ -68,11 +61,18 @@ public final class PermissionDescriptorSelect {
     /**
      * @return The expression used to select which option to apply.
      * 
-     * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
+     * Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
      * 
      */
     public Optional<Object> selector() {
         return Optional.ofNullable(this.selector);
+    }
+    /**
+     * @return Expected value is &#39;PermissionDescriptorSelect&#39;.
+     * 
+     */
+    public String type__() {
+        return this.type__;
     }
 
     public static Builder builder() {
@@ -84,25 +84,17 @@ public final class PermissionDescriptorSelect {
     }
     @CustomType.Builder
     public static final class Builder {
-        private String __type;
         private @Nullable List<PermissionSelectvalue> options;
         private @Nullable Object selector;
+        private String type__;
         public Builder() {}
         public Builder(PermissionDescriptorSelect defaults) {
     	      Objects.requireNonNull(defaults);
-    	      this.__type = defaults.__type;
     	      this.options = defaults.options;
     	      this.selector = defaults.selector;
+    	      this.type__ = defaults.type__;
         }
 
-        @CustomType.Setter
-        public Builder __type(String __type) {
-            if (__type == null) {
-              throw new MissingRequiredPropertyException("PermissionDescriptorSelect", "__type");
-            }
-            this.__type = __type;
-            return this;
-        }
         @CustomType.Setter
         public Builder options(@Nullable List<PermissionSelectvalue> options) {
 
@@ -118,11 +110,19 @@ public final class PermissionDescriptorSelect {
             this.selector = selector;
             return this;
         }
+        @CustomType.Setter
+        public Builder type__(String type__) {
+            if (type__ == null) {
+              throw new MissingRequiredPropertyException("PermissionDescriptorSelect", "type__");
+            }
+            this.type__ = type__;
+            return this;
+        }
         public PermissionDescriptorSelect build() {
             final var _resultValue = new PermissionDescriptorSelect();
-            _resultValue.__type = __type;
             _resultValue.options = options;
             _resultValue.selector = selector;
+            _resultValue.type__ = type__;
             return _resultValue;
         }
     }

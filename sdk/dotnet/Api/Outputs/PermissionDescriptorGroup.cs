@@ -14,24 +14,24 @@ namespace Pulumi.PulumiService.Api.Outputs
     public sealed class PermissionDescriptorGroup
     {
         /// <summary>
-        /// Expected value is 'PermissionDescriptorGroup'.
-        /// </summary>
-        public readonly string __type;
-        /// <summary>
         /// The list of permission descriptor entries in this group.
         /// 
-        /// Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
+        /// Valid `type__` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
         /// </summary>
         public readonly ImmutableArray<object> Entries;
+        /// <summary>
+        /// Expected value is 'PermissionDescriptorGroup'.
+        /// </summary>
+        public readonly string Type__;
 
         [OutputConstructor]
         private PermissionDescriptorGroup(
-            string __type,
+            ImmutableArray<object> entries,
 
-            ImmutableArray<object> entries)
+            string type__)
         {
-            this.__type = __type;
             Entries = entries;
+            Type__ = type__;
         }
     }
 }

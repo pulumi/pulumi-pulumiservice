@@ -78,7 +78,7 @@ public class App {
                     .description("Read-only access to stacks, scoped via the platform team.")
                     .uxPurpose("role")
                     .details(Map.of(
-                        "__type", "PermissionDescriptorAllow",
+                        "type__", "PermissionDescriptorAllow",
                         "permissions", List.of("stack:read")))
                     .build());
 

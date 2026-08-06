@@ -20,6 +20,8 @@ import (
 	"strings"
 
 	"github.com/pulumi/pulumi/pkg/v3/codegen/schema"
+
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 )
 
 const schemaRefPrefix = "#/components/schemas/"
@@ -580,7 +582,7 @@ func (r *typeRegistry) unionTypeSpec(baseName, tagProp string, mapping map[strin
 	return schema.TypeSpec{
 		OneOf: oneOf,
 		Discriminator: &schema.DiscriminatorSpec{
-			PropertyName: tagProp,
+			PropertyName: util.ToSchemaName(tagProp),
 			Mapping:      discMapping,
 		},
 	}
@@ -617,32 +619,34 @@ func (r *typeRegistry) emit(name, tagProp, tag string) string {
 	pprops := map[string]schema.PropertySpec{}
 	for k, v := range props {
 		ps := r.property(v)
-		if looksSecret(k) {
+		propName := util.ToSchemaName(k)
+		if looksSecret(propName) {
 			ps.Secret = true
 		}
-		pprops[k] = ps
+		pprops[propName] = ps
 	}
 	reqSet := map[string]bool{}
 	for _, rr := range required {
-		if _, ok := pprops[rr]; ok {
-			reqSet[rr] = true
+		if _, ok := pprops[util.ToSchemaName(rr)]; ok {
+			reqSet[util.ToSchemaName(rr)] = true
 		}
 	}
 	for _, opt := range r.typeMeta[name].Optional {
-		delete(reqSet, opt)
+		delete(reqSet, util.ToSchemaName(opt))
 	}
 
 	if tagProp != "" {
+		tagName := util.ToSchemaName(tagProp)
 		desc := fmt.Sprintf("Expected value is '%s'.", tag)
-		if prev, ok := pprops[tagProp]; ok && prev.Description != "" {
+		if prev, ok := pprops[tagName]; ok && prev.Description != "" {
 			desc = prev.Description + " " + desc
 		}
-		pprops[tagProp] = schema.PropertySpec{
+		pprops[tagName] = schema.PropertySpec{
 			TypeSpec:    schema.TypeSpec{Type: typeString},
 			Const:       tag,
 			Description: desc,
 		}
-		reqSet[tagProp] = true
+		reqSet[tagName] = true
 	}
 
 	desc := ""

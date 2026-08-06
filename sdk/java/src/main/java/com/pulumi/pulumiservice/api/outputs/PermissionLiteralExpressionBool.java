@@ -17,7 +17,7 @@ public final class PermissionLiteralExpressionBool {
      * @return Expected value is &#39;PermissionLiteralExpressionBool&#39;.
      * 
      */
-    private String __type;
+    private String type__;
     /**
      * @return The boolean literal value.
      * 
@@ -29,8 +29,8 @@ public final class PermissionLiteralExpressionBool {
      * @return Expected value is &#39;PermissionLiteralExpressionBool&#39;.
      * 
      */
-    public String __type() {
-        return this.__type;
+    public String type__() {
+        return this.type__;
     }
     /**
      * @return The boolean literal value.
@@ -49,21 +49,21 @@ public final class PermissionLiteralExpressionBool {
     }
     @CustomType.Builder
     public static final class Builder {
-        private String __type;
+        private String type__;
         private @Nullable Boolean value;
         public Builder() {}
         public Builder(PermissionLiteralExpressionBool defaults) {
     	      Objects.requireNonNull(defaults);
-    	      this.__type = defaults.__type;
+    	      this.type__ = defaults.type__;
     	      this.value = defaults.value;
         }
 
         @CustomType.Setter
-        public Builder __type(String __type) {
-            if (__type == null) {
-              throw new MissingRequiredPropertyException("PermissionLiteralExpressionBool", "__type");
+        public Builder type__(String type__) {
+            if (type__ == null) {
+              throw new MissingRequiredPropertyException("PermissionLiteralExpressionBool", "type__");
             }
-            this.__type = __type;
+            this.type__ = type__;
             return this;
         }
         @CustomType.Setter
@@ -74,7 +74,7 @@ public final class PermissionLiteralExpressionBool {
         }
         public PermissionLiteralExpressionBool build() {
             final var _resultValue = new PermissionLiteralExpressionBool();
-            _resultValue.__type = __type;
+            _resultValue.type__ = type__;
             _resultValue.value = value;
             return _resultValue;
         }

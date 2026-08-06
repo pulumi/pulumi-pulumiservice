@@ -14,42 +14,42 @@ namespace Pulumi.PulumiService.Api.Outputs
     public sealed class PermissionDescriptorIfThenElse
     {
         /// <summary>
-        /// Expected value is 'PermissionDescriptorIfThenElse'.
-        /// </summary>
-        public readonly string __type;
-        /// <summary>
         /// The boolean condition to evaluate.
         /// 
-        /// Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+        /// Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
         /// </summary>
         public readonly object? Condition;
         /// <summary>
         /// The permission descriptor to apply when the condition is false.
         /// 
-        /// Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
+        /// Valid `type__` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
         /// </summary>
         public readonly object? SubNodeForFalse;
         /// <summary>
         /// The permission descriptor to apply when the condition is true.
         /// 
-        /// Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
+        /// Valid `type__` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
         /// </summary>
         public readonly object? SubNodeForTrue;
+        /// <summary>
+        /// Expected value is 'PermissionDescriptorIfThenElse'.
+        /// </summary>
+        public readonly string Type__;
 
         [OutputConstructor]
         private PermissionDescriptorIfThenElse(
-            string __type,
-
             object? condition,
 
             object? subNodeForFalse,
 
-            object? subNodeForTrue)
+            object? subNodeForTrue,
+
+            string type__)
         {
-            this.__type = __type;
             Condition = condition;
             SubNodeForFalse = subNodeForFalse;
             SubNodeForTrue = subNodeForTrue;
+            Type__ = type__;
         }
     }
 }

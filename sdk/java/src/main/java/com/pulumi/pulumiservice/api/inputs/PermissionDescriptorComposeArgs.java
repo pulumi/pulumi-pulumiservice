@@ -19,21 +19,6 @@ public final class PermissionDescriptorComposeArgs extends com.pulumi.resources.
     public static final PermissionDescriptorComposeArgs Empty = new PermissionDescriptorComposeArgs();
 
     /**
-     * Expected value is &#39;PermissionDescriptorCompose&#39;.
-     * 
-     */
-    @Import(name="__type", required=true)
-    private Output<String> __type;
-
-    /**
-     * @return Expected value is &#39;PermissionDescriptorCompose&#39;.
-     * 
-     */
-    public Output<String> __type() {
-        return this.__type;
-    }
-
-    /**
      * References to other descriptors to include in the tree
      * 
      */
@@ -48,11 +33,26 @@ public final class PermissionDescriptorComposeArgs extends com.pulumi.resources.
         return Optional.ofNullable(this.permissionDescriptors);
     }
 
+    /**
+     * Expected value is &#39;PermissionDescriptorCompose&#39;.
+     * 
+     */
+    @Import(name="type__", required=true)
+    private Output<String> type__;
+
+    /**
+     * @return Expected value is &#39;PermissionDescriptorCompose&#39;.
+     * 
+     */
+    public Output<String> type__() {
+        return this.type__;
+    }
+
     private PermissionDescriptorComposeArgs() {}
 
     private PermissionDescriptorComposeArgs(PermissionDescriptorComposeArgs $) {
-        this.__type = $.__type;
         this.permissionDescriptors = $.permissionDescriptors;
+        this.type__ = $.type__;
     }
 
     public static Builder builder() {
@@ -71,27 +71,6 @@ public final class PermissionDescriptorComposeArgs extends com.pulumi.resources.
 
         public Builder(PermissionDescriptorComposeArgs defaults) {
             $ = new PermissionDescriptorComposeArgs(Objects.requireNonNull(defaults));
-        }
-
-        /**
-         * @param __type Expected value is &#39;PermissionDescriptorCompose&#39;.
-         * 
-         * @return builder
-         * 
-         */
-        public Builder __type(Output<String> __type) {
-            $.__type = __type;
-            return this;
-        }
-
-        /**
-         * @param __type Expected value is &#39;PermissionDescriptorCompose&#39;.
-         * 
-         * @return builder
-         * 
-         */
-        public Builder __type(String __type) {
-            return __type(Output.of(__type));
         }
 
         /**
@@ -125,8 +104,29 @@ public final class PermissionDescriptorComposeArgs extends com.pulumi.resources.
             return permissionDescriptors(List.of(permissionDescriptors));
         }
 
+        /**
+         * @param type__ Expected value is &#39;PermissionDescriptorCompose&#39;.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder type__(Output<String> type__) {
+            $.type__ = type__;
+            return this;
+        }
+
+        /**
+         * @param type__ Expected value is &#39;PermissionDescriptorCompose&#39;.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder type__(String type__) {
+            return type__(Output.of(type__));
+        }
+
         public PermissionDescriptorComposeArgs build() {
-            $.__type = Codegen.stringProp("__type").output().arg($.__type).require();
+            $.type__ = Codegen.stringProp("type__").output().arg($.type__).require();
             return $;
         }
     }

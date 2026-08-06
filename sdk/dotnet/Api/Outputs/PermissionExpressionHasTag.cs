@@ -14,13 +14,9 @@ namespace Pulumi.PulumiService.Api.Outputs
     public sealed class PermissionExpressionHasTag
     {
         /// <summary>
-        /// Expected value is 'PermissionExpressionHasTag'.
-        /// </summary>
-        public readonly string __type;
-        /// <summary>
         /// The context expression to check for the tag.
         /// 
-        /// Valid `__type` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
+        /// Valid `type__` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
         /// </summary>
         public readonly object? Context;
         /// <summary>
@@ -30,24 +26,28 @@ namespace Pulumi.PulumiService.Api.Outputs
         /// <summary>
         /// The operand of the unary boolean expression.
         /// 
-        /// Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+        /// Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
         /// </summary>
         public readonly object? Node;
+        /// <summary>
+        /// Expected value is 'PermissionExpressionHasTag'.
+        /// </summary>
+        public readonly string Type__;
 
         [OutputConstructor]
         private PermissionExpressionHasTag(
-            string __type,
-
             object? context,
 
             string? key,
 
-            object? node)
+            object? node,
+
+            string type__)
         {
-            this.__type = __type;
             Context = context;
             Key = key;
             Node = node;
+            Type__ = type__;
         }
     }
 }

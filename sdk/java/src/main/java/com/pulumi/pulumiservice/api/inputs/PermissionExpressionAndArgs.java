@@ -23,24 +23,9 @@ public final class PermissionExpressionAndArgs extends com.pulumi.resources.Reso
     public static final PermissionExpressionAndArgs Empty = new PermissionExpressionAndArgs();
 
     /**
-     * Expected value is &#39;PermissionExpressionAnd&#39;.
-     * 
-     */
-    @Import(name="__type", required=true)
-    private Output<String> __type;
-
-    /**
-     * @return Expected value is &#39;PermissionExpressionAnd&#39;.
-     * 
-     */
-    public Output<String> __type() {
-        return this.__type;
-    }
-
-    /**
      * The left operand of the binary boolean expression.
      * 
-     * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+     * Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
      * 
      */
     @Import(name="left")
@@ -49,7 +34,7 @@ public final class PermissionExpressionAndArgs extends com.pulumi.resources.Reso
     /**
      * @return The left operand of the binary boolean expression.
      * 
-     * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+     * Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
      * 
      */
     public Optional<Output<Object>> left() {
@@ -59,7 +44,7 @@ public final class PermissionExpressionAndArgs extends com.pulumi.resources.Reso
     /**
      * The right operand of the binary boolean expression.
      * 
-     * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+     * Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
      * 
      */
     @Import(name="right")
@@ -68,19 +53,34 @@ public final class PermissionExpressionAndArgs extends com.pulumi.resources.Reso
     /**
      * @return The right operand of the binary boolean expression.
      * 
-     * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+     * Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
      * 
      */
     public Optional<Output<Object>> right() {
         return Optional.ofNullable(this.right);
     }
 
+    /**
+     * Expected value is &#39;PermissionExpressionAnd&#39;.
+     * 
+     */
+    @Import(name="type__", required=true)
+    private Output<String> type__;
+
+    /**
+     * @return Expected value is &#39;PermissionExpressionAnd&#39;.
+     * 
+     */
+    public Output<String> type__() {
+        return this.type__;
+    }
+
     private PermissionExpressionAndArgs() {}
 
     private PermissionExpressionAndArgs(PermissionExpressionAndArgs $) {
-        this.__type = $.__type;
         this.left = $.left;
         this.right = $.right;
+        this.type__ = $.type__;
     }
 
     public static Builder builder() {
@@ -102,30 +102,9 @@ public final class PermissionExpressionAndArgs extends com.pulumi.resources.Reso
         }
 
         /**
-         * @param __type Expected value is &#39;PermissionExpressionAnd&#39;.
-         * 
-         * @return builder
-         * 
-         */
-        public Builder __type(Output<String> __type) {
-            $.__type = __type;
-            return this;
-        }
-
-        /**
-         * @param __type Expected value is &#39;PermissionExpressionAnd&#39;.
-         * 
-         * @return builder
-         * 
-         */
-        public Builder __type(String __type) {
-            return __type(Output.of(__type));
-        }
-
-        /**
          * @param left The left operand of the binary boolean expression.
          * 
-         * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+         * Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
          * 
          * @return builder
          * 
@@ -138,7 +117,7 @@ public final class PermissionExpressionAndArgs extends com.pulumi.resources.Reso
         /**
          * @param left The left operand of the binary boolean expression.
          * 
-         * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+         * Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
          * 
          * @return builder
          * 
@@ -150,7 +129,7 @@ public final class PermissionExpressionAndArgs extends com.pulumi.resources.Reso
         /**
          * @param right The right operand of the binary boolean expression.
          * 
-         * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+         * Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
          * 
          * @return builder
          * 
@@ -163,7 +142,7 @@ public final class PermissionExpressionAndArgs extends com.pulumi.resources.Reso
         /**
          * @param right The right operand of the binary boolean expression.
          * 
-         * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+         * Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
          * 
          * @return builder
          * 
@@ -172,8 +151,29 @@ public final class PermissionExpressionAndArgs extends com.pulumi.resources.Reso
             return right(Output.of(right));
         }
 
+        /**
+         * @param type__ Expected value is &#39;PermissionExpressionAnd&#39;.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder type__(Output<String> type__) {
+            $.type__ = type__;
+            return this;
+        }
+
+        /**
+         * @param type__ Expected value is &#39;PermissionExpressionAnd&#39;.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder type__(String type__) {
+            return type__(Output.of(type__));
+        }
+
         public PermissionExpressionAndArgs build() {
-            $.__type = Codegen.stringProp("__type").output().arg($.__type).require();
+            $.type__ = Codegen.stringProp("type__").output().arg($.type__).require();
             return $;
         }
     }

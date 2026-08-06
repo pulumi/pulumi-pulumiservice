@@ -6,10 +6,10 @@ const organizationName = config.get("organizationName") ?? "service-provider-tes
 const nameSuffix = config.get("nameSuffix") ?? "manual";
 const roleDescription = config.get("roleDescription") ?? "Read-only access to stacks, created by the api rbac example.";
 
-// details is a discriminated union; the __type literal selects the variant
+// details is a discriminated union; the type__ literal selects the variant
 // and the compiler checks the variant's fields.
 const readOnlyDetails: ps.types.input.api.PermissionDescriptorAllowArgs = {
-    __type: "PermissionDescriptorAllow",
+    type__: "PermissionDescriptorAllow",
     permissions: ["stack:read"],
 };
 

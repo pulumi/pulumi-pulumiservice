@@ -24,44 +24,37 @@ import javax.annotation.Nullable;
 @CustomType
 public final class PermissionDescriptorIfThenElse {
     /**
-     * @return Expected value is &#39;PermissionDescriptorIfThenElse&#39;.
-     * 
-     */
-    private String __type;
-    /**
      * @return The boolean condition to evaluate.
      * 
-     * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+     * Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
      * 
      */
     private @Nullable Object condition;
     /**
      * @return The permission descriptor to apply when the condition is false.
      * 
-     * Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
+     * Valid `type__` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
      * 
      */
     private @Nullable Object subNodeForFalse;
     /**
      * @return The permission descriptor to apply when the condition is true.
      * 
-     * Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
+     * Valid `type__` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
      * 
      */
     private @Nullable Object subNodeForTrue;
-
-    private PermissionDescriptorIfThenElse() {}
     /**
      * @return Expected value is &#39;PermissionDescriptorIfThenElse&#39;.
      * 
      */
-    public String __type() {
-        return this.__type;
-    }
+    private String type__;
+
+    private PermissionDescriptorIfThenElse() {}
     /**
      * @return The boolean condition to evaluate.
      * 
-     * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+     * Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
      * 
      */
     public Optional<Object> condition() {
@@ -70,7 +63,7 @@ public final class PermissionDescriptorIfThenElse {
     /**
      * @return The permission descriptor to apply when the condition is false.
      * 
-     * Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
+     * Valid `type__` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
      * 
      */
     public Optional<Object> subNodeForFalse() {
@@ -79,11 +72,18 @@ public final class PermissionDescriptorIfThenElse {
     /**
      * @return The permission descriptor to apply when the condition is true.
      * 
-     * Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
+     * Valid `type__` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
      * 
      */
     public Optional<Object> subNodeForTrue() {
         return Optional.ofNullable(this.subNodeForTrue);
+    }
+    /**
+     * @return Expected value is &#39;PermissionDescriptorIfThenElse&#39;.
+     * 
+     */
+    public String type__() {
+        return this.type__;
     }
 
     public static Builder builder() {
@@ -95,27 +95,19 @@ public final class PermissionDescriptorIfThenElse {
     }
     @CustomType.Builder
     public static final class Builder {
-        private String __type;
         private @Nullable Object condition;
         private @Nullable Object subNodeForFalse;
         private @Nullable Object subNodeForTrue;
+        private String type__;
         public Builder() {}
         public Builder(PermissionDescriptorIfThenElse defaults) {
     	      Objects.requireNonNull(defaults);
-    	      this.__type = defaults.__type;
     	      this.condition = defaults.condition;
     	      this.subNodeForFalse = defaults.subNodeForFalse;
     	      this.subNodeForTrue = defaults.subNodeForTrue;
+    	      this.type__ = defaults.type__;
         }
 
-        @CustomType.Setter
-        public Builder __type(String __type) {
-            if (__type == null) {
-              throw new MissingRequiredPropertyException("PermissionDescriptorIfThenElse", "__type");
-            }
-            this.__type = __type;
-            return this;
-        }
         @CustomType.Setter
         public Builder condition(@Nullable Object condition) {
 
@@ -134,12 +126,20 @@ public final class PermissionDescriptorIfThenElse {
             this.subNodeForTrue = subNodeForTrue;
             return this;
         }
+        @CustomType.Setter
+        public Builder type__(String type__) {
+            if (type__ == null) {
+              throw new MissingRequiredPropertyException("PermissionDescriptorIfThenElse", "type__");
+            }
+            this.type__ = type__;
+            return this;
+        }
         public PermissionDescriptorIfThenElse build() {
             final var _resultValue = new PermissionDescriptorIfThenElse();
-            _resultValue.__type = __type;
             _resultValue.condition = condition;
             _resultValue.subNodeForFalse = subNodeForFalse;
             _resultValue.subNodeForTrue = subNodeForTrue;
+            _resultValue.type__ = type__;
             return _resultValue;
         }
     }

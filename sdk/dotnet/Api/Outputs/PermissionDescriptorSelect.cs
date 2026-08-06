@@ -14,31 +14,31 @@ namespace Pulumi.PulumiService.Api.Outputs
     public sealed class PermissionDescriptorSelect
     {
         /// <summary>
-        /// Expected value is 'PermissionDescriptorSelect'.
-        /// </summary>
-        public readonly string __type;
-        /// <summary>
         /// The available options to select from based on the selector expression.
         /// </summary>
         public readonly ImmutableArray<Outputs.PermissionSelectvalue> Options;
         /// <summary>
         /// The expression used to select which option to apply.
         /// 
-        /// Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
+        /// Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam.
         /// </summary>
         public readonly object? Selector;
+        /// <summary>
+        /// Expected value is 'PermissionDescriptorSelect'.
+        /// </summary>
+        public readonly string Type__;
 
         [OutputConstructor]
         private PermissionDescriptorSelect(
-            string __type,
-
             ImmutableArray<Outputs.PermissionSelectvalue> options,
 
-            object? selector)
+            object? selector,
+
+            string type__)
         {
-            this.__type = __type;
             Options = options;
             Selector = selector;
+            Type__ = type__;
         }
     }
 }

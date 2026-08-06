@@ -12,29 +12,29 @@ resources:
       description: ${roleDescription}
       uxPurpose: role
       details:
-        __type: PermissionDescriptorGroup
+        type__: PermissionDescriptorGroup
         entries:
-          - __type: PermissionDescriptorCondition
+          - type__: PermissionDescriptorCondition
             condition:
-              __type: PermissionExpressionAnd
+              type__: PermissionExpressionAnd
               left:
-                __type: PermissionExpressionEqual
+                type__: PermissionExpressionEqual
                 left:
-                  __type: PermissionExpressionEnvironment
+                  type__: PermissionExpressionEnvironment
                 right:
-                  __type: PermissionLiteralExpressionEnvironment
+                  type__: PermissionLiteralExpressionEnvironment
                   identity: ${allowedEnvironmentId}
               right:
-                __type: PermissionExpressionNot
+                type__: PermissionExpressionNot
                 node:
-                  __type: PermissionExpressionEqual
+                  type__: PermissionExpressionEqual
                   left:
-                    __type: PermissionExpressionEnvironment
+                    type__: PermissionExpressionEnvironment
                   right:
-                    __type: PermissionLiteralExpressionEnvironment
+                    type__: PermissionLiteralExpressionEnvironment
                     identity: ${deniedEnvironmentId}
             subNode:
-              __type: PermissionDescriptorAllow
+              type__: PermissionDescriptorAllow
               permissions:
                 - environment:read
                 - environment:open

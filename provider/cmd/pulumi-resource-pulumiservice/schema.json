@@ -3757,11 +3757,6 @@
     },
     "pulumiservice:api:PermissionDescriptorAllow": {
       "properties": {
-        "__type": {
-          "type": "string",
-          "description": "Expected value is 'PermissionDescriptorAllow'.",
-          "const": "PermissionDescriptorAllow"
-        },
         "constraints": {
           "$ref": "#/types/pulumiservice:api:RbacPermissionConstraints",
           "description": "Optional contextual constraints for the permissions"
@@ -3772,40 +3767,40 @@
             "type": "string"
           },
           "description": "List of permissions to allow"
+        },
+        "type__": {
+          "type": "string",
+          "description": "Expected value is 'PermissionDescriptorAllow'.",
+          "const": "PermissionDescriptorAllow"
         }
       },
       "type": "object",
       "required": [
-        "__type"
+        "type__"
       ]
     },
     "pulumiservice:api:PermissionDescriptorCompose": {
       "properties": {
-        "__type": {
-          "type": "string",
-          "description": "Expected value is 'PermissionDescriptorCompose'.",
-          "const": "PermissionDescriptorCompose"
-        },
         "permissionDescriptors": {
           "type": "array",
           "items": {
             "type": "string"
           },
           "description": "References to other descriptors to include in the tree"
+        },
+        "type__": {
+          "type": "string",
+          "description": "Expected value is 'PermissionDescriptorCompose'.",
+          "const": "PermissionDescriptorCompose"
         }
       },
       "type": "object",
       "required": [
-        "__type"
+        "type__"
       ]
     },
     "pulumiservice:api:PermissionDescriptorCondition": {
       "properties": {
-        "__type": {
-          "type": "string",
-          "description": "Expected value is 'PermissionDescriptorCondition'.",
-          "const": "PermissionDescriptorCondition"
-        },
         "condition": {
           "oneOf": [
             {
@@ -3825,7 +3820,7 @@
             }
           ],
           "discriminator": {
-            "propertyName": "__type",
+            "propertyName": "type__",
             "mapping": {
               "PermissionExpressionAnd": "#/types/pulumiservice:api:PermissionExpressionAnd",
               "PermissionExpressionEqual": "#/types/pulumiservice:api:PermissionExpressionEqual",
@@ -3834,7 +3829,7 @@
               "PermissionExpressionOr": "#/types/pulumiservice:api:PermissionExpressionOr"
             }
           },
-          "description": "The boolean condition to evaluate.\n\nValid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr."
+          "description": "The boolean condition to evaluate.\n\nValid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr."
         },
         "subNode": {
           "oneOf": [
@@ -3858,7 +3853,7 @@
             }
           ],
           "discriminator": {
-            "propertyName": "__type",
+            "propertyName": "type__",
             "mapping": {
               "PermissionDescriptorAllow": "#/types/pulumiservice:api:PermissionDescriptorAllow",
               "PermissionDescriptorCompose": "#/types/pulumiservice:api:PermissionDescriptorCompose",
@@ -3868,21 +3863,21 @@
               "PermissionDescriptorSelect": "#/types/pulumiservice:api:PermissionDescriptorSelect"
             }
           },
-          "description": "The permission descriptor to apply when the condition is true.\n\nValid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect."
+          "description": "The permission descriptor to apply when the condition is true.\n\nValid `type__` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect."
+        },
+        "type__": {
+          "type": "string",
+          "description": "Expected value is 'PermissionDescriptorCondition'.",
+          "const": "PermissionDescriptorCondition"
         }
       },
       "type": "object",
       "required": [
-        "__type"
+        "type__"
       ]
     },
     "pulumiservice:api:PermissionDescriptorGroup": {
       "properties": {
-        "__type": {
-          "type": "string",
-          "description": "Expected value is 'PermissionDescriptorGroup'.",
-          "const": "PermissionDescriptorGroup"
-        },
         "entries": {
           "type": "array",
           "items": {
@@ -3907,7 +3902,7 @@
               }
             ],
             "discriminator": {
-              "propertyName": "__type",
+              "propertyName": "type__",
               "mapping": {
                 "PermissionDescriptorAllow": "#/types/pulumiservice:api:PermissionDescriptorAllow",
                 "PermissionDescriptorCompose": "#/types/pulumiservice:api:PermissionDescriptorCompose",
@@ -3918,21 +3913,21 @@
               }
             }
           },
-          "description": "The list of permission descriptor entries in this group.\n\nValid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect."
+          "description": "The list of permission descriptor entries in this group.\n\nValid `type__` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect."
+        },
+        "type__": {
+          "type": "string",
+          "description": "Expected value is 'PermissionDescriptorGroup'.",
+          "const": "PermissionDescriptorGroup"
         }
       },
       "type": "object",
       "required": [
-        "__type"
+        "type__"
       ]
     },
     "pulumiservice:api:PermissionDescriptorIfThenElse": {
       "properties": {
-        "__type": {
-          "type": "string",
-          "description": "Expected value is 'PermissionDescriptorIfThenElse'.",
-          "const": "PermissionDescriptorIfThenElse"
-        },
         "condition": {
           "oneOf": [
             {
@@ -3952,7 +3947,7 @@
             }
           ],
           "discriminator": {
-            "propertyName": "__type",
+            "propertyName": "type__",
             "mapping": {
               "PermissionExpressionAnd": "#/types/pulumiservice:api:PermissionExpressionAnd",
               "PermissionExpressionEqual": "#/types/pulumiservice:api:PermissionExpressionEqual",
@@ -3961,7 +3956,7 @@
               "PermissionExpressionOr": "#/types/pulumiservice:api:PermissionExpressionOr"
             }
           },
-          "description": "The boolean condition to evaluate.\n\nValid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr."
+          "description": "The boolean condition to evaluate.\n\nValid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr."
         },
         "subNodeForFalse": {
           "oneOf": [
@@ -3985,7 +3980,7 @@
             }
           ],
           "discriminator": {
-            "propertyName": "__type",
+            "propertyName": "type__",
             "mapping": {
               "PermissionDescriptorAllow": "#/types/pulumiservice:api:PermissionDescriptorAllow",
               "PermissionDescriptorCompose": "#/types/pulumiservice:api:PermissionDescriptorCompose",
@@ -3995,7 +3990,7 @@
               "PermissionDescriptorSelect": "#/types/pulumiservice:api:PermissionDescriptorSelect"
             }
           },
-          "description": "The permission descriptor to apply when the condition is false.\n\nValid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect."
+          "description": "The permission descriptor to apply when the condition is false.\n\nValid `type__` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect."
         },
         "subNodeForTrue": {
           "oneOf": [
@@ -4019,7 +4014,7 @@
             }
           ],
           "discriminator": {
-            "propertyName": "__type",
+            "propertyName": "type__",
             "mapping": {
               "PermissionDescriptorAllow": "#/types/pulumiservice:api:PermissionDescriptorAllow",
               "PermissionDescriptorCompose": "#/types/pulumiservice:api:PermissionDescriptorCompose",
@@ -4029,21 +4024,21 @@
               "PermissionDescriptorSelect": "#/types/pulumiservice:api:PermissionDescriptorSelect"
             }
           },
-          "description": "The permission descriptor to apply when the condition is true.\n\nValid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect."
+          "description": "The permission descriptor to apply when the condition is true.\n\nValid `type__` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect."
+        },
+        "type__": {
+          "type": "string",
+          "description": "Expected value is 'PermissionDescriptorIfThenElse'.",
+          "const": "PermissionDescriptorIfThenElse"
         }
       },
       "type": "object",
       "required": [
-        "__type"
+        "type__"
       ]
     },
     "pulumiservice:api:PermissionDescriptorSelect": {
       "properties": {
-        "__type": {
-          "type": "string",
-          "description": "Expected value is 'PermissionDescriptorSelect'.",
-          "const": "PermissionDescriptorSelect"
-        },
         "options": {
           "type": "array",
           "items": {
@@ -4106,7 +4101,7 @@
             }
           ],
           "discriminator": {
-            "propertyName": "__type",
+            "propertyName": "type__",
             "mapping": {
               "PermissionExpressionAnd": "#/types/pulumiservice:api:PermissionExpressionAnd",
               "PermissionExpressionEnvironment": "#/types/pulumiservice:api:PermissionExpressionEnvironment",
@@ -4127,21 +4122,21 @@
               "PermissionLiteralExpressionTeam": "#/types/pulumiservice:api:PermissionLiteralExpressionTeam"
             }
           },
-          "description": "The expression used to select which option to apply.\n\nValid `__type` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam."
+          "description": "The expression used to select which option to apply.\n\nValid `type__` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam."
+        },
+        "type__": {
+          "type": "string",
+          "description": "Expected value is 'PermissionDescriptorSelect'.",
+          "const": "PermissionDescriptorSelect"
         }
       },
       "type": "object",
       "required": [
-        "__type"
+        "type__"
       ]
     },
     "pulumiservice:api:PermissionExpressionAnd": {
       "properties": {
-        "__type": {
-          "type": "string",
-          "description": "Expected value is 'PermissionExpressionAnd'.",
-          "const": "PermissionExpressionAnd"
-        },
         "left": {
           "oneOf": [
             {
@@ -4161,7 +4156,7 @@
             }
           ],
           "discriminator": {
-            "propertyName": "__type",
+            "propertyName": "type__",
             "mapping": {
               "PermissionExpressionAnd": "#/types/pulumiservice:api:PermissionExpressionAnd",
               "PermissionExpressionEqual": "#/types/pulumiservice:api:PermissionExpressionEqual",
@@ -4170,7 +4165,7 @@
               "PermissionExpressionOr": "#/types/pulumiservice:api:PermissionExpressionOr"
             }
           },
-          "description": "The left operand of the binary boolean expression.\n\nValid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr."
+          "description": "The left operand of the binary boolean expression.\n\nValid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr."
         },
         "right": {
           "oneOf": [
@@ -4191,7 +4186,7 @@
             }
           ],
           "discriminator": {
-            "propertyName": "__type",
+            "propertyName": "type__",
             "mapping": {
               "PermissionExpressionAnd": "#/types/pulumiservice:api:PermissionExpressionAnd",
               "PermissionExpressionEqual": "#/types/pulumiservice:api:PermissionExpressionEqual",
@@ -4200,17 +4195,22 @@
               "PermissionExpressionOr": "#/types/pulumiservice:api:PermissionExpressionOr"
             }
           },
-          "description": "The right operand of the binary boolean expression.\n\nValid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr."
+          "description": "The right operand of the binary boolean expression.\n\nValid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr."
+        },
+        "type__": {
+          "type": "string",
+          "description": "Expected value is 'PermissionExpressionAnd'.",
+          "const": "PermissionExpressionAnd"
         }
       },
       "type": "object",
       "required": [
-        "__type"
+        "type__"
       ]
     },
     "pulumiservice:api:PermissionExpressionEnvironment": {
       "properties": {
-        "__type": {
+        "type__": {
           "type": "string",
           "description": "Expected value is 'PermissionExpressionEnvironment'.",
           "const": "PermissionExpressionEnvironment"
@@ -4218,16 +4218,11 @@
       },
       "type": "object",
       "required": [
-        "__type"
+        "type__"
       ]
     },
     "pulumiservice:api:PermissionExpressionEqual": {
       "properties": {
-        "__type": {
-          "type": "string",
-          "description": "Expected value is 'PermissionExpressionEqual'.",
-          "const": "PermissionExpressionEqual"
-        },
         "left": {
           "oneOf": [
             {
@@ -4283,7 +4278,7 @@
             }
           ],
           "discriminator": {
-            "propertyName": "__type",
+            "propertyName": "type__",
             "mapping": {
               "PermissionExpressionAnd": "#/types/pulumiservice:api:PermissionExpressionAnd",
               "PermissionExpressionEnvironment": "#/types/pulumiservice:api:PermissionExpressionEnvironment",
@@ -4304,7 +4299,7 @@
               "PermissionLiteralExpressionTeam": "#/types/pulumiservice:api:PermissionLiteralExpressionTeam"
             }
           },
-          "description": "The left operand of the equality comparison.\n\nValid `__type` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam."
+          "description": "The left operand of the equality comparison.\n\nValid `type__` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam."
         },
         "right": {
           "oneOf": [
@@ -4361,7 +4356,7 @@
             }
           ],
           "discriminator": {
-            "propertyName": "__type",
+            "propertyName": "type__",
             "mapping": {
               "PermissionExpressionAnd": "#/types/pulumiservice:api:PermissionExpressionAnd",
               "PermissionExpressionEnvironment": "#/types/pulumiservice:api:PermissionExpressionEnvironment",
@@ -4382,21 +4377,21 @@
               "PermissionLiteralExpressionTeam": "#/types/pulumiservice:api:PermissionLiteralExpressionTeam"
             }
           },
-          "description": "The right operand of the equality comparison.\n\nValid `__type` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam."
+          "description": "The right operand of the equality comparison.\n\nValid `type__` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam."
+        },
+        "type__": {
+          "type": "string",
+          "description": "Expected value is 'PermissionExpressionEqual'.",
+          "const": "PermissionExpressionEqual"
         }
       },
       "type": "object",
       "required": [
-        "__type"
+        "type__"
       ]
     },
     "pulumiservice:api:PermissionExpressionHasTag": {
       "properties": {
-        "__type": {
-          "type": "string",
-          "description": "Expected value is 'PermissionExpressionHasTag'.",
-          "const": "PermissionExpressionHasTag"
-        },
         "context": {
           "oneOf": [
             {
@@ -4413,7 +4408,7 @@
             }
           ],
           "discriminator": {
-            "propertyName": "__type",
+            "propertyName": "type__",
             "mapping": {
               "PermissionExpressionEnvironment": "#/types/pulumiservice:api:PermissionExpressionEnvironment",
               "PermissionExpressionInsightsAccount": "#/types/pulumiservice:api:PermissionExpressionInsightsAccount",
@@ -4421,7 +4416,7 @@
               "PermissionExpressionTeam": "#/types/pulumiservice:api:PermissionExpressionTeam"
             }
           },
-          "description": "The context expression to check for the tag.\n\nValid `__type` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam."
+          "description": "The context expression to check for the tag.\n\nValid `type__` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam."
         },
         "key": {
           "type": "string",
@@ -4446,7 +4441,7 @@
             }
           ],
           "discriminator": {
-            "propertyName": "__type",
+            "propertyName": "type__",
             "mapping": {
               "PermissionExpressionAnd": "#/types/pulumiservice:api:PermissionExpressionAnd",
               "PermissionExpressionEqual": "#/types/pulumiservice:api:PermissionExpressionEqual",
@@ -4455,17 +4450,22 @@
               "PermissionExpressionOr": "#/types/pulumiservice:api:PermissionExpressionOr"
             }
           },
-          "description": "The operand of the unary boolean expression.\n\nValid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr."
+          "description": "The operand of the unary boolean expression.\n\nValid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr."
+        },
+        "type__": {
+          "type": "string",
+          "description": "Expected value is 'PermissionExpressionHasTag'.",
+          "const": "PermissionExpressionHasTag"
         }
       },
       "type": "object",
       "required": [
-        "__type"
+        "type__"
       ]
     },
     "pulumiservice:api:PermissionExpressionInsightsAccount": {
       "properties": {
-        "__type": {
+        "type__": {
           "type": "string",
           "description": "Expected value is 'PermissionExpressionInsightsAccount'.",
           "const": "PermissionExpressionInsightsAccount"
@@ -4473,16 +4473,11 @@
       },
       "type": "object",
       "required": [
-        "__type"
+        "type__"
       ]
     },
     "pulumiservice:api:PermissionExpressionNot": {
       "properties": {
-        "__type": {
-          "type": "string",
-          "description": "Expected value is 'PermissionExpressionNot'.",
-          "const": "PermissionExpressionNot"
-        },
         "node": {
           "oneOf": [
             {
@@ -4502,7 +4497,7 @@
             }
           ],
           "discriminator": {
-            "propertyName": "__type",
+            "propertyName": "type__",
             "mapping": {
               "PermissionExpressionAnd": "#/types/pulumiservice:api:PermissionExpressionAnd",
               "PermissionExpressionEqual": "#/types/pulumiservice:api:PermissionExpressionEqual",
@@ -4511,21 +4506,21 @@
               "PermissionExpressionOr": "#/types/pulumiservice:api:PermissionExpressionOr"
             }
           },
-          "description": "The operand of the unary boolean expression.\n\nValid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr."
+          "description": "The operand of the unary boolean expression.\n\nValid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr."
+        },
+        "type__": {
+          "type": "string",
+          "description": "Expected value is 'PermissionExpressionNot'.",
+          "const": "PermissionExpressionNot"
         }
       },
       "type": "object",
       "required": [
-        "__type"
+        "type__"
       ]
     },
     "pulumiservice:api:PermissionExpressionOr": {
       "properties": {
-        "__type": {
-          "type": "string",
-          "description": "Expected value is 'PermissionExpressionOr'.",
-          "const": "PermissionExpressionOr"
-        },
         "left": {
           "oneOf": [
             {
@@ -4545,7 +4540,7 @@
             }
           ],
           "discriminator": {
-            "propertyName": "__type",
+            "propertyName": "type__",
             "mapping": {
               "PermissionExpressionAnd": "#/types/pulumiservice:api:PermissionExpressionAnd",
               "PermissionExpressionEqual": "#/types/pulumiservice:api:PermissionExpressionEqual",
@@ -4554,7 +4549,7 @@
               "PermissionExpressionOr": "#/types/pulumiservice:api:PermissionExpressionOr"
             }
           },
-          "description": "The left operand of the binary boolean expression.\n\nValid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr."
+          "description": "The left operand of the binary boolean expression.\n\nValid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr."
         },
         "right": {
           "oneOf": [
@@ -4575,7 +4570,7 @@
             }
           ],
           "discriminator": {
-            "propertyName": "__type",
+            "propertyName": "type__",
             "mapping": {
               "PermissionExpressionAnd": "#/types/pulumiservice:api:PermissionExpressionAnd",
               "PermissionExpressionEqual": "#/types/pulumiservice:api:PermissionExpressionEqual",
@@ -4584,17 +4579,22 @@
               "PermissionExpressionOr": "#/types/pulumiservice:api:PermissionExpressionOr"
             }
           },
-          "description": "The right operand of the binary boolean expression.\n\nValid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr."
+          "description": "The right operand of the binary boolean expression.\n\nValid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr."
+        },
+        "type__": {
+          "type": "string",
+          "description": "Expected value is 'PermissionExpressionOr'.",
+          "const": "PermissionExpressionOr"
         }
       },
       "type": "object",
       "required": [
-        "__type"
+        "type__"
       ]
     },
     "pulumiservice:api:PermissionExpressionStack": {
       "properties": {
-        "__type": {
+        "type__": {
           "type": "string",
           "description": "Expected value is 'PermissionExpressionStack'.",
           "const": "PermissionExpressionStack"
@@ -4602,16 +4602,11 @@
       },
       "type": "object",
       "required": [
-        "__type"
+        "type__"
       ]
     },
     "pulumiservice:api:PermissionExpressionTag": {
       "properties": {
-        "__type": {
-          "type": "string",
-          "description": "Expected value is 'PermissionExpressionTag'.",
-          "const": "PermissionExpressionTag"
-        },
         "context": {
           "oneOf": [
             {
@@ -4628,7 +4623,7 @@
             }
           ],
           "discriminator": {
-            "propertyName": "__type",
+            "propertyName": "type__",
             "mapping": {
               "PermissionExpressionEnvironment": "#/types/pulumiservice:api:PermissionExpressionEnvironment",
               "PermissionExpressionInsightsAccount": "#/types/pulumiservice:api:PermissionExpressionInsightsAccount",
@@ -4636,21 +4631,26 @@
               "PermissionExpressionTeam": "#/types/pulumiservice:api:PermissionExpressionTeam"
             }
           },
-          "description": "The context expression identifying the resource to look up the tag on.\n\nValid `__type` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam."
+          "description": "The context expression identifying the resource to look up the tag on.\n\nValid `type__` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam."
         },
         "key": {
           "type": "string",
           "description": "The tag key to retrieve."
+        },
+        "type__": {
+          "type": "string",
+          "description": "Expected value is 'PermissionExpressionTag'.",
+          "const": "PermissionExpressionTag"
         }
       },
       "type": "object",
       "required": [
-        "__type"
+        "type__"
       ]
     },
     "pulumiservice:api:PermissionExpressionTeam": {
       "properties": {
-        "__type": {
+        "type__": {
           "type": "string",
           "description": "Expected value is 'PermissionExpressionTeam'.",
           "const": "PermissionExpressionTeam"
@@ -4658,12 +4658,12 @@
       },
       "type": "object",
       "required": [
-        "__type"
+        "type__"
       ]
     },
     "pulumiservice:api:PermissionLiteralExpressionBool": {
       "properties": {
-        "__type": {
+        "type__": {
           "type": "string",
           "description": "Expected value is 'PermissionLiteralExpressionBool'.",
           "const": "PermissionLiteralExpressionBool"
@@ -4675,46 +4675,46 @@
       },
       "type": "object",
       "required": [
-        "__type"
+        "type__"
       ]
     },
     "pulumiservice:api:PermissionLiteralExpressionEnvironment": {
       "properties": {
-        "__type": {
-          "type": "string",
-          "description": "Expected value is 'PermissionLiteralExpressionEnvironment'.",
-          "const": "PermissionLiteralExpressionEnvironment"
-        },
         "identity": {
           "type": "string",
           "description": "The identity of the environment."
+        },
+        "type__": {
+          "type": "string",
+          "description": "Expected value is 'PermissionLiteralExpressionEnvironment'.",
+          "const": "PermissionLiteralExpressionEnvironment"
         }
       },
       "type": "object",
       "required": [
-        "__type"
+        "type__"
       ]
     },
     "pulumiservice:api:PermissionLiteralExpressionInsightsAccount": {
       "properties": {
-        "__type": {
-          "type": "string",
-          "description": "Expected value is 'PermissionLiteralExpressionInsightsAccount'.",
-          "const": "PermissionLiteralExpressionInsightsAccount"
-        },
         "identity": {
           "type": "string",
           "description": "The identity of the Insights account."
+        },
+        "type__": {
+          "type": "string",
+          "description": "Expected value is 'PermissionLiteralExpressionInsightsAccount'.",
+          "const": "PermissionLiteralExpressionInsightsAccount"
         }
       },
       "type": "object",
       "required": [
-        "__type"
+        "type__"
       ]
     },
     "pulumiservice:api:PermissionLiteralExpressionNumber": {
       "properties": {
-        "__type": {
+        "type__": {
           "type": "string",
           "description": "Expected value is 'PermissionLiteralExpressionNumber'.",
           "const": "PermissionLiteralExpressionNumber"
@@ -4726,29 +4726,29 @@
       },
       "type": "object",
       "required": [
-        "__type"
+        "type__"
       ]
     },
     "pulumiservice:api:PermissionLiteralExpressionStack": {
       "properties": {
-        "__type": {
-          "type": "string",
-          "description": "Expected value is 'PermissionLiteralExpressionStack'.",
-          "const": "PermissionLiteralExpressionStack"
-        },
         "identity": {
           "type": "string",
           "description": "The identity of the stack."
+        },
+        "type__": {
+          "type": "string",
+          "description": "Expected value is 'PermissionLiteralExpressionStack'.",
+          "const": "PermissionLiteralExpressionStack"
         }
       },
       "type": "object",
       "required": [
-        "__type"
+        "type__"
       ]
     },
     "pulumiservice:api:PermissionLiteralExpressionString": {
       "properties": {
-        "__type": {
+        "type__": {
           "type": "string",
           "description": "Expected value is 'PermissionLiteralExpressionString'.",
           "const": "PermissionLiteralExpressionString"
@@ -4760,24 +4760,24 @@
       },
       "type": "object",
       "required": [
-        "__type"
+        "type__"
       ]
     },
     "pulumiservice:api:PermissionLiteralExpressionTeam": {
       "properties": {
-        "__type": {
-          "type": "string",
-          "description": "Expected value is 'PermissionLiteralExpressionTeam'.",
-          "const": "PermissionLiteralExpressionTeam"
-        },
         "identity": {
           "type": "string",
           "description": "The identity of the team."
+        },
+        "type__": {
+          "type": "string",
+          "description": "Expected value is 'PermissionLiteralExpressionTeam'.",
+          "const": "PermissionLiteralExpressionTeam"
         }
       },
       "type": "object",
       "required": [
-        "__type"
+        "type__"
       ]
     },
     "pulumiservice:api:PermissionSelectvalue": {
@@ -4805,7 +4805,7 @@
             }
           ],
           "discriminator": {
-            "propertyName": "__type",
+            "propertyName": "type__",
             "mapping": {
               "PermissionDescriptorAllow": "#/types/pulumiservice:api:PermissionDescriptorAllow",
               "PermissionDescriptorCompose": "#/types/pulumiservice:api:PermissionDescriptorCompose",
@@ -4815,7 +4815,7 @@
               "PermissionDescriptorSelect": "#/types/pulumiservice:api:PermissionDescriptorSelect"
             }
           },
-          "description": "The permission descriptor to apply when this value matches.\n\nValid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect."
+          "description": "The permission descriptor to apply when this value matches.\n\nValid `type__` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect."
         },
         "value": {
           "oneOf": [
@@ -4872,7 +4872,7 @@
             }
           ],
           "discriminator": {
-            "propertyName": "__type",
+            "propertyName": "type__",
             "mapping": {
               "PermissionExpressionAnd": "#/types/pulumiservice:api:PermissionExpressionAnd",
               "PermissionExpressionEnvironment": "#/types/pulumiservice:api:PermissionExpressionEnvironment",
@@ -4893,7 +4893,7 @@
               "PermissionLiteralExpressionTeam": "#/types/pulumiservice:api:PermissionLiteralExpressionTeam"
             }
           },
-          "description": "The value expression to match against the selector.\n\nValid `__type` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam."
+          "description": "The value expression to match against the selector.\n\nValid `type__` values: PermissionExpressionAnd, PermissionExpressionEnvironment, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionInsightsAccount, PermissionExpressionNot, PermissionExpressionOr, PermissionExpressionStack, PermissionExpressionTag, PermissionExpressionTeam, PermissionLiteralExpressionBool, PermissionLiteralExpressionEnvironment, PermissionLiteralExpressionInsightsAccount, PermissionLiteralExpressionNumber, PermissionLiteralExpressionStack, PermissionLiteralExpressionString, PermissionLiteralExpressionTeam."
         }
       },
       "type": "object"
@@ -9960,7 +9960,7 @@
             }
           ],
           "discriminator": {
-            "propertyName": "__type",
+            "propertyName": "type__",
             "mapping": {
               "PermissionDescriptorAllow": "#/types/pulumiservice:api:PermissionDescriptorAllow",
               "PermissionDescriptorCompose": "#/types/pulumiservice:api:PermissionDescriptorCompose",
@@ -9970,7 +9970,7 @@
               "PermissionDescriptorSelect": "#/types/pulumiservice:api:PermissionDescriptorSelect"
             }
           },
-          "description": "The detailed permission descriptor tree.\n\nValid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect."
+          "description": "The detailed permission descriptor tree.\n\nValid `type__` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect."
         },
         "isOrgDefault": {
           "type": "boolean",
@@ -10047,7 +10047,7 @@
             }
           ],
           "discriminator": {
-            "propertyName": "__type",
+            "propertyName": "type__",
             "mapping": {
               "PermissionDescriptorAllow": "#/types/pulumiservice:api:PermissionDescriptorAllow",
               "PermissionDescriptorCompose": "#/types/pulumiservice:api:PermissionDescriptorCompose",
@@ -10057,7 +10057,7 @@
               "PermissionDescriptorSelect": "#/types/pulumiservice:api:PermissionDescriptorSelect"
             }
           },
-          "description": "The detailed permission descriptor tree.\n\nValid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect."
+          "description": "The detailed permission descriptor tree.\n\nValid `type__` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect."
         },
         "name": {
           "type": "string",

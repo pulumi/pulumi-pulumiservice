@@ -22,14 +22,9 @@ import javax.annotation.Nullable;
 @CustomType
 public final class PermissionExpressionHasTag {
     /**
-     * @return Expected value is &#39;PermissionExpressionHasTag&#39;.
-     * 
-     */
-    private String __type;
-    /**
      * @return The context expression to check for the tag.
      * 
-     * Valid `__type` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
+     * Valid `type__` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
      * 
      */
     private @Nullable Object context;
@@ -41,23 +36,21 @@ public final class PermissionExpressionHasTag {
     /**
      * @return The operand of the unary boolean expression.
      * 
-     * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+     * Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
      * 
      */
     private @Nullable Object node;
-
-    private PermissionExpressionHasTag() {}
     /**
      * @return Expected value is &#39;PermissionExpressionHasTag&#39;.
      * 
      */
-    public String __type() {
-        return this.__type;
-    }
+    private String type__;
+
+    private PermissionExpressionHasTag() {}
     /**
      * @return The context expression to check for the tag.
      * 
-     * Valid `__type` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
+     * Valid `type__` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
      * 
      */
     public Optional<Object> context() {
@@ -73,11 +66,18 @@ public final class PermissionExpressionHasTag {
     /**
      * @return The operand of the unary boolean expression.
      * 
-     * Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+     * Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
      * 
      */
     public Optional<Object> node() {
         return Optional.ofNullable(this.node);
+    }
+    /**
+     * @return Expected value is &#39;PermissionExpressionHasTag&#39;.
+     * 
+     */
+    public String type__() {
+        return this.type__;
     }
 
     public static Builder builder() {
@@ -89,27 +89,19 @@ public final class PermissionExpressionHasTag {
     }
     @CustomType.Builder
     public static final class Builder {
-        private String __type;
         private @Nullable Object context;
         private @Nullable String key;
         private @Nullable Object node;
+        private String type__;
         public Builder() {}
         public Builder(PermissionExpressionHasTag defaults) {
     	      Objects.requireNonNull(defaults);
-    	      this.__type = defaults.__type;
     	      this.context = defaults.context;
     	      this.key = defaults.key;
     	      this.node = defaults.node;
+    	      this.type__ = defaults.type__;
         }
 
-        @CustomType.Setter
-        public Builder __type(String __type) {
-            if (__type == null) {
-              throw new MissingRequiredPropertyException("PermissionExpressionHasTag", "__type");
-            }
-            this.__type = __type;
-            return this;
-        }
         @CustomType.Setter
         public Builder context(@Nullable Object context) {
 
@@ -128,12 +120,20 @@ public final class PermissionExpressionHasTag {
             this.node = node;
             return this;
         }
+        @CustomType.Setter
+        public Builder type__(String type__) {
+            if (type__ == null) {
+              throw new MissingRequiredPropertyException("PermissionExpressionHasTag", "type__");
+            }
+            this.type__ = type__;
+            return this;
+        }
         public PermissionExpressionHasTag build() {
             final var _resultValue = new PermissionExpressionHasTag();
-            _resultValue.__type = __type;
             _resultValue.context = context;
             _resultValue.key = key;
             _resultValue.node = node;
+            _resultValue.type__ = type__;
             return _resultValue;
         }
     }

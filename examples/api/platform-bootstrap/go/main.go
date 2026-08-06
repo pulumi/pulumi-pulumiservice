@@ -75,7 +75,7 @@ func main() {
 			Description: pulumi.String("Read-only access to stacks, scoped via the platform team."),
 			UxPurpose:   pulumi.String("role"),
 			Details: pulumi.Map{
-				"__type":      pulumi.String("PermissionDescriptorAllow"),
+				"type__":      pulumi.String("PermissionDescriptorAllow"),
 				"permissions": pulumi.StringArray{pulumi.String("stack:read")},
 			},
 		}); err != nil {

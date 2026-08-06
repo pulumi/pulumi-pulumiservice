@@ -23,24 +23,9 @@ public final class PermissionExpressionTagArgs extends com.pulumi.resources.Reso
     public static final PermissionExpressionTagArgs Empty = new PermissionExpressionTagArgs();
 
     /**
-     * Expected value is &#39;PermissionExpressionTag&#39;.
-     * 
-     */
-    @Import(name="__type", required=true)
-    private Output<String> __type;
-
-    /**
-     * @return Expected value is &#39;PermissionExpressionTag&#39;.
-     * 
-     */
-    public Output<String> __type() {
-        return this.__type;
-    }
-
-    /**
      * The context expression identifying the resource to look up the tag on.
      * 
-     * Valid `__type` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
+     * Valid `type__` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
      * 
      */
     @Import(name="context")
@@ -49,7 +34,7 @@ public final class PermissionExpressionTagArgs extends com.pulumi.resources.Reso
     /**
      * @return The context expression identifying the resource to look up the tag on.
      * 
-     * Valid `__type` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
+     * Valid `type__` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
      * 
      */
     public Optional<Output<Object>> context() {
@@ -71,12 +56,27 @@ public final class PermissionExpressionTagArgs extends com.pulumi.resources.Reso
         return Optional.ofNullable(this.key);
     }
 
+    /**
+     * Expected value is &#39;PermissionExpressionTag&#39;.
+     * 
+     */
+    @Import(name="type__", required=true)
+    private Output<String> type__;
+
+    /**
+     * @return Expected value is &#39;PermissionExpressionTag&#39;.
+     * 
+     */
+    public Output<String> type__() {
+        return this.type__;
+    }
+
     private PermissionExpressionTagArgs() {}
 
     private PermissionExpressionTagArgs(PermissionExpressionTagArgs $) {
-        this.__type = $.__type;
         this.context = $.context;
         this.key = $.key;
+        this.type__ = $.type__;
     }
 
     public static Builder builder() {
@@ -98,30 +98,9 @@ public final class PermissionExpressionTagArgs extends com.pulumi.resources.Reso
         }
 
         /**
-         * @param __type Expected value is &#39;PermissionExpressionTag&#39;.
-         * 
-         * @return builder
-         * 
-         */
-        public Builder __type(Output<String> __type) {
-            $.__type = __type;
-            return this;
-        }
-
-        /**
-         * @param __type Expected value is &#39;PermissionExpressionTag&#39;.
-         * 
-         * @return builder
-         * 
-         */
-        public Builder __type(String __type) {
-            return __type(Output.of(__type));
-        }
-
-        /**
          * @param context The context expression identifying the resource to look up the tag on.
          * 
-         * Valid `__type` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
+         * Valid `type__` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
          * 
          * @return builder
          * 
@@ -134,7 +113,7 @@ public final class PermissionExpressionTagArgs extends com.pulumi.resources.Reso
         /**
          * @param context The context expression identifying the resource to look up the tag on.
          * 
-         * Valid `__type` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
+         * Valid `type__` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
          * 
          * @return builder
          * 
@@ -164,8 +143,29 @@ public final class PermissionExpressionTagArgs extends com.pulumi.resources.Reso
             return key(Output.of(key));
         }
 
+        /**
+         * @param type__ Expected value is &#39;PermissionExpressionTag&#39;.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder type__(Output<String> type__) {
+            $.type__ = type__;
+            return this;
+        }
+
+        /**
+         * @param type__ Expected value is &#39;PermissionExpressionTag&#39;.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder type__(String type__) {
+            return type__(Output.of(type__));
+        }
+
         public PermissionExpressionTagArgs build() {
-            $.__type = Codegen.stringProp("__type").output().arg($.__type).require();
+            $.type__ = Codegen.stringProp("type__").output().arg($.type__).require();
             return $;
         }
     }

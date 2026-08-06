@@ -52,7 +52,7 @@ export class Role extends pulumi.CustomResource {
     /**
      * The detailed permission descriptor tree.
      *
-     * Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
+     * Valid `type__` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
      */
     declare public readonly details: pulumi.Output<outputs.api.PermissionDescriptorAllow | outputs.api.PermissionDescriptorCompose | outputs.api.PermissionDescriptorCondition | outputs.api.PermissionDescriptorGroup | outputs.api.PermissionDescriptorIfThenElse | outputs.api.PermissionDescriptorSelect | undefined>;
     /**
@@ -150,7 +150,7 @@ export interface RoleArgs {
     /**
      * The detailed permission descriptor tree.
      *
-     * Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
+     * Valid `type__` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
      */
     details?: pulumi.Input<inputs.api.PermissionDescriptorAllowArgs | inputs.api.PermissionDescriptorComposeArgs | inputs.api.PermissionDescriptorConditionArgs | inputs.api.PermissionDescriptorGroupArgs | inputs.api.PermissionDescriptorIfThenElseArgs | inputs.api.PermissionDescriptorSelectArgs | undefined>;
     /**

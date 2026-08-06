@@ -13,15 +13,9 @@ namespace Pulumi.PulumiService.Api.Inputs
     public sealed class PermissionExpressionTagArgs : global::Pulumi.ResourceArgs
     {
         /// <summary>
-        /// Expected value is 'PermissionExpressionTag'.
-        /// </summary>
-        [Input("__type", required: true)]
-        public Input<string> __type { get; set; } = null!;
-
-        /// <summary>
         /// The context expression identifying the resource to look up the tag on.
         /// 
-        /// Valid `__type` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
+        /// Valid `type__` values: PermissionExpressionEnvironment, PermissionExpressionInsightsAccount, PermissionExpressionStack, PermissionExpressionTeam.
         /// </summary>
         [Input("context")]
         public object? Context { get; set; }
@@ -31,6 +25,12 @@ namespace Pulumi.PulumiService.Api.Inputs
         /// </summary>
         [Input("key")]
         public Input<string>? Key { get; set; }
+
+        /// <summary>
+        /// Expected value is 'PermissionExpressionTag'.
+        /// </summary>
+        [Input("type__", required: true)]
+        public Input<string> Type__ { get; set; } = null!;
 
         public PermissionExpressionTagArgs()
         {

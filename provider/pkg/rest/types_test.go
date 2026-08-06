@@ -28,7 +28,6 @@ const (
 	widgetRequest   = "WidgetRequest"
 	tagCircle       = "circle"
 	propsKey        = "properties"
-	typeKey         = "type"
 	tagKind         = "kind"
 	circleRef       = schemaRefPrefix + "Circle"
 	schemaShape     = "Shape"
@@ -419,6 +418,51 @@ func TestUnionPropertyDocListsTags(t *testing.T) {
 	in := pkg.Resources[widgetTok].InputProperties["shape"]
 	if want := "Valid `kind` values: blob, circle, square."; !strings.Contains(in.Description, want) {
 		t.Errorf("union property description missing tag list: %q", in.Description)
+	}
+}
+
+// TestUnderscoreDiscriminatorUsesSuffixForm covers the whole schema-side
+// surface of the `__type` → `type__` switch in one build: the const tag, the
+// required list, the ordinary sibling property, the DiscriminatorSpec, and
+// the generated doc line.
+func TestUnderscoreDiscriminatorUsesSuffixForm(t *testing.T) {
+	pkg := buildSynth(t, map[string]any{
+		widgetRequest: obj(map[string]any{"shape": sref(schemaShape)}),
+		schemaShape: discBase(wireType, map[string]any{
+			tagCircle: circleRef,
+			"square":  schemaRefPrefix + schemaSquare,
+			"blob":    schemaRefPrefix + schemaBlob,
+		}, map[string]any{"__label": map[string]any{typeKey: typeString}}),
+		"Circle":     variant(schemaShape, map[string]any{"radius": map[string]any{typeKey: typeNumber}}),
+		schemaSquare: variant(schemaShape, map[string]any{"side": map[string]any{typeKey: typeNumber}}),
+		schemaBlob:   variant(schemaShape, map[string]any{"blobby": map[string]any{typeKey: typeBoolean}}),
+	})
+
+	circle := pkg.Types["pulumiservice:api:Circle"]
+	if _, leaked := circle.Properties[wireType]; leaked {
+		t.Errorf("wire name %q must not appear in the schema", wireType)
+	}
+	tag, ok := circle.Properties[schemaType]
+	if !ok {
+		t.Fatalf("expected a %q property; have %v", schemaType, mapKeys(circle.Properties))
+	}
+	if tag.Const != tagCircle {
+		t.Errorf("%s const: got %v, want %q", schemaType, tag.Const, tagCircle)
+	}
+	if !slicesEqual(circle.Required, []string{schemaType}) {
+		t.Errorf("required: got %v, want [%s]", circle.Required, schemaType)
+	}
+	// Non-discriminator `__` properties take the same encoding.
+	if _, ok := circle.Properties["label__"]; !ok {
+		t.Errorf("inherited __label should surface as label__; have %v", mapKeys(circle.Properties))
+	}
+
+	in := pkg.Resources[widgetTok].InputProperties["shape"]
+	if in.Discriminator == nil || in.Discriminator.PropertyName != schemaType {
+		t.Fatalf("discriminator propertyName: got %+v, want %q", in.Discriminator, schemaType)
+	}
+	if want := "Valid `" + schemaType + "` values: blob, circle, square."; !strings.Contains(in.Description, want) {
+		t.Errorf("union doc should name the schema-side tag: %q", in.Description)
 	}
 }
 

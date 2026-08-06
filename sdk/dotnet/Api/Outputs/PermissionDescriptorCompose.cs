@@ -14,22 +14,22 @@ namespace Pulumi.PulumiService.Api.Outputs
     public sealed class PermissionDescriptorCompose
     {
         /// <summary>
-        /// Expected value is 'PermissionDescriptorCompose'.
-        /// </summary>
-        public readonly string __type;
-        /// <summary>
         /// References to other descriptors to include in the tree
         /// </summary>
         public readonly ImmutableArray<string> PermissionDescriptors;
+        /// <summary>
+        /// Expected value is 'PermissionDescriptorCompose'.
+        /// </summary>
+        public readonly string Type__;
 
         [OutputConstructor]
         private PermissionDescriptorCompose(
-            string __type,
+            ImmutableArray<string> permissionDescriptors,
 
-            ImmutableArray<string> permissionDescriptors)
+            string type__)
         {
-            this.__type = __type;
             PermissionDescriptors = permissionDescriptors;
+            Type__ = type__;
         }
     }
 }

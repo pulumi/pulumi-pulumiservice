@@ -14,33 +14,33 @@ namespace Pulumi.PulumiService.Api.Outputs
     public sealed class PermissionExpressionAnd
     {
         /// <summary>
-        /// Expected value is 'PermissionExpressionAnd'.
-        /// </summary>
-        public readonly string __type;
-        /// <summary>
         /// The left operand of the binary boolean expression.
         /// 
-        /// Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+        /// Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
         /// </summary>
         public readonly object? Left;
         /// <summary>
         /// The right operand of the binary boolean expression.
         /// 
-        /// Valid `__type` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
+        /// Valid `type__` values: PermissionExpressionAnd, PermissionExpressionEqual, PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr.
         /// </summary>
         public readonly object? Right;
+        /// <summary>
+        /// Expected value is 'PermissionExpressionAnd'.
+        /// </summary>
+        public readonly string Type__;
 
         [OutputConstructor]
         private PermissionExpressionAnd(
-            string __type,
-
             object? left,
 
-            object? right)
+            object? right,
+
+            string type__)
         {
-            this.__type = __type;
             Left = left;
             Right = right;
+            Type__ = type__;
         }
     }
 }

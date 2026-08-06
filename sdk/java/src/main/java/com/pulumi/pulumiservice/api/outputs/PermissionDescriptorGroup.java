@@ -19,34 +19,34 @@ import javax.annotation.Nullable;
 @CustomType
 public final class PermissionDescriptorGroup {
     /**
-     * @return Expected value is &#39;PermissionDescriptorGroup&#39;.
-     * 
-     */
-    private String __type;
-    /**
      * @return The list of permission descriptor entries in this group.
      * 
-     * Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
+     * Valid `type__` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
      * 
      */
     private @Nullable List<Object> entries;
-
-    private PermissionDescriptorGroup() {}
     /**
      * @return Expected value is &#39;PermissionDescriptorGroup&#39;.
      * 
      */
-    public String __type() {
-        return this.__type;
-    }
+    private String type__;
+
+    private PermissionDescriptorGroup() {}
     /**
      * @return The list of permission descriptor entries in this group.
      * 
-     * Valid `__type` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
+     * Valid `type__` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
      * 
      */
     public List<Object> entries() {
         return this.entries == null ? List.of() : this.entries;
+    }
+    /**
+     * @return Expected value is &#39;PermissionDescriptorGroup&#39;.
+     * 
+     */
+    public String type__() {
+        return this.type__;
     }
 
     public static Builder builder() {
@@ -58,23 +58,15 @@ public final class PermissionDescriptorGroup {
     }
     @CustomType.Builder
     public static final class Builder {
-        private String __type;
         private @Nullable List<Object> entries;
+        private String type__;
         public Builder() {}
         public Builder(PermissionDescriptorGroup defaults) {
     	      Objects.requireNonNull(defaults);
-    	      this.__type = defaults.__type;
     	      this.entries = defaults.entries;
+    	      this.type__ = defaults.type__;
         }
 
-        @CustomType.Setter
-        public Builder __type(String __type) {
-            if (__type == null) {
-              throw new MissingRequiredPropertyException("PermissionDescriptorGroup", "__type");
-            }
-            this.__type = __type;
-            return this;
-        }
         @CustomType.Setter
         public Builder entries(@Nullable List<Object> entries) {
 
@@ -84,10 +76,18 @@ public final class PermissionDescriptorGroup {
         public Builder entries(Object... entries) {
             return entries(List.of(entries));
         }
+        @CustomType.Setter
+        public Builder type__(String type__) {
+            if (type__ == null) {
+              throw new MissingRequiredPropertyException("PermissionDescriptorGroup", "type__");
+            }
+            this.type__ = type__;
+            return this;
+        }
         public PermissionDescriptorGroup build() {
             final var _resultValue = new PermissionDescriptorGroup();
-            _resultValue.__type = __type;
             _resultValue.entries = entries;
+            _resultValue.type__ = type__;
             return _resultValue;
         }
     }

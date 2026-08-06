@@ -14,22 +14,22 @@ namespace Pulumi.PulumiService.Api.Outputs
     public sealed class PermissionLiteralExpressionStack
     {
         /// <summary>
-        /// Expected value is 'PermissionLiteralExpressionStack'.
-        /// </summary>
-        public readonly string __type;
-        /// <summary>
         /// The identity of the stack.
         /// </summary>
         public readonly string? Identity;
+        /// <summary>
+        /// Expected value is 'PermissionLiteralExpressionStack'.
+        /// </summary>
+        public readonly string Type__;
 
         [OutputConstructor]
         private PermissionLiteralExpressionStack(
-            string __type,
+            string? identity,
 
-            string? identity)
+            string type__)
         {
-            this.__type = __type;
             Identity = identity;
+            Type__ = type__;
         }
     }
 }

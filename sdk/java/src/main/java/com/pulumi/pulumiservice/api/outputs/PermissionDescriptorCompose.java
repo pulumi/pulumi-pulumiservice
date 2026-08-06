@@ -13,30 +13,30 @@ import javax.annotation.Nullable;
 @CustomType
 public final class PermissionDescriptorCompose {
     /**
-     * @return Expected value is &#39;PermissionDescriptorCompose&#39;.
-     * 
-     */
-    private String __type;
-    /**
      * @return References to other descriptors to include in the tree
      * 
      */
     private @Nullable List<String> permissionDescriptors;
-
-    private PermissionDescriptorCompose() {}
     /**
      * @return Expected value is &#39;PermissionDescriptorCompose&#39;.
      * 
      */
-    public String __type() {
-        return this.__type;
-    }
+    private String type__;
+
+    private PermissionDescriptorCompose() {}
     /**
      * @return References to other descriptors to include in the tree
      * 
      */
     public List<String> permissionDescriptors() {
         return this.permissionDescriptors == null ? List.of() : this.permissionDescriptors;
+    }
+    /**
+     * @return Expected value is &#39;PermissionDescriptorCompose&#39;.
+     * 
+     */
+    public String type__() {
+        return this.type__;
     }
 
     public static Builder builder() {
@@ -48,23 +48,15 @@ public final class PermissionDescriptorCompose {
     }
     @CustomType.Builder
     public static final class Builder {
-        private String __type;
         private @Nullable List<String> permissionDescriptors;
+        private String type__;
         public Builder() {}
         public Builder(PermissionDescriptorCompose defaults) {
     	      Objects.requireNonNull(defaults);
-    	      this.__type = defaults.__type;
     	      this.permissionDescriptors = defaults.permissionDescriptors;
+    	      this.type__ = defaults.type__;
         }
 
-        @CustomType.Setter
-        public Builder __type(String __type) {
-            if (__type == null) {
-              throw new MissingRequiredPropertyException("PermissionDescriptorCompose", "__type");
-            }
-            this.__type = __type;
-            return this;
-        }
         @CustomType.Setter
         public Builder permissionDescriptors(@Nullable List<String> permissionDescriptors) {
 
@@ -74,10 +66,18 @@ public final class PermissionDescriptorCompose {
         public Builder permissionDescriptors(String... permissionDescriptors) {
             return permissionDescriptors(List.of(permissionDescriptors));
         }
+        @CustomType.Setter
+        public Builder type__(String type__) {
+            if (type__ == null) {
+              throw new MissingRequiredPropertyException("PermissionDescriptorCompose", "type__");
+            }
+            this.type__ = type__;
+            return this;
+        }
         public PermissionDescriptorCompose build() {
             final var _resultValue = new PermissionDescriptorCompose();
-            _resultValue.__type = __type;
             _resultValue.permissionDescriptors = permissionDescriptors;
+            _resultValue.type__ = type__;
             return _resultValue;
         }
     }
