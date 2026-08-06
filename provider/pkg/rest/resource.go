@@ -753,8 +753,8 @@ func (r *Resource) Update(ctx context.Context, req p.UpdateRequest) (p.UpdateRes
 // by-name body mapping finds no input under the new* name, silently sends
 // nothing, and the update becomes a server-side no-op. The paired
 // current<Stem>/new<Stem> shape is UpdateEnvelope's job and never reaches
-// this path. Aliases only fill fields that have no direct source, so an
-// explicit input under the wire name still wins.
+// this path. An explicit input under the wire name still wins: aliases are
+// merged behind bodySrc, which takes precedence.
 //
 // Replace-triggering base fields are skipped: Diff already replaces when they
 // change, so Update only ever sees them unchanged and the alias would inject
@@ -767,9 +767,6 @@ func (r *Resource) aliasFlatNewFields(op *Operation, bodySrc property.Map) prope
 	for wireKey := range bodyProps {
 		stem, found := strings.CutPrefix(wireKey, "new")
 		if !found || stem == "" || stem[0] < 'A' || stem[0] > 'Z' {
-			continue
-		}
-		if _, ok := bodySrc.GetOk(pulumiName(wireKey, r.meta.Renames)); ok {
 			continue
 		}
 		base := pulumiName(strings.ToLower(stem[:1])+stem[1:], r.meta.Renames)
