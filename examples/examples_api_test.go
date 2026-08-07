@@ -177,13 +177,17 @@ var apiCases = []apiCase{
 		// don't yet model. Skip the Update step.
 	},
 	{
-		Name:    "deployment-settings",
-		Config:  stackConfig,
-		FullE2E: true,
-		// Switch executor image — exercises PatchDeploymentSettings.
-		UpdateOverrides: func() map[string]string {
-			return map[string]string{"executorImage": "pulumi/pulumi:latest"}
-		},
+		Name:   "deployment-settings",
+		Config: stackConfig,
+		// The example carries a `vcs` block so the DeploymentSettingsVCS union
+		// has live example coverage. Pulumi Cloud validates that the named
+		// integration is installed for the repository — for every provider,
+		// not just github — and the test org has none, so create returns 400.
+		// This costs the FullE2E flow that previously exercised
+		// PatchDeploymentSettings via an executorImage override; restore both
+		// by pointing the example at a repository whose integration is
+		// installed in the test org.
+		PreviewOnlyAll: true,
 	},
 	{
 		Name:    "teams",

@@ -22,13 +22,13 @@ resources:
           TEST_VAR: foo
         options:
           skipInstallDependencies: true
-      # `provider: custom` rather than github: Pulumi Cloud checks that the
-      # Pulumi GitHub app is installed for the repository a github block names,
-      # and this repo is a placeholder. The variants are wire-identical, so
-      # custom exercises the same union. With a `vcs` block the repository
-      # comes from `vcs`; repoUrl is rejected in that combination.
+      # With a `vcs` block the repository comes from `vcs`; repoUrl is rejected
+      # in that combination. Pulumi Cloud validates that the named integration
+      # is installed for the repository — for every provider, not just github —
+      # so this example is preview-only. See PreviewOnlyAll in
+      # examples_api_test.go.
       vcs:
-        provider: custom
+        provider: github
         repository: example/example
       sourceContext:
         git:

@@ -61,14 +61,11 @@ var variantWaivers = map[string]string{
 	"eligibilityType=has_permission_on_target": "platform-bootstrap uses team_member; " +
 		"permission-based eligibility needs role fixtures",
 
-	// VCS providers beyond the custom block deployment-settings carries:
-	// wire-identical modulo the tag. github additionally cannot be exercised
-	// live — Pulumi Cloud checks that the Pulumi GitHub app is installed for
-	// the repository a github block names, and the examples have no real
-	// repository to point at.
+	// VCS providers beyond the github block deployment-settings carries:
+	// wire-identical modulo the tag.
 	"provider=azure_devops": waiverVCSTag,
 	"provider=bitbucket":    waiverVCSTag,
-	"provider=github":       "needs a repository with the Pulumi GitHub app installed; custom covers the union",
+	"provider=custom":       waiverVCSTag,
 	"provider=gitlab":       waiverVCSTag,
 }
 
