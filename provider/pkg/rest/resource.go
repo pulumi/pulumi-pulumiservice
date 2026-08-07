@@ -559,10 +559,12 @@ func hasPathParams(op *Operation) bool {
 //
 // The returned Inputs differ between import and refresh: on import
 // (req.Inputs empty), we surface the parsed-ID values so the user gets
-// a usable program-input reconstruction; on refresh we preserve the
-// caller's existing Inputs verbatim. Otherwise the parsed-ID values —
-// which the user never wrote in their program — show up as a diff on
-// every refresh ("+issuerId" etc).
+// a usable program-input reconstruction; on refresh we project the
+// freshly-read state onto the existing input keys so out-of-band edits
+// surface in the engine's input-driven refresh diff (#938). Keys stay
+// limited to what the program already set: parsed-ID values the user
+// never wrote must not show up as a diff on every refresh ("+issuerId"
+// etc).
 //
 // EmitOnCreate fields are preserved from prior state.
 func (r *Resource) Read(ctx context.Context, req p.ReadRequest) (p.ReadResponse, error) {
@@ -583,7 +585,80 @@ func (r *Resource) Read(ctx context.Context, req p.ReadRequest) (p.ReadResponse,
 		// No read op declared: refresh is a no-op, return prior state.
 		return p.ReadResponse{ID: req.ID, Inputs: returnedInputs, Properties: req.Properties}, nil
 	}
+	if req.Inputs.Len() > 0 {
+		returnedInputs = r.projectStateOntoInputs(req.Inputs, state)
+	}
 	return p.ReadResponse{ID: req.ID, Properties: state, Inputs: returnedInputs}, nil
+}
+
+// projectStateOntoInputs overlays freshly-read state onto prior inputs.
+// Only keys already present in the inputs are considered: response-only
+// fields stay out, and fields the read response omits (write-only values)
+// keep their prior values. Projected values get the same normalization as
+// Check (enum case, Unordered sort) so server ordering doesn't read as
+// drift, and they keep the prior value's secret marking.
+func (r *Resource) projectStateOntoInputs(inputs, state property.Map) property.Map {
+	op, _ := r.spec.Op(r.meta.Operations.Create)
+	bodyProps := flattenedRequestProperties(r.spec, op)
+	out := map[string]property.Value{}
+	for k, prior := range inputs.AllStable {
+		v, ok := state.GetOk(k)
+		if !ok {
+			out[k] = prior
+			continue
+		}
+		v = normalizeValue(projectValue(prior, v), k, bodyProps, r.meta)
+		if prior.Secret() {
+			v = v.WithSecret(true)
+		}
+		out[k] = v
+	}
+	return property.NewMap(out)
+}
+
+// projectValue picks the state-side replacement for one prior input value.
+// Map pairs recurse key-wise and array pairs element-wise — the program owns
+// only the keys and elements it wrote, so server-populated siblings (system
+// stack tags on GetStack, the response-only half of GetService's items) don't
+// leak into inputs as phantom refresh drift. State elements past the end of
+// the prior array are adopted whole: nothing program-side describes their
+// shape, and the drift they report is a real server-side addition. Anything
+// else takes the state value wholesale.
+func projectValue(prior, state property.Value) property.Value {
+	switch {
+	case prior.IsMap() && state.IsMap():
+		stateMap := state.AsMap()
+		out := map[string]property.Value{}
+		for k, pv := range prior.AsMap().AllStable {
+			sv, ok := stateMap.GetOk(k)
+			if !ok {
+				out[k] = pv
+				continue
+			}
+			out[k] = projectValue(pv, sv)
+		}
+		return keepSecret(prior, property.New(property.NewMap(out)))
+	case prior.IsArray() && state.IsArray():
+		priorArr, stateArr := prior.AsArray(), state.AsArray()
+		out := make([]property.Value, stateArr.Len())
+		for i := range out {
+			out[i] = stateArr.Get(i)
+			if i < priorArr.Len() {
+				out[i] = projectValue(priorArr.Get(i), out[i])
+			}
+		}
+		return keepSecret(prior, property.New(property.NewArray(out)))
+	}
+	return keepSecret(prior, state)
+}
+
+// keepSecret re-applies prior's secret marking to v. Value.Secret() is not
+// recursive, so every level projectValue rebuilds has to restore it itself.
+func keepSecret(prior, v property.Value) property.Value {
+	if prior.Secret() {
+		return v.WithSecret(true)
+	}
+	return v
 }
 
 // fetchState runs the read op and merges EmitOnCreate fields from prior.
@@ -654,7 +729,7 @@ func (r *Resource) Update(ctx context.Context, req p.UpdateRequest) (p.UpdateRes
 		currentSrc := mergeMaps(req.State, req.OldInputs)
 		_, state, err = r.execEnvelopeUpdate(ctx, op, urlSrc, currentSrc, bodySrc)
 	} else {
-		_, state, err = r.execAndDecodeSplit(ctx, op, urlSrc, bodySrc)
+		_, state, err = r.execAndDecodeSplit(ctx, op, urlSrc, r.aliasFlatNewFields(op, bodySrc))
 	}
 	if err != nil {
 		return p.UpdateResponse{}, err
@@ -669,6 +744,43 @@ func (r *Resource) Update(ctx context.Context, req p.UpdateRequest) (p.UpdateRes
 		state = mergeMaps(state, req.State)
 	}
 	return p.UpdateResponse{Properties: state}, nil
+}
+
+// aliasFlatNewFields sources flat new<Stem>-convention update body fields
+// from their base-named inputs. Several Pulumi Cloud update schemas rename
+// the field they mutate (UpdateTeamRequest.newDescription mutates
+// description, AppUpdatePolicyGroupRequest.newName mutates name); the
+// by-name body mapping finds no input under the new* name, silently sends
+// nothing, and the update becomes a server-side no-op. The paired
+// current<Stem>/new<Stem> shape is UpdateEnvelope's job and never reaches
+// this path. An explicit input under the wire name still wins: aliases are
+// merged behind bodySrc, which takes precedence.
+//
+// Replace-triggering base fields are skipped: Diff already replaces when they
+// change, so Update only ever sees them unchanged and the alias would inject
+// a no-op mutation (PolicyGroup's name is the {policyGroup} path param, so
+// newName is unreachable for the rename it was meant to carry).
+func (r *Resource) aliasFlatNewFields(op *Operation, bodySrc property.Map) property.Map {
+	bodyProps := flattenedRequestProperties(r.spec, op)
+	replaces := r.replaceTriggeringFields()
+	aliased := map[string]property.Value{}
+	for wireKey := range bodyProps {
+		stem, found := strings.CutPrefix(wireKey, "new")
+		if !found || stem == "" || stem[0] < 'A' || stem[0] > 'Z' {
+			continue
+		}
+		base := pulumiName(strings.ToLower(stem[:1])+stem[1:], r.meta.Renames)
+		if replaces[base] {
+			continue
+		}
+		if v, ok := bodySrc.GetOk(base); ok {
+			aliased[pulumiName(wireKey, r.meta.Renames)] = v
+		}
+	}
+	if len(aliased) == 0 {
+		return bodySrc
+	}
+	return mergeMaps(bodySrc, property.NewMap(aliased))
 }
 
 // Delete fires the delete op (if declared). Without one the engine drops

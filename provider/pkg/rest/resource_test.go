@@ -68,6 +68,11 @@ const (
 	fooVal               = "foo"
 	thing1ID             = "thing-1"
 	createdKey           = "created"
+	statusKey            = "status"
+	passwordKey          = "password" //nolint:gosec // property name, not a credential
+	detailsKey           = "details"
+	tagsKey              = "tags"
+	newDescVal           = "new desc"
 	newTagKey            = "newTag"
 	envNameKey           = "envName"
 	projectNameKey       = "projectName"
@@ -76,6 +81,13 @@ const (
 	ownerVal             = "owner"
 	teamXVal             = "team-x"
 	teamYVal             = "team-y"
+	typeKey              = "type"
+	cloudCountKey        = "cloudCount"
+	stackVal             = "stack"
+	testOrgInfraID       = "test-org/infra"
+	itemsKey             = "items"
+	envVarsKey           = "environmentVariables"
+	newDescriptionKey    = "newDescription"
 )
 
 // mockTransport serves canned responses keyed by "<METHOD> <path>". Set
@@ -213,7 +225,7 @@ func TestCreateSynthesizesID(t *testing.T) {
 				nameKey:        infraVal, // body; renames map name→teamName for path
 				descriptionKey: infraTeamVal,
 			},
-			wantID: "test-org/infra",
+			wantID: testOrgInfraID,
 		},
 		{ //nolint:gosec // G101: test fixture, not a real credential.
 			// DefaultOrganization: requireImport singleton; GET returns 404
@@ -470,6 +482,359 @@ func TestReadDecodesYamlResponseBody(t *testing.T) {
 	}
 }
 
+// TestReadRefreshProjectsRemoteDriftIntoInputs: on refresh (non-empty
+// req.Inputs), values the server reports differently are projected into
+// the returned Inputs so the engine's input-driven refresh diff surfaces
+// drift (#938). Keys absent from the response (write-only fields) keep
+// their prior input values; response-only keys are never added.
+func TestReadRefreshProjectsRemoteDriftIntoInputs(t *testing.T) {
+	const specJSON = `{
+	  "openapi": "3.0.0",
+	  "components": {"schemas": {
+	    "Body": {"type": "object", "properties": {
+	      "name":     {"type": "string"},
+	      "value":    {"type": "string"},
+	      "password": {"type": "string"},
+	      "tags":     {"type": "array", "items": {"type": "string"}}
+	    }},
+	    "Thing": {"type": "object", "properties": {
+	      "id":     {"type": "string"},
+	      "name":   {"type": "string"},
+	      "value":  {"type": "string"},
+	      "tags":   {"type": "array", "items": {"type": "string"}},
+	      "status": {"type": "string"}
+	    }}
+	  }},
+	  "paths": {
+	    "/things/{org}": {
+	      "post": {
+	        "operationId": "CreateThing",
+	        "parameters": [{"name": "org", "in": "path", "required": true, "schema": {"type": "string"}}],
+	        "requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Body"}}}},
+	        "responses": {"200": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Thing"}}}}}
+	      }
+	    },
+	    "/things/{org}/{id}": {
+	      "get": {
+	        "operationId": "GetThing",
+	        "parameters": [
+	          {"name": "org", "in": "path", "required": true, "schema": {"type": "string"}},
+	          {"name": "id",  "in": "path", "required": true, "schema": {"type": "string"}}
+	        ],
+	        "responses": {"200": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Thing"}}}}}
+	      }
+	    }
+	  }
+	}`
+	spec, err := ParseSpec([]byte(specJSON))
+	if err != nil {
+		t.Fatalf("parse spec: %v", err)
+	}
+	r := &Resource{
+		spec: spec,
+		meta: ResourceMeta{
+			Operations: Operations{Create: createThingOp, Read: getThingOp},
+			IDFormat:   orgIDFormat,
+			Fields:     map[string]FieldMeta{tagsKey: {Unordered: true}},
+		},
+	}
+
+	mock := &mockTransport{responses: map[string]mockResponse{
+		getThingPath: {
+			status: 200,
+			body:   `{"id":"thing-1","name":"n1","value":"remote","tags":["z","a"],"status":"ok"}`,
+		},
+	}}
+	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
+
+	oldInputs := property.NewMap(map[string]property.Value{
+		orgKey:      property.New(acmeVal),
+		nameKey:     property.New("n1"),
+		valueKey:    property.New("local").WithSecret(true),
+		passwordKey: property.New("hunter2"),
+		tagsKey: property.New(property.NewArray([]property.Value{
+			property.New("a"), property.New("b"),
+		})),
+	})
+	resp, err := r.Read(t.Context(), p.ReadRequest{
+		ID:     "acme/thing-1",
+		Inputs: oldInputs,
+		Properties: propMap(map[string]any{
+			"id": thing1ID, nameKey: "n1", valueKey: "local", statusKey: "ok",
+		}),
+	})
+	if err != nil {
+		t.Fatalf("read: %v\n  calls: %v", err, mock.calls)
+	}
+
+	if v, ok := resp.Inputs.GetOk(valueKey); !ok || v.AsString() != "remote" {
+		t.Errorf("inputs.value: got %#v, want remote drift projected", v)
+	} else if !v.Secret() {
+		t.Errorf("inputs.value lost its secret marking")
+	}
+	if v, ok := resp.Inputs.GetOk(passwordKey); !ok || v.AsString() != "hunter2" {
+		t.Errorf("inputs.password: got %#v, want prior value preserved", v)
+	}
+	if v, ok := resp.Inputs.GetOk(orgKey); !ok || v.AsString() != acmeVal {
+		t.Errorf("inputs.org: got %#v, want %q", v, acmeVal)
+	}
+	for _, k := range []string{statusKey, "id"} {
+		if _, ok := resp.Inputs.GetOk(k); ok {
+			t.Errorf("inputs gained response-only key %q", k)
+		}
+	}
+	tags, ok := resp.Inputs.GetOk(tagsKey)
+	if !ok {
+		t.Fatalf("inputs.tags missing")
+	}
+	var gotTags []string
+	for _, v := range tags.AsArray().AsSlice() {
+		gotTags = append(gotTags, v.AsString())
+	}
+	if !reflect.DeepEqual(gotTags, []string{"a", "z"}) {
+		t.Errorf("inputs.tags: got %v, want [a z] projected and unordered-sorted", gotTags)
+	}
+}
+
+// TestRefreshChainSurfacesRoleDetailsDrift replays the engine's refresh
+// sequence for api:Role against the real spec: Read, then Diff with the
+// Read-returned inputs as OldInputs (mirroring diffResource in
+// pulumi/pulumi's RefreshStep). Out-of-band permission edits must surface
+// as a diff on `details` (#938), and an unchanged server response must
+// stay quiet.
+func TestRefreshChainSurfacesRoleDetailsDrift(t *testing.T) {
+	spec, meta := loadFixtures(t)
+	resources := Resources(spec, meta)
+	r, ok := resources["pulumiservice:api:Role"]
+	if !ok {
+		t.Fatalf("api:Role resource not found")
+	}
+
+	oldInputs := propMap(map[string]any{
+		orgNameKey:     testOrgName,
+		nameKey:        "perm-set",
+		"uxPurpose":    "set",
+		"resourceType": "global",
+		detailsKey: map[string]any{
+			"__type":      "PermissionDescriptorAllow",
+			"permissions": []any{"organization:read_usage"},
+		},
+	})
+	oldState := propMap(map[string]any{
+		"roleID":       "role-123",
+		nameKey:        "perm-set",
+		"uxPurpose":    "set",
+		"resourceType": "global",
+		detailsKey: map[string]any{
+			"__type":      "PermissionDescriptorAllow",
+			"permissions": []any{"organization:read_usage"},
+		},
+	})
+
+	cases := []struct {
+		name       string
+		details    string
+		wantDrift  bool
+		driftedKey string
+	}{
+		{
+			name:       "console edit drifts details",
+			details:    `{"__type":"PermissionDescriptorAllow","permissions":["organization:read_usage","organization:admin"]}`,
+			wantDrift:  true,
+			driftedKey: detailsKey,
+		},
+		{
+			name:      "unchanged server state stays quiet",
+			details:   `{"__type":"PermissionDescriptorAllow","permissions":["organization:read_usage"]}`,
+			wantDrift: false,
+		},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			mock := &mockTransport{responses: map[string]mockResponse{
+				"GET /api/orgs/test-org/roles/role-123": {
+					status: 200,
+					body: `{"id":"role-123","name":"perm-set","uxPurpose":"set","resourceType":"global",` +
+						`"details":` + tc.details + `,"version":2,"orgId":"o1"}`,
+				},
+			}}
+			SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
+
+			readResp, err := r.Read(t.Context(), p.ReadRequest{
+				ID:         "test-org/role-123",
+				Inputs:     oldInputs,
+				Properties: oldState,
+			})
+			if err != nil {
+				t.Fatalf("read: %v\n  calls: %v", err, mock.calls)
+			}
+
+			// RefreshStep passes the freshly-read inputs as OldInputs and the
+			// pre-refresh inputs as Inputs, then inverts the result for display.
+			diffResp, err := r.Diff(t.Context(), p.DiffRequest{
+				ID:        "test-org/role-123",
+				OldInputs: readResp.Inputs,
+				State:     readResp.Properties,
+				Inputs:    oldInputs,
+			})
+			if err != nil {
+				t.Fatalf("diff: %v", err)
+			}
+			if diffResp.HasChanges != tc.wantDrift {
+				t.Fatalf("HasChanges: got %v, want %v (detailed: %#v)",
+					diffResp.HasChanges, tc.wantDrift, diffResp.DetailedDiff)
+			}
+			if tc.wantDrift {
+				if _, ok := diffResp.DetailedDiff[tc.driftedKey]; !ok {
+					t.Errorf("detailed diff missing %q: %#v", tc.driftedKey, diffResp.DetailedDiff)
+				}
+			}
+		})
+	}
+}
+
+// TestRefreshChainIgnoresServerAddedStackTags: GetStack returns system
+// tags (pulumi:project etc.) alongside the program's own; key-scoped map
+// projection keeps them out of inputs so refresh stays quiet, while drift
+// on a program-written tag still surfaces.
+func TestRefreshChainIgnoresServerAddedStackTags(t *testing.T) {
+	spec, meta := loadFixtures(t)
+	resources := Resources(spec, meta)
+	r, ok := resources["pulumiservice:api/stacks:Stack"]
+	if !ok {
+		t.Fatalf("api/stacks:Stack resource not found")
+	}
+
+	oldInputs := propMap(map[string]any{
+		orgNameKey:     testOrgName,
+		projectNameKey: myprojVal,
+		"stackName":    "dev",
+		tagsKey:        map[string]any{ownerVal: "platform", "purpose": "demo"},
+	})
+
+	cases := []struct {
+		name      string
+		tags      string
+		wantDrift bool
+	}{
+		{
+			name:      "server-added system tags stay quiet",
+			tags:      `{"owner":"platform","purpose":"demo","pulumi:project":"myproj","pulumi:runtime":"yaml"}`,
+			wantDrift: false,
+		},
+		{
+			name:      "drift on a program-written tag surfaces",
+			tags:      `{"owner":"someone-else","purpose":"demo","pulumi:project":"myproj"}`,
+			wantDrift: true,
+		},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			mock := &mockTransport{responses: map[string]mockResponse{
+				"GET /api/stacks/test-org/myproj/dev": {
+					status: 200,
+					body: `{"orgName":"test-org","projectName":"myproj","stackName":"dev",` +
+						`"tags":` + tc.tags + `}`,
+				},
+			}}
+			SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
+
+			readResp, err := r.Read(t.Context(), p.ReadRequest{
+				ID:         "test-org/myproj/dev",
+				Inputs:     oldInputs,
+				Properties: oldInputs,
+			})
+			if err != nil {
+				t.Fatalf("read: %v\n  calls: %v", err, mock.calls)
+			}
+			diffResp, err := r.Diff(t.Context(), p.DiffRequest{
+				ID:        "test-org/myproj/dev",
+				OldInputs: readResp.Inputs,
+				State:     readResp.Properties,
+				Inputs:    oldInputs,
+			})
+			if err != nil {
+				t.Fatalf("diff: %v", err)
+			}
+			if diffResp.HasChanges != tc.wantDrift {
+				t.Fatalf("HasChanges: got %v, want %v (detailed: %#v)",
+					diffResp.HasChanges, tc.wantDrift, diffResp.DetailedDiff)
+			}
+			if tc.wantDrift {
+				if _, ok := diffResp.DetailedDiff[tagsKey]; !ok {
+					t.Errorf("detailed diff missing tags: %#v", diffResp.DetailedDiff)
+				}
+			}
+		})
+	}
+}
+
+// TestUpdateAliasesFlatNewFields: UpdateTeamRequest renames the fields it
+// mutates (newDescription/newDisplayName); the update body must source
+// them from the base-named inputs or the PATCH is a silent server-side
+// no-op.
+func TestUpdateAliasesFlatNewFields(t *testing.T) {
+	spec, meta := loadFixtures(t)
+	resources := Resources(spec, meta)
+	r, ok := resources["pulumiservice:api/teams:Team"]
+	if !ok {
+		t.Fatalf("api/teams:Team resource not found")
+	}
+
+	var patchBody map[string]any
+	mock := &mockTransport{
+		responseFn: func(req *http.Request) mockResponse {
+			switch req.Method {
+			case http.MethodPatch:
+				b, _ := io.ReadAll(req.Body)
+				if err := json.Unmarshal(b, &patchBody); err != nil {
+					t.Fatalf("unmarshal patch body %q: %v", b, err)
+				}
+				return mockResponse{status: 204, body: ""}
+			case http.MethodGet:
+				return mockResponse{status: 200, body: `{"name":"infra","displayName":"New Display","description":"new desc"}`}
+			}
+			return mockResponse{status: 500, body: unexpectedBody}
+		},
+	}
+	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
+
+	prior := propMap(map[string]any{
+		orgNameKey:     testOrgName,
+		nameKey:        infraVal,
+		"displayName":  "Old Display",
+		descriptionKey: "old desc",
+	})
+	newInputs := propMap(map[string]any{
+		orgNameKey:     testOrgName,
+		nameKey:        infraVal,
+		"displayName":  "New Display",
+		descriptionKey: newDescVal,
+	})
+	resp, err := r.Update(t.Context(), p.UpdateRequest{
+		ID:        testOrgInfraID,
+		OldInputs: prior,
+		State:     prior,
+		Inputs:    newInputs,
+	})
+	if err != nil {
+		t.Fatalf("update: %v\n  calls: %v", err, mock.calls)
+	}
+
+	if got := patchBody[newDescriptionKey]; got != newDescVal {
+		t.Errorf("patch newDescription: got %#v, want new desc", got)
+	}
+	if got := patchBody["newDisplayName"]; got != "New Display" {
+		t.Errorf("patch newDisplayName: got %#v, want New Display", got)
+	}
+	if _, ok := patchBody[descriptionKey]; ok {
+		t.Errorf("patch body carries off-schema %q key: %#v", descriptionKey, patchBody)
+	}
+	if v, ok := resp.Properties.GetOk(descriptionKey); !ok || v.AsString() != newDescVal {
+		t.Errorf("state description: got %#v, want new desc", v)
+	}
+}
+
 // TestCreateReadAfterCreateSourcesFromInputs: the read URL is built from
 // user inputs, not from the (potentially sparse) create response.
 func TestCreateReadAfterCreateSourcesFromInputs(t *testing.T) {
@@ -529,7 +894,7 @@ func TestCreateReadAfterCreateSourcesFromInputs(t *testing.T) {
 	if len(mock.calls) != 2 || mock.calls[1] != getThingPath {
 		t.Errorf("expected POST then GET /things/acme/thing-1, got: %v", mock.calls)
 	}
-	if v, ok := resp.Properties.GetOk("status"); !ok || v.AsString() != "ready" {
+	if v, ok := resp.Properties.GetOk(statusKey); !ok || v.AsString() != "ready" {
 		t.Errorf("state missing read-only field 'status': ok=%v v=%q", ok, v.AsString())
 	}
 }
@@ -599,7 +964,7 @@ func TestCreateReadsAfterCreate(t *testing.T) {
 	if len(mock.calls) != 2 || mock.calls[0] != postThingsAcme || mock.calls[1] != getThingPath {
 		t.Errorf("expected POST then GET, got: %v", mock.calls)
 	}
-	for _, key := range []string{"lastUpdate", "status"} {
+	for _, key := range []string{"lastUpdate", statusKey} {
 		v, ok := resp.Properties.GetOk(key)
 		if !ok {
 			t.Errorf("state missing %q after read-after-create", key)
@@ -1632,5 +1997,185 @@ func TestUpdateEnvelopeAllOfWrapper(t *testing.T) {
 	}
 	if !reflect.DeepEqual(got, want) {
 		t.Errorf("PATCH body = %s, want %v", patchBody, want)
+	}
+}
+
+// TestProjectValueArrayElements: array items must project element-wise like
+// maps do. GetServiceResponse.items (ServiceItem) is richer than
+// CreateServiceRequest.items (AddServiceItem), so adopting the state array
+// wholesale writes response-only fields into inputs as permanent drift.
+func TestProjectValueArrayElements(t *testing.T) {
+	prior := anyToPropertyValue([]any{map[string]any{nameKey: infraVal, typeKey: stackVal}})
+	state := anyToPropertyValue([]any{map[string]any{
+		nameKey:       infraVal,
+		typeKey:       stackVal,
+		createdKey:    createdTimestamp,
+		cloudCountKey: 3.0,
+	}})
+
+	got := projectValue(prior, state)
+	if !got.IsArray() {
+		t.Fatalf("projected value is not an array: %v", got)
+	}
+	elem := got.AsArray().Get(0)
+	if !elem.IsMap() {
+		t.Fatalf("element is not a map: %v", elem)
+	}
+	for _, k := range []string{createdKey, cloudCountKey} {
+		if _, ok := elem.AsMap().GetOk(k); ok {
+			t.Errorf("response-only key %q leaked into projected inputs: %v", k, elem)
+		}
+	}
+	if v, ok := elem.AsMap().GetOk(nameKey); !ok || v.AsString() != infraVal {
+		t.Errorf("program-owned key %q lost: %v", nameKey, elem)
+	}
+}
+
+// TestProjectValuePreservesNestedSecrets: Value.Secret() is not recursive,
+// so rebuilding a map during projection must re-apply each leaf's prior
+// secret marking or a user's pulumi.secret() value silently goes plaintext.
+func TestProjectValuePreservesNestedSecrets(t *testing.T) {
+	prior := property.New(property.NewMap(map[string]property.Value{
+		envVarsKey: property.New(property.NewMap(map[string]property.Value{
+			passwordKey: property.New("s3cret").WithSecret(true),
+		})),
+	}))
+	state := property.New(property.NewMap(map[string]property.Value{
+		envVarsKey: property.New(property.NewMap(map[string]property.Value{
+			passwordKey: property.New("s3cret"),
+		})),
+	}))
+
+	got := projectValue(prior, state)
+	leaf := got.AsMap().Get(envVarsKey).AsMap().Get(passwordKey)
+	if !leaf.Secret() {
+		t.Errorf("nested secret marking dropped: %v", got)
+	}
+}
+
+// TestUpdateSkipsAliasForReplaceTriggeringField: PolicyGroup's name is the
+// {policyGroup} path param, so Diff replaces on a name change and the
+// newName alias is unreachable. It must not fire on unrelated updates.
+func TestUpdateSkipsAliasForReplaceTriggeringField(t *testing.T) {
+	spec, meta := loadFixtures(t)
+	r, ok := Resources(spec, meta)["pulumiservice:api:PolicyGroup"]
+	if !ok {
+		t.Fatalf("PolicyGroup resource not found")
+	}
+
+	var patchBody map[string]any
+	mock := &mockTransport{
+		responseFn: func(req *http.Request) mockResponse {
+			switch req.Method {
+			case http.MethodPatch:
+				b, _ := io.ReadAll(req.Body)
+				if err := json.Unmarshal(b, &patchBody); err != nil {
+					t.Fatalf("unmarshal patch body %q: %v", b, err)
+				}
+				return mockResponse{status: 204, body: ""}
+			case http.MethodGet:
+				return mockResponse{status: 200, body: `{"name":"pg1"}`}
+			}
+			return mockResponse{status: 500, body: unexpectedBody}
+		},
+	}
+	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
+
+	prior := propMap(map[string]any{orgNameKey: testOrgName, nameKey: "pg1", "agentPoolId": "pool-a"})
+	newInputs := propMap(map[string]any{orgNameKey: testOrgName, nameKey: "pg1", "agentPoolId": "pool-b"})
+	if _, err := r.Update(t.Context(), p.UpdateRequest{
+		ID: "test-org/pg1", OldInputs: prior, State: prior, Inputs: newInputs,
+	}); err != nil {
+		t.Fatalf("update: %v\n  calls: %v", err, mock.calls)
+	}
+	if v, ok := patchBody["newName"]; ok {
+		t.Errorf("newName=%v sent though name is unchanged and replace-triggering; body=%v", v, patchBody)
+	}
+}
+
+// TestUpdateExplicitWireNameWinsOverAlias: aliases only fill fields with no
+// direct source, so an explicit new<Stem> input takes precedence over the
+// base-named one.
+func TestUpdateExplicitWireNameWinsOverAlias(t *testing.T) {
+	spec, meta := loadFixtures(t)
+	r, ok := Resources(spec, meta)["pulumiservice:api/teams:Team"]
+	if !ok {
+		t.Fatalf("api/teams:Team resource not found")
+	}
+
+	var patchBody map[string]any
+	mock := &mockTransport{
+		responseFn: func(req *http.Request) mockResponse {
+			switch req.Method {
+			case http.MethodPatch:
+				b, _ := io.ReadAll(req.Body)
+				if err := json.Unmarshal(b, &patchBody); err != nil {
+					t.Fatalf("unmarshal patch body %q: %v", b, err)
+				}
+				return mockResponse{status: 204, body: ""}
+			case http.MethodGet:
+				return mockResponse{status: 200, body: `{"name":"infra","description":"explicit desc"}`}
+			}
+			return mockResponse{status: 500, body: unexpectedBody}
+		},
+	}
+	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
+
+	prior := propMap(map[string]any{
+		orgNameKey: testOrgName, nameKey: infraVal, descriptionKey: "old desc",
+	})
+	newInputs := propMap(map[string]any{
+		orgNameKey: testOrgName, nameKey: infraVal,
+		descriptionKey:    newDescVal,
+		newDescriptionKey: "explicit desc",
+	})
+	if _, err := r.Update(t.Context(), p.UpdateRequest{
+		ID: testOrgInfraID, OldInputs: prior, State: prior, Inputs: newInputs,
+	}); err != nil {
+		t.Fatalf("update: %v\n  calls: %v", err, mock.calls)
+	}
+	if got := patchBody[newDescriptionKey]; got != "explicit desc" {
+		t.Errorf("explicit newDescription overridden by alias: got %#v, want explicit desc", got)
+	}
+}
+
+// TestReadKeepsResponseOnlyItemFieldsOutOfInputs: GetService returns
+// ServiceItem (created, cloudCount, ...) where CreateService accepts only
+// AddServiceItem (name, type). Refresh must not adopt the response-only
+// half, or every subsequent preview reports a phantom items update.
+func TestReadKeepsResponseOnlyItemFieldsOutOfInputs(t *testing.T) {
+	spec, meta := loadFixtures(t)
+	r, ok := Resources(spec, meta)["pulumiservice:api/services:Service"]
+	if !ok {
+		t.Fatalf("api/services:Service resource not found")
+	}
+
+	SetTransportResolver(func(_ context.Context) (Transport, error) {
+		return &mockTransport{responseFn: func(_ *http.Request) mockResponse {
+			return mockResponse{status: 200, body: `{
+				"items":[{"name":"infra","type":"stack","created":"2026-05-05T00:00:00Z","cloudCount":3}],
+				"service":{"name":"svc-1"}
+			}`}
+		}}, nil
+	})
+
+	inputs := propMap(map[string]any{
+		orgNameKey:  testOrgName,
+		"ownerType": "team",
+		"ownerName": teamXVal,
+		nameKey:     "svc-1",
+		itemsKey:    []any{map[string]any{nameKey: infraVal, typeKey: stackVal}},
+	})
+	resp, err := r.Read(t.Context(), p.ReadRequest{
+		ID: "test-org/team/team-x/svc-1", Inputs: inputs, Properties: inputs,
+	})
+	if err != nil {
+		t.Fatalf("read: %v", err)
+	}
+	item := resp.Inputs.Get(itemsKey).AsArray().Get(0)
+	for _, k := range []string{createdKey, cloudCountKey} {
+		if _, ok := item.AsMap().GetOk(k); ok {
+			t.Errorf("response-only key %q leaked into inputs: %v", k, item)
+		}
 	}
 }
