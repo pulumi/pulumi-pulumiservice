@@ -616,7 +616,7 @@ func TestRefreshChainSurfacesRoleDetailsDrift(t *testing.T) {
 		"uxPurpose":    "set",
 		"resourceType": "global",
 		detailsKey: map[string]any{
-			"__type":      "PermissionDescriptorAllow",
+			schemaType:    "PermissionDescriptorAllow",
 			"permissions": []any{"organization:read_usage"},
 		},
 	})
@@ -626,7 +626,7 @@ func TestRefreshChainSurfacesRoleDetailsDrift(t *testing.T) {
 		"uxPurpose":    "set",
 		"resourceType": "global",
 		detailsKey: map[string]any{
-			"__type":      "PermissionDescriptorAllow",
+			schemaType:    "PermissionDescriptorAllow",
 			"permissions": []any{"organization:read_usage"},
 		},
 	})
@@ -647,6 +647,16 @@ func TestRefreshChainSurfacesRoleDetailsDrift(t *testing.T) {
 			name:      "unchanged server state stays quiet",
 			details:   `{"__type":"PermissionDescriptorAllow","permissions":["organization:read_usage"]}`,
 			wantDrift: false,
+		},
+		// The discriminator is the field this resource's union hangs off, so
+		// a console edit that swaps the variant and nothing else must still
+		// register. The response carries the wire name; drift is only visible
+		// if roundTrip's rename lands it on the same key the inputs use.
+		{
+			name:       "variant swap alone drifts details",
+			details:    `{"__type":"PermissionDescriptorGroup","permissions":["organization:read_usage"]}`,
+			wantDrift:  true,
+			driftedKey: detailsKey,
 		},
 	}
 	for _, tc := range cases {

@@ -115,7 +115,8 @@ func (r *Resource) resolveOp(verb, id string) (*Operation, error) {
 }
 
 // Check normalizes user inputs to suppress spurious diffs: enum case-folding,
-// set-like array sorting (Unordered), and autoName generation.
+// set-like array sorting (Unordered), and autoName generation. It also runs
+// ValidateInputs, so Check can reject a program outright, not just reshape it.
 func (r *Resource) Check(_ context.Context, req p.CheckRequest) (p.CheckResponse, error) {
 	if r.meta.Attachment != nil {
 		// Attachments have no create op to normalize against; their edge inputs

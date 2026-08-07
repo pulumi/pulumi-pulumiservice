@@ -16,20 +16,10 @@ package util
 
 import "strings"
 
-// Pulumi Cloud names its discriminators with a `__` prefix (`__type`), which a
-// Pulumi schema cannot carry: Go codegen emits an unexported struct field,
-// Python mangles the constructor parameter, and the engine treats
-// `__`-prefixed keys as internal — hiding them from diffs and stripping them
-// in the .NET deserializer. The schema therefore exposes the suffix form
-// (`type__`) and the provider rewrites names in both directions at every wire
-// boundary. Python's mangling rule needs two or more *leading* underscores, so
-// the suffix form is immune by language definition.
-//
-// The mapping is injective because no Pulumi Cloud property ends in `__`. It
-// is not surjective: a *schema-side* name that already starts with `__` has no
-// wire preimage, so ToWireName passes it through rather than inventing one.
-// Such a name cannot reach the provider anyway — the engine strips
-// `__`-prefixed keys before Check sees them.
+// Pulumi Cloud spells its discriminator `__type`, which a Pulumi schema cannot
+// carry: Go emits an unexported field, Python mangles the parameter, and the
+// engine strips `__`-prefixed keys. The schema exposes `type__` instead, which
+// is reversible because no Pulumi Cloud property ends in `__`.
 const (
 	wireNamePrefix   = "__"
 	schemaNameSuffix = "__"
