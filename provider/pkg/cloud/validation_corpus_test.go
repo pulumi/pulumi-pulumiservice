@@ -21,6 +21,8 @@ const (
 	apiRoleType   = "pulumiservice:api:Role"
 	yamlDirName   = "yaml"
 	permStackRead = "stack:read"
+	allowTag      = "PermissionDescriptorAllow"
+	permsKey      = "permissions"
 )
 
 // TestValidatorAcceptsEveryYamlExample runs the Check-time input validator
@@ -84,7 +86,7 @@ func TestValidatorRejectsKnownBadShapes(t *testing.T) {
 			inputs: map[string]any{detailsKey: map[string]any{
 				discKey:     "PermissionDescriptorCondition",
 				"condition": map[string]any{discKey: "PermissionLiteralExpressionBool", "value": true},
-				"subNode":   map[string]any{discKey: "PermissionDescriptorAllow", "permissions": []any{permStackRead}},
+				"subNode":   map[string]any{discKey: allowTag, permsKey: []any{permStackRead}},
 			}},
 			wantIn: "expected one of: PermissionExpressionAnd, PermissionExpressionEqual, " +
 				"PermissionExpressionHasTag, PermissionExpressionNot, PermissionExpressionOr",
@@ -94,7 +96,7 @@ func TestValidatorRejectsKnownBadShapes(t *testing.T) {
 			name:  "misspelled discriminator tag",
 			token: apiRoleType,
 			inputs: map[string]any{detailsKey: map[string]any{
-				discKey: "PermissionDescriptorAllw", "permissions": []any{permStackRead},
+				discKey: "PermissionDescriptorAllw", permsKey: []any{permStackRead},
 			}},
 			wantIn: `did you mean "PermissionDescriptorAllow"`,
 			wantAt: "details." + discKey,
@@ -107,7 +109,7 @@ func TestValidatorRejectsKnownBadShapes(t *testing.T) {
 			name:  "misspelled field the service drops silently",
 			token: apiRoleType,
 			inputs: map[string]any{detailsKey: map[string]any{
-				discKey: "PermissionDescriptorAllow", "permission": []any{permStackRead},
+				discKey: allowTag, "permission": []any{permStackRead},
 			}},
 			wantIn: `did you mean "permissions"`,
 			wantAt: "details.permission",
@@ -121,7 +123,7 @@ func TestValidatorRejectsKnownBadShapes(t *testing.T) {
 			name:  "wire-form discriminator is not accepted",
 			token: apiRoleType,
 			inputs: map[string]any{detailsKey: map[string]any{
-				"__type": "PermissionDescriptorAllow", "permissions": []any{permStackRead},
+				"__type": allowTag, permsKey: []any{permStackRead},
 			}},
 			wantIn: `missing "type__"`,
 			wantAt: "details." + discKey,
