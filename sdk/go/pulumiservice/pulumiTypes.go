@@ -787,6 +787,8 @@ func (o DeploymentSettingsCacheOptionsPtrOutput) Enable() pulumi.BoolPtrOutput {
 
 // The executor context defines information about the executor where the deployment is executed. If unspecified, the default 'pulumi/pulumi' image is used.
 type DeploymentSettingsExecutorContext struct {
+	// Credentials for pulling `executorImage` from a private container registry. Only needed when the image is not publicly accessible.
+	Credentials *DeploymentSettingsExecutorImageCredentials `pulumi:"credentials"`
 	// Allows overriding the default executor image with a custom image. E.g. 'pulumi/pulumi-nodejs:latest'
 	ExecutorImage string `pulumi:"executorImage"`
 }
@@ -804,6 +806,8 @@ type DeploymentSettingsExecutorContextInput interface {
 
 // The executor context defines information about the executor where the deployment is executed. If unspecified, the default 'pulumi/pulumi' image is used.
 type DeploymentSettingsExecutorContextArgs struct {
+	// Credentials for pulling `executorImage` from a private container registry. Only needed when the image is not publicly accessible.
+	Credentials DeploymentSettingsExecutorImageCredentialsPtrInput `pulumi:"credentials"`
 	// Allows overriding the default executor image with a custom image. E.g. 'pulumi/pulumi-nodejs:latest'
 	ExecutorImage pulumi.StringInput `pulumi:"executorImage"`
 }
@@ -886,6 +890,13 @@ func (o DeploymentSettingsExecutorContextOutput) ToDeploymentSettingsExecutorCon
 	}).(DeploymentSettingsExecutorContextPtrOutput)
 }
 
+// Credentials for pulling `executorImage` from a private container registry. Only needed when the image is not publicly accessible.
+func (o DeploymentSettingsExecutorContextOutput) Credentials() DeploymentSettingsExecutorImageCredentialsPtrOutput {
+	return o.ApplyT(func(v DeploymentSettingsExecutorContext) *DeploymentSettingsExecutorImageCredentials {
+		return v.Credentials
+	}).(DeploymentSettingsExecutorImageCredentialsPtrOutput)
+}
+
 // Allows overriding the default executor image with a custom image. E.g. 'pulumi/pulumi-nodejs:latest'
 func (o DeploymentSettingsExecutorContextOutput) ExecutorImage() pulumi.StringOutput {
 	return o.ApplyT(func(v DeploymentSettingsExecutorContext) string { return v.ExecutorImage }).(pulumi.StringOutput)
@@ -915,6 +926,16 @@ func (o DeploymentSettingsExecutorContextPtrOutput) Elem() DeploymentSettingsExe
 	}).(DeploymentSettingsExecutorContextOutput)
 }
 
+// Credentials for pulling `executorImage` from a private container registry. Only needed when the image is not publicly accessible.
+func (o DeploymentSettingsExecutorContextPtrOutput) Credentials() DeploymentSettingsExecutorImageCredentialsPtrOutput {
+	return o.ApplyT(func(v *DeploymentSettingsExecutorContext) *DeploymentSettingsExecutorImageCredentials {
+		if v == nil {
+			return nil
+		}
+		return v.Credentials
+	}).(DeploymentSettingsExecutorImageCredentialsPtrOutput)
+}
+
 // Allows overriding the default executor image with a custom image. E.g. 'pulumi/pulumi-nodejs:latest'
 func (o DeploymentSettingsExecutorContextPtrOutput) ExecutorImage() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *DeploymentSettingsExecutorContext) *string {
@@ -922,6 +943,165 @@ func (o DeploymentSettingsExecutorContextPtrOutput) ExecutorImage() pulumi.Strin
 			return nil
 		}
 		return &v.ExecutorImage
+	}).(pulumi.StringPtrOutput)
+}
+
+// Credentials for pulling the executor image from a private container registry.
+type DeploymentSettingsExecutorImageCredentials struct {
+	// Password or access token for authenticating with the container registry.
+	Password string `pulumi:"password"`
+	// Username for authenticating with the container registry.
+	Username string `pulumi:"username"`
+}
+
+// DeploymentSettingsExecutorImageCredentialsInput is an input type that accepts DeploymentSettingsExecutorImageCredentialsArgs and DeploymentSettingsExecutorImageCredentialsOutput values.
+// You can construct a concrete instance of `DeploymentSettingsExecutorImageCredentialsInput` via:
+//
+//	DeploymentSettingsExecutorImageCredentialsArgs{...}
+type DeploymentSettingsExecutorImageCredentialsInput interface {
+	pulumi.Input
+
+	ToDeploymentSettingsExecutorImageCredentialsOutput() DeploymentSettingsExecutorImageCredentialsOutput
+	ToDeploymentSettingsExecutorImageCredentialsOutputWithContext(context.Context) DeploymentSettingsExecutorImageCredentialsOutput
+}
+
+// Credentials for pulling the executor image from a private container registry.
+type DeploymentSettingsExecutorImageCredentialsArgs struct {
+	// Password or access token for authenticating with the container registry.
+	Password pulumi.StringInput `pulumi:"password"`
+	// Username for authenticating with the container registry.
+	Username pulumi.StringInput `pulumi:"username"`
+}
+
+func (DeploymentSettingsExecutorImageCredentialsArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*DeploymentSettingsExecutorImageCredentials)(nil)).Elem()
+}
+
+func (i DeploymentSettingsExecutorImageCredentialsArgs) ToDeploymentSettingsExecutorImageCredentialsOutput() DeploymentSettingsExecutorImageCredentialsOutput {
+	return i.ToDeploymentSettingsExecutorImageCredentialsOutputWithContext(context.Background())
+}
+
+func (i DeploymentSettingsExecutorImageCredentialsArgs) ToDeploymentSettingsExecutorImageCredentialsOutputWithContext(ctx context.Context) DeploymentSettingsExecutorImageCredentialsOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(DeploymentSettingsExecutorImageCredentialsOutput)
+}
+
+func (i DeploymentSettingsExecutorImageCredentialsArgs) ToDeploymentSettingsExecutorImageCredentialsPtrOutput() DeploymentSettingsExecutorImageCredentialsPtrOutput {
+	return i.ToDeploymentSettingsExecutorImageCredentialsPtrOutputWithContext(context.Background())
+}
+
+func (i DeploymentSettingsExecutorImageCredentialsArgs) ToDeploymentSettingsExecutorImageCredentialsPtrOutputWithContext(ctx context.Context) DeploymentSettingsExecutorImageCredentialsPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(DeploymentSettingsExecutorImageCredentialsOutput).ToDeploymentSettingsExecutorImageCredentialsPtrOutputWithContext(ctx)
+}
+
+// DeploymentSettingsExecutorImageCredentialsPtrInput is an input type that accepts DeploymentSettingsExecutorImageCredentialsArgs, DeploymentSettingsExecutorImageCredentialsPtr and DeploymentSettingsExecutorImageCredentialsPtrOutput values.
+// You can construct a concrete instance of `DeploymentSettingsExecutorImageCredentialsPtrInput` via:
+//
+//	        DeploymentSettingsExecutorImageCredentialsArgs{...}
+//
+//	or:
+//
+//	        nil
+type DeploymentSettingsExecutorImageCredentialsPtrInput interface {
+	pulumi.Input
+
+	ToDeploymentSettingsExecutorImageCredentialsPtrOutput() DeploymentSettingsExecutorImageCredentialsPtrOutput
+	ToDeploymentSettingsExecutorImageCredentialsPtrOutputWithContext(context.Context) DeploymentSettingsExecutorImageCredentialsPtrOutput
+}
+
+type deploymentSettingsExecutorImageCredentialsPtrType DeploymentSettingsExecutorImageCredentialsArgs
+
+func DeploymentSettingsExecutorImageCredentialsPtr(v *DeploymentSettingsExecutorImageCredentialsArgs) DeploymentSettingsExecutorImageCredentialsPtrInput {
+	return (*deploymentSettingsExecutorImageCredentialsPtrType)(v)
+}
+
+func (*deploymentSettingsExecutorImageCredentialsPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**DeploymentSettingsExecutorImageCredentials)(nil)).Elem()
+}
+
+func (i *deploymentSettingsExecutorImageCredentialsPtrType) ToDeploymentSettingsExecutorImageCredentialsPtrOutput() DeploymentSettingsExecutorImageCredentialsPtrOutput {
+	return i.ToDeploymentSettingsExecutorImageCredentialsPtrOutputWithContext(context.Background())
+}
+
+func (i *deploymentSettingsExecutorImageCredentialsPtrType) ToDeploymentSettingsExecutorImageCredentialsPtrOutputWithContext(ctx context.Context) DeploymentSettingsExecutorImageCredentialsPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(DeploymentSettingsExecutorImageCredentialsPtrOutput)
+}
+
+// Credentials for pulling the executor image from a private container registry.
+type DeploymentSettingsExecutorImageCredentialsOutput struct{ *pulumi.OutputState }
+
+func (DeploymentSettingsExecutorImageCredentialsOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*DeploymentSettingsExecutorImageCredentials)(nil)).Elem()
+}
+
+func (o DeploymentSettingsExecutorImageCredentialsOutput) ToDeploymentSettingsExecutorImageCredentialsOutput() DeploymentSettingsExecutorImageCredentialsOutput {
+	return o
+}
+
+func (o DeploymentSettingsExecutorImageCredentialsOutput) ToDeploymentSettingsExecutorImageCredentialsOutputWithContext(ctx context.Context) DeploymentSettingsExecutorImageCredentialsOutput {
+	return o
+}
+
+func (o DeploymentSettingsExecutorImageCredentialsOutput) ToDeploymentSettingsExecutorImageCredentialsPtrOutput() DeploymentSettingsExecutorImageCredentialsPtrOutput {
+	return o.ToDeploymentSettingsExecutorImageCredentialsPtrOutputWithContext(context.Background())
+}
+
+func (o DeploymentSettingsExecutorImageCredentialsOutput) ToDeploymentSettingsExecutorImageCredentialsPtrOutputWithContext(ctx context.Context) DeploymentSettingsExecutorImageCredentialsPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v DeploymentSettingsExecutorImageCredentials) *DeploymentSettingsExecutorImageCredentials {
+		return &v
+	}).(DeploymentSettingsExecutorImageCredentialsPtrOutput)
+}
+
+// Password or access token for authenticating with the container registry.
+func (o DeploymentSettingsExecutorImageCredentialsOutput) Password() pulumi.StringOutput {
+	return o.ApplyT(func(v DeploymentSettingsExecutorImageCredentials) string { return v.Password }).(pulumi.StringOutput)
+}
+
+// Username for authenticating with the container registry.
+func (o DeploymentSettingsExecutorImageCredentialsOutput) Username() pulumi.StringOutput {
+	return o.ApplyT(func(v DeploymentSettingsExecutorImageCredentials) string { return v.Username }).(pulumi.StringOutput)
+}
+
+type DeploymentSettingsExecutorImageCredentialsPtrOutput struct{ *pulumi.OutputState }
+
+func (DeploymentSettingsExecutorImageCredentialsPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**DeploymentSettingsExecutorImageCredentials)(nil)).Elem()
+}
+
+func (o DeploymentSettingsExecutorImageCredentialsPtrOutput) ToDeploymentSettingsExecutorImageCredentialsPtrOutput() DeploymentSettingsExecutorImageCredentialsPtrOutput {
+	return o
+}
+
+func (o DeploymentSettingsExecutorImageCredentialsPtrOutput) ToDeploymentSettingsExecutorImageCredentialsPtrOutputWithContext(ctx context.Context) DeploymentSettingsExecutorImageCredentialsPtrOutput {
+	return o
+}
+
+func (o DeploymentSettingsExecutorImageCredentialsPtrOutput) Elem() DeploymentSettingsExecutorImageCredentialsOutput {
+	return o.ApplyT(func(v *DeploymentSettingsExecutorImageCredentials) DeploymentSettingsExecutorImageCredentials {
+		if v != nil {
+			return *v
+		}
+		var ret DeploymentSettingsExecutorImageCredentials
+		return ret
+	}).(DeploymentSettingsExecutorImageCredentialsOutput)
+}
+
+// Password or access token for authenticating with the container registry.
+func (o DeploymentSettingsExecutorImageCredentialsPtrOutput) Password() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *DeploymentSettingsExecutorImageCredentials) *string {
+		if v == nil {
+			return nil
+		}
+		return &v.Password
+	}).(pulumi.StringPtrOutput)
+}
+
+// Username for authenticating with the container registry.
+func (o DeploymentSettingsExecutorImageCredentialsPtrOutput) Username() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *DeploymentSettingsExecutorImageCredentials) *string {
+		if v == nil {
+			return nil
+		}
+		return &v.Username
 	}).(pulumi.StringPtrOutput)
 }
 
@@ -4467,6 +4647,8 @@ func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*DeploymentSettingsCacheOptionsPtrInput)(nil)).Elem(), DeploymentSettingsCacheOptionsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*DeploymentSettingsExecutorContextInput)(nil)).Elem(), DeploymentSettingsExecutorContextArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*DeploymentSettingsExecutorContextPtrInput)(nil)).Elem(), DeploymentSettingsExecutorContextArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*DeploymentSettingsExecutorImageCredentialsInput)(nil)).Elem(), DeploymentSettingsExecutorImageCredentialsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*DeploymentSettingsExecutorImageCredentialsPtrInput)(nil)).Elem(), DeploymentSettingsExecutorImageCredentialsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*DeploymentSettingsGitAuthBasicAuthInput)(nil)).Elem(), DeploymentSettingsGitAuthBasicAuthArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*DeploymentSettingsGitAuthBasicAuthPtrInput)(nil)).Elem(), DeploymentSettingsGitAuthBasicAuthArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*DeploymentSettingsGitAuthSSHAuthInput)(nil)).Elem(), DeploymentSettingsGitAuthSSHAuthArgs{})
@@ -4513,6 +4695,8 @@ func init() {
 	pulumi.RegisterOutputType(DeploymentSettingsCacheOptionsPtrOutput{})
 	pulumi.RegisterOutputType(DeploymentSettingsExecutorContextOutput{})
 	pulumi.RegisterOutputType(DeploymentSettingsExecutorContextPtrOutput{})
+	pulumi.RegisterOutputType(DeploymentSettingsExecutorImageCredentialsOutput{})
+	pulumi.RegisterOutputType(DeploymentSettingsExecutorImageCredentialsPtrOutput{})
 	pulumi.RegisterOutputType(DeploymentSettingsGitAuthBasicAuthOutput{})
 	pulumi.RegisterOutputType(DeploymentSettingsGitAuthBasicAuthPtrOutput{})
 	pulumi.RegisterOutputType(DeploymentSettingsGitAuthSSHAuthOutput{})

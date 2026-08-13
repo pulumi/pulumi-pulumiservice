@@ -65,6 +65,8 @@ type ExecutorContext = apitype.ExecutorContext
 
 type DockerImage = apitype.DockerImage
 
+type DockerImageCredentials = apitype.DockerImageCredentials
+
 type SourceContextGit = apitype.SourceContextGit
 
 type GitAuthConfig = apitype.GitAuthConfig

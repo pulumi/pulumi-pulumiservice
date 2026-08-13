@@ -10,6 +10,12 @@ resources:
       stack: test-stack-${digits}
       executorContext:
         executorImage: "pulumi/pulumi-nodejs:latest"
+        # Credentials are only required when executorImage lives in a private
+        # registry. The image above is public; these are here to exercise the
+        # credentials path.
+        credentials:
+          username: ${imageUsername}
+          password: ${imagePassword}
       sourceContext:
         git:
           repoUrl: "https://github.com/pulumi/deploy-demos.git"

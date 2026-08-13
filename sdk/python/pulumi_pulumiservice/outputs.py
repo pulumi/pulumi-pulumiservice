@@ -23,6 +23,7 @@ __all__ = [
     'AzureOIDCConfiguration',
     'DeploymentSettingsCacheOptions',
     'DeploymentSettingsExecutorContext',
+    'DeploymentSettingsExecutorImageCredentials',
     'DeploymentSettingsGitAuthBasicAuth',
     'DeploymentSettingsGitAuthSSHAuth',
     'DeploymentSettingsGitSource',
@@ -432,13 +433,17 @@ class DeploymentSettingsExecutorContext(dict):
         return super().get(key, default)
 
     def __init__(__self__, *,
-                 executor_image: _builtins.str):
+                 executor_image: _builtins.str,
+                 credentials: Optional['outputs.DeploymentSettingsExecutorImageCredentials'] = None):
         """
         The executor context defines information about the executor where the deployment is executed. If unspecified, the default 'pulumi/pulumi' image is used.
 
         :param _builtins.str executor_image: Allows overriding the default executor image with a custom image. E.g. 'pulumi/pulumi-nodejs:latest'
+        :param 'DeploymentSettingsExecutorImageCredentials' credentials: Credentials for pulling `executorImage` from a private container registry. Only needed when the image is not publicly accessible.
         """
         pulumi.set(__self__, "executor_image", executor_image)
+        if credentials is not None:
+            pulumi.set(__self__, "credentials", credentials)
 
     @_builtins.property
     @pulumi.getter(name="executorImage")
@@ -447,6 +452,48 @@ class DeploymentSettingsExecutorContext(dict):
         Allows overriding the default executor image with a custom image. E.g. 'pulumi/pulumi-nodejs:latest'
         """
         return pulumi.get(self, "executor_image")
+
+    @_builtins.property
+    @pulumi.getter
+    def credentials(self) -> Optional['outputs.DeploymentSettingsExecutorImageCredentials']:
+        """
+        Credentials for pulling `executorImage` from a private container registry. Only needed when the image is not publicly accessible.
+        """
+        return pulumi.get(self, "credentials")
+
+
+@pulumi.output_type
+class DeploymentSettingsExecutorImageCredentials(dict):
+    """
+    Credentials for pulling the executor image from a private container registry.
+    """
+    def __init__(__self__, *,
+                 password: _builtins.str,
+                 username: _builtins.str):
+        """
+        Credentials for pulling the executor image from a private container registry.
+
+        :param _builtins.str password: Password or access token for authenticating with the container registry.
+        :param _builtins.str username: Username for authenticating with the container registry.
+        """
+        pulumi.set(__self__, "password", password)
+        pulumi.set(__self__, "username", username)
+
+    @_builtins.property
+    @pulumi.getter
+    def password(self) -> _builtins.str:
+        """
+        Password or access token for authenticating with the container registry.
+        """
+        return pulumi.get(self, "password")
+
+    @_builtins.property
+    @pulumi.getter
+    def username(self) -> _builtins.str:
+        """
+        Username for authenticating with the container registry.
+        """
+        return pulumi.get(self, "username")
 
 
 @pulumi.output_type
