@@ -22,6 +22,20 @@ const (
 	gcAWS          = "aws"
 )
 
+// Property names along the paths to the nested credentials.
+const (
+	gcSourceContext   = "sourceContext"
+	gcGit             = "git"
+	gcGitAuth         = "gitAuth"
+	gcSSHAuth         = "sshAuth"
+	gcSSHPrivateKey   = "sshPrivateKey"
+	gcBasicAuth       = "basicAuth"
+	gcUsername        = "username"
+	gcPassword        = "password"
+	gcExecutorContext = "executorContext"
+	gcCredentials     = "credentials"
+)
+
 type PulumiServiceDeploymentSettingsInput struct {
 	pulumiapi.DeploymentSettings
 	Stack pulumiapi.StackIdentifier
@@ -144,9 +158,32 @@ func (ds *PulumiServiceDeploymentSettingsInput) ToPropertyMap(
 				if ds.SourceContext.Git.GitAuth.BasicAuth != nil {
 					basicAuthPropertyMap := resource.PropertyMap{}
 					if ds.SourceContext.Git.GitAuth.BasicAuth.UserName.Value != "" {
-						basicAuthPropertyMap["username"] = resource.NewPropertyValue(
-							ds.SourceContext.Git.GitAuth.BasicAuth.UserName.Value,
-						)
+						if mergeMode {
+							var plaintextValue *pulumiapi.SecretValue
+							var currentCipherValue *pulumiapi.SecretValue
+							if currentStateCipherSettings.SourceContext != nil &&
+								currentStateCipherSettings.SourceContext.Git != nil &&
+								currentStateCipherSettings.SourceContext.Git.GitAuth != nil &&
+								currentStateCipherSettings.SourceContext.Git.GitAuth.BasicAuth != nil {
+								plaintextValue = &plaintextInputSettings.SourceContext.Git.GitAuth.BasicAuth.UserName
+								currentCipherValue = &currentStateCipherSettings.SourceContext.Git.GitAuth.BasicAuth.UserName
+							}
+							util.MergeSecretValue(
+								basicAuthPropertyMap,
+								gcUsername,
+								ds.SourceContext.Git.GitAuth.BasicAuth.UserName,
+								plaintextValue,
+								currentCipherValue,
+								isInput,
+							)
+						} else if createMode {
+							util.CreateSecretValue(basicAuthPropertyMap, gcUsername, ds.SourceContext.Git.GitAuth.BasicAuth.UserName,
+								plaintextInputSettings.SourceContext.Git.GitAuth.BasicAuth.UserName, isInput)
+						} else {
+							util.ImportSecretValue(
+								basicAuthPropertyMap, gcUsername, ds.SourceContext.Git.GitAuth.BasicAuth.UserName, isInput,
+							)
+						}
 					}
 					if ds.SourceContext.Git.GitAuth.BasicAuth.Password.Value != "" {
 						if mergeMode {
@@ -560,12 +597,10 @@ func toSourceContext(inputMap resource.PropertyMap) *pulumiapi.SourceContext {
 	}
 
 	scInput := util.GetSecretOrObjectValue(inputMap["sourceContext"])
-	cascadeSecret := inputMap["sourceContext"].IsSecret()
 	var sc pulumiapi.SourceContext
 
 	if scInput["git"].HasValue() {
 		gitInput := util.GetSecretOrObjectValue(scInput["git"])
-		cascadeSecret = cascadeSecret || scInput["git"].IsSecret()
 		var g pulumiapi.SourceContextGit
 
 		if gitInput["repoUrl"].HasValue() {
@@ -583,7 +618,6 @@ func toSourceContext(inputMap resource.PropertyMap) *pulumiapi.SourceContext {
 
 		if gitInput["gitAuth"].HasValue() {
 			authInput := util.GetSecretOrObjectValue(gitInput["gitAuth"])
-			cascadeSecret = cascadeSecret || gitInput["gitAuth"].IsSecret()
 			var a pulumiapi.GitAuthConfig
 
 			if authInput["sshAuth"].HasValue() {
@@ -608,13 +642,14 @@ func toSourceContext(inputMap resource.PropertyMap) *pulumiapi.SourceContext {
 
 			if authInput["basicAuth"].HasValue() {
 				basicInput := util.GetSecretOrObjectValue(authInput["basicAuth"])
-				cascadeSecret = cascadeSecret || authInput["basicAuth"].IsSecret()
 				var b pulumiapi.BasicAuth
 
-				if basicInput["username"].HasValue() {
+				if basicInput["username"].HasValue() || basicInput["usernameCipher"].HasValue() {
+					// Secret must be set, otherwise Pulumi Cloud stores the value in
+					// plaintext: it only encrypts SecretValues flagged as secret.
 					b.UserName = pulumiapi.SecretValue{
 						Value:  util.GetSecretOrStringValue(basicInput["username"]),
-						Secret: cascadeSecret || basicInput["username"].IsSecret(),
+						Secret: true,
 					}
 				}
 				if basicInput["password"].HasValue() || basicInput["passwordCipher"].HasValue() {
@@ -879,20 +914,19 @@ func (ds *PulumiServiceDeploymentSettingsResource) Check(
 		}
 	}
 
-	// Force the executor image registry password to be secret. The engine records
-	// whatever Check hands back as the resource's inputs in the state file, and
-	// nothing upstream of here marks it: the schema's `"secret": true` only drives
-	// SDK codegen, which cannot express `additionalSecretOutputs` for a property
-	// nested inside a type. So a program passing a plaintext literal would
-	// otherwise have that literal written to state verbatim.
-	if news["executorContext"].HasValue() {
-		executorContext := util.GetSecretOrObjectValue(news["executorContext"])
-		if executorContext["credentials"].HasValue() {
-			credentials := util.GetSecretOrObjectValue(executorContext["credentials"])
-			if credentials["password"].HasValue() && !credentials["password"].IsSecret() {
-				credentials["password"] = resource.MakeSecret(credentials["password"])
-			}
-		}
+	// Force the nested credentials to be secret. Their `"secret": true` in the
+	// schema is codegen-only, and for a property nested inside a type only the
+	// .NET SDK acts on it — so in every other language a program passing a
+	// plaintext literal would have that literal written to state verbatim. See
+	// util.MakeNestedSecret.
+	for _, path := range [][]resource.PropertyKey{
+		{gcSourceContext, gcGit, gcGitAuth, gcSSHAuth, gcSSHPrivateKey},
+		{gcSourceContext, gcGit, gcGitAuth, gcSSHAuth, gcPassword},
+		{gcSourceContext, gcGit, gcGitAuth, gcBasicAuth, gcUsername},
+		{gcSourceContext, gcGit, gcGitAuth, gcBasicAuth, gcPassword},
+		{gcExecutorContext, gcCredentials, gcPassword},
+	} {
+		util.MakeNestedSecret(news, path...)
 	}
 
 	checkedNews, err := plugin.MarshalProperties(news, util.StandardMarshal)

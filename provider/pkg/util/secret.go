@@ -86,6 +86,47 @@ func GetSecretOrObjectValue(prop resource.PropertyValue) resource.PropertyMap {
 	}
 }
 
+// MakeNestedSecret promotes the value at path to a secret, if it is present and
+// is not already one. Intermediate levels may themselves be secret-wrapped
+// objects. A missing level, a level that is not an object, or a missing leaf is
+// a no-op.
+//
+// A nested property cannot be relied on to be marked secret by the schema. The
+// `"secret": true` flag only drives SDK codegen, and for a property nested
+// inside a `#/types/...` object only the .NET generator acts on it (it wraps the
+// setter in Output.CreateSecret); Node.js, Python, Go and Java emit nothing. So
+// a provider that wants a nested property kept out of plaintext state has to
+// promote it here, in Check: the engine records whatever Check hands back as the
+// resource's inputs in the state file.
+func MakeNestedSecret(props resource.PropertyMap, path ...resource.PropertyKey) {
+	if len(path) == 0 {
+		return
+	}
+
+	for _, key := range path[:len(path)-1] {
+		value, ok := props[key]
+		if !ok || !value.HasValue() {
+			return
+		}
+		if value.IsSecret() {
+			value = value.SecretValue().Element
+		}
+		if !value.IsObject() {
+			return
+		}
+		// PropertyMap is a Go map, so the walk hands back the live nested map and
+		// the assignment below is visible from the root. No write-back needed.
+		props = value.ObjectValue()
+	}
+
+	leaf := path[len(path)-1]
+	value, ok := props[leaf]
+	if !ok || !value.HasValue() || value.IsSecret() {
+		return
+	}
+	props[leaf] = resource.MakeSecret(value)
+}
+
 // This is a value for imported secrets, to hint that value needs to be replaced
 // in generated code
 const replaceMe = "<REPLACE WITH ACTUAL SECRET VALUE>"

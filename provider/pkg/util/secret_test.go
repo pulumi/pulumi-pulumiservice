@@ -132,3 +132,93 @@ func TestGetSecretOrObjectValue(t *testing.T) {
 		assert.Equal(t, "secret-value", result["key"].StringValue())
 	})
 }
+
+// nested builds {"a": {"b": {"c": leaf}}}.
+func nested(leaf resource.PropertyValue) resource.PropertyMap {
+	return resource.PropertyMap{
+		"a": resource.NewObjectProperty(resource.PropertyMap{
+			"b": resource.NewObjectProperty(resource.PropertyMap{
+				"c": leaf,
+			}),
+		}),
+	}
+}
+
+func TestMakeNestedSecret(t *testing.T) {
+	t.Run("promotes a plaintext leaf", func(t *testing.T) {
+		props := nested(resource.NewStringProperty("hunter2"))
+
+		MakeNestedSecret(props, "a", "b", "c")
+
+		leaf := props["a"].ObjectValue()["b"].ObjectValue()["c"]
+		assert.True(t, leaf.IsSecret(), "leaf should have been promoted")
+		assert.Equal(t, "hunter2", leaf.SecretValue().Element.StringValue())
+	})
+
+	t.Run("leaves an already secret leaf untouched", func(t *testing.T) {
+		props := nested(resource.MakeSecret(resource.NewStringProperty("hunter2")))
+
+		MakeNestedSecret(props, "a", "b", "c")
+
+		leaf := props["a"].ObjectValue()["b"].ObjectValue()["c"]
+		assert.True(t, leaf.IsSecret())
+		// Not double-wrapped: the element is still the string, not another secret.
+		assert.Equal(t, "hunter2", leaf.SecretValue().Element.StringValue())
+	})
+
+	t.Run("walks through a secret intermediate object", func(t *testing.T) {
+		props := resource.PropertyMap{
+			"a": resource.MakeSecret(resource.NewObjectProperty(resource.PropertyMap{
+				"b": resource.NewObjectProperty(resource.PropertyMap{
+					"c": resource.NewStringProperty("hunter2"),
+				}),
+			})),
+		}
+
+		MakeNestedSecret(props, "a", "b", "c")
+
+		leaf := props["a"].SecretValue().Element.ObjectValue()["b"].ObjectValue()["c"]
+		assert.True(t, leaf.IsSecret())
+		assert.Equal(t, "hunter2", leaf.SecretValue().Element.StringValue())
+	})
+
+	t.Run("no-op when the path is missing", func(t *testing.T) {
+		props := nested(resource.NewStringProperty("hunter2"))
+		before := props.Copy()
+
+		MakeNestedSecret(props, "a", "nope", "c")
+		MakeNestedSecret(props, "a", "b", "nope")
+		MakeNestedSecret(props, "nope")
+
+		assert.Equal(t, before, props)
+	})
+
+	t.Run("no-op when an intermediate level is not an object", func(t *testing.T) {
+		props := resource.PropertyMap{
+			"a": resource.NewStringProperty("not-an-object"),
+		}
+		before := props.Copy()
+
+		MakeNestedSecret(props, "a", "b", "c")
+
+		assert.Equal(t, before, props)
+	})
+
+	t.Run("no-op on an empty path", func(t *testing.T) {
+		props := nested(resource.NewStringProperty("hunter2"))
+		before := props.Copy()
+
+		MakeNestedSecret(props)
+
+		assert.Equal(t, before, props)
+	})
+
+	t.Run("no-op on a null leaf", func(t *testing.T) {
+		props := nested(resource.NewNullProperty())
+		before := props.Copy()
+
+		MakeNestedSecret(props, "a", "b", "c")
+
+		assert.Equal(t, before, props)
+	})
+}
