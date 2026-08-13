@@ -221,7 +221,11 @@ func TestYamlDeploymentSettingsExample(t *testing.T) {
 		Dir:       path.Join(cwd, ".", "yaml-deployment-settings"),
 		StackName: "test-stack-" + digits,
 		Config: map[string]string{
-			"digits": digits,
+			"digits":        digits,
+			"imageUsername": "registry-user",
+		},
+		Secrets: map[string]string{
+			"imagePassword": "registry-password",
 		},
 		EditDirs: []integration.EditDir{
 			{

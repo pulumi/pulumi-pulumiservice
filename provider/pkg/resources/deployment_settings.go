@@ -337,6 +337,41 @@ func (ds *PulumiServiceDeploymentSettingsInput) ToPropertyMap(
 		ds.Executor.ExecutorImage.Reference != "" {
 		ecMap := resource.PropertyMap{}
 		ecMap["executorImage"] = resource.NewPropertyValue(ds.Executor.ExecutorImage.Reference)
+		if ds.Executor.ExecutorImage.Credentials != nil {
+			credentialsPropertyMap := resource.PropertyMap{}
+			if ds.Executor.ExecutorImage.Credentials.Username != "" {
+				credentialsPropertyMap["username"] = resource.NewPropertyValue(
+					ds.Executor.ExecutorImage.Credentials.Username,
+				)
+			}
+			if ds.Executor.ExecutorImage.Credentials.Password.Value != "" {
+				if mergeMode {
+					var plaintextValue *pulumiapi.SecretValue
+					var currentCipherValue *pulumiapi.SecretValue
+					if executorImageCredentials(plaintextInputSettings) != nil &&
+						executorImageCredentials(currentStateCipherSettings) != nil {
+						plaintextValue = &executorImageCredentials(plaintextInputSettings).Password
+						currentCipherValue = &executorImageCredentials(currentStateCipherSettings).Password
+					}
+					util.MergeSecretValue(
+						credentialsPropertyMap,
+						"password",
+						ds.Executor.ExecutorImage.Credentials.Password,
+						plaintextValue,
+						currentCipherValue,
+						isInput,
+					)
+				} else if createMode && executorImageCredentials(plaintextInputSettings) != nil {
+					util.CreateSecretValue(credentialsPropertyMap, "password", ds.Executor.ExecutorImage.Credentials.Password,
+						executorImageCredentials(plaintextInputSettings).Password, isInput)
+				} else {
+					util.ImportSecretValue(
+						credentialsPropertyMap, "password", ds.Executor.ExecutorImage.Credentials.Password, isInput,
+					)
+				}
+			}
+			ecMap["credentials"] = resource.PropertyValue{V: credentialsPropertyMap}
+		}
 		pm["executorContext"] = resource.PropertyValue{V: ecMap}
 	}
 
@@ -377,6 +412,15 @@ func (ds *PulumiServiceDeploymentSettingsResource) ToPulumiServiceDeploymentSett
 	return input
 }
 
+// executorImageCredentials walks the executor image credentials out of a settings
+// struct, tolerating a nil at any level of the chain.
+func executorImageCredentials(settings *pulumiapi.DeploymentSettings) *pulumiapi.DockerImageCredentials {
+	if settings == nil || settings.Executor == nil || settings.Executor.ExecutorImage == nil {
+		return nil
+	}
+	return settings.Executor.ExecutorImage.Credentials
+}
+
 func toExecutorContext(inputMap resource.PropertyMap) *pulumiapi.ExecutorContext {
 	if !inputMap["executorContext"].HasValue() {
 		return nil
@@ -388,6 +432,25 @@ func toExecutorContext(inputMap resource.PropertyMap) *pulumiapi.ExecutorContext
 	if ecInput["executorImage"].HasValue() {
 		ec.ExecutorImage = &pulumiapi.DockerImage{
 			Reference: util.GetSecretOrStringValue(ecInput["executorImage"]),
+		}
+
+		if ecInput["credentials"].HasValue() {
+			credentialsInput := util.GetSecretOrObjectValue(ecInput["credentials"])
+			var credentials pulumiapi.DockerImageCredentials
+
+			if credentialsInput["username"].HasValue() {
+				credentials.Username = util.GetSecretOrStringValue(credentialsInput["username"])
+			}
+			if credentialsInput["password"].HasValue() {
+				// Secret must be set, otherwise Pulumi Cloud stores the password
+				// in plaintext: it only encrypts SecretValues flagged as secret.
+				credentials.Password = pulumiapi.SecretValue{
+					Secret: true,
+					Value:  util.GetSecretOrStringValue(credentialsInput["password"]),
+				}
+			}
+
+			ec.ExecutorImage.Credentials = &credentials
 		}
 	}
 
@@ -812,6 +875,22 @@ func (ds *PulumiServiceDeploymentSettingsResource) Check(
 						}
 					}
 				}
+			}
+		}
+	}
+
+	// Force the executor image registry password to be secret. The engine records
+	// whatever Check hands back as the resource's inputs in the state file, and
+	// nothing upstream of here marks it: the schema's `"secret": true` only drives
+	// SDK codegen, which cannot express `additionalSecretOutputs` for a property
+	// nested inside a type. So a program passing a plaintext literal would
+	// otherwise have that literal written to state verbatim.
+	if news["executorContext"].HasValue() {
+		executorContext := util.GetSecretOrObjectValue(news["executorContext"])
+		if executorContext["credentials"].HasValue() {
+			credentials := util.GetSecretOrObjectValue(executorContext["credentials"])
+			if credentials["password"].HasValue() && !credentials["password"].IsSecret() {
+				credentials["password"] = resource.MakeSecret(credentials["password"])
 			}
 		}
 	}

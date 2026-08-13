@@ -120,9 +120,27 @@ export function deploymentSettingsCacheOptionsArgsProvideDefaults(val: Deploymen
  */
 export interface DeploymentSettingsExecutorContextArgs {
     /**
+     * Credentials for pulling `executorImage` from a private container registry. Only needed when the image is not publicly accessible.
+     */
+    credentials?: pulumi.Input<inputs.DeploymentSettingsExecutorImageCredentialsArgs | undefined>;
+    /**
      * Allows overriding the default executor image with a custom image. E.g. 'pulumi/pulumi-nodejs:latest'
      */
     executorImage: pulumi.Input<string>;
+}
+
+/**
+ * Credentials for pulling the executor image from a private container registry.
+ */
+export interface DeploymentSettingsExecutorImageCredentialsArgs {
+    /**
+     * Password or access token for authenticating with the container registry.
+     */
+    password: pulumi.Input<string>;
+    /**
+     * Username for authenticating with the container registry.
+     */
+    username: pulumi.Input<string>;
 }
 
 /**

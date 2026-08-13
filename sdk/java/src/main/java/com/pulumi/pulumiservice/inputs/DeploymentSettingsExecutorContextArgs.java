@@ -6,8 +6,11 @@ package com.pulumi.pulumiservice.inputs;
 import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
 import com.pulumi.exceptions.MissingRequiredPropertyException;
+import com.pulumi.pulumiservice.inputs.DeploymentSettingsExecutorImageCredentialsArgs;
 import java.lang.String;
 import java.util.Objects;
+import java.util.Optional;
+import javax.annotation.Nullable;
 
 
 /**
@@ -17,6 +20,21 @@ import java.util.Objects;
 public final class DeploymentSettingsExecutorContextArgs extends com.pulumi.resources.ResourceArgs {
 
     public static final DeploymentSettingsExecutorContextArgs Empty = new DeploymentSettingsExecutorContextArgs();
+
+    /**
+     * Credentials for pulling `executorImage` from a private container registry. Only needed when the image is not publicly accessible.
+     * 
+     */
+    @Import(name="credentials")
+    private @Nullable Output<DeploymentSettingsExecutorImageCredentialsArgs> credentials;
+
+    /**
+     * @return Credentials for pulling `executorImage` from a private container registry. Only needed when the image is not publicly accessible.
+     * 
+     */
+    public Optional<Output<DeploymentSettingsExecutorImageCredentialsArgs>> credentials() {
+        return Optional.ofNullable(this.credentials);
+    }
 
     /**
      * Allows overriding the default executor image with a custom image. E.g. &#39;pulumi/pulumi-nodejs:latest&#39;
@@ -36,6 +54,7 @@ public final class DeploymentSettingsExecutorContextArgs extends com.pulumi.reso
     private DeploymentSettingsExecutorContextArgs() {}
 
     private DeploymentSettingsExecutorContextArgs(DeploymentSettingsExecutorContextArgs $) {
+        this.credentials = $.credentials;
         this.executorImage = $.executorImage;
     }
 
@@ -55,6 +74,27 @@ public final class DeploymentSettingsExecutorContextArgs extends com.pulumi.reso
 
         public Builder(DeploymentSettingsExecutorContextArgs defaults) {
             $ = new DeploymentSettingsExecutorContextArgs(Objects.requireNonNull(defaults));
+        }
+
+        /**
+         * @param credentials Credentials for pulling `executorImage` from a private container registry. Only needed when the image is not publicly accessible.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder credentials(@Nullable Output<DeploymentSettingsExecutorImageCredentialsArgs> credentials) {
+            $.credentials = credentials;
+            return this;
+        }
+
+        /**
+         * @param credentials Credentials for pulling `executorImage` from a private container registry. Only needed when the image is not publicly accessible.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder credentials(DeploymentSettingsExecutorImageCredentialsArgs credentials) {
+            return credentials(Output.of(credentials));
         }
 
         /**

@@ -300,6 +300,10 @@
     "pulumiservice:index:DeploymentSettingsExecutorContext": {
       "description": "The executor context defines information about the executor where the deployment is executed. If unspecified, the default 'pulumi/pulumi' image is used.",
       "properties": {
+        "credentials": {
+          "$ref": "#/types/pulumiservice:index:DeploymentSettingsExecutorImageCredentials",
+          "description": "Credentials for pulling `executorImage` from a private container registry. Only needed when the image is not publicly accessible."
+        },
         "executorImage": {
           "type": "string",
           "description": "Allows overriding the default executor image with a custom image. E.g. 'pulumi/pulumi-nodejs:latest'"
@@ -308,6 +312,25 @@
       "type": "object",
       "required": [
         "executorImage"
+      ]
+    },
+    "pulumiservice:index:DeploymentSettingsExecutorImageCredentials": {
+      "description": "Credentials for pulling the executor image from a private container registry.",
+      "properties": {
+        "password": {
+          "type": "string",
+          "description": "Password or access token for authenticating with the container registry.",
+          "secret": true
+        },
+        "username": {
+          "type": "string",
+          "description": "Username for authenticating with the container registry."
+        }
+      },
+      "type": "object",
+      "required": [
+        "username",
+        "password"
       ]
     },
     "pulumiservice:index:DeploymentSettingsGitAuthBasicAuth": {

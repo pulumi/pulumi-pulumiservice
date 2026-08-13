@@ -28,6 +28,8 @@ __all__ = [
     'DeploymentSettingsCacheOptionsArgsDict',
     'DeploymentSettingsExecutorContextArgs',
     'DeploymentSettingsExecutorContextArgsDict',
+    'DeploymentSettingsExecutorImageCredentialsArgs',
+    'DeploymentSettingsExecutorImageCredentialsArgsDict',
     'DeploymentSettingsGitAuthBasicAuthArgs',
     'DeploymentSettingsGitAuthBasicAuthArgsDict',
     'DeploymentSettingsGitAuthSSHAuthArgs',
@@ -514,17 +516,25 @@ class DeploymentSettingsExecutorContextArgsDict(TypedDict):
     """
     Allows overriding the default executor image with a custom image. E.g. 'pulumi/pulumi-nodejs:latest'
     """
+    credentials: NotRequired[pulumi.Input[Optional['DeploymentSettingsExecutorImageCredentialsArgsDict']]]
+    """
+    Credentials for pulling `executorImage` from a private container registry. Only needed when the image is not publicly accessible.
+    """
 
 @pulumi.input_type
 class DeploymentSettingsExecutorContextArgs:
     def __init__(__self__, *,
-                 executor_image: pulumi.Input[_builtins.str]):
+                 executor_image: pulumi.Input[_builtins.str],
+                 credentials: pulumi.Input[Optional['DeploymentSettingsExecutorImageCredentialsArgs']] = None):
         """
         The executor context defines information about the executor where the deployment is executed. If unspecified, the default 'pulumi/pulumi' image is used.
 
         :param pulumi.Input[_builtins.str] executor_image: Allows overriding the default executor image with a custom image. E.g. 'pulumi/pulumi-nodejs:latest'
+        :param pulumi.Input['DeploymentSettingsExecutorImageCredentialsArgs'] credentials: Credentials for pulling `executorImage` from a private container registry. Only needed when the image is not publicly accessible.
         """
         pulumi.set(__self__, "executor_image", executor_image)
+        if credentials is not None:
+            pulumi.set(__self__, "credentials", credentials)
 
     @_builtins.property
     @pulumi.getter(name="executorImage")
@@ -537,6 +547,70 @@ class DeploymentSettingsExecutorContextArgs:
     @executor_image.setter
     def executor_image(self, value: pulumi.Input[_builtins.str]):
         pulumi.set(self, "executor_image", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def credentials(self) -> pulumi.Input[Optional['DeploymentSettingsExecutorImageCredentialsArgs']]:
+        """
+        Credentials for pulling `executorImage` from a private container registry. Only needed when the image is not publicly accessible.
+        """
+        return pulumi.get(self, "credentials")
+
+    @credentials.setter
+    def credentials(self, value: pulumi.Input[Optional['DeploymentSettingsExecutorImageCredentialsArgs']]):
+        pulumi.set(self, "credentials", value)
+
+
+class DeploymentSettingsExecutorImageCredentialsArgsDict(TypedDict):
+    """
+    Credentials for pulling the executor image from a private container registry.
+    """
+    password: pulumi.Input[_builtins.str]
+    """
+    Password or access token for authenticating with the container registry.
+    """
+    username: pulumi.Input[_builtins.str]
+    """
+    Username for authenticating with the container registry.
+    """
+
+@pulumi.input_type
+class DeploymentSettingsExecutorImageCredentialsArgs:
+    def __init__(__self__, *,
+                 password: pulumi.Input[_builtins.str],
+                 username: pulumi.Input[_builtins.str]):
+        """
+        Credentials for pulling the executor image from a private container registry.
+
+        :param pulumi.Input[_builtins.str] password: Password or access token for authenticating with the container registry.
+        :param pulumi.Input[_builtins.str] username: Username for authenticating with the container registry.
+        """
+        pulumi.set(__self__, "password", password)
+        pulumi.set(__self__, "username", username)
+
+    @_builtins.property
+    @pulumi.getter
+    def password(self) -> pulumi.Input[_builtins.str]:
+        """
+        Password or access token for authenticating with the container registry.
+        """
+        return pulumi.get(self, "password")
+
+    @password.setter
+    def password(self, value: pulumi.Input[_builtins.str]):
+        pulumi.set(self, "password", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def username(self) -> pulumi.Input[_builtins.str]:
+        """
+        Username for authenticating with the container registry.
+        """
+        return pulumi.get(self, "username")
+
+    @username.setter
+    def username(self, value: pulumi.Input[_builtins.str]):
+        pulumi.set(self, "username", value)
 
 
 class DeploymentSettingsGitAuthBasicAuthArgsDict(TypedDict):

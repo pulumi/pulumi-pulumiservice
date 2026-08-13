@@ -17,13 +17,21 @@ namespace Pulumi.PulumiService.Outputs
     public sealed class DeploymentSettingsExecutorContext
     {
         /// <summary>
+        /// Credentials for pulling `executorImage` from a private container registry. Only needed when the image is not publicly accessible.
+        /// </summary>
+        public readonly Outputs.DeploymentSettingsExecutorImageCredentials? Credentials;
+        /// <summary>
         /// Allows overriding the default executor image with a custom image. E.g. 'pulumi/pulumi-nodejs:latest'
         /// </summary>
         public readonly string ExecutorImage;
 
         [OutputConstructor]
-        private DeploymentSettingsExecutorContext(string executorImage)
+        private DeploymentSettingsExecutorContext(
+            Outputs.DeploymentSettingsExecutorImageCredentials? credentials,
+
+            string executorImage)
         {
+            Credentials = credentials;
             ExecutorImage = executorImage;
         }
     }

@@ -47,6 +47,7 @@ func TestDeploymentSettingsExample(t *testing.T) {
 	)
 	test.SetConfig(t, "my_secret", "my_secret_value")
 	test.SetConfig(t, "password", "my_password")
+	test.SetConfig(t, "imagePassword", "my_image_password")
 	runPulumiTest(t, test)
 }
 

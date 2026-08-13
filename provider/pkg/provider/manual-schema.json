@@ -18,12 +18,35 @@
         "executorImage": {
           "type": "string",
           "description": "Allows overriding the default executor image with a custom image. E.g. 'pulumi/pulumi-nodejs:latest'"
+        },
+        "credentials": {
+          "$ref": "#/types/pulumiservice:index:DeploymentSettingsExecutorImageCredentials",
+          "description": "Credentials for pulling `executorImage` from a private container registry. Only needed when the image is not publicly accessible."
         }
       },
       "type": "object",
       "required": [
         "executorImage"
       ]
+    },
+    "pulumiservice:index:DeploymentSettingsExecutorImageCredentials": {
+      "description": "Credentials for pulling the executor image from a private container registry.",
+      "properties": {
+        "username": {
+          "type": "string",
+          "description": "Username for authenticating with the container registry."
+        },
+        "password": {
+          "type": "string",
+          "secret": true,
+          "description": "Password or access token for authenticating with the container registry."
+        }
+      },
+      "required": [
+        "username",
+        "password"
+      ],
+      "type": "object"
     },
     "pulumiservice:index:DeploymentSettingsSourceContext": {
       "description": "Settings related to the source of the deployment.",

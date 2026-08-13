@@ -18,6 +18,11 @@ const settings = new service.DeploymentSettings("deployment_settings", {
     stack: stack.stackName,
     executorContext: {
         executorImage: "pulumi-cli",
+        // Only required when the executor image lives in a private registry.
+        credentials: {
+            username: "registry-user",
+            password: config.requireSecret("imagePassword"),
+        },
     },
     operationContext: {
         preRunCommands: ["yarn"],

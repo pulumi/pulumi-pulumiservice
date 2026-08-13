@@ -16,6 +16,12 @@ namespace Pulumi.PulumiService.Inputs
     public sealed class DeploymentSettingsExecutorContextArgs : global::Pulumi.ResourceArgs
     {
         /// <summary>
+        /// Credentials for pulling `executorImage` from a private container registry. Only needed when the image is not publicly accessible.
+        /// </summary>
+        [Input("credentials")]
+        public Input<Inputs.DeploymentSettingsExecutorImageCredentialsArgs>? Credentials { get; set; }
+
+        /// <summary>
         /// Allows overriding the default executor image with a custom image. E.g. 'pulumi/pulumi-nodejs:latest'
         /// </summary>
         [Input("executorImage", required: true)]

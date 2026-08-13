@@ -5,11 +5,19 @@ package com.pulumi.pulumiservice.outputs;
 
 import com.pulumi.core.annotations.CustomType;
 import com.pulumi.exceptions.MissingRequiredPropertyException;
+import com.pulumi.pulumiservice.outputs.DeploymentSettingsExecutorImageCredentials;
 import java.lang.String;
 import java.util.Objects;
+import java.util.Optional;
+import javax.annotation.Nullable;
 
 @CustomType
 public final class DeploymentSettingsExecutorContext {
+    /**
+     * @return Credentials for pulling `executorImage` from a private container registry. Only needed when the image is not publicly accessible.
+     * 
+     */
+    private @Nullable DeploymentSettingsExecutorImageCredentials credentials;
     /**
      * @return Allows overriding the default executor image with a custom image. E.g. &#39;pulumi/pulumi-nodejs:latest&#39;
      * 
@@ -17,6 +25,13 @@ public final class DeploymentSettingsExecutorContext {
     private String executorImage;
 
     private DeploymentSettingsExecutorContext() {}
+    /**
+     * @return Credentials for pulling `executorImage` from a private container registry. Only needed when the image is not publicly accessible.
+     * 
+     */
+    public Optional<DeploymentSettingsExecutorImageCredentials> credentials() {
+        return Optional.ofNullable(this.credentials);
+    }
     /**
      * @return Allows overriding the default executor image with a custom image. E.g. &#39;pulumi/pulumi-nodejs:latest&#39;
      * 
@@ -34,13 +49,21 @@ public final class DeploymentSettingsExecutorContext {
     }
     @CustomType.Builder
     public static final class Builder {
+        private @Nullable DeploymentSettingsExecutorImageCredentials credentials;
         private String executorImage;
         public Builder() {}
         public Builder(DeploymentSettingsExecutorContext defaults) {
     	      Objects.requireNonNull(defaults);
+    	      this.credentials = defaults.credentials;
     	      this.executorImage = defaults.executorImage;
         }
 
+        @CustomType.Setter
+        public Builder credentials(@Nullable DeploymentSettingsExecutorImageCredentials credentials) {
+
+            this.credentials = credentials;
+            return this;
+        }
         @CustomType.Setter
         public Builder executorImage(String executorImage) {
             if (executorImage == null) {
@@ -51,6 +74,7 @@ public final class DeploymentSettingsExecutorContext {
         }
         public DeploymentSettingsExecutorContext build() {
             final var _resultValue = new DeploymentSettingsExecutorContext();
+            _resultValue.credentials = credentials;
             _resultValue.executorImage = executorImage;
             return _resultValue;
         }
