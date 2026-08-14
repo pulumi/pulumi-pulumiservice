@@ -33,12 +33,8 @@ type GetPolicyPacksResult struct {
 }
 
 func GetPolicyPacksOutput(ctx *pulumi.Context, args GetPolicyPacksOutputArgs, opts ...pulumi.InvokeOption) GetPolicyPacksResultOutput {
-	return pulumi.ToOutputWithContext(ctx.Context(), args).
-		ApplyT(func(v interface{}) (GetPolicyPacksResultOutput, error) {
-			args := v.(GetPolicyPacksArgs)
-			options := pulumi.InvokeOutputOptions{InvokeOptions: internal.PkgInvokeDefaultOpts(opts)}
-			return ctx.InvokeOutput("pulumiservice:index:getPolicyPacks", args, GetPolicyPacksResultOutput{}, options).(GetPolicyPacksResultOutput), nil
-		}).(GetPolicyPacksResultOutput)
+	options := pulumi.InvokeOutputOptions{InvokeOptions: internal.PkgInvokeDefaultOpts(opts)}
+	return ctx.InvokeOutput("pulumiservice:index:getPolicyPacks", args, GetPolicyPacksResultOutput{}, options).(GetPolicyPacksResultOutput)
 }
 
 type GetPolicyPacksOutputArgs struct {

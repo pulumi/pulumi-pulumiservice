@@ -60,12 +60,8 @@ func (val *LookupInsightsAccountResult) Defaults() *LookupInsightsAccountResult 
 	return &tmp
 }
 func LookupInsightsAccountOutput(ctx *pulumi.Context, args LookupInsightsAccountOutputArgs, opts ...pulumi.InvokeOption) LookupInsightsAccountResultOutput {
-	return pulumi.ToOutputWithContext(ctx.Context(), args).
-		ApplyT(func(v interface{}) (LookupInsightsAccountResultOutput, error) {
-			args := v.(LookupInsightsAccountArgs)
-			options := pulumi.InvokeOutputOptions{InvokeOptions: internal.PkgInvokeDefaultOpts(opts)}
-			return ctx.InvokeOutput("pulumiservice:index:getInsightsAccount", args, LookupInsightsAccountResultOutput{}, options).(LookupInsightsAccountResultOutput), nil
-		}).(LookupInsightsAccountResultOutput)
+	options := pulumi.InvokeOutputOptions{InvokeOptions: internal.PkgInvokeDefaultOpts(opts)}
+	return ctx.InvokeOutput("pulumiservice:index:getInsightsAccount", args, LookupInsightsAccountResultOutput{}, options).(LookupInsightsAccountResultOutput)
 }
 
 type LookupInsightsAccountOutputArgs struct {

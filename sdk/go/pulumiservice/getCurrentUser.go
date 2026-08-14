@@ -37,12 +37,8 @@ type GetCurrentUserResult struct {
 }
 
 func GetCurrentUserOutput(ctx *pulumi.Context, args GetCurrentUserOutputArgs, opts ...pulumi.InvokeOption) GetCurrentUserResultOutput {
-	return pulumi.ToOutputWithContext(ctx.Context(), args).
-		ApplyT(func(v interface{}) (GetCurrentUserResultOutput, error) {
-			args := v.(GetCurrentUserArgs)
-			options := pulumi.InvokeOutputOptions{InvokeOptions: internal.PkgInvokeDefaultOpts(opts)}
-			return ctx.InvokeOutput("pulumiservice:index:getCurrentUser", args, GetCurrentUserResultOutput{}, options).(GetCurrentUserResultOutput), nil
-		}).(GetCurrentUserResultOutput)
+	options := pulumi.InvokeOutputOptions{InvokeOptions: internal.PkgInvokeDefaultOpts(opts)}
+	return ctx.InvokeOutput("pulumiservice:index:getCurrentUser", args, GetCurrentUserResultOutput{}, options).(GetCurrentUserResultOutput)
 }
 
 type GetCurrentUserOutputArgs struct {

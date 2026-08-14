@@ -33,12 +33,8 @@ type BuildAllowPermissionsResult struct {
 }
 
 func BuildAllowPermissionsOutput(ctx *pulumi.Context, args BuildAllowPermissionsOutputArgs, opts ...pulumi.InvokeOption) BuildAllowPermissionsResultOutput {
-	return pulumi.ToOutputWithContext(ctx.Context(), args).
-		ApplyT(func(v interface{}) (BuildAllowPermissionsResultOutput, error) {
-			args := v.(BuildAllowPermissionsArgs)
-			options := pulumi.InvokeOutputOptions{InvokeOptions: internal.PkgInvokeDefaultOpts(opts)}
-			return ctx.InvokeOutput("pulumiservice:index:buildAllowPermissions", args, BuildAllowPermissionsResultOutput{}, options).(BuildAllowPermissionsResultOutput), nil
-		}).(BuildAllowPermissionsResultOutput)
+	options := pulumi.InvokeOutputOptions{InvokeOptions: internal.PkgInvokeDefaultOpts(opts)}
+	return ctx.InvokeOutput("pulumiservice:index:buildAllowPermissions", args, BuildAllowPermissionsResultOutput{}, options).(BuildAllowPermissionsResultOutput)
 }
 
 type BuildAllowPermissionsOutputArgs struct {

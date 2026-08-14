@@ -35,12 +35,8 @@ type BuildStackScopedPermissionsResult struct {
 }
 
 func BuildStackScopedPermissionsOutput(ctx *pulumi.Context, args BuildStackScopedPermissionsOutputArgs, opts ...pulumi.InvokeOption) BuildStackScopedPermissionsResultOutput {
-	return pulumi.ToOutputWithContext(ctx.Context(), args).
-		ApplyT(func(v interface{}) (BuildStackScopedPermissionsResultOutput, error) {
-			args := v.(BuildStackScopedPermissionsArgs)
-			options := pulumi.InvokeOutputOptions{InvokeOptions: internal.PkgInvokeDefaultOpts(opts)}
-			return ctx.InvokeOutput("pulumiservice:index:buildStackScopedPermissions", args, BuildStackScopedPermissionsResultOutput{}, options).(BuildStackScopedPermissionsResultOutput), nil
-		}).(BuildStackScopedPermissionsResultOutput)
+	options := pulumi.InvokeOutputOptions{InvokeOptions: internal.PkgInvokeDefaultOpts(opts)}
+	return ctx.InvokeOutput("pulumiservice:index:buildStackScopedPermissions", args, BuildStackScopedPermissionsResultOutput{}, options).(BuildStackScopedPermissionsResultOutput)
 }
 
 type BuildStackScopedPermissionsOutputArgs struct {
