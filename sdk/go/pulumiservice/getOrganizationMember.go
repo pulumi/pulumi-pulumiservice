@@ -43,12 +43,8 @@ type LookupOrganizationMemberResult struct {
 }
 
 func LookupOrganizationMemberOutput(ctx *pulumi.Context, args LookupOrganizationMemberOutputArgs, opts ...pulumi.InvokeOption) LookupOrganizationMemberResultOutput {
-	return pulumi.ToOutputWithContext(ctx.Context(), args).
-		ApplyT(func(v interface{}) (LookupOrganizationMemberResultOutput, error) {
-			args := v.(LookupOrganizationMemberArgs)
-			options := pulumi.InvokeOutputOptions{InvokeOptions: internal.PkgInvokeDefaultOpts(opts)}
-			return ctx.InvokeOutput("pulumiservice:index:getOrganizationMember", args, LookupOrganizationMemberResultOutput{}, options).(LookupOrganizationMemberResultOutput), nil
-		}).(LookupOrganizationMemberResultOutput)
+	options := pulumi.InvokeOutputOptions{InvokeOptions: internal.PkgInvokeDefaultOpts(opts)}
+	return ctx.InvokeOutput("pulumiservice:index:getOrganizationMember", args, LookupOrganizationMemberResultOutput{}, options).(LookupOrganizationMemberResultOutput)
 }
 
 type LookupOrganizationMemberOutputArgs struct {

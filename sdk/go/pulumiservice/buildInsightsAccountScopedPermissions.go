@@ -35,12 +35,8 @@ type BuildInsightsAccountScopedPermissionsResult struct {
 }
 
 func BuildInsightsAccountScopedPermissionsOutput(ctx *pulumi.Context, args BuildInsightsAccountScopedPermissionsOutputArgs, opts ...pulumi.InvokeOption) BuildInsightsAccountScopedPermissionsResultOutput {
-	return pulumi.ToOutputWithContext(ctx.Context(), args).
-		ApplyT(func(v interface{}) (BuildInsightsAccountScopedPermissionsResultOutput, error) {
-			args := v.(BuildInsightsAccountScopedPermissionsArgs)
-			options := pulumi.InvokeOutputOptions{InvokeOptions: internal.PkgInvokeDefaultOpts(opts)}
-			return ctx.InvokeOutput("pulumiservice:index:buildInsightsAccountScopedPermissions", args, BuildInsightsAccountScopedPermissionsResultOutput{}, options).(BuildInsightsAccountScopedPermissionsResultOutput), nil
-		}).(BuildInsightsAccountScopedPermissionsResultOutput)
+	options := pulumi.InvokeOutputOptions{InvokeOptions: internal.PkgInvokeDefaultOpts(opts)}
+	return ctx.InvokeOutput("pulumiservice:index:buildInsightsAccountScopedPermissions", args, BuildInsightsAccountScopedPermissionsResultOutput{}, options).(BuildInsightsAccountScopedPermissionsResultOutput)
 }
 
 type BuildInsightsAccountScopedPermissionsOutputArgs struct {
