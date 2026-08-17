@@ -64,6 +64,15 @@
 
 ### Bug Fixes
 
+- Fixed `DeploymentSettings` git auth credentials being written to state in plaintext when the program supplies them as non-secret values. All four `sourceContext.git.gitAuth` credentials (`sshAuth.sshPrivateKey`, `sshAuth.password`, `basicAuth.username` and `basicAuth.password`) are declared `secret` in the schema, but that flag only drives SDK codegen for a resource's own top-level properties and reaches a property nested inside a type only in the .NET SDK — so in every other language a plain value was recorded verbatim in the stack's state `inputs`. The provider now marks all four secret in `Check`, and `basicAuth.username` is handled as an encrypted twin-value secret on create, refresh and import like the other three. [#1037](https://github.com/pulumi/pulumi-pulumiservice/issues/1037)
+
+  Upgrade behavior for existing stacks:
+
+  - State `inputs` heal on the next `pulumi up`, with no diff shown.
+  - `sshPrivateKey` and both passwords were always sent to Pulumi Cloud flagged as secrets, so they were already encrypted at rest and their state `outputs` already read `[secret]`.
+  - `basicAuth.username` was previously sent unflagged, so Pulumi Cloud stored it unencrypted. Because the change of secretness alone produces no diff, the value stays unencrypted server-side — and plaintext in state `outputs` — until the `DeploymentSettings` resource is next actually updated for some other reason.
+
+  Two things this fix cannot undo: a stack that is never updated again keeps its plaintext inputs, and earlier state versions retained by the backend still contain the plaintext. **Anyone who has committed a state file, or uses a backend where prior state versions are readable, should rotate the affected credentials.**
 - Fixed `OidcIssuer` panicking during `pulumi preview` when its `url` input was an unknown value, such as another resource's output. The provider read the unknown input as a concrete string during `Check` and crashed; previews now complete and resolve `url` as computed. [#831](https://github.com/pulumi/pulumi-pulumiservice/pull/831)
 - Fixed `AgentPool.agentPoolId` output never being populated. The provider previously wrote the value under a state key that did not match the schema, so `pool.agentPoolId` was always undefined. Existing stacks pick up the correct value on the next `pulumi refresh`.
 - Fixed TeamEnvironmentPermission spurious replacement on upgrade from 0.29.2 caused by the optional `maxOpenDuration` field being serialized as an empty string in Check and Read [#751](https://github.com/pulumi/pulumi-pulumiservice/issues/751)

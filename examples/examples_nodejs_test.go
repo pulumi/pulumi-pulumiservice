@@ -48,7 +48,17 @@ func TestDeploymentSettingsExample(t *testing.T) {
 	test.SetConfig(t, "my_secret", "my_secret_value")
 	test.SetConfig(t, "password", "my_password")
 	test.SetConfig(t, "imagePassword", "my_image_password")
-	runPulumiTest(t, test)
+
+	// The example passes sshPrivateKey as a plaintext literal. The provider must
+	// still store it as a secret: for a property nested inside a type the
+	// schema's `"secret": true` only reaches the .NET SDK, so for this Node.js
+	// program only Check keeps it out of the state file.
+	// Guards https://github.com/pulumi/pulumi-pulumiservice/issues/1037.
+	runPulumiTestAfterUp(t, test, func(t *testing.T, test *pulumitest.PulumiTest) {
+		inputs := stateInputs(t, test, "pulumiservice:index:DeploymentSettings")
+		assertStateSecret(t, inputs, "sourceContext", "git", "gitAuth", "sshAuth", "sshPrivateKey")
+		assertStateSecret(t, inputs, "sourceContext", "git", "gitAuth", "sshAuth", "password")
+	})
 }
 
 func TestTeamStackPermissionsExample(t *testing.T) {
