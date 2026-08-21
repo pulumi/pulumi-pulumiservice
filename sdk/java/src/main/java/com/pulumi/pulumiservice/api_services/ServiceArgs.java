@@ -6,6 +6,7 @@ package com.pulumi.pulumiservice.api_services;
 import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
 import com.pulumi.exceptions.MissingRequiredPropertyException;
+import com.pulumi.pulumiservice.api_services.inputs.ServicePropertyArgs;
 import java.lang.Object;
 import java.lang.String;
 import java.util.List;
@@ -111,13 +112,13 @@ public final class ServiceArgs extends com.pulumi.resources.ResourceArgs {
      * 
      */
     @Import(name="properties", required=true)
-    private Output<List<Object>> properties;
+    private Output<List<ServicePropertyArgs>> properties;
 
     /**
      * @return an optional list of properties to set on the service
      * 
      */
-    public Output<List<Object>> properties() {
+    public Output<List<ServicePropertyArgs>> properties() {
         return this.properties;
     }
 
@@ -293,7 +294,7 @@ public final class ServiceArgs extends com.pulumi.resources.ResourceArgs {
          * @return builder
          * 
          */
-        public Builder properties(Output<List<Object>> properties) {
+        public Builder properties(Output<List<ServicePropertyArgs>> properties) {
             $.properties = properties;
             return this;
         }
@@ -304,7 +305,7 @@ public final class ServiceArgs extends com.pulumi.resources.ResourceArgs {
          * @return builder
          * 
          */
-        public Builder properties(List<Object> properties) {
+        public Builder properties(List<ServicePropertyArgs> properties) {
             return properties(Output.of(properties));
         }
 
@@ -314,7 +315,7 @@ public final class ServiceArgs extends com.pulumi.resources.ResourceArgs {
          * @return builder
          * 
          */
-        public Builder properties(Object... properties) {
+        public Builder properties(ServicePropertyArgs... properties) {
             return properties(List.of(properties));
         }
 

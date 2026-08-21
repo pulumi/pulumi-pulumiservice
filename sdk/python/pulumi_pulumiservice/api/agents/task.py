@@ -13,6 +13,9 @@ if sys.version_info >= (3, 11):
 else:
     from typing_extensions import NotRequired, TypedDict, TypeAlias
 from ... import _utilities
+from . import outputs
+from ... import api as _api
+from ._inputs import *
 
 __all__ = ['TaskArgs', 'Task']
 
@@ -21,9 +24,9 @@ class TaskArgs:
     def __init__(__self__, *,
                  org_name: pulumi.Input[_builtins.str],
                  approval_mode: pulumi.Input[Optional[_builtins.str]] = None,
-                 cli_integrations: pulumi.Input[Optional[Sequence[Any]]] = None,
-                 enabled_integrations: pulumi.Input[Optional[Sequence[Any]]] = None,
-                 message: Optional[Any] = None,
+                 cli_integrations: pulumi.Input[Optional[Sequence[pulumi.Input['CLIIntegrationRefArgs']]]] = None,
+                 enabled_integrations: pulumi.Input[Optional[Sequence[pulumi.Input['AgentTaskIntegrationRefArgs']]]] = None,
+                 message: pulumi.Input[Optional['AgentUserEventMessageArgs']] = None,
                  permission_mode: pulumi.Input[Optional[_builtins.str]] = None,
                  plan_mode: pulumi.Input[Optional[_builtins.bool]] = None,
                  role: pulumi.Input[Optional[_builtins.str]] = None,
@@ -35,9 +38,9 @@ class TaskArgs:
 
         :param pulumi.Input[_builtins.str] org_name: The organization name
         :param pulumi.Input[_builtins.str] approval_mode: Optional approval mode override for this task. If omitted, org default is used.
-        :param pulumi.Input[Sequence[Any]] cli_integrations: Optional filter for CLI integrations to enable for this task. Semantics: omitted/null → enable all CLI integrations connected for the org; empty list → explicit opt-out (no CLI integrations for this task); populated list → whitelist by (catalogId, name) of the configured instances to enable. Entries with missing or unknown catalogId, missing name, or referencing a (catalogId, name) pair that is not connected for the organization are rejected with a 400 response. catalogId matching is case-insensitive.
-        :param pulumi.Input[Sequence[Any]] enabled_integrations: Optional list of integrations to enable for this task. Semantics: omitted/null → inherit all org-enabled integrations; empty list → explicit opt-out (no integration credentials for this task); populated list → whitelist of specific integrations by ID. Modeled as an object array rather than a bare string array so multi-instance support (instance_name, scope, etc.) can be added later without a wire break.
-        :param Any message: The message content. This is the first event in the conversation and must be a user message, so its discriminator field must be set to "type": "user_message".
+        :param pulumi.Input[Sequence[pulumi.Input['CLIIntegrationRefArgs']]] cli_integrations: Optional filter for CLI integrations to enable for this task. Semantics: omitted/null → enable all CLI integrations connected for the org; empty list → explicit opt-out (no CLI integrations for this task); populated list → whitelist by (catalogId, name) of the configured instances to enable. Entries with missing or unknown catalogId, missing name, or referencing a (catalogId, name) pair that is not connected for the organization are rejected with a 400 response. catalogId matching is case-insensitive.
+        :param pulumi.Input[Sequence[pulumi.Input['AgentTaskIntegrationRefArgs']]] enabled_integrations: Optional list of integrations to enable for this task. Semantics: omitted/null → inherit all org-enabled integrations; empty list → explicit opt-out (no integration credentials for this task); populated list → whitelist of specific integrations by ID. Modeled as an object array rather than a bare string array so multi-instance support (instance_name, scope, etc.) can be added later without a wire break.
+        :param pulumi.Input['AgentUserEventMessageArgs'] message: The message content. This is the first event in the conversation and must be a user message, so its discriminator field must be set to "type": "user_message".
         :param pulumi.Input[_builtins.str] permission_mode: Controls the permission scope for the task. When omitted, defaults to 'default' (the agent uses the creating user's full permissions).
         :param pulumi.Input[_builtins.bool] plan_mode: Whether to enable plan mode for this task.
         :param pulumi.Input[_builtins.str] role: Optional RBAC role the task assumes, identified by role id. When set, the task operates with that role's permissions in place of the creating user's own assignments. You may only assume a role that is assigned to you, directly or through a team; a role you do not hold is rejected with a 403. Omitted/null means no assumed role: the task uses the creating user's full permissions. Orthogonal to permissionMode, which controls the read-only behavior posture independently.
@@ -93,38 +96,38 @@ class TaskArgs:
 
     @_builtins.property
     @pulumi.getter(name="cliIntegrations")
-    def cli_integrations(self) -> pulumi.Input[Optional[Sequence[Any]]]:
+    def cli_integrations(self) -> pulumi.Input[Optional[Sequence[pulumi.Input['CLIIntegrationRefArgs']]]]:
         """
         Optional filter for CLI integrations to enable for this task. Semantics: omitted/null → enable all CLI integrations connected for the org; empty list → explicit opt-out (no CLI integrations for this task); populated list → whitelist by (catalogId, name) of the configured instances to enable. Entries with missing or unknown catalogId, missing name, or referencing a (catalogId, name) pair that is not connected for the organization are rejected with a 400 response. catalogId matching is case-insensitive.
         """
         return pulumi.get(self, "cli_integrations")
 
     @cli_integrations.setter
-    def cli_integrations(self, value: pulumi.Input[Optional[Sequence[Any]]]):
+    def cli_integrations(self, value: pulumi.Input[Optional[Sequence[pulumi.Input['CLIIntegrationRefArgs']]]]):
         pulumi.set(self, "cli_integrations", value)
 
     @_builtins.property
     @pulumi.getter(name="enabledIntegrations")
-    def enabled_integrations(self) -> pulumi.Input[Optional[Sequence[Any]]]:
+    def enabled_integrations(self) -> pulumi.Input[Optional[Sequence[pulumi.Input['AgentTaskIntegrationRefArgs']]]]:
         """
         Optional list of integrations to enable for this task. Semantics: omitted/null → inherit all org-enabled integrations; empty list → explicit opt-out (no integration credentials for this task); populated list → whitelist of specific integrations by ID. Modeled as an object array rather than a bare string array so multi-instance support (instance_name, scope, etc.) can be added later without a wire break.
         """
         return pulumi.get(self, "enabled_integrations")
 
     @enabled_integrations.setter
-    def enabled_integrations(self, value: pulumi.Input[Optional[Sequence[Any]]]):
+    def enabled_integrations(self, value: pulumi.Input[Optional[Sequence[pulumi.Input['AgentTaskIntegrationRefArgs']]]]):
         pulumi.set(self, "enabled_integrations", value)
 
     @_builtins.property
     @pulumi.getter
-    def message(self) -> Optional[Any]:
+    def message(self) -> pulumi.Input[Optional['AgentUserEventMessageArgs']]:
         """
         The message content. This is the first event in the conversation and must be a user message, so its discriminator field must be set to "type": "user_message".
         """
         return pulumi.get(self, "message")
 
     @message.setter
-    def message(self, value: Optional[Any]):
+    def message(self, value: pulumi.Input[Optional['AgentUserEventMessageArgs']]):
         pulumi.set(self, "message", value)
 
     @_builtins.property
@@ -207,9 +210,9 @@ class Task(pulumi.CustomResource):
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
                  approval_mode: pulumi.Input[Optional[_builtins.str]] = None,
-                 cli_integrations: pulumi.Input[Optional[Sequence[Any]]] = None,
-                 enabled_integrations: pulumi.Input[Optional[Sequence[Any]]] = None,
-                 message: Optional[Any] = None,
+                 cli_integrations: pulumi.Input[Optional[Sequence[pulumi.Input[Union['CLIIntegrationRefArgs', 'CLIIntegrationRefArgsDict']]]]] = None,
+                 enabled_integrations: pulumi.Input[Optional[Sequence[pulumi.Input[Union['AgentTaskIntegrationRefArgs', 'AgentTaskIntegrationRefArgsDict']]]]] = None,
+                 message: pulumi.Input[Optional[Union['AgentUserEventMessageArgs', 'AgentUserEventMessageArgsDict']]] = None,
                  org_name: pulumi.Input[Optional[_builtins.str]] = None,
                  permission_mode: pulumi.Input[Optional[_builtins.str]] = None,
                  plan_mode: pulumi.Input[Optional[_builtins.bool]] = None,
@@ -224,9 +227,9 @@ class Task(pulumi.CustomResource):
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] approval_mode: Optional approval mode override for this task. If omitted, org default is used.
-        :param pulumi.Input[Sequence[Any]] cli_integrations: Optional filter for CLI integrations to enable for this task. Semantics: omitted/null → enable all CLI integrations connected for the org; empty list → explicit opt-out (no CLI integrations for this task); populated list → whitelist by (catalogId, name) of the configured instances to enable. Entries with missing or unknown catalogId, missing name, or referencing a (catalogId, name) pair that is not connected for the organization are rejected with a 400 response. catalogId matching is case-insensitive.
-        :param pulumi.Input[Sequence[Any]] enabled_integrations: Optional list of integrations to enable for this task. Semantics: omitted/null → inherit all org-enabled integrations; empty list → explicit opt-out (no integration credentials for this task); populated list → whitelist of specific integrations by ID. Modeled as an object array rather than a bare string array so multi-instance support (instance_name, scope, etc.) can be added later without a wire break.
-        :param Any message: The message content. This is the first event in the conversation and must be a user message, so its discriminator field must be set to "type": "user_message".
+        :param pulumi.Input[Sequence[pulumi.Input[Union['CLIIntegrationRefArgs', 'CLIIntegrationRefArgsDict']]]] cli_integrations: Optional filter for CLI integrations to enable for this task. Semantics: omitted/null → enable all CLI integrations connected for the org; empty list → explicit opt-out (no CLI integrations for this task); populated list → whitelist by (catalogId, name) of the configured instances to enable. Entries with missing or unknown catalogId, missing name, or referencing a (catalogId, name) pair that is not connected for the organization are rejected with a 400 response. catalogId matching is case-insensitive.
+        :param pulumi.Input[Sequence[pulumi.Input[Union['AgentTaskIntegrationRefArgs', 'AgentTaskIntegrationRefArgsDict']]]] enabled_integrations: Optional list of integrations to enable for this task. Semantics: omitted/null → inherit all org-enabled integrations; empty list → explicit opt-out (no integration credentials for this task); populated list → whitelist of specific integrations by ID. Modeled as an object array rather than a bare string array so multi-instance support (instance_name, scope, etc.) can be added later without a wire break.
+        :param pulumi.Input[Union['AgentUserEventMessageArgs', 'AgentUserEventMessageArgsDict']] message: The message content. This is the first event in the conversation and must be a user message, so its discriminator field must be set to "type": "user_message".
         :param pulumi.Input[_builtins.str] org_name: The organization name
         :param pulumi.Input[_builtins.str] permission_mode: Controls the permission scope for the task. When omitted, defaults to 'default' (the agent uses the creating user's full permissions).
         :param pulumi.Input[_builtins.bool] plan_mode: Whether to enable plan mode for this task.
@@ -260,9 +263,9 @@ class Task(pulumi.CustomResource):
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
                  approval_mode: pulumi.Input[Optional[_builtins.str]] = None,
-                 cli_integrations: pulumi.Input[Optional[Sequence[Any]]] = None,
-                 enabled_integrations: pulumi.Input[Optional[Sequence[Any]]] = None,
-                 message: Optional[Any] = None,
+                 cli_integrations: pulumi.Input[Optional[Sequence[pulumi.Input[Union['CLIIntegrationRefArgs', 'CLIIntegrationRefArgsDict']]]]] = None,
+                 enabled_integrations: pulumi.Input[Optional[Sequence[pulumi.Input[Union['AgentTaskIntegrationRefArgs', 'AgentTaskIntegrationRefArgsDict']]]]] = None,
+                 message: pulumi.Input[Optional[Union['AgentUserEventMessageArgs', 'AgentUserEventMessageArgsDict']]] = None,
                  org_name: pulumi.Input[Optional[_builtins.str]] = None,
                  permission_mode: pulumi.Input[Optional[_builtins.str]] = None,
                  plan_mode: pulumi.Input[Optional[_builtins.bool]] = None,
@@ -406,7 +409,7 @@ class Task(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter(name="createdBy")
-    def created_by(self) -> pulumi.Output[Any]:
+    def created_by(self) -> pulumi.Output['_api.outputs.UserInfo']:
         """
         Information about the user who created this task.
         """
@@ -417,6 +420,8 @@ class Task(pulumi.CustomResource):
     def entities(self) -> pulumi.Output[Sequence[Any]]:
         """
         Pulumi entities (stacks, projects, etc.) that provide context for the agent.
+
+        Valid `type` values: policy_issue, pull_request, repository, stack.
         """
         return pulumi.get(self, "entities")
 

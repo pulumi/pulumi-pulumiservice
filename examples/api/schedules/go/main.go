@@ -40,10 +40,10 @@ func main() {
 			OrgName:     pulumi.String(organizationName),
 			ProjectName: pulumi.String(projectName),
 			StackName:   pulumi.String(stackName),
-			SourceContext: pulumi.Map{
-				"git": pulumi.Map{
-					"repoUrl": pulumi.String("https://github.com/example/example.git"),
-					"branch":  pulumi.String("refs/heads/main"),
+			SourceContext: &deployments.SourceContextRequestArgs{
+				Git: &deployments.SourceContextGitRequestArgs{
+					RepoUrl: pulumi.String("https://github.com/example/example.git"),
+					Branch:  pulumi.String("refs/heads/main"),
 				},
 			},
 		}, pulumi.DependsOn([]pulumi.Resource{parentStack}))
@@ -56,8 +56,8 @@ func main() {
 			ProjectName:  pulumi.String(projectName),
 			StackName:    pulumi.String(stackName),
 			ScheduleCron: pulumi.String(scheduleCron),
-			Request: pulumi.Map{
-				"operation": pulumi.String("update"),
+			Request: &deployments.CreateDeploymentRequestArgs{
+				Operation: pulumi.String("update"),
 			},
 		}, pulumi.DependsOn([]pulumi.Resource{parentSettings}))
 		if err != nil {

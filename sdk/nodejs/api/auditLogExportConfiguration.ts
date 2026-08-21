@@ -2,6 +2,9 @@
 // *** Do not edit by hand unless you're certain you know what you are doing! ***
 
 import * as pulumi from "@pulumi/pulumi";
+import * as inputs from "../types/input";
+import * as outputs from "../types/output";
+import * as enums from "../types/enums";
 import * as utilities from "../utilities";
 
 /**
@@ -41,11 +44,11 @@ export class AuditLogExportConfiguration extends pulumi.CustomResource {
     /**
      * The result of the last audit log export attempt.
      */
-    declare public /*out*/ readonly lastResult: pulumi.Output<any>;
+    declare public /*out*/ readonly lastResult: pulumi.Output<outputs.api.AuditLogExportResult>;
     /**
      * The S3 configuration for exporting audit logs.
      */
-    declare public /*out*/ readonly s3Config: pulumi.Output<any>;
+    declare public /*out*/ readonly s3Config: pulumi.Output<outputs.api.AuditLogsExportS3Config>;
 
     /**
      * Create a AuditLogExportConfiguration resource with the given unique name, arguments, and options.
@@ -94,7 +97,7 @@ export interface AuditLogExportConfigurationArgs {
     /**
      * The new S3 configuration for audit log export.
      */
-    newS3Configuration: any;
+    newS3Configuration: pulumi.Input<inputs.api.AuditLogsExportS3ConfigArgs>;
     /**
      * The organization name
      */

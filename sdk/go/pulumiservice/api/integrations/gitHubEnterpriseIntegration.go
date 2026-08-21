@@ -35,7 +35,7 @@ type GitHubEnterpriseIntegration struct {
 	// Whether PR comments are disabled for this installation.
 	DisablePRComments pulumi.BoolOutput `pulumi:"disablePRComments"`
 	// URL to configure repository access for this GitHub App installation.
-	GhUrls pulumi.AnyOutput `pulumi:"ghUrls"`
+	GhUrls GitHubAppURLsPtrOutput `pulumi:"ghUrls"`
 	// Whether the installation has the 'contents' permission.
 	HasContentsPermission pulumi.BoolOutput `pulumi:"hasContentsPermission"`
 	// Whether the installation has the 'members' permission (only relevant for organization accounts).
@@ -49,7 +49,7 @@ type GitHubEnterpriseIntegration struct {
 	// Whether this is a self-hosted GitHub Enterprise installation.
 	IsSelfHosted pulumi.BoolOutput `pulumi:"isSelfHosted"`
 	// Neo GitHub App permission requirements for this installation.
-	NeoGitHubAppPermissionRequirements pulumi.ArrayOutput `pulumi:"neoGitHubAppPermissionRequirements"`
+	NeoGitHubAppPermissionRequirements GitHubAppPermissionRequirementArrayOutput `pulumi:"neoGitHubAppPermissionRequirements"`
 }
 
 // NewGitHubEnterpriseIntegration registers a new resource with the given unique name, arguments, and options.
@@ -269,8 +269,8 @@ func (o GitHubEnterpriseIntegrationOutput) DisablePRComments() pulumi.BoolOutput
 }
 
 // URL to configure repository access for this GitHub App installation.
-func (o GitHubEnterpriseIntegrationOutput) GhUrls() pulumi.AnyOutput {
-	return o.ApplyT(func(v *GitHubEnterpriseIntegration) pulumi.AnyOutput { return v.GhUrls }).(pulumi.AnyOutput)
+func (o GitHubEnterpriseIntegrationOutput) GhUrls() GitHubAppURLsPtrOutput {
+	return o.ApplyT(func(v *GitHubEnterpriseIntegration) GitHubAppURLsPtrOutput { return v.GhUrls }).(GitHubAppURLsPtrOutput)
 }
 
 // Whether the installation has the 'contents' permission.
@@ -304,8 +304,10 @@ func (o GitHubEnterpriseIntegrationOutput) IsSelfHosted() pulumi.BoolOutput {
 }
 
 // Neo GitHub App permission requirements for this installation.
-func (o GitHubEnterpriseIntegrationOutput) NeoGitHubAppPermissionRequirements() pulumi.ArrayOutput {
-	return o.ApplyT(func(v *GitHubEnterpriseIntegration) pulumi.ArrayOutput { return v.NeoGitHubAppPermissionRequirements }).(pulumi.ArrayOutput)
+func (o GitHubEnterpriseIntegrationOutput) NeoGitHubAppPermissionRequirements() GitHubAppPermissionRequirementArrayOutput {
+	return o.ApplyT(func(v *GitHubEnterpriseIntegration) GitHubAppPermissionRequirementArrayOutput {
+		return v.NeoGitHubAppPermissionRequirements
+	}).(GitHubAppPermissionRequirementArrayOutput)
 }
 
 type GitHubEnterpriseIntegrationArrayOutput struct{ *pulumi.OutputState }

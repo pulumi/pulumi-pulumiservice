@@ -28,13 +28,13 @@ namespace Pulumi.PulumiService.Api.Services
         /// The list of service items
         /// </summary>
         [Output("items")]
-        public Output<ImmutableArray<object>> Items { get; private set; } = null!;
+        public Output<ImmutableArray<Outputs.ServiceItem>> Items { get; private set; } = null!;
 
         /// <summary>
         /// The service details
         /// </summary>
         [Output("service")]
-        public Output<object> Service { get; private set; } = null!;
+        public Output<Outputs.ServiceProperties> Service { get; private set; } = null!;
 
 
         /// <summary>

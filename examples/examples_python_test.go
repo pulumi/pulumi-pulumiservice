@@ -97,10 +97,11 @@ func TestPythonRbacExample(t *testing.T) {
 			}
 		},
 		// Re-apply the same program to pin the descriptor round-trip:
-		// helper output (`__type` at every level) → API → role record
-		// → Read response → state → next preview must converge to no
-		// changes. Any drift in the descriptor pass-through would
-		// surface here as a `~` on `permissions` instead.
+		// helper output (`type__` at every level) → provider rename →
+		// API → role record → Read response → rename back → state →
+		// next preview must converge to no changes. Any asymmetry
+		// between the two rename directions surfaces here as a `~` on
+		// `permissions` instead.
 		EditDirs: []integration.EditDir{
 			{
 				Dir:             rbacDir,

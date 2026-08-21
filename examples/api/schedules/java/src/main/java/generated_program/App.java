@@ -7,10 +7,12 @@ import com.pulumi.pulumiservice.api_deployments.Settings;
 import com.pulumi.pulumiservice.api_deployments.SettingsArgs;
 import com.pulumi.pulumiservice.api_deployments.ScheduledDeployment;
 import com.pulumi.pulumiservice.api_deployments.ScheduledDeploymentArgs;
+import com.pulumi.pulumiservice.api_deployments.inputs.CreateDeploymentRequestArgs;
+import com.pulumi.pulumiservice.api_deployments.inputs.SourceContextGitRequestArgs;
+import com.pulumi.pulumiservice.api_deployments.inputs.SourceContextRequestArgs;
 import com.pulumi.resources.CustomResourceOptions;
 
 import java.util.List;
-import java.util.Map;
 
 public class App {
     public static void main(String[] args) {
@@ -33,9 +35,12 @@ public class App {
                     .orgName(organizationName)
                     .projectName(projectName)
                     .stackName(stackName)
-                    .sourceContext(Map.of("git", Map.of(
-                        "repoUrl", "https://github.com/example/example.git",
-                        "branch", "refs/heads/main")))
+                    .sourceContext(SourceContextRequestArgs.builder()
+                        .git(SourceContextGitRequestArgs.builder()
+                            .repoUrl("https://github.com/example/example.git")
+                            .branch("refs/heads/main")
+                            .build())
+                        .build())
                     .build(),
                 CustomResourceOptions.builder().dependsOn(List.of(parentStack)).build());
 
@@ -45,7 +50,9 @@ public class App {
                     .projectName(projectName)
                     .stackName(stackName)
                     .scheduleCron(scheduleCron)
-                    .request(Map.of("operation", "update"))
+                    .request(CreateDeploymentRequestArgs.builder()
+                        .operation("update")
+                        .build())
                     .build(),
                 CustomResourceOptions.builder().dependsOn(List.of(parentSettings)).build());
 

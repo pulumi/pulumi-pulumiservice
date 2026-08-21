@@ -35,6 +35,8 @@ namespace Pulumi.PulumiService.Api
 
         /// <summary>
         /// The detailed permission descriptor tree.
+        /// 
+        /// Valid `type__` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
         /// </summary>
         [Output("details")]
         public Output<object?> Details { get; private set; } = null!;
@@ -146,9 +148,11 @@ namespace Pulumi.PulumiService.Api
 
         /// <summary>
         /// The detailed permission descriptor tree.
+        /// 
+        /// Valid `type__` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
         /// </summary>
         [Input("details")]
-        public Input<object>? Details { get; set; }
+        public object? Details { get; set; }
 
         /// <summary>
         /// The name of the permission descriptor.

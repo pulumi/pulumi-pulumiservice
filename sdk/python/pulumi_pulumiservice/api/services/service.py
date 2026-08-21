@@ -13,6 +13,8 @@ if sys.version_info >= (3, 11):
 else:
     from typing_extensions import NotRequired, TypedDict, TypeAlias
 from ... import _utilities
+from . import outputs
+from ._inputs import *
 
 __all__ = ['ServiceArgs', 'Service']
 
@@ -25,7 +27,7 @@ class ServiceArgs:
                  org_name: pulumi.Input[_builtins.str],
                  owner_name: pulumi.Input[_builtins.str],
                  owner_type: pulumi.Input[_builtins.str],
-                 properties: pulumi.Input[Sequence[Any]]):
+                 properties: pulumi.Input[Sequence[pulumi.Input['ServicePropertyArgs']]]):
         """
         The set of arguments for constructing a Service resource.
 
@@ -35,7 +37,7 @@ class ServiceArgs:
         :param pulumi.Input[_builtins.str] org_name: The organization name
         :param pulumi.Input[_builtins.str] owner_name: the service owner name
         :param pulumi.Input[_builtins.str] owner_type: the service owner type
-        :param pulumi.Input[Sequence[Any]] properties: an optional list of properties to set on the service
+        :param pulumi.Input[Sequence[pulumi.Input['ServicePropertyArgs']]] properties: an optional list of properties to set on the service
         """
         pulumi.set(__self__, "description", description)
         pulumi.set(__self__, "items", items)
@@ -119,14 +121,14 @@ class ServiceArgs:
 
     @_builtins.property
     @pulumi.getter
-    def properties(self) -> pulumi.Input[Sequence[Any]]:
+    def properties(self) -> pulumi.Input[Sequence[pulumi.Input['ServicePropertyArgs']]]:
         """
         an optional list of properties to set on the service
         """
         return pulumi.get(self, "properties")
 
     @properties.setter
-    def properties(self, value: pulumi.Input[Sequence[Any]]):
+    def properties(self, value: pulumi.Input[Sequence[pulumi.Input['ServicePropertyArgs']]]):
         pulumi.set(self, "properties", value)
 
 
@@ -142,7 +144,7 @@ class Service(pulumi.CustomResource):
                  org_name: pulumi.Input[Optional[_builtins.str]] = None,
                  owner_name: pulumi.Input[Optional[_builtins.str]] = None,
                  owner_type: pulumi.Input[Optional[_builtins.str]] = None,
-                 properties: pulumi.Input[Optional[Sequence[Any]]] = None,
+                 properties: pulumi.Input[Optional[Sequence[pulumi.Input[Union['ServicePropertyArgs', 'ServicePropertyArgsDict']]]]] = None,
                  __props__=None):
         """
         Creates a new service account in an organization. Service accounts provide programmatic, non-human identities for accessing Pulumi Cloud resources. They are scoped to an organization and can hold access tokens, belong to teams, and have stack permissions. The service name must be unique within the organization.
@@ -155,7 +157,7 @@ class Service(pulumi.CustomResource):
         :param pulumi.Input[_builtins.str] org_name: The organization name
         :param pulumi.Input[_builtins.str] owner_name: the service owner name
         :param pulumi.Input[_builtins.str] owner_type: the service owner type
-        :param pulumi.Input[Sequence[Any]] properties: an optional list of properties to set on the service
+        :param pulumi.Input[Sequence[pulumi.Input[Union['ServicePropertyArgs', 'ServicePropertyArgsDict']]]] properties: an optional list of properties to set on the service
         """
         ...
     @overload
@@ -187,7 +189,7 @@ class Service(pulumi.CustomResource):
                  org_name: pulumi.Input[Optional[_builtins.str]] = None,
                  owner_name: pulumi.Input[Optional[_builtins.str]] = None,
                  owner_type: pulumi.Input[Optional[_builtins.str]] = None,
-                 properties: pulumi.Input[Optional[Sequence[Any]]] = None,
+                 properties: pulumi.Input[Optional[Sequence[pulumi.Input[Union['ServicePropertyArgs', 'ServicePropertyArgsDict']]]]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
         if not isinstance(opts, pulumi.ResourceOptions):
@@ -256,7 +258,7 @@ class Service(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter
-    def items(self) -> pulumi.Output[Sequence[Any]]:
+    def items(self) -> pulumi.Output[Sequence['outputs.ServiceItem']]:
         """
         The list of service items
         """

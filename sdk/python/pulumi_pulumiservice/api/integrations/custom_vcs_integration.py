@@ -13,6 +13,7 @@ if sys.version_info >= (3, 11):
 else:
     from typing_extensions import NotRequired, TypedDict, TypeAlias
 from ... import _utilities
+from . import outputs
 
 __all__ = ['CustomVCSIntegrationArgs', 'CustomVCSIntegration']
 
@@ -286,7 +287,7 @@ class CustomVCSIntegration(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter
-    def repositories(self) -> pulumi.Output[Optional[Sequence[Any]]]:
+    def repositories(self) -> pulumi.Output[Optional[Sequence['outputs.CustomVCSRepositoryProperties']]]:
         """
         List of repositories configured on this integration
         """

@@ -17,11 +17,12 @@ package rest
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
 
 	p "github.com/pulumi/pulumi-go-provider"
 	"github.com/pulumi/pulumi/sdk/v3/go/property"
+
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 )
 
 // Attachment resources model one membership edge of a parent resource whose
@@ -147,9 +148,9 @@ func (r *Resource) execAttachment(
 		return nil, property.Map{}, err
 	}
 	body := map[string]any{field: r.attachmentEdge(urlSrc)}
-	bodyJSON, err := json.Marshal(body)
+	bodyJSON, err := marshalWireBody(op, body)
 	if err != nil {
-		return nil, property.Map{}, fmt.Errorf("rest: marshal attachment body for %s: %w", op.ID, err)
+		return nil, property.Map{}, err
 	}
 	return r.roundTrip(ctx, op, url, bytes.NewReader(bodyJSON), contentJSON)
 }
@@ -238,7 +239,9 @@ func (r *Resource) attachmentElementMatches(elem, source property.Map) bool {
 		if !ok {
 			return false
 		}
-		got, ok := elem.GetOk(wireKey)
+		// Declared renames apply only to the top level of a response, so a
+		// membership element is keyed by its schema-side wire name.
+		got, ok := elem.GetOk(util.ToSchemaName(wireKey))
 		if !ok || !edgeValuesEqual(got, want) {
 			return false
 		}
@@ -260,7 +263,7 @@ func (r *Resource) attachmentState(source, elem property.Map) property.Map {
 		}
 	}
 	for _, k := range r.meta.Attachment.MatchKey {
-		if v, ok := elem.GetOk(k); ok {
+		if v, ok := elem.GetOk(util.ToSchemaName(k)); ok {
 			out[pulumiName(k, r.meta.Renames)] = v
 		}
 	}

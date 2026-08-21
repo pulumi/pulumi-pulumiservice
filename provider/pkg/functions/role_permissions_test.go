@@ -29,13 +29,16 @@ const (
 	permEnvironmentRead     = "environment:read"
 	permInsightsAccountRead = "insights_account:read"
 	permStackRead           = "stack:read"
+
+	// Helpers return the SDK-boundary spelling; `__type` never leaves the
+	// provider.
+	schemaType = "type__"
 )
 
 // assertScopedConditionShape verifies a helper's output is the
 // `PermissionDescriptorCondition(Equal(Expression<E>, Literal<E>(id)),
-// Allow(perms))` shape. The wire format and SDK boundary share the
-// `__type` discriminator at every level (Pulumi's Python SDK preserves
-// `__`-prefixed keys as of pulumi/pulumi#22834).
+// Allow(perms))` shape, carrying the schema-side `type__` discriminator at
+// every level.
 func assertScopedConditionShape(
 	t *testing.T,
 	got map[string]interface{},
@@ -46,25 +49,25 @@ func assertScopedConditionShape(
 ) {
 	t.Helper()
 
-	assert.Equal(t, "PermissionDescriptorCondition", got["__type"],
-		"top-level __type must be PermissionDescriptorCondition")
+	assert.Equal(t, "PermissionDescriptorCondition", got[schemaType],
+		"top-level type__ must be PermissionDescriptorCondition")
 
 	cond, ok := got["condition"].(map[string]interface{})
 	require.True(t, ok, "condition must be a map; got %T", got["condition"])
-	assert.Equal(t, "PermissionExpressionEqual", cond["__type"])
+	assert.Equal(t, "PermissionExpressionEqual", cond[schemaType])
 
 	left, ok := cond["left"].(map[string]interface{})
 	require.True(t, ok, "condition.left must be a map; got %T", cond["left"])
-	assert.Equal(t, expectedExpressionType, left["__type"])
+	assert.Equal(t, expectedExpressionType, left[schemaType])
 
 	right, ok := cond["right"].(map[string]interface{})
 	require.True(t, ok, "condition.right must be a map; got %T", cond["right"])
-	assert.Equal(t, expectedLiteralType, right["__type"])
+	assert.Equal(t, expectedLiteralType, right[schemaType])
 	assert.Equal(t, expectedIdentity, right["identity"])
 
 	sub, ok := got["subNode"].(map[string]interface{})
 	require.True(t, ok, "subNode must be a map; got %T", got["subNode"])
-	assert.Equal(t, "PermissionDescriptorAllow", sub["__type"])
+	assert.Equal(t, "PermissionDescriptorAllow", sub[schemaType])
 
 	rawPerms, ok := sub["permissions"].([]interface{})
 	require.True(t, ok, "subNode.permissions must be a list; got %T", sub["permissions"])
@@ -90,7 +93,7 @@ func TestBuildAllowPermissions(t *testing.T) {
 		)
 		require.NoError(t, err)
 		got := resp.Output.Permissions
-		assert.Equal(t, "PermissionDescriptorAllow", got["__type"])
+		assert.Equal(t, "PermissionDescriptorAllow", got[schemaType])
 		// Permissions list passes through verbatim.
 		perms, ok := got["permissions"].([]interface{})
 		require.True(t, ok)

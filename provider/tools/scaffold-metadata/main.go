@@ -160,6 +160,9 @@ type metadataDoc struct {
 	Note      string                     `json:"_note,omitempty"`
 	Excluded  []string                   `json:"_excluded,omitempty"`
 	Resources map[string]json.RawMessage `json:"resources"`
+	// Types carries hand-written per-schema overrides; the scaffolder
+	// round-trips it untouched.
+	Types json.RawMessage `json:"types,omitempty"`
 }
 
 // unmappedFieldSet holds update-body wire fields no input can populate,
@@ -185,7 +188,10 @@ func main() {
 		fail("read spec: %v", err)
 	}
 	var rawSpec struct {
-		Paths map[string]map[string]any `json:"paths"`
+		Paths      map[string]map[string]any `json:"paths"`
+		Components struct {
+			Schemas map[string]map[string]any `json:"schemas"`
+		} `json:"components"`
 	}
 	if err := json.Unmarshal(specBytes, &rawSpec); err != nil {
 		fail("parse spec: %v", err)
@@ -327,6 +333,7 @@ func main() {
 	fmt.Fprintf(os.Stderr, "  skipped (no Create+Read|Delete): %d\n", len(stats.skipped))
 	fmt.Fprintf(os.Stderr, "  attachment resources emitted: %d new, %d updated (add/remove pairs skipped: %d)\n",
 		attachAdded, attachChanged, attachSkipped)
+	printUnionCensus(rawSpec.Components.Schemas)
 	if len(orphans) > 0 {
 		fmt.Fprintf(os.Stderr, "  orphans (in metadata.json, not derived from spec): %d\n", len(orphans))
 		for _, o := range orphans {
@@ -1692,7 +1699,16 @@ func writeMetadata(path string, doc *metadataDoc) error {
 	if len(tokens) > 0 {
 		b.WriteString("\n  ")
 	}
-	b.WriteString("}\n}\n")
+	b.WriteString("}")
+	if len(doc.Types) > 0 {
+		ty, err := indentJSON(doc.Types, "  ")
+		if err != nil {
+			return err
+		}
+		b.WriteString(",\n  \"types\": ")
+		b.Write(ty)
+	}
+	b.WriteString("\n}\n")
 
 	return atomicWriteFile(path, []byte(b.String()), 0o600)
 }
@@ -2059,4 +2075,207 @@ func mapKeys(m map[string]map[string]string) []string {
 	}
 	sort.Strings(out)
 	return out
+}
+
+// printUnionCensus summarizes the discriminated-union surface of the spec so
+// refresh PRs surface union changes: bases with tag and arity, pure marker
+// subtypes with their descendant subsets (the union the generator emits at
+// properties referencing the marker), and warnings for arities that fail
+// BuildSchema (2-member unions until the upstream .NET/Java deserializers are
+// fixed; empty marker subsets).
+const (
+	censusDiscKey  = "discriminator"
+	censusAllOfKey = "allOf"
+	censusRefKey   = "$ref"
+	censusPropsKey = "properties"
+)
+
+func printUnionCensus(schemas map[string]map[string]any) {
+	type base struct {
+		name, tag string
+		arity     int
+	}
+	var bases []base
+	var markers []string
+	for name, node := range schemas {
+		if disc, ok := node[censusDiscKey].(map[string]any); ok {
+			tag, _ := disc["propertyName"].(string)
+			arity := 0
+			if mapping, ok := disc["mapping"].(map[string]any); ok {
+				arity = len(mapping)
+			}
+			bases = append(bases, base{name, tag, arity})
+			continue
+		}
+		if all, ok := node[censusAllOfKey].([]any); ok {
+			hasRef, hasProps := false, false
+			for _, m := range all {
+				mm, ok := m.(map[string]any)
+				if !ok {
+					continue
+				}
+				if _, ok := mm[censusRefKey]; ok {
+					hasRef = true
+				}
+				if props, ok := mm[censusPropsKey].(map[string]any); ok && len(props) > 0 {
+					hasProps = true
+				}
+			}
+			if hasRef && !hasProps {
+				markers = append(markers, name)
+			}
+		}
+	}
+	sort.Slice(bases, func(i, j int) bool { return bases[i].name < bases[j].name })
+	sort.Strings(markers)
+	fmt.Fprintf(os.Stderr, "  discriminated bases: %d (marker subtypes: %d)\n", len(bases), len(markers))
+	for _, b := range bases {
+		warn := ""
+		if b.arity == 2 {
+			warn = "  <-- WARNING: 2-member unions fail BuildSchema on outputs (broken upstream .NET/Java deserialization)"
+		}
+		fmt.Fprintf(os.Stderr, "    %-34s tag=%-16s variants=%d%s\n", b.name, b.tag, b.arity, warn)
+	}
+	for _, m := range markers {
+		base := discriminatedAncestor(schemas, m)
+		if base == "" {
+			fmt.Fprintf(os.Stderr, "    marker %-33s (no discriminated ancestor)\n", m)
+			continue
+		}
+		if tag := mappedTagOf(schemas, base, m); tag != "" {
+			fmt.Fprintf(os.Stderr, "    marker %-33s variant of %s (tag=%s, renders as the definite type)\n", m, base, tag)
+			continue
+		}
+		subset := markerSubsetSize(schemas, m, base)
+		warn := ""
+		switch subset {
+		case 0:
+			warn = "  <-- WARNING: no mapped descendants; a property referencing it fails BuildSchema"
+		case 2:
+			warn = "  <-- WARNING: 2-member subset; a property referencing it fails BuildSchema"
+		}
+		fmt.Fprintf(os.Stderr, "    marker %-33s base=%-24s subset=%d%s\n", m, base, subset, warn)
+	}
+}
+
+func censusRefName(ref string) string {
+	parts := strings.Split(ref, "/")
+	return parts[len(parts)-1]
+}
+
+// discriminatedAncestor walks the first-parent allOf chain to the nearest
+// ancestor carrying a discriminator; empty when the chain reaches none.
+func discriminatedAncestor(schemas map[string]map[string]any, name string) string {
+	seen := map[string]bool{name: true}
+	cur := schemas[name]
+	for cur != nil {
+		all, ok := cur[censusAllOfKey].([]any)
+		if !ok {
+			return ""
+		}
+		parent := ""
+		for _, m := range all {
+			if mm, ok := m.(map[string]any); ok {
+				if ref, ok := mm[censusRefKey].(string); ok {
+					parent = censusRefName(ref)
+					break
+				}
+			}
+		}
+		if parent == "" || seen[parent] {
+			return ""
+		}
+		seen[parent] = true
+		node, ok := schemas[parent]
+		if !ok {
+			return ""
+		}
+		if _, ok := node[censusDiscKey]; ok {
+			return parent
+		}
+		cur = node
+	}
+	return ""
+}
+
+// mappedTagOf returns the tag under which name appears in base's
+// discriminator mapping, or "" when name is not a mapped variant.
+func mappedTagOf(schemas map[string]map[string]any, base, name string) string {
+	disc, ok := schemas[base][censusDiscKey].(map[string]any)
+	if !ok {
+		return ""
+	}
+	mapping, ok := disc["mapping"].(map[string]any)
+	if !ok {
+		return ""
+	}
+	tags := make([]string, 0, len(mapping))
+	for tag := range mapping {
+		tags = append(tags, tag)
+	}
+	sort.Strings(tags)
+	for _, tag := range tags {
+		if s, ok := mapping[tag].(string); ok && censusRefName(s) == name {
+			return tag
+		}
+	}
+	return ""
+}
+
+// markerSubsetSize counts the base's mapped variants whose allOf chain passes
+// through the marker — the arity of the union emitted at properties that
+// reference the marker.
+func markerSubsetSize(schemas map[string]map[string]any, marker, base string) int {
+	disc, ok := schemas[base][censusDiscKey].(map[string]any)
+	if !ok {
+		return 0
+	}
+	mapping, ok := disc["mapping"].(map[string]any)
+	if !ok {
+		return 0
+	}
+	n := 0
+	for _, ref := range mapping {
+		if s, ok := ref.(string); ok && censusHasAncestor(schemas, censusRefName(s), marker) {
+			n++
+		}
+	}
+	return n
+}
+
+// censusHasAncestor reports whether name's allOf chain transitively references
+// ancestor.
+func censusHasAncestor(schemas map[string]map[string]any, name, ancestor string) bool {
+	seen := map[string]bool{}
+	var walk func(n string) bool
+	walk = func(n string) bool {
+		if seen[n] {
+			return false
+		}
+		seen[n] = true
+		node, ok := schemas[n]
+		if !ok {
+			return false
+		}
+		all, ok := node[censusAllOfKey].([]any)
+		if !ok {
+			return false
+		}
+		for _, m := range all {
+			mm, ok := m.(map[string]any)
+			if !ok {
+				continue
+			}
+			ref, ok := mm[censusRefKey].(string)
+			if !ok {
+				continue
+			}
+			parent := censusRefName(ref)
+			if parent == ancestor || walk(parent) {
+				return true
+			}
+		}
+		return false
+	}
+	return walk(name)
 }

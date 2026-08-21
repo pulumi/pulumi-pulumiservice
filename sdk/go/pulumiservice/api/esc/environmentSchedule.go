@@ -19,7 +19,7 @@ type EnvironmentSchedule struct {
 	// The timestamp when this scheduled action was created.
 	Created pulumi.StringOutput `pulumi:"created"`
 	// The action definition, which varies based on the action kind.
-	Definition pulumi.MapOutput `pulumi:"definition"`
+	Definition pulumi.MapMapOutput `pulumi:"definition"`
 	// The kind of action to be executed.
 	Kind pulumi.StringOutput `pulumi:"kind"`
 	// The timestamp of the last execution, if any.
@@ -57,7 +57,7 @@ func NewEnvironmentSchedule(ctx *pulumi.Context,
 		return nil, errors.New("invalid value for required argument 'ProjectName'")
 	}
 	if args.SecretRotationRequest != nil {
-		args.SecretRotationRequest = pulumi.ToSecret(args.SecretRotationRequest).(pulumi.Input)
+		args.SecretRotationRequest = pulumi.ToSecret(args.SecretRotationRequest).(CreateEnvironmentSecretRotationScheduleRequestPtrInput)
 	}
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource EnvironmentSchedule
@@ -105,7 +105,7 @@ type environmentScheduleArgs struct {
 	// The schedule once
 	ScheduleOnce *string `pulumi:"scheduleOnce"`
 	// The secret rotation request
-	SecretRotationRequest interface{} `pulumi:"secretRotationRequest"`
+	SecretRotationRequest *CreateEnvironmentSecretRotationScheduleRequest `pulumi:"secretRotationRequest"`
 }
 
 // The set of arguments for constructing a EnvironmentSchedule resource.
@@ -123,7 +123,7 @@ type EnvironmentScheduleArgs struct {
 	// The schedule once
 	ScheduleOnce pulumi.StringPtrInput
 	// The secret rotation request
-	SecretRotationRequest pulumi.Input
+	SecretRotationRequest CreateEnvironmentSecretRotationScheduleRequestPtrInput
 }
 
 func (EnvironmentScheduleArgs) ElementType() reflect.Type {
@@ -219,8 +219,8 @@ func (o EnvironmentScheduleOutput) Created() pulumi.StringOutput {
 }
 
 // The action definition, which varies based on the action kind.
-func (o EnvironmentScheduleOutput) Definition() pulumi.MapOutput {
-	return o.ApplyT(func(v *EnvironmentSchedule) pulumi.MapOutput { return v.Definition }).(pulumi.MapOutput)
+func (o EnvironmentScheduleOutput) Definition() pulumi.MapMapOutput {
+	return o.ApplyT(func(v *EnvironmentSchedule) pulumi.MapMapOutput { return v.Definition }).(pulumi.MapMapOutput)
 }
 
 // The kind of action to be executed.

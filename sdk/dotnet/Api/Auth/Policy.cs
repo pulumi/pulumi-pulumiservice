@@ -48,7 +48,7 @@ namespace Pulumi.PulumiService.Api.Auth
         /// List of policies
         /// </summary>
         [Output("policies")]
-        public Output<ImmutableArray<object>> Policies { get; private set; } = null!;
+        public Output<ImmutableArray<Outputs.AuthPolicyDefinition>> Policies { get; private set; } = null!;
 
         /// <summary>
         /// The version number
@@ -114,14 +114,14 @@ namespace Pulumi.PulumiService.Api.Auth
         public Input<string> OrgName { get; set; } = null!;
 
         [Input("policies", required: true)]
-        private InputList<object>? _policies;
+        private InputList<Inputs.AuthPolicyDefinitionArgs>? _policies;
 
         /// <summary>
         /// List of policies
         /// </summary>
-        public InputList<object> Policies
+        public InputList<Inputs.AuthPolicyDefinitionArgs> Policies
         {
-            get => _policies ?? (_policies = new InputList<object>());
+            get => _policies ?? (_policies = new InputList<Inputs.AuthPolicyDefinitionArgs>());
             set => _policies = value;
         }
 

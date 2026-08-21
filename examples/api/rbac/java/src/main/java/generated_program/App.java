@@ -3,6 +3,7 @@ package generated_program;
 import com.pulumi.Pulumi;
 import com.pulumi.pulumiservice.api.Role;
 import com.pulumi.pulumiservice.api.RoleArgs;
+import com.pulumi.pulumiservice.api.inputs.PermissionDescriptorAllowArgs;
 import com.pulumi.pulumiservice.api_teams.Team;
 import com.pulumi.pulumiservice.api_teams.TeamArgs;
 
@@ -23,9 +24,10 @@ public class App {
                     .name("api-rbac-read-only-" + nameSuffix)
                     .description(roleDescription)
                     .uxPurpose("role")
-                    .details(Map.of(
-                        "__type", "PermissionDescriptorAllow",
-                        "permissions", List.of("stack:read")))
+                    .details(PermissionDescriptorAllowArgs.builder()
+                        .type__("PermissionDescriptorAllow")
+                        .permissions("stack:read")
+                        .build())
                     .build());
 
             var rbacTeam = new Team("rbacTeam",

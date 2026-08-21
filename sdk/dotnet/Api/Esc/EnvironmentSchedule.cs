@@ -25,7 +25,7 @@ namespace Pulumi.PulumiService.Api.Esc
         /// The action definition, which varies based on the action kind.
         /// </summary>
         [Output("definition")]
-        public Output<ImmutableDictionary<string, object>> Definition { get; private set; } = null!;
+        public Output<ImmutableDictionary<string, ImmutableDictionary<string, object>>> Definition { get; private set; } = null!;
 
         /// <summary>
         /// The kind of action to be executed.
@@ -163,18 +163,18 @@ namespace Pulumi.PulumiService.Api.Esc
         public Input<string>? ScheduleOnce { get; set; }
 
         [Input("secretRotationRequest")]
-        private Input<object>? _secretRotationRequest;
+        private Input<Inputs.CreateEnvironmentSecretRotationScheduleRequestArgs>? _secretRotationRequest;
 
         /// <summary>
         /// The secret rotation request
         /// </summary>
-        public Input<object>? SecretRotationRequest
+        public Input<Inputs.CreateEnvironmentSecretRotationScheduleRequestArgs>? SecretRotationRequest
         {
             get => _secretRotationRequest;
             set
             {
                 var emptySecret = Output.CreateSecret(0);
-                _secretRotationRequest = Output.Tuple<Input<object>?, int>(value, emptySecret).Apply(t => t.Item1);
+                _secretRotationRequest = Output.Tuple<Input<Inputs.CreateEnvironmentSecretRotationScheduleRequestArgs>?, int>(value, emptySecret).Apply(t => t.Item1);
             }
         }
 

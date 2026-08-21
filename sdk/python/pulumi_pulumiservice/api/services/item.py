@@ -13,6 +13,7 @@ if sys.version_info >= (3, 11):
 else:
     from typing_extensions import NotRequired, TypedDict, TypeAlias
 from ... import _utilities
+from . import outputs
 
 __all__ = ['ItemArgs', 'Item']
 
@@ -240,7 +241,7 @@ class Item(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter
-    def items(self) -> pulumi.Output[Sequence[Any]]:
+    def items(self) -> pulumi.Output[Sequence['outputs.ServiceItem']]:
         """
         The list of service items
         """
@@ -248,7 +249,7 @@ class Item(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter
-    def service(self) -> pulumi.Output[Any]:
+    def service(self) -> pulumi.Output['outputs.ServiceProperties']:
         """
         The service details
         """

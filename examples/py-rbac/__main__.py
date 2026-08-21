@@ -63,11 +63,10 @@ team_members = current_user.username.apply(
 )
 
 # 3. Custom org role that grants stack:read. The simplest descriptor: a
-#    flat ``PermissionDescriptorAllow``. The descriptor uses the wire
-#    format's ``__type`` discriminator at every level — Pulumi's Python
-#    SDK preserves ``__``-prefixed keys as of pulumi/pulumi#22834
-#    (3.235.0+), so authoring this map in Python works identically to
-#    the other languages.
+#    flat ``PermissionDescriptorAllow``, keyed by ``type__`` at every
+#    level. Pulumi Cloud spells this ``__type`` on the wire; the suffix
+#    form is what the schema exposes, because Python mangles any
+#    parameter or key written with two leading underscores.
 #
 #    For the common case, prefer the ``build_*_permissions_output``
 #    helpers — see ``scoped_role`` below.
@@ -77,7 +76,7 @@ custom_role = OrganizationRole(
     name=f"py-rbac-read-only-{digits}",
     description="Read-only access to stacks, created by the py-rbac example.",
     permissions={
-        "__type": "PermissionDescriptorAllow",
+        "type__": "PermissionDescriptorAllow",
         "permissions": ["stack:read"],
     },
 )
@@ -134,8 +133,7 @@ scoped_env = Environment(
 #    env created above. Anywhere else in the org the role grants nothing.
 #    The role definition is org-scoped (resourceType defaults to "global");
 #    the helper returns a ``PermissionDescriptorCondition(Equal(...),
-#    Allow)`` tree using the wire format's ``__type`` discriminator at
-#    every level, ready to assign.
+#    Allow)`` tree keyed by ``type__`` at every level, ready to assign.
 scoped_role = OrganizationRole(
     "scopedReadOnlyRole",
     organization_name=organization_name,

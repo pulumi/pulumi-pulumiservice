@@ -32,13 +32,13 @@ namespace Pulumi.PulumiService.Api.Stacks
         /// If set, then the stack's configuration is loaded from the cloud and not a file on disk.
         /// </summary>
         [Output("config")]
-        public Output<object?> Config { get; private set; } = null!;
+        public Output<Outputs.AppStackConfig?> Config { get; private set; } = null!;
 
         /// <summary>
         /// Information about a live operation currently running for the stack, its kind, the author who initiated it, and its start time. Null when no operation is in flight.
         /// </summary>
         [Output("currentOperation")]
-        public Output<object?> CurrentOperation { get; private set; } = null!;
+        public Output<Outputs.AppOperationStatus?> CurrentOperation { get; private set; } = null!;
 
         /// <summary>
         /// The organization name
@@ -62,7 +62,7 @@ namespace Pulumi.PulumiService.Api.Stacks
         /// Map of tags
         /// </summary>
         [Output("tags")]
-        public Output<ImmutableDictionary<string, object>?> Tags { get; private set; } = null!;
+        public Output<ImmutableDictionary<string, string>?> Tags { get; private set; } = null!;
 
         /// <summary>
         /// The version number
@@ -119,7 +119,7 @@ namespace Pulumi.PulumiService.Api.Stacks
         /// The configuration for the new stack.
         /// </summary>
         [Input("config")]
-        public Input<object>? Config { get; set; }
+        public Input<Inputs.AppStackConfigArgs>? Config { get; set; }
 
         /// <summary>
         /// The organization name
@@ -143,17 +143,17 @@ namespace Pulumi.PulumiService.Api.Stacks
         /// An optional state to initialize the stack with.
         /// </summary>
         [Input("state")]
-        public Input<object>? State { get; set; }
+        public Input<Inputs.AppUntypedDeploymentArgs>? State { get; set; }
 
         [Input("tags")]
-        private InputMap<object>? _tags;
+        private InputMap<string>? _tags;
 
         /// <summary>
         /// An optional set of tags to apply to the stack.
         /// </summary>
-        public InputMap<object> Tags
+        public InputMap<string> Tags
         {
-            get => _tags ?? (_tags = new InputMap<object>());
+            get => _tags ?? (_tags = new InputMap<string>());
             set => _tags = value;
         }
 

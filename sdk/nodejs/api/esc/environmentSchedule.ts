@@ -2,6 +2,9 @@
 // *** Do not edit by hand unless you're certain you know what you are doing! ***
 
 import * as pulumi from "@pulumi/pulumi";
+import * as inputs from "../../types/input";
+import * as outputs from "../../types/output";
+import * as enums from "../../types/enums";
 import * as utilities from "../../utilities";
 
 /**
@@ -41,7 +44,7 @@ export class EnvironmentSchedule extends pulumi.CustomResource {
     /**
      * The action definition, which varies based on the action kind.
      */
-    declare public /*out*/ readonly definition: pulumi.Output<{[key: string]: any}>;
+    declare public /*out*/ readonly definition: pulumi.Output<{[key: string]: {[key: string]: any}}>;
     /**
      * The kind of action to be executed.
      */
@@ -163,5 +166,5 @@ export interface EnvironmentScheduleArgs {
     /**
      * The secret rotation request
      */
-    secretRotationRequest?: any | undefined;
+    secretRotationRequest?: pulumi.Input<inputs.api.esc.CreateEnvironmentSecretRotationScheduleRequestArgs | undefined>;
 }

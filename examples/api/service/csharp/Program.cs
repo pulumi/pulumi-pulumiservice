@@ -11,12 +11,16 @@ return await Deployment.RunAsync(() =>
     var stackItem = ImmutableDictionary<string, object>.Empty
         .Add("kind", "stack")
         .Add("ref", "service-provider-test-org/example-app/dev");
-    var tierProp = ImmutableDictionary<string, object>.Empty
-        .Add("key", "tier")
-        .Add("value", "gold");
-    var oncallProp = ImmutableDictionary<string, object>.Empty
-        .Add("key", "oncall")
-        .Add("value", "platform-ops");
+    var tierProp = new Ps.Api.Services.Inputs.ServicePropertyArgs
+    {
+        Key = "tier",
+        Value = "gold",
+    };
+    var oncallProp = new Ps.Api.Services.Inputs.ServicePropertyArgs
+    {
+        Key = "oncall",
+        Value = "platform-ops",
+    };
 
     new Ps.Api.Services.Service("catalogService", new()
     {
@@ -26,6 +30,6 @@ return await Deployment.RunAsync(() =>
         OwnerType = "team",
         OwnerName = "platform",
         Items = new object[] { stackItem },
-        Properties = new object[] { tierProp, oncallProp },
+        Properties = new[] { tierProp, oncallProp },
     });
 });

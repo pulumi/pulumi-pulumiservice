@@ -8,19 +8,25 @@ return await Deployment.RunAsync(() =>
     var organizationName = config.Get("organizationName") ?? "service-provider-test-org";
     var policyId = config.Get("policyId") ?? "org";
 
-    var allowPolicy = ImmutableDictionary<string, object>.Empty
-        .Add("decision", "allow")
-        .Add("permission", "read")
-        .Add("tokenType", "organization");
-    var denyPolicy = ImmutableDictionary<string, object>.Empty
-        .Add("decision", "deny")
-        .Add("permission", "admin")
-        .Add("tokenType", "organization");
+    var allowPolicy = new Ps.Api.Auth.Inputs.AuthPolicyDefinitionArgs
+    {
+        Decision = "allow",
+        TokenType = "organization",
+        AuthorizedPermissions = new[] { "standard" },
+        Rules = ImmutableDictionary<string, ImmutableDictionary<string, object>>.Empty,
+    };
+    var denyPolicy = new Ps.Api.Auth.Inputs.AuthPolicyDefinitionArgs
+    {
+        Decision = "deny",
+        TokenType = "organization",
+        AuthorizedPermissions = new[] { "admin" },
+        Rules = ImmutableDictionary<string, ImmutableDictionary<string, object>>.Empty,
+    };
 
     new Ps.Api.Auth.Policy("policy", new()
     {
         OrgName = organizationName,
         PolicyId = policyId,
-        Policies = new object[] { allowPolicy, denyPolicy },
+        Policies = new[] { allowPolicy, denyPolicy },
     });
 });

@@ -8,8 +8,7 @@ resources:
       orgName: ${organizationName}
       newEnabled: true
       newS3Configuration:
-        bucketName: ${bucketName}
-        region: ${region}
-        roleArn: arn:aws:iam::123456789012:role/PulumiAuditLogExportRole
+        s3BucketName: ${bucketName}
+        iamRoleArn: arn:aws:iam::123456789012:role/PulumiAuditLogExportRole
 outputs:
   exportEnabled: ${exportConfig.enabled}

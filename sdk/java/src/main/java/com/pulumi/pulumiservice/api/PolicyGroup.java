@@ -9,8 +9,9 @@ import com.pulumi.core.annotations.ResourceType;
 import com.pulumi.core.internal.Codegen;
 import com.pulumi.pulumiservice.Utilities;
 import com.pulumi.pulumiservice.api.PolicyGroupArgs;
+import com.pulumi.pulumiservice.api.outputs.AppPolicyPackMetadata;
+import com.pulumi.pulumiservice.api.outputs.AppPulumiStackReference;
 import java.lang.Boolean;
-import java.lang.Object;
 import java.lang.String;
 import java.util.List;
 import java.util.Optional;
@@ -54,14 +55,14 @@ public class PolicyGroup extends com.pulumi.resources.CustomResource {
      * List of policy packs that are applied to this policy group.
      * 
      */
-    @Export(name="appliedPolicyPacks", refs={List.class,Object.class}, tree="[0,1]")
-    private Output<List<Object>> appliedPolicyPacks;
+    @Export(name="appliedPolicyPacks", refs={List.class,AppPolicyPackMetadata.class}, tree="[0,1]")
+    private Output<List<AppPolicyPackMetadata>> appliedPolicyPacks;
 
     /**
      * @return List of policy packs that are applied to this policy group.
      * 
      */
-    public Output<List<Object>> appliedPolicyPacks() {
+    public Output<List<AppPolicyPackMetadata>> appliedPolicyPacks() {
         return this.appliedPolicyPacks;
     }
     /**
@@ -124,14 +125,14 @@ public class PolicyGroup extends com.pulumi.resources.CustomResource {
      * List of stacks that are members of this policy group.
      * 
      */
-    @Export(name="stacks", refs={List.class,Object.class}, tree="[0,1]")
-    private Output<List<Object>> stacks;
+    @Export(name="stacks", refs={List.class,AppPulumiStackReference.class}, tree="[0,1]")
+    private Output<List<AppPulumiStackReference>> stacks;
 
     /**
      * @return List of stacks that are members of this policy group.
      * 
      */
-    public Output<List<Object>> stacks() {
+    public Output<List<AppPulumiStackReference>> stacks() {
         return this.stacks;
     }
 

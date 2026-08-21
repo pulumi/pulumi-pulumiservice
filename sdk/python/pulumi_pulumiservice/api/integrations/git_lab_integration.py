@@ -13,6 +13,7 @@ if sys.version_info >= (3, 11):
 else:
     from typing_extensions import NotRequired, TypedDict, TypeAlias
 from ... import _utilities
+from . import outputs
 
 __all__ = ['GitLabIntegrationArgs', 'GitLabIntegration']
 
@@ -222,7 +223,7 @@ class GitLabIntegration(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter(name="authUser")
-    def auth_user(self) -> pulumi.Output[Optional[Any]]:
+    def auth_user(self) -> pulumi.Output[Optional['outputs.User']]:
         """
         The Pulumi user whose GitLab authentication token is being used, if applicable.
         """
@@ -270,7 +271,7 @@ class GitLabIntegration(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter(name="gitLabOrg")
-    def git_lab_org(self) -> pulumi.Output[Optional[Any]]:
+    def git_lab_org(self) -> pulumi.Output[Optional['outputs.GitLabAppOrganization']]:
         """
         Metadata about the GitLab group linked to this integration.
         """
