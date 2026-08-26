@@ -17,7 +17,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/apiclient"
+	"github.com/pulumi/pulumi-cloud-sdk/go/apiclient"
 )
 
 // ErrorResponse is returned from pulumi service api when there's been an error

@@ -21,11 +21,11 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/pulumi/pulumi-cloud-sdk/go/apitype"
 	p "github.com/pulumi/pulumi-go-provider"
 	"github.com/pulumi/pulumi-go-provider/infer"
 	"github.com/pulumi/pulumi/sdk/v3/go/property"
 
-	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/apitype"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"

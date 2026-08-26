@@ -21,7 +21,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/apiclient"
+	"github.com/pulumi/pulumi-cloud-sdk/go/apiclient"
 )
 
 func TestGetErrorStatusCode(t *testing.T) {

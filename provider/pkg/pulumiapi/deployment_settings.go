@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"path"
 
-	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/apitype"
+	"github.com/pulumi/pulumi-cloud-sdk/go/apitype"
 )
 
 type DeploymentSettingsClient interface {
