@@ -34,7 +34,7 @@ type Policy struct {
 	// The last modification timestamp
 	Modified pulumi.StringPtrOutput `pulumi:"modified"`
 	// List of policies
-	Policies pulumi.ArrayOutput `pulumi:"policies"`
+	Policies AuthPolicyDefinitionArrayOutput `pulumi:"policies"`
 	// The version number
 	Version pulumi.IntOutput `pulumi:"version"`
 }
@@ -93,7 +93,7 @@ type policyArgs struct {
 	// The organization name
 	OrgName string `pulumi:"orgName"`
 	// List of policies
-	Policies []interface{} `pulumi:"policies"`
+	Policies []AuthPolicyDefinition `pulumi:"policies"`
 	// The policy identifier
 	PolicyId string `pulumi:"policyId"`
 }
@@ -105,7 +105,7 @@ type PolicyArgs struct {
 	// The organization name
 	OrgName pulumi.StringInput
 	// List of policies
-	Policies pulumi.ArrayInput
+	Policies AuthPolicyDefinitionArrayInput
 	// The policy identifier
 	PolicyId pulumi.StringInput
 }
@@ -213,8 +213,8 @@ func (o PolicyOutput) Modified() pulumi.StringPtrOutput {
 }
 
 // List of policies
-func (o PolicyOutput) Policies() pulumi.ArrayOutput {
-	return o.ApplyT(func(v *Policy) pulumi.ArrayOutput { return v.Policies }).(pulumi.ArrayOutput)
+func (o PolicyOutput) Policies() AuthPolicyDefinitionArrayOutput {
+	return o.ApplyT(func(v *Policy) AuthPolicyDefinitionArrayOutput { return v.Policies }).(AuthPolicyDefinitionArrayOutput)
 }
 
 // The version number

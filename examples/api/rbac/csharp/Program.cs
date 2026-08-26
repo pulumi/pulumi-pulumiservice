@@ -16,11 +16,11 @@ return await Deployment.RunAsync(() =>
         Name = $"api-rbac-read-only-{nameSuffix}",
         Description = roleDescription,
         UxPurpose = "role",
-        Details = ImmutableDictionary.CreateRange(new[]
+        Details = new Ps.Api.Inputs.PermissionDescriptorAllowArgs
         {
-            new KeyValuePair<string, object>("__type", "PermissionDescriptorAllow"),
-            new KeyValuePair<string, object>("permissions", new[] { "stack:read" }),
-        }),
+            Type__ = "PermissionDescriptorAllow",
+            Permissions = new[] { "stack:read" },
+        },
     });
 
     var rbacTeam = new Ps.Api.Teams.Team("rbacTeam", new()

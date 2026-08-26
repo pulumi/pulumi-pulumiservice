@@ -19,9 +19,9 @@ type AuditLogExportConfiguration struct {
 	// Whether audit log export is currently active. May be paused automatically if the configured destination repeatedly fails to authenticate.
 	Enabled pulumi.BoolOutput `pulumi:"enabled"`
 	// The result of the last audit log export attempt.
-	LastResult pulumi.AnyOutput `pulumi:"lastResult"`
+	LastResult AuditLogExportResultOutput `pulumi:"lastResult"`
 	// The S3 configuration for exporting audit logs.
-	S3Config pulumi.AnyOutput `pulumi:"s3Config"`
+	S3Config AuditLogsExportS3ConfigOutput `pulumi:"s3Config"`
 }
 
 // NewAuditLogExportConfiguration registers a new resource with the given unique name, arguments, and options.
@@ -76,7 +76,7 @@ type auditLogExportConfigurationArgs struct {
 	// Whether the audit log export is enabled.
 	NewEnabled bool `pulumi:"newEnabled"`
 	// The new S3 configuration for audit log export.
-	NewS3Configuration interface{} `pulumi:"newS3Configuration"`
+	NewS3Configuration AuditLogsExportS3Config `pulumi:"newS3Configuration"`
 	// The organization name
 	OrgName string `pulumi:"orgName"`
 }
@@ -86,7 +86,7 @@ type AuditLogExportConfigurationArgs struct {
 	// Whether the audit log export is enabled.
 	NewEnabled pulumi.BoolInput
 	// The new S3 configuration for audit log export.
-	NewS3Configuration pulumi.Input
+	NewS3Configuration AuditLogsExportS3ConfigInput
 	// The organization name
 	OrgName pulumi.StringInput
 }
@@ -184,13 +184,13 @@ func (o AuditLogExportConfigurationOutput) Enabled() pulumi.BoolOutput {
 }
 
 // The result of the last audit log export attempt.
-func (o AuditLogExportConfigurationOutput) LastResult() pulumi.AnyOutput {
-	return o.ApplyT(func(v *AuditLogExportConfiguration) pulumi.AnyOutput { return v.LastResult }).(pulumi.AnyOutput)
+func (o AuditLogExportConfigurationOutput) LastResult() AuditLogExportResultOutput {
+	return o.ApplyT(func(v *AuditLogExportConfiguration) AuditLogExportResultOutput { return v.LastResult }).(AuditLogExportResultOutput)
 }
 
 // The S3 configuration for exporting audit logs.
-func (o AuditLogExportConfigurationOutput) S3Config() pulumi.AnyOutput {
-	return o.ApplyT(func(v *AuditLogExportConfiguration) pulumi.AnyOutput { return v.S3Config }).(pulumi.AnyOutput)
+func (o AuditLogExportConfigurationOutput) S3Config() AuditLogsExportS3ConfigOutput {
+	return o.ApplyT(func(v *AuditLogExportConfiguration) AuditLogsExportS3ConfigOutput { return v.S3Config }).(AuditLogsExportS3ConfigOutput)
 }
 
 type AuditLogExportConfigurationArrayOutput struct{ *pulumi.OutputState }

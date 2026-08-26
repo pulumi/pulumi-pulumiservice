@@ -6,6 +6,12 @@ package com.pulumi.pulumiservice.api;
 import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
 import com.pulumi.exceptions.MissingRequiredPropertyException;
+import com.pulumi.pulumiservice.api.inputs.PermissionDescriptorAllowArgs;
+import com.pulumi.pulumiservice.api.inputs.PermissionDescriptorComposeArgs;
+import com.pulumi.pulumiservice.api.inputs.PermissionDescriptorConditionArgs;
+import com.pulumi.pulumiservice.api.inputs.PermissionDescriptorGroupArgs;
+import com.pulumi.pulumiservice.api.inputs.PermissionDescriptorIfThenElseArgs;
+import com.pulumi.pulumiservice.api.inputs.PermissionDescriptorSelectArgs;
 import java.lang.Boolean;
 import java.lang.Object;
 import java.lang.String;
@@ -51,12 +57,16 @@ public final class RoleArgs extends com.pulumi.resources.ResourceArgs {
     /**
      * The detailed permission descriptor tree.
      * 
+     * Valid `type__` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
+     * 
      */
     @Import(name="details")
     private @Nullable Output<Object> details;
 
     /**
      * @return The detailed permission descriptor tree.
+     * 
+     * Valid `type__` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
      * 
      */
     public Optional<Output<Object>> details() {
@@ -214,6 +224,8 @@ public final class RoleArgs extends com.pulumi.resources.ResourceArgs {
         /**
          * @param details The detailed permission descriptor tree.
          * 
+         * Valid `type__` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
+         * 
          * @return builder
          * 
          */
@@ -224,6 +236,8 @@ public final class RoleArgs extends com.pulumi.resources.ResourceArgs {
 
         /**
          * @param details The detailed permission descriptor tree.
+         * 
+         * Valid `type__` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
          * 
          * @return builder
          * 

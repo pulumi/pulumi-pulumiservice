@@ -31,7 +31,7 @@ namespace Pulumi.PulumiService.Api
         /// List of policy packs that are applied to this policy group.
         /// </summary>
         [Output("appliedPolicyPacks")]
-        public Output<ImmutableArray<object>> AppliedPolicyPacks { get; private set; } = null!;
+        public Output<ImmutableArray<Outputs.AppPolicyPackMetadata>> AppliedPolicyPacks { get; private set; } = null!;
 
         /// <summary>
         /// The type of entities this policy group applies to (stacks or accounts).
@@ -61,7 +61,7 @@ namespace Pulumi.PulumiService.Api
         /// List of stacks that are members of this policy group.
         /// </summary>
         [Output("stacks")]
-        public Output<ImmutableArray<object>> Stacks { get; private set; } = null!;
+        public Output<ImmutableArray<Outputs.AppPulumiStackReference>> Stacks { get; private set; } = null!;
 
 
         /// <summary>

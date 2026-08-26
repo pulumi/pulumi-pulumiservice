@@ -9,6 +9,12 @@ import com.pulumi.core.annotations.ResourceType;
 import com.pulumi.core.internal.Codegen;
 import com.pulumi.pulumiservice.Utilities;
 import com.pulumi.pulumiservice.api.RoleArgs;
+import com.pulumi.pulumiservice.api.outputs.PermissionDescriptorAllow;
+import com.pulumi.pulumiservice.api.outputs.PermissionDescriptorCompose;
+import com.pulumi.pulumiservice.api.outputs.PermissionDescriptorCondition;
+import com.pulumi.pulumiservice.api.outputs.PermissionDescriptorGroup;
+import com.pulumi.pulumiservice.api.outputs.PermissionDescriptorIfThenElse;
+import com.pulumi.pulumiservice.api.outputs.PermissionDescriptorSelect;
 import java.lang.Boolean;
 import java.lang.Integer;
 import java.lang.Object;
@@ -67,12 +73,16 @@ public class Role extends com.pulumi.resources.CustomResource {
     /**
      * The detailed permission descriptor tree.
      * 
+     * Valid `type__` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
+     * 
      */
     @Export(name="details", refs={Object.class}, tree="[0]")
     private Output</* @Nullable */ Object> details;
 
     /**
      * @return The detailed permission descriptor tree.
+     * 
+     * Valid `type__` values: PermissionDescriptorAllow, PermissionDescriptorCompose, PermissionDescriptorCondition, PermissionDescriptorGroup, PermissionDescriptorIfThenElse, PermissionDescriptorSelect.
      * 
      */
     public Output<Optional<Object>> details() {

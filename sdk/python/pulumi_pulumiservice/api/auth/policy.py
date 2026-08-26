@@ -13,6 +13,8 @@ if sys.version_info >= (3, 11):
 else:
     from typing_extensions import NotRequired, TypedDict, TypeAlias
 from ... import _utilities
+from . import outputs
+from ._inputs import *
 
 __all__ = ['PolicyArgs', 'Policy']
 
@@ -20,14 +22,14 @@ __all__ = ['PolicyArgs', 'Policy']
 class PolicyArgs:
     def __init__(__self__, *,
                  org_name: pulumi.Input[_builtins.str],
-                 policies: pulumi.Input[Sequence[Any]],
+                 policies: pulumi.Input[Sequence[pulumi.Input['AuthPolicyDefinitionArgs']]],
                  policy_id: pulumi.Input[_builtins.str],
                  issuer_id: pulumi.Input[Optional[_builtins.str]] = None):
         """
         The set of arguments for constructing a Policy resource.
 
         :param pulumi.Input[_builtins.str] org_name: The organization name
-        :param pulumi.Input[Sequence[Any]] policies: List of policies
+        :param pulumi.Input[Sequence[pulumi.Input['AuthPolicyDefinitionArgs']]] policies: List of policies
         :param pulumi.Input[_builtins.str] policy_id: The policy identifier
         :param pulumi.Input[_builtins.str] issuer_id: The OIDC issuer identifier
         """
@@ -51,14 +53,14 @@ class PolicyArgs:
 
     @_builtins.property
     @pulumi.getter
-    def policies(self) -> pulumi.Input[Sequence[Any]]:
+    def policies(self) -> pulumi.Input[Sequence[pulumi.Input['AuthPolicyDefinitionArgs']]]:
         """
         List of policies
         """
         return pulumi.get(self, "policies")
 
     @policies.setter
-    def policies(self, value: pulumi.Input[Sequence[Any]]):
+    def policies(self, value: pulumi.Input[Sequence[pulumi.Input['AuthPolicyDefinitionArgs']]]):
         pulumi.set(self, "policies", value)
 
     @_builtins.property
@@ -94,7 +96,7 @@ class Policy(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None,
                  issuer_id: pulumi.Input[Optional[_builtins.str]] = None,
                  org_name: pulumi.Input[Optional[_builtins.str]] = None,
-                 policies: pulumi.Input[Optional[Sequence[Any]]] = None,
+                 policies: pulumi.Input[Optional[Sequence[pulumi.Input[Union['AuthPolicyDefinitionArgs', 'AuthPolicyDefinitionArgsDict']]]]] = None,
                  policy_id: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         """
@@ -115,7 +117,7 @@ class Policy(pulumi.CustomResource):
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] issuer_id: The OIDC issuer identifier
         :param pulumi.Input[_builtins.str] org_name: The organization name
-        :param pulumi.Input[Sequence[Any]] policies: List of policies
+        :param pulumi.Input[Sequence[pulumi.Input[Union['AuthPolicyDefinitionArgs', 'AuthPolicyDefinitionArgsDict']]]] policies: List of policies
         :param pulumi.Input[_builtins.str] policy_id: The policy identifier
         """
         ...
@@ -155,7 +157,7 @@ class Policy(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None,
                  issuer_id: pulumi.Input[Optional[_builtins.str]] = None,
                  org_name: pulumi.Input[Optional[_builtins.str]] = None,
-                 policies: pulumi.Input[Optional[Sequence[Any]]] = None,
+                 policies: pulumi.Input[Optional[Sequence[pulumi.Input[Union['AuthPolicyDefinitionArgs', 'AuthPolicyDefinitionArgsDict']]]]] = None,
                  policy_id: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
@@ -234,7 +236,7 @@ class Policy(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter
-    def policies(self) -> pulumi.Output[Sequence[Any]]:
+    def policies(self) -> pulumi.Output[Sequence['outputs.AuthPolicyDefinition']]:
         """
         List of policies
         """

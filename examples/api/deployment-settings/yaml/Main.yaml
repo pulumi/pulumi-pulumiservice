@@ -22,9 +22,16 @@ resources:
           TEST_VAR: foo
         options:
           skipInstallDependencies: true
+      # With a `vcs` block the repository comes from `vcs`; repoUrl is rejected
+      # in that combination. Pulumi Cloud validates that the named integration
+      # is installed for the repository — for every provider, not just github —
+      # so this example is preview-only. See PreviewOnlyAll in
+      # examples_api_test.go.
+      vcs:
+        provider: github
+        repository: example/example
       sourceContext:
         git:
-          repoUrl: https://github.com/example/example.git
           branch: refs/heads/main
     options:
       dependsOn:

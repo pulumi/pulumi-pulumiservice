@@ -39,7 +39,7 @@ const stackReadonlyRole = new ps.api.Role("stackReadonlyRole", {
     description: "Read-only access to stacks, scoped via the platform team.",
     uxPurpose: "role",
     details: {
-        __type: "PermissionDescriptorAllow",
+        type__: "PermissionDescriptorAllow",
         permissions: ["stack:read"],
     },
 });

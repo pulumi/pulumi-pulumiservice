@@ -1,0 +1,3 @@
+name: pulumicloud-api-rbac-scoped
+runtime: nodejs
+description: Environment-scoped RBAC role via typed discriminated unions.

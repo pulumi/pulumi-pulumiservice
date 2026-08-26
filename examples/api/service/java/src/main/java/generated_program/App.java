@@ -3,6 +3,7 @@ package generated_program;
 import com.pulumi.Pulumi;
 import com.pulumi.pulumiservice.api_services.Service;
 import com.pulumi.pulumiservice.api_services.ServiceArgs;
+import com.pulumi.pulumiservice.api_services.inputs.ServicePropertyArgs;
 
 import java.util.List;
 import java.util.Map;
@@ -24,8 +25,8 @@ public class App {
                     .items(List.of(
                         Map.of("kind", "stack", "ref", "service-provider-test-org/example-app/dev")))
                     .properties(List.of(
-                        Map.of("key", "tier", "value", "gold"),
-                        Map.of("key", "oncall", "value", "platform-ops")))
+                        ServicePropertyArgs.builder().key("tier").value("gold").build(),
+                        ServicePropertyArgs.builder().key("oncall").value("platform-ops").build()))
                     .build());
         });
     }

@@ -13,6 +13,7 @@ if sys.version_info >= (3, 11):
 else:
     from typing_extensions import NotRequired, TypedDict, TypeAlias
 from ... import _utilities
+from . import outputs
 
 __all__ = ['SAMLArgs', 'SAML']
 
@@ -177,7 +178,7 @@ class SAML(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter
-    def organization(self) -> pulumi.Output[Any]:
+    def organization(self) -> pulumi.Output['outputs.Organization']:
         """
         The Pulumi organization.
         """

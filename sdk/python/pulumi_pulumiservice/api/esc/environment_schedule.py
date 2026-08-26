@@ -13,6 +13,7 @@ if sys.version_info >= (3, 11):
 else:
     from typing_extensions import NotRequired, TypedDict, TypeAlias
 from ... import _utilities
+from ._inputs import *
 
 __all__ = ['EnvironmentScheduleArgs', 'EnvironmentSchedule']
 
@@ -25,7 +26,7 @@ class EnvironmentScheduleArgs:
                  schedule_cron: pulumi.Input[Optional[_builtins.str]] = None,
                  schedule_id: pulumi.Input[Optional[_builtins.str]] = None,
                  schedule_once: pulumi.Input[Optional[_builtins.str]] = None,
-                 secret_rotation_request: Optional[Any] = None):
+                 secret_rotation_request: pulumi.Input[Optional['CreateEnvironmentSecretRotationScheduleRequestArgs']] = None):
         """
         The set of arguments for constructing a EnvironmentSchedule resource.
 
@@ -35,7 +36,7 @@ class EnvironmentScheduleArgs:
         :param pulumi.Input[_builtins.str] schedule_cron: The schedule cron
         :param pulumi.Input[_builtins.str] schedule_id: The schedule ID
         :param pulumi.Input[_builtins.str] schedule_once: The schedule once
-        :param Any secret_rotation_request: The secret rotation request
+        :param pulumi.Input['CreateEnvironmentSecretRotationScheduleRequestArgs'] secret_rotation_request: The secret rotation request
         """
         pulumi.set(__self__, "env_name", env_name)
         pulumi.set(__self__, "org_name", org_name)
@@ -123,14 +124,14 @@ class EnvironmentScheduleArgs:
 
     @_builtins.property
     @pulumi.getter(name="secretRotationRequest")
-    def secret_rotation_request(self) -> Optional[Any]:
+    def secret_rotation_request(self) -> pulumi.Input[Optional['CreateEnvironmentSecretRotationScheduleRequestArgs']]:
         """
         The secret rotation request
         """
         return pulumi.get(self, "secret_rotation_request")
 
     @secret_rotation_request.setter
-    def secret_rotation_request(self, value: Optional[Any]):
+    def secret_rotation_request(self, value: pulumi.Input[Optional['CreateEnvironmentSecretRotationScheduleRequestArgs']]):
         pulumi.set(self, "secret_rotation_request", value)
 
 
@@ -146,7 +147,7 @@ class EnvironmentSchedule(pulumi.CustomResource):
                  schedule_cron: pulumi.Input[Optional[_builtins.str]] = None,
                  schedule_id: pulumi.Input[Optional[_builtins.str]] = None,
                  schedule_once: pulumi.Input[Optional[_builtins.str]] = None,
-                 secret_rotation_request: Optional[Any] = None,
+                 secret_rotation_request: pulumi.Input[Optional[Union['CreateEnvironmentSecretRotationScheduleRequestArgs', 'CreateEnvironmentSecretRotationScheduleRequestArgsDict']]] = None,
                  __props__=None):
         """
         Creates a new scheduled action for a Pulumi ESC environment. Schedules can be used to automate recurring operations on environments, such as secret rotation. The request body specifies the schedule timing and the action to perform. Returns the created ScheduledAction on success. Requires the secret rotation feature to be enabled for the organization.
@@ -159,7 +160,7 @@ class EnvironmentSchedule(pulumi.CustomResource):
         :param pulumi.Input[_builtins.str] schedule_cron: The schedule cron
         :param pulumi.Input[_builtins.str] schedule_id: The schedule ID
         :param pulumi.Input[_builtins.str] schedule_once: The schedule once
-        :param Any secret_rotation_request: The secret rotation request
+        :param pulumi.Input[Union['CreateEnvironmentSecretRotationScheduleRequestArgs', 'CreateEnvironmentSecretRotationScheduleRequestArgsDict']] secret_rotation_request: The secret rotation request
         """
         ...
     @overload
@@ -191,7 +192,7 @@ class EnvironmentSchedule(pulumi.CustomResource):
                  schedule_cron: pulumi.Input[Optional[_builtins.str]] = None,
                  schedule_id: pulumi.Input[Optional[_builtins.str]] = None,
                  schedule_once: pulumi.Input[Optional[_builtins.str]] = None,
-                 secret_rotation_request: Optional[Any] = None,
+                 secret_rotation_request: pulumi.Input[Optional[Union['CreateEnvironmentSecretRotationScheduleRequestArgs', 'CreateEnvironmentSecretRotationScheduleRequestArgsDict']]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
         if not isinstance(opts, pulumi.ResourceOptions):
@@ -267,7 +268,7 @@ class EnvironmentSchedule(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter
-    def definition(self) -> pulumi.Output[Mapping[str, Any]]:
+    def definition(self) -> pulumi.Output[Mapping[str, Mapping[str, Any]]]:
         """
         The action definition, which varies based on the action kind.
         """

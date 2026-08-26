@@ -9,8 +9,10 @@ import com.pulumi.core.annotations.ResourceType;
 import com.pulumi.core.internal.Codegen;
 import com.pulumi.pulumiservice.Utilities;
 import com.pulumi.pulumiservice.api.OrganizationMemberArgs;
+import com.pulumi.pulumiservice.api.outputs.FGARole;
+import com.pulumi.pulumiservice.api.outputs.MemberLinks;
+import com.pulumi.pulumiservice.api.outputs.UserInfo;
 import java.lang.Boolean;
-import java.lang.Object;
 import java.lang.String;
 import java.util.List;
 import java.util.Optional;
@@ -44,14 +46,14 @@ public class OrganizationMember extends com.pulumi.resources.CustomResource {
      * The role currently assigned to this member — either a built-in role (member, admin, billingManager) or a custom role. Falls back to the organization&#39;s default role if no role is assigned directly.
      * 
      */
-    @Export(name="fgaRole", refs={Object.class}, tree="[0]")
-    private Output<Object> fgaRole;
+    @Export(name="fgaRole", refs={FGARole.class}, tree="[0]")
+    private Output<FGARole> fgaRole;
 
     /**
      * @return The role currently assigned to this member — either a built-in role (member, admin, billingManager) or a custom role. Falls back to the organization&#39;s default role if no role is assigned directly.
      * 
      */
-    public Output<Object> fgaRole() {
+    public Output<FGARole> fgaRole() {
         return this.fgaRole;
     }
     /**
@@ -72,14 +74,14 @@ public class OrganizationMember extends com.pulumi.resources.CustomResource {
      * Links to the member in the Pulumi Console
      * 
      */
-    @Export(name="links", refs={Object.class}, tree="[0]")
-    private Output</* @Nullable */ Object> links;
+    @Export(name="links", refs={MemberLinks.class}, tree="[0]")
+    private Output</* @Nullable */ MemberLinks> links;
 
     /**
      * @return Links to the member in the Pulumi Console
      * 
      */
-    public Output<Optional<Object>> links() {
+    public Output<Optional<MemberLinks>> links() {
         return Codegen.optional(this.links);
     }
     /**
@@ -114,14 +116,14 @@ public class OrganizationMember extends com.pulumi.resources.CustomResource {
      * The user information for this organization member.
      * 
      */
-    @Export(name="user", refs={Object.class}, tree="[0]")
-    private Output<Object> user;
+    @Export(name="user", refs={UserInfo.class}, tree="[0]")
+    private Output<UserInfo> user;
 
     /**
      * @return The user information for this organization member.
      * 
      */
-    public Output<Object> user() {
+    public Output<UserInfo> user() {
         return this.user;
     }
     /**

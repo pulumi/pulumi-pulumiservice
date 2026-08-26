@@ -25,6 +25,11 @@ import com.pulumi.pulumiservice.api_deployments.Settings;
 import com.pulumi.pulumiservice.api_deployments.SettingsArgs;
 import com.pulumi.pulumiservice.api_deployments.ScheduledDeployment;
 import com.pulumi.pulumiservice.api_deployments.ScheduledDeploymentArgs;
+import com.pulumi.pulumiservice.api.inputs.ChangeGateApprovalRuleInputArgs;
+import com.pulumi.pulumiservice.api.inputs.ChangeGateTargetInputArgs;
+import com.pulumi.pulumiservice.api_deployments.inputs.CreateDeploymentRequestArgs;
+import com.pulumi.pulumiservice.api_deployments.inputs.DockerImageRequestArgs;
+import com.pulumi.pulumiservice.api_deployments.inputs.ExecutorSettingsRequestArgs;
 
 import java.util.List;
 import java.util.Map;
@@ -73,7 +78,7 @@ public class App {
                     .description("Read-only access to stacks, scoped via the platform team.")
                     .uxPurpose("role")
                     .details(Map.of(
-                        "__type", "PermissionDescriptorAllow",
+                        "type__", "PermissionDescriptorAllow",
                         "permissions", List.of("stack:read")))
                     .build());
 
@@ -185,14 +190,22 @@ public class App {
                     .orgName(organizationName)
                     .projectName(stagingStack.projectName())
                     .stackName(stagingStack.stackName())
-                    .executorContext(Map.of("executorImage", Map.of("reference", "pulumi/pulumi:latest")))
+                    .executorContext(ExecutorSettingsRequestArgs.builder()
+                        .executorImage(DockerImageRequestArgs.builder()
+                            .reference("pulumi/pulumi:latest")
+                            .build())
+                        .build())
                     .build());
             var prodDeploySettings = new Settings("prodDeploySettings",
                 SettingsArgs.builder()
                     .orgName(organizationName)
                     .projectName(prodStack.projectName())
                     .stackName(prodStack.stackName())
-                    .executorContext(Map.of("executorImage", Map.of("reference", "pulumi/pulumi:3-nonroot")))
+                    .executorContext(ExecutorSettingsRequestArgs.builder()
+                        .executorImage(DockerImageRequestArgs.builder()
+                            .reference("pulumi/pulumi:3-nonroot")
+                            .build())
+                        .build())
                     .build());
 
             new Gate("credsApprovalGate",
@@ -200,17 +213,19 @@ public class App {
                     .orgName(organizationName)
                     .name("creds-approval-" + suffix)
                     .enabled(prodApprovalEnabled)
-                    .rule(Map.of(
-                        "ruleType", "approval_required",
-                        "numApprovalsRequired", 1,
-                        "allowSelfApproval", false,
-                        "requireReapprovalOnChange", true,
-                        "eligibleApprovers", List.of(
-                            Map.of("eligibilityType", "team_member", "teamName", platformTeam.name()))))
-                    .target(Map.of(
-                        "entityType", "environment",
-                        "actionTypes", List.of("update"),
-                        "qualifiedName", sharedEnvRef))
+                    .rule(ChangeGateApprovalRuleInputArgs.builder()
+                        .ruleType("approval_required")
+                        .numApprovalsRequired(1)
+                        .allowSelfApproval(false)
+                        .requireReapprovalOnChange(true)
+                        .eligibleApprovers(List.of(
+                            Map.of("eligibilityType", "team_member", "teamName", platformTeam.name())))
+                        .build())
+                    .target(ChangeGateTargetInputArgs.builder()
+                        .entityType("environment")
+                        .actionTypes(List.of("update"))
+                        .qualifiedName(sharedEnvRef)
+                        .build())
                     .build(),
                 CustomResourceOptions.builder().dependsOn(sharedCredentials).build());
 
@@ -220,7 +235,10 @@ public class App {
                     .projectName(prodStack.projectName())
                     .stackName(prodStack.stackName())
                     .scheduleCron("0 7 * * *")
-                    .request(Map.of("operation", "update", "inheritSettings", true))
+                    .request(CreateDeploymentRequestArgs.builder()
+                        .operation("update")
+                        .inheritSettings(true)
+                        .build())
                     .build(),
                 CustomResourceOptions.builder().dependsOn(prodDeploySettings).build());
 

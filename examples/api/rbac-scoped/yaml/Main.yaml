@@ -1,0 +1,42 @@
+# Exercises the deep RBAC union hierarchy: a permission descriptor Group
+# holding a Condition whose boolean expression scopes an Allow to one
+# environment and explicitly not another. This is the production shape for
+# environment-scoped roles (see buildEnvironmentScopedPermissions for the
+# helper that generates the same tree).
+resources:
+  scopedRole:
+    type: pulumiservice:api:Role
+    properties:
+      orgName: ${organizationName}
+      name: api-rbac-scoped-${nameSuffix}
+      description: ${roleDescription}
+      uxPurpose: role
+      details:
+        type__: PermissionDescriptorGroup
+        entries:
+          - type__: PermissionDescriptorCondition
+            condition:
+              type__: PermissionExpressionAnd
+              left:
+                type__: PermissionExpressionEqual
+                left:
+                  type__: PermissionExpressionEnvironment
+                right:
+                  type__: PermissionLiteralExpressionEnvironment
+                  identity: ${allowedEnvironmentId}
+              right:
+                type__: PermissionExpressionNot
+                node:
+                  type__: PermissionExpressionEqual
+                  left:
+                    type__: PermissionExpressionEnvironment
+                  right:
+                    type__: PermissionLiteralExpressionEnvironment
+                    identity: ${deniedEnvironmentId}
+            subNode:
+              type__: PermissionDescriptorAllow
+              permissions:
+                - environment:read
+                - environment:open
+outputs:
+  roleName: ${scopedRole.name}

@@ -43,7 +43,7 @@ ps_api.Role(
     description="Read-only access to stacks, scoped via the platform team.",
     ux_purpose="role",
     details={
-        "__type": "PermissionDescriptorAllow",
+        "type__": "PermissionDescriptorAllow",
         "permissions": ["stack:read"],
     },
 )

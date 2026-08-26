@@ -616,7 +616,7 @@ func TestRefreshChainSurfacesRoleDetailsDrift(t *testing.T) {
 		"uxPurpose":    "set",
 		"resourceType": "global",
 		detailsKey: map[string]any{
-			"__type":      "PermissionDescriptorAllow",
+			schemaType:    "PermissionDescriptorAllow",
 			"permissions": []any{"organization:read_usage"},
 		},
 	})
@@ -626,7 +626,7 @@ func TestRefreshChainSurfacesRoleDetailsDrift(t *testing.T) {
 		"uxPurpose":    "set",
 		"resourceType": "global",
 		detailsKey: map[string]any{
-			"__type":      "PermissionDescriptorAllow",
+			schemaType:    "PermissionDescriptorAllow",
 			"permissions": []any{"organization:read_usage"},
 		},
 	})
@@ -647,6 +647,16 @@ func TestRefreshChainSurfacesRoleDetailsDrift(t *testing.T) {
 			name:      "unchanged server state stays quiet",
 			details:   `{"__type":"PermissionDescriptorAllow","permissions":["organization:read_usage"]}`,
 			wantDrift: false,
+		},
+		// The discriminator is the field this resource's union hangs off, so
+		// a console edit that swaps the variant and nothing else must still
+		// register. The response carries the wire name; drift is only visible
+		// if roundTrip's rename lands it on the same key the inputs use.
+		{
+			name:       "variant swap alone drifts details",
+			details:    `{"__type":"PermissionDescriptorGroup","permissions":["organization:read_usage"]}`,
+			wantDrift:  true,
+			driftedKey: detailsKey,
 		},
 	}
 	for _, tc := range cases {
@@ -2177,5 +2187,106 @@ func TestReadKeepsResponseOnlyItemFieldsOutOfInputs(t *testing.T) {
 		if _, ok := item.AsMap().GetOk(k); ok {
 			t.Errorf("response-only key %q leaked into inputs: %v", k, item)
 		}
+	}
+}
+
+// roleDetailsSchemaJSON and roleDetailsWireJSON are the same permission
+// descriptor tree in the two naming conventions: what a user writes in their
+// program, and what Pulumi Cloud accepts. They are spelled out rather than
+// derived from each other so the round-trip test proves the translation
+// instead of restating it.
+const roleDetailsSchemaJSON = `{
+  "type__": "PermissionDescriptorGroup",
+  "entries": [
+    {
+      "type__": "PermissionDescriptorCondition",
+      "condition": {
+        "type__": "PermissionExpressionEqual",
+        "left": {"type__": "PermissionExpressionEnvironment"},
+        "right": {"type__": "PermissionLiteralExpressionEnvironment", "identity": "acme/dev"}
+      },
+      "subNode": {"type__": "PermissionDescriptorAllow", "permissions": ["environment:read"]}
+    }
+  ]
+}`
+
+const roleDetailsWireJSON = `{
+  "__type": "PermissionDescriptorGroup",
+  "entries": [
+    {
+      "__type": "PermissionDescriptorCondition",
+      "condition": {
+        "__type": "PermissionExpressionEqual",
+        "left": {"__type": "PermissionExpressionEnvironment"},
+        "right": {"__type": "PermissionLiteralExpressionEnvironment", "identity": "acme/dev"}
+      },
+      "subNode": {"__type": "PermissionDescriptorAllow", "permissions": ["environment:read"]}
+    }
+  ]
+}`
+
+func mustUnmarshalMap(t *testing.T, s string) map[string]any {
+	t.Helper()
+	var out map[string]any
+	if err := json.Unmarshal([]byte(s), &out); err != nil {
+		t.Fatalf("unmarshal %q: %v", s, err)
+	}
+	return out
+}
+
+// TestDiscriminatorRoundTripsThroughWireNames drives a real resource whose
+// input is a deeply nested discriminated tree and pins both boundary
+// crossings: the request body must carry the wire's `__type` at every level
+// (objects and array elements alike), and the state decoded from the response
+// must come back in the schema's `type__` form, byte-identical to what the
+// user wrote.
+func TestDiscriminatorRoundTripsThroughWireNames(t *testing.T) {
+	spec, meta := loadFixtures(t)
+	r, ok := Resources(spec, meta)["pulumiservice:api:Role"]
+	if !ok {
+		t.Fatal("pulumiservice:api:Role not in metadata")
+	}
+
+	schemaTree := mustUnmarshalMap(t, roleDetailsSchemaJSON)
+	wireTree := mustUnmarshalMap(t, roleDetailsWireJSON)
+
+	var postBody []byte
+	mock := &mockTransport{responseFn: func(req *http.Request) mockResponse {
+		if req.Method == http.MethodPost {
+			postBody, _ = io.ReadAll(req.Body)
+		}
+		// Pulumi Cloud echoes the descriptor back in the wire convention on
+		// both the create response and the read-after-create.
+		return mockResponse{
+			status: 200,
+			body:   `{"id":"role-1","name":"env-reader","details":` + roleDetailsWireJSON + `}`,
+		}
+	}}
+	ctx := WithTransport(t.Context(), mock)
+
+	inputs := propMap(map[string]any{
+		orgNameKey: testOrgName,
+		nameKey:    "env-reader",
+		"details":  schemaTree,
+	})
+	resp, err := r.Create(ctx, p.CreateRequest{Properties: inputs})
+	if err != nil {
+		t.Fatalf("Create: %v\n  calls: %v", err, mock.calls)
+	}
+
+	sent := mustUnmarshalMap(t, string(postBody))
+	if got := sent["details"]; !reflect.DeepEqual(got, wireTree) {
+		t.Errorf("request body details:\n got %#v\nwant %#v", got, wireTree)
+	}
+	if strings.Contains(string(postBody), schemaType) {
+		t.Errorf("request body leaked the schema-side name %q: %s", schemaType, postBody)
+	}
+
+	details, ok := resp.Properties.GetOk("details")
+	if !ok {
+		t.Fatalf("state has no details; have %v", resp.Properties)
+	}
+	if got := propertyValueToAny(details); !reflect.DeepEqual(got, schemaTree) {
+		t.Errorf("state details:\n got %#v\nwant %#v", got, schemaTree)
 	}
 }

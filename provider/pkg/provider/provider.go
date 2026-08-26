@@ -231,11 +231,11 @@ func MakeProvider(host *provider.HostClient, name, version string) (pulumirpc.Re
 			"python": map[string]any{
 				"packageName": "pulumi_pulumiservice",
 				"requires": map[string]any{
-					// 3.235.0 is the first runtime that preserves
-					// `__`-prefixed input keys (pulumi/pulumi#22834),
-					// which OrganizationRole.permissions relies on for
-					// the `__type` discriminator at every level of the
-					// descriptor tree.
+					// This floor was added for `__`-prefixed input keys
+					// (pulumi/pulumi#22834). The schema no longer emits
+					// any, so it is no longer load-bearing; it stays here
+					// rather than being relaxed as a side effect of the
+					// `type__` rename.
 					"pulumi": ">=3.235.0,<4.0.0",
 				},
 				"pyproject": map[string]any{

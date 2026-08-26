@@ -13,7 +13,7 @@ read_only_role = ps_api.Role(
     description=role_description,
     ux_purpose="role",
     details={
-        "__type": "PermissionDescriptorAllow",
+        "type__": "PermissionDescriptorAllow",
         "permissions": ["stack:read"],
     },
 )

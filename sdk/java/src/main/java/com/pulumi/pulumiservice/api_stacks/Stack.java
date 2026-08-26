@@ -9,8 +9,9 @@ import com.pulumi.core.annotations.ResourceType;
 import com.pulumi.core.internal.Codegen;
 import com.pulumi.pulumiservice.Utilities;
 import com.pulumi.pulumiservice.api_stacks.StackArgs;
+import com.pulumi.pulumiservice.api_stacks.outputs.AppOperationStatus;
+import com.pulumi.pulumiservice.api_stacks.outputs.AppStackConfig;
 import java.lang.Integer;
-import java.lang.Object;
 import java.lang.String;
 import java.util.Map;
 import java.util.Optional;
@@ -47,29 +48,29 @@ public class Stack extends com.pulumi.resources.CustomResource {
      * If set, then the stack&#39;s configuration is loaded from the cloud and not a file on disk.
      * 
      */
-    @Export(name="config", refs={Object.class}, tree="[0]")
-    private Output</* @Nullable */ Object> config;
+    @Export(name="config", refs={AppStackConfig.class}, tree="[0]")
+    private Output</* @Nullable */ AppStackConfig> config;
 
     /**
      * @return Optional cloud-persisted stack configuration.
      * If set, then the stack&#39;s configuration is loaded from the cloud and not a file on disk.
      * 
      */
-    public Output<Optional<Object>> config() {
+    public Output<Optional<AppStackConfig>> config() {
         return Codegen.optional(this.config);
     }
     /**
      * Information about a live operation currently running for the stack, its kind, the author who initiated it, and its start time. Null when no operation is in flight.
      * 
      */
-    @Export(name="currentOperation", refs={Object.class}, tree="[0]")
-    private Output</* @Nullable */ Object> currentOperation;
+    @Export(name="currentOperation", refs={AppOperationStatus.class}, tree="[0]")
+    private Output</* @Nullable */ AppOperationStatus> currentOperation;
 
     /**
      * @return Information about a live operation currently running for the stack, its kind, the author who initiated it, and its start time. Null when no operation is in flight.
      * 
      */
-    public Output<Optional<Object>> currentOperation() {
+    public Output<Optional<AppOperationStatus>> currentOperation() {
         return Codegen.optional(this.currentOperation);
     }
     /**
@@ -118,14 +119,14 @@ public class Stack extends com.pulumi.resources.CustomResource {
      * Map of tags
      * 
      */
-    @Export(name="tags", refs={Map.class,String.class,Object.class}, tree="[0,1,2]")
-    private Output</* @Nullable */ Map<String,Object>> tags;
+    @Export(name="tags", refs={Map.class,String.class}, tree="[0,1,1]")
+    private Output</* @Nullable */ Map<String,String>> tags;
 
     /**
      * @return Map of tags
      * 
      */
-    public Output<Optional<Map<String,Object>>> tags() {
+    public Output<Optional<Map<String,String>>> tags() {
         return Codegen.optional(this.tags);
     }
     /**

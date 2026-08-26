@@ -19,7 +19,7 @@ namespace Pulumi.PulumiService.Api
         /// Deprecated - use destinationURL instead.
         /// </summary>
         [Output("destination")]
-        public Output<object?> Destination { get; private set; } = null!;
+        public Output<Outputs.TemplateDestination?> Destination { get; private set; } = null!;
 
         /// <summary>
         /// The destination URL for the template source.
@@ -106,7 +106,7 @@ namespace Pulumi.PulumiService.Api
         /// deprecated - use DestinationURL instead
         /// </summary>
         [Input("destination")]
-        public Input<object>? Destination { get; set; }
+        public Input<Inputs.TemplateDestinationArgs>? Destination { get; set; }
 
         /// <summary>
         /// The destination URL for the template source.

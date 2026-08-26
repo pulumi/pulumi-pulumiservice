@@ -35,6 +35,8 @@ import (
 
 	p "github.com/pulumi/pulumi-go-provider"
 	"github.com/pulumi/pulumi/sdk/v3/go/property"
+
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 )
 
 // pathParamRE matches OpenAPI {param} placeholders in path strings.
@@ -87,7 +89,7 @@ func Resources(spec *Spec, metadata *Metadata) map[string]*Resource {
 				"rest: %s has create==update operationId %q but requireImport is unset; re-run scaffold-metadata\n",
 				token, rm.Operations.Create)
 		}
-		out[token] = &Resource{meta: rm, spec: spec}
+		out[token] = &Resource{meta: rm, spec: spec, typeMeta: metadata.Types}
 	}
 	return out
 }
@@ -95,8 +97,9 @@ func Resources(spec *Spec, metadata *Metadata) map[string]*Resource {
 // Resource is a metadata-driven CRUD handler. Operation IDs resolve at
 // call time, not at construction.
 type Resource struct {
-	meta ResourceMeta
-	spec *Spec
+	meta     ResourceMeta
+	spec     *Spec
+	typeMeta map[string]TypeMeta
 }
 
 // resolveOp looks up an operation ID. Returns (nil, nil) when id is empty.
@@ -112,7 +115,8 @@ func (r *Resource) resolveOp(verb, id string) (*Operation, error) {
 }
 
 // Check normalizes user inputs to suppress spurious diffs: enum case-folding,
-// set-like array sorting (Unordered), and autoName generation.
+// set-like array sorting (Unordered), and autoName generation. It also runs
+// ValidateInputs, so Check can reject a program outright, not just reshape it.
 func (r *Resource) Check(_ context.Context, req p.CheckRequest) (p.CheckResponse, error) {
 	if r.meta.Attachment != nil {
 		// Attachments have no create op to normalize against; their edge inputs
@@ -138,7 +142,11 @@ func (r *Resource) Check(_ context.Context, req p.CheckRequest) (p.CheckResponse
 		}
 		out[name] = property.New(generateAutoName(string(req.Urn), req.RandomSeed, fm.AutoName))
 	}
-	return p.CheckResponse{Inputs: property.NewMap(out)}, nil
+	checked := property.NewMap(out)
+	return p.CheckResponse{
+		Inputs:   checked,
+		Failures: ValidateInputs(r.spec, r.typeMeta, op, r.meta, checked),
+	}, nil
 }
 
 // normalizeValue canonicalizes one input: enum case-fold for strings,
@@ -229,12 +237,13 @@ func generateAutoName(urn string, seed []byte, maxLen int) string {
 	return candidate
 }
 
-// wireSideName inverts the renames map: Pulumi-side → wire-side.
+// wireSideName inverts the renames map: Pulumi-side → wire-side. An explicit
+// rename wins; otherwise the structural `__` rule applies (see util/wirename.go).
 func wireSideName(pulumiName string, renames map[string]string) string {
 	if wire, ok := renames[pulumiName]; ok {
 		return wire
 	}
-	return pulumiName
+	return util.ToWireName(pulumiName)
 }
 
 // flattenedRequestProperties returns the op's request body properties,
@@ -848,9 +857,9 @@ func (r *Resource) execAndDecodeSplit(
 				contentType = contentYAML
 			}
 		default:
-			bodyJSON, err := json.Marshal(r.buildRequestBody(op, bodySrc))
+			bodyJSON, err := marshalWireBody(op, r.buildRequestBody(op, bodySrc))
 			if err != nil {
-				return nil, property.Map{}, fmt.Errorf("rest: marshal request body for %s: %w", op.ID, err)
+				return nil, property.Map{}, err
 			}
 			body = bytes.NewReader(bodyJSON)
 			contentType = contentJSON
@@ -924,15 +933,16 @@ func (r *Resource) roundTrip(
 	if err := json.Unmarshal(respBody, &raw); err != nil {
 		return respBody, property.Map{}, fmt.Errorf("rest: decode response for %s: %w", op.ID, err)
 	}
-	// Translate top-level response keys wire-side → Pulumi-side.
+	// Translate top-level response keys wire-side → Pulumi-side, then rewrite
+	// `__`-prefixed wire names to their schema form at every depth.
 	if len(r.meta.Renames) > 0 {
 		raw = renameMapKeys(raw, r.meta.Renames)
 	}
-	return respBody, anyMapToPropertyMap(raw), nil
+	return respBody, anyMapToPropertyMap(util.ToSchemaTree(raw)), nil
 }
 
 // renameMapKeys translates wire-side keys to Pulumi-side. Nested maps are
-// not touched — renames only apply at the top level of resource I/O.
+// not touched — declared renames only apply at the top level of resource I/O.
 func renameMapKeys(m map[string]any, renames map[string]string) map[string]any {
 	out := make(map[string]any, len(m))
 	for k, v := range m {
@@ -1029,6 +1039,18 @@ func (r *Resource) buildRequestBody(op *Operation, inputs property.Map) map[stri
 	return mapBodyProps(bodyProps, inputs, r.meta.Renames)
 }
 
+// marshalWireBody is the single request-side boundary crossing: it rewrites
+// schema-side property names to wire names throughout the assembled body and
+// serializes it. Every JSON request body goes through here so the two
+// directions of the mapping cannot drift.
+func marshalWireBody(op *Operation, body map[string]any) ([]byte, error) {
+	out, err := json.Marshal(util.ToWireTree(body))
+	if err != nil {
+		return nil, fmt.Errorf("rest: marshal request body for %s: %w", op.ID, err)
+	}
+	return out, nil
+}
+
 // mapBodyProps fills wire-side schema properties from a property.Map source
 // by (renamed) field name, silently omitting fields the source lacks — the
 // shared mapping convention for request bodies at any nesting level.
@@ -1066,9 +1088,9 @@ func (r *Resource) execEnvelopeUpdate(
 	if err != nil {
 		return nil, property.Map{}, err
 	}
-	bodyJSON, err := json.Marshal(body)
+	bodyJSON, err := marshalWireBody(op, body)
 	if err != nil {
-		return nil, property.Map{}, fmt.Errorf("rest: marshal request body for %s: %w", op.ID, err)
+		return nil, property.Map{}, err
 	}
 	return r.roundTrip(ctx, op, url, bytes.NewReader(bodyJSON), contentJSON)
 }

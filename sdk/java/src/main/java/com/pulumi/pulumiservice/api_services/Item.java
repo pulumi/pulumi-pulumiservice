@@ -9,7 +9,8 @@ import com.pulumi.core.annotations.ResourceType;
 import com.pulumi.core.internal.Codegen;
 import com.pulumi.pulumiservice.Utilities;
 import com.pulumi.pulumiservice.api_services.ItemArgs;
-import java.lang.Object;
+import com.pulumi.pulumiservice.api_services.outputs.ServiceItem;
+import com.pulumi.pulumiservice.api_services.outputs.ServiceProperties;
 import java.lang.String;
 import java.util.List;
 import java.util.Optional;
@@ -43,28 +44,28 @@ public class Item extends com.pulumi.resources.CustomResource {
      * The list of service items
      * 
      */
-    @Export(name="items", refs={List.class,Object.class}, tree="[0,1]")
-    private Output<List<Object>> items;
+    @Export(name="items", refs={List.class,ServiceItem.class}, tree="[0,1]")
+    private Output<List<ServiceItem>> items;
 
     /**
      * @return The list of service items
      * 
      */
-    public Output<List<Object>> items() {
+    public Output<List<ServiceItem>> items() {
         return this.items;
     }
     /**
      * The service details
      * 
      */
-    @Export(name="service", refs={Object.class}, tree="[0]")
-    private Output<Object> service;
+    @Export(name="service", refs={ServiceProperties.class}, tree="[0]")
+    private Output<ServiceProperties> service;
 
     /**
      * @return The service details
      * 
      */
-    public Output<Object> service() {
+    public Output<ServiceProperties> service() {
         return this.service;
     }
 

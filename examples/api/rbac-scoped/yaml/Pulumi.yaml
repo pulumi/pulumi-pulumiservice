@@ -1,0 +1,18 @@
+name: pulumicloud-api-rbac-scoped
+runtime: yaml
+config:
+  organizationName:
+    type: string
+    default: service-provider-test-org
+  nameSuffix:
+    type: string
+    default: manual
+  roleDescription:
+    type: string
+    default: Environment-scoped read access, created by the api rbac-scoped example.
+  allowedEnvironmentId:
+    type: string
+    default: c5549aa1-87db-4d67-a195-455b56772900
+  deniedEnvironmentId:
+    type: string
+    default: 3cb9b7ad-0848-4e0d-aeff-8e9f093fd2d9

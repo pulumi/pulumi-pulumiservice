@@ -73,7 +73,7 @@ namespace Pulumi.PulumiService.Api.Integrations
         /// URL to configure repository access for this GitHub App installation.
         /// </summary>
         [Output("ghUrls")]
-        public Output<object?> GhUrls { get; private set; } = null!;
+        public Output<Outputs.GitHubAppURLs?> GhUrls { get; private set; } = null!;
 
         /// <summary>
         /// Whether the installation has the 'contents' permission.
@@ -115,7 +115,7 @@ namespace Pulumi.PulumiService.Api.Integrations
         /// Neo GitHub App permission requirements for this installation.
         /// </summary>
         [Output("neoGitHubAppPermissionRequirements")]
-        public Output<ImmutableArray<object>> NeoGitHubAppPermissionRequirements { get; private set; } = null!;
+        public Output<ImmutableArray<Outputs.GitHubAppPermissionRequirement>> NeoGitHubAppPermissionRequirements { get; private set; } = null!;
 
 
         /// <summary>

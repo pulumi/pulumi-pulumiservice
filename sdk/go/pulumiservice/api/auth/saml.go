@@ -24,7 +24,7 @@ type SAML struct {
 	// The SAML NameID format used by the identity provider.
 	NameIdFormat pulumi.StringPtrOutput `pulumi:"nameIdFormat"`
 	// The Pulumi organization.
-	Organization pulumi.AnyOutput `pulumi:"organization"`
+	Organization OrganizationOutput `pulumi:"organization"`
 	// The SSO URL for the identity provider.
 	SsoUrl pulumi.StringPtrOutput `pulumi:"ssoUrl"`
 	// ValidUntil is the date until which the X.509 Certificate
@@ -195,8 +195,8 @@ func (o SAMLOutput) NameIdFormat() pulumi.StringPtrOutput {
 }
 
 // The Pulumi organization.
-func (o SAMLOutput) Organization() pulumi.AnyOutput {
-	return o.ApplyT(func(v *SAML) pulumi.AnyOutput { return v.Organization }).(pulumi.AnyOutput)
+func (o SAMLOutput) Organization() OrganizationOutput {
+	return o.ApplyT(func(v *SAML) OrganizationOutput { return v.Organization }).(OrganizationOutput)
 }
 
 // The SSO URL for the identity provider.

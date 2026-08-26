@@ -22,9 +22,9 @@ type Item struct {
 	// items. Will be nil once all items have been returned.
 	ContinuationToken pulumi.StringPtrOutput `pulumi:"continuationToken"`
 	// The list of service items
-	Items pulumi.ArrayOutput `pulumi:"items"`
+	Items ServiceItemArrayOutput `pulumi:"items"`
 	// The service details
-	Service pulumi.AnyOutput `pulumi:"service"`
+	Service ServicePropertiesOutput `pulumi:"service"`
 }
 
 // NewItem registers a new resource with the given unique name, arguments, and options.
@@ -206,13 +206,13 @@ func (o ItemOutput) ContinuationToken() pulumi.StringPtrOutput {
 }
 
 // The list of service items
-func (o ItemOutput) Items() pulumi.ArrayOutput {
-	return o.ApplyT(func(v *Item) pulumi.ArrayOutput { return v.Items }).(pulumi.ArrayOutput)
+func (o ItemOutput) Items() ServiceItemArrayOutput {
+	return o.ApplyT(func(v *Item) ServiceItemArrayOutput { return v.Items }).(ServiceItemArrayOutput)
 }
 
 // The service details
-func (o ItemOutput) Service() pulumi.AnyOutput {
-	return o.ApplyT(func(v *Item) pulumi.AnyOutput { return v.Service }).(pulumi.AnyOutput)
+func (o ItemOutput) Service() ServicePropertiesOutput {
+	return o.ApplyT(func(v *Item) ServicePropertiesOutput { return v.Service }).(ServicePropertiesOutput)
 }
 
 type ItemArrayOutput struct{ *pulumi.OutputState }

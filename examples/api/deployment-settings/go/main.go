@@ -40,20 +40,20 @@ func main() {
 			OrgName:     pulumi.String(organizationName),
 			ProjectName: pulumi.String(projectName),
 			StackName:   pulumi.String(stackName),
-			ExecutorContext: pulumi.Map{
-				"executorImage": pulumi.String(executorImage),
+			ExecutorContext: &deployments.ExecutorSettingsRequestArgs{
+				ExecutorImage: pulumi.String(executorImage),
 			},
-			OperationContext: pulumi.Map{
-				"preRunCommands":       pulumi.StringArray{pulumi.String("yarn")},
-				"environmentVariables": pulumi.StringMap{"TEST_VAR": pulumi.String("foo")},
-				"options": pulumi.Map{
-					"skipInstallDependencies": pulumi.Bool(true),
+			OperationContext: &deployments.OperationContextRequestArgs{
+				PreRunCommands:       pulumi.StringArray{pulumi.String("yarn")},
+				EnvironmentVariables: pulumi.Map{"TEST_VAR": pulumi.String("foo")},
+				Options: &deployments.OperationContextOptionsRequestArgs{
+					SkipInstallDependencies: pulumi.Bool(true),
 				},
 			},
-			SourceContext: pulumi.Map{
-				"git": pulumi.Map{
-					"repoUrl": pulumi.String("https://github.com/example/example.git"),
-					"branch":  pulumi.String("refs/heads/main"),
+			SourceContext: &deployments.SourceContextRequestArgs{
+				Git: &deployments.SourceContextGitRequestArgs{
+					RepoUrl: pulumi.String("https://github.com/example/example.git"),
+					Branch:  pulumi.String("refs/heads/main"),
 				},
 			},
 		}, pulumi.DependsOn([]pulumi.Resource{parentStack}))

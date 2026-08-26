@@ -84,19 +84,19 @@ func (c *OrganizationRoleCore) Annotate(a infer.Annotator) {
 		&c.Permissions,
 		"The role's permission descriptor tree, expressed in the Pulumi Cloud "+
 			"wire grammar. The provider exposes the descriptor as `map[string]Any` "+
-			"and passes it through verbatim — the wire-format `__type` "+
-			"discriminator is used at every level (SDK and API alike).\n\n"+
+			"and passes it through verbatim — the `type__` discriminator selects "+
+			"the variant at every level.\n\n"+
 			"Common top-level descriptors:\n"+
-			"- `PermissionDescriptorAllow` — `{__type: \"PermissionDescriptorAllow\", "+
+			"- `PermissionDescriptorAllow` — `{type__: \"PermissionDescriptorAllow\", "+
 			"permissions: [\"<scope>\", ...]}` grants the listed scopes.\n"+
-			"- `PermissionDescriptorGroup` — `{__type: \"PermissionDescriptorGroup\", "+
-			"entries: [{__type: \"PermissionDescriptorAllow\", ...}, ...]}` composes "+
+			"- `PermissionDescriptorGroup` — `{type__: \"PermissionDescriptorGroup\", "+
+			"entries: [{type__: \"PermissionDescriptorAllow\", ...}, ...]}` composes "+
 			"multiple descriptors; the role grants the union of every entry.\n"+
-			"- `PermissionDescriptorCondition` — `{__type: "+
-			"\"PermissionDescriptorCondition\", condition: {__type: ...}, subNode: "+
-			"{__type: ...}}` gates a sub-descriptor on a boolean expression.\n"+
+			"- `PermissionDescriptorCondition` — `{type__: "+
+			"\"PermissionDescriptorCondition\", condition: {type__: ...}, subNode: "+
+			"{type__: ...}}` gates a sub-descriptor on a boolean expression.\n"+
 			"- `PermissionDescriptorCompose` — references other roles by ID; "+
-			"`{__type: \"PermissionDescriptorCompose\", permissionDescriptors: "+
+			"`{type__: \"PermissionDescriptorCompose\", permissionDescriptors: "+
 			"[<roleId>, ...]}`.\n\n"+
 			"Pulumi Cloud's REST API also accepts `PermissionDescriptorIfThenElse`, "+
 			"`PermissionDescriptorSelect`, and the `PermissionExpression*` / "+
@@ -110,10 +110,12 @@ func (c *OrganizationRoleCore) Annotate(a infer.Annotator) {
 			"helpers, which build the descriptor tree for you. To grant a role to a "+
 			"team, use the `TeamRoleAssignment` resource — roles are *associated "+
 			"with* teams, not gated on them via a permission descriptor.\n\n"+
-			"Note: the `__type` field name uses Pulumi's `__`-prefixed-key passthrough "+
-			"(pulumi/pulumi#22834, available in pulumi 3.235.0+). Earlier pulumi "+
-			"runtimes will drop these keys at the SDK boundary; the Python SDK pins "+
-			"the minimum runtime version automatically.",
+			"Note: Pulumi Cloud's REST API spells this discriminator `__type`. A "+
+			"leading double underscore is reserved in Pulumi schemas — Go would "+
+			"emit an unexported field, Python would mangle the parameter name, and "+
+			"the engine treats such keys as internal — so the schema exposes the "+
+			"suffix form `type__` and the provider rewrites it in both directions. "+
+			"Write `type__` everywhere in the descriptor tree.",
 	)
 }
 
@@ -158,8 +160,8 @@ func (*OrganizationRole) Check(
 		} else if _, err := buildPermissionDescriptorForAPI(in.Permissions); err != nil {
 			// Validate the descriptor tree up front so users see a
 			// clear error at preview, not a 400 from the API at apply.
-			// The typed JSON unmarshaller dispatches on `__type` and
-			// rejects missing/unknown discriminators with a clear message.
+			// The typed JSON unmarshaller dispatches on the discriminator
+			// and rejects missing/unknown values with a clear message.
 			failures = append(failures, p.CheckFailure{
 				Property: gcPermissions,
 				Reason:   err.Error(),
@@ -385,18 +387,20 @@ func orgRoleCoreFromAPI(
 	}
 	if role.Details != nil {
 		// Round-trip the typed Details through JSON to recover the
-		// `__type`-discriminated map shape the SDK exposes. The marshal
-		// call dispatches through the typed descriptor's MarshalJSON,
-		// which emits `__type` natively.
+		// discriminated map shape the SDK exposes. The marshal call
+		// dispatches through the typed descriptor's MarshalJSON, which
+		// emits the wire-side `__type`; ToSchemaTree renames it to the
+		// `type__` the schema exposes at every level.
 		raw, err := json.Marshal(role.Details)
 		if err != nil {
 			return OrganizationRoleCore{}, fmt.Errorf(
 				"marshalling role details for %q: %w", role.ID, err)
 		}
-		core.Permissions = map[string]interface{}{}
-		if err := json.Unmarshal(raw, &core.Permissions); err != nil {
+		wire := map[string]interface{}{}
+		if err := json.Unmarshal(raw, &wire); err != nil {
 			return OrganizationRoleCore{}, fmt.Errorf("parsing role details for %q: %w", role.ID, err)
 		}
+		core.Permissions = util.ToSchemaTree(wire)
 	}
 	return core, nil
 }
@@ -414,18 +418,18 @@ func orgRoleStateFromAPI(
 	}
 }
 
-// buildPermissionDescriptorForAPI converts a user-facing `__type`-shape
+// buildPermissionDescriptorForAPI converts a user-facing `type__`-shape
 // permissions map into the typed apitype.PermissionDescriptor tree
 // expected by the generated SDK. The user's tree passes through to the
-// API verbatim; this routine just hands the JSON off to the generated
-// UnmarshalJSONPermissionDescriptor for `__type` dispatch. The
-// unmarshaller surfaces a clear "type X not recognized" error for
-// missing or unknown discriminators, so we don't structurally inspect
-// the map ourselves.
+// API verbatim apart from the discriminator name: util.ToWireTree restores
+// Pulumi Cloud's `__type` at every level, then the generated
+// UnmarshalJSONPermissionDescriptor dispatches on it. The unmarshaller
+// surfaces a clear "type X not recognized" error for missing or unknown
+// discriminators, so we don't structurally inspect the map ourselves.
 func buildPermissionDescriptorForAPI(
 	permissions map[string]interface{},
 ) (apitype.PermissionDescriptor, error) {
-	raw, err := json.Marshal(permissions)
+	raw, err := json.Marshal(util.ToWireTree(permissions))
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal permissions: %w", err)
 	}
@@ -434,7 +438,8 @@ func buildPermissionDescriptorForAPI(
 		return nil, fmt.Errorf("failed to parse permission descriptor: %w", err)
 	}
 	if details == nil {
-		return nil, fmt.Errorf("permission descriptor parsed to nil — missing or unknown __type")
+		// Quote the name the user writes, not the wire name they never see.
+		return nil, fmt.Errorf("permission descriptor parsed to nil — missing or unknown type__")
 	}
 	return details, nil
 }

@@ -23,30 +23,30 @@ return await Deployment.RunAsync(() =>
         OrgName = organizationName,
         ProjectName = projectName,
         StackName = stackName,
-        ExecutorContext = ImmutableDictionary.CreateRange(new[]
+        ExecutorContext = new Ps.Api.Deployments.Inputs.ExecutorSettingsRequestArgs
         {
-            new KeyValuePair<string, object>("executorImage", executorImage),
-        }),
-        OperationContext = ImmutableDictionary.CreateRange(new[]
+            ExecutorImage = executorImage,
+        },
+        OperationContext = new Ps.Api.Deployments.Inputs.OperationContextRequestArgs
         {
-            new KeyValuePair<string, object>("preRunCommands", new[] { "yarn" }),
-            new KeyValuePair<string, object>("environmentVariables", ImmutableDictionary.CreateRange(new[]
+            PreRunCommands = new[] { "yarn" },
+            EnvironmentVariables = new Dictionary<string, object>
             {
-                new KeyValuePair<string, object>("TEST_VAR", "foo"),
-            })),
-            new KeyValuePair<string, object>("options", ImmutableDictionary.CreateRange(new[]
+                ["TEST_VAR"] = "foo",
+            },
+            Options = new Ps.Api.Deployments.Inputs.OperationContextOptionsRequestArgs
             {
-                new KeyValuePair<string, object>("skipInstallDependencies", true),
-            })),
-        }),
-        SourceContext = ImmutableDictionary.CreateRange(new[]
+                SkipInstallDependencies = true,
+            },
+        },
+        SourceContext = new Ps.Api.Deployments.Inputs.SourceContextRequestArgs
         {
-            new KeyValuePair<string, object>("git", ImmutableDictionary.CreateRange(new[]
+            Git = new Ps.Api.Deployments.Inputs.SourceContextGitRequestArgs
             {
-                new KeyValuePair<string, object>("repoUrl", "https://github.com/example/example.git"),
-                new KeyValuePair<string, object>("branch", "refs/heads/main"),
-            })),
-        }),
+                RepoUrl = "https://github.com/example/example.git",
+                Branch = "refs/heads/main",
+            },
+        },
     }, new CustomResourceOptions { DependsOn = { parentStack } });
 
     _ = settings;
