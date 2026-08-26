@@ -47,7 +47,6 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi/provider"
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 
-	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/apiclient"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/cloud"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/functions"
@@ -272,7 +271,7 @@ func (t *authedTransport) Do(_ context.Context, req *http.Request) (*http.Respon
 	// media type; api (rest.Resource) sets Accept: application/json explicitly
 	// because its OpenAPI-described endpoints return standard JSON.
 	if req.Header.Get("Accept") == "" {
-		req.Header.Set("Accept", apiclient.AcceptMediaType)
+		req.Header.Set("Accept", pulumiapi.AcceptMediaType)
 	}
 	req.Header.Set("X-Pulumi-Source", "provider")
 

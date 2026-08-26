@@ -23,8 +23,12 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/apiclient"
+	"github.com/pulumi/pulumi-cloud-sdk/go/apiclient"
 )
+
+// AcceptMediaType is the media type sent on the Accept header for Pulumi
+// Cloud API requests; the +N suffix is the wire-protocol version.
+const AcceptMediaType = "application/vnd.pulumi+8"
 
 type Client struct {
 	httpClient *http.Client
@@ -104,7 +108,7 @@ func (c *Client) createRequest(
 
 	// add default headers
 	req.Header.Add("X-Pulumi-Source", "provider")
-	req.Header.Add("Accept", apiclient.AcceptMediaType)
+	req.Header.Add("Accept", AcceptMediaType)
 	req.Header.Add("Content-Type", "application/json")
 	req.Header.Add("Authorization", "token "+c.token)
 

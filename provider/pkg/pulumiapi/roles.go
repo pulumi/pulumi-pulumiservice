@@ -20,7 +20,7 @@ import (
 	"net/http"
 	"path"
 
-	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/apitype"
+	"github.com/pulumi/pulumi-cloud-sdk/go/apitype"
 )
 
 type RoleClient interface {
@@ -205,7 +205,12 @@ func (c *Client) ListOrgRoles(
 		return nil, errors.New("uxPurpose must not be empty")
 	}
 
-	resp, err := c.SDK.ListRolesByOrgIDAndUXPurpose(ctx, orgName, &uxPurpose)
+	resp, err := c.SDK.ListRolesByOrgIDAndUXPurpose(
+		ctx,
+		orgName,
+		nil,
+		apitype.PermissionDescriptorUXPurpose(uxPurpose),
+	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list organization roles: %w", err)
 	}

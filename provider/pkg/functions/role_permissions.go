@@ -19,9 +19,8 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/pulumi/pulumi-cloud-sdk/go/apitype"
 	"github.com/pulumi/pulumi-go-provider/infer"
-
-	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/apitype"
 )
 
 // scopedPermissionsHelpDoc is the shared epilogue for the helpers'
