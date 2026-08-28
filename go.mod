@@ -7,7 +7,7 @@ require (
 	github.com/pgavlin/fx/v2 v2.0.12
 	github.com/pulumi/esc v0.26.0
 	github.com/pulumi/providertest v0.7.0
-	github.com/pulumi/pulumi-cloud-sdk/go v1.20260826.1349
+	github.com/pulumi/pulumi-cloud-sdk/go v1.20260827.0
 	github.com/pulumi/pulumi/pkg/v3 v3.259.0
 	github.com/pulumi/pulumi/sdk/v3 v3.259.0
 	github.com/stretchr/testify v1.11.1
