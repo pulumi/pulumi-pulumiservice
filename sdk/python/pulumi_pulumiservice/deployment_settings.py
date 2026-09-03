@@ -195,15 +195,15 @@ class DeploymentSettings(pulumi.CustomResource):
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
                  agent_pool_id: pulumi.Input[Optional[_builtins.str]] = None,
-                 cache_options: pulumi.Input[Optional[Union['DeploymentSettingsCacheOptionsArgs', 'DeploymentSettingsCacheOptionsArgsDict']]] = None,
-                 executor_context: pulumi.Input[Optional[Union['DeploymentSettingsExecutorContextArgs', 'DeploymentSettingsExecutorContextArgsDict']]] = None,
-                 github: pulumi.Input[Optional[Union['DeploymentSettingsGithubArgs', 'DeploymentSettingsGithubArgsDict']]] = None,
-                 operation_context: pulumi.Input[Optional[Union['DeploymentSettingsOperationContextArgs', 'DeploymentSettingsOperationContextArgsDict']]] = None,
+                 cache_options: pulumi.Input[Optional[Union['DeploymentSettingsCacheOptionsArgs', 'DeploymentSettingsCacheOptionsArgsDict', 'outputs.DeploymentSettingsCacheOptions']]] = None,
+                 executor_context: pulumi.Input[Optional[Union['DeploymentSettingsExecutorContextArgs', 'DeploymentSettingsExecutorContextArgsDict', 'outputs.DeploymentSettingsExecutorContext']]] = None,
+                 github: pulumi.Input[Optional[Union['DeploymentSettingsGithubArgs', 'DeploymentSettingsGithubArgsDict', 'outputs.DeploymentSettingsGithub']]] = None,
+                 operation_context: pulumi.Input[Optional[Union['DeploymentSettingsOperationContextArgs', 'DeploymentSettingsOperationContextArgsDict', 'outputs.DeploymentSettingsOperationContext']]] = None,
                  organization: pulumi.Input[Optional[_builtins.str]] = None,
                  project: pulumi.Input[Optional[_builtins.str]] = None,
-                 source_context: pulumi.Input[Optional[Union['DeploymentSettingsSourceContextArgs', 'DeploymentSettingsSourceContextArgsDict']]] = None,
+                 source_context: pulumi.Input[Optional[Union['DeploymentSettingsSourceContextArgs', 'DeploymentSettingsSourceContextArgsDict', 'outputs.DeploymentSettingsSourceContext']]] = None,
                  stack: pulumi.Input[Optional[_builtins.str]] = None,
-                 vcs: pulumi.Input[Optional[Union['DeploymentSettingsVcsArgs', 'DeploymentSettingsVcsArgsDict']]] = None,
+                 vcs: pulumi.Input[Optional[Union['DeploymentSettingsVcsArgs', 'DeploymentSettingsVcsArgsDict', 'outputs.DeploymentSettingsVcs']]] = None,
                  __props__=None):
         """
         Deployment settings configure Pulumi Deployments for a stack.
@@ -220,15 +220,15 @@ class DeploymentSettings(pulumi.CustomResource):
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] agent_pool_id: The agent pool identifier to use for the deployment.
-        :param pulumi.Input[Union['DeploymentSettingsCacheOptionsArgs', 'DeploymentSettingsCacheOptionsArgsDict']] cache_options: Dependency cache settings for the deployment
-        :param pulumi.Input[Union['DeploymentSettingsExecutorContextArgs', 'DeploymentSettingsExecutorContextArgsDict']] executor_context: Settings related to the deployment executor.
-        :param pulumi.Input[Union['DeploymentSettingsGithubArgs', 'DeploymentSettingsGithubArgsDict']] github: GitHub settings for the deployment.
-        :param pulumi.Input[Union['DeploymentSettingsOperationContextArgs', 'DeploymentSettingsOperationContextArgsDict']] operation_context: Settings related to the Pulumi operation environment during the deployment.
+        :param pulumi.Input[Union['DeploymentSettingsCacheOptionsArgs', 'DeploymentSettingsCacheOptionsArgsDict', 'outputs.DeploymentSettingsCacheOptions']] cache_options: Dependency cache settings for the deployment
+        :param pulumi.Input[Union['DeploymentSettingsExecutorContextArgs', 'DeploymentSettingsExecutorContextArgsDict', 'outputs.DeploymentSettingsExecutorContext']] executor_context: Settings related to the deployment executor.
+        :param pulumi.Input[Union['DeploymentSettingsGithubArgs', 'DeploymentSettingsGithubArgsDict', 'outputs.DeploymentSettingsGithub']] github: GitHub settings for the deployment.
+        :param pulumi.Input[Union['DeploymentSettingsOperationContextArgs', 'DeploymentSettingsOperationContextArgsDict', 'outputs.DeploymentSettingsOperationContext']] operation_context: Settings related to the Pulumi operation environment during the deployment.
         :param pulumi.Input[_builtins.str] organization: Organization name.
         :param pulumi.Input[_builtins.str] project: Project name.
-        :param pulumi.Input[Union['DeploymentSettingsSourceContextArgs', 'DeploymentSettingsSourceContextArgsDict']] source_context: Settings related to the source of the deployment.
+        :param pulumi.Input[Union['DeploymentSettingsSourceContextArgs', 'DeploymentSettingsSourceContextArgsDict', 'outputs.DeploymentSettingsSourceContext']] source_context: Settings related to the source of the deployment.
         :param pulumi.Input[_builtins.str] stack: Stack name.
-        :param pulumi.Input[Union['DeploymentSettingsVcsArgs', 'DeploymentSettingsVcsArgsDict']] vcs: VCS settings for the deployment. Supports Azure DevOps and GitHub via the 'provider' discriminator field.
+        :param pulumi.Input[Union['DeploymentSettingsVcsArgs', 'DeploymentSettingsVcsArgsDict', 'outputs.DeploymentSettingsVcs']] vcs: VCS settings for the deployment. Supports Azure DevOps and GitHub via the 'provider' discriminator field.
         """
         ...
     @overload
@@ -264,15 +264,15 @@ class DeploymentSettings(pulumi.CustomResource):
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
                  agent_pool_id: pulumi.Input[Optional[_builtins.str]] = None,
-                 cache_options: pulumi.Input[Optional[Union['DeploymentSettingsCacheOptionsArgs', 'DeploymentSettingsCacheOptionsArgsDict']]] = None,
-                 executor_context: pulumi.Input[Optional[Union['DeploymentSettingsExecutorContextArgs', 'DeploymentSettingsExecutorContextArgsDict']]] = None,
-                 github: pulumi.Input[Optional[Union['DeploymentSettingsGithubArgs', 'DeploymentSettingsGithubArgsDict']]] = None,
-                 operation_context: pulumi.Input[Optional[Union['DeploymentSettingsOperationContextArgs', 'DeploymentSettingsOperationContextArgsDict']]] = None,
+                 cache_options: pulumi.Input[Optional[Union['DeploymentSettingsCacheOptionsArgs', 'DeploymentSettingsCacheOptionsArgsDict', 'outputs.DeploymentSettingsCacheOptions']]] = None,
+                 executor_context: pulumi.Input[Optional[Union['DeploymentSettingsExecutorContextArgs', 'DeploymentSettingsExecutorContextArgsDict', 'outputs.DeploymentSettingsExecutorContext']]] = None,
+                 github: pulumi.Input[Optional[Union['DeploymentSettingsGithubArgs', 'DeploymentSettingsGithubArgsDict', 'outputs.DeploymentSettingsGithub']]] = None,
+                 operation_context: pulumi.Input[Optional[Union['DeploymentSettingsOperationContextArgs', 'DeploymentSettingsOperationContextArgsDict', 'outputs.DeploymentSettingsOperationContext']]] = None,
                  organization: pulumi.Input[Optional[_builtins.str]] = None,
                  project: pulumi.Input[Optional[_builtins.str]] = None,
-                 source_context: pulumi.Input[Optional[Union['DeploymentSettingsSourceContextArgs', 'DeploymentSettingsSourceContextArgsDict']]] = None,
+                 source_context: pulumi.Input[Optional[Union['DeploymentSettingsSourceContextArgs', 'DeploymentSettingsSourceContextArgsDict', 'outputs.DeploymentSettingsSourceContext']]] = None,
                  stack: pulumi.Input[Optional[_builtins.str]] = None,
-                 vcs: pulumi.Input[Optional[Union['DeploymentSettingsVcsArgs', 'DeploymentSettingsVcsArgsDict']]] = None,
+                 vcs: pulumi.Input[Optional[Union['DeploymentSettingsVcsArgs', 'DeploymentSettingsVcsArgsDict', 'outputs.DeploymentSettingsVcs']]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
         if not isinstance(opts, pulumi.ResourceOptions):
