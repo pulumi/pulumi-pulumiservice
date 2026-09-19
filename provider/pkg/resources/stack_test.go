@@ -118,6 +118,18 @@ func TestStackDiffForceDestroy(t *testing.T) {
 		assert.Equal(t, p.Update, resp.DetailedDiff["forceDestroy"].Kind)
 	})
 
+	t.Run("update records the flag without calling the API", func(t *testing.T) {
+		resp, err := server.Update(p.UpdateRequest{
+			ID:        id,
+			Urn:       stackURN,
+			State:     withForceDestroy(false),
+			OldInputs: withForceDestroy(false),
+			Inputs:    withForceDestroy(true),
+		})
+		require.NoError(t, err)
+		assert.Equal(t, withForceDestroy(true), resp.Properties)
+	})
+
 	t.Run("identity still replaces", func(t *testing.T) {
 		news := withForceDestroy(false)
 		resp, err := server.Diff(p.DiffRequest{
