@@ -64,7 +64,6 @@ namespace Pulumi.PulumiService
                 Version = Utilities.Version,
                 ReplaceOnChanges =
                 {
-                    "forceDestroy",
                     "organizationName",
                     "projectName",
                     "stackName",

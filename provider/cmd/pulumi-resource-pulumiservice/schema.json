@@ -6186,8 +6186,7 @@
       "properties": {
         "forceDestroy": {
           "type": "boolean",
-          "description": "Optional. Flag indicating whether to delete the stack even if it still contains resources.",
-          "replaceOnChanges": true
+          "description": "Optional. Flag indicating whether to delete the stack even if it still contains resources."
         },
         "organizationName": {
           "type": "string",
@@ -6213,8 +6212,7 @@
       "inputProperties": {
         "forceDestroy": {
           "type": "boolean",
-          "description": "Optional. Flag indicating whether to delete the stack even if it still contains resources.",
-          "replaceOnChanges": true
+          "description": "Optional. Flag indicating whether to delete the stack even if it still contains resources."
         },
         "organizationName": {
           "type": "string",
