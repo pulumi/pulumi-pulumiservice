@@ -43,7 +43,6 @@ func NewStack(ctx *pulumi.Context,
 		return nil, errors.New("invalid value for required argument 'StackName'")
 	}
 	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
-		"forceDestroy",
 		"organizationName",
 		"projectName",
 		"stackName",

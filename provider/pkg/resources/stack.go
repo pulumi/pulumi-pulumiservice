@@ -31,6 +31,7 @@ var (
 	_ infer.CustomCreate[StackInput, StackState] = &Stack{}
 	_ infer.CustomDelete[StackState]             = &Stack{}
 	_ infer.CustomRead[StackInput, StackState]   = &Stack{}
+	_ infer.CustomUpdate[StackInput, StackState] = &Stack{}
 )
 
 func (*Stack) Annotate(a infer.Annotator) {
@@ -46,7 +47,10 @@ type StackInput struct {
 	OrganizationName string `pulumi:"organizationName" provider:"replaceOnChanges"`
 	ProjectName      string `pulumi:"projectName"      provider:"replaceOnChanges"`
 	StackName        string `pulumi:"stackName"        provider:"replaceOnChanges"`
-	ForceDestroy     bool   `pulumi:"forceDestroy,optional" provider:"replaceOnChanges"`
+	// forceDestroy is consulted only at delete time, so a change to it must not
+	// replace the stack. Without an Update method infer treats every change as a
+	// replacement, which is why Update exists below.
+	ForceDestroy bool `pulumi:"forceDestroy,optional"`
 }
 
 func (i *StackInput) Annotate(a infer.Annotator) {
@@ -84,6 +88,17 @@ func (*Stack) Create(
 	}
 	return infer.CreateResponse[StackState]{
 		ID:     stackResourceID(stackID),
+		Output: StackState{StackInput: req.Inputs},
+	}, nil
+}
+
+// Update handles the one non-replacing input, forceDestroy, which the Pulumi
+// Cloud API does not store: the only thing to do is record the new value.
+func (*Stack) Update(
+	_ context.Context,
+	req infer.UpdateRequest[StackInput, StackState],
+) (infer.UpdateResponse[StackState], error) {
+	return infer.UpdateResponse[StackState]{
 		Output: StackState{StackInput: req.Inputs},
 	}, nil
 }
