@@ -7,7 +7,7 @@ require (
 	github.com/pgavlin/fx/v2 v2.0.12
 	github.com/pulumi/esc v0.26.0
 	github.com/pulumi/providertest v0.7.0
-	github.com/pulumi/pulumi-cloud-sdk/go v1.20260921.0
+	github.com/pulumi/pulumi-cloud-sdk/go v1.20260922.0
 	github.com/pulumi/pulumi/pkg/v3 v3.263.0
 	github.com/pulumi/pulumi/sdk/v3 v3.263.0
 	github.com/stretchr/testify v1.12.1
@@ -130,7 +130,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/sts v1.45.0 // indirect
 	github.com/aws/smithy-go v1.27.4 // indirect
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
-	github.com/blang/semver v3.5.1+incompatible // indirect
+	github.com/blang/semver v3.5.1+incompatible
 	github.com/charmbracelet/bubbles v1.0.0 // indirect
 	github.com/charmbracelet/bubbletea v1.3.10 // indirect
 	github.com/charmbracelet/lipgloss v1.1.0 // indirect
