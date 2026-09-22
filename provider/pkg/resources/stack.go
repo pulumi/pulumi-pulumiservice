@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"strings"
 
+	p "github.com/pulumi/pulumi-go-provider"
 	"github.com/pulumi/pulumi-go-provider/infer"
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
@@ -31,6 +32,8 @@ var (
 	_ infer.CustomCreate[StackInput, StackState] = &Stack{}
 	_ infer.CustomDelete[StackState]             = &Stack{}
 	_ infer.CustomRead[StackInput, StackState]   = &Stack{}
+	_ infer.CustomUpdate[StackInput, StackState] = &Stack{}
+	_ infer.CustomDiff[StackInput, StackState]   = &Stack{}
 )
 
 func (*Stack) Annotate(a infer.Annotator) {
@@ -46,7 +49,10 @@ type StackInput struct {
 	OrganizationName string `pulumi:"organizationName" provider:"replaceOnChanges"`
 	ProjectName      string `pulumi:"projectName"      provider:"replaceOnChanges"`
 	StackName        string `pulumi:"stackName"        provider:"replaceOnChanges"`
-	ForceDestroy     bool   `pulumi:"forceDestroy,optional" provider:"replaceOnChanges"`
+	// forceDestroy is consulted only at delete time, so a change to it must not
+	// replace the stack; Diff and Update below carry that distinction, since
+	// without an Update method infer treats every change as a replacement.
+	ForceDestroy bool `pulumi:"forceDestroy,optional"`
 }
 
 func (i *StackInput) Annotate(a infer.Annotator) {
@@ -84,6 +90,55 @@ func (*Stack) Create(
 	}
 	return infer.CreateResponse[StackState]{
 		ID:     stackResourceID(stackID),
+		Output: StackState{StackInput: req.Inputs},
+	}, nil
+}
+
+// Diff compares typed values rather than raw property maps so that state
+// written by a provider before v1.1.0, which omitted forceDestroy when false,
+// decodes to the same false the current inputs carry and produces no diff.
+func (*Stack) Diff(
+	_ context.Context,
+	req infer.DiffRequest[StackInput, StackState],
+) (infer.DiffResponse, error) {
+	diff := map[string]p.PropertyDiff{}
+	replace := func(key string) { diff[key] = p.PropertyDiff{Kind: p.UpdateReplace, InputDiff: true} }
+
+	if req.State.OrganizationName != req.Inputs.OrganizationName {
+		replace("organizationName")
+	}
+	if req.State.ProjectName != req.Inputs.ProjectName {
+		replace("projectName")
+	}
+	if req.State.StackName != req.Inputs.StackName {
+		replace("stackName")
+	}
+	if req.State.ForceDestroy != req.Inputs.ForceDestroy {
+		diff["forceDestroy"] = p.PropertyDiff{Kind: p.Update, InputDiff: true}
+	}
+
+	return infer.DiffResponse{
+		HasChanges:   len(diff) > 0,
+		DetailedDiff: diff,
+	}, nil
+}
+
+// Update handles the one non-replacing input, forceDestroy, which the Pulumi
+// Cloud API does not store: the only thing to do is record the new value.
+// Anything else reaching here escaped Diff's replace path, so refuse it
+// rather than record a change the API never saw.
+func (*Stack) Update(
+	_ context.Context,
+	req infer.UpdateRequest[StackInput, StackState],
+) (infer.UpdateResponse[StackState], error) {
+	old := req.State.StackInput
+	if req.Inputs.OrganizationName != old.OrganizationName ||
+		req.Inputs.ProjectName != old.ProjectName ||
+		req.Inputs.StackName != old.StackName {
+		return infer.UpdateResponse[StackState]{}, fmt.Errorf(
+			"stack %q cannot be updated in place; identity changes require a replacement", req.ID)
+	}
+	return infer.UpdateResponse[StackState]{
 		Output: StackState{StackInput: req.Inputs},
 	}, nil
 }

@@ -118,7 +118,6 @@ public class Stack extends com.pulumi.resources.CustomResource {
         var defaultOptions = com.pulumi.resources.CustomResourceOptions.builder()
             .version(Utilities.getVersion())
             .replaceOnChanges(List.of(
-                "forceDestroy",
                 "organizationName",
                 "projectName",
                 "stackName"
