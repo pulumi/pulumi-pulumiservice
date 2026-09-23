@@ -1,9 +1,0 @@
-name: pulumicloud-api-policy-groups
-runtime: yaml
-config:
-  organizationName:
-    type: string
-    default: service-provider-test-org
-  groupName:
-    type: string
-    default: example-policy-group
