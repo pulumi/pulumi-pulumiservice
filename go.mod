@@ -8,10 +8,10 @@ require (
 	github.com/pulumi/esc v0.26.0
 	github.com/pulumi/providertest v0.7.0
 	github.com/pulumi/pulumi-cloud-sdk/go v1.20260924.0
-	github.com/pulumi/pulumi/pkg/v3 v3.264.0
-	github.com/pulumi/pulumi/sdk/v3 v3.264.0
+	github.com/pulumi/pulumi/pkg/v3 v3.265.0
+	github.com/pulumi/pulumi/sdk/v3 v3.265.0
 	github.com/stretchr/testify v1.12.1
-	golang.org/x/exp v0.0.0-20260410095643-746e56fc9e2f
+	golang.org/x/exp v0.0.0-20260908205506-85c1c2202aba
 	google.golang.org/grpc v1.84.0
 	google.golang.org/protobuf v1.36.12
 	gopkg.in/yaml.v2 v2.4.0
@@ -64,7 +64,7 @@ require (
 	github.com/godbus/dbus/v5 v5.2.2 // indirect
 	github.com/golang/glog v1.2.5 // indirect
 	github.com/google/go-tpm v0.9.8 // indirect
-	github.com/grpc-ecosystem/grpc-gateway/v2 v2.30.0 // indirect
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.31.0 // indirect
 	github.com/hashicorp/go-version v1.9.0 // indirect
 	github.com/iwdgo/sigintwindows v0.2.2 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
@@ -212,8 +212,8 @@ require (
 	github.com/xeipuuv/gojsonschema v1.2.0 // indirect
 	github.com/zclconf/go-cty v1.16.3 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
-	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.70.0 // indirect
-	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.70.0 // indirect
+	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.71.0 // indirect
+	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.71.0 // indirect
 	go.opentelemetry.io/otel v1.46.0 // indirect
 	go.opentelemetry.io/otel/metric v1.46.0 // indirect
 	go.opentelemetry.io/otel/trace v1.46.0 // indirect
@@ -229,7 +229,7 @@ require (
 	golang.org/x/term v0.46.0 // indirect
 	golang.org/x/text v0.42.0 // indirect
 	golang.org/x/time v0.15.0 // indirect
-	golang.org/x/tools v0.49.0 // indirect
+	golang.org/x/tools v0.50.0 // indirect
 	golang.org/x/xerrors v0.0.0-20240903120638-7835f813f4da // indirect
 	google.golang.org/api v0.290.0 // indirect
 	google.golang.org/genproto v0.0.0-20260724162435-b2f20204f0df // indirect
