@@ -1335,6 +1335,9 @@
         }
       }
     },
+    "required": [
+      "apiUrl"
+    ],
     "inputProperties": {
       "accessToken": {
         "type": "string",
@@ -5370,6 +5373,7 @@
         "project",
         "stack",
         "scheduleCron",
+        "autoRemediate",
         "scheduleId"
       ],
       "inputProperties": {
@@ -5566,6 +5570,7 @@
       },
       "required": [
         "organization",
+        "project",
         "environment",
         "tagName",
         "revision"
@@ -5795,7 +5800,7 @@
       ]
     },
     "pulumiservice:index:OrgAccessToken": {
-      "description": "The Pulumi Cloud allows users to create access tokens scoped to orgs. Org access tokens is a resource to create them and assign them to an org",
+      "description": "Creates an access token scoped to a Pulumi Cloud organization.\n\nThe provider must be authenticated as a user, for example with a personal access token, to create or delete this resource. Organization and team access tokens cannot create or delete organization tokens, even when they have the Admin role, so that a token cannot be used to mint further organization tokens. Such requests fail with `403 Machine tokens are not allowed to perform this operation`. For automation, use the personal access token of a dedicated service-account user. `TeamAccessToken` does not have this restriction.",
       "properties": {
         "admin": {
           "type": "boolean",
@@ -5827,6 +5832,7 @@
       "required": [
         "name",
         "organizationName",
+        "admin",
         "value"
       ],
       "inputProperties": {
@@ -6455,7 +6461,7 @@
       ]
     },
     "pulumiservice:index:TeamAccessToken": {
-      "description": "The Pulumi Cloud allows users to create access tokens scoped to team. Team access tokens is a resource to create them and assign them to a team",
+      "description": "Creates an access token scoped to a Pulumi Cloud team.\n\nUnlike `OrgAccessToken`, this resource can be created by a provider authenticated with an organization or team access token.",
       "properties": {
         "description": {
           "type": "string",
@@ -6555,6 +6561,7 @@
       "required": [
         "organization",
         "team",
+        "project",
         "environment",
         "permission"
       ],
@@ -6810,6 +6817,7 @@
         "project",
         "stack",
         "timestamp",
+        "deleteAfterDestroy",
         "scheduleId"
       ],
       "inputProperties": {
