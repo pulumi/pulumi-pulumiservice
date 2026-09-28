@@ -98,7 +98,9 @@ class TeamAccessToken(pulumi.CustomResource):
                  team_name: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         """
-        The Pulumi Cloud allows users to create access tokens scoped to team. Team access tokens is a resource to create them and assign them to a team
+        Creates an access token scoped to a Pulumi Cloud team.
+
+        Unlike `OrgAccessToken`, this resource can be created by a provider authenticated with an organization or team access token.
 
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
@@ -114,7 +116,9 @@ class TeamAccessToken(pulumi.CustomResource):
                  args: TeamAccessTokenArgs,
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
-        The Pulumi Cloud allows users to create access tokens scoped to team. Team access tokens is a resource to create them and assign them to a team
+        Creates an access token scoped to a Pulumi Cloud team.
+
+        Unlike `OrgAccessToken`, this resource can be created by a provider authenticated with an organization or team access token.
 
         :param str resource_name: The name of the resource.
         :param TeamAccessTokenArgs args: The arguments to use to populate this resource's properties.

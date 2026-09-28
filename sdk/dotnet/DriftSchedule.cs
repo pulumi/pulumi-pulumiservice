@@ -19,7 +19,7 @@ namespace Pulumi.PulumiService
         /// Whether any drift detected should be remediated after a drift run.
         /// </summary>
         [Output("autoRemediate")]
-        public Output<bool?> AutoRemediate { get; private set; } = null!;
+        public Output<bool> AutoRemediate { get; private set; } = null!;
 
         /// <summary>
         /// Organization name.

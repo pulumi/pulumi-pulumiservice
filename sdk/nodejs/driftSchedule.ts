@@ -37,7 +37,7 @@ export class DriftSchedule extends pulumi.CustomResource {
     /**
      * Whether any drift detected should be remediated after a drift run.
      */
-    declare public readonly autoRemediate: pulumi.Output<boolean | undefined>;
+    declare public readonly autoRemediate: pulumi.Output<boolean>;
     /**
      * Organization name.
      */

@@ -17,7 +17,7 @@ type Provider struct {
 	// Access Token to authenticate with Pulumi Cloud.
 	AccessToken pulumi.StringPtrOutput `pulumi:"accessToken"`
 	// Optional override of Pulumi Cloud API endpoint.
-	ApiUrl pulumi.StringPtrOutput `pulumi:"apiUrl"`
+	ApiUrl pulumi.StringOutput `pulumi:"apiUrl"`
 }
 
 // NewProvider registers a new resource with the given unique name, arguments, and options.
@@ -106,8 +106,8 @@ func (o ProviderOutput) AccessToken() pulumi.StringPtrOutput {
 }
 
 // Optional override of Pulumi Cloud API endpoint.
-func (o ProviderOutput) ApiUrl() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *Provider) pulumi.StringPtrOutput { return v.ApiUrl }).(pulumi.StringPtrOutput)
+func (o ProviderOutput) ApiUrl() pulumi.StringOutput {
+	return o.ApplyT(func(v *Provider) pulumi.StringOutput { return v.ApiUrl }).(pulumi.StringOutput)
 }
 
 func init() {

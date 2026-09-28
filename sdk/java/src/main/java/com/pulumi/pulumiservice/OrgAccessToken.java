@@ -16,7 +16,9 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 
 /**
- * The Pulumi Cloud allows users to create access tokens scoped to orgs. Org access tokens is a resource to create them and assign them to an org
+ * Creates an access token scoped to a Pulumi Cloud organization.
+ * 
+ * The provider must be authenticated as a user, for example with a personal access token, to create or delete this resource. Organization and team access tokens cannot create or delete organization tokens, even when they have the Admin role, so that a token cannot be used to mint further organization tokens. Such requests fail with `403 Machine tokens are not allowed to perform this operation`. For automation, use the personal access token of a dedicated service-account user. `TeamAccessToken` does not have this restriction.
  * 
  */
 @ResourceType(type="pulumiservice:index:OrgAccessToken")
@@ -26,14 +28,14 @@ public class OrgAccessToken extends com.pulumi.resources.CustomResource {
      * 
      */
     @Export(name="admin", refs={Boolean.class}, tree="[0]")
-    private Output</* @Nullable */ Boolean> admin;
+    private Output<Boolean> admin;
 
     /**
      * @return Optional. True if this is an admin token.
      * 
      */
-    public Output<Optional<Boolean>> admin() {
-        return Codegen.optional(this.admin);
+    public Output<Boolean> admin() {
+        return this.admin;
     }
     /**
      * Optional. Description for the token.

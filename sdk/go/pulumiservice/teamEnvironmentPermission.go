@@ -25,7 +25,7 @@ type TeamEnvironmentPermission struct {
 	// Which permission level to grant to the specified team.
 	Permission EnvironmentPermissionOutput `pulumi:"permission"`
 	// Project name.
-	Project pulumi.StringPtrOutput `pulumi:"project"`
+	Project pulumi.StringOutput `pulumi:"project"`
 	// Team name.
 	Team pulumi.StringOutput `pulumi:"team"`
 }
@@ -232,8 +232,8 @@ func (o TeamEnvironmentPermissionOutput) Permission() EnvironmentPermissionOutpu
 }
 
 // Project name.
-func (o TeamEnvironmentPermissionOutput) Project() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *TeamEnvironmentPermission) pulumi.StringPtrOutput { return v.Project }).(pulumi.StringPtrOutput)
+func (o TeamEnvironmentPermissionOutput) Project() pulumi.StringOutput {
+	return o.ApplyT(func(v *TeamEnvironmentPermission) pulumi.StringOutput { return v.Project }).(pulumi.StringOutput)
 }
 
 // Team name.

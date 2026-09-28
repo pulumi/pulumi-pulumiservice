@@ -35,14 +35,14 @@ public class Provider extends com.pulumi.resources.ProviderResource {
      * 
      */
     @Export(name="apiUrl", refs={String.class}, tree="[0]")
-    private Output</* @Nullable */ String> apiUrl;
+    private Output<String> apiUrl;
 
     /**
      * @return Optional override of Pulumi Cloud API endpoint.
      * 
      */
-    public Output<Optional<String>> apiUrl() {
-        return Codegen.optional(this.apiUrl);
+    public Output<String> apiUrl() {
+        return this.apiUrl;
     }
 
     /**

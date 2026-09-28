@@ -12,7 +12,6 @@ import com.pulumi.pulumiservice.Utilities;
 import java.lang.Boolean;
 import java.lang.String;
 import java.util.List;
-import java.util.Optional;
 import javax.annotation.Nullable;
 
 /**
@@ -26,14 +25,14 @@ public class TtlSchedule extends com.pulumi.resources.CustomResource {
      * 
      */
     @Export(name="deleteAfterDestroy", refs={Boolean.class}, tree="[0]")
-    private Output</* @Nullable */ Boolean> deleteAfterDestroy;
+    private Output<Boolean> deleteAfterDestroy;
 
     /**
      * @return True if the stack and all associated history and settings should be deleted.
      * 
      */
-    public Output<Optional<Boolean>> deleteAfterDestroy() {
-        return Codegen.optional(this.deleteAfterDestroy);
+    public Output<Boolean> deleteAfterDestroy() {
+        return this.deleteAfterDestroy;
     }
     /**
      * Organization name.

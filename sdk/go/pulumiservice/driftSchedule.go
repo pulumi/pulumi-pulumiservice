@@ -17,7 +17,7 @@ type DriftSchedule struct {
 	pulumi.CustomResourceState
 
 	// Whether any drift detected should be remediated after a drift run.
-	AutoRemediate pulumi.BoolPtrOutput `pulumi:"autoRemediate"`
+	AutoRemediate pulumi.BoolOutput `pulumi:"autoRemediate"`
 	// Organization name.
 	Organization pulumi.StringOutput `pulumi:"organization"`
 	// Project name.
@@ -205,8 +205,8 @@ func (o DriftScheduleOutput) ToDriftScheduleOutputWithContext(ctx context.Contex
 }
 
 // Whether any drift detected should be remediated after a drift run.
-func (o DriftScheduleOutput) AutoRemediate() pulumi.BoolPtrOutput {
-	return o.ApplyT(func(v *DriftSchedule) pulumi.BoolPtrOutput { return v.AutoRemediate }).(pulumi.BoolPtrOutput)
+func (o DriftScheduleOutput) AutoRemediate() pulumi.BoolOutput {
+	return o.ApplyT(func(v *DriftSchedule) pulumi.BoolOutput { return v.AutoRemediate }).(pulumi.BoolOutput)
 }
 
 // Organization name.

@@ -19,7 +19,7 @@ namespace Pulumi.PulumiService
         /// True if the stack and all associated history and settings should be deleted.
         /// </summary>
         [Output("deleteAfterDestroy")]
-        public Output<bool?> DeleteAfterDestroy { get; private set; } = null!;
+        public Output<bool> DeleteAfterDestroy { get; private set; } = null!;
 
         /// <summary>
         /// Organization name.

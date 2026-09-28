@@ -45,7 +45,7 @@ export class EnvironmentVersionTag extends pulumi.CustomResource {
     /**
      * Project name.
      */
-    declare public readonly project: pulumi.Output<string | undefined>;
+    declare public readonly project: pulumi.Output<string>;
     /**
      * Revision number.
      */

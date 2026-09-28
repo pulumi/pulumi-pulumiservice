@@ -22,7 +22,7 @@ namespace Pulumi.PulumiService
         /// Optional override of Pulumi Cloud API endpoint.
         /// </summary>
         [Output("apiUrl")]
-        public Output<string?> ApiUrl { get; private set; } = null!;
+        public Output<string> ApiUrl { get; private set; } = null!;
 
 
         /// <summary>

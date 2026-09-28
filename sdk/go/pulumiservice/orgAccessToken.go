@@ -12,12 +12,14 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
-// The Pulumi Cloud allows users to create access tokens scoped to orgs. Org access tokens is a resource to create them and assign them to an org
+// Creates an access token scoped to a Pulumi Cloud organization.
+//
+// The provider must be authenticated as a user, for example with a personal access token, to create or delete this resource. Organization and team access tokens cannot create or delete organization tokens, even when they have the Admin role, so that a token cannot be used to mint further organization tokens. Such requests fail with `403 Machine tokens are not allowed to perform this operation`. For automation, use the personal access token of a dedicated service-account user. `TeamAccessToken` does not have this restriction.
 type OrgAccessToken struct {
 	pulumi.CustomResourceState
 
 	// Optional. True if this is an admin token.
-	Admin pulumi.BoolPtrOutput `pulumi:"admin"`
+	Admin pulumi.BoolOutput `pulumi:"admin"`
 	// Optional. Description for the token.
 	Description pulumi.StringPtrOutput `pulumi:"description"`
 	// The name for the token.
@@ -198,8 +200,8 @@ func (o OrgAccessTokenOutput) ToOrgAccessTokenOutputWithContext(ctx context.Cont
 }
 
 // Optional. True if this is an admin token.
-func (o OrgAccessTokenOutput) Admin() pulumi.BoolPtrOutput {
-	return o.ApplyT(func(v *OrgAccessToken) pulumi.BoolPtrOutput { return v.Admin }).(pulumi.BoolPtrOutput)
+func (o OrgAccessTokenOutput) Admin() pulumi.BoolOutput {
+	return o.ApplyT(func(v *OrgAccessToken) pulumi.BoolOutput { return v.Admin }).(pulumi.BoolOutput)
 }
 
 // Optional. Description for the token.

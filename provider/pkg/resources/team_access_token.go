@@ -41,8 +41,9 @@ var (
 func (*TeamAccessToken) Annotate(a infer.Annotator) {
 	a.Describe(
 		&TeamAccessToken{},
-		"The Pulumi Cloud allows users to create access tokens scoped to team. "+
-			"Team access tokens is a resource to create them and assign them to a team",
+		"Creates an access token scoped to a Pulumi Cloud team.\n\n"+
+			"Unlike `OrgAccessToken`, this resource can be created by a provider authenticated with "+
+			"an organization or team access token.",
 	)
 }
 

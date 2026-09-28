@@ -56,7 +56,7 @@ export class TeamEnvironmentPermission extends pulumi.CustomResource {
     /**
      * Project name.
      */
-    declare public readonly project: pulumi.Output<string | undefined>;
+    declare public readonly project: pulumi.Output<string>;
     /**
      * Team name.
      */

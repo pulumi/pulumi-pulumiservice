@@ -101,7 +101,9 @@ class OrgAccessToken(pulumi.CustomResource):
                  organization_name: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         """
-        The Pulumi Cloud allows users to create access tokens scoped to orgs. Org access tokens is a resource to create them and assign them to an org
+        Creates an access token scoped to a Pulumi Cloud organization.
+
+        The provider must be authenticated as a user, for example with a personal access token, to create or delete this resource. Organization and team access tokens cannot create or delete organization tokens, even when they have the Admin role, so that a token cannot be used to mint further organization tokens. Such requests fail with `403 Machine tokens are not allowed to perform this operation`. For automation, use the personal access token of a dedicated service-account user. `TeamAccessToken` does not have this restriction.
 
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
@@ -117,7 +119,9 @@ class OrgAccessToken(pulumi.CustomResource):
                  args: OrgAccessTokenArgs,
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
-        The Pulumi Cloud allows users to create access tokens scoped to orgs. Org access tokens is a resource to create them and assign them to an org
+        Creates an access token scoped to a Pulumi Cloud organization.
+
+        The provider must be authenticated as a user, for example with a personal access token, to create or delete this resource. Organization and team access tokens cannot create or delete organization tokens, even when they have the Admin role, so that a token cannot be used to mint further organization tokens. Such requests fail with `403 Machine tokens are not allowed to perform this operation`. For automation, use the personal access token of a dedicated service-account user. `TeamAccessToken` does not have this restriction.
 
         :param str resource_name: The name of the resource.
         :param OrgAccessTokenArgs args: The arguments to use to populate this resource's properties.
@@ -193,7 +197,7 @@ class OrgAccessToken(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter
-    def admin(self) -> pulumi.Output[Optional[_builtins.bool]]:
+    def admin(self) -> pulumi.Output[_builtins.bool]:
         """
         Optional. True if this is an admin token.
         """

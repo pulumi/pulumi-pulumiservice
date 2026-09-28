@@ -12,7 +12,6 @@ import com.pulumi.pulumiservice.Utilities;
 import java.lang.Boolean;
 import java.lang.String;
 import java.util.List;
-import java.util.Optional;
 import javax.annotation.Nullable;
 
 /**
@@ -26,14 +25,14 @@ public class DriftSchedule extends com.pulumi.resources.CustomResource {
      * 
      */
     @Export(name="autoRemediate", refs={Boolean.class}, tree="[0]")
-    private Output</* @Nullable */ Boolean> autoRemediate;
+    private Output<Boolean> autoRemediate;
 
     /**
      * @return Whether any drift detected should be remediated after a drift run.
      * 
      */
-    public Output<Optional<Boolean>> autoRemediate() {
-        return Codegen.optional(this.autoRemediate);
+    public Output<Boolean> autoRemediate() {
+        return this.autoRemediate;
     }
     /**
      * Organization name.

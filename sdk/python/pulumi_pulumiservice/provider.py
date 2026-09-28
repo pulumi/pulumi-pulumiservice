@@ -133,7 +133,7 @@ class Provider(pulumi.ProviderResource):
 
     @_builtins.property
     @pulumi.getter(name="apiUrl")
-    def api_url(self) -> pulumi.Output[Optional[_builtins.str]]:
+    def api_url(self) -> pulumi.Output[_builtins.str]:
         """
         Optional override of Pulumi Cloud API endpoint.
         """
