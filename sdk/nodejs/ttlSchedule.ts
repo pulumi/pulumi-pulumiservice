@@ -37,7 +37,7 @@ export class TtlSchedule extends pulumi.CustomResource {
     /**
      * True if the stack and all associated history and settings should be deleted.
      */
-    declare public readonly deleteAfterDestroy: pulumi.Output<boolean | undefined>;
+    declare public readonly deleteAfterDestroy: pulumi.Output<boolean>;
     /**
      * Organization name.
      */

@@ -17,7 +17,7 @@ type TtlSchedule struct {
 	pulumi.CustomResourceState
 
 	// True if the stack and all associated history and settings should be deleted.
-	DeleteAfterDestroy pulumi.BoolPtrOutput `pulumi:"deleteAfterDestroy"`
+	DeleteAfterDestroy pulumi.BoolOutput `pulumi:"deleteAfterDestroy"`
 	// Organization name.
 	Organization pulumi.StringOutput `pulumi:"organization"`
 	// Project name.
@@ -206,8 +206,8 @@ func (o TtlScheduleOutput) ToTtlScheduleOutputWithContext(ctx context.Context) T
 }
 
 // True if the stack and all associated history and settings should be deleted.
-func (o TtlScheduleOutput) DeleteAfterDestroy() pulumi.BoolPtrOutput {
-	return o.ApplyT(func(v *TtlSchedule) pulumi.BoolPtrOutput { return v.DeleteAfterDestroy }).(pulumi.BoolPtrOutput)
+func (o TtlScheduleOutput) DeleteAfterDestroy() pulumi.BoolOutput {
+	return o.ApplyT(func(v *TtlSchedule) pulumi.BoolOutput { return v.DeleteAfterDestroy }).(pulumi.BoolOutput)
 }
 
 // Organization name.

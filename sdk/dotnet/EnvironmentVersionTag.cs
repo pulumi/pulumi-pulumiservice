@@ -31,7 +31,7 @@ namespace Pulumi.PulumiService
         /// Project name.
         /// </summary>
         [Output("project")]
-        public Output<string?> Project { get; private set; } = null!;
+        public Output<string> Project { get; private set; } = null!;
 
         /// <summary>
         /// Revision number.

@@ -28,14 +28,14 @@ public class OrgAccessToken extends com.pulumi.resources.CustomResource {
      * 
      */
     @Export(name="admin", refs={Boolean.class}, tree="[0]")
-    private Output</* @Nullable */ Boolean> admin;
+    private Output<Boolean> admin;
 
     /**
      * @return Optional. True if this is an admin token.
      * 
      */
-    public Output<Optional<Boolean>> admin() {
-        return Codegen.optional(this.admin);
+    public Output<Boolean> admin() {
+        return this.admin;
     }
     /**
      * Optional. Description for the token.

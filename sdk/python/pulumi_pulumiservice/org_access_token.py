@@ -197,7 +197,7 @@ class OrgAccessToken(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter
-    def admin(self) -> pulumi.Output[Optional[_builtins.bool]]:
+    def admin(self) -> pulumi.Output[_builtins.bool]:
         """
         Optional. True if this is an admin token.
         """

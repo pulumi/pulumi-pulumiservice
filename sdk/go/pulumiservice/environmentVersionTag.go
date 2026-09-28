@@ -21,7 +21,7 @@ type EnvironmentVersionTag struct {
 	// Organization name.
 	Organization pulumi.StringOutput `pulumi:"organization"`
 	// Project name.
-	Project pulumi.StringPtrOutput `pulumi:"project"`
+	Project pulumi.StringOutput `pulumi:"project"`
 	// Revision number.
 	Revision pulumi.IntOutput `pulumi:"revision"`
 	// Tag name.
@@ -214,8 +214,8 @@ func (o EnvironmentVersionTagOutput) Organization() pulumi.StringOutput {
 }
 
 // Project name.
-func (o EnvironmentVersionTagOutput) Project() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *EnvironmentVersionTag) pulumi.StringPtrOutput { return v.Project }).(pulumi.StringPtrOutput)
+func (o EnvironmentVersionTagOutput) Project() pulumi.StringOutput {
+	return o.ApplyT(func(v *EnvironmentVersionTag) pulumi.StringOutput { return v.Project }).(pulumi.StringOutput)
 }
 
 // Revision number.

@@ -214,7 +214,7 @@ class DriftSchedule(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter(name="autoRemediate")
-    def auto_remediate(self) -> pulumi.Output[Optional[_builtins.bool]]:
+    def auto_remediate(self) -> pulumi.Output[_builtins.bool]:
         """
         Whether any drift detected should be remediated after a drift run.
         """

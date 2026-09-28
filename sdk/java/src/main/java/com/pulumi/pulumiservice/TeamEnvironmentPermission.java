@@ -82,14 +82,14 @@ public class TeamEnvironmentPermission extends com.pulumi.resources.CustomResour
      * 
      */
     @Export(name="project", refs={String.class}, tree="[0]")
-    private Output</* @Nullable */ String> project;
+    private Output<String> project;
 
     /**
      * @return Project name.
      * 
      */
-    public Output<Optional<String>> project() {
-        return Codegen.optional(this.project);
+    public Output<String> project() {
+        return this.project;
     }
     /**
      * Team name.

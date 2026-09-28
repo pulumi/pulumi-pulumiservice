@@ -26,7 +26,7 @@ export class Provider extends pulumi.ProviderResource {
     /**
      * Optional override of Pulumi Cloud API endpoint.
      */
-    declare public readonly apiUrl: pulumi.Output<string | undefined>;
+    declare public readonly apiUrl: pulumi.Output<string>;
 
     /**
      * Create a Provider resource with the given unique name, arguments, and options.

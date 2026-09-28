@@ -214,7 +214,7 @@ class TtlSchedule(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter(name="deleteAfterDestroy")
-    def delete_after_destroy(self) -> pulumi.Output[Optional[_builtins.bool]]:
+    def delete_after_destroy(self) -> pulumi.Output[_builtins.bool]:
         """
         True if the stack and all associated history and settings should be deleted.
         """

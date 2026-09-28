@@ -39,7 +39,7 @@ export class OrgAccessToken extends pulumi.CustomResource {
     /**
      * Optional. True if this is an admin token.
      */
-    declare public readonly admin: pulumi.Output<boolean | undefined>;
+    declare public readonly admin: pulumi.Output<boolean>;
     /**
      * Optional. Description for the token.
      */

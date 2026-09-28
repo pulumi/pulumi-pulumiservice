@@ -21,7 +21,7 @@ namespace Pulumi.PulumiService
         /// Optional. True if this is an admin token.
         /// </summary>
         [Output("admin")]
-        public Output<bool?> Admin { get; private set; } = null!;
+        public Output<bool> Admin { get; private set; } = null!;
 
         /// <summary>
         /// Optional. Description for the token.

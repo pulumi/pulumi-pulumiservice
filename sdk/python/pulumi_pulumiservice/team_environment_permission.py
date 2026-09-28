@@ -266,7 +266,7 @@ class TeamEnvironmentPermission(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter
-    def project(self) -> pulumi.Output[Optional[_builtins.str]]:
+    def project(self) -> pulumi.Output[_builtins.str]:
         """
         Project name.
         """
