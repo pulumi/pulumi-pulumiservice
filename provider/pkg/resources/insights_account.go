@@ -205,16 +205,17 @@ func (*InsightsAccount) Create(
 		}, infer.ResourceInitFailedError{Reasons: []string{err.Error()}}
 	}
 	if account == nil {
-		return infer.CreateResponse[InsightsAccountState]{
-				ID: accountID,
-				Output: InsightsAccountState{
-					InsightsAccountCore: req.Inputs.InsightsAccountCore,
-				},
-			}, infer.ResourceInitFailedError{
-				Reasons: []string{
-					fmt.Sprintf("insights account '%s' not found after creation", req.Inputs.AccountName),
-				},
-			}
+		partial := infer.CreateResponse[InsightsAccountState]{
+			ID: accountID,
+			Output: InsightsAccountState{
+				InsightsAccountCore: req.Inputs.InsightsAccountCore,
+			},
+		}
+		return partial, infer.ResourceInitFailedError{
+			Reasons: []string{
+				fmt.Sprintf("insights account '%s' not found after creation", req.Inputs.AccountName),
+			},
+		}
 	}
 
 	return infer.CreateResponse[InsightsAccountState]{
@@ -359,14 +360,15 @@ func (*InsightsAccount) Update(
 		}, infer.ResourceInitFailedError{Reasons: []string{err.Error()}}
 	}
 	if account == nil {
-		return infer.UpdateResponse[InsightsAccountState]{
-				Output: InsightsAccountState{
-					InsightsAccountCore: req.Inputs.InsightsAccountCore,
-					InsightsAccountID:   req.State.InsightsAccountID,
-				},
-			}, infer.ResourceInitFailedError{
-				Reasons: []string{fmt.Sprintf("insights account '%s' not found after update", req.State.AccountName)},
-			}
+		partial := infer.UpdateResponse[InsightsAccountState]{
+			Output: InsightsAccountState{
+				InsightsAccountCore: req.Inputs.InsightsAccountCore,
+				InsightsAccountID:   req.State.InsightsAccountID,
+			},
+		}
+		return partial, infer.ResourceInitFailedError{
+			Reasons: []string{fmt.Sprintf("insights account '%s' not found after update", req.State.AccountName)},
+		}
 	}
 
 	return infer.UpdateResponse[InsightsAccountState]{

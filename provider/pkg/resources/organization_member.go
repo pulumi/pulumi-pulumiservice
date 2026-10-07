@@ -170,14 +170,15 @@ func (*OrganizationMember) Create(
 			roleToSet,
 			core.RoleId,
 		); err != nil {
-			return infer.CreateResponse[OrganizationMemberState]{
-					ID: id,
-					Output: OrganizationMemberState{
-						OrganizationMemberCore: core,
-					},
-				}, infer.ResourceInitFailedError{Reasons: []string{
-					fmt.Sprintf("user added but failed to assign role: %s", err.Error()),
-				}}
+			partial := infer.CreateResponse[OrganizationMemberState]{
+				ID: id,
+				Output: OrganizationMemberState{
+					OrganizationMemberCore: core,
+				},
+			}
+			return partial, infer.ResourceInitFailedError{Reasons: []string{
+				fmt.Sprintf("user added but failed to assign role: %s", err.Error()),
+			}}
 		}
 	}
 

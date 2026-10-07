@@ -109,12 +109,13 @@ func (*StackTags) Create(
 		if err := client.CreateStackTag(ctx, stackIdentifier, pulumiapi.StackTag{Name: name, Value: value}); err != nil {
 			partial := req.Inputs
 			partial.Tags = created
-			return infer.CreateResponse[StackTagsState]{
-					ID:     id,
-					Output: partial,
-				}, infer.ResourceInitFailedError{
-					Reasons: []string{fmt.Sprintf("failed to create tag %q: %s", name, err.Error())},
-				}
+			resp := infer.CreateResponse[StackTagsState]{
+				ID:     id,
+				Output: partial,
+			}
+			return resp, infer.ResourceInitFailedError{
+				Reasons: []string{fmt.Sprintf("failed to create tag %q: %s", name, err.Error())},
+			}
 		}
 		created[name] = value
 	}
