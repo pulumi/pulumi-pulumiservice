@@ -275,8 +275,14 @@ func permissionSetDetails(in RbacPermissionSetInput) apitype.PermissionDescripto
 }
 
 // sdkCanRead reports whether the Cloud SDK can report scope s back on read.
-// Its unmarshaller silently drops scopes newer than the SDK version, so the
-// provider cannot tell whether such a scope is still granted.
+//
+// The SDK's RbacPermission enum is generated with fixup validation:
+// RbacPermissionSlice.UnmarshalJSON silently drops any scope that isn't in
+// the pinned SDK version, while marshalling sends every value verbatim (see
+// TestCreateRoleSendsScopesUnknownToTheSDK in pulumiapi/roles_test.go). A
+// scope Pulumi Cloud added after that SDK version can therefore be granted
+// through `additionalPermissions` but never appears in a GetRole response, so
+// the provider cannot tell whether it is still granted.
 func sdkCanRead(s string) bool {
 	return apitype.RbacPermission(s).IsValid()
 }
@@ -326,7 +332,11 @@ func permissionSetInputFromAPI(
 		}
 	}
 	// Carry forward scopes the SDK cannot report back, rather than showing
-	// them as removed on every refresh.
+	// them as removed on every refresh. The trade-off: if such a scope is
+	// removed outside Pulumi (in the console, or because Pulumi Cloud retires
+	// it), refresh won't report the drift until the Cloud SDK is bumped to a
+	// version that knows the scope. That is unlikely in practice, because
+	// Pulumi Cloud rarely retires scopes and Renovate bumps the SDK often.
 	for _, s := range prior.Permissions {
 		if !sdkCanRead(string(s)) {
 			perms = append(perms, s)
