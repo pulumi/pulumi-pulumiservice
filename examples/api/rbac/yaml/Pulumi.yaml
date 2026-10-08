@@ -9,4 +9,4 @@ config:
     default: manual
   roleDescription:
     type: string
-    default: Read-only access to stacks, created by the api rbac example.
+    default: Stack read everywhere, plus write on stacks tagged team=platform.

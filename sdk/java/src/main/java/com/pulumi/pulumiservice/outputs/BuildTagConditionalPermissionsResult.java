@@ -11,16 +11,16 @@ import java.util.Map;
 import java.util.Objects;
 
 @CustomType
-public final class BuildStackScopedPermissionsResult {
+public final class BuildTagConditionalPermissionsResult {
     /**
-     * @return A `PermissionDescriptorCondition` tree gating the grant on the named stack.
+     * @return A `PermissionDescriptorCondition` tree gating the grant on the tag.
      * 
      */
     private Map<String,Object> permissions;
 
-    private BuildStackScopedPermissionsResult() {}
+    private BuildTagConditionalPermissionsResult() {}
     /**
-     * @return A `PermissionDescriptorCondition` tree gating the grant on the named stack.
+     * @return A `PermissionDescriptorCondition` tree gating the grant on the tag.
      * 
      */
     public Map<String,Object> permissions() {
@@ -31,14 +31,14 @@ public final class BuildStackScopedPermissionsResult {
         return new Builder();
     }
 
-    public static Builder builder(BuildStackScopedPermissionsResult defaults) {
+    public static Builder builder(BuildTagConditionalPermissionsResult defaults) {
         return new Builder(defaults);
     }
     @CustomType.Builder
     public static final class Builder {
         private Map<String,Object> permissions;
         public Builder() {}
-        public Builder(BuildStackScopedPermissionsResult defaults) {
+        public Builder(BuildTagConditionalPermissionsResult defaults) {
     	      Objects.requireNonNull(defaults);
     	      this.permissions = defaults.permissions;
         }
@@ -46,13 +46,13 @@ public final class BuildStackScopedPermissionsResult {
         @CustomType.Setter
         public Builder permissions(Map<String,Object> permissions) {
             if (permissions == null) {
-              throw new MissingRequiredPropertyException("BuildStackScopedPermissionsResult", "permissions");
+              throw new MissingRequiredPropertyException("BuildTagConditionalPermissionsResult", "permissions");
             }
             this.permissions = permissions;
             return this;
         }
-        public BuildStackScopedPermissionsResult build() {
-            final var _resultValue = new BuildStackScopedPermissionsResult();
+        public BuildTagConditionalPermissionsResult build() {
+            final var _resultValue = new BuildTagConditionalPermissionsResult();
             _resultValue.permissions = permissions;
             return _resultValue;
         }

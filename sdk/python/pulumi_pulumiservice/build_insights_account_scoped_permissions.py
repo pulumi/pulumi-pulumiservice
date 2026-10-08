@@ -32,7 +32,7 @@ class BuildInsightsAccountScopedPermissionsResult:
     @pulumi.getter
     def permissions(self) -> Mapping[str, Any]:
         """
-        A `PermissionDescriptorCondition` tree gating a `PermissionDescriptorAllow` on the named insights account, ready to assign to `OrganizationRole.permissions`.
+        A `PermissionDescriptorCondition` tree gating the grant on the named insights account.
         """
         return pulumi.get(self, "permissions")
 
@@ -48,33 +48,39 @@ class AwaitableBuildInsightsAccountScopedPermissionsResult(BuildInsightsAccountS
 
 def build_insights_account_scoped_permissions(insights_account_id: Optional[_builtins.str] = None,
                                               permissions: Optional[Sequence[_builtins.str]] = None,
+                                              set_ids: Optional[Sequence[_builtins.str]] = None,
                                               opts: Optional[pulumi.InvokeOptions] = None) -> AwaitableBuildInsightsAccountScopedPermissionsResult:
     """
-    Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named insights account. Pair with `InsightsAccount.insightsAccountId` (or the `getInsightsAccount` data source). The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls the output of each helper.
+    Builds a permission descriptor that grants the supplied scopes or permission sets only on the named insights account. Pair with `InsightsAccount.insightsAccountId` (or the `getInsightsAccount` data source). The result is directly assignable to `OrganizationRole.permissions` or `api.Role.details`. To combine several grants in one descriptor, pass the output of each helper to `buildGroupPermissions`.
 
     :param _builtins.str insights_account_id: The target insights account's identifier. Use the `insightsAccountId` output of an `InsightsAccount` resource or the `getInsightsAccount` data source.
     :param Sequence[_builtins.str] permissions: The set of `insights-account:*` scopes to grant on the target account. Discover valid scope names via the `getOrganizationRoleScopes` data source.
+    :param Sequence[_builtins.str] set_ids: The IDs of the permission sets to grant on the target insights account. Set exactly one of `permissions` or `setIds`. `permissions` grants the scopes inline. `setIds` grants the referenced permission sets (`api.Role` with `uxPurpose: set`), which is the shape Pulumi Cloud uses for policies (`api.Role` with `uxPurpose: policy`).
     """
     __args__ = dict()
     __args__['insightsAccountId'] = insights_account_id
     __args__['permissions'] = permissions
+    __args__['setIds'] = set_ids
     opts = pulumi.InvokeOptions.merge(_utilities.get_invoke_opts_defaults(), opts)
     __ret__ = pulumi.runtime.invoke('pulumiservice:index:buildInsightsAccountScopedPermissions', __args__, opts=opts, typ=BuildInsightsAccountScopedPermissionsResult).value
 
     return AwaitableBuildInsightsAccountScopedPermissionsResult(
         permissions=pulumi.get(__ret__, 'permissions'))
 def build_insights_account_scoped_permissions_output(insights_account_id: pulumi.Input[Optional[_builtins.str]] = None,
-                                                     permissions: pulumi.Input[Optional[Sequence[_builtins.str]]] = None,
+                                                     permissions: pulumi.Input[Optional[Optional[Sequence[_builtins.str]]]] = None,
+                                                     set_ids: pulumi.Input[Optional[Optional[Sequence[_builtins.str]]]] = None,
                                                      opts: Optional[Union[pulumi.InvokeOptions, pulumi.InvokeOutputOptions]] = None) -> pulumi.Output[BuildInsightsAccountScopedPermissionsResult]:
     """
-    Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named insights account. Pair with `InsightsAccount.insightsAccountId` (or the `getInsightsAccount` data source). The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls the output of each helper.
+    Builds a permission descriptor that grants the supplied scopes or permission sets only on the named insights account. Pair with `InsightsAccount.insightsAccountId` (or the `getInsightsAccount` data source). The result is directly assignable to `OrganizationRole.permissions` or `api.Role.details`. To combine several grants in one descriptor, pass the output of each helper to `buildGroupPermissions`.
 
     :param _builtins.str insights_account_id: The target insights account's identifier. Use the `insightsAccountId` output of an `InsightsAccount` resource or the `getInsightsAccount` data source.
     :param Sequence[_builtins.str] permissions: The set of `insights-account:*` scopes to grant on the target account. Discover valid scope names via the `getOrganizationRoleScopes` data source.
+    :param Sequence[_builtins.str] set_ids: The IDs of the permission sets to grant on the target insights account. Set exactly one of `permissions` or `setIds`. `permissions` grants the scopes inline. `setIds` grants the referenced permission sets (`api.Role` with `uxPurpose: set`), which is the shape Pulumi Cloud uses for policies (`api.Role` with `uxPurpose: policy`).
     """
     __args__ = dict()
     __args__['insightsAccountId'] = insights_account_id
     __args__['permissions'] = permissions
+    __args__['setIds'] = set_ids
     opts = pulumi.InvokeOutputOptions.merge(_utilities.get_invoke_opts_defaults(), opts)
     __ret__ = pulumi.runtime.invoke_output('pulumiservice:index:buildInsightsAccountScopedPermissions', __args__, opts=opts, typ=BuildInsightsAccountScopedPermissionsResult)
     return __ret__.apply(lambda __response__: BuildInsightsAccountScopedPermissionsResult(

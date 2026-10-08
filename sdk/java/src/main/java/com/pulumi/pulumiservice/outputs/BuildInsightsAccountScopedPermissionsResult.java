@@ -13,14 +13,14 @@ import java.util.Objects;
 @CustomType
 public final class BuildInsightsAccountScopedPermissionsResult {
     /**
-     * @return A `PermissionDescriptorCondition` tree gating a `PermissionDescriptorAllow` on the named insights account, ready to assign to `OrganizationRole.permissions`.
+     * @return A `PermissionDescriptorCondition` tree gating the grant on the named insights account.
      * 
      */
     private Map<String,Object> permissions;
 
     private BuildInsightsAccountScopedPermissionsResult() {}
     /**
-     * @return A `PermissionDescriptorCondition` tree gating a `PermissionDescriptorAllow` on the named insights account, ready to assign to `OrganizationRole.permissions`.
+     * @return A `PermissionDescriptorCondition` tree gating the grant on the named insights account.
      * 
      */
     public Map<String,Object> permissions() {

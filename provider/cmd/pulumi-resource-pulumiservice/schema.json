@@ -6994,7 +6994,7 @@
   },
   "functions": {
     "pulumiservice:index:buildAllowPermissions": {
-      "description": "Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes globally — i.e. on every entity of the matching resource type. This is the simplest descriptor: a flat `PermissionDescriptorAllow`. Use this helper instead of hand-authoring the descriptor literal so the wire-format `__type` discriminator stays an implementation detail. For grants scoped to a specific entity, see `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, or `buildInsightsAccountScopedPermissions`. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls the output of each helper.",
+      "description": "Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes globally — i.e. on every entity of the matching resource type. This is the simplest descriptor: a flat `PermissionDescriptorAllow`. Use this helper instead of hand-authoring the descriptor literal so the wire-format `__type` discriminator stays an implementation detail. For grants scoped to a specific entity, see `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, or `buildInsightsAccountScopedPermissions`. The result is directly assignable to `OrganizationRole.permissions` or `api.Role.details`. To combine several grants in one descriptor, pass the output of each helper to `buildGroupPermissions`.",
       "inputs": {
         "properties": {
           "permissions": {
@@ -7026,8 +7026,41 @@
         "type": "object"
       }
     },
+    "pulumiservice:index:buildComposePermissions": {
+      "description": "Builds a `PermissionDescriptorCompose` that grants the union of the referenced permission descriptors. Pulumi Cloud models a role in three layers: a role composes policies, a policy composes permission sets, and a set grants scopes. Use this helper for an `api.Role` with `uxPurpose: role` (pass policy IDs) and for the unconditional entry of a policy (pass set IDs).",
+      "inputs": {
+        "properties": {
+          "permissionDescriptorIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "The IDs of the descriptors to compose. A role may reference only policies, and a policy may reference only sets."
+          }
+        },
+        "type": "object",
+        "required": [
+          "permissionDescriptorIds"
+        ]
+      },
+      "outputs": {
+        "properties": {
+          "permissions": {
+            "additionalProperties": {
+              "$ref": "pulumi.json#/Any"
+            },
+            "description": "A `PermissionDescriptorCompose` referencing the supplied IDs.",
+            "type": "object"
+          }
+        },
+        "required": [
+          "permissions"
+        ],
+        "type": "object"
+      }
+    },
     "pulumiservice:index:buildEnvironmentScopedPermissions": {
-      "description": "Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named environment. Pair with `Environment.environmentId` (or the `getEnvironment` data source) to avoid hand-rolling the `PermissionDescriptorCondition` tree yourself. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls the output of each helper.",
+      "description": "Builds a permission descriptor that grants the supplied scopes or permission sets only on the named environment. Pair with `Environment.environmentId` (or the `getEnvironment` data source) to avoid hand-rolling the `PermissionDescriptorCondition` tree yourself. The result is directly assignable to `OrganizationRole.permissions` or `api.Role.details`. To combine several grants in one descriptor, pass the output of each helper to `buildGroupPermissions`.",
       "inputs": {
         "properties": {
           "environmentId": {
@@ -7040,12 +7073,18 @@
               "type": "string"
             },
             "description": "The set of `environment:*` scopes to grant on the target environment (e.g. `environment:read`, `environment:open`, `environment:update`). Discover valid scope names via the `getOrganizationRoleScopes` data source."
+          },
+          "setIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "The IDs of the permission sets to grant on the target environment. Set exactly one of `permissions` or `setIds`. `permissions` grants the scopes inline. `setIds` grants the referenced permission sets (`api.Role` with `uxPurpose: set`), which is the shape Pulumi Cloud uses for policies (`api.Role` with `uxPurpose: policy`)."
           }
         },
         "type": "object",
         "required": [
-          "environmentId",
-          "permissions"
+          "environmentId"
         ]
       },
       "outputs": {
@@ -7054,7 +7093,43 @@
             "additionalProperties": {
               "$ref": "pulumi.json#/Any"
             },
-            "description": "A `PermissionDescriptorCondition` tree gating a `PermissionDescriptorAllow` on the named environment, ready to assign to `OrganizationRole.permissions`.",
+            "description": "A `PermissionDescriptorCondition` tree gating the grant on the named environment.",
+            "type": "object"
+          }
+        },
+        "required": [
+          "permissions"
+        ],
+        "type": "object"
+      }
+    },
+    "pulumiservice:index:buildGroupPermissions": {
+      "description": "Builds a `PermissionDescriptorGroup` that grants the union of its entries. Use it for the `details` of an `api.Role` with `uxPurpose: policy`: one `buildComposePermissions` entry for the sets granted everywhere, plus one conditional entry (for example from `buildTagConditionalPermissions` or `buildStackScopedPermissions` with `setIds`) per targeted grant.",
+      "inputs": {
+        "properties": {
+          "entries": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": {
+                "$ref": "pulumi.json#/Any"
+              }
+            },
+            "description": "The descriptors to group, typically the `permissions` outputs of the other `build*` helpers."
+          }
+        },
+        "type": "object",
+        "required": [
+          "entries"
+        ]
+      },
+      "outputs": {
+        "properties": {
+          "permissions": {
+            "additionalProperties": {
+              "$ref": "pulumi.json#/Any"
+            },
+            "description": "A `PermissionDescriptorGroup` containing the supplied entries.",
             "type": "object"
           }
         },
@@ -7065,7 +7140,7 @@
       }
     },
     "pulumiservice:index:buildInsightsAccountScopedPermissions": {
-      "description": "Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named insights account. Pair with `InsightsAccount.insightsAccountId` (or the `getInsightsAccount` data source). The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls the output of each helper.",
+      "description": "Builds a permission descriptor that grants the supplied scopes or permission sets only on the named insights account. Pair with `InsightsAccount.insightsAccountId` (or the `getInsightsAccount` data source). The result is directly assignable to `OrganizationRole.permissions` or `api.Role.details`. To combine several grants in one descriptor, pass the output of each helper to `buildGroupPermissions`.",
       "inputs": {
         "properties": {
           "insightsAccountId": {
@@ -7078,12 +7153,18 @@
               "type": "string"
             },
             "description": "The set of `insights-account:*` scopes to grant on the target account. Discover valid scope names via the `getOrganizationRoleScopes` data source."
+          },
+          "setIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "The IDs of the permission sets to grant on the target insights account. Set exactly one of `permissions` or `setIds`. `permissions` grants the scopes inline. `setIds` grants the referenced permission sets (`api.Role` with `uxPurpose: set`), which is the shape Pulumi Cloud uses for policies (`api.Role` with `uxPurpose: policy`)."
           }
         },
         "type": "object",
         "required": [
-          "insightsAccountId",
-          "permissions"
+          "insightsAccountId"
         ]
       },
       "outputs": {
@@ -7092,7 +7173,7 @@
             "additionalProperties": {
               "$ref": "pulumi.json#/Any"
             },
-            "description": "A `PermissionDescriptorCondition` tree gating a `PermissionDescriptorAllow` on the named insights account, ready to assign to `OrganizationRole.permissions`.",
+            "description": "A `PermissionDescriptorCondition` tree gating the grant on the named insights account.",
             "type": "object"
           }
         },
@@ -7103,7 +7184,7 @@
       }
     },
     "pulumiservice:index:buildStackScopedPermissions": {
-      "description": "Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named stack. The `stackId` is the stack's opaque Pulumi Cloud identifier — distinct from the `organization/project/stack` triple. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls the output of each helper.",
+      "description": "Builds a permission descriptor that grants the supplied scopes or permission sets only on the named stack. The `stackId` is the stack's opaque Pulumi Cloud identifier — distinct from the `organization/project/stack` triple. The result is directly assignable to `OrganizationRole.permissions` or `api.Role.details`. To combine several grants in one descriptor, pass the output of each helper to `buildGroupPermissions`.",
       "inputs": {
         "properties": {
           "permissions": {
@@ -7113,6 +7194,13 @@
             },
             "description": "The set of `stack:*` scopes to grant on the target stack (e.g. `stack:read`, `stack:edit`, `stack:admin`). Discover valid scope names via the `getOrganizationRoleScopes` data source."
           },
+          "setIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "The IDs of the permission sets to grant on the target stack. Set exactly one of `permissions` or `setIds`. `permissions` grants the scopes inline. `setIds` grants the referenced permission sets (`api.Role` with `uxPurpose: set`), which is the shape Pulumi Cloud uses for policies (`api.Role` with `uxPurpose: policy`)."
+          },
           "stackId": {
             "type": "string",
             "description": "The target stack's opaque Pulumi Cloud identifier (not the `organization/project/stack` triple)."
@@ -7120,8 +7208,7 @@
         },
         "type": "object",
         "required": [
-          "stackId",
-          "permissions"
+          "stackId"
         ]
       },
       "outputs": {
@@ -7130,7 +7217,60 @@
             "additionalProperties": {
               "$ref": "pulumi.json#/Any"
             },
-            "description": "A `PermissionDescriptorCondition` tree gating a `PermissionDescriptorAllow` on the named stack, ready to assign to `OrganizationRole.permissions`.",
+            "description": "A `PermissionDescriptorCondition` tree gating the grant on the named stack.",
+            "type": "object"
+          }
+        },
+        "required": [
+          "permissions"
+        ],
+        "type": "object"
+      }
+    },
+    "pulumiservice:index:buildTagConditionalPermissions": {
+      "description": "Builds a permission descriptor that grants the supplied scopes or permission sets only on entities that carry a tag. With `tagValue`, the tag must have that exact value; without it, the tag key must exist. Tags are evaluated on existing entities, so grant create rights unconditionally. The result is directly assignable to `OrganizationRole.permissions` or `api.Role.details`. To combine several grants in one descriptor, pass the output of each helper to `buildGroupPermissions`.",
+      "inputs": {
+        "properties": {
+          "entityType": {
+            "type": "string",
+            "description": "The kind of entity whose tags are evaluated: `stack`, `environment`, or `insights-account`."
+          },
+          "permissions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "The scopes to grant on matching entities. Discover valid scope names via the `getOrganizationRoleScopes` data source."
+          },
+          "setIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "The IDs of the permission sets to grant on matching entities. Set exactly one of `permissions` or `setIds`. `permissions` grants the scopes inline. `setIds` grants the referenced permission sets (`api.Role` with `uxPurpose: set`), which is the shape Pulumi Cloud uses for policies (`api.Role` with `uxPurpose: policy`)."
+          },
+          "tagKey": {
+            "type": "string",
+            "description": "The tag key to match."
+          },
+          "tagValue": {
+            "type": "string",
+            "description": "The tag value to match. Omit it to match every entity that has `tagKey`, whatever its value."
+          }
+        },
+        "type": "object",
+        "required": [
+          "entityType",
+          "tagKey"
+        ]
+      },
+      "outputs": {
+        "properties": {
+          "permissions": {
+            "additionalProperties": {
+              "$ref": "pulumi.json#/Any"
+            },
+            "description": "A `PermissionDescriptorCondition` tree gating the grant on the tag.",
             "type": "object"
           }
         },
