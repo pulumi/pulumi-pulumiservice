@@ -79,3 +79,39 @@ func TestDeleteStack(t *testing.T) {
 		assert.EqualError(t, c.DeleteStack(ctx, s, false), "failed to delete stack: 401 API error: unauthorized")
 	})
 }
+
+func TestGetStackID(t *testing.T) {
+	s := StackIdentifier{
+		OrgName:     organizationKey,
+		ProjectName: projectKey,
+		StackName:   stackKey,
+	}
+	stackPath := fmt.Sprintf("/api/stacks/%s/%s/%s", s.OrgName, s.ProjectName, s.StackName)
+
+	t.Run("Happy Path", func(t *testing.T) {
+		c := startTestServer(t, testServerConfig{
+			ExpectedReqMethod: http.MethodGet,
+			ExpectedReqPath:   stackPath,
+			ResponseCode:      http.StatusOK,
+			ResponseBody:      map[string]string{"id": "program-123", "stackName": s.StackName},
+		})
+		id, err := c.GetStackID(ctx, s)
+		assert.NoError(t, err)
+		assert.Equal(t, "program-123", id)
+	})
+
+	t.Run("Not Found", func(t *testing.T) {
+		c := startTestServer(t, testServerConfig{
+			ExpectedReqMethod: http.MethodGet,
+			ExpectedReqPath:   stackPath,
+			ResponseCode:      http.StatusNotFound,
+			ResponseBody:      ErrorResponse{Message: notFoundError},
+		})
+		id, err := c.GetStackID(ctx, s)
+		assert.NoError(t, err)
+		assert.Empty(t, id)
+		exists, err := c.StackExists(ctx, s)
+		assert.NoError(t, err)
+		assert.False(t, exists)
+	})
+}

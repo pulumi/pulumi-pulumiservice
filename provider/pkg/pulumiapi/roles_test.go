@@ -2,6 +2,7 @@ package pulumiapi
 
 import (
 	"net/http"
+	"net/url"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -17,6 +18,7 @@ const (
 	readOnlyDescription = "read only access"
 	globalScope         = "global"
 	stackKey            = "stack"
+	testOrgRolesPath    = "/api/orgs/an-organization/roles"
 )
 
 // testRoleDetails is the wire-shape JSON the server speaks. Tests build a
@@ -48,7 +50,7 @@ func TestCreateRole(t *testing.T) {
 		}
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPost,
-			ExpectedReqPath:   "/api/orgs/an-organization/roles",
+			ExpectedReqPath:   testOrgRolesPath,
 			ExpectedReqBody: apitype.PermissionDescriptorBase{
 				Name:         readOnlyRoleName,
 				Description:  readOnlyDescription,
@@ -208,4 +210,29 @@ func TestDeleteRole(t *testing.T) {
 		})
 		assert.NoError(t, c.DeleteRole(ctx, testRoleOrgName, testRoleID, false))
 	})
+}
+
+func TestCreateRoleWithPolicy(t *testing.T) {
+	details := mustParseDetails(t)
+	policy := apitype.PermissionDescriptorBase{
+		Name:         readOnlyRoleName,
+		Description:  readOnlyDescription,
+		ResourceType: globalScope,
+		UxPurpose:    apitype.PermissionDescriptorUXPurposeRole,
+		Details:      details,
+	}
+	c := startTestServer(t, testServerConfig{
+		ExpectedReqMethod:   http.MethodPost,
+		ExpectedReqPath:     testOrgRolesPath,
+		ExpectedQueryParams: url.Values{"createPolicyAndRole": []string{"true"}},
+		ExpectedReqBody:     policy,
+		ResponseCode:        200,
+		ResponseBody: apitype.PermissionDescriptorRecord{
+			PermissionDescriptorBase: apitype.PermissionDescriptorBase{Name: readOnlyRoleName},
+			ID:                       testRoleID,
+		},
+	})
+	role, err := c.CreateRoleWithPolicy(t.Context(), testRoleOrgName, policy)
+	require.NoError(t, err)
+	assert.Equal(t, testRoleID, role.ID)
 }

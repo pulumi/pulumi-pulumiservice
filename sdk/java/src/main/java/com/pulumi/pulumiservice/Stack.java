@@ -64,6 +64,20 @@ public class Stack extends com.pulumi.resources.CustomResource {
         return this.projectName;
     }
     /**
+     * The stack&#39;s unique ID. Use it in an `RbacRole` entity rule to grant permissions on this stack.
+     * 
+     */
+    @Export(name="stackId", refs={String.class}, tree="[0]")
+    private Output</* @Nullable */ String> stackId;
+
+    /**
+     * @return The stack&#39;s unique ID. Use it in an `RbacRole` entity rule to grant permissions on this stack.
+     * 
+     */
+    public Output<Optional<String>> stackId() {
+        return Codegen.optional(this.stackId);
+    }
+    /**
      * The name of the stack.
      * 
      */

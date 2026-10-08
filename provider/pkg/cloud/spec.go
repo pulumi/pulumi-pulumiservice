@@ -30,7 +30,7 @@ import (
 
 // Spec source: https://api.pulumi.com/api/openapi/pulumi-spec.json
 //
-// `go generate` runs two steps in order:
+// `go generate` runs three steps in order:
 //  1. curl | jq         — refresh spec.json from the upstream URL
 //  2. scaffold-metadata — refresh per-resource operations in metadata.json.
 //     The scaffolder writes only the auto-derived `operations` block on
@@ -38,9 +38,13 @@ import (
 //     fields round-trip untouched. New tokens get an empty entry the human
 //     can decorate with overrides; tokens listed under top-level
 //     `_excluded` are skipped.
+//  3. gen-rbac-scopes   — regenerate the RbacScope enum so member names track
+//     the spec. rbac-scopes.json itself needs an access token to refresh; see
+//     scripts/fetch-rbac-scopes.sh.
 //
 //go:generate sh -c "curl -sf --max-time 60 https://api.pulumi.com/api/openapi/pulumi-spec.json | jq --sort-keys . > spec.json"
 //go:generate go run ../../tools/scaffold-metadata -in spec.json -out metadata.json
+//go:generate go run ../../tools/gen-rbac-scopes -scopes rbac-scopes.json -spec spec.json -out ../resources/zz_generated_rbac.go
 
 //go:embed spec.json
 var specJSON []byte

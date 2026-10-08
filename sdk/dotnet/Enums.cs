@@ -306,6 +306,764 @@ namespace Pulumi.PulumiService
     }
 
     [EnumType]
+    public readonly struct RbacResourceType : IEquatable<RbacResourceType>
+    {
+        private readonly string _value;
+
+        private RbacResourceType(string value)
+        {
+            _value = value ?? throw new ArgumentNullException(nameof(value));
+        }
+
+        /// <summary>
+        /// Permissions on ESC environments, granted through a role's environment entity rules.
+        /// </summary>
+        public static RbacResourceType Environment { get; } = new RbacResourceType("environment");
+        /// <summary>
+        /// Organization-wide permissions, granted through a role's organization-level access.
+        /// </summary>
+        public static RbacResourceType Global { get; } = new RbacResourceType("global");
+        /// <summary>
+        /// Permissions on Insights accounts, granted through a role's Insights account entity rules.
+        /// </summary>
+        public static RbacResourceType InsightsAccount { get; } = new RbacResourceType("insights-account");
+        /// <summary>
+        /// Permissions on stacks, granted through a role's stack entity rules.
+        /// </summary>
+        public static RbacResourceType Stack { get; } = new RbacResourceType("stack");
+
+        public static bool operator ==(RbacResourceType left, RbacResourceType right) => left.Equals(right);
+        public static bool operator !=(RbacResourceType left, RbacResourceType right) => !left.Equals(right);
+
+        public static explicit operator string(RbacResourceType value) => value._value;
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public override bool Equals(object? obj) => obj is RbacResourceType other && Equals(other);
+        public bool Equals(RbacResourceType other) => string.Equals(_value, other._value, StringComparison.Ordinal);
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public override int GetHashCode() => _value?.GetHashCode() ?? 0;
+
+        public override string ToString() => _value;
+    }
+
+    [EnumType]
+    public readonly struct RbacScope : IEquatable<RbacScope>
+    {
+        private readonly string _value;
+
+        private RbacScope(string value)
+        {
+            _value = value ?? throw new ArgumentNullException(nameof(value));
+        }
+
+        /// <summary>
+        /// Create agent pool. Applies to: global (Agent pools).
+        /// </summary>
+        public static RbacScope AgentPoolCreate { get; } = new RbacScope("agent_pool:create");
+        /// <summary>
+        /// Delete agent pool. Applies to: global (Agent pools).
+        /// </summary>
+        public static RbacScope AgentPoolDelete { get; } = new RbacScope("agent_pool:delete");
+        /// <summary>
+        /// Read agent pool. Applies to: global (Agent pools).
+        /// </summary>
+        public static RbacScope AgentPoolRead { get; } = new RbacScope("agent_pool:read");
+        /// <summary>
+        /// Update agent pool. Applies to: global (Agent pools).
+        /// </summary>
+        public static RbacScope AgentPoolUpdate { get; } = new RbacScope("agent_pool:update");
+        /// <summary>
+        /// Create Neo tasks. Applies to: global (Neo).
+        /// </summary>
+        public static RbacScope AgentTaskCreate { get; } = new RbacScope("agent_task:create");
+        /// <summary>
+        /// Export audit logs. Applies to: global (Audit logs).
+        /// </summary>
+        public static RbacScope AuditLogsExport { get; } = new RbacScope("audit_logs:export");
+        /// <summary>
+        /// Read audit logs. Applies to: global (Audit logs).
+        /// </summary>
+        public static RbacScope AuditLogsRead { get; } = new RbacScope("audit_logs:read");
+        /// <summary>
+        /// Read authentication policies. Applies to: global (OIDC).
+        /// </summary>
+        public static RbacScope AuthPoliciesRead { get; } = new RbacScope("auth_policies:read");
+        /// <summary>
+        /// Update authentication policies. Applies to: global (OIDC).
+        /// </summary>
+        public static RbacScope AuthPoliciesUpdate { get; } = new RbacScope("auth_policies:update");
+        /// <summary>
+        /// Create approval rules. Applies to: environment, global (Approvals).
+        /// </summary>
+        public static RbacScope ChangeGateCreate { get; } = new RbacScope("change_gate:create");
+        /// <summary>
+        /// Delete approval rules. Applies to: environment, global (Approvals).
+        /// </summary>
+        public static RbacScope ChangeGateDelete { get; } = new RbacScope("change_gate:delete");
+        /// <summary>
+        /// Update approval rules. Applies to: environment, global (Approvals).
+        /// </summary>
+        public static RbacScope ChangeGateUpdate { get; } = new RbacScope("change_gate:update");
+        /// <summary>
+        /// Pause deployments. Applies to: global (Deployments).
+        /// </summary>
+        public static RbacScope DeploymentsPause { get; } = new RbacScope("deployments:pause");
+        /// <summary>
+        /// Read deployments. Applies to: global (Deployments).
+        /// </summary>
+        public static RbacScope DeploymentsRead { get; } = new RbacScope("deployments:read");
+        /// <summary>
+        /// Read deployment usage. Applies to: global (Deployments).
+        /// </summary>
+        public static RbacScope DeploymentsReadUsage { get; } = new RbacScope("deployments:read_usage");
+        /// <summary>
+        /// Resume deployments. Applies to: global (Deployments).
+        /// </summary>
+        public static RbacScope DeploymentsResume { get; } = new RbacScope("deployments:resume");
+        /// <summary>
+        /// Clone environment. Applies to: environment (Environments).
+        /// </summary>
+        public static RbacScope EnvironmentClone { get; } = new RbacScope("environment:clone");
+        /// <summary>
+        /// Create environment. Applies to: global (Environment management).
+        /// </summary>
+        public static RbacScope EnvironmentCreate { get; } = new RbacScope("environment:create");
+        /// <summary>
+        /// Delete environment. Applies to: environment (Environments).
+        /// </summary>
+        public static RbacScope EnvironmentDelete { get; } = new RbacScope("environment:delete");
+        /// <summary>
+        /// List deleted environments. Applies to: global (Environment management).
+        /// </summary>
+        public static RbacScope EnvironmentListDeleted { get; } = new RbacScope("environment:list_deleted");
+        /// <summary>
+        /// Open and decrypt environment. Applies to: environment (Environments).
+        /// </summary>
+        public static RbacScope EnvironmentOpen { get; } = new RbacScope("environment:open");
+        /// <summary>
+        /// Read environment. Applies to: environment (Environments).
+        /// </summary>
+        public static RbacScope EnvironmentRead { get; } = new RbacScope("environment:read");
+        /// <summary>
+        /// Restore deleted environment. Applies to: global (Environment management).
+        /// </summary>
+        public static RbacScope EnvironmentRestoreDeleted { get; } = new RbacScope("environment:restore_deleted");
+        /// <summary>
+        /// Rotates secrets in an environment. Applies to: environment (Environment secrets rotation).
+        /// </summary>
+        public static RbacScope EnvironmentRotate { get; } = new RbacScope("environment:rotate");
+        /// <summary>
+        /// List secret rotation history of an environment. Applies to: environment (Environment secrets rotation).
+        /// </summary>
+        public static RbacScope EnvironmentRotateHistory { get; } = new RbacScope("environment:rotate_history");
+        /// <summary>
+        /// Write environment. Applies to: environment (Environments).
+        /// </summary>
+        public static RbacScope EnvironmentWrite { get; } = new RbacScope("environment:write");
+        /// <summary>
+        /// Creates a new environment schedule. Applies to: environment (Environment schedules).
+        /// </summary>
+        public static RbacScope EnvironmentScheduleCreate { get; } = new RbacScope("environment_schedule:create");
+        /// <summary>
+        /// Deletes an environment schedule. Applies to: environment (Environment schedules).
+        /// </summary>
+        public static RbacScope EnvironmentScheduleDelete { get; } = new RbacScope("environment_schedule:delete");
+        /// <summary>
+        /// Pauses an environment schedule. Applies to: environment (Environment schedules).
+        /// </summary>
+        public static RbacScope EnvironmentSchedulePause { get; } = new RbacScope("environment_schedule:pause");
+        /// <summary>
+        /// Reads an environment schedule. Applies to: environment (Environment schedules).
+        /// </summary>
+        public static RbacScope EnvironmentScheduleRead { get; } = new RbacScope("environment_schedule:read");
+        /// <summary>
+        /// Resumes an environment schedule. Applies to: environment (Environment schedules).
+        /// </summary>
+        public static RbacScope EnvironmentScheduleResume { get; } = new RbacScope("environment_schedule:resume");
+        /// <summary>
+        /// Updates an environment schedule. Applies to: environment (Environment schedules).
+        /// </summary>
+        public static RbacScope EnvironmentScheduleUpdate { get; } = new RbacScope("environment_schedule:update");
+        /// <summary>
+        /// Read environment settings. Applies to: environment (Environments).
+        /// </summary>
+        public static RbacScope EnvironmentSettingsRead { get; } = new RbacScope("environment_settings:read");
+        /// <summary>
+        /// Update environment settings. Applies to: environment (Environments).
+        /// </summary>
+        public static RbacScope EnvironmentSettingsUpdate { get; } = new RbacScope("environment_settings:update");
+        /// <summary>
+        /// Adds a new tag to an environment. Applies to: environment (Environment tags).
+        /// </summary>
+        public static RbacScope EnvironmentTagCreate { get; } = new RbacScope("environment_tag:create");
+        /// <summary>
+        /// Removes a tag from an environment. Applies to: environment (Environment tags).
+        /// </summary>
+        public static RbacScope EnvironmentTagDelete { get; } = new RbacScope("environment_tag:delete");
+        /// <summary>
+        /// Reads the value of an environments tag. Applies to: environment (Environment tags).
+        /// </summary>
+        public static RbacScope EnvironmentTagRead { get; } = new RbacScope("environment_tag:read");
+        /// <summary>
+        /// Modifies the value of an environments tag. Applies to: environment (Environment tags).
+        /// </summary>
+        public static RbacScope EnvironmentTagUpdate { get; } = new RbacScope("environment_tag:update");
+        /// <summary>
+        /// List the tags across all environments. Applies to: global (Environment management).
+        /// </summary>
+        public static RbacScope EnvironmentTagsList { get; } = new RbacScope("environment_tags:list");
+        /// <summary>
+        /// Creates a new version tag. Applies to: environment (Environment versions).
+        /// </summary>
+        public static RbacScope EnvironmentVersionCreate { get; } = new RbacScope("environment_version:create");
+        /// <summary>
+        /// Deletes a version tag. Applies to: environment (Environment versions).
+        /// </summary>
+        public static RbacScope EnvironmentVersionDelete { get; } = new RbacScope("environment_version:delete");
+        /// <summary>
+        /// Open and decrypt a version tag. Applies to: environment (Environment versions).
+        /// </summary>
+        public static RbacScope EnvironmentVersionOpen { get; } = new RbacScope("environment_version:open");
+        /// <summary>
+        /// Reads a version tag. Applies to: environment (Environment versions).
+        /// </summary>
+        public static RbacScope EnvironmentVersionRead { get; } = new RbacScope("environment_version:read");
+        /// <summary>
+        /// Retracts a specific version of the given environment. Applies to: environment (Environment versions).
+        /// </summary>
+        public static RbacScope EnvironmentVersionRetract { get; } = new RbacScope("environment_version:retract");
+        /// <summary>
+        /// Updates a version tag. Applies to: environment (Environment versions).
+        /// </summary>
+        public static RbacScope EnvironmentVersionUpdate { get; } = new RbacScope("environment_version:update");
+        /// <summary>
+        /// Create environment webhook. Applies to: environment (Environment webhooks).
+        /// </summary>
+        public static RbacScope EnvironmentWebhookCreate { get; } = new RbacScope("environment_webhook:create");
+        /// <summary>
+        /// Delete environment webhook. Applies to: environment (Environment webhooks).
+        /// </summary>
+        public static RbacScope EnvironmentWebhookDelete { get; } = new RbacScope("environment_webhook:delete");
+        /// <summary>
+        /// Read environment webhook. Applies to: environment (Environment webhooks).
+        /// </summary>
+        public static RbacScope EnvironmentWebhookRead { get; } = new RbacScope("environment_webhook:read");
+        /// <summary>
+        /// Update environment webhook. Applies to: environment (Environment webhooks).
+        /// </summary>
+        public static RbacScope EnvironmentWebhookUpdate { get; } = new RbacScope("environment_webhook:update");
+        /// <summary>
+        /// Create GitHub team. Applies to: global (Teams).
+        /// </summary>
+        public static RbacScope GithubTeamCreate { get; } = new RbacScope("github_team:create");
+        /// <summary>
+        /// Create Insights account. Applies to: global (Insights account management).
+        /// </summary>
+        public static RbacScope InsightsAccountCreate { get; } = new RbacScope("insights_account:create");
+        /// <summary>
+        /// Delete Insights account. Applies to: insights-account (Accounts).
+        /// </summary>
+        public static RbacScope InsightsAccountDelete { get; } = new RbacScope("insights_account:delete");
+        /// <summary>
+        /// Read Insights account. Applies to: insights-account (Accounts).
+        /// </summary>
+        public static RbacScope InsightsAccountRead { get; } = new RbacScope("insights_account:read");
+        /// <summary>
+        /// Scan Insights account. Applies to: insights-account (Scans).
+        /// </summary>
+        public static RbacScope InsightsAccountScan { get; } = new RbacScope("insights_account:scan");
+        /// <summary>
+        /// Update Insights account. Applies to: insights-account (Accounts).
+        /// </summary>
+        public static RbacScope InsightsAccountUpdate { get; } = new RbacScope("insights_account:update");
+        /// <summary>
+        /// Read Insights account access. Applies to: insights-account (Accounts).
+        /// </summary>
+        public static RbacScope InsightsAccountAccessRead { get; } = new RbacScope("insights_account_access:read");
+        /// <summary>
+        /// Update Insights account access. Applies to: insights-account (Accounts).
+        /// </summary>
+        public static RbacScope InsightsAccountAccessUpdate { get; } = new RbacScope("insights_account_access:update");
+        /// <summary>
+        /// Cancel Insights account scan. Applies to: insights-account (Scans).
+        /// </summary>
+        public static RbacScope InsightsAccountScanCancel { get; } = new RbacScope("insights_account_scan:cancel");
+        /// <summary>
+        /// Pause Insights account scan. Applies to: insights-account (Scans).
+        /// </summary>
+        public static RbacScope InsightsAccountScanPause { get; } = new RbacScope("insights_account_scan:pause");
+        /// <summary>
+        /// Read Insights account scan. Applies to: insights-account (Scans).
+        /// </summary>
+        public static RbacScope InsightsAccountScanRead { get; } = new RbacScope("insights_account_scan:read");
+        /// <summary>
+        /// Resume Insights account scan. Applies to: insights-account (Scans).
+        /// </summary>
+        public static RbacScope InsightsAccountScanResume { get; } = new RbacScope("insights_account_scan:resume");
+        /// <summary>
+        /// Update Insights account scan. Applies to: insights-account (Scans).
+        /// </summary>
+        public static RbacScope InsightsAccountScanUpdate { get; } = new RbacScope("insights_account_scan:update");
+        /// <summary>
+        /// Read integrations. Applies to: global (Organization).
+        /// </summary>
+        public static RbacScope IntegrationsRead { get; } = new RbacScope("integrations:read");
+        /// <summary>
+        /// Update integrations. Applies to: global (Organization).
+        /// </summary>
+        public static RbacScope IntegrationsUpdate { get; } = new RbacScope("integrations:update");
+        /// <summary>
+        /// Create invites. Applies to: global (Membership).
+        /// </summary>
+        public static RbacScope InvitesCreate { get; } = new RbacScope("invites:create");
+        /// <summary>
+        /// Read invites. Applies to: global (Membership).
+        /// </summary>
+        public static RbacScope InvitesRead { get; } = new RbacScope("invites:read");
+        /// <summary>
+        /// Create OIDC issuer. Applies to: global (OIDC).
+        /// </summary>
+        public static RbacScope OidcIssuersCreate { get; } = new RbacScope("oidc_issuers:create");
+        /// <summary>
+        /// Delete OIDC issuer. Applies to: global (OIDC).
+        /// </summary>
+        public static RbacScope OidcIssuersDelete { get; } = new RbacScope("oidc_issuers:delete");
+        /// <summary>
+        /// Read OIDC issuers. Applies to: global (OIDC).
+        /// </summary>
+        public static RbacScope OidcIssuersRead { get; } = new RbacScope("oidc_issuers:read");
+        /// <summary>
+        /// Regenerate OIDC issuer thumbprints. Applies to: global (OIDC).
+        /// </summary>
+        public static RbacScope OidcIssuersRegenerateThumbprints { get; } = new RbacScope("oidc_issuers:regenerate_thumbprints");
+        /// <summary>
+        /// Update OIDC issuers. Applies to: global (OIDC).
+        /// </summary>
+        public static RbacScope OidcIssuersUpdate { get; } = new RbacScope("oidc_issuers:update");
+        /// <summary>
+        /// Read organization integrations. Applies to: global (Organization).
+        /// </summary>
+        public static RbacScope OrgIntegrationsRead { get; } = new RbacScope("org_integrations:read");
+        /// <summary>
+        /// Update organization integrations. Applies to: global (Organization).
+        /// </summary>
+        public static RbacScope OrgIntegrationsUpdate { get; } = new RbacScope("org_integrations:update");
+        /// <summary>
+        /// Add organization member. Applies to: global (Membership).
+        /// </summary>
+        public static RbacScope OrgMemberAdd { get; } = new RbacScope("org_member:add");
+        /// <summary>
+        /// Delete organization member. Applies to: global (Membership).
+        /// </summary>
+        public static RbacScope OrgMemberDelete { get; } = new RbacScope("org_member:delete");
+        /// <summary>
+        /// Read organization member. Applies to: global (Membership).
+        /// </summary>
+        public static RbacScope OrgMemberRead { get; } = new RbacScope("org_member:read");
+        /// <summary>
+        /// Set organization member admin. Applies to: global (Membership).
+        /// </summary>
+        public static RbacScope OrgMemberSetAdmin { get; } = new RbacScope("org_member:set_admin");
+        /// <summary>
+        /// Update organization member. Applies to: global (Membership).
+        /// </summary>
+        public static RbacScope OrgMemberUpdate { get; } = new RbacScope("org_member:update");
+        /// <summary>
+        /// Read organization member access. Applies to: global (Membership).
+        /// </summary>
+        public static RbacScope OrgMemberAccessRead { get; } = new RbacScope("org_member_access:read");
+        /// <summary>
+        /// Read organization requests. Applies to: global (Membership).
+        /// </summary>
+        public static RbacScope OrgRequestsRead { get; } = new RbacScope("org_requests:read");
+        /// <summary>
+        /// Update organization requests. Applies to: global (Membership).
+        /// </summary>
+        public static RbacScope OrgRequestsUpdate { get; } = new RbacScope("org_requests:update");
+        /// <summary>
+        /// Create organization access token. Applies to: global (Organization access tokens).
+        /// </summary>
+        public static RbacScope OrgTokenCreate { get; } = new RbacScope("org_token:create");
+        /// <summary>
+        /// Delete organization access token. Applies to: global (Organization access tokens).
+        /// </summary>
+        public static RbacScope OrgTokenDelete { get; } = new RbacScope("org_token:delete");
+        /// <summary>
+        /// Read organization access token. Applies to: global (Organization access tokens).
+        /// </summary>
+        public static RbacScope OrgTokenRead { get; } = new RbacScope("org_token:read");
+        /// <summary>
+        /// Manage organization billing. Applies to: global (Organization).
+        /// </summary>
+        public static RbacScope OrganizationBilling { get; } = new RbacScope("organization:billing");
+        /// <summary>
+        /// Change organization backend. Applies to: global (Organization).
+        /// </summary>
+        public static RbacScope OrganizationChangeBackend { get; } = new RbacScope("organization:change_backend");
+        /// <summary>
+        /// Delete organization. Applies to: global (Organization).
+        /// </summary>
+        public static RbacScope OrganizationDelete { get; } = new RbacScope("organization:delete");
+        /// <summary>
+        /// Read organization usage. Applies to: global (Organization).
+        /// </summary>
+        public static RbacScope OrganizationReadUsage { get; } = new RbacScope("organization:read_usage");
+        /// <summary>
+        /// Rename organization. Applies to: global (Organization).
+        /// </summary>
+        public static RbacScope OrganizationRename { get; } = new RbacScope("organization:rename");
+        /// <summary>
+        /// Transfer organization stacks. Applies to: global (Stack management).
+        /// </summary>
+        public static RbacScope OrganizationTransferStacks { get; } = new RbacScope("organization:transfer_stacks");
+        /// <summary>
+        /// Update organization. Applies to: global (Organization).
+        /// </summary>
+        public static RbacScope OrganizationUpdate { get; } = new RbacScope("organization:update");
+        /// <summary>
+        /// Create organization webhook. Applies to: global (Organization webhooks).
+        /// </summary>
+        public static RbacScope OrganizationWebhookCreate { get; } = new RbacScope("organization_webhook:create");
+        /// <summary>
+        /// Delete organization webhook. Applies to: global (Organization webhooks).
+        /// </summary>
+        public static RbacScope OrganizationWebhookDelete { get; } = new RbacScope("organization_webhook:delete");
+        /// <summary>
+        /// Read organization webhook. Applies to: global (Organization webhooks).
+        /// </summary>
+        public static RbacScope OrganizationWebhookRead { get; } = new RbacScope("organization_webhook:read");
+        /// <summary>
+        /// Update organization webhook. Applies to: global (Organization webhooks).
+        /// </summary>
+        public static RbacScope OrganizationWebhookUpdate { get; } = new RbacScope("organization_webhook:update");
+        /// <summary>
+        /// Create Insights policy groups. Applies to: global (Insights policy management).
+        /// </summary>
+        public static RbacScope InsightsPolicyGroupsCreate { get; } = new RbacScope("policy_groups:create");
+        /// <summary>
+        /// Delete Insights policy groups. Applies to: global (Insights policy management).
+        /// </summary>
+        public static RbacScope InsightsPolicyGroupsDelete { get; } = new RbacScope("policy_groups:delete");
+        /// <summary>
+        /// Read Insights policy groups. Applies to: global (Insights policy management).
+        /// </summary>
+        public static RbacScope InsightsPolicyGroupsRead { get; } = new RbacScope("policy_groups:read");
+        /// <summary>
+        /// Update Insights policy groups. Applies to: global (Insights policy management).
+        /// </summary>
+        public static RbacScope InsightsPolicyGroupsUpdate { get; } = new RbacScope("policy_groups:update");
+        /// <summary>
+        /// Create Insights policy pack. Applies to: global (Insights policy management).
+        /// </summary>
+        public static RbacScope InsightsPolicyPackCreate { get; } = new RbacScope("policy_pack:create");
+        /// <summary>
+        /// Delete Insights policy pack. Applies to: global (Insights policy management).
+        /// </summary>
+        public static RbacScope InsightsPolicyPackDelete { get; } = new RbacScope("policy_pack:delete");
+        /// <summary>
+        /// Read Insights policy pack. Applies to: global (Insights policy management).
+        /// </summary>
+        public static RbacScope InsightsPolicyPackRead { get; } = new RbacScope("policy_pack:read");
+        /// <summary>
+        /// Update Insights policy pack. Applies to: global (Insights policy management).
+        /// </summary>
+        public static RbacScope InsightsPolicyPackUpdate { get; } = new RbacScope("policy_pack:update");
+        /// <summary>
+        /// Read Insights policy results. Applies to: global (Insights policy management).
+        /// </summary>
+        public static RbacScope InsightsPolicyResultsRead { get; } = new RbacScope("policy_results:read");
+        /// <summary>
+        /// Update Insights policy results. Applies to: global (Insights policy management).
+        /// </summary>
+        public static RbacScope PolicyResultsUpdate { get; } = new RbacScope("policy_results:update");
+        /// <summary>
+        /// Decrypt project. Applies to: global (Stack management).
+        /// </summary>
+        public static RbacScope ProjectDecrypt { get; } = new RbacScope("project:decrypt");
+        /// <summary>
+        /// Encrypt project. Applies to: global (Stack management).
+        /// </summary>
+        public static RbacScope ProjectEncrypt { get; } = new RbacScope("project:encrypt");
+        /// <summary>
+        /// View resources dashboard. Applies to: global (Search).
+        /// </summary>
+        public static RbacScope ResourcesDashboard { get; } = new RbacScope("resources:dashboard");
+        /// <summary>
+        /// Index resources. Applies to: global (Search).
+        /// </summary>
+        public static RbacScope ResourcesIndex { get; } = new RbacScope("resources:index");
+        /// <summary>
+        /// Search resources. Applies to: global (Search).
+        /// </summary>
+        public static RbacScope ResourcesSearch { get; } = new RbacScope("resources:search");
+        /// <summary>
+        /// Create role. Applies to: global (Roles).
+        /// </summary>
+        public static RbacScope RoleCreate { get; } = new RbacScope("role:create");
+        /// <summary>
+        /// Delete role. Applies to: global (Roles).
+        /// </summary>
+        public static RbacScope RoleDelete { get; } = new RbacScope("role:delete");
+        /// <summary>
+        /// Read role. Applies to: global (Roles).
+        /// </summary>
+        public static RbacScope RoleRead { get; } = new RbacScope("role:read");
+        /// <summary>
+        /// Update role. Applies to: global (Roles).
+        /// </summary>
+        public static RbacScope RoleUpdate { get; } = new RbacScope("role:update");
+        /// <summary>
+        /// Read SAML. Applies to: global (SSO).
+        /// </summary>
+        public static RbacScope SAMLRead { get; } = new RbacScope("saml:read");
+        /// <summary>
+        /// Update SAML. Applies to: global (SSO).
+        /// </summary>
+        public static RbacScope SAMLUpdate { get; } = new RbacScope("saml:update");
+        /// <summary>
+        /// Delete SCIM. Applies to: global (SSO).
+        /// </summary>
+        public static RbacScope SCIMDelete { get; } = new RbacScope("scim:delete");
+        /// <summary>
+        /// Read SCIM. Applies to: global (SSO).
+        /// </summary>
+        public static RbacScope SCIMRead { get; } = new RbacScope("scim:read");
+        /// <summary>
+        /// Update SCIM. Applies to: global (SSO).
+        /// </summary>
+        public static RbacScope SCIMUpdate { get; } = new RbacScope("scim:update");
+        /// <summary>
+        /// Cancel stack update. Applies to: stack (Stacks).
+        /// </summary>
+        public static RbacScope StackCancelUpdate { get; } = new RbacScope("stack:cancel_update");
+        /// <summary>
+        /// Create stack. Applies to: global, stack (Stack management, Stacks).
+        /// </summary>
+        public static RbacScope StackCreate { get; } = new RbacScope("stack:create");
+        /// <summary>
+        /// Decrypt stack. Applies to: stack (Stacks).
+        /// </summary>
+        public static RbacScope StackDecrypt { get; } = new RbacScope("stack:decrypt");
+        /// <summary>
+        /// Delete stack. Applies to: stack (Stacks).
+        /// </summary>
+        public static RbacScope StackDelete { get; } = new RbacScope("stack:delete");
+        /// <summary>
+        /// Encrypt stack. Applies to: stack (Stacks).
+        /// </summary>
+        public static RbacScope StackEncrypt { get; } = new RbacScope("stack:encrypt");
+        /// <summary>
+        /// Export stack. Applies to: stack (Stacks).
+        /// </summary>
+        public static RbacScope StackExport { get; } = new RbacScope("stack:export");
+        /// <summary>
+        /// Import stack. Applies to: stack (Stacks).
+        /// </summary>
+        public static RbacScope StackImport { get; } = new RbacScope("stack:import");
+        /// <summary>
+        /// List deleted stacks. Applies to: global (Stack management).
+        /// </summary>
+        public static RbacScope StackListDeleted { get; } = new RbacScope("stack:list_deleted");
+        /// <summary>
+        /// Read stack. Applies to: stack (Stacks).
+        /// </summary>
+        public static RbacScope StackRead { get; } = new RbacScope("stack:read");
+        /// <summary>
+        /// Rename stack. Applies to: stack (Stacks).
+        /// </summary>
+        public static RbacScope StackRename { get; } = new RbacScope("stack:rename");
+        /// <summary>
+        /// Restore deleted stack. Applies to: global (Stack management).
+        /// </summary>
+        public static RbacScope StackRestoreDeleted { get; } = new RbacScope("stack:restore_deleted");
+        /// <summary>
+        /// Transfer stack. Applies to: stack (Stacks).
+        /// </summary>
+        public static RbacScope StackTransfer { get; } = new RbacScope("stack:transfer");
+        /// <summary>
+        /// Write stack. Applies to: stack (Stacks).
+        /// </summary>
+        public static RbacScope StackWrite { get; } = new RbacScope("stack:write");
+        /// <summary>
+        /// Read stack teams. Applies to: stack (Stacks).
+        /// </summary>
+        public static RbacScope StackAccessRead { get; } = new RbacScope("stack_access:read");
+        /// <summary>
+        /// Update stack teams. Applies to: stack (Stacks).
+        /// </summary>
+        public static RbacScope StackAccessUpdate { get; } = new RbacScope("stack_access:update");
+        /// <summary>
+        /// Create deployment. Applies to: stack (Stack deployments).
+        /// </summary>
+        public static RbacScope StackDeploymentCreate { get; } = new RbacScope("stack_deployment:create");
+        /// <summary>
+        /// Read deployment. Applies to: stack (Stack deployments).
+        /// </summary>
+        public static RbacScope StackDeploymentRead { get; } = new RbacScope("stack_deployment:read");
+        /// <summary>
+        /// Encrypt deployment settings. Applies to: stack (Stack deployments).
+        /// </summary>
+        public static RbacScope StackDeploymentSettingsEncrypt { get; } = new RbacScope("stack_deployment_settings:encrypt");
+        /// <summary>
+        /// Read deployment settings. Applies to: stack (Stack deployments).
+        /// </summary>
+        public static RbacScope StackDeploymentSettingsRead { get; } = new RbacScope("stack_deployment_settings:read");
+        /// <summary>
+        /// Write deployment settings. Applies to: stack (Stack deployments).
+        /// </summary>
+        public static RbacScope StackDeploymentSettingsWrite { get; } = new RbacScope("stack_deployment_settings:write");
+        /// <summary>
+        /// Create stack schedule. Applies to: stack (Stack deployment schedules).
+        /// </summary>
+        public static RbacScope StackScheduleCreate { get; } = new RbacScope("stack_schedule:create");
+        /// <summary>
+        /// Delete stack schedule. Applies to: stack (Stack deployment schedules).
+        /// </summary>
+        public static RbacScope StackScheduleDelete { get; } = new RbacScope("stack_schedule:delete");
+        /// <summary>
+        /// Pause stack schedule. Applies to: stack (Stack deployment schedules).
+        /// </summary>
+        public static RbacScope StackSchedulePause { get; } = new RbacScope("stack_schedule:pause");
+        /// <summary>
+        /// Read stack schedule. Applies to: stack (Stack deployment schedules).
+        /// </summary>
+        public static RbacScope StackScheduleRead { get; } = new RbacScope("stack_schedule:read");
+        /// <summary>
+        /// Resume stack schedule. Applies to: stack (Stack deployment schedules).
+        /// </summary>
+        public static RbacScope StackScheduleResume { get; } = new RbacScope("stack_schedule:resume");
+        /// <summary>
+        /// Update stack schedule. Applies to: stack (Stack deployment schedules).
+        /// </summary>
+        public static RbacScope StackScheduleUpdate { get; } = new RbacScope("stack_schedule:update");
+        /// <summary>
+        /// Update stack tags. Applies to: stack (Stack tags).
+        /// </summary>
+        public static RbacScope StackTagsUpdate { get; } = new RbacScope("stack_tags:update");
+        /// <summary>
+        /// Create stack webhook. Applies to: stack (Stack webhooks).
+        /// </summary>
+        public static RbacScope StackWebhookCreate { get; } = new RbacScope("stack_webhook:create");
+        /// <summary>
+        /// Delete stack webhook. Applies to: stack (Stack webhooks).
+        /// </summary>
+        public static RbacScope StackWebhookDelete { get; } = new RbacScope("stack_webhook:delete");
+        /// <summary>
+        /// Read stack webhook. Applies to: stack (Stack webhooks).
+        /// </summary>
+        public static RbacScope StackWebhookRead { get; } = new RbacScope("stack_webhook:read");
+        /// <summary>
+        /// Update stack webhook. Applies to: stack (Stack webhooks).
+        /// </summary>
+        public static RbacScope StackWebhookUpdate { get; } = new RbacScope("stack_webhook:update");
+        /// <summary>
+        /// Read project tags. Applies to: global (Stack management).
+        /// </summary>
+        public static RbacScope TagsRead { get; } = new RbacScope("tags:read");
+        /// <summary>
+        /// Create team. Applies to: global (Teams).
+        /// </summary>
+        public static RbacScope TeamCreate { get; } = new RbacScope("team:create");
+        /// <summary>
+        /// Create team access token. Applies to: global (Teams).
+        /// </summary>
+        public static RbacScope TeamCreateToken { get; } = new RbacScope("team:create_token");
+        /// <summary>
+        /// Delete team. Applies to: global (Teams).
+        /// </summary>
+        public static RbacScope TeamDelete { get; } = new RbacScope("team:delete");
+        /// <summary>
+        /// Delete team access token. Applies to: global (Teams).
+        /// </summary>
+        public static RbacScope TeamDeleteToken { get; } = new RbacScope("team:delete_token");
+        /// <summary>
+        /// List teams. Applies to: global (Teams).
+        /// </summary>
+        public static RbacScope TeamList { get; } = new RbacScope("team:list");
+        /// <summary>
+        /// List team access tokens. Applies to: global (Teams).
+        /// </summary>
+        public static RbacScope TeamListTokens { get; } = new RbacScope("team:list_tokens");
+        /// <summary>
+        /// Read team. Applies to: global (Teams).
+        /// </summary>
+        public static RbacScope TeamRead { get; } = new RbacScope("team:read");
+        /// <summary>
+        /// Update team. Applies to: global (Teams).
+        /// </summary>
+        public static RbacScope TeamUpdate { get; } = new RbacScope("team:update");
+        /// <summary>
+        /// Read templates. Applies to: global (Templates).
+        /// </summary>
+        public static RbacScope TemplatesRead { get; } = new RbacScope("templates:read");
+        /// <summary>
+        /// Create template sources. Applies to: global (Templates).
+        /// </summary>
+        public static RbacScope TemplatesSourceCreate { get; } = new RbacScope("templates_source:create");
+        /// <summary>
+        /// Delete template sources. Applies to: global (Templates).
+        /// </summary>
+        public static RbacScope TemplatesSourceDelete { get; } = new RbacScope("templates_source:delete");
+        /// <summary>
+        /// Read template sources. Applies to: global (Templates).
+        /// </summary>
+        public static RbacScope TemplatesSourceRead { get; } = new RbacScope("templates_source:read");
+        /// <summary>
+        /// Update template sources. Applies to: global (Templates).
+        /// </summary>
+        public static RbacScope TemplatesSourceUpdate { get; } = new RbacScope("templates_source:update");
+
+        public static bool operator ==(RbacScope left, RbacScope right) => left.Equals(right);
+        public static bool operator !=(RbacScope left, RbacScope right) => !left.Equals(right);
+
+        public static explicit operator string(RbacScope value) => value._value;
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public override bool Equals(object? obj) => obj is RbacScope other && Equals(other);
+        public bool Equals(RbacScope other) => string.Equals(_value, other._value, StringComparison.Ordinal);
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public override int GetHashCode() => _value?.GetHashCode() ?? 0;
+
+        public override string ToString() => _value;
+    }
+
+    [EnumType]
+    public readonly struct RbacTagOperator : IEquatable<RbacTagOperator>
+    {
+        private readonly string _value;
+
+        private RbacTagOperator(string value)
+        {
+            _value = value ?? throw new ArgumentNullException(nameof(value));
+        }
+
+        /// <summary>
+        /// The tag equals the value (or, with no value, the tag is present).
+        /// </summary>
+        public static RbacTagOperator EqualsValue { get; } = new RbacTagOperator("equals");
+        /// <summary>
+        /// The tag does not equal the value (or, with no value, the tag is absent).
+        /// </summary>
+        public static RbacTagOperator NotEquals { get; } = new RbacTagOperator("notEquals");
+
+        public static bool operator ==(RbacTagOperator left, RbacTagOperator right) => left.Equals(right);
+        public static bool operator !=(RbacTagOperator left, RbacTagOperator right) => !left.Equals(right);
+
+        public static explicit operator string(RbacTagOperator value) => value._value;
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public override bool Equals(object? obj) => obj is RbacTagOperator other && Equals(other);
+        public bool Equals(RbacTagOperator other) => string.Equals(_value, other._value, StringComparison.Ordinal);
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public override int GetHashCode() => _value?.GetHashCode() ?? 0;
+
+        public override string ToString() => _value;
+    }
+
+    [EnumType]
     public readonly struct ScanSchedule : IEquatable<ScanSchedule>
     {
         private readonly string _value;

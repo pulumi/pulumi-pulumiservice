@@ -4,6 +4,9 @@
 
 ### Improvements
 
+- Added `RbacPermissionSet` and `RbacRole`, which model Pulumi Cloud custom roles the way the console builds them. A permission set is a list of scopes for one resource type (`global`, `stack`, `environment`, or `insights-account`). A role grants permission sets through organization-level access and entity rules. A rule matches all entities of a kind, one entity by ID, or entities whose tags match a list of `equals`/`notEquals` conditions. Roles created this way can be viewed and edited in the console, and console edits show up on refresh. New `getRbacPermissionSet` and `getRbacPermissionSets` functions look up built-in permission sets such as "Stack Read" (`stack-read`) and "Read Only" (`org-settings-read-only`). [#929](https://github.com/pulumi/pulumi-pulumiservice/issues/929)
+- Added the `RbacScope` and `RbacResourceType` enums, generated from the Pulumi Cloud scope catalog, so permission names and the resource type each one applies to are discoverable in every SDK. `RbacPermissionSet.permissions` uses them, and `RbacPermissionSet.additionalPermissions` accepts plain strings for scopes added to Pulumi Cloud after your provider version. [#929](https://github.com/pulumi/pulumi-pulumiservice/issues/929)
+- `Stack` now outputs `stackId`, the stack's unique ID that `RbacRole` entity rules use to target a single stack. Stacks created with an earlier provider version get it on the next `pulumi up`, which shows a one-time in-place update. [#929](https://github.com/pulumi/pulumi-pulumiservice/issues/929)
 - Documented that `OrgAccessToken` must be created and deleted by a provider authenticated as a user, for example with a personal access token. Pulumi Cloud rejects organization and team access tokens, even Admin ones, with `403 Machine tokens are not allowed to perform this operation`. `TeamAccessToken` has no such restriction. No behavior change. [#1112](https://github.com/pulumi/pulumi-pulumiservice/issues/1112)
 
 ## 1.4.0

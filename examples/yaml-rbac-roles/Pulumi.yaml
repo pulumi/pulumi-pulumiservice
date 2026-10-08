@@ -1,0 +1,123 @@
+name: yaml-rbac-roles
+runtime: yaml
+description: Builds a custom role the way the Pulumi Cloud console does, from permission sets, organization-level access, and entity rules.
+
+config:
+  organizationName:
+    type: string
+    default: service-provider-test-org
+  digits:
+    type: string
+
+# Everything below `resources:` is also the Example Usage on the
+# RbacPermissionSet and RbacRole schema pages, with the `-${digits}` suffixes
+# removed (provider/pkg/resources/docs/rbac_example.md). Keep them in sync;
+# TestRbacExampleDocsMatchYamlExample enforces it.
+resources:
+  # A custom permission set for deploying stacks.
+  deployer:
+    type: pulumiservice:RbacPermissionSet
+    properties:
+      organizationName: ${organizationName}
+      name: Stack Deployer-${digits}
+      description: Read, update, and deploy stacks.
+      resourceType: stack
+      permissions:
+        - stack:read
+        - stack:write
+        - stack_deployment:create
+
+  prodStack:
+    type: pulumiservice:Stack
+    properties:
+      organizationName: ${organizationName}
+      projectName: rbac-example
+      stackName: prod-${digits}
+
+  sharedEnv:
+    type: pulumiservice:Environment
+    properties:
+      organization: ${organizationName}
+      project: rbac-example
+      name: shared-${digits}
+      yaml:
+        fn::stringAsset: |-
+          values:
+            region: us-west-2
+
+  # A role laid out like the console: organization-level access plus entity rules.
+  platformRole:
+    type: pulumiservice:RbacRole
+    properties:
+      organizationName: ${organizationName}
+      name: Platform Engineers-${digits}
+      description: Deploys platform stacks and reads shared configuration.
+      organizationPermissionSetIds:
+        - ${orgReadOnly.permissionSetId}
+      entityRules:
+        # Read every stack in the organization.
+        - permissionSetIds: ["${stackRead.permissionSetId}"]
+          stack:
+            all: true
+        # Deploy one specific stack.
+        - permissionSetIds: ["${deployer.permissionSetId}"]
+          stack:
+            id: ${prodStack.stackId}
+        # Deploy stacks tagged team=platform, except those tagged env=prod.
+        - permissionSetIds: ["${deployer.permissionSetId}"]
+          stack:
+            tags:
+              - key: team
+                value: platform
+              - key: env
+                value: prod
+                operator: notEquals
+        # Read one environment.
+        - permissionSetIds: ["${envRead.permissionSetId}"]
+          environment:
+            id: ${sharedEnv.environmentId}
+
+  platformTeam:
+    type: pulumiservice:Team
+    properties:
+      organizationName: ${organizationName}
+      name: platform-${digits}
+      teamType: pulumi
+      displayName: Platform
+      members:
+        - ${currentUser.username}
+
+  platformTeamRole:
+    type: pulumiservice:TeamRoleAssignment
+    properties:
+      organizationName: ${organizationName}
+      teamName: ${platformTeam.name}
+      roleId: ${platformRole.roleId}
+
+variables:
+  currentUser:
+    fn::invoke:
+      function: pulumiservice:getCurrentUser
+  # Built-in permission sets are looked up, not recreated.
+  orgReadOnly:
+    fn::invoke:
+      function: pulumiservice:getRbacPermissionSet
+      arguments:
+        organizationName: ${organizationName}
+        defaultIdentifier: org-settings-read-only
+  stackRead:
+    fn::invoke:
+      function: pulumiservice:getRbacPermissionSet
+      arguments:
+        organizationName: ${organizationName}
+        defaultIdentifier: stack-read
+  envRead:
+    fn::invoke:
+      function: pulumiservice:getRbacPermissionSet
+      arguments:
+        organizationName: ${organizationName}
+        defaultIdentifier: environment-read
+
+outputs:
+  roleId: ${platformRole.roleId}
+  policyId: ${platformRole.policyId}

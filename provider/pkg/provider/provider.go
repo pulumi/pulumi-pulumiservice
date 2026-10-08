@@ -161,6 +161,8 @@ func MakeProvider(host *provider.HostClient, name, version string) (pulumirpc.Re
 			infer.Resource(&resources.OrganizationMember{}),
 			infer.Resource(&resources.OrganizationRole{}),
 			infer.Resource(&resources.PolicyPack{}),
+			infer.Resource(&resources.RbacPermissionSet{}),
+			infer.Resource(&resources.RbacRole{}),
 			infer.Resource(&resources.Stack{}),
 			infer.Resource(&resources.StackTag{}),
 			infer.Resource(&resources.StackTags{}),
@@ -185,6 +187,8 @@ func MakeProvider(host *provider.HostClient, name, version string) (pulumirpc.Re
 			infer.Function(&functions.GetOrganizationMemberFunction{}),
 			infer.Function(&functions.GetOrganizationMembersFunction{}),
 			infer.Function(&functions.GetOrganizationRoleScopesFunction{}),
+			infer.Function(&functions.GetRbacPermissionSetFunction{}),
+			infer.Function(&functions.GetRbacPermissionSetsFunction{}),
 		).
 		WithModuleMap(map[tokens.ModuleName]tokens.ModuleName{
 			"resources": "index",

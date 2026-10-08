@@ -618,6 +618,82 @@ export interface PolicyPackSummary {
     versions: number[];
 }
 
+export interface RbacEntityRule {
+    /**
+     * Select ESC environments.
+     */
+    environment?: outputs.RbacEntitySelector;
+    /**
+     * Select Insights accounts.
+     */
+    insightsAccount?: outputs.RbacEntitySelector;
+    /**
+     * IDs of the permission sets to grant. Their `resourceType` must match the selected entity kind.
+     */
+    permissionSetIds: string[];
+    /**
+     * Select stacks. Exactly one of `stack`, `environment`, or `insightsAccount` must be set.
+     */
+    stack?: outputs.RbacEntitySelector;
+}
+
+export interface RbacEntitySelector {
+    /**
+     * Apply to every entity of this kind in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+     */
+    all?: boolean;
+    /**
+     * Apply to a single entity: a `Stack.stackId`, `Environment.environmentId`, or `InsightsAccount.insightsAccountId`.
+     */
+    id?: string;
+    /**
+     * Apply to entities whose tags match every condition.
+     */
+    tags?: outputs.RbacTagCondition[];
+}
+
+export interface RbacPermissionSetInfo {
+    /**
+     * For built-in permission sets, a stable identifier such as `stack-read`, `environment-admin`, or `org-settings-read-only`. Unset for custom permission sets.
+     */
+    defaultIdentifier?: string;
+    /**
+     * Human-readable description of what the permission set grants.
+     */
+    description: string;
+    /**
+     * The permission set's display name.
+     */
+    name: string;
+    /**
+     * The permission set's unique ID. Reference it from an `RbacRole`.
+     */
+    permissionSetId: string;
+    /**
+     * The scopes the permission set grants. Only populated for permission sets that grant a flat list of scopes.
+     */
+    permissions: string[];
+    /**
+     * The kind of entity the permission set applies to.
+     */
+    resourceType: enums.RbacResourceType;
+}
+
+export interface RbacTagCondition {
+    /**
+     * The tag key.
+     */
+    key: string;
+    /**
+     * How the tag is compared. Defaults to `equals`.
+     */
+    operator?: enums.RbacTagOperator;
+    /**
+     * The tag value. When omitted, the condition matches on whether the tag is present at all.
+     */
+    value?: string;
+}
+
 export interface RoleScopeInfo {
     /**
      * Human-readable description of what the scope grants.

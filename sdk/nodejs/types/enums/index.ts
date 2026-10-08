@@ -153,6 +153,701 @@ export const RbacPermission = {
 
 export type RbacPermission = (typeof RbacPermission)[keyof typeof RbacPermission];
 
+export const RbacResourceType = {
+    /**
+     * Permissions on ESC environments, granted through a role's environment entity rules.
+     */
+    Environment: "environment",
+    /**
+     * Organization-wide permissions, granted through a role's organization-level access.
+     */
+    Global: "global",
+    /**
+     * Permissions on Insights accounts, granted through a role's Insights account entity rules.
+     */
+    InsightsAccount: "insights-account",
+    /**
+     * Permissions on stacks, granted through a role's stack entity rules.
+     */
+    Stack: "stack",
+} as const;
+
+export type RbacResourceType = (typeof RbacResourceType)[keyof typeof RbacResourceType];
+
+export const RbacScope = {
+    /**
+     * Create agent pool. Applies to: global (Agent pools).
+     */
+    AgentPoolCreate: "agent_pool:create",
+    /**
+     * Delete agent pool. Applies to: global (Agent pools).
+     */
+    AgentPoolDelete: "agent_pool:delete",
+    /**
+     * Read agent pool. Applies to: global (Agent pools).
+     */
+    AgentPoolRead: "agent_pool:read",
+    /**
+     * Update agent pool. Applies to: global (Agent pools).
+     */
+    AgentPoolUpdate: "agent_pool:update",
+    /**
+     * Create Neo tasks. Applies to: global (Neo).
+     */
+    AgentTaskCreate: "agent_task:create",
+    /**
+     * Export audit logs. Applies to: global (Audit logs).
+     */
+    AuditLogsExport: "audit_logs:export",
+    /**
+     * Read audit logs. Applies to: global (Audit logs).
+     */
+    AuditLogsRead: "audit_logs:read",
+    /**
+     * Read authentication policies. Applies to: global (OIDC).
+     */
+    AuthPoliciesRead: "auth_policies:read",
+    /**
+     * Update authentication policies. Applies to: global (OIDC).
+     */
+    AuthPoliciesUpdate: "auth_policies:update",
+    /**
+     * Create approval rules. Applies to: environment, global (Approvals).
+     */
+    ChangeGateCreate: "change_gate:create",
+    /**
+     * Delete approval rules. Applies to: environment, global (Approvals).
+     */
+    ChangeGateDelete: "change_gate:delete",
+    /**
+     * Update approval rules. Applies to: environment, global (Approvals).
+     */
+    ChangeGateUpdate: "change_gate:update",
+    /**
+     * Pause deployments. Applies to: global (Deployments).
+     */
+    DeploymentsPause: "deployments:pause",
+    /**
+     * Read deployments. Applies to: global (Deployments).
+     */
+    DeploymentsRead: "deployments:read",
+    /**
+     * Read deployment usage. Applies to: global (Deployments).
+     */
+    DeploymentsReadUsage: "deployments:read_usage",
+    /**
+     * Resume deployments. Applies to: global (Deployments).
+     */
+    DeploymentsResume: "deployments:resume",
+    /**
+     * Clone environment. Applies to: environment (Environments).
+     */
+    EnvironmentClone: "environment:clone",
+    /**
+     * Create environment. Applies to: global (Environment management).
+     */
+    EnvironmentCreate: "environment:create",
+    /**
+     * Delete environment. Applies to: environment (Environments).
+     */
+    EnvironmentDelete: "environment:delete",
+    /**
+     * List deleted environments. Applies to: global (Environment management).
+     */
+    EnvironmentListDeleted: "environment:list_deleted",
+    /**
+     * Open and decrypt environment. Applies to: environment (Environments).
+     */
+    EnvironmentOpen: "environment:open",
+    /**
+     * Read environment. Applies to: environment (Environments).
+     */
+    EnvironmentRead: "environment:read",
+    /**
+     * Restore deleted environment. Applies to: global (Environment management).
+     */
+    EnvironmentRestoreDeleted: "environment:restore_deleted",
+    /**
+     * Rotates secrets in an environment. Applies to: environment (Environment secrets rotation).
+     */
+    EnvironmentRotate: "environment:rotate",
+    /**
+     * List secret rotation history of an environment. Applies to: environment (Environment secrets rotation).
+     */
+    EnvironmentRotateHistory: "environment:rotate_history",
+    /**
+     * Write environment. Applies to: environment (Environments).
+     */
+    EnvironmentWrite: "environment:write",
+    /**
+     * Creates a new environment schedule. Applies to: environment (Environment schedules).
+     */
+    EnvironmentScheduleCreate: "environment_schedule:create",
+    /**
+     * Deletes an environment schedule. Applies to: environment (Environment schedules).
+     */
+    EnvironmentScheduleDelete: "environment_schedule:delete",
+    /**
+     * Pauses an environment schedule. Applies to: environment (Environment schedules).
+     */
+    EnvironmentSchedulePause: "environment_schedule:pause",
+    /**
+     * Reads an environment schedule. Applies to: environment (Environment schedules).
+     */
+    EnvironmentScheduleRead: "environment_schedule:read",
+    /**
+     * Resumes an environment schedule. Applies to: environment (Environment schedules).
+     */
+    EnvironmentScheduleResume: "environment_schedule:resume",
+    /**
+     * Updates an environment schedule. Applies to: environment (Environment schedules).
+     */
+    EnvironmentScheduleUpdate: "environment_schedule:update",
+    /**
+     * Read environment settings. Applies to: environment (Environments).
+     */
+    EnvironmentSettingsRead: "environment_settings:read",
+    /**
+     * Update environment settings. Applies to: environment (Environments).
+     */
+    EnvironmentSettingsUpdate: "environment_settings:update",
+    /**
+     * Adds a new tag to an environment. Applies to: environment (Environment tags).
+     */
+    EnvironmentTagCreate: "environment_tag:create",
+    /**
+     * Removes a tag from an environment. Applies to: environment (Environment tags).
+     */
+    EnvironmentTagDelete: "environment_tag:delete",
+    /**
+     * Reads the value of an environments tag. Applies to: environment (Environment tags).
+     */
+    EnvironmentTagRead: "environment_tag:read",
+    /**
+     * Modifies the value of an environments tag. Applies to: environment (Environment tags).
+     */
+    EnvironmentTagUpdate: "environment_tag:update",
+    /**
+     * List the tags across all environments. Applies to: global (Environment management).
+     */
+    EnvironmentTagsList: "environment_tags:list",
+    /**
+     * Creates a new version tag. Applies to: environment (Environment versions).
+     */
+    EnvironmentVersionCreate: "environment_version:create",
+    /**
+     * Deletes a version tag. Applies to: environment (Environment versions).
+     */
+    EnvironmentVersionDelete: "environment_version:delete",
+    /**
+     * Open and decrypt a version tag. Applies to: environment (Environment versions).
+     */
+    EnvironmentVersionOpen: "environment_version:open",
+    /**
+     * Reads a version tag. Applies to: environment (Environment versions).
+     */
+    EnvironmentVersionRead: "environment_version:read",
+    /**
+     * Retracts a specific version of the given environment. Applies to: environment (Environment versions).
+     */
+    EnvironmentVersionRetract: "environment_version:retract",
+    /**
+     * Updates a version tag. Applies to: environment (Environment versions).
+     */
+    EnvironmentVersionUpdate: "environment_version:update",
+    /**
+     * Create environment webhook. Applies to: environment (Environment webhooks).
+     */
+    EnvironmentWebhookCreate: "environment_webhook:create",
+    /**
+     * Delete environment webhook. Applies to: environment (Environment webhooks).
+     */
+    EnvironmentWebhookDelete: "environment_webhook:delete",
+    /**
+     * Read environment webhook. Applies to: environment (Environment webhooks).
+     */
+    EnvironmentWebhookRead: "environment_webhook:read",
+    /**
+     * Update environment webhook. Applies to: environment (Environment webhooks).
+     */
+    EnvironmentWebhookUpdate: "environment_webhook:update",
+    /**
+     * Create GitHub team. Applies to: global (Teams).
+     */
+    GithubTeamCreate: "github_team:create",
+    /**
+     * Create Insights account. Applies to: global (Insights account management).
+     */
+    InsightsAccountCreate: "insights_account:create",
+    /**
+     * Delete Insights account. Applies to: insights-account (Accounts).
+     */
+    InsightsAccountDelete: "insights_account:delete",
+    /**
+     * Read Insights account. Applies to: insights-account (Accounts).
+     */
+    InsightsAccountRead: "insights_account:read",
+    /**
+     * Scan Insights account. Applies to: insights-account (Scans).
+     */
+    InsightsAccountScan: "insights_account:scan",
+    /**
+     * Update Insights account. Applies to: insights-account (Accounts).
+     */
+    InsightsAccountUpdate: "insights_account:update",
+    /**
+     * Read Insights account access. Applies to: insights-account (Accounts).
+     */
+    InsightsAccountAccessRead: "insights_account_access:read",
+    /**
+     * Update Insights account access. Applies to: insights-account (Accounts).
+     */
+    InsightsAccountAccessUpdate: "insights_account_access:update",
+    /**
+     * Cancel Insights account scan. Applies to: insights-account (Scans).
+     */
+    InsightsAccountScanCancel: "insights_account_scan:cancel",
+    /**
+     * Pause Insights account scan. Applies to: insights-account (Scans).
+     */
+    InsightsAccountScanPause: "insights_account_scan:pause",
+    /**
+     * Read Insights account scan. Applies to: insights-account (Scans).
+     */
+    InsightsAccountScanRead: "insights_account_scan:read",
+    /**
+     * Resume Insights account scan. Applies to: insights-account (Scans).
+     */
+    InsightsAccountScanResume: "insights_account_scan:resume",
+    /**
+     * Update Insights account scan. Applies to: insights-account (Scans).
+     */
+    InsightsAccountScanUpdate: "insights_account_scan:update",
+    /**
+     * Read integrations. Applies to: global (Organization).
+     */
+    IntegrationsRead: "integrations:read",
+    /**
+     * Update integrations. Applies to: global (Organization).
+     */
+    IntegrationsUpdate: "integrations:update",
+    /**
+     * Create invites. Applies to: global (Membership).
+     */
+    InvitesCreate: "invites:create",
+    /**
+     * Read invites. Applies to: global (Membership).
+     */
+    InvitesRead: "invites:read",
+    /**
+     * Create OIDC issuer. Applies to: global (OIDC).
+     */
+    OidcIssuersCreate: "oidc_issuers:create",
+    /**
+     * Delete OIDC issuer. Applies to: global (OIDC).
+     */
+    OidcIssuersDelete: "oidc_issuers:delete",
+    /**
+     * Read OIDC issuers. Applies to: global (OIDC).
+     */
+    OidcIssuersRead: "oidc_issuers:read",
+    /**
+     * Regenerate OIDC issuer thumbprints. Applies to: global (OIDC).
+     */
+    OidcIssuersRegenerateThumbprints: "oidc_issuers:regenerate_thumbprints",
+    /**
+     * Update OIDC issuers. Applies to: global (OIDC).
+     */
+    OidcIssuersUpdate: "oidc_issuers:update",
+    /**
+     * Read organization integrations. Applies to: global (Organization).
+     */
+    OrgIntegrationsRead: "org_integrations:read",
+    /**
+     * Update organization integrations. Applies to: global (Organization).
+     */
+    OrgIntegrationsUpdate: "org_integrations:update",
+    /**
+     * Add organization member. Applies to: global (Membership).
+     */
+    OrgMemberAdd: "org_member:add",
+    /**
+     * Delete organization member. Applies to: global (Membership).
+     */
+    OrgMemberDelete: "org_member:delete",
+    /**
+     * Read organization member. Applies to: global (Membership).
+     */
+    OrgMemberRead: "org_member:read",
+    /**
+     * Set organization member admin. Applies to: global (Membership).
+     */
+    OrgMemberSetAdmin: "org_member:set_admin",
+    /**
+     * Update organization member. Applies to: global (Membership).
+     */
+    OrgMemberUpdate: "org_member:update",
+    /**
+     * Read organization member access. Applies to: global (Membership).
+     */
+    OrgMemberAccessRead: "org_member_access:read",
+    /**
+     * Read organization requests. Applies to: global (Membership).
+     */
+    OrgRequestsRead: "org_requests:read",
+    /**
+     * Update organization requests. Applies to: global (Membership).
+     */
+    OrgRequestsUpdate: "org_requests:update",
+    /**
+     * Create organization access token. Applies to: global (Organization access tokens).
+     */
+    OrgTokenCreate: "org_token:create",
+    /**
+     * Delete organization access token. Applies to: global (Organization access tokens).
+     */
+    OrgTokenDelete: "org_token:delete",
+    /**
+     * Read organization access token. Applies to: global (Organization access tokens).
+     */
+    OrgTokenRead: "org_token:read",
+    /**
+     * Manage organization billing. Applies to: global (Organization).
+     */
+    OrganizationBilling: "organization:billing",
+    /**
+     * Change organization backend. Applies to: global (Organization).
+     */
+    OrganizationChangeBackend: "organization:change_backend",
+    /**
+     * Delete organization. Applies to: global (Organization).
+     */
+    OrganizationDelete: "organization:delete",
+    /**
+     * Read organization usage. Applies to: global (Organization).
+     */
+    OrganizationReadUsage: "organization:read_usage",
+    /**
+     * Rename organization. Applies to: global (Organization).
+     */
+    OrganizationRename: "organization:rename",
+    /**
+     * Transfer organization stacks. Applies to: global (Stack management).
+     */
+    OrganizationTransferStacks: "organization:transfer_stacks",
+    /**
+     * Update organization. Applies to: global (Organization).
+     */
+    OrganizationUpdate: "organization:update",
+    /**
+     * Create organization webhook. Applies to: global (Organization webhooks).
+     */
+    OrganizationWebhookCreate: "organization_webhook:create",
+    /**
+     * Delete organization webhook. Applies to: global (Organization webhooks).
+     */
+    OrganizationWebhookDelete: "organization_webhook:delete",
+    /**
+     * Read organization webhook. Applies to: global (Organization webhooks).
+     */
+    OrganizationWebhookRead: "organization_webhook:read",
+    /**
+     * Update organization webhook. Applies to: global (Organization webhooks).
+     */
+    OrganizationWebhookUpdate: "organization_webhook:update",
+    /**
+     * Create Insights policy groups. Applies to: global (Insights policy management).
+     */
+    InsightsPolicyGroupsCreate: "policy_groups:create",
+    /**
+     * Delete Insights policy groups. Applies to: global (Insights policy management).
+     */
+    InsightsPolicyGroupsDelete: "policy_groups:delete",
+    /**
+     * Read Insights policy groups. Applies to: global (Insights policy management).
+     */
+    InsightsPolicyGroupsRead: "policy_groups:read",
+    /**
+     * Update Insights policy groups. Applies to: global (Insights policy management).
+     */
+    InsightsPolicyGroupsUpdate: "policy_groups:update",
+    /**
+     * Create Insights policy pack. Applies to: global (Insights policy management).
+     */
+    InsightsPolicyPackCreate: "policy_pack:create",
+    /**
+     * Delete Insights policy pack. Applies to: global (Insights policy management).
+     */
+    InsightsPolicyPackDelete: "policy_pack:delete",
+    /**
+     * Read Insights policy pack. Applies to: global (Insights policy management).
+     */
+    InsightsPolicyPackRead: "policy_pack:read",
+    /**
+     * Update Insights policy pack. Applies to: global (Insights policy management).
+     */
+    InsightsPolicyPackUpdate: "policy_pack:update",
+    /**
+     * Read Insights policy results. Applies to: global (Insights policy management).
+     */
+    InsightsPolicyResultsRead: "policy_results:read",
+    /**
+     * Update Insights policy results. Applies to: global (Insights policy management).
+     */
+    PolicyResultsUpdate: "policy_results:update",
+    /**
+     * Decrypt project. Applies to: global (Stack management).
+     */
+    ProjectDecrypt: "project:decrypt",
+    /**
+     * Encrypt project. Applies to: global (Stack management).
+     */
+    ProjectEncrypt: "project:encrypt",
+    /**
+     * View resources dashboard. Applies to: global (Search).
+     */
+    ResourcesDashboard: "resources:dashboard",
+    /**
+     * Index resources. Applies to: global (Search).
+     */
+    ResourcesIndex: "resources:index",
+    /**
+     * Search resources. Applies to: global (Search).
+     */
+    ResourcesSearch: "resources:search",
+    /**
+     * Create role. Applies to: global (Roles).
+     */
+    RoleCreate: "role:create",
+    /**
+     * Delete role. Applies to: global (Roles).
+     */
+    RoleDelete: "role:delete",
+    /**
+     * Read role. Applies to: global (Roles).
+     */
+    RoleRead: "role:read",
+    /**
+     * Update role. Applies to: global (Roles).
+     */
+    RoleUpdate: "role:update",
+    /**
+     * Read SAML. Applies to: global (SSO).
+     */
+    SAMLRead: "saml:read",
+    /**
+     * Update SAML. Applies to: global (SSO).
+     */
+    SAMLUpdate: "saml:update",
+    /**
+     * Delete SCIM. Applies to: global (SSO).
+     */
+    SCIMDelete: "scim:delete",
+    /**
+     * Read SCIM. Applies to: global (SSO).
+     */
+    SCIMRead: "scim:read",
+    /**
+     * Update SCIM. Applies to: global (SSO).
+     */
+    SCIMUpdate: "scim:update",
+    /**
+     * Cancel stack update. Applies to: stack (Stacks).
+     */
+    StackCancelUpdate: "stack:cancel_update",
+    /**
+     * Create stack. Applies to: global, stack (Stack management, Stacks).
+     */
+    StackCreate: "stack:create",
+    /**
+     * Decrypt stack. Applies to: stack (Stacks).
+     */
+    StackDecrypt: "stack:decrypt",
+    /**
+     * Delete stack. Applies to: stack (Stacks).
+     */
+    StackDelete: "stack:delete",
+    /**
+     * Encrypt stack. Applies to: stack (Stacks).
+     */
+    StackEncrypt: "stack:encrypt",
+    /**
+     * Export stack. Applies to: stack (Stacks).
+     */
+    StackExport: "stack:export",
+    /**
+     * Import stack. Applies to: stack (Stacks).
+     */
+    StackImport: "stack:import",
+    /**
+     * List deleted stacks. Applies to: global (Stack management).
+     */
+    StackListDeleted: "stack:list_deleted",
+    /**
+     * Read stack. Applies to: stack (Stacks).
+     */
+    StackRead: "stack:read",
+    /**
+     * Rename stack. Applies to: stack (Stacks).
+     */
+    StackRename: "stack:rename",
+    /**
+     * Restore deleted stack. Applies to: global (Stack management).
+     */
+    StackRestoreDeleted: "stack:restore_deleted",
+    /**
+     * Transfer stack. Applies to: stack (Stacks).
+     */
+    StackTransfer: "stack:transfer",
+    /**
+     * Write stack. Applies to: stack (Stacks).
+     */
+    StackWrite: "stack:write",
+    /**
+     * Read stack teams. Applies to: stack (Stacks).
+     */
+    StackAccessRead: "stack_access:read",
+    /**
+     * Update stack teams. Applies to: stack (Stacks).
+     */
+    StackAccessUpdate: "stack_access:update",
+    /**
+     * Create deployment. Applies to: stack (Stack deployments).
+     */
+    StackDeploymentCreate: "stack_deployment:create",
+    /**
+     * Read deployment. Applies to: stack (Stack deployments).
+     */
+    StackDeploymentRead: "stack_deployment:read",
+    /**
+     * Encrypt deployment settings. Applies to: stack (Stack deployments).
+     */
+    StackDeploymentSettingsEncrypt: "stack_deployment_settings:encrypt",
+    /**
+     * Read deployment settings. Applies to: stack (Stack deployments).
+     */
+    StackDeploymentSettingsRead: "stack_deployment_settings:read",
+    /**
+     * Write deployment settings. Applies to: stack (Stack deployments).
+     */
+    StackDeploymentSettingsWrite: "stack_deployment_settings:write",
+    /**
+     * Create stack schedule. Applies to: stack (Stack deployment schedules).
+     */
+    StackScheduleCreate: "stack_schedule:create",
+    /**
+     * Delete stack schedule. Applies to: stack (Stack deployment schedules).
+     */
+    StackScheduleDelete: "stack_schedule:delete",
+    /**
+     * Pause stack schedule. Applies to: stack (Stack deployment schedules).
+     */
+    StackSchedulePause: "stack_schedule:pause",
+    /**
+     * Read stack schedule. Applies to: stack (Stack deployment schedules).
+     */
+    StackScheduleRead: "stack_schedule:read",
+    /**
+     * Resume stack schedule. Applies to: stack (Stack deployment schedules).
+     */
+    StackScheduleResume: "stack_schedule:resume",
+    /**
+     * Update stack schedule. Applies to: stack (Stack deployment schedules).
+     */
+    StackScheduleUpdate: "stack_schedule:update",
+    /**
+     * Update stack tags. Applies to: stack (Stack tags).
+     */
+    StackTagsUpdate: "stack_tags:update",
+    /**
+     * Create stack webhook. Applies to: stack (Stack webhooks).
+     */
+    StackWebhookCreate: "stack_webhook:create",
+    /**
+     * Delete stack webhook. Applies to: stack (Stack webhooks).
+     */
+    StackWebhookDelete: "stack_webhook:delete",
+    /**
+     * Read stack webhook. Applies to: stack (Stack webhooks).
+     */
+    StackWebhookRead: "stack_webhook:read",
+    /**
+     * Update stack webhook. Applies to: stack (Stack webhooks).
+     */
+    StackWebhookUpdate: "stack_webhook:update",
+    /**
+     * Read project tags. Applies to: global (Stack management).
+     */
+    TagsRead: "tags:read",
+    /**
+     * Create team. Applies to: global (Teams).
+     */
+    TeamCreate: "team:create",
+    /**
+     * Create team access token. Applies to: global (Teams).
+     */
+    TeamCreateToken: "team:create_token",
+    /**
+     * Delete team. Applies to: global (Teams).
+     */
+    TeamDelete: "team:delete",
+    /**
+     * Delete team access token. Applies to: global (Teams).
+     */
+    TeamDeleteToken: "team:delete_token",
+    /**
+     * List teams. Applies to: global (Teams).
+     */
+    TeamList: "team:list",
+    /**
+     * List team access tokens. Applies to: global (Teams).
+     */
+    TeamListTokens: "team:list_tokens",
+    /**
+     * Read team. Applies to: global (Teams).
+     */
+    TeamRead: "team:read",
+    /**
+     * Update team. Applies to: global (Teams).
+     */
+    TeamUpdate: "team:update",
+    /**
+     * Read templates. Applies to: global (Templates).
+     */
+    TemplatesRead: "templates:read",
+    /**
+     * Create template sources. Applies to: global (Templates).
+     */
+    TemplatesSourceCreate: "templates_source:create",
+    /**
+     * Delete template sources. Applies to: global (Templates).
+     */
+    TemplatesSourceDelete: "templates_source:delete",
+    /**
+     * Read template sources. Applies to: global (Templates).
+     */
+    TemplatesSourceRead: "templates_source:read",
+    /**
+     * Update template sources. Applies to: global (Templates).
+     */
+    TemplatesSourceUpdate: "templates_source:update",
+} as const;
+
+export type RbacScope = (typeof RbacScope)[keyof typeof RbacScope];
+
+export const RbacTagOperator = {
+    /**
+     * The tag equals the value (or, with no value, the tag is present).
+     */
+    Equals: "equals",
+    /**
+     * The tag does not equal the value (or, with no value, the tag is absent).
+     */
+    NotEquals: "notEquals",
+} as const;
+
+export type RbacTagOperator = (typeof RbacTagOperator)[keyof typeof RbacTagOperator];
+
 export const ScanSchedule = {
     /**
      * Disable automated scanning.

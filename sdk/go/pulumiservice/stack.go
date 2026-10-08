@@ -22,6 +22,8 @@ type Stack struct {
 	OrganizationName pulumi.StringOutput `pulumi:"organizationName"`
 	// The name of the project.
 	ProjectName pulumi.StringOutput `pulumi:"projectName"`
+	// The stack's unique ID. Use it in an `RbacRole` entity rule to grant permissions on this stack.
+	StackId pulumi.StringPtrOutput `pulumi:"stackId"`
 	// The name of the stack.
 	StackName pulumi.StringOutput `pulumi:"stackName"`
 }
@@ -203,6 +205,11 @@ func (o StackOutput) OrganizationName() pulumi.StringOutput {
 // The name of the project.
 func (o StackOutput) ProjectName() pulumi.StringOutput {
 	return o.ApplyT(func(v *Stack) pulumi.StringOutput { return v.ProjectName }).(pulumi.StringOutput)
+}
+
+// The stack's unique ID. Use it in an `RbacRole` entity rule to grant permissions on this stack.
+func (o StackOutput) StackId() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *Stack) pulumi.StringPtrOutput { return v.StackId }).(pulumi.StringPtrOutput)
 }
 
 // The name of the stack.

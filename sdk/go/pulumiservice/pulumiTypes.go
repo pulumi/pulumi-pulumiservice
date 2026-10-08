@@ -4433,6 +4433,499 @@ func (o PolicyPackSummaryArrayOutput) Index(i pulumi.IntInput) PolicyPackSummary
 	}).(PolicyPackSummaryOutput)
 }
 
+type RbacEntityRule struct {
+	// Select ESC environments.
+	Environment *RbacEntitySelector `pulumi:"environment"`
+	// Select Insights accounts.
+	InsightsAccount *RbacEntitySelector `pulumi:"insightsAccount"`
+	// IDs of the permission sets to grant. Their `resourceType` must match the selected entity kind.
+	PermissionSetIds []string `pulumi:"permissionSetIds"`
+	// Select stacks. Exactly one of `stack`, `environment`, or `insightsAccount` must be set.
+	Stack *RbacEntitySelector `pulumi:"stack"`
+}
+
+// RbacEntityRuleInput is an input type that accepts RbacEntityRuleArgs and RbacEntityRuleOutput values.
+// You can construct a concrete instance of `RbacEntityRuleInput` via:
+//
+//	RbacEntityRuleArgs{...}
+type RbacEntityRuleInput interface {
+	pulumi.Input
+
+	ToRbacEntityRuleOutput() RbacEntityRuleOutput
+	ToRbacEntityRuleOutputWithContext(context.Context) RbacEntityRuleOutput
+}
+
+type RbacEntityRuleArgs struct {
+	// Select ESC environments.
+	Environment RbacEntitySelectorPtrInput `pulumi:"environment"`
+	// Select Insights accounts.
+	InsightsAccount RbacEntitySelectorPtrInput `pulumi:"insightsAccount"`
+	// IDs of the permission sets to grant. Their `resourceType` must match the selected entity kind.
+	PermissionSetIds pulumi.StringArrayInput `pulumi:"permissionSetIds"`
+	// Select stacks. Exactly one of `stack`, `environment`, or `insightsAccount` must be set.
+	Stack RbacEntitySelectorPtrInput `pulumi:"stack"`
+}
+
+func (RbacEntityRuleArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*RbacEntityRule)(nil)).Elem()
+}
+
+func (i RbacEntityRuleArgs) ToRbacEntityRuleOutput() RbacEntityRuleOutput {
+	return i.ToRbacEntityRuleOutputWithContext(context.Background())
+}
+
+func (i RbacEntityRuleArgs) ToRbacEntityRuleOutputWithContext(ctx context.Context) RbacEntityRuleOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(RbacEntityRuleOutput)
+}
+
+// RbacEntityRuleArrayInput is an input type that accepts RbacEntityRuleArray and RbacEntityRuleArrayOutput values.
+// You can construct a concrete instance of `RbacEntityRuleArrayInput` via:
+//
+//	RbacEntityRuleArray{ RbacEntityRuleArgs{...} }
+type RbacEntityRuleArrayInput interface {
+	pulumi.Input
+
+	ToRbacEntityRuleArrayOutput() RbacEntityRuleArrayOutput
+	ToRbacEntityRuleArrayOutputWithContext(context.Context) RbacEntityRuleArrayOutput
+}
+
+type RbacEntityRuleArray []RbacEntityRuleInput
+
+func (RbacEntityRuleArray) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]RbacEntityRule)(nil)).Elem()
+}
+
+func (i RbacEntityRuleArray) ToRbacEntityRuleArrayOutput() RbacEntityRuleArrayOutput {
+	return i.ToRbacEntityRuleArrayOutputWithContext(context.Background())
+}
+
+func (i RbacEntityRuleArray) ToRbacEntityRuleArrayOutputWithContext(ctx context.Context) RbacEntityRuleArrayOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(RbacEntityRuleArrayOutput)
+}
+
+type RbacEntityRuleOutput struct{ *pulumi.OutputState }
+
+func (RbacEntityRuleOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*RbacEntityRule)(nil)).Elem()
+}
+
+func (o RbacEntityRuleOutput) ToRbacEntityRuleOutput() RbacEntityRuleOutput {
+	return o
+}
+
+func (o RbacEntityRuleOutput) ToRbacEntityRuleOutputWithContext(ctx context.Context) RbacEntityRuleOutput {
+	return o
+}
+
+// Select ESC environments.
+func (o RbacEntityRuleOutput) Environment() RbacEntitySelectorPtrOutput {
+	return o.ApplyT(func(v RbacEntityRule) *RbacEntitySelector { return v.Environment }).(RbacEntitySelectorPtrOutput)
+}
+
+// Select Insights accounts.
+func (o RbacEntityRuleOutput) InsightsAccount() RbacEntitySelectorPtrOutput {
+	return o.ApplyT(func(v RbacEntityRule) *RbacEntitySelector { return v.InsightsAccount }).(RbacEntitySelectorPtrOutput)
+}
+
+// IDs of the permission sets to grant. Their `resourceType` must match the selected entity kind.
+func (o RbacEntityRuleOutput) PermissionSetIds() pulumi.StringArrayOutput {
+	return o.ApplyT(func(v RbacEntityRule) []string { return v.PermissionSetIds }).(pulumi.StringArrayOutput)
+}
+
+// Select stacks. Exactly one of `stack`, `environment`, or `insightsAccount` must be set.
+func (o RbacEntityRuleOutput) Stack() RbacEntitySelectorPtrOutput {
+	return o.ApplyT(func(v RbacEntityRule) *RbacEntitySelector { return v.Stack }).(RbacEntitySelectorPtrOutput)
+}
+
+type RbacEntityRuleArrayOutput struct{ *pulumi.OutputState }
+
+func (RbacEntityRuleArrayOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]RbacEntityRule)(nil)).Elem()
+}
+
+func (o RbacEntityRuleArrayOutput) ToRbacEntityRuleArrayOutput() RbacEntityRuleArrayOutput {
+	return o
+}
+
+func (o RbacEntityRuleArrayOutput) ToRbacEntityRuleArrayOutputWithContext(ctx context.Context) RbacEntityRuleArrayOutput {
+	return o
+}
+
+func (o RbacEntityRuleArrayOutput) Index(i pulumi.IntInput) RbacEntityRuleOutput {
+	return pulumi.All(o, i).ApplyT(func(vs []interface{}) RbacEntityRule {
+		return vs[0].([]RbacEntityRule)[vs[1].(int)]
+	}).(RbacEntityRuleOutput)
+}
+
+type RbacEntitySelector struct {
+	// Apply to every entity of this kind in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+	All *bool `pulumi:"all"`
+	// Apply to a single entity: a `Stack.stackId`, `Environment.environmentId`, or `InsightsAccount.insightsAccountId`.
+	Id *string `pulumi:"id"`
+	// Apply to entities whose tags match every condition.
+	Tags []RbacTagCondition `pulumi:"tags"`
+}
+
+// RbacEntitySelectorInput is an input type that accepts RbacEntitySelectorArgs and RbacEntitySelectorOutput values.
+// You can construct a concrete instance of `RbacEntitySelectorInput` via:
+//
+//	RbacEntitySelectorArgs{...}
+type RbacEntitySelectorInput interface {
+	pulumi.Input
+
+	ToRbacEntitySelectorOutput() RbacEntitySelectorOutput
+	ToRbacEntitySelectorOutputWithContext(context.Context) RbacEntitySelectorOutput
+}
+
+type RbacEntitySelectorArgs struct {
+	// Apply to every entity of this kind in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+	All pulumi.BoolPtrInput `pulumi:"all"`
+	// Apply to a single entity: a `Stack.stackId`, `Environment.environmentId`, or `InsightsAccount.insightsAccountId`.
+	Id pulumi.StringPtrInput `pulumi:"id"`
+	// Apply to entities whose tags match every condition.
+	Tags RbacTagConditionArrayInput `pulumi:"tags"`
+}
+
+func (RbacEntitySelectorArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*RbacEntitySelector)(nil)).Elem()
+}
+
+func (i RbacEntitySelectorArgs) ToRbacEntitySelectorOutput() RbacEntitySelectorOutput {
+	return i.ToRbacEntitySelectorOutputWithContext(context.Background())
+}
+
+func (i RbacEntitySelectorArgs) ToRbacEntitySelectorOutputWithContext(ctx context.Context) RbacEntitySelectorOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(RbacEntitySelectorOutput)
+}
+
+func (i RbacEntitySelectorArgs) ToRbacEntitySelectorPtrOutput() RbacEntitySelectorPtrOutput {
+	return i.ToRbacEntitySelectorPtrOutputWithContext(context.Background())
+}
+
+func (i RbacEntitySelectorArgs) ToRbacEntitySelectorPtrOutputWithContext(ctx context.Context) RbacEntitySelectorPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(RbacEntitySelectorOutput).ToRbacEntitySelectorPtrOutputWithContext(ctx)
+}
+
+// RbacEntitySelectorPtrInput is an input type that accepts RbacEntitySelectorArgs, RbacEntitySelectorPtr and RbacEntitySelectorPtrOutput values.
+// You can construct a concrete instance of `RbacEntitySelectorPtrInput` via:
+//
+//	        RbacEntitySelectorArgs{...}
+//
+//	or:
+//
+//	        nil
+type RbacEntitySelectorPtrInput interface {
+	pulumi.Input
+
+	ToRbacEntitySelectorPtrOutput() RbacEntitySelectorPtrOutput
+	ToRbacEntitySelectorPtrOutputWithContext(context.Context) RbacEntitySelectorPtrOutput
+}
+
+type rbacEntitySelectorPtrType RbacEntitySelectorArgs
+
+func RbacEntitySelectorPtr(v *RbacEntitySelectorArgs) RbacEntitySelectorPtrInput {
+	return (*rbacEntitySelectorPtrType)(v)
+}
+
+func (*rbacEntitySelectorPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**RbacEntitySelector)(nil)).Elem()
+}
+
+func (i *rbacEntitySelectorPtrType) ToRbacEntitySelectorPtrOutput() RbacEntitySelectorPtrOutput {
+	return i.ToRbacEntitySelectorPtrOutputWithContext(context.Background())
+}
+
+func (i *rbacEntitySelectorPtrType) ToRbacEntitySelectorPtrOutputWithContext(ctx context.Context) RbacEntitySelectorPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(RbacEntitySelectorPtrOutput)
+}
+
+type RbacEntitySelectorOutput struct{ *pulumi.OutputState }
+
+func (RbacEntitySelectorOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*RbacEntitySelector)(nil)).Elem()
+}
+
+func (o RbacEntitySelectorOutput) ToRbacEntitySelectorOutput() RbacEntitySelectorOutput {
+	return o
+}
+
+func (o RbacEntitySelectorOutput) ToRbacEntitySelectorOutputWithContext(ctx context.Context) RbacEntitySelectorOutput {
+	return o
+}
+
+func (o RbacEntitySelectorOutput) ToRbacEntitySelectorPtrOutput() RbacEntitySelectorPtrOutput {
+	return o.ToRbacEntitySelectorPtrOutputWithContext(context.Background())
+}
+
+func (o RbacEntitySelectorOutput) ToRbacEntitySelectorPtrOutputWithContext(ctx context.Context) RbacEntitySelectorPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v RbacEntitySelector) *RbacEntitySelector {
+		return &v
+	}).(RbacEntitySelectorPtrOutput)
+}
+
+// Apply to every entity of this kind in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+func (o RbacEntitySelectorOutput) All() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v RbacEntitySelector) *bool { return v.All }).(pulumi.BoolPtrOutput)
+}
+
+// Apply to a single entity: a `Stack.stackId`, `Environment.environmentId`, or `InsightsAccount.insightsAccountId`.
+func (o RbacEntitySelectorOutput) Id() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v RbacEntitySelector) *string { return v.Id }).(pulumi.StringPtrOutput)
+}
+
+// Apply to entities whose tags match every condition.
+func (o RbacEntitySelectorOutput) Tags() RbacTagConditionArrayOutput {
+	return o.ApplyT(func(v RbacEntitySelector) []RbacTagCondition { return v.Tags }).(RbacTagConditionArrayOutput)
+}
+
+type RbacEntitySelectorPtrOutput struct{ *pulumi.OutputState }
+
+func (RbacEntitySelectorPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**RbacEntitySelector)(nil)).Elem()
+}
+
+func (o RbacEntitySelectorPtrOutput) ToRbacEntitySelectorPtrOutput() RbacEntitySelectorPtrOutput {
+	return o
+}
+
+func (o RbacEntitySelectorPtrOutput) ToRbacEntitySelectorPtrOutputWithContext(ctx context.Context) RbacEntitySelectorPtrOutput {
+	return o
+}
+
+func (o RbacEntitySelectorPtrOutput) Elem() RbacEntitySelectorOutput {
+	return o.ApplyT(func(v *RbacEntitySelector) RbacEntitySelector {
+		if v != nil {
+			return *v
+		}
+		var ret RbacEntitySelector
+		return ret
+	}).(RbacEntitySelectorOutput)
+}
+
+// Apply to every entity of this kind in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+func (o RbacEntitySelectorPtrOutput) All() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v *RbacEntitySelector) *bool {
+		if v == nil {
+			return nil
+		}
+		return v.All
+	}).(pulumi.BoolPtrOutput)
+}
+
+// Apply to a single entity: a `Stack.stackId`, `Environment.environmentId`, or `InsightsAccount.insightsAccountId`.
+func (o RbacEntitySelectorPtrOutput) Id() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *RbacEntitySelector) *string {
+		if v == nil {
+			return nil
+		}
+		return v.Id
+	}).(pulumi.StringPtrOutput)
+}
+
+// Apply to entities whose tags match every condition.
+func (o RbacEntitySelectorPtrOutput) Tags() RbacTagConditionArrayOutput {
+	return o.ApplyT(func(v *RbacEntitySelector) []RbacTagCondition {
+		if v == nil {
+			return nil
+		}
+		return v.Tags
+	}).(RbacTagConditionArrayOutput)
+}
+
+type RbacPermissionSetInfo struct {
+	// For built-in permission sets, a stable identifier such as `stack-read`, `environment-admin`, or `org-settings-read-only`. Unset for custom permission sets.
+	DefaultIdentifier *string `pulumi:"defaultIdentifier"`
+	// Human-readable description of what the permission set grants.
+	Description string `pulumi:"description"`
+	// The permission set's display name.
+	Name string `pulumi:"name"`
+	// The permission set's unique ID. Reference it from an `RbacRole`.
+	PermissionSetId string `pulumi:"permissionSetId"`
+	// The scopes the permission set grants. Only populated for permission sets that grant a flat list of scopes.
+	Permissions []string `pulumi:"permissions"`
+	// The kind of entity the permission set applies to.
+	ResourceType RbacResourceType `pulumi:"resourceType"`
+}
+
+type RbacPermissionSetInfoOutput struct{ *pulumi.OutputState }
+
+func (RbacPermissionSetInfoOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*RbacPermissionSetInfo)(nil)).Elem()
+}
+
+func (o RbacPermissionSetInfoOutput) ToRbacPermissionSetInfoOutput() RbacPermissionSetInfoOutput {
+	return o
+}
+
+func (o RbacPermissionSetInfoOutput) ToRbacPermissionSetInfoOutputWithContext(ctx context.Context) RbacPermissionSetInfoOutput {
+	return o
+}
+
+// For built-in permission sets, a stable identifier such as `stack-read`, `environment-admin`, or `org-settings-read-only`. Unset for custom permission sets.
+func (o RbacPermissionSetInfoOutput) DefaultIdentifier() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v RbacPermissionSetInfo) *string { return v.DefaultIdentifier }).(pulumi.StringPtrOutput)
+}
+
+// Human-readable description of what the permission set grants.
+func (o RbacPermissionSetInfoOutput) Description() pulumi.StringOutput {
+	return o.ApplyT(func(v RbacPermissionSetInfo) string { return v.Description }).(pulumi.StringOutput)
+}
+
+// The permission set's display name.
+func (o RbacPermissionSetInfoOutput) Name() pulumi.StringOutput {
+	return o.ApplyT(func(v RbacPermissionSetInfo) string { return v.Name }).(pulumi.StringOutput)
+}
+
+// The permission set's unique ID. Reference it from an `RbacRole`.
+func (o RbacPermissionSetInfoOutput) PermissionSetId() pulumi.StringOutput {
+	return o.ApplyT(func(v RbacPermissionSetInfo) string { return v.PermissionSetId }).(pulumi.StringOutput)
+}
+
+// The scopes the permission set grants. Only populated for permission sets that grant a flat list of scopes.
+func (o RbacPermissionSetInfoOutput) Permissions() pulumi.StringArrayOutput {
+	return o.ApplyT(func(v RbacPermissionSetInfo) []string { return v.Permissions }).(pulumi.StringArrayOutput)
+}
+
+// The kind of entity the permission set applies to.
+func (o RbacPermissionSetInfoOutput) ResourceType() RbacResourceTypeOutput {
+	return o.ApplyT(func(v RbacPermissionSetInfo) RbacResourceType { return v.ResourceType }).(RbacResourceTypeOutput)
+}
+
+type RbacPermissionSetInfoArrayOutput struct{ *pulumi.OutputState }
+
+func (RbacPermissionSetInfoArrayOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]RbacPermissionSetInfo)(nil)).Elem()
+}
+
+func (o RbacPermissionSetInfoArrayOutput) ToRbacPermissionSetInfoArrayOutput() RbacPermissionSetInfoArrayOutput {
+	return o
+}
+
+func (o RbacPermissionSetInfoArrayOutput) ToRbacPermissionSetInfoArrayOutputWithContext(ctx context.Context) RbacPermissionSetInfoArrayOutput {
+	return o
+}
+
+func (o RbacPermissionSetInfoArrayOutput) Index(i pulumi.IntInput) RbacPermissionSetInfoOutput {
+	return pulumi.All(o, i).ApplyT(func(vs []interface{}) RbacPermissionSetInfo {
+		return vs[0].([]RbacPermissionSetInfo)[vs[1].(int)]
+	}).(RbacPermissionSetInfoOutput)
+}
+
+type RbacTagCondition struct {
+	// The tag key.
+	Key string `pulumi:"key"`
+	// How the tag is compared. Defaults to `equals`.
+	Operator *RbacTagOperator `pulumi:"operator"`
+	// The tag value. When omitted, the condition matches on whether the tag is present at all.
+	Value *string `pulumi:"value"`
+}
+
+// RbacTagConditionInput is an input type that accepts RbacTagConditionArgs and RbacTagConditionOutput values.
+// You can construct a concrete instance of `RbacTagConditionInput` via:
+//
+//	RbacTagConditionArgs{...}
+type RbacTagConditionInput interface {
+	pulumi.Input
+
+	ToRbacTagConditionOutput() RbacTagConditionOutput
+	ToRbacTagConditionOutputWithContext(context.Context) RbacTagConditionOutput
+}
+
+type RbacTagConditionArgs struct {
+	// The tag key.
+	Key pulumi.StringInput `pulumi:"key"`
+	// How the tag is compared. Defaults to `equals`.
+	Operator RbacTagOperatorPtrInput `pulumi:"operator"`
+	// The tag value. When omitted, the condition matches on whether the tag is present at all.
+	Value pulumi.StringPtrInput `pulumi:"value"`
+}
+
+func (RbacTagConditionArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*RbacTagCondition)(nil)).Elem()
+}
+
+func (i RbacTagConditionArgs) ToRbacTagConditionOutput() RbacTagConditionOutput {
+	return i.ToRbacTagConditionOutputWithContext(context.Background())
+}
+
+func (i RbacTagConditionArgs) ToRbacTagConditionOutputWithContext(ctx context.Context) RbacTagConditionOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(RbacTagConditionOutput)
+}
+
+// RbacTagConditionArrayInput is an input type that accepts RbacTagConditionArray and RbacTagConditionArrayOutput values.
+// You can construct a concrete instance of `RbacTagConditionArrayInput` via:
+//
+//	RbacTagConditionArray{ RbacTagConditionArgs{...} }
+type RbacTagConditionArrayInput interface {
+	pulumi.Input
+
+	ToRbacTagConditionArrayOutput() RbacTagConditionArrayOutput
+	ToRbacTagConditionArrayOutputWithContext(context.Context) RbacTagConditionArrayOutput
+}
+
+type RbacTagConditionArray []RbacTagConditionInput
+
+func (RbacTagConditionArray) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]RbacTagCondition)(nil)).Elem()
+}
+
+func (i RbacTagConditionArray) ToRbacTagConditionArrayOutput() RbacTagConditionArrayOutput {
+	return i.ToRbacTagConditionArrayOutputWithContext(context.Background())
+}
+
+func (i RbacTagConditionArray) ToRbacTagConditionArrayOutputWithContext(ctx context.Context) RbacTagConditionArrayOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(RbacTagConditionArrayOutput)
+}
+
+type RbacTagConditionOutput struct{ *pulumi.OutputState }
+
+func (RbacTagConditionOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*RbacTagCondition)(nil)).Elem()
+}
+
+func (o RbacTagConditionOutput) ToRbacTagConditionOutput() RbacTagConditionOutput {
+	return o
+}
+
+func (o RbacTagConditionOutput) ToRbacTagConditionOutputWithContext(ctx context.Context) RbacTagConditionOutput {
+	return o
+}
+
+// The tag key.
+func (o RbacTagConditionOutput) Key() pulumi.StringOutput {
+	return o.ApplyT(func(v RbacTagCondition) string { return v.Key }).(pulumi.StringOutput)
+}
+
+// How the tag is compared. Defaults to `equals`.
+func (o RbacTagConditionOutput) Operator() RbacTagOperatorPtrOutput {
+	return o.ApplyT(func(v RbacTagCondition) *RbacTagOperator { return v.Operator }).(RbacTagOperatorPtrOutput)
+}
+
+// The tag value. When omitted, the condition matches on whether the tag is present at all.
+func (o RbacTagConditionOutput) Value() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v RbacTagCondition) *string { return v.Value }).(pulumi.StringPtrOutput)
+}
+
+type RbacTagConditionArrayOutput struct{ *pulumi.OutputState }
+
+func (RbacTagConditionArrayOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]RbacTagCondition)(nil)).Elem()
+}
+
+func (o RbacTagConditionArrayOutput) ToRbacTagConditionArrayOutput() RbacTagConditionArrayOutput {
+	return o
+}
+
+func (o RbacTagConditionArrayOutput) ToRbacTagConditionArrayOutputWithContext(ctx context.Context) RbacTagConditionArrayOutput {
+	return o
+}
+
+func (o RbacTagConditionArrayOutput) Index(i pulumi.IntInput) RbacTagConditionOutput {
+	return pulumi.All(o, i).ApplyT(func(vs []interface{}) RbacTagCondition {
+		return vs[0].([]RbacTagCondition)[vs[1].(int)]
+	}).(RbacTagConditionOutput)
+}
+
 type RoleScopeInfo struct {
 	// Human-readable description of what the scope grants.
 	Description string `pulumi:"description"`
@@ -4682,6 +5175,12 @@ func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*PolicyPackComplianceFrameworkInputPtrInput)(nil)).Elem(), PolicyPackComplianceFrameworkInputArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*PolicyPackPolicyInputInput)(nil)).Elem(), PolicyPackPolicyInputArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*PolicyPackPolicyInputArrayInput)(nil)).Elem(), PolicyPackPolicyInputArray{})
+	pulumi.RegisterInputType(reflect.TypeOf((*RbacEntityRuleInput)(nil)).Elem(), RbacEntityRuleArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*RbacEntityRuleArrayInput)(nil)).Elem(), RbacEntityRuleArray{})
+	pulumi.RegisterInputType(reflect.TypeOf((*RbacEntitySelectorInput)(nil)).Elem(), RbacEntitySelectorArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*RbacEntitySelectorPtrInput)(nil)).Elem(), RbacEntitySelectorArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*RbacTagConditionInput)(nil)).Elem(), RbacTagConditionArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*RbacTagConditionArrayInput)(nil)).Elem(), RbacTagConditionArray{})
 	pulumi.RegisterInputType(reflect.TypeOf((*TemplateSourceDestinationInput)(nil)).Elem(), TemplateSourceDestinationArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*TemplateSourceDestinationPtrInput)(nil)).Elem(), TemplateSourceDestinationArgs{})
 	pulumi.RegisterOutputType(AWSOIDCConfigurationOutput{})
@@ -4738,6 +5237,14 @@ func init() {
 	pulumi.RegisterOutputType(PolicyPackPolicyInputArrayOutput{})
 	pulumi.RegisterOutputType(PolicyPackSummaryOutput{})
 	pulumi.RegisterOutputType(PolicyPackSummaryArrayOutput{})
+	pulumi.RegisterOutputType(RbacEntityRuleOutput{})
+	pulumi.RegisterOutputType(RbacEntityRuleArrayOutput{})
+	pulumi.RegisterOutputType(RbacEntitySelectorOutput{})
+	pulumi.RegisterOutputType(RbacEntitySelectorPtrOutput{})
+	pulumi.RegisterOutputType(RbacPermissionSetInfoOutput{})
+	pulumi.RegisterOutputType(RbacPermissionSetInfoArrayOutput{})
+	pulumi.RegisterOutputType(RbacTagConditionOutput{})
+	pulumi.RegisterOutputType(RbacTagConditionArrayOutput{})
 	pulumi.RegisterOutputType(RoleScopeInfoOutput{})
 	pulumi.RegisterOutputType(RoleScopeInfoArrayOutput{})
 	pulumi.RegisterOutputType(TemplateSourceDestinationOutput{})

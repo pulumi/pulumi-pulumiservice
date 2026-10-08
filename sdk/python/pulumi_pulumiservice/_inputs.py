@@ -64,6 +64,12 @@ __all__ = [
     'PolicyPackComplianceFrameworkInputArgsDict',
     'PolicyPackPolicyInputArgs',
     'PolicyPackPolicyInputArgsDict',
+    'RbacEntityRuleArgs',
+    'RbacEntityRuleArgsDict',
+    'RbacEntitySelectorArgs',
+    'RbacEntitySelectorArgsDict',
+    'RbacTagConditionArgs',
+    'RbacTagConditionArgsDict',
     'TemplateSourceDestinationArgs',
     'TemplateSourceDestinationArgsDict',
 ]
@@ -2169,6 +2175,231 @@ class PolicyPackPolicyInputArgs:
     @url.setter
     def url(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "url", value)
+
+
+class RbacEntityRuleArgsDict(TypedDict):
+    permission_set_ids: pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]
+    """
+    IDs of the permission sets to grant. Their `resourceType` must match the selected entity kind.
+    """
+    environment: NotRequired[pulumi.Input[Optional['RbacEntitySelectorArgsDict']]]
+    """
+    Select ESC environments.
+    """
+    insights_account: NotRequired[pulumi.Input[Optional['RbacEntitySelectorArgsDict']]]
+    """
+    Select Insights accounts.
+    """
+    stack: NotRequired[pulumi.Input[Optional['RbacEntitySelectorArgsDict']]]
+    """
+    Select stacks. Exactly one of `stack`, `environment`, or `insightsAccount` must be set.
+    """
+
+@pulumi.input_type
+class RbacEntityRuleArgs:
+    def __init__(__self__, *,
+                 permission_set_ids: pulumi.Input[Sequence[pulumi.Input[_builtins.str]]],
+                 environment: pulumi.Input[Optional['RbacEntitySelectorArgs']] = None,
+                 insights_account: pulumi.Input[Optional['RbacEntitySelectorArgs']] = None,
+                 stack: pulumi.Input[Optional['RbacEntitySelectorArgs']] = None):
+        """
+        :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] permission_set_ids: IDs of the permission sets to grant. Their `resourceType` must match the selected entity kind.
+        :param pulumi.Input['RbacEntitySelectorArgs'] environment: Select ESC environments.
+        :param pulumi.Input['RbacEntitySelectorArgs'] insights_account: Select Insights accounts.
+        :param pulumi.Input['RbacEntitySelectorArgs'] stack: Select stacks. Exactly one of `stack`, `environment`, or `insightsAccount` must be set.
+        """
+        pulumi.set(__self__, "permission_set_ids", permission_set_ids)
+        if environment is not None:
+            pulumi.set(__self__, "environment", environment)
+        if insights_account is not None:
+            pulumi.set(__self__, "insights_account", insights_account)
+        if stack is not None:
+            pulumi.set(__self__, "stack", stack)
+
+    @_builtins.property
+    @pulumi.getter(name="permissionSetIds")
+    def permission_set_ids(self) -> pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]:
+        """
+        IDs of the permission sets to grant. Their `resourceType` must match the selected entity kind.
+        """
+        return pulumi.get(self, "permission_set_ids")
+
+    @permission_set_ids.setter
+    def permission_set_ids(self, value: pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]):
+        pulumi.set(self, "permission_set_ids", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def environment(self) -> pulumi.Input[Optional['RbacEntitySelectorArgs']]:
+        """
+        Select ESC environments.
+        """
+        return pulumi.get(self, "environment")
+
+    @environment.setter
+    def environment(self, value: pulumi.Input[Optional['RbacEntitySelectorArgs']]):
+        pulumi.set(self, "environment", value)
+
+    @_builtins.property
+    @pulumi.getter(name="insightsAccount")
+    def insights_account(self) -> pulumi.Input[Optional['RbacEntitySelectorArgs']]:
+        """
+        Select Insights accounts.
+        """
+        return pulumi.get(self, "insights_account")
+
+    @insights_account.setter
+    def insights_account(self, value: pulumi.Input[Optional['RbacEntitySelectorArgs']]):
+        pulumi.set(self, "insights_account", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def stack(self) -> pulumi.Input[Optional['RbacEntitySelectorArgs']]:
+        """
+        Select stacks. Exactly one of `stack`, `environment`, or `insightsAccount` must be set.
+        """
+        return pulumi.get(self, "stack")
+
+    @stack.setter
+    def stack(self, value: pulumi.Input[Optional['RbacEntitySelectorArgs']]):
+        pulumi.set(self, "stack", value)
+
+
+class RbacEntitySelectorArgsDict(TypedDict):
+    all: NotRequired[pulumi.Input[Optional[_builtins.bool]]]
+    """
+    Apply to every entity of this kind in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+    """
+    id: NotRequired[pulumi.Input[Optional[_builtins.str]]]
+    """
+    Apply to a single entity: a `Stack.stackId`, `Environment.environmentId`, or `InsightsAccount.insightsAccountId`.
+    """
+    tags: NotRequired[pulumi.Input[Optional[Sequence[pulumi.Input['RbacTagConditionArgsDict']]]]]
+    """
+    Apply to entities whose tags match every condition.
+    """
+
+@pulumi.input_type
+class RbacEntitySelectorArgs:
+    def __init__(__self__, *,
+                 all: pulumi.Input[Optional[_builtins.bool]] = None,
+                 id: pulumi.Input[Optional[_builtins.str]] = None,
+                 tags: pulumi.Input[Optional[Sequence[pulumi.Input['RbacTagConditionArgs']]]] = None):
+        """
+        :param pulumi.Input[_builtins.bool] all: Apply to every entity of this kind in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+        :param pulumi.Input[_builtins.str] id: Apply to a single entity: a `Stack.stackId`, `Environment.environmentId`, or `InsightsAccount.insightsAccountId`.
+        :param pulumi.Input[Sequence[pulumi.Input['RbacTagConditionArgs']]] tags: Apply to entities whose tags match every condition.
+        """
+        if all is not None:
+            pulumi.set(__self__, "all", all)
+        if id is not None:
+            pulumi.set(__self__, "id", id)
+        if tags is not None:
+            pulumi.set(__self__, "tags", tags)
+
+    @_builtins.property
+    @pulumi.getter
+    def all(self) -> pulumi.Input[Optional[_builtins.bool]]:
+        """
+        Apply to every entity of this kind in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+        """
+        return pulumi.get(self, "all")
+
+    @all.setter
+    def all(self, value: pulumi.Input[Optional[_builtins.bool]]):
+        pulumi.set(self, "all", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def id(self) -> pulumi.Input[Optional[_builtins.str]]:
+        """
+        Apply to a single entity: a `Stack.stackId`, `Environment.environmentId`, or `InsightsAccount.insightsAccountId`.
+        """
+        return pulumi.get(self, "id")
+
+    @id.setter
+    def id(self, value: pulumi.Input[Optional[_builtins.str]]):
+        pulumi.set(self, "id", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def tags(self) -> pulumi.Input[Optional[Sequence[pulumi.Input['RbacTagConditionArgs']]]]:
+        """
+        Apply to entities whose tags match every condition.
+        """
+        return pulumi.get(self, "tags")
+
+    @tags.setter
+    def tags(self, value: pulumi.Input[Optional[Sequence[pulumi.Input['RbacTagConditionArgs']]]]):
+        pulumi.set(self, "tags", value)
+
+
+class RbacTagConditionArgsDict(TypedDict):
+    key: pulumi.Input[_builtins.str]
+    """
+    The tag key.
+    """
+    operator: NotRequired[pulumi.Input[Optional['RbacTagOperator']]]
+    """
+    How the tag is compared. Defaults to `equals`.
+    """
+    value: NotRequired[pulumi.Input[Optional[_builtins.str]]]
+    """
+    The tag value. When omitted, the condition matches on whether the tag is present at all.
+    """
+
+@pulumi.input_type
+class RbacTagConditionArgs:
+    def __init__(__self__, *,
+                 key: pulumi.Input[_builtins.str],
+                 operator: pulumi.Input[Optional['RbacTagOperator']] = None,
+                 value: pulumi.Input[Optional[_builtins.str]] = None):
+        """
+        :param pulumi.Input[_builtins.str] key: The tag key.
+        :param pulumi.Input['RbacTagOperator'] operator: How the tag is compared. Defaults to `equals`.
+        :param pulumi.Input[_builtins.str] value: The tag value. When omitted, the condition matches on whether the tag is present at all.
+        """
+        pulumi.set(__self__, "key", key)
+        if operator is not None:
+            pulumi.set(__self__, "operator", operator)
+        if value is not None:
+            pulumi.set(__self__, "value", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def key(self) -> pulumi.Input[_builtins.str]:
+        """
+        The tag key.
+        """
+        return pulumi.get(self, "key")
+
+    @key.setter
+    def key(self, value: pulumi.Input[_builtins.str]):
+        pulumi.set(self, "key", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def operator(self) -> pulumi.Input[Optional['RbacTagOperator']]:
+        """
+        How the tag is compared. Defaults to `equals`.
+        """
+        return pulumi.get(self, "operator")
+
+    @operator.setter
+    def operator(self, value: pulumi.Input[Optional['RbacTagOperator']]):
+        pulumi.set(self, "operator", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def value(self) -> pulumi.Input[Optional[_builtins.str]]:
+        """
+        The tag value. When omitted, the condition matches on whether the tag is present at all.
+        """
+        return pulumi.get(self, "value")
+
+    @value.setter
+    def value(self, value: pulumi.Input[Optional[_builtins.str]]):
+        pulumi.set(self, "value", value)
 
 
 class TemplateSourceDestinationArgsDict(TypedDict):

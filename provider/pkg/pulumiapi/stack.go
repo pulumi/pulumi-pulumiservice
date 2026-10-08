@@ -11,6 +11,7 @@ import (
 type StackClient interface {
 	CreateStack(ctx context.Context, stack StackIdentifier) error
 	StackExists(ctx context.Context, stack StackIdentifier) (bool, error)
+	GetStackID(ctx context.Context, stack StackIdentifier) (string, error)
 	DeleteStack(ctx context.Context, stack StackIdentifier, forceDestroy bool) error
 }
 
@@ -30,21 +31,33 @@ func (c *Client) CreateStack(ctx context.Context, stack StackIdentifier) error {
 }
 
 func (c *Client) StackExists(ctx context.Context, stackName StackIdentifier) (bool, error) {
+	id, err := c.GetStackID(ctx, stackName)
+	return id != "", err
+}
+
+// GetStackID returns the stack's unique ID (the program ID that RBAC entity
+// rules reference), or "" if the stack does not exist.
+func (c *Client) GetStackID(ctx context.Context, stackName StackIdentifier) (string, error) {
 	if stackName.OrgName == "" || stackName.ProjectName == "" || stackName.StackName == "" {
-		return false, fmt.Errorf("invalid stack identifier: %v", stackName)
+		return "", fmt.Errorf("invalid stack identifier: %v", stackName)
 	}
 	apiPath := path.Join("stacks", stackName.OrgName, stackName.ProjectName, stackName.StackName)
-	var s stack
+	var s struct {
+		ID string `json:"id"`
+	}
 	_, err := c.do(ctx, http.MethodGet, apiPath, nil, &s)
 	if err != nil {
 		statusCode := GetErrorStatusCode(err)
 		if statusCode == http.StatusNotFound {
-			return false, nil
+			return "", nil
 		}
 
-		return false, fmt.Errorf("failed to get stack: %w", err)
+		return "", fmt.Errorf("failed to get stack: %w", err)
 	}
-	return true, nil
+	if s.ID == "" {
+		return "", fmt.Errorf("stack %s returned no id", stackName)
+	}
+	return s.ID, nil
 }
 
 func (c *Client) DeleteStack(ctx context.Context, stackName StackIdentifier, forceDestroy bool) error {

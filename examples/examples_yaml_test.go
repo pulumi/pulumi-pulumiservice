@@ -593,6 +593,25 @@ func TestYamlDeploymentSettingsVcsExample(t *testing.T) {
 	t.Skip("requires an existing Azure DevOps integration; run manually against a configured environment")
 }
 
+// TestYamlRbacRolesExample exercises RbacPermissionSet, RbacRole (org-level
+// access plus all-stacks, single-entity, and tag entity rules),
+// getRbacPermissionSet, and Stack.stackId. Requires the Custom Roles feature on
+// the test organization. The program doubles as the schema's Example Usage.
+func TestYamlRbacRolesExample(t *testing.T) {
+	test := pulumitest.NewPulumiTest(t,
+		filepath.Join(getCwd(t), "yaml-rbac-roles"),
+		inMemoryProvider(),
+		opttest.UseAmbientBackend(),
+		opttest.StackName(randomStackName()),
+	)
+	test.SetConfig(t, "digits", generateRandomFiveDigits())
+	test.SetConfig(t, "organizationName", getOrgName())
+
+	up := runPulumiTest(t, test)
+	assert.NotEmpty(t, up.Outputs["roleId"].Value)
+	assert.NotEmpty(t, up.Outputs["policyId"].Value)
+}
+
 func TestYamlRbacExample(t *testing.T) {
 	// Requires the Custom Roles feature to be enabled on the test
 	// organization. If it isn't, CreateRole will return a feature-flag

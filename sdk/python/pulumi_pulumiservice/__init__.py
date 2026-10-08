@@ -29,6 +29,8 @@ from .get_organization_members import *
 from .get_organization_role_scopes import *
 from .get_policy_pack import *
 from .get_policy_packs import *
+from .get_rbac_permission_set import *
+from .get_rbac_permission_sets import *
 from .insights_account import *
 from .oidc_issuer import *
 from .org_access_token import *
@@ -37,6 +39,8 @@ from .organization_role import *
 from .policy_group import *
 from .policy_pack import *
 from .provider import *
+from .rbac_permission_set import *
+from .rbac_role import *
 from .stack import *
 from .stack_tag import *
 from .stack_tags import *
@@ -215,6 +219,8 @@ _utilities.register(
    "pulumiservice:index:OrganizationRole": "OrganizationRole",
    "pulumiservice:index:PolicyGroup": "PolicyGroup",
    "pulumiservice:index:PolicyPack": "PolicyPack",
+   "pulumiservice:index:RbacPermissionSet": "RbacPermissionSet",
+   "pulumiservice:index:RbacRole": "RbacRole",
    "pulumiservice:index:Stack": "Stack",
    "pulumiservice:index:StackTag": "StackTag",
    "pulumiservice:index:StackTags": "StackTags",

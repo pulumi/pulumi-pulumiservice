@@ -83,6 +83,7 @@ type Client interface {
 	pulumiapi.OrgAccessTokenClient
 	pulumiapi.PolicyPackClient
 	pulumiapi.RegistryPolicyPackClient
+	pulumiapi.PermissionSetClient
 	pulumiapi.RoleClient
 	pulumiapi.StackClient
 	pulumiapi.StackScheduleClient

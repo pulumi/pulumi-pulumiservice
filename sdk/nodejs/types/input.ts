@@ -513,6 +513,55 @@ export interface PolicyPackPolicyInputArgs {
     url?: pulumi.Input<string | undefined>;
 }
 
+export interface RbacEntityRuleArgs {
+    /**
+     * Select ESC environments.
+     */
+    environment?: pulumi.Input<inputs.RbacEntitySelectorArgs | undefined>;
+    /**
+     * Select Insights accounts.
+     */
+    insightsAccount?: pulumi.Input<inputs.RbacEntitySelectorArgs | undefined>;
+    /**
+     * IDs of the permission sets to grant. Their `resourceType` must match the selected entity kind.
+     */
+    permissionSetIds: pulumi.Input<pulumi.Input<string>[]>;
+    /**
+     * Select stacks. Exactly one of `stack`, `environment`, or `insightsAccount` must be set.
+     */
+    stack?: pulumi.Input<inputs.RbacEntitySelectorArgs | undefined>;
+}
+
+export interface RbacEntitySelectorArgs {
+    /**
+     * Apply to every entity of this kind in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+     */
+    all?: pulumi.Input<boolean | undefined>;
+    /**
+     * Apply to a single entity: a `Stack.stackId`, `Environment.environmentId`, or `InsightsAccount.insightsAccountId`.
+     */
+    id?: pulumi.Input<string | undefined>;
+    /**
+     * Apply to entities whose tags match every condition.
+     */
+    tags?: pulumi.Input<pulumi.Input<inputs.RbacTagConditionArgs>[] | undefined>;
+}
+
+export interface RbacTagConditionArgs {
+    /**
+     * The tag key.
+     */
+    key: pulumi.Input<string>;
+    /**
+     * How the tag is compared. Defaults to `equals`.
+     */
+    operator?: pulumi.Input<enums.RbacTagOperator | undefined>;
+    /**
+     * The tag value. When omitted, the condition matches on whether the tag is present at all.
+     */
+    value?: pulumi.Input<string | undefined>;
+}
+
 export interface TemplateSourceDestinationArgs {
     /**
      * Destination URL that gets filled in on new project creation.

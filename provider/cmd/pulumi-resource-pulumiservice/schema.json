@@ -982,6 +982,53 @@
         }
       ]
     },
+    "pulumiservice:index:RbacEntityRule": {
+      "properties": {
+        "environment": {
+          "$ref": "#/types/pulumiservice:index:RbacEntitySelector",
+          "description": "Select ESC environments."
+        },
+        "insightsAccount": {
+          "$ref": "#/types/pulumiservice:index:RbacEntitySelector",
+          "description": "Select Insights accounts."
+        },
+        "permissionSetIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "IDs of the permission sets to grant. Their `resourceType` must match the selected entity kind."
+        },
+        "stack": {
+          "$ref": "#/types/pulumiservice:index:RbacEntitySelector",
+          "description": "Select stacks. Exactly one of `stack`, `environment`, or `insightsAccount` must be set."
+        }
+      },
+      "type": "object",
+      "required": [
+        "permissionSetIds"
+      ]
+    },
+    "pulumiservice:index:RbacEntitySelector": {
+      "properties": {
+        "all": {
+          "type": "boolean",
+          "description": "Apply to every entity of this kind in the organization. Exactly one of `all`, `id`, or `tags` must be set."
+        },
+        "id": {
+          "type": "string",
+          "description": "Apply to a single entity: a `Stack.stackId`, `Environment.environmentId`, or `InsightsAccount.insightsAccountId`."
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "$ref": "#/types/pulumiservice:index:RbacTagCondition"
+          },
+          "description": "Apply to entities whose tags match every condition."
+        }
+      },
+      "type": "object"
+    },
     "pulumiservice:index:RbacPermission": {
       "type": "string",
       "enum": [
@@ -1019,6 +1066,930 @@
           "name": "Rotate",
           "description": "Rotate permission.",
           "value": "environment:rotate"
+        }
+      ]
+    },
+    "pulumiservice:index:RbacPermissionSetInfo": {
+      "properties": {
+        "defaultIdentifier": {
+          "type": "string",
+          "description": "For built-in permission sets, a stable identifier such as `stack-read`, `environment-admin`, or `org-settings-read-only`. Unset for custom permission sets."
+        },
+        "description": {
+          "type": "string",
+          "description": "Human-readable description of what the permission set grants."
+        },
+        "name": {
+          "type": "string",
+          "description": "The permission set's display name."
+        },
+        "permissionSetId": {
+          "type": "string",
+          "description": "The permission set's unique ID. Reference it from an `RbacRole`."
+        },
+        "permissions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The scopes the permission set grants. Only populated for permission sets that grant a flat list of scopes."
+        },
+        "resourceType": {
+          "$ref": "#/types/pulumiservice:index:RbacResourceType",
+          "description": "The kind of entity the permission set applies to."
+        }
+      },
+      "type": "object",
+      "required": [
+        "permissionSetId",
+        "name",
+        "description",
+        "resourceType",
+        "permissions"
+      ]
+    },
+    "pulumiservice:index:RbacResourceType": {
+      "type": "string",
+      "enum": [
+        {
+          "name": "Environment",
+          "description": "Permissions on ESC environments, granted through a role's environment entity rules.",
+          "value": "environment"
+        },
+        {
+          "name": "Global",
+          "description": "Organization-wide permissions, granted through a role's organization-level access.",
+          "value": "global"
+        },
+        {
+          "name": "InsightsAccount",
+          "description": "Permissions on Insights accounts, granted through a role's Insights account entity rules.",
+          "value": "insights-account"
+        },
+        {
+          "name": "Stack",
+          "description": "Permissions on stacks, granted through a role's stack entity rules.",
+          "value": "stack"
+        }
+      ]
+    },
+    "pulumiservice:index:RbacScope": {
+      "type": "string",
+      "enum": [
+        {
+          "name": "AgentPoolCreate",
+          "description": "Create agent pool. Applies to: global (Agent pools).",
+          "value": "agent_pool:create"
+        },
+        {
+          "name": "AgentPoolDelete",
+          "description": "Delete agent pool. Applies to: global (Agent pools).",
+          "value": "agent_pool:delete"
+        },
+        {
+          "name": "AgentPoolRead",
+          "description": "Read agent pool. Applies to: global (Agent pools).",
+          "value": "agent_pool:read"
+        },
+        {
+          "name": "AgentPoolUpdate",
+          "description": "Update agent pool. Applies to: global (Agent pools).",
+          "value": "agent_pool:update"
+        },
+        {
+          "name": "AgentTaskCreate",
+          "description": "Create Neo tasks. Applies to: global (Neo).",
+          "value": "agent_task:create"
+        },
+        {
+          "name": "AuditLogsExport",
+          "description": "Export audit logs. Applies to: global (Audit logs).",
+          "value": "audit_logs:export"
+        },
+        {
+          "name": "AuditLogsRead",
+          "description": "Read audit logs. Applies to: global (Audit logs).",
+          "value": "audit_logs:read"
+        },
+        {
+          "name": "AuthPoliciesRead",
+          "description": "Read authentication policies. Applies to: global (OIDC).",
+          "value": "auth_policies:read"
+        },
+        {
+          "name": "AuthPoliciesUpdate",
+          "description": "Update authentication policies. Applies to: global (OIDC).",
+          "value": "auth_policies:update"
+        },
+        {
+          "name": "ChangeGateCreate",
+          "description": "Create approval rules. Applies to: environment, global (Approvals).",
+          "value": "change_gate:create"
+        },
+        {
+          "name": "ChangeGateDelete",
+          "description": "Delete approval rules. Applies to: environment, global (Approvals).",
+          "value": "change_gate:delete"
+        },
+        {
+          "name": "ChangeGateUpdate",
+          "description": "Update approval rules. Applies to: environment, global (Approvals).",
+          "value": "change_gate:update"
+        },
+        {
+          "name": "DeploymentsPause",
+          "description": "Pause deployments. Applies to: global (Deployments).",
+          "value": "deployments:pause"
+        },
+        {
+          "name": "DeploymentsRead",
+          "description": "Read deployments. Applies to: global (Deployments).",
+          "value": "deployments:read"
+        },
+        {
+          "name": "DeploymentsReadUsage",
+          "description": "Read deployment usage. Applies to: global (Deployments).",
+          "value": "deployments:read_usage"
+        },
+        {
+          "name": "DeploymentsResume",
+          "description": "Resume deployments. Applies to: global (Deployments).",
+          "value": "deployments:resume"
+        },
+        {
+          "name": "EnvironmentClone",
+          "description": "Clone environment. Applies to: environment (Environments).",
+          "value": "environment:clone"
+        },
+        {
+          "name": "EnvironmentCreate",
+          "description": "Create environment. Applies to: global (Environment management).",
+          "value": "environment:create"
+        },
+        {
+          "name": "EnvironmentDelete",
+          "description": "Delete environment. Applies to: environment (Environments).",
+          "value": "environment:delete"
+        },
+        {
+          "name": "EnvironmentListDeleted",
+          "description": "List deleted environments. Applies to: global (Environment management).",
+          "value": "environment:list_deleted"
+        },
+        {
+          "name": "EnvironmentOpen",
+          "description": "Open and decrypt environment. Applies to: environment (Environments).",
+          "value": "environment:open"
+        },
+        {
+          "name": "EnvironmentRead",
+          "description": "Read environment. Applies to: environment (Environments).",
+          "value": "environment:read"
+        },
+        {
+          "name": "EnvironmentRestoreDeleted",
+          "description": "Restore deleted environment. Applies to: global (Environment management).",
+          "value": "environment:restore_deleted"
+        },
+        {
+          "name": "EnvironmentRotate",
+          "description": "Rotates secrets in an environment. Applies to: environment (Environment secrets rotation).",
+          "value": "environment:rotate"
+        },
+        {
+          "name": "EnvironmentRotateHistory",
+          "description": "List secret rotation history of an environment. Applies to: environment (Environment secrets rotation).",
+          "value": "environment:rotate_history"
+        },
+        {
+          "name": "EnvironmentWrite",
+          "description": "Write environment. Applies to: environment (Environments).",
+          "value": "environment:write"
+        },
+        {
+          "name": "EnvironmentScheduleCreate",
+          "description": "Creates a new environment schedule. Applies to: environment (Environment schedules).",
+          "value": "environment_schedule:create"
+        },
+        {
+          "name": "EnvironmentScheduleDelete",
+          "description": "Deletes an environment schedule. Applies to: environment (Environment schedules).",
+          "value": "environment_schedule:delete"
+        },
+        {
+          "name": "EnvironmentSchedulePause",
+          "description": "Pauses an environment schedule. Applies to: environment (Environment schedules).",
+          "value": "environment_schedule:pause"
+        },
+        {
+          "name": "EnvironmentScheduleRead",
+          "description": "Reads an environment schedule. Applies to: environment (Environment schedules).",
+          "value": "environment_schedule:read"
+        },
+        {
+          "name": "EnvironmentScheduleResume",
+          "description": "Resumes an environment schedule. Applies to: environment (Environment schedules).",
+          "value": "environment_schedule:resume"
+        },
+        {
+          "name": "EnvironmentScheduleUpdate",
+          "description": "Updates an environment schedule. Applies to: environment (Environment schedules).",
+          "value": "environment_schedule:update"
+        },
+        {
+          "name": "EnvironmentSettingsRead",
+          "description": "Read environment settings. Applies to: environment (Environments).",
+          "value": "environment_settings:read"
+        },
+        {
+          "name": "EnvironmentSettingsUpdate",
+          "description": "Update environment settings. Applies to: environment (Environments).",
+          "value": "environment_settings:update"
+        },
+        {
+          "name": "EnvironmentTagCreate",
+          "description": "Adds a new tag to an environment. Applies to: environment (Environment tags).",
+          "value": "environment_tag:create"
+        },
+        {
+          "name": "EnvironmentTagDelete",
+          "description": "Removes a tag from an environment. Applies to: environment (Environment tags).",
+          "value": "environment_tag:delete"
+        },
+        {
+          "name": "EnvironmentTagRead",
+          "description": "Reads the value of an environments tag. Applies to: environment (Environment tags).",
+          "value": "environment_tag:read"
+        },
+        {
+          "name": "EnvironmentTagUpdate",
+          "description": "Modifies the value of an environments tag. Applies to: environment (Environment tags).",
+          "value": "environment_tag:update"
+        },
+        {
+          "name": "EnvironmentTagsList",
+          "description": "List the tags across all environments. Applies to: global (Environment management).",
+          "value": "environment_tags:list"
+        },
+        {
+          "name": "EnvironmentVersionCreate",
+          "description": "Creates a new version tag. Applies to: environment (Environment versions).",
+          "value": "environment_version:create"
+        },
+        {
+          "name": "EnvironmentVersionDelete",
+          "description": "Deletes a version tag. Applies to: environment (Environment versions).",
+          "value": "environment_version:delete"
+        },
+        {
+          "name": "EnvironmentVersionOpen",
+          "description": "Open and decrypt a version tag. Applies to: environment (Environment versions).",
+          "value": "environment_version:open"
+        },
+        {
+          "name": "EnvironmentVersionRead",
+          "description": "Reads a version tag. Applies to: environment (Environment versions).",
+          "value": "environment_version:read"
+        },
+        {
+          "name": "EnvironmentVersionRetract",
+          "description": "Retracts a specific version of the given environment. Applies to: environment (Environment versions).",
+          "value": "environment_version:retract"
+        },
+        {
+          "name": "EnvironmentVersionUpdate",
+          "description": "Updates a version tag. Applies to: environment (Environment versions).",
+          "value": "environment_version:update"
+        },
+        {
+          "name": "EnvironmentWebhookCreate",
+          "description": "Create environment webhook. Applies to: environment (Environment webhooks).",
+          "value": "environment_webhook:create"
+        },
+        {
+          "name": "EnvironmentWebhookDelete",
+          "description": "Delete environment webhook. Applies to: environment (Environment webhooks).",
+          "value": "environment_webhook:delete"
+        },
+        {
+          "name": "EnvironmentWebhookRead",
+          "description": "Read environment webhook. Applies to: environment (Environment webhooks).",
+          "value": "environment_webhook:read"
+        },
+        {
+          "name": "EnvironmentWebhookUpdate",
+          "description": "Update environment webhook. Applies to: environment (Environment webhooks).",
+          "value": "environment_webhook:update"
+        },
+        {
+          "name": "GithubTeamCreate",
+          "description": "Create GitHub team. Applies to: global (Teams).",
+          "value": "github_team:create"
+        },
+        {
+          "name": "InsightsAccountCreate",
+          "description": "Create Insights account. Applies to: global (Insights account management).",
+          "value": "insights_account:create"
+        },
+        {
+          "name": "InsightsAccountDelete",
+          "description": "Delete Insights account. Applies to: insights-account (Accounts).",
+          "value": "insights_account:delete"
+        },
+        {
+          "name": "InsightsAccountRead",
+          "description": "Read Insights account. Applies to: insights-account (Accounts).",
+          "value": "insights_account:read"
+        },
+        {
+          "name": "InsightsAccountScan",
+          "description": "Scan Insights account. Applies to: insights-account (Scans).",
+          "value": "insights_account:scan"
+        },
+        {
+          "name": "InsightsAccountUpdate",
+          "description": "Update Insights account. Applies to: insights-account (Accounts).",
+          "value": "insights_account:update"
+        },
+        {
+          "name": "InsightsAccountAccessRead",
+          "description": "Read Insights account access. Applies to: insights-account (Accounts).",
+          "value": "insights_account_access:read"
+        },
+        {
+          "name": "InsightsAccountAccessUpdate",
+          "description": "Update Insights account access. Applies to: insights-account (Accounts).",
+          "value": "insights_account_access:update"
+        },
+        {
+          "name": "InsightsAccountScanCancel",
+          "description": "Cancel Insights account scan. Applies to: insights-account (Scans).",
+          "value": "insights_account_scan:cancel"
+        },
+        {
+          "name": "InsightsAccountScanPause",
+          "description": "Pause Insights account scan. Applies to: insights-account (Scans).",
+          "value": "insights_account_scan:pause"
+        },
+        {
+          "name": "InsightsAccountScanRead",
+          "description": "Read Insights account scan. Applies to: insights-account (Scans).",
+          "value": "insights_account_scan:read"
+        },
+        {
+          "name": "InsightsAccountScanResume",
+          "description": "Resume Insights account scan. Applies to: insights-account (Scans).",
+          "value": "insights_account_scan:resume"
+        },
+        {
+          "name": "InsightsAccountScanUpdate",
+          "description": "Update Insights account scan. Applies to: insights-account (Scans).",
+          "value": "insights_account_scan:update"
+        },
+        {
+          "name": "IntegrationsRead",
+          "description": "Read integrations. Applies to: global (Organization).",
+          "value": "integrations:read"
+        },
+        {
+          "name": "IntegrationsUpdate",
+          "description": "Update integrations. Applies to: global (Organization).",
+          "value": "integrations:update"
+        },
+        {
+          "name": "InvitesCreate",
+          "description": "Create invites. Applies to: global (Membership).",
+          "value": "invites:create"
+        },
+        {
+          "name": "InvitesRead",
+          "description": "Read invites. Applies to: global (Membership).",
+          "value": "invites:read"
+        },
+        {
+          "name": "OidcIssuersCreate",
+          "description": "Create OIDC issuer. Applies to: global (OIDC).",
+          "value": "oidc_issuers:create"
+        },
+        {
+          "name": "OidcIssuersDelete",
+          "description": "Delete OIDC issuer. Applies to: global (OIDC).",
+          "value": "oidc_issuers:delete"
+        },
+        {
+          "name": "OidcIssuersRead",
+          "description": "Read OIDC issuers. Applies to: global (OIDC).",
+          "value": "oidc_issuers:read"
+        },
+        {
+          "name": "OidcIssuersRegenerateThumbprints",
+          "description": "Regenerate OIDC issuer thumbprints. Applies to: global (OIDC).",
+          "value": "oidc_issuers:regenerate_thumbprints"
+        },
+        {
+          "name": "OidcIssuersUpdate",
+          "description": "Update OIDC issuers. Applies to: global (OIDC).",
+          "value": "oidc_issuers:update"
+        },
+        {
+          "name": "OrgIntegrationsRead",
+          "description": "Read organization integrations. Applies to: global (Organization).",
+          "value": "org_integrations:read"
+        },
+        {
+          "name": "OrgIntegrationsUpdate",
+          "description": "Update organization integrations. Applies to: global (Organization).",
+          "value": "org_integrations:update"
+        },
+        {
+          "name": "OrgMemberAdd",
+          "description": "Add organization member. Applies to: global (Membership).",
+          "value": "org_member:add"
+        },
+        {
+          "name": "OrgMemberDelete",
+          "description": "Delete organization member. Applies to: global (Membership).",
+          "value": "org_member:delete"
+        },
+        {
+          "name": "OrgMemberRead",
+          "description": "Read organization member. Applies to: global (Membership).",
+          "value": "org_member:read"
+        },
+        {
+          "name": "OrgMemberSetAdmin",
+          "description": "Set organization member admin. Applies to: global (Membership).",
+          "value": "org_member:set_admin"
+        },
+        {
+          "name": "OrgMemberUpdate",
+          "description": "Update organization member. Applies to: global (Membership).",
+          "value": "org_member:update"
+        },
+        {
+          "name": "OrgMemberAccessRead",
+          "description": "Read organization member access. Applies to: global (Membership).",
+          "value": "org_member_access:read"
+        },
+        {
+          "name": "OrgRequestsRead",
+          "description": "Read organization requests. Applies to: global (Membership).",
+          "value": "org_requests:read"
+        },
+        {
+          "name": "OrgRequestsUpdate",
+          "description": "Update organization requests. Applies to: global (Membership).",
+          "value": "org_requests:update"
+        },
+        {
+          "name": "OrgTokenCreate",
+          "description": "Create organization access token. Applies to: global (Organization access tokens).",
+          "value": "org_token:create"
+        },
+        {
+          "name": "OrgTokenDelete",
+          "description": "Delete organization access token. Applies to: global (Organization access tokens).",
+          "value": "org_token:delete"
+        },
+        {
+          "name": "OrgTokenRead",
+          "description": "Read organization access token. Applies to: global (Organization access tokens).",
+          "value": "org_token:read"
+        },
+        {
+          "name": "OrganizationBilling",
+          "description": "Manage organization billing. Applies to: global (Organization).",
+          "value": "organization:billing"
+        },
+        {
+          "name": "OrganizationChangeBackend",
+          "description": "Change organization backend. Applies to: global (Organization).",
+          "value": "organization:change_backend"
+        },
+        {
+          "name": "OrganizationDelete",
+          "description": "Delete organization. Applies to: global (Organization).",
+          "value": "organization:delete"
+        },
+        {
+          "name": "OrganizationReadUsage",
+          "description": "Read organization usage. Applies to: global (Organization).",
+          "value": "organization:read_usage"
+        },
+        {
+          "name": "OrganizationRename",
+          "description": "Rename organization. Applies to: global (Organization).",
+          "value": "organization:rename"
+        },
+        {
+          "name": "OrganizationTransferStacks",
+          "description": "Transfer organization stacks. Applies to: global (Stack management).",
+          "value": "organization:transfer_stacks"
+        },
+        {
+          "name": "OrganizationUpdate",
+          "description": "Update organization. Applies to: global (Organization).",
+          "value": "organization:update"
+        },
+        {
+          "name": "OrganizationWebhookCreate",
+          "description": "Create organization webhook. Applies to: global (Organization webhooks).",
+          "value": "organization_webhook:create"
+        },
+        {
+          "name": "OrganizationWebhookDelete",
+          "description": "Delete organization webhook. Applies to: global (Organization webhooks).",
+          "value": "organization_webhook:delete"
+        },
+        {
+          "name": "OrganizationWebhookRead",
+          "description": "Read organization webhook. Applies to: global (Organization webhooks).",
+          "value": "organization_webhook:read"
+        },
+        {
+          "name": "OrganizationWebhookUpdate",
+          "description": "Update organization webhook. Applies to: global (Organization webhooks).",
+          "value": "organization_webhook:update"
+        },
+        {
+          "name": "InsightsPolicyGroupsCreate",
+          "description": "Create Insights policy groups. Applies to: global (Insights policy management).",
+          "value": "policy_groups:create"
+        },
+        {
+          "name": "InsightsPolicyGroupsDelete",
+          "description": "Delete Insights policy groups. Applies to: global (Insights policy management).",
+          "value": "policy_groups:delete"
+        },
+        {
+          "name": "InsightsPolicyGroupsRead",
+          "description": "Read Insights policy groups. Applies to: global (Insights policy management).",
+          "value": "policy_groups:read"
+        },
+        {
+          "name": "InsightsPolicyGroupsUpdate",
+          "description": "Update Insights policy groups. Applies to: global (Insights policy management).",
+          "value": "policy_groups:update"
+        },
+        {
+          "name": "InsightsPolicyPackCreate",
+          "description": "Create Insights policy pack. Applies to: global (Insights policy management).",
+          "value": "policy_pack:create"
+        },
+        {
+          "name": "InsightsPolicyPackDelete",
+          "description": "Delete Insights policy pack. Applies to: global (Insights policy management).",
+          "value": "policy_pack:delete"
+        },
+        {
+          "name": "InsightsPolicyPackRead",
+          "description": "Read Insights policy pack. Applies to: global (Insights policy management).",
+          "value": "policy_pack:read"
+        },
+        {
+          "name": "InsightsPolicyPackUpdate",
+          "description": "Update Insights policy pack. Applies to: global (Insights policy management).",
+          "value": "policy_pack:update"
+        },
+        {
+          "name": "InsightsPolicyResultsRead",
+          "description": "Read Insights policy results. Applies to: global (Insights policy management).",
+          "value": "policy_results:read"
+        },
+        {
+          "name": "PolicyResultsUpdate",
+          "description": "Update Insights policy results. Applies to: global (Insights policy management).",
+          "value": "policy_results:update"
+        },
+        {
+          "name": "ProjectDecrypt",
+          "description": "Decrypt project. Applies to: global (Stack management).",
+          "value": "project:decrypt"
+        },
+        {
+          "name": "ProjectEncrypt",
+          "description": "Encrypt project. Applies to: global (Stack management).",
+          "value": "project:encrypt"
+        },
+        {
+          "name": "ResourcesDashboard",
+          "description": "View resources dashboard. Applies to: global (Search).",
+          "value": "resources:dashboard"
+        },
+        {
+          "name": "ResourcesIndex",
+          "description": "Index resources. Applies to: global (Search).",
+          "value": "resources:index"
+        },
+        {
+          "name": "ResourcesSearch",
+          "description": "Search resources. Applies to: global (Search).",
+          "value": "resources:search"
+        },
+        {
+          "name": "RoleCreate",
+          "description": "Create role. Applies to: global (Roles).",
+          "value": "role:create"
+        },
+        {
+          "name": "RoleDelete",
+          "description": "Delete role. Applies to: global (Roles).",
+          "value": "role:delete"
+        },
+        {
+          "name": "RoleRead",
+          "description": "Read role. Applies to: global (Roles).",
+          "value": "role:read"
+        },
+        {
+          "name": "RoleUpdate",
+          "description": "Update role. Applies to: global (Roles).",
+          "value": "role:update"
+        },
+        {
+          "name": "SAMLRead",
+          "description": "Read SAML. Applies to: global (SSO).",
+          "value": "saml:read"
+        },
+        {
+          "name": "SAMLUpdate",
+          "description": "Update SAML. Applies to: global (SSO).",
+          "value": "saml:update"
+        },
+        {
+          "name": "SCIMDelete",
+          "description": "Delete SCIM. Applies to: global (SSO).",
+          "value": "scim:delete"
+        },
+        {
+          "name": "SCIMRead",
+          "description": "Read SCIM. Applies to: global (SSO).",
+          "value": "scim:read"
+        },
+        {
+          "name": "SCIMUpdate",
+          "description": "Update SCIM. Applies to: global (SSO).",
+          "value": "scim:update"
+        },
+        {
+          "name": "StackCancelUpdate",
+          "description": "Cancel stack update. Applies to: stack (Stacks).",
+          "value": "stack:cancel_update"
+        },
+        {
+          "name": "StackCreate",
+          "description": "Create stack. Applies to: global, stack (Stack management, Stacks).",
+          "value": "stack:create"
+        },
+        {
+          "name": "StackDecrypt",
+          "description": "Decrypt stack. Applies to: stack (Stacks).",
+          "value": "stack:decrypt"
+        },
+        {
+          "name": "StackDelete",
+          "description": "Delete stack. Applies to: stack (Stacks).",
+          "value": "stack:delete"
+        },
+        {
+          "name": "StackEncrypt",
+          "description": "Encrypt stack. Applies to: stack (Stacks).",
+          "value": "stack:encrypt"
+        },
+        {
+          "name": "StackExport",
+          "description": "Export stack. Applies to: stack (Stacks).",
+          "value": "stack:export"
+        },
+        {
+          "name": "StackImport",
+          "description": "Import stack. Applies to: stack (Stacks).",
+          "value": "stack:import"
+        },
+        {
+          "name": "StackListDeleted",
+          "description": "List deleted stacks. Applies to: global (Stack management).",
+          "value": "stack:list_deleted"
+        },
+        {
+          "name": "StackRead",
+          "description": "Read stack. Applies to: stack (Stacks).",
+          "value": "stack:read"
+        },
+        {
+          "name": "StackRename",
+          "description": "Rename stack. Applies to: stack (Stacks).",
+          "value": "stack:rename"
+        },
+        {
+          "name": "StackRestoreDeleted",
+          "description": "Restore deleted stack. Applies to: global (Stack management).",
+          "value": "stack:restore_deleted"
+        },
+        {
+          "name": "StackTransfer",
+          "description": "Transfer stack. Applies to: stack (Stacks).",
+          "value": "stack:transfer"
+        },
+        {
+          "name": "StackWrite",
+          "description": "Write stack. Applies to: stack (Stacks).",
+          "value": "stack:write"
+        },
+        {
+          "name": "StackAccessRead",
+          "description": "Read stack teams. Applies to: stack (Stacks).",
+          "value": "stack_access:read"
+        },
+        {
+          "name": "StackAccessUpdate",
+          "description": "Update stack teams. Applies to: stack (Stacks).",
+          "value": "stack_access:update"
+        },
+        {
+          "name": "StackDeploymentCreate",
+          "description": "Create deployment. Applies to: stack (Stack deployments).",
+          "value": "stack_deployment:create"
+        },
+        {
+          "name": "StackDeploymentRead",
+          "description": "Read deployment. Applies to: stack (Stack deployments).",
+          "value": "stack_deployment:read"
+        },
+        {
+          "name": "StackDeploymentSettingsEncrypt",
+          "description": "Encrypt deployment settings. Applies to: stack (Stack deployments).",
+          "value": "stack_deployment_settings:encrypt"
+        },
+        {
+          "name": "StackDeploymentSettingsRead",
+          "description": "Read deployment settings. Applies to: stack (Stack deployments).",
+          "value": "stack_deployment_settings:read"
+        },
+        {
+          "name": "StackDeploymentSettingsWrite",
+          "description": "Write deployment settings. Applies to: stack (Stack deployments).",
+          "value": "stack_deployment_settings:write"
+        },
+        {
+          "name": "StackScheduleCreate",
+          "description": "Create stack schedule. Applies to: stack (Stack deployment schedules).",
+          "value": "stack_schedule:create"
+        },
+        {
+          "name": "StackScheduleDelete",
+          "description": "Delete stack schedule. Applies to: stack (Stack deployment schedules).",
+          "value": "stack_schedule:delete"
+        },
+        {
+          "name": "StackSchedulePause",
+          "description": "Pause stack schedule. Applies to: stack (Stack deployment schedules).",
+          "value": "stack_schedule:pause"
+        },
+        {
+          "name": "StackScheduleRead",
+          "description": "Read stack schedule. Applies to: stack (Stack deployment schedules).",
+          "value": "stack_schedule:read"
+        },
+        {
+          "name": "StackScheduleResume",
+          "description": "Resume stack schedule. Applies to: stack (Stack deployment schedules).",
+          "value": "stack_schedule:resume"
+        },
+        {
+          "name": "StackScheduleUpdate",
+          "description": "Update stack schedule. Applies to: stack (Stack deployment schedules).",
+          "value": "stack_schedule:update"
+        },
+        {
+          "name": "StackTagsUpdate",
+          "description": "Update stack tags. Applies to: stack (Stack tags).",
+          "value": "stack_tags:update"
+        },
+        {
+          "name": "StackWebhookCreate",
+          "description": "Create stack webhook. Applies to: stack (Stack webhooks).",
+          "value": "stack_webhook:create"
+        },
+        {
+          "name": "StackWebhookDelete",
+          "description": "Delete stack webhook. Applies to: stack (Stack webhooks).",
+          "value": "stack_webhook:delete"
+        },
+        {
+          "name": "StackWebhookRead",
+          "description": "Read stack webhook. Applies to: stack (Stack webhooks).",
+          "value": "stack_webhook:read"
+        },
+        {
+          "name": "StackWebhookUpdate",
+          "description": "Update stack webhook. Applies to: stack (Stack webhooks).",
+          "value": "stack_webhook:update"
+        },
+        {
+          "name": "TagsRead",
+          "description": "Read project tags. Applies to: global (Stack management).",
+          "value": "tags:read"
+        },
+        {
+          "name": "TeamCreate",
+          "description": "Create team. Applies to: global (Teams).",
+          "value": "team:create"
+        },
+        {
+          "name": "TeamCreateToken",
+          "description": "Create team access token. Applies to: global (Teams).",
+          "value": "team:create_token"
+        },
+        {
+          "name": "TeamDelete",
+          "description": "Delete team. Applies to: global (Teams).",
+          "value": "team:delete"
+        },
+        {
+          "name": "TeamDeleteToken",
+          "description": "Delete team access token. Applies to: global (Teams).",
+          "value": "team:delete_token"
+        },
+        {
+          "name": "TeamList",
+          "description": "List teams. Applies to: global (Teams).",
+          "value": "team:list"
+        },
+        {
+          "name": "TeamListTokens",
+          "description": "List team access tokens. Applies to: global (Teams).",
+          "value": "team:list_tokens"
+        },
+        {
+          "name": "TeamRead",
+          "description": "Read team. Applies to: global (Teams).",
+          "value": "team:read"
+        },
+        {
+          "name": "TeamUpdate",
+          "description": "Update team. Applies to: global (Teams).",
+          "value": "team:update"
+        },
+        {
+          "name": "TemplatesRead",
+          "description": "Read templates. Applies to: global (Templates).",
+          "value": "templates:read"
+        },
+        {
+          "name": "TemplatesSourceCreate",
+          "description": "Create template sources. Applies to: global (Templates).",
+          "value": "templates_source:create"
+        },
+        {
+          "name": "TemplatesSourceDelete",
+          "description": "Delete template sources. Applies to: global (Templates).",
+          "value": "templates_source:delete"
+        },
+        {
+          "name": "TemplatesSourceRead",
+          "description": "Read template sources. Applies to: global (Templates).",
+          "value": "templates_source:read"
+        },
+        {
+          "name": "TemplatesSourceUpdate",
+          "description": "Update template sources. Applies to: global (Templates).",
+          "value": "templates_source:update"
+        }
+      ]
+    },
+    "pulumiservice:index:RbacTagCondition": {
+      "properties": {
+        "key": {
+          "type": "string",
+          "description": "The tag key."
+        },
+        "operator": {
+          "$ref": "#/types/pulumiservice:index:RbacTagOperator",
+          "description": "How the tag is compared. Defaults to `equals`."
+        },
+        "value": {
+          "type": "string",
+          "description": "The tag value. When omitted, the condition matches on whether the tag is present at all."
+        }
+      },
+      "type": "object",
+      "required": [
+        "key"
+      ]
+    },
+    "pulumiservice:index:RbacTagOperator": {
+      "type": "string",
+      "enum": [
+        {
+          "name": "Equals",
+          "description": "The tag equals the value (or, with no value, the tag is present).",
+          "value": "equals"
+        },
+        {
+          "name": "NotEquals",
+          "description": "The tag does not equal the value (or, with no value, the tag is absent).",
+          "value": "notEquals"
         }
       ]
     },
@@ -6187,6 +7158,183 @@
         "sourcePath"
       ]
     },
+    "pulumiservice:index:RbacPermissionSet": {
+      "description": "A custom permission set: a named list of RBAC scopes that apply to one kind of entity (the organization, stacks, environments, or Insights accounts). Permission sets are the building blocks of an `RbacRole`, which grants them organization-wide or through entity rules. This is the resource behind **Settings > Access management > Permission sets** in the Pulumi Cloud console.\n\nBuilt-in permission sets such as \"Stack Read\" or \"Environment Admin\" already exist in every organization; look them up with `getRbacPermissionSet` instead of recreating them.\n\nRequires the Custom Roles feature to be enabled on the organization.\n\n{{% examples %}}\n## Example Usage\n\n{{% example %}}\n### A role with organization-level access and entity rules\n\n```typescript\nimport * as pulumi from \"@pulumi/pulumi\";\nimport * as pulumiservice from \"@pulumi/pulumiservice\";\n\nconst config = new pulumi.Config();\nconst organizationName = config.get(\"organizationName\") || \"my-org\";\nconst currentUser = pulumiservice.getCurrentUserOutput({});\nconst orgReadOnly = pulumiservice.getRbacPermissionSetOutput({\n    organizationName: organizationName,\n    defaultIdentifier: \"org-settings-read-only\",\n});\nconst stackRead = pulumiservice.getRbacPermissionSetOutput({\n    organizationName: organizationName,\n    defaultIdentifier: \"stack-read\",\n});\nconst envRead = pulumiservice.getRbacPermissionSetOutput({\n    organizationName: organizationName,\n    defaultIdentifier: \"environment-read\",\n});\nconst deployer = new pulumiservice.RbacPermissionSet(\"deployer\", {\n    organizationName: organizationName,\n    name: \"Stack Deployer\",\n    description: \"Read, update, and deploy stacks.\",\n    resourceType: pulumiservice.RbacResourceType.Stack,\n    permissions: [\n        pulumiservice.RbacScope.StackRead,\n        pulumiservice.RbacScope.StackWrite,\n        pulumiservice.RbacScope.StackDeploymentCreate,\n    ],\n});\nconst prodStack = new pulumiservice.Stack(\"prodStack\", {\n    organizationName: organizationName,\n    projectName: \"rbac-example\",\n    stackName: \"prod\",\n});\nconst sharedEnv = new pulumiservice.Environment(\"sharedEnv\", {\n    organization: organizationName,\n    project: \"rbac-example\",\n    name: \"shared\",\n    yaml: new pulumi.asset.StringAsset(`values:\n  region: us-west-2`),\n});\nconst platformRole = new pulumiservice.RbacRole(\"platformRole\", {\n    organizationName: organizationName,\n    name: \"Platform Engineers\",\n    description: \"Deploys platform stacks and reads shared configuration.\",\n    organizationPermissionSetIds: [orgReadOnly.permissionSetId],\n    entityRules: [\n        {\n            permissionSetIds: [stackRead.permissionSetId],\n            stack: {\n                all: true,\n            },\n        },\n        {\n            permissionSetIds: [deployer.permissionSetId],\n            stack: {\n                id: prodStack.stackId,\n            },\n        },\n        {\n            permissionSetIds: [deployer.permissionSetId],\n            stack: {\n                tags: [\n                    {\n                        key: \"team\",\n                        value: \"platform\",\n                    },\n                    {\n                        key: \"env\",\n                        value: \"prod\",\n                        operator: pulumiservice.RbacTagOperator.NotEquals,\n                    },\n                ],\n            },\n        },\n        {\n            permissionSetIds: [envRead.permissionSetId],\n            environment: {\n                id: sharedEnv.environmentId,\n            },\n        },\n    ],\n});\nconst platformTeam = new pulumiservice.Team(\"platformTeam\", {\n    organizationName: organizationName,\n    name: \"platform\",\n    teamType: \"pulumi\",\n    displayName: \"Platform\",\n    members: [currentUser.username],\n});\nconst platformTeamRole = new pulumiservice.TeamRoleAssignment(\"platformTeamRole\", {\n    organizationName: organizationName,\n    teamName: platformTeam.name,\n    roleId: platformRole.roleId,\n});\nexport const roleId = platformRole.roleId;\nexport const policyId = platformRole.policyId;\n\n```\n\n```python\nimport pulumi\nimport pulumi_pulumiservice as pulumiservice\n\nconfig = pulumi.Config()\norganization_name = config.get(\"organizationName\")\nif organization_name is None:\n    organization_name = \"my-org\"\ncurrent_user = pulumiservice.get_current_user_output()\norg_read_only = pulumiservice.get_rbac_permission_set_output(organization_name=organization_name,\n    default_identifier=\"org-settings-read-only\")\nstack_read = pulumiservice.get_rbac_permission_set_output(organization_name=organization_name,\n    default_identifier=\"stack-read\")\nenv_read = pulumiservice.get_rbac_permission_set_output(organization_name=organization_name,\n    default_identifier=\"environment-read\")\ndeployer = pulumiservice.RbacPermissionSet(\"deployer\",\n    organization_name=organization_name,\n    name=\"Stack Deployer\",\n    description=\"Read, update, and deploy stacks.\",\n    resource_type=pulumiservice.RbacResourceType.STACK,\n    permissions=[\n        pulumiservice.RbacScope.STACK_READ,\n        pulumiservice.RbacScope.STACK_WRITE,\n        pulumiservice.RbacScope.STACK_DEPLOYMENT_CREATE,\n    ])\nprod_stack = pulumiservice.Stack(\"prodStack\",\n    organization_name=organization_name,\n    project_name=\"rbac-example\",\n    stack_name=\"prod\")\nshared_env = pulumiservice.Environment(\"sharedEnv\",\n    organization=organization_name,\n    project=\"rbac-example\",\n    name=\"shared\",\n    yaml=pulumi.StringAsset(\"\"\"values:\n  region: us-west-2\"\"\"))\nplatform_role = pulumiservice.RbacRole(\"platformRole\",\n    organization_name=organization_name,\n    name=\"Platform Engineers\",\n    description=\"Deploys platform stacks and reads shared configuration.\",\n    organization_permission_set_ids=[org_read_only.permission_set_id],\n    entity_rules=[\n        {\n            \"permission_set_ids\": [stack_read.permission_set_id],\n            \"stack\": {\n                \"all\": True,\n            },\n        },\n        {\n            \"permission_set_ids\": [deployer.permission_set_id],\n            \"stack\": {\n                \"id\": prod_stack.stack_id,\n            },\n        },\n        {\n            \"permission_set_ids\": [deployer.permission_set_id],\n            \"stack\": {\n                \"tags\": [\n                    {\n                        \"key\": \"team\",\n                        \"value\": \"platform\",\n                    },\n                    {\n                        \"key\": \"env\",\n                        \"value\": \"prod\",\n                        \"operator\": pulumiservice.RbacTagOperator.NOT_EQUALS,\n                    },\n                ],\n            },\n        },\n        {\n            \"permission_set_ids\": [env_read.permission_set_id],\n            \"environment\": {\n                \"id\": shared_env.environment_id,\n            },\n        },\n    ])\nplatform_team = pulumiservice.Team(\"platformTeam\",\n    organization_name=organization_name,\n    name=\"platform\",\n    team_type=\"pulumi\",\n    display_name=\"Platform\",\n    members=[current_user.username])\nplatform_team_role = pulumiservice.TeamRoleAssignment(\"platformTeamRole\",\n    organization_name=organization_name,\n    team_name=platform_team.name,\n    role_id=platform_role.role_id)\npulumi.export(\"roleId\", platform_role.role_id)\npulumi.export(\"policyId\", platform_role.policy_id)\n\n```\n\n```go\npackage main\n\nimport (\n\t\"github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice\"\n\t\"github.com/pulumi/pulumi/sdk/v3/go/pulumi\"\n\t\"github.com/pulumi/pulumi/sdk/v3/go/pulumi/config\"\n)\n\nfunc main() {\n\tpulumi.Run(func(ctx *pulumi.Context) error {\n\t\tcfg := config.New(ctx, \"\")\n\t\torganizationName := \"my-org\"\n\t\tif param := cfg.Get(\"organizationName\"); param != \"\" {\n\t\t\torganizationName = param\n\t\t}\n\t\tcurrentUser := pulumiservice.GetCurrentUserOutput(ctx, pulumiservice.GetCurrentUserOutputArgs{}, nil)\n\t\torgReadOnly := pulumiservice.GetRbacPermissionSetOutput(ctx, pulumiservice.GetRbacPermissionSetOutputArgs{\n\t\t\tOrganizationName:  pulumi.String(organizationName),\n\t\t\tDefaultIdentifier: pulumi.String(\"org-settings-read-only\"),\n\t\t}, nil)\n\t\tstackRead := pulumiservice.GetRbacPermissionSetOutput(ctx, pulumiservice.GetRbacPermissionSetOutputArgs{\n\t\t\tOrganizationName:  pulumi.String(organizationName),\n\t\t\tDefaultIdentifier: pulumi.String(\"stack-read\"),\n\t\t}, nil)\n\t\tenvRead := pulumiservice.GetRbacPermissionSetOutput(ctx, pulumiservice.GetRbacPermissionSetOutputArgs{\n\t\t\tOrganizationName:  pulumi.String(organizationName),\n\t\t\tDefaultIdentifier: pulumi.String(\"environment-read\"),\n\t\t}, nil)\n\t\tdeployer, err := pulumiservice.NewRbacPermissionSet(ctx, \"deployer\", &pulumiservice.RbacPermissionSetArgs{\n\t\t\tOrganizationName: pulumi.String(organizationName),\n\t\t\tName:             pulumi.String(\"Stack Deployer\"),\n\t\t\tDescription:      pulumi.String(\"Read, update, and deploy stacks.\"),\n\t\t\tResourceType:     pulumiservice.RbacResourceTypeStack,\n\t\t\tPermissions: pulumiservice.RbacScopeArray{\n\t\t\t\tpulumiservice.RbacScopeStackRead,\n\t\t\t\tpulumiservice.RbacScopeStackWrite,\n\t\t\t\tpulumiservice.RbacScopeStackDeploymentCreate,\n\t\t\t},\n\t\t})\n\t\tif err != nil {\n\t\t\treturn err\n\t\t}\n\t\tprodStack, err := pulumiservice.NewStack(ctx, \"prodStack\", &pulumiservice.StackArgs{\n\t\t\tOrganizationName: pulumi.String(organizationName),\n\t\t\tProjectName:      pulumi.String(\"rbac-example\"),\n\t\t\tStackName:        pulumi.String(\"prod\"),\n\t\t})\n\t\tif err != nil {\n\t\t\treturn err\n\t\t}\n\t\tsharedEnv, err := pulumiservice.NewEnvironment(ctx, \"sharedEnv\", &pulumiservice.EnvironmentArgs{\n\t\t\tOrganization: pulumi.String(organizationName),\n\t\t\tProject:      pulumi.String(\"rbac-example\"),\n\t\t\tName:         pulumi.String(\"shared\"),\n\t\t\tYaml:         pulumi.NewStringAsset(\"values:\\n  region: us-west-2\"),\n\t\t})\n\t\tif err != nil {\n\t\t\treturn err\n\t\t}\n\t\tplatformRole, err := pulumiservice.NewRbacRole(ctx, \"platformRole\", &pulumiservice.RbacRoleArgs{\n\t\t\tOrganizationName: pulumi.String(organizationName),\n\t\t\tName:             pulumi.String(\"Platform Engineers\"),\n\t\t\tDescription:      pulumi.String(\"Deploys platform stacks and reads shared configuration.\"),\n\t\t\tOrganizationPermissionSetIds: pulumi.StringArray{\n\t\t\t\torgReadOnly.PermissionSetId(),\n\t\t\t},\n\t\t\tEntityRules: pulumiservice.RbacEntityRuleArray{\n\t\t\t\t&pulumiservice.RbacEntityRuleArgs{\n\t\t\t\t\tPermissionSetIds: pulumi.StringArray{\n\t\t\t\t\t\tstackRead.PermissionSetId(),\n\t\t\t\t\t},\n\t\t\t\t\tStack: &pulumiservice.RbacEntitySelectorArgs{\n\t\t\t\t\t\tAll: pulumi.Bool(true),\n\t\t\t\t\t},\n\t\t\t\t},\n\t\t\t\t&pulumiservice.RbacEntityRuleArgs{\n\t\t\t\t\tPermissionSetIds: pulumi.StringArray{\n\t\t\t\t\t\tdeployer.PermissionSetId,\n\t\t\t\t\t},\n\t\t\t\t\tStack: &pulumiservice.RbacEntitySelectorArgs{\n\t\t\t\t\t\tId: prodStack.StackId,\n\t\t\t\t\t},\n\t\t\t\t},\n\t\t\t\t&pulumiservice.RbacEntityRuleArgs{\n\t\t\t\t\tPermissionSetIds: pulumi.StringArray{\n\t\t\t\t\t\tdeployer.PermissionSetId,\n\t\t\t\t\t},\n\t\t\t\t\tStack: &pulumiservice.RbacEntitySelectorArgs{\n\t\t\t\t\t\tTags: pulumiservice.RbacTagConditionArray{\n\t\t\t\t\t\t\t&pulumiservice.RbacTagConditionArgs{\n\t\t\t\t\t\t\t\tKey:   pulumi.String(\"team\"),\n\t\t\t\t\t\t\t\tValue: pulumi.String(\"platform\"),\n\t\t\t\t\t\t\t},\n\t\t\t\t\t\t\t&pulumiservice.RbacTagConditionArgs{\n\t\t\t\t\t\t\t\tKey:      pulumi.String(\"env\"),\n\t\t\t\t\t\t\t\tValue:    pulumi.String(\"prod\"),\n\t\t\t\t\t\t\t\tOperator: pulumiservice.RbacTagOperatorNotEquals,\n\t\t\t\t\t\t\t},\n\t\t\t\t\t\t},\n\t\t\t\t\t},\n\t\t\t\t},\n\t\t\t\t&pulumiservice.RbacEntityRuleArgs{\n\t\t\t\t\tPermissionSetIds: pulumi.StringArray{\n\t\t\t\t\t\tenvRead.PermissionSetId(),\n\t\t\t\t\t},\n\t\t\t\t\tEnvironment: &pulumiservice.RbacEntitySelectorArgs{\n\t\t\t\t\t\tId: sharedEnv.EnvironmentId,\n\t\t\t\t\t},\n\t\t\t\t},\n\t\t\t},\n\t\t})\n\t\tif err != nil {\n\t\t\treturn err\n\t\t}\n\t\tplatformTeam, err := pulumiservice.NewTeam(ctx, \"platformTeam\", &pulumiservice.TeamArgs{\n\t\t\tOrganizationName: pulumi.String(organizationName),\n\t\t\tName:             pulumi.String(\"platform\"),\n\t\t\tTeamType:         pulumi.String(\"pulumi\"),\n\t\t\tDisplayName:      pulumi.String(\"Platform\"),\n\t\t\tMembers: pulumi.StringArray{\n\t\t\t\tcurrentUser.Username(),\n\t\t\t},\n\t\t})\n\t\tif err != nil {\n\t\t\treturn err\n\t\t}\n\t\t_, err = pulumiservice.NewTeamRoleAssignment(ctx, \"platformTeamRole\", &pulumiservice.TeamRoleAssignmentArgs{\n\t\t\tOrganizationName: pulumi.String(organizationName),\n\t\t\tTeamName:         platformTeam.Name,\n\t\t\tRoleId:           platformRole.RoleId,\n\t\t})\n\t\tif err != nil {\n\t\t\treturn err\n\t\t}\n\t\tctx.Export(\"roleId\", platformRole.RoleId)\n\t\tctx.Export(\"policyId\", platformRole.PolicyId)\n\t\treturn nil\n\t})\n}\n\n```\n\n```csharp\nusing System.Collections.Generic;\nusing System.Linq;\nusing Pulumi;\nusing PulumiService = Pulumi.PulumiService;\n\nreturn await Deployment.RunAsync(() => \n{\n    var config = new Config();\n    var organizationName = config.Get(\"organizationName\") ?? \"my-org\";\n    var currentUser = PulumiService.GetCurrentUser.Invoke();\n\n    var orgReadOnly = PulumiService.GetRbacPermissionSet.Invoke(new()\n    {\n        OrganizationName = organizationName,\n        DefaultIdentifier = \"org-settings-read-only\",\n    });\n\n    var stackRead = PulumiService.GetRbacPermissionSet.Invoke(new()\n    {\n        OrganizationName = organizationName,\n        DefaultIdentifier = \"stack-read\",\n    });\n\n    var envRead = PulumiService.GetRbacPermissionSet.Invoke(new()\n    {\n        OrganizationName = organizationName,\n        DefaultIdentifier = \"environment-read\",\n    });\n\n    var deployer = new PulumiService.RbacPermissionSet(\"deployer\", new()\n    {\n        OrganizationName = organizationName,\n        Name = \"Stack Deployer\",\n        Description = \"Read, update, and deploy stacks.\",\n        ResourceType = PulumiService.RbacResourceType.Stack,\n        Permissions = new[]\n        {\n            PulumiService.RbacScope.StackRead,\n            PulumiService.RbacScope.StackWrite,\n            PulumiService.RbacScope.StackDeploymentCreate,\n        },\n    });\n\n    var prodStack = new PulumiService.Stack(\"prodStack\", new()\n    {\n        OrganizationName = organizationName,\n        ProjectName = \"rbac-example\",\n        StackName = \"prod\",\n    });\n\n    var sharedEnv = new PulumiService.Environment(\"sharedEnv\", new()\n    {\n        Organization = organizationName,\n        Project = \"rbac-example\",\n        Name = \"shared\",\n        Yaml = new StringAsset(@\"values:\n  region: us-west-2\"),\n    });\n\n    var platformRole = new PulumiService.RbacRole(\"platformRole\", new()\n    {\n        OrganizationName = organizationName,\n        Name = \"Platform Engineers\",\n        Description = \"Deploys platform stacks and reads shared configuration.\",\n        OrganizationPermissionSetIds = new[]\n        {\n            orgReadOnly.Apply(getRbacPermissionSetResult => getRbacPermissionSetResult.PermissionSetId),\n        },\n        EntityRules = new[]\n        {\n            new PulumiService.Inputs.RbacEntityRuleArgs\n            {\n                PermissionSetIds = new[]\n                {\n                    stackRead.Apply(getRbacPermissionSetResult => getRbacPermissionSetResult.PermissionSetId),\n                },\n                Stack = new PulumiService.Inputs.RbacEntitySelectorArgs\n                {\n                    All = true,\n                },\n            },\n            new PulumiService.Inputs.RbacEntityRuleArgs\n            {\n                PermissionSetIds = new[]\n                {\n                    deployer.PermissionSetId,\n                },\n                Stack = new PulumiService.Inputs.RbacEntitySelectorArgs\n                {\n                    Id = prodStack.StackId,\n                },\n            },\n            new PulumiService.Inputs.RbacEntityRuleArgs\n            {\n                PermissionSetIds = new[]\n                {\n                    deployer.PermissionSetId,\n                },\n                Stack = new PulumiService.Inputs.RbacEntitySelectorArgs\n                {\n                    Tags = new[]\n                    {\n                        new PulumiService.Inputs.RbacTagConditionArgs\n                        {\n                            Key = \"team\",\n                            Value = \"platform\",\n                        },\n                        new PulumiService.Inputs.RbacTagConditionArgs\n                        {\n                            Key = \"env\",\n                            Value = \"prod\",\n                            Operator = PulumiService.RbacTagOperator.NotEquals,\n                        },\n                    },\n                },\n            },\n            new PulumiService.Inputs.RbacEntityRuleArgs\n            {\n                PermissionSetIds = new[]\n                {\n                    envRead.Apply(getRbacPermissionSetResult => getRbacPermissionSetResult.PermissionSetId),\n                },\n                Environment = new PulumiService.Inputs.RbacEntitySelectorArgs\n                {\n                    Id = sharedEnv.EnvironmentId,\n                },\n            },\n        },\n    });\n\n    var platformTeam = new PulumiService.Team(\"platformTeam\", new()\n    {\n        OrganizationName = organizationName,\n        Name = \"platform\",\n        TeamType = \"pulumi\",\n        DisplayName = \"Platform\",\n        Members = new[]\n        {\n            currentUser.Apply(getCurrentUserResult => getCurrentUserResult.Username),\n        },\n    });\n\n    var platformTeamRole = new PulumiService.TeamRoleAssignment(\"platformTeamRole\", new()\n    {\n        OrganizationName = organizationName,\n        TeamName = platformTeam.Name,\n        RoleId = platformRole.RoleId,\n    });\n\n    return new Dictionary<string, object?>\n    {\n        [\"roleId\"] = platformRole.RoleId,\n        [\"policyId\"] = platformRole.PolicyId,\n    };\n});\n\n\n```\n\n```java\npackage generated_program;\n\nimport com.pulumi.Context;\nimport com.pulumi.Pulumi;\nimport com.pulumi.core.Output;\nimport com.pulumi.pulumiservice.PulumiserviceFunctions;\nimport com.pulumi.pulumiservice.inputs.GetCurrentUserArgs;\nimport com.pulumi.pulumiservice.inputs.GetRbacPermissionSetArgs;\nimport com.pulumi.pulumiservice.RbacPermissionSet;\nimport com.pulumi.pulumiservice.RbacPermissionSetArgs;\nimport com.pulumi.pulumiservice.Stack;\nimport com.pulumi.pulumiservice.StackArgs;\nimport com.pulumi.pulumiservice.Environment;\nimport com.pulumi.pulumiservice.EnvironmentArgs;\nimport com.pulumi.pulumiservice.RbacRole;\nimport com.pulumi.pulumiservice.RbacRoleArgs;\nimport com.pulumi.pulumiservice.inputs.RbacEntityRuleArgs;\nimport com.pulumi.pulumiservice.inputs.RbacEntitySelectorArgs;\nimport com.pulumi.pulumiservice.inputs.RbacTagConditionArgs;\nimport com.pulumi.pulumiservice.Team;\nimport com.pulumi.pulumiservice.TeamArgs;\nimport com.pulumi.pulumiservice.TeamRoleAssignment;\nimport com.pulumi.pulumiservice.TeamRoleAssignmentArgs;\nimport com.pulumi.asset.StringAsset;\nimport java.util.ArrayList;\nimport java.util.Arrays;\nimport java.util.Map;\nimport java.io.File;\nimport java.nio.file.Files;\nimport java.nio.file.Paths;\n\npublic class App {\n    public static void main(String[] args) {\n        Pulumi.run(App::stack);\n    }\n\n    public static void stack(Context ctx) {\n        final var config = ctx.config();\n        final var organizationName = config.get(\"organizationName\").orElse(\"my-org\");\n        final var currentUser = PulumiserviceFunctions.getCurrentUser(GetCurrentUserArgs.builder()\n            .build());\n\n        final var orgReadOnly = PulumiserviceFunctions.getRbacPermissionSet(GetRbacPermissionSetArgs.builder()\n            .organizationName(organizationName)\n            .defaultIdentifier(\"org-settings-read-only\")\n            .build());\n\n        final var stackRead = PulumiserviceFunctions.getRbacPermissionSet(GetRbacPermissionSetArgs.builder()\n            .organizationName(organizationName)\n            .defaultIdentifier(\"stack-read\")\n            .build());\n\n        final var envRead = PulumiserviceFunctions.getRbacPermissionSet(GetRbacPermissionSetArgs.builder()\n            .organizationName(organizationName)\n            .defaultIdentifier(\"environment-read\")\n            .build());\n\n        var deployer = new RbacPermissionSet(\"deployer\", RbacPermissionSetArgs.builder()\n            .organizationName(organizationName)\n            .name(\"Stack Deployer\")\n            .description(\"Read, update, and deploy stacks.\")\n            .resourceType(\"stack\")\n            .permissions(            \n                \"stack:read\",\n                \"stack:write\",\n                \"stack_deployment:create\")\n            .build());\n\n        var prodStack = new Stack(\"prodStack\", StackArgs.builder()\n            .organizationName(organizationName)\n            .projectName(\"rbac-example\")\n            .stackName(\"prod\")\n            .build());\n\n        var sharedEnv = new Environment(\"sharedEnv\", EnvironmentArgs.builder()\n            .organization(organizationName)\n            .project(\"rbac-example\")\n            .name(\"shared\")\n            .yaml(new StringAsset(\"\"\"\nvalues:\n  region: us-west-2            \"\"\"))\n            .build());\n\n        var platformRole = new RbacRole(\"platformRole\", RbacRoleArgs.builder()\n            .organizationName(organizationName)\n            .name(\"Platform Engineers\")\n            .description(\"Deploys platform stacks and reads shared configuration.\")\n            .organizationPermissionSetIds(orgReadOnly.applyValue(_orgReadOnly -> _orgReadOnly.permissionSetId()))\n            .entityRules(            \n                RbacEntityRuleArgs.builder()\n                    .permissionSetIds(stackRead.applyValue(_stackRead -> _stackRead.permissionSetId()))\n                    .stack(RbacEntitySelectorArgs.builder()\n                        .all(true)\n                        .build())\n                    .build(),\n                RbacEntityRuleArgs.builder()\n                    .permissionSetIds(deployer.permissionSetId())\n                    .stack(RbacEntitySelectorArgs.builder()\n                        .id(prodStack.stackId())\n                        .build())\n                    .build(),\n                RbacEntityRuleArgs.builder()\n                    .permissionSetIds(deployer.permissionSetId())\n                    .stack(RbacEntitySelectorArgs.builder()\n                        .tags(                        \n                            RbacTagConditionArgs.builder()\n                                .key(\"team\")\n                                .value(\"platform\")\n                                .build(),\n                            RbacTagConditionArgs.builder()\n                                .key(\"env\")\n                                .value(\"prod\")\n                                .operator(\"notEquals\")\n                                .build())\n                        .build())\n                    .build(),\n                RbacEntityRuleArgs.builder()\n                    .permissionSetIds(envRead.applyValue(_envRead -> _envRead.permissionSetId()))\n                    .environment(RbacEntitySelectorArgs.builder()\n                        .id(sharedEnv.environmentId())\n                        .build())\n                    .build())\n            .build());\n\n        var platformTeam = new Team(\"platformTeam\", TeamArgs.builder()\n            .organizationName(organizationName)\n            .name(\"platform\")\n            .teamType(\"pulumi\")\n            .displayName(\"Platform\")\n            .members(currentUser.applyValue(_currentUser -> _currentUser.username()))\n            .build());\n\n        var platformTeamRole = new TeamRoleAssignment(\"platformTeamRole\", TeamRoleAssignmentArgs.builder()\n            .organizationName(organizationName)\n            .teamName(platformTeam.name())\n            .roleId(platformRole.roleId())\n            .build());\n\n        ctx.export(\"roleId\", platformRole.roleId());\n        ctx.export(\"policyId\", platformRole.policyId());\n    }\n}\n\n```\n\n```yaml\nconfig:\n  organizationName:\n    type: string\n    default: my-org\n\nresources:\n  # A custom permission set for deploying stacks.\n  deployer:\n    type: pulumiservice:RbacPermissionSet\n    properties:\n      organizationName: ${organizationName}\n      name: Stack Deployer\n      description: Read, update, and deploy stacks.\n      resourceType: stack\n      permissions:\n        - stack:read\n        - stack:write\n        - stack_deployment:create\n\n  prodStack:\n    type: pulumiservice:Stack\n    properties:\n      organizationName: ${organizationName}\n      projectName: rbac-example\n      stackName: prod\n\n  sharedEnv:\n    type: pulumiservice:Environment\n    properties:\n      organization: ${organizationName}\n      project: rbac-example\n      name: shared\n      yaml:\n        fn::stringAsset: |-\n          values:\n            region: us-west-2\n\n  # A role laid out like the console: organization-level access plus entity rules.\n  platformRole:\n    type: pulumiservice:RbacRole\n    properties:\n      organizationName: ${organizationName}\n      name: Platform Engineers\n      description: Deploys platform stacks and reads shared configuration.\n      organizationPermissionSetIds:\n        - ${orgReadOnly.permissionSetId}\n      entityRules:\n        # Read every stack in the organization.\n        - permissionSetIds: [\"${stackRead.permissionSetId}\"]\n          stack:\n            all: true\n        # Deploy one specific stack.\n        - permissionSetIds: [\"${deployer.permissionSetId}\"]\n          stack:\n            id: ${prodStack.stackId}\n        # Deploy stacks tagged team=platform, except those tagged env=prod.\n        - permissionSetIds: [\"${deployer.permissionSetId}\"]\n          stack:\n            tags:\n              - key: team\n                value: platform\n              - key: env\n                value: prod\n                operator: notEquals\n        # Read one environment.\n        - permissionSetIds: [\"${envRead.permissionSetId}\"]\n          environment:\n            id: ${sharedEnv.environmentId}\n\n  platformTeam:\n    type: pulumiservice:Team\n    properties:\n      organizationName: ${organizationName}\n      name: platform\n      teamType: pulumi\n      displayName: Platform\n      members:\n        - ${currentUser.username}\n\n  platformTeamRole:\n    type: pulumiservice:TeamRoleAssignment\n    properties:\n      organizationName: ${organizationName}\n      teamName: ${platformTeam.name}\n      roleId: ${platformRole.roleId}\n\nvariables:\n  currentUser:\n    fn::invoke:\n      function: pulumiservice:getCurrentUser\n  # Built-in permission sets are looked up, not recreated.\n  orgReadOnly:\n    fn::invoke:\n      function: pulumiservice:getRbacPermissionSet\n      arguments:\n        organizationName: ${organizationName}\n        defaultIdentifier: org-settings-read-only\n  stackRead:\n    fn::invoke:\n      function: pulumiservice:getRbacPermissionSet\n      arguments:\n        organizationName: ${organizationName}\n        defaultIdentifier: stack-read\n  envRead:\n    fn::invoke:\n      function: pulumiservice:getRbacPermissionSet\n      arguments:\n        organizationName: ${organizationName}\n        defaultIdentifier: environment-read\n\noutputs:\n  roleId: ${platformRole.roleId}\n  policyId: ${platformRole.policyId}\n```\n\n{{% /example %}}\n{{% /examples %}}\n",
+      "properties": {
+        "additionalPermissions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Scopes to grant that are not yet in this SDK's `RbacScope` enum, for example ones Pulumi Cloud added after this provider version was released. Values are passed through as-is. Prefer `permissions` once the scope is available there."
+        },
+        "description": {
+          "type": "string",
+          "description": "Human-readable description of what the permission set grants."
+        },
+        "name": {
+          "type": "string",
+          "description": "The permission set's display name. Must be unique within the organization."
+        },
+        "organizationName": {
+          "type": "string",
+          "description": "The Pulumi Cloud organization name.",
+          "replaceOnChanges": true
+        },
+        "permissionSetId": {
+          "type": "string",
+          "description": "The permission set's unique ID. Reference it from an `RbacRole`."
+        },
+        "permissions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/types/pulumiservice:index:RbacScope"
+          },
+          "description": "The scopes the permission set grants. Each scope must be valid for `resourceType`."
+        },
+        "resourceType": {
+          "$ref": "#/types/pulumiservice:index:RbacResourceType",
+          "description": "The kind of entity the permission set applies to. `global` sets grant organization-level access; `stack`, `environment`, and `insights-account` sets are granted on entities through a role's entity rules. Changing this replaces the permission set.",
+          "replaceOnChanges": true
+        },
+        "version": {
+          "type": "integer",
+          "description": "The service-maintained version number that increments on every update."
+        }
+      },
+      "required": [
+        "organizationName",
+        "name",
+        "resourceType",
+        "permissions",
+        "permissionSetId",
+        "version"
+      ],
+      "inputProperties": {
+        "additionalPermissions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Scopes to grant that are not yet in this SDK's `RbacScope` enum, for example ones Pulumi Cloud added after this provider version was released. Values are passed through as-is. Prefer `permissions` once the scope is available there."
+        },
+        "description": {
+          "type": "string",
+          "description": "Human-readable description of what the permission set grants."
+        },
+        "name": {
+          "type": "string",
+          "description": "The permission set's display name. Must be unique within the organization."
+        },
+        "organizationName": {
+          "type": "string",
+          "description": "The Pulumi Cloud organization name.",
+          "replaceOnChanges": true
+        },
+        "permissions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/types/pulumiservice:index:RbacScope"
+          },
+          "description": "The scopes the permission set grants. Each scope must be valid for `resourceType`."
+        },
+        "resourceType": {
+          "$ref": "#/types/pulumiservice:index:RbacResourceType",
+          "description": "The kind of entity the permission set applies to. `global` sets grant organization-level access; `stack`, `environment`, and `insights-account` sets are granted on entities through a role's entity rules. Changing this replaces the permission set.",
+          "replaceOnChanges": true
+        }
+      },
+      "requiredInputs": [
+        "organizationName",
+        "name",
+        "resourceType",
+        "permissions"
+      ]
+    },
+    "pulumiservice:index:RbacRole": {
+      "description": "A custom role, modeled the way the Pulumi Cloud console builds one under **Settings > Access management > Roles**: organization-level access plus entity rules. Each grants one or more `RbacPermissionSet`s (or built-in permission sets, looked up with `getRbacPermissionSet`).\n\n- **Organization-level access** (`organizationPermissionSetIds`) grants `global` permission sets across the organization.\n- **Entity rules** (`entityRules`) grant `stack`, `environment`, or `insights-account` permission sets on all entities of that kind, on one entity by ID, or on entities whose tags match.\n\nAssign the role to teams with `TeamRoleAssignment` or to members with `OrganizationMember.roleId`. Requires the Custom Roles feature to be enabled on the organization.\n\n{{% examples %}}\n## Example Usage\n\n{{% example %}}\n### A role with organization-level access and entity rules\n\n```typescript\nimport * as pulumi from \"@pulumi/pulumi\";\nimport * as pulumiservice from \"@pulumi/pulumiservice\";\n\nconst config = new pulumi.Config();\nconst organizationName = config.get(\"organizationName\") || \"my-org\";\nconst currentUser = pulumiservice.getCurrentUserOutput({});\nconst orgReadOnly = pulumiservice.getRbacPermissionSetOutput({\n    organizationName: organizationName,\n    defaultIdentifier: \"org-settings-read-only\",\n});\nconst stackRead = pulumiservice.getRbacPermissionSetOutput({\n    organizationName: organizationName,\n    defaultIdentifier: \"stack-read\",\n});\nconst envRead = pulumiservice.getRbacPermissionSetOutput({\n    organizationName: organizationName,\n    defaultIdentifier: \"environment-read\",\n});\nconst deployer = new pulumiservice.RbacPermissionSet(\"deployer\", {\n    organizationName: organizationName,\n    name: \"Stack Deployer\",\n    description: \"Read, update, and deploy stacks.\",\n    resourceType: pulumiservice.RbacResourceType.Stack,\n    permissions: [\n        pulumiservice.RbacScope.StackRead,\n        pulumiservice.RbacScope.StackWrite,\n        pulumiservice.RbacScope.StackDeploymentCreate,\n    ],\n});\nconst prodStack = new pulumiservice.Stack(\"prodStack\", {\n    organizationName: organizationName,\n    projectName: \"rbac-example\",\n    stackName: \"prod\",\n});\nconst sharedEnv = new pulumiservice.Environment(\"sharedEnv\", {\n    organization: organizationName,\n    project: \"rbac-example\",\n    name: \"shared\",\n    yaml: new pulumi.asset.StringAsset(`values:\n  region: us-west-2`),\n});\nconst platformRole = new pulumiservice.RbacRole(\"platformRole\", {\n    organizationName: organizationName,\n    name: \"Platform Engineers\",\n    description: \"Deploys platform stacks and reads shared configuration.\",\n    organizationPermissionSetIds: [orgReadOnly.permissionSetId],\n    entityRules: [\n        {\n            permissionSetIds: [stackRead.permissionSetId],\n            stack: {\n                all: true,\n            },\n        },\n        {\n            permissionSetIds: [deployer.permissionSetId],\n            stack: {\n                id: prodStack.stackId,\n            },\n        },\n        {\n            permissionSetIds: [deployer.permissionSetId],\n            stack: {\n                tags: [\n                    {\n                        key: \"team\",\n                        value: \"platform\",\n                    },\n                    {\n                        key: \"env\",\n                        value: \"prod\",\n                        operator: pulumiservice.RbacTagOperator.NotEquals,\n                    },\n                ],\n            },\n        },\n        {\n            permissionSetIds: [envRead.permissionSetId],\n            environment: {\n                id: sharedEnv.environmentId,\n            },\n        },\n    ],\n});\nconst platformTeam = new pulumiservice.Team(\"platformTeam\", {\n    organizationName: organizationName,\n    name: \"platform\",\n    teamType: \"pulumi\",\n    displayName: \"Platform\",\n    members: [currentUser.username],\n});\nconst platformTeamRole = new pulumiservice.TeamRoleAssignment(\"platformTeamRole\", {\n    organizationName: organizationName,\n    teamName: platformTeam.name,\n    roleId: platformRole.roleId,\n});\nexport const roleId = platformRole.roleId;\nexport const policyId = platformRole.policyId;\n\n```\n\n```python\nimport pulumi\nimport pulumi_pulumiservice as pulumiservice\n\nconfig = pulumi.Config()\norganization_name = config.get(\"organizationName\")\nif organization_name is None:\n    organization_name = \"my-org\"\ncurrent_user = pulumiservice.get_current_user_output()\norg_read_only = pulumiservice.get_rbac_permission_set_output(organization_name=organization_name,\n    default_identifier=\"org-settings-read-only\")\nstack_read = pulumiservice.get_rbac_permission_set_output(organization_name=organization_name,\n    default_identifier=\"stack-read\")\nenv_read = pulumiservice.get_rbac_permission_set_output(organization_name=organization_name,\n    default_identifier=\"environment-read\")\ndeployer = pulumiservice.RbacPermissionSet(\"deployer\",\n    organization_name=organization_name,\n    name=\"Stack Deployer\",\n    description=\"Read, update, and deploy stacks.\",\n    resource_type=pulumiservice.RbacResourceType.STACK,\n    permissions=[\n        pulumiservice.RbacScope.STACK_READ,\n        pulumiservice.RbacScope.STACK_WRITE,\n        pulumiservice.RbacScope.STACK_DEPLOYMENT_CREATE,\n    ])\nprod_stack = pulumiservice.Stack(\"prodStack\",\n    organization_name=organization_name,\n    project_name=\"rbac-example\",\n    stack_name=\"prod\")\nshared_env = pulumiservice.Environment(\"sharedEnv\",\n    organization=organization_name,\n    project=\"rbac-example\",\n    name=\"shared\",\n    yaml=pulumi.StringAsset(\"\"\"values:\n  region: us-west-2\"\"\"))\nplatform_role = pulumiservice.RbacRole(\"platformRole\",\n    organization_name=organization_name,\n    name=\"Platform Engineers\",\n    description=\"Deploys platform stacks and reads shared configuration.\",\n    organization_permission_set_ids=[org_read_only.permission_set_id],\n    entity_rules=[\n        {\n            \"permission_set_ids\": [stack_read.permission_set_id],\n            \"stack\": {\n                \"all\": True,\n            },\n        },\n        {\n            \"permission_set_ids\": [deployer.permission_set_id],\n            \"stack\": {\n                \"id\": prod_stack.stack_id,\n            },\n        },\n        {\n            \"permission_set_ids\": [deployer.permission_set_id],\n            \"stack\": {\n                \"tags\": [\n                    {\n                        \"key\": \"team\",\n                        \"value\": \"platform\",\n                    },\n                    {\n                        \"key\": \"env\",\n                        \"value\": \"prod\",\n                        \"operator\": pulumiservice.RbacTagOperator.NOT_EQUALS,\n                    },\n                ],\n            },\n        },\n        {\n            \"permission_set_ids\": [env_read.permission_set_id],\n            \"environment\": {\n                \"id\": shared_env.environment_id,\n            },\n        },\n    ])\nplatform_team = pulumiservice.Team(\"platformTeam\",\n    organization_name=organization_name,\n    name=\"platform\",\n    team_type=\"pulumi\",\n    display_name=\"Platform\",\n    members=[current_user.username])\nplatform_team_role = pulumiservice.TeamRoleAssignment(\"platformTeamRole\",\n    organization_name=organization_name,\n    team_name=platform_team.name,\n    role_id=platform_role.role_id)\npulumi.export(\"roleId\", platform_role.role_id)\npulumi.export(\"policyId\", platform_role.policy_id)\n\n```\n\n```go\npackage main\n\nimport (\n\t\"github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice\"\n\t\"github.com/pulumi/pulumi/sdk/v3/go/pulumi\"\n\t\"github.com/pulumi/pulumi/sdk/v3/go/pulumi/config\"\n)\n\nfunc main() {\n\tpulumi.Run(func(ctx *pulumi.Context) error {\n\t\tcfg := config.New(ctx, \"\")\n\t\torganizationName := \"my-org\"\n\t\tif param := cfg.Get(\"organizationName\"); param != \"\" {\n\t\t\torganizationName = param\n\t\t}\n\t\tcurrentUser := pulumiservice.GetCurrentUserOutput(ctx, pulumiservice.GetCurrentUserOutputArgs{}, nil)\n\t\torgReadOnly := pulumiservice.GetRbacPermissionSetOutput(ctx, pulumiservice.GetRbacPermissionSetOutputArgs{\n\t\t\tOrganizationName:  pulumi.String(organizationName),\n\t\t\tDefaultIdentifier: pulumi.String(\"org-settings-read-only\"),\n\t\t}, nil)\n\t\tstackRead := pulumiservice.GetRbacPermissionSetOutput(ctx, pulumiservice.GetRbacPermissionSetOutputArgs{\n\t\t\tOrganizationName:  pulumi.String(organizationName),\n\t\t\tDefaultIdentifier: pulumi.String(\"stack-read\"),\n\t\t}, nil)\n\t\tenvRead := pulumiservice.GetRbacPermissionSetOutput(ctx, pulumiservice.GetRbacPermissionSetOutputArgs{\n\t\t\tOrganizationName:  pulumi.String(organizationName),\n\t\t\tDefaultIdentifier: pulumi.String(\"environment-read\"),\n\t\t}, nil)\n\t\tdeployer, err := pulumiservice.NewRbacPermissionSet(ctx, \"deployer\", &pulumiservice.RbacPermissionSetArgs{\n\t\t\tOrganizationName: pulumi.String(organizationName),\n\t\t\tName:             pulumi.String(\"Stack Deployer\"),\n\t\t\tDescription:      pulumi.String(\"Read, update, and deploy stacks.\"),\n\t\t\tResourceType:     pulumiservice.RbacResourceTypeStack,\n\t\t\tPermissions: pulumiservice.RbacScopeArray{\n\t\t\t\tpulumiservice.RbacScopeStackRead,\n\t\t\t\tpulumiservice.RbacScopeStackWrite,\n\t\t\t\tpulumiservice.RbacScopeStackDeploymentCreate,\n\t\t\t},\n\t\t})\n\t\tif err != nil {\n\t\t\treturn err\n\t\t}\n\t\tprodStack, err := pulumiservice.NewStack(ctx, \"prodStack\", &pulumiservice.StackArgs{\n\t\t\tOrganizationName: pulumi.String(organizationName),\n\t\t\tProjectName:      pulumi.String(\"rbac-example\"),\n\t\t\tStackName:        pulumi.String(\"prod\"),\n\t\t})\n\t\tif err != nil {\n\t\t\treturn err\n\t\t}\n\t\tsharedEnv, err := pulumiservice.NewEnvironment(ctx, \"sharedEnv\", &pulumiservice.EnvironmentArgs{\n\t\t\tOrganization: pulumi.String(organizationName),\n\t\t\tProject:      pulumi.String(\"rbac-example\"),\n\t\t\tName:         pulumi.String(\"shared\"),\n\t\t\tYaml:         pulumi.NewStringAsset(\"values:\\n  region: us-west-2\"),\n\t\t})\n\t\tif err != nil {\n\t\t\treturn err\n\t\t}\n\t\tplatformRole, err := pulumiservice.NewRbacRole(ctx, \"platformRole\", &pulumiservice.RbacRoleArgs{\n\t\t\tOrganizationName: pulumi.String(organizationName),\n\t\t\tName:             pulumi.String(\"Platform Engineers\"),\n\t\t\tDescription:      pulumi.String(\"Deploys platform stacks and reads shared configuration.\"),\n\t\t\tOrganizationPermissionSetIds: pulumi.StringArray{\n\t\t\t\torgReadOnly.PermissionSetId(),\n\t\t\t},\n\t\t\tEntityRules: pulumiservice.RbacEntityRuleArray{\n\t\t\t\t&pulumiservice.RbacEntityRuleArgs{\n\t\t\t\t\tPermissionSetIds: pulumi.StringArray{\n\t\t\t\t\t\tstackRead.PermissionSetId(),\n\t\t\t\t\t},\n\t\t\t\t\tStack: &pulumiservice.RbacEntitySelectorArgs{\n\t\t\t\t\t\tAll: pulumi.Bool(true),\n\t\t\t\t\t},\n\t\t\t\t},\n\t\t\t\t&pulumiservice.RbacEntityRuleArgs{\n\t\t\t\t\tPermissionSetIds: pulumi.StringArray{\n\t\t\t\t\t\tdeployer.PermissionSetId,\n\t\t\t\t\t},\n\t\t\t\t\tStack: &pulumiservice.RbacEntitySelectorArgs{\n\t\t\t\t\t\tId: prodStack.StackId,\n\t\t\t\t\t},\n\t\t\t\t},\n\t\t\t\t&pulumiservice.RbacEntityRuleArgs{\n\t\t\t\t\tPermissionSetIds: pulumi.StringArray{\n\t\t\t\t\t\tdeployer.PermissionSetId,\n\t\t\t\t\t},\n\t\t\t\t\tStack: &pulumiservice.RbacEntitySelectorArgs{\n\t\t\t\t\t\tTags: pulumiservice.RbacTagConditionArray{\n\t\t\t\t\t\t\t&pulumiservice.RbacTagConditionArgs{\n\t\t\t\t\t\t\t\tKey:   pulumi.String(\"team\"),\n\t\t\t\t\t\t\t\tValue: pulumi.String(\"platform\"),\n\t\t\t\t\t\t\t},\n\t\t\t\t\t\t\t&pulumiservice.RbacTagConditionArgs{\n\t\t\t\t\t\t\t\tKey:      pulumi.String(\"env\"),\n\t\t\t\t\t\t\t\tValue:    pulumi.String(\"prod\"),\n\t\t\t\t\t\t\t\tOperator: pulumiservice.RbacTagOperatorNotEquals,\n\t\t\t\t\t\t\t},\n\t\t\t\t\t\t},\n\t\t\t\t\t},\n\t\t\t\t},\n\t\t\t\t&pulumiservice.RbacEntityRuleArgs{\n\t\t\t\t\tPermissionSetIds: pulumi.StringArray{\n\t\t\t\t\t\tenvRead.PermissionSetId(),\n\t\t\t\t\t},\n\t\t\t\t\tEnvironment: &pulumiservice.RbacEntitySelectorArgs{\n\t\t\t\t\t\tId: sharedEnv.EnvironmentId,\n\t\t\t\t\t},\n\t\t\t\t},\n\t\t\t},\n\t\t})\n\t\tif err != nil {\n\t\t\treturn err\n\t\t}\n\t\tplatformTeam, err := pulumiservice.NewTeam(ctx, \"platformTeam\", &pulumiservice.TeamArgs{\n\t\t\tOrganizationName: pulumi.String(organizationName),\n\t\t\tName:             pulumi.String(\"platform\"),\n\t\t\tTeamType:         pulumi.String(\"pulumi\"),\n\t\t\tDisplayName:      pulumi.String(\"Platform\"),\n\t\t\tMembers: pulumi.StringArray{\n\t\t\t\tcurrentUser.Username(),\n\t\t\t},\n\t\t})\n\t\tif err != nil {\n\t\t\treturn err\n\t\t}\n\t\t_, err = pulumiservice.NewTeamRoleAssignment(ctx, \"platformTeamRole\", &pulumiservice.TeamRoleAssignmentArgs{\n\t\t\tOrganizationName: pulumi.String(organizationName),\n\t\t\tTeamName:         platformTeam.Name,\n\t\t\tRoleId:           platformRole.RoleId,\n\t\t})\n\t\tif err != nil {\n\t\t\treturn err\n\t\t}\n\t\tctx.Export(\"roleId\", platformRole.RoleId)\n\t\tctx.Export(\"policyId\", platformRole.PolicyId)\n\t\treturn nil\n\t})\n}\n\n```\n\n```csharp\nusing System.Collections.Generic;\nusing System.Linq;\nusing Pulumi;\nusing PulumiService = Pulumi.PulumiService;\n\nreturn await Deployment.RunAsync(() => \n{\n    var config = new Config();\n    var organizationName = config.Get(\"organizationName\") ?? \"my-org\";\n    var currentUser = PulumiService.GetCurrentUser.Invoke();\n\n    var orgReadOnly = PulumiService.GetRbacPermissionSet.Invoke(new()\n    {\n        OrganizationName = organizationName,\n        DefaultIdentifier = \"org-settings-read-only\",\n    });\n\n    var stackRead = PulumiService.GetRbacPermissionSet.Invoke(new()\n    {\n        OrganizationName = organizationName,\n        DefaultIdentifier = \"stack-read\",\n    });\n\n    var envRead = PulumiService.GetRbacPermissionSet.Invoke(new()\n    {\n        OrganizationName = organizationName,\n        DefaultIdentifier = \"environment-read\",\n    });\n\n    var deployer = new PulumiService.RbacPermissionSet(\"deployer\", new()\n    {\n        OrganizationName = organizationName,\n        Name = \"Stack Deployer\",\n        Description = \"Read, update, and deploy stacks.\",\n        ResourceType = PulumiService.RbacResourceType.Stack,\n        Permissions = new[]\n        {\n            PulumiService.RbacScope.StackRead,\n            PulumiService.RbacScope.StackWrite,\n            PulumiService.RbacScope.StackDeploymentCreate,\n        },\n    });\n\n    var prodStack = new PulumiService.Stack(\"prodStack\", new()\n    {\n        OrganizationName = organizationName,\n        ProjectName = \"rbac-example\",\n        StackName = \"prod\",\n    });\n\n    var sharedEnv = new PulumiService.Environment(\"sharedEnv\", new()\n    {\n        Organization = organizationName,\n        Project = \"rbac-example\",\n        Name = \"shared\",\n        Yaml = new StringAsset(@\"values:\n  region: us-west-2\"),\n    });\n\n    var platformRole = new PulumiService.RbacRole(\"platformRole\", new()\n    {\n        OrganizationName = organizationName,\n        Name = \"Platform Engineers\",\n        Description = \"Deploys platform stacks and reads shared configuration.\",\n        OrganizationPermissionSetIds = new[]\n        {\n            orgReadOnly.Apply(getRbacPermissionSetResult => getRbacPermissionSetResult.PermissionSetId),\n        },\n        EntityRules = new[]\n        {\n            new PulumiService.Inputs.RbacEntityRuleArgs\n            {\n                PermissionSetIds = new[]\n                {\n                    stackRead.Apply(getRbacPermissionSetResult => getRbacPermissionSetResult.PermissionSetId),\n                },\n                Stack = new PulumiService.Inputs.RbacEntitySelectorArgs\n                {\n                    All = true,\n                },\n            },\n            new PulumiService.Inputs.RbacEntityRuleArgs\n            {\n                PermissionSetIds = new[]\n                {\n                    deployer.PermissionSetId,\n                },\n                Stack = new PulumiService.Inputs.RbacEntitySelectorArgs\n                {\n                    Id = prodStack.StackId,\n                },\n            },\n            new PulumiService.Inputs.RbacEntityRuleArgs\n            {\n                PermissionSetIds = new[]\n                {\n                    deployer.PermissionSetId,\n                },\n                Stack = new PulumiService.Inputs.RbacEntitySelectorArgs\n                {\n                    Tags = new[]\n                    {\n                        new PulumiService.Inputs.RbacTagConditionArgs\n                        {\n                            Key = \"team\",\n                            Value = \"platform\",\n                        },\n                        new PulumiService.Inputs.RbacTagConditionArgs\n                        {\n                            Key = \"env\",\n                            Value = \"prod\",\n                            Operator = PulumiService.RbacTagOperator.NotEquals,\n                        },\n                    },\n                },\n            },\n            new PulumiService.Inputs.RbacEntityRuleArgs\n            {\n                PermissionSetIds = new[]\n                {\n                    envRead.Apply(getRbacPermissionSetResult => getRbacPermissionSetResult.PermissionSetId),\n                },\n                Environment = new PulumiService.Inputs.RbacEntitySelectorArgs\n                {\n                    Id = sharedEnv.EnvironmentId,\n                },\n            },\n        },\n    });\n\n    var platformTeam = new PulumiService.Team(\"platformTeam\", new()\n    {\n        OrganizationName = organizationName,\n        Name = \"platform\",\n        TeamType = \"pulumi\",\n        DisplayName = \"Platform\",\n        Members = new[]\n        {\n            currentUser.Apply(getCurrentUserResult => getCurrentUserResult.Username),\n        },\n    });\n\n    var platformTeamRole = new PulumiService.TeamRoleAssignment(\"platformTeamRole\", new()\n    {\n        OrganizationName = organizationName,\n        TeamName = platformTeam.Name,\n        RoleId = platformRole.RoleId,\n    });\n\n    return new Dictionary<string, object?>\n    {\n        [\"roleId\"] = platformRole.RoleId,\n        [\"policyId\"] = platformRole.PolicyId,\n    };\n});\n\n\n```\n\n```java\npackage generated_program;\n\nimport com.pulumi.Context;\nimport com.pulumi.Pulumi;\nimport com.pulumi.core.Output;\nimport com.pulumi.pulumiservice.PulumiserviceFunctions;\nimport com.pulumi.pulumiservice.inputs.GetCurrentUserArgs;\nimport com.pulumi.pulumiservice.inputs.GetRbacPermissionSetArgs;\nimport com.pulumi.pulumiservice.RbacPermissionSet;\nimport com.pulumi.pulumiservice.RbacPermissionSetArgs;\nimport com.pulumi.pulumiservice.Stack;\nimport com.pulumi.pulumiservice.StackArgs;\nimport com.pulumi.pulumiservice.Environment;\nimport com.pulumi.pulumiservice.EnvironmentArgs;\nimport com.pulumi.pulumiservice.RbacRole;\nimport com.pulumi.pulumiservice.RbacRoleArgs;\nimport com.pulumi.pulumiservice.inputs.RbacEntityRuleArgs;\nimport com.pulumi.pulumiservice.inputs.RbacEntitySelectorArgs;\nimport com.pulumi.pulumiservice.inputs.RbacTagConditionArgs;\nimport com.pulumi.pulumiservice.Team;\nimport com.pulumi.pulumiservice.TeamArgs;\nimport com.pulumi.pulumiservice.TeamRoleAssignment;\nimport com.pulumi.pulumiservice.TeamRoleAssignmentArgs;\nimport com.pulumi.asset.StringAsset;\nimport java.util.ArrayList;\nimport java.util.Arrays;\nimport java.util.Map;\nimport java.io.File;\nimport java.nio.file.Files;\nimport java.nio.file.Paths;\n\npublic class App {\n    public static void main(String[] args) {\n        Pulumi.run(App::stack);\n    }\n\n    public static void stack(Context ctx) {\n        final var config = ctx.config();\n        final var organizationName = config.get(\"organizationName\").orElse(\"my-org\");\n        final var currentUser = PulumiserviceFunctions.getCurrentUser(GetCurrentUserArgs.builder()\n            .build());\n\n        final var orgReadOnly = PulumiserviceFunctions.getRbacPermissionSet(GetRbacPermissionSetArgs.builder()\n            .organizationName(organizationName)\n            .defaultIdentifier(\"org-settings-read-only\")\n            .build());\n\n        final var stackRead = PulumiserviceFunctions.getRbacPermissionSet(GetRbacPermissionSetArgs.builder()\n            .organizationName(organizationName)\n            .defaultIdentifier(\"stack-read\")\n            .build());\n\n        final var envRead = PulumiserviceFunctions.getRbacPermissionSet(GetRbacPermissionSetArgs.builder()\n            .organizationName(organizationName)\n            .defaultIdentifier(\"environment-read\")\n            .build());\n\n        var deployer = new RbacPermissionSet(\"deployer\", RbacPermissionSetArgs.builder()\n            .organizationName(organizationName)\n            .name(\"Stack Deployer\")\n            .description(\"Read, update, and deploy stacks.\")\n            .resourceType(\"stack\")\n            .permissions(            \n                \"stack:read\",\n                \"stack:write\",\n                \"stack_deployment:create\")\n            .build());\n\n        var prodStack = new Stack(\"prodStack\", StackArgs.builder()\n            .organizationName(organizationName)\n            .projectName(\"rbac-example\")\n            .stackName(\"prod\")\n            .build());\n\n        var sharedEnv = new Environment(\"sharedEnv\", EnvironmentArgs.builder()\n            .organization(organizationName)\n            .project(\"rbac-example\")\n            .name(\"shared\")\n            .yaml(new StringAsset(\"\"\"\nvalues:\n  region: us-west-2            \"\"\"))\n            .build());\n\n        var platformRole = new RbacRole(\"platformRole\", RbacRoleArgs.builder()\n            .organizationName(organizationName)\n            .name(\"Platform Engineers\")\n            .description(\"Deploys platform stacks and reads shared configuration.\")\n            .organizationPermissionSetIds(orgReadOnly.applyValue(_orgReadOnly -> _orgReadOnly.permissionSetId()))\n            .entityRules(            \n                RbacEntityRuleArgs.builder()\n                    .permissionSetIds(stackRead.applyValue(_stackRead -> _stackRead.permissionSetId()))\n                    .stack(RbacEntitySelectorArgs.builder()\n                        .all(true)\n                        .build())\n                    .build(),\n                RbacEntityRuleArgs.builder()\n                    .permissionSetIds(deployer.permissionSetId())\n                    .stack(RbacEntitySelectorArgs.builder()\n                        .id(prodStack.stackId())\n                        .build())\n                    .build(),\n                RbacEntityRuleArgs.builder()\n                    .permissionSetIds(deployer.permissionSetId())\n                    .stack(RbacEntitySelectorArgs.builder()\n                        .tags(                        \n                            RbacTagConditionArgs.builder()\n                                .key(\"team\")\n                                .value(\"platform\")\n                                .build(),\n                            RbacTagConditionArgs.builder()\n                                .key(\"env\")\n                                .value(\"prod\")\n                                .operator(\"notEquals\")\n                                .build())\n                        .build())\n                    .build(),\n                RbacEntityRuleArgs.builder()\n                    .permissionSetIds(envRead.applyValue(_envRead -> _envRead.permissionSetId()))\n                    .environment(RbacEntitySelectorArgs.builder()\n                        .id(sharedEnv.environmentId())\n                        .build())\n                    .build())\n            .build());\n\n        var platformTeam = new Team(\"platformTeam\", TeamArgs.builder()\n            .organizationName(organizationName)\n            .name(\"platform\")\n            .teamType(\"pulumi\")\n            .displayName(\"Platform\")\n            .members(currentUser.applyValue(_currentUser -> _currentUser.username()))\n            .build());\n\n        var platformTeamRole = new TeamRoleAssignment(\"platformTeamRole\", TeamRoleAssignmentArgs.builder()\n            .organizationName(organizationName)\n            .teamName(platformTeam.name())\n            .roleId(platformRole.roleId())\n            .build());\n\n        ctx.export(\"roleId\", platformRole.roleId());\n        ctx.export(\"policyId\", platformRole.policyId());\n    }\n}\n\n```\n\n```yaml\nconfig:\n  organizationName:\n    type: string\n    default: my-org\n\nresources:\n  # A custom permission set for deploying stacks.\n  deployer:\n    type: pulumiservice:RbacPermissionSet\n    properties:\n      organizationName: ${organizationName}\n      name: Stack Deployer\n      description: Read, update, and deploy stacks.\n      resourceType: stack\n      permissions:\n        - stack:read\n        - stack:write\n        - stack_deployment:create\n\n  prodStack:\n    type: pulumiservice:Stack\n    properties:\n      organizationName: ${organizationName}\n      projectName: rbac-example\n      stackName: prod\n\n  sharedEnv:\n    type: pulumiservice:Environment\n    properties:\n      organization: ${organizationName}\n      project: rbac-example\n      name: shared\n      yaml:\n        fn::stringAsset: |-\n          values:\n            region: us-west-2\n\n  # A role laid out like the console: organization-level access plus entity rules.\n  platformRole:\n    type: pulumiservice:RbacRole\n    properties:\n      organizationName: ${organizationName}\n      name: Platform Engineers\n      description: Deploys platform stacks and reads shared configuration.\n      organizationPermissionSetIds:\n        - ${orgReadOnly.permissionSetId}\n      entityRules:\n        # Read every stack in the organization.\n        - permissionSetIds: [\"${stackRead.permissionSetId}\"]\n          stack:\n            all: true\n        # Deploy one specific stack.\n        - permissionSetIds: [\"${deployer.permissionSetId}\"]\n          stack:\n            id: ${prodStack.stackId}\n        # Deploy stacks tagged team=platform, except those tagged env=prod.\n        - permissionSetIds: [\"${deployer.permissionSetId}\"]\n          stack:\n            tags:\n              - key: team\n                value: platform\n              - key: env\n                value: prod\n                operator: notEquals\n        # Read one environment.\n        - permissionSetIds: [\"${envRead.permissionSetId}\"]\n          environment:\n            id: ${sharedEnv.environmentId}\n\n  platformTeam:\n    type: pulumiservice:Team\n    properties:\n      organizationName: ${organizationName}\n      name: platform\n      teamType: pulumi\n      displayName: Platform\n      members:\n        - ${currentUser.username}\n\n  platformTeamRole:\n    type: pulumiservice:TeamRoleAssignment\n    properties:\n      organizationName: ${organizationName}\n      teamName: ${platformTeam.name}\n      roleId: ${platformRole.roleId}\n\nvariables:\n  currentUser:\n    fn::invoke:\n      function: pulumiservice:getCurrentUser\n  # Built-in permission sets are looked up, not recreated.\n  orgReadOnly:\n    fn::invoke:\n      function: pulumiservice:getRbacPermissionSet\n      arguments:\n        organizationName: ${organizationName}\n        defaultIdentifier: org-settings-read-only\n  stackRead:\n    fn::invoke:\n      function: pulumiservice:getRbacPermissionSet\n      arguments:\n        organizationName: ${organizationName}\n        defaultIdentifier: stack-read\n  envRead:\n    fn::invoke:\n      function: pulumiservice:getRbacPermissionSet\n      arguments:\n        organizationName: ${organizationName}\n        defaultIdentifier: environment-read\n\noutputs:\n  roleId: ${platformRole.roleId}\n  policyId: ${platformRole.policyId}\n```\n\n{{% /example %}}\n{{% /examples %}}\n",
+      "properties": {
+        "description": {
+          "type": "string",
+          "description": "Human-readable description of what the role grants."
+        },
+        "entityRules": {
+          "type": "array",
+          "items": {
+            "$ref": "#/types/pulumiservice:index:RbacEntityRule"
+          },
+          "description": "Rules granting `stack`, `environment`, or `insights-account` permission sets on matching entities (the console's \"Entity rules\")."
+        },
+        "name": {
+          "type": "string",
+          "description": "The role's display name. Must be unique within the organization."
+        },
+        "organizationName": {
+          "type": "string",
+          "description": "The Pulumi Cloud organization name.",
+          "replaceOnChanges": true
+        },
+        "organizationPermissionSetIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "IDs of `global` permission sets granted across the organization (the console's \"Organization-level access\"), for example the built-in \"Standard\" or \"Read Only\" sets."
+        },
+        "policyId": {
+          "type": "string",
+          "description": "The ID of the policy that holds the role's organization-level access and entity rules. Pulumi Cloud creates and deletes it with the role."
+        },
+        "roleId": {
+          "type": "string",
+          "description": "The role's unique ID. Assign it with `TeamRoleAssignment.roleId` or `OrganizationMember.roleId`."
+        },
+        "version": {
+          "type": "integer",
+          "description": "The service-maintained version number of the role's policy, which increments on every update."
+        }
+      },
+      "required": [
+        "organizationName",
+        "name",
+        "roleId",
+        "policyId",
+        "version"
+      ],
+      "inputProperties": {
+        "description": {
+          "type": "string",
+          "description": "Human-readable description of what the role grants."
+        },
+        "entityRules": {
+          "type": "array",
+          "items": {
+            "$ref": "#/types/pulumiservice:index:RbacEntityRule"
+          },
+          "description": "Rules granting `stack`, `environment`, or `insights-account` permission sets on matching entities (the console's \"Entity rules\")."
+        },
+        "name": {
+          "type": "string",
+          "description": "The role's display name. Must be unique within the organization."
+        },
+        "organizationName": {
+          "type": "string",
+          "description": "The Pulumi Cloud organization name.",
+          "replaceOnChanges": true
+        },
+        "organizationPermissionSetIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "IDs of `global` permission sets granted across the organization (the console's \"Organization-level access\"), for example the built-in \"Standard\" or \"Read Only\" sets."
+        }
+      },
+      "requiredInputs": [
+        "organizationName",
+        "name"
+      ]
+    },
     "pulumiservice:index:Stack": {
       "description": "A stack is a collection of resources that share a common lifecycle. Stacks are uniquely identified by their name and the project they belong to.",
       "properties": {
@@ -6203,6 +7351,10 @@
           "type": "string",
           "description": "The name of the project.",
           "replaceOnChanges": true
+        },
+        "stackId": {
+          "type": "string",
+          "description": "The stack's unique ID. Use it in an `RbacRole` entity rule to grant permissions on this stack."
         },
         "stackName": {
           "type": "string",
@@ -7533,6 +8685,102 @@
         "required": [
           "policyPacks"
         ]
+      }
+    },
+    "pulumiservice:index:getRbacPermissionSet": {
+      "description": "Looks up a permission set in an organization by built-in identifier or by name. Use it to grant built-in permission sets, such as \"Stack Read\" (`stack-read`) or \"Read Only\" (`org-settings-read-only`), from an `RbacRole`. Exactly one of `defaultIdentifier` or `name` must be set.",
+      "inputs": {
+        "properties": {
+          "defaultIdentifier": {
+            "type": "string",
+            "description": "The built-in permission set's identifier: `stack-read`, `stack-write`, `stack-admin`, `environment-read`, `environment-open`, `environment-write`, `environment-admin`, `insights-account-read`, `insights-account-write`, `insights-account-admin`, `org-settings-standard`, `org-settings-read-only`, or `org-settings-billing`."
+          },
+          "name": {
+            "type": "string",
+            "description": "The permission set's display name."
+          },
+          "organizationName": {
+            "type": "string",
+            "description": "The Pulumi Cloud organization name."
+          }
+        },
+        "type": "object",
+        "required": [
+          "organizationName"
+        ]
+      },
+      "outputs": {
+        "properties": {
+          "defaultIdentifier": {
+            "description": "For built-in permission sets, a stable identifier such as `stack-read`, `environment-admin`, or `org-settings-read-only`. Unset for custom permission sets.",
+            "type": "string"
+          },
+          "description": {
+            "description": "Human-readable description of what the permission set grants.",
+            "type": "string"
+          },
+          "name": {
+            "description": "The permission set's display name.",
+            "type": "string"
+          },
+          "permissionSetId": {
+            "description": "The permission set's unique ID. Reference it from an `RbacRole`.",
+            "type": "string"
+          },
+          "permissions": {
+            "description": "The scopes the permission set grants. Only populated for permission sets that grant a flat list of scopes.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "resourceType": {
+            "$ref": "#/types/pulumiservice:index:RbacResourceType",
+            "description": "The kind of entity the permission set applies to."
+          }
+        },
+        "required": [
+          "permissionSetId",
+          "name",
+          "description",
+          "resourceType",
+          "permissions"
+        ],
+        "type": "object"
+      }
+    },
+    "pulumiservice:index:getRbacPermissionSets": {
+      "description": "Lists the built-in and custom permission sets in an organization, sorted by resource type and name.",
+      "inputs": {
+        "properties": {
+          "organizationName": {
+            "type": "string",
+            "description": "The Pulumi Cloud organization name."
+          },
+          "resourceType": {
+            "$ref": "#/types/pulumiservice:index:RbacResourceType",
+            "description": "Only return permission sets for this kind of entity."
+          }
+        },
+        "type": "object",
+        "required": [
+          "organizationName"
+        ]
+      },
+      "outputs": {
+        "properties": {
+          "permissionSets": {
+            "description": "The matching permission sets.",
+            "items": {
+              "$ref": "#/types/pulumiservice:index:RbacPermissionSetInfo"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "permissionSets"
+        ],
+        "type": "object"
       }
     }
   }

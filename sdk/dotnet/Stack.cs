@@ -34,6 +34,12 @@ namespace Pulumi.PulumiService
         public Output<string> ProjectName { get; private set; } = null!;
 
         /// <summary>
+        /// The stack's unique ID. Use it in an `RbacRole` entity rule to grant permissions on this stack.
+        /// </summary>
+        [Output("stackId")]
+        public Output<string?> StackId { get; private set; } = null!;
+
+        /// <summary>
         /// The name of the stack.
         /// </summary>
         [Output("stackName")]
