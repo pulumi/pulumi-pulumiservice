@@ -23,8 +23,8 @@ func BuildTagConditionalPermissions(ctx *pulumi.Context, args *BuildTagCondition
 }
 
 type BuildTagConditionalPermissionsArgs struct {
-	// The kind of entity whose tags are evaluated: `stack`, `environment`, or `insights-account`. `global` is not valid here.
-	EntityType RbacResourceType `pulumi:"entityType"`
+	// The kind of entity whose tags are evaluated: `stack`, `environment`, or `insights-account`.
+	EntityType RbacEntityType `pulumi:"entityType"`
 	// The scopes to grant on matching entities. Discover valid scope names via the `getOrganizationRoleScopes` data source.
 	Permissions []RbacScope `pulumi:"permissions"`
 	// The IDs of the permission sets to grant on matching entities. Set exactly one of `permissions` or `setIds`. `permissions` grants the scopes inline. `setIds` grants the referenced permission sets (`api.Role` with `uxPurpose: set`), which is the shape Pulumi Cloud uses for policies (`api.Role` with `uxPurpose: policy`).
@@ -46,8 +46,8 @@ func BuildTagConditionalPermissionsOutput(ctx *pulumi.Context, args BuildTagCond
 }
 
 type BuildTagConditionalPermissionsOutputArgs struct {
-	// The kind of entity whose tags are evaluated: `stack`, `environment`, or `insights-account`. `global` is not valid here.
-	EntityType RbacResourceTypeInput `pulumi:"entityType"`
+	// The kind of entity whose tags are evaluated: `stack`, `environment`, or `insights-account`.
+	EntityType RbacEntityTypeInput `pulumi:"entityType"`
 	// The scopes to grant on matching entities. Discover valid scope names via the `getOrganizationRoleScopes` data source.
 	Permissions RbacScopeArrayInput `pulumi:"permissions"`
 	// The IDs of the permission sets to grant on matching entities. Set exactly one of `permissions` or `setIds`. `permissions` grants the scopes inline. `setIds` grants the referenced permission sets (`api.Role` with `uxPurpose: set`), which is the shape Pulumi Cloud uses for policies (`api.Role` with `uxPurpose: policy`).

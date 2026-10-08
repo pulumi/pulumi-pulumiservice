@@ -62,7 +62,7 @@ func main() {
 						PermissionDescriptorIds: pulumi.StringArray{stackReadSet.RoleID},
 					}).Permissions(),
 					ps.BuildTagConditionalPermissionsOutput(ctx, ps.BuildTagConditionalPermissionsOutputArgs{
-						EntityType: ps.RbacResourceTypeStack,
+						EntityType: ps.RbacEntityTypeStack,
 						TagKey:     pulumi.String("team"),
 						TagValue:   pulumi.String("platform"),
 						SetIds:     pulumi.StringArray{stackWriteSet.RoleID},

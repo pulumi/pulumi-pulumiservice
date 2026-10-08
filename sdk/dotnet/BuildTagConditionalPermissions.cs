@@ -34,10 +34,10 @@ namespace Pulumi.PulumiService
     public sealed class BuildTagConditionalPermissionsArgs : global::Pulumi.InvokeArgs
     {
         /// <summary>
-        /// The kind of entity whose tags are evaluated: `stack`, `environment`, or `insights-account`. `global` is not valid here.
+        /// The kind of entity whose tags are evaluated: `stack`, `environment`, or `insights-account`.
         /// </summary>
         [Input("entityType", required: true)]
-        public Pulumi.PulumiService.RbacResourceType EntityType { get; set; }
+        public Pulumi.PulumiService.RbacEntityType EntityType { get; set; }
 
         [Input("permissions")]
         private List<Pulumi.PulumiService.RbacScope>? _permissions;
@@ -84,10 +84,10 @@ namespace Pulumi.PulumiService
     public sealed class BuildTagConditionalPermissionsInvokeArgs : global::Pulumi.InvokeArgs
     {
         /// <summary>
-        /// The kind of entity whose tags are evaluated: `stack`, `environment`, or `insights-account`. `global` is not valid here.
+        /// The kind of entity whose tags are evaluated: `stack`, `environment`, or `insights-account`.
         /// </summary>
         [Input("entityType", required: true)]
-        public Input<Pulumi.PulumiService.RbacResourceType> EntityType { get; set; } = null!;
+        public Input<Pulumi.PulumiService.RbacEntityType> EntityType { get; set; } = null!;
 
         [Input("permissions")]
         private InputList<Pulumi.PulumiService.RbacScope>? _permissions;

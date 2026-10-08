@@ -9,17 +9,12 @@ import java.util.Objects;
 import java.util.StringJoiner;
 
     @EnumType
-    public enum RbacResourceType {
+    public enum RbacEntityType {
         /**
          * ESC environments.
          * 
          */
         Environment("environment"),
-        /**
-         * The organization as a whole.
-         * 
-         */
-        Global("global"),
         /**
          * Insights accounts.
          * 
@@ -33,7 +28,7 @@ import java.util.StringJoiner;
 
         private final String value;
 
-        RbacResourceType(String value) {
+        RbacEntityType(String value) {
             this.value = Objects.requireNonNull(value);
         }
 
@@ -44,7 +39,7 @@ import java.util.StringJoiner;
 
         @Override
         public java.lang.String toString() {
-            return new StringJoiner(", ", "RbacResourceType[", "]")
+            return new StringJoiner(", ", "RbacEntityType[", "]")
                 .add("value='" + this.value + "'")
                 .toString();
         }

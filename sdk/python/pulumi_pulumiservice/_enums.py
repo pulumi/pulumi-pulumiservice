@@ -13,8 +13,8 @@ __all__ = [
     'CloudProvider',
     'EnvironmentPermission',
     'PulumiOperation',
+    'RbacEntityType',
     'RbacPermission',
-    'RbacResourceType',
     'RbacScope',
     'ScanSchedule',
     'TargetActionType',
@@ -137,6 +137,22 @@ class PulumiOperation(_builtins.str, Enum):
     """
 
 
+@pulumi.type_token("pulumiservice:index:RbacEntityType")
+class RbacEntityType(_builtins.str, Enum):
+    ENVIRONMENT = "environment"
+    """
+    ESC environments.
+    """
+    INSIGHTS_ACCOUNT = "insights-account"
+    """
+    Insights accounts.
+    """
+    STACK = "stack"
+    """
+    Stacks.
+    """
+
+
 @pulumi.type_token("pulumiservice:index:RbacPermission")
 class RbacPermission(_builtins.str, Enum):
     READ = "environment:read"
@@ -166,26 +182,6 @@ class RbacPermission(_builtins.str, Enum):
     ROTATE = "environment:rotate"
     """
     Rotate permission.
-    """
-
-
-@pulumi.type_token("pulumiservice:index:RbacResourceType")
-class RbacResourceType(_builtins.str, Enum):
-    ENVIRONMENT = "environment"
-    """
-    ESC environments.
-    """
-    GLOBAL_ = "global"
-    """
-    The organization as a whole.
-    """
-    INSIGHTS_ACCOUNT = "insights-account"
-    """
-    Insights accounts.
-    """
-    STACK = "stack"
-    """
-    Stacks.
     """
 
 

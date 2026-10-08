@@ -6,7 +6,7 @@ package com.pulumi.pulumiservice.inputs;
 import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
 import com.pulumi.exceptions.MissingRequiredPropertyException;
-import com.pulumi.pulumiservice.enums.RbacResourceType;
+import com.pulumi.pulumiservice.enums.RbacEntityType;
 import com.pulumi.pulumiservice.enums.RbacScope;
 import java.lang.String;
 import java.util.List;
@@ -20,17 +20,17 @@ public final class BuildTagConditionalPermissionsArgs extends com.pulumi.resourc
     public static final BuildTagConditionalPermissionsArgs Empty = new BuildTagConditionalPermissionsArgs();
 
     /**
-     * The kind of entity whose tags are evaluated: `stack`, `environment`, or `insights-account`. `global` is not valid here.
+     * The kind of entity whose tags are evaluated: `stack`, `environment`, or `insights-account`.
      * 
      */
     @Import(name="entityType", required=true)
-    private Output<RbacResourceType> entityType;
+    private Output<RbacEntityType> entityType;
 
     /**
-     * @return The kind of entity whose tags are evaluated: `stack`, `environment`, or `insights-account`. `global` is not valid here.
+     * @return The kind of entity whose tags are evaluated: `stack`, `environment`, or `insights-account`.
      * 
      */
-    public Output<RbacResourceType> entityType() {
+    public Output<RbacEntityType> entityType() {
         return this.entityType;
     }
 
@@ -123,23 +123,23 @@ public final class BuildTagConditionalPermissionsArgs extends com.pulumi.resourc
         }
 
         /**
-         * @param entityType The kind of entity whose tags are evaluated: `stack`, `environment`, or `insights-account`. `global` is not valid here.
+         * @param entityType The kind of entity whose tags are evaluated: `stack`, `environment`, or `insights-account`.
          * 
          * @return builder
          * 
          */
-        public Builder entityType(Output<RbacResourceType> entityType) {
+        public Builder entityType(Output<RbacEntityType> entityType) {
             $.entityType = entityType;
             return this;
         }
 
         /**
-         * @param entityType The kind of entity whose tags are evaluated: `stack`, `environment`, or `insights-account`. `global` is not valid here.
+         * @param entityType The kind of entity whose tags are evaluated: `stack`, `environment`, or `insights-account`.
          * 
          * @return builder
          * 
          */
-        public Builder entityType(RbacResourceType entityType) {
+        public Builder entityType(RbacEntityType entityType) {
             return entityType(Output.of(entityType));
         }
 

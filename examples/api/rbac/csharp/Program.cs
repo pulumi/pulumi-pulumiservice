@@ -50,7 +50,7 @@ return await Deployment.RunAsync(() =>
                 }).Apply(r => r.Permissions),
                 Ps.BuildTagConditionalPermissions.Invoke(new()
                 {
-                    EntityType = Ps.RbacResourceType.Stack,
+                    EntityType = Ps.RbacEntityType.Stack,
                     TagKey = "team",
                     TagValue = "platform",
                     SetIds = { stackWriteSet.RoleID },

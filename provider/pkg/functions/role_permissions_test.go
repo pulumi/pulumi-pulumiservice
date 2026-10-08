@@ -332,7 +332,7 @@ func TestBuildTagConditionalPermissions(t *testing.T) {
 			context.Background(),
 			infer.FunctionRequest[BuildTagConditionalPermissionsInput]{
 				Input: BuildTagConditionalPermissionsInput{
-					EntityType: RbacResourceTypeStack,
+					EntityType: RbacEntityTypeStack,
 					TagKey:     testTagKey,
 					TagValue:   "platform",
 					SetIDs:     []string{testSetID},
@@ -366,7 +366,7 @@ func TestBuildTagConditionalPermissions(t *testing.T) {
 			context.Background(),
 			infer.FunctionRequest[BuildTagConditionalPermissionsInput]{
 				Input: BuildTagConditionalPermissionsInput{
-					EntityType:  RbacResourceTypeInsightsAccount,
+					EntityType:  RbacEntityTypeInsightsAccount,
 					TagKey:      "owner",
 					Permissions: []RbacScope{permInsightsAccountRead},
 				},
@@ -384,13 +384,13 @@ func TestBuildTagConditionalPermissions(t *testing.T) {
 		assert.Equal(t, "PermissionDescriptorAllow", sub[keyType])
 	})
 
-	t.Run("rejects the global resource type", func(t *testing.T) {
+	t.Run("rejects an unknown entity type", func(t *testing.T) {
 		t.Parallel()
 		_, err := BuildTagConditionalPermissionsFunction{}.Invoke(
 			context.Background(),
 			infer.FunctionRequest[BuildTagConditionalPermissionsInput]{
 				Input: BuildTagConditionalPermissionsInput{
-					EntityType: RbacResourceTypeGlobal,
+					EntityType: "global",
 					TagKey:     "k",
 					SetIDs:     []string{testSetID},
 				},
@@ -405,7 +405,7 @@ func TestBuildTagConditionalPermissions(t *testing.T) {
 			context.Background(),
 			infer.FunctionRequest[BuildTagConditionalPermissionsInput]{
 				Input: BuildTagConditionalPermissionsInput{
-					EntityType: RbacResourceTypeEnvironment,
+					EntityType: RbacEntityTypeEnvironment,
 					SetIDs:     []string{testSetID},
 				},
 			},
@@ -419,7 +419,7 @@ func TestBuildTagConditionalPermissions(t *testing.T) {
 			context.Background(),
 			infer.FunctionRequest[BuildTagConditionalPermissionsInput]{
 				Input: BuildTagConditionalPermissionsInput{
-					EntityType: RbacResourceTypeEnvironment,
+					EntityType: RbacEntityTypeEnvironment,
 					TagKey:     "k",
 				},
 			},

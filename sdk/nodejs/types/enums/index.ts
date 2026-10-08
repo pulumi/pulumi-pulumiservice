@@ -120,6 +120,23 @@ export const PulumiOperation = {
 
 export type PulumiOperation = (typeof PulumiOperation)[keyof typeof PulumiOperation];
 
+export const RbacEntityType = {
+    /**
+     * ESC environments.
+     */
+    Environment: "environment",
+    /**
+     * Insights accounts.
+     */
+    InsightsAccount: "insights-account",
+    /**
+     * Stacks.
+     */
+    Stack: "stack",
+} as const;
+
+export type RbacEntityType = (typeof RbacEntityType)[keyof typeof RbacEntityType];
+
 export const RbacPermission = {
     /**
      * Read permission.
@@ -152,27 +169,6 @@ export const RbacPermission = {
 } as const;
 
 export type RbacPermission = (typeof RbacPermission)[keyof typeof RbacPermission];
-
-export const RbacResourceType = {
-    /**
-     * ESC environments.
-     */
-    Environment: "environment",
-    /**
-     * The organization as a whole.
-     */
-    Global: "global",
-    /**
-     * Insights accounts.
-     */
-    InsightsAccount: "insights-account",
-    /**
-     * Stacks.
-     */
-    Stack: "stack",
-} as const;
-
-export type RbacResourceType = (typeof RbacResourceType)[keyof typeof RbacResourceType];
 
 export const RbacScope = {
     AgentPoolCreate: "agent_pool:create",

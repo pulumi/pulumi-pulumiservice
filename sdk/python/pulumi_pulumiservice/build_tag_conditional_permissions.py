@@ -47,7 +47,7 @@ class AwaitableBuildTagConditionalPermissionsResult(BuildTagConditionalPermissio
             permissions=self.permissions)
 
 
-def build_tag_conditional_permissions(entity_type: Optional['RbacResourceType'] = None,
+def build_tag_conditional_permissions(entity_type: Optional['RbacEntityType'] = None,
                                       permissions: Optional[Sequence['RbacScope']] = None,
                                       set_ids: Optional[Sequence[_builtins.str]] = None,
                                       tag_key: Optional[_builtins.str] = None,
@@ -56,7 +56,7 @@ def build_tag_conditional_permissions(entity_type: Optional['RbacResourceType'] 
     """
     Builds a permission descriptor that grants the supplied scopes or permission sets only on entities that carry a tag. With `tagValue`, the tag must have that exact value; without it, the tag key must exist. Tags are evaluated on existing entities, so grant create rights unconditionally. The result is directly assignable to `OrganizationRole.permissions` or `api.Role.details`. To combine several grants in one descriptor, pass the output of each helper to `buildGroupPermissions`.
 
-    :param 'RbacResourceType' entity_type: The kind of entity whose tags are evaluated: `stack`, `environment`, or `insights-account`. `global` is not valid here.
+    :param 'RbacEntityType' entity_type: The kind of entity whose tags are evaluated: `stack`, `environment`, or `insights-account`.
     :param Sequence['RbacScope'] permissions: The scopes to grant on matching entities. Discover valid scope names via the `getOrganizationRoleScopes` data source.
     :param Sequence[_builtins.str] set_ids: The IDs of the permission sets to grant on matching entities. Set exactly one of `permissions` or `setIds`. `permissions` grants the scopes inline. `setIds` grants the referenced permission sets (`api.Role` with `uxPurpose: set`), which is the shape Pulumi Cloud uses for policies (`api.Role` with `uxPurpose: policy`).
     :param _builtins.str tag_key: The tag key to match.
@@ -73,7 +73,7 @@ def build_tag_conditional_permissions(entity_type: Optional['RbacResourceType'] 
 
     return AwaitableBuildTagConditionalPermissionsResult(
         permissions=pulumi.get(__ret__, 'permissions'))
-def build_tag_conditional_permissions_output(entity_type: pulumi.Input[Optional['RbacResourceType']] = None,
+def build_tag_conditional_permissions_output(entity_type: pulumi.Input[Optional['RbacEntityType']] = None,
                                              permissions: pulumi.Input[Optional[Optional[Sequence['RbacScope']]]] = None,
                                              set_ids: pulumi.Input[Optional[Optional[Sequence[_builtins.str]]]] = None,
                                              tag_key: pulumi.Input[Optional[_builtins.str]] = None,
@@ -82,7 +82,7 @@ def build_tag_conditional_permissions_output(entity_type: pulumi.Input[Optional[
     """
     Builds a permission descriptor that grants the supplied scopes or permission sets only on entities that carry a tag. With `tagValue`, the tag must have that exact value; without it, the tag key must exist. Tags are evaluated on existing entities, so grant create rights unconditionally. The result is directly assignable to `OrganizationRole.permissions` or `api.Role.details`. To combine several grants in one descriptor, pass the output of each helper to `buildGroupPermissions`.
 
-    :param 'RbacResourceType' entity_type: The kind of entity whose tags are evaluated: `stack`, `environment`, or `insights-account`. `global` is not valid here.
+    :param 'RbacEntityType' entity_type: The kind of entity whose tags are evaluated: `stack`, `environment`, or `insights-account`.
     :param Sequence['RbacScope'] permissions: The scopes to grant on matching entities. Discover valid scope names via the `getOrganizationRoleScopes` data source.
     :param Sequence[_builtins.str] set_ids: The IDs of the permission sets to grant on matching entities. Set exactly one of `permissions` or `setIds`. `permissions` grants the scopes inline. `setIds` grants the referenced permission sets (`api.Role` with `uxPurpose: set`), which is the shape Pulumi Cloud uses for policies (`api.Role` with `uxPurpose: policy`).
     :param _builtins.str tag_key: The tag key to match.

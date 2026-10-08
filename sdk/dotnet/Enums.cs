@@ -252,6 +252,44 @@ namespace Pulumi.PulumiService
     }
 
     [EnumType]
+    public readonly struct RbacEntityType : IEquatable<RbacEntityType>
+    {
+        private readonly string _value;
+
+        private RbacEntityType(string value)
+        {
+            _value = value ?? throw new ArgumentNullException(nameof(value));
+        }
+
+        /// <summary>
+        /// ESC environments.
+        /// </summary>
+        public static RbacEntityType Environment { get; } = new RbacEntityType("environment");
+        /// <summary>
+        /// Insights accounts.
+        /// </summary>
+        public static RbacEntityType InsightsAccount { get; } = new RbacEntityType("insights-account");
+        /// <summary>
+        /// Stacks.
+        /// </summary>
+        public static RbacEntityType Stack { get; } = new RbacEntityType("stack");
+
+        public static bool operator ==(RbacEntityType left, RbacEntityType right) => left.Equals(right);
+        public static bool operator !=(RbacEntityType left, RbacEntityType right) => !left.Equals(right);
+
+        public static explicit operator string(RbacEntityType value) => value._value;
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public override bool Equals(object? obj) => obj is RbacEntityType other && Equals(other);
+        public bool Equals(RbacEntityType other) => string.Equals(_value, other._value, StringComparison.Ordinal);
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public override int GetHashCode() => _value?.GetHashCode() ?? 0;
+
+        public override string ToString() => _value;
+    }
+
+    [EnumType]
     public readonly struct RbacPermission : IEquatable<RbacPermission>
     {
         private readonly string _value;
@@ -298,48 +336,6 @@ namespace Pulumi.PulumiService
         [EditorBrowsable(EditorBrowsableState.Never)]
         public override bool Equals(object? obj) => obj is RbacPermission other && Equals(other);
         public bool Equals(RbacPermission other) => string.Equals(_value, other._value, StringComparison.Ordinal);
-
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public override int GetHashCode() => _value?.GetHashCode() ?? 0;
-
-        public override string ToString() => _value;
-    }
-
-    [EnumType]
-    public readonly struct RbacResourceType : IEquatable<RbacResourceType>
-    {
-        private readonly string _value;
-
-        private RbacResourceType(string value)
-        {
-            _value = value ?? throw new ArgumentNullException(nameof(value));
-        }
-
-        /// <summary>
-        /// ESC environments.
-        /// </summary>
-        public static RbacResourceType Environment { get; } = new RbacResourceType("environment");
-        /// <summary>
-        /// The organization as a whole.
-        /// </summary>
-        public static RbacResourceType Global { get; } = new RbacResourceType("global");
-        /// <summary>
-        /// Insights accounts.
-        /// </summary>
-        public static RbacResourceType InsightsAccount { get; } = new RbacResourceType("insights-account");
-        /// <summary>
-        /// Stacks.
-        /// </summary>
-        public static RbacResourceType Stack { get; } = new RbacResourceType("stack");
-
-        public static bool operator ==(RbacResourceType left, RbacResourceType right) => left.Equals(right);
-        public static bool operator !=(RbacResourceType left, RbacResourceType right) => !left.Equals(right);
-
-        public static explicit operator string(RbacResourceType value) => value._value;
-
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public override bool Equals(object? obj) => obj is RbacResourceType other && Equals(other);
-        public bool Equals(RbacResourceType other) => string.Equals(_value, other._value, StringComparison.Ordinal);
 
         [EditorBrowsable(EditorBrowsableState.Never)]
         public override int GetHashCode() => _value?.GetHashCode() ?? 0;

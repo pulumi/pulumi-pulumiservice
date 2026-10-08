@@ -447,11 +447,11 @@ func (BuildInsightsAccountScopedPermissionsFunction) Invoke(
 type BuildTagConditionalPermissionsFunction struct{}
 
 type BuildTagConditionalPermissionsInput struct {
-	EntityType  RbacResourceType `pulumi:"entityType"`
-	TagKey      string           `pulumi:"tagKey"`
-	TagValue    string           `pulumi:"tagValue,optional"`
-	Permissions []RbacScope      `pulumi:"permissions,optional"`
-	SetIDs      []string         `pulumi:"setIds,optional"`
+	EntityType  RbacEntityType `pulumi:"entityType"`
+	TagKey      string         `pulumi:"tagKey"`
+	TagValue    string         `pulumi:"tagValue,optional"`
+	Permissions []RbacScope    `pulumi:"permissions,optional"`
+	SetIDs      []string       `pulumi:"setIds,optional"`
 }
 
 type BuildTagConditionalPermissionsOutput struct {
@@ -472,8 +472,7 @@ func (BuildTagConditionalPermissionsFunction) Annotate(a infer.Annotator) {
 func (i *BuildTagConditionalPermissionsInput) Annotate(a infer.Annotator) {
 	a.Describe(
 		&i.EntityType,
-		"The kind of entity whose tags are evaluated: `stack`, `environment`, or `insights-account`. "+
-			"`global` is not valid here.",
+		"The kind of entity whose tags are evaluated: `stack`, `environment`, or `insights-account`.",
 	)
 	a.Describe(&i.TagKey, "The tag key to match.")
 	a.Describe(
@@ -498,13 +497,13 @@ func (o *BuildTagConditionalPermissionsOutput) Annotate(a infer.Annotator) {
 	)
 }
 
-func tagContext(entityType RbacResourceType) (apitype.PermissionContextExpression, error) {
+func tagContext(entityType RbacEntityType) (apitype.PermissionContextExpression, error) {
 	switch entityType {
-	case RbacResourceTypeStack:
+	case RbacEntityTypeStack:
 		return apitype.PermissionExpressionStackBuilder{}.Build(), nil
-	case RbacResourceTypeEnvironment:
+	case RbacEntityTypeEnvironment:
 		return apitype.PermissionExpressionEnvironmentBuilder{}.Build(), nil
-	case RbacResourceTypeInsightsAccount:
+	case RbacEntityTypeInsightsAccount:
 		return apitype.PermissionExpressionInsightsAccountBuilder{}.Build(), nil
 	default:
 		return nil, fmt.Errorf(

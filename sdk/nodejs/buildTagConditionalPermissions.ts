@@ -23,9 +23,9 @@ export function buildTagConditionalPermissions(args: BuildTagConditionalPermissi
 
 export interface BuildTagConditionalPermissionsArgs {
     /**
-     * The kind of entity whose tags are evaluated: `stack`, `environment`, or `insights-account`. `global` is not valid here.
+     * The kind of entity whose tags are evaluated: `stack`, `environment`, or `insights-account`.
      */
-    entityType: enums.RbacResourceType;
+    entityType: enums.RbacEntityType;
     /**
      * The scopes to grant on matching entities. Discover valid scope names via the `getOrganizationRoleScopes` data source.
      */
@@ -66,9 +66,9 @@ export function buildTagConditionalPermissionsOutput(args: BuildTagConditionalPe
 
 export interface BuildTagConditionalPermissionsOutputArgs {
     /**
-     * The kind of entity whose tags are evaluated: `stack`, `environment`, or `insights-account`. `global` is not valid here.
+     * The kind of entity whose tags are evaluated: `stack`, `environment`, or `insights-account`.
      */
-    entityType: pulumi.Input<enums.RbacResourceType>;
+    entityType: pulumi.Input<enums.RbacEntityType>;
     /**
      * The scopes to grant on matching entities. Discover valid scope names via the `getOrganizationRoleScopes` data source.
      */

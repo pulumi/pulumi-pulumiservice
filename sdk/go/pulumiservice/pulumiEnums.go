@@ -1087,6 +1087,176 @@ func (in *pulumiOperationPtr) ToPulumiOperationPtrOutputWithContext(ctx context.
 	return pulumi.ToOutputWithContext(ctx, in).(PulumiOperationPtrOutput)
 }
 
+type RbacEntityType string
+
+const (
+	// ESC environments.
+	RbacEntityTypeEnvironment = RbacEntityType("environment")
+	// Insights accounts.
+	RbacEntityTypeInsightsAccount = RbacEntityType("insights-account")
+	// Stacks.
+	RbacEntityTypeStack = RbacEntityType("stack")
+)
+
+func (RbacEntityType) ElementType() reflect.Type {
+	return reflect.TypeOf((*RbacEntityType)(nil)).Elem()
+}
+
+func (e RbacEntityType) ToRbacEntityTypeOutput() RbacEntityTypeOutput {
+	return pulumi.ToOutput(e).(RbacEntityTypeOutput)
+}
+
+func (e RbacEntityType) ToRbacEntityTypeOutputWithContext(ctx context.Context) RbacEntityTypeOutput {
+	return pulumi.ToOutputWithContext(ctx, e).(RbacEntityTypeOutput)
+}
+
+func (e RbacEntityType) ToRbacEntityTypePtrOutput() RbacEntityTypePtrOutput {
+	return e.ToRbacEntityTypePtrOutputWithContext(context.Background())
+}
+
+func (e RbacEntityType) ToRbacEntityTypePtrOutputWithContext(ctx context.Context) RbacEntityTypePtrOutput {
+	return RbacEntityType(e).ToRbacEntityTypeOutputWithContext(ctx).ToRbacEntityTypePtrOutputWithContext(ctx)
+}
+
+func (e RbacEntityType) ToStringOutput() pulumi.StringOutput {
+	return pulumi.ToOutput(pulumi.String(e)).(pulumi.StringOutput)
+}
+
+func (e RbacEntityType) ToStringOutputWithContext(ctx context.Context) pulumi.StringOutput {
+	return pulumi.ToOutputWithContext(ctx, pulumi.String(e)).(pulumi.StringOutput)
+}
+
+func (e RbacEntityType) ToStringPtrOutput() pulumi.StringPtrOutput {
+	return pulumi.String(e).ToStringPtrOutputWithContext(context.Background())
+}
+
+func (e RbacEntityType) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
+	return pulumi.String(e).ToStringOutputWithContext(ctx).ToStringPtrOutputWithContext(ctx)
+}
+
+type RbacEntityTypeOutput struct{ *pulumi.OutputState }
+
+func (RbacEntityTypeOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*RbacEntityType)(nil)).Elem()
+}
+
+func (o RbacEntityTypeOutput) ToRbacEntityTypeOutput() RbacEntityTypeOutput {
+	return o
+}
+
+func (o RbacEntityTypeOutput) ToRbacEntityTypeOutputWithContext(ctx context.Context) RbacEntityTypeOutput {
+	return o
+}
+
+func (o RbacEntityTypeOutput) ToRbacEntityTypePtrOutput() RbacEntityTypePtrOutput {
+	return o.ToRbacEntityTypePtrOutputWithContext(context.Background())
+}
+
+func (o RbacEntityTypeOutput) ToRbacEntityTypePtrOutputWithContext(ctx context.Context) RbacEntityTypePtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v RbacEntityType) *RbacEntityType {
+		return &v
+	}).(RbacEntityTypePtrOutput)
+}
+
+func (o RbacEntityTypeOutput) ToStringOutput() pulumi.StringOutput {
+	return o.ToStringOutputWithContext(context.Background())
+}
+
+func (o RbacEntityTypeOutput) ToStringOutputWithContext(ctx context.Context) pulumi.StringOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e RbacEntityType) string {
+		return string(e)
+	}).(pulumi.StringOutput)
+}
+
+func (o RbacEntityTypeOutput) ToStringPtrOutput() pulumi.StringPtrOutput {
+	return o.ToStringPtrOutputWithContext(context.Background())
+}
+
+func (o RbacEntityTypeOutput) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e RbacEntityType) *string {
+		v := string(e)
+		return &v
+	}).(pulumi.StringPtrOutput)
+}
+
+type RbacEntityTypePtrOutput struct{ *pulumi.OutputState }
+
+func (RbacEntityTypePtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**RbacEntityType)(nil)).Elem()
+}
+
+func (o RbacEntityTypePtrOutput) ToRbacEntityTypePtrOutput() RbacEntityTypePtrOutput {
+	return o
+}
+
+func (o RbacEntityTypePtrOutput) ToRbacEntityTypePtrOutputWithContext(ctx context.Context) RbacEntityTypePtrOutput {
+	return o
+}
+
+func (o RbacEntityTypePtrOutput) Elem() RbacEntityTypeOutput {
+	return o.ApplyT(func(v *RbacEntityType) RbacEntityType {
+		if v != nil {
+			return *v
+		}
+		var ret RbacEntityType
+		return ret
+	}).(RbacEntityTypeOutput)
+}
+
+func (o RbacEntityTypePtrOutput) ToStringPtrOutput() pulumi.StringPtrOutput {
+	return o.ToStringPtrOutputWithContext(context.Background())
+}
+
+func (o RbacEntityTypePtrOutput) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e *RbacEntityType) *string {
+		if e == nil {
+			return nil
+		}
+		v := string(*e)
+		return &v
+	}).(pulumi.StringPtrOutput)
+}
+
+// RbacEntityTypeInput is an input type that accepts values of the RbacEntityType enum
+// A concrete instance of `RbacEntityTypeInput` can be one of the following:
+//
+//	RbacEntityTypeEnvironment
+//	RbacEntityTypeInsightsAccount
+//	RbacEntityTypeStack
+type RbacEntityTypeInput interface {
+	pulumi.Input
+
+	ToRbacEntityTypeOutput() RbacEntityTypeOutput
+	ToRbacEntityTypeOutputWithContext(context.Context) RbacEntityTypeOutput
+}
+
+var rbacEntityTypePtrType = reflect.TypeOf((**RbacEntityType)(nil)).Elem()
+
+type RbacEntityTypePtrInput interface {
+	pulumi.Input
+
+	ToRbacEntityTypePtrOutput() RbacEntityTypePtrOutput
+	ToRbacEntityTypePtrOutputWithContext(context.Context) RbacEntityTypePtrOutput
+}
+
+type rbacEntityTypePtr string
+
+func RbacEntityTypePtr(v string) RbacEntityTypePtrInput {
+	return (*rbacEntityTypePtr)(&v)
+}
+
+func (*rbacEntityTypePtr) ElementType() reflect.Type {
+	return rbacEntityTypePtrType
+}
+
+func (in *rbacEntityTypePtr) ToRbacEntityTypePtrOutput() RbacEntityTypePtrOutput {
+	return pulumi.ToOutput(in).(RbacEntityTypePtrOutput)
+}
+
+func (in *rbacEntityTypePtr) ToRbacEntityTypePtrOutputWithContext(ctx context.Context) RbacEntityTypePtrOutput {
+	return pulumi.ToOutputWithContext(ctx, in).(RbacEntityTypePtrOutput)
+}
+
 type RbacPermission string
 
 const (
@@ -1267,179 +1437,6 @@ func (in *rbacPermissionPtr) ToRbacPermissionPtrOutput() RbacPermissionPtrOutput
 
 func (in *rbacPermissionPtr) ToRbacPermissionPtrOutputWithContext(ctx context.Context) RbacPermissionPtrOutput {
 	return pulumi.ToOutputWithContext(ctx, in).(RbacPermissionPtrOutput)
-}
-
-type RbacResourceType string
-
-const (
-	// ESC environments.
-	RbacResourceTypeEnvironment = RbacResourceType("environment")
-	// The organization as a whole.
-	RbacResourceTypeGlobal = RbacResourceType("global")
-	// Insights accounts.
-	RbacResourceTypeInsightsAccount = RbacResourceType("insights-account")
-	// Stacks.
-	RbacResourceTypeStack = RbacResourceType("stack")
-)
-
-func (RbacResourceType) ElementType() reflect.Type {
-	return reflect.TypeOf((*RbacResourceType)(nil)).Elem()
-}
-
-func (e RbacResourceType) ToRbacResourceTypeOutput() RbacResourceTypeOutput {
-	return pulumi.ToOutput(e).(RbacResourceTypeOutput)
-}
-
-func (e RbacResourceType) ToRbacResourceTypeOutputWithContext(ctx context.Context) RbacResourceTypeOutput {
-	return pulumi.ToOutputWithContext(ctx, e).(RbacResourceTypeOutput)
-}
-
-func (e RbacResourceType) ToRbacResourceTypePtrOutput() RbacResourceTypePtrOutput {
-	return e.ToRbacResourceTypePtrOutputWithContext(context.Background())
-}
-
-func (e RbacResourceType) ToRbacResourceTypePtrOutputWithContext(ctx context.Context) RbacResourceTypePtrOutput {
-	return RbacResourceType(e).ToRbacResourceTypeOutputWithContext(ctx).ToRbacResourceTypePtrOutputWithContext(ctx)
-}
-
-func (e RbacResourceType) ToStringOutput() pulumi.StringOutput {
-	return pulumi.ToOutput(pulumi.String(e)).(pulumi.StringOutput)
-}
-
-func (e RbacResourceType) ToStringOutputWithContext(ctx context.Context) pulumi.StringOutput {
-	return pulumi.ToOutputWithContext(ctx, pulumi.String(e)).(pulumi.StringOutput)
-}
-
-func (e RbacResourceType) ToStringPtrOutput() pulumi.StringPtrOutput {
-	return pulumi.String(e).ToStringPtrOutputWithContext(context.Background())
-}
-
-func (e RbacResourceType) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
-	return pulumi.String(e).ToStringOutputWithContext(ctx).ToStringPtrOutputWithContext(ctx)
-}
-
-type RbacResourceTypeOutput struct{ *pulumi.OutputState }
-
-func (RbacResourceTypeOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((*RbacResourceType)(nil)).Elem()
-}
-
-func (o RbacResourceTypeOutput) ToRbacResourceTypeOutput() RbacResourceTypeOutput {
-	return o
-}
-
-func (o RbacResourceTypeOutput) ToRbacResourceTypeOutputWithContext(ctx context.Context) RbacResourceTypeOutput {
-	return o
-}
-
-func (o RbacResourceTypeOutput) ToRbacResourceTypePtrOutput() RbacResourceTypePtrOutput {
-	return o.ToRbacResourceTypePtrOutputWithContext(context.Background())
-}
-
-func (o RbacResourceTypeOutput) ToRbacResourceTypePtrOutputWithContext(ctx context.Context) RbacResourceTypePtrOutput {
-	return o.ApplyTWithContext(ctx, func(_ context.Context, v RbacResourceType) *RbacResourceType {
-		return &v
-	}).(RbacResourceTypePtrOutput)
-}
-
-func (o RbacResourceTypeOutput) ToStringOutput() pulumi.StringOutput {
-	return o.ToStringOutputWithContext(context.Background())
-}
-
-func (o RbacResourceTypeOutput) ToStringOutputWithContext(ctx context.Context) pulumi.StringOutput {
-	return o.ApplyTWithContext(ctx, func(_ context.Context, e RbacResourceType) string {
-		return string(e)
-	}).(pulumi.StringOutput)
-}
-
-func (o RbacResourceTypeOutput) ToStringPtrOutput() pulumi.StringPtrOutput {
-	return o.ToStringPtrOutputWithContext(context.Background())
-}
-
-func (o RbacResourceTypeOutput) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
-	return o.ApplyTWithContext(ctx, func(_ context.Context, e RbacResourceType) *string {
-		v := string(e)
-		return &v
-	}).(pulumi.StringPtrOutput)
-}
-
-type RbacResourceTypePtrOutput struct{ *pulumi.OutputState }
-
-func (RbacResourceTypePtrOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((**RbacResourceType)(nil)).Elem()
-}
-
-func (o RbacResourceTypePtrOutput) ToRbacResourceTypePtrOutput() RbacResourceTypePtrOutput {
-	return o
-}
-
-func (o RbacResourceTypePtrOutput) ToRbacResourceTypePtrOutputWithContext(ctx context.Context) RbacResourceTypePtrOutput {
-	return o
-}
-
-func (o RbacResourceTypePtrOutput) Elem() RbacResourceTypeOutput {
-	return o.ApplyT(func(v *RbacResourceType) RbacResourceType {
-		if v != nil {
-			return *v
-		}
-		var ret RbacResourceType
-		return ret
-	}).(RbacResourceTypeOutput)
-}
-
-func (o RbacResourceTypePtrOutput) ToStringPtrOutput() pulumi.StringPtrOutput {
-	return o.ToStringPtrOutputWithContext(context.Background())
-}
-
-func (o RbacResourceTypePtrOutput) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
-	return o.ApplyTWithContext(ctx, func(_ context.Context, e *RbacResourceType) *string {
-		if e == nil {
-			return nil
-		}
-		v := string(*e)
-		return &v
-	}).(pulumi.StringPtrOutput)
-}
-
-// RbacResourceTypeInput is an input type that accepts values of the RbacResourceType enum
-// A concrete instance of `RbacResourceTypeInput` can be one of the following:
-//
-//	RbacResourceTypeEnvironment
-//	RbacResourceTypeGlobal
-//	RbacResourceTypeInsightsAccount
-//	RbacResourceTypeStack
-type RbacResourceTypeInput interface {
-	pulumi.Input
-
-	ToRbacResourceTypeOutput() RbacResourceTypeOutput
-	ToRbacResourceTypeOutputWithContext(context.Context) RbacResourceTypeOutput
-}
-
-var rbacResourceTypePtrType = reflect.TypeOf((**RbacResourceType)(nil)).Elem()
-
-type RbacResourceTypePtrInput interface {
-	pulumi.Input
-
-	ToRbacResourceTypePtrOutput() RbacResourceTypePtrOutput
-	ToRbacResourceTypePtrOutputWithContext(context.Context) RbacResourceTypePtrOutput
-}
-
-type rbacResourceTypePtr string
-
-func RbacResourceTypePtr(v string) RbacResourceTypePtrInput {
-	return (*rbacResourceTypePtr)(&v)
-}
-
-func (*rbacResourceTypePtr) ElementType() reflect.Type {
-	return rbacResourceTypePtrType
-}
-
-func (in *rbacResourceTypePtr) ToRbacResourceTypePtrOutput() RbacResourceTypePtrOutput {
-	return pulumi.ToOutput(in).(RbacResourceTypePtrOutput)
-}
-
-func (in *rbacResourceTypePtr) ToRbacResourceTypePtrOutputWithContext(ctx context.Context) RbacResourceTypePtrOutput {
-	return pulumi.ToOutputWithContext(ctx, in).(RbacResourceTypePtrOutput)
 }
 
 type RbacScope string
@@ -3285,10 +3282,10 @@ func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*EnvironmentPermissionPtrInput)(nil)).Elem(), EnvironmentPermission("none"))
 	pulumi.RegisterInputType(reflect.TypeOf((*PulumiOperationInput)(nil)).Elem(), PulumiOperation("update"))
 	pulumi.RegisterInputType(reflect.TypeOf((*PulumiOperationPtrInput)(nil)).Elem(), PulumiOperation("update"))
+	pulumi.RegisterInputType(reflect.TypeOf((*RbacEntityTypeInput)(nil)).Elem(), RbacEntityType("environment"))
+	pulumi.RegisterInputType(reflect.TypeOf((*RbacEntityTypePtrInput)(nil)).Elem(), RbacEntityType("environment"))
 	pulumi.RegisterInputType(reflect.TypeOf((*RbacPermissionInput)(nil)).Elem(), RbacPermission("environment:read"))
 	pulumi.RegisterInputType(reflect.TypeOf((*RbacPermissionPtrInput)(nil)).Elem(), RbacPermission("environment:read"))
-	pulumi.RegisterInputType(reflect.TypeOf((*RbacResourceTypeInput)(nil)).Elem(), RbacResourceType("environment"))
-	pulumi.RegisterInputType(reflect.TypeOf((*RbacResourceTypePtrInput)(nil)).Elem(), RbacResourceType("environment"))
 	pulumi.RegisterInputType(reflect.TypeOf((*RbacScopeInput)(nil)).Elem(), RbacScope("agent_pool:create"))
 	pulumi.RegisterInputType(reflect.TypeOf((*RbacScopePtrInput)(nil)).Elem(), RbacScope("agent_pool:create"))
 	pulumi.RegisterInputType(reflect.TypeOf((*RbacScopeArrayInput)(nil)).Elem(), RbacScopeArray{})
@@ -3320,10 +3317,10 @@ func init() {
 	pulumi.RegisterOutputType(EnvironmentPermissionPtrOutput{})
 	pulumi.RegisterOutputType(PulumiOperationOutput{})
 	pulumi.RegisterOutputType(PulumiOperationPtrOutput{})
+	pulumi.RegisterOutputType(RbacEntityTypeOutput{})
+	pulumi.RegisterOutputType(RbacEntityTypePtrOutput{})
 	pulumi.RegisterOutputType(RbacPermissionOutput{})
 	pulumi.RegisterOutputType(RbacPermissionPtrOutput{})
-	pulumi.RegisterOutputType(RbacResourceTypeOutput{})
-	pulumi.RegisterOutputType(RbacResourceTypePtrOutput{})
 	pulumi.RegisterOutputType(RbacScopeOutput{})
 	pulumi.RegisterOutputType(RbacScopePtrOutput{})
 	pulumi.RegisterOutputType(RbacScopeArrayOutput{})

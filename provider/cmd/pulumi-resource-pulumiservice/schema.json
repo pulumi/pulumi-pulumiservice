@@ -982,6 +982,26 @@
         }
       ]
     },
+    "pulumiservice:index:RbacEntityType": {
+      "type": "string",
+      "enum": [
+        {
+          "name": "Environment",
+          "description": "ESC environments.",
+          "value": "environment"
+        },
+        {
+          "name": "InsightsAccount",
+          "description": "Insights accounts.",
+          "value": "insights-account"
+        },
+        {
+          "name": "Stack",
+          "description": "Stacks.",
+          "value": "stack"
+        }
+      ]
+    },
     "pulumiservice:index:RbacPermission": {
       "type": "string",
       "enum": [
@@ -1019,31 +1039,6 @@
           "name": "Rotate",
           "description": "Rotate permission.",
           "value": "environment:rotate"
-        }
-      ]
-    },
-    "pulumiservice:index:RbacResourceType": {
-      "type": "string",
-      "enum": [
-        {
-          "name": "Environment",
-          "description": "ESC environments.",
-          "value": "environment"
-        },
-        {
-          "name": "Global",
-          "description": "The organization as a whole.",
-          "value": "global"
-        },
-        {
-          "name": "InsightsAccount",
-          "description": "Insights accounts.",
-          "value": "insights-account"
-        },
-        {
-          "name": "Stack",
-          "description": "Stacks.",
-          "value": "stack"
         }
       ]
     },
@@ -8030,8 +8025,8 @@
       "inputs": {
         "properties": {
           "entityType": {
-            "$ref": "#/types/pulumiservice:index:RbacResourceType",
-            "description": "The kind of entity whose tags are evaluated: `stack`, `environment`, or `insights-account`. `global` is not valid here."
+            "$ref": "#/types/pulumiservice:index:RbacEntityType",
+            "description": "The kind of entity whose tags are evaluated: `stack`, `environment`, or `insights-account`."
           },
           "permissions": {
             "type": "array",

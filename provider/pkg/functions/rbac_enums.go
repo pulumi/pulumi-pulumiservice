@@ -43,22 +43,20 @@ func (RbacScope) Values() []infer.EnumValue[RbacScope] {
 	return out
 }
 
-// RbacResourceType is the kind of entity a permission set applies to.
-type RbacResourceType string
+// RbacEntityType is the kind of entity a permission rule can target.
+type RbacEntityType string
 
 const (
-	RbacResourceTypeEnvironment     RbacResourceType = "environment"
-	RbacResourceTypeGlobal          RbacResourceType = "global"
-	RbacResourceTypeInsightsAccount RbacResourceType = "insights-account"
-	RbacResourceTypeStack           RbacResourceType = "stack"
+	RbacEntityTypeEnvironment     RbacEntityType = "environment"
+	RbacEntityTypeInsightsAccount RbacEntityType = "insights-account"
+	RbacEntityTypeStack           RbacEntityType = "stack"
 )
 
-func (RbacResourceType) Values() []infer.EnumValue[RbacResourceType] {
-	return []infer.EnumValue[RbacResourceType]{
-		{Name: "Environment", Value: RbacResourceTypeEnvironment, Description: "ESC environments."},
-		{Name: "Global", Value: RbacResourceTypeGlobal, Description: "The organization as a whole."},
-		{Name: "InsightsAccount", Value: RbacResourceTypeInsightsAccount, Description: "Insights accounts."},
-		{Name: "Stack", Value: RbacResourceTypeStack, Description: "Stacks."},
+func (RbacEntityType) Values() []infer.EnumValue[RbacEntityType] {
+	return []infer.EnumValue[RbacEntityType]{
+		{Name: "Environment", Value: RbacEntityTypeEnvironment, Description: "ESC environments."},
+		{Name: "InsightsAccount", Value: RbacEntityTypeInsightsAccount, Description: "Insights accounts."},
+		{Name: "Stack", Value: RbacEntityTypeStack, Description: "Stacks."},
 	}
 }
 
