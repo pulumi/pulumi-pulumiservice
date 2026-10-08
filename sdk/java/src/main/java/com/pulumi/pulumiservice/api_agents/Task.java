@@ -24,6 +24,20 @@ import javax.annotation.Nullable;
 @ResourceType(type="pulumiservice:api/agents:Task")
 public class Task extends com.pulumi.resources.CustomResource {
     /**
+     * The Custom Agent definition this task was run as, if any. Null for tasks run by a user directly rather than as a saved agent.
+     * 
+     */
+    @Export(name="agentDefinitionId", refs={String.class}, tree="[0]")
+    private Output</* @Nullable */ String> agentDefinitionId;
+
+    /**
+     * @return The Custom Agent definition this task was run as, if any. Null for tasks run by a user directly rather than as a saved agent.
+     * 
+     */
+    public Output<Optional<String>> agentDefinitionId() {
+        return Codegen.optional(this.agentDefinitionId);
+    }
+    /**
      * Approval mode for this task. Valid values: &#39;manual&#39;, &#39;auto&#39;, &#39;balanced&#39;.
      * 
      */
@@ -178,6 +192,20 @@ public class Task extends com.pulumi.resources.CustomResource {
         return this.name;
     }
     /**
+     * The number of pending inputs waiting behind this task. Present for tasks that can receive asynchronous inputs.
+     * 
+     */
+    @Export(name="pendingInputCount", refs={Integer.class}, tree="[0]")
+    private Output</* @Nullable */ Integer> pendingInputCount;
+
+    /**
+     * @return The number of pending inputs waiting behind this task. Present for tasks that can receive asynchronous inputs.
+     * 
+     */
+    public Output<Optional<Integer>> pendingInputCount() {
+        return Codegen.optional(this.pendingInputCount);
+    }
+    /**
      * The permission scope for the task.
      * 
      */
@@ -218,6 +246,20 @@ public class Task extends com.pulumi.resources.CustomResource {
      */
     public Output<Optional<String>> role() {
         return Codegen.optional(this.role);
+    }
+    /**
+     * The display name of the RBAC role this task assumes. Null when the task has no assumed role or the role no longer exists.
+     * 
+     */
+    @Export(name="roleName", refs={String.class}, tree="[0]")
+    private Output</* @Nullable */ String> roleName;
+
+    /**
+     * @return The display name of the RBAC role this task assumes. Null when the task has no assumed role or the role no longer exists.
+     * 
+     */
+    public Output<Optional<String>> roleName() {
+        return Codegen.optional(this.roleName);
     }
     /**
      * The current runtime phase for this task. Null until the runtime checks in.

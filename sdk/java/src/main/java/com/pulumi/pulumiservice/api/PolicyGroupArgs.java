@@ -32,14 +32,14 @@ public final class PolicyGroupArgs extends com.pulumi.resources.ResourceArgs {
     }
 
     /**
-     * The type of entities this policy group applies to (stacks or accounts).
+     * The type of entities this policy group applies to (stacks or accounts). Fixed at creation; it cannot be changed later.
      * 
      */
     @Import(name="entityType", required=true)
     private Output<String> entityType;
 
     /**
-     * @return The type of entities this policy group applies to (stacks or accounts).
+     * @return The type of entities this policy group applies to (stacks or accounts). Fixed at creation; it cannot be changed later.
      * 
      */
     public Output<String> entityType() {
@@ -47,14 +47,14 @@ public final class PolicyGroupArgs extends com.pulumi.resources.ResourceArgs {
     }
 
     /**
-     * The enforcement mode for the policy group (audit or preventative). Defaults to &#39;audit&#39; for account policy groups, &#39;preventative&#39; for stack policy groups.
+     * The enforcement mode for the policy group (audit or preventative). Defaults to &#39;audit&#39; for account policy groups, &#39;preventative&#39; for stack policy groups. Fixed at creation; it cannot be changed later.
      * 
      */
     @Import(name="mode")
     private @Nullable Output<String> mode;
 
     /**
-     * @return The enforcement mode for the policy group (audit or preventative). Defaults to &#39;audit&#39; for account policy groups, &#39;preventative&#39; for stack policy groups.
+     * @return The enforcement mode for the policy group (audit or preventative). Defaults to &#39;audit&#39; for account policy groups, &#39;preventative&#39; for stack policy groups. Fixed at creation; it cannot be changed later.
      * 
      */
     public Optional<Output<String>> mode() {
@@ -62,14 +62,14 @@ public final class PolicyGroupArgs extends com.pulumi.resources.ResourceArgs {
     }
 
     /**
-     * The name of the new policy group.
+     * The name of the new policy group. Up to 100 characters, made up of letters, numbers, hyphens, underscores, periods, or spaces, and may not begin or end with a space.
      * 
      */
     @Import(name="name", required=true)
     private Output<String> name;
 
     /**
-     * @return The name of the new policy group.
+     * @return The name of the new policy group. Up to 100 characters, made up of letters, numbers, hyphens, underscores, periods, or spaces, and may not begin or end with a space.
      * 
      */
     public Output<String> name() {
@@ -141,7 +141,7 @@ public final class PolicyGroupArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param entityType The type of entities this policy group applies to (stacks or accounts).
+         * @param entityType The type of entities this policy group applies to (stacks or accounts). Fixed at creation; it cannot be changed later.
          * 
          * @return builder
          * 
@@ -152,7 +152,7 @@ public final class PolicyGroupArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param entityType The type of entities this policy group applies to (stacks or accounts).
+         * @param entityType The type of entities this policy group applies to (stacks or accounts). Fixed at creation; it cannot be changed later.
          * 
          * @return builder
          * 
@@ -162,7 +162,7 @@ public final class PolicyGroupArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param mode The enforcement mode for the policy group (audit or preventative). Defaults to &#39;audit&#39; for account policy groups, &#39;preventative&#39; for stack policy groups.
+         * @param mode The enforcement mode for the policy group (audit or preventative). Defaults to &#39;audit&#39; for account policy groups, &#39;preventative&#39; for stack policy groups. Fixed at creation; it cannot be changed later.
          * 
          * @return builder
          * 
@@ -173,7 +173,7 @@ public final class PolicyGroupArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param mode The enforcement mode for the policy group (audit or preventative). Defaults to &#39;audit&#39; for account policy groups, &#39;preventative&#39; for stack policy groups.
+         * @param mode The enforcement mode for the policy group (audit or preventative). Defaults to &#39;audit&#39; for account policy groups, &#39;preventative&#39; for stack policy groups. Fixed at creation; it cannot be changed later.
          * 
          * @return builder
          * 
@@ -183,7 +183,7 @@ public final class PolicyGroupArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param name The name of the new policy group.
+         * @param name The name of the new policy group. Up to 100 characters, made up of letters, numbers, hyphens, underscores, periods, or spaces, and may not begin or end with a space.
          * 
          * @return builder
          * 
@@ -194,7 +194,7 @@ public final class PolicyGroupArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param name The name of the new policy group.
+         * @param name The name of the new policy group. Up to 100 characters, made up of letters, numbers, hyphens, underscores, periods, or spaces, and may not begin or end with a space.
          * 
          * @return builder
          * 

@@ -35,6 +35,10 @@ export class Task extends pulumi.CustomResource {
     }
 
     /**
+     * The Custom Agent definition this task was run as, if any. Null for tasks run by a user directly rather than as a saved agent.
+     */
+    declare public readonly agentDefinitionId: pulumi.Output<string | undefined>;
+    /**
      * Approval mode for this task. Valid values: 'manual', 'auto', 'balanced'.
      */
     declare public readonly approvalMode: pulumi.Output<string>;
@@ -79,6 +83,10 @@ export class Task extends pulumi.CustomResource {
      */
     declare public /*out*/ readonly name: pulumi.Output<string>;
     /**
+     * The number of pending inputs waiting behind this task. Present for tasks that can receive asynchronous inputs.
+     */
+    declare public /*out*/ readonly pendingInputCount: pulumi.Output<number | undefined>;
+    /**
      * The permission scope for the task.
      */
     declare public readonly permissionMode: pulumi.Output<string | undefined>;
@@ -90,6 +98,10 @@ export class Task extends pulumi.CustomResource {
      * The id of the RBAC role this task assumes. Null when the task runs with the creating user's own permissions (no assumed role).
      */
     declare public readonly role: pulumi.Output<string | undefined>;
+    /**
+     * The display name of the RBAC role this task assumes. Null when the task has no assumed role or the role no longer exists.
+     */
+    declare public /*out*/ readonly roleName: pulumi.Output<string | undefined>;
     /**
      * The current runtime phase for this task. Null until the runtime checks in.
      */
@@ -141,6 +153,7 @@ export class Task extends pulumi.CustomResource {
             if (args?.orgName === undefined && !opts.urn) {
                 throw new Error("Missing required property 'orgName'");
             }
+            resourceInputs["agentDefinitionId"] = args?.agentDefinitionId;
             resourceInputs["approvalMode"] = args?.approvalMode;
             resourceInputs["cliIntegrations"] = args?.cliIntegrations;
             resourceInputs["enabledIntegrations"] = args?.enabledIntegrations;
@@ -162,6 +175,8 @@ export class Task extends pulumi.CustomResource {
             resourceInputs["isShared"] = undefined /*out*/;
             resourceInputs["lastHeartbeat"] = undefined /*out*/;
             resourceInputs["name"] = undefined /*out*/;
+            resourceInputs["pendingInputCount"] = undefined /*out*/;
+            resourceInputs["roleName"] = undefined /*out*/;
             resourceInputs["runtimePhase"] = undefined /*out*/;
             resourceInputs["sharedAt"] = undefined /*out*/;
             resourceInputs["sourceAutomationID"] = undefined /*out*/;
@@ -170,6 +185,7 @@ export class Task extends pulumi.CustomResource {
             resourceInputs["tokensUsed"] = undefined /*out*/;
             resourceInputs["vcsProvider"] = undefined /*out*/;
         } else {
+            resourceInputs["agentDefinitionId"] = undefined /*out*/;
             resourceInputs["approvalMode"] = undefined /*out*/;
             resourceInputs["asyncTriggerType"] = undefined /*out*/;
             resourceInputs["contextCompactionThresholdPercent"] = undefined /*out*/;
@@ -181,9 +197,11 @@ export class Task extends pulumi.CustomResource {
             resourceInputs["isShared"] = undefined /*out*/;
             resourceInputs["lastHeartbeat"] = undefined /*out*/;
             resourceInputs["name"] = undefined /*out*/;
+            resourceInputs["pendingInputCount"] = undefined /*out*/;
             resourceInputs["permissionMode"] = undefined /*out*/;
             resourceInputs["planMode"] = undefined /*out*/;
             resourceInputs["role"] = undefined /*out*/;
+            resourceInputs["roleName"] = undefined /*out*/;
             resourceInputs["runtimePhase"] = undefined /*out*/;
             resourceInputs["sharedAt"] = undefined /*out*/;
             resourceInputs["source"] = undefined /*out*/;
@@ -203,6 +221,10 @@ export class Task extends pulumi.CustomResource {
  * The set of arguments for constructing a Task resource.
  */
 export interface TaskArgs {
+    /**
+     * Optional Custom Agent definition id to run this task as. When set, the task's role, permission mode, and enabled integrations are taken from the named agent definition instead of from this request, and the task is attributed to that agent. The agent's instructions and approval mode are not copied at creation: they are read from the definition on every turn, so editing the agent applies to the next turn of every run. A preview capability, gated per organization.
+     */
+    agentDefinitionId?: pulumi.Input<string | undefined>;
     /**
      * Optional approval mode override for this task. If omitted, org default is used.
      */

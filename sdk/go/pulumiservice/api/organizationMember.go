@@ -30,6 +30,10 @@ type OrganizationMember struct {
 	Links pulumi.AnyOutput `pulumi:"links"`
 	// **Deprecated:** Use `fgaRole` instead. The member's built-in role within the organization. For members assigned a custom role, this is the closest built-in projection (`member`, `admin`, or `billingManager`) and may lose detail; `fgaRole` is authoritative.
 	Role pulumi.StringOutput `pulumi:"role"`
+	// Suspended indicates that the membership is suspended: the member keeps their
+	// place in the organization but has no access until an administrator restores them.
+	// Suspended members are only included in responses when explicitly requested.
+	Suspended pulumi.BoolPtrOutput `pulumi:"suspended"`
 	// Deprecated. Use GetOrganizationMemberTeams to list teams.
 	Teams pulumi.StringArrayOutput `pulumi:"teams"`
 	// The user information for this organization member.
@@ -216,6 +220,13 @@ func (o OrganizationMemberOutput) Links() pulumi.AnyOutput {
 // **Deprecated:** Use `fgaRole` instead. The member's built-in role within the organization. For members assigned a custom role, this is the closest built-in projection (`member`, `admin`, or `billingManager`) and may lose detail; `fgaRole` is authoritative.
 func (o OrganizationMemberOutput) Role() pulumi.StringOutput {
 	return o.ApplyT(func(v *OrganizationMember) pulumi.StringOutput { return v.Role }).(pulumi.StringOutput)
+}
+
+// Suspended indicates that the membership is suspended: the member keeps their
+// place in the organization but has no access until an administrator restores them.
+// Suspended members are only included in responses when explicitly requested.
+func (o OrganizationMemberOutput) Suspended() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v *OrganizationMember) pulumi.BoolPtrOutput { return v.Suspended }).(pulumi.BoolPtrOutput)
 }
 
 // Deprecated. Use GetOrganizationMemberTeams to list teams.
