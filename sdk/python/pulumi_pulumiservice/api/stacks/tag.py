@@ -113,7 +113,7 @@ class Tag(pulumi.CustomResource):
                  value: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         """
-        Creates a new tag on the specified stack. Tags are key-value metadata pairs that can be used for organization, filtering, and storing additional information about stacks. The request body must include both a tag name and value. Returns 400 if the tag name is invalid or the tag already exists. Built-in tags (such as those automatically set by the Pulumi CLI) follow specific naming conventions.
+        Creates a new tag on the specified stack. Tags are key-value metadata pairs that can be used for organization, filtering, and storing additional information about stacks. The request body must include both a tag name and value. Returns 400 if the tag name is invalid or the tag already exists. The 'pulumi:', 'gitHub:' and 'vcs:' name prefixes are reserved for built-in tags that Pulumi manages automatically: deploys refresh them from project metadata, so a value written directly is overwritten by the next update. In particular, a stack's description is the 'description' field in the project's Pulumi.yaml, surfaced as the 'pulumi:description' tag — set it by editing Pulumi.yaml rather than by creating the tag.
 
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
@@ -130,7 +130,7 @@ class Tag(pulumi.CustomResource):
                  args: TagArgs,
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
-        Creates a new tag on the specified stack. Tags are key-value metadata pairs that can be used for organization, filtering, and storing additional information about stacks. The request body must include both a tag name and value. Returns 400 if the tag name is invalid or the tag already exists. Built-in tags (such as those automatically set by the Pulumi CLI) follow specific naming conventions.
+        Creates a new tag on the specified stack. Tags are key-value metadata pairs that can be used for organization, filtering, and storing additional information about stacks. The request body must include both a tag name and value. Returns 400 if the tag name is invalid or the tag already exists. The 'pulumi:', 'gitHub:' and 'vcs:' name prefixes are reserved for built-in tags that Pulumi manages automatically: deploys refresh them from project metadata, so a value written directly is overwritten by the next update. In particular, a stack's description is the 'description' field in the project's Pulumi.yaml, surfaced as the 'pulumi:description' tag — set it by editing Pulumi.yaml rather than by creating the tag.
 
         :param str resource_name: The name of the resource.
         :param TagArgs args: The arguments to use to populate this resource's properties.

@@ -16,6 +16,12 @@ namespace Pulumi.PulumiService.Api.Agents
     public partial class Task : global::Pulumi.CustomResource
     {
         /// <summary>
+        /// The Custom Agent definition this task was run as, if any. Null for tasks run by a user directly rather than as a saved agent.
+        /// </summary>
+        [Output("agentDefinitionId")]
+        public Output<string?> AgentDefinitionId { get; private set; } = null!;
+
+        /// <summary>
         /// Approval mode for this task. Valid values: 'manual', 'auto', 'balanced'.
         /// </summary>
         [Output("approvalMode")]
@@ -82,6 +88,12 @@ namespace Pulumi.PulumiService.Api.Agents
         public Output<string> Name { get; private set; } = null!;
 
         /// <summary>
+        /// The number of pending inputs waiting behind this task. Present for tasks that can receive asynchronous inputs.
+        /// </summary>
+        [Output("pendingInputCount")]
+        public Output<int?> PendingInputCount { get; private set; } = null!;
+
+        /// <summary>
         /// The permission scope for the task.
         /// </summary>
         [Output("permissionMode")]
@@ -98,6 +110,12 @@ namespace Pulumi.PulumiService.Api.Agents
         /// </summary>
         [Output("role")]
         public Output<string?> Role { get; private set; } = null!;
+
+        /// <summary>
+        /// The display name of the RBAC role this task assumes. Null when the task has no assumed role or the role no longer exists.
+        /// </summary>
+        [Output("roleName")]
+        public Output<string?> RoleName { get; private set; } = null!;
 
         /// <summary>
         /// The current runtime phase for this task. Null until the runtime checks in.
@@ -198,6 +216,12 @@ namespace Pulumi.PulumiService.Api.Agents
 
     public sealed class TaskArgs : global::Pulumi.ResourceArgs
     {
+        /// <summary>
+        /// Optional Custom Agent definition id to run this task as. When set, the task's role, permission mode, and enabled integrations are taken from the named agent definition instead of from this request, and the task is attributed to that agent. The agent's instructions and approval mode are not copied at creation: they are read from the definition on every turn, so editing the agent applies to the next turn of every run. A preview capability, gated per organization.
+        /// </summary>
+        [Input("agentDefinitionId")]
+        public Input<string>? AgentDefinitionId { get; set; }
+
         /// <summary>
         /// Optional approval mode override for this task. If omitted, org default is used.
         /// </summary>

@@ -16,7 +16,7 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 
 /**
- * Creates a new service account in an organization. Service accounts provide programmatic, non-human identities for accessing Pulumi Cloud resources. They are scoped to an organization and can hold access tokens, belong to teams, and have stack permissions. The service name must be unique within the organization.
+ * Creates a new service in an organization. A service is a Pulumi Cloud construct that groups stacks, ESC environments, and other resources under shared metadata, making it easier for its members to discover and access the resources that make up a piece of software. The service is owned by a user or a team, and the name must be unique among services owned by the same owner.
  * 
  */
 @ResourceType(type="pulumiservice:api/services:Service")

@@ -20,6 +20,21 @@ public final class TaskArgs extends com.pulumi.resources.ResourceArgs {
     public static final TaskArgs Empty = new TaskArgs();
 
     /**
+     * Optional Custom Agent definition id to run this task as. When set, the task&#39;s role, permission mode, and enabled integrations are taken from the named agent definition instead of from this request, and the task is attributed to that agent. The agent&#39;s instructions and approval mode are not copied at creation: they are read from the definition on every turn, so editing the agent applies to the next turn of every run. A preview capability, gated per organization.
+     * 
+     */
+    @Import(name="agentDefinitionId")
+    private @Nullable Output<String> agentDefinitionId;
+
+    /**
+     * @return Optional Custom Agent definition id to run this task as. When set, the task&#39;s role, permission mode, and enabled integrations are taken from the named agent definition instead of from this request, and the task is attributed to that agent. The agent&#39;s instructions and approval mode are not copied at creation: they are read from the definition on every turn, so editing the agent applies to the next turn of every run. A preview capability, gated per organization.
+     * 
+     */
+    public Optional<Output<String>> agentDefinitionId() {
+        return Optional.ofNullable(this.agentDefinitionId);
+    }
+
+    /**
      * Optional approval mode override for this task. If omitted, org default is used.
      * 
      */
@@ -187,6 +202,7 @@ public final class TaskArgs extends com.pulumi.resources.ResourceArgs {
     private TaskArgs() {}
 
     private TaskArgs(TaskArgs $) {
+        this.agentDefinitionId = $.agentDefinitionId;
         this.approvalMode = $.approvalMode;
         this.cliIntegrations = $.cliIntegrations;
         this.enabledIntegrations = $.enabledIntegrations;
@@ -216,6 +232,27 @@ public final class TaskArgs extends com.pulumi.resources.ResourceArgs {
 
         public Builder(TaskArgs defaults) {
             $ = new TaskArgs(Objects.requireNonNull(defaults));
+        }
+
+        /**
+         * @param agentDefinitionId Optional Custom Agent definition id to run this task as. When set, the task&#39;s role, permission mode, and enabled integrations are taken from the named agent definition instead of from this request, and the task is attributed to that agent. The agent&#39;s instructions and approval mode are not copied at creation: they are read from the definition on every turn, so editing the agent applies to the next turn of every run. A preview capability, gated per organization.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder agentDefinitionId(@Nullable Output<String> agentDefinitionId) {
+            $.agentDefinitionId = agentDefinitionId;
+            return this;
+        }
+
+        /**
+         * @param agentDefinitionId Optional Custom Agent definition id to run this task as. When set, the task&#39;s role, permission mode, and enabled integrations are taken from the named agent definition instead of from this request, and the task is attributed to that agent. The agent&#39;s instructions and approval mode are not copied at creation: they are read from the definition on every turn, so editing the agent applies to the next turn of every run. A preview capability, gated per organization.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder agentDefinitionId(String agentDefinitionId) {
+            return agentDefinitionId(Output.of(agentDefinitionId));
         }
 
         /**

@@ -50,6 +50,14 @@ namespace Pulumi.PulumiService.Api
         public Output<string> Role { get; private set; } = null!;
 
         /// <summary>
+        /// Suspended indicates that the membership is suspended: the member keeps their
+        /// place in the organization but has no access until an administrator restores them.
+        /// Suspended members are only included in responses when explicitly requested.
+        /// </summary>
+        [Output("suspended")]
+        public Output<bool?> Suspended { get; private set; } = null!;
+
+        /// <summary>
         /// Deprecated. Use GetOrganizationMemberTeams to list teams.
         /// </summary>
         [Output("teams")]

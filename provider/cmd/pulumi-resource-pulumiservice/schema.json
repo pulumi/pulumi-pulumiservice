@@ -1429,6 +1429,10 @@
     "pulumiservice:api/agents:Task": {
       "description": "Creates a new agent task for the specified organization. The request must include a prompt (the user event message) that initiates the task. The message is a user message, so its discriminator field must be set to \"type\": \"user_message\". Set the 'permissionMode' field in the request body to restrict the agent to read-only operations. Returns the created task details including task ID, name, status, and timestamp.",
       "properties": {
+        "agentDefinitionId": {
+          "type": "string",
+          "description": "The Custom Agent definition this task was run as, if any. Null for tasks run by a user directly rather than as a saved agent."
+        },
         "approvalMode": {
           "type": "string",
           "description": "Approval mode for this task. Valid values: 'manual', 'auto', 'balanced'."
@@ -1476,6 +1480,10 @@
           "type": "string",
           "description": "Display name for the task, typically auto-generated from the initial user message."
         },
+        "pendingInputCount": {
+          "type": "integer",
+          "description": "The number of pending inputs waiting behind this task. Present for tasks that can receive asynchronous inputs."
+        },
         "permissionMode": {
           "type": "string",
           "description": "The permission scope for the task."
@@ -1487,6 +1495,10 @@
         "role": {
           "type": "string",
           "description": "The id of the RBAC role this task assumes. Null when the task runs with the creating user's own permissions (no assumed role)."
+        },
+        "roleName": {
+          "type": "string",
+          "description": "The display name of the RBAC role this task assumes. Null when the task has no assumed role or the role no longer exists."
         },
         "runtimePhase": {
           "type": "string",
@@ -1539,6 +1551,10 @@
         "tokensUsed"
       ],
       "inputProperties": {
+        "agentDefinitionId": {
+          "type": "string",
+          "description": "Optional Custom Agent definition id to run this task as. When set, the task's role, permission mode, and enabled integrations are taken from the named agent definition instead of from this request, and the task is attributed to that agent. The agent's instructions and approval mode are not copied at creation: they are read from the definition on every turn, so editing the agent applies to the next turn of every run. A preview capability, gated per organization."
+        },
         "approvalMode": {
           "type": "string",
           "description": "Optional approval mode override for this task. If omitted, org default is used."
@@ -2655,7 +2671,7 @@
         },
         "providerVersion": {
           "type": "string",
-          "description": "The version of the Pulumi provider package used for discovery."
+          "description": "Deprecated: no longer populated. Omitted from responses, and ignored if sent.\nThe provider version used for discovery is now recorded per resource."
         },
         "scanStatus": {
           "$ref": "pulumi.json#/Any",
@@ -3482,7 +3498,7 @@
       ]
     },
     "pulumiservice:api/services:Item": {
-      "description": "Adds items (such as access tokens, team memberships, or stack permissions) to an existing service account. Service accounts provide programmatic, non-human access to Pulumi Cloud resources and are scoped to an organization. Items define what the service account can access and what credentials it holds. Returns the updated service details with the first page of items; if `continuationToken` is set on the response, pass it to `GetService` to fetch the remaining pages.\n\nPrefer `AddServiceItemsV2`, then `GetService` to read the items.",
+      "description": "Adds items, such as stacks or ESC environments, to an existing service. A service is a Pulumi Cloud construct that groups stacks, environments, and other resources under shared metadata so members of the service can discover and access them together. Returns the updated service details with the first page of items; if `continuationToken` is set on the response, pass it to `GetService` to fetch the remaining pages.\n\nPrefer `AddServiceItemsV2`, then `GetService` to read the items.",
       "properties": {
         "continuationToken": {
           "type": "string",
@@ -3553,7 +3569,7 @@
       ]
     },
     "pulumiservice:api/services:Service": {
-      "description": "Creates a new service account in an organization. Service accounts provide programmatic, non-human identities for accessing Pulumi Cloud resources. They are scoped to an organization and can hold access tokens, belong to teams, and have stack permissions. The service name must be unique within the organization.",
+      "description": "Creates a new service in an organization. A service is a Pulumi Cloud construct that groups stacks, ESC environments, and other resources under shared metadata, making it easier for its members to discover and access the resources that make up a piece of software. The service is owned by a user or a team, and the name must be unique among services owned by the same owner.",
       "properties": {
         "continuationToken": {
           "type": "string",
@@ -3790,7 +3806,7 @@
       ]
     },
     "pulumiservice:api/stacks:Tag": {
-      "description": "Creates a new tag on the specified stack. Tags are key-value metadata pairs that can be used for organization, filtering, and storing additional information about stacks. The request body must include both a tag name and value. Returns 400 if the tag name is invalid or the tag already exists. Built-in tags (such as those automatically set by the Pulumi CLI) follow specific naming conventions.",
+      "description": "Creates a new tag on the specified stack. Tags are key-value metadata pairs that can be used for organization, filtering, and storing additional information about stacks. The request body must include both a tag name and value. Returns 400 if the tag name is invalid or the tag already exists. The 'pulumi:', 'gitHub:' and 'vcs:' name prefixes are reserved for built-in tags that Pulumi manages automatically: deploys refresh them from project metadata, so a value written directly is overwritten by the next update. In particular, a stack's description is the 'description' field in the project's Pulumi.yaml, surfaced as the 'pulumi:description' tag — set it by editing Pulumi.yaml rather than by creating the tag.",
       "type": "object",
       "inputProperties": {
         "name": {
@@ -4109,7 +4125,7 @@
       ]
     },
     "pulumiservice:api/tokens:OrgToken": {
-      "description": "Generates a new access token scoped to the organization for use in CI/CD pipelines and automated workflows. Organization tokens belong to the organization rather than individual users, ensuring that access is not disrupted when team members leave.\n\nThe `name` field must be unique across the organization (including deleted tokens) and cannot exceed 40 characters. The `expires` field accepts a unix epoch timestamp up to two years from the present, or `0` for no expiry (default).\n\n**Important:** The token value in the response is only returned once at creation time and cannot be retrieved later. Audit logs for actions performed with organization tokens are attributed to the organization rather than an individual user.",
+      "description": "Generates a new access token scoped to the organization for use in CI/CD pipelines and automated workflows. Organization tokens belong to the organization rather than individual users, ensuring that access is not disrupted when team members leave.\n\nThe `name` field must be unique across the organization (including deleted tokens) and cannot exceed 40 characters. The `expires` field accepts a unix epoch timestamp up to two years from the present, or `0` for no expiry (default).\n\n**Important:** The token value in the response is only returned once at creation time and cannot be retrieved later. Audit logs for actions performed with organization tokens are attributed to the organization rather than an individual user.\n\nThis request must be authenticated as a user, for example with a personal access token. Organization and team access tokens cannot create organization tokens, even when they have the Admin role, so that a token cannot be used to mint further organization tokens. Such requests return a 403 error.",
       "properties": {
         "tokenId": {
           "type": "string",
@@ -4503,6 +4519,10 @@
           "type": "string",
           "description": "**Deprecated:** Use `fgaRole` instead. The member's built-in role within the organization. For members assigned a custom role, this is the closest built-in projection (`member`, `admin`, or `billingManager`) and may lose detail; `fgaRole` is authoritative."
         },
+        "suspended": {
+          "type": "boolean",
+          "description": "Suspended indicates that the membership is suspended: the member keeps their\nplace in the organization but has no access until an administrator restores them.\nSuspended members are only included in responses when explicitly requested."
+        },
         "teams": {
           "type": "array",
           "items": {
@@ -4760,15 +4780,15 @@
         },
         "entityType": {
           "type": "string",
-          "description": "The type of entities this policy group applies to (stacks or accounts)."
+          "description": "The type of entities this policy group applies to (stacks or accounts). Fixed at creation; it cannot be changed later."
         },
         "mode": {
           "type": "string",
-          "description": "The enforcement mode for the policy group (audit or preventative). Defaults to 'audit' for account policy groups, 'preventative' for stack policy groups."
+          "description": "The enforcement mode for the policy group (audit or preventative). Defaults to 'audit' for account policy groups, 'preventative' for stack policy groups. Fixed at creation; it cannot be changed later."
         },
         "name": {
           "type": "string",
-          "description": "The name of the new policy group.",
+          "description": "The name of the new policy group. Up to 100 characters, made up of letters, numbers, hyphens, underscores, periods, or spaces, and may not begin or end with a space.",
           "replaceOnChanges": true,
           "willReplaceOnChanges": true
         },
