@@ -4,7 +4,7 @@
 
 ### Improvements
 
-- Added `buildComposePermissions`, `buildGroupPermissions`, and `buildTagConditionalPermissions` helpers, and an optional `setIds` input on `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, and `buildInsightsAccountScopedPermissions`. Together they build Pulumi Cloud's full role model (permission sets, policies that compose sets with optional entity or tag conditions, and roles that compose policies) for `api.Role` without hand-writing `__type` descriptor trees. Existing calls that pass `permissions` behave as before.
+- Added `buildComposePermissions`, `buildGroupPermissions`, and `buildTagConditionalPermissions` helpers, and an optional `setIds` input on `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, and `buildInsightsAccountScopedPermissions`. Together they build Pulumi Cloud's full role model (permission sets, policies that compose sets with optional entity or tag conditions, and roles that compose policies) for `api.Role` without hand-writing `__type` descriptor trees. `buildTagConditionalPermissions` takes its entity type and scopes as the new `RbacResourceType` and `RbacScope` enums. Existing calls that pass `permissions` behave as before.
 - Documented that `OrgAccessToken` must be created and deleted by a provider authenticated as a user, for example with a personal access token. Pulumi Cloud rejects organization and team access tokens, even Admin ones, with `403 Machine tokens are not allowed to perform this operation`. `TeamAccessToken` has no such restriction. No behavior change. [#1112](https://github.com/pulumi/pulumi-pulumiservice/issues/1112)
 
 ## 1.4.0

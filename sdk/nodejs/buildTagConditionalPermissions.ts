@@ -2,6 +2,9 @@
 // *** Do not edit by hand unless you're certain you know what you are doing! ***
 
 import * as pulumi from "@pulumi/pulumi";
+import * as inputs from "./types/input";
+import * as outputs from "./types/output";
+import * as enums from "./types/enums";
 import * as utilities from "./utilities";
 
 /**
@@ -20,13 +23,13 @@ export function buildTagConditionalPermissions(args: BuildTagConditionalPermissi
 
 export interface BuildTagConditionalPermissionsArgs {
     /**
-     * The kind of entity whose tags are evaluated: `stack`, `environment`, or `insights-account`.
+     * The kind of entity whose tags are evaluated: `stack`, `environment`, or `insights-account`. `global` is not valid here.
      */
-    entityType: string;
+    entityType: enums.RbacResourceType;
     /**
      * The scopes to grant on matching entities. Discover valid scope names via the `getOrganizationRoleScopes` data source.
      */
-    permissions?: string[];
+    permissions?: enums.RbacScope[];
     /**
      * The IDs of the permission sets to grant on matching entities. Set exactly one of `permissions` or `setIds`. `permissions` grants the scopes inline. `setIds` grants the referenced permission sets (`api.Role` with `uxPurpose: set`), which is the shape Pulumi Cloud uses for policies (`api.Role` with `uxPurpose: policy`).
      */
@@ -63,13 +66,13 @@ export function buildTagConditionalPermissionsOutput(args: BuildTagConditionalPe
 
 export interface BuildTagConditionalPermissionsOutputArgs {
     /**
-     * The kind of entity whose tags are evaluated: `stack`, `environment`, or `insights-account`.
+     * The kind of entity whose tags are evaluated: `stack`, `environment`, or `insights-account`. `global` is not valid here.
      */
-    entityType: pulumi.Input<string>;
+    entityType: pulumi.Input<enums.RbacResourceType>;
     /**
      * The scopes to grant on matching entities. Discover valid scope names via the `getOrganizationRoleScopes` data source.
      */
-    permissions?: pulumi.Input<pulumi.Input<string>[] | undefined>;
+    permissions?: pulumi.Input<pulumi.Input<enums.RbacScope>[] | undefined>;
     /**
      * The IDs of the permission sets to grant on matching entities. Set exactly one of `permissions` or `setIds`. `permissions` grants the scopes inline. `setIds` grants the referenced permission sets (`api.Role` with `uxPurpose: set`), which is the shape Pulumi Cloud uses for policies (`api.Role` with `uxPurpose: policy`).
      */

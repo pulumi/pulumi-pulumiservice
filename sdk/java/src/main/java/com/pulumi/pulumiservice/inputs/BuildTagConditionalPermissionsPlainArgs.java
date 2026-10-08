@@ -5,6 +5,8 @@ package com.pulumi.pulumiservice.inputs;
 
 import com.pulumi.core.annotations.Import;
 import com.pulumi.exceptions.MissingRequiredPropertyException;
+import com.pulumi.pulumiservice.enums.RbacResourceType;
+import com.pulumi.pulumiservice.enums.RbacScope;
 import java.lang.String;
 import java.util.List;
 import java.util.Objects;
@@ -17,17 +19,17 @@ public final class BuildTagConditionalPermissionsPlainArgs extends com.pulumi.re
     public static final BuildTagConditionalPermissionsPlainArgs Empty = new BuildTagConditionalPermissionsPlainArgs();
 
     /**
-     * The kind of entity whose tags are evaluated: `stack`, `environment`, or `insights-account`.
+     * The kind of entity whose tags are evaluated: `stack`, `environment`, or `insights-account`. `global` is not valid here.
      * 
      */
     @Import(name="entityType", required=true)
-    private String entityType;
+    private RbacResourceType entityType;
 
     /**
-     * @return The kind of entity whose tags are evaluated: `stack`, `environment`, or `insights-account`.
+     * @return The kind of entity whose tags are evaluated: `stack`, `environment`, or `insights-account`. `global` is not valid here.
      * 
      */
-    public String entityType() {
+    public RbacResourceType entityType() {
         return this.entityType;
     }
 
@@ -36,13 +38,13 @@ public final class BuildTagConditionalPermissionsPlainArgs extends com.pulumi.re
      * 
      */
     @Import(name="permissions")
-    private @Nullable List<String> permissions;
+    private @Nullable List<RbacScope> permissions;
 
     /**
      * @return The scopes to grant on matching entities. Discover valid scope names via the `getOrganizationRoleScopes` data source.
      * 
      */
-    public Optional<List<String>> permissions() {
+    public Optional<List<RbacScope>> permissions() {
         return Optional.ofNullable(this.permissions);
     }
 
@@ -120,12 +122,12 @@ public final class BuildTagConditionalPermissionsPlainArgs extends com.pulumi.re
         }
 
         /**
-         * @param entityType The kind of entity whose tags are evaluated: `stack`, `environment`, or `insights-account`.
+         * @param entityType The kind of entity whose tags are evaluated: `stack`, `environment`, or `insights-account`. `global` is not valid here.
          * 
          * @return builder
          * 
          */
-        public Builder entityType(String entityType) {
+        public Builder entityType(RbacResourceType entityType) {
             $.entityType = entityType;
             return this;
         }
@@ -136,7 +138,7 @@ public final class BuildTagConditionalPermissionsPlainArgs extends com.pulumi.re
          * @return builder
          * 
          */
-        public Builder permissions(@Nullable List<String> permissions) {
+        public Builder permissions(@Nullable List<RbacScope> permissions) {
             $.permissions = permissions;
             return this;
         }
@@ -147,7 +149,7 @@ public final class BuildTagConditionalPermissionsPlainArgs extends com.pulumi.re
          * @return builder
          * 
          */
-        public Builder permissions(String... permissions) {
+        public Builder permissions(RbacScope... permissions) {
             return permissions(List.of(permissions));
         }
 

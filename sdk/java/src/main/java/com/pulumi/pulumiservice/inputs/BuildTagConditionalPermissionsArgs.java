@@ -6,6 +6,8 @@ package com.pulumi.pulumiservice.inputs;
 import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
 import com.pulumi.exceptions.MissingRequiredPropertyException;
+import com.pulumi.pulumiservice.enums.RbacResourceType;
+import com.pulumi.pulumiservice.enums.RbacScope;
 import java.lang.String;
 import java.util.List;
 import java.util.Objects;
@@ -18,17 +20,17 @@ public final class BuildTagConditionalPermissionsArgs extends com.pulumi.resourc
     public static final BuildTagConditionalPermissionsArgs Empty = new BuildTagConditionalPermissionsArgs();
 
     /**
-     * The kind of entity whose tags are evaluated: `stack`, `environment`, or `insights-account`.
+     * The kind of entity whose tags are evaluated: `stack`, `environment`, or `insights-account`. `global` is not valid here.
      * 
      */
     @Import(name="entityType", required=true)
-    private Output<String> entityType;
+    private Output<RbacResourceType> entityType;
 
     /**
-     * @return The kind of entity whose tags are evaluated: `stack`, `environment`, or `insights-account`.
+     * @return The kind of entity whose tags are evaluated: `stack`, `environment`, or `insights-account`. `global` is not valid here.
      * 
      */
-    public Output<String> entityType() {
+    public Output<RbacResourceType> entityType() {
         return this.entityType;
     }
 
@@ -37,13 +39,13 @@ public final class BuildTagConditionalPermissionsArgs extends com.pulumi.resourc
      * 
      */
     @Import(name="permissions")
-    private @Nullable Output<List<String>> permissions;
+    private @Nullable Output<List<RbacScope>> permissions;
 
     /**
      * @return The scopes to grant on matching entities. Discover valid scope names via the `getOrganizationRoleScopes` data source.
      * 
      */
-    public Optional<Output<List<String>>> permissions() {
+    public Optional<Output<List<RbacScope>>> permissions() {
         return Optional.ofNullable(this.permissions);
     }
 
@@ -121,23 +123,23 @@ public final class BuildTagConditionalPermissionsArgs extends com.pulumi.resourc
         }
 
         /**
-         * @param entityType The kind of entity whose tags are evaluated: `stack`, `environment`, or `insights-account`.
+         * @param entityType The kind of entity whose tags are evaluated: `stack`, `environment`, or `insights-account`. `global` is not valid here.
          * 
          * @return builder
          * 
          */
-        public Builder entityType(Output<String> entityType) {
+        public Builder entityType(Output<RbacResourceType> entityType) {
             $.entityType = entityType;
             return this;
         }
 
         /**
-         * @param entityType The kind of entity whose tags are evaluated: `stack`, `environment`, or `insights-account`.
+         * @param entityType The kind of entity whose tags are evaluated: `stack`, `environment`, or `insights-account`. `global` is not valid here.
          * 
          * @return builder
          * 
          */
-        public Builder entityType(String entityType) {
+        public Builder entityType(RbacResourceType entityType) {
             return entityType(Output.of(entityType));
         }
 
@@ -147,7 +149,7 @@ public final class BuildTagConditionalPermissionsArgs extends com.pulumi.resourc
          * @return builder
          * 
          */
-        public Builder permissions(@Nullable Output<List<String>> permissions) {
+        public Builder permissions(@Nullable Output<List<RbacScope>> permissions) {
             $.permissions = permissions;
             return this;
         }
@@ -158,7 +160,7 @@ public final class BuildTagConditionalPermissionsArgs extends com.pulumi.resourc
          * @return builder
          * 
          */
-        public Builder permissions(List<String> permissions) {
+        public Builder permissions(List<RbacScope> permissions) {
             return permissions(Output.of(permissions));
         }
 
@@ -168,7 +170,7 @@ public final class BuildTagConditionalPermissionsArgs extends com.pulumi.resourc
          * @return builder
          * 
          */
-        public Builder permissions(String... permissions) {
+        public Builder permissions(RbacScope... permissions) {
             return permissions(List.of(permissions));
         }
 

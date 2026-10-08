@@ -13,6 +13,7 @@ if sys.version_info >= (3, 11):
 else:
     from typing_extensions import NotRequired, TypedDict, TypeAlias
 from . import _utilities
+from ._enums import *
 
 __all__ = [
     'BuildTagConditionalPermissionsResult',
@@ -46,8 +47,8 @@ class AwaitableBuildTagConditionalPermissionsResult(BuildTagConditionalPermissio
             permissions=self.permissions)
 
 
-def build_tag_conditional_permissions(entity_type: Optional[_builtins.str] = None,
-                                      permissions: Optional[Sequence[_builtins.str]] = None,
+def build_tag_conditional_permissions(entity_type: Optional['RbacResourceType'] = None,
+                                      permissions: Optional[Sequence['RbacScope']] = None,
                                       set_ids: Optional[Sequence[_builtins.str]] = None,
                                       tag_key: Optional[_builtins.str] = None,
                                       tag_value: Optional[_builtins.str] = None,
@@ -55,8 +56,8 @@ def build_tag_conditional_permissions(entity_type: Optional[_builtins.str] = Non
     """
     Builds a permission descriptor that grants the supplied scopes or permission sets only on entities that carry a tag. With `tagValue`, the tag must have that exact value; without it, the tag key must exist. Tags are evaluated on existing entities, so grant create rights unconditionally. The result is directly assignable to `OrganizationRole.permissions` or `api.Role.details`. To combine several grants in one descriptor, pass the output of each helper to `buildGroupPermissions`.
 
-    :param _builtins.str entity_type: The kind of entity whose tags are evaluated: `stack`, `environment`, or `insights-account`.
-    :param Sequence[_builtins.str] permissions: The scopes to grant on matching entities. Discover valid scope names via the `getOrganizationRoleScopes` data source.
+    :param 'RbacResourceType' entity_type: The kind of entity whose tags are evaluated: `stack`, `environment`, or `insights-account`. `global` is not valid here.
+    :param Sequence['RbacScope'] permissions: The scopes to grant on matching entities. Discover valid scope names via the `getOrganizationRoleScopes` data source.
     :param Sequence[_builtins.str] set_ids: The IDs of the permission sets to grant on matching entities. Set exactly one of `permissions` or `setIds`. `permissions` grants the scopes inline. `setIds` grants the referenced permission sets (`api.Role` with `uxPurpose: set`), which is the shape Pulumi Cloud uses for policies (`api.Role` with `uxPurpose: policy`).
     :param _builtins.str tag_key: The tag key to match.
     :param _builtins.str tag_value: The tag value to match. Omit it to match every entity that has `tagKey`, whatever its value.
@@ -72,8 +73,8 @@ def build_tag_conditional_permissions(entity_type: Optional[_builtins.str] = Non
 
     return AwaitableBuildTagConditionalPermissionsResult(
         permissions=pulumi.get(__ret__, 'permissions'))
-def build_tag_conditional_permissions_output(entity_type: pulumi.Input[Optional[_builtins.str]] = None,
-                                             permissions: pulumi.Input[Optional[Optional[Sequence[_builtins.str]]]] = None,
+def build_tag_conditional_permissions_output(entity_type: pulumi.Input[Optional['RbacResourceType']] = None,
+                                             permissions: pulumi.Input[Optional[Optional[Sequence['RbacScope']]]] = None,
                                              set_ids: pulumi.Input[Optional[Optional[Sequence[_builtins.str]]]] = None,
                                              tag_key: pulumi.Input[Optional[_builtins.str]] = None,
                                              tag_value: pulumi.Input[Optional[Optional[_builtins.str]]] = None,
@@ -81,8 +82,8 @@ def build_tag_conditional_permissions_output(entity_type: pulumi.Input[Optional[
     """
     Builds a permission descriptor that grants the supplied scopes or permission sets only on entities that carry a tag. With `tagValue`, the tag must have that exact value; without it, the tag key must exist. Tags are evaluated on existing entities, so grant create rights unconditionally. The result is directly assignable to `OrganizationRole.permissions` or `api.Role.details`. To combine several grants in one descriptor, pass the output of each helper to `buildGroupPermissions`.
 
-    :param _builtins.str entity_type: The kind of entity whose tags are evaluated: `stack`, `environment`, or `insights-account`.
-    :param Sequence[_builtins.str] permissions: The scopes to grant on matching entities. Discover valid scope names via the `getOrganizationRoleScopes` data source.
+    :param 'RbacResourceType' entity_type: The kind of entity whose tags are evaluated: `stack`, `environment`, or `insights-account`. `global` is not valid here.
+    :param Sequence['RbacScope'] permissions: The scopes to grant on matching entities. Discover valid scope names via the `getOrganizationRoleScopes` data source.
     :param Sequence[_builtins.str] set_ids: The IDs of the permission sets to grant on matching entities. Set exactly one of `permissions` or `setIds`. `permissions` grants the scopes inline. `setIds` grants the referenced permission sets (`api.Role` with `uxPurpose: set`), which is the shape Pulumi Cloud uses for policies (`api.Role` with `uxPurpose: policy`).
     :param _builtins.str tag_key: The tag key to match.
     :param _builtins.str tag_value: The tag value to match. Omit it to match every entity that has `tagKey`, whatever its value.

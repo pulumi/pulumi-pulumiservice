@@ -39,7 +39,6 @@ const (
 	testSetID                = "set-1"
 	testPolicyID             = "policy-1"
 	testTagKey               = "team"
-	entityEnvironment        = "environment"
 )
 
 // assertScopedConditionShape verifies a helper's output is the
@@ -333,7 +332,7 @@ func TestBuildTagConditionalPermissions(t *testing.T) {
 			context.Background(),
 			infer.FunctionRequest[BuildTagConditionalPermissionsInput]{
 				Input: BuildTagConditionalPermissionsInput{
-					EntityType: "stack",
+					EntityType: RbacResourceTypeStack,
 					TagKey:     testTagKey,
 					TagValue:   "platform",
 					SetIDs:     []string{testSetID},
@@ -367,9 +366,9 @@ func TestBuildTagConditionalPermissions(t *testing.T) {
 			context.Background(),
 			infer.FunctionRequest[BuildTagConditionalPermissionsInput]{
 				Input: BuildTagConditionalPermissionsInput{
-					EntityType:  "insights-account",
+					EntityType:  RbacResourceTypeInsightsAccount,
 					TagKey:      "owner",
-					Permissions: []string{permInsightsAccountRead},
+					Permissions: []RbacScope{permInsightsAccountRead},
 				},
 			},
 		)
@@ -385,13 +384,13 @@ func TestBuildTagConditionalPermissions(t *testing.T) {
 		assert.Equal(t, "PermissionDescriptorAllow", sub[keyType])
 	})
 
-	t.Run("rejects an unknown entity type", func(t *testing.T) {
+	t.Run("rejects the global resource type", func(t *testing.T) {
 		t.Parallel()
 		_, err := BuildTagConditionalPermissionsFunction{}.Invoke(
 			context.Background(),
 			infer.FunctionRequest[BuildTagConditionalPermissionsInput]{
 				Input: BuildTagConditionalPermissionsInput{
-					EntityType: testTagKey,
+					EntityType: RbacResourceTypeGlobal,
 					TagKey:     "k",
 					SetIDs:     []string{testSetID},
 				},
@@ -406,7 +405,7 @@ func TestBuildTagConditionalPermissions(t *testing.T) {
 			context.Background(),
 			infer.FunctionRequest[BuildTagConditionalPermissionsInput]{
 				Input: BuildTagConditionalPermissionsInput{
-					EntityType: entityEnvironment,
+					EntityType: RbacResourceTypeEnvironment,
 					SetIDs:     []string{testSetID},
 				},
 			},
@@ -420,7 +419,7 @@ func TestBuildTagConditionalPermissions(t *testing.T) {
 			context.Background(),
 			infer.FunctionRequest[BuildTagConditionalPermissionsInput]{
 				Input: BuildTagConditionalPermissionsInput{
-					EntityType: entityEnvironment,
+					EntityType: RbacResourceTypeEnvironment,
 					TagKey:     "k",
 				},
 			},
@@ -501,4 +500,20 @@ func TestBuildGroupPermissions(t *testing.T) {
 		)
 		assert.ErrorContains(t, err, "entries[0]")
 	})
+}
+
+func TestRbacScopeEnumMatchesValidation(t *testing.T) {
+	t.Parallel()
+
+	values := RbacScope("").Values()
+	require.NotEmpty(t, values)
+	names := map[string]bool{}
+	for _, v := range values {
+		_, err := rbacPermissionSlice([]string{string(v.Value)})
+		assert.NoError(t, err)
+		assert.NotEmpty(t, v.Name)
+		assert.False(t, names[v.Name], "duplicate enum name %q", v.Name)
+		names[v.Name] = true
+	}
+	assert.True(t, names["InsightsAccountRead"])
 }

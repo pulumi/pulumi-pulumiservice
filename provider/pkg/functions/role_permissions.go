@@ -447,11 +447,11 @@ func (BuildInsightsAccountScopedPermissionsFunction) Invoke(
 type BuildTagConditionalPermissionsFunction struct{}
 
 type BuildTagConditionalPermissionsInput struct {
-	EntityType  string   `pulumi:"entityType"`
-	TagKey      string   `pulumi:"tagKey"`
-	TagValue    string   `pulumi:"tagValue,optional"`
-	Permissions []string `pulumi:"permissions,optional"`
-	SetIDs      []string `pulumi:"setIds,optional"`
+	EntityType  RbacResourceType `pulumi:"entityType"`
+	TagKey      string           `pulumi:"tagKey"`
+	TagValue    string           `pulumi:"tagValue,optional"`
+	Permissions []RbacScope      `pulumi:"permissions,optional"`
+	SetIDs      []string         `pulumi:"setIds,optional"`
 }
 
 type BuildTagConditionalPermissionsOutput struct {
@@ -472,7 +472,8 @@ func (BuildTagConditionalPermissionsFunction) Annotate(a infer.Annotator) {
 func (i *BuildTagConditionalPermissionsInput) Annotate(a infer.Annotator) {
 	a.Describe(
 		&i.EntityType,
-		"The kind of entity whose tags are evaluated: `stack`, `environment`, or `insights-account`.",
+		"The kind of entity whose tags are evaluated: `stack`, `environment`, or `insights-account`. "+
+			"`global` is not valid here.",
 	)
 	a.Describe(&i.TagKey, "The tag key to match.")
 	a.Describe(
@@ -497,13 +498,13 @@ func (o *BuildTagConditionalPermissionsOutput) Annotate(a infer.Annotator) {
 	)
 }
 
-func tagContext(entityType string) (apitype.PermissionContextExpression, error) {
+func tagContext(entityType RbacResourceType) (apitype.PermissionContextExpression, error) {
 	switch entityType {
-	case "stack":
+	case RbacResourceTypeStack:
 		return apitype.PermissionExpressionStackBuilder{}.Build(), nil
-	case "environment":
+	case RbacResourceTypeEnvironment:
 		return apitype.PermissionExpressionEnvironmentBuilder{}.Build(), nil
-	case "insights-account":
+	case RbacResourceTypeInsightsAccount:
 		return apitype.PermissionExpressionInsightsAccountBuilder{}.Build(), nil
 	default:
 		return nil, fmt.Errorf(
@@ -533,7 +534,7 @@ func (BuildTagConditionalPermissionsFunction) Invoke(
 			Right: apitype.PermissionLiteralExpressionStringBuilder{Value: in.TagValue}.Build(),
 		}.Build()
 	}
-	out, err := conditionalDescriptor(condition, in.Permissions, in.SetIDs)
+	out, err := conditionalDescriptor(condition, scopeStrings(in.Permissions), in.SetIDs)
 	if err != nil {
 		return infer.FunctionResponse[BuildTagConditionalPermissionsOutput]{}, err
 	}

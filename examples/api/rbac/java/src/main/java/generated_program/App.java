@@ -7,6 +7,7 @@ import com.pulumi.pulumiservice.api.Role;
 import com.pulumi.pulumiservice.api.RoleArgs;
 import com.pulumi.pulumiservice.api_teams.Team;
 import com.pulumi.pulumiservice.api_teams.TeamArgs;
+import com.pulumi.pulumiservice.enums.RbacResourceType;
 import com.pulumi.pulumiservice.inputs.BuildAllowPermissionsArgs;
 import com.pulumi.pulumiservice.inputs.BuildComposePermissionsArgs;
 import com.pulumi.pulumiservice.inputs.BuildGroupPermissionsArgs;
@@ -54,7 +55,7 @@ public class App {
                 .applyValue(r -> r.permissions());
 
             var platformStacksWrite = PulumiserviceFunctions.buildTagConditionalPermissions(BuildTagConditionalPermissionsArgs.builder()
-                    .entityType("stack")
+                    .entityType(RbacResourceType.Stack)
                     .tagKey("team")
                     .tagValue("platform")
                     .setIds(stackWriteSet.roleID().applyValue(List::of))

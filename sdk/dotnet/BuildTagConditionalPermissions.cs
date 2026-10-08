@@ -34,20 +34,20 @@ namespace Pulumi.PulumiService
     public sealed class BuildTagConditionalPermissionsArgs : global::Pulumi.InvokeArgs
     {
         /// <summary>
-        /// The kind of entity whose tags are evaluated: `stack`, `environment`, or `insights-account`.
+        /// The kind of entity whose tags are evaluated: `stack`, `environment`, or `insights-account`. `global` is not valid here.
         /// </summary>
         [Input("entityType", required: true)]
-        public string EntityType { get; set; } = null!;
+        public Pulumi.PulumiService.RbacResourceType EntityType { get; set; }
 
         [Input("permissions")]
-        private List<string>? _permissions;
+        private List<Pulumi.PulumiService.RbacScope>? _permissions;
 
         /// <summary>
         /// The scopes to grant on matching entities. Discover valid scope names via the `getOrganizationRoleScopes` data source.
         /// </summary>
-        public List<string> Permissions
+        public List<Pulumi.PulumiService.RbacScope> Permissions
         {
-            get => _permissions ?? (_permissions = new List<string>());
+            get => _permissions ?? (_permissions = new List<Pulumi.PulumiService.RbacScope>());
             set => _permissions = value;
         }
 
@@ -84,20 +84,20 @@ namespace Pulumi.PulumiService
     public sealed class BuildTagConditionalPermissionsInvokeArgs : global::Pulumi.InvokeArgs
     {
         /// <summary>
-        /// The kind of entity whose tags are evaluated: `stack`, `environment`, or `insights-account`.
+        /// The kind of entity whose tags are evaluated: `stack`, `environment`, or `insights-account`. `global` is not valid here.
         /// </summary>
         [Input("entityType", required: true)]
-        public Input<string> EntityType { get; set; } = null!;
+        public Input<Pulumi.PulumiService.RbacResourceType> EntityType { get; set; } = null!;
 
         [Input("permissions")]
-        private InputList<string>? _permissions;
+        private InputList<Pulumi.PulumiService.RbacScope>? _permissions;
 
         /// <summary>
         /// The scopes to grant on matching entities. Discover valid scope names via the `getOrganizationRoleScopes` data source.
         /// </summary>
-        public InputList<string> Permissions
+        public InputList<Pulumi.PulumiService.RbacScope> Permissions
         {
-            get => _permissions ?? (_permissions = new InputList<string>());
+            get => _permissions ?? (_permissions = new InputList<Pulumi.PulumiService.RbacScope>());
             set => _permissions = value;
         }
 
