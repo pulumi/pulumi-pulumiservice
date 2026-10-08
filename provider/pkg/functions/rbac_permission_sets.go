@@ -19,10 +19,10 @@ import (
 	"fmt"
 	"sort"
 
+	"github.com/pulumi/pulumi-cloud-sdk/go/apitype"
 	"github.com/pulumi/pulumi-go-provider/infer"
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
-	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/resources"
 )
 
@@ -47,22 +47,28 @@ func (s *RbacPermissionSetInfo) Annotate(a infer.Annotator) {
 		"that grant a flat list of scopes.")
 }
 
-func permissionSetInfo(s pulumiapi.PermissionSet) RbacPermissionSetInfo {
+func permissionSetInfo(s apitype.PermissionDescriptorRecord) RbacPermissionSetInfo {
 	info := RbacPermissionSetInfo{
 		PermissionSetId: s.ID,
 		Name:            s.Name,
 		Description:     s.Description,
 		ResourceType:    resources.RbacResourceType(s.ResourceType),
-		Permissions:     s.Permissions,
+		Permissions:     []string{},
 	}
-	if info.Permissions == nil {
-		info.Permissions = []string{}
+	if allow, ok := s.Details.(apitype.PermissionDescriptorAllow); ok {
+		for _, p := range allow.Permissions() {
+			info.Permissions = append(info.Permissions, string(p))
+		}
 	}
 	if s.DefaultIdentifier != "" {
 		id := s.DefaultIdentifier
 		info.DefaultIdentifier = &id
 	}
 	return info
+}
+
+func listPermissionSets(ctx context.Context, orgName string) ([]apitype.PermissionDescriptorRecord, error) {
+	return config.GetClient(ctx).ListOrgRoles(ctx, orgName, string(apitype.PermissionDescriptorUXPurposeSet))
 }
 
 // GetRbacPermissionSetFunction looks up one permission set, typically a
@@ -104,12 +110,12 @@ func (GetRbacPermissionSetFunction) Invoke(
 		return infer.FunctionResponse[RbacPermissionSetInfo]{},
 			fmt.Errorf("exactly one of defaultIdentifier or name must be set")
 	}
-	sets, err := config.GetClient(ctx).ListPermissionSets(ctx, in.OrganizationName)
+	sets, err := listPermissionSets(ctx, in.OrganizationName)
 	if err != nil {
 		return infer.FunctionResponse[RbacPermissionSetInfo]{}, err
 	}
 
-	var matches []pulumiapi.PermissionSet
+	var matches []apitype.PermissionDescriptorRecord
 	for _, s := range sets {
 		if (in.DefaultIdentifier != nil && s.DefaultIdentifier == *in.DefaultIdentifier) ||
 			(in.Name != nil && s.Name == *in.Name) {
@@ -167,7 +173,7 @@ func (GetRbacPermissionSetsFunction) Invoke(
 	ctx context.Context,
 	req infer.FunctionRequest[GetRbacPermissionSetsInput],
 ) (infer.FunctionResponse[GetRbacPermissionSetsOutput], error) {
-	sets, err := config.GetClient(ctx).ListPermissionSets(ctx, req.Input.OrganizationName)
+	sets, err := listPermissionSets(ctx, req.Input.OrganizationName)
 	if err != nil {
 		return infer.FunctionResponse[GetRbacPermissionSetsOutput]{}, err
 	}

@@ -15,12 +15,13 @@
 package resources
 
 import (
-	"encoding/json"
 	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/pulumi/pulumi-cloud-sdk/go/apitype"
 )
 
 const (
@@ -43,41 +44,73 @@ func testSetTypes(id string) (RbacResourceType, error) {
 	}
 }
 
-// consoleRole mirrors the shapes the Pulumi Cloud console writes, captured
+// Shorthands for building descriptor trees with the Cloud SDK.
+
+func stackExpr() apitype.PermissionContextExpression {
+	return apitype.PermissionExpressionStackBuilder{}.Build()
+}
+
+func envExpr() apitype.PermissionContextExpression {
+	return apitype.PermissionExpressionEnvironmentBuilder{}.Build()
+}
+
+func condition(c apitype.PermissionBooleanExpression, sub apitype.PermissionDescriptor) apitype.PermissionDescriptor {
+	return apitype.PermissionDescriptorConditionBuilder{Condition: c, SubNode: sub}.Build()
+}
+
+func equal(l, r apitype.PermissionExpression) apitype.PermissionBooleanExpression {
+	return apitype.PermissionExpressionEqualBuilder{Left: l, Right: r}.Build()
+}
+
+func tagEquals(ctx apitype.PermissionContextExpression, key, value string) apitype.PermissionBooleanExpression {
+	return equal(
+		apitype.PermissionExpressionTagBuilder{Context: ctx, Key: key}.Build(),
+		apitype.PermissionLiteralExpressionStringBuilder{Value: value}.Build(),
+	)
+}
+
+func hasTag(ctx apitype.PermissionContextExpression, key string) apitype.PermissionBooleanExpression {
+	return apitype.PermissionExpressionHasTagBuilder{Context: ctx, Key: key}.Build()
+}
+
+func not(n apitype.PermissionBooleanExpression) apitype.PermissionBooleanExpression {
+	return apitype.PermissionExpressionNotBuilder{
+		PermissionBooleanExpressionUnaryBuilder: apitype.PermissionBooleanExpressionUnaryBuilder{Node: n},
+	}.Build()
+}
+
+func and(l, r apitype.PermissionBooleanExpression) apitype.PermissionBooleanExpression {
+	return apitype.PermissionExpressionAndBuilder{
+		PermissionBooleanExpressionBinaryBuilder: apitype.PermissionBooleanExpressionBinaryBuilder{Left: l, Right: r},
+	}.Build()
+}
+
+func group(entries ...apitype.PermissionDescriptor) apitype.PermissionDescriptor {
+	return apitype.PermissionDescriptorGroupBuilder{Entries: entries}.Build()
+}
+
+func allow(scopes ...apitype.RbacPermission) apitype.PermissionDescriptor {
+	return apitype.PermissionDescriptorAllowBuilder{Permissions: scopes}.Build()
+}
+
+// consoleRoleTree mirrors the shapes the Pulumi Cloud console writes, captured
 // from roles created in the console: org-level access and "all stacks" share
 // one unconditional Compose, then one Condition per entity or tag rule.
-const consoleRole = `{
-  "__type": "PermissionDescriptorGroup",
-  "entries": [
-    {"__type": "PermissionDescriptorCompose", "permissionDescriptors": ["org-set", "stack-set"]},
-    {"__type": "PermissionDescriptorCondition",
-     "condition": {"__type": "PermissionExpressionEqual",
-       "left": {"__type": "PermissionExpressionStack"},
-       "right": {"__type": "PermissionLiteralExpressionStack", "identity": "20dede8f-f399-4deb-bd19-174410f209c6"}},
-     "subNode": {"__type": "PermissionDescriptorCompose", "permissionDescriptors": ["stack-set"]}},
-    {"__type": "PermissionDescriptorCondition",
-     "condition": {"__type": "PermissionExpressionEqual",
-       "left": {"__type": "PermissionExpressionEnvironment"},
-       "right": {"__type": "PermissionLiteralExpressionEnvironment",
-         "identity": "58dd45c3-23fd-40b0-9b7e-3db51e09877b"}},
-     "subNode": {"__type": "PermissionDescriptorCompose", "permissionDescriptors": ["env-set"]}},
-    {"__type": "PermissionDescriptorCondition",
-     "condition": {"__type": "PermissionExpressionAnd",
-       "left": {"__type": "PermissionExpressionAnd",
-         "left": {"__type": "PermissionExpressionEqual",
-           "left": {"__type": "PermissionExpressionTag",
-             "context": {"__type": "PermissionExpressionStack"}, "key": "Owner"},
-           "right": {"__type": "PermissionLiteralExpressionString", "value": "DevTeam"}},
-         "right": {"__type": "PermissionExpressionNot",
-           "node": {"__type": "PermissionExpressionEqual",
-             "left": {"__type": "PermissionExpressionTag",
-               "context": {"__type": "PermissionExpressionStack"}, "key": "env"},
-             "right": {"__type": "PermissionLiteralExpressionString", "value": "prod"}}}},
-       "right": {"__type": "PermissionExpressionHasTag",
-         "context": {"__type": "PermissionExpressionStack"}, "key": "team"}},
-     "subNode": {"__type": "PermissionDescriptorCompose", "permissionDescriptors": ["stack-set"]}}
-  ]
-}`
+func consoleRoleTree() apitype.PermissionDescriptor {
+	return group(
+		compose([]string{testOrgSetID, testStackSetID}),
+		condition(
+			equal(stackExpr(), apitype.PermissionLiteralExpressionStackBuilder{Identity: testStackUUID}.Build()),
+			compose([]string{testStackSetID})),
+		condition(
+			equal(envExpr(), apitype.PermissionLiteralExpressionEnvironmentBuilder{Identity: testEnvUUID}.Build()),
+			compose([]string{testEnvSetID})),
+		condition(
+			and(and(tagEquals(stackExpr(), "Owner", "DevTeam"), not(tagEquals(stackExpr(), "env", "prod"))),
+				hasTag(stackExpr(), "team")),
+			compose([]string{testStackSetID})),
+	)
+}
 
 func consoleRoleModel() RbacRoleCore {
 	return RbacRoleCore{
@@ -99,15 +132,12 @@ func TestBuildPolicyDetailsMatchesConsole(t *testing.T) {
 	t.Parallel()
 	details, err := buildPolicyDetails(consoleRoleModel())
 	require.NoError(t, err)
-	got, err := json.Marshal(details)
-	require.NoError(t, err)
-	assert.JSONEq(t, consoleRole, string(got))
+	assert.Equal(t, consoleRoleTree(), details)
 }
 
 func TestParsePolicyDetailsRoundTrip(t *testing.T) {
 	t.Parallel()
-	details := mustParseDescriptor(t, consoleRole)
-	org, rules, err := parsePolicyDetails(details, testSetTypes)
+	org, rules, err := parsePolicyDetails(consoleRoleTree(), testSetTypes)
 	require.NoError(t, err)
 
 	want := consoleRoleModel()
@@ -122,12 +152,9 @@ func TestParsePolicyDetailsRoundTrip(t *testing.T) {
 
 func TestParsePolicyDetailsEnvironmentTagRule(t *testing.T) {
 	t.Parallel()
-	details := mustParseDescriptor(t, `{"__type":"PermissionDescriptorGroup","entries":[
-	  {"__type":"PermissionDescriptorCondition",
-	   "condition":{"__type":"PermissionExpressionNot","node":{"__type":"PermissionExpressionHasTag",
-	     "context":{"__type":"PermissionExpressionEnvironment"},"key":"sensitive"}},
-	   "subNode":{"__type":"PermissionDescriptorCompose","permissionDescriptors":["env-set"]}}]}`)
-	_, rules, err := parsePolicyDetails(details, testSetTypes)
+	_, rules, err := parsePolicyDetails(
+		group(condition(not(hasTag(envExpr(), "sensitive")), compose([]string{testEnvSetID}))),
+		testSetTypes)
 	require.NoError(t, err)
 	require.Len(t, rules, 1)
 	require.NotNil(t, rules[0].Environment)
@@ -137,32 +164,23 @@ func TestParsePolicyDetailsEnvironmentTagRule(t *testing.T) {
 
 func TestParsePolicyDetailsUnrepresentable(t *testing.T) {
 	t.Parallel()
-	cases := map[string]string{
-		"raw allow": `{"__type":"PermissionDescriptorAllow","permissions":["stack:read"]}`,
-		"allow inside group": `{"__type":"PermissionDescriptorGroup","entries":[
-		  {"__type":"PermissionDescriptorAllow","permissions":["stack:read"]}]}`,
-		"or condition": `{"__type":"PermissionDescriptorGroup","entries":[
-		  {"__type":"PermissionDescriptorCondition",
-		   "condition":{"__type":"PermissionExpressionOr",
-		     "left":{"__type":"PermissionExpressionHasTag","context":{"__type":"PermissionExpressionStack"},"key":"a"},
-		     "right":{"__type":"PermissionExpressionHasTag","context":{"__type":"PermissionExpressionStack"},"key":"b"}},
-		   "subNode":{"__type":"PermissionDescriptorCompose","permissionDescriptors":["stack-set"]}}]}`,
-		"mixed tag contexts": `{"__type":"PermissionDescriptorGroup","entries":[
-		  {"__type":"PermissionDescriptorCondition",
-		   "condition":{"__type":"PermissionExpressionAnd",
-		     "left":{"__type":"PermissionExpressionHasTag","context":{"__type":"PermissionExpressionStack"},"key":"a"},
-		     "right":{"__type":"PermissionExpressionHasTag",
-		       "context":{"__type":"PermissionExpressionEnvironment"},"key":"b"}},
-		   "subNode":{"__type":"PermissionDescriptorCompose","permissionDescriptors":["stack-set"]}}]}`,
-		"condition granting allow": `{"__type":"PermissionDescriptorGroup","entries":[
-		  {"__type":"PermissionDescriptorCondition",
-		   "condition":{"__type":"PermissionExpressionHasTag","context":{"__type":"PermissionExpressionStack"},"key":"a"},
-		   "subNode":{"__type":"PermissionDescriptorAllow","permissions":["stack:read"]}}]}`,
+	or := apitype.PermissionExpressionOrBuilder{
+		PermissionBooleanExpressionBinaryBuilder: apitype.PermissionBooleanExpressionBinaryBuilder{
+			Left: hasTag(stackExpr(), "a"), Right: hasTag(stackExpr(), "b"),
+		},
+	}.Build()
+	cases := map[string]apitype.PermissionDescriptor{
+		"raw allow":          allow(apitype.RbacPermissionStackRead),
+		"allow inside group": group(allow(apitype.RbacPermissionStackRead)),
+		"or condition":       group(condition(or, compose([]string{testStackSetID}))),
+		"mixed tag contexts": group(condition(
+			and(hasTag(stackExpr(), "a"), hasTag(envExpr(), "b")), compose([]string{testStackSetID}))),
+		"condition granting allow": group(condition(hasTag(stackExpr(), "a"), allow(apitype.RbacPermissionStackRead))),
 	}
-	for name, wire := range cases {
+	for name, details := range cases {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			_, _, err := parsePolicyDetails(mustParseDescriptor(t, wire), testSetTypes)
+			_, _, err := parsePolicyDetails(details, testSetTypes)
 			assert.True(t, errors.Is(err, errUnrepresentable), "got %v", err)
 		})
 	}
@@ -178,10 +196,7 @@ func TestBuildPolicyDetailsDedupesUnconditionalSets(t *testing.T) {
 		},
 	})
 	require.NoError(t, err)
-	got, err := json.Marshal(details)
-	require.NoError(t, err)
-	assert.JSONEq(t, `{"__type":"PermissionDescriptorGroup","entries":[
-	  {"__type":"PermissionDescriptorCompose","permissionDescriptors":["org-set","stack-set"]}]}`, string(got))
+	assert.Equal(t, group(compose([]string{testOrgSetID, testStackSetID})), details)
 }
 
 func TestCanonicalRoleKeyIgnoresLayout(t *testing.T) {

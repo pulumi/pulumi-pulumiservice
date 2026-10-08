@@ -21,29 +21,51 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/pulumi/pulumi-cloud-sdk/go/apitype"
 	"github.com/pulumi/pulumi-go-provider/infer"
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
-	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/resources"
 )
 
 type permissionSetListMock struct {
 	config.Client
-	sets []pulumiapi.PermissionSet
+	sets []apitype.PermissionDescriptorRecord
 }
 
-func (m *permissionSetListMock) ListPermissionSets(context.Context, string) ([]pulumiapi.PermissionSet, error) {
+func (m *permissionSetListMock) ListOrgRoles(
+	_ context.Context, _, uxPurpose string,
+) ([]apitype.PermissionDescriptorRecord, error) {
+	if uxPurpose != string(apitype.PermissionDescriptorUXPurposeSet) {
+		return nil, nil
+	}
 	return m.sets, nil
 }
 
+func permissionSet(
+	id, name string, rt resources.RbacResourceType, defaultID string, scopes ...apitype.RbacPermission,
+) apitype.PermissionDescriptorRecord {
+	return apitype.PermissionDescriptorRecord{
+		PermissionDescriptorBase: apitype.PermissionDescriptorBase{
+			Name:         name,
+			ResourceType: string(rt),
+			UxPurpose:    apitype.PermissionDescriptorUXPurposeSet,
+			Details:      apitype.PermissionDescriptorAllowBuilder{Permissions: scopes}.Build(),
+		},
+		ID:                id,
+		DefaultIdentifier: defaultID,
+	}
+}
+
 func permissionSetCtx() context.Context {
-	return config.WithMockClient(context.Background(), &permissionSetListMock{sets: []pulumiapi.PermissionSet{
-		{ID: "s1", Name: "Stack Read", ResourceType: "stack", DefaultIdentifier: "stack-read",
-			Permissions: []string{"stack:read"}},
-		{ID: "s2", Name: "Read Only", ResourceType: "global", DefaultIdentifier: "org-settings-read-only"},
-		{ID: "s3", Name: "Deployer", ResourceType: "stack"},
-	}})
+	return config.WithMockClient(context.Background(), &permissionSetListMock{
+		sets: []apitype.PermissionDescriptorRecord{
+			permissionSet("s1", "Stack Read", resources.RbacResourceTypeStack, "stack-read",
+				apitype.RbacPermissionStackRead),
+			permissionSet("s2", "Read Only", resources.RbacResourceTypeGlobal, "org-settings-read-only"),
+			permissionSet("s3", "Deployer", resources.RbacResourceTypeStack, ""),
+		},
+	})
 }
 
 func TestGetRbacPermissionSet(t *testing.T) {

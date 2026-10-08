@@ -26,8 +26,8 @@ package resources
 //	]}
 //
 // Tag conditions: Equal(Tag{context, key}, LiteralString{value}); an empty
-// value is HasTag{context, key}; notEquals wraps either in Not{node}; several
-// conditions fold left into And{left, right}.
+// value is HasTag{context, key}; notEquals wraps either in Not; several
+// conditions fold left into And.
 
 import (
 	"encoding/json"
@@ -42,70 +42,72 @@ import (
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 )
 
-const (
-	wireAllow        = "PermissionDescriptorAllow"
-	wireGroup        = "PermissionDescriptorGroup"
-	wireCompose      = "PermissionDescriptorCompose"
-	wireCondition    = "PermissionDescriptorCondition"
-	wireEqual        = "PermissionExpressionEqual"
-	wireNot          = "PermissionExpressionNot"
-	wireAnd          = "PermissionExpressionAnd"
-	wireHasTag       = "PermissionExpressionHasTag"
-	wireTag          = "PermissionExpressionTag"
-	wireLiteralStr   = "PermissionLiteralExpressionString"
-	wireExprPrefix   = "PermissionExpression"
-	wireLiteralPrefx = "PermissionLiteralExpression"
-)
-
 // errUnrepresentable marks a descriptor tree that RbacRole's typed model
 // cannot express, typically one built with `pulumiservice:api:Role` or
 // `OrganizationRole`.
 var errUnrepresentable = errors.New("permission descriptor cannot be represented by RbacRole")
 
-// wireNode is a loose view of any descriptor or expression node, enough to
-// build and walk the shapes the console uses.
-type wireNode struct {
-	Type                  string          `json:"__type"`
-	PermissionDescriptors []string        `json:"permissionDescriptors,omitempty"`
-	Entries               []*wireNode     `json:"entries,omitempty"`
-	Condition             *wireNode       `json:"condition,omitempty"`
-	SubNode               *wireNode       `json:"subNode,omitempty"`
-	Left                  *wireNode       `json:"left,omitempty"`
-	Right                 *wireNode       `json:"right,omitempty"`
-	Node                  *wireNode       `json:"node,omitempty"`
-	Context               *wireNode       `json:"context,omitempty"`
-	Key                   string          `json:"key,omitempty"`
-	Identity              string          `json:"identity,omitempty"`
-	Value                 json.RawMessage `json:"value,omitempty"`
+// entityKinds lists the entity selector kinds in the order rules are emitted
+// and "all" sets are grouped.
+var entityKinds = []RbacResourceType{
+	RbacResourceTypeStack,
+	RbacResourceTypeEnvironment,
+	RbacResourceTypeInsightsAccount,
 }
 
-// entityKinds maps the entity selector fields to their wire suffix, in the
-// order rules are emitted and "all" sets are grouped.
-var entityKinds = []struct {
-	resourceType RbacResourceType
-	wire         string
-}{
-	{RbacResourceTypeStack, "Stack"},
-	{RbacResourceTypeEnvironment, "Environment"},
-	{RbacResourceTypeInsightsAccount, "InsightsAccount"},
-}
-
-func wireSuffix(rt RbacResourceType) string {
-	for _, k := range entityKinds {
-		if k.resourceType == rt {
-			return k.wire
-		}
+// entityContext returns the expression that refers to the entity being
+// authorized, e.g. "the stack".
+func entityContext(rt RbacResourceType) apitype.PermissionContextExpression {
+	switch rt {
+	case RbacResourceTypeEnvironment:
+		return apitype.PermissionExpressionEnvironmentBuilder{}.Build()
+	case RbacResourceTypeInsightsAccount:
+		return apitype.PermissionExpressionInsightsAccountBuilder{}.Build()
+	default:
+		return apitype.PermissionExpressionStackBuilder{}.Build()
 	}
-	return ""
 }
 
-func resourceTypeForWire(suffix string) (RbacResourceType, bool) {
-	for _, k := range entityKinds {
-		if k.wire == suffix {
-			return k.resourceType, true
-		}
+// entityLiteral returns the expression for one specific entity.
+func entityLiteral(rt RbacResourceType, id string) apitype.PermissionExpression {
+	switch rt {
+	case RbacResourceTypeEnvironment:
+		return apitype.PermissionLiteralExpressionEnvironmentBuilder{Identity: id}.Build()
+	case RbacResourceTypeInsightsAccount:
+		return apitype.PermissionLiteralExpressionInsightsAccountBuilder{Identity: id}.Build()
+	default:
+		return apitype.PermissionLiteralExpressionStackBuilder{Identity: id}.Build()
+	}
+}
+
+// contextResourceType is the inverse of entityContext.
+func contextResourceType(e apitype.PermissionExpression) (RbacResourceType, bool) {
+	switch e.(type) {
+	case apitype.PermissionExpressionStack:
+		return RbacResourceTypeStack, true
+	case apitype.PermissionExpressionEnvironment:
+		return RbacResourceTypeEnvironment, true
+	case apitype.PermissionExpressionInsightsAccount:
+		return RbacResourceTypeInsightsAccount, true
 	}
 	return "", false
+}
+
+// literalEntity is the inverse of entityLiteral.
+func literalEntity(e apitype.PermissionExpression) (RbacResourceType, string, bool) {
+	switch lit := e.(type) {
+	case apitype.PermissionLiteralExpressionStack:
+		return RbacResourceTypeStack, lit.Identity(), true
+	case apitype.PermissionLiteralExpressionEnvironment:
+		return RbacResourceTypeEnvironment, lit.Identity(), true
+	case apitype.PermissionLiteralExpressionInsightsAccount:
+		return RbacResourceTypeInsightsAccount, lit.Identity(), true
+	}
+	return "", "", false
+}
+
+func compose(ids []string) apitype.PermissionDescriptorCompose {
+	return apitype.PermissionDescriptorComposeBuilder{PermissionDescriptors: ids}.Build()
 }
 
 // selector returns the rule's entity type and selector. Check guarantees
@@ -137,10 +139,8 @@ func ruleFor(rt RbacResourceType, sel *RbacEntitySelector, setIDs []string) Rbac
 
 // buildPolicyDetails returns the policy descriptor tree for a role.
 func buildPolicyDetails(in RbacRoleCore) (apitype.PermissionDescriptor, error) {
-	group := &wireNode{Type: wireGroup}
-
 	unconditional := slices.Clone(in.OrganizationPermissionSetIds)
-	var conditional []*wireNode
+	var conditional []apitype.PermissionDescriptor
 	for i, rule := range in.EntityRules {
 		rt, sel := rule.selector()
 		if sel == nil {
@@ -154,65 +154,55 @@ func buildPolicyDetails(in RbacRoleCore) (apitype.PermissionDescriptor, error) {
 		if err != nil {
 			return nil, fmt.Errorf("entityRules[%d]: %w", i, err)
 		}
-		conditional = append(conditional, &wireNode{
-			Type:      wireCondition,
+		conditional = append(conditional, apitype.PermissionDescriptorConditionBuilder{
 			Condition: cond,
-			SubNode:   &wireNode{Type: wireCompose, PermissionDescriptors: rule.PermissionSetIds},
-		})
+			SubNode:   compose(rule.PermissionSetIds),
+		}.Build())
 	}
-	if len(unconditional) > 0 {
-		group.Entries = append(group.Entries, &wireNode{Type: wireCompose, PermissionDescriptors: dedupe(unconditional)})
-	}
-	group.Entries = append(group.Entries, conditional...)
 
-	raw, err := json.Marshal(group)
-	if err != nil {
-		return nil, fmt.Errorf("marshal policy details: %w", err)
+	var entries []apitype.PermissionDescriptor
+	if len(unconditional) > 0 {
+		entries = append(entries, compose(dedupe(unconditional)))
 	}
-	var details apitype.PermissionDescriptor
-	if err := apitype.UnmarshalJSONPermissionDescriptor(raw, &details); err != nil {
-		return nil, fmt.Errorf("build policy details: %w", err)
-	}
-	return details, nil
+	entries = append(entries, conditional...)
+	return apitype.PermissionDescriptorGroupBuilder{Entries: entries}.Build(), nil
 }
 
-func buildSelectorCondition(rt RbacResourceType, sel *RbacEntitySelector) (*wireNode, error) {
-	suffix := wireSuffix(rt)
-	context := func() *wireNode { return &wireNode{Type: wireExprPrefix + suffix} }
-
+func buildSelectorCondition(rt RbacResourceType, sel *RbacEntitySelector) (apitype.PermissionBooleanExpression, error) {
 	if sel.Id != nil {
-		return &wireNode{
-			Type:  wireEqual,
-			Left:  context(),
-			Right: &wireNode{Type: wireLiteralPrefx + suffix, Identity: *sel.Id},
-		}, nil
+		return apitype.PermissionExpressionEqualBuilder{
+			Left:  entityContext(rt),
+			Right: entityLiteral(rt, *sel.Id),
+		}.Build(), nil
 	}
 	if len(sel.Tags) == 0 {
 		return nil, errors.New("one of id, tags, or all must be set")
 	}
-	var acc *wireNode
+
+	var acc apitype.PermissionBooleanExpression
 	for _, tc := range sel.Tags {
-		var leaf *wireNode
+		var leaf apitype.PermissionBooleanExpression
 		if v := strings.TrimSpace(util.OrZero(tc.Value)); v == "" {
-			leaf = &wireNode{Type: wireHasTag, Context: context(), Key: tc.Key}
+			leaf = apitype.PermissionExpressionHasTagBuilder{Context: entityContext(rt), Key: tc.Key}.Build()
 		} else {
-			lit, err := json.Marshal(*tc.Value)
-			if err != nil {
-				return nil, err
-			}
-			leaf = &wireNode{
-				Type:  wireEqual,
-				Left:  &wireNode{Type: wireTag, Context: context(), Key: tc.Key},
-				Right: &wireNode{Type: wireLiteralStr, Value: lit},
-			}
+			leaf = apitype.PermissionExpressionEqualBuilder{
+				Left:  apitype.PermissionExpressionTagBuilder{Context: entityContext(rt), Key: tc.Key}.Build(),
+				Right: apitype.PermissionLiteralExpressionStringBuilder{Value: *tc.Value}.Build(),
+			}.Build()
 		}
 		if tc.Operator != nil && *tc.Operator == RbacTagOperatorNotEquals {
-			leaf = &wireNode{Type: wireNot, Node: leaf}
+			leaf = apitype.PermissionExpressionNotBuilder{
+				PermissionBooleanExpressionUnaryBuilder: apitype.PermissionBooleanExpressionUnaryBuilder{Node: leaf},
+			}.Build()
 		}
 		if acc == nil {
 			acc = leaf
 		} else {
-			acc = &wireNode{Type: wireAnd, Left: acc, Right: leaf}
+			acc = apitype.PermissionExpressionAndBuilder{
+				PermissionBooleanExpressionBinaryBuilder: apitype.PermissionBooleanExpressionBinaryBuilder{
+					Left: acc, Right: leaf,
+				},
+			}.Build()
 		}
 	}
 	return acc, nil
@@ -221,29 +211,32 @@ func buildSelectorCondition(rt RbacResourceType, sel *RbacEntitySelector) (*wire
 // setTypeLookup resolves a permission set ID to its resource type.
 type setTypeLookup func(id string) (RbacResourceType, error)
 
+// typeName names a descriptor or expression node for error messages.
+func typeName(n interface{ GetDiscriminatorValue() (string, error) }) string {
+	if n == nil {
+		return "<nil>"
+	}
+	name, _ := n.GetDiscriminatorValue()
+	return name
+}
+
 // parsePolicyDetails is the inverse of buildPolicyDetails. Unconditional set
 // references are split by the referenced set's resource type: global sets
 // are organization-level access, the rest are "all <entity>" rules.
 func parsePolicyDetails(
 	details apitype.PermissionDescriptor, lookup setTypeLookup,
 ) (orgSetIDs []string, rules []RbacEntityRule, err error) {
-	raw, err := json.Marshal(details)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal policy details: %w", err)
-	}
-	var root wireNode
-	if err := json.Unmarshal(raw, &root); err != nil {
-		return nil, nil, fmt.Errorf("parse policy details: %w", err)
-	}
-	if root.Type != wireGroup {
-		return nil, nil, fmt.Errorf("%w: policy is a %s, want %s", errUnrepresentable, root.Type, wireGroup)
+	group, ok := details.(apitype.PermissionDescriptorGroup)
+	if !ok {
+		return nil, nil, fmt.Errorf("%w: policy is a %s, want PermissionDescriptorGroup",
+			errUnrepresentable, typeName(details))
 	}
 
 	allSets := map[RbacResourceType][]string{}
-	for i, entry := range root.Entries {
-		switch entry.Type {
-		case wireCompose:
-			for _, id := range entry.PermissionDescriptors {
+	for i, entry := range group.Entries() {
+		switch entry := entry.(type) {
+		case apitype.PermissionDescriptorCompose:
+			for _, id := range entry.PermissionDescriptors() {
 				rt, err := lookup(id)
 				if err != nil {
 					return nil, nil, err
@@ -254,54 +247,54 @@ func parsePolicyDetails(
 					allSets[rt] = append(allSets[rt], id)
 				}
 			}
-		case wireCondition:
-			if entry.SubNode == nil || entry.SubNode.Type != wireCompose {
-				return nil, nil, fmt.Errorf("%w: entry %d grants something other than permission sets", errUnrepresentable, i)
+		case apitype.PermissionDescriptorCondition:
+			sub, ok := entry.SubNode().(apitype.PermissionDescriptorCompose)
+			if !ok {
+				return nil, nil, fmt.Errorf("%w: entry %d grants a %s instead of permission sets",
+					errUnrepresentable, i, typeName(entry.SubNode()))
 			}
-			rt, sel, err := parseCondition(entry.Condition)
+			rt, sel, err := parseCondition(entry.Condition())
 			if err != nil {
 				return nil, nil, fmt.Errorf("entry %d: %w", i, err)
 			}
-			rules = append(rules, ruleFor(rt, sel, entry.SubNode.PermissionDescriptors))
+			rules = append(rules, ruleFor(rt, sel, sub.PermissionDescriptors()))
 		default:
-			return nil, nil, fmt.Errorf("%w: entry %d is a %s", errUnrepresentable, i, entry.Type)
+			return nil, nil, fmt.Errorf("%w: entry %d is a %s", errUnrepresentable, i, typeName(entry))
 		}
 	}
 
 	var allRules []RbacEntityRule
-	for _, k := range entityKinds {
-		if ids := allSets[k.resourceType]; len(ids) > 0 {
-			allRules = append(allRules, ruleFor(k.resourceType, &RbacEntitySelector{All: pointerTo(true)}, ids))
+	for _, rt := range entityKinds {
+		if ids := allSets[rt]; len(ids) > 0 {
+			allRules = append(allRules, ruleFor(rt, &RbacEntitySelector{All: pointerTo(true)}, ids))
 		}
 	}
 	return orgSetIDs, append(allRules, rules...), nil
 }
 
-func parseCondition(n *wireNode) (RbacResourceType, *RbacEntitySelector, error) {
-	if n == nil {
-		return "", nil, fmt.Errorf("%w: condition is empty", errUnrepresentable)
-	}
+func parseCondition(c apitype.PermissionBooleanExpression) (RbacResourceType, *RbacEntitySelector, error) {
 	// A single entity: Equal(<Entity>, Literal<Entity>{identity}).
-	if n.Type == wireEqual && n.Left != nil && n.Right != nil &&
-		strings.HasPrefix(n.Right.Type, wireLiteralPrefx) && n.Right.Type != wireLiteralStr {
-		rt, ok := resourceTypeForWire(strings.TrimPrefix(n.Left.Type, wireExprPrefix))
-		if !ok || n.Right.Type != wireLiteralPrefx+wireSuffix(rt) {
-			return "", nil, fmt.Errorf("%w: unsupported entity condition %s = %s", errUnrepresentable, n.Left.Type, n.Right.Type)
+	if eq, ok := c.(apitype.PermissionExpressionEqual); ok {
+		if rt, id, ok := literalEntity(eq.Right()); ok {
+			if ctxRT, ok := contextResourceType(eq.Left()); !ok || ctxRT != rt {
+				return "", nil, fmt.Errorf("%w: unsupported entity condition %s = %s",
+					errUnrepresentable, typeName(eq.Left()), typeName(eq.Right()))
+			}
+			return rt, &RbacEntitySelector{Id: pointerTo(id)}, nil
 		}
-		return rt, &RbacEntitySelector{Id: pointerTo(n.Right.Identity)}, nil
 	}
 
-	var leaves []*wireNode
-	var flatten func(*wireNode)
-	flatten = func(x *wireNode) {
-		if x != nil && x.Type == wireAnd {
-			flatten(x.Left)
-			flatten(x.Right)
+	var leaves []apitype.PermissionBooleanExpression
+	var flatten func(apitype.PermissionBooleanExpression)
+	flatten = func(x apitype.PermissionBooleanExpression) {
+		if and, ok := x.(apitype.PermissionExpressionAnd); ok {
+			flatten(and.Left())
+			flatten(and.Right())
 			return
 		}
 		leaves = append(leaves, x)
 	}
-	flatten(n)
+	flatten(c)
 
 	var rt RbacResourceType
 	tags := make([]RbacTagCondition, 0, len(leaves))
@@ -319,43 +312,31 @@ func parseCondition(n *wireNode) (RbacResourceType, *RbacEntitySelector, error) 
 	return rt, &RbacEntitySelector{Tags: tags}, nil
 }
 
-func parseTagCondition(n *wireNode) (RbacResourceType, RbacTagCondition, error) {
+func parseTagCondition(n apitype.PermissionBooleanExpression) (RbacResourceType, RbacTagCondition, error) {
 	var tc RbacTagCondition
-	if n != nil && n.Type == wireNot {
+	if not, ok := n.(apitype.PermissionExpressionNot); ok {
 		tc.Operator = pointerTo(RbacTagOperatorNotEquals)
-		n = n.Node
+		n = not.Node()
 	}
-	unsupported := func() (RbacResourceType, RbacTagCondition, error) {
-		typ := "<nil>"
-		if n != nil {
-			typ = n.Type
-		}
-		return "", RbacTagCondition{}, fmt.Errorf("%w: unsupported condition %s", errUnrepresentable, typ)
-	}
-	if n == nil {
-		return unsupported()
-	}
+	unsupported := fmt.Errorf("%w: unsupported condition %s", errUnrepresentable, typeName(n))
 
-	var context *wireNode
-	switch {
-	case n.Type == wireHasTag:
-		context, tc.Key = n.Context, n.Key
-	case n.Type == wireEqual && n.Left != nil && n.Left.Type == wireTag &&
-		n.Right != nil && n.Right.Type == wireLiteralStr:
-		var v string
-		if err := json.Unmarshal(n.Right.Value, &v); err != nil {
-			return unsupported()
+	var context apitype.PermissionContextExpression
+	switch leaf := n.(type) {
+	case apitype.PermissionExpressionHasTag:
+		context, tc.Key = leaf.Context(), leaf.Key()
+	case apitype.PermissionExpressionEqual:
+		tag, okTag := leaf.Left().(apitype.PermissionExpressionTag)
+		str, okStr := leaf.Right().(apitype.PermissionLiteralExpressionString)
+		if !okTag || !okStr {
+			return "", RbacTagCondition{}, unsupported
 		}
-		context, tc.Key, tc.Value = n.Left.Context, n.Left.Key, pointerTo(v)
+		context, tc.Key, tc.Value = tag.Context(), tag.Key(), pointerTo(str.Value())
 	default:
-		return unsupported()
+		return "", RbacTagCondition{}, unsupported
 	}
-	if context == nil {
-		return unsupported()
-	}
-	rt, ok := resourceTypeForWire(strings.TrimPrefix(context.Type, wireExprPrefix))
+	rt, ok := contextResourceType(context)
 	if !ok {
-		return unsupported()
+		return "", RbacTagCondition{}, unsupported
 	}
 	return rt, tc, nil
 }

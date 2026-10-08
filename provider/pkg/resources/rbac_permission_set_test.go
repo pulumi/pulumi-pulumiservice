@@ -26,50 +26,55 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/property"
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
-	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 )
 
-// testFutureScope stands in for a scope Pulumi Cloud added after this
-// provider's enum was generated.
 const (
+	// testFutureScope stands in for a scope Pulumi Cloud added after both this
+	// provider's enum and the Cloud SDK were generated.
 	testFutureScope = "stack:time_travel"
 	testSetID       = "acme/set-1"
 )
 
 type permissionSetClientMock struct {
 	config.Client
-	create func(org string, req pulumiapi.PermissionSetRequest) (*pulumiapi.PermissionSet, error)
-	get    func(org, id string) (*pulumiapi.PermissionSet, error)
-	update func(org, id string, req pulumiapi.PermissionSetRequest) (*pulumiapi.PermissionSet, error)
+	create func(org string, req apitype.PermissionDescriptorBase) (*apitype.PermissionDescriptorRecord, error)
+	get    func(org, id string) (*apitype.PermissionDescriptorRecord, error)
 }
 
-func (m *permissionSetClientMock) CreatePermissionSet(
-	_ context.Context, org string, req pulumiapi.PermissionSetRequest,
-) (*pulumiapi.PermissionSet, error) {
+func (m *permissionSetClientMock) CreateRole(
+	_ context.Context, org string, req apitype.PermissionDescriptorBase,
+) (*apitype.PermissionDescriptorRecord, error) {
 	return m.create(org, req)
 }
 
-func (m *permissionSetClientMock) GetPermissionSet(
+func (m *permissionSetClientMock) GetRole(
 	_ context.Context, org, id string,
-) (*pulumiapi.PermissionSet, error) {
+) (*apitype.PermissionDescriptorRecord, error) {
 	return m.get(org, id)
 }
 
-func (m *permissionSetClientMock) UpdatePermissionSet(
-	_ context.Context, org, id string, req pulumiapi.PermissionSetRequest,
-) (*pulumiapi.PermissionSet, error) {
-	return m.update(org, id, req)
+func scopesOf(t *testing.T, d apitype.PermissionDescriptor) []string {
+	t.Helper()
+	a, ok := d.(apitype.PermissionDescriptorAllow)
+	require.True(t, ok, "details must be a PermissionDescriptorAllow")
+	var out []string
+	for _, p := range a.Permissions() {
+		out = append(out, string(p))
+	}
+	return out
 }
 
 func TestRbacPermissionSetCreateSendsAdditionalScopes(t *testing.T) {
 	t.Parallel()
 	mock := &permissionSetClientMock{
-		create: func(org string, req pulumiapi.PermissionSetRequest) (*pulumiapi.PermissionSet, error) {
+		create: func(org string, req apitype.PermissionDescriptorBase) (*apitype.PermissionDescriptorRecord, error) {
 			assert.Equal(t, gcAcme, org)
+			assert.Equal(t, apitype.PermissionDescriptorUXPurposeSet, req.UxPurpose)
 			assert.Equal(t, string(RbacResourceTypeStack), req.ResourceType)
 			// Unknown scopes pass through untouched; duplicates collapse.
-			assert.Equal(t, []string{string(RbacScopeStackRead), string(RbacScopeStackWrite), testFutureScope}, req.Permissions)
-			return &pulumiapi.PermissionSet{ID: "set-1", Version: 1}, nil
+			assert.Equal(t, []string{string(RbacScopeStackRead), string(RbacScopeStackWrite), testFutureScope},
+				scopesOf(t, req.Details))
+			return &apitype.PermissionDescriptorRecord{ID: "set-1", Version: 1}, nil
 		},
 	}
 	ctx := config.WithMockClient(context.Background(), mock)
@@ -88,32 +93,41 @@ func TestRbacPermissionSetCreateSendsAdditionalScopes(t *testing.T) {
 	assert.Equal(t, "set-1", resp.Output.PermissionSetId)
 }
 
+func storedPermissionSet(scopes ...apitype.RbacPermission) *apitype.PermissionDescriptorRecord {
+	return &apitype.PermissionDescriptorRecord{
+		PermissionDescriptorBase: apitype.PermissionDescriptorBase{
+			Name:         "Deployer",
+			ResourceType: string(RbacResourceTypeStack),
+			UxPurpose:    apitype.PermissionDescriptorUXPurposeSet,
+			Details:      allow(scopes...),
+		},
+		ID:      "set-1",
+		Version: 3,
+	}
+}
+
 func TestRbacPermissionSetRead(t *testing.T) {
 	t.Parallel()
-	stored := &pulumiapi.PermissionSet{
-		ID:           "set-1",
-		Name:         "Deployer",
-		ResourceType: string(RbacResourceTypeStack),
-		UxPurpose:    "set",
-		DetailsType:  wireAllow,
-		Version:      3,
-		Permissions: []string{
-			string(RbacScopeStackWrite), testFutureScope, string(RbacScopeStackRead), string(RbacScopeStackDelete),
-		},
+	// As the Cloud SDK reports it: testFutureScope is granted but the SDK's
+	// unmarshaller dropped it.
+	stored := storedPermissionSet(
+		apitype.RbacPermissionStackWrite, apitype.RbacPermissionStackRead, apitype.RbacPermissionStackDelete)
+	read := func(t *testing.T, mock config.Client, prior RbacPermissionSetInput) (
+		infer.ReadResponse[RbacPermissionSetInput, RbacPermissionSetState], error,
+	) {
+		t.Helper()
+		return (&RbacPermissionSet{}).Read(config.WithMockClient(context.Background(), mock),
+			infer.ReadRequest[RbacPermissionSetInput, RbacPermissionSetState]{ID: testSetID, Inputs: prior})
 	}
 	mock := &permissionSetClientMock{
-		get: func(_, _ string) (*pulumiapi.PermissionSet, error) { return stored, nil },
+		get: func(_, _ string) (*apitype.PermissionDescriptorRecord, error) { return stored, nil },
 	}
-	ctx := config.WithMockClient(context.Background(), mock)
 
-	t.Run("splits scopes and keeps the user's layout", func(t *testing.T) {
-		resp, err := (&RbacPermissionSet{}).Read(ctx, infer.ReadRequest[RbacPermissionSetInput, RbacPermissionSetState]{
-			ID: testSetID,
-			Inputs: RbacPermissionSetInput{
-				Permissions: []RbacScope{RbacScopeStackRead, RbacScopeStackWrite},
-				// The user kept a known scope in additionalPermissions; leave it there.
-				AdditionalPermissions: []string{testFutureScope, string(RbacScopeStackDelete)},
-			},
+	t.Run("keeps the user's layout and scopes the SDK cannot report", func(t *testing.T) {
+		resp, err := read(t, mock, RbacPermissionSetInput{
+			Permissions: []RbacScope{RbacScopeStackRead, RbacScopeStackWrite},
+			// The user kept a known scope in additionalPermissions; leave it there.
+			AdditionalPermissions: []string{testFutureScope, string(RbacScopeStackDelete)},
 		})
 		require.NoError(t, err)
 		assert.Equal(t, []RbacScope{RbacScopeStackRead, RbacScopeStackWrite}, resp.Inputs.Permissions)
@@ -123,33 +137,37 @@ func TestRbacPermissionSetRead(t *testing.T) {
 		assert.Equal(t, 3, resp.State.Version)
 	})
 
-	t.Run("import puts unknown scopes in additionalPermissions", func(t *testing.T) {
-		resp, err := (&RbacPermissionSet{}).Read(ctx, infer.ReadRequest[RbacPermissionSetInput, RbacPermissionSetState]{
-			ID: testSetID,
+	t.Run("reports a removed known scope", func(t *testing.T) {
+		resp, err := read(t, mock, RbacPermissionSetInput{
+			Permissions: []RbacScope{RbacScopeStackRead, RbacScopeStackWrite, RbacScopeStackDelete, RbacScopeStackCreate},
 		})
 		require.NoError(t, err)
-		assert.Equal(t, "acme", resp.Inputs.OrganizationName)
+		assert.Equal(t, []RbacScope{RbacScopeStackWrite, RbacScopeStackRead, RbacScopeStackDelete},
+			resp.Inputs.Permissions)
+	})
+
+	t.Run("import", func(t *testing.T) {
+		resp, err := read(t, mock, RbacPermissionSetInput{})
+		require.NoError(t, err)
+		assert.Equal(t, gcAcme, resp.Inputs.OrganizationName)
 		assert.Equal(t, []RbacScope{RbacScopeStackWrite, RbacScopeStackRead, RbacScopeStackDelete}, resp.Inputs.Permissions)
-		assert.Equal(t, []string{testFutureScope}, resp.Inputs.AdditionalPermissions)
+		assert.Empty(t, resp.Inputs.AdditionalPermissions)
 	})
 
 	t.Run("rejects descriptors that are not permission sets", func(t *testing.T) {
-		mock := &permissionSetClientMock{get: func(_, _ string) (*pulumiapi.PermissionSet, error) {
-			return &pulumiapi.PermissionSet{
-				ID:          "role-1",
-				UxPurpose:   string(apitype.PermissionDescriptorUXPurposeRole),
-				DetailsType: wireCompose,
-			}, nil
-		}}
-		_, err := (&RbacPermissionSet{}).Read(config.WithMockClient(context.Background(), mock),
-			infer.ReadRequest[RbacPermissionSetInput, RbacPermissionSetState]{ID: "acme/role-1"})
+		role := storedPermissionSet()
+		role.UxPurpose = apitype.PermissionDescriptorUXPurposeRole
+		role.Details = compose([]string{"policy-1"})
+		_, err := read(t, &permissionSetClientMock{
+			get: func(_, _ string) (*apitype.PermissionDescriptorRecord, error) { return role, nil },
+		}, RbacPermissionSetInput{})
 		assert.ErrorContains(t, err, "not a permission set")
 	})
 
 	t.Run("gone", func(t *testing.T) {
-		mock := &permissionSetClientMock{get: func(_, _ string) (*pulumiapi.PermissionSet, error) { return nil, nil }}
-		resp, err := (&RbacPermissionSet{}).Read(config.WithMockClient(context.Background(), mock),
-			infer.ReadRequest[RbacPermissionSetInput, RbacPermissionSetState]{ID: testSetID})
+		resp, err := read(t, &permissionSetClientMock{
+			get: func(_, _ string) (*apitype.PermissionDescriptorRecord, error) { return nil, nil },
+		}, RbacPermissionSetInput{})
 		require.NoError(t, err)
 		assert.Empty(t, resp.ID)
 	})

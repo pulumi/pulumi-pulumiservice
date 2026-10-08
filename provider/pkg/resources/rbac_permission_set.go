@@ -169,14 +169,20 @@ func (*RbacPermissionSet) Create(
 		}, nil
 	}
 
-	set, err := config.GetClient(ctx).CreatePermissionSet(ctx, in.OrganizationName, permissionSetRequest(in))
+	set, err := config.GetClient(ctx).CreateRole(ctx, in.OrganizationName, apitype.PermissionDescriptorBase{
+		Name:         in.Name,
+		Description:  util.OrZero(in.Description),
+		ResourceType: string(in.ResourceType),
+		UxPurpose:    apitype.PermissionDescriptorUXPurposeSet,
+		Details:      permissionSetDetails(in),
+	})
 	if err != nil {
 		return infer.CreateResponse[RbacPermissionSetState]{}, fmt.Errorf(
 			"failed to create permission set %q: %w", in.Name, err)
 	}
 	return infer.CreateResponse[RbacPermissionSetState]{
 		ID:     fmt.Sprintf("%s/%s", in.OrganizationName, set.ID),
-		Output: RbacPermissionSetState{RbacPermissionSetInput: in, PermissionSetId: set.ID, Version: set.Version},
+		Output: RbacPermissionSetState{RbacPermissionSetInput: in, PermissionSetId: set.ID, Version: int(set.Version)},
 	}, nil
 }
 
@@ -195,8 +201,10 @@ func (*RbacPermissionSet) Update(
 		}, nil
 	}
 
-	set, err := config.GetClient(ctx).UpdatePermissionSet(
-		ctx, req.State.OrganizationName, req.State.PermissionSetId, permissionSetRequest(in))
+	name := in.Name
+	description := util.OrZero(in.Description)
+	set, err := config.GetClient(ctx).UpdateRole(ctx, req.State.OrganizationName, req.State.PermissionSetId,
+		apitype.UpdateRoleRequest{Name: &name, Description: &description, Details: permissionSetDetails(in)})
 	if err != nil {
 		return infer.UpdateResponse[RbacPermissionSetState]{}, fmt.Errorf(
 			"failed to update permission set %q: %w", req.State.PermissionSetId, err)
@@ -205,7 +213,7 @@ func (*RbacPermissionSet) Update(
 		Output: RbacPermissionSetState{
 			RbacPermissionSetInput: in,
 			PermissionSetId:        set.ID,
-			Version:                set.Version,
+			Version:                int(set.Version),
 		},
 	}, nil
 }
@@ -232,7 +240,7 @@ func (*RbacPermissionSet) Read(
 	if err != nil {
 		return infer.ReadResponse[RbacPermissionSetInput, RbacPermissionSetState]{}, err
 	}
-	set, err := config.GetClient(ctx).GetPermissionSet(ctx, orgName, setID)
+	set, err := config.GetClient(ctx).GetRole(ctx, orgName, setID)
 	if err != nil {
 		return infer.ReadResponse[RbacPermissionSetInput, RbacPermissionSetState]{}, fmt.Errorf(
 			"failed to read permission set %q: %w", req.ID, err)
@@ -248,39 +256,46 @@ func (*RbacPermissionSet) Read(
 	return infer.ReadResponse[RbacPermissionSetInput, RbacPermissionSetState]{
 		ID:     req.ID,
 		Inputs: in,
-		State:  RbacPermissionSetState{RbacPermissionSetInput: in, PermissionSetId: set.ID, Version: set.Version},
+		State:  RbacPermissionSetState{RbacPermissionSetInput: in, PermissionSetId: set.ID, Version: int(set.Version)},
 	}, nil
 }
 
-// permissionSetRequest merges both scope lists into the single list the
-// service stores.
-func permissionSetRequest(in RbacPermissionSetInput) pulumiapi.PermissionSetRequest {
+// permissionSetDetails merges both scope lists into the Allow descriptor the
+// service stores. Scopes this SDK doesn't know still marshal as-is.
+func permissionSetDetails(in RbacPermissionSetInput) apitype.PermissionDescriptorAllow {
 	scopes := make([]string, 0, len(in.Permissions)+len(in.AdditionalPermissions))
 	for _, s := range in.Permissions {
 		scopes = append(scopes, string(s))
 	}
-	return pulumiapi.PermissionSetRequest{
-		Name:         in.Name,
-		Description:  util.OrZero(in.Description),
-		ResourceType: string(in.ResourceType),
-		Permissions:  dedupe(append(scopes, in.AdditionalPermissions...)),
+	var perms apitype.RbacPermissionSlice
+	for _, s := range dedupe(append(scopes, in.AdditionalPermissions...)) {
+		perms = append(perms, apitype.RbacPermission(s))
 	}
+	return apitype.PermissionDescriptorAllowBuilder{Permissions: perms}.Build()
+}
+
+// sdkCanRead reports whether the Cloud SDK can report scope s back on read.
+// Its unmarshaller silently drops scopes newer than the SDK version, so the
+// provider cannot tell whether such a scope is still granted.
+func sdkCanRead(s string) bool {
+	return apitype.RbacPermission(s).IsValid()
 }
 
 func permissionSetInputFromAPI(
 	orgName string,
 	prior RbacPermissionSetInput,
-	set *pulumiapi.PermissionSet,
+	set *apitype.PermissionDescriptorRecord,
 ) (RbacPermissionSetInput, error) {
-	if set.UxPurpose != string(apitype.PermissionDescriptorUXPurposeSet) {
+	if set.UxPurpose != apitype.PermissionDescriptorUXPurposeSet {
 		return RbacPermissionSetInput{}, fmt.Errorf(
 			"descriptor %q is not a permission set (uxPurpose=%q); use `RbacRole` for roles or "+
 				"`pulumiservice:api:Role` for other descriptor kinds", set.ID, set.UxPurpose)
 	}
-	if set.DetailsType != wireAllow {
+	allow, ok := set.Details.(apitype.PermissionDescriptorAllow)
+	if !ok {
 		return RbacPermissionSetInput{}, fmt.Errorf(
 			"permission set %q does not grant a flat list of scopes (%s) and cannot be managed by "+
-				"`RbacPermissionSet`; use `pulumiservice:api:Role` instead", set.ID, set.DetailsType)
+				"`RbacPermissionSet`; use `pulumiservice:api:Role` instead", set.ID, typeName(set.Details))
 	}
 
 	in := RbacPermissionSetInput{
@@ -294,18 +309,31 @@ func permissionSetInputFromAPI(
 	}
 
 	// Split the service's flat list back into the two inputs: scopes in this
-	// SDK's enum go to `permissions` unless the user listed them in
-	// `additionalPermissions`. Keep the user's order when the sets match.
+	// provider's enum go to `permissions` unless the user listed them in
+	// `additionalPermissions`.
 	priorExtra := map[string]bool{}
 	for _, s := range prior.AdditionalPermissions {
 		priorExtra[s] = true
 	}
 	var perms []RbacScope
 	var extra []string
-	for _, s := range set.Permissions {
+	for _, p := range allow.Permissions() {
+		s := string(p)
 		if isKnownScope(s) && !priorExtra[s] {
 			perms = append(perms, RbacScope(s))
 		} else {
+			extra = append(extra, s)
+		}
+	}
+	// Carry forward scopes the SDK cannot report back, rather than showing
+	// them as removed on every refresh.
+	for _, s := range prior.Permissions {
+		if !sdkCanRead(string(s)) {
+			perms = append(perms, s)
+		}
+	}
+	for _, s := range prior.AdditionalPermissions {
+		if !sdkCanRead(s) {
 			extra = append(extra, s)
 		}
 	}

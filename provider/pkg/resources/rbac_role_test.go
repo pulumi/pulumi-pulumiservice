@@ -16,7 +16,6 @@ package resources
 
 import (
 	"context"
-	"encoding/json"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -27,7 +26,6 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/property"
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
-	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 )
 
 const (
@@ -41,23 +39,28 @@ const (
 type rbacRoleClientMock struct {
 	config.Client
 	descriptors map[string]*apitype.PermissionDescriptorRecord
-	sets        []pulumiapi.PermissionSet
+	sets        []apitype.PermissionDescriptorRecord
 
 	created *apitype.PermissionDescriptorBase
 	updates map[string]apitype.UpdateRoleRequest
 	deleted []string
 }
 
-func newRbacRoleClientMock(t *testing.T, policyWire string) *rbacRoleClientMock {
-	t.Helper()
+func permissionSetRecord(id string, rt RbacResourceType) apitype.PermissionDescriptorRecord {
+	return apitype.PermissionDescriptorRecord{
+		PermissionDescriptorBase: apitype.PermissionDescriptorBase{ResourceType: string(rt)},
+		ID:                       id,
+	}
+}
+
+func newRbacRoleClientMock(policy apitype.PermissionDescriptor) *rbacRoleClientMock {
 	return &rbacRoleClientMock{
 		descriptors: map[string]*apitype.PermissionDescriptorRecord{
 			testRbacRoleID: {
 				PermissionDescriptorBase: apitype.PermissionDescriptorBase{
 					Name:      testRoleName,
 					UxPurpose: apitype.PermissionDescriptorUXPurposeRole,
-					Details: mustParseDescriptor(t,
-						`{"__type":"PermissionDescriptorCompose","permissionDescriptors":["policy-1"]}`),
+					Details:   compose([]string{testRbacPolicyID}),
 				},
 				ID: testRbacRoleID,
 			},
@@ -65,16 +68,16 @@ func newRbacRoleClientMock(t *testing.T, policyWire string) *rbacRoleClientMock 
 				PermissionDescriptorBase: apitype.PermissionDescriptorBase{
 					Name:      testRoleName,
 					UxPurpose: apitype.PermissionDescriptorUXPurposePolicy,
-					Details:   mustParseDescriptor(t, policyWire),
+					Details:   policy,
 				},
 				ID:      testRbacPolicyID,
 				Version: 4,
 			},
 		},
-		sets: []pulumiapi.PermissionSet{
-			{ID: testOrgSetID, ResourceType: "global"},
-			{ID: testStackSetID, ResourceType: string(RbacResourceTypeStack)},
-			{ID: testEnvSetID, ResourceType: string(RbacResourceTypeEnvironment)},
+		sets: []apitype.PermissionDescriptorRecord{
+			permissionSetRecord(testOrgSetID, RbacResourceTypeGlobal),
+			permissionSetRecord(testStackSetID, RbacResourceTypeStack),
+			permissionSetRecord(testEnvSetID, RbacResourceTypeEnvironment),
 		},
 		updates: map[string]apitype.UpdateRoleRequest{},
 	}
@@ -91,6 +94,15 @@ func (m *rbacRoleClientMock) GetRole(_ context.Context, _, id string) (*apitype.
 	return m.descriptors[id], nil
 }
 
+func (m *rbacRoleClientMock) ListOrgRoles(
+	_ context.Context, _, uxPurpose string,
+) ([]apitype.PermissionDescriptorRecord, error) {
+	if uxPurpose != string(apitype.PermissionDescriptorUXPurposeSet) {
+		return nil, nil
+	}
+	return m.sets, nil
+}
+
 func (m *rbacRoleClientMock) UpdateRole(
 	_ context.Context, _, id string, req apitype.UpdateRoleRequest,
 ) (*apitype.PermissionDescriptorRecord, error) {
@@ -105,14 +117,6 @@ func (m *rbacRoleClientMock) DeleteRole(_ context.Context, _, id string, _ bool)
 	return nil
 }
 
-func (m *rbacRoleClientMock) ListPermissionSets(context.Context, string) ([]pulumiapi.PermissionSet, error) {
-	return m.sets, nil
-}
-
-func (m *rbacRoleClientMock) GetPermissionSet(context.Context, string, string) (*pulumiapi.PermissionSet, error) {
-	return nil, nil
-}
-
 func testRoleCore() RbacRoleCore {
 	core := consoleRoleModel()
 	core.OrganizationName = gcAcme
@@ -122,7 +126,7 @@ func testRoleCore() RbacRoleCore {
 
 func TestRbacRoleCreate(t *testing.T) {
 	t.Parallel()
-	mock := newRbacRoleClientMock(t, consoleRole)
+	mock := newRbacRoleClientMock(consoleRoleTree())
 	ctx := config.WithMockClient(context.Background(), mock)
 
 	resp, err := (&RbacRole{}).Create(ctx, infer.CreateRequest[RbacRoleInput]{
@@ -137,9 +141,7 @@ func TestRbacRoleCreate(t *testing.T) {
 	require.NotNil(t, mock.created)
 	assert.Equal(t, apitype.PermissionDescriptorUXPurposeRole, mock.created.UxPurpose)
 	assert.Empty(t, mock.created.ResourceType, "console roles carry no resource type")
-	got, err := json.Marshal(mock.created.Details)
-	require.NoError(t, err)
-	assert.JSONEq(t, consoleRole, string(got))
+	assert.Equal(t, consoleRoleTree(), mock.created.Details)
 }
 
 func TestRbacRoleUpdate(t *testing.T) {
@@ -147,7 +149,7 @@ func TestRbacRoleUpdate(t *testing.T) {
 	prior := testRoleCore()
 
 	t.Run("permissions only touch the policy", func(t *testing.T) {
-		mock := newRbacRoleClientMock(t, consoleRole)
+		mock := newRbacRoleClientMock(consoleRoleTree())
 		next := testRoleCore()
 		next.EntityRules = next.EntityRules[:1]
 		resp, err := (&RbacRole{}).Update(config.WithMockClient(context.Background(), mock),
@@ -162,7 +164,7 @@ func TestRbacRoleUpdate(t *testing.T) {
 	})
 
 	t.Run("rename updates both descriptors", func(t *testing.T) {
-		mock := newRbacRoleClientMock(t, consoleRole)
+		mock := newRbacRoleClientMock(consoleRoleTree())
 		next := testRoleCore()
 		next.Name = "Platform Engineers"
 		_, err := (&RbacRole{}).Update(config.WithMockClient(context.Background(), mock),
@@ -180,7 +182,7 @@ func TestRbacRoleUpdate(t *testing.T) {
 
 func TestRbacRoleDeleteOnlyDeletesRole(t *testing.T) {
 	t.Parallel()
-	mock := newRbacRoleClientMock(t, consoleRole)
+	mock := newRbacRoleClientMock(consoleRoleTree())
 	_, err := (&RbacRole{}).Delete(config.WithMockClient(context.Background(), mock),
 		infer.DeleteRequest[RbacRoleState]{State: RbacRoleState{
 			RbacRoleCore: testRoleCore(), RoleId: testRbacRoleID, PolicyId: testRbacPolicyID,
@@ -201,7 +203,7 @@ func TestRbacRoleRead(t *testing.T) {
 	t.Run("keeps the user's layout when nothing changed", func(t *testing.T) {
 		prior := testRoleCore()
 		slicesReverse(prior.EntityRules)
-		resp, err := read(t, newRbacRoleClientMock(t, consoleRole), prior)
+		resp, err := read(t, newRbacRoleClientMock(consoleRoleTree()), prior)
 		require.NoError(t, err)
 		assert.Equal(t, prior.EntityRules, resp.Inputs.EntityRules)
 		assert.Equal(t, testRbacPolicyID, resp.State.PolicyId)
@@ -209,9 +211,8 @@ func TestRbacRoleRead(t *testing.T) {
 	})
 
 	t.Run("reports console edits", func(t *testing.T) {
-		edited := `{"__type":"PermissionDescriptorGroup","entries":[
-		  {"__type":"PermissionDescriptorCompose","permissionDescriptors":["org-set","env-set"]}]}`
-		resp, err := read(t, newRbacRoleClientMock(t, edited), testRoleCore())
+		edited := group(compose([]string{testOrgSetID, testEnvSetID}))
+		resp, err := read(t, newRbacRoleClientMock(edited), testRoleCore())
 		require.NoError(t, err)
 		assert.Equal(t, []string{testOrgSetID}, resp.Inputs.OrganizationPermissionSetIds)
 		require.Len(t, resp.Inputs.EntityRules, 1)
@@ -219,7 +220,7 @@ func TestRbacRoleRead(t *testing.T) {
 	})
 
 	t.Run("import", func(t *testing.T) {
-		resp, err := read(t, newRbacRoleClientMock(t, consoleRole), RbacRoleCore{})
+		resp, err := read(t, newRbacRoleClientMock(consoleRoleTree()), RbacRoleCore{})
 		require.NoError(t, err)
 		assert.Equal(t, gcAcme, resp.Inputs.OrganizationName)
 		assert.Equal(t, testRoleName, resp.Inputs.Name)
@@ -227,9 +228,8 @@ func TestRbacRoleRead(t *testing.T) {
 	})
 
 	t.Run("unrepresentable role points at alternatives", func(t *testing.T) {
-		mock := newRbacRoleClientMock(t, consoleRole)
-		mock.descriptors[testRbacRoleID].Details = mustParseDescriptor(t,
-			`{"__type":"PermissionDescriptorAllow","permissions":["stack:read"]}`)
+		mock := newRbacRoleClientMock(consoleRoleTree())
+		mock.descriptors[testRbacRoleID].Details = allow(apitype.RbacPermissionStackRead)
 		_, err := read(t, mock, RbacRoleCore{})
 		assert.ErrorContains(t, err, "OrganizationRole")
 	})

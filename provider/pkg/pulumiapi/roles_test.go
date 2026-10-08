@@ -1,6 +1,7 @@
 package pulumiapi
 
 import (
+	"io"
 	"net/http"
 	"net/url"
 	"testing"
@@ -235,4 +236,30 @@ func TestCreateRoleWithPolicy(t *testing.T) {
 	role, err := c.CreateRoleWithPolicy(t.Context(), testRoleOrgName, policy)
 	require.NoError(t, err)
 	assert.Equal(t, testRoleID, role.ID)
+}
+
+// TestCreateRoleSendsScopesUnknownToTheSDK checks that a permission set can
+// grant a scope Pulumi Cloud added after the pinned Cloud SDK: the SDK
+// marshals typed RbacPermission values verbatim even though it would drop
+// them when unmarshalling.
+func TestCreateRoleSendsScopesUnknownToTheSDK(t *testing.T) {
+	const futureScope = "stack:time_travel"
+	require.False(t, apitype.RbacPermission(futureScope).IsValid())
+
+	var sent string
+	c := startTestServerMulti(t, func(r *http.Request) (int, any) {
+		body, err := io.ReadAll(r.Body)
+		require.NoError(t, err)
+		sent = string(body)
+		return http.StatusOK, apitype.PermissionDescriptorRecord{ID: testRoleID}
+	})
+	_, err := c.CreateRole(t.Context(), testRoleOrgName, apitype.PermissionDescriptorBase{
+		Name:      readOnlyRoleName,
+		UxPurpose: apitype.PermissionDescriptorUXPurposeSet,
+		Details: apitype.PermissionDescriptorAllowBuilder{
+			Permissions: apitype.RbacPermissionSlice{apitype.RbacPermissionStackRead, futureScope},
+		}.Build(),
+	})
+	require.NoError(t, err)
+	assert.Contains(t, sent, `"`+futureScope+`"`)
 }

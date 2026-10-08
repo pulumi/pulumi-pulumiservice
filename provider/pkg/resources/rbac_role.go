@@ -452,7 +452,7 @@ func newSetTypeLookup(ctx context.Context, orgName string) setTypeLookup {
 	var types map[string]RbacResourceType
 	return func(id string) (RbacResourceType, error) {
 		if types == nil {
-			sets, err := client.ListPermissionSets(ctx, orgName)
+			sets, err := client.ListOrgRoles(ctx, orgName, string(apitype.PermissionDescriptorUXPurposeSet))
 			if err != nil {
 				return "", err
 			}
@@ -464,7 +464,7 @@ func newSetTypeLookup(ctx context.Context, orgName string) setTypeLookup {
 		if rt, ok := types[id]; ok {
 			return rt, nil
 		}
-		set, err := client.GetPermissionSet(ctx, orgName, id)
+		set, err := client.GetRole(ctx, orgName, id)
 		if err != nil {
 			return "", fmt.Errorf("failed to read permission set %q: %w", id, err)
 		}
