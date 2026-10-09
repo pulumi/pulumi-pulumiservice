@@ -1,0 +1,212 @@
+name: yaml-organization-role
+runtime: yaml
+description: >-
+  End-to-end test of OrganizationRole built with the RBAC helper functions. The
+  OrganizationRole docs example (provider/pkg/resources/docs/organization_role_example)
+  covers the same features against existing entities.
+
+config:
+  organizationName:
+    type: string
+    default: service-provider-test-org
+  digits:
+    type: string
+
+variables:
+  currentUser:
+    fn::invoke:
+      function: pulumiservice:getCurrentUser
+  prod:
+    fn::invoke:
+      function: pulumiservice:getStack
+      arguments:
+        organizationName: ${organizationName}
+        projectName: ${prodStack.projectName}
+        stackName: ${prodStack.stackName}
+  sharedEnvironmentRotate:
+    fn::invoke:
+      function: pulumiservice:buildEnvironmentScopedPermissions
+      arguments:
+        environmentId: ${sharedEnvironment.environmentId}
+        permissions:
+          - environment:rotate
+
+  # A role built from scopes, with every selector kind for stacks and
+  # environments. Insights accounts can't be created here, so their rules
+  # use `all` and tags only.
+  platformPermissions:
+    fn::invoke:
+      function: pulumiservice:buildRolePermissions
+      arguments:
+        organizationScopes:
+          - team:read
+        stackRules:
+          - all: true
+            scopes: [stack:read]
+          - id: ${prod.stackId}
+            scopes: [stack:write, stack_deployment:create]
+          - tags:
+              - key: team
+                value: platform
+            scopes: [stack:write]
+          - tags:
+              - key: env
+                value: prod
+                operator: notEquals
+            scopes: [stack:write]
+          - tags:
+              - key: cost-center
+            scopes: [stack_deployment_settings:read]
+          - tags:
+              - key: team
+                value: platform
+              - key: lifecycle
+                value: ephemeral
+            scopes: [stack:delete]
+        environmentRules:
+          - all: true
+            scopes: [environment:read]
+          - id: ${sharedEnvironment.environmentId}
+            scopes: [environment:open, environment:write]
+          - tags:
+              - key: team
+                value: platform
+            scopes: [environment:open]
+        insightsAccountRules:
+          - all: true
+            scopes: [insights_account:read]
+          - tags:
+              - key: team
+                value: platform
+            scopes: [insights_account:update]
+        additionalEntries:
+          - ${sharedEnvironmentRotate.permissions}
+
+  # Permission sets are accepted only in a policy, which the role composes.
+  orgReadOnly:
+    fn::invoke:
+      function: pulumiservice:getOrganizationPermissionSet
+      arguments:
+        organizationName: ${organizationName}
+        defaultIdentifier: org-settings-read-only
+  stackWrite:
+    fn::invoke:
+      function: pulumiservice:getOrganizationPermissionSet
+      arguments:
+        organizationName: ${organizationName}
+        defaultIdentifier: stack-write
+  environmentRead:
+    fn::invoke:
+      function: pulumiservice:getOrganizationPermissionSet
+      arguments:
+        organizationName: ${organizationName}
+        defaultIdentifier: environment-read
+  insightsAccountRead:
+    fn::invoke:
+      function: pulumiservice:getOrganizationPermissionSet
+      arguments:
+        organizationName: ${organizationName}
+        defaultIdentifier: insights-account-read
+  operatorPolicyPermissions:
+    fn::invoke:
+      function: pulumiservice:buildRolePermissions
+      arguments:
+        organizationPermissionSets:
+          - permissionSetId: ${orgReadOnly.permissionSetId}
+            resourceType: ${orgReadOnly.resourceType}
+        stackRules:
+          - id: ${prod.stackId}
+            permissionSets:
+              - permissionSetId: ${stackWrite.permissionSetId}
+                resourceType: ${stackWrite.resourceType}
+        environmentRules:
+          - all: true
+            permissionSets:
+              - permissionSetId: ${environmentRead.permissionSetId}
+                resourceType: ${environmentRead.resourceType}
+            scopes: [environment:open]
+        insightsAccountRules:
+          - tags:
+              - key: team
+                value: platform
+            permissionSets:
+              - permissionSetId: ${insightsAccountRead.permissionSetId}
+                resourceType: ${insightsAccountRead.resourceType}
+  operatorPermissions:
+    fn::invoke:
+      function: pulumiservice:buildComposePermissions
+      arguments:
+        ids:
+          - ${operatorPolicy.roleID}
+
+resources:
+  prodStack:
+    type: pulumiservice:Stack
+    properties:
+      organizationName: ${organizationName}
+      projectName: rbac-example-${digits}
+      stackName: prod
+
+  sharedEnvironment:
+    type: pulumiservice:Environment
+    properties:
+      organization: ${organizationName}
+      project: rbac-example-${digits}
+      name: shared
+      yaml:
+        fn::stringAsset: |-
+          values:
+            region: us-west-2
+
+  platformRole:
+    type: pulumiservice:OrganizationRole
+    properties:
+      organizationName: ${organizationName}
+      name: Platform Engineers ${digits}
+      description: Scopes on platform stacks, environments, and Insights accounts.
+      permissions: ${platformPermissions.permissions}
+
+  operatorPolicy:
+    type: pulumiservice:api:Role
+    properties:
+      orgName: ${organizationName}
+      name: Platform Operators policy ${digits}
+      uxPurpose: policy
+      details: ${operatorPolicyPermissions.permissions}
+
+  operatorRole:
+    type: pulumiservice:OrganizationRole
+    properties:
+      organizationName: ${organizationName}
+      name: Platform Operators ${digits}
+      description: Built-in permission sets on platform entities, granted through a policy.
+      permissions: ${operatorPermissions.permissions}
+
+  platformTeam:
+    type: pulumiservice:Team
+    properties:
+      organizationName: ${organizationName}
+      teamType: pulumi
+      name: platform-${digits}
+      displayName: Platform
+      # Pulumi Cloud adds the team's creator as its first member.
+      members:
+        - ${currentUser.username}
+
+  platformTeamRole:
+    type: pulumiservice:TeamRoleAssignment
+    properties:
+      organizationName: ${organizationName}
+      teamName: ${platformTeam.name}
+      roleId: ${platformRole.roleId}
+
+  operatorTeamRole:
+    type: pulumiservice:TeamRoleAssignment
+    properties:
+      organizationName: ${organizationName}
+      teamName: ${platformTeam.name}
+      roleId: ${operatorRole.roleId}
+
+outputs:
+  platformRoleId: ${platformRole.roleId}
+  operatorRoleId: ${operatorRole.roleId}

@@ -26,9 +26,8 @@ import (
 // scopedPermissionsHelpDoc is the shared epilogue for the helpers'
 // descriptions, kept identical so codegen documentation stays consistent.
 const scopedPermissionsHelpDoc = "The result is directly assignable to " +
-	"`OrganizationRole.permissions`. To grant scopes on more than one entity " +
-	"in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` " +
-	"list pulls the output of each helper."
+	"`OrganizationRole.permissions`. To combine it with other grants in a " +
+	"single role, pass it to `buildRolePermissions` in `additionalEntries`."
 
 // descriptorToSDKMap marshals a typed apitype.PermissionDescriptor to the
 // SDK-boundary map shape the provider expects on

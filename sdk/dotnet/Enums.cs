@@ -252,6 +252,640 @@ namespace Pulumi.PulumiService
     }
 
     [EnumType]
+    public readonly struct RbacEnvironmentScope : IEquatable<RbacEnvironmentScope>
+    {
+        private readonly string _value;
+
+        private RbacEnvironmentScope(string value)
+        {
+            _value = value ?? throw new ArgumentNullException(nameof(value));
+        }
+
+        /// <summary>
+        /// Create approval rules
+        /// </summary>
+        public static RbacEnvironmentScope ChangeGateCreate { get; } = new RbacEnvironmentScope("change_gate:create");
+        /// <summary>
+        /// Delete approval rules
+        /// </summary>
+        public static RbacEnvironmentScope ChangeGateDelete { get; } = new RbacEnvironmentScope("change_gate:delete");
+        /// <summary>
+        /// Update approval rules
+        /// </summary>
+        public static RbacEnvironmentScope ChangeGateUpdate { get; } = new RbacEnvironmentScope("change_gate:update");
+        /// <summary>
+        /// Clone environment
+        /// </summary>
+        public static RbacEnvironmentScope EnvironmentClone { get; } = new RbacEnvironmentScope("environment:clone");
+        /// <summary>
+        /// Delete environment
+        /// </summary>
+        public static RbacEnvironmentScope EnvironmentDelete { get; } = new RbacEnvironmentScope("environment:delete");
+        /// <summary>
+        /// Open and decrypt environment
+        /// </summary>
+        public static RbacEnvironmentScope EnvironmentOpen { get; } = new RbacEnvironmentScope("environment:open");
+        /// <summary>
+        /// Read environment
+        /// </summary>
+        public static RbacEnvironmentScope EnvironmentRead { get; } = new RbacEnvironmentScope("environment:read");
+        /// <summary>
+        /// Rotates secrets in an environment
+        /// </summary>
+        public static RbacEnvironmentScope EnvironmentRotate { get; } = new RbacEnvironmentScope("environment:rotate");
+        /// <summary>
+        /// List secret rotation history of an environment
+        /// </summary>
+        public static RbacEnvironmentScope EnvironmentRotateHistory { get; } = new RbacEnvironmentScope("environment:rotate_history");
+        /// <summary>
+        /// Write environment
+        /// </summary>
+        public static RbacEnvironmentScope EnvironmentWrite { get; } = new RbacEnvironmentScope("environment:write");
+        /// <summary>
+        /// Creates a new environment schedule
+        /// </summary>
+        public static RbacEnvironmentScope EnvironmentScheduleCreate { get; } = new RbacEnvironmentScope("environment_schedule:create");
+        /// <summary>
+        /// Deletes an environment schedule
+        /// </summary>
+        public static RbacEnvironmentScope EnvironmentScheduleDelete { get; } = new RbacEnvironmentScope("environment_schedule:delete");
+        /// <summary>
+        /// Pauses an environment schedule
+        /// </summary>
+        public static RbacEnvironmentScope EnvironmentSchedulePause { get; } = new RbacEnvironmentScope("environment_schedule:pause");
+        /// <summary>
+        /// Reads an environment schedule
+        /// </summary>
+        public static RbacEnvironmentScope EnvironmentScheduleRead { get; } = new RbacEnvironmentScope("environment_schedule:read");
+        /// <summary>
+        /// Resumes an environment schedule
+        /// </summary>
+        public static RbacEnvironmentScope EnvironmentScheduleResume { get; } = new RbacEnvironmentScope("environment_schedule:resume");
+        /// <summary>
+        /// Updates an environment schedule
+        /// </summary>
+        public static RbacEnvironmentScope EnvironmentScheduleUpdate { get; } = new RbacEnvironmentScope("environment_schedule:update");
+        /// <summary>
+        /// Read environment settings
+        /// </summary>
+        public static RbacEnvironmentScope EnvironmentSettingsRead { get; } = new RbacEnvironmentScope("environment_settings:read");
+        /// <summary>
+        /// Update environment settings
+        /// </summary>
+        public static RbacEnvironmentScope EnvironmentSettingsUpdate { get; } = new RbacEnvironmentScope("environment_settings:update");
+        /// <summary>
+        /// Adds a new tag to an environment
+        /// </summary>
+        public static RbacEnvironmentScope EnvironmentTagCreate { get; } = new RbacEnvironmentScope("environment_tag:create");
+        /// <summary>
+        /// Removes a tag from an environment
+        /// </summary>
+        public static RbacEnvironmentScope EnvironmentTagDelete { get; } = new RbacEnvironmentScope("environment_tag:delete");
+        /// <summary>
+        /// Reads the value of an environments tag
+        /// </summary>
+        public static RbacEnvironmentScope EnvironmentTagRead { get; } = new RbacEnvironmentScope("environment_tag:read");
+        /// <summary>
+        /// Modifies the value of an environments tag
+        /// </summary>
+        public static RbacEnvironmentScope EnvironmentTagUpdate { get; } = new RbacEnvironmentScope("environment_tag:update");
+        /// <summary>
+        /// Creates a new version tag
+        /// </summary>
+        public static RbacEnvironmentScope EnvironmentVersionCreate { get; } = new RbacEnvironmentScope("environment_version:create");
+        /// <summary>
+        /// Deletes a version tag
+        /// </summary>
+        public static RbacEnvironmentScope EnvironmentVersionDelete { get; } = new RbacEnvironmentScope("environment_version:delete");
+        /// <summary>
+        /// Open and decrypt a version tag
+        /// </summary>
+        public static RbacEnvironmentScope EnvironmentVersionOpen { get; } = new RbacEnvironmentScope("environment_version:open");
+        /// <summary>
+        /// Reads a version tag
+        /// </summary>
+        public static RbacEnvironmentScope EnvironmentVersionRead { get; } = new RbacEnvironmentScope("environment_version:read");
+        /// <summary>
+        /// Retracts a specific version of the given environment
+        /// </summary>
+        public static RbacEnvironmentScope EnvironmentVersionRetract { get; } = new RbacEnvironmentScope("environment_version:retract");
+        /// <summary>
+        /// Updates a version tag
+        /// </summary>
+        public static RbacEnvironmentScope EnvironmentVersionUpdate { get; } = new RbacEnvironmentScope("environment_version:update");
+        /// <summary>
+        /// Create environment webhook
+        /// </summary>
+        public static RbacEnvironmentScope EnvironmentWebhookCreate { get; } = new RbacEnvironmentScope("environment_webhook:create");
+        /// <summary>
+        /// Delete environment webhook
+        /// </summary>
+        public static RbacEnvironmentScope EnvironmentWebhookDelete { get; } = new RbacEnvironmentScope("environment_webhook:delete");
+        /// <summary>
+        /// Read environment webhook
+        /// </summary>
+        public static RbacEnvironmentScope EnvironmentWebhookRead { get; } = new RbacEnvironmentScope("environment_webhook:read");
+        /// <summary>
+        /// Update environment webhook
+        /// </summary>
+        public static RbacEnvironmentScope EnvironmentWebhookUpdate { get; } = new RbacEnvironmentScope("environment_webhook:update");
+
+        public static bool operator ==(RbacEnvironmentScope left, RbacEnvironmentScope right) => left.Equals(right);
+        public static bool operator !=(RbacEnvironmentScope left, RbacEnvironmentScope right) => !left.Equals(right);
+
+        public static explicit operator string(RbacEnvironmentScope value) => value._value;
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public override bool Equals(object? obj) => obj is RbacEnvironmentScope other && Equals(other);
+        public bool Equals(RbacEnvironmentScope other) => string.Equals(_value, other._value, StringComparison.Ordinal);
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public override int GetHashCode() => _value?.GetHashCode() ?? 0;
+
+        public override string ToString() => _value;
+    }
+
+    [EnumType]
+    public readonly struct RbacInsightsAccountScope : IEquatable<RbacInsightsAccountScope>
+    {
+        private readonly string _value;
+
+        private RbacInsightsAccountScope(string value)
+        {
+            _value = value ?? throw new ArgumentNullException(nameof(value));
+        }
+
+        /// <summary>
+        /// Delete Insights account
+        /// </summary>
+        public static RbacInsightsAccountScope InsightsAccountDelete { get; } = new RbacInsightsAccountScope("insights_account:delete");
+        /// <summary>
+        /// Read Insights account
+        /// </summary>
+        public static RbacInsightsAccountScope InsightsAccountRead { get; } = new RbacInsightsAccountScope("insights_account:read");
+        /// <summary>
+        /// Scan Insights account
+        /// </summary>
+        public static RbacInsightsAccountScope InsightsAccountScan { get; } = new RbacInsightsAccountScope("insights_account:scan");
+        /// <summary>
+        /// Update Insights account
+        /// </summary>
+        public static RbacInsightsAccountScope InsightsAccountUpdate { get; } = new RbacInsightsAccountScope("insights_account:update");
+        /// <summary>
+        /// Read Insights account access
+        /// </summary>
+        public static RbacInsightsAccountScope InsightsAccountAccessRead { get; } = new RbacInsightsAccountScope("insights_account_access:read");
+        /// <summary>
+        /// Update Insights account access
+        /// </summary>
+        public static RbacInsightsAccountScope InsightsAccountAccessUpdate { get; } = new RbacInsightsAccountScope("insights_account_access:update");
+        /// <summary>
+        /// Cancel Insights account scan
+        /// </summary>
+        public static RbacInsightsAccountScope InsightsAccountScanCancel { get; } = new RbacInsightsAccountScope("insights_account_scan:cancel");
+        /// <summary>
+        /// Pause Insights account scan
+        /// </summary>
+        public static RbacInsightsAccountScope InsightsAccountScanPause { get; } = new RbacInsightsAccountScope("insights_account_scan:pause");
+        /// <summary>
+        /// Read Insights account scan
+        /// </summary>
+        public static RbacInsightsAccountScope InsightsAccountScanRead { get; } = new RbacInsightsAccountScope("insights_account_scan:read");
+        /// <summary>
+        /// Resume Insights account scan
+        /// </summary>
+        public static RbacInsightsAccountScope InsightsAccountScanResume { get; } = new RbacInsightsAccountScope("insights_account_scan:resume");
+        /// <summary>
+        /// Update Insights account scan
+        /// </summary>
+        public static RbacInsightsAccountScope InsightsAccountScanUpdate { get; } = new RbacInsightsAccountScope("insights_account_scan:update");
+
+        public static bool operator ==(RbacInsightsAccountScope left, RbacInsightsAccountScope right) => left.Equals(right);
+        public static bool operator !=(RbacInsightsAccountScope left, RbacInsightsAccountScope right) => !left.Equals(right);
+
+        public static explicit operator string(RbacInsightsAccountScope value) => value._value;
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public override bool Equals(object? obj) => obj is RbacInsightsAccountScope other && Equals(other);
+        public bool Equals(RbacInsightsAccountScope other) => string.Equals(_value, other._value, StringComparison.Ordinal);
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public override int GetHashCode() => _value?.GetHashCode() ?? 0;
+
+        public override string ToString() => _value;
+    }
+
+    [EnumType]
+    public readonly struct RbacOrganizationScope : IEquatable<RbacOrganizationScope>
+    {
+        private readonly string _value;
+
+        private RbacOrganizationScope(string value)
+        {
+            _value = value ?? throw new ArgumentNullException(nameof(value));
+        }
+
+        /// <summary>
+        /// Create agent pool
+        /// </summary>
+        public static RbacOrganizationScope AgentPoolCreate { get; } = new RbacOrganizationScope("agent_pool:create");
+        /// <summary>
+        /// Delete agent pool
+        /// </summary>
+        public static RbacOrganizationScope AgentPoolDelete { get; } = new RbacOrganizationScope("agent_pool:delete");
+        /// <summary>
+        /// Read agent pool
+        /// </summary>
+        public static RbacOrganizationScope AgentPoolRead { get; } = new RbacOrganizationScope("agent_pool:read");
+        /// <summary>
+        /// Update agent pool
+        /// </summary>
+        public static RbacOrganizationScope AgentPoolUpdate { get; } = new RbacOrganizationScope("agent_pool:update");
+        /// <summary>
+        /// Create Neo tasks
+        /// </summary>
+        public static RbacOrganizationScope AgentTaskCreate { get; } = new RbacOrganizationScope("agent_task:create");
+        /// <summary>
+        /// Export audit logs
+        /// </summary>
+        public static RbacOrganizationScope AuditLogsExport { get; } = new RbacOrganizationScope("audit_logs:export");
+        /// <summary>
+        /// Read audit logs
+        /// </summary>
+        public static RbacOrganizationScope AuditLogsRead { get; } = new RbacOrganizationScope("audit_logs:read");
+        /// <summary>
+        /// Read authentication policies
+        /// </summary>
+        public static RbacOrganizationScope AuthPoliciesRead { get; } = new RbacOrganizationScope("auth_policies:read");
+        /// <summary>
+        /// Update authentication policies
+        /// </summary>
+        public static RbacOrganizationScope AuthPoliciesUpdate { get; } = new RbacOrganizationScope("auth_policies:update");
+        /// <summary>
+        /// Create approval rules
+        /// </summary>
+        public static RbacOrganizationScope ChangeGateCreate { get; } = new RbacOrganizationScope("change_gate:create");
+        /// <summary>
+        /// Delete approval rules
+        /// </summary>
+        public static RbacOrganizationScope ChangeGateDelete { get; } = new RbacOrganizationScope("change_gate:delete");
+        /// <summary>
+        /// Update approval rules
+        /// </summary>
+        public static RbacOrganizationScope ChangeGateUpdate { get; } = new RbacOrganizationScope("change_gate:update");
+        /// <summary>
+        /// Pause deployments
+        /// </summary>
+        public static RbacOrganizationScope DeploymentsPause { get; } = new RbacOrganizationScope("deployments:pause");
+        /// <summary>
+        /// Read deployments
+        /// </summary>
+        public static RbacOrganizationScope DeploymentsRead { get; } = new RbacOrganizationScope("deployments:read");
+        /// <summary>
+        /// Read deployment usage
+        /// </summary>
+        public static RbacOrganizationScope DeploymentsReadUsage { get; } = new RbacOrganizationScope("deployments:read_usage");
+        /// <summary>
+        /// Resume deployments
+        /// </summary>
+        public static RbacOrganizationScope DeploymentsResume { get; } = new RbacOrganizationScope("deployments:resume");
+        /// <summary>
+        /// Create environment
+        /// </summary>
+        public static RbacOrganizationScope EnvironmentCreate { get; } = new RbacOrganizationScope("environment:create");
+        /// <summary>
+        /// List deleted environments
+        /// </summary>
+        public static RbacOrganizationScope EnvironmentListDeleted { get; } = new RbacOrganizationScope("environment:list_deleted");
+        /// <summary>
+        /// Restore deleted environment
+        /// </summary>
+        public static RbacOrganizationScope EnvironmentRestoreDeleted { get; } = new RbacOrganizationScope("environment:restore_deleted");
+        /// <summary>
+        /// List the tags across all environments
+        /// </summary>
+        public static RbacOrganizationScope EnvironmentTagsList { get; } = new RbacOrganizationScope("environment_tags:list");
+        /// <summary>
+        /// Create GitHub team
+        /// </summary>
+        public static RbacOrganizationScope GithubTeamCreate { get; } = new RbacOrganizationScope("github_team:create");
+        /// <summary>
+        /// Create Insights account
+        /// </summary>
+        public static RbacOrganizationScope InsightsAccountCreate { get; } = new RbacOrganizationScope("insights_account:create");
+        /// <summary>
+        /// Read integrations
+        /// </summary>
+        public static RbacOrganizationScope IntegrationsRead { get; } = new RbacOrganizationScope("integrations:read");
+        /// <summary>
+        /// Update integrations
+        /// </summary>
+        public static RbacOrganizationScope IntegrationsUpdate { get; } = new RbacOrganizationScope("integrations:update");
+        /// <summary>
+        /// Create invites
+        /// </summary>
+        public static RbacOrganizationScope InvitesCreate { get; } = new RbacOrganizationScope("invites:create");
+        /// <summary>
+        /// Read invites
+        /// </summary>
+        public static RbacOrganizationScope InvitesRead { get; } = new RbacOrganizationScope("invites:read");
+        /// <summary>
+        /// Create OIDC issuer
+        /// </summary>
+        public static RbacOrganizationScope OidcIssuersCreate { get; } = new RbacOrganizationScope("oidc_issuers:create");
+        /// <summary>
+        /// Delete OIDC issuer
+        /// </summary>
+        public static RbacOrganizationScope OidcIssuersDelete { get; } = new RbacOrganizationScope("oidc_issuers:delete");
+        /// <summary>
+        /// Read OIDC issuers
+        /// </summary>
+        public static RbacOrganizationScope OidcIssuersRead { get; } = new RbacOrganizationScope("oidc_issuers:read");
+        /// <summary>
+        /// Regenerate OIDC issuer thumbprints
+        /// </summary>
+        public static RbacOrganizationScope OidcIssuersRegenerateThumbprints { get; } = new RbacOrganizationScope("oidc_issuers:regenerate_thumbprints");
+        /// <summary>
+        /// Update OIDC issuers
+        /// </summary>
+        public static RbacOrganizationScope OidcIssuersUpdate { get; } = new RbacOrganizationScope("oidc_issuers:update");
+        /// <summary>
+        /// Read organization integrations
+        /// </summary>
+        public static RbacOrganizationScope OrgIntegrationsRead { get; } = new RbacOrganizationScope("org_integrations:read");
+        /// <summary>
+        /// Update organization integrations
+        /// </summary>
+        public static RbacOrganizationScope OrgIntegrationsUpdate { get; } = new RbacOrganizationScope("org_integrations:update");
+        /// <summary>
+        /// Add organization member
+        /// </summary>
+        public static RbacOrganizationScope OrgMemberAdd { get; } = new RbacOrganizationScope("org_member:add");
+        /// <summary>
+        /// Delete organization member
+        /// </summary>
+        public static RbacOrganizationScope OrgMemberDelete { get; } = new RbacOrganizationScope("org_member:delete");
+        /// <summary>
+        /// Read organization member
+        /// </summary>
+        public static RbacOrganizationScope OrgMemberRead { get; } = new RbacOrganizationScope("org_member:read");
+        /// <summary>
+        /// Set organization member admin
+        /// </summary>
+        public static RbacOrganizationScope OrgMemberSetAdmin { get; } = new RbacOrganizationScope("org_member:set_admin");
+        /// <summary>
+        /// Update organization member
+        /// </summary>
+        public static RbacOrganizationScope OrgMemberUpdate { get; } = new RbacOrganizationScope("org_member:update");
+        /// <summary>
+        /// Read organization member access
+        /// </summary>
+        public static RbacOrganizationScope OrgMemberAccessRead { get; } = new RbacOrganizationScope("org_member_access:read");
+        /// <summary>
+        /// Read organization requests
+        /// </summary>
+        public static RbacOrganizationScope OrgRequestsRead { get; } = new RbacOrganizationScope("org_requests:read");
+        /// <summary>
+        /// Update organization requests
+        /// </summary>
+        public static RbacOrganizationScope OrgRequestsUpdate { get; } = new RbacOrganizationScope("org_requests:update");
+        /// <summary>
+        /// Create organization access token
+        /// </summary>
+        public static RbacOrganizationScope OrgTokenCreate { get; } = new RbacOrganizationScope("org_token:create");
+        /// <summary>
+        /// Delete organization access token
+        /// </summary>
+        public static RbacOrganizationScope OrgTokenDelete { get; } = new RbacOrganizationScope("org_token:delete");
+        /// <summary>
+        /// Read organization access token
+        /// </summary>
+        public static RbacOrganizationScope OrgTokenRead { get; } = new RbacOrganizationScope("org_token:read");
+        /// <summary>
+        /// Manage organization billing
+        /// </summary>
+        public static RbacOrganizationScope OrganizationBilling { get; } = new RbacOrganizationScope("organization:billing");
+        /// <summary>
+        /// Change organization backend
+        /// </summary>
+        public static RbacOrganizationScope OrganizationChangeBackend { get; } = new RbacOrganizationScope("organization:change_backend");
+        /// <summary>
+        /// Delete organization
+        /// </summary>
+        public static RbacOrganizationScope OrganizationDelete { get; } = new RbacOrganizationScope("organization:delete");
+        /// <summary>
+        /// Read organization usage
+        /// </summary>
+        public static RbacOrganizationScope OrganizationReadUsage { get; } = new RbacOrganizationScope("organization:read_usage");
+        /// <summary>
+        /// Rename organization
+        /// </summary>
+        public static RbacOrganizationScope OrganizationRename { get; } = new RbacOrganizationScope("organization:rename");
+        /// <summary>
+        /// Transfer organization stacks
+        /// </summary>
+        public static RbacOrganizationScope OrganizationTransferStacks { get; } = new RbacOrganizationScope("organization:transfer_stacks");
+        /// <summary>
+        /// Update organization
+        /// </summary>
+        public static RbacOrganizationScope OrganizationUpdate { get; } = new RbacOrganizationScope("organization:update");
+        /// <summary>
+        /// Create organization webhook
+        /// </summary>
+        public static RbacOrganizationScope OrganizationWebhookCreate { get; } = new RbacOrganizationScope("organization_webhook:create");
+        /// <summary>
+        /// Delete organization webhook
+        /// </summary>
+        public static RbacOrganizationScope OrganizationWebhookDelete { get; } = new RbacOrganizationScope("organization_webhook:delete");
+        /// <summary>
+        /// Read organization webhook
+        /// </summary>
+        public static RbacOrganizationScope OrganizationWebhookRead { get; } = new RbacOrganizationScope("organization_webhook:read");
+        /// <summary>
+        /// Update organization webhook
+        /// </summary>
+        public static RbacOrganizationScope OrganizationWebhookUpdate { get; } = new RbacOrganizationScope("organization_webhook:update");
+        /// <summary>
+        /// Create Insights policy groups
+        /// </summary>
+        public static RbacOrganizationScope PolicyGroupsCreate { get; } = new RbacOrganizationScope("policy_groups:create");
+        /// <summary>
+        /// Delete Insights policy groups
+        /// </summary>
+        public static RbacOrganizationScope PolicyGroupsDelete { get; } = new RbacOrganizationScope("policy_groups:delete");
+        /// <summary>
+        /// Read Insights policy groups
+        /// </summary>
+        public static RbacOrganizationScope PolicyGroupsRead { get; } = new RbacOrganizationScope("policy_groups:read");
+        /// <summary>
+        /// Update Insights policy groups
+        /// </summary>
+        public static RbacOrganizationScope PolicyGroupsUpdate { get; } = new RbacOrganizationScope("policy_groups:update");
+        /// <summary>
+        /// Create Insights policy pack
+        /// </summary>
+        public static RbacOrganizationScope PolicyPackCreate { get; } = new RbacOrganizationScope("policy_pack:create");
+        /// <summary>
+        /// Delete Insights policy pack
+        /// </summary>
+        public static RbacOrganizationScope PolicyPackDelete { get; } = new RbacOrganizationScope("policy_pack:delete");
+        /// <summary>
+        /// Read Insights policy pack
+        /// </summary>
+        public static RbacOrganizationScope PolicyPackRead { get; } = new RbacOrganizationScope("policy_pack:read");
+        /// <summary>
+        /// Update Insights policy pack
+        /// </summary>
+        public static RbacOrganizationScope PolicyPackUpdate { get; } = new RbacOrganizationScope("policy_pack:update");
+        /// <summary>
+        /// Read Insights policy results
+        /// </summary>
+        public static RbacOrganizationScope PolicyResultsRead { get; } = new RbacOrganizationScope("policy_results:read");
+        /// <summary>
+        /// Update Insights policy results
+        /// </summary>
+        public static RbacOrganizationScope PolicyResultsUpdate { get; } = new RbacOrganizationScope("policy_results:update");
+        /// <summary>
+        /// Decrypt project
+        /// </summary>
+        public static RbacOrganizationScope ProjectDecrypt { get; } = new RbacOrganizationScope("project:decrypt");
+        /// <summary>
+        /// Encrypt project
+        /// </summary>
+        public static RbacOrganizationScope ProjectEncrypt { get; } = new RbacOrganizationScope("project:encrypt");
+        /// <summary>
+        /// View resources dashboard
+        /// </summary>
+        public static RbacOrganizationScope ResourcesDashboard { get; } = new RbacOrganizationScope("resources:dashboard");
+        /// <summary>
+        /// Index resources
+        /// </summary>
+        public static RbacOrganizationScope ResourcesIndex { get; } = new RbacOrganizationScope("resources:index");
+        /// <summary>
+        /// Search resources
+        /// </summary>
+        public static RbacOrganizationScope ResourcesSearch { get; } = new RbacOrganizationScope("resources:search");
+        /// <summary>
+        /// Create role
+        /// </summary>
+        public static RbacOrganizationScope RoleCreate { get; } = new RbacOrganizationScope("role:create");
+        /// <summary>
+        /// Delete role
+        /// </summary>
+        public static RbacOrganizationScope RoleDelete { get; } = new RbacOrganizationScope("role:delete");
+        /// <summary>
+        /// Read role
+        /// </summary>
+        public static RbacOrganizationScope RoleRead { get; } = new RbacOrganizationScope("role:read");
+        /// <summary>
+        /// Update role
+        /// </summary>
+        public static RbacOrganizationScope RoleUpdate { get; } = new RbacOrganizationScope("role:update");
+        /// <summary>
+        /// Read SAML
+        /// </summary>
+        public static RbacOrganizationScope SamlRead { get; } = new RbacOrganizationScope("saml:read");
+        /// <summary>
+        /// Update SAML
+        /// </summary>
+        public static RbacOrganizationScope SamlUpdate { get; } = new RbacOrganizationScope("saml:update");
+        /// <summary>
+        /// Delete SCIM
+        /// </summary>
+        public static RbacOrganizationScope ScimDelete { get; } = new RbacOrganizationScope("scim:delete");
+        /// <summary>
+        /// Read SCIM
+        /// </summary>
+        public static RbacOrganizationScope ScimRead { get; } = new RbacOrganizationScope("scim:read");
+        /// <summary>
+        /// Update SCIM
+        /// </summary>
+        public static RbacOrganizationScope ScimUpdate { get; } = new RbacOrganizationScope("scim:update");
+        /// <summary>
+        /// Create stack
+        /// </summary>
+        public static RbacOrganizationScope StackCreate { get; } = new RbacOrganizationScope("stack:create");
+        /// <summary>
+        /// List deleted stacks
+        /// </summary>
+        public static RbacOrganizationScope StackListDeleted { get; } = new RbacOrganizationScope("stack:list_deleted");
+        /// <summary>
+        /// Restore deleted stack
+        /// </summary>
+        public static RbacOrganizationScope StackRestoreDeleted { get; } = new RbacOrganizationScope("stack:restore_deleted");
+        /// <summary>
+        /// Read project tags
+        /// </summary>
+        public static RbacOrganizationScope TagsRead { get; } = new RbacOrganizationScope("tags:read");
+        /// <summary>
+        /// Create team
+        /// </summary>
+        public static RbacOrganizationScope TeamCreate { get; } = new RbacOrganizationScope("team:create");
+        /// <summary>
+        /// Create team access token
+        /// </summary>
+        public static RbacOrganizationScope TeamCreateToken { get; } = new RbacOrganizationScope("team:create_token");
+        /// <summary>
+        /// Delete team
+        /// </summary>
+        public static RbacOrganizationScope TeamDelete { get; } = new RbacOrganizationScope("team:delete");
+        /// <summary>
+        /// Delete team access token
+        /// </summary>
+        public static RbacOrganizationScope TeamDeleteToken { get; } = new RbacOrganizationScope("team:delete_token");
+        /// <summary>
+        /// List teams
+        /// </summary>
+        public static RbacOrganizationScope TeamList { get; } = new RbacOrganizationScope("team:list");
+        /// <summary>
+        /// List team access tokens
+        /// </summary>
+        public static RbacOrganizationScope TeamListTokens { get; } = new RbacOrganizationScope("team:list_tokens");
+        /// <summary>
+        /// Read team
+        /// </summary>
+        public static RbacOrganizationScope TeamRead { get; } = new RbacOrganizationScope("team:read");
+        /// <summary>
+        /// Update team
+        /// </summary>
+        public static RbacOrganizationScope TeamUpdate { get; } = new RbacOrganizationScope("team:update");
+        /// <summary>
+        /// Read templates
+        /// </summary>
+        public static RbacOrganizationScope TemplatesRead { get; } = new RbacOrganizationScope("templates:read");
+        /// <summary>
+        /// Create template sources
+        /// </summary>
+        public static RbacOrganizationScope TemplatesSourceCreate { get; } = new RbacOrganizationScope("templates_source:create");
+        /// <summary>
+        /// Delete template sources
+        /// </summary>
+        public static RbacOrganizationScope TemplatesSourceDelete { get; } = new RbacOrganizationScope("templates_source:delete");
+        /// <summary>
+        /// Read template sources
+        /// </summary>
+        public static RbacOrganizationScope TemplatesSourceRead { get; } = new RbacOrganizationScope("templates_source:read");
+        /// <summary>
+        /// Update template sources
+        /// </summary>
+        public static RbacOrganizationScope TemplatesSourceUpdate { get; } = new RbacOrganizationScope("templates_source:update");
+
+        public static bool operator ==(RbacOrganizationScope left, RbacOrganizationScope right) => left.Equals(right);
+        public static bool operator !=(RbacOrganizationScope left, RbacOrganizationScope right) => !left.Equals(right);
+
+        public static explicit operator string(RbacOrganizationScope value) => value._value;
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public override bool Equals(object? obj) => obj is RbacOrganizationScope other && Equals(other);
+        public bool Equals(RbacOrganizationScope other) => string.Equals(_value, other._value, StringComparison.Ordinal);
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public override int GetHashCode() => _value?.GetHashCode() ?? 0;
+
+        public override string ToString() => _value;
+    }
+
+    [EnumType]
     public readonly struct RbacPermission : IEquatable<RbacPermission>
     {
         private readonly string _value;
@@ -298,6 +932,182 @@ namespace Pulumi.PulumiService
         [EditorBrowsable(EditorBrowsableState.Never)]
         public override bool Equals(object? obj) => obj is RbacPermission other && Equals(other);
         public bool Equals(RbacPermission other) => string.Equals(_value, other._value, StringComparison.Ordinal);
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public override int GetHashCode() => _value?.GetHashCode() ?? 0;
+
+        public override string ToString() => _value;
+    }
+
+    [EnumType]
+    public readonly struct RbacStackScope : IEquatable<RbacStackScope>
+    {
+        private readonly string _value;
+
+        private RbacStackScope(string value)
+        {
+            _value = value ?? throw new ArgumentNullException(nameof(value));
+        }
+
+        /// <summary>
+        /// Cancel stack update
+        /// </summary>
+        public static RbacStackScope StackCancelUpdate { get; } = new RbacStackScope("stack:cancel_update");
+        /// <summary>
+        /// Create stack
+        /// </summary>
+        public static RbacStackScope StackCreate { get; } = new RbacStackScope("stack:create");
+        /// <summary>
+        /// Decrypt stack
+        /// </summary>
+        public static RbacStackScope StackDecrypt { get; } = new RbacStackScope("stack:decrypt");
+        /// <summary>
+        /// Delete stack
+        /// </summary>
+        public static RbacStackScope StackDelete { get; } = new RbacStackScope("stack:delete");
+        /// <summary>
+        /// Encrypt stack
+        /// </summary>
+        public static RbacStackScope StackEncrypt { get; } = new RbacStackScope("stack:encrypt");
+        /// <summary>
+        /// Export stack
+        /// </summary>
+        public static RbacStackScope StackExport { get; } = new RbacStackScope("stack:export");
+        /// <summary>
+        /// Import stack
+        /// </summary>
+        public static RbacStackScope StackImport { get; } = new RbacStackScope("stack:import");
+        /// <summary>
+        /// Read stack
+        /// </summary>
+        public static RbacStackScope StackRead { get; } = new RbacStackScope("stack:read");
+        /// <summary>
+        /// Rename stack
+        /// </summary>
+        public static RbacStackScope StackRename { get; } = new RbacStackScope("stack:rename");
+        /// <summary>
+        /// Transfer stack
+        /// </summary>
+        public static RbacStackScope StackTransfer { get; } = new RbacStackScope("stack:transfer");
+        /// <summary>
+        /// Write stack
+        /// </summary>
+        public static RbacStackScope StackWrite { get; } = new RbacStackScope("stack:write");
+        /// <summary>
+        /// Read stack teams
+        /// </summary>
+        public static RbacStackScope StackAccessRead { get; } = new RbacStackScope("stack_access:read");
+        /// <summary>
+        /// Update stack teams
+        /// </summary>
+        public static RbacStackScope StackAccessUpdate { get; } = new RbacStackScope("stack_access:update");
+        /// <summary>
+        /// Create deployment
+        /// </summary>
+        public static RbacStackScope StackDeploymentCreate { get; } = new RbacStackScope("stack_deployment:create");
+        /// <summary>
+        /// Read deployment
+        /// </summary>
+        public static RbacStackScope StackDeploymentRead { get; } = new RbacStackScope("stack_deployment:read");
+        /// <summary>
+        /// Encrypt deployment settings
+        /// </summary>
+        public static RbacStackScope StackDeploymentSettingsEncrypt { get; } = new RbacStackScope("stack_deployment_settings:encrypt");
+        /// <summary>
+        /// Read deployment settings
+        /// </summary>
+        public static RbacStackScope StackDeploymentSettingsRead { get; } = new RbacStackScope("stack_deployment_settings:read");
+        /// <summary>
+        /// Write deployment settings
+        /// </summary>
+        public static RbacStackScope StackDeploymentSettingsWrite { get; } = new RbacStackScope("stack_deployment_settings:write");
+        /// <summary>
+        /// Create stack schedule
+        /// </summary>
+        public static RbacStackScope StackScheduleCreate { get; } = new RbacStackScope("stack_schedule:create");
+        /// <summary>
+        /// Delete stack schedule
+        /// </summary>
+        public static RbacStackScope StackScheduleDelete { get; } = new RbacStackScope("stack_schedule:delete");
+        /// <summary>
+        /// Pause stack schedule
+        /// </summary>
+        public static RbacStackScope StackSchedulePause { get; } = new RbacStackScope("stack_schedule:pause");
+        /// <summary>
+        /// Read stack schedule
+        /// </summary>
+        public static RbacStackScope StackScheduleRead { get; } = new RbacStackScope("stack_schedule:read");
+        /// <summary>
+        /// Resume stack schedule
+        /// </summary>
+        public static RbacStackScope StackScheduleResume { get; } = new RbacStackScope("stack_schedule:resume");
+        /// <summary>
+        /// Update stack schedule
+        /// </summary>
+        public static RbacStackScope StackScheduleUpdate { get; } = new RbacStackScope("stack_schedule:update");
+        /// <summary>
+        /// Update stack tags
+        /// </summary>
+        public static RbacStackScope StackTagsUpdate { get; } = new RbacStackScope("stack_tags:update");
+        /// <summary>
+        /// Create stack webhook
+        /// </summary>
+        public static RbacStackScope StackWebhookCreate { get; } = new RbacStackScope("stack_webhook:create");
+        /// <summary>
+        /// Delete stack webhook
+        /// </summary>
+        public static RbacStackScope StackWebhookDelete { get; } = new RbacStackScope("stack_webhook:delete");
+        /// <summary>
+        /// Read stack webhook
+        /// </summary>
+        public static RbacStackScope StackWebhookRead { get; } = new RbacStackScope("stack_webhook:read");
+        /// <summary>
+        /// Update stack webhook
+        /// </summary>
+        public static RbacStackScope StackWebhookUpdate { get; } = new RbacStackScope("stack_webhook:update");
+
+        public static bool operator ==(RbacStackScope left, RbacStackScope right) => left.Equals(right);
+        public static bool operator !=(RbacStackScope left, RbacStackScope right) => !left.Equals(right);
+
+        public static explicit operator string(RbacStackScope value) => value._value;
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public override bool Equals(object? obj) => obj is RbacStackScope other && Equals(other);
+        public bool Equals(RbacStackScope other) => string.Equals(_value, other._value, StringComparison.Ordinal);
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public override int GetHashCode() => _value?.GetHashCode() ?? 0;
+
+        public override string ToString() => _value;
+    }
+
+    [EnumType]
+    public readonly struct RoleTagOperator : IEquatable<RoleTagOperator>
+    {
+        private readonly string _value;
+
+        private RoleTagOperator(string value)
+        {
+            _value = value ?? throw new ArgumentNullException(nameof(value));
+        }
+
+        /// <summary>
+        /// Match entities whose tag equals the value (or that have the tag, when no value is set).
+        /// </summary>
+        public static RoleTagOperator EqualsValue { get; } = new RoleTagOperator("equals");
+        /// <summary>
+        /// Match entities whose tag does not equal the value (or that lack the tag, when no value is set).
+        /// </summary>
+        public static RoleTagOperator NotEquals { get; } = new RoleTagOperator("notEquals");
+
+        public static bool operator ==(RoleTagOperator left, RoleTagOperator right) => left.Equals(right);
+        public static bool operator !=(RoleTagOperator left, RoleTagOperator right) => !left.Equals(right);
+
+        public static explicit operator string(RoleTagOperator value) => value._value;
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public override bool Equals(object? obj) => obj is RoleTagOperator other && Equals(other);
+        public bool Equals(RoleTagOperator other) => string.Equals(_value, other._value, StringComparison.Ordinal);
 
         [EditorBrowsable(EditorBrowsableState.Never)]
         public override int GetHashCode() => _value?.GetHashCode() ?? 0;

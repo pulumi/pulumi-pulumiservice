@@ -513,6 +513,196 @@ export interface PolicyPackPolicyInputArgs {
     url?: pulumi.Input<string | undefined>;
 }
 
+export interface RoleEnvironmentRule {
+    /**
+     * Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+     */
+    all?: boolean;
+    /**
+     * Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or an Insights account's `insightsAccountId`.
+     */
+    id?: string;
+    /**
+     * Permission sets to grant, typically the output of `getOrganizationPermissionSet`. Each set's `resourceType` must match this rule's entity type. Pulumi Cloud accepts permission sets only in a policy: see `buildRolePermissions`.
+     */
+    permissionSets?: inputs.RolePermissionSetRef[];
+    /**
+     * Environment scopes to grant on the selected environments.
+     */
+    scopes?: enums.RbacEnvironmentScope[];
+    /**
+     * Apply to entities whose tags match every condition.
+     */
+    tags?: inputs.RoleTagCondition[];
+}
+
+export interface RoleEnvironmentRuleArgs {
+    /**
+     * Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+     */
+    all?: pulumi.Input<boolean | undefined>;
+    /**
+     * Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or an Insights account's `insightsAccountId`.
+     */
+    id?: pulumi.Input<string | undefined>;
+    /**
+     * Permission sets to grant, typically the output of `getOrganizationPermissionSet`. Each set's `resourceType` must match this rule's entity type. Pulumi Cloud accepts permission sets only in a policy: see `buildRolePermissions`.
+     */
+    permissionSets?: pulumi.Input<pulumi.Input<inputs.RolePermissionSetRefArgs>[] | undefined>;
+    /**
+     * Environment scopes to grant on the selected environments.
+     */
+    scopes?: pulumi.Input<pulumi.Input<enums.RbacEnvironmentScope>[] | undefined>;
+    /**
+     * Apply to entities whose tags match every condition.
+     */
+    tags?: pulumi.Input<pulumi.Input<inputs.RoleTagConditionArgs>[] | undefined>;
+}
+
+export interface RoleInsightsAccountRule {
+    /**
+     * Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+     */
+    all?: boolean;
+    /**
+     * Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or an Insights account's `insightsAccountId`.
+     */
+    id?: string;
+    /**
+     * Permission sets to grant, typically the output of `getOrganizationPermissionSet`. Each set's `resourceType` must match this rule's entity type. Pulumi Cloud accepts permission sets only in a policy: see `buildRolePermissions`.
+     */
+    permissionSets?: inputs.RolePermissionSetRef[];
+    /**
+     * Insights account scopes to grant on the selected accounts.
+     */
+    scopes?: enums.RbacInsightsAccountScope[];
+    /**
+     * Apply to entities whose tags match every condition.
+     */
+    tags?: inputs.RoleTagCondition[];
+}
+
+export interface RoleInsightsAccountRuleArgs {
+    /**
+     * Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+     */
+    all?: pulumi.Input<boolean | undefined>;
+    /**
+     * Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or an Insights account's `insightsAccountId`.
+     */
+    id?: pulumi.Input<string | undefined>;
+    /**
+     * Permission sets to grant, typically the output of `getOrganizationPermissionSet`. Each set's `resourceType` must match this rule's entity type. Pulumi Cloud accepts permission sets only in a policy: see `buildRolePermissions`.
+     */
+    permissionSets?: pulumi.Input<pulumi.Input<inputs.RolePermissionSetRefArgs>[] | undefined>;
+    /**
+     * Insights account scopes to grant on the selected accounts.
+     */
+    scopes?: pulumi.Input<pulumi.Input<enums.RbacInsightsAccountScope>[] | undefined>;
+    /**
+     * Apply to entities whose tags match every condition.
+     */
+    tags?: pulumi.Input<pulumi.Input<inputs.RoleTagConditionArgs>[] | undefined>;
+}
+
+export interface RolePermissionSetRef {
+    /**
+     * The permission set's ID.
+     */
+    permissionSetId: string;
+    /**
+     * The permission set's entity type: `stack`, `environment`, `insights-account`, or `global` for organization-level sets. It must match the rule list the set is used in.
+     */
+    resourceType: string;
+}
+
+export interface RolePermissionSetRefArgs {
+    /**
+     * The permission set's ID.
+     */
+    permissionSetId: pulumi.Input<string>;
+    /**
+     * The permission set's entity type: `stack`, `environment`, `insights-account`, or `global` for organization-level sets. It must match the rule list the set is used in.
+     */
+    resourceType: pulumi.Input<string>;
+}
+
+export interface RoleStackRule {
+    /**
+     * Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+     */
+    all?: boolean;
+    /**
+     * Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or an Insights account's `insightsAccountId`.
+     */
+    id?: string;
+    /**
+     * Permission sets to grant, typically the output of `getOrganizationPermissionSet`. Each set's `resourceType` must match this rule's entity type. Pulumi Cloud accepts permission sets only in a policy: see `buildRolePermissions`.
+     */
+    permissionSets?: inputs.RolePermissionSetRef[];
+    /**
+     * Stack scopes to grant on the selected stacks.
+     */
+    scopes?: enums.RbacStackScope[];
+    /**
+     * Apply to entities whose tags match every condition.
+     */
+    tags?: inputs.RoleTagCondition[];
+}
+
+export interface RoleStackRuleArgs {
+    /**
+     * Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+     */
+    all?: pulumi.Input<boolean | undefined>;
+    /**
+     * Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or an Insights account's `insightsAccountId`.
+     */
+    id?: pulumi.Input<string | undefined>;
+    /**
+     * Permission sets to grant, typically the output of `getOrganizationPermissionSet`. Each set's `resourceType` must match this rule's entity type. Pulumi Cloud accepts permission sets only in a policy: see `buildRolePermissions`.
+     */
+    permissionSets?: pulumi.Input<pulumi.Input<inputs.RolePermissionSetRefArgs>[] | undefined>;
+    /**
+     * Stack scopes to grant on the selected stacks.
+     */
+    scopes?: pulumi.Input<pulumi.Input<enums.RbacStackScope>[] | undefined>;
+    /**
+     * Apply to entities whose tags match every condition.
+     */
+    tags?: pulumi.Input<pulumi.Input<inputs.RoleTagConditionArgs>[] | undefined>;
+}
+
+export interface RoleTagCondition {
+    /**
+     * The tag key.
+     */
+    key: string;
+    /**
+     * How the tag is compared. Defaults to `equals`.
+     */
+    operator?: enums.RoleTagOperator;
+    /**
+     * The tag value. When omitted, the condition matches on whether the tag is present.
+     */
+    value?: string;
+}
+
+export interface RoleTagConditionArgs {
+    /**
+     * The tag key.
+     */
+    key: pulumi.Input<string>;
+    /**
+     * How the tag is compared. Defaults to `equals`.
+     */
+    operator?: pulumi.Input<enums.RoleTagOperator | undefined>;
+    /**
+     * The tag value. When omitted, the condition matches on whether the tag is present.
+     */
+    value?: pulumi.Input<string | undefined>;
+}
+
 export interface TemplateSourceDestinationArgs {
     /**
      * Destination URL that gets filled in on new project creation.
