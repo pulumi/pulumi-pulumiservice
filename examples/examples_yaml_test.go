@@ -639,6 +639,29 @@ func TestYamlRbacExample(t *testing.T) {
 	test.Destroy(t)
 }
 
+// TestYamlOrganizationRoleExample runs OrganizationRole end to end with the
+// RBAC helper functions, including permission sets granted through a policy.
+// Requires the Custom Roles feature on the test organization.
+func TestYamlOrganizationRoleExample(t *testing.T) {
+	test := pulumitest.NewPulumiTest(t,
+		filepath.Join(getCwd(t), "yaml-organization-role"),
+		inMemoryProvider(),
+		opttest.UseAmbientBackend(),
+		opttest.StackName(randomStackName()),
+	)
+	test.SetConfig(t, "digits", generateRandomFiveDigits())
+	test.SetConfig(t, "organizationName", getOrgName())
+
+	up := test.Up(t)
+	assert.NotEmpty(t, up.Outputs["platformRoleId"].Value)
+	assert.NotEmpty(t, up.Outputs["operatorRoleId"].Value)
+	preview := test.Preview(t)
+	assertpreview.HasNoChanges(t, preview)
+	refresh := test.Refresh(t)
+	assertrefresh.HasNoChanges(t, refresh)
+	test.Destroy(t)
+}
+
 // TestYamlRbacComposeImport pins the headline regression: a Pulumi
 // Cloud role authored with `PermissionDescriptorCompose` (the variant
 // an earlier structural translator rejected with "unknown __type")

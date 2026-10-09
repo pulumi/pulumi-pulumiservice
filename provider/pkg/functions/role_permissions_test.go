@@ -220,7 +220,7 @@ func TestBuildInsightsAccountScopedPermissions(t *testing.T) {
 			context.Background(),
 			infer.FunctionRequest[BuildInsightsAccountScopedPermissionsInput]{
 				Input: BuildInsightsAccountScopedPermissionsInput{
-					InsightsAccountID: "acct-1",
+					InsightsAccountID: testAccountID,
 					Permissions:       []string{permInsightsAccountRead},
 				},
 			},
@@ -230,7 +230,7 @@ func TestBuildInsightsAccountScopedPermissions(t *testing.T) {
 			t, resp.Output.Permissions,
 			"PermissionExpressionInsightsAccount",
 			"PermissionLiteralExpressionInsightsAccount",
-			"acct-1",
+			testAccountID,
 			[]string{permInsightsAccountRead},
 		)
 	})
@@ -254,7 +254,7 @@ func TestBuildInsightsAccountScopedPermissions(t *testing.T) {
 			context.Background(),
 			infer.FunctionRequest[BuildInsightsAccountScopedPermissionsInput]{
 				Input: BuildInsightsAccountScopedPermissionsInput{
-					InsightsAccountID: "acct-1",
+					InsightsAccountID: testAccountID,
 				},
 			},
 		)

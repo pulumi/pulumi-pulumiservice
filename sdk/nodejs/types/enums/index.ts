@@ -120,6 +120,577 @@ export const PulumiOperation = {
 
 export type PulumiOperation = (typeof PulumiOperation)[keyof typeof PulumiOperation];
 
+export const RbacEnvironmentScope = {
+    /**
+     * Create approval rules
+     */
+    ChangeGateCreate: "change_gate:create",
+    /**
+     * Delete approval rules
+     */
+    ChangeGateDelete: "change_gate:delete",
+    /**
+     * Update approval rules
+     */
+    ChangeGateUpdate: "change_gate:update",
+    /**
+     * Clone environment
+     */
+    EnvironmentClone: "environment:clone",
+    /**
+     * Delete environment
+     */
+    EnvironmentDelete: "environment:delete",
+    /**
+     * Open and decrypt environment
+     */
+    EnvironmentOpen: "environment:open",
+    /**
+     * Read environment
+     */
+    EnvironmentRead: "environment:read",
+    /**
+     * Rotates secrets in an environment
+     */
+    EnvironmentRotate: "environment:rotate",
+    /**
+     * List secret rotation history of an environment
+     */
+    EnvironmentRotateHistory: "environment:rotate_history",
+    /**
+     * Write environment
+     */
+    EnvironmentWrite: "environment:write",
+    /**
+     * Creates a new environment schedule
+     */
+    EnvironmentScheduleCreate: "environment_schedule:create",
+    /**
+     * Deletes an environment schedule
+     */
+    EnvironmentScheduleDelete: "environment_schedule:delete",
+    /**
+     * Pauses an environment schedule
+     */
+    EnvironmentSchedulePause: "environment_schedule:pause",
+    /**
+     * Reads an environment schedule
+     */
+    EnvironmentScheduleRead: "environment_schedule:read",
+    /**
+     * Resumes an environment schedule
+     */
+    EnvironmentScheduleResume: "environment_schedule:resume",
+    /**
+     * Updates an environment schedule
+     */
+    EnvironmentScheduleUpdate: "environment_schedule:update",
+    /**
+     * Read environment settings
+     */
+    EnvironmentSettingsRead: "environment_settings:read",
+    /**
+     * Update environment settings
+     */
+    EnvironmentSettingsUpdate: "environment_settings:update",
+    /**
+     * Adds a new tag to an environment
+     */
+    EnvironmentTagCreate: "environment_tag:create",
+    /**
+     * Removes a tag from an environment
+     */
+    EnvironmentTagDelete: "environment_tag:delete",
+    /**
+     * Reads the value of an environments tag
+     */
+    EnvironmentTagRead: "environment_tag:read",
+    /**
+     * Modifies the value of an environments tag
+     */
+    EnvironmentTagUpdate: "environment_tag:update",
+    /**
+     * Creates a new version tag
+     */
+    EnvironmentVersionCreate: "environment_version:create",
+    /**
+     * Deletes a version tag
+     */
+    EnvironmentVersionDelete: "environment_version:delete",
+    /**
+     * Open and decrypt a version tag
+     */
+    EnvironmentVersionOpen: "environment_version:open",
+    /**
+     * Reads a version tag
+     */
+    EnvironmentVersionRead: "environment_version:read",
+    /**
+     * Retracts a specific version of the given environment
+     */
+    EnvironmentVersionRetract: "environment_version:retract",
+    /**
+     * Updates a version tag
+     */
+    EnvironmentVersionUpdate: "environment_version:update",
+    /**
+     * Create environment webhook
+     */
+    EnvironmentWebhookCreate: "environment_webhook:create",
+    /**
+     * Delete environment webhook
+     */
+    EnvironmentWebhookDelete: "environment_webhook:delete",
+    /**
+     * Read environment webhook
+     */
+    EnvironmentWebhookRead: "environment_webhook:read",
+    /**
+     * Update environment webhook
+     */
+    EnvironmentWebhookUpdate: "environment_webhook:update",
+} as const;
+
+export type RbacEnvironmentScope = (typeof RbacEnvironmentScope)[keyof typeof RbacEnvironmentScope];
+
+export const RbacInsightsAccountScope = {
+    /**
+     * Delete Insights account
+     */
+    InsightsAccountDelete: "insights_account:delete",
+    /**
+     * Read Insights account
+     */
+    InsightsAccountRead: "insights_account:read",
+    /**
+     * Scan Insights account
+     */
+    InsightsAccountScan: "insights_account:scan",
+    /**
+     * Update Insights account
+     */
+    InsightsAccountUpdate: "insights_account:update",
+    /**
+     * Read Insights account access
+     */
+    InsightsAccountAccessRead: "insights_account_access:read",
+    /**
+     * Update Insights account access
+     */
+    InsightsAccountAccessUpdate: "insights_account_access:update",
+    /**
+     * Cancel Insights account scan
+     */
+    InsightsAccountScanCancel: "insights_account_scan:cancel",
+    /**
+     * Pause Insights account scan
+     */
+    InsightsAccountScanPause: "insights_account_scan:pause",
+    /**
+     * Read Insights account scan
+     */
+    InsightsAccountScanRead: "insights_account_scan:read",
+    /**
+     * Resume Insights account scan
+     */
+    InsightsAccountScanResume: "insights_account_scan:resume",
+    /**
+     * Update Insights account scan
+     */
+    InsightsAccountScanUpdate: "insights_account_scan:update",
+} as const;
+
+export type RbacInsightsAccountScope = (typeof RbacInsightsAccountScope)[keyof typeof RbacInsightsAccountScope];
+
+export const RbacOrganizationScope = {
+    /**
+     * Create agent pool
+     */
+    AgentPoolCreate: "agent_pool:create",
+    /**
+     * Delete agent pool
+     */
+    AgentPoolDelete: "agent_pool:delete",
+    /**
+     * Read agent pool
+     */
+    AgentPoolRead: "agent_pool:read",
+    /**
+     * Update agent pool
+     */
+    AgentPoolUpdate: "agent_pool:update",
+    /**
+     * Create Neo tasks
+     */
+    AgentTaskCreate: "agent_task:create",
+    /**
+     * Export audit logs
+     */
+    AuditLogsExport: "audit_logs:export",
+    /**
+     * Read audit logs
+     */
+    AuditLogsRead: "audit_logs:read",
+    /**
+     * Read authentication policies
+     */
+    AuthPoliciesRead: "auth_policies:read",
+    /**
+     * Update authentication policies
+     */
+    AuthPoliciesUpdate: "auth_policies:update",
+    /**
+     * Create approval rules
+     */
+    ChangeGateCreate: "change_gate:create",
+    /**
+     * Delete approval rules
+     */
+    ChangeGateDelete: "change_gate:delete",
+    /**
+     * Update approval rules
+     */
+    ChangeGateUpdate: "change_gate:update",
+    /**
+     * Pause deployments
+     */
+    DeploymentsPause: "deployments:pause",
+    /**
+     * Read deployments
+     */
+    DeploymentsRead: "deployments:read",
+    /**
+     * Read deployment usage
+     */
+    DeploymentsReadUsage: "deployments:read_usage",
+    /**
+     * Resume deployments
+     */
+    DeploymentsResume: "deployments:resume",
+    /**
+     * Create environment
+     */
+    EnvironmentCreate: "environment:create",
+    /**
+     * List deleted environments
+     */
+    EnvironmentListDeleted: "environment:list_deleted",
+    /**
+     * Restore deleted environment
+     */
+    EnvironmentRestoreDeleted: "environment:restore_deleted",
+    /**
+     * List the tags across all environments
+     */
+    EnvironmentTagsList: "environment_tags:list",
+    /**
+     * Create GitHub team
+     */
+    GithubTeamCreate: "github_team:create",
+    /**
+     * Create Insights account
+     */
+    InsightsAccountCreate: "insights_account:create",
+    /**
+     * Read integrations
+     */
+    IntegrationsRead: "integrations:read",
+    /**
+     * Update integrations
+     */
+    IntegrationsUpdate: "integrations:update",
+    /**
+     * Create invites
+     */
+    InvitesCreate: "invites:create",
+    /**
+     * Read invites
+     */
+    InvitesRead: "invites:read",
+    /**
+     * Create OIDC issuer
+     */
+    OidcIssuersCreate: "oidc_issuers:create",
+    /**
+     * Delete OIDC issuer
+     */
+    OidcIssuersDelete: "oidc_issuers:delete",
+    /**
+     * Read OIDC issuers
+     */
+    OidcIssuersRead: "oidc_issuers:read",
+    /**
+     * Regenerate OIDC issuer thumbprints
+     */
+    OidcIssuersRegenerateThumbprints: "oidc_issuers:regenerate_thumbprints",
+    /**
+     * Update OIDC issuers
+     */
+    OidcIssuersUpdate: "oidc_issuers:update",
+    /**
+     * Read organization integrations
+     */
+    OrgIntegrationsRead: "org_integrations:read",
+    /**
+     * Update organization integrations
+     */
+    OrgIntegrationsUpdate: "org_integrations:update",
+    /**
+     * Add organization member
+     */
+    OrgMemberAdd: "org_member:add",
+    /**
+     * Delete organization member
+     */
+    OrgMemberDelete: "org_member:delete",
+    /**
+     * Read organization member
+     */
+    OrgMemberRead: "org_member:read",
+    /**
+     * Set organization member admin
+     */
+    OrgMemberSetAdmin: "org_member:set_admin",
+    /**
+     * Update organization member
+     */
+    OrgMemberUpdate: "org_member:update",
+    /**
+     * Read organization member access
+     */
+    OrgMemberAccessRead: "org_member_access:read",
+    /**
+     * Read organization requests
+     */
+    OrgRequestsRead: "org_requests:read",
+    /**
+     * Update organization requests
+     */
+    OrgRequestsUpdate: "org_requests:update",
+    /**
+     * Create organization access token
+     */
+    OrgTokenCreate: "org_token:create",
+    /**
+     * Delete organization access token
+     */
+    OrgTokenDelete: "org_token:delete",
+    /**
+     * Read organization access token
+     */
+    OrgTokenRead: "org_token:read",
+    /**
+     * Manage organization billing
+     */
+    OrganizationBilling: "organization:billing",
+    /**
+     * Change organization backend
+     */
+    OrganizationChangeBackend: "organization:change_backend",
+    /**
+     * Delete organization
+     */
+    OrganizationDelete: "organization:delete",
+    /**
+     * Read organization usage
+     */
+    OrganizationReadUsage: "organization:read_usage",
+    /**
+     * Rename organization
+     */
+    OrganizationRename: "organization:rename",
+    /**
+     * Transfer organization stacks
+     */
+    OrganizationTransferStacks: "organization:transfer_stacks",
+    /**
+     * Update organization
+     */
+    OrganizationUpdate: "organization:update",
+    /**
+     * Create organization webhook
+     */
+    OrganizationWebhookCreate: "organization_webhook:create",
+    /**
+     * Delete organization webhook
+     */
+    OrganizationWebhookDelete: "organization_webhook:delete",
+    /**
+     * Read organization webhook
+     */
+    OrganizationWebhookRead: "organization_webhook:read",
+    /**
+     * Update organization webhook
+     */
+    OrganizationWebhookUpdate: "organization_webhook:update",
+    /**
+     * Create Insights policy groups
+     */
+    PolicyGroupsCreate: "policy_groups:create",
+    /**
+     * Delete Insights policy groups
+     */
+    PolicyGroupsDelete: "policy_groups:delete",
+    /**
+     * Read Insights policy groups
+     */
+    PolicyGroupsRead: "policy_groups:read",
+    /**
+     * Update Insights policy groups
+     */
+    PolicyGroupsUpdate: "policy_groups:update",
+    /**
+     * Create Insights policy pack
+     */
+    PolicyPackCreate: "policy_pack:create",
+    /**
+     * Delete Insights policy pack
+     */
+    PolicyPackDelete: "policy_pack:delete",
+    /**
+     * Read Insights policy pack
+     */
+    PolicyPackRead: "policy_pack:read",
+    /**
+     * Update Insights policy pack
+     */
+    PolicyPackUpdate: "policy_pack:update",
+    /**
+     * Read Insights policy results
+     */
+    PolicyResultsRead: "policy_results:read",
+    /**
+     * Update Insights policy results
+     */
+    PolicyResultsUpdate: "policy_results:update",
+    /**
+     * Decrypt project
+     */
+    ProjectDecrypt: "project:decrypt",
+    /**
+     * Encrypt project
+     */
+    ProjectEncrypt: "project:encrypt",
+    /**
+     * View resources dashboard
+     */
+    ResourcesDashboard: "resources:dashboard",
+    /**
+     * Index resources
+     */
+    ResourcesIndex: "resources:index",
+    /**
+     * Search resources
+     */
+    ResourcesSearch: "resources:search",
+    /**
+     * Create role
+     */
+    RoleCreate: "role:create",
+    /**
+     * Delete role
+     */
+    RoleDelete: "role:delete",
+    /**
+     * Read role
+     */
+    RoleRead: "role:read",
+    /**
+     * Update role
+     */
+    RoleUpdate: "role:update",
+    /**
+     * Read SAML
+     */
+    SamlRead: "saml:read",
+    /**
+     * Update SAML
+     */
+    SamlUpdate: "saml:update",
+    /**
+     * Delete SCIM
+     */
+    ScimDelete: "scim:delete",
+    /**
+     * Read SCIM
+     */
+    ScimRead: "scim:read",
+    /**
+     * Update SCIM
+     */
+    ScimUpdate: "scim:update",
+    /**
+     * Create stack
+     */
+    StackCreate: "stack:create",
+    /**
+     * List deleted stacks
+     */
+    StackListDeleted: "stack:list_deleted",
+    /**
+     * Restore deleted stack
+     */
+    StackRestoreDeleted: "stack:restore_deleted",
+    /**
+     * Read project tags
+     */
+    TagsRead: "tags:read",
+    /**
+     * Create team
+     */
+    TeamCreate: "team:create",
+    /**
+     * Create team access token
+     */
+    TeamCreateToken: "team:create_token",
+    /**
+     * Delete team
+     */
+    TeamDelete: "team:delete",
+    /**
+     * Delete team access token
+     */
+    TeamDeleteToken: "team:delete_token",
+    /**
+     * List teams
+     */
+    TeamList: "team:list",
+    /**
+     * List team access tokens
+     */
+    TeamListTokens: "team:list_tokens",
+    /**
+     * Read team
+     */
+    TeamRead: "team:read",
+    /**
+     * Update team
+     */
+    TeamUpdate: "team:update",
+    /**
+     * Read templates
+     */
+    TemplatesRead: "templates:read",
+    /**
+     * Create template sources
+     */
+    TemplatesSourceCreate: "templates_source:create",
+    /**
+     * Delete template sources
+     */
+    TemplatesSourceDelete: "templates_source:delete",
+    /**
+     * Read template sources
+     */
+    TemplatesSourceRead: "templates_source:read",
+    /**
+     * Update template sources
+     */
+    TemplatesSourceUpdate: "templates_source:update",
+} as const;
+
+export type RbacOrganizationScope = (typeof RbacOrganizationScope)[keyof typeof RbacOrganizationScope];
+
 export const RbacPermission = {
     /**
      * Read permission.
@@ -152,6 +723,140 @@ export const RbacPermission = {
 } as const;
 
 export type RbacPermission = (typeof RbacPermission)[keyof typeof RbacPermission];
+
+export const RbacStackScope = {
+    /**
+     * Cancel stack update
+     */
+    StackCancelUpdate: "stack:cancel_update",
+    /**
+     * Create stack
+     */
+    StackCreate: "stack:create",
+    /**
+     * Decrypt stack
+     */
+    StackDecrypt: "stack:decrypt",
+    /**
+     * Delete stack
+     */
+    StackDelete: "stack:delete",
+    /**
+     * Encrypt stack
+     */
+    StackEncrypt: "stack:encrypt",
+    /**
+     * Export stack
+     */
+    StackExport: "stack:export",
+    /**
+     * Import stack
+     */
+    StackImport: "stack:import",
+    /**
+     * Read stack
+     */
+    StackRead: "stack:read",
+    /**
+     * Rename stack
+     */
+    StackRename: "stack:rename",
+    /**
+     * Transfer stack
+     */
+    StackTransfer: "stack:transfer",
+    /**
+     * Write stack
+     */
+    StackWrite: "stack:write",
+    /**
+     * Read stack teams
+     */
+    StackAccessRead: "stack_access:read",
+    /**
+     * Update stack teams
+     */
+    StackAccessUpdate: "stack_access:update",
+    /**
+     * Create deployment
+     */
+    StackDeploymentCreate: "stack_deployment:create",
+    /**
+     * Read deployment
+     */
+    StackDeploymentRead: "stack_deployment:read",
+    /**
+     * Encrypt deployment settings
+     */
+    StackDeploymentSettingsEncrypt: "stack_deployment_settings:encrypt",
+    /**
+     * Read deployment settings
+     */
+    StackDeploymentSettingsRead: "stack_deployment_settings:read",
+    /**
+     * Write deployment settings
+     */
+    StackDeploymentSettingsWrite: "stack_deployment_settings:write",
+    /**
+     * Create stack schedule
+     */
+    StackScheduleCreate: "stack_schedule:create",
+    /**
+     * Delete stack schedule
+     */
+    StackScheduleDelete: "stack_schedule:delete",
+    /**
+     * Pause stack schedule
+     */
+    StackSchedulePause: "stack_schedule:pause",
+    /**
+     * Read stack schedule
+     */
+    StackScheduleRead: "stack_schedule:read",
+    /**
+     * Resume stack schedule
+     */
+    StackScheduleResume: "stack_schedule:resume",
+    /**
+     * Update stack schedule
+     */
+    StackScheduleUpdate: "stack_schedule:update",
+    /**
+     * Update stack tags
+     */
+    StackTagsUpdate: "stack_tags:update",
+    /**
+     * Create stack webhook
+     */
+    StackWebhookCreate: "stack_webhook:create",
+    /**
+     * Delete stack webhook
+     */
+    StackWebhookDelete: "stack_webhook:delete",
+    /**
+     * Read stack webhook
+     */
+    StackWebhookRead: "stack_webhook:read",
+    /**
+     * Update stack webhook
+     */
+    StackWebhookUpdate: "stack_webhook:update",
+} as const;
+
+export type RbacStackScope = (typeof RbacStackScope)[keyof typeof RbacStackScope];
+
+export const RoleTagOperator = {
+    /**
+     * Match entities whose tag equals the value (or that have the tag, when no value is set).
+     */
+    Equals: "equals",
+    /**
+     * Match entities whose tag does not equal the value (or that lack the tag, when no value is set).
+     */
+    NotEquals: "notEquals",
+} as const;
+
+export type RoleTagOperator = (typeof RoleTagOperator)[keyof typeof RoleTagOperator];
 
 export const ScanSchedule = {
     /**

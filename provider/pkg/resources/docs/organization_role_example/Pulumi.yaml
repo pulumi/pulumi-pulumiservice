@@ -1,0 +1,215 @@
+name: organization-role
+runtime: yaml
+description: Source of the OrganizationRole Example Usage docs. Regenerate with scripts/gen-organization-role-example-docs.sh.
+
+config:
+  organizationName:
+    type: string
+    default: my-org
+
+variables:
+  # Look up the entities the rules below grant access to. They already exist.
+  prodStack:
+    fn::invoke:
+      function: pulumiservice:getStack
+      arguments:
+        organizationName: ${organizationName}
+        projectName: networking
+        stackName: prod
+  sharedEnvironment:
+    fn::invoke:
+      function: pulumiservice:getEnvironment
+      arguments:
+        organizationName: ${organizationName}
+        projectName: platform
+        name: shared
+  awsAccount:
+    fn::invoke:
+      function: pulumiservice:getInsightsAccount
+      arguments:
+        organizationName: ${organizationName}
+        accountName: aws-production
+
+  # Any single-purpose helper can be folded into a role through `additionalEntries`.
+  sharedEnvironmentRotate:
+    fn::invoke:
+      function: pulumiservice:buildEnvironmentScopedPermissions
+      arguments:
+        environmentId: ${sharedEnvironment.environmentId}
+        permissions:
+          - environment:rotate
+
+  # A role built from scopes: organization-level access plus rules for stacks,
+  # environments, and Insights accounts. Each rule list accepts only scopes for
+  # its own entity type.
+  platformPermissions:
+    fn::invoke:
+      function: pulumiservice:buildRolePermissions
+      arguments:
+        organizationScopes:
+          - team:read
+          - stack:create
+        stackRules:
+          # Read every stack in the organization
+          - all: true
+            scopes:
+              - stack:read
+          # Deploy one specific stack
+          - id: ${prodStack.stackId}
+            scopes:
+              - stack:write
+              - stack_deployment:create
+          # Deploy stacks tagged team=platform (the operator defaults to equals)
+          - tags:
+              - key: team
+                value: platform
+            scopes:
+              - stack:write
+              - stack_deployment:create
+          # Deploy stacks whose env tag is anything but "prod"
+          - tags:
+              - key: env
+                value: prod
+                operator: notEquals
+            scopes:
+              - stack:write
+              - stack_deployment:create
+          # Read deployment settings on stacks that have a cost-center tag, whatever its value
+          - tags:
+              - key: cost-center
+            scopes:
+              - stack_deployment_settings:read
+          # Delete stacks that match every tag condition
+          - tags:
+              - key: team
+                value: platform
+              - key: lifecycle
+                value: ephemeral
+            scopes:
+              - stack:delete
+        environmentRules:
+          # Read every environment
+          - all: true
+            scopes:
+              - environment:read
+          # Open and update one specific environment
+          - id: ${sharedEnvironment.environmentId}
+            scopes:
+              - environment:open
+              - environment:write
+          # Open environments tagged team=platform
+          - tags:
+              - key: team
+                value: platform
+            scopes:
+              - environment:open
+        insightsAccountRules:
+          # Read every Insights account
+          - all: true
+            scopes:
+              - insights_account:read
+          # Scan one specific account
+          - id: ${awsAccount.insightsAccountId}
+            scopes:
+              - insights_account:scan
+          # Update accounts tagged team=platform
+          - tags:
+              - key: team
+                value: platform
+            scopes:
+              - insights_account:update
+        additionalEntries:
+          - ${sharedEnvironmentRotate.permissions}
+
+  # Permission sets bundle scopes and are shared by reference, so a role that
+  # uses them follows changes to the set. Look up the built-in sets to grant,
+  # and pass each set's ID with its entity type, which the rule lists check.
+  orgReadOnly:
+    fn::invoke:
+      function: pulumiservice:getOrganizationPermissionSet
+      arguments:
+        organizationName: ${organizationName}
+        defaultIdentifier: org-settings-read-only
+  stackWrite:
+    fn::invoke:
+      function: pulumiservice:getOrganizationPermissionSet
+      arguments:
+        organizationName: ${organizationName}
+        defaultIdentifier: stack-write
+  environmentRead:
+    fn::invoke:
+      function: pulumiservice:getOrganizationPermissionSet
+      arguments:
+        organizationName: ${organizationName}
+        defaultIdentifier: environment-read
+  insightsAccountRead:
+    fn::invoke:
+      function: pulumiservice:getOrganizationPermissionSet
+      arguments:
+        organizationName: ${organizationName}
+        defaultIdentifier: insights-account-read
+
+  # Pulumi Cloud accepts permission sets only in a policy, so these
+  # permissions are stored in the policy below.
+  operatorPolicyPermissions:
+    fn::invoke:
+      function: pulumiservice:buildRolePermissions
+      arguments:
+        organizationPermissionSets:
+          - permissionSetId: ${orgReadOnly.permissionSetId}
+            resourceType: ${orgReadOnly.resourceType}
+        stackRules:
+          # The Stack Write set on stacks tagged team=platform
+          - tags:
+              - key: team
+                value: platform
+            permissionSets:
+              - permissionSetId: ${stackWrite.permissionSetId}
+                resourceType: ${stackWrite.resourceType}
+        environmentRules:
+          # The Environment Read set on every environment
+          - all: true
+            permissionSets:
+              - permissionSetId: ${environmentRead.permissionSetId}
+                resourceType: ${environmentRead.resourceType}
+        insightsAccountRules:
+          # The Insights Account Read set, plus one extra scope, on one account
+          - id: ${awsAccount.insightsAccountId}
+            permissionSets:
+              - permissionSetId: ${insightsAccountRead.permissionSetId}
+                resourceType: ${insightsAccountRead.resourceType}
+            scopes:
+              - insights_account:scan
+
+  # The role grants the policy.
+  operatorPermissions:
+    fn::invoke:
+      function: pulumiservice:buildComposePermissions
+      arguments:
+        ids:
+          - ${operatorPolicy.roleID}
+
+resources:
+  platformRole:
+    type: pulumiservice:OrganizationRole
+    properties:
+      organizationName: ${organizationName}
+      name: Platform Engineers
+      description: Read access across the organization, plus deploy access to platform stacks.
+      permissions: ${platformPermissions.permissions}
+
+  operatorPolicy:
+    type: pulumiservice:api:Role
+    properties:
+      orgName: ${organizationName}
+      name: Platform Operators policy
+      uxPurpose: policy
+      details: ${operatorPolicyPermissions.permissions}
+
+  operatorRole:
+    type: pulumiservice:OrganizationRole
+    properties:
+      organizationName: ${organizationName}
+      name: Platform Operators
+      description: Built-in permission sets on platform entities.
+      permissions: ${operatorPermissions.permissions}

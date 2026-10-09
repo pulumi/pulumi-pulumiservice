@@ -4433,6 +4433,378 @@ func (o PolicyPackSummaryArrayOutput) Index(i pulumi.IntInput) PolicyPackSummary
 	}).(PolicyPackSummaryOutput)
 }
 
+type RoleEnvironmentRule struct {
+	// Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+	All *bool `pulumi:"all"`
+	// Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or an Insights account's `insightsAccountId`.
+	Id *string `pulumi:"id"`
+	// Permission sets to grant, typically the output of `getOrganizationPermissionSet`. Each set's `resourceType` must match this rule's entity type. Pulumi Cloud accepts permission sets only in a policy: see `buildRolePermissions`.
+	PermissionSets []RolePermissionSetRef `pulumi:"permissionSets"`
+	// Environment scopes to grant on the selected environments.
+	Scopes []RbacEnvironmentScope `pulumi:"scopes"`
+	// Apply to entities whose tags match every condition.
+	Tags []RoleTagCondition `pulumi:"tags"`
+}
+
+// RoleEnvironmentRuleInput is an input type that accepts RoleEnvironmentRuleArgs and RoleEnvironmentRuleOutput values.
+// You can construct a concrete instance of `RoleEnvironmentRuleInput` via:
+//
+//	RoleEnvironmentRuleArgs{...}
+type RoleEnvironmentRuleInput interface {
+	pulumi.Input
+
+	ToRoleEnvironmentRuleOutput() RoleEnvironmentRuleOutput
+	ToRoleEnvironmentRuleOutputWithContext(context.Context) RoleEnvironmentRuleOutput
+}
+
+type RoleEnvironmentRuleArgs struct {
+	// Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+	All pulumi.BoolPtrInput `pulumi:"all"`
+	// Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or an Insights account's `insightsAccountId`.
+	Id pulumi.StringPtrInput `pulumi:"id"`
+	// Permission sets to grant, typically the output of `getOrganizationPermissionSet`. Each set's `resourceType` must match this rule's entity type. Pulumi Cloud accepts permission sets only in a policy: see `buildRolePermissions`.
+	PermissionSets RolePermissionSetRefArrayInput `pulumi:"permissionSets"`
+	// Environment scopes to grant on the selected environments.
+	Scopes RbacEnvironmentScopeArrayInput `pulumi:"scopes"`
+	// Apply to entities whose tags match every condition.
+	Tags RoleTagConditionArrayInput `pulumi:"tags"`
+}
+
+func (RoleEnvironmentRuleArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*RoleEnvironmentRule)(nil)).Elem()
+}
+
+func (i RoleEnvironmentRuleArgs) ToRoleEnvironmentRuleOutput() RoleEnvironmentRuleOutput {
+	return i.ToRoleEnvironmentRuleOutputWithContext(context.Background())
+}
+
+func (i RoleEnvironmentRuleArgs) ToRoleEnvironmentRuleOutputWithContext(ctx context.Context) RoleEnvironmentRuleOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(RoleEnvironmentRuleOutput)
+}
+
+// RoleEnvironmentRuleArrayInput is an input type that accepts RoleEnvironmentRuleArray and RoleEnvironmentRuleArrayOutput values.
+// You can construct a concrete instance of `RoleEnvironmentRuleArrayInput` via:
+//
+//	RoleEnvironmentRuleArray{ RoleEnvironmentRuleArgs{...} }
+type RoleEnvironmentRuleArrayInput interface {
+	pulumi.Input
+
+	ToRoleEnvironmentRuleArrayOutput() RoleEnvironmentRuleArrayOutput
+	ToRoleEnvironmentRuleArrayOutputWithContext(context.Context) RoleEnvironmentRuleArrayOutput
+}
+
+type RoleEnvironmentRuleArray []RoleEnvironmentRuleInput
+
+func (RoleEnvironmentRuleArray) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]RoleEnvironmentRule)(nil)).Elem()
+}
+
+func (i RoleEnvironmentRuleArray) ToRoleEnvironmentRuleArrayOutput() RoleEnvironmentRuleArrayOutput {
+	return i.ToRoleEnvironmentRuleArrayOutputWithContext(context.Background())
+}
+
+func (i RoleEnvironmentRuleArray) ToRoleEnvironmentRuleArrayOutputWithContext(ctx context.Context) RoleEnvironmentRuleArrayOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(RoleEnvironmentRuleArrayOutput)
+}
+
+type RoleEnvironmentRuleOutput struct{ *pulumi.OutputState }
+
+func (RoleEnvironmentRuleOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*RoleEnvironmentRule)(nil)).Elem()
+}
+
+func (o RoleEnvironmentRuleOutput) ToRoleEnvironmentRuleOutput() RoleEnvironmentRuleOutput {
+	return o
+}
+
+func (o RoleEnvironmentRuleOutput) ToRoleEnvironmentRuleOutputWithContext(ctx context.Context) RoleEnvironmentRuleOutput {
+	return o
+}
+
+// Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+func (o RoleEnvironmentRuleOutput) All() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v RoleEnvironmentRule) *bool { return v.All }).(pulumi.BoolPtrOutput)
+}
+
+// Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or an Insights account's `insightsAccountId`.
+func (o RoleEnvironmentRuleOutput) Id() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v RoleEnvironmentRule) *string { return v.Id }).(pulumi.StringPtrOutput)
+}
+
+// Permission sets to grant, typically the output of `getOrganizationPermissionSet`. Each set's `resourceType` must match this rule's entity type. Pulumi Cloud accepts permission sets only in a policy: see `buildRolePermissions`.
+func (o RoleEnvironmentRuleOutput) PermissionSets() RolePermissionSetRefArrayOutput {
+	return o.ApplyT(func(v RoleEnvironmentRule) []RolePermissionSetRef { return v.PermissionSets }).(RolePermissionSetRefArrayOutput)
+}
+
+// Environment scopes to grant on the selected environments.
+func (o RoleEnvironmentRuleOutput) Scopes() RbacEnvironmentScopeArrayOutput {
+	return o.ApplyT(func(v RoleEnvironmentRule) []RbacEnvironmentScope { return v.Scopes }).(RbacEnvironmentScopeArrayOutput)
+}
+
+// Apply to entities whose tags match every condition.
+func (o RoleEnvironmentRuleOutput) Tags() RoleTagConditionArrayOutput {
+	return o.ApplyT(func(v RoleEnvironmentRule) []RoleTagCondition { return v.Tags }).(RoleTagConditionArrayOutput)
+}
+
+type RoleEnvironmentRuleArrayOutput struct{ *pulumi.OutputState }
+
+func (RoleEnvironmentRuleArrayOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]RoleEnvironmentRule)(nil)).Elem()
+}
+
+func (o RoleEnvironmentRuleArrayOutput) ToRoleEnvironmentRuleArrayOutput() RoleEnvironmentRuleArrayOutput {
+	return o
+}
+
+func (o RoleEnvironmentRuleArrayOutput) ToRoleEnvironmentRuleArrayOutputWithContext(ctx context.Context) RoleEnvironmentRuleArrayOutput {
+	return o
+}
+
+func (o RoleEnvironmentRuleArrayOutput) Index(i pulumi.IntInput) RoleEnvironmentRuleOutput {
+	return pulumi.All(o, i).ApplyT(func(vs []interface{}) RoleEnvironmentRule {
+		return vs[0].([]RoleEnvironmentRule)[vs[1].(int)]
+	}).(RoleEnvironmentRuleOutput)
+}
+
+type RoleInsightsAccountRule struct {
+	// Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+	All *bool `pulumi:"all"`
+	// Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or an Insights account's `insightsAccountId`.
+	Id *string `pulumi:"id"`
+	// Permission sets to grant, typically the output of `getOrganizationPermissionSet`. Each set's `resourceType` must match this rule's entity type. Pulumi Cloud accepts permission sets only in a policy: see `buildRolePermissions`.
+	PermissionSets []RolePermissionSetRef `pulumi:"permissionSets"`
+	// Insights account scopes to grant on the selected accounts.
+	Scopes []RbacInsightsAccountScope `pulumi:"scopes"`
+	// Apply to entities whose tags match every condition.
+	Tags []RoleTagCondition `pulumi:"tags"`
+}
+
+// RoleInsightsAccountRuleInput is an input type that accepts RoleInsightsAccountRuleArgs and RoleInsightsAccountRuleOutput values.
+// You can construct a concrete instance of `RoleInsightsAccountRuleInput` via:
+//
+//	RoleInsightsAccountRuleArgs{...}
+type RoleInsightsAccountRuleInput interface {
+	pulumi.Input
+
+	ToRoleInsightsAccountRuleOutput() RoleInsightsAccountRuleOutput
+	ToRoleInsightsAccountRuleOutputWithContext(context.Context) RoleInsightsAccountRuleOutput
+}
+
+type RoleInsightsAccountRuleArgs struct {
+	// Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+	All pulumi.BoolPtrInput `pulumi:"all"`
+	// Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or an Insights account's `insightsAccountId`.
+	Id pulumi.StringPtrInput `pulumi:"id"`
+	// Permission sets to grant, typically the output of `getOrganizationPermissionSet`. Each set's `resourceType` must match this rule's entity type. Pulumi Cloud accepts permission sets only in a policy: see `buildRolePermissions`.
+	PermissionSets RolePermissionSetRefArrayInput `pulumi:"permissionSets"`
+	// Insights account scopes to grant on the selected accounts.
+	Scopes RbacInsightsAccountScopeArrayInput `pulumi:"scopes"`
+	// Apply to entities whose tags match every condition.
+	Tags RoleTagConditionArrayInput `pulumi:"tags"`
+}
+
+func (RoleInsightsAccountRuleArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*RoleInsightsAccountRule)(nil)).Elem()
+}
+
+func (i RoleInsightsAccountRuleArgs) ToRoleInsightsAccountRuleOutput() RoleInsightsAccountRuleOutput {
+	return i.ToRoleInsightsAccountRuleOutputWithContext(context.Background())
+}
+
+func (i RoleInsightsAccountRuleArgs) ToRoleInsightsAccountRuleOutputWithContext(ctx context.Context) RoleInsightsAccountRuleOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(RoleInsightsAccountRuleOutput)
+}
+
+// RoleInsightsAccountRuleArrayInput is an input type that accepts RoleInsightsAccountRuleArray and RoleInsightsAccountRuleArrayOutput values.
+// You can construct a concrete instance of `RoleInsightsAccountRuleArrayInput` via:
+//
+//	RoleInsightsAccountRuleArray{ RoleInsightsAccountRuleArgs{...} }
+type RoleInsightsAccountRuleArrayInput interface {
+	pulumi.Input
+
+	ToRoleInsightsAccountRuleArrayOutput() RoleInsightsAccountRuleArrayOutput
+	ToRoleInsightsAccountRuleArrayOutputWithContext(context.Context) RoleInsightsAccountRuleArrayOutput
+}
+
+type RoleInsightsAccountRuleArray []RoleInsightsAccountRuleInput
+
+func (RoleInsightsAccountRuleArray) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]RoleInsightsAccountRule)(nil)).Elem()
+}
+
+func (i RoleInsightsAccountRuleArray) ToRoleInsightsAccountRuleArrayOutput() RoleInsightsAccountRuleArrayOutput {
+	return i.ToRoleInsightsAccountRuleArrayOutputWithContext(context.Background())
+}
+
+func (i RoleInsightsAccountRuleArray) ToRoleInsightsAccountRuleArrayOutputWithContext(ctx context.Context) RoleInsightsAccountRuleArrayOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(RoleInsightsAccountRuleArrayOutput)
+}
+
+type RoleInsightsAccountRuleOutput struct{ *pulumi.OutputState }
+
+func (RoleInsightsAccountRuleOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*RoleInsightsAccountRule)(nil)).Elem()
+}
+
+func (o RoleInsightsAccountRuleOutput) ToRoleInsightsAccountRuleOutput() RoleInsightsAccountRuleOutput {
+	return o
+}
+
+func (o RoleInsightsAccountRuleOutput) ToRoleInsightsAccountRuleOutputWithContext(ctx context.Context) RoleInsightsAccountRuleOutput {
+	return o
+}
+
+// Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+func (o RoleInsightsAccountRuleOutput) All() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v RoleInsightsAccountRule) *bool { return v.All }).(pulumi.BoolPtrOutput)
+}
+
+// Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or an Insights account's `insightsAccountId`.
+func (o RoleInsightsAccountRuleOutput) Id() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v RoleInsightsAccountRule) *string { return v.Id }).(pulumi.StringPtrOutput)
+}
+
+// Permission sets to grant, typically the output of `getOrganizationPermissionSet`. Each set's `resourceType` must match this rule's entity type. Pulumi Cloud accepts permission sets only in a policy: see `buildRolePermissions`.
+func (o RoleInsightsAccountRuleOutput) PermissionSets() RolePermissionSetRefArrayOutput {
+	return o.ApplyT(func(v RoleInsightsAccountRule) []RolePermissionSetRef { return v.PermissionSets }).(RolePermissionSetRefArrayOutput)
+}
+
+// Insights account scopes to grant on the selected accounts.
+func (o RoleInsightsAccountRuleOutput) Scopes() RbacInsightsAccountScopeArrayOutput {
+	return o.ApplyT(func(v RoleInsightsAccountRule) []RbacInsightsAccountScope { return v.Scopes }).(RbacInsightsAccountScopeArrayOutput)
+}
+
+// Apply to entities whose tags match every condition.
+func (o RoleInsightsAccountRuleOutput) Tags() RoleTagConditionArrayOutput {
+	return o.ApplyT(func(v RoleInsightsAccountRule) []RoleTagCondition { return v.Tags }).(RoleTagConditionArrayOutput)
+}
+
+type RoleInsightsAccountRuleArrayOutput struct{ *pulumi.OutputState }
+
+func (RoleInsightsAccountRuleArrayOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]RoleInsightsAccountRule)(nil)).Elem()
+}
+
+func (o RoleInsightsAccountRuleArrayOutput) ToRoleInsightsAccountRuleArrayOutput() RoleInsightsAccountRuleArrayOutput {
+	return o
+}
+
+func (o RoleInsightsAccountRuleArrayOutput) ToRoleInsightsAccountRuleArrayOutputWithContext(ctx context.Context) RoleInsightsAccountRuleArrayOutput {
+	return o
+}
+
+func (o RoleInsightsAccountRuleArrayOutput) Index(i pulumi.IntInput) RoleInsightsAccountRuleOutput {
+	return pulumi.All(o, i).ApplyT(func(vs []interface{}) RoleInsightsAccountRule {
+		return vs[0].([]RoleInsightsAccountRule)[vs[1].(int)]
+	}).(RoleInsightsAccountRuleOutput)
+}
+
+type RolePermissionSetRef struct {
+	// The permission set's ID.
+	PermissionSetId string `pulumi:"permissionSetId"`
+	// The permission set's entity type: `stack`, `environment`, `insights-account`, or `global` for organization-level sets. It must match the rule list the set is used in.
+	ResourceType string `pulumi:"resourceType"`
+}
+
+// RolePermissionSetRefInput is an input type that accepts RolePermissionSetRefArgs and RolePermissionSetRefOutput values.
+// You can construct a concrete instance of `RolePermissionSetRefInput` via:
+//
+//	RolePermissionSetRefArgs{...}
+type RolePermissionSetRefInput interface {
+	pulumi.Input
+
+	ToRolePermissionSetRefOutput() RolePermissionSetRefOutput
+	ToRolePermissionSetRefOutputWithContext(context.Context) RolePermissionSetRefOutput
+}
+
+type RolePermissionSetRefArgs struct {
+	// The permission set's ID.
+	PermissionSetId pulumi.StringInput `pulumi:"permissionSetId"`
+	// The permission set's entity type: `stack`, `environment`, `insights-account`, or `global` for organization-level sets. It must match the rule list the set is used in.
+	ResourceType pulumi.StringInput `pulumi:"resourceType"`
+}
+
+func (RolePermissionSetRefArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*RolePermissionSetRef)(nil)).Elem()
+}
+
+func (i RolePermissionSetRefArgs) ToRolePermissionSetRefOutput() RolePermissionSetRefOutput {
+	return i.ToRolePermissionSetRefOutputWithContext(context.Background())
+}
+
+func (i RolePermissionSetRefArgs) ToRolePermissionSetRefOutputWithContext(ctx context.Context) RolePermissionSetRefOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(RolePermissionSetRefOutput)
+}
+
+// RolePermissionSetRefArrayInput is an input type that accepts RolePermissionSetRefArray and RolePermissionSetRefArrayOutput values.
+// You can construct a concrete instance of `RolePermissionSetRefArrayInput` via:
+//
+//	RolePermissionSetRefArray{ RolePermissionSetRefArgs{...} }
+type RolePermissionSetRefArrayInput interface {
+	pulumi.Input
+
+	ToRolePermissionSetRefArrayOutput() RolePermissionSetRefArrayOutput
+	ToRolePermissionSetRefArrayOutputWithContext(context.Context) RolePermissionSetRefArrayOutput
+}
+
+type RolePermissionSetRefArray []RolePermissionSetRefInput
+
+func (RolePermissionSetRefArray) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]RolePermissionSetRef)(nil)).Elem()
+}
+
+func (i RolePermissionSetRefArray) ToRolePermissionSetRefArrayOutput() RolePermissionSetRefArrayOutput {
+	return i.ToRolePermissionSetRefArrayOutputWithContext(context.Background())
+}
+
+func (i RolePermissionSetRefArray) ToRolePermissionSetRefArrayOutputWithContext(ctx context.Context) RolePermissionSetRefArrayOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(RolePermissionSetRefArrayOutput)
+}
+
+type RolePermissionSetRefOutput struct{ *pulumi.OutputState }
+
+func (RolePermissionSetRefOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*RolePermissionSetRef)(nil)).Elem()
+}
+
+func (o RolePermissionSetRefOutput) ToRolePermissionSetRefOutput() RolePermissionSetRefOutput {
+	return o
+}
+
+func (o RolePermissionSetRefOutput) ToRolePermissionSetRefOutputWithContext(ctx context.Context) RolePermissionSetRefOutput {
+	return o
+}
+
+// The permission set's ID.
+func (o RolePermissionSetRefOutput) PermissionSetId() pulumi.StringOutput {
+	return o.ApplyT(func(v RolePermissionSetRef) string { return v.PermissionSetId }).(pulumi.StringOutput)
+}
+
+// The permission set's entity type: `stack`, `environment`, `insights-account`, or `global` for organization-level sets. It must match the rule list the set is used in.
+func (o RolePermissionSetRefOutput) ResourceType() pulumi.StringOutput {
+	return o.ApplyT(func(v RolePermissionSetRef) string { return v.ResourceType }).(pulumi.StringOutput)
+}
+
+type RolePermissionSetRefArrayOutput struct{ *pulumi.OutputState }
+
+func (RolePermissionSetRefArrayOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]RolePermissionSetRef)(nil)).Elem()
+}
+
+func (o RolePermissionSetRefArrayOutput) ToRolePermissionSetRefArrayOutput() RolePermissionSetRefArrayOutput {
+	return o
+}
+
+func (o RolePermissionSetRefArrayOutput) ToRolePermissionSetRefArrayOutputWithContext(ctx context.Context) RolePermissionSetRefArrayOutput {
+	return o
+}
+
+func (o RolePermissionSetRefArrayOutput) Index(i pulumi.IntInput) RolePermissionSetRefOutput {
+	return pulumi.All(o, i).ApplyT(func(vs []interface{}) RolePermissionSetRef {
+		return vs[0].([]RolePermissionSetRef)[vs[1].(int)]
+	}).(RolePermissionSetRefOutput)
+}
+
 type RoleScopeInfo struct {
 	// Human-readable description of what the scope grants.
 	Description string `pulumi:"description"`
@@ -4496,6 +4868,254 @@ func (o RoleScopeInfoArrayOutput) Index(i pulumi.IntInput) RoleScopeInfoOutput {
 	return pulumi.All(o, i).ApplyT(func(vs []interface{}) RoleScopeInfo {
 		return vs[0].([]RoleScopeInfo)[vs[1].(int)]
 	}).(RoleScopeInfoOutput)
+}
+
+type RoleStackRule struct {
+	// Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+	All *bool `pulumi:"all"`
+	// Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or an Insights account's `insightsAccountId`.
+	Id *string `pulumi:"id"`
+	// Permission sets to grant, typically the output of `getOrganizationPermissionSet`. Each set's `resourceType` must match this rule's entity type. Pulumi Cloud accepts permission sets only in a policy: see `buildRolePermissions`.
+	PermissionSets []RolePermissionSetRef `pulumi:"permissionSets"`
+	// Stack scopes to grant on the selected stacks.
+	Scopes []RbacStackScope `pulumi:"scopes"`
+	// Apply to entities whose tags match every condition.
+	Tags []RoleTagCondition `pulumi:"tags"`
+}
+
+// RoleStackRuleInput is an input type that accepts RoleStackRuleArgs and RoleStackRuleOutput values.
+// You can construct a concrete instance of `RoleStackRuleInput` via:
+//
+//	RoleStackRuleArgs{...}
+type RoleStackRuleInput interface {
+	pulumi.Input
+
+	ToRoleStackRuleOutput() RoleStackRuleOutput
+	ToRoleStackRuleOutputWithContext(context.Context) RoleStackRuleOutput
+}
+
+type RoleStackRuleArgs struct {
+	// Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+	All pulumi.BoolPtrInput `pulumi:"all"`
+	// Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or an Insights account's `insightsAccountId`.
+	Id pulumi.StringPtrInput `pulumi:"id"`
+	// Permission sets to grant, typically the output of `getOrganizationPermissionSet`. Each set's `resourceType` must match this rule's entity type. Pulumi Cloud accepts permission sets only in a policy: see `buildRolePermissions`.
+	PermissionSets RolePermissionSetRefArrayInput `pulumi:"permissionSets"`
+	// Stack scopes to grant on the selected stacks.
+	Scopes RbacStackScopeArrayInput `pulumi:"scopes"`
+	// Apply to entities whose tags match every condition.
+	Tags RoleTagConditionArrayInput `pulumi:"tags"`
+}
+
+func (RoleStackRuleArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*RoleStackRule)(nil)).Elem()
+}
+
+func (i RoleStackRuleArgs) ToRoleStackRuleOutput() RoleStackRuleOutput {
+	return i.ToRoleStackRuleOutputWithContext(context.Background())
+}
+
+func (i RoleStackRuleArgs) ToRoleStackRuleOutputWithContext(ctx context.Context) RoleStackRuleOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(RoleStackRuleOutput)
+}
+
+// RoleStackRuleArrayInput is an input type that accepts RoleStackRuleArray and RoleStackRuleArrayOutput values.
+// You can construct a concrete instance of `RoleStackRuleArrayInput` via:
+//
+//	RoleStackRuleArray{ RoleStackRuleArgs{...} }
+type RoleStackRuleArrayInput interface {
+	pulumi.Input
+
+	ToRoleStackRuleArrayOutput() RoleStackRuleArrayOutput
+	ToRoleStackRuleArrayOutputWithContext(context.Context) RoleStackRuleArrayOutput
+}
+
+type RoleStackRuleArray []RoleStackRuleInput
+
+func (RoleStackRuleArray) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]RoleStackRule)(nil)).Elem()
+}
+
+func (i RoleStackRuleArray) ToRoleStackRuleArrayOutput() RoleStackRuleArrayOutput {
+	return i.ToRoleStackRuleArrayOutputWithContext(context.Background())
+}
+
+func (i RoleStackRuleArray) ToRoleStackRuleArrayOutputWithContext(ctx context.Context) RoleStackRuleArrayOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(RoleStackRuleArrayOutput)
+}
+
+type RoleStackRuleOutput struct{ *pulumi.OutputState }
+
+func (RoleStackRuleOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*RoleStackRule)(nil)).Elem()
+}
+
+func (o RoleStackRuleOutput) ToRoleStackRuleOutput() RoleStackRuleOutput {
+	return o
+}
+
+func (o RoleStackRuleOutput) ToRoleStackRuleOutputWithContext(ctx context.Context) RoleStackRuleOutput {
+	return o
+}
+
+// Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+func (o RoleStackRuleOutput) All() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v RoleStackRule) *bool { return v.All }).(pulumi.BoolPtrOutput)
+}
+
+// Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or an Insights account's `insightsAccountId`.
+func (o RoleStackRuleOutput) Id() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v RoleStackRule) *string { return v.Id }).(pulumi.StringPtrOutput)
+}
+
+// Permission sets to grant, typically the output of `getOrganizationPermissionSet`. Each set's `resourceType` must match this rule's entity type. Pulumi Cloud accepts permission sets only in a policy: see `buildRolePermissions`.
+func (o RoleStackRuleOutput) PermissionSets() RolePermissionSetRefArrayOutput {
+	return o.ApplyT(func(v RoleStackRule) []RolePermissionSetRef { return v.PermissionSets }).(RolePermissionSetRefArrayOutput)
+}
+
+// Stack scopes to grant on the selected stacks.
+func (o RoleStackRuleOutput) Scopes() RbacStackScopeArrayOutput {
+	return o.ApplyT(func(v RoleStackRule) []RbacStackScope { return v.Scopes }).(RbacStackScopeArrayOutput)
+}
+
+// Apply to entities whose tags match every condition.
+func (o RoleStackRuleOutput) Tags() RoleTagConditionArrayOutput {
+	return o.ApplyT(func(v RoleStackRule) []RoleTagCondition { return v.Tags }).(RoleTagConditionArrayOutput)
+}
+
+type RoleStackRuleArrayOutput struct{ *pulumi.OutputState }
+
+func (RoleStackRuleArrayOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]RoleStackRule)(nil)).Elem()
+}
+
+func (o RoleStackRuleArrayOutput) ToRoleStackRuleArrayOutput() RoleStackRuleArrayOutput {
+	return o
+}
+
+func (o RoleStackRuleArrayOutput) ToRoleStackRuleArrayOutputWithContext(ctx context.Context) RoleStackRuleArrayOutput {
+	return o
+}
+
+func (o RoleStackRuleArrayOutput) Index(i pulumi.IntInput) RoleStackRuleOutput {
+	return pulumi.All(o, i).ApplyT(func(vs []interface{}) RoleStackRule {
+		return vs[0].([]RoleStackRule)[vs[1].(int)]
+	}).(RoleStackRuleOutput)
+}
+
+type RoleTagCondition struct {
+	// The tag key.
+	Key string `pulumi:"key"`
+	// How the tag is compared. Defaults to `equals`.
+	Operator *RoleTagOperator `pulumi:"operator"`
+	// The tag value. When omitted, the condition matches on whether the tag is present.
+	Value *string `pulumi:"value"`
+}
+
+// RoleTagConditionInput is an input type that accepts RoleTagConditionArgs and RoleTagConditionOutput values.
+// You can construct a concrete instance of `RoleTagConditionInput` via:
+//
+//	RoleTagConditionArgs{...}
+type RoleTagConditionInput interface {
+	pulumi.Input
+
+	ToRoleTagConditionOutput() RoleTagConditionOutput
+	ToRoleTagConditionOutputWithContext(context.Context) RoleTagConditionOutput
+}
+
+type RoleTagConditionArgs struct {
+	// The tag key.
+	Key pulumi.StringInput `pulumi:"key"`
+	// How the tag is compared. Defaults to `equals`.
+	Operator RoleTagOperatorPtrInput `pulumi:"operator"`
+	// The tag value. When omitted, the condition matches on whether the tag is present.
+	Value pulumi.StringPtrInput `pulumi:"value"`
+}
+
+func (RoleTagConditionArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*RoleTagCondition)(nil)).Elem()
+}
+
+func (i RoleTagConditionArgs) ToRoleTagConditionOutput() RoleTagConditionOutput {
+	return i.ToRoleTagConditionOutputWithContext(context.Background())
+}
+
+func (i RoleTagConditionArgs) ToRoleTagConditionOutputWithContext(ctx context.Context) RoleTagConditionOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(RoleTagConditionOutput)
+}
+
+// RoleTagConditionArrayInput is an input type that accepts RoleTagConditionArray and RoleTagConditionArrayOutput values.
+// You can construct a concrete instance of `RoleTagConditionArrayInput` via:
+//
+//	RoleTagConditionArray{ RoleTagConditionArgs{...} }
+type RoleTagConditionArrayInput interface {
+	pulumi.Input
+
+	ToRoleTagConditionArrayOutput() RoleTagConditionArrayOutput
+	ToRoleTagConditionArrayOutputWithContext(context.Context) RoleTagConditionArrayOutput
+}
+
+type RoleTagConditionArray []RoleTagConditionInput
+
+func (RoleTagConditionArray) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]RoleTagCondition)(nil)).Elem()
+}
+
+func (i RoleTagConditionArray) ToRoleTagConditionArrayOutput() RoleTagConditionArrayOutput {
+	return i.ToRoleTagConditionArrayOutputWithContext(context.Background())
+}
+
+func (i RoleTagConditionArray) ToRoleTagConditionArrayOutputWithContext(ctx context.Context) RoleTagConditionArrayOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(RoleTagConditionArrayOutput)
+}
+
+type RoleTagConditionOutput struct{ *pulumi.OutputState }
+
+func (RoleTagConditionOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*RoleTagCondition)(nil)).Elem()
+}
+
+func (o RoleTagConditionOutput) ToRoleTagConditionOutput() RoleTagConditionOutput {
+	return o
+}
+
+func (o RoleTagConditionOutput) ToRoleTagConditionOutputWithContext(ctx context.Context) RoleTagConditionOutput {
+	return o
+}
+
+// The tag key.
+func (o RoleTagConditionOutput) Key() pulumi.StringOutput {
+	return o.ApplyT(func(v RoleTagCondition) string { return v.Key }).(pulumi.StringOutput)
+}
+
+// How the tag is compared. Defaults to `equals`.
+func (o RoleTagConditionOutput) Operator() RoleTagOperatorPtrOutput {
+	return o.ApplyT(func(v RoleTagCondition) *RoleTagOperator { return v.Operator }).(RoleTagOperatorPtrOutput)
+}
+
+// The tag value. When omitted, the condition matches on whether the tag is present.
+func (o RoleTagConditionOutput) Value() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v RoleTagCondition) *string { return v.Value }).(pulumi.StringPtrOutput)
+}
+
+type RoleTagConditionArrayOutput struct{ *pulumi.OutputState }
+
+func (RoleTagConditionArrayOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]RoleTagCondition)(nil)).Elem()
+}
+
+func (o RoleTagConditionArrayOutput) ToRoleTagConditionArrayOutput() RoleTagConditionArrayOutput {
+	return o
+}
+
+func (o RoleTagConditionArrayOutput) ToRoleTagConditionArrayOutputWithContext(ctx context.Context) RoleTagConditionArrayOutput {
+	return o
+}
+
+func (o RoleTagConditionArrayOutput) Index(i pulumi.IntInput) RoleTagConditionOutput {
+	return pulumi.All(o, i).ApplyT(func(vs []interface{}) RoleTagCondition {
+		return vs[0].([]RoleTagCondition)[vs[1].(int)]
+	}).(RoleTagConditionOutput)
 }
 
 type TemplateSourceDestination struct {
@@ -4682,6 +5302,16 @@ func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*PolicyPackComplianceFrameworkInputPtrInput)(nil)).Elem(), PolicyPackComplianceFrameworkInputArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*PolicyPackPolicyInputInput)(nil)).Elem(), PolicyPackPolicyInputArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*PolicyPackPolicyInputArrayInput)(nil)).Elem(), PolicyPackPolicyInputArray{})
+	pulumi.RegisterInputType(reflect.TypeOf((*RoleEnvironmentRuleInput)(nil)).Elem(), RoleEnvironmentRuleArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*RoleEnvironmentRuleArrayInput)(nil)).Elem(), RoleEnvironmentRuleArray{})
+	pulumi.RegisterInputType(reflect.TypeOf((*RoleInsightsAccountRuleInput)(nil)).Elem(), RoleInsightsAccountRuleArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*RoleInsightsAccountRuleArrayInput)(nil)).Elem(), RoleInsightsAccountRuleArray{})
+	pulumi.RegisterInputType(reflect.TypeOf((*RolePermissionSetRefInput)(nil)).Elem(), RolePermissionSetRefArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*RolePermissionSetRefArrayInput)(nil)).Elem(), RolePermissionSetRefArray{})
+	pulumi.RegisterInputType(reflect.TypeOf((*RoleStackRuleInput)(nil)).Elem(), RoleStackRuleArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*RoleStackRuleArrayInput)(nil)).Elem(), RoleStackRuleArray{})
+	pulumi.RegisterInputType(reflect.TypeOf((*RoleTagConditionInput)(nil)).Elem(), RoleTagConditionArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*RoleTagConditionArrayInput)(nil)).Elem(), RoleTagConditionArray{})
 	pulumi.RegisterInputType(reflect.TypeOf((*TemplateSourceDestinationInput)(nil)).Elem(), TemplateSourceDestinationArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*TemplateSourceDestinationPtrInput)(nil)).Elem(), TemplateSourceDestinationArgs{})
 	pulumi.RegisterOutputType(AWSOIDCConfigurationOutput{})
@@ -4738,8 +5368,18 @@ func init() {
 	pulumi.RegisterOutputType(PolicyPackPolicyInputArrayOutput{})
 	pulumi.RegisterOutputType(PolicyPackSummaryOutput{})
 	pulumi.RegisterOutputType(PolicyPackSummaryArrayOutput{})
+	pulumi.RegisterOutputType(RoleEnvironmentRuleOutput{})
+	pulumi.RegisterOutputType(RoleEnvironmentRuleArrayOutput{})
+	pulumi.RegisterOutputType(RoleInsightsAccountRuleOutput{})
+	pulumi.RegisterOutputType(RoleInsightsAccountRuleArrayOutput{})
+	pulumi.RegisterOutputType(RolePermissionSetRefOutput{})
+	pulumi.RegisterOutputType(RolePermissionSetRefArrayOutput{})
 	pulumi.RegisterOutputType(RoleScopeInfoOutput{})
 	pulumi.RegisterOutputType(RoleScopeInfoArrayOutput{})
+	pulumi.RegisterOutputType(RoleStackRuleOutput{})
+	pulumi.RegisterOutputType(RoleStackRuleArrayOutput{})
+	pulumi.RegisterOutputType(RoleTagConditionOutput{})
+	pulumi.RegisterOutputType(RoleTagConditionArrayOutput{})
 	pulumi.RegisterOutputType(TemplateSourceDestinationOutput{})
 	pulumi.RegisterOutputType(TemplateSourceDestinationPtrOutput{})
 }

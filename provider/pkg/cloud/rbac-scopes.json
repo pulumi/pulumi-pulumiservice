@@ -1,0 +1,1225 @@
+{
+  "environment": [
+    {
+      "name": "Approvals",
+      "scopes": [
+        {
+          "metadata": {
+            "description": "Create approval rules"
+          },
+          "name": "change_gate:create"
+        },
+        {
+          "metadata": {
+            "description": "Delete approval rules"
+          },
+          "name": "change_gate:delete"
+        },
+        {
+          "metadata": {
+            "description": "Update approval rules"
+          },
+          "name": "change_gate:update"
+        }
+      ]
+    },
+    {
+      "name": "Environment schedules",
+      "scopes": [
+        {
+          "metadata": {
+            "description": "Creates a new environment schedule"
+          },
+          "name": "environment_schedule:create"
+        },
+        {
+          "metadata": {
+            "description": "Deletes an environment schedule"
+          },
+          "name": "environment_schedule:delete"
+        },
+        {
+          "metadata": {
+            "description": "Pauses an environment schedule"
+          },
+          "name": "environment_schedule:pause"
+        },
+        {
+          "metadata": {
+            "description": "Reads an environment schedule"
+          },
+          "name": "environment_schedule:read"
+        },
+        {
+          "metadata": {
+            "description": "Resumes an environment schedule"
+          },
+          "name": "environment_schedule:resume"
+        },
+        {
+          "metadata": {
+            "description": "Updates an environment schedule"
+          },
+          "name": "environment_schedule:update"
+        }
+      ]
+    },
+    {
+      "name": "Environment secrets rotation",
+      "scopes": [
+        {
+          "metadata": {
+            "description": "Rotates secrets in an environment"
+          },
+          "name": "environment:rotate"
+        },
+        {
+          "metadata": {
+            "description": "List secret rotation history of an environment"
+          },
+          "name": "environment:rotate_history"
+        }
+      ]
+    },
+    {
+      "name": "Environment tags",
+      "scopes": [
+        {
+          "metadata": {
+            "description": "Adds a new tag to an environment"
+          },
+          "name": "environment_tag:create"
+        },
+        {
+          "metadata": {
+            "description": "Removes a tag from an environment"
+          },
+          "name": "environment_tag:delete"
+        },
+        {
+          "metadata": {
+            "description": "Reads the value of an environments tag"
+          },
+          "name": "environment_tag:read"
+        },
+        {
+          "metadata": {
+            "description": "Modifies the value of an environments tag"
+          },
+          "name": "environment_tag:update"
+        }
+      ]
+    },
+    {
+      "name": "Environment versions",
+      "scopes": [
+        {
+          "metadata": {
+            "description": "Creates a new version tag"
+          },
+          "name": "environment_version:create"
+        },
+        {
+          "metadata": {
+            "description": "Deletes a version tag"
+          },
+          "name": "environment_version:delete"
+        },
+        {
+          "metadata": {
+            "description": "Open and decrypt a version tag"
+          },
+          "name": "environment_version:open"
+        },
+        {
+          "metadata": {
+            "description": "Reads a version tag"
+          },
+          "name": "environment_version:read"
+        },
+        {
+          "metadata": {
+            "description": "Retracts a specific version of the given environment"
+          },
+          "name": "environment_version:retract"
+        },
+        {
+          "metadata": {
+            "description": "Updates a version tag"
+          },
+          "name": "environment_version:update"
+        }
+      ]
+    },
+    {
+      "name": "Environment webhooks",
+      "scopes": [
+        {
+          "metadata": {
+            "description": "Create environment webhook"
+          },
+          "name": "environment_webhook:create"
+        },
+        {
+          "metadata": {
+            "description": "Delete environment webhook"
+          },
+          "name": "environment_webhook:delete"
+        },
+        {
+          "metadata": {
+            "description": "Read environment webhook"
+          },
+          "name": "environment_webhook:read"
+        },
+        {
+          "metadata": {
+            "description": "Update environment webhook"
+          },
+          "name": "environment_webhook:update"
+        }
+      ]
+    },
+    {
+      "name": "Environments",
+      "scopes": [
+        {
+          "metadata": {
+            "description": "Clone environment"
+          },
+          "name": "environment:clone"
+        },
+        {
+          "metadata": {
+            "description": "Delete environment"
+          },
+          "name": "environment:delete"
+        },
+        {
+          "metadata": {
+            "description": "Open and decrypt environment"
+          },
+          "name": "environment:open"
+        },
+        {
+          "metadata": {
+            "description": "Read environment"
+          },
+          "name": "environment:read"
+        },
+        {
+          "metadata": {
+            "description": "Write environment"
+          },
+          "name": "environment:write"
+        },
+        {
+          "metadata": {
+            "description": "Read environment settings"
+          },
+          "name": "environment_settings:read"
+        },
+        {
+          "metadata": {
+            "description": "Update environment settings"
+          },
+          "name": "environment_settings:update"
+        }
+      ]
+    }
+  ],
+  "global": [
+    {
+      "name": "Agent pools",
+      "scopes": [
+        {
+          "metadata": {
+            "description": "Create agent pool"
+          },
+          "name": "agent_pool:create"
+        },
+        {
+          "metadata": {
+            "description": "Delete agent pool"
+          },
+          "name": "agent_pool:delete"
+        },
+        {
+          "metadata": {
+            "description": "Read agent pool"
+          },
+          "name": "agent_pool:read"
+        },
+        {
+          "metadata": {
+            "description": "Update agent pool"
+          },
+          "name": "agent_pool:update"
+        }
+      ]
+    },
+    {
+      "name": "Approvals",
+      "scopes": [
+        {
+          "metadata": {
+            "description": "Create approval rules"
+          },
+          "name": "change_gate:create"
+        },
+        {
+          "metadata": {
+            "description": "Delete approval rules"
+          },
+          "name": "change_gate:delete"
+        },
+        {
+          "metadata": {
+            "description": "Update approval rules"
+          },
+          "name": "change_gate:update"
+        }
+      ]
+    },
+    {
+      "name": "Audit logs",
+      "scopes": [
+        {
+          "metadata": {
+            "description": "Export audit logs"
+          },
+          "name": "audit_logs:export"
+        },
+        {
+          "metadata": {
+            "description": "Read audit logs"
+          },
+          "name": "audit_logs:read"
+        }
+      ]
+    },
+    {
+      "name": "Deployments",
+      "scopes": [
+        {
+          "metadata": {
+            "description": "Pause deployments"
+          },
+          "name": "deployments:pause"
+        },
+        {
+          "metadata": {
+            "description": "Read deployments"
+          },
+          "name": "deployments:read"
+        },
+        {
+          "metadata": {
+            "description": "Read deployment usage"
+          },
+          "name": "deployments:read_usage"
+        },
+        {
+          "metadata": {
+            "description": "Resume deployments"
+          },
+          "name": "deployments:resume"
+        }
+      ]
+    },
+    {
+      "name": "Environment management",
+      "scopes": [
+        {
+          "metadata": {
+            "description": "Create environment"
+          },
+          "name": "environment:create"
+        },
+        {
+          "metadata": {
+            "description": "List deleted environments"
+          },
+          "name": "environment:list_deleted"
+        },
+        {
+          "metadata": {
+            "description": "Restore deleted environment"
+          },
+          "name": "environment:restore_deleted"
+        },
+        {
+          "metadata": {
+            "description": "List the tags across all environments"
+          },
+          "name": "environment_tags:list"
+        }
+      ]
+    },
+    {
+      "name": "Insights account management",
+      "scopes": [
+        {
+          "metadata": {
+            "description": "Create Insights account"
+          },
+          "name": "insights_account:create"
+        }
+      ]
+    },
+    {
+      "name": "Insights policy management",
+      "scopes": [
+        {
+          "metadata": {
+            "description": "Create Insights policy groups"
+          },
+          "name": "policy_groups:create"
+        },
+        {
+          "metadata": {
+            "description": "Delete Insights policy groups"
+          },
+          "name": "policy_groups:delete"
+        },
+        {
+          "metadata": {
+            "description": "Read Insights policy groups"
+          },
+          "name": "policy_groups:read"
+        },
+        {
+          "metadata": {
+            "description": "Update Insights policy groups"
+          },
+          "name": "policy_groups:update"
+        },
+        {
+          "metadata": {
+            "description": "Create Insights policy pack"
+          },
+          "name": "policy_pack:create"
+        },
+        {
+          "metadata": {
+            "description": "Delete Insights policy pack"
+          },
+          "name": "policy_pack:delete"
+        },
+        {
+          "metadata": {
+            "description": "Read Insights policy pack"
+          },
+          "name": "policy_pack:read"
+        },
+        {
+          "metadata": {
+            "description": "Update Insights policy pack"
+          },
+          "name": "policy_pack:update"
+        },
+        {
+          "metadata": {
+            "description": "Read Insights policy results"
+          },
+          "name": "policy_results:read"
+        },
+        {
+          "metadata": {
+            "description": "Update Insights policy results"
+          },
+          "name": "policy_results:update"
+        }
+      ]
+    },
+    {
+      "name": "Membership",
+      "scopes": [
+        {
+          "metadata": {
+            "description": "Create invites"
+          },
+          "name": "invites:create"
+        },
+        {
+          "metadata": {
+            "description": "Read invites"
+          },
+          "name": "invites:read"
+        },
+        {
+          "metadata": {
+            "description": "Add organization member"
+          },
+          "name": "org_member:add"
+        },
+        {
+          "metadata": {
+            "description": "Delete organization member"
+          },
+          "name": "org_member:delete"
+        },
+        {
+          "metadata": {
+            "description": "Read organization member"
+          },
+          "name": "org_member:read"
+        },
+        {
+          "metadata": {
+            "description": "Set organization member admin"
+          },
+          "name": "org_member:set_admin"
+        },
+        {
+          "metadata": {
+            "description": "Update organization member"
+          },
+          "name": "org_member:update"
+        },
+        {
+          "metadata": {
+            "description": "Read organization member access"
+          },
+          "name": "org_member_access:read"
+        },
+        {
+          "metadata": {
+            "description": "Read organization requests"
+          },
+          "name": "org_requests:read"
+        },
+        {
+          "metadata": {
+            "description": "Update organization requests"
+          },
+          "name": "org_requests:update"
+        }
+      ]
+    },
+    {
+      "name": "Neo",
+      "scopes": [
+        {
+          "metadata": {
+            "description": "Create org-owned Neo automations"
+          },
+          "name": "agent_automations:create"
+        },
+        {
+          "metadata": {
+            "description": "Delete org-owned Neo automations"
+          },
+          "name": "agent_automations:delete"
+        },
+        {
+          "metadata": {
+            "description": "Read org-owned Neo automations"
+          },
+          "name": "agent_automations:read"
+        },
+        {
+          "metadata": {
+            "description": "Update org-owned Neo automations"
+          },
+          "name": "agent_automations:update"
+        },
+        {
+          "metadata": {
+            "description": "Create Custom Agents"
+          },
+          "name": "agent_definitions:create"
+        },
+        {
+          "metadata": {
+            "description": "Delete Custom Agents"
+          },
+          "name": "agent_definitions:delete"
+        },
+        {
+          "metadata": {
+            "description": "Update Custom Agents"
+          },
+          "name": "agent_definitions:update"
+        },
+        {
+          "metadata": {
+            "description": "Create Neo tasks"
+          },
+          "name": "agent_task:create"
+        }
+      ]
+    },
+    {
+      "name": "OIDC",
+      "scopes": [
+        {
+          "metadata": {
+            "description": "Read authentication policies"
+          },
+          "name": "auth_policies:read"
+        },
+        {
+          "metadata": {
+            "description": "Update authentication policies"
+          },
+          "name": "auth_policies:update"
+        },
+        {
+          "metadata": {
+            "description": "Create OIDC issuer"
+          },
+          "name": "oidc_issuers:create"
+        },
+        {
+          "metadata": {
+            "description": "Delete OIDC issuer"
+          },
+          "name": "oidc_issuers:delete"
+        },
+        {
+          "metadata": {
+            "description": "Read OIDC issuers"
+          },
+          "name": "oidc_issuers:read"
+        },
+        {
+          "metadata": {
+            "description": "Regenerate OIDC issuer thumbprints"
+          },
+          "name": "oidc_issuers:regenerate_thumbprints"
+        },
+        {
+          "metadata": {
+            "description": "Update OIDC issuers"
+          },
+          "name": "oidc_issuers:update"
+        }
+      ]
+    },
+    {
+      "name": "Organization",
+      "scopes": [
+        {
+          "metadata": {
+            "description": "Read integrations"
+          },
+          "name": "integrations:read"
+        },
+        {
+          "metadata": {
+            "description": "Update integrations"
+          },
+          "name": "integrations:update"
+        },
+        {
+          "metadata": {
+            "description": "Read organization integrations"
+          },
+          "name": "org_integrations:read"
+        },
+        {
+          "metadata": {
+            "description": "Update organization integrations"
+          },
+          "name": "org_integrations:update"
+        },
+        {
+          "metadata": {
+            "description": "Manage organization billing"
+          },
+          "name": "organization:billing"
+        },
+        {
+          "metadata": {
+            "description": "Change organization backend"
+          },
+          "name": "organization:change_backend"
+        },
+        {
+          "metadata": {
+            "description": "Delete organization"
+          },
+          "name": "organization:delete"
+        },
+        {
+          "metadata": {
+            "description": "Read organization usage"
+          },
+          "name": "organization:read_usage"
+        },
+        {
+          "metadata": {
+            "description": "Rename organization"
+          },
+          "name": "organization:rename"
+        },
+        {
+          "metadata": {
+            "description": "Update organization"
+          },
+          "name": "organization:update"
+        }
+      ]
+    },
+    {
+      "name": "Organization access tokens",
+      "scopes": [
+        {
+          "metadata": {
+            "description": "Create organization access token"
+          },
+          "name": "org_token:create"
+        },
+        {
+          "metadata": {
+            "description": "Delete organization access token"
+          },
+          "name": "org_token:delete"
+        },
+        {
+          "metadata": {
+            "description": "Read organization access token"
+          },
+          "name": "org_token:read"
+        }
+      ]
+    },
+    {
+      "name": "Organization webhooks",
+      "scopes": [
+        {
+          "metadata": {
+            "description": "Create organization webhook"
+          },
+          "name": "organization_webhook:create"
+        },
+        {
+          "metadata": {
+            "description": "Delete organization webhook"
+          },
+          "name": "organization_webhook:delete"
+        },
+        {
+          "metadata": {
+            "description": "Read organization webhook"
+          },
+          "name": "organization_webhook:read"
+        },
+        {
+          "metadata": {
+            "description": "Update organization webhook"
+          },
+          "name": "organization_webhook:update"
+        }
+      ]
+    },
+    {
+      "name": "Roles",
+      "scopes": [
+        {
+          "metadata": {
+            "description": "Create role"
+          },
+          "name": "role:create"
+        },
+        {
+          "metadata": {
+            "description": "Delete role"
+          },
+          "name": "role:delete"
+        },
+        {
+          "metadata": {
+            "description": "Read role"
+          },
+          "name": "role:read"
+        },
+        {
+          "metadata": {
+            "description": "Update role"
+          },
+          "name": "role:update"
+        }
+      ]
+    },
+    {
+      "name": "SSO",
+      "scopes": [
+        {
+          "metadata": {
+            "description": "Read SAML"
+          },
+          "name": "saml:read"
+        },
+        {
+          "metadata": {
+            "description": "Update SAML"
+          },
+          "name": "saml:update"
+        },
+        {
+          "metadata": {
+            "description": "Delete SCIM"
+          },
+          "name": "scim:delete"
+        },
+        {
+          "metadata": {
+            "description": "Read SCIM"
+          },
+          "name": "scim:read"
+        },
+        {
+          "metadata": {
+            "description": "Update SCIM"
+          },
+          "name": "scim:update"
+        }
+      ]
+    },
+    {
+      "name": "Search",
+      "scopes": [
+        {
+          "metadata": {
+            "description": "View resources dashboard"
+          },
+          "name": "resources:dashboard"
+        },
+        {
+          "metadata": {
+            "description": "Index resources"
+          },
+          "name": "resources:index"
+        },
+        {
+          "metadata": {
+            "description": "Search resources"
+          },
+          "name": "resources:search"
+        }
+      ]
+    },
+    {
+      "name": "Stack management",
+      "scopes": [
+        {
+          "metadata": {
+            "description": "Transfer organization stacks"
+          },
+          "name": "organization:transfer_stacks"
+        },
+        {
+          "metadata": {
+            "description": "Decrypt project"
+          },
+          "name": "project:decrypt"
+        },
+        {
+          "metadata": {
+            "description": "Encrypt project"
+          },
+          "name": "project:encrypt"
+        },
+        {
+          "metadata": {
+            "description": "Create stack"
+          },
+          "name": "stack:create"
+        },
+        {
+          "metadata": {
+            "description": "List deleted stacks"
+          },
+          "name": "stack:list_deleted"
+        },
+        {
+          "metadata": {
+            "description": "Restore deleted stack"
+          },
+          "name": "stack:restore_deleted"
+        },
+        {
+          "metadata": {
+            "description": "Read project tags"
+          },
+          "name": "tags:read"
+        }
+      ]
+    },
+    {
+      "name": "Teams",
+      "scopes": [
+        {
+          "metadata": {
+            "description": "Create GitHub team"
+          },
+          "name": "github_team:create"
+        },
+        {
+          "metadata": {
+            "description": "Create team"
+          },
+          "name": "team:create"
+        },
+        {
+          "metadata": {
+            "description": "Create team access token"
+          },
+          "name": "team:create_token"
+        },
+        {
+          "metadata": {
+            "description": "Delete team"
+          },
+          "name": "team:delete"
+        },
+        {
+          "metadata": {
+            "description": "Delete team access token"
+          },
+          "name": "team:delete_token"
+        },
+        {
+          "metadata": {
+            "description": "List teams"
+          },
+          "name": "team:list"
+        },
+        {
+          "metadata": {
+            "description": "List team access tokens"
+          },
+          "name": "team:list_tokens"
+        },
+        {
+          "metadata": {
+            "description": "Read team"
+          },
+          "name": "team:read"
+        },
+        {
+          "metadata": {
+            "description": "Update team"
+          },
+          "name": "team:update"
+        }
+      ]
+    },
+    {
+      "name": "Templates",
+      "scopes": [
+        {
+          "metadata": {
+            "description": "Read templates"
+          },
+          "name": "templates:read"
+        },
+        {
+          "metadata": {
+            "description": "Create template sources"
+          },
+          "name": "templates_source:create"
+        },
+        {
+          "metadata": {
+            "description": "Delete template sources"
+          },
+          "name": "templates_source:delete"
+        },
+        {
+          "metadata": {
+            "description": "Read template sources"
+          },
+          "name": "templates_source:read"
+        },
+        {
+          "metadata": {
+            "description": "Update template sources"
+          },
+          "name": "templates_source:update"
+        }
+      ]
+    }
+  ],
+  "insights-account": [
+    {
+      "name": "Accounts",
+      "scopes": [
+        {
+          "metadata": {
+            "description": "Delete Insights account"
+          },
+          "name": "insights_account:delete"
+        },
+        {
+          "metadata": {
+            "description": "Read Insights account"
+          },
+          "name": "insights_account:read"
+        },
+        {
+          "metadata": {
+            "description": "Update Insights account"
+          },
+          "name": "insights_account:update"
+        },
+        {
+          "metadata": {
+            "description": "Read Insights account access"
+          },
+          "name": "insights_account_access:read"
+        },
+        {
+          "metadata": {
+            "description": "Update Insights account access"
+          },
+          "name": "insights_account_access:update"
+        }
+      ]
+    },
+    {
+      "name": "Scans",
+      "scopes": [
+        {
+          "metadata": {
+            "description": "Scan Insights account"
+          },
+          "name": "insights_account:scan"
+        },
+        {
+          "metadata": {
+            "description": "Cancel Insights account scan"
+          },
+          "name": "insights_account_scan:cancel"
+        },
+        {
+          "metadata": {
+            "description": "Pause Insights account scan"
+          },
+          "name": "insights_account_scan:pause"
+        },
+        {
+          "metadata": {
+            "description": "Read Insights account scan"
+          },
+          "name": "insights_account_scan:read"
+        },
+        {
+          "metadata": {
+            "description": "Resume Insights account scan"
+          },
+          "name": "insights_account_scan:resume"
+        },
+        {
+          "metadata": {
+            "description": "Update Insights account scan"
+          },
+          "name": "insights_account_scan:update"
+        }
+      ]
+    }
+  ],
+  "stack": [
+    {
+      "name": "Stack deployment schedules",
+      "scopes": [
+        {
+          "metadata": {
+            "description": "Create stack schedule"
+          },
+          "name": "stack_schedule:create"
+        },
+        {
+          "metadata": {
+            "description": "Delete stack schedule"
+          },
+          "name": "stack_schedule:delete"
+        },
+        {
+          "metadata": {
+            "description": "Pause stack schedule"
+          },
+          "name": "stack_schedule:pause"
+        },
+        {
+          "metadata": {
+            "description": "Read stack schedule"
+          },
+          "name": "stack_schedule:read"
+        },
+        {
+          "metadata": {
+            "description": "Resume stack schedule"
+          },
+          "name": "stack_schedule:resume"
+        },
+        {
+          "metadata": {
+            "description": "Update stack schedule"
+          },
+          "name": "stack_schedule:update"
+        }
+      ]
+    },
+    {
+      "name": "Stack deployments",
+      "scopes": [
+        {
+          "metadata": {
+            "description": "Create deployment"
+          },
+          "name": "stack_deployment:create"
+        },
+        {
+          "metadata": {
+            "description": "Read deployment"
+          },
+          "name": "stack_deployment:read"
+        },
+        {
+          "metadata": {
+            "description": "Encrypt deployment settings"
+          },
+          "name": "stack_deployment_settings:encrypt"
+        },
+        {
+          "metadata": {
+            "description": "Read deployment settings"
+          },
+          "name": "stack_deployment_settings:read"
+        },
+        {
+          "metadata": {
+            "description": "Write deployment settings"
+          },
+          "name": "stack_deployment_settings:write"
+        }
+      ]
+    },
+    {
+      "name": "Stack tags",
+      "scopes": [
+        {
+          "metadata": {
+            "description": "Update stack tags"
+          },
+          "name": "stack_tags:update"
+        }
+      ]
+    },
+    {
+      "name": "Stack webhooks",
+      "scopes": [
+        {
+          "metadata": {
+            "description": "Create stack webhook"
+          },
+          "name": "stack_webhook:create"
+        },
+        {
+          "metadata": {
+            "description": "Delete stack webhook"
+          },
+          "name": "stack_webhook:delete"
+        },
+        {
+          "metadata": {
+            "description": "Read stack webhook"
+          },
+          "name": "stack_webhook:read"
+        },
+        {
+          "metadata": {
+            "description": "Update stack webhook"
+          },
+          "name": "stack_webhook:update"
+        }
+      ]
+    },
+    {
+      "name": "Stacks",
+      "scopes": [
+        {
+          "metadata": {
+            "description": "Cancel stack update"
+          },
+          "name": "stack:cancel_update"
+        },
+        {
+          "metadata": {
+            "description": "Create stack"
+          },
+          "name": "stack:create"
+        },
+        {
+          "metadata": {
+            "description": "Decrypt stack"
+          },
+          "name": "stack:decrypt"
+        },
+        {
+          "metadata": {
+            "description": "Delete stack"
+          },
+          "name": "stack:delete"
+        },
+        {
+          "metadata": {
+            "description": "Encrypt stack"
+          },
+          "name": "stack:encrypt"
+        },
+        {
+          "metadata": {
+            "description": "Export stack"
+          },
+          "name": "stack:export"
+        },
+        {
+          "metadata": {
+            "description": "Import stack"
+          },
+          "name": "stack:import"
+        },
+        {
+          "metadata": {
+            "description": "Read stack"
+          },
+          "name": "stack:read"
+        },
+        {
+          "metadata": {
+            "description": "Rename stack"
+          },
+          "name": "stack:rename"
+        },
+        {
+          "metadata": {
+            "description": "Transfer stack"
+          },
+          "name": "stack:transfer"
+        },
+        {
+          "metadata": {
+            "description": "Write stack"
+          },
+          "name": "stack:write"
+        },
+        {
+          "metadata": {
+            "description": "Read stack teams"
+          },
+          "name": "stack_access:read"
+        },
+        {
+          "metadata": {
+            "description": "Update stack teams"
+          },
+          "name": "stack_access:update"
+        }
+      ]
+    }
+  ]
+}
