@@ -63,8 +63,8 @@ func TestGetPulumiAccessToken(t *testing.T) {
 
 		err := workspace.StoreCredentials(workspace.Credentials{
 			Current: account,
-			AccessTokens: map[string]string{
-				account: wantToken,
+			Accounts: map[string]workspace.Account{
+				account: {AccessToken: wantToken},
 			},
 		})
 		if err != nil {
