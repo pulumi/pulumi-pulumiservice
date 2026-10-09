@@ -29,6 +29,11 @@ type RoleClient interface {
 		orgName string,
 		req apitype.PermissionDescriptorBase,
 	) (*apitype.PermissionDescriptorRecord, error)
+	CreateRoleWithPolicy(
+		ctx context.Context,
+		orgName string,
+		policy apitype.PermissionDescriptorBase,
+	) (*apitype.PermissionDescriptorRecord, error)
 	GetRole(
 		ctx context.Context,
 		orgName, roleID string,
@@ -110,6 +115,34 @@ func (c *Client) CreateRole(
 	}
 
 	role, err := c.SDK.CreateRole(ctx, orgName, nil, req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create role: %w", err)
+	}
+	return role, nil
+}
+
+// CreateRoleWithPolicy creates a custom role the way the Pulumi Cloud console
+// does: the service stores `policy.Details` as a uxPurpose=policy descriptor,
+// then creates a uxPurpose=role descriptor with the same name and description
+// whose details compose that policy. Only the role is returned; its details
+// carry the policy ID.
+func (c *Client) CreateRoleWithPolicy(
+	ctx context.Context,
+	orgName string,
+	policy apitype.PermissionDescriptorBase,
+) (*apitype.PermissionDescriptorRecord, error) {
+	if len(orgName) == 0 {
+		return nil, errors.New("organization name must not be empty")
+	}
+	if policy.Name == "" {
+		return nil, errors.New("role name must not be empty")
+	}
+	if policy.Details == nil {
+		return nil, errors.New("role permissions details must not be empty")
+	}
+
+	createPolicyAndRole := true
+	role, err := c.SDK.CreateRole(ctx, orgName, &createPolicyAndRole, policy)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create role: %w", err)
 	}

@@ -67,6 +67,12 @@ func (i *StackInput) Annotate(a infer.Annotator) {
 
 type StackState struct {
 	StackInput
+	StackId string `pulumi:"stackId,optional"`
+}
+
+func (s *StackState) Annotate(a infer.Annotator) {
+	a.Describe(&s.StackId,
+		"The stack's unique ID. Use it in an `RbacRole` entity rule to grant permissions on this stack.")
 }
 
 func (*Stack) Create(
@@ -83,14 +89,21 @@ func (*Stack) Create(
 		ProjectName: req.Inputs.ProjectName,
 		StackName:   req.Inputs.StackName,
 	}
-	if err := config.GetClient(ctx).CreateStack(ctx, stackID); err != nil {
+	client := config.GetClient(ctx)
+	if err := client.CreateStack(ctx, stackID); err != nil {
 		return infer.CreateResponse[StackState]{}, fmt.Errorf(
 			"error creating stack %q: %w", stackID, err,
 		)
 	}
+	id, err := client.GetStackID(ctx, stackID)
+	if err != nil {
+		return infer.CreateResponse[StackState]{}, fmt.Errorf(
+			"error reading created stack %q: %w", stackID, err,
+		)
+	}
 	return infer.CreateResponse[StackState]{
 		ID:     stackResourceID(stackID),
-		Output: StackState{StackInput: req.Inputs},
+		Output: StackState{StackInput: req.Inputs, StackId: id},
 	}, nil
 }
 
@@ -116,6 +129,11 @@ func (*Stack) Diff(
 	if req.State.ForceDestroy != req.Inputs.ForceDestroy {
 		diff["forceDestroy"] = p.PropertyDiff{Kind: p.Update, InputDiff: true}
 	}
+	// State written before stackId existed has no ID; an in-place update
+	// backfills it so `stack.stackId` is usable without a manual refresh.
+	if req.State.StackId == "" && len(diff) == 0 {
+		diff["stackId"] = p.PropertyDiff{Kind: p.Update}
+	}
 
 	return infer.DiffResponse{
 		HasChanges:   len(diff) > 0,
@@ -124,11 +142,12 @@ func (*Stack) Diff(
 }
 
 // Update handles the one non-replacing input, forceDestroy, which the Pulumi
-// Cloud API does not store: the only thing to do is record the new value.
+// Cloud API does not store: the only thing to do is record the new value. It
+// also backfills stackId for state written before that output existed.
 // Anything else reaching here escaped Diff's replace path, so refuse it
 // rather than record a change the API never saw.
 func (*Stack) Update(
-	_ context.Context,
+	ctx context.Context,
 	req infer.UpdateRequest[StackInput, StackState],
 ) (infer.UpdateResponse[StackState], error) {
 	old := req.State.StackInput
@@ -138,8 +157,20 @@ func (*Stack) Update(
 		return infer.UpdateResponse[StackState]{}, fmt.Errorf(
 			"stack %q cannot be updated in place; identity changes require a replacement", req.ID)
 	}
+	id := req.State.StackId
+	if id == "" && !req.DryRun {
+		var err error
+		id, err = config.GetClient(ctx).GetStackID(ctx, pulumiapi.StackIdentifier{
+			OrgName:     old.OrganizationName,
+			ProjectName: old.ProjectName,
+			StackName:   old.StackName,
+		})
+		if err != nil {
+			return infer.UpdateResponse[StackState]{}, fmt.Errorf("error reading stack %q: %w", req.ID, err)
+		}
+	}
 	return infer.UpdateResponse[StackState]{
-		Output: StackState{StackInput: req.Inputs},
+		Output: StackState{StackInput: req.Inputs, StackId: id},
 	}, nil
 }
 
@@ -168,13 +199,13 @@ func (*Stack) Read(
 		ProjectName: projectName,
 		StackName:   stackName,
 	}
-	exists, err := config.GetClient(ctx).StackExists(ctx, stackID)
+	id, err := config.GetClient(ctx).GetStackID(ctx, stackID)
 	if err != nil {
 		return infer.ReadResponse[StackInput, StackState]{}, fmt.Errorf(
 			"failure while checking if stack %q exists: %w", req.ID, err,
 		)
 	}
-	if !exists {
+	if id == "" {
 		return infer.ReadResponse[StackInput, StackState]{}, nil
 	}
 	inputs := StackInput{
@@ -188,7 +219,7 @@ func (*Stack) Read(
 	return infer.ReadResponse[StackInput, StackState]{
 		ID:     req.ID,
 		Inputs: inputs,
-		State:  StackState{StackInput: inputs},
+		State:  StackState{StackInput: inputs, StackId: id},
 	}, nil
 }
 

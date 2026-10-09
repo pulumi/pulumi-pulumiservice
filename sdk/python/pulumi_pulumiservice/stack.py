@@ -154,6 +154,7 @@ class Stack(pulumi.CustomResource):
             if stack_name is None and not opts.urn:
                 raise TypeError("Missing required property 'stack_name'")
             __props__.__dict__["stack_name"] = stack_name
+            __props__.__dict__["stack_id"] = None
         replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["organizationName", "projectName", "stackName"])
         opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(Stack, __self__).__init__(
@@ -181,6 +182,7 @@ class Stack(pulumi.CustomResource):
         __props__.__dict__["force_destroy"] = None
         __props__.__dict__["organization_name"] = None
         __props__.__dict__["project_name"] = None
+        __props__.__dict__["stack_id"] = None
         __props__.__dict__["stack_name"] = None
         return Stack(resource_name, opts=opts, __props__=__props__)
 
@@ -207,6 +209,14 @@ class Stack(pulumi.CustomResource):
         The name of the project.
         """
         return pulumi.get(self, "project_name")
+
+    @_builtins.property
+    @pulumi.getter(name="stackId")
+    def stack_id(self) -> pulumi.Output[Optional[_builtins.str]]:
+        """
+        The stack's unique ID. Use it in an `RbacRole` entity rule to grant permissions on this stack.
+        """
+        return pulumi.get(self, "stack_id")
 
     @_builtins.property
     @pulumi.getter(name="stackName")

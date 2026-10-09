@@ -47,6 +47,10 @@ export class Stack extends pulumi.CustomResource {
      */
     declare public readonly projectName: pulumi.Output<string>;
     /**
+     * The stack's unique ID. Use it in an `RbacRole` entity rule to grant permissions on this stack.
+     */
+    declare public /*out*/ readonly stackId: pulumi.Output<string | undefined>;
+    /**
      * The name of the stack.
      */
     declare public readonly stackName: pulumi.Output<string>;
@@ -75,10 +79,12 @@ export class Stack extends pulumi.CustomResource {
             resourceInputs["organizationName"] = args?.organizationName;
             resourceInputs["projectName"] = args?.projectName;
             resourceInputs["stackName"] = args?.stackName;
+            resourceInputs["stackId"] = undefined /*out*/;
         } else {
             resourceInputs["forceDestroy"] = undefined /*out*/;
             resourceInputs["organizationName"] = undefined /*out*/;
             resourceInputs["projectName"] = undefined /*out*/;
+            resourceInputs["stackId"] = undefined /*out*/;
             resourceInputs["stackName"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);

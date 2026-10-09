@@ -115,6 +115,16 @@ export const getPolicyPacks: typeof import("./getPolicyPacks").getPolicyPacks = 
 export const getPolicyPacksOutput: typeof import("./getPolicyPacks").getPolicyPacksOutput = null as any;
 utilities.lazyLoad(exports, ["getPolicyPacks","getPolicyPacksOutput"], () => require("./getPolicyPacks"));
 
+export { GetRbacPermissionSetArgs, GetRbacPermissionSetResult, GetRbacPermissionSetOutputArgs } from "./getRbacPermissionSet";
+export const getRbacPermissionSet: typeof import("./getRbacPermissionSet").getRbacPermissionSet = null as any;
+export const getRbacPermissionSetOutput: typeof import("./getRbacPermissionSet").getRbacPermissionSetOutput = null as any;
+utilities.lazyLoad(exports, ["getRbacPermissionSet","getRbacPermissionSetOutput"], () => require("./getRbacPermissionSet"));
+
+export { GetRbacPermissionSetsArgs, GetRbacPermissionSetsResult, GetRbacPermissionSetsOutputArgs } from "./getRbacPermissionSets";
+export const getRbacPermissionSets: typeof import("./getRbacPermissionSets").getRbacPermissionSets = null as any;
+export const getRbacPermissionSetsOutput: typeof import("./getRbacPermissionSets").getRbacPermissionSetsOutput = null as any;
+utilities.lazyLoad(exports, ["getRbacPermissionSets","getRbacPermissionSetsOutput"], () => require("./getRbacPermissionSets"));
+
 export { InsightsAccountArgs } from "./insightsAccount";
 export type InsightsAccount = import("./insightsAccount").InsightsAccount;
 export const InsightsAccount: typeof import("./insightsAccount").InsightsAccount = null as any;
@@ -154,6 +164,16 @@ export { ProviderArgs } from "./provider";
 export type Provider = import("./provider").Provider;
 export const Provider: typeof import("./provider").Provider = null as any;
 utilities.lazyLoad(exports, ["Provider"], () => require("./provider"));
+
+export { RbacPermissionSetArgs } from "./rbacPermissionSet";
+export type RbacPermissionSet = import("./rbacPermissionSet").RbacPermissionSet;
+export const RbacPermissionSet: typeof import("./rbacPermissionSet").RbacPermissionSet = null as any;
+utilities.lazyLoad(exports, ["RbacPermissionSet"], () => require("./rbacPermissionSet"));
+
+export { RbacRoleArgs } from "./rbacRole";
+export type RbacRole = import("./rbacRole").RbacRole;
+export const RbacRole: typeof import("./rbacRole").RbacRole = null as any;
+utilities.lazyLoad(exports, ["RbacRole"], () => require("./rbacRole"));
 
 export { StackArgs } from "./stack";
 export type Stack = import("./stack").Stack;
@@ -261,6 +281,10 @@ const _module = {
                 return new PolicyGroup(name, <any>undefined, { urn })
             case "pulumiservice:index:PolicyPack":
                 return new PolicyPack(name, <any>undefined, { urn })
+            case "pulumiservice:index:RbacPermissionSet":
+                return new RbacPermissionSet(name, <any>undefined, { urn })
+            case "pulumiservice:index:RbacRole":
+                return new RbacRole(name, <any>undefined, { urn })
             case "pulumiservice:index:Stack":
                 return new Stack(name, <any>undefined, { urn })
             case "pulumiservice:index:StackTag":

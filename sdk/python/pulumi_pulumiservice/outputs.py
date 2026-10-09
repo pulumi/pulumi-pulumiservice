@@ -44,6 +44,10 @@ __all__ = [
     'PolicyPackComplianceFrameworkInput',
     'PolicyPackPolicyInput',
     'PolicyPackSummary',
+    'RbacEntityRule',
+    'RbacEntitySelector',
+    'RbacPermissionSetInfo',
+    'RbacTagCondition',
     'RoleScopeInfo',
     'TemplateSourceDestination',
 ]
@@ -1988,6 +1992,238 @@ class PolicyPackSummary(dict):
         Where the policy pack is hosted in the Pulumi Registry: `pulumi` for packs published by Pulumi (for example `cis-aws`), `private` for packs published by an organization. Omitted when the provider could not determine registry metadata for this pack.
         """
         return pulumi.get(self, "source")
+
+
+@pulumi.output_type
+class RbacEntityRule(dict):
+    @staticmethod
+    def __key_warning(key: str):
+        suggest = None
+        if key == "permissionSetIds":
+            suggest = "permission_set_ids"
+        elif key == "insightsAccount":
+            suggest = "insights_account"
+
+        if suggest:
+            pulumi.log.warn(f"Key '{key}' not found in RbacEntityRule. Access the value via the '{suggest}' property getter instead.")
+
+    def __getitem__(self, key: str) -> Any:
+        RbacEntityRule.__key_warning(key)
+        return super().__getitem__(key)
+
+    def get(self, key: str, default = None) -> Any:
+        RbacEntityRule.__key_warning(key)
+        return super().get(key, default)
+
+    def __init__(__self__, *,
+                 permission_set_ids: Sequence[_builtins.str],
+                 environment: Optional['outputs.RbacEntitySelector'] = None,
+                 insights_account: Optional['outputs.RbacEntitySelector'] = None,
+                 stack: Optional['outputs.RbacEntitySelector'] = None):
+        """
+        :param Sequence[_builtins.str] permission_set_ids: IDs of the permission sets to grant. Their `resourceType` must match the selected entity kind.
+        :param 'RbacEntitySelector' environment: Select ESC environments.
+        :param 'RbacEntitySelector' insights_account: Select Insights accounts.
+        :param 'RbacEntitySelector' stack: Select stacks. Exactly one of `stack`, `environment`, or `insightsAccount` must be set.
+        """
+        pulumi.set(__self__, "permission_set_ids", permission_set_ids)
+        if environment is not None:
+            pulumi.set(__self__, "environment", environment)
+        if insights_account is not None:
+            pulumi.set(__self__, "insights_account", insights_account)
+        if stack is not None:
+            pulumi.set(__self__, "stack", stack)
+
+    @_builtins.property
+    @pulumi.getter(name="permissionSetIds")
+    def permission_set_ids(self) -> Sequence[_builtins.str]:
+        """
+        IDs of the permission sets to grant. Their `resourceType` must match the selected entity kind.
+        """
+        return pulumi.get(self, "permission_set_ids")
+
+    @_builtins.property
+    @pulumi.getter
+    def environment(self) -> Optional['outputs.RbacEntitySelector']:
+        """
+        Select ESC environments.
+        """
+        return pulumi.get(self, "environment")
+
+    @_builtins.property
+    @pulumi.getter(name="insightsAccount")
+    def insights_account(self) -> Optional['outputs.RbacEntitySelector']:
+        """
+        Select Insights accounts.
+        """
+        return pulumi.get(self, "insights_account")
+
+    @_builtins.property
+    @pulumi.getter
+    def stack(self) -> Optional['outputs.RbacEntitySelector']:
+        """
+        Select stacks. Exactly one of `stack`, `environment`, or `insightsAccount` must be set.
+        """
+        return pulumi.get(self, "stack")
+
+
+@pulumi.output_type
+class RbacEntitySelector(dict):
+    def __init__(__self__, *,
+                 all: Optional[_builtins.bool] = None,
+                 id: Optional[_builtins.str] = None,
+                 tags: Optional[Sequence['outputs.RbacTagCondition']] = None):
+        """
+        :param _builtins.bool all: Apply to every entity of this kind in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+        :param _builtins.str id: Apply to a single entity: a `Stack.stackId`, `Environment.environmentId`, or `InsightsAccount.insightsAccountId`.
+        :param Sequence['RbacTagCondition'] tags: Apply to entities whose tags match every condition.
+        """
+        if all is not None:
+            pulumi.set(__self__, "all", all)
+        if id is not None:
+            pulumi.set(__self__, "id", id)
+        if tags is not None:
+            pulumi.set(__self__, "tags", tags)
+
+    @_builtins.property
+    @pulumi.getter
+    def all(self) -> Optional[_builtins.bool]:
+        """
+        Apply to every entity of this kind in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+        """
+        return pulumi.get(self, "all")
+
+    @_builtins.property
+    @pulumi.getter
+    def id(self) -> Optional[_builtins.str]:
+        """
+        Apply to a single entity: a `Stack.stackId`, `Environment.environmentId`, or `InsightsAccount.insightsAccountId`.
+        """
+        return pulumi.get(self, "id")
+
+    @_builtins.property
+    @pulumi.getter
+    def tags(self) -> Optional[Sequence['outputs.RbacTagCondition']]:
+        """
+        Apply to entities whose tags match every condition.
+        """
+        return pulumi.get(self, "tags")
+
+
+@pulumi.output_type
+class RbacPermissionSetInfo(dict):
+    def __init__(__self__, *,
+                 description: _builtins.str,
+                 name: _builtins.str,
+                 permission_set_id: _builtins.str,
+                 permissions: Sequence[_builtins.str],
+                 resource_type: 'RbacResourceType',
+                 default_identifier: Optional[_builtins.str] = None):
+        """
+        :param _builtins.str description: Human-readable description of what the permission set grants.
+        :param _builtins.str name: The permission set's display name.
+        :param _builtins.str permission_set_id: The permission set's unique ID. Reference it from an `RbacRole`.
+        :param Sequence[_builtins.str] permissions: The scopes the permission set grants. Only populated for permission sets that grant a flat list of scopes.
+        :param 'RbacResourceType' resource_type: The kind of entity the permission set applies to.
+        :param _builtins.str default_identifier: For built-in permission sets, a stable identifier such as `stack-read`, `environment-admin`, or `org-settings-read-only`. Unset for custom permission sets.
+        """
+        pulumi.set(__self__, "description", description)
+        pulumi.set(__self__, "name", name)
+        pulumi.set(__self__, "permission_set_id", permission_set_id)
+        pulumi.set(__self__, "permissions", permissions)
+        pulumi.set(__self__, "resource_type", resource_type)
+        if default_identifier is not None:
+            pulumi.set(__self__, "default_identifier", default_identifier)
+
+    @_builtins.property
+    @pulumi.getter
+    def description(self) -> _builtins.str:
+        """
+        Human-readable description of what the permission set grants.
+        """
+        return pulumi.get(self, "description")
+
+    @_builtins.property
+    @pulumi.getter
+    def name(self) -> _builtins.str:
+        """
+        The permission set's display name.
+        """
+        return pulumi.get(self, "name")
+
+    @_builtins.property
+    @pulumi.getter(name="permissionSetId")
+    def permission_set_id(self) -> _builtins.str:
+        """
+        The permission set's unique ID. Reference it from an `RbacRole`.
+        """
+        return pulumi.get(self, "permission_set_id")
+
+    @_builtins.property
+    @pulumi.getter
+    def permissions(self) -> Sequence[_builtins.str]:
+        """
+        The scopes the permission set grants. Only populated for permission sets that grant a flat list of scopes.
+        """
+        return pulumi.get(self, "permissions")
+
+    @_builtins.property
+    @pulumi.getter(name="resourceType")
+    def resource_type(self) -> 'RbacResourceType':
+        """
+        The kind of entity the permission set applies to.
+        """
+        return pulumi.get(self, "resource_type")
+
+    @_builtins.property
+    @pulumi.getter(name="defaultIdentifier")
+    def default_identifier(self) -> Optional[_builtins.str]:
+        """
+        For built-in permission sets, a stable identifier such as `stack-read`, `environment-admin`, or `org-settings-read-only`. Unset for custom permission sets.
+        """
+        return pulumi.get(self, "default_identifier")
+
+
+@pulumi.output_type
+class RbacTagCondition(dict):
+    def __init__(__self__, *,
+                 key: _builtins.str,
+                 operator: Optional['RbacTagOperator'] = None,
+                 value: Optional[_builtins.str] = None):
+        """
+        :param _builtins.str key: The tag key.
+        :param 'RbacTagOperator' operator: How the tag is compared. Defaults to `equals`.
+        :param _builtins.str value: The tag value. When omitted, the condition matches on whether the tag is present at all.
+        """
+        pulumi.set(__self__, "key", key)
+        if operator is not None:
+            pulumi.set(__self__, "operator", operator)
+        if value is not None:
+            pulumi.set(__self__, "value", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def key(self) -> _builtins.str:
+        """
+        The tag key.
+        """
+        return pulumi.get(self, "key")
+
+    @_builtins.property
+    @pulumi.getter
+    def operator(self) -> Optional['RbacTagOperator']:
+        """
+        How the tag is compared. Defaults to `equals`.
+        """
+        return pulumi.get(self, "operator")
+
+    @_builtins.property
+    @pulumi.getter
+    def value(self) -> Optional[_builtins.str]:
+        """
+        The tag value. When omitted, the condition matches on whether the tag is present at all.
+        """
+        return pulumi.get(self, "value")
 
 
 @pulumi.output_type

@@ -15,6 +15,7 @@
 package resources
 
 import (
+	"context"
 	"testing"
 
 	"github.com/blang/semver"
@@ -27,6 +28,7 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/urn"
 	"github.com/pulumi/pulumi/sdk/v3/go/property"
 
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 )
 
@@ -85,6 +87,10 @@ func TestStackForceDestroy(t *testing.T) {
 	withForceDestroy := func(v bool) property.Map {
 		return identity.Set("forceDestroy", property.New(v))
 	}
+	// State as written by current providers, which record the stack's ID.
+	stateWithForceDestroy := func(v bool) property.Map {
+		return withForceDestroy(v).Set("stackId", property.New("program-123"))
+	}
 	stackURN := urn.New("test", gcMyProject, "", "pulumiservice:index:Stack", "s")
 	id := gcMyOrg + "/" + gcMyProject + "/dev"
 
@@ -92,7 +98,7 @@ func TestStackForceDestroy(t *testing.T) {
 		resp, err := server.Diff(p.DiffRequest{
 			ID:     id,
 			Urn:    stackURN,
-			State:  identity,
+			State:  identity.Set("stackId", property.New("program-123")),
 			Inputs: withForceDestroy(false),
 		})
 		require.NoError(t, err)
@@ -104,7 +110,7 @@ func TestStackForceDestroy(t *testing.T) {
 		resp, err := server.Diff(p.DiffRequest{
 			ID:     id,
 			Urn:    stackURN,
-			State:  withForceDestroy(false),
+			State:  stateWithForceDestroy(false),
 			Inputs: withForceDestroy(true),
 		})
 		require.NoError(t, err)
@@ -117,18 +123,31 @@ func TestStackForceDestroy(t *testing.T) {
 		resp, err := server.Update(p.UpdateRequest{
 			ID:     id,
 			Urn:    stackURN,
-			State:  withForceDestroy(false),
+			State:  stateWithForceDestroy(false),
 			Inputs: withForceDestroy(true),
 		})
 		require.NoError(t, err)
-		assert.Equal(t, withForceDestroy(true), resp.Properties)
+		assert.Equal(t, stateWithForceDestroy(true), resp.Properties)
+	})
+
+	t.Run("state written before stackId existed backfills it", func(t *testing.T) {
+		resp, err := server.Diff(p.DiffRequest{
+			ID:     id,
+			Urn:    stackURN,
+			State:  withForceDestroy(false),
+			Inputs: withForceDestroy(false),
+		})
+		require.NoError(t, err)
+		require.True(t, resp.HasChanges)
+		require.Contains(t, resp.DetailedDiff, "stackId")
+		assert.Equal(t, p.Update, resp.DetailedDiff["stackId"].Kind)
 	})
 
 	t.Run("identity still replaces", func(t *testing.T) {
 		resp, err := server.Diff(p.DiffRequest{
 			ID:     id,
 			Urn:    stackURN,
-			State:  withForceDestroy(false),
+			State:  stateWithForceDestroy(false),
 			Inputs: withForceDestroy(false).Set("stackName", property.New("prod")),
 		})
 		require.NoError(t, err)
@@ -140,9 +159,37 @@ func TestStackForceDestroy(t *testing.T) {
 		_, err := server.Update(p.UpdateRequest{
 			ID:     id,
 			Urn:    stackURN,
-			State:  withForceDestroy(false),
+			State:  stateWithForceDestroy(false),
 			Inputs: withForceDestroy(false).Set("stackName", property.New("prod")),
 		})
 		require.ErrorContains(t, err, "identity changes require a replacement")
 	})
+}
+
+type stackIDClientMock struct {
+	config.Client
+	getStackID func(ctx context.Context, stack pulumiapi.StackIdentifier) (string, error)
+}
+
+func (c *stackIDClientMock) GetStackID(ctx context.Context, stack pulumiapi.StackIdentifier) (string, error) {
+	return c.getStackID(ctx, stack)
+}
+
+func TestStackUpdateBackfillsStackID(t *testing.T) {
+	t.Parallel()
+
+	in := StackInput{OrganizationName: gcMyOrg, ProjectName: gcMyProject, StackName: "dev"}
+	mock := &stackIDClientMock{getStackID: func(_ context.Context, s pulumiapi.StackIdentifier) (string, error) {
+		assert.Equal(t, "dev", s.StackName)
+		return "program-123", nil
+	}}
+	ctx := config.WithMockClient(context.Background(), mock)
+
+	resp, err := (&Stack{}).Update(ctx, infer.UpdateRequest[StackInput, StackState]{
+		ID:     gcMyOrg + "/" + gcMyProject + "/dev",
+		Inputs: in,
+		State:  StackState{StackInput: in},
+	})
+	require.NoError(t, err)
+	assert.Equal(t, "program-123", resp.Output.StackId)
 }

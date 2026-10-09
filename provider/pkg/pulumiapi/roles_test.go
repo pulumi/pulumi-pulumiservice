@@ -1,7 +1,9 @@
 package pulumiapi
 
 import (
+	"io"
 	"net/http"
+	"net/url"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -17,6 +19,7 @@ const (
 	readOnlyDescription = "read only access"
 	globalScope         = "global"
 	stackKey            = "stack"
+	testOrgRolesPath    = "/api/orgs/an-organization/roles"
 )
 
 // testRoleDetails is the wire-shape JSON the server speaks. Tests build a
@@ -48,7 +51,7 @@ func TestCreateRole(t *testing.T) {
 		}
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPost,
-			ExpectedReqPath:   "/api/orgs/an-organization/roles",
+			ExpectedReqPath:   testOrgRolesPath,
 			ExpectedReqBody: apitype.PermissionDescriptorBase{
 				Name:         readOnlyRoleName,
 				Description:  readOnlyDescription,
@@ -208,4 +211,55 @@ func TestDeleteRole(t *testing.T) {
 		})
 		assert.NoError(t, c.DeleteRole(ctx, testRoleOrgName, testRoleID, false))
 	})
+}
+
+func TestCreateRoleWithPolicy(t *testing.T) {
+	details := mustParseDetails(t)
+	policy := apitype.PermissionDescriptorBase{
+		Name:         readOnlyRoleName,
+		Description:  readOnlyDescription,
+		ResourceType: globalScope,
+		UxPurpose:    apitype.PermissionDescriptorUXPurposeRole,
+		Details:      details,
+	}
+	c := startTestServer(t, testServerConfig{
+		ExpectedReqMethod:   http.MethodPost,
+		ExpectedReqPath:     testOrgRolesPath,
+		ExpectedQueryParams: url.Values{"createPolicyAndRole": []string{"true"}},
+		ExpectedReqBody:     policy,
+		ResponseCode:        200,
+		ResponseBody: apitype.PermissionDescriptorRecord{
+			PermissionDescriptorBase: apitype.PermissionDescriptorBase{Name: readOnlyRoleName},
+			ID:                       testRoleID,
+		},
+	})
+	role, err := c.CreateRoleWithPolicy(t.Context(), testRoleOrgName, policy)
+	require.NoError(t, err)
+	assert.Equal(t, testRoleID, role.ID)
+}
+
+// TestCreateRoleSendsScopesUnknownToTheSDK checks that a permission set can
+// grant a scope Pulumi Cloud added after the pinned Cloud SDK: the SDK
+// marshals typed RbacPermission values verbatim even though it would drop
+// them when unmarshalling.
+func TestCreateRoleSendsScopesUnknownToTheSDK(t *testing.T) {
+	const futureScope = "stack:time_travel"
+	require.False(t, apitype.RbacPermission(futureScope).IsValid())
+
+	var sent string
+	c := startTestServerMulti(t, func(r *http.Request) (int, any) {
+		body, err := io.ReadAll(r.Body)
+		require.NoError(t, err)
+		sent = string(body)
+		return http.StatusOK, apitype.PermissionDescriptorRecord{ID: testRoleID}
+	})
+	_, err := c.CreateRole(t.Context(), testRoleOrgName, apitype.PermissionDescriptorBase{
+		Name:      readOnlyRoleName,
+		UxPurpose: apitype.PermissionDescriptorUXPurposeSet,
+		Details: apitype.PermissionDescriptorAllowBuilder{
+			Permissions: apitype.RbacPermissionSlice{apitype.RbacPermissionStackRead, futureScope},
+		}.Build(),
+	})
+	require.NoError(t, err)
+	assert.Contains(t, sent, `"`+futureScope+`"`)
 }

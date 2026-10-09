@@ -35,6 +35,10 @@ import com.pulumi.pulumiservice.inputs.GetPolicyPackArgs;
 import com.pulumi.pulumiservice.inputs.GetPolicyPackPlainArgs;
 import com.pulumi.pulumiservice.inputs.GetPolicyPacksArgs;
 import com.pulumi.pulumiservice.inputs.GetPolicyPacksPlainArgs;
+import com.pulumi.pulumiservice.inputs.GetRbacPermissionSetArgs;
+import com.pulumi.pulumiservice.inputs.GetRbacPermissionSetPlainArgs;
+import com.pulumi.pulumiservice.inputs.GetRbacPermissionSetsArgs;
+import com.pulumi.pulumiservice.inputs.GetRbacPermissionSetsPlainArgs;
 import com.pulumi.pulumiservice.outputs.BuildAllowPermissionsResult;
 import com.pulumi.pulumiservice.outputs.BuildEnvironmentScopedPermissionsResult;
 import com.pulumi.pulumiservice.outputs.BuildInsightsAccountScopedPermissionsResult;
@@ -48,6 +52,8 @@ import com.pulumi.pulumiservice.outputs.GetOrganizationMembersResult;
 import com.pulumi.pulumiservice.outputs.GetOrganizationRoleScopesResult;
 import com.pulumi.pulumiservice.outputs.GetPolicyPackResult;
 import com.pulumi.pulumiservice.outputs.GetPolicyPacksResult;
+import com.pulumi.pulumiservice.outputs.GetRbacPermissionSetResult;
+import com.pulumi.pulumiservice.outputs.GetRbacPermissionSetsResult;
 import java.util.concurrent.CompletableFuture;
 
 public final class PulumiserviceFunctions {
@@ -519,5 +525,75 @@ public final class PulumiserviceFunctions {
      */
     public static CompletableFuture<GetPolicyPacksResult> getPolicyPacksPlain(GetPolicyPacksPlainArgs args, InvokeOptions options) {
         return Deployment.getInstance().invokeAsync("pulumiservice:index:getPolicyPacks", TypeShape.of(GetPolicyPacksResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Looks up a permission set in an organization by built-in identifier or by name. Use it to grant built-in permission sets, such as &#34;Stack Read&#34; (`stack-read`) or &#34;Read Only&#34; (`org-settings-read-only`), from an `RbacRole`. Exactly one of `defaultIdentifier` or `name` must be set.
+     * 
+     */
+    public static Output<GetRbacPermissionSetResult> getRbacPermissionSet(GetRbacPermissionSetArgs args) {
+        return getRbacPermissionSet(args, InvokeOptions.Empty);
+    }
+    /**
+     * Looks up a permission set in an organization by built-in identifier or by name. Use it to grant built-in permission sets, such as &#34;Stack Read&#34; (`stack-read`) or &#34;Read Only&#34; (`org-settings-read-only`), from an `RbacRole`. Exactly one of `defaultIdentifier` or `name` must be set.
+     * 
+     */
+    public static CompletableFuture<GetRbacPermissionSetResult> getRbacPermissionSetPlain(GetRbacPermissionSetPlainArgs args) {
+        return getRbacPermissionSetPlain(args, InvokeOptions.Empty);
+    }
+    /**
+     * Looks up a permission set in an organization by built-in identifier or by name. Use it to grant built-in permission sets, such as &#34;Stack Read&#34; (`stack-read`) or &#34;Read Only&#34; (`org-settings-read-only`), from an `RbacRole`. Exactly one of `defaultIdentifier` or `name` must be set.
+     * 
+     */
+    public static Output<GetRbacPermissionSetResult> getRbacPermissionSet(GetRbacPermissionSetArgs args, InvokeOptions options) {
+        return Deployment.getInstance().invoke("pulumiservice:index:getRbacPermissionSet", TypeShape.of(GetRbacPermissionSetResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Looks up a permission set in an organization by built-in identifier or by name. Use it to grant built-in permission sets, such as &#34;Stack Read&#34; (`stack-read`) or &#34;Read Only&#34; (`org-settings-read-only`), from an `RbacRole`. Exactly one of `defaultIdentifier` or `name` must be set.
+     * 
+     */
+    public static Output<GetRbacPermissionSetResult> getRbacPermissionSet(GetRbacPermissionSetArgs args, InvokeOutputOptions options) {
+        return Deployment.getInstance().invoke("pulumiservice:index:getRbacPermissionSet", TypeShape.of(GetRbacPermissionSetResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Looks up a permission set in an organization by built-in identifier or by name. Use it to grant built-in permission sets, such as &#34;Stack Read&#34; (`stack-read`) or &#34;Read Only&#34; (`org-settings-read-only`), from an `RbacRole`. Exactly one of `defaultIdentifier` or `name` must be set.
+     * 
+     */
+    public static CompletableFuture<GetRbacPermissionSetResult> getRbacPermissionSetPlain(GetRbacPermissionSetPlainArgs args, InvokeOptions options) {
+        return Deployment.getInstance().invokeAsync("pulumiservice:index:getRbacPermissionSet", TypeShape.of(GetRbacPermissionSetResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Lists the built-in and custom permission sets in an organization, sorted by resource type and name.
+     * 
+     */
+    public static Output<GetRbacPermissionSetsResult> getRbacPermissionSets(GetRbacPermissionSetsArgs args) {
+        return getRbacPermissionSets(args, InvokeOptions.Empty);
+    }
+    /**
+     * Lists the built-in and custom permission sets in an organization, sorted by resource type and name.
+     * 
+     */
+    public static CompletableFuture<GetRbacPermissionSetsResult> getRbacPermissionSetsPlain(GetRbacPermissionSetsPlainArgs args) {
+        return getRbacPermissionSetsPlain(args, InvokeOptions.Empty);
+    }
+    /**
+     * Lists the built-in and custom permission sets in an organization, sorted by resource type and name.
+     * 
+     */
+    public static Output<GetRbacPermissionSetsResult> getRbacPermissionSets(GetRbacPermissionSetsArgs args, InvokeOptions options) {
+        return Deployment.getInstance().invoke("pulumiservice:index:getRbacPermissionSets", TypeShape.of(GetRbacPermissionSetsResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Lists the built-in and custom permission sets in an organization, sorted by resource type and name.
+     * 
+     */
+    public static Output<GetRbacPermissionSetsResult> getRbacPermissionSets(GetRbacPermissionSetsArgs args, InvokeOutputOptions options) {
+        return Deployment.getInstance().invoke("pulumiservice:index:getRbacPermissionSets", TypeShape.of(GetRbacPermissionSetsResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Lists the built-in and custom permission sets in an organization, sorted by resource type and name.
+     * 
+     */
+    public static CompletableFuture<GetRbacPermissionSetsResult> getRbacPermissionSetsPlain(GetRbacPermissionSetsPlainArgs args, InvokeOptions options) {
+        return Deployment.getInstance().invokeAsync("pulumiservice:index:getRbacPermissionSets", TypeShape.of(GetRbacPermissionSetsResult.class), args, Utilities.withVersion(options));
     }
 }
