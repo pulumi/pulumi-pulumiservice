@@ -25,10 +25,20 @@ export const buildAllowPermissions: typeof import("./buildAllowPermissions").bui
 export const buildAllowPermissionsOutput: typeof import("./buildAllowPermissions").buildAllowPermissionsOutput = null as any;
 utilities.lazyLoad(exports, ["buildAllowPermissions","buildAllowPermissionsOutput"], () => require("./buildAllowPermissions"));
 
+export { BuildComposePermissionsArgs, BuildComposePermissionsResult, BuildComposePermissionsOutputArgs } from "./buildComposePermissions";
+export const buildComposePermissions: typeof import("./buildComposePermissions").buildComposePermissions = null as any;
+export const buildComposePermissionsOutput: typeof import("./buildComposePermissions").buildComposePermissionsOutput = null as any;
+utilities.lazyLoad(exports, ["buildComposePermissions","buildComposePermissionsOutput"], () => require("./buildComposePermissions"));
+
 export { BuildEnvironmentScopedPermissionsArgs, BuildEnvironmentScopedPermissionsResult, BuildEnvironmentScopedPermissionsOutputArgs } from "./buildEnvironmentScopedPermissions";
 export const buildEnvironmentScopedPermissions: typeof import("./buildEnvironmentScopedPermissions").buildEnvironmentScopedPermissions = null as any;
 export const buildEnvironmentScopedPermissionsOutput: typeof import("./buildEnvironmentScopedPermissions").buildEnvironmentScopedPermissionsOutput = null as any;
 utilities.lazyLoad(exports, ["buildEnvironmentScopedPermissions","buildEnvironmentScopedPermissionsOutput"], () => require("./buildEnvironmentScopedPermissions"));
+
+export { BuildGroupPermissionsArgs, BuildGroupPermissionsResult, BuildGroupPermissionsOutputArgs } from "./buildGroupPermissions";
+export const buildGroupPermissions: typeof import("./buildGroupPermissions").buildGroupPermissions = null as any;
+export const buildGroupPermissionsOutput: typeof import("./buildGroupPermissions").buildGroupPermissionsOutput = null as any;
+utilities.lazyLoad(exports, ["buildGroupPermissions","buildGroupPermissionsOutput"], () => require("./buildGroupPermissions"));
 
 export { BuildInsightsAccountScopedPermissionsArgs, BuildInsightsAccountScopedPermissionsResult, BuildInsightsAccountScopedPermissionsOutputArgs } from "./buildInsightsAccountScopedPermissions";
 export const buildInsightsAccountScopedPermissions: typeof import("./buildInsightsAccountScopedPermissions").buildInsightsAccountScopedPermissions = null as any;
@@ -39,6 +49,11 @@ export { BuildStackScopedPermissionsArgs, BuildStackScopedPermissionsResult, Bui
 export const buildStackScopedPermissions: typeof import("./buildStackScopedPermissions").buildStackScopedPermissions = null as any;
 export const buildStackScopedPermissionsOutput: typeof import("./buildStackScopedPermissions").buildStackScopedPermissionsOutput = null as any;
 utilities.lazyLoad(exports, ["buildStackScopedPermissions","buildStackScopedPermissionsOutput"], () => require("./buildStackScopedPermissions"));
+
+export { BuildTagConditionalPermissionsArgs, BuildTagConditionalPermissionsResult, BuildTagConditionalPermissionsOutputArgs } from "./buildTagConditionalPermissions";
+export const buildTagConditionalPermissions: typeof import("./buildTagConditionalPermissions").buildTagConditionalPermissions = null as any;
+export const buildTagConditionalPermissionsOutput: typeof import("./buildTagConditionalPermissions").buildTagConditionalPermissionsOutput = null as any;
+utilities.lazyLoad(exports, ["buildTagConditionalPermissions","buildTagConditionalPermissionsOutput"], () => require("./buildTagConditionalPermissions"));
 
 export { DeploymentScheduleArgs } from "./deploymentSchedule";
 export type DeploymentSchedule = import("./deploymentSchedule").DeploymentSchedule;

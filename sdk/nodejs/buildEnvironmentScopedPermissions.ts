@@ -5,13 +5,14 @@ import * as pulumi from "@pulumi/pulumi";
 import * as utilities from "./utilities";
 
 /**
- * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named environment. Pair with `Environment.environmentId` (or the `getEnvironment` data source) to avoid hand-rolling the `PermissionDescriptorCondition` tree yourself. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls the output of each helper.
+ * Builds a permission descriptor that grants the supplied scopes or permission sets only on the named environment. Pair with `Environment.environmentId` (or the `getEnvironment` data source) to avoid hand-rolling the `PermissionDescriptorCondition` tree yourself. The result is directly assignable to `OrganizationRole.permissions` or `api.Role.details`. To combine several grants in one descriptor, pass the output of each helper to `buildGroupPermissions`.
  */
 export function buildEnvironmentScopedPermissions(args: BuildEnvironmentScopedPermissionsArgs, opts?: pulumi.InvokeOptions): Promise<BuildEnvironmentScopedPermissionsResult> {
     opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts || {});
     return pulumi.runtime.invoke("pulumiservice:index:buildEnvironmentScopedPermissions", {
         "environmentId": args.environmentId,
         "permissions": args.permissions,
+        "setIds": args.setIds,
     }, opts);
 }
 
@@ -23,23 +24,28 @@ export interface BuildEnvironmentScopedPermissionsArgs {
     /**
      * The set of `environment:*` scopes to grant on the target environment (e.g. `environment:read`, `environment:open`, `environment:update`). Discover valid scope names via the `getOrganizationRoleScopes` data source.
      */
-    permissions: string[];
+    permissions?: string[];
+    /**
+     * The IDs of the permission sets to grant on the target environment. Set exactly one of `permissions` or `setIds`. `permissions` grants the scopes inline. `setIds` grants the referenced permission sets (`api.Role` with `uxPurpose: set`), which is the shape Pulumi Cloud uses for policies (`api.Role` with `uxPurpose: policy`).
+     */
+    setIds?: string[];
 }
 
 export interface BuildEnvironmentScopedPermissionsResult {
     /**
-     * A `PermissionDescriptorCondition` tree gating a `PermissionDescriptorAllow` on the named environment, ready to assign to `OrganizationRole.permissions`.
+     * A `PermissionDescriptorCondition` tree gating the grant on the named environment.
      */
     readonly permissions: {[key: string]: any};
 }
 /**
- * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named environment. Pair with `Environment.environmentId` (or the `getEnvironment` data source) to avoid hand-rolling the `PermissionDescriptorCondition` tree yourself. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls the output of each helper.
+ * Builds a permission descriptor that grants the supplied scopes or permission sets only on the named environment. Pair with `Environment.environmentId` (or the `getEnvironment` data source) to avoid hand-rolling the `PermissionDescriptorCondition` tree yourself. The result is directly assignable to `OrganizationRole.permissions` or `api.Role.details`. To combine several grants in one descriptor, pass the output of each helper to `buildGroupPermissions`.
  */
 export function buildEnvironmentScopedPermissionsOutput(args: BuildEnvironmentScopedPermissionsOutputArgs, opts?: pulumi.InvokeOutputOptions): pulumi.Output<BuildEnvironmentScopedPermissionsResult> {
     opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts || {});
     return pulumi.runtime.invokeOutput("pulumiservice:index:buildEnvironmentScopedPermissions", {
         "environmentId": args.environmentId,
         "permissions": args.permissions,
+        "setIds": args.setIds,
     }, opts);
 }
 
@@ -51,5 +57,9 @@ export interface BuildEnvironmentScopedPermissionsOutputArgs {
     /**
      * The set of `environment:*` scopes to grant on the target environment (e.g. `environment:read`, `environment:open`, `environment:update`). Discover valid scope names via the `getOrganizationRoleScopes` data source.
      */
-    permissions: pulumi.Input<pulumi.Input<string>[]>;
+    permissions?: pulumi.Input<pulumi.Input<string>[] | undefined>;
+    /**
+     * The IDs of the permission sets to grant on the target environment. Set exactly one of `permissions` or `setIds`. `permissions` grants the scopes inline. `setIds` grants the referenced permission sets (`api.Role` with `uxPurpose: set`), which is the shape Pulumi Cloud uses for policies (`api.Role` with `uxPurpose: policy`).
+     */
+    setIds?: pulumi.Input<pulumi.Input<string>[] | undefined>;
 }

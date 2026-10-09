@@ -838,7 +838,7 @@ func rbacConfig() map[string]string {
 	return map[string]string{
 		"organizationName": ServiceProviderTestOrg,
 		"nameSuffix":       generateRandomFiveDigits(),
-		"roleDescription":  "Read-only access to stacks, created by the api rbac example.",
+		"roleDescription":  "Stack read everywhere, plus write on stacks tagged team=platform.",
 	}
 }
 

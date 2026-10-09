@@ -9,6 +9,8 @@ import com.pulumi.exceptions.MissingRequiredPropertyException;
 import java.lang.String;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import javax.annotation.Nullable;
 
 
 public final class BuildInsightsAccountScopedPermissionsArgs extends com.pulumi.resources.InvokeArgs {
@@ -34,15 +36,30 @@ public final class BuildInsightsAccountScopedPermissionsArgs extends com.pulumi.
      * The set of `insights-account:*` scopes to grant on the target account. Discover valid scope names via the `getOrganizationRoleScopes` data source.
      * 
      */
-    @Import(name="permissions", required=true)
-    private Output<List<String>> permissions;
+    @Import(name="permissions")
+    private @Nullable Output<List<String>> permissions;
 
     /**
      * @return The set of `insights-account:*` scopes to grant on the target account. Discover valid scope names via the `getOrganizationRoleScopes` data source.
      * 
      */
-    public Output<List<String>> permissions() {
-        return this.permissions;
+    public Optional<Output<List<String>>> permissions() {
+        return Optional.ofNullable(this.permissions);
+    }
+
+    /**
+     * The IDs of the permission sets to grant on the target insights account. Set exactly one of `permissions` or `setIds`. `permissions` grants the scopes inline. `setIds` grants the referenced permission sets (`api.Role` with `uxPurpose: set`), which is the shape Pulumi Cloud uses for policies (`api.Role` with `uxPurpose: policy`).
+     * 
+     */
+    @Import(name="setIds")
+    private @Nullable Output<List<String>> setIds;
+
+    /**
+     * @return The IDs of the permission sets to grant on the target insights account. Set exactly one of `permissions` or `setIds`. `permissions` grants the scopes inline. `setIds` grants the referenced permission sets (`api.Role` with `uxPurpose: set`), which is the shape Pulumi Cloud uses for policies (`api.Role` with `uxPurpose: policy`).
+     * 
+     */
+    public Optional<Output<List<String>>> setIds() {
+        return Optional.ofNullable(this.setIds);
     }
 
     private BuildInsightsAccountScopedPermissionsArgs() {}
@@ -50,6 +67,7 @@ public final class BuildInsightsAccountScopedPermissionsArgs extends com.pulumi.
     private BuildInsightsAccountScopedPermissionsArgs(BuildInsightsAccountScopedPermissionsArgs $) {
         this.insightsAccountId = $.insightsAccountId;
         this.permissions = $.permissions;
+        this.setIds = $.setIds;
     }
 
     public static Builder builder() {
@@ -97,7 +115,7 @@ public final class BuildInsightsAccountScopedPermissionsArgs extends com.pulumi.
          * @return builder
          * 
          */
-        public Builder permissions(Output<List<String>> permissions) {
+        public Builder permissions(@Nullable Output<List<String>> permissions) {
             $.permissions = permissions;
             return this;
         }
@@ -122,12 +140,40 @@ public final class BuildInsightsAccountScopedPermissionsArgs extends com.pulumi.
             return permissions(List.of(permissions));
         }
 
+        /**
+         * @param setIds The IDs of the permission sets to grant on the target insights account. Set exactly one of `permissions` or `setIds`. `permissions` grants the scopes inline. `setIds` grants the referenced permission sets (`api.Role` with `uxPurpose: set`), which is the shape Pulumi Cloud uses for policies (`api.Role` with `uxPurpose: policy`).
+         * 
+         * @return builder
+         * 
+         */
+        public Builder setIds(@Nullable Output<List<String>> setIds) {
+            $.setIds = setIds;
+            return this;
+        }
+
+        /**
+         * @param setIds The IDs of the permission sets to grant on the target insights account. Set exactly one of `permissions` or `setIds`. `permissions` grants the scopes inline. `setIds` grants the referenced permission sets (`api.Role` with `uxPurpose: set`), which is the shape Pulumi Cloud uses for policies (`api.Role` with `uxPurpose: policy`).
+         * 
+         * @return builder
+         * 
+         */
+        public Builder setIds(List<String> setIds) {
+            return setIds(Output.of(setIds));
+        }
+
+        /**
+         * @param setIds The IDs of the permission sets to grant on the target insights account. Set exactly one of `permissions` or `setIds`. `permissions` grants the scopes inline. `setIds` grants the referenced permission sets (`api.Role` with `uxPurpose: set`), which is the shape Pulumi Cloud uses for policies (`api.Role` with `uxPurpose: policy`).
+         * 
+         * @return builder
+         * 
+         */
+        public Builder setIds(String... setIds) {
+            return setIds(List.of(setIds));
+        }
+
         public BuildInsightsAccountScopedPermissionsArgs build() {
             if ($.insightsAccountId == null) {
                 throw new MissingRequiredPropertyException("BuildInsightsAccountScopedPermissionsArgs", "insightsAccountId");
-            }
-            if ($.permissions == null) {
-                throw new MissingRequiredPropertyException("BuildInsightsAccountScopedPermissionsArgs", "permissions");
             }
             return $;
         }

@@ -1,15 +1,37 @@
+# Pulumi Cloud models a role in three layers: a set grants scopes, a policy
+# composes sets (optionally gated on a condition), and a role composes policies.
 resources:
-  readOnlyRole:
+  stackReadSet:
     type: pulumiservice:api:Role
     properties:
       orgName: ${organizationName}
-      name: api-rbac-read-only-${nameSuffix}
+      name: api-rbac-stack-read-${nameSuffix}
+      uxPurpose: set
+      resourceType: stack
+      details: ${stackReadPermissions.permissions}
+  stackWriteSet:
+    type: pulumiservice:api:Role
+    properties:
+      orgName: ${organizationName}
+      name: api-rbac-stack-write-${nameSuffix}
+      uxPurpose: set
+      resourceType: stack
+      details: ${stackWritePermissions.permissions}
+  platformPolicy:
+    type: pulumiservice:api:Role
+    properties:
+      orgName: ${organizationName}
+      name: api-rbac-policy-${nameSuffix}
+      uxPurpose: policy
+      details: ${policyPermissions.permissions}
+  platformRole:
+    type: pulumiservice:api:Role
+    properties:
+      orgName: ${organizationName}
+      name: api-rbac-role-${nameSuffix}
       description: ${roleDescription}
       uxPurpose: role
-      details:
-        __type: PermissionDescriptorAllow
-        permissions:
-          - stack:read
+      details: ${rolePermissions.permissions}
   rbacTeam:
     type: pulumiservice:api/teams:Team
     properties:
@@ -17,6 +39,48 @@ resources:
       name: api-rbac-team-${nameSuffix}
       displayName: api RBAC Team ${nameSuffix}
       description: Team scaffold used by the api rbac example.
+variables:
+  stackReadPermissions:
+    fn::invoke:
+      function: pulumiservice:buildAllowPermissions
+      arguments:
+        permissions:
+          - stack:read
+  stackWritePermissions:
+    fn::invoke:
+      function: pulumiservice:buildAllowPermissions
+      arguments:
+        permissions:
+          - stack:read
+          - stack:write
+  allStacksRead:
+    fn::invoke:
+      function: pulumiservice:buildComposePermissions
+      arguments:
+        permissionDescriptorIds:
+          - ${stackReadSet.roleID}
+  platformStacksWrite:
+    fn::invoke:
+      function: pulumiservice:buildTagConditionalPermissions
+      arguments:
+        entityType: stack
+        tagKey: team
+        tagValue: platform
+        setIds:
+          - ${stackWriteSet.roleID}
+  policyPermissions:
+    fn::invoke:
+      function: pulumiservice:buildGroupPermissions
+      arguments:
+        entries:
+          - ${allStacksRead.permissions}
+          - ${platformStacksWrite.permissions}
+  rolePermissions:
+    fn::invoke:
+      function: pulumiservice:buildComposePermissions
+      arguments:
+        permissionDescriptorIds:
+          - ${platformPolicy.roleID}
 outputs:
-  roleName: ${readOnlyRole.name}
+  roleName: ${platformRole.name}
   teamName: ${rbacTeam.name}

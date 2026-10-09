@@ -982,6 +982,26 @@
         }
       ]
     },
+    "pulumiservice:index:RbacEntityType": {
+      "type": "string",
+      "enum": [
+        {
+          "name": "Environment",
+          "description": "ESC environments.",
+          "value": "environment"
+        },
+        {
+          "name": "InsightsAccount",
+          "description": "Insights accounts.",
+          "value": "insights-account"
+        },
+        {
+          "name": "Stack",
+          "description": "Stacks.",
+          "value": "stack"
+        }
+      ]
+    },
     "pulumiservice:index:RbacPermission": {
       "type": "string",
       "enum": [
@@ -1019,6 +1039,779 @@
           "name": "Rotate",
           "description": "Rotate permission.",
           "value": "environment:rotate"
+        }
+      ]
+    },
+    "pulumiservice:index:RbacScope": {
+      "type": "string",
+      "enum": [
+        {
+          "name": "AgentPoolCreate",
+          "value": "agent_pool:create"
+        },
+        {
+          "name": "AgentPoolDelete",
+          "value": "agent_pool:delete"
+        },
+        {
+          "name": "AgentPoolRead",
+          "value": "agent_pool:read"
+        },
+        {
+          "name": "AgentPoolUpdate",
+          "value": "agent_pool:update"
+        },
+        {
+          "name": "AgentTaskCreate",
+          "value": "agent_task:create"
+        },
+        {
+          "name": "AiConversationsCreate",
+          "value": "ai_conversations:create"
+        },
+        {
+          "name": "AiConversationsListAll",
+          "value": "ai_conversations:list_all"
+        },
+        {
+          "name": "AiConversationsRead",
+          "value": "ai_conversations:read"
+        },
+        {
+          "name": "AiConversationsUpdate",
+          "value": "ai_conversations:update"
+        },
+        {
+          "name": "AuditLogsExport",
+          "value": "audit_logs:export"
+        },
+        {
+          "name": "AuditLogsRead",
+          "value": "audit_logs:read"
+        },
+        {
+          "name": "AuthPoliciesRead",
+          "value": "auth_policies:read"
+        },
+        {
+          "name": "AuthPoliciesUpdate",
+          "value": "auth_policies:update"
+        },
+        {
+          "name": "ChangeGateCreate",
+          "value": "change_gate:create"
+        },
+        {
+          "name": "ChangeGateDelete",
+          "value": "change_gate:delete"
+        },
+        {
+          "name": "ChangeGateUpdate",
+          "value": "change_gate:update"
+        },
+        {
+          "name": "DeploymentsPause",
+          "value": "deployments:pause"
+        },
+        {
+          "name": "DeploymentsRead",
+          "value": "deployments:read"
+        },
+        {
+          "name": "DeploymentsReadUsage",
+          "value": "deployments:read_usage"
+        },
+        {
+          "name": "DeploymentsResume",
+          "value": "deployments:resume"
+        },
+        {
+          "name": "EnvironmentClone",
+          "value": "environment:clone"
+        },
+        {
+          "name": "EnvironmentCreate",
+          "value": "environment:create"
+        },
+        {
+          "name": "EnvironmentDelete",
+          "value": "environment:delete"
+        },
+        {
+          "name": "EnvironmentList",
+          "value": "environment:list"
+        },
+        {
+          "name": "EnvironmentListDeleted",
+          "value": "environment:list_deleted"
+        },
+        {
+          "name": "EnvironmentOpen",
+          "value": "environment:open"
+        },
+        {
+          "name": "EnvironmentRead",
+          "value": "environment:read"
+        },
+        {
+          "name": "EnvironmentRestoreDeleted",
+          "value": "environment:restore_deleted"
+        },
+        {
+          "name": "EnvironmentRotate",
+          "value": "environment:rotate"
+        },
+        {
+          "name": "EnvironmentRotateHistory",
+          "value": "environment:rotate_history"
+        },
+        {
+          "name": "EnvironmentWrite",
+          "value": "environment:write"
+        },
+        {
+          "name": "EnvironmentAccessRead",
+          "value": "environment_access:read"
+        },
+        {
+          "name": "EnvironmentAccessUpdate",
+          "value": "environment_access:update"
+        },
+        {
+          "name": "EnvironmentScheduleCreate",
+          "value": "environment_schedule:create"
+        },
+        {
+          "name": "EnvironmentScheduleDelete",
+          "value": "environment_schedule:delete"
+        },
+        {
+          "name": "EnvironmentSchedulePause",
+          "value": "environment_schedule:pause"
+        },
+        {
+          "name": "EnvironmentScheduleRead",
+          "value": "environment_schedule:read"
+        },
+        {
+          "name": "EnvironmentScheduleResume",
+          "value": "environment_schedule:resume"
+        },
+        {
+          "name": "EnvironmentScheduleUpdate",
+          "value": "environment_schedule:update"
+        },
+        {
+          "name": "EnvironmentSettingsRead",
+          "value": "environment_settings:read"
+        },
+        {
+          "name": "EnvironmentSettingsUpdate",
+          "value": "environment_settings:update"
+        },
+        {
+          "name": "EnvironmentTagCreate",
+          "value": "environment_tag:create"
+        },
+        {
+          "name": "EnvironmentTagDelete",
+          "value": "environment_tag:delete"
+        },
+        {
+          "name": "EnvironmentTagRead",
+          "value": "environment_tag:read"
+        },
+        {
+          "name": "EnvironmentTagUpdate",
+          "value": "environment_tag:update"
+        },
+        {
+          "name": "EnvironmentTagsList",
+          "value": "environment_tags:list"
+        },
+        {
+          "name": "EnvironmentVersionCreate",
+          "value": "environment_version:create"
+        },
+        {
+          "name": "EnvironmentVersionDelete",
+          "value": "environment_version:delete"
+        },
+        {
+          "name": "EnvironmentVersionOpen",
+          "value": "environment_version:open"
+        },
+        {
+          "name": "EnvironmentVersionRead",
+          "value": "environment_version:read"
+        },
+        {
+          "name": "EnvironmentVersionRetract",
+          "value": "environment_version:retract"
+        },
+        {
+          "name": "EnvironmentVersionUpdate",
+          "value": "environment_version:update"
+        },
+        {
+          "name": "EnvironmentWebhookCreate",
+          "value": "environment_webhook:create"
+        },
+        {
+          "name": "EnvironmentWebhookDelete",
+          "value": "environment_webhook:delete"
+        },
+        {
+          "name": "EnvironmentWebhookRead",
+          "value": "environment_webhook:read"
+        },
+        {
+          "name": "EnvironmentWebhookUpdate",
+          "value": "environment_webhook:update"
+        },
+        {
+          "name": "EnvironmentYamlOpen",
+          "value": "environment_yaml:open"
+        },
+        {
+          "name": "GithubTeamCreate",
+          "value": "github_team:create"
+        },
+        {
+          "name": "InsightsAccountCreate",
+          "value": "insights_account:create"
+        },
+        {
+          "name": "InsightsAccountDelete",
+          "value": "insights_account:delete"
+        },
+        {
+          "name": "InsightsAccountList",
+          "value": "insights_account:list"
+        },
+        {
+          "name": "InsightsAccountRead",
+          "value": "insights_account:read"
+        },
+        {
+          "name": "InsightsAccountScan",
+          "value": "insights_account:scan"
+        },
+        {
+          "name": "InsightsAccountUpdate",
+          "value": "insights_account:update"
+        },
+        {
+          "name": "InsightsAccountUpdatePolicyResults",
+          "value": "insights_account:update_policy_results"
+        },
+        {
+          "name": "InsightsAccountAccessRead",
+          "value": "insights_account_access:read"
+        },
+        {
+          "name": "InsightsAccountAccessUpdate",
+          "value": "insights_account_access:update"
+        },
+        {
+          "name": "InsightsAccountScanCancel",
+          "value": "insights_account_scan:cancel"
+        },
+        {
+          "name": "InsightsAccountScanPause",
+          "value": "insights_account_scan:pause"
+        },
+        {
+          "name": "InsightsAccountScanRead",
+          "value": "insights_account_scan:read"
+        },
+        {
+          "name": "InsightsAccountScanResume",
+          "value": "insights_account_scan:resume"
+        },
+        {
+          "name": "InsightsAccountScanUpdate",
+          "value": "insights_account_scan:update"
+        },
+        {
+          "name": "InsightsPolicyEvaluatorDelete",
+          "value": "insights_policy_evaluator:delete"
+        },
+        {
+          "name": "InsightsPolicyEvaluatorEnsure",
+          "value": "insights_policy_evaluator:ensure"
+        },
+        {
+          "name": "InsightsPolicyEvaluatorRead",
+          "value": "insights_policy_evaluator:read"
+        },
+        {
+          "name": "InsightsPolicyEvaluatorUpdate",
+          "value": "insights_policy_evaluator:update"
+        },
+        {
+          "name": "InsightsPolicyQueueRead",
+          "value": "insights_policy_queue:read"
+        },
+        {
+          "name": "IntegrationsRead",
+          "value": "integrations:read"
+        },
+        {
+          "name": "IntegrationsUpdate",
+          "value": "integrations:update"
+        },
+        {
+          "name": "InvitesCreate",
+          "value": "invites:create"
+        },
+        {
+          "name": "InvitesRead",
+          "value": "invites:read"
+        },
+        {
+          "name": "OidcIssuersCreate",
+          "value": "oidc_issuers:create"
+        },
+        {
+          "name": "OidcIssuersDelete",
+          "value": "oidc_issuers:delete"
+        },
+        {
+          "name": "OidcIssuersRead",
+          "value": "oidc_issuers:read"
+        },
+        {
+          "name": "OidcIssuersRegenerateThumbprints",
+          "value": "oidc_issuers:regenerate_thumbprints"
+        },
+        {
+          "name": "OidcIssuersUpdate",
+          "value": "oidc_issuers:update"
+        },
+        {
+          "name": "OrgIntegrationsRead",
+          "value": "org_integrations:read"
+        },
+        {
+          "name": "OrgIntegrationsUpdate",
+          "value": "org_integrations:update"
+        },
+        {
+          "name": "OrgMemberAdd",
+          "value": "org_member:add"
+        },
+        {
+          "name": "OrgMemberDelete",
+          "value": "org_member:delete"
+        },
+        {
+          "name": "OrgMemberRead",
+          "value": "org_member:read"
+        },
+        {
+          "name": "OrgMemberSetAdmin",
+          "value": "org_member:set_admin"
+        },
+        {
+          "name": "OrgMemberUpdate",
+          "value": "org_member:update"
+        },
+        {
+          "name": "OrgMemberAccessRead",
+          "value": "org_member_access:read"
+        },
+        {
+          "name": "OrgRequestsRead",
+          "value": "org_requests:read"
+        },
+        {
+          "name": "OrgRequestsUpdate",
+          "value": "org_requests:update"
+        },
+        {
+          "name": "OrgTokenCreate",
+          "value": "org_token:create"
+        },
+        {
+          "name": "OrgTokenDelete",
+          "value": "org_token:delete"
+        },
+        {
+          "name": "OrgTokenRead",
+          "value": "org_token:read"
+        },
+        {
+          "name": "OrganizationBilling",
+          "value": "organization:billing"
+        },
+        {
+          "name": "OrganizationChangeBackend",
+          "value": "organization:change_backend"
+        },
+        {
+          "name": "OrganizationDelete",
+          "value": "organization:delete"
+        },
+        {
+          "name": "OrganizationPotential",
+          "value": "organization:potential"
+        },
+        {
+          "name": "OrganizationReadUsage",
+          "value": "organization:read_usage"
+        },
+        {
+          "name": "OrganizationRename",
+          "value": "organization:rename"
+        },
+        {
+          "name": "OrganizationTransferStacks",
+          "value": "organization:transfer_stacks"
+        },
+        {
+          "name": "OrganizationUpdate",
+          "value": "organization:update"
+        },
+        {
+          "name": "OrganizationAnnotationsRead",
+          "value": "organization_annotations:read"
+        },
+        {
+          "name": "OrganizationAnnotationsUpdate",
+          "value": "organization_annotations:update"
+        },
+        {
+          "name": "OrganizationWebhookCreate",
+          "value": "organization_webhook:create"
+        },
+        {
+          "name": "OrganizationWebhookDelete",
+          "value": "organization_webhook:delete"
+        },
+        {
+          "name": "OrganizationWebhookRead",
+          "value": "organization_webhook:read"
+        },
+        {
+          "name": "OrganizationWebhookUpdate",
+          "value": "organization_webhook:update"
+        },
+        {
+          "name": "PolicyGroupsCreate",
+          "value": "policy_groups:create"
+        },
+        {
+          "name": "PolicyGroupsDelete",
+          "value": "policy_groups:delete"
+        },
+        {
+          "name": "PolicyGroupsRead",
+          "value": "policy_groups:read"
+        },
+        {
+          "name": "PolicyGroupsUpdate",
+          "value": "policy_groups:update"
+        },
+        {
+          "name": "PolicyPackCreate",
+          "value": "policy_pack:create"
+        },
+        {
+          "name": "PolicyPackDelete",
+          "value": "policy_pack:delete"
+        },
+        {
+          "name": "PolicyPackRead",
+          "value": "policy_pack:read"
+        },
+        {
+          "name": "PolicyPackUpdate",
+          "value": "policy_pack:update"
+        },
+        {
+          "name": "PolicyResultsRead",
+          "value": "policy_results:read"
+        },
+        {
+          "name": "PolicyResultsUpdate",
+          "value": "policy_results:update"
+        },
+        {
+          "name": "ProjectDecrypt",
+          "value": "project:decrypt"
+        },
+        {
+          "name": "ProjectEncrypt",
+          "value": "project:encrypt"
+        },
+        {
+          "name": "ProjectAnnotationsRead",
+          "value": "project_annotations:read"
+        },
+        {
+          "name": "ProjectAnnotationsUpdate",
+          "value": "project_annotations:update"
+        },
+        {
+          "name": "ResourcesDashboard",
+          "value": "resources:dashboard"
+        },
+        {
+          "name": "ResourcesIndex",
+          "value": "resources:index"
+        },
+        {
+          "name": "ResourcesSearch",
+          "value": "resources:search"
+        },
+        {
+          "name": "RoleCreate",
+          "value": "role:create"
+        },
+        {
+          "name": "RoleDelete",
+          "value": "role:delete"
+        },
+        {
+          "name": "RoleRead",
+          "value": "role:read"
+        },
+        {
+          "name": "RoleUpdate",
+          "value": "role:update"
+        },
+        {
+          "name": "SamlRead",
+          "value": "saml:read"
+        },
+        {
+          "name": "SamlUpdate",
+          "value": "saml:update"
+        },
+        {
+          "name": "ScimDelete",
+          "value": "scim:delete"
+        },
+        {
+          "name": "ScimRead",
+          "value": "scim:read"
+        },
+        {
+          "name": "ScimUpdate",
+          "value": "scim:update"
+        },
+        {
+          "name": "ServicesAdmin",
+          "value": "services:admin"
+        },
+        {
+          "name": "ServicesCreate",
+          "value": "services:create"
+        },
+        {
+          "name": "ServicesRead",
+          "value": "services:read"
+        },
+        {
+          "name": "ServicesWrite",
+          "value": "services:write"
+        },
+        {
+          "name": "StackCancelUpdate",
+          "value": "stack:cancel_update"
+        },
+        {
+          "name": "StackCreate",
+          "value": "stack:create"
+        },
+        {
+          "name": "StackDecrypt",
+          "value": "stack:decrypt"
+        },
+        {
+          "name": "StackDelete",
+          "value": "stack:delete"
+        },
+        {
+          "name": "StackEncrypt",
+          "value": "stack:encrypt"
+        },
+        {
+          "name": "StackExport",
+          "value": "stack:export"
+        },
+        {
+          "name": "StackImport",
+          "value": "stack:import"
+        },
+        {
+          "name": "StackList",
+          "value": "stack:list"
+        },
+        {
+          "name": "StackListDeleted",
+          "value": "stack:list_deleted"
+        },
+        {
+          "name": "StackRead",
+          "value": "stack:read"
+        },
+        {
+          "name": "StackRename",
+          "value": "stack:rename"
+        },
+        {
+          "name": "StackRestoreDeleted",
+          "value": "stack:restore_deleted"
+        },
+        {
+          "name": "StackTransfer",
+          "value": "stack:transfer"
+        },
+        {
+          "name": "StackWrite",
+          "value": "stack:write"
+        },
+        {
+          "name": "StackAccessRead",
+          "value": "stack_access:read"
+        },
+        {
+          "name": "StackAccessUpdate",
+          "value": "stack_access:update"
+        },
+        {
+          "name": "StackAnnotationsRead",
+          "value": "stack_annotations:read"
+        },
+        {
+          "name": "StackAnnotationsUpdate",
+          "value": "stack_annotations:update"
+        },
+        {
+          "name": "StackDeploymentCreate",
+          "value": "stack_deployment:create"
+        },
+        {
+          "name": "StackDeploymentRead",
+          "value": "stack_deployment:read"
+        },
+        {
+          "name": "StackDeploymentCacheRead",
+          "value": "stack_deployment_cache:read"
+        },
+        {
+          "name": "StackDeploymentSettingsEncrypt",
+          "value": "stack_deployment_settings:encrypt"
+        },
+        {
+          "name": "StackDeploymentSettingsRead",
+          "value": "stack_deployment_settings:read"
+        },
+        {
+          "name": "StackDeploymentSettingsWrite",
+          "value": "stack_deployment_settings:write"
+        },
+        {
+          "name": "StackScheduleCreate",
+          "value": "stack_schedule:create"
+        },
+        {
+          "name": "StackScheduleDelete",
+          "value": "stack_schedule:delete"
+        },
+        {
+          "name": "StackSchedulePause",
+          "value": "stack_schedule:pause"
+        },
+        {
+          "name": "StackScheduleRead",
+          "value": "stack_schedule:read"
+        },
+        {
+          "name": "StackScheduleResume",
+          "value": "stack_schedule:resume"
+        },
+        {
+          "name": "StackScheduleUpdate",
+          "value": "stack_schedule:update"
+        },
+        {
+          "name": "StackTagsUpdate",
+          "value": "stack_tags:update"
+        },
+        {
+          "name": "StackWebhookCreate",
+          "value": "stack_webhook:create"
+        },
+        {
+          "name": "StackWebhookDelete",
+          "value": "stack_webhook:delete"
+        },
+        {
+          "name": "StackWebhookRead",
+          "value": "stack_webhook:read"
+        },
+        {
+          "name": "StackWebhookUpdate",
+          "value": "stack_webhook:update"
+        },
+        {
+          "name": "TagsRead",
+          "value": "tags:read"
+        },
+        {
+          "name": "TeamCreate",
+          "value": "team:create"
+        },
+        {
+          "name": "TeamCreateToken",
+          "value": "team:create_token"
+        },
+        {
+          "name": "TeamDelete",
+          "value": "team:delete"
+        },
+        {
+          "name": "TeamDeleteToken",
+          "value": "team:delete_token"
+        },
+        {
+          "name": "TeamList",
+          "value": "team:list"
+        },
+        {
+          "name": "TeamListTokens",
+          "value": "team:list_tokens"
+        },
+        {
+          "name": "TeamRead",
+          "value": "team:read"
+        },
+        {
+          "name": "TeamUpdate",
+          "value": "team:update"
+        },
+        {
+          "name": "TemplatesRead",
+          "value": "templates:read"
+        },
+        {
+          "name": "TemplatesSourceCreate",
+          "value": "templates_source:create"
+        },
+        {
+          "name": "TemplatesSourceDelete",
+          "value": "templates_source:delete"
+        },
+        {
+          "name": "TemplatesSourceRead",
+          "value": "templates_source:read"
+        },
+        {
+          "name": "TemplatesSourceUpdate",
+          "value": "templates_source:update"
         }
       ]
     },
@@ -6994,7 +7787,7 @@
   },
   "functions": {
     "pulumiservice:index:buildAllowPermissions": {
-      "description": "Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes globally — i.e. on every entity of the matching resource type. This is the simplest descriptor: a flat `PermissionDescriptorAllow`. Use this helper instead of hand-authoring the descriptor literal so the wire-format `__type` discriminator stays an implementation detail. For grants scoped to a specific entity, see `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, or `buildInsightsAccountScopedPermissions`. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls the output of each helper.",
+      "description": "Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes globally — i.e. on every entity of the matching resource type. This is the simplest descriptor: a flat `PermissionDescriptorAllow`. Use this helper instead of hand-authoring the descriptor literal so the wire-format `__type` discriminator stays an implementation detail. For grants scoped to a specific entity, see `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, or `buildInsightsAccountScopedPermissions`. The result is directly assignable to `OrganizationRole.permissions` or `api.Role.details`. To combine several grants in one descriptor, pass the output of each helper to `buildGroupPermissions`.",
       "inputs": {
         "properties": {
           "permissions": {
@@ -7026,8 +7819,41 @@
         "type": "object"
       }
     },
+    "pulumiservice:index:buildComposePermissions": {
+      "description": "Builds a `PermissionDescriptorCompose` that grants the union of the referenced permission descriptors. Pulumi Cloud models a role in three layers: a role composes policies, a policy composes permission sets, and a set grants scopes. Use this helper for an `api.Role` with `uxPurpose: role` (pass policy IDs) and for the unconditional entry of a policy (pass set IDs).",
+      "inputs": {
+        "properties": {
+          "permissionDescriptorIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "The IDs of the descriptors to compose. A role may reference only policies, and a policy may reference only sets."
+          }
+        },
+        "type": "object",
+        "required": [
+          "permissionDescriptorIds"
+        ]
+      },
+      "outputs": {
+        "properties": {
+          "permissions": {
+            "additionalProperties": {
+              "$ref": "pulumi.json#/Any"
+            },
+            "description": "A `PermissionDescriptorCompose` referencing the supplied IDs.",
+            "type": "object"
+          }
+        },
+        "required": [
+          "permissions"
+        ],
+        "type": "object"
+      }
+    },
     "pulumiservice:index:buildEnvironmentScopedPermissions": {
-      "description": "Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named environment. Pair with `Environment.environmentId` (or the `getEnvironment` data source) to avoid hand-rolling the `PermissionDescriptorCondition` tree yourself. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls the output of each helper.",
+      "description": "Builds a permission descriptor that grants the supplied scopes or permission sets only on the named environment. Pair with `Environment.environmentId` (or the `getEnvironment` data source) to avoid hand-rolling the `PermissionDescriptorCondition` tree yourself. The result is directly assignable to `OrganizationRole.permissions` or `api.Role.details`. To combine several grants in one descriptor, pass the output of each helper to `buildGroupPermissions`.",
       "inputs": {
         "properties": {
           "environmentId": {
@@ -7040,12 +7866,18 @@
               "type": "string"
             },
             "description": "The set of `environment:*` scopes to grant on the target environment (e.g. `environment:read`, `environment:open`, `environment:update`). Discover valid scope names via the `getOrganizationRoleScopes` data source."
+          },
+          "setIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "The IDs of the permission sets to grant on the target environment. Set exactly one of `permissions` or `setIds`. `permissions` grants the scopes inline. `setIds` grants the referenced permission sets (`api.Role` with `uxPurpose: set`), which is the shape Pulumi Cloud uses for policies (`api.Role` with `uxPurpose: policy`)."
           }
         },
         "type": "object",
         "required": [
-          "environmentId",
-          "permissions"
+          "environmentId"
         ]
       },
       "outputs": {
@@ -7054,7 +7886,43 @@
             "additionalProperties": {
               "$ref": "pulumi.json#/Any"
             },
-            "description": "A `PermissionDescriptorCondition` tree gating a `PermissionDescriptorAllow` on the named environment, ready to assign to `OrganizationRole.permissions`.",
+            "description": "A `PermissionDescriptorCondition` tree gating the grant on the named environment.",
+            "type": "object"
+          }
+        },
+        "required": [
+          "permissions"
+        ],
+        "type": "object"
+      }
+    },
+    "pulumiservice:index:buildGroupPermissions": {
+      "description": "Builds a `PermissionDescriptorGroup` that grants the union of its entries. Use it for the `details` of an `api.Role` with `uxPurpose: policy`: one `buildComposePermissions` entry for the sets granted everywhere, plus one conditional entry (for example from `buildTagConditionalPermissions` or `buildStackScopedPermissions` with `setIds`) per targeted grant.",
+      "inputs": {
+        "properties": {
+          "entries": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": {
+                "$ref": "pulumi.json#/Any"
+              }
+            },
+            "description": "The descriptors to group, typically the `permissions` outputs of the other `build*` helpers."
+          }
+        },
+        "type": "object",
+        "required": [
+          "entries"
+        ]
+      },
+      "outputs": {
+        "properties": {
+          "permissions": {
+            "additionalProperties": {
+              "$ref": "pulumi.json#/Any"
+            },
+            "description": "A `PermissionDescriptorGroup` containing the supplied entries.",
             "type": "object"
           }
         },
@@ -7065,7 +7933,7 @@
       }
     },
     "pulumiservice:index:buildInsightsAccountScopedPermissions": {
-      "description": "Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named insights account. Pair with `InsightsAccount.insightsAccountId` (or the `getInsightsAccount` data source). The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls the output of each helper.",
+      "description": "Builds a permission descriptor that grants the supplied scopes or permission sets only on the named insights account. Pair with `InsightsAccount.insightsAccountId` (or the `getInsightsAccount` data source). The result is directly assignable to `OrganizationRole.permissions` or `api.Role.details`. To combine several grants in one descriptor, pass the output of each helper to `buildGroupPermissions`.",
       "inputs": {
         "properties": {
           "insightsAccountId": {
@@ -7078,12 +7946,18 @@
               "type": "string"
             },
             "description": "The set of `insights-account:*` scopes to grant on the target account. Discover valid scope names via the `getOrganizationRoleScopes` data source."
+          },
+          "setIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "The IDs of the permission sets to grant on the target insights account. Set exactly one of `permissions` or `setIds`. `permissions` grants the scopes inline. `setIds` grants the referenced permission sets (`api.Role` with `uxPurpose: set`), which is the shape Pulumi Cloud uses for policies (`api.Role` with `uxPurpose: policy`)."
           }
         },
         "type": "object",
         "required": [
-          "insightsAccountId",
-          "permissions"
+          "insightsAccountId"
         ]
       },
       "outputs": {
@@ -7092,7 +7966,7 @@
             "additionalProperties": {
               "$ref": "pulumi.json#/Any"
             },
-            "description": "A `PermissionDescriptorCondition` tree gating a `PermissionDescriptorAllow` on the named insights account, ready to assign to `OrganizationRole.permissions`.",
+            "description": "A `PermissionDescriptorCondition` tree gating the grant on the named insights account.",
             "type": "object"
           }
         },
@@ -7103,7 +7977,7 @@
       }
     },
     "pulumiservice:index:buildStackScopedPermissions": {
-      "description": "Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named stack. The `stackId` is the stack's opaque Pulumi Cloud identifier — distinct from the `organization/project/stack` triple. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls the output of each helper.",
+      "description": "Builds a permission descriptor that grants the supplied scopes or permission sets only on the named stack. The `stackId` is the stack's opaque Pulumi Cloud identifier — distinct from the `organization/project/stack` triple. The result is directly assignable to `OrganizationRole.permissions` or `api.Role.details`. To combine several grants in one descriptor, pass the output of each helper to `buildGroupPermissions`.",
       "inputs": {
         "properties": {
           "permissions": {
@@ -7113,6 +7987,13 @@
             },
             "description": "The set of `stack:*` scopes to grant on the target stack (e.g. `stack:read`, `stack:edit`, `stack:admin`). Discover valid scope names via the `getOrganizationRoleScopes` data source."
           },
+          "setIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "The IDs of the permission sets to grant on the target stack. Set exactly one of `permissions` or `setIds`. `permissions` grants the scopes inline. `setIds` grants the referenced permission sets (`api.Role` with `uxPurpose: set`), which is the shape Pulumi Cloud uses for policies (`api.Role` with `uxPurpose: policy`)."
+          },
           "stackId": {
             "type": "string",
             "description": "The target stack's opaque Pulumi Cloud identifier (not the `organization/project/stack` triple)."
@@ -7120,8 +8001,7 @@
         },
         "type": "object",
         "required": [
-          "stackId",
-          "permissions"
+          "stackId"
         ]
       },
       "outputs": {
@@ -7130,7 +8010,60 @@
             "additionalProperties": {
               "$ref": "pulumi.json#/Any"
             },
-            "description": "A `PermissionDescriptorCondition` tree gating a `PermissionDescriptorAllow` on the named stack, ready to assign to `OrganizationRole.permissions`.",
+            "description": "A `PermissionDescriptorCondition` tree gating the grant on the named stack.",
+            "type": "object"
+          }
+        },
+        "required": [
+          "permissions"
+        ],
+        "type": "object"
+      }
+    },
+    "pulumiservice:index:buildTagConditionalPermissions": {
+      "description": "Builds a permission descriptor that grants the supplied scopes or permission sets only on entities that carry a tag. With `tagValue`, the tag must have that exact value; without it, the tag key must exist. Tags are evaluated on existing entities, so grant create rights unconditionally. The result is directly assignable to `OrganizationRole.permissions` or `api.Role.details`. To combine several grants in one descriptor, pass the output of each helper to `buildGroupPermissions`.",
+      "inputs": {
+        "properties": {
+          "entityType": {
+            "$ref": "#/types/pulumiservice:index:RbacEntityType",
+            "description": "The kind of entity whose tags are evaluated: `stack`, `environment`, or `insights-account`."
+          },
+          "permissions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/types/pulumiservice:index:RbacScope"
+            },
+            "description": "The scopes to grant on matching entities. Discover valid scope names via the `getOrganizationRoleScopes` data source."
+          },
+          "setIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "The IDs of the permission sets to grant on matching entities. Set exactly one of `permissions` or `setIds`. `permissions` grants the scopes inline. `setIds` grants the referenced permission sets (`api.Role` with `uxPurpose: set`), which is the shape Pulumi Cloud uses for policies (`api.Role` with `uxPurpose: policy`)."
+          },
+          "tagKey": {
+            "type": "string",
+            "description": "The tag key to match."
+          },
+          "tagValue": {
+            "type": "string",
+            "description": "The tag value to match. Omit it to match every entity that has `tagKey`, whatever its value."
+          }
+        },
+        "type": "object",
+        "required": [
+          "entityType",
+          "tagKey"
+        ]
+      },
+      "outputs": {
+        "properties": {
+          "permissions": {
+            "additionalProperties": {
+              "$ref": "pulumi.json#/Any"
+            },
+            "description": "A `PermissionDescriptorCondition` tree gating the grant on the tag.",
             "type": "object"
           }
         },
