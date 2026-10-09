@@ -121,7 +121,7 @@ func (c *Config) Configure(context.Context) error {
 			return ErrAccessTokenNotFound
 		}
 
-		c.AccessToken = creds.AccessTokens[creds.Current]
+		c.AccessToken = creds.Accounts[creds.Current].AccessToken
 	}
 
 	if c.AccessToken == "" {

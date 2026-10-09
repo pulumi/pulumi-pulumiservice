@@ -45,8 +45,8 @@ func (pc *PulumiServiceConfig) getPulumiAccessToken() (*string, error) {
 	if err != nil {
 		return nil, ErrAccessTokenNotFound
 	}
-	if token, ok := creds.AccessTokens[creds.Current]; ok {
-		return &token, nil
+	if account, ok := creds.Accounts[creds.Current]; ok && account.AccessToken != "" {
+		return &account.AccessToken, nil
 	}
 	return nil, ErrAccessTokenNotFound
 }

@@ -6,6 +6,10 @@
 
 - Documented that `OrgAccessToken` must be created and deleted by a provider authenticated as a user, for example with a personal access token. Pulumi Cloud rejects organization and team access tokens, even Admin ones, with `403 Machine tokens are not allowed to perform this operation`. `TeamAccessToken` has no such restriction. No behavior change. [#1112](https://github.com/pulumi/pulumi-pulumiservice/issues/1112)
 
+### Bug Fixes
+
+- Updated the Pulumi Cloud SDK so `OrganizationRole.permissions` and the permission builder helpers accept scopes and permission descriptor types that Pulumi Cloud added recently. The previous version rejected them, or silently dropped scopes it didn't recognize. [#1162](https://github.com/pulumi/pulumi-pulumiservice/issues/1162)
+
 ## 1.4.0
 
 ### Breaking Changes

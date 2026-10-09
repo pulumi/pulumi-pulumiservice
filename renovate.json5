@@ -1,0 +1,17 @@
+{
+  $schema: "https://docs.renovatebot.com/renovate-schema.json",
+  extends: ["github>pulumi/renovate-config//default.json5"],
+  packageRules: [
+    {
+      // Pulumi Cloud SDK releases ship several times a week and decide which
+      // RBAC scopes and permission descriptors the provider accepts. Keep them
+      // out of the first-party group so a breaking pulumi/pkg bump can't hold
+      // them back (#1162). Automerge and the other first-party settings still
+      // apply; this rule changes only the group.
+      matchManagers: ["gomod"],
+      matchPackageNames: ["github.com/pulumi/pulumi-cloud-sdk/go"],
+      groupName: "Pulumi Cloud SDK",
+      groupSlug: "pulumi-cloud-sdk",
+    },
+  ],
+}
