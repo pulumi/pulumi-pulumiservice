@@ -1087,6 +1087,1041 @@ func (in *pulumiOperationPtr) ToPulumiOperationPtrOutputWithContext(ctx context.
 	return pulumi.ToOutputWithContext(ctx, in).(PulumiOperationPtrOutput)
 }
 
+type RbacEnvironmentScope string
+
+const (
+	// Create approval rules
+	RbacEnvironmentScopeChangeGateCreate = RbacEnvironmentScope("change_gate:create")
+	// Delete approval rules
+	RbacEnvironmentScopeChangeGateDelete = RbacEnvironmentScope("change_gate:delete")
+	// Update approval rules
+	RbacEnvironmentScopeChangeGateUpdate = RbacEnvironmentScope("change_gate:update")
+	// Clone environment
+	RbacEnvironmentScopeEnvironmentClone = RbacEnvironmentScope("environment:clone")
+	// Delete environment
+	RbacEnvironmentScopeEnvironmentDelete = RbacEnvironmentScope("environment:delete")
+	// Open and decrypt environment
+	RbacEnvironmentScopeEnvironmentOpen = RbacEnvironmentScope("environment:open")
+	// Read environment
+	RbacEnvironmentScopeEnvironmentRead = RbacEnvironmentScope("environment:read")
+	// Rotates secrets in an environment
+	RbacEnvironmentScopeEnvironmentRotate = RbacEnvironmentScope("environment:rotate")
+	// List secret rotation history of an environment
+	RbacEnvironmentScopeEnvironmentRotateHistory = RbacEnvironmentScope("environment:rotate_history")
+	// Write environment
+	RbacEnvironmentScopeEnvironmentWrite = RbacEnvironmentScope("environment:write")
+	// Creates a new environment schedule
+	RbacEnvironmentScopeEnvironmentScheduleCreate = RbacEnvironmentScope("environment_schedule:create")
+	// Deletes an environment schedule
+	RbacEnvironmentScopeEnvironmentScheduleDelete = RbacEnvironmentScope("environment_schedule:delete")
+	// Pauses an environment schedule
+	RbacEnvironmentScopeEnvironmentSchedulePause = RbacEnvironmentScope("environment_schedule:pause")
+	// Reads an environment schedule
+	RbacEnvironmentScopeEnvironmentScheduleRead = RbacEnvironmentScope("environment_schedule:read")
+	// Resumes an environment schedule
+	RbacEnvironmentScopeEnvironmentScheduleResume = RbacEnvironmentScope("environment_schedule:resume")
+	// Updates an environment schedule
+	RbacEnvironmentScopeEnvironmentScheduleUpdate = RbacEnvironmentScope("environment_schedule:update")
+	// Read environment settings
+	RbacEnvironmentScopeEnvironmentSettingsRead = RbacEnvironmentScope("environment_settings:read")
+	// Update environment settings
+	RbacEnvironmentScopeEnvironmentSettingsUpdate = RbacEnvironmentScope("environment_settings:update")
+	// Adds a new tag to an environment
+	RbacEnvironmentScopeEnvironmentTagCreate = RbacEnvironmentScope("environment_tag:create")
+	// Removes a tag from an environment
+	RbacEnvironmentScopeEnvironmentTagDelete = RbacEnvironmentScope("environment_tag:delete")
+	// Reads the value of an environments tag
+	RbacEnvironmentScopeEnvironmentTagRead = RbacEnvironmentScope("environment_tag:read")
+	// Modifies the value of an environments tag
+	RbacEnvironmentScopeEnvironmentTagUpdate = RbacEnvironmentScope("environment_tag:update")
+	// Creates a new version tag
+	RbacEnvironmentScopeEnvironmentVersionCreate = RbacEnvironmentScope("environment_version:create")
+	// Deletes a version tag
+	RbacEnvironmentScopeEnvironmentVersionDelete = RbacEnvironmentScope("environment_version:delete")
+	// Open and decrypt a version tag
+	RbacEnvironmentScopeEnvironmentVersionOpen = RbacEnvironmentScope("environment_version:open")
+	// Reads a version tag
+	RbacEnvironmentScopeEnvironmentVersionRead = RbacEnvironmentScope("environment_version:read")
+	// Retracts a specific version of the given environment
+	RbacEnvironmentScopeEnvironmentVersionRetract = RbacEnvironmentScope("environment_version:retract")
+	// Updates a version tag
+	RbacEnvironmentScopeEnvironmentVersionUpdate = RbacEnvironmentScope("environment_version:update")
+	// Create environment webhook
+	RbacEnvironmentScopeEnvironmentWebhookCreate = RbacEnvironmentScope("environment_webhook:create")
+	// Delete environment webhook
+	RbacEnvironmentScopeEnvironmentWebhookDelete = RbacEnvironmentScope("environment_webhook:delete")
+	// Read environment webhook
+	RbacEnvironmentScopeEnvironmentWebhookRead = RbacEnvironmentScope("environment_webhook:read")
+	// Update environment webhook
+	RbacEnvironmentScopeEnvironmentWebhookUpdate = RbacEnvironmentScope("environment_webhook:update")
+)
+
+func (RbacEnvironmentScope) ElementType() reflect.Type {
+	return reflect.TypeOf((*RbacEnvironmentScope)(nil)).Elem()
+}
+
+func (e RbacEnvironmentScope) ToRbacEnvironmentScopeOutput() RbacEnvironmentScopeOutput {
+	return pulumi.ToOutput(e).(RbacEnvironmentScopeOutput)
+}
+
+func (e RbacEnvironmentScope) ToRbacEnvironmentScopeOutputWithContext(ctx context.Context) RbacEnvironmentScopeOutput {
+	return pulumi.ToOutputWithContext(ctx, e).(RbacEnvironmentScopeOutput)
+}
+
+func (e RbacEnvironmentScope) ToRbacEnvironmentScopePtrOutput() RbacEnvironmentScopePtrOutput {
+	return e.ToRbacEnvironmentScopePtrOutputWithContext(context.Background())
+}
+
+func (e RbacEnvironmentScope) ToRbacEnvironmentScopePtrOutputWithContext(ctx context.Context) RbacEnvironmentScopePtrOutput {
+	return RbacEnvironmentScope(e).ToRbacEnvironmentScopeOutputWithContext(ctx).ToRbacEnvironmentScopePtrOutputWithContext(ctx)
+}
+
+func (e RbacEnvironmentScope) ToStringOutput() pulumi.StringOutput {
+	return pulumi.ToOutput(pulumi.String(e)).(pulumi.StringOutput)
+}
+
+func (e RbacEnvironmentScope) ToStringOutputWithContext(ctx context.Context) pulumi.StringOutput {
+	return pulumi.ToOutputWithContext(ctx, pulumi.String(e)).(pulumi.StringOutput)
+}
+
+func (e RbacEnvironmentScope) ToStringPtrOutput() pulumi.StringPtrOutput {
+	return pulumi.String(e).ToStringPtrOutputWithContext(context.Background())
+}
+
+func (e RbacEnvironmentScope) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
+	return pulumi.String(e).ToStringOutputWithContext(ctx).ToStringPtrOutputWithContext(ctx)
+}
+
+type RbacEnvironmentScopeOutput struct{ *pulumi.OutputState }
+
+func (RbacEnvironmentScopeOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*RbacEnvironmentScope)(nil)).Elem()
+}
+
+func (o RbacEnvironmentScopeOutput) ToRbacEnvironmentScopeOutput() RbacEnvironmentScopeOutput {
+	return o
+}
+
+func (o RbacEnvironmentScopeOutput) ToRbacEnvironmentScopeOutputWithContext(ctx context.Context) RbacEnvironmentScopeOutput {
+	return o
+}
+
+func (o RbacEnvironmentScopeOutput) ToRbacEnvironmentScopePtrOutput() RbacEnvironmentScopePtrOutput {
+	return o.ToRbacEnvironmentScopePtrOutputWithContext(context.Background())
+}
+
+func (o RbacEnvironmentScopeOutput) ToRbacEnvironmentScopePtrOutputWithContext(ctx context.Context) RbacEnvironmentScopePtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v RbacEnvironmentScope) *RbacEnvironmentScope {
+		return &v
+	}).(RbacEnvironmentScopePtrOutput)
+}
+
+func (o RbacEnvironmentScopeOutput) ToStringOutput() pulumi.StringOutput {
+	return o.ToStringOutputWithContext(context.Background())
+}
+
+func (o RbacEnvironmentScopeOutput) ToStringOutputWithContext(ctx context.Context) pulumi.StringOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e RbacEnvironmentScope) string {
+		return string(e)
+	}).(pulumi.StringOutput)
+}
+
+func (o RbacEnvironmentScopeOutput) ToStringPtrOutput() pulumi.StringPtrOutput {
+	return o.ToStringPtrOutputWithContext(context.Background())
+}
+
+func (o RbacEnvironmentScopeOutput) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e RbacEnvironmentScope) *string {
+		v := string(e)
+		return &v
+	}).(pulumi.StringPtrOutput)
+}
+
+type RbacEnvironmentScopePtrOutput struct{ *pulumi.OutputState }
+
+func (RbacEnvironmentScopePtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**RbacEnvironmentScope)(nil)).Elem()
+}
+
+func (o RbacEnvironmentScopePtrOutput) ToRbacEnvironmentScopePtrOutput() RbacEnvironmentScopePtrOutput {
+	return o
+}
+
+func (o RbacEnvironmentScopePtrOutput) ToRbacEnvironmentScopePtrOutputWithContext(ctx context.Context) RbacEnvironmentScopePtrOutput {
+	return o
+}
+
+func (o RbacEnvironmentScopePtrOutput) Elem() RbacEnvironmentScopeOutput {
+	return o.ApplyT(func(v *RbacEnvironmentScope) RbacEnvironmentScope {
+		if v != nil {
+			return *v
+		}
+		var ret RbacEnvironmentScope
+		return ret
+	}).(RbacEnvironmentScopeOutput)
+}
+
+func (o RbacEnvironmentScopePtrOutput) ToStringPtrOutput() pulumi.StringPtrOutput {
+	return o.ToStringPtrOutputWithContext(context.Background())
+}
+
+func (o RbacEnvironmentScopePtrOutput) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e *RbacEnvironmentScope) *string {
+		if e == nil {
+			return nil
+		}
+		v := string(*e)
+		return &v
+	}).(pulumi.StringPtrOutput)
+}
+
+// RbacEnvironmentScopeInput is an input type that accepts values of the RbacEnvironmentScope enum
+// A concrete instance of `RbacEnvironmentScopeInput` can be one of the following:
+//
+//	RbacEnvironmentScopeChangeGateCreate
+//	RbacEnvironmentScopeChangeGateDelete
+//	RbacEnvironmentScopeChangeGateUpdate
+//	RbacEnvironmentScopeEnvironmentClone
+//	RbacEnvironmentScopeEnvironmentDelete
+//	RbacEnvironmentScopeEnvironmentOpen
+//	RbacEnvironmentScopeEnvironmentRead
+//	RbacEnvironmentScopeEnvironmentRotate
+//	RbacEnvironmentScopeEnvironmentRotateHistory
+//	RbacEnvironmentScopeEnvironmentWrite
+//	RbacEnvironmentScopeEnvironmentScheduleCreate
+//	RbacEnvironmentScopeEnvironmentScheduleDelete
+//	RbacEnvironmentScopeEnvironmentSchedulePause
+//	RbacEnvironmentScopeEnvironmentScheduleRead
+//	RbacEnvironmentScopeEnvironmentScheduleResume
+//	RbacEnvironmentScopeEnvironmentScheduleUpdate
+//	RbacEnvironmentScopeEnvironmentSettingsRead
+//	RbacEnvironmentScopeEnvironmentSettingsUpdate
+//	RbacEnvironmentScopeEnvironmentTagCreate
+//	RbacEnvironmentScopeEnvironmentTagDelete
+//	RbacEnvironmentScopeEnvironmentTagRead
+//	RbacEnvironmentScopeEnvironmentTagUpdate
+//	RbacEnvironmentScopeEnvironmentVersionCreate
+//	RbacEnvironmentScopeEnvironmentVersionDelete
+//	RbacEnvironmentScopeEnvironmentVersionOpen
+//	RbacEnvironmentScopeEnvironmentVersionRead
+//	RbacEnvironmentScopeEnvironmentVersionRetract
+//	RbacEnvironmentScopeEnvironmentVersionUpdate
+//	RbacEnvironmentScopeEnvironmentWebhookCreate
+//	RbacEnvironmentScopeEnvironmentWebhookDelete
+//	RbacEnvironmentScopeEnvironmentWebhookRead
+//	RbacEnvironmentScopeEnvironmentWebhookUpdate
+type RbacEnvironmentScopeInput interface {
+	pulumi.Input
+
+	ToRbacEnvironmentScopeOutput() RbacEnvironmentScopeOutput
+	ToRbacEnvironmentScopeOutputWithContext(context.Context) RbacEnvironmentScopeOutput
+}
+
+var rbacEnvironmentScopePtrType = reflect.TypeOf((**RbacEnvironmentScope)(nil)).Elem()
+
+type RbacEnvironmentScopePtrInput interface {
+	pulumi.Input
+
+	ToRbacEnvironmentScopePtrOutput() RbacEnvironmentScopePtrOutput
+	ToRbacEnvironmentScopePtrOutputWithContext(context.Context) RbacEnvironmentScopePtrOutput
+}
+
+type rbacEnvironmentScopePtr string
+
+func RbacEnvironmentScopePtr(v string) RbacEnvironmentScopePtrInput {
+	return (*rbacEnvironmentScopePtr)(&v)
+}
+
+func (*rbacEnvironmentScopePtr) ElementType() reflect.Type {
+	return rbacEnvironmentScopePtrType
+}
+
+func (in *rbacEnvironmentScopePtr) ToRbacEnvironmentScopePtrOutput() RbacEnvironmentScopePtrOutput {
+	return pulumi.ToOutput(in).(RbacEnvironmentScopePtrOutput)
+}
+
+func (in *rbacEnvironmentScopePtr) ToRbacEnvironmentScopePtrOutputWithContext(ctx context.Context) RbacEnvironmentScopePtrOutput {
+	return pulumi.ToOutputWithContext(ctx, in).(RbacEnvironmentScopePtrOutput)
+}
+
+// RbacEnvironmentScopeArrayInput is an input type that accepts RbacEnvironmentScopeArray and RbacEnvironmentScopeArrayOutput values.
+// You can construct a concrete instance of `RbacEnvironmentScopeArrayInput` via:
+//
+//	RbacEnvironmentScopeArray{ RbacEnvironmentScopeArgs{...} }
+type RbacEnvironmentScopeArrayInput interface {
+	pulumi.Input
+
+	ToRbacEnvironmentScopeArrayOutput() RbacEnvironmentScopeArrayOutput
+	ToRbacEnvironmentScopeArrayOutputWithContext(context.Context) RbacEnvironmentScopeArrayOutput
+}
+
+type RbacEnvironmentScopeArray []RbacEnvironmentScope
+
+func (RbacEnvironmentScopeArray) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]RbacEnvironmentScope)(nil)).Elem()
+}
+
+func (i RbacEnvironmentScopeArray) ToRbacEnvironmentScopeArrayOutput() RbacEnvironmentScopeArrayOutput {
+	return i.ToRbacEnvironmentScopeArrayOutputWithContext(context.Background())
+}
+
+func (i RbacEnvironmentScopeArray) ToRbacEnvironmentScopeArrayOutputWithContext(ctx context.Context) RbacEnvironmentScopeArrayOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(RbacEnvironmentScopeArrayOutput)
+}
+
+type RbacEnvironmentScopeArrayOutput struct{ *pulumi.OutputState }
+
+func (RbacEnvironmentScopeArrayOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]RbacEnvironmentScope)(nil)).Elem()
+}
+
+func (o RbacEnvironmentScopeArrayOutput) ToRbacEnvironmentScopeArrayOutput() RbacEnvironmentScopeArrayOutput {
+	return o
+}
+
+func (o RbacEnvironmentScopeArrayOutput) ToRbacEnvironmentScopeArrayOutputWithContext(ctx context.Context) RbacEnvironmentScopeArrayOutput {
+	return o
+}
+
+func (o RbacEnvironmentScopeArrayOutput) Index(i pulumi.IntInput) RbacEnvironmentScopeOutput {
+	return pulumi.All(o, i).ApplyT(func(vs []interface{}) RbacEnvironmentScope {
+		return vs[0].([]RbacEnvironmentScope)[vs[1].(int)]
+	}).(RbacEnvironmentScopeOutput)
+}
+
+type RbacInsightsAccountScope string
+
+const (
+	// Delete Insights account
+	RbacInsightsAccountScopeInsightsAccountDelete = RbacInsightsAccountScope("insights_account:delete")
+	// Read Insights account
+	RbacInsightsAccountScopeInsightsAccountRead = RbacInsightsAccountScope("insights_account:read")
+	// Scan Insights account
+	RbacInsightsAccountScopeInsightsAccountScan = RbacInsightsAccountScope("insights_account:scan")
+	// Update Insights account
+	RbacInsightsAccountScopeInsightsAccountUpdate = RbacInsightsAccountScope("insights_account:update")
+	// Read Insights account access
+	RbacInsightsAccountScopeInsightsAccountAccessRead = RbacInsightsAccountScope("insights_account_access:read")
+	// Update Insights account access
+	RbacInsightsAccountScopeInsightsAccountAccessUpdate = RbacInsightsAccountScope("insights_account_access:update")
+	// Cancel Insights account scan
+	RbacInsightsAccountScopeInsightsAccountScanCancel = RbacInsightsAccountScope("insights_account_scan:cancel")
+	// Pause Insights account scan
+	RbacInsightsAccountScopeInsightsAccountScanPause = RbacInsightsAccountScope("insights_account_scan:pause")
+	// Read Insights account scan
+	RbacInsightsAccountScopeInsightsAccountScanRead = RbacInsightsAccountScope("insights_account_scan:read")
+	// Resume Insights account scan
+	RbacInsightsAccountScopeInsightsAccountScanResume = RbacInsightsAccountScope("insights_account_scan:resume")
+	// Update Insights account scan
+	RbacInsightsAccountScopeInsightsAccountScanUpdate = RbacInsightsAccountScope("insights_account_scan:update")
+)
+
+func (RbacInsightsAccountScope) ElementType() reflect.Type {
+	return reflect.TypeOf((*RbacInsightsAccountScope)(nil)).Elem()
+}
+
+func (e RbacInsightsAccountScope) ToRbacInsightsAccountScopeOutput() RbacInsightsAccountScopeOutput {
+	return pulumi.ToOutput(e).(RbacInsightsAccountScopeOutput)
+}
+
+func (e RbacInsightsAccountScope) ToRbacInsightsAccountScopeOutputWithContext(ctx context.Context) RbacInsightsAccountScopeOutput {
+	return pulumi.ToOutputWithContext(ctx, e).(RbacInsightsAccountScopeOutput)
+}
+
+func (e RbacInsightsAccountScope) ToRbacInsightsAccountScopePtrOutput() RbacInsightsAccountScopePtrOutput {
+	return e.ToRbacInsightsAccountScopePtrOutputWithContext(context.Background())
+}
+
+func (e RbacInsightsAccountScope) ToRbacInsightsAccountScopePtrOutputWithContext(ctx context.Context) RbacInsightsAccountScopePtrOutput {
+	return RbacInsightsAccountScope(e).ToRbacInsightsAccountScopeOutputWithContext(ctx).ToRbacInsightsAccountScopePtrOutputWithContext(ctx)
+}
+
+func (e RbacInsightsAccountScope) ToStringOutput() pulumi.StringOutput {
+	return pulumi.ToOutput(pulumi.String(e)).(pulumi.StringOutput)
+}
+
+func (e RbacInsightsAccountScope) ToStringOutputWithContext(ctx context.Context) pulumi.StringOutput {
+	return pulumi.ToOutputWithContext(ctx, pulumi.String(e)).(pulumi.StringOutput)
+}
+
+func (e RbacInsightsAccountScope) ToStringPtrOutput() pulumi.StringPtrOutput {
+	return pulumi.String(e).ToStringPtrOutputWithContext(context.Background())
+}
+
+func (e RbacInsightsAccountScope) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
+	return pulumi.String(e).ToStringOutputWithContext(ctx).ToStringPtrOutputWithContext(ctx)
+}
+
+type RbacInsightsAccountScopeOutput struct{ *pulumi.OutputState }
+
+func (RbacInsightsAccountScopeOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*RbacInsightsAccountScope)(nil)).Elem()
+}
+
+func (o RbacInsightsAccountScopeOutput) ToRbacInsightsAccountScopeOutput() RbacInsightsAccountScopeOutput {
+	return o
+}
+
+func (o RbacInsightsAccountScopeOutput) ToRbacInsightsAccountScopeOutputWithContext(ctx context.Context) RbacInsightsAccountScopeOutput {
+	return o
+}
+
+func (o RbacInsightsAccountScopeOutput) ToRbacInsightsAccountScopePtrOutput() RbacInsightsAccountScopePtrOutput {
+	return o.ToRbacInsightsAccountScopePtrOutputWithContext(context.Background())
+}
+
+func (o RbacInsightsAccountScopeOutput) ToRbacInsightsAccountScopePtrOutputWithContext(ctx context.Context) RbacInsightsAccountScopePtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v RbacInsightsAccountScope) *RbacInsightsAccountScope {
+		return &v
+	}).(RbacInsightsAccountScopePtrOutput)
+}
+
+func (o RbacInsightsAccountScopeOutput) ToStringOutput() pulumi.StringOutput {
+	return o.ToStringOutputWithContext(context.Background())
+}
+
+func (o RbacInsightsAccountScopeOutput) ToStringOutputWithContext(ctx context.Context) pulumi.StringOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e RbacInsightsAccountScope) string {
+		return string(e)
+	}).(pulumi.StringOutput)
+}
+
+func (o RbacInsightsAccountScopeOutput) ToStringPtrOutput() pulumi.StringPtrOutput {
+	return o.ToStringPtrOutputWithContext(context.Background())
+}
+
+func (o RbacInsightsAccountScopeOutput) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e RbacInsightsAccountScope) *string {
+		v := string(e)
+		return &v
+	}).(pulumi.StringPtrOutput)
+}
+
+type RbacInsightsAccountScopePtrOutput struct{ *pulumi.OutputState }
+
+func (RbacInsightsAccountScopePtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**RbacInsightsAccountScope)(nil)).Elem()
+}
+
+func (o RbacInsightsAccountScopePtrOutput) ToRbacInsightsAccountScopePtrOutput() RbacInsightsAccountScopePtrOutput {
+	return o
+}
+
+func (o RbacInsightsAccountScopePtrOutput) ToRbacInsightsAccountScopePtrOutputWithContext(ctx context.Context) RbacInsightsAccountScopePtrOutput {
+	return o
+}
+
+func (o RbacInsightsAccountScopePtrOutput) Elem() RbacInsightsAccountScopeOutput {
+	return o.ApplyT(func(v *RbacInsightsAccountScope) RbacInsightsAccountScope {
+		if v != nil {
+			return *v
+		}
+		var ret RbacInsightsAccountScope
+		return ret
+	}).(RbacInsightsAccountScopeOutput)
+}
+
+func (o RbacInsightsAccountScopePtrOutput) ToStringPtrOutput() pulumi.StringPtrOutput {
+	return o.ToStringPtrOutputWithContext(context.Background())
+}
+
+func (o RbacInsightsAccountScopePtrOutput) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e *RbacInsightsAccountScope) *string {
+		if e == nil {
+			return nil
+		}
+		v := string(*e)
+		return &v
+	}).(pulumi.StringPtrOutput)
+}
+
+// RbacInsightsAccountScopeInput is an input type that accepts values of the RbacInsightsAccountScope enum
+// A concrete instance of `RbacInsightsAccountScopeInput` can be one of the following:
+//
+//	RbacInsightsAccountScopeInsightsAccountDelete
+//	RbacInsightsAccountScopeInsightsAccountRead
+//	RbacInsightsAccountScopeInsightsAccountScan
+//	RbacInsightsAccountScopeInsightsAccountUpdate
+//	RbacInsightsAccountScopeInsightsAccountAccessRead
+//	RbacInsightsAccountScopeInsightsAccountAccessUpdate
+//	RbacInsightsAccountScopeInsightsAccountScanCancel
+//	RbacInsightsAccountScopeInsightsAccountScanPause
+//	RbacInsightsAccountScopeInsightsAccountScanRead
+//	RbacInsightsAccountScopeInsightsAccountScanResume
+//	RbacInsightsAccountScopeInsightsAccountScanUpdate
+type RbacInsightsAccountScopeInput interface {
+	pulumi.Input
+
+	ToRbacInsightsAccountScopeOutput() RbacInsightsAccountScopeOutput
+	ToRbacInsightsAccountScopeOutputWithContext(context.Context) RbacInsightsAccountScopeOutput
+}
+
+var rbacInsightsAccountScopePtrType = reflect.TypeOf((**RbacInsightsAccountScope)(nil)).Elem()
+
+type RbacInsightsAccountScopePtrInput interface {
+	pulumi.Input
+
+	ToRbacInsightsAccountScopePtrOutput() RbacInsightsAccountScopePtrOutput
+	ToRbacInsightsAccountScopePtrOutputWithContext(context.Context) RbacInsightsAccountScopePtrOutput
+}
+
+type rbacInsightsAccountScopePtr string
+
+func RbacInsightsAccountScopePtr(v string) RbacInsightsAccountScopePtrInput {
+	return (*rbacInsightsAccountScopePtr)(&v)
+}
+
+func (*rbacInsightsAccountScopePtr) ElementType() reflect.Type {
+	return rbacInsightsAccountScopePtrType
+}
+
+func (in *rbacInsightsAccountScopePtr) ToRbacInsightsAccountScopePtrOutput() RbacInsightsAccountScopePtrOutput {
+	return pulumi.ToOutput(in).(RbacInsightsAccountScopePtrOutput)
+}
+
+func (in *rbacInsightsAccountScopePtr) ToRbacInsightsAccountScopePtrOutputWithContext(ctx context.Context) RbacInsightsAccountScopePtrOutput {
+	return pulumi.ToOutputWithContext(ctx, in).(RbacInsightsAccountScopePtrOutput)
+}
+
+// RbacInsightsAccountScopeArrayInput is an input type that accepts RbacInsightsAccountScopeArray and RbacInsightsAccountScopeArrayOutput values.
+// You can construct a concrete instance of `RbacInsightsAccountScopeArrayInput` via:
+//
+//	RbacInsightsAccountScopeArray{ RbacInsightsAccountScopeArgs{...} }
+type RbacInsightsAccountScopeArrayInput interface {
+	pulumi.Input
+
+	ToRbacInsightsAccountScopeArrayOutput() RbacInsightsAccountScopeArrayOutput
+	ToRbacInsightsAccountScopeArrayOutputWithContext(context.Context) RbacInsightsAccountScopeArrayOutput
+}
+
+type RbacInsightsAccountScopeArray []RbacInsightsAccountScope
+
+func (RbacInsightsAccountScopeArray) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]RbacInsightsAccountScope)(nil)).Elem()
+}
+
+func (i RbacInsightsAccountScopeArray) ToRbacInsightsAccountScopeArrayOutput() RbacInsightsAccountScopeArrayOutput {
+	return i.ToRbacInsightsAccountScopeArrayOutputWithContext(context.Background())
+}
+
+func (i RbacInsightsAccountScopeArray) ToRbacInsightsAccountScopeArrayOutputWithContext(ctx context.Context) RbacInsightsAccountScopeArrayOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(RbacInsightsAccountScopeArrayOutput)
+}
+
+type RbacInsightsAccountScopeArrayOutput struct{ *pulumi.OutputState }
+
+func (RbacInsightsAccountScopeArrayOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]RbacInsightsAccountScope)(nil)).Elem()
+}
+
+func (o RbacInsightsAccountScopeArrayOutput) ToRbacInsightsAccountScopeArrayOutput() RbacInsightsAccountScopeArrayOutput {
+	return o
+}
+
+func (o RbacInsightsAccountScopeArrayOutput) ToRbacInsightsAccountScopeArrayOutputWithContext(ctx context.Context) RbacInsightsAccountScopeArrayOutput {
+	return o
+}
+
+func (o RbacInsightsAccountScopeArrayOutput) Index(i pulumi.IntInput) RbacInsightsAccountScopeOutput {
+	return pulumi.All(o, i).ApplyT(func(vs []interface{}) RbacInsightsAccountScope {
+		return vs[0].([]RbacInsightsAccountScope)[vs[1].(int)]
+	}).(RbacInsightsAccountScopeOutput)
+}
+
+type RbacOrganizationScope string
+
+const (
+	// Create agent pool
+	RbacOrganizationScopeAgentPoolCreate = RbacOrganizationScope("agent_pool:create")
+	// Delete agent pool
+	RbacOrganizationScopeAgentPoolDelete = RbacOrganizationScope("agent_pool:delete")
+	// Read agent pool
+	RbacOrganizationScopeAgentPoolRead = RbacOrganizationScope("agent_pool:read")
+	// Update agent pool
+	RbacOrganizationScopeAgentPoolUpdate = RbacOrganizationScope("agent_pool:update")
+	// Create Neo tasks
+	RbacOrganizationScopeAgentTaskCreate = RbacOrganizationScope("agent_task:create")
+	// Export audit logs
+	RbacOrganizationScopeAuditLogsExport = RbacOrganizationScope("audit_logs:export")
+	// Read audit logs
+	RbacOrganizationScopeAuditLogsRead = RbacOrganizationScope("audit_logs:read")
+	// Read authentication policies
+	RbacOrganizationScopeAuthPoliciesRead = RbacOrganizationScope("auth_policies:read")
+	// Update authentication policies
+	RbacOrganizationScopeAuthPoliciesUpdate = RbacOrganizationScope("auth_policies:update")
+	// Create approval rules
+	RbacOrganizationScopeChangeGateCreate = RbacOrganizationScope("change_gate:create")
+	// Delete approval rules
+	RbacOrganizationScopeChangeGateDelete = RbacOrganizationScope("change_gate:delete")
+	// Update approval rules
+	RbacOrganizationScopeChangeGateUpdate = RbacOrganizationScope("change_gate:update")
+	// Pause deployments
+	RbacOrganizationScopeDeploymentsPause = RbacOrganizationScope("deployments:pause")
+	// Read deployments
+	RbacOrganizationScopeDeploymentsRead = RbacOrganizationScope("deployments:read")
+	// Read deployment usage
+	RbacOrganizationScopeDeploymentsReadUsage = RbacOrganizationScope("deployments:read_usage")
+	// Resume deployments
+	RbacOrganizationScopeDeploymentsResume = RbacOrganizationScope("deployments:resume")
+	// Create environment
+	RbacOrganizationScopeEnvironmentCreate = RbacOrganizationScope("environment:create")
+	// List deleted environments
+	RbacOrganizationScopeEnvironmentListDeleted = RbacOrganizationScope("environment:list_deleted")
+	// Restore deleted environment
+	RbacOrganizationScopeEnvironmentRestoreDeleted = RbacOrganizationScope("environment:restore_deleted")
+	// List the tags across all environments
+	RbacOrganizationScopeEnvironmentTagsList = RbacOrganizationScope("environment_tags:list")
+	// Create GitHub team
+	RbacOrganizationScopeGithubTeamCreate = RbacOrganizationScope("github_team:create")
+	// Create Insights account
+	RbacOrganizationScopeInsightsAccountCreate = RbacOrganizationScope("insights_account:create")
+	// Read integrations
+	RbacOrganizationScopeIntegrationsRead = RbacOrganizationScope("integrations:read")
+	// Update integrations
+	RbacOrganizationScopeIntegrationsUpdate = RbacOrganizationScope("integrations:update")
+	// Create invites
+	RbacOrganizationScopeInvitesCreate = RbacOrganizationScope("invites:create")
+	// Read invites
+	RbacOrganizationScopeInvitesRead = RbacOrganizationScope("invites:read")
+	// Create OIDC issuer
+	RbacOrganizationScopeOidcIssuersCreate = RbacOrganizationScope("oidc_issuers:create")
+	// Delete OIDC issuer
+	RbacOrganizationScopeOidcIssuersDelete = RbacOrganizationScope("oidc_issuers:delete")
+	// Read OIDC issuers
+	RbacOrganizationScopeOidcIssuersRead = RbacOrganizationScope("oidc_issuers:read")
+	// Regenerate OIDC issuer thumbprints
+	RbacOrganizationScopeOidcIssuersRegenerateThumbprints = RbacOrganizationScope("oidc_issuers:regenerate_thumbprints")
+	// Update OIDC issuers
+	RbacOrganizationScopeOidcIssuersUpdate = RbacOrganizationScope("oidc_issuers:update")
+	// Read organization integrations
+	RbacOrganizationScopeOrgIntegrationsRead = RbacOrganizationScope("org_integrations:read")
+	// Update organization integrations
+	RbacOrganizationScopeOrgIntegrationsUpdate = RbacOrganizationScope("org_integrations:update")
+	// Add organization member
+	RbacOrganizationScopeOrgMemberAdd = RbacOrganizationScope("org_member:add")
+	// Delete organization member
+	RbacOrganizationScopeOrgMemberDelete = RbacOrganizationScope("org_member:delete")
+	// Read organization member
+	RbacOrganizationScopeOrgMemberRead = RbacOrganizationScope("org_member:read")
+	// Set organization member admin
+	RbacOrganizationScopeOrgMemberSetAdmin = RbacOrganizationScope("org_member:set_admin")
+	// Update organization member
+	RbacOrganizationScopeOrgMemberUpdate = RbacOrganizationScope("org_member:update")
+	// Read organization member access
+	RbacOrganizationScopeOrgMemberAccessRead = RbacOrganizationScope("org_member_access:read")
+	// Read organization requests
+	RbacOrganizationScopeOrgRequestsRead = RbacOrganizationScope("org_requests:read")
+	// Update organization requests
+	RbacOrganizationScopeOrgRequestsUpdate = RbacOrganizationScope("org_requests:update")
+	// Create organization access token
+	RbacOrganizationScopeOrgTokenCreate = RbacOrganizationScope("org_token:create")
+	// Delete organization access token
+	RbacOrganizationScopeOrgTokenDelete = RbacOrganizationScope("org_token:delete")
+	// Read organization access token
+	RbacOrganizationScopeOrgTokenRead = RbacOrganizationScope("org_token:read")
+	// Manage organization billing
+	RbacOrganizationScopeOrganizationBilling = RbacOrganizationScope("organization:billing")
+	// Change organization backend
+	RbacOrganizationScopeOrganizationChangeBackend = RbacOrganizationScope("organization:change_backend")
+	// Delete organization
+	RbacOrganizationScopeOrganizationDelete = RbacOrganizationScope("organization:delete")
+	// Read organization usage
+	RbacOrganizationScopeOrganizationReadUsage = RbacOrganizationScope("organization:read_usage")
+	// Rename organization
+	RbacOrganizationScopeOrganizationRename = RbacOrganizationScope("organization:rename")
+	// Transfer organization stacks
+	RbacOrganizationScopeOrganizationTransferStacks = RbacOrganizationScope("organization:transfer_stacks")
+	// Update organization
+	RbacOrganizationScopeOrganizationUpdate = RbacOrganizationScope("organization:update")
+	// Create organization webhook
+	RbacOrganizationScopeOrganizationWebhookCreate = RbacOrganizationScope("organization_webhook:create")
+	// Delete organization webhook
+	RbacOrganizationScopeOrganizationWebhookDelete = RbacOrganizationScope("organization_webhook:delete")
+	// Read organization webhook
+	RbacOrganizationScopeOrganizationWebhookRead = RbacOrganizationScope("organization_webhook:read")
+	// Update organization webhook
+	RbacOrganizationScopeOrganizationWebhookUpdate = RbacOrganizationScope("organization_webhook:update")
+	// Create Insights policy groups
+	RbacOrganizationScopePolicyGroupsCreate = RbacOrganizationScope("policy_groups:create")
+	// Delete Insights policy groups
+	RbacOrganizationScopePolicyGroupsDelete = RbacOrganizationScope("policy_groups:delete")
+	// Read Insights policy groups
+	RbacOrganizationScopePolicyGroupsRead = RbacOrganizationScope("policy_groups:read")
+	// Update Insights policy groups
+	RbacOrganizationScopePolicyGroupsUpdate = RbacOrganizationScope("policy_groups:update")
+	// Create Insights policy pack
+	RbacOrganizationScopePolicyPackCreate = RbacOrganizationScope("policy_pack:create")
+	// Delete Insights policy pack
+	RbacOrganizationScopePolicyPackDelete = RbacOrganizationScope("policy_pack:delete")
+	// Read Insights policy pack
+	RbacOrganizationScopePolicyPackRead = RbacOrganizationScope("policy_pack:read")
+	// Update Insights policy pack
+	RbacOrganizationScopePolicyPackUpdate = RbacOrganizationScope("policy_pack:update")
+	// Read Insights policy results
+	RbacOrganizationScopePolicyResultsRead = RbacOrganizationScope("policy_results:read")
+	// Update Insights policy results
+	RbacOrganizationScopePolicyResultsUpdate = RbacOrganizationScope("policy_results:update")
+	// Decrypt project
+	RbacOrganizationScopeProjectDecrypt = RbacOrganizationScope("project:decrypt")
+	// Encrypt project
+	RbacOrganizationScopeProjectEncrypt = RbacOrganizationScope("project:encrypt")
+	// View resources dashboard
+	RbacOrganizationScopeResourcesDashboard = RbacOrganizationScope("resources:dashboard")
+	// Index resources
+	RbacOrganizationScopeResourcesIndex = RbacOrganizationScope("resources:index")
+	// Search resources
+	RbacOrganizationScopeResourcesSearch = RbacOrganizationScope("resources:search")
+	// Create role
+	RbacOrganizationScopeRoleCreate = RbacOrganizationScope("role:create")
+	// Delete role
+	RbacOrganizationScopeRoleDelete = RbacOrganizationScope("role:delete")
+	// Read role
+	RbacOrganizationScopeRoleRead = RbacOrganizationScope("role:read")
+	// Update role
+	RbacOrganizationScopeRoleUpdate = RbacOrganizationScope("role:update")
+	// Read SAML
+	RbacOrganizationScopeSamlRead = RbacOrganizationScope("saml:read")
+	// Update SAML
+	RbacOrganizationScopeSamlUpdate = RbacOrganizationScope("saml:update")
+	// Delete SCIM
+	RbacOrganizationScopeScimDelete = RbacOrganizationScope("scim:delete")
+	// Read SCIM
+	RbacOrganizationScopeScimRead = RbacOrganizationScope("scim:read")
+	// Update SCIM
+	RbacOrganizationScopeScimUpdate = RbacOrganizationScope("scim:update")
+	// Create stack
+	RbacOrganizationScopeStackCreate = RbacOrganizationScope("stack:create")
+	// List deleted stacks
+	RbacOrganizationScopeStackListDeleted = RbacOrganizationScope("stack:list_deleted")
+	// Restore deleted stack
+	RbacOrganizationScopeStackRestoreDeleted = RbacOrganizationScope("stack:restore_deleted")
+	// Read project tags
+	RbacOrganizationScopeTagsRead = RbacOrganizationScope("tags:read")
+	// Create team
+	RbacOrganizationScopeTeamCreate = RbacOrganizationScope("team:create")
+	// Create team access token
+	RbacOrganizationScopeTeamCreateToken = RbacOrganizationScope("team:create_token")
+	// Delete team
+	RbacOrganizationScopeTeamDelete = RbacOrganizationScope("team:delete")
+	// Delete team access token
+	RbacOrganizationScopeTeamDeleteToken = RbacOrganizationScope("team:delete_token")
+	// List teams
+	RbacOrganizationScopeTeamList = RbacOrganizationScope("team:list")
+	// List team access tokens
+	RbacOrganizationScopeTeamListTokens = RbacOrganizationScope("team:list_tokens")
+	// Read team
+	RbacOrganizationScopeTeamRead = RbacOrganizationScope("team:read")
+	// Update team
+	RbacOrganizationScopeTeamUpdate = RbacOrganizationScope("team:update")
+	// Read templates
+	RbacOrganizationScopeTemplatesRead = RbacOrganizationScope("templates:read")
+	// Create template sources
+	RbacOrganizationScopeTemplatesSourceCreate = RbacOrganizationScope("templates_source:create")
+	// Delete template sources
+	RbacOrganizationScopeTemplatesSourceDelete = RbacOrganizationScope("templates_source:delete")
+	// Read template sources
+	RbacOrganizationScopeTemplatesSourceRead = RbacOrganizationScope("templates_source:read")
+	// Update template sources
+	RbacOrganizationScopeTemplatesSourceUpdate = RbacOrganizationScope("templates_source:update")
+)
+
+func (RbacOrganizationScope) ElementType() reflect.Type {
+	return reflect.TypeOf((*RbacOrganizationScope)(nil)).Elem()
+}
+
+func (e RbacOrganizationScope) ToRbacOrganizationScopeOutput() RbacOrganizationScopeOutput {
+	return pulumi.ToOutput(e).(RbacOrganizationScopeOutput)
+}
+
+func (e RbacOrganizationScope) ToRbacOrganizationScopeOutputWithContext(ctx context.Context) RbacOrganizationScopeOutput {
+	return pulumi.ToOutputWithContext(ctx, e).(RbacOrganizationScopeOutput)
+}
+
+func (e RbacOrganizationScope) ToRbacOrganizationScopePtrOutput() RbacOrganizationScopePtrOutput {
+	return e.ToRbacOrganizationScopePtrOutputWithContext(context.Background())
+}
+
+func (e RbacOrganizationScope) ToRbacOrganizationScopePtrOutputWithContext(ctx context.Context) RbacOrganizationScopePtrOutput {
+	return RbacOrganizationScope(e).ToRbacOrganizationScopeOutputWithContext(ctx).ToRbacOrganizationScopePtrOutputWithContext(ctx)
+}
+
+func (e RbacOrganizationScope) ToStringOutput() pulumi.StringOutput {
+	return pulumi.ToOutput(pulumi.String(e)).(pulumi.StringOutput)
+}
+
+func (e RbacOrganizationScope) ToStringOutputWithContext(ctx context.Context) pulumi.StringOutput {
+	return pulumi.ToOutputWithContext(ctx, pulumi.String(e)).(pulumi.StringOutput)
+}
+
+func (e RbacOrganizationScope) ToStringPtrOutput() pulumi.StringPtrOutput {
+	return pulumi.String(e).ToStringPtrOutputWithContext(context.Background())
+}
+
+func (e RbacOrganizationScope) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
+	return pulumi.String(e).ToStringOutputWithContext(ctx).ToStringPtrOutputWithContext(ctx)
+}
+
+type RbacOrganizationScopeOutput struct{ *pulumi.OutputState }
+
+func (RbacOrganizationScopeOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*RbacOrganizationScope)(nil)).Elem()
+}
+
+func (o RbacOrganizationScopeOutput) ToRbacOrganizationScopeOutput() RbacOrganizationScopeOutput {
+	return o
+}
+
+func (o RbacOrganizationScopeOutput) ToRbacOrganizationScopeOutputWithContext(ctx context.Context) RbacOrganizationScopeOutput {
+	return o
+}
+
+func (o RbacOrganizationScopeOutput) ToRbacOrganizationScopePtrOutput() RbacOrganizationScopePtrOutput {
+	return o.ToRbacOrganizationScopePtrOutputWithContext(context.Background())
+}
+
+func (o RbacOrganizationScopeOutput) ToRbacOrganizationScopePtrOutputWithContext(ctx context.Context) RbacOrganizationScopePtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v RbacOrganizationScope) *RbacOrganizationScope {
+		return &v
+	}).(RbacOrganizationScopePtrOutput)
+}
+
+func (o RbacOrganizationScopeOutput) ToStringOutput() pulumi.StringOutput {
+	return o.ToStringOutputWithContext(context.Background())
+}
+
+func (o RbacOrganizationScopeOutput) ToStringOutputWithContext(ctx context.Context) pulumi.StringOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e RbacOrganizationScope) string {
+		return string(e)
+	}).(pulumi.StringOutput)
+}
+
+func (o RbacOrganizationScopeOutput) ToStringPtrOutput() pulumi.StringPtrOutput {
+	return o.ToStringPtrOutputWithContext(context.Background())
+}
+
+func (o RbacOrganizationScopeOutput) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e RbacOrganizationScope) *string {
+		v := string(e)
+		return &v
+	}).(pulumi.StringPtrOutput)
+}
+
+type RbacOrganizationScopePtrOutput struct{ *pulumi.OutputState }
+
+func (RbacOrganizationScopePtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**RbacOrganizationScope)(nil)).Elem()
+}
+
+func (o RbacOrganizationScopePtrOutput) ToRbacOrganizationScopePtrOutput() RbacOrganizationScopePtrOutput {
+	return o
+}
+
+func (o RbacOrganizationScopePtrOutput) ToRbacOrganizationScopePtrOutputWithContext(ctx context.Context) RbacOrganizationScopePtrOutput {
+	return o
+}
+
+func (o RbacOrganizationScopePtrOutput) Elem() RbacOrganizationScopeOutput {
+	return o.ApplyT(func(v *RbacOrganizationScope) RbacOrganizationScope {
+		if v != nil {
+			return *v
+		}
+		var ret RbacOrganizationScope
+		return ret
+	}).(RbacOrganizationScopeOutput)
+}
+
+func (o RbacOrganizationScopePtrOutput) ToStringPtrOutput() pulumi.StringPtrOutput {
+	return o.ToStringPtrOutputWithContext(context.Background())
+}
+
+func (o RbacOrganizationScopePtrOutput) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e *RbacOrganizationScope) *string {
+		if e == nil {
+			return nil
+		}
+		v := string(*e)
+		return &v
+	}).(pulumi.StringPtrOutput)
+}
+
+// RbacOrganizationScopeInput is an input type that accepts values of the RbacOrganizationScope enum
+// A concrete instance of `RbacOrganizationScopeInput` can be one of the following:
+//
+//	RbacOrganizationScopeAgentPoolCreate
+//	RbacOrganizationScopeAgentPoolDelete
+//	RbacOrganizationScopeAgentPoolRead
+//	RbacOrganizationScopeAgentPoolUpdate
+//	RbacOrganizationScopeAgentTaskCreate
+//	RbacOrganizationScopeAuditLogsExport
+//	RbacOrganizationScopeAuditLogsRead
+//	RbacOrganizationScopeAuthPoliciesRead
+//	RbacOrganizationScopeAuthPoliciesUpdate
+//	RbacOrganizationScopeChangeGateCreate
+//	RbacOrganizationScopeChangeGateDelete
+//	RbacOrganizationScopeChangeGateUpdate
+//	RbacOrganizationScopeDeploymentsPause
+//	RbacOrganizationScopeDeploymentsRead
+//	RbacOrganizationScopeDeploymentsReadUsage
+//	RbacOrganizationScopeDeploymentsResume
+//	RbacOrganizationScopeEnvironmentCreate
+//	RbacOrganizationScopeEnvironmentListDeleted
+//	RbacOrganizationScopeEnvironmentRestoreDeleted
+//	RbacOrganizationScopeEnvironmentTagsList
+//	RbacOrganizationScopeGithubTeamCreate
+//	RbacOrganizationScopeInsightsAccountCreate
+//	RbacOrganizationScopeIntegrationsRead
+//	RbacOrganizationScopeIntegrationsUpdate
+//	RbacOrganizationScopeInvitesCreate
+//	RbacOrganizationScopeInvitesRead
+//	RbacOrganizationScopeOidcIssuersCreate
+//	RbacOrganizationScopeOidcIssuersDelete
+//	RbacOrganizationScopeOidcIssuersRead
+//	RbacOrganizationScopeOidcIssuersRegenerateThumbprints
+//	RbacOrganizationScopeOidcIssuersUpdate
+//	RbacOrganizationScopeOrgIntegrationsRead
+//	RbacOrganizationScopeOrgIntegrationsUpdate
+//	RbacOrganizationScopeOrgMemberAdd
+//	RbacOrganizationScopeOrgMemberDelete
+//	RbacOrganizationScopeOrgMemberRead
+//	RbacOrganizationScopeOrgMemberSetAdmin
+//	RbacOrganizationScopeOrgMemberUpdate
+//	RbacOrganizationScopeOrgMemberAccessRead
+//	RbacOrganizationScopeOrgRequestsRead
+//	RbacOrganizationScopeOrgRequestsUpdate
+//	RbacOrganizationScopeOrgTokenCreate
+//	RbacOrganizationScopeOrgTokenDelete
+//	RbacOrganizationScopeOrgTokenRead
+//	RbacOrganizationScopeOrganizationBilling
+//	RbacOrganizationScopeOrganizationChangeBackend
+//	RbacOrganizationScopeOrganizationDelete
+//	RbacOrganizationScopeOrganizationReadUsage
+//	RbacOrganizationScopeOrganizationRename
+//	RbacOrganizationScopeOrganizationTransferStacks
+//	RbacOrganizationScopeOrganizationUpdate
+//	RbacOrganizationScopeOrganizationWebhookCreate
+//	RbacOrganizationScopeOrganizationWebhookDelete
+//	RbacOrganizationScopeOrganizationWebhookRead
+//	RbacOrganizationScopeOrganizationWebhookUpdate
+//	RbacOrganizationScopePolicyGroupsCreate
+//	RbacOrganizationScopePolicyGroupsDelete
+//	RbacOrganizationScopePolicyGroupsRead
+//	RbacOrganizationScopePolicyGroupsUpdate
+//	RbacOrganizationScopePolicyPackCreate
+//	RbacOrganizationScopePolicyPackDelete
+//	RbacOrganizationScopePolicyPackRead
+//	RbacOrganizationScopePolicyPackUpdate
+//	RbacOrganizationScopePolicyResultsRead
+//	RbacOrganizationScopePolicyResultsUpdate
+//	RbacOrganizationScopeProjectDecrypt
+//	RbacOrganizationScopeProjectEncrypt
+//	RbacOrganizationScopeResourcesDashboard
+//	RbacOrganizationScopeResourcesIndex
+//	RbacOrganizationScopeResourcesSearch
+//	RbacOrganizationScopeRoleCreate
+//	RbacOrganizationScopeRoleDelete
+//	RbacOrganizationScopeRoleRead
+//	RbacOrganizationScopeRoleUpdate
+//	RbacOrganizationScopeSamlRead
+//	RbacOrganizationScopeSamlUpdate
+//	RbacOrganizationScopeScimDelete
+//	RbacOrganizationScopeScimRead
+//	RbacOrganizationScopeScimUpdate
+//	RbacOrganizationScopeStackCreate
+//	RbacOrganizationScopeStackListDeleted
+//	RbacOrganizationScopeStackRestoreDeleted
+//	RbacOrganizationScopeTagsRead
+//	RbacOrganizationScopeTeamCreate
+//	RbacOrganizationScopeTeamCreateToken
+//	RbacOrganizationScopeTeamDelete
+//	RbacOrganizationScopeTeamDeleteToken
+//	RbacOrganizationScopeTeamList
+//	RbacOrganizationScopeTeamListTokens
+//	RbacOrganizationScopeTeamRead
+//	RbacOrganizationScopeTeamUpdate
+//	RbacOrganizationScopeTemplatesRead
+//	RbacOrganizationScopeTemplatesSourceCreate
+//	RbacOrganizationScopeTemplatesSourceDelete
+//	RbacOrganizationScopeTemplatesSourceRead
+//	RbacOrganizationScopeTemplatesSourceUpdate
+type RbacOrganizationScopeInput interface {
+	pulumi.Input
+
+	ToRbacOrganizationScopeOutput() RbacOrganizationScopeOutput
+	ToRbacOrganizationScopeOutputWithContext(context.Context) RbacOrganizationScopeOutput
+}
+
+var rbacOrganizationScopePtrType = reflect.TypeOf((**RbacOrganizationScope)(nil)).Elem()
+
+type RbacOrganizationScopePtrInput interface {
+	pulumi.Input
+
+	ToRbacOrganizationScopePtrOutput() RbacOrganizationScopePtrOutput
+	ToRbacOrganizationScopePtrOutputWithContext(context.Context) RbacOrganizationScopePtrOutput
+}
+
+type rbacOrganizationScopePtr string
+
+func RbacOrganizationScopePtr(v string) RbacOrganizationScopePtrInput {
+	return (*rbacOrganizationScopePtr)(&v)
+}
+
+func (*rbacOrganizationScopePtr) ElementType() reflect.Type {
+	return rbacOrganizationScopePtrType
+}
+
+func (in *rbacOrganizationScopePtr) ToRbacOrganizationScopePtrOutput() RbacOrganizationScopePtrOutput {
+	return pulumi.ToOutput(in).(RbacOrganizationScopePtrOutput)
+}
+
+func (in *rbacOrganizationScopePtr) ToRbacOrganizationScopePtrOutputWithContext(ctx context.Context) RbacOrganizationScopePtrOutput {
+	return pulumi.ToOutputWithContext(ctx, in).(RbacOrganizationScopePtrOutput)
+}
+
+// RbacOrganizationScopeArrayInput is an input type that accepts RbacOrganizationScopeArray and RbacOrganizationScopeArrayOutput values.
+// You can construct a concrete instance of `RbacOrganizationScopeArrayInput` via:
+//
+//	RbacOrganizationScopeArray{ RbacOrganizationScopeArgs{...} }
+type RbacOrganizationScopeArrayInput interface {
+	pulumi.Input
+
+	ToRbacOrganizationScopeArrayOutput() RbacOrganizationScopeArrayOutput
+	ToRbacOrganizationScopeArrayOutputWithContext(context.Context) RbacOrganizationScopeArrayOutput
+}
+
+type RbacOrganizationScopeArray []RbacOrganizationScope
+
+func (RbacOrganizationScopeArray) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]RbacOrganizationScope)(nil)).Elem()
+}
+
+func (i RbacOrganizationScopeArray) ToRbacOrganizationScopeArrayOutput() RbacOrganizationScopeArrayOutput {
+	return i.ToRbacOrganizationScopeArrayOutputWithContext(context.Background())
+}
+
+func (i RbacOrganizationScopeArray) ToRbacOrganizationScopeArrayOutputWithContext(ctx context.Context) RbacOrganizationScopeArrayOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(RbacOrganizationScopeArrayOutput)
+}
+
+type RbacOrganizationScopeArrayOutput struct{ *pulumi.OutputState }
+
+func (RbacOrganizationScopeArrayOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]RbacOrganizationScope)(nil)).Elem()
+}
+
+func (o RbacOrganizationScopeArrayOutput) ToRbacOrganizationScopeArrayOutput() RbacOrganizationScopeArrayOutput {
+	return o
+}
+
+func (o RbacOrganizationScopeArrayOutput) ToRbacOrganizationScopeArrayOutputWithContext(ctx context.Context) RbacOrganizationScopeArrayOutput {
+	return o
+}
+
+func (o RbacOrganizationScopeArrayOutput) Index(i pulumi.IntInput) RbacOrganizationScopeOutput {
+	return pulumi.All(o, i).ApplyT(func(vs []interface{}) RbacOrganizationScope {
+		return vs[0].([]RbacOrganizationScope)[vs[1].(int)]
+	}).(RbacOrganizationScopeOutput)
+}
+
 type RbacPermission string
 
 const (
@@ -1267,6 +2302,466 @@ func (in *rbacPermissionPtr) ToRbacPermissionPtrOutput() RbacPermissionPtrOutput
 
 func (in *rbacPermissionPtr) ToRbacPermissionPtrOutputWithContext(ctx context.Context) RbacPermissionPtrOutput {
 	return pulumi.ToOutputWithContext(ctx, in).(RbacPermissionPtrOutput)
+}
+
+type RbacStackScope string
+
+const (
+	// Cancel stack update
+	RbacStackScopeStackCancelUpdate = RbacStackScope("stack:cancel_update")
+	// Create stack
+	RbacStackScopeStackCreate = RbacStackScope("stack:create")
+	// Decrypt stack
+	RbacStackScopeStackDecrypt = RbacStackScope("stack:decrypt")
+	// Delete stack
+	RbacStackScopeStackDelete = RbacStackScope("stack:delete")
+	// Encrypt stack
+	RbacStackScopeStackEncrypt = RbacStackScope("stack:encrypt")
+	// Export stack
+	RbacStackScopeStackExport = RbacStackScope("stack:export")
+	// Import stack
+	RbacStackScopeStackImport = RbacStackScope("stack:import")
+	// Read stack
+	RbacStackScopeStackRead = RbacStackScope("stack:read")
+	// Rename stack
+	RbacStackScopeStackRename = RbacStackScope("stack:rename")
+	// Transfer stack
+	RbacStackScopeStackTransfer = RbacStackScope("stack:transfer")
+	// Write stack
+	RbacStackScopeStackWrite = RbacStackScope("stack:write")
+	// Read stack teams
+	RbacStackScopeStackAccessRead = RbacStackScope("stack_access:read")
+	// Update stack teams
+	RbacStackScopeStackAccessUpdate = RbacStackScope("stack_access:update")
+	// Create deployment
+	RbacStackScopeStackDeploymentCreate = RbacStackScope("stack_deployment:create")
+	// Read deployment
+	RbacStackScopeStackDeploymentRead = RbacStackScope("stack_deployment:read")
+	// Encrypt deployment settings
+	RbacStackScopeStackDeploymentSettingsEncrypt = RbacStackScope("stack_deployment_settings:encrypt")
+	// Read deployment settings
+	RbacStackScopeStackDeploymentSettingsRead = RbacStackScope("stack_deployment_settings:read")
+	// Write deployment settings
+	RbacStackScopeStackDeploymentSettingsWrite = RbacStackScope("stack_deployment_settings:write")
+	// Create stack schedule
+	RbacStackScopeStackScheduleCreate = RbacStackScope("stack_schedule:create")
+	// Delete stack schedule
+	RbacStackScopeStackScheduleDelete = RbacStackScope("stack_schedule:delete")
+	// Pause stack schedule
+	RbacStackScopeStackSchedulePause = RbacStackScope("stack_schedule:pause")
+	// Read stack schedule
+	RbacStackScopeStackScheduleRead = RbacStackScope("stack_schedule:read")
+	// Resume stack schedule
+	RbacStackScopeStackScheduleResume = RbacStackScope("stack_schedule:resume")
+	// Update stack schedule
+	RbacStackScopeStackScheduleUpdate = RbacStackScope("stack_schedule:update")
+	// Update stack tags
+	RbacStackScopeStackTagsUpdate = RbacStackScope("stack_tags:update")
+	// Create stack webhook
+	RbacStackScopeStackWebhookCreate = RbacStackScope("stack_webhook:create")
+	// Delete stack webhook
+	RbacStackScopeStackWebhookDelete = RbacStackScope("stack_webhook:delete")
+	// Read stack webhook
+	RbacStackScopeStackWebhookRead = RbacStackScope("stack_webhook:read")
+	// Update stack webhook
+	RbacStackScopeStackWebhookUpdate = RbacStackScope("stack_webhook:update")
+)
+
+func (RbacStackScope) ElementType() reflect.Type {
+	return reflect.TypeOf((*RbacStackScope)(nil)).Elem()
+}
+
+func (e RbacStackScope) ToRbacStackScopeOutput() RbacStackScopeOutput {
+	return pulumi.ToOutput(e).(RbacStackScopeOutput)
+}
+
+func (e RbacStackScope) ToRbacStackScopeOutputWithContext(ctx context.Context) RbacStackScopeOutput {
+	return pulumi.ToOutputWithContext(ctx, e).(RbacStackScopeOutput)
+}
+
+func (e RbacStackScope) ToRbacStackScopePtrOutput() RbacStackScopePtrOutput {
+	return e.ToRbacStackScopePtrOutputWithContext(context.Background())
+}
+
+func (e RbacStackScope) ToRbacStackScopePtrOutputWithContext(ctx context.Context) RbacStackScopePtrOutput {
+	return RbacStackScope(e).ToRbacStackScopeOutputWithContext(ctx).ToRbacStackScopePtrOutputWithContext(ctx)
+}
+
+func (e RbacStackScope) ToStringOutput() pulumi.StringOutput {
+	return pulumi.ToOutput(pulumi.String(e)).(pulumi.StringOutput)
+}
+
+func (e RbacStackScope) ToStringOutputWithContext(ctx context.Context) pulumi.StringOutput {
+	return pulumi.ToOutputWithContext(ctx, pulumi.String(e)).(pulumi.StringOutput)
+}
+
+func (e RbacStackScope) ToStringPtrOutput() pulumi.StringPtrOutput {
+	return pulumi.String(e).ToStringPtrOutputWithContext(context.Background())
+}
+
+func (e RbacStackScope) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
+	return pulumi.String(e).ToStringOutputWithContext(ctx).ToStringPtrOutputWithContext(ctx)
+}
+
+type RbacStackScopeOutput struct{ *pulumi.OutputState }
+
+func (RbacStackScopeOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*RbacStackScope)(nil)).Elem()
+}
+
+func (o RbacStackScopeOutput) ToRbacStackScopeOutput() RbacStackScopeOutput {
+	return o
+}
+
+func (o RbacStackScopeOutput) ToRbacStackScopeOutputWithContext(ctx context.Context) RbacStackScopeOutput {
+	return o
+}
+
+func (o RbacStackScopeOutput) ToRbacStackScopePtrOutput() RbacStackScopePtrOutput {
+	return o.ToRbacStackScopePtrOutputWithContext(context.Background())
+}
+
+func (o RbacStackScopeOutput) ToRbacStackScopePtrOutputWithContext(ctx context.Context) RbacStackScopePtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v RbacStackScope) *RbacStackScope {
+		return &v
+	}).(RbacStackScopePtrOutput)
+}
+
+func (o RbacStackScopeOutput) ToStringOutput() pulumi.StringOutput {
+	return o.ToStringOutputWithContext(context.Background())
+}
+
+func (o RbacStackScopeOutput) ToStringOutputWithContext(ctx context.Context) pulumi.StringOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e RbacStackScope) string {
+		return string(e)
+	}).(pulumi.StringOutput)
+}
+
+func (o RbacStackScopeOutput) ToStringPtrOutput() pulumi.StringPtrOutput {
+	return o.ToStringPtrOutputWithContext(context.Background())
+}
+
+func (o RbacStackScopeOutput) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e RbacStackScope) *string {
+		v := string(e)
+		return &v
+	}).(pulumi.StringPtrOutput)
+}
+
+type RbacStackScopePtrOutput struct{ *pulumi.OutputState }
+
+func (RbacStackScopePtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**RbacStackScope)(nil)).Elem()
+}
+
+func (o RbacStackScopePtrOutput) ToRbacStackScopePtrOutput() RbacStackScopePtrOutput {
+	return o
+}
+
+func (o RbacStackScopePtrOutput) ToRbacStackScopePtrOutputWithContext(ctx context.Context) RbacStackScopePtrOutput {
+	return o
+}
+
+func (o RbacStackScopePtrOutput) Elem() RbacStackScopeOutput {
+	return o.ApplyT(func(v *RbacStackScope) RbacStackScope {
+		if v != nil {
+			return *v
+		}
+		var ret RbacStackScope
+		return ret
+	}).(RbacStackScopeOutput)
+}
+
+func (o RbacStackScopePtrOutput) ToStringPtrOutput() pulumi.StringPtrOutput {
+	return o.ToStringPtrOutputWithContext(context.Background())
+}
+
+func (o RbacStackScopePtrOutput) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e *RbacStackScope) *string {
+		if e == nil {
+			return nil
+		}
+		v := string(*e)
+		return &v
+	}).(pulumi.StringPtrOutput)
+}
+
+// RbacStackScopeInput is an input type that accepts values of the RbacStackScope enum
+// A concrete instance of `RbacStackScopeInput` can be one of the following:
+//
+//	RbacStackScopeStackCancelUpdate
+//	RbacStackScopeStackCreate
+//	RbacStackScopeStackDecrypt
+//	RbacStackScopeStackDelete
+//	RbacStackScopeStackEncrypt
+//	RbacStackScopeStackExport
+//	RbacStackScopeStackImport
+//	RbacStackScopeStackRead
+//	RbacStackScopeStackRename
+//	RbacStackScopeStackTransfer
+//	RbacStackScopeStackWrite
+//	RbacStackScopeStackAccessRead
+//	RbacStackScopeStackAccessUpdate
+//	RbacStackScopeStackDeploymentCreate
+//	RbacStackScopeStackDeploymentRead
+//	RbacStackScopeStackDeploymentSettingsEncrypt
+//	RbacStackScopeStackDeploymentSettingsRead
+//	RbacStackScopeStackDeploymentSettingsWrite
+//	RbacStackScopeStackScheduleCreate
+//	RbacStackScopeStackScheduleDelete
+//	RbacStackScopeStackSchedulePause
+//	RbacStackScopeStackScheduleRead
+//	RbacStackScopeStackScheduleResume
+//	RbacStackScopeStackScheduleUpdate
+//	RbacStackScopeStackTagsUpdate
+//	RbacStackScopeStackWebhookCreate
+//	RbacStackScopeStackWebhookDelete
+//	RbacStackScopeStackWebhookRead
+//	RbacStackScopeStackWebhookUpdate
+type RbacStackScopeInput interface {
+	pulumi.Input
+
+	ToRbacStackScopeOutput() RbacStackScopeOutput
+	ToRbacStackScopeOutputWithContext(context.Context) RbacStackScopeOutput
+}
+
+var rbacStackScopePtrType = reflect.TypeOf((**RbacStackScope)(nil)).Elem()
+
+type RbacStackScopePtrInput interface {
+	pulumi.Input
+
+	ToRbacStackScopePtrOutput() RbacStackScopePtrOutput
+	ToRbacStackScopePtrOutputWithContext(context.Context) RbacStackScopePtrOutput
+}
+
+type rbacStackScopePtr string
+
+func RbacStackScopePtr(v string) RbacStackScopePtrInput {
+	return (*rbacStackScopePtr)(&v)
+}
+
+func (*rbacStackScopePtr) ElementType() reflect.Type {
+	return rbacStackScopePtrType
+}
+
+func (in *rbacStackScopePtr) ToRbacStackScopePtrOutput() RbacStackScopePtrOutput {
+	return pulumi.ToOutput(in).(RbacStackScopePtrOutput)
+}
+
+func (in *rbacStackScopePtr) ToRbacStackScopePtrOutputWithContext(ctx context.Context) RbacStackScopePtrOutput {
+	return pulumi.ToOutputWithContext(ctx, in).(RbacStackScopePtrOutput)
+}
+
+// RbacStackScopeArrayInput is an input type that accepts RbacStackScopeArray and RbacStackScopeArrayOutput values.
+// You can construct a concrete instance of `RbacStackScopeArrayInput` via:
+//
+//	RbacStackScopeArray{ RbacStackScopeArgs{...} }
+type RbacStackScopeArrayInput interface {
+	pulumi.Input
+
+	ToRbacStackScopeArrayOutput() RbacStackScopeArrayOutput
+	ToRbacStackScopeArrayOutputWithContext(context.Context) RbacStackScopeArrayOutput
+}
+
+type RbacStackScopeArray []RbacStackScope
+
+func (RbacStackScopeArray) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]RbacStackScope)(nil)).Elem()
+}
+
+func (i RbacStackScopeArray) ToRbacStackScopeArrayOutput() RbacStackScopeArrayOutput {
+	return i.ToRbacStackScopeArrayOutputWithContext(context.Background())
+}
+
+func (i RbacStackScopeArray) ToRbacStackScopeArrayOutputWithContext(ctx context.Context) RbacStackScopeArrayOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(RbacStackScopeArrayOutput)
+}
+
+type RbacStackScopeArrayOutput struct{ *pulumi.OutputState }
+
+func (RbacStackScopeArrayOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]RbacStackScope)(nil)).Elem()
+}
+
+func (o RbacStackScopeArrayOutput) ToRbacStackScopeArrayOutput() RbacStackScopeArrayOutput {
+	return o
+}
+
+func (o RbacStackScopeArrayOutput) ToRbacStackScopeArrayOutputWithContext(ctx context.Context) RbacStackScopeArrayOutput {
+	return o
+}
+
+func (o RbacStackScopeArrayOutput) Index(i pulumi.IntInput) RbacStackScopeOutput {
+	return pulumi.All(o, i).ApplyT(func(vs []interface{}) RbacStackScope {
+		return vs[0].([]RbacStackScope)[vs[1].(int)]
+	}).(RbacStackScopeOutput)
+}
+
+type RoleTagOperator string
+
+const (
+	// Match entities whose tag equals the value (or that have the tag, when no value is set).
+	RoleTagOperatorEquals = RoleTagOperator("equals")
+	// Match entities whose tag does not equal the value (or that lack the tag, when no value is set).
+	RoleTagOperatorNotEquals = RoleTagOperator("notEquals")
+)
+
+func (RoleTagOperator) ElementType() reflect.Type {
+	return reflect.TypeOf((*RoleTagOperator)(nil)).Elem()
+}
+
+func (e RoleTagOperator) ToRoleTagOperatorOutput() RoleTagOperatorOutput {
+	return pulumi.ToOutput(e).(RoleTagOperatorOutput)
+}
+
+func (e RoleTagOperator) ToRoleTagOperatorOutputWithContext(ctx context.Context) RoleTagOperatorOutput {
+	return pulumi.ToOutputWithContext(ctx, e).(RoleTagOperatorOutput)
+}
+
+func (e RoleTagOperator) ToRoleTagOperatorPtrOutput() RoleTagOperatorPtrOutput {
+	return e.ToRoleTagOperatorPtrOutputWithContext(context.Background())
+}
+
+func (e RoleTagOperator) ToRoleTagOperatorPtrOutputWithContext(ctx context.Context) RoleTagOperatorPtrOutput {
+	return RoleTagOperator(e).ToRoleTagOperatorOutputWithContext(ctx).ToRoleTagOperatorPtrOutputWithContext(ctx)
+}
+
+func (e RoleTagOperator) ToStringOutput() pulumi.StringOutput {
+	return pulumi.ToOutput(pulumi.String(e)).(pulumi.StringOutput)
+}
+
+func (e RoleTagOperator) ToStringOutputWithContext(ctx context.Context) pulumi.StringOutput {
+	return pulumi.ToOutputWithContext(ctx, pulumi.String(e)).(pulumi.StringOutput)
+}
+
+func (e RoleTagOperator) ToStringPtrOutput() pulumi.StringPtrOutput {
+	return pulumi.String(e).ToStringPtrOutputWithContext(context.Background())
+}
+
+func (e RoleTagOperator) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
+	return pulumi.String(e).ToStringOutputWithContext(ctx).ToStringPtrOutputWithContext(ctx)
+}
+
+type RoleTagOperatorOutput struct{ *pulumi.OutputState }
+
+func (RoleTagOperatorOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*RoleTagOperator)(nil)).Elem()
+}
+
+func (o RoleTagOperatorOutput) ToRoleTagOperatorOutput() RoleTagOperatorOutput {
+	return o
+}
+
+func (o RoleTagOperatorOutput) ToRoleTagOperatorOutputWithContext(ctx context.Context) RoleTagOperatorOutput {
+	return o
+}
+
+func (o RoleTagOperatorOutput) ToRoleTagOperatorPtrOutput() RoleTagOperatorPtrOutput {
+	return o.ToRoleTagOperatorPtrOutputWithContext(context.Background())
+}
+
+func (o RoleTagOperatorOutput) ToRoleTagOperatorPtrOutputWithContext(ctx context.Context) RoleTagOperatorPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v RoleTagOperator) *RoleTagOperator {
+		return &v
+	}).(RoleTagOperatorPtrOutput)
+}
+
+func (o RoleTagOperatorOutput) ToStringOutput() pulumi.StringOutput {
+	return o.ToStringOutputWithContext(context.Background())
+}
+
+func (o RoleTagOperatorOutput) ToStringOutputWithContext(ctx context.Context) pulumi.StringOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e RoleTagOperator) string {
+		return string(e)
+	}).(pulumi.StringOutput)
+}
+
+func (o RoleTagOperatorOutput) ToStringPtrOutput() pulumi.StringPtrOutput {
+	return o.ToStringPtrOutputWithContext(context.Background())
+}
+
+func (o RoleTagOperatorOutput) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e RoleTagOperator) *string {
+		v := string(e)
+		return &v
+	}).(pulumi.StringPtrOutput)
+}
+
+type RoleTagOperatorPtrOutput struct{ *pulumi.OutputState }
+
+func (RoleTagOperatorPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**RoleTagOperator)(nil)).Elem()
+}
+
+func (o RoleTagOperatorPtrOutput) ToRoleTagOperatorPtrOutput() RoleTagOperatorPtrOutput {
+	return o
+}
+
+func (o RoleTagOperatorPtrOutput) ToRoleTagOperatorPtrOutputWithContext(ctx context.Context) RoleTagOperatorPtrOutput {
+	return o
+}
+
+func (o RoleTagOperatorPtrOutput) Elem() RoleTagOperatorOutput {
+	return o.ApplyT(func(v *RoleTagOperator) RoleTagOperator {
+		if v != nil {
+			return *v
+		}
+		var ret RoleTagOperator
+		return ret
+	}).(RoleTagOperatorOutput)
+}
+
+func (o RoleTagOperatorPtrOutput) ToStringPtrOutput() pulumi.StringPtrOutput {
+	return o.ToStringPtrOutputWithContext(context.Background())
+}
+
+func (o RoleTagOperatorPtrOutput) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e *RoleTagOperator) *string {
+		if e == nil {
+			return nil
+		}
+		v := string(*e)
+		return &v
+	}).(pulumi.StringPtrOutput)
+}
+
+// RoleTagOperatorInput is an input type that accepts values of the RoleTagOperator enum
+// A concrete instance of `RoleTagOperatorInput` can be one of the following:
+//
+//	RoleTagOperatorEquals
+//	RoleTagOperatorNotEquals
+type RoleTagOperatorInput interface {
+	pulumi.Input
+
+	ToRoleTagOperatorOutput() RoleTagOperatorOutput
+	ToRoleTagOperatorOutputWithContext(context.Context) RoleTagOperatorOutput
+}
+
+var roleTagOperatorPtrType = reflect.TypeOf((**RoleTagOperator)(nil)).Elem()
+
+type RoleTagOperatorPtrInput interface {
+	pulumi.Input
+
+	ToRoleTagOperatorPtrOutput() RoleTagOperatorPtrOutput
+	ToRoleTagOperatorPtrOutputWithContext(context.Context) RoleTagOperatorPtrOutput
+}
+
+type roleTagOperatorPtr string
+
+func RoleTagOperatorPtr(v string) RoleTagOperatorPtrInput {
+	return (*roleTagOperatorPtr)(&v)
+}
+
+func (*roleTagOperatorPtr) ElementType() reflect.Type {
+	return roleTagOperatorPtrType
+}
+
+func (in *roleTagOperatorPtr) ToRoleTagOperatorPtrOutput() RoleTagOperatorPtrOutput {
+	return pulumi.ToOutput(in).(RoleTagOperatorPtrOutput)
+}
+
+func (in *roleTagOperatorPtr) ToRoleTagOperatorPtrOutputWithContext(ctx context.Context) RoleTagOperatorPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, in).(RoleTagOperatorPtrOutput)
 }
 
 type ScanSchedule string
@@ -2522,8 +4017,22 @@ func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*EnvironmentPermissionPtrInput)(nil)).Elem(), EnvironmentPermission("none"))
 	pulumi.RegisterInputType(reflect.TypeOf((*PulumiOperationInput)(nil)).Elem(), PulumiOperation("update"))
 	pulumi.RegisterInputType(reflect.TypeOf((*PulumiOperationPtrInput)(nil)).Elem(), PulumiOperation("update"))
+	pulumi.RegisterInputType(reflect.TypeOf((*RbacEnvironmentScopeInput)(nil)).Elem(), RbacEnvironmentScope("change_gate:create"))
+	pulumi.RegisterInputType(reflect.TypeOf((*RbacEnvironmentScopePtrInput)(nil)).Elem(), RbacEnvironmentScope("change_gate:create"))
+	pulumi.RegisterInputType(reflect.TypeOf((*RbacEnvironmentScopeArrayInput)(nil)).Elem(), RbacEnvironmentScopeArray{})
+	pulumi.RegisterInputType(reflect.TypeOf((*RbacInsightsAccountScopeInput)(nil)).Elem(), RbacInsightsAccountScope("insights_account:delete"))
+	pulumi.RegisterInputType(reflect.TypeOf((*RbacInsightsAccountScopePtrInput)(nil)).Elem(), RbacInsightsAccountScope("insights_account:delete"))
+	pulumi.RegisterInputType(reflect.TypeOf((*RbacInsightsAccountScopeArrayInput)(nil)).Elem(), RbacInsightsAccountScopeArray{})
+	pulumi.RegisterInputType(reflect.TypeOf((*RbacOrganizationScopeInput)(nil)).Elem(), RbacOrganizationScope("agent_pool:create"))
+	pulumi.RegisterInputType(reflect.TypeOf((*RbacOrganizationScopePtrInput)(nil)).Elem(), RbacOrganizationScope("agent_pool:create"))
+	pulumi.RegisterInputType(reflect.TypeOf((*RbacOrganizationScopeArrayInput)(nil)).Elem(), RbacOrganizationScopeArray{})
 	pulumi.RegisterInputType(reflect.TypeOf((*RbacPermissionInput)(nil)).Elem(), RbacPermission("environment:read"))
 	pulumi.RegisterInputType(reflect.TypeOf((*RbacPermissionPtrInput)(nil)).Elem(), RbacPermission("environment:read"))
+	pulumi.RegisterInputType(reflect.TypeOf((*RbacStackScopeInput)(nil)).Elem(), RbacStackScope("stack:cancel_update"))
+	pulumi.RegisterInputType(reflect.TypeOf((*RbacStackScopePtrInput)(nil)).Elem(), RbacStackScope("stack:cancel_update"))
+	pulumi.RegisterInputType(reflect.TypeOf((*RbacStackScopeArrayInput)(nil)).Elem(), RbacStackScopeArray{})
+	pulumi.RegisterInputType(reflect.TypeOf((*RoleTagOperatorInput)(nil)).Elem(), RoleTagOperator("equals"))
+	pulumi.RegisterInputType(reflect.TypeOf((*RoleTagOperatorPtrInput)(nil)).Elem(), RoleTagOperator("equals"))
 	pulumi.RegisterInputType(reflect.TypeOf((*ScanScheduleInput)(nil)).Elem(), ScanSchedule("none"))
 	pulumi.RegisterInputType(reflect.TypeOf((*ScanSchedulePtrInput)(nil)).Elem(), ScanSchedule("none"))
 	pulumi.RegisterInputType(reflect.TypeOf((*TargetActionTypeInput)(nil)).Elem(), TargetActionType("update"))
@@ -2552,8 +4061,22 @@ func init() {
 	pulumi.RegisterOutputType(EnvironmentPermissionPtrOutput{})
 	pulumi.RegisterOutputType(PulumiOperationOutput{})
 	pulumi.RegisterOutputType(PulumiOperationPtrOutput{})
+	pulumi.RegisterOutputType(RbacEnvironmentScopeOutput{})
+	pulumi.RegisterOutputType(RbacEnvironmentScopePtrOutput{})
+	pulumi.RegisterOutputType(RbacEnvironmentScopeArrayOutput{})
+	pulumi.RegisterOutputType(RbacInsightsAccountScopeOutput{})
+	pulumi.RegisterOutputType(RbacInsightsAccountScopePtrOutput{})
+	pulumi.RegisterOutputType(RbacInsightsAccountScopeArrayOutput{})
+	pulumi.RegisterOutputType(RbacOrganizationScopeOutput{})
+	pulumi.RegisterOutputType(RbacOrganizationScopePtrOutput{})
+	pulumi.RegisterOutputType(RbacOrganizationScopeArrayOutput{})
 	pulumi.RegisterOutputType(RbacPermissionOutput{})
 	pulumi.RegisterOutputType(RbacPermissionPtrOutput{})
+	pulumi.RegisterOutputType(RbacStackScopeOutput{})
+	pulumi.RegisterOutputType(RbacStackScopePtrOutput{})
+	pulumi.RegisterOutputType(RbacStackScopeArrayOutput{})
+	pulumi.RegisterOutputType(RoleTagOperatorOutput{})
+	pulumi.RegisterOutputType(RoleTagOperatorPtrOutput{})
 	pulumi.RegisterOutputType(ScanScheduleOutput{})
 	pulumi.RegisterOutputType(ScanSchedulePtrOutput{})
 	pulumi.RegisterOutputType(TargetActionTypeOutput{})

@@ -64,6 +64,16 @@ __all__ = [
     'PolicyPackComplianceFrameworkInputArgsDict',
     'PolicyPackPolicyInputArgs',
     'PolicyPackPolicyInputArgsDict',
+    'RoleEnvironmentRule',
+    'RoleEnvironmentRuleDict',
+    'RoleInsightsAccountRule',
+    'RoleInsightsAccountRuleDict',
+    'RolePermissionSetRef',
+    'RolePermissionSetRefDict',
+    'RoleStackRule',
+    'RoleStackRuleDict',
+    'RoleTagCondition',
+    'RoleTagConditionDict',
     'TemplateSourceDestinationArgs',
     'TemplateSourceDestinationArgsDict',
 ]
@@ -2169,6 +2179,448 @@ class PolicyPackPolicyInputArgs:
     @url.setter
     def url(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "url", value)
+
+
+class RoleEnvironmentRuleDict(TypedDict):
+    all: NotRequired[_builtins.bool]
+    """
+    Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+    """
+    id: NotRequired[_builtins.str]
+    """
+    Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or an Insights account's `insightsAccountId`.
+    """
+    permission_sets: NotRequired[Sequence['RolePermissionSetRefDict']]
+    """
+    Permission sets to grant, typically the output of `getOrganizationPermissionSet`. Each set's `resourceType` must match this rule's entity type. Pulumi Cloud accepts permission sets only in a policy: see `buildRolePermissions`.
+    """
+    scopes: NotRequired[Sequence['RbacEnvironmentScope']]
+    """
+    Environment scopes to grant on the selected environments.
+    """
+    tags: NotRequired[Sequence['RoleTagConditionDict']]
+    """
+    Apply to entities whose tags match every condition.
+    """
+
+@pulumi.input_type
+class RoleEnvironmentRule:
+    def __init__(__self__, *,
+                 all: Optional[_builtins.bool] = None,
+                 id: Optional[_builtins.str] = None,
+                 permission_sets: Optional[Sequence['RolePermissionSetRef']] = None,
+                 scopes: Optional[Sequence['RbacEnvironmentScope']] = None,
+                 tags: Optional[Sequence['RoleTagCondition']] = None):
+        """
+        :param _builtins.bool all: Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+        :param _builtins.str id: Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or an Insights account's `insightsAccountId`.
+        :param Sequence['RolePermissionSetRef'] permission_sets: Permission sets to grant, typically the output of `getOrganizationPermissionSet`. Each set's `resourceType` must match this rule's entity type. Pulumi Cloud accepts permission sets only in a policy: see `buildRolePermissions`.
+        :param Sequence['RbacEnvironmentScope'] scopes: Environment scopes to grant on the selected environments.
+        :param Sequence['RoleTagCondition'] tags: Apply to entities whose tags match every condition.
+        """
+        if all is not None:
+            pulumi.set(__self__, "all", all)
+        if id is not None:
+            pulumi.set(__self__, "id", id)
+        if permission_sets is not None:
+            pulumi.set(__self__, "permission_sets", permission_sets)
+        if scopes is not None:
+            pulumi.set(__self__, "scopes", scopes)
+        if tags is not None:
+            pulumi.set(__self__, "tags", tags)
+
+    @_builtins.property
+    @pulumi.getter
+    def all(self) -> Optional[_builtins.bool]:
+        """
+        Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+        """
+        return pulumi.get(self, "all")
+
+    @all.setter
+    def all(self, value: Optional[_builtins.bool]):
+        pulumi.set(self, "all", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def id(self) -> Optional[_builtins.str]:
+        """
+        Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or an Insights account's `insightsAccountId`.
+        """
+        return pulumi.get(self, "id")
+
+    @id.setter
+    def id(self, value: Optional[_builtins.str]):
+        pulumi.set(self, "id", value)
+
+    @_builtins.property
+    @pulumi.getter(name="permissionSets")
+    def permission_sets(self) -> Optional[Sequence['RolePermissionSetRef']]:
+        """
+        Permission sets to grant, typically the output of `getOrganizationPermissionSet`. Each set's `resourceType` must match this rule's entity type. Pulumi Cloud accepts permission sets only in a policy: see `buildRolePermissions`.
+        """
+        return pulumi.get(self, "permission_sets")
+
+    @permission_sets.setter
+    def permission_sets(self, value: Optional[Sequence['RolePermissionSetRef']]):
+        pulumi.set(self, "permission_sets", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def scopes(self) -> Optional[Sequence['RbacEnvironmentScope']]:
+        """
+        Environment scopes to grant on the selected environments.
+        """
+        return pulumi.get(self, "scopes")
+
+    @scopes.setter
+    def scopes(self, value: Optional[Sequence['RbacEnvironmentScope']]):
+        pulumi.set(self, "scopes", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def tags(self) -> Optional[Sequence['RoleTagCondition']]:
+        """
+        Apply to entities whose tags match every condition.
+        """
+        return pulumi.get(self, "tags")
+
+    @tags.setter
+    def tags(self, value: Optional[Sequence['RoleTagCondition']]):
+        pulumi.set(self, "tags", value)
+
+
+class RoleInsightsAccountRuleDict(TypedDict):
+    all: NotRequired[_builtins.bool]
+    """
+    Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+    """
+    id: NotRequired[_builtins.str]
+    """
+    Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or an Insights account's `insightsAccountId`.
+    """
+    permission_sets: NotRequired[Sequence['RolePermissionSetRefDict']]
+    """
+    Permission sets to grant, typically the output of `getOrganizationPermissionSet`. Each set's `resourceType` must match this rule's entity type. Pulumi Cloud accepts permission sets only in a policy: see `buildRolePermissions`.
+    """
+    scopes: NotRequired[Sequence['RbacInsightsAccountScope']]
+    """
+    Insights account scopes to grant on the selected accounts.
+    """
+    tags: NotRequired[Sequence['RoleTagConditionDict']]
+    """
+    Apply to entities whose tags match every condition.
+    """
+
+@pulumi.input_type
+class RoleInsightsAccountRule:
+    def __init__(__self__, *,
+                 all: Optional[_builtins.bool] = None,
+                 id: Optional[_builtins.str] = None,
+                 permission_sets: Optional[Sequence['RolePermissionSetRef']] = None,
+                 scopes: Optional[Sequence['RbacInsightsAccountScope']] = None,
+                 tags: Optional[Sequence['RoleTagCondition']] = None):
+        """
+        :param _builtins.bool all: Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+        :param _builtins.str id: Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or an Insights account's `insightsAccountId`.
+        :param Sequence['RolePermissionSetRef'] permission_sets: Permission sets to grant, typically the output of `getOrganizationPermissionSet`. Each set's `resourceType` must match this rule's entity type. Pulumi Cloud accepts permission sets only in a policy: see `buildRolePermissions`.
+        :param Sequence['RbacInsightsAccountScope'] scopes: Insights account scopes to grant on the selected accounts.
+        :param Sequence['RoleTagCondition'] tags: Apply to entities whose tags match every condition.
+        """
+        if all is not None:
+            pulumi.set(__self__, "all", all)
+        if id is not None:
+            pulumi.set(__self__, "id", id)
+        if permission_sets is not None:
+            pulumi.set(__self__, "permission_sets", permission_sets)
+        if scopes is not None:
+            pulumi.set(__self__, "scopes", scopes)
+        if tags is not None:
+            pulumi.set(__self__, "tags", tags)
+
+    @_builtins.property
+    @pulumi.getter
+    def all(self) -> Optional[_builtins.bool]:
+        """
+        Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+        """
+        return pulumi.get(self, "all")
+
+    @all.setter
+    def all(self, value: Optional[_builtins.bool]):
+        pulumi.set(self, "all", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def id(self) -> Optional[_builtins.str]:
+        """
+        Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or an Insights account's `insightsAccountId`.
+        """
+        return pulumi.get(self, "id")
+
+    @id.setter
+    def id(self, value: Optional[_builtins.str]):
+        pulumi.set(self, "id", value)
+
+    @_builtins.property
+    @pulumi.getter(name="permissionSets")
+    def permission_sets(self) -> Optional[Sequence['RolePermissionSetRef']]:
+        """
+        Permission sets to grant, typically the output of `getOrganizationPermissionSet`. Each set's `resourceType` must match this rule's entity type. Pulumi Cloud accepts permission sets only in a policy: see `buildRolePermissions`.
+        """
+        return pulumi.get(self, "permission_sets")
+
+    @permission_sets.setter
+    def permission_sets(self, value: Optional[Sequence['RolePermissionSetRef']]):
+        pulumi.set(self, "permission_sets", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def scopes(self) -> Optional[Sequence['RbacInsightsAccountScope']]:
+        """
+        Insights account scopes to grant on the selected accounts.
+        """
+        return pulumi.get(self, "scopes")
+
+    @scopes.setter
+    def scopes(self, value: Optional[Sequence['RbacInsightsAccountScope']]):
+        pulumi.set(self, "scopes", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def tags(self) -> Optional[Sequence['RoleTagCondition']]:
+        """
+        Apply to entities whose tags match every condition.
+        """
+        return pulumi.get(self, "tags")
+
+    @tags.setter
+    def tags(self, value: Optional[Sequence['RoleTagCondition']]):
+        pulumi.set(self, "tags", value)
+
+
+class RolePermissionSetRefDict(TypedDict):
+    permission_set_id: _builtins.str
+    """
+    The permission set's ID.
+    """
+    resource_type: _builtins.str
+    """
+    The permission set's entity type: `stack`, `environment`, `insights-account`, or `global` for organization-level sets. It must match the rule list the set is used in.
+    """
+
+@pulumi.input_type
+class RolePermissionSetRef:
+    def __init__(__self__, *,
+                 permission_set_id: _builtins.str,
+                 resource_type: _builtins.str):
+        """
+        :param _builtins.str permission_set_id: The permission set's ID.
+        :param _builtins.str resource_type: The permission set's entity type: `stack`, `environment`, `insights-account`, or `global` for organization-level sets. It must match the rule list the set is used in.
+        """
+        pulumi.set(__self__, "permission_set_id", permission_set_id)
+        pulumi.set(__self__, "resource_type", resource_type)
+
+    @_builtins.property
+    @pulumi.getter(name="permissionSetId")
+    def permission_set_id(self) -> _builtins.str:
+        """
+        The permission set's ID.
+        """
+        return pulumi.get(self, "permission_set_id")
+
+    @permission_set_id.setter
+    def permission_set_id(self, value: _builtins.str):
+        pulumi.set(self, "permission_set_id", value)
+
+    @_builtins.property
+    @pulumi.getter(name="resourceType")
+    def resource_type(self) -> _builtins.str:
+        """
+        The permission set's entity type: `stack`, `environment`, `insights-account`, or `global` for organization-level sets. It must match the rule list the set is used in.
+        """
+        return pulumi.get(self, "resource_type")
+
+    @resource_type.setter
+    def resource_type(self, value: _builtins.str):
+        pulumi.set(self, "resource_type", value)
+
+
+class RoleStackRuleDict(TypedDict):
+    all: NotRequired[_builtins.bool]
+    """
+    Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+    """
+    id: NotRequired[_builtins.str]
+    """
+    Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or an Insights account's `insightsAccountId`.
+    """
+    permission_sets: NotRequired[Sequence['RolePermissionSetRefDict']]
+    """
+    Permission sets to grant, typically the output of `getOrganizationPermissionSet`. Each set's `resourceType` must match this rule's entity type. Pulumi Cloud accepts permission sets only in a policy: see `buildRolePermissions`.
+    """
+    scopes: NotRequired[Sequence['RbacStackScope']]
+    """
+    Stack scopes to grant on the selected stacks.
+    """
+    tags: NotRequired[Sequence['RoleTagConditionDict']]
+    """
+    Apply to entities whose tags match every condition.
+    """
+
+@pulumi.input_type
+class RoleStackRule:
+    def __init__(__self__, *,
+                 all: Optional[_builtins.bool] = None,
+                 id: Optional[_builtins.str] = None,
+                 permission_sets: Optional[Sequence['RolePermissionSetRef']] = None,
+                 scopes: Optional[Sequence['RbacStackScope']] = None,
+                 tags: Optional[Sequence['RoleTagCondition']] = None):
+        """
+        :param _builtins.bool all: Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+        :param _builtins.str id: Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or an Insights account's `insightsAccountId`.
+        :param Sequence['RolePermissionSetRef'] permission_sets: Permission sets to grant, typically the output of `getOrganizationPermissionSet`. Each set's `resourceType` must match this rule's entity type. Pulumi Cloud accepts permission sets only in a policy: see `buildRolePermissions`.
+        :param Sequence['RbacStackScope'] scopes: Stack scopes to grant on the selected stacks.
+        :param Sequence['RoleTagCondition'] tags: Apply to entities whose tags match every condition.
+        """
+        if all is not None:
+            pulumi.set(__self__, "all", all)
+        if id is not None:
+            pulumi.set(__self__, "id", id)
+        if permission_sets is not None:
+            pulumi.set(__self__, "permission_sets", permission_sets)
+        if scopes is not None:
+            pulumi.set(__self__, "scopes", scopes)
+        if tags is not None:
+            pulumi.set(__self__, "tags", tags)
+
+    @_builtins.property
+    @pulumi.getter
+    def all(self) -> Optional[_builtins.bool]:
+        """
+        Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+        """
+        return pulumi.get(self, "all")
+
+    @all.setter
+    def all(self, value: Optional[_builtins.bool]):
+        pulumi.set(self, "all", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def id(self) -> Optional[_builtins.str]:
+        """
+        Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or an Insights account's `insightsAccountId`.
+        """
+        return pulumi.get(self, "id")
+
+    @id.setter
+    def id(self, value: Optional[_builtins.str]):
+        pulumi.set(self, "id", value)
+
+    @_builtins.property
+    @pulumi.getter(name="permissionSets")
+    def permission_sets(self) -> Optional[Sequence['RolePermissionSetRef']]:
+        """
+        Permission sets to grant, typically the output of `getOrganizationPermissionSet`. Each set's `resourceType` must match this rule's entity type. Pulumi Cloud accepts permission sets only in a policy: see `buildRolePermissions`.
+        """
+        return pulumi.get(self, "permission_sets")
+
+    @permission_sets.setter
+    def permission_sets(self, value: Optional[Sequence['RolePermissionSetRef']]):
+        pulumi.set(self, "permission_sets", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def scopes(self) -> Optional[Sequence['RbacStackScope']]:
+        """
+        Stack scopes to grant on the selected stacks.
+        """
+        return pulumi.get(self, "scopes")
+
+    @scopes.setter
+    def scopes(self, value: Optional[Sequence['RbacStackScope']]):
+        pulumi.set(self, "scopes", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def tags(self) -> Optional[Sequence['RoleTagCondition']]:
+        """
+        Apply to entities whose tags match every condition.
+        """
+        return pulumi.get(self, "tags")
+
+    @tags.setter
+    def tags(self, value: Optional[Sequence['RoleTagCondition']]):
+        pulumi.set(self, "tags", value)
+
+
+class RoleTagConditionDict(TypedDict):
+    key: _builtins.str
+    """
+    The tag key.
+    """
+    operator: NotRequired['RoleTagOperator']
+    """
+    How the tag is compared. Defaults to `equals`.
+    """
+    value: NotRequired[_builtins.str]
+    """
+    The tag value. When omitted, the condition matches on whether the tag is present.
+    """
+
+@pulumi.input_type
+class RoleTagCondition:
+    def __init__(__self__, *,
+                 key: _builtins.str,
+                 operator: Optional['RoleTagOperator'] = None,
+                 value: Optional[_builtins.str] = None):
+        """
+        :param _builtins.str key: The tag key.
+        :param 'RoleTagOperator' operator: How the tag is compared. Defaults to `equals`.
+        :param _builtins.str value: The tag value. When omitted, the condition matches on whether the tag is present.
+        """
+        pulumi.set(__self__, "key", key)
+        if operator is not None:
+            pulumi.set(__self__, "operator", operator)
+        if value is not None:
+            pulumi.set(__self__, "value", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def key(self) -> _builtins.str:
+        """
+        The tag key.
+        """
+        return pulumi.get(self, "key")
+
+    @key.setter
+    def key(self, value: _builtins.str):
+        pulumi.set(self, "key", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def operator(self) -> Optional['RoleTagOperator']:
+        """
+        How the tag is compared. Defaults to `equals`.
+        """
+        return pulumi.get(self, "operator")
+
+    @operator.setter
+    def operator(self, value: Optional['RoleTagOperator']):
+        pulumi.set(self, "operator", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def value(self) -> Optional[_builtins.str]:
+        """
+        The tag value. When omitted, the condition matches on whether the tag is present.
+        """
+        return pulumi.get(self, "value")
+
+    @value.setter
+    def value(self, value: Optional[_builtins.str]):
+        pulumi.set(self, "value", value)
 
 
 class TemplateSourceDestinationArgsDict(TypedDict):

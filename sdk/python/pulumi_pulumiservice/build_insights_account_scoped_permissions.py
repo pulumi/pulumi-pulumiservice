@@ -50,7 +50,7 @@ def build_insights_account_scoped_permissions(insights_account_id: Optional[_bui
                                               permissions: Optional[Sequence[_builtins.str]] = None,
                                               opts: Optional[pulumi.InvokeOptions] = None) -> AwaitableBuildInsightsAccountScopedPermissionsResult:
     """
-    Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named insights account. Pair with `InsightsAccount.insightsAccountId` (or the `getInsightsAccount` data source). The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls the output of each helper.
+    Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named insights account. Pair with `InsightsAccount.insightsAccountId` (or the `getInsightsAccount` data source). The result is directly assignable to `OrganizationRole.permissions`. To combine it with other grants in a single role, pass it to `buildRolePermissions` in `additionalEntries`.
 
     :param _builtins.str insights_account_id: The target insights account's identifier. Use the `insightsAccountId` output of an `InsightsAccount` resource or the `getInsightsAccount` data source.
     :param Sequence[_builtins.str] permissions: The set of `insights-account:*` scopes to grant on the target account. Discover valid scope names via the `getOrganizationRoleScopes` data source.
@@ -67,7 +67,7 @@ def build_insights_account_scoped_permissions_output(insights_account_id: pulumi
                                                      permissions: pulumi.Input[Optional[Sequence[_builtins.str]]] = None,
                                                      opts: Optional[Union[pulumi.InvokeOptions, pulumi.InvokeOutputOptions]] = None) -> pulumi.Output[BuildInsightsAccountScopedPermissionsResult]:
     """
-    Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named insights account. Pair with `InsightsAccount.insightsAccountId` (or the `getInsightsAccount` data source). The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls the output of each helper.
+    Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named insights account. Pair with `InsightsAccount.insightsAccountId` (or the `getInsightsAccount` data source). The result is directly assignable to `OrganizationRole.permissions`. To combine it with other grants in a single role, pass it to `buildRolePermissions` in `additionalEntries`.
 
     :param _builtins.str insights_account_id: The target insights account's identifier. Use the `insightsAccountId` output of an `InsightsAccount` resource or the `getInsightsAccount` data source.
     :param Sequence[_builtins.str] permissions: The set of `insights-account:*` scopes to grant on the target account. Discover valid scope names via the `getOrganizationRoleScopes` data source.

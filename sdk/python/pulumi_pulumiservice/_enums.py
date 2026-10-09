@@ -13,7 +13,12 @@ __all__ = [
     'CloudProvider',
     'EnvironmentPermission',
     'PulumiOperation',
+    'RbacEnvironmentScope',
+    'RbacInsightsAccountScope',
+    'RbacOrganizationScope',
     'RbacPermission',
+    'RbacStackScope',
+    'RoleTagOperator',
     'ScanSchedule',
     'TargetActionType',
     'TeamStackPermissionScope',
@@ -135,6 +140,574 @@ class PulumiOperation(_builtins.str, Enum):
     """
 
 
+@pulumi.type_token("pulumiservice:index:RbacEnvironmentScope")
+class RbacEnvironmentScope(_builtins.str, Enum):
+    CHANGE_GATE_CREATE = "change_gate:create"
+    """
+    Create approval rules
+    """
+    CHANGE_GATE_DELETE = "change_gate:delete"
+    """
+    Delete approval rules
+    """
+    CHANGE_GATE_UPDATE = "change_gate:update"
+    """
+    Update approval rules
+    """
+    ENVIRONMENT_CLONE = "environment:clone"
+    """
+    Clone environment
+    """
+    ENVIRONMENT_DELETE = "environment:delete"
+    """
+    Delete environment
+    """
+    ENVIRONMENT_OPEN = "environment:open"
+    """
+    Open and decrypt environment
+    """
+    ENVIRONMENT_READ = "environment:read"
+    """
+    Read environment
+    """
+    ENVIRONMENT_ROTATE = "environment:rotate"
+    """
+    Rotates secrets in an environment
+    """
+    ENVIRONMENT_ROTATE_HISTORY = "environment:rotate_history"
+    """
+    List secret rotation history of an environment
+    """
+    ENVIRONMENT_WRITE = "environment:write"
+    """
+    Write environment
+    """
+    ENVIRONMENT_SCHEDULE_CREATE = "environment_schedule:create"
+    """
+    Creates a new environment schedule
+    """
+    ENVIRONMENT_SCHEDULE_DELETE = "environment_schedule:delete"
+    """
+    Deletes an environment schedule
+    """
+    ENVIRONMENT_SCHEDULE_PAUSE = "environment_schedule:pause"
+    """
+    Pauses an environment schedule
+    """
+    ENVIRONMENT_SCHEDULE_READ = "environment_schedule:read"
+    """
+    Reads an environment schedule
+    """
+    ENVIRONMENT_SCHEDULE_RESUME = "environment_schedule:resume"
+    """
+    Resumes an environment schedule
+    """
+    ENVIRONMENT_SCHEDULE_UPDATE = "environment_schedule:update"
+    """
+    Updates an environment schedule
+    """
+    ENVIRONMENT_SETTINGS_READ = "environment_settings:read"
+    """
+    Read environment settings
+    """
+    ENVIRONMENT_SETTINGS_UPDATE = "environment_settings:update"
+    """
+    Update environment settings
+    """
+    ENVIRONMENT_TAG_CREATE = "environment_tag:create"
+    """
+    Adds a new tag to an environment
+    """
+    ENVIRONMENT_TAG_DELETE = "environment_tag:delete"
+    """
+    Removes a tag from an environment
+    """
+    ENVIRONMENT_TAG_READ = "environment_tag:read"
+    """
+    Reads the value of an environments tag
+    """
+    ENVIRONMENT_TAG_UPDATE = "environment_tag:update"
+    """
+    Modifies the value of an environments tag
+    """
+    ENVIRONMENT_VERSION_CREATE = "environment_version:create"
+    """
+    Creates a new version tag
+    """
+    ENVIRONMENT_VERSION_DELETE = "environment_version:delete"
+    """
+    Deletes a version tag
+    """
+    ENVIRONMENT_VERSION_OPEN = "environment_version:open"
+    """
+    Open and decrypt a version tag
+    """
+    ENVIRONMENT_VERSION_READ = "environment_version:read"
+    """
+    Reads a version tag
+    """
+    ENVIRONMENT_VERSION_RETRACT = "environment_version:retract"
+    """
+    Retracts a specific version of the given environment
+    """
+    ENVIRONMENT_VERSION_UPDATE = "environment_version:update"
+    """
+    Updates a version tag
+    """
+    ENVIRONMENT_WEBHOOK_CREATE = "environment_webhook:create"
+    """
+    Create environment webhook
+    """
+    ENVIRONMENT_WEBHOOK_DELETE = "environment_webhook:delete"
+    """
+    Delete environment webhook
+    """
+    ENVIRONMENT_WEBHOOK_READ = "environment_webhook:read"
+    """
+    Read environment webhook
+    """
+    ENVIRONMENT_WEBHOOK_UPDATE = "environment_webhook:update"
+    """
+    Update environment webhook
+    """
+
+
+@pulumi.type_token("pulumiservice:index:RbacInsightsAccountScope")
+class RbacInsightsAccountScope(_builtins.str, Enum):
+    INSIGHTS_ACCOUNT_DELETE = "insights_account:delete"
+    """
+    Delete Insights account
+    """
+    INSIGHTS_ACCOUNT_READ = "insights_account:read"
+    """
+    Read Insights account
+    """
+    INSIGHTS_ACCOUNT_SCAN = "insights_account:scan"
+    """
+    Scan Insights account
+    """
+    INSIGHTS_ACCOUNT_UPDATE = "insights_account:update"
+    """
+    Update Insights account
+    """
+    INSIGHTS_ACCOUNT_ACCESS_READ = "insights_account_access:read"
+    """
+    Read Insights account access
+    """
+    INSIGHTS_ACCOUNT_ACCESS_UPDATE = "insights_account_access:update"
+    """
+    Update Insights account access
+    """
+    INSIGHTS_ACCOUNT_SCAN_CANCEL = "insights_account_scan:cancel"
+    """
+    Cancel Insights account scan
+    """
+    INSIGHTS_ACCOUNT_SCAN_PAUSE = "insights_account_scan:pause"
+    """
+    Pause Insights account scan
+    """
+    INSIGHTS_ACCOUNT_SCAN_READ = "insights_account_scan:read"
+    """
+    Read Insights account scan
+    """
+    INSIGHTS_ACCOUNT_SCAN_RESUME = "insights_account_scan:resume"
+    """
+    Resume Insights account scan
+    """
+    INSIGHTS_ACCOUNT_SCAN_UPDATE = "insights_account_scan:update"
+    """
+    Update Insights account scan
+    """
+
+
+@pulumi.type_token("pulumiservice:index:RbacOrganizationScope")
+class RbacOrganizationScope(_builtins.str, Enum):
+    AGENT_POOL_CREATE = "agent_pool:create"
+    """
+    Create agent pool
+    """
+    AGENT_POOL_DELETE = "agent_pool:delete"
+    """
+    Delete agent pool
+    """
+    AGENT_POOL_READ = "agent_pool:read"
+    """
+    Read agent pool
+    """
+    AGENT_POOL_UPDATE = "agent_pool:update"
+    """
+    Update agent pool
+    """
+    AGENT_TASK_CREATE = "agent_task:create"
+    """
+    Create Neo tasks
+    """
+    AUDIT_LOGS_EXPORT = "audit_logs:export"
+    """
+    Export audit logs
+    """
+    AUDIT_LOGS_READ = "audit_logs:read"
+    """
+    Read audit logs
+    """
+    AUTH_POLICIES_READ = "auth_policies:read"
+    """
+    Read authentication policies
+    """
+    AUTH_POLICIES_UPDATE = "auth_policies:update"
+    """
+    Update authentication policies
+    """
+    CHANGE_GATE_CREATE = "change_gate:create"
+    """
+    Create approval rules
+    """
+    CHANGE_GATE_DELETE = "change_gate:delete"
+    """
+    Delete approval rules
+    """
+    CHANGE_GATE_UPDATE = "change_gate:update"
+    """
+    Update approval rules
+    """
+    DEPLOYMENTS_PAUSE = "deployments:pause"
+    """
+    Pause deployments
+    """
+    DEPLOYMENTS_READ = "deployments:read"
+    """
+    Read deployments
+    """
+    DEPLOYMENTS_READ_USAGE = "deployments:read_usage"
+    """
+    Read deployment usage
+    """
+    DEPLOYMENTS_RESUME = "deployments:resume"
+    """
+    Resume deployments
+    """
+    ENVIRONMENT_CREATE = "environment:create"
+    """
+    Create environment
+    """
+    ENVIRONMENT_LIST_DELETED = "environment:list_deleted"
+    """
+    List deleted environments
+    """
+    ENVIRONMENT_RESTORE_DELETED = "environment:restore_deleted"
+    """
+    Restore deleted environment
+    """
+    ENVIRONMENT_TAGS_LIST = "environment_tags:list"
+    """
+    List the tags across all environments
+    """
+    GITHUB_TEAM_CREATE = "github_team:create"
+    """
+    Create GitHub team
+    """
+    INSIGHTS_ACCOUNT_CREATE = "insights_account:create"
+    """
+    Create Insights account
+    """
+    INTEGRATIONS_READ = "integrations:read"
+    """
+    Read integrations
+    """
+    INTEGRATIONS_UPDATE = "integrations:update"
+    """
+    Update integrations
+    """
+    INVITES_CREATE = "invites:create"
+    """
+    Create invites
+    """
+    INVITES_READ = "invites:read"
+    """
+    Read invites
+    """
+    OIDC_ISSUERS_CREATE = "oidc_issuers:create"
+    """
+    Create OIDC issuer
+    """
+    OIDC_ISSUERS_DELETE = "oidc_issuers:delete"
+    """
+    Delete OIDC issuer
+    """
+    OIDC_ISSUERS_READ = "oidc_issuers:read"
+    """
+    Read OIDC issuers
+    """
+    OIDC_ISSUERS_REGENERATE_THUMBPRINTS = "oidc_issuers:regenerate_thumbprints"
+    """
+    Regenerate OIDC issuer thumbprints
+    """
+    OIDC_ISSUERS_UPDATE = "oidc_issuers:update"
+    """
+    Update OIDC issuers
+    """
+    ORG_INTEGRATIONS_READ = "org_integrations:read"
+    """
+    Read organization integrations
+    """
+    ORG_INTEGRATIONS_UPDATE = "org_integrations:update"
+    """
+    Update organization integrations
+    """
+    ORG_MEMBER_ADD = "org_member:add"
+    """
+    Add organization member
+    """
+    ORG_MEMBER_DELETE = "org_member:delete"
+    """
+    Delete organization member
+    """
+    ORG_MEMBER_READ = "org_member:read"
+    """
+    Read organization member
+    """
+    ORG_MEMBER_SET_ADMIN = "org_member:set_admin"
+    """
+    Set organization member admin
+    """
+    ORG_MEMBER_UPDATE = "org_member:update"
+    """
+    Update organization member
+    """
+    ORG_MEMBER_ACCESS_READ = "org_member_access:read"
+    """
+    Read organization member access
+    """
+    ORG_REQUESTS_READ = "org_requests:read"
+    """
+    Read organization requests
+    """
+    ORG_REQUESTS_UPDATE = "org_requests:update"
+    """
+    Update organization requests
+    """
+    ORG_TOKEN_CREATE = "org_token:create"
+    """
+    Create organization access token
+    """
+    ORG_TOKEN_DELETE = "org_token:delete"
+    """
+    Delete organization access token
+    """
+    ORG_TOKEN_READ = "org_token:read"
+    """
+    Read organization access token
+    """
+    ORGANIZATION_BILLING = "organization:billing"
+    """
+    Manage organization billing
+    """
+    ORGANIZATION_CHANGE_BACKEND = "organization:change_backend"
+    """
+    Change organization backend
+    """
+    ORGANIZATION_DELETE = "organization:delete"
+    """
+    Delete organization
+    """
+    ORGANIZATION_READ_USAGE = "organization:read_usage"
+    """
+    Read organization usage
+    """
+    ORGANIZATION_RENAME = "organization:rename"
+    """
+    Rename organization
+    """
+    ORGANIZATION_TRANSFER_STACKS = "organization:transfer_stacks"
+    """
+    Transfer organization stacks
+    """
+    ORGANIZATION_UPDATE = "organization:update"
+    """
+    Update organization
+    """
+    ORGANIZATION_WEBHOOK_CREATE = "organization_webhook:create"
+    """
+    Create organization webhook
+    """
+    ORGANIZATION_WEBHOOK_DELETE = "organization_webhook:delete"
+    """
+    Delete organization webhook
+    """
+    ORGANIZATION_WEBHOOK_READ = "organization_webhook:read"
+    """
+    Read organization webhook
+    """
+    ORGANIZATION_WEBHOOK_UPDATE = "organization_webhook:update"
+    """
+    Update organization webhook
+    """
+    POLICY_GROUPS_CREATE = "policy_groups:create"
+    """
+    Create Insights policy groups
+    """
+    POLICY_GROUPS_DELETE = "policy_groups:delete"
+    """
+    Delete Insights policy groups
+    """
+    POLICY_GROUPS_READ = "policy_groups:read"
+    """
+    Read Insights policy groups
+    """
+    POLICY_GROUPS_UPDATE = "policy_groups:update"
+    """
+    Update Insights policy groups
+    """
+    POLICY_PACK_CREATE = "policy_pack:create"
+    """
+    Create Insights policy pack
+    """
+    POLICY_PACK_DELETE = "policy_pack:delete"
+    """
+    Delete Insights policy pack
+    """
+    POLICY_PACK_READ = "policy_pack:read"
+    """
+    Read Insights policy pack
+    """
+    POLICY_PACK_UPDATE = "policy_pack:update"
+    """
+    Update Insights policy pack
+    """
+    POLICY_RESULTS_READ = "policy_results:read"
+    """
+    Read Insights policy results
+    """
+    POLICY_RESULTS_UPDATE = "policy_results:update"
+    """
+    Update Insights policy results
+    """
+    PROJECT_DECRYPT = "project:decrypt"
+    """
+    Decrypt project
+    """
+    PROJECT_ENCRYPT = "project:encrypt"
+    """
+    Encrypt project
+    """
+    RESOURCES_DASHBOARD = "resources:dashboard"
+    """
+    View resources dashboard
+    """
+    RESOURCES_INDEX = "resources:index"
+    """
+    Index resources
+    """
+    RESOURCES_SEARCH = "resources:search"
+    """
+    Search resources
+    """
+    ROLE_CREATE = "role:create"
+    """
+    Create role
+    """
+    ROLE_DELETE = "role:delete"
+    """
+    Delete role
+    """
+    ROLE_READ = "role:read"
+    """
+    Read role
+    """
+    ROLE_UPDATE = "role:update"
+    """
+    Update role
+    """
+    SAML_READ = "saml:read"
+    """
+    Read SAML
+    """
+    SAML_UPDATE = "saml:update"
+    """
+    Update SAML
+    """
+    SCIM_DELETE = "scim:delete"
+    """
+    Delete SCIM
+    """
+    SCIM_READ = "scim:read"
+    """
+    Read SCIM
+    """
+    SCIM_UPDATE = "scim:update"
+    """
+    Update SCIM
+    """
+    STACK_CREATE = "stack:create"
+    """
+    Create stack
+    """
+    STACK_LIST_DELETED = "stack:list_deleted"
+    """
+    List deleted stacks
+    """
+    STACK_RESTORE_DELETED = "stack:restore_deleted"
+    """
+    Restore deleted stack
+    """
+    TAGS_READ = "tags:read"
+    """
+    Read project tags
+    """
+    TEAM_CREATE = "team:create"
+    """
+    Create team
+    """
+    TEAM_CREATE_TOKEN = "team:create_token"
+    """
+    Create team access token
+    """
+    TEAM_DELETE = "team:delete"
+    """
+    Delete team
+    """
+    TEAM_DELETE_TOKEN = "team:delete_token"
+    """
+    Delete team access token
+    """
+    TEAM_LIST = "team:list"
+    """
+    List teams
+    """
+    TEAM_LIST_TOKENS = "team:list_tokens"
+    """
+    List team access tokens
+    """
+    TEAM_READ = "team:read"
+    """
+    Read team
+    """
+    TEAM_UPDATE = "team:update"
+    """
+    Update team
+    """
+    TEMPLATES_READ = "templates:read"
+    """
+    Read templates
+    """
+    TEMPLATES_SOURCE_CREATE = "templates_source:create"
+    """
+    Create template sources
+    """
+    TEMPLATES_SOURCE_DELETE = "templates_source:delete"
+    """
+    Delete template sources
+    """
+    TEMPLATES_SOURCE_READ = "templates_source:read"
+    """
+    Read template sources
+    """
+    TEMPLATES_SOURCE_UPDATE = "templates_source:update"
+    """
+    Update template sources
+    """
+
+
 @pulumi.type_token("pulumiservice:index:RbacPermission")
 class RbacPermission(_builtins.str, Enum):
     READ = "environment:read"
@@ -164,6 +737,138 @@ class RbacPermission(_builtins.str, Enum):
     ROTATE = "environment:rotate"
     """
     Rotate permission.
+    """
+
+
+@pulumi.type_token("pulumiservice:index:RbacStackScope")
+class RbacStackScope(_builtins.str, Enum):
+    STACK_CANCEL_UPDATE = "stack:cancel_update"
+    """
+    Cancel stack update
+    """
+    STACK_CREATE = "stack:create"
+    """
+    Create stack
+    """
+    STACK_DECRYPT = "stack:decrypt"
+    """
+    Decrypt stack
+    """
+    STACK_DELETE = "stack:delete"
+    """
+    Delete stack
+    """
+    STACK_ENCRYPT = "stack:encrypt"
+    """
+    Encrypt stack
+    """
+    STACK_EXPORT = "stack:export"
+    """
+    Export stack
+    """
+    STACK_IMPORT = "stack:import"
+    """
+    Import stack
+    """
+    STACK_READ = "stack:read"
+    """
+    Read stack
+    """
+    STACK_RENAME = "stack:rename"
+    """
+    Rename stack
+    """
+    STACK_TRANSFER = "stack:transfer"
+    """
+    Transfer stack
+    """
+    STACK_WRITE = "stack:write"
+    """
+    Write stack
+    """
+    STACK_ACCESS_READ = "stack_access:read"
+    """
+    Read stack teams
+    """
+    STACK_ACCESS_UPDATE = "stack_access:update"
+    """
+    Update stack teams
+    """
+    STACK_DEPLOYMENT_CREATE = "stack_deployment:create"
+    """
+    Create deployment
+    """
+    STACK_DEPLOYMENT_READ = "stack_deployment:read"
+    """
+    Read deployment
+    """
+    STACK_DEPLOYMENT_SETTINGS_ENCRYPT = "stack_deployment_settings:encrypt"
+    """
+    Encrypt deployment settings
+    """
+    STACK_DEPLOYMENT_SETTINGS_READ = "stack_deployment_settings:read"
+    """
+    Read deployment settings
+    """
+    STACK_DEPLOYMENT_SETTINGS_WRITE = "stack_deployment_settings:write"
+    """
+    Write deployment settings
+    """
+    STACK_SCHEDULE_CREATE = "stack_schedule:create"
+    """
+    Create stack schedule
+    """
+    STACK_SCHEDULE_DELETE = "stack_schedule:delete"
+    """
+    Delete stack schedule
+    """
+    STACK_SCHEDULE_PAUSE = "stack_schedule:pause"
+    """
+    Pause stack schedule
+    """
+    STACK_SCHEDULE_READ = "stack_schedule:read"
+    """
+    Read stack schedule
+    """
+    STACK_SCHEDULE_RESUME = "stack_schedule:resume"
+    """
+    Resume stack schedule
+    """
+    STACK_SCHEDULE_UPDATE = "stack_schedule:update"
+    """
+    Update stack schedule
+    """
+    STACK_TAGS_UPDATE = "stack_tags:update"
+    """
+    Update stack tags
+    """
+    STACK_WEBHOOK_CREATE = "stack_webhook:create"
+    """
+    Create stack webhook
+    """
+    STACK_WEBHOOK_DELETE = "stack_webhook:delete"
+    """
+    Delete stack webhook
+    """
+    STACK_WEBHOOK_READ = "stack_webhook:read"
+    """
+    Read stack webhook
+    """
+    STACK_WEBHOOK_UPDATE = "stack_webhook:update"
+    """
+    Update stack webhook
+    """
+
+
+@pulumi.type_token("pulumiservice:index:RoleTagOperator")
+class RoleTagOperator(_builtins.str, Enum):
+    EQUALS = "equals"
+    """
+    Match entities whose tag equals the value (or that have the tag, when no value is set).
+    """
+    NOT_EQUALS = "notEquals"
+    """
+    Match entities whose tag does not equal the value (or that lack the tag, when no value is set).
     """
 
 
