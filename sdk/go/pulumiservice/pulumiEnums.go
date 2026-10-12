@@ -1831,6 +1831,20 @@ func (o RbacInsightsAccountScopeArrayOutput) Index(i pulumi.IntInput) RbacInsigh
 type RbacOrganizationScope string
 
 const (
+	// Create org-owned Neo automations
+	RbacOrganizationScopeAgentAutomationsCreate = RbacOrganizationScope("agent_automations:create")
+	// Delete org-owned Neo automations
+	RbacOrganizationScopeAgentAutomationsDelete = RbacOrganizationScope("agent_automations:delete")
+	// Read org-owned Neo automations
+	RbacOrganizationScopeAgentAutomationsRead = RbacOrganizationScope("agent_automations:read")
+	// Update org-owned Neo automations
+	RbacOrganizationScopeAgentAutomationsUpdate = RbacOrganizationScope("agent_automations:update")
+	// Create Custom Agents
+	RbacOrganizationScopeAgentDefinitionsCreate = RbacOrganizationScope("agent_definitions:create")
+	// Delete Custom Agents
+	RbacOrganizationScopeAgentDefinitionsDelete = RbacOrganizationScope("agent_definitions:delete")
+	// Update Custom Agents
+	RbacOrganizationScopeAgentDefinitionsUpdate = RbacOrganizationScope("agent_definitions:update")
 	// Create agent pool
 	RbacOrganizationScopeAgentPoolCreate = RbacOrganizationScope("agent_pool:create")
 	// Delete agent pool
@@ -2147,6 +2161,13 @@ func (o RbacOrganizationScopePtrOutput) ToStringPtrOutputWithContext(ctx context
 // RbacOrganizationScopeInput is an input type that accepts values of the RbacOrganizationScope enum
 // A concrete instance of `RbacOrganizationScopeInput` can be one of the following:
 //
+//	RbacOrganizationScopeAgentAutomationsCreate
+//	RbacOrganizationScopeAgentAutomationsDelete
+//	RbacOrganizationScopeAgentAutomationsRead
+//	RbacOrganizationScopeAgentAutomationsUpdate
+//	RbacOrganizationScopeAgentDefinitionsCreate
+//	RbacOrganizationScopeAgentDefinitionsDelete
+//	RbacOrganizationScopeAgentDefinitionsUpdate
 //	RbacOrganizationScopeAgentPoolCreate
 //	RbacOrganizationScopeAgentPoolDelete
 //	RbacOrganizationScopeAgentPoolRead
@@ -4225,8 +4246,8 @@ func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*RbacInsightsAccountScopeInput)(nil)).Elem(), RbacInsightsAccountScope("insights_account:delete"))
 	pulumi.RegisterInputType(reflect.TypeOf((*RbacInsightsAccountScopePtrInput)(nil)).Elem(), RbacInsightsAccountScope("insights_account:delete"))
 	pulumi.RegisterInputType(reflect.TypeOf((*RbacInsightsAccountScopeArrayInput)(nil)).Elem(), RbacInsightsAccountScopeArray{})
-	pulumi.RegisterInputType(reflect.TypeOf((*RbacOrganizationScopeInput)(nil)).Elem(), RbacOrganizationScope("agent_pool:create"))
-	pulumi.RegisterInputType(reflect.TypeOf((*RbacOrganizationScopePtrInput)(nil)).Elem(), RbacOrganizationScope("agent_pool:create"))
+	pulumi.RegisterInputType(reflect.TypeOf((*RbacOrganizationScopeInput)(nil)).Elem(), RbacOrganizationScope("agent_automations:create"))
+	pulumi.RegisterInputType(reflect.TypeOf((*RbacOrganizationScopePtrInput)(nil)).Elem(), RbacOrganizationScope("agent_automations:create"))
 	pulumi.RegisterInputType(reflect.TypeOf((*RbacOrganizationScopeArrayInput)(nil)).Elem(), RbacOrganizationScopeArray{})
 	pulumi.RegisterInputType(reflect.TypeOf((*RbacPermissionInput)(nil)).Elem(), RbacPermission("environment:read"))
 	pulumi.RegisterInputType(reflect.TypeOf((*RbacPermissionPtrInput)(nil)).Elem(), RbacPermission("environment:read"))

@@ -564,6 +564,34 @@ namespace Pulumi.PulumiService
         }
 
         /// <summary>
+        /// Create org-owned Neo automations
+        /// </summary>
+        public static RbacOrganizationScope AgentAutomationsCreate { get; } = new RbacOrganizationScope("agent_automations:create");
+        /// <summary>
+        /// Delete org-owned Neo automations
+        /// </summary>
+        public static RbacOrganizationScope AgentAutomationsDelete { get; } = new RbacOrganizationScope("agent_automations:delete");
+        /// <summary>
+        /// Read org-owned Neo automations
+        /// </summary>
+        public static RbacOrganizationScope AgentAutomationsRead { get; } = new RbacOrganizationScope("agent_automations:read");
+        /// <summary>
+        /// Update org-owned Neo automations
+        /// </summary>
+        public static RbacOrganizationScope AgentAutomationsUpdate { get; } = new RbacOrganizationScope("agent_automations:update");
+        /// <summary>
+        /// Create Custom Agents
+        /// </summary>
+        public static RbacOrganizationScope AgentDefinitionsCreate { get; } = new RbacOrganizationScope("agent_definitions:create");
+        /// <summary>
+        /// Delete Custom Agents
+        /// </summary>
+        public static RbacOrganizationScope AgentDefinitionsDelete { get; } = new RbacOrganizationScope("agent_definitions:delete");
+        /// <summary>
+        /// Update Custom Agents
+        /// </summary>
+        public static RbacOrganizationScope AgentDefinitionsUpdate { get; } = new RbacOrganizationScope("agent_definitions:update");
+        /// <summary>
         /// Create agent pool
         /// </summary>
         public static RbacOrganizationScope AgentPoolCreate { get; } = new RbacOrganizationScope("agent_pool:create");

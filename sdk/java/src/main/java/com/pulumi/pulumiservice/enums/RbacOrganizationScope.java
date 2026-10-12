@@ -11,6 +11,41 @@ import java.util.StringJoiner;
     @EnumType
     public enum RbacOrganizationScope {
         /**
+         * Create org-owned Neo automations
+         * 
+         */
+        AgentAutomationsCreate("agent_automations:create"),
+        /**
+         * Delete org-owned Neo automations
+         * 
+         */
+        AgentAutomationsDelete("agent_automations:delete"),
+        /**
+         * Read org-owned Neo automations
+         * 
+         */
+        AgentAutomationsRead("agent_automations:read"),
+        /**
+         * Update org-owned Neo automations
+         * 
+         */
+        AgentAutomationsUpdate("agent_automations:update"),
+        /**
+         * Create Custom Agents
+         * 
+         */
+        AgentDefinitionsCreate("agent_definitions:create"),
+        /**
+         * Delete Custom Agents
+         * 
+         */
+        AgentDefinitionsDelete("agent_definitions:delete"),
+        /**
+         * Update Custom Agents
+         * 
+         */
+        AgentDefinitionsUpdate("agent_definitions:update"),
+        /**
          * Create agent pool
          * 
          */

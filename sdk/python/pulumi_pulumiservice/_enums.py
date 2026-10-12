@@ -379,6 +379,34 @@ class RbacInsightsAccountScope(_builtins.str, Enum):
 
 @pulumi.type_token("pulumiservice:index:RbacOrganizationScope")
 class RbacOrganizationScope(_builtins.str, Enum):
+    AGENT_AUTOMATIONS_CREATE = "agent_automations:create"
+    """
+    Create org-owned Neo automations
+    """
+    AGENT_AUTOMATIONS_DELETE = "agent_automations:delete"
+    """
+    Delete org-owned Neo automations
+    """
+    AGENT_AUTOMATIONS_READ = "agent_automations:read"
+    """
+    Read org-owned Neo automations
+    """
+    AGENT_AUTOMATIONS_UPDATE = "agent_automations:update"
+    """
+    Update org-owned Neo automations
+    """
+    AGENT_DEFINITIONS_CREATE = "agent_definitions:create"
+    """
+    Create Custom Agents
+    """
+    AGENT_DEFINITIONS_DELETE = "agent_definitions:delete"
+    """
+    Delete Custom Agents
+    """
+    AGENT_DEFINITIONS_UPDATE = "agent_definitions:update"
+    """
+    Update Custom Agents
+    """
     AGENT_POOL_CREATE = "agent_pool:create"
     """
     Create agent pool

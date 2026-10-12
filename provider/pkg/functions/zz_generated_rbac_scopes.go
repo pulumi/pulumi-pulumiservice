@@ -104,6 +104,13 @@ var rbacInsightsAccountScopeValues = []infer.EnumValue[RbacInsightsAccountScope]
 }
 
 const (
+	RbacOrganizationScopeAgentAutomationsCreate           RbacOrganizationScope = "agent_automations:create"
+	RbacOrganizationScopeAgentAutomationsDelete           RbacOrganizationScope = "agent_automations:delete"
+	RbacOrganizationScopeAgentAutomationsRead             RbacOrganizationScope = "agent_automations:read"
+	RbacOrganizationScopeAgentAutomationsUpdate           RbacOrganizationScope = "agent_automations:update"
+	RbacOrganizationScopeAgentDefinitionsCreate           RbacOrganizationScope = "agent_definitions:create"
+	RbacOrganizationScopeAgentDefinitionsDelete           RbacOrganizationScope = "agent_definitions:delete"
+	RbacOrganizationScopeAgentDefinitionsUpdate           RbacOrganizationScope = "agent_definitions:update"
 	RbacOrganizationScopeAgentPoolCreate                  RbacOrganizationScope = "agent_pool:create"
 	RbacOrganizationScopeAgentPoolDelete                  RbacOrganizationScope = "agent_pool:delete"
 	RbacOrganizationScopeAgentPoolRead                    RbacOrganizationScope = "agent_pool:read"
@@ -203,6 +210,13 @@ const (
 )
 
 var rbacOrganizationScopeValues = []infer.EnumValue[RbacOrganizationScope]{
+	{Name: "AgentAutomationsCreate", Value: RbacOrganizationScopeAgentAutomationsCreate, Description: "Create org-owned Neo automations"},
+	{Name: "AgentAutomationsDelete", Value: RbacOrganizationScopeAgentAutomationsDelete, Description: "Delete org-owned Neo automations"},
+	{Name: "AgentAutomationsRead", Value: RbacOrganizationScopeAgentAutomationsRead, Description: "Read org-owned Neo automations"},
+	{Name: "AgentAutomationsUpdate", Value: RbacOrganizationScopeAgentAutomationsUpdate, Description: "Update org-owned Neo automations"},
+	{Name: "AgentDefinitionsCreate", Value: RbacOrganizationScopeAgentDefinitionsCreate, Description: "Create Custom Agents"},
+	{Name: "AgentDefinitionsDelete", Value: RbacOrganizationScopeAgentDefinitionsDelete, Description: "Delete Custom Agents"},
+	{Name: "AgentDefinitionsUpdate", Value: RbacOrganizationScopeAgentDefinitionsUpdate, Description: "Update Custom Agents"},
 	{Name: "AgentPoolCreate", Value: RbacOrganizationScopeAgentPoolCreate, Description: "Create agent pool"},
 	{Name: "AgentPoolDelete", Value: RbacOrganizationScopeAgentPoolDelete, Description: "Delete agent pool"},
 	{Name: "AgentPoolRead", Value: RbacOrganizationScopeAgentPoolRead, Description: "Read agent pool"},

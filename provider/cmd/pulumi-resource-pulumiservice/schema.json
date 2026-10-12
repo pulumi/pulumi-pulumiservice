@@ -1281,6 +1281,41 @@
       "type": "string",
       "enum": [
         {
+          "name": "AgentAutomationsCreate",
+          "description": "Create org-owned Neo automations",
+          "value": "agent_automations:create"
+        },
+        {
+          "name": "AgentAutomationsDelete",
+          "description": "Delete org-owned Neo automations",
+          "value": "agent_automations:delete"
+        },
+        {
+          "name": "AgentAutomationsRead",
+          "description": "Read org-owned Neo automations",
+          "value": "agent_automations:read"
+        },
+        {
+          "name": "AgentAutomationsUpdate",
+          "description": "Update org-owned Neo automations",
+          "value": "agent_automations:update"
+        },
+        {
+          "name": "AgentDefinitionsCreate",
+          "description": "Create Custom Agents",
+          "value": "agent_definitions:create"
+        },
+        {
+          "name": "AgentDefinitionsDelete",
+          "description": "Delete Custom Agents",
+          "value": "agent_definitions:delete"
+        },
+        {
+          "name": "AgentDefinitionsUpdate",
+          "description": "Update Custom Agents",
+          "value": "agent_definitions:update"
+        },
+        {
           "name": "AgentPoolCreate",
           "description": "Create agent pool",
           "value": "agent_pool:create"
