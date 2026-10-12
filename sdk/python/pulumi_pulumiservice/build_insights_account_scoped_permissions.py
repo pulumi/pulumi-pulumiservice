@@ -21,6 +21,8 @@ __all__ = [
     'build_insights_account_scoped_permissions_output',
 ]
 
+warnings.warn("""Use `buildRolePermissions` instead, with an `insightsAccountRules` entry that sets `id`. For a scope the enums don't list yet, pass a raw `{__type: \"PermissionDescriptorAllow\", permissions: [...]}` descriptor in `buildRolePermissions.additionalEntries`.""", DeprecationWarning)
+
 @pulumi.output_type
 class BuildInsightsAccountScopedPermissionsResult:
     def __init__(__self__, permissions=None):
@@ -55,6 +57,7 @@ def build_insights_account_scoped_permissions(insights_account_id: Optional[_bui
     :param _builtins.str insights_account_id: The target insights account's identifier. Use the `insightsAccountId` output of an `InsightsAccount` resource or the `getInsightsAccount` data source.
     :param Sequence[_builtins.str] permissions: The set of `insights-account:*` scopes to grant on the target account. Discover valid scope names via the `getOrganizationRoleScopes` data source.
     """
+    pulumi.log.warn("""build_insights_account_scoped_permissions is deprecated: Use `buildRolePermissions` instead, with an `insightsAccountRules` entry that sets `id`. For a scope the enums don't list yet, pass a raw `{__type: "PermissionDescriptorAllow", permissions: [...]}` descriptor in `buildRolePermissions.additionalEntries`.""")
     __args__ = dict()
     __args__['insightsAccountId'] = insights_account_id
     __args__['permissions'] = permissions
@@ -72,6 +75,7 @@ def build_insights_account_scoped_permissions_output(insights_account_id: pulumi
     :param _builtins.str insights_account_id: The target insights account's identifier. Use the `insightsAccountId` output of an `InsightsAccount` resource or the `getInsightsAccount` data source.
     :param Sequence[_builtins.str] permissions: The set of `insights-account:*` scopes to grant on the target account. Discover valid scope names via the `getOrganizationRoleScopes` data source.
     """
+    pulumi.log.warn("""build_insights_account_scoped_permissions is deprecated: Use `buildRolePermissions` instead, with an `insightsAccountRules` entry that sets `id`. For a scope the enums don't list yet, pass a raw `{__type: "PermissionDescriptorAllow", permissions: [...]}` descriptor in `buildRolePermissions.additionalEntries`.""")
     __args__ = dict()
     __args__['insightsAccountId'] = insights_account_id
     __args__['permissions'] = permissions

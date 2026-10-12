@@ -7,7 +7,9 @@ import * as utilities from "./utilities";
 /**
  * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes globally — i.e. on every entity of the matching resource type. This is the simplest descriptor: a flat `PermissionDescriptorAllow`. Use this helper instead of hand-authoring the descriptor literal so the wire-format `__type` discriminator stays an implementation detail. For grants scoped to a specific entity, see `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, or `buildInsightsAccountScopedPermissions`. The result is directly assignable to `OrganizationRole.permissions`. To combine it with other grants in a single role, pass it to `buildRolePermissions` in `additionalEntries`.
  */
+/** @deprecated Use `buildRolePermissions` instead, with `organizationScopes` for organization-level scopes and an `all: true` rule for entity scopes. For a scope the enums don't list yet, pass a raw `{__type: "PermissionDescriptorAllow", permissions: [...]}` descriptor in `buildRolePermissions.additionalEntries`. */
 export function buildAllowPermissions(args: BuildAllowPermissionsArgs, opts?: pulumi.InvokeOptions): Promise<BuildAllowPermissionsResult> {
+    pulumi.log.warn("buildAllowPermissions is deprecated: Use `buildRolePermissions` instead, with `organizationScopes` for organization-level scopes and an `all: true` rule for entity scopes. For a scope the enums don't list yet, pass a raw `{__type: \"PermissionDescriptorAllow\", permissions: [...]}` descriptor in `buildRolePermissions.additionalEntries`.")
     opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts || {});
     return pulumi.runtime.invoke("pulumiservice:index:buildAllowPermissions", {
         "permissions": args.permissions,
@@ -30,7 +32,9 @@ export interface BuildAllowPermissionsResult {
 /**
  * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes globally — i.e. on every entity of the matching resource type. This is the simplest descriptor: a flat `PermissionDescriptorAllow`. Use this helper instead of hand-authoring the descriptor literal so the wire-format `__type` discriminator stays an implementation detail. For grants scoped to a specific entity, see `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, or `buildInsightsAccountScopedPermissions`. The result is directly assignable to `OrganizationRole.permissions`. To combine it with other grants in a single role, pass it to `buildRolePermissions` in `additionalEntries`.
  */
+/** @deprecated Use `buildRolePermissions` instead, with `organizationScopes` for organization-level scopes and an `all: true` rule for entity scopes. For a scope the enums don't list yet, pass a raw `{__type: "PermissionDescriptorAllow", permissions: [...]}` descriptor in `buildRolePermissions.additionalEntries`. */
 export function buildAllowPermissionsOutput(args: BuildAllowPermissionsOutputArgs, opts?: pulumi.InvokeOutputOptions): pulumi.Output<BuildAllowPermissionsResult> {
+    pulumi.log.warn("buildAllowPermissions is deprecated: Use `buildRolePermissions` instead, with `organizationScopes` for organization-level scopes and an `all: true` rule for entity scopes. For a scope the enums don't list yet, pass a raw `{__type: \"PermissionDescriptorAllow\", permissions: [...]}` descriptor in `buildRolePermissions.additionalEntries`.")
     opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts || {});
     return pulumi.runtime.invokeOutput("pulumiservice:index:buildAllowPermissions", {
         "permissions": args.permissions,

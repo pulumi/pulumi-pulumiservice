@@ -21,6 +21,8 @@ __all__ = [
     'build_allow_permissions_output',
 ]
 
+warnings.warn("""Use `buildRolePermissions` instead, with `organizationScopes` for organization-level scopes and an `all: true` rule for entity scopes. For a scope the enums don't list yet, pass a raw `{__type: \"PermissionDescriptorAllow\", permissions: [...]}` descriptor in `buildRolePermissions.additionalEntries`.""", DeprecationWarning)
+
 @pulumi.output_type
 class BuildAllowPermissionsResult:
     def __init__(__self__, permissions=None):
@@ -53,6 +55,7 @@ def build_allow_permissions(permissions: Optional[Sequence[_builtins.str]] = Non
 
     :param Sequence[_builtins.str] permissions: The set of scopes to grant globally (e.g. `stack:read`, `environment:open`, `organization:billingManager`). Discover valid scope names via the `getOrganizationRoleScopes` data source.
     """
+    pulumi.log.warn("""build_allow_permissions is deprecated: Use `buildRolePermissions` instead, with `organizationScopes` for organization-level scopes and an `all: true` rule for entity scopes. For a scope the enums don't list yet, pass a raw `{__type: "PermissionDescriptorAllow", permissions: [...]}` descriptor in `buildRolePermissions.additionalEntries`.""")
     __args__ = dict()
     __args__['permissions'] = permissions
     opts = pulumi.InvokeOptions.merge(_utilities.get_invoke_opts_defaults(), opts)
@@ -67,6 +70,7 @@ def build_allow_permissions_output(permissions: pulumi.Input[Optional[Sequence[_
 
     :param Sequence[_builtins.str] permissions: The set of scopes to grant globally (e.g. `stack:read`, `environment:open`, `organization:billingManager`). Discover valid scope names via the `getOrganizationRoleScopes` data source.
     """
+    pulumi.log.warn("""build_allow_permissions is deprecated: Use `buildRolePermissions` instead, with `organizationScopes` for organization-level scopes and an `all: true` rule for entity scopes. For a scope the enums don't list yet, pass a raw `{__type: "PermissionDescriptorAllow", permissions: [...]}` descriptor in `buildRolePermissions.additionalEntries`.""")
     __args__ = dict()
     __args__['permissions'] = permissions
     opts = pulumi.InvokeOutputOptions.merge(_utilities.get_invoke_opts_defaults(), opts)

@@ -23,13 +23,6 @@ variables:
         organizationName: ${organizationName}
         projectName: ${prodStack.projectName}
         stackName: ${prodStack.stackName}
-  sharedEnvironmentRotate:
-    fn::invoke:
-      function: pulumiservice:buildEnvironmentScopedPermissions
-      arguments:
-        environmentId: ${sharedEnvironment.environmentId}
-        permissions:
-          - environment:rotate
 
   # A role built from scopes, with every selector kind for stacks and
   # environments. Cloud accounts can't be created here, so their rules
@@ -79,8 +72,11 @@ variables:
               - key: team
                 value: platform
             scopes: [insights_account:update]
+        # A raw descriptor in the Pulumi Cloud wire format, for grants the
+        # rules can't express.
         additionalEntries:
-          - ${sharedEnvironmentRotate.permissions}
+          - __type: PermissionDescriptorAllow
+            permissions: [environment:rotate]
 
   # Permission sets are accepted only in a policy, which the role composes.
   orgReadOnly:

@@ -8,7 +8,7 @@ import * as enums from "./types/enums";
 import * as utilities from "./utilities";
 
 /**
- * Builds a complete `OrganizationRole.permissions` descriptor from organization-level access and rules for stacks, environments, and cloud accounts (Discovery; `InsightsAccount` in the API and this provider), the same model as the role editor in the Pulumi Cloud console. Each rule grants scopes and/or permission sets on every entity of its type, on one specific entity, or on entities matching tag conditions. Each rule list accepts only scopes and permission sets for its own entity type. Use `additionalEntries` to fold in the output of the other `build*Permissions` helpers.
+ * Builds a complete `OrganizationRole.permissions` descriptor from organization-level access and rules for stacks, environments, and cloud accounts (Discovery; `InsightsAccount` in the API and this provider), the same model as the role editor in the Pulumi Cloud console. Each rule grants scopes and/or permission sets on every entity of its type, on one specific entity, or on entities matching tag conditions. Each rule list accepts only scopes and permission sets for its own entity type. Use `additionalEntries` for anything the rules can't express, such as a scope the enums don't list yet.
  *
  * A result that uses only scopes is directly assignable to `OrganizationRole.permissions`. Pulumi Cloud accepts permission sets only in a policy: store such a result with `pulumiservice:api:Role` (`uxPurpose: policy`, `details: <result>`) and grant the policy to the role with `buildComposePermissions`.
  */
@@ -27,7 +27,7 @@ export function buildRolePermissions(args?: BuildRolePermissionsArgs, opts?: pul
 
 export interface BuildRolePermissionsArgs {
     /**
-     * Further descriptors to include in the role, typically the `permissions` output of `buildAllowPermissions`, `buildStackScopedPermissions`, `buildEnvironmentScopedPermissions`, or `buildInsightsAccountScopedPermissions`.
+     * Further descriptors to include in the role, in the Pulumi Cloud wire format, for grants the rules can't express. For example, `{__type: "PermissionDescriptorAllow", permissions: ["agent_task:read"]}` grants a scope the enums don't list yet. Scopes the provider doesn't recognize at all, including misspelled ones, are silently removed rather than rejected.
      */
     additionalEntries?: {[key: string]: any}[];
     /**
@@ -59,7 +59,7 @@ export interface BuildRolePermissionsResult {
     readonly permissions: {[key: string]: any};
 }
 /**
- * Builds a complete `OrganizationRole.permissions` descriptor from organization-level access and rules for stacks, environments, and cloud accounts (Discovery; `InsightsAccount` in the API and this provider), the same model as the role editor in the Pulumi Cloud console. Each rule grants scopes and/or permission sets on every entity of its type, on one specific entity, or on entities matching tag conditions. Each rule list accepts only scopes and permission sets for its own entity type. Use `additionalEntries` to fold in the output of the other `build*Permissions` helpers.
+ * Builds a complete `OrganizationRole.permissions` descriptor from organization-level access and rules for stacks, environments, and cloud accounts (Discovery; `InsightsAccount` in the API and this provider), the same model as the role editor in the Pulumi Cloud console. Each rule grants scopes and/or permission sets on every entity of its type, on one specific entity, or on entities matching tag conditions. Each rule list accepts only scopes and permission sets for its own entity type. Use `additionalEntries` for anything the rules can't express, such as a scope the enums don't list yet.
  *
  * A result that uses only scopes is directly assignable to `OrganizationRole.permissions`. Pulumi Cloud accepts permission sets only in a policy: store such a result with `pulumiservice:api:Role` (`uxPurpose: policy`, `details: <result>`) and grant the policy to the role with `buildComposePermissions`.
  */
@@ -78,7 +78,7 @@ export function buildRolePermissionsOutput(args?: BuildRolePermissionsOutputArgs
 
 export interface BuildRolePermissionsOutputArgs {
     /**
-     * Further descriptors to include in the role, typically the `permissions` output of `buildAllowPermissions`, `buildStackScopedPermissions`, `buildEnvironmentScopedPermissions`, or `buildInsightsAccountScopedPermissions`.
+     * Further descriptors to include in the role, in the Pulumi Cloud wire format, for grants the rules can't express. For example, `{__type: "PermissionDescriptorAllow", permissions: ["agent_task:read"]}` grants a scope the enums don't list yet. Scopes the provider doesn't recognize at all, including misspelled ones, are silently removed rather than rejected.
      */
     additionalEntries?: pulumi.Input<pulumi.Input<{[key: string]: any}>[] | undefined>;
     /**

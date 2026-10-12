@@ -29,6 +29,29 @@ const scopedPermissionsHelpDoc = "The result is directly assignable to " +
 	"`OrganizationRole.permissions`. To combine it with other grants in a " +
 	"single role, pass it to `buildRolePermissions` in `additionalEntries`."
 
+// rawDescriptorFallback ends each deprecation message: the escape hatch for
+// scopes the typed enums don't list yet.
+const rawDescriptorFallback = " For a scope the enums don't list yet, pass a raw " +
+	"`{__type: \"PermissionDescriptorAllow\", permissions: [...]}` descriptor in " +
+	"`buildRolePermissions.additionalEntries`."
+
+// DeprecatedFunctions maps each deprecated function's token to its
+// deprecation message. The functions also call Annotator.Deprecate, but
+// pulumi-go-provider doesn't emit function deprecations to the schema yet
+// (pulumi/pulumi-go-provider#636), so the provider adds them to the schema
+// from this map.
+var DeprecatedFunctions = map[string]string{
+	"pulumiservice:index:buildAllowPermissions": "Use `buildRolePermissions` instead, with " +
+		"`organizationScopes` for organization-level scopes and an `all: true` rule for entity scopes." +
+		rawDescriptorFallback,
+	"pulumiservice:index:buildStackScopedPermissions": "Use `buildRolePermissions` instead, with a " +
+		"`stackRules` entry that sets `id`." + rawDescriptorFallback,
+	"pulumiservice:index:buildEnvironmentScopedPermissions": "Use `buildRolePermissions` instead, with an " +
+		"`environmentRules` entry that sets `id`." + rawDescriptorFallback,
+	"pulumiservice:index:buildInsightsAccountScopedPermissions": "Use `buildRolePermissions` instead, with " +
+		"an `insightsAccountRules` entry that sets `id`." + rawDescriptorFallback,
+}
+
 // descriptorToSDKMap marshals a typed apitype.PermissionDescriptor to the
 // SDK-boundary map shape the provider expects on
 // `OrganizationRole.permissions`. The typed Marshaler emits the wire format
@@ -134,6 +157,8 @@ func (BuildAllowPermissionsFunction) Annotate(a infer.Annotator) {
 			scopedPermissionsHelpDoc,
 	)
 	a.SetToken("index", "buildAllowPermissions")
+	a.Deprecate(&BuildAllowPermissionsFunction{},
+		DeprecatedFunctions["pulumiservice:index:buildAllowPermissions"])
 }
 
 func (i *BuildAllowPermissionsInput) Annotate(a infer.Annotator) {
@@ -202,6 +227,8 @@ func (BuildEnvironmentScopedPermissionsFunction) Annotate(a infer.Annotator) {
 			scopedPermissionsHelpDoc,
 	)
 	a.SetToken("index", "buildEnvironmentScopedPermissions")
+	a.Deprecate(&BuildEnvironmentScopedPermissionsFunction{},
+		DeprecatedFunctions["pulumiservice:index:buildEnvironmentScopedPermissions"])
 }
 
 func (i *BuildEnvironmentScopedPermissionsInput) Annotate(a infer.Annotator) {
@@ -274,6 +301,8 @@ func (BuildStackScopedPermissionsFunction) Annotate(a infer.Annotator) {
 			"from the `organization/project/stack` triple. "+scopedPermissionsHelpDoc,
 	)
 	a.SetToken("index", "buildStackScopedPermissions")
+	a.Deprecate(&BuildStackScopedPermissionsFunction{},
+		DeprecatedFunctions["pulumiservice:index:buildStackScopedPermissions"])
 }
 
 func (i *BuildStackScopedPermissionsInput) Annotate(a infer.Annotator) {
@@ -345,6 +374,8 @@ func (BuildInsightsAccountScopedPermissionsFunction) Annotate(a infer.Annotator)
 			"`getInsightsAccount` data source). "+scopedPermissionsHelpDoc,
 	)
 	a.SetToken("index", "buildInsightsAccountScopedPermissions")
+	a.Deprecate(&BuildInsightsAccountScopedPermissionsFunction{},
+		DeprecatedFunctions["pulumiservice:index:buildInsightsAccountScopedPermissions"])
 }
 
 func (i *BuildInsightsAccountScopedPermissionsInput) Annotate(a infer.Annotator) {

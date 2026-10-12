@@ -5,7 +5,7 @@ import * as pulumi from "@pulumi/pulumi";
 import * as utilities from "./utilities";
 
 /**
- * Looks up an existing stack in Pulumi Cloud. Use its `stackId` to scope role permissions to the stack, for example with an `id` entity rule in `buildRolePermissions` or with `buildStackScopedPermissions`.
+ * Looks up an existing stack in Pulumi Cloud. Use its `stackId` to scope role permissions to the stack with an `id` entity rule in `buildRolePermissions`.
  */
 export function getStack(args: GetStackArgs, opts?: pulumi.InvokeOptions): Promise<GetStackResult> {
     opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts || {});
@@ -54,7 +54,7 @@ export interface GetStackResult {
     readonly tags: {[key: string]: string};
 }
 /**
- * Looks up an existing stack in Pulumi Cloud. Use its `stackId` to scope role permissions to the stack, for example with an `id` entity rule in `buildRolePermissions` or with `buildStackScopedPermissions`.
+ * Looks up an existing stack in Pulumi Cloud. Use its `stackId` to scope role permissions to the stack with an `id` entity rule in `buildRolePermissions`.
  */
 export function getStackOutput(args: GetStackOutputArgs, opts?: pulumi.InvokeOutputOptions): pulumi.Output<GetStackResult> {
     opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts || {});

@@ -46,8 +46,7 @@ func (GetStackFunction) Annotate(a infer.Annotator) {
 	a.Describe(
 		&GetStackFunction{},
 		"Looks up an existing stack in Pulumi Cloud. Use its `stackId` to scope role permissions to the "+
-			"stack, for example with an `id` entity rule in `buildRolePermissions` or with "+
-			"`buildStackScopedPermissions`.",
+			"stack with an `id` entity rule in `buildRolePermissions`.",
 	)
 	a.SetToken("index", "getStack")
 }

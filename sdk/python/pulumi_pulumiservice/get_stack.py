@@ -99,7 +99,7 @@ def get_stack(organization_name: Optional[_builtins.str] = None,
               stack_name: Optional[_builtins.str] = None,
               opts: Optional[pulumi.InvokeOptions] = None) -> AwaitableGetStackResult:
     """
-    Looks up an existing stack in Pulumi Cloud. Use its `stackId` to scope role permissions to the stack, for example with an `id` entity rule in `buildRolePermissions` or with `buildStackScopedPermissions`.
+    Looks up an existing stack in Pulumi Cloud. Use its `stackId` to scope role permissions to the stack with an `id` entity rule in `buildRolePermissions`.
 
     :param _builtins.str organization_name: The Pulumi Cloud organization name.
     :param _builtins.str project_name: The project name.
@@ -123,7 +123,7 @@ def get_stack_output(organization_name: pulumi.Input[Optional[_builtins.str]] = 
                      stack_name: pulumi.Input[Optional[_builtins.str]] = None,
                      opts: Optional[Union[pulumi.InvokeOptions, pulumi.InvokeOutputOptions]] = None) -> pulumi.Output[GetStackResult]:
     """
-    Looks up an existing stack in Pulumi Cloud. Use its `stackId` to scope role permissions to the stack, for example with an `id` entity rule in `buildRolePermissions` or with `buildStackScopedPermissions`.
+    Looks up an existing stack in Pulumi Cloud. Use its `stackId` to scope role permissions to the stack with an `id` entity rule in `buildRolePermissions`.
 
     :param _builtins.str organization_name: The Pulumi Cloud organization name.
     :param _builtins.str project_name: The project name.

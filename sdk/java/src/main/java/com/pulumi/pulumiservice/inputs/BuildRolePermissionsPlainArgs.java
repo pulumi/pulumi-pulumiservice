@@ -23,14 +23,14 @@ public final class BuildRolePermissionsPlainArgs extends com.pulumi.resources.In
     public static final BuildRolePermissionsPlainArgs Empty = new BuildRolePermissionsPlainArgs();
 
     /**
-     * Further descriptors to include in the role, typically the `permissions` output of `buildAllowPermissions`, `buildStackScopedPermissions`, `buildEnvironmentScopedPermissions`, or `buildInsightsAccountScopedPermissions`.
+     * Further descriptors to include in the role, in the Pulumi Cloud wire format, for grants the rules can&#39;t express. For example, `{__type: &#34;PermissionDescriptorAllow&#34;, permissions: [&#34;agent_task:read&#34;]}` grants a scope the enums don&#39;t list yet. Scopes the provider doesn&#39;t recognize at all, including misspelled ones, are silently removed rather than rejected.
      * 
      */
     @Import(name="additionalEntries")
     private @Nullable List<Map<String,Object>> additionalEntries;
 
     /**
-     * @return Further descriptors to include in the role, typically the `permissions` output of `buildAllowPermissions`, `buildStackScopedPermissions`, `buildEnvironmentScopedPermissions`, or `buildInsightsAccountScopedPermissions`.
+     * @return Further descriptors to include in the role, in the Pulumi Cloud wire format, for grants the rules can&#39;t express. For example, `{__type: &#34;PermissionDescriptorAllow&#34;, permissions: [&#34;agent_task:read&#34;]}` grants a scope the enums don&#39;t list yet. Scopes the provider doesn&#39;t recognize at all, including misspelled ones, are silently removed rather than rejected.
      * 
      */
     public Optional<List<Map<String,Object>>> additionalEntries() {
@@ -142,7 +142,7 @@ public final class BuildRolePermissionsPlainArgs extends com.pulumi.resources.In
         }
 
         /**
-         * @param additionalEntries Further descriptors to include in the role, typically the `permissions` output of `buildAllowPermissions`, `buildStackScopedPermissions`, `buildEnvironmentScopedPermissions`, or `buildInsightsAccountScopedPermissions`.
+         * @param additionalEntries Further descriptors to include in the role, in the Pulumi Cloud wire format, for grants the rules can&#39;t express. For example, `{__type: &#34;PermissionDescriptorAllow&#34;, permissions: [&#34;agent_task:read&#34;]}` grants a scope the enums don&#39;t list yet. Scopes the provider doesn&#39;t recognize at all, including misspelled ones, are silently removed rather than rejected.
          * 
          * @return builder
          * 
@@ -153,7 +153,7 @@ public final class BuildRolePermissionsPlainArgs extends com.pulumi.resources.In
         }
 
         /**
-         * @param additionalEntries Further descriptors to include in the role, typically the `permissions` output of `buildAllowPermissions`, `buildStackScopedPermissions`, `buildEnvironmentScopedPermissions`, or `buildInsightsAccountScopedPermissions`.
+         * @param additionalEntries Further descriptors to include in the role, in the Pulumi Cloud wire format, for grants the rules can&#39;t express. For example, `{__type: &#34;PermissionDescriptorAllow&#34;, permissions: [&#34;agent_task:read&#34;]}` grants a scope the enums don&#39;t list yet. Scopes the provider doesn&#39;t recognize at all, including misspelled ones, are silently removed rather than rejected.
          * 
          * @return builder
          * 

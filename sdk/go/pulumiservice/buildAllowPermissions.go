@@ -12,6 +12,8 @@ import (
 )
 
 // Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes globally — i.e. on every entity of the matching resource type. This is the simplest descriptor: a flat `PermissionDescriptorAllow`. Use this helper instead of hand-authoring the descriptor literal so the wire-format `__type` discriminator stays an implementation detail. For grants scoped to a specific entity, see `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, or `buildInsightsAccountScopedPermissions`. The result is directly assignable to `OrganizationRole.permissions`. To combine it with other grants in a single role, pass it to `buildRolePermissions` in `additionalEntries`.
+//
+// Deprecated: Use `buildRolePermissions` instead, with `organizationScopes` for organization-level scopes and an `all: true` rule for entity scopes. For a scope the enums don't list yet, pass a raw `{__type: "PermissionDescriptorAllow", permissions: [...]}` descriptor in `buildRolePermissions.additionalEntries`.
 func BuildAllowPermissions(ctx *pulumi.Context, args *BuildAllowPermissionsArgs, opts ...pulumi.InvokeOption) (*BuildAllowPermissionsResult, error) {
 	opts = internal.PkgInvokeDefaultOpts(opts)
 	var rv BuildAllowPermissionsResult

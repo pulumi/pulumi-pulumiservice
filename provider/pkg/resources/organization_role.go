@@ -102,12 +102,10 @@ func (c *OrganizationRoleCore) Annotate(a infer.Annotator) {
 			"and/or permission sets on every entity of its type, on one specific entity, or on entities "+
 			"matching tags. Each rule list accepts only scopes and permission sets for its own entity "+
 			"type, so a stack scope can't end up on an environment rule.\n"+
-			"- `buildAllowPermissions`: grants scopes with no conditions.\n"+
-			"- `buildStackScopedPermissions`, `buildEnvironmentScopedPermissions`, and "+
-			"`buildInsightsAccountScopedPermissions`: grant scopes on one specific entity.\n"+
 			"- `buildComposePermissions`: grants a policy by ID (see below).\n\n"+
-			"Combine helpers by passing their `permissions` outputs to "+
-			"`buildRolePermissions.additionalEntries`. Look up stack IDs with `getStack`, environment IDs "+
+			"`buildAllowPermissions`, `buildStackScopedPermissions`, `buildEnvironmentScopedPermissions`, and "+
+			"`buildInsightsAccountScopedPermissions` are deprecated: `buildRolePermissions` does what they do "+
+			"with typed scopes. Look up stack IDs with `getStack`, environment IDs "+
 			"with `getEnvironment`, and cloud account IDs with `getInsightsAccount`. To assign the role, "+
 			"use `TeamRoleAssignment` or `OrganizationMember.roleId`.\n\n"+
 			"**Permission sets** (bundles of scopes such as the built-in Stack Write, looked up with "+
@@ -133,11 +131,14 @@ func (c *OrganizationRoleCore) Annotate(a infer.Annotator) {
 			"- `PermissionDescriptorIfThenElse` and `PermissionDescriptorSelect`, plus the "+
 			"`PermissionExpression*` and `PermissionLiteralExpression*` expressions (And, Or, Not, "+
 			"Equal, HasTag, Tag, Stack, Environment, InsightsAccount, Team, and others).\n\n"+
-			"**When Pulumi Cloud is newer than this provider**, raw descriptors may not work here: the "+
-			"provider checks them against the Pulumi Cloud API version it was built with. It rejects "+
-			"node types it doesn't recognize and doesn't send scopes it doesn't recognize. Until a "+
-			"provider release catches up, use `pulumiservice:api:Role`, which sends its `details` to "+
-			"Pulumi Cloud unchanged.\n\n"+
+			"**Check scope names in raw descriptors carefully.** The provider checks raw descriptors "+
+			"against the Pulumi Cloud API version it was built with. It rejects node types it doesn't "+
+			"recognize, but it silently removes scopes it doesn't recognize, without an error or a "+
+			"warning. A misspelled scope, such as `stack:raed`, is dropped and the role is created "+
+			"without it. The helper functions don't have this problem: they reject unrecognized scopes.\n\n"+
+			"**When Pulumi Cloud is newer than this provider**, the same check removes scopes that "+
+			"Pulumi Cloud added after the provider was built. Until a provider release catches up, use "+
+			"`pulumiservice:api:Role`, which sends its `details` to Pulumi Cloud unchanged.\n\n"+
 			"Note: `__type` keys require pulumi 3.235.0 or later (pulumi/pulumi#22834). Earlier "+
 			"runtimes drop them at the SDK boundary; the Python SDK pins the minimum runtime version "+
 			"automatically.",

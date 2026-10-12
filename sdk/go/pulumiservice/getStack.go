@@ -11,7 +11,7 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
-// Looks up an existing stack in Pulumi Cloud. Use its `stackId` to scope role permissions to the stack, for example with an `id` entity rule in `buildRolePermissions` or with `buildStackScopedPermissions`.
+// Looks up an existing stack in Pulumi Cloud. Use its `stackId` to scope role permissions to the stack with an `id` entity rule in `buildRolePermissions`.
 func LookupStack(ctx *pulumi.Context, args *LookupStackArgs, opts ...pulumi.InvokeOption) (*LookupStackResult, error) {
 	opts = internal.PkgInvokeDefaultOpts(opts)
 	var rv LookupStackResult

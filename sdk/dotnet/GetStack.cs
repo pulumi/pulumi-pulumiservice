@@ -12,19 +12,19 @@ namespace Pulumi.PulumiService
     public static class GetStack
     {
         /// <summary>
-        /// Looks up an existing stack in Pulumi Cloud. Use its `stackId` to scope role permissions to the stack, for example with an `id` entity rule in `buildRolePermissions` or with `buildStackScopedPermissions`.
+        /// Looks up an existing stack in Pulumi Cloud. Use its `stackId` to scope role permissions to the stack with an `id` entity rule in `buildRolePermissions`.
         /// </summary>
         public static Task<GetStackResult> InvokeAsync(GetStackArgs args, InvokeOptions? options = null)
             => global::Pulumi.Deployment.Instance.InvokeAsync<GetStackResult>("pulumiservice:index:getStack", args ?? new GetStackArgs(), options.WithDefaults());
 
         /// <summary>
-        /// Looks up an existing stack in Pulumi Cloud. Use its `stackId` to scope role permissions to the stack, for example with an `id` entity rule in `buildRolePermissions` or with `buildStackScopedPermissions`.
+        /// Looks up an existing stack in Pulumi Cloud. Use its `stackId` to scope role permissions to the stack with an `id` entity rule in `buildRolePermissions`.
         /// </summary>
         public static Output<GetStackResult> Invoke(GetStackInvokeArgs args, InvokeOptions? options = null)
             => global::Pulumi.Deployment.Instance.Invoke<GetStackResult>("pulumiservice:index:getStack", args ?? new GetStackInvokeArgs(), options.WithDefaults());
 
         /// <summary>
-        /// Looks up an existing stack in Pulumi Cloud. Use its `stackId` to scope role permissions to the stack, for example with an `id` entity rule in `buildRolePermissions` or with `buildStackScopedPermissions`.
+        /// Looks up an existing stack in Pulumi Cloud. Use its `stackId` to scope role permissions to the stack with an `id` entity rule in `buildRolePermissions`.
         /// </summary>
         public static Output<GetStackResult> Invoke(GetStackInvokeArgs args, InvokeOutputOptions options)
             => global::Pulumi.Deployment.Instance.Invoke<GetStackResult>("pulumiservice:index:getStack", args ?? new GetStackInvokeArgs(), options.WithDefaults());

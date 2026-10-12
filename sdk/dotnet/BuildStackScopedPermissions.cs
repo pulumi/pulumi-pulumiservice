@@ -9,6 +9,7 @@ using Pulumi.Serialization;
 
 namespace Pulumi.PulumiService
 {
+    [Obsolete(@"Use `buildRolePermissions` instead, with a `stackRules` entry that sets `id`. For a scope the enums don't list yet, pass a raw `{__type: ""PermissionDescriptorAllow"", permissions: [...]}` descriptor in `buildRolePermissions.additionalEntries`.")]
     public static class BuildStackScopedPermissions
     {
         /// <summary>

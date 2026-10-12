@@ -21,6 +21,8 @@ __all__ = [
     'build_stack_scoped_permissions_output',
 ]
 
+warnings.warn("""Use `buildRolePermissions` instead, with a `stackRules` entry that sets `id`. For a scope the enums don't list yet, pass a raw `{__type: \"PermissionDescriptorAllow\", permissions: [...]}` descriptor in `buildRolePermissions.additionalEntries`.""", DeprecationWarning)
+
 @pulumi.output_type
 class BuildStackScopedPermissionsResult:
     def __init__(__self__, permissions=None):
@@ -55,6 +57,7 @@ def build_stack_scoped_permissions(permissions: Optional[Sequence[_builtins.str]
     :param Sequence[_builtins.str] permissions: The set of `stack:*` scopes to grant on the target stack (e.g. `stack:read`, `stack:edit`, `stack:admin`). Discover valid scope names via the `getOrganizationRoleScopes` data source.
     :param _builtins.str stack_id: The target stack's opaque Pulumi Cloud identifier (not the `organization/project/stack` triple).
     """
+    pulumi.log.warn("""build_stack_scoped_permissions is deprecated: Use `buildRolePermissions` instead, with a `stackRules` entry that sets `id`. For a scope the enums don't list yet, pass a raw `{__type: "PermissionDescriptorAllow", permissions: [...]}` descriptor in `buildRolePermissions.additionalEntries`.""")
     __args__ = dict()
     __args__['permissions'] = permissions
     __args__['stackId'] = stack_id
@@ -72,6 +75,7 @@ def build_stack_scoped_permissions_output(permissions: pulumi.Input[Optional[Seq
     :param Sequence[_builtins.str] permissions: The set of `stack:*` scopes to grant on the target stack (e.g. `stack:read`, `stack:edit`, `stack:admin`). Discover valid scope names via the `getOrganizationRoleScopes` data source.
     :param _builtins.str stack_id: The target stack's opaque Pulumi Cloud identifier (not the `organization/project/stack` triple).
     """
+    pulumi.log.warn("""build_stack_scoped_permissions is deprecated: Use `buildRolePermissions` instead, with a `stackRules` entry that sets `id`. For a scope the enums don't list yet, pass a raw `{__type: "PermissionDescriptorAllow", permissions: [...]}` descriptor in `buildRolePermissions.additionalEntries`.""")
     __args__ = dict()
     __args__['permissions'] = permissions
     __args__['stackId'] = stack_id

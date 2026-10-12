@@ -26,10 +26,6 @@ const awsAccount = pulumiservice.getInsightsAccountOutput({
     organizationName: organizationName,
     accountName: "aws-production",
 });
-const sharedEnvironmentRotate = pulumiservice.buildEnvironmentScopedPermissionsOutput({
-    environmentId: sharedEnvironment.environmentId,
-    permissions: ["environment:rotate"],
-});
 const platformPermissions = pulumiservice.buildRolePermissionsOutput({
     organizationScopes: [
         pulumiservice.RbacOrganizationScope.TeamRead,
@@ -100,12 +96,13 @@ const platformPermissions = pulumiservice.buildRolePermissionsOutput({
             all: true,
             scopes: [pulumiservice.RbacEnvironmentScope.EnvironmentRead],
         },
-        // Open and update one specific environment
+        // Open, update, and rotate one specific environment
         {
             id: sharedEnvironment.environmentId,
             scopes: [
                 pulumiservice.RbacEnvironmentScope.EnvironmentOpen,
                 pulumiservice.RbacEnvironmentScope.EnvironmentWrite,
+                pulumiservice.RbacEnvironmentScope.EnvironmentRotate,
             ],
         },
         // Open environments tagged team=platform
@@ -137,7 +134,6 @@ const platformPermissions = pulumiservice.buildRolePermissionsOutput({
             scopes: [pulumiservice.RbacInsightsAccountScope.InsightsAccountUpdate],
         },
     ],
-    additionalEntries: [sharedEnvironmentRotate.permissions],
 });
 const orgReadOnly = pulumiservice.getOrganizationPermissionSetOutput({
     organizationName: organizationName,
@@ -229,8 +225,6 @@ shared_environment = pulumiservice.get_environment_output(organization_name=orga
     name="shared")
 aws_account = pulumiservice.get_insights_account_output(organization_name=organization_name,
     account_name="aws-production")
-shared_environment_rotate = pulumiservice.build_environment_scoped_permissions_output(environment_id=shared_environment.environment_id,
-    permissions=["environment:rotate"])
 platform_permissions = pulumiservice.build_role_permissions_output(organization_scopes=[
         pulumiservice.RbacOrganizationScope.TEAM_READ,
         pulumiservice.RbacOrganizationScope.STACK_CREATE,
@@ -300,12 +294,13 @@ platform_permissions = pulumiservice.build_role_permissions_output(organization_
             "all": True,
             "scopes": [pulumiservice.RbacEnvironmentScope.ENVIRONMENT_READ],
         },
-        # Open and update one specific environment
+        # Open, update, and rotate one specific environment
         {
             "id": shared_environment.environment_id,
             "scopes": [
                 pulumiservice.RbacEnvironmentScope.ENVIRONMENT_OPEN,
                 pulumiservice.RbacEnvironmentScope.ENVIRONMENT_WRITE,
+                pulumiservice.RbacEnvironmentScope.ENVIRONMENT_ROTATE,
             ],
         },
         # Open environments tagged team=platform
@@ -336,8 +331,7 @@ platform_permissions = pulumiservice.build_role_permissions_output(organization_
             }],
             "scopes": [pulumiservice.RbacInsightsAccountScope.INSIGHTS_ACCOUNT_UPDATE],
         },
-    ],
-    additional_entries=[shared_environment_rotate.permissions])
+    ])
 org_read_only = pulumiservice.get_organization_permission_set_output(organization_name=organization_name,
     default_identifier=pulumiservice.BuiltInPermissionSet.ORG_SETTINGS_READ_ONLY)
 stack_write = pulumiservice.get_organization_permission_set_output(organization_name=organization_name,
@@ -428,12 +422,6 @@ func main() {
 			OrganizationName: pulumi.String(organizationName),
 			AccountName:      pulumi.String("aws-production"),
 		}, nil)
-		sharedEnvironmentRotate := pulumiservice.BuildEnvironmentScopedPermissionsOutput(ctx, pulumiservice.BuildEnvironmentScopedPermissionsOutputArgs{
-			EnvironmentId: sharedEnvironment.EnvironmentId(),
-			Permissions: pulumi.StringArray{
-				pulumi.String("environment:rotate"),
-			},
-		}, nil)
 		platformPermissions := pulumiservice.BuildRolePermissionsOutput(ctx, pulumiservice.BuildRolePermissionsOutputArgs{
 			OrganizationScopes: pulumiservice.RbacOrganizationScopeArray{
 				pulumiservice.RbacOrganizationScopeTeamRead,
@@ -518,12 +506,13 @@ func main() {
 						pulumiservice.RbacEnvironmentScopeEnvironmentRead,
 					},
 				},
-				// Open and update one specific environment
+				// Open, update, and rotate one specific environment
 				&pulumiservice.RoleEnvironmentRuleArgs{
 					Id: sharedEnvironment.EnvironmentId(),
 					Scopes: pulumiservice.RbacEnvironmentScopeArray{
 						pulumiservice.RbacEnvironmentScopeEnvironmentOpen,
 						pulumiservice.RbacEnvironmentScopeEnvironmentWrite,
+						pulumiservice.RbacEnvironmentScopeEnvironmentRotate,
 					},
 				},
 				// Open environments tagged team=platform
@@ -566,9 +555,6 @@ func main() {
 						pulumiservice.RbacInsightsAccountScopeInsightsAccountUpdate,
 					},
 				},
-			},
-			AdditionalEntries: pulumi.MapArray{
-				sharedEnvironmentRotate.Permissions(),
 			},
 		}, nil)
 		orgReadOnly := pulumiservice.GetOrganizationPermissionSetOutput(ctx, pulumiservice.GetOrganizationPermissionSetOutputArgs{
@@ -707,15 +693,6 @@ return await Deployment.RunAsync(() =>
         AccountName = "aws-production",
     });
 
-    var sharedEnvironmentRotate = PulumiService.BuildEnvironmentScopedPermissions.Invoke(new()
-    {
-        EnvironmentId = sharedEnvironment.Apply(getEnvironmentResult => getEnvironmentResult.EnvironmentId),
-        Permissions = new[]
-        {
-            "environment:rotate",
-        },
-    });
-
     var platformPermissions = PulumiService.BuildRolePermissions.Invoke(new()
     {
         OrganizationScopes = new[]
@@ -827,7 +804,7 @@ return await Deployment.RunAsync(() =>
                     PulumiService.RbacEnvironmentScope.EnvironmentRead,
                 },
             },
-            // Open and update one specific environment
+            // Open, update, and rotate one specific environment
             new PulumiService.Inputs.RoleEnvironmentRuleInputArgs
             {
                 Id = sharedEnvironment.Apply(getEnvironmentResult => getEnvironmentResult.EnvironmentId),
@@ -835,6 +812,7 @@ return await Deployment.RunAsync(() =>
                 {
                     PulumiService.RbacEnvironmentScope.EnvironmentOpen,
                     PulumiService.RbacEnvironmentScope.EnvironmentWrite,
+                    PulumiService.RbacEnvironmentScope.EnvironmentRotate,
                 },
             },
             // Open environments tagged team=platform
@@ -890,10 +868,6 @@ return await Deployment.RunAsync(() =>
                     PulumiService.RbacInsightsAccountScope.InsightsAccountUpdate,
                 },
             },
-        },
-        AdditionalEntries = new[]
-        {
-            sharedEnvironmentRotate.Apply(buildEnvironmentScopedPermissionsResult => buildEnvironmentScopedPermissionsResult.Permissions),
         },
     });
 
@@ -1045,7 +1019,6 @@ import com.pulumi.pulumiservice.PulumiserviceFunctions;
 import com.pulumi.pulumiservice.inputs.GetStackArgs;
 import com.pulumi.pulumiservice.inputs.GetEnvironmentArgs;
 import com.pulumi.pulumiservice.inputs.GetInsightsAccountArgs;
-import com.pulumi.pulumiservice.inputs.BuildEnvironmentScopedPermissionsArgs;
 import com.pulumi.pulumiservice.inputs.BuildRolePermissionsArgs;
 import com.pulumi.pulumiservice.inputs.RoleStackRuleArgs;
 import com.pulumi.pulumiservice.inputs.RoleTagConditionArgs;
@@ -1088,11 +1061,6 @@ public class App {
         final var awsAccount = PulumiserviceFunctions.getInsightsAccount(GetInsightsAccountArgs.builder()
             .organizationName(organizationName)
             .accountName("aws-production")
-            .build());
-
-        final var sharedEnvironmentRotate = PulumiserviceFunctions.buildEnvironmentScopedPermissions(BuildEnvironmentScopedPermissionsArgs.builder()
-            .environmentId(sharedEnvironment.applyValue(_sharedEnvironment -> _sharedEnvironment.environmentId()))
-            .permissions("environment:rotate")
             .build());
 
         final var platformPermissions = PulumiserviceFunctions.buildRolePermissions(BuildRolePermissionsArgs.builder()
@@ -1159,12 +1127,13 @@ public class App {
                     .all(true)
                     .scopes(RbacEnvironmentScope.EnvironmentRead)
                     .build(),
-                // Open and update one specific environment
+                // Open, update, and rotate one specific environment
                 RoleEnvironmentRuleArgs.builder()
                     .id(sharedEnvironment.applyValue(_sharedEnvironment -> _sharedEnvironment.environmentId()))
                     .scopes(                    
                         RbacEnvironmentScope.EnvironmentOpen,
-                        RbacEnvironmentScope.EnvironmentWrite)
+                        RbacEnvironmentScope.EnvironmentWrite,
+                        RbacEnvironmentScope.EnvironmentRotate)
                     .build(),
                 // Open environments tagged team=platform
                 RoleEnvironmentRuleArgs.builder()
@@ -1193,7 +1162,6 @@ public class App {
                         .build())
                     .scopes(RbacInsightsAccountScope.InsightsAccountUpdate)
                     .build())
-            .additionalEntries(sharedEnvironmentRotate.applyValue(_sharedEnvironmentRotate -> _sharedEnvironmentRotate.permissions()))
             .build());
 
         final var orgReadOnly = PulumiserviceFunctions.getOrganizationPermissionSet(GetOrganizationPermissionSetArgs.builder()
@@ -1310,15 +1278,6 @@ variables:
         organizationName: ${organizationName}
         accountName: aws-production
 
-  # Any single-purpose helper can be folded into a role through `additionalEntries`.
-  sharedEnvironmentRotate:
-    fn::invoke:
-      function: pulumiservice:buildEnvironmentScopedPermissions
-      arguments:
-        environmentId: ${sharedEnvironment.environmentId}
-        permissions:
-          - environment:rotate
-
   # A role built from scopes: organization-level access plus rules for stacks,
   # environments, and cloud accounts. Each rule list accepts only scopes for
   # its own entity type.
@@ -1372,11 +1331,12 @@ variables:
           - all: true
             scopes:
               - environment:read
-          # Open and update one specific environment
+          # Open, update, and rotate one specific environment
           - id: ${sharedEnvironment.environmentId}
             scopes:
               - environment:open
               - environment:write
+              - environment:rotate
           # Open environments tagged team=platform
           - tags:
               - key: team
@@ -1398,8 +1358,6 @@ variables:
                 value: platform
             scopes:
               - insights_account:update
-        additionalEntries:
-          - ${sharedEnvironmentRotate.permissions}
 
   # Permission sets bundle scopes and are shared by reference, so a role that
   # uses them follows changes to the set. Look up the built-in sets to grant,

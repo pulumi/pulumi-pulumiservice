@@ -7,7 +7,9 @@ import * as utilities from "./utilities";
 /**
  * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named insights account. Pair with `InsightsAccount.insightsAccountId` (or the `getInsightsAccount` data source). The result is directly assignable to `OrganizationRole.permissions`. To combine it with other grants in a single role, pass it to `buildRolePermissions` in `additionalEntries`.
  */
+/** @deprecated Use `buildRolePermissions` instead, with an `insightsAccountRules` entry that sets `id`. For a scope the enums don't list yet, pass a raw `{__type: "PermissionDescriptorAllow", permissions: [...]}` descriptor in `buildRolePermissions.additionalEntries`. */
 export function buildInsightsAccountScopedPermissions(args: BuildInsightsAccountScopedPermissionsArgs, opts?: pulumi.InvokeOptions): Promise<BuildInsightsAccountScopedPermissionsResult> {
+    pulumi.log.warn("buildInsightsAccountScopedPermissions is deprecated: Use `buildRolePermissions` instead, with an `insightsAccountRules` entry that sets `id`. For a scope the enums don't list yet, pass a raw `{__type: \"PermissionDescriptorAllow\", permissions: [...]}` descriptor in `buildRolePermissions.additionalEntries`.")
     opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts || {});
     return pulumi.runtime.invoke("pulumiservice:index:buildInsightsAccountScopedPermissions", {
         "insightsAccountId": args.insightsAccountId,
@@ -35,7 +37,9 @@ export interface BuildInsightsAccountScopedPermissionsResult {
 /**
  * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named insights account. Pair with `InsightsAccount.insightsAccountId` (or the `getInsightsAccount` data source). The result is directly assignable to `OrganizationRole.permissions`. To combine it with other grants in a single role, pass it to `buildRolePermissions` in `additionalEntries`.
  */
+/** @deprecated Use `buildRolePermissions` instead, with an `insightsAccountRules` entry that sets `id`. For a scope the enums don't list yet, pass a raw `{__type: "PermissionDescriptorAllow", permissions: [...]}` descriptor in `buildRolePermissions.additionalEntries`. */
 export function buildInsightsAccountScopedPermissionsOutput(args: BuildInsightsAccountScopedPermissionsOutputArgs, opts?: pulumi.InvokeOutputOptions): pulumi.Output<BuildInsightsAccountScopedPermissionsResult> {
+    pulumi.log.warn("buildInsightsAccountScopedPermissions is deprecated: Use `buildRolePermissions` instead, with an `insightsAccountRules` entry that sets `id`. For a scope the enums don't list yet, pass a raw `{__type: \"PermissionDescriptorAllow\", permissions: [...]}` descriptor in `buildRolePermissions.additionalEntries`.")
     opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts || {});
     return pulumi.runtime.invokeOutput("pulumiservice:index:buildInsightsAccountScopedPermissions", {
         "insightsAccountId": args.insightsAccountId,

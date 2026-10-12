@@ -12,6 +12,8 @@ import (
 )
 
 // Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named stack. The `stackId` is the stack's opaque Pulumi Cloud identifier — distinct from the `organization/project/stack` triple. The result is directly assignable to `OrganizationRole.permissions`. To combine it with other grants in a single role, pass it to `buildRolePermissions` in `additionalEntries`.
+//
+// Deprecated: Use `buildRolePermissions` instead, with a `stackRules` entry that sets `id`. For a scope the enums don't list yet, pass a raw `{__type: "PermissionDescriptorAllow", permissions: [...]}` descriptor in `buildRolePermissions.additionalEntries`.
 func BuildStackScopedPermissions(ctx *pulumi.Context, args *BuildStackScopedPermissionsArgs, opts ...pulumi.InvokeOption) (*BuildStackScopedPermissionsResult, error) {
 	opts = internal.PkgInvokeDefaultOpts(opts)
 	var rv BuildStackScopedPermissionsResult

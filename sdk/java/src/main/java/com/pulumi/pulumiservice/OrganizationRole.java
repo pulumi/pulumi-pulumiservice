@@ -48,7 +48,6 @@ import javax.annotation.Nullable;
  * import com.pulumi.pulumiservice.inputs.GetStackArgs;
  * import com.pulumi.pulumiservice.inputs.GetEnvironmentArgs;
  * import com.pulumi.pulumiservice.inputs.GetInsightsAccountArgs;
- * import com.pulumi.pulumiservice.inputs.BuildEnvironmentScopedPermissionsArgs;
  * import com.pulumi.pulumiservice.inputs.BuildRolePermissionsArgs;
  * import com.pulumi.pulumiservice.inputs.RoleStackRuleArgs;
  * import com.pulumi.pulumiservice.inputs.RoleTagConditionArgs;
@@ -91,11 +90,6 @@ import javax.annotation.Nullable;
  *         final var awsAccount = PulumiserviceFunctions.getInsightsAccount(GetInsightsAccountArgs.builder()
  *             .organizationName(organizationName)
  *             .accountName("aws-production")
- *             .build());
- * 
- *         final var sharedEnvironmentRotate = PulumiserviceFunctions.buildEnvironmentScopedPermissions(BuildEnvironmentScopedPermissionsArgs.builder()
- *             .environmentId(sharedEnvironment.applyValue(_sharedEnvironment -> _sharedEnvironment.environmentId()))
- *             .permissions("environment:rotate")
  *             .build());
  * 
  *         final var platformPermissions = PulumiserviceFunctions.buildRolePermissions(BuildRolePermissionsArgs.builder()
@@ -162,12 +156,13 @@ import javax.annotation.Nullable;
  *                     .all(true)
  *                     .scopes(RbacEnvironmentScope.EnvironmentRead)
  *                     .build(),
- *                 // Open and update one specific environment
+ *                 // Open, update, and rotate one specific environment
  *                 RoleEnvironmentRuleArgs.builder()
  *                     .id(sharedEnvironment.applyValue(_sharedEnvironment -> _sharedEnvironment.environmentId()))
  *                     .scopes(                    
  *                         RbacEnvironmentScope.EnvironmentOpen,
- *                         RbacEnvironmentScope.EnvironmentWrite)
+ *                         RbacEnvironmentScope.EnvironmentWrite,
+ *                         RbacEnvironmentScope.EnvironmentRotate)
  *                     .build(),
  *                 // Open environments tagged team=platform
  *                 RoleEnvironmentRuleArgs.builder()
@@ -196,7 +191,6 @@ import javax.annotation.Nullable;
  *                         .build())
  *                     .scopes(RbacInsightsAccountScope.InsightsAccountUpdate)
  *                     .build())
- *             .additionalEntries(sharedEnvironmentRotate.applyValue(_sharedEnvironmentRotate -> _sharedEnvironmentRotate.permissions()))
  *             .build());
  * 
  *         final var orgReadOnly = PulumiserviceFunctions.getOrganizationPermissionSet(GetOrganizationPermissionSetArgs.builder()
@@ -335,11 +329,9 @@ public class OrganizationRole extends com.pulumi.resources.CustomResource {
      * 
      * **Build this with the helper functions.** They construct the tree for you and validate it before anything reaches Pulumi Cloud:
      * - `buildRolePermissions`: start here. It builds a complete role from organization-level access and rules for stacks, environments, and cloud accounts (Discovery; `InsightsAccount` in the API and this provider). Each rule grants scopes and/or permission sets on every entity of its type, on one specific entity, or on entities matching tags. Each rule list accepts only scopes and permission sets for its own entity type, so a stack scope can&#39;t end up on an environment rule.
-     * - `buildAllowPermissions`: grants scopes with no conditions.
-     * - `buildStackScopedPermissions`, `buildEnvironmentScopedPermissions`, and `buildInsightsAccountScopedPermissions`: grant scopes on one specific entity.
      * - `buildComposePermissions`: grants a policy by ID (see below).
      * 
-     * Combine helpers by passing their `permissions` outputs to `buildRolePermissions.additionalEntries`. Look up stack IDs with `getStack`, environment IDs with `getEnvironment`, and cloud account IDs with `getInsightsAccount`. To assign the role, use `TeamRoleAssignment` or `OrganizationMember.roleId`.
+     * `buildAllowPermissions`, `buildStackScopedPermissions`, `buildEnvironmentScopedPermissions`, and `buildInsightsAccountScopedPermissions` are deprecated: `buildRolePermissions` does what they do with typed scopes. Look up stack IDs with `getStack`, environment IDs with `getEnvironment`, and cloud account IDs with `getInsightsAccount`. To assign the role, use `TeamRoleAssignment` or `OrganizationMember.roleId`.
      * 
      * **Permission sets** (bundles of scopes such as the built-in Stack Write, looked up with `getOrganizationPermissionSet`) can&#39;t be referenced from a role directly: Pulumi Cloud accepts them only in a policy. Build the policy&#39;s permissions with `buildRolePermissions` (`permissionSets`, `organizationPermissionSets`), store them with `pulumiservice:api:Role` (`uxPurpose: policy`), and set this property to `buildComposePermissions` with the policy&#39;s `roleID`. The example below shows both approaches.
      * 
@@ -352,7 +344,9 @@ public class OrganizationRole extends com.pulumi.resources.CustomResource {
      * - `PermissionDescriptorCompose`: `{permissionDescriptors: [&lt;id&gt;, ...]}` grants other permission sets or roles by ID.
      * - `PermissionDescriptorIfThenElse` and `PermissionDescriptorSelect`, plus the `PermissionExpression*` and `PermissionLiteralExpression*` expressions (And, Or, Not, Equal, HasTag, Tag, Stack, Environment, InsightsAccount, Team, and others).
      * 
-     * **When Pulumi Cloud is newer than this provider**, raw descriptors may not work here: the provider checks them against the Pulumi Cloud API version it was built with. It rejects node types it doesn&#39;t recognize and doesn&#39;t send scopes it doesn&#39;t recognize. Until a provider release catches up, use `pulumiservice:api:Role`, which sends its `details` to Pulumi Cloud unchanged.
+     * **Check scope names in raw descriptors carefully.** The provider checks raw descriptors against the Pulumi Cloud API version it was built with. It rejects node types it doesn&#39;t recognize, but it silently removes scopes it doesn&#39;t recognize, without an error or a warning. A misspelled scope, such as `stack:raed`, is dropped and the role is created without it. The helper functions don&#39;t have this problem: they reject unrecognized scopes.
+     * 
+     * **When Pulumi Cloud is newer than this provider**, the same check removes scopes that Pulumi Cloud added after the provider was built. Until a provider release catches up, use `pulumiservice:api:Role`, which sends its `details` to Pulumi Cloud unchanged.
      * 
      * Note: `__type` keys require pulumi 3.235.0 or later (pulumi/pulumi#22834). Earlier runtimes drop them at the SDK boundary; the Python SDK pins the minimum runtime version automatically.
      * 
@@ -365,11 +359,9 @@ public class OrganizationRole extends com.pulumi.resources.CustomResource {
      * 
      * **Build this with the helper functions.** They construct the tree for you and validate it before anything reaches Pulumi Cloud:
      * - `buildRolePermissions`: start here. It builds a complete role from organization-level access and rules for stacks, environments, and cloud accounts (Discovery; `InsightsAccount` in the API and this provider). Each rule grants scopes and/or permission sets on every entity of its type, on one specific entity, or on entities matching tags. Each rule list accepts only scopes and permission sets for its own entity type, so a stack scope can&#39;t end up on an environment rule.
-     * - `buildAllowPermissions`: grants scopes with no conditions.
-     * - `buildStackScopedPermissions`, `buildEnvironmentScopedPermissions`, and `buildInsightsAccountScopedPermissions`: grant scopes on one specific entity.
      * - `buildComposePermissions`: grants a policy by ID (see below).
      * 
-     * Combine helpers by passing their `permissions` outputs to `buildRolePermissions.additionalEntries`. Look up stack IDs with `getStack`, environment IDs with `getEnvironment`, and cloud account IDs with `getInsightsAccount`. To assign the role, use `TeamRoleAssignment` or `OrganizationMember.roleId`.
+     * `buildAllowPermissions`, `buildStackScopedPermissions`, `buildEnvironmentScopedPermissions`, and `buildInsightsAccountScopedPermissions` are deprecated: `buildRolePermissions` does what they do with typed scopes. Look up stack IDs with `getStack`, environment IDs with `getEnvironment`, and cloud account IDs with `getInsightsAccount`. To assign the role, use `TeamRoleAssignment` or `OrganizationMember.roleId`.
      * 
      * **Permission sets** (bundles of scopes such as the built-in Stack Write, looked up with `getOrganizationPermissionSet`) can&#39;t be referenced from a role directly: Pulumi Cloud accepts them only in a policy. Build the policy&#39;s permissions with `buildRolePermissions` (`permissionSets`, `organizationPermissionSets`), store them with `pulumiservice:api:Role` (`uxPurpose: policy`), and set this property to `buildComposePermissions` with the policy&#39;s `roleID`. The example below shows both approaches.
      * 
@@ -382,7 +374,9 @@ public class OrganizationRole extends com.pulumi.resources.CustomResource {
      * - `PermissionDescriptorCompose`: `{permissionDescriptors: [&lt;id&gt;, ...]}` grants other permission sets or roles by ID.
      * - `PermissionDescriptorIfThenElse` and `PermissionDescriptorSelect`, plus the `PermissionExpression*` and `PermissionLiteralExpression*` expressions (And, Or, Not, Equal, HasTag, Tag, Stack, Environment, InsightsAccount, Team, and others).
      * 
-     * **When Pulumi Cloud is newer than this provider**, raw descriptors may not work here: the provider checks them against the Pulumi Cloud API version it was built with. It rejects node types it doesn&#39;t recognize and doesn&#39;t send scopes it doesn&#39;t recognize. Until a provider release catches up, use `pulumiservice:api:Role`, which sends its `details` to Pulumi Cloud unchanged.
+     * **Check scope names in raw descriptors carefully.** The provider checks raw descriptors against the Pulumi Cloud API version it was built with. It rejects node types it doesn&#39;t recognize, but it silently removes scopes it doesn&#39;t recognize, without an error or a warning. A misspelled scope, such as `stack:raed`, is dropped and the role is created without it. The helper functions don&#39;t have this problem: they reject unrecognized scopes.
+     * 
+     * **When Pulumi Cloud is newer than this provider**, the same check removes scopes that Pulumi Cloud added after the provider was built. Until a provider release catches up, use `pulumiservice:api:Role`, which sends its `details` to Pulumi Cloud unchanged.
      * 
      * Note: `__type` keys require pulumi 3.235.0 or later (pulumi/pulumi#22834). Earlier runtimes drop them at the SDK boundary; the Python SDK pins the minimum runtime version automatically.
      * 

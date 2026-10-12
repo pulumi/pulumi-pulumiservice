@@ -30,15 +30,6 @@ variables:
         organizationName: ${organizationName}
         accountName: aws-production
 
-  # Any single-purpose helper can be folded into a role through `additionalEntries`.
-  sharedEnvironmentRotate:
-    fn::invoke:
-      function: pulumiservice:buildEnvironmentScopedPermissions
-      arguments:
-        environmentId: ${sharedEnvironment.environmentId}
-        permissions:
-          - environment:rotate
-
   # A role built from scopes: organization-level access plus rules for stacks,
   # environments, and cloud accounts. Each rule list accepts only scopes for
   # its own entity type.
@@ -92,11 +83,12 @@ variables:
           - all: true
             scopes:
               - environment:read
-          # Open and update one specific environment
+          # Open, update, and rotate one specific environment
           - id: ${sharedEnvironment.environmentId}
             scopes:
               - environment:open
               - environment:write
+              - environment:rotate
           # Open environments tagged team=platform
           - tags:
               - key: team
@@ -118,8 +110,6 @@ variables:
                 value: platform
             scopes:
               - insights_account:update
-        additionalEntries:
-          - ${sharedEnvironmentRotate.permissions}
 
   # Permission sets bundle scopes and are shared by reference, so a role that
   # uses them follows changes to the set. Look up the built-in sets to grant,

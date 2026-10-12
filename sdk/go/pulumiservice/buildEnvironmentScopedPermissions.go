@@ -12,6 +12,8 @@ import (
 )
 
 // Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named environment. Pair with `Environment.environmentId` (or the `getEnvironment` data source) to avoid hand-rolling the `PermissionDescriptorCondition` tree yourself. The result is directly assignable to `OrganizationRole.permissions`. To combine it with other grants in a single role, pass it to `buildRolePermissions` in `additionalEntries`.
+//
+// Deprecated: Use `buildRolePermissions` instead, with an `environmentRules` entry that sets `id`. For a scope the enums don't list yet, pass a raw `{__type: "PermissionDescriptorAllow", permissions: [...]}` descriptor in `buildRolePermissions.additionalEntries`.
 func BuildEnvironmentScopedPermissions(ctx *pulumi.Context, args *BuildEnvironmentScopedPermissionsArgs, opts ...pulumi.InvokeOption) (*BuildEnvironmentScopedPermissionsResult, error) {
 	opts = internal.PkgInvokeDefaultOpts(opts)
 	var rv BuildEnvironmentScopedPermissionsResult

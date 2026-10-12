@@ -11,8 +11,7 @@ assigns both roles to a team:
   them in a `pulumiservice:api:Role` policy and grants it with
   **`pulumiservice:buildComposePermissions`**.
 - **`pulumiservice:getStack`** looks up a stack's unique ID.
-- **`pulumiservice:buildEnvironmentScopedPermissions`** is folded in through
-  `additionalEntries`.
+- A raw permission descriptor is folded in through `additionalEntries`.
 - **`pulumiservice:TeamRoleAssignment`** assigns the roles to a team.
 
 The `OrganizationRole` docs example lives in
