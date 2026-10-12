@@ -97,7 +97,8 @@ func (c *OrganizationRoleCore) Annotate(a infer.Annotator) {
 			"**Build this with the helper functions.** They construct the tree for you and validate it "+
 			"before anything reaches Pulumi Cloud:\n"+
 			"- `buildRolePermissions`: start here. It builds a complete role from organization-level "+
-			"access and rules for stacks, environments, and Insights accounts. Each rule grants scopes "+
+			"access and rules for stacks, environments, and cloud accounts (Discovery; `InsightsAccount` in "+
+			"the API and this provider). Each rule grants scopes "+
 			"and/or permission sets on every entity of its type, on one specific entity, or on entities "+
 			"matching tags. Each rule list accepts only scopes and permission sets for its own entity "+
 			"type, so a stack scope can't end up on an environment rule.\n"+
@@ -107,7 +108,7 @@ func (c *OrganizationRoleCore) Annotate(a infer.Annotator) {
 			"- `buildComposePermissions`: grants a policy by ID (see below).\n\n"+
 			"Combine helpers by passing their `permissions` outputs to "+
 			"`buildRolePermissions.additionalEntries`. Look up stack IDs with `getStack`, environment IDs "+
-			"with `getEnvironment`, and Insights account IDs with `getInsightsAccount`. To assign the role, "+
+			"with `getEnvironment`, and cloud account IDs with `getInsightsAccount`. To assign the role, "+
 			"use `TeamRoleAssignment` or `OrganizationMember.roleId`.\n\n"+
 			"**Permission sets** (bundles of scopes such as the built-in Stack Write, looked up with "+
 			"`getOrganizationPermissionSet`) can't be referenced from a role directly: Pulumi Cloud accepts "+

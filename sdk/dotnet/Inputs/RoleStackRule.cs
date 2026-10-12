@@ -19,7 +19,7 @@ namespace Pulumi.PulumiService.Inputs
         public bool? All { get; set; }
 
         /// <summary>
-        /// Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or an Insights account's `insightsAccountId`.
+        /// Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
         /// </summary>
         [Input("id")]
         public string? Id { get; set; }

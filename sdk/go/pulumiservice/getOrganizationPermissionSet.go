@@ -23,8 +23,8 @@ func GetOrganizationPermissionSet(ctx *pulumi.Context, args *GetOrganizationPerm
 }
 
 type GetOrganizationPermissionSetArgs struct {
-	// The built-in permission set's identifier: `stack-read`, `stack-write`, `stack-admin`, `environment-read`, `environment-open`, `environment-write`, `environment-admin`, `insights-account-read`, `insights-account-write`, `insights-account-admin`, `org-settings-standard`, `org-settings-read-only`, or `org-settings-billing`.
-	DefaultIdentifier *string `pulumi:"defaultIdentifier"`
+	// The built-in permission set's identifier, such as `stack-read`.
+	DefaultIdentifier *BuiltInPermissionSet `pulumi:"defaultIdentifier"`
 	// The permission set's display name.
 	Name *string `pulumi:"name"`
 	// The Pulumi Cloud organization name.
@@ -52,8 +52,8 @@ func GetOrganizationPermissionSetOutput(ctx *pulumi.Context, args GetOrganizatio
 }
 
 type GetOrganizationPermissionSetOutputArgs struct {
-	// The built-in permission set's identifier: `stack-read`, `stack-write`, `stack-admin`, `environment-read`, `environment-open`, `environment-write`, `environment-admin`, `insights-account-read`, `insights-account-write`, `insights-account-admin`, `org-settings-standard`, `org-settings-read-only`, or `org-settings-billing`.
-	DefaultIdentifier pulumi.StringPtrInput `pulumi:"defaultIdentifier"`
+	// The built-in permission set's identifier, such as `stack-read`.
+	DefaultIdentifier BuiltInPermissionSetPtrInput `pulumi:"defaultIdentifier"`
 	// The permission set's display name.
 	Name pulumi.StringPtrInput `pulumi:"name"`
 	// The Pulumi Cloud organization name.

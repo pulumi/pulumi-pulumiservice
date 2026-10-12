@@ -54,14 +54,14 @@ public final class BuildRolePermissionsArgs extends com.pulumi.resources.InvokeA
     }
 
     /**
-     * Grants on Insights accounts.
+     * Grants on cloud accounts (`InsightsAccount`).
      * 
      */
     @Import(name="insightsAccountRules")
     private @Nullable Output<List<RoleInsightsAccountRuleArgs>> insightsAccountRules;
 
     /**
-     * @return Grants on Insights accounts.
+     * @return Grants on cloud accounts (`InsightsAccount`).
      * 
      */
     public Optional<Output<List<RoleInsightsAccountRuleArgs>>> insightsAccountRules() {
@@ -205,7 +205,7 @@ public final class BuildRolePermissionsArgs extends com.pulumi.resources.InvokeA
         }
 
         /**
-         * @param insightsAccountRules Grants on Insights accounts.
+         * @param insightsAccountRules Grants on cloud accounts (`InsightsAccount`).
          * 
          * @return builder
          * 
@@ -216,7 +216,7 @@ public final class BuildRolePermissionsArgs extends com.pulumi.resources.InvokeA
         }
 
         /**
-         * @param insightsAccountRules Grants on Insights accounts.
+         * @param insightsAccountRules Grants on cloud accounts (`InsightsAccount`).
          * 
          * @return builder
          * 
@@ -226,7 +226,7 @@ public final class BuildRolePermissionsArgs extends com.pulumi.resources.InvokeA
         }
 
         /**
-         * @param insightsAccountRules Grants on Insights accounts.
+         * @param insightsAccountRules Grants on cloud accounts (`InsightsAccount`).
          * 
          * @return builder
          * 

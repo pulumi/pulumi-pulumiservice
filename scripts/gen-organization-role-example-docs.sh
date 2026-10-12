@@ -56,7 +56,7 @@ block() { # block <fence language> <file>
 {
   printf '{{%% examples %%}}\n## Example Usage\n\n{{%% example %%}}\n'
   printf '### A role with organization-level access and entity rules\n\n'
-  printf 'The program looks up an existing stack, environment, and Insights account, then defines two '
+  printf 'The program looks up an existing stack, environment, and cloud account, then defines two '
   printf 'roles: one granting scopes directly, and one granting permission sets through a policy.\n\n'
   block typescript "$work/typescript/index.ts"
   block python "$work/python/__main__.py"

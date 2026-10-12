@@ -19,7 +19,7 @@ namespace Pulumi.PulumiService.Inputs
         public bool? All { get; set; }
 
         /// <summary>
-        /// Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or an Insights account's `insightsAccountId`.
+        /// Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
         /// </summary>
         [Input("id")]
         public string? Id { get; set; }
@@ -40,7 +40,7 @@ namespace Pulumi.PulumiService.Inputs
         private List<Pulumi.PulumiService.RbacInsightsAccountScope>? _scopes;
 
         /// <summary>
-        /// Insights account scopes to grant on the selected accounts.
+        /// Cloud account scopes to grant on the selected accounts.
         /// </summary>
         public List<Pulumi.PulumiService.RbacInsightsAccountScope> Scopes
         {

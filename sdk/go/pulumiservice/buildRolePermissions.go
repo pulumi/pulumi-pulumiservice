@@ -11,7 +11,7 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
-// Builds a complete `OrganizationRole.permissions` descriptor from organization-level access and rules for stacks, environments, and Insights accounts, the same model as the role editor in the Pulumi Cloud console. Each rule grants scopes and/or permission sets on every entity of its type, on one specific entity, or on entities matching tag conditions. Each rule list accepts only scopes and permission sets for its own entity type. Use `additionalEntries` to fold in the output of the other `build*Permissions` helpers.
+// Builds a complete `OrganizationRole.permissions` descriptor from organization-level access and rules for stacks, environments, and cloud accounts (Discovery; `InsightsAccount` in the API and this provider), the same model as the role editor in the Pulumi Cloud console. Each rule grants scopes and/or permission sets on every entity of its type, on one specific entity, or on entities matching tag conditions. Each rule list accepts only scopes and permission sets for its own entity type. Use `additionalEntries` to fold in the output of the other `build*Permissions` helpers.
 //
 // A result that uses only scopes is directly assignable to `OrganizationRole.permissions`. Pulumi Cloud accepts permission sets only in a policy: store such a result with `pulumiservice:api:Role` (`uxPurpose: policy`, `details: <result>`) and grant the policy to the role with `buildComposePermissions`.
 func BuildRolePermissions(ctx *pulumi.Context, args *BuildRolePermissionsArgs, opts ...pulumi.InvokeOption) (*BuildRolePermissionsResult, error) {
@@ -29,7 +29,7 @@ type BuildRolePermissionsArgs struct {
 	AdditionalEntries []map[string]interface{} `pulumi:"additionalEntries"`
 	// Grants on ESC environments.
 	EnvironmentRules []RoleEnvironmentRule `pulumi:"environmentRules"`
-	// Grants on Insights accounts.
+	// Grants on cloud accounts (`InsightsAccount`).
 	InsightsAccountRules []RoleInsightsAccountRule `pulumi:"insightsAccountRules"`
 	// Organization-level (`global`) permission sets to grant, such as the built-in `org-settings-read-only` set from `getOrganizationPermissionSet`.
 	OrganizationPermissionSets []RolePermissionSetRef `pulumi:"organizationPermissionSets"`
@@ -54,7 +54,7 @@ type BuildRolePermissionsOutputArgs struct {
 	AdditionalEntries pulumi.MapArrayInput `pulumi:"additionalEntries"`
 	// Grants on ESC environments.
 	EnvironmentRules RoleEnvironmentRuleArrayInput `pulumi:"environmentRules"`
-	// Grants on Insights accounts.
+	// Grants on cloud accounts (`InsightsAccount`).
 	InsightsAccountRules RoleInsightsAccountRuleArrayInput `pulumi:"insightsAccountRules"`
 	// Organization-level (`global`) permission sets to grant, such as the built-in `org-settings-read-only` set from `getOrganizationPermissionSet`.
 	OrganizationPermissionSets RolePermissionSetRefArrayInput `pulumi:"organizationPermissionSets"`

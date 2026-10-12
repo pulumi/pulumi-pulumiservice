@@ -4,7 +4,7 @@
 {{% example %}}
 ### A role with organization-level access and entity rules
 
-The program looks up an existing stack, environment, and Insights account, then defines two roles: one granting scopes directly, and one granting permission sets through a policy.
+The program looks up an existing stack, environment, and cloud account, then defines two roles: one granting scopes directly, and one granting permission sets through a policy.
 
 ```typescript
 import * as pulumi from "@pulumi/pulumi";
@@ -118,7 +118,7 @@ const platformPermissions = pulumiservice.buildRolePermissionsOutput({
         },
     ],
     insightsAccountRules: [
-        // Read every Insights account
+        // Read every cloud account
         {
             all: true,
             scopes: [pulumiservice.RbacInsightsAccountScope.InsightsAccountRead],
@@ -141,19 +141,19 @@ const platformPermissions = pulumiservice.buildRolePermissionsOutput({
 });
 const orgReadOnly = pulumiservice.getOrganizationPermissionSetOutput({
     organizationName: organizationName,
-    defaultIdentifier: "org-settings-read-only",
+    defaultIdentifier: pulumiservice.BuiltInPermissionSet.OrgSettingsReadOnly,
 });
 const stackWrite = pulumiservice.getOrganizationPermissionSetOutput({
     organizationName: organizationName,
-    defaultIdentifier: "stack-write",
+    defaultIdentifier: pulumiservice.BuiltInPermissionSet.StackWrite,
 });
 const environmentRead = pulumiservice.getOrganizationPermissionSetOutput({
     organizationName: organizationName,
-    defaultIdentifier: "environment-read",
+    defaultIdentifier: pulumiservice.BuiltInPermissionSet.EnvironmentRead,
 });
 const insightsAccountRead = pulumiservice.getOrganizationPermissionSetOutput({
     organizationName: organizationName,
-    defaultIdentifier: "insights-account-read",
+    defaultIdentifier: pulumiservice.BuiltInPermissionSet.InsightsAccountRead,
 });
 const operatorPolicyPermissions = pulumiservice.buildRolePermissionsOutput({
     organizationPermissionSets: [{
@@ -179,7 +179,7 @@ const operatorPolicyPermissions = pulumiservice.buildRolePermissionsOutput({
             resourceType: environmentRead.resourceType,
         }],
     }],
-    // The Insights Account Read set, plus one extra scope, on one account
+    // The built-in Account Read set, plus one extra scope, on one account
     insightsAccountRules: [{
         id: awsAccount.insightsAccountId,
         permissionSets: [{
@@ -318,7 +318,7 @@ platform_permissions = pulumiservice.build_role_permissions_output(organization_
         },
     ],
     insights_account_rules=[
-        # Read every Insights account
+        # Read every cloud account
         {
             "all": True,
             "scopes": [pulumiservice.RbacInsightsAccountScope.INSIGHTS_ACCOUNT_READ],
@@ -339,13 +339,13 @@ platform_permissions = pulumiservice.build_role_permissions_output(organization_
     ],
     additional_entries=[shared_environment_rotate.permissions])
 org_read_only = pulumiservice.get_organization_permission_set_output(organization_name=organization_name,
-    default_identifier="org-settings-read-only")
+    default_identifier=pulumiservice.BuiltInPermissionSet.ORG_SETTINGS_READ_ONLY)
 stack_write = pulumiservice.get_organization_permission_set_output(organization_name=organization_name,
-    default_identifier="stack-write")
+    default_identifier=pulumiservice.BuiltInPermissionSet.STACK_WRITE)
 environment_read = pulumiservice.get_organization_permission_set_output(organization_name=organization_name,
-    default_identifier="environment-read")
+    default_identifier=pulumiservice.BuiltInPermissionSet.ENVIRONMENT_READ)
 insights_account_read = pulumiservice.get_organization_permission_set_output(organization_name=organization_name,
-    default_identifier="insights-account-read")
+    default_identifier=pulumiservice.BuiltInPermissionSet.INSIGHTS_ACCOUNT_READ)
 operator_policy_permissions = pulumiservice.build_role_permissions_output(organization_permission_sets=[{
         "permission_set_id": org_read_only.permission_set_id,
         "resource_type": org_read_only.resource_type,
@@ -369,7 +369,7 @@ operator_policy_permissions = pulumiservice.build_role_permissions_output(organi
             "resource_type": environment_read.resource_type,
         }],
     }],
-    # The Insights Account Read set, plus one extra scope, on one account
+    # The built-in Account Read set, plus one extra scope, on one account
     insights_account_rules=[{
         "id": aws_account.insights_account_id,
         "permission_sets": [{
@@ -540,7 +540,7 @@ func main() {
 				},
 			},
 			InsightsAccountRules: pulumiservice.RoleInsightsAccountRuleArray{
-				// Read every Insights account
+				// Read every cloud account
 				&pulumiservice.RoleInsightsAccountRuleArgs{
 					All: pulumi.Bool(true),
 					Scopes: pulumiservice.RbacInsightsAccountScopeArray{
@@ -573,19 +573,19 @@ func main() {
 		}, nil)
 		orgReadOnly := pulumiservice.GetOrganizationPermissionSetOutput(ctx, pulumiservice.GetOrganizationPermissionSetOutputArgs{
 			OrganizationName:  pulumi.String(organizationName),
-			DefaultIdentifier: pulumi.String("org-settings-read-only"),
+			DefaultIdentifier: pulumiservice.BuiltInPermissionSetOrgSettingsReadOnly,
 		}, nil)
 		stackWrite := pulumiservice.GetOrganizationPermissionSetOutput(ctx, pulumiservice.GetOrganizationPermissionSetOutputArgs{
 			OrganizationName:  pulumi.String(organizationName),
-			DefaultIdentifier: pulumi.String("stack-write"),
+			DefaultIdentifier: pulumiservice.BuiltInPermissionSetStackWrite,
 		}, nil)
 		environmentRead := pulumiservice.GetOrganizationPermissionSetOutput(ctx, pulumiservice.GetOrganizationPermissionSetOutputArgs{
 			OrganizationName:  pulumi.String(organizationName),
-			DefaultIdentifier: pulumi.String("environment-read"),
+			DefaultIdentifier: pulumiservice.BuiltInPermissionSetEnvironmentRead,
 		}, nil)
 		insightsAccountRead := pulumiservice.GetOrganizationPermissionSetOutput(ctx, pulumiservice.GetOrganizationPermissionSetOutputArgs{
 			OrganizationName:  pulumi.String(organizationName),
-			DefaultIdentifier: pulumi.String("insights-account-read"),
+			DefaultIdentifier: pulumiservice.BuiltInPermissionSetInsightsAccountRead,
 		}, nil)
 		operatorPolicyPermissions := pulumiservice.BuildRolePermissionsOutput(ctx, pulumiservice.BuildRolePermissionsOutputArgs{
 			OrganizationPermissionSets: pulumiservice.RolePermissionSetRefArray{
@@ -624,7 +624,7 @@ func main() {
 				},
 			},
 			InsightsAccountRules: pulumiservice.RoleInsightsAccountRuleArray{
-				// The Insights Account Read set, plus one extra scope, on one account
+				// The built-in Account Read set, plus one extra scope, on one account
 				&pulumiservice.RoleInsightsAccountRuleArgs{
 					Id: awsAccount.InsightsAccountId(),
 					PermissionSets: pulumiservice.RolePermissionSetRefArray{
@@ -856,7 +856,7 @@ return await Deployment.RunAsync(() =>
         },
         InsightsAccountRules = new[]
         {
-            // Read every Insights account
+            // Read every cloud account
             new PulumiService.Inputs.RoleInsightsAccountRuleInputArgs
             {
                 All = true,
@@ -900,25 +900,25 @@ return await Deployment.RunAsync(() =>
     var orgReadOnly = PulumiService.GetOrganizationPermissionSet.Invoke(new()
     {
         OrganizationName = organizationName,
-        DefaultIdentifier = "org-settings-read-only",
+        DefaultIdentifier = PulumiService.BuiltInPermissionSet.OrgSettingsReadOnly,
     });
 
     var stackWrite = PulumiService.GetOrganizationPermissionSet.Invoke(new()
     {
         OrganizationName = organizationName,
-        DefaultIdentifier = "stack-write",
+        DefaultIdentifier = PulumiService.BuiltInPermissionSet.StackWrite,
     });
 
     var environmentRead = PulumiService.GetOrganizationPermissionSet.Invoke(new()
     {
         OrganizationName = organizationName,
-        DefaultIdentifier = "environment-read",
+        DefaultIdentifier = PulumiService.BuiltInPermissionSet.EnvironmentRead,
     });
 
     var insightsAccountRead = PulumiService.GetOrganizationPermissionSet.Invoke(new()
     {
         OrganizationName = organizationName,
-        DefaultIdentifier = "insights-account-read",
+        DefaultIdentifier = PulumiService.BuiltInPermissionSet.InsightsAccountRead,
     });
 
     var operatorPolicyPermissions = PulumiService.BuildRolePermissions.Invoke(new()
@@ -972,7 +972,7 @@ return await Deployment.RunAsync(() =>
         },
         InsightsAccountRules = new[]
         {
-            // The Insights Account Read set, plus one extra scope, on one account
+            // The built-in Account Read set, plus one extra scope, on one account
             new PulumiService.Inputs.RoleInsightsAccountRuleInputArgs
             {
                 Id = awsAccount.Apply(getInsightsAccountResult => getInsightsAccountResult.InsightsAccountId),
@@ -1035,6 +1035,7 @@ package generated_program;
 import com.pulumi.Context;
 import com.pulumi.Pulumi;
 import com.pulumi.core.Output;
+import com.pulumi.pulumiservice.enums.BuiltInPermissionSet;
 import com.pulumi.pulumiservice.enums.RbacEnvironmentScope;
 import com.pulumi.pulumiservice.enums.RbacInsightsAccountScope;
 import com.pulumi.pulumiservice.enums.RbacOrganizationScope;
@@ -1174,7 +1175,7 @@ public class App {
                     .scopes(RbacEnvironmentScope.EnvironmentOpen)
                     .build())
             .insightsAccountRules(            
-                // Read every Insights account
+                // Read every cloud account
                 RoleInsightsAccountRuleArgs.builder()
                     .all(true)
                     .scopes(RbacInsightsAccountScope.InsightsAccountRead)
@@ -1197,22 +1198,22 @@ public class App {
 
         final var orgReadOnly = PulumiserviceFunctions.getOrganizationPermissionSet(GetOrganizationPermissionSetArgs.builder()
             .organizationName(organizationName)
-            .defaultIdentifier("org-settings-read-only")
+            .defaultIdentifier(BuiltInPermissionSet.OrgSettingsReadOnly)
             .build());
 
         final var stackWrite = PulumiserviceFunctions.getOrganizationPermissionSet(GetOrganizationPermissionSetArgs.builder()
             .organizationName(organizationName)
-            .defaultIdentifier("stack-write")
+            .defaultIdentifier(BuiltInPermissionSet.StackWrite)
             .build());
 
         final var environmentRead = PulumiserviceFunctions.getOrganizationPermissionSet(GetOrganizationPermissionSetArgs.builder()
             .organizationName(organizationName)
-            .defaultIdentifier("environment-read")
+            .defaultIdentifier(BuiltInPermissionSet.EnvironmentRead)
             .build());
 
         final var insightsAccountRead = PulumiserviceFunctions.getOrganizationPermissionSet(GetOrganizationPermissionSetArgs.builder()
             .organizationName(organizationName)
-            .defaultIdentifier("insights-account-read")
+            .defaultIdentifier(BuiltInPermissionSet.InsightsAccountRead)
             .build());
 
         final var operatorPolicyPermissions = PulumiserviceFunctions.buildRolePermissions(BuildRolePermissionsArgs.builder()
@@ -1239,7 +1240,7 @@ public class App {
                     .resourceType(environmentRead.applyValue(_environmentRead -> _environmentRead.resourceType()))
                     .build())
                 .build())
-            // The Insights Account Read set, plus one extra scope, on one account
+            // The built-in Account Read set, plus one extra scope, on one account
             .insightsAccountRules(RoleInsightsAccountRuleArgs.builder()
                 .id(awsAccount.applyValue(_awsAccount -> _awsAccount.insightsAccountId()))
                 .permissionSets(RolePermissionSetRefArgs.builder()
@@ -1319,7 +1320,7 @@ variables:
           - environment:rotate
 
   # A role built from scopes: organization-level access plus rules for stacks,
-  # environments, and Insights accounts. Each rule list accepts only scopes for
+  # environments, and cloud accounts. Each rule list accepts only scopes for
   # its own entity type.
   platformPermissions:
     fn::invoke:
@@ -1383,7 +1384,7 @@ variables:
             scopes:
               - environment:open
         insightsAccountRules:
-          # Read every Insights account
+          # Read every cloud account
           - all: true
             scopes:
               - insights_account:read
@@ -1452,7 +1453,7 @@ variables:
               - permissionSetId: ${environmentRead.permissionSetId}
                 resourceType: ${environmentRead.resourceType}
         insightsAccountRules:
-          # The Insights Account Read set, plus one extra scope, on one account
+          # The built-in Account Read set, plus one extra scope, on one account
           - id: ${awsAccount.insightsAccountId}
             permissionSets:
               - permissionSetId: ${insightsAccountRead.permissionSetId}

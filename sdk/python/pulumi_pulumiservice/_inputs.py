@@ -2188,7 +2188,7 @@ class RoleEnvironmentRuleDict(TypedDict):
     """
     id: NotRequired[_builtins.str]
     """
-    Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or an Insights account's `insightsAccountId`.
+    Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
     """
     permission_sets: NotRequired[Sequence['RolePermissionSetRefDict']]
     """
@@ -2213,7 +2213,7 @@ class RoleEnvironmentRule:
                  tags: Optional[Sequence['RoleTagCondition']] = None):
         """
         :param _builtins.bool all: Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
-        :param _builtins.str id: Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or an Insights account's `insightsAccountId`.
+        :param _builtins.str id: Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
         :param Sequence['RolePermissionSetRef'] permission_sets: Permission sets to grant, typically the output of `getOrganizationPermissionSet`. Each set's `resourceType` must match this rule's entity type. Pulumi Cloud accepts permission sets only in a policy: see `buildRolePermissions`.
         :param Sequence['RbacEnvironmentScope'] scopes: Environment scopes to grant on the selected environments.
         :param Sequence['RoleTagCondition'] tags: Apply to entities whose tags match every condition.
@@ -2245,7 +2245,7 @@ class RoleEnvironmentRule:
     @pulumi.getter
     def id(self) -> Optional[_builtins.str]:
         """
-        Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or an Insights account's `insightsAccountId`.
+        Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
         """
         return pulumi.get(self, "id")
 
@@ -2297,7 +2297,7 @@ class RoleInsightsAccountRuleDict(TypedDict):
     """
     id: NotRequired[_builtins.str]
     """
-    Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or an Insights account's `insightsAccountId`.
+    Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
     """
     permission_sets: NotRequired[Sequence['RolePermissionSetRefDict']]
     """
@@ -2305,7 +2305,7 @@ class RoleInsightsAccountRuleDict(TypedDict):
     """
     scopes: NotRequired[Sequence['RbacInsightsAccountScope']]
     """
-    Insights account scopes to grant on the selected accounts.
+    Cloud account scopes to grant on the selected accounts.
     """
     tags: NotRequired[Sequence['RoleTagConditionDict']]
     """
@@ -2322,9 +2322,9 @@ class RoleInsightsAccountRule:
                  tags: Optional[Sequence['RoleTagCondition']] = None):
         """
         :param _builtins.bool all: Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
-        :param _builtins.str id: Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or an Insights account's `insightsAccountId`.
+        :param _builtins.str id: Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
         :param Sequence['RolePermissionSetRef'] permission_sets: Permission sets to grant, typically the output of `getOrganizationPermissionSet`. Each set's `resourceType` must match this rule's entity type. Pulumi Cloud accepts permission sets only in a policy: see `buildRolePermissions`.
-        :param Sequence['RbacInsightsAccountScope'] scopes: Insights account scopes to grant on the selected accounts.
+        :param Sequence['RbacInsightsAccountScope'] scopes: Cloud account scopes to grant on the selected accounts.
         :param Sequence['RoleTagCondition'] tags: Apply to entities whose tags match every condition.
         """
         if all is not None:
@@ -2354,7 +2354,7 @@ class RoleInsightsAccountRule:
     @pulumi.getter
     def id(self) -> Optional[_builtins.str]:
         """
-        Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or an Insights account's `insightsAccountId`.
+        Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
         """
         return pulumi.get(self, "id")
 
@@ -2378,7 +2378,7 @@ class RoleInsightsAccountRule:
     @pulumi.getter
     def scopes(self) -> Optional[Sequence['RbacInsightsAccountScope']]:
         """
-        Insights account scopes to grant on the selected accounts.
+        Cloud account scopes to grant on the selected accounts.
         """
         return pulumi.get(self, "scopes")
 
@@ -2453,7 +2453,7 @@ class RoleStackRuleDict(TypedDict):
     """
     id: NotRequired[_builtins.str]
     """
-    Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or an Insights account's `insightsAccountId`.
+    Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
     """
     permission_sets: NotRequired[Sequence['RolePermissionSetRefDict']]
     """
@@ -2478,7 +2478,7 @@ class RoleStackRule:
                  tags: Optional[Sequence['RoleTagCondition']] = None):
         """
         :param _builtins.bool all: Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
-        :param _builtins.str id: Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or an Insights account's `insightsAccountId`.
+        :param _builtins.str id: Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
         :param Sequence['RolePermissionSetRef'] permission_sets: Permission sets to grant, typically the output of `getOrganizationPermissionSet`. Each set's `resourceType` must match this rule's entity type. Pulumi Cloud accepts permission sets only in a policy: see `buildRolePermissions`.
         :param Sequence['RbacStackScope'] scopes: Stack scopes to grant on the selected stacks.
         :param Sequence['RoleTagCondition'] tags: Apply to entities whose tags match every condition.
@@ -2510,7 +2510,7 @@ class RoleStackRule:
     @pulumi.getter
     def id(self) -> Optional[_builtins.str]:
         """
-        Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or an Insights account's `insightsAccountId`.
+        Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
         """
         return pulumi.get(self, "id")
 

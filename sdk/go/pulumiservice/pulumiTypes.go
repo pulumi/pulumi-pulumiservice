@@ -4436,7 +4436,7 @@ func (o PolicyPackSummaryArrayOutput) Index(i pulumi.IntInput) PolicyPackSummary
 type RoleEnvironmentRule struct {
 	// Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
 	All *bool `pulumi:"all"`
-	// Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or an Insights account's `insightsAccountId`.
+	// Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
 	Id *string `pulumi:"id"`
 	// Permission sets to grant, typically the output of `getOrganizationPermissionSet`. Each set's `resourceType` must match this rule's entity type. Pulumi Cloud accepts permission sets only in a policy: see `buildRolePermissions`.
 	PermissionSets []RolePermissionSetRef `pulumi:"permissionSets"`
@@ -4460,7 +4460,7 @@ type RoleEnvironmentRuleInput interface {
 type RoleEnvironmentRuleArgs struct {
 	// Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
 	All pulumi.BoolPtrInput `pulumi:"all"`
-	// Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or an Insights account's `insightsAccountId`.
+	// Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
 	Id pulumi.StringPtrInput `pulumi:"id"`
 	// Permission sets to grant, typically the output of `getOrganizationPermissionSet`. Each set's `resourceType` must match this rule's entity type. Pulumi Cloud accepts permission sets only in a policy: see `buildRolePermissions`.
 	PermissionSets RolePermissionSetRefArrayInput `pulumi:"permissionSets"`
@@ -4526,7 +4526,7 @@ func (o RoleEnvironmentRuleOutput) All() pulumi.BoolPtrOutput {
 	return o.ApplyT(func(v RoleEnvironmentRule) *bool { return v.All }).(pulumi.BoolPtrOutput)
 }
 
-// Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or an Insights account's `insightsAccountId`.
+// Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
 func (o RoleEnvironmentRuleOutput) Id() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v RoleEnvironmentRule) *string { return v.Id }).(pulumi.StringPtrOutput)
 }
@@ -4569,11 +4569,11 @@ func (o RoleEnvironmentRuleArrayOutput) Index(i pulumi.IntInput) RoleEnvironment
 type RoleInsightsAccountRule struct {
 	// Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
 	All *bool `pulumi:"all"`
-	// Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or an Insights account's `insightsAccountId`.
+	// Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
 	Id *string `pulumi:"id"`
 	// Permission sets to grant, typically the output of `getOrganizationPermissionSet`. Each set's `resourceType` must match this rule's entity type. Pulumi Cloud accepts permission sets only in a policy: see `buildRolePermissions`.
 	PermissionSets []RolePermissionSetRef `pulumi:"permissionSets"`
-	// Insights account scopes to grant on the selected accounts.
+	// Cloud account scopes to grant on the selected accounts.
 	Scopes []RbacInsightsAccountScope `pulumi:"scopes"`
 	// Apply to entities whose tags match every condition.
 	Tags []RoleTagCondition `pulumi:"tags"`
@@ -4593,11 +4593,11 @@ type RoleInsightsAccountRuleInput interface {
 type RoleInsightsAccountRuleArgs struct {
 	// Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
 	All pulumi.BoolPtrInput `pulumi:"all"`
-	// Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or an Insights account's `insightsAccountId`.
+	// Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
 	Id pulumi.StringPtrInput `pulumi:"id"`
 	// Permission sets to grant, typically the output of `getOrganizationPermissionSet`. Each set's `resourceType` must match this rule's entity type. Pulumi Cloud accepts permission sets only in a policy: see `buildRolePermissions`.
 	PermissionSets RolePermissionSetRefArrayInput `pulumi:"permissionSets"`
-	// Insights account scopes to grant on the selected accounts.
+	// Cloud account scopes to grant on the selected accounts.
 	Scopes RbacInsightsAccountScopeArrayInput `pulumi:"scopes"`
 	// Apply to entities whose tags match every condition.
 	Tags RoleTagConditionArrayInput `pulumi:"tags"`
@@ -4659,7 +4659,7 @@ func (o RoleInsightsAccountRuleOutput) All() pulumi.BoolPtrOutput {
 	return o.ApplyT(func(v RoleInsightsAccountRule) *bool { return v.All }).(pulumi.BoolPtrOutput)
 }
 
-// Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or an Insights account's `insightsAccountId`.
+// Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
 func (o RoleInsightsAccountRuleOutput) Id() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v RoleInsightsAccountRule) *string { return v.Id }).(pulumi.StringPtrOutput)
 }
@@ -4669,7 +4669,7 @@ func (o RoleInsightsAccountRuleOutput) PermissionSets() RolePermissionSetRefArra
 	return o.ApplyT(func(v RoleInsightsAccountRule) []RolePermissionSetRef { return v.PermissionSets }).(RolePermissionSetRefArrayOutput)
 }
 
-// Insights account scopes to grant on the selected accounts.
+// Cloud account scopes to grant on the selected accounts.
 func (o RoleInsightsAccountRuleOutput) Scopes() RbacInsightsAccountScopeArrayOutput {
 	return o.ApplyT(func(v RoleInsightsAccountRule) []RbacInsightsAccountScope { return v.Scopes }).(RbacInsightsAccountScopeArrayOutput)
 }
@@ -4873,7 +4873,7 @@ func (o RoleScopeInfoArrayOutput) Index(i pulumi.IntInput) RoleScopeInfoOutput {
 type RoleStackRule struct {
 	// Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
 	All *bool `pulumi:"all"`
-	// Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or an Insights account's `insightsAccountId`.
+	// Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
 	Id *string `pulumi:"id"`
 	// Permission sets to grant, typically the output of `getOrganizationPermissionSet`. Each set's `resourceType` must match this rule's entity type. Pulumi Cloud accepts permission sets only in a policy: see `buildRolePermissions`.
 	PermissionSets []RolePermissionSetRef `pulumi:"permissionSets"`
@@ -4897,7 +4897,7 @@ type RoleStackRuleInput interface {
 type RoleStackRuleArgs struct {
 	// Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
 	All pulumi.BoolPtrInput `pulumi:"all"`
-	// Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or an Insights account's `insightsAccountId`.
+	// Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
 	Id pulumi.StringPtrInput `pulumi:"id"`
 	// Permission sets to grant, typically the output of `getOrganizationPermissionSet`. Each set's `resourceType` must match this rule's entity type. Pulumi Cloud accepts permission sets only in a policy: see `buildRolePermissions`.
 	PermissionSets RolePermissionSetRefArrayInput `pulumi:"permissionSets"`
@@ -4963,7 +4963,7 @@ func (o RoleStackRuleOutput) All() pulumi.BoolPtrOutput {
 	return o.ApplyT(func(v RoleStackRule) *bool { return v.All }).(pulumi.BoolPtrOutput)
 }
 
-// Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or an Insights account's `insightsAccountId`.
+// Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
 func (o RoleStackRuleOutput) Id() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v RoleStackRule) *string { return v.Id }).(pulumi.StringPtrOutput)
 }

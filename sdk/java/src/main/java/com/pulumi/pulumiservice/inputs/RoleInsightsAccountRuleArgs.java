@@ -36,14 +36,14 @@ public final class RoleInsightsAccountRuleArgs extends com.pulumi.resources.Reso
     }
 
     /**
-     * Apply to a single entity: a stack&#39;s `stackId` (from `getStack`), an environment&#39;s `environmentId`, or an Insights account&#39;s `insightsAccountId`.
+     * Apply to a single entity: a stack&#39;s `stackId` (from `getStack`), an environment&#39;s `environmentId`, or a cloud account&#39;s `insightsAccountId`.
      * 
      */
     @Import(name="id")
     private @Nullable Output<String> id;
 
     /**
-     * @return Apply to a single entity: a stack&#39;s `stackId` (from `getStack`), an environment&#39;s `environmentId`, or an Insights account&#39;s `insightsAccountId`.
+     * @return Apply to a single entity: a stack&#39;s `stackId` (from `getStack`), an environment&#39;s `environmentId`, or a cloud account&#39;s `insightsAccountId`.
      * 
      */
     public Optional<Output<String>> id() {
@@ -66,14 +66,14 @@ public final class RoleInsightsAccountRuleArgs extends com.pulumi.resources.Reso
     }
 
     /**
-     * Insights account scopes to grant on the selected accounts.
+     * Cloud account scopes to grant on the selected accounts.
      * 
      */
     @Import(name="scopes")
     private @Nullable Output<List<RbacInsightsAccountScope>> scopes;
 
     /**
-     * @return Insights account scopes to grant on the selected accounts.
+     * @return Cloud account scopes to grant on the selected accounts.
      * 
      */
     public Optional<Output<List<RbacInsightsAccountScope>>> scopes() {
@@ -145,7 +145,7 @@ public final class RoleInsightsAccountRuleArgs extends com.pulumi.resources.Reso
         }
 
         /**
-         * @param id Apply to a single entity: a stack&#39;s `stackId` (from `getStack`), an environment&#39;s `environmentId`, or an Insights account&#39;s `insightsAccountId`.
+         * @param id Apply to a single entity: a stack&#39;s `stackId` (from `getStack`), an environment&#39;s `environmentId`, or a cloud account&#39;s `insightsAccountId`.
          * 
          * @return builder
          * 
@@ -156,7 +156,7 @@ public final class RoleInsightsAccountRuleArgs extends com.pulumi.resources.Reso
         }
 
         /**
-         * @param id Apply to a single entity: a stack&#39;s `stackId` (from `getStack`), an environment&#39;s `environmentId`, or an Insights account&#39;s `insightsAccountId`.
+         * @param id Apply to a single entity: a stack&#39;s `stackId` (from `getStack`), an environment&#39;s `environmentId`, or a cloud account&#39;s `insightsAccountId`.
          * 
          * @return builder
          * 
@@ -197,7 +197,7 @@ public final class RoleInsightsAccountRuleArgs extends com.pulumi.resources.Reso
         }
 
         /**
-         * @param scopes Insights account scopes to grant on the selected accounts.
+         * @param scopes Cloud account scopes to grant on the selected accounts.
          * 
          * @return builder
          * 
@@ -208,7 +208,7 @@ public final class RoleInsightsAccountRuleArgs extends com.pulumi.resources.Reso
         }
 
         /**
-         * @param scopes Insights account scopes to grant on the selected accounts.
+         * @param scopes Cloud account scopes to grant on the selected accounts.
          * 
          * @return builder
          * 
@@ -218,7 +218,7 @@ public final class RoleInsightsAccountRuleArgs extends com.pulumi.resources.Reso
         }
 
         /**
-         * @param scopes Insights account scopes to grant on the selected accounts.
+         * @param scopes Cloud account scopes to grant on the selected accounts.
          * 
          * @return builder
          * 

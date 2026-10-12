@@ -14,8 +14,9 @@
 
 // Command gen-rbac-scopes turns the Pulumi Cloud RBAC scope catalog (the
 // normalized response of GET /api/orgs/{org}/roles/scopes) into the
-// provider's per-entity-type scope enums. Run it through
-// scripts/gen-rbac-scopes.sh.
+// provider's per-entity-type scope enums, and the organization's built-in
+// permission sets (from GET /api/orgs/{org}/roles?uxPurpose=set) into the
+// BuiltInPermissionSet enum. Run it through scripts/gen-rbac-scopes.sh.
 package main
 
 import (
@@ -53,6 +54,18 @@ type scopeCatalog map[string][]struct {
 	} `json:"scopes"`
 }
 
+// permissionSetCatalog is the normalized list of built-in permission sets.
+type permissionSetCatalog []struct {
+	DefaultIdentifier string `json:"defaultIdentifier"`
+	Name              string `json:"name"`
+	Description       string `json:"description"`
+	ResourceType      string `json:"resourceType"`
+}
+
+// permissionSetEnum is the Go enum type generated for built-in permission sets.
+const permissionSetEnum = "BuiltInPermissionSet"
+
+// scope is one enum member: a scope, or a built-in permission set.
 type scope struct {
 	Value       string
 	Name        string
@@ -62,11 +75,38 @@ type scope struct {
 func main() {
 	in := flag.String("catalog", "rbac-scopes.json", "Normalized /roles/scopes response")
 	out := flag.String("out", "zz_generated_rbac_scopes.go", "Go file to write")
+	setsIn := flag.String("permission-sets", "rbac-permission-sets.json", "Normalized built-in permission sets")
+	setsOut := flag.String("permission-sets-out", "zz_generated_permission_sets.go", "Go file to write")
 	allowRemovals := flag.Bool("allow-removals", false,
-		"Allow dropping scopes the current enums have. Removing an enum member breaks SDK users.")
+		"Allow dropping values the current enums have. Removing an enum member breaks SDK users.")
 	flag.Parse()
 
-	raw, err := os.ReadFile(*in)
+	generate(*out, scopeEnums(*in), *allowRemovals)
+	generate(*setsOut, map[string][]scope{permissionSetEnum: permissionSets(*setsIn)}, *allowRemovals)
+}
+
+// generate writes the enums to out, failing if that would drop a value the
+// previously generated file has.
+func generate(out string, enums map[string][]scope, allowRemovals bool) {
+	if removed := removedValues(out, enums); len(removed) > 0 && !allowRemovals {
+		fail("these values are in the current enums but not in the API's: %s. Removing an enum member "+
+			"is a breaking change for SDK users; rerun with -allow-removals if that is intended",
+			strings.Join(removed, ", "))
+	}
+	src, err := render(enums)
+	if err != nil {
+		fail("%v", err)
+	}
+	if err := os.WriteFile(out, src, 0o600); err != nil {
+		fail("write %s: %v", out, err)
+	}
+	for _, typ := range sortedKeys(enums) {
+		fmt.Fprintf(os.Stderr, "gen-rbac-scopes: %s: %d values\n", typ, len(enums[typ]))
+	}
+}
+
+func scopeEnums(in string) map[string][]scope {
+	raw, err := os.ReadFile(in)
 	if err != nil {
 		fail("read catalog: %v", err)
 	}
@@ -89,30 +129,47 @@ func main() {
 			fail("catalog has no scopes for entity type %q", bucket)
 		}
 	}
-	if removed := removedScopes(*out, enums); len(removed) > 0 && !*allowRemovals {
-		fail("these scopes are in the current enums but not in the catalog: %s. Removing an enum member "+
-			"is a breaking change for SDK users; rerun with -allow-removals if that is intended",
-			strings.Join(removed, ", "))
-	}
-	src, err := render(enums)
-	if err != nil {
-		fail("%v", err)
-	}
-	if err := os.WriteFile(*out, src, 0o600); err != nil {
-		fail("write %s: %v", *out, err)
-	}
-	for _, typ := range sortedKeys(enums) {
-		fmt.Fprintf(os.Stderr, "gen-rbac-scopes: %s: %d scopes\n", typ, len(enums[typ]))
-	}
+	return enums
 }
 
-// generatedConst matches a scope constant in a previously generated file,
-// e.g. `RbacStackScopeStackRead RbacStackScope = "stack:read"`.
-var generatedConst = regexp.MustCompile(`(?m)^\s*\w+\s+(Rbac\w+Scope)\s+=\s+"([^"]+)"$`)
+// permissionSets reads the built-in permission sets, sorted by identifier.
+// Each member's description leads with the set's display name, as the
+// Pulumi Cloud console shows it.
+func permissionSets(in string) []scope {
+	raw, err := os.ReadFile(in)
+	if err != nil {
+		fail("read permission sets: %v", err)
+	}
+	var catalog permissionSetCatalog
+	if err := json.Unmarshal(raw, &catalog); err != nil {
+		fail("parse permission sets: %v", err)
+	}
+	if len(catalog) == 0 {
+		fail("%s has no built-in permission sets", in)
+	}
+	sets := make([]scope, 0, len(catalog))
+	for _, s := range catalog {
+		if _, ok := enumTypes[s.ResourceType]; !ok {
+			fail("permission set %q has unknown entity type %q; add it to enumTypes",
+				s.DefaultIdentifier, s.ResourceType)
+		}
+		sets = append(sets, scope{
+			Value:       s.DefaultIdentifier,
+			Name:        pascal(s.DefaultIdentifier),
+			Description: fmt.Sprintf("%s (%s): %s", s.Name, s.ResourceType, s.Description),
+		})
+	}
+	sort.Slice(sets, func(i, j int) bool { return sets[i].Value < sets[j].Value })
+	return sets
+}
 
-// removedScopes lists the scopes, as "Enum value", that the previously
+// generatedConst matches an enum constant in a previously generated file,
+// e.g. `RbacStackScopeStackRead RbacStackScope = "stack:read"`.
+var generatedConst = regexp.MustCompile(`(?m)^\s*\w+\s+(\w+)\s+=\s+"([^"]+)"$`)
+
+// removedValues lists the values, as "Enum value", that the previously
 // generated file at path has but enums doesn't.
-func removedScopes(path string, enums map[string][]scope) []string {
+func removedValues(path string, enums map[string][]scope) []string {
 	prev, err := os.ReadFile(path)
 	if err != nil {
 		return nil // first generation

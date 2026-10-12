@@ -83,7 +83,9 @@ func TestGetOrganizationPermissionSet(t *testing.T) {
 	t.Run("by default identifier", func(t *testing.T) {
 		t.Parallel()
 		got, err := invoke(t, []apitype.PermissionDescriptorRecord{stackRead, custom},
-			GetOrganizationPermissionSetInput{OrganizationName: testOrgName, DefaultIdentifier: ptr(testStackReadSetID)})
+			GetOrganizationPermissionSetInput{
+				OrganizationName: testOrgName, DefaultIdentifier: ptr(BuiltInPermissionSetStackRead),
+			})
 		require.NoError(t, err)
 		assert.Equal(t, GetOrganizationPermissionSetOutput{
 			PermissionSetId:   testSetID,
@@ -124,7 +126,7 @@ func TestGetOrganizationPermissionSet(t *testing.T) {
 		_, err := invoke(t, nil, GetOrganizationPermissionSetInput{OrganizationName: testOrgName})
 		require.ErrorContains(t, err, "exactly one of `defaultIdentifier` or `name`")
 		_, err = invoke(t, nil, GetOrganizationPermissionSetInput{
-			OrganizationName: testOrgName, Name: ptr("a"), DefaultIdentifier: ptr("b"),
+			OrganizationName: testOrgName, Name: ptr("a"), DefaultIdentifier: ptr(BuiltInPermissionSetStackRead),
 		})
 		require.ErrorContains(t, err, "exactly one of `defaultIdentifier` or `name`")
 	})

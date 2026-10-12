@@ -2,6 +2,9 @@
 // *** Do not edit by hand unless you're certain you know what you are doing! ***
 
 import * as pulumi from "@pulumi/pulumi";
+import * as inputs from "./types/input";
+import * as outputs from "./types/output";
+import * as enums from "./types/enums";
 import * as utilities from "./utilities";
 
 /**
@@ -18,9 +21,9 @@ export function getOrganizationPermissionSet(args: GetOrganizationPermissionSetA
 
 export interface GetOrganizationPermissionSetArgs {
     /**
-     * The built-in permission set's identifier: `stack-read`, `stack-write`, `stack-admin`, `environment-read`, `environment-open`, `environment-write`, `environment-admin`, `insights-account-read`, `insights-account-write`, `insights-account-admin`, `org-settings-standard`, `org-settings-read-only`, or `org-settings-billing`.
+     * The built-in permission set's identifier, such as `stack-read`.
      */
-    defaultIdentifier?: string;
+    defaultIdentifier?: enums.BuiltInPermissionSet;
     /**
      * The permission set's display name.
      */
@@ -71,9 +74,9 @@ export function getOrganizationPermissionSetOutput(args: GetOrganizationPermissi
 
 export interface GetOrganizationPermissionSetOutputArgs {
     /**
-     * The built-in permission set's identifier: `stack-read`, `stack-write`, `stack-admin`, `environment-read`, `environment-open`, `environment-write`, `environment-admin`, `insights-account-read`, `insights-account-write`, `insights-account-admin`, `org-settings-standard`, `org-settings-read-only`, or `org-settings-billing`.
+     * The built-in permission set's identifier, such as `stack-read`.
      */
-    defaultIdentifier?: pulumi.Input<string | undefined>;
+    defaultIdentifier?: pulumi.Input<enums.BuiltInPermissionSet | undefined>;
     /**
      * The permission set's display name.
      */

@@ -49,6 +49,63 @@ export const AuthPolicyTokenType = {
 
 export type AuthPolicyTokenType = (typeof AuthPolicyTokenType)[keyof typeof AuthPolicyTokenType];
 
+export const BuiltInPermissionSet = {
+    /**
+     * Environment Admin (environment): Admin access to environments.
+     */
+    EnvironmentAdmin: "environment-admin",
+    /**
+     * Environment Open (environment): Read/open access to environments.
+     */
+    EnvironmentOpen: "environment-open",
+    /**
+     * Environment Read (environment): Read access to environments.
+     */
+    EnvironmentRead: "environment-read",
+    /**
+     * Environment Write (environment): Read/open/write access to environments.
+     */
+    EnvironmentWrite: "environment-write",
+    /**
+     * Account Admin (insights-account): Admin access to insights accounts.
+     */
+    InsightsAccountAdmin: "insights-account-admin",
+    /**
+     * Account Read (insights-account): Read access to insights accounts.
+     */
+    InsightsAccountRead: "insights-account-read",
+    /**
+     * Account Write (insights-account): Read/write access to insights accounts.
+     */
+    InsightsAccountWrite: "insights-account-write",
+    /**
+     * Organization Settings Billing (global): Billing access.
+     */
+    OrgSettingsBilling: "org-settings-billing",
+    /**
+     * Read Only (global): View-only org access: usage, members, stacks, environments, teams, Insights accounts; read deployments, integrations, services, templates, and resources. No create/update/delete.
+     */
+    OrgSettingsReadOnly: "org-settings-read-only",
+    /**
+     * Standard (global): View org usage and members; list stacks, environments, teams, and Insights accounts; use deployments, integrations, services, and resources; create resources (stacks, environments, teams, Insights accounts). Excludes billing and member or org admin settings.
+     */
+    OrgSettingsStandard: "org-settings-standard",
+    /**
+     * Stack Admin (stack): Admin access to stacks, including deployment settings.
+     */
+    StackAdmin: "stack-admin",
+    /**
+     * Stack Read (stack): Read access to stacks, including deployment settings.
+     */
+    StackRead: "stack-read",
+    /**
+     * Stack Write (stack): Read/write access to stacks, including deployment settings.
+     */
+    StackWrite: "stack-write",
+} as const;
+
+export type BuiltInPermissionSet = (typeof BuiltInPermissionSet)[keyof typeof BuiltInPermissionSet];
+
 export const CloudProvider = {
     /**
      * Amazon Web Services

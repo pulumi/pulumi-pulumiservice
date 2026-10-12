@@ -12,7 +12,7 @@ namespace Pulumi.PulumiService
     public static class BuildRolePermissions
     {
         /// <summary>
-        /// Builds a complete `OrganizationRole.permissions` descriptor from organization-level access and rules for stacks, environments, and Insights accounts, the same model as the role editor in the Pulumi Cloud console. Each rule grants scopes and/or permission sets on every entity of its type, on one specific entity, or on entities matching tag conditions. Each rule list accepts only scopes and permission sets for its own entity type. Use `additionalEntries` to fold in the output of the other `build*Permissions` helpers.
+        /// Builds a complete `OrganizationRole.permissions` descriptor from organization-level access and rules for stacks, environments, and cloud accounts (Discovery; `InsightsAccount` in the API and this provider), the same model as the role editor in the Pulumi Cloud console. Each rule grants scopes and/or permission sets on every entity of its type, on one specific entity, or on entities matching tag conditions. Each rule list accepts only scopes and permission sets for its own entity type. Use `additionalEntries` to fold in the output of the other `build*Permissions` helpers.
         /// 
         /// A result that uses only scopes is directly assignable to `OrganizationRole.permissions`. Pulumi Cloud accepts permission sets only in a policy: store such a result with `pulumiservice:api:Role` (`uxPurpose: policy`, `details: &lt;result&gt;`) and grant the policy to the role with `buildComposePermissions`.
         /// </summary>
@@ -20,7 +20,7 @@ namespace Pulumi.PulumiService
             => global::Pulumi.Deployment.Instance.InvokeAsync<BuildRolePermissionsResult>("pulumiservice:index:buildRolePermissions", args ?? new BuildRolePermissionsArgs(), options.WithDefaults());
 
         /// <summary>
-        /// Builds a complete `OrganizationRole.permissions` descriptor from organization-level access and rules for stacks, environments, and Insights accounts, the same model as the role editor in the Pulumi Cloud console. Each rule grants scopes and/or permission sets on every entity of its type, on one specific entity, or on entities matching tag conditions. Each rule list accepts only scopes and permission sets for its own entity type. Use `additionalEntries` to fold in the output of the other `build*Permissions` helpers.
+        /// Builds a complete `OrganizationRole.permissions` descriptor from organization-level access and rules for stacks, environments, and cloud accounts (Discovery; `InsightsAccount` in the API and this provider), the same model as the role editor in the Pulumi Cloud console. Each rule grants scopes and/or permission sets on every entity of its type, on one specific entity, or on entities matching tag conditions. Each rule list accepts only scopes and permission sets for its own entity type. Use `additionalEntries` to fold in the output of the other `build*Permissions` helpers.
         /// 
         /// A result that uses only scopes is directly assignable to `OrganizationRole.permissions`. Pulumi Cloud accepts permission sets only in a policy: store such a result with `pulumiservice:api:Role` (`uxPurpose: policy`, `details: &lt;result&gt;`) and grant the policy to the role with `buildComposePermissions`.
         /// </summary>
@@ -28,7 +28,7 @@ namespace Pulumi.PulumiService
             => global::Pulumi.Deployment.Instance.Invoke<BuildRolePermissionsResult>("pulumiservice:index:buildRolePermissions", args ?? new BuildRolePermissionsInvokeArgs(), options.WithDefaults());
 
         /// <summary>
-        /// Builds a complete `OrganizationRole.permissions` descriptor from organization-level access and rules for stacks, environments, and Insights accounts, the same model as the role editor in the Pulumi Cloud console. Each rule grants scopes and/or permission sets on every entity of its type, on one specific entity, or on entities matching tag conditions. Each rule list accepts only scopes and permission sets for its own entity type. Use `additionalEntries` to fold in the output of the other `build*Permissions` helpers.
+        /// Builds a complete `OrganizationRole.permissions` descriptor from organization-level access and rules for stacks, environments, and cloud accounts (Discovery; `InsightsAccount` in the API and this provider), the same model as the role editor in the Pulumi Cloud console. Each rule grants scopes and/or permission sets on every entity of its type, on one specific entity, or on entities matching tag conditions. Each rule list accepts only scopes and permission sets for its own entity type. Use `additionalEntries` to fold in the output of the other `build*Permissions` helpers.
         /// 
         /// A result that uses only scopes is directly assignable to `OrganizationRole.permissions`. Pulumi Cloud accepts permission sets only in a policy: store such a result with `pulumiservice:api:Role` (`uxPurpose: policy`, `details: &lt;result&gt;`) and grant the policy to the role with `buildComposePermissions`.
         /// </summary>
@@ -67,7 +67,7 @@ namespace Pulumi.PulumiService
         private List<Inputs.RoleInsightsAccountRule>? _insightsAccountRules;
 
         /// <summary>
-        /// Grants on Insights accounts.
+        /// Grants on cloud accounts (`InsightsAccount`).
         /// </summary>
         public List<Inputs.RoleInsightsAccountRule> InsightsAccountRules
         {
@@ -147,7 +147,7 @@ namespace Pulumi.PulumiService
         private InputList<Inputs.RoleInsightsAccountRuleArgs>? _insightsAccountRules;
 
         /// <summary>
-        /// Grants on Insights accounts.
+        /// Grants on cloud accounts (`InsightsAccount`).
         /// </summary>
         public InputList<Inputs.RoleInsightsAccountRuleArgs> InsightsAccountRules
         {

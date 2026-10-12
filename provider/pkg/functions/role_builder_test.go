@@ -135,7 +135,7 @@ func TestBuildRolePermissions(t *testing.T) {
 			)),
 		},
 		{
-			name: "one insights account by id",
+			name: "one cloud account by id",
 			in: BuildRolePermissionsInput{
 				InsightsAccountRules: []RoleInsightsAccountRule{{
 					RoleRuleSelector: RoleRuleSelector{Id: ptr(testAccountID)},
@@ -281,7 +281,7 @@ func TestBuildRolePermissionsErrors(t *testing.T) {
 				RoleRuleSelector: all,
 				Scopes:           []RbacInsightsAccountScope{RbacInsightsAccountScope("insights_account:fly")},
 			}},
-		}, "is not an Insights account scope"},
+		}, "is not a cloud account scope"},
 		{"stack permission set in an all-environments rule", BuildRolePermissionsInput{
 			EnvironmentRules: []RoleEnvironmentRule{{
 				RoleRuleSelector: all,

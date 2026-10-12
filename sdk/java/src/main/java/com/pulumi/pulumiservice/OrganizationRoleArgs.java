@@ -67,12 +67,12 @@ public final class OrganizationRoleArgs extends com.pulumi.resources.ResourceArg
      * The role&#39;s permission descriptor tree.
      * 
      * **Build this with the helper functions.** They construct the tree for you and validate it before anything reaches Pulumi Cloud:
-     * - `buildRolePermissions`: start here. It builds a complete role from organization-level access and rules for stacks, environments, and Insights accounts. Each rule grants scopes and/or permission sets on every entity of its type, on one specific entity, or on entities matching tags. Each rule list accepts only scopes and permission sets for its own entity type, so a stack scope can&#39;t end up on an environment rule.
+     * - `buildRolePermissions`: start here. It builds a complete role from organization-level access and rules for stacks, environments, and cloud accounts (Discovery; `InsightsAccount` in the API and this provider). Each rule grants scopes and/or permission sets on every entity of its type, on one specific entity, or on entities matching tags. Each rule list accepts only scopes and permission sets for its own entity type, so a stack scope can&#39;t end up on an environment rule.
      * - `buildAllowPermissions`: grants scopes with no conditions.
      * - `buildStackScopedPermissions`, `buildEnvironmentScopedPermissions`, and `buildInsightsAccountScopedPermissions`: grant scopes on one specific entity.
      * - `buildComposePermissions`: grants a policy by ID (see below).
      * 
-     * Combine helpers by passing their `permissions` outputs to `buildRolePermissions.additionalEntries`. Look up stack IDs with `getStack`, environment IDs with `getEnvironment`, and Insights account IDs with `getInsightsAccount`. To assign the role, use `TeamRoleAssignment` or `OrganizationMember.roleId`.
+     * Combine helpers by passing their `permissions` outputs to `buildRolePermissions.additionalEntries`. Look up stack IDs with `getStack`, environment IDs with `getEnvironment`, and cloud account IDs with `getInsightsAccount`. To assign the role, use `TeamRoleAssignment` or `OrganizationMember.roleId`.
      * 
      * **Permission sets** (bundles of scopes such as the built-in Stack Write, looked up with `getOrganizationPermissionSet`) can&#39;t be referenced from a role directly: Pulumi Cloud accepts them only in a policy. Build the policy&#39;s permissions with `buildRolePermissions` (`permissionSets`, `organizationPermissionSets`), store them with `pulumiservice:api:Role` (`uxPurpose: policy`), and set this property to `buildComposePermissions` with the policy&#39;s `roleID`. The example below shows both approaches.
      * 
@@ -97,12 +97,12 @@ public final class OrganizationRoleArgs extends com.pulumi.resources.ResourceArg
      * @return The role&#39;s permission descriptor tree.
      * 
      * **Build this with the helper functions.** They construct the tree for you and validate it before anything reaches Pulumi Cloud:
-     * - `buildRolePermissions`: start here. It builds a complete role from organization-level access and rules for stacks, environments, and Insights accounts. Each rule grants scopes and/or permission sets on every entity of its type, on one specific entity, or on entities matching tags. Each rule list accepts only scopes and permission sets for its own entity type, so a stack scope can&#39;t end up on an environment rule.
+     * - `buildRolePermissions`: start here. It builds a complete role from organization-level access and rules for stacks, environments, and cloud accounts (Discovery; `InsightsAccount` in the API and this provider). Each rule grants scopes and/or permission sets on every entity of its type, on one specific entity, or on entities matching tags. Each rule list accepts only scopes and permission sets for its own entity type, so a stack scope can&#39;t end up on an environment rule.
      * - `buildAllowPermissions`: grants scopes with no conditions.
      * - `buildStackScopedPermissions`, `buildEnvironmentScopedPermissions`, and `buildInsightsAccountScopedPermissions`: grant scopes on one specific entity.
      * - `buildComposePermissions`: grants a policy by ID (see below).
      * 
-     * Combine helpers by passing their `permissions` outputs to `buildRolePermissions.additionalEntries`. Look up stack IDs with `getStack`, environment IDs with `getEnvironment`, and Insights account IDs with `getInsightsAccount`. To assign the role, use `TeamRoleAssignment` or `OrganizationMember.roleId`.
+     * Combine helpers by passing their `permissions` outputs to `buildRolePermissions.additionalEntries`. Look up stack IDs with `getStack`, environment IDs with `getEnvironment`, and cloud account IDs with `getInsightsAccount`. To assign the role, use `TeamRoleAssignment` or `OrganizationMember.roleId`.
      * 
      * **Permission sets** (bundles of scopes such as the built-in Stack Write, looked up with `getOrganizationPermissionSet`) can&#39;t be referenced from a role directly: Pulumi Cloud accepts them only in a policy. Build the policy&#39;s permissions with `buildRolePermissions` (`permissionSets`, `organizationPermissionSets`), store them with `pulumiservice:api:Role` (`uxPurpose: policy`), and set this property to `buildComposePermissions` with the policy&#39;s `roleID`. The example below shows both approaches.
      * 
@@ -234,12 +234,12 @@ public final class OrganizationRoleArgs extends com.pulumi.resources.ResourceArg
          * @param permissions The role&#39;s permission descriptor tree.
          * 
          * **Build this with the helper functions.** They construct the tree for you and validate it before anything reaches Pulumi Cloud:
-         * - `buildRolePermissions`: start here. It builds a complete role from organization-level access and rules for stacks, environments, and Insights accounts. Each rule grants scopes and/or permission sets on every entity of its type, on one specific entity, or on entities matching tags. Each rule list accepts only scopes and permission sets for its own entity type, so a stack scope can&#39;t end up on an environment rule.
+         * - `buildRolePermissions`: start here. It builds a complete role from organization-level access and rules for stacks, environments, and cloud accounts (Discovery; `InsightsAccount` in the API and this provider). Each rule grants scopes and/or permission sets on every entity of its type, on one specific entity, or on entities matching tags. Each rule list accepts only scopes and permission sets for its own entity type, so a stack scope can&#39;t end up on an environment rule.
          * - `buildAllowPermissions`: grants scopes with no conditions.
          * - `buildStackScopedPermissions`, `buildEnvironmentScopedPermissions`, and `buildInsightsAccountScopedPermissions`: grant scopes on one specific entity.
          * - `buildComposePermissions`: grants a policy by ID (see below).
          * 
-         * Combine helpers by passing their `permissions` outputs to `buildRolePermissions.additionalEntries`. Look up stack IDs with `getStack`, environment IDs with `getEnvironment`, and Insights account IDs with `getInsightsAccount`. To assign the role, use `TeamRoleAssignment` or `OrganizationMember.roleId`.
+         * Combine helpers by passing their `permissions` outputs to `buildRolePermissions.additionalEntries`. Look up stack IDs with `getStack`, environment IDs with `getEnvironment`, and cloud account IDs with `getInsightsAccount`. To assign the role, use `TeamRoleAssignment` or `OrganizationMember.roleId`.
          * 
          * **Permission sets** (bundles of scopes such as the built-in Stack Write, looked up with `getOrganizationPermissionSet`) can&#39;t be referenced from a role directly: Pulumi Cloud accepts them only in a policy. Build the policy&#39;s permissions with `buildRolePermissions` (`permissionSets`, `organizationPermissionSets`), store them with `pulumiservice:api:Role` (`uxPurpose: policy`), and set this property to `buildComposePermissions` with the policy&#39;s `roleID`. The example below shows both approaches.
          * 
@@ -268,12 +268,12 @@ public final class OrganizationRoleArgs extends com.pulumi.resources.ResourceArg
          * @param permissions The role&#39;s permission descriptor tree.
          * 
          * **Build this with the helper functions.** They construct the tree for you and validate it before anything reaches Pulumi Cloud:
-         * - `buildRolePermissions`: start here. It builds a complete role from organization-level access and rules for stacks, environments, and Insights accounts. Each rule grants scopes and/or permission sets on every entity of its type, on one specific entity, or on entities matching tags. Each rule list accepts only scopes and permission sets for its own entity type, so a stack scope can&#39;t end up on an environment rule.
+         * - `buildRolePermissions`: start here. It builds a complete role from organization-level access and rules for stacks, environments, and cloud accounts (Discovery; `InsightsAccount` in the API and this provider). Each rule grants scopes and/or permission sets on every entity of its type, on one specific entity, or on entities matching tags. Each rule list accepts only scopes and permission sets for its own entity type, so a stack scope can&#39;t end up on an environment rule.
          * - `buildAllowPermissions`: grants scopes with no conditions.
          * - `buildStackScopedPermissions`, `buildEnvironmentScopedPermissions`, and `buildInsightsAccountScopedPermissions`: grant scopes on one specific entity.
          * - `buildComposePermissions`: grants a policy by ID (see below).
          * 
-         * Combine helpers by passing their `permissions` outputs to `buildRolePermissions.additionalEntries`. Look up stack IDs with `getStack`, environment IDs with `getEnvironment`, and Insights account IDs with `getInsightsAccount`. To assign the role, use `TeamRoleAssignment` or `OrganizationMember.roleId`.
+         * Combine helpers by passing their `permissions` outputs to `buildRolePermissions.additionalEntries`. Look up stack IDs with `getStack`, environment IDs with `getEnvironment`, and cloud account IDs with `getInsightsAccount`. To assign the role, use `TeamRoleAssignment` or `OrganizationMember.roleId`.
          * 
          * **Permission sets** (bundles of scopes such as the built-in Stack Write, looked up with `getOrganizationPermissionSet`) can&#39;t be referenced from a role directly: Pulumi Cloud accepts them only in a policy. Build the policy&#39;s permissions with `buildRolePermissions` (`permissionSets`, `organizationPermissionSets`), store them with `pulumiservice:api:Role` (`uxPurpose: policy`), and set this property to `buildComposePermissions` with the policy&#39;s `roleID`. The example below shows both approaches.
          * 

@@ -40,7 +40,7 @@ variables:
           - environment:rotate
 
   # A role built from scopes: organization-level access plus rules for stacks,
-  # environments, and Insights accounts. Each rule list accepts only scopes for
+  # environments, and cloud accounts. Each rule list accepts only scopes for
   # its own entity type.
   platformPermissions:
     fn::invoke:
@@ -104,7 +104,7 @@ variables:
             scopes:
               - environment:open
         insightsAccountRules:
-          # Read every Insights account
+          # Read every cloud account
           - all: true
             scopes:
               - insights_account:read
@@ -173,7 +173,7 @@ variables:
               - permissionSetId: ${environmentRead.permissionSetId}
                 resourceType: ${environmentRead.resourceType}
         insightsAccountRules:
-          # The Insights Account Read set, plus one extra scope, on one account
+          # The built-in Account Read set, plus one extra scope, on one account
           - id: ${awsAccount.insightsAccountId}
             permissionSets:
               - permissionSetId: ${insightsAccountRead.permissionSetId}

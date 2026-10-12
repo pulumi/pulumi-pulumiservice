@@ -26,14 +26,26 @@ import (
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 )
 
+// BuiltInPermissionSet identifies one of the permission sets Pulumi Cloud
+// creates in every organization. The values are provider-owned: they are
+// generated from the organization's built-in sets by
+// scripts/gen-rbac-scopes.sh and checked in, like the scope enums. The Pulumi
+// Cloud SDK's DefaultIdentifier isn't used because it also lists the built-in
+// roles and lacks the organization-level sets.
+type BuiltInPermissionSet string
+
+func (BuiltInPermissionSet) Values() []infer.EnumValue[BuiltInPermissionSet] {
+	return builtInPermissionSetValues
+}
+
 // GetOrganizationPermissionSetFunction looks up one permission set, typically
 // a built-in one, so a role can grant it via `buildRolePermissions`.
 type GetOrganizationPermissionSetFunction struct{}
 
 type GetOrganizationPermissionSetInput struct {
-	OrganizationName  string  `pulumi:"organizationName"`
-	DefaultIdentifier *string `pulumi:"defaultIdentifier,optional"`
-	Name              *string `pulumi:"name,optional"`
+	OrganizationName  string                `pulumi:"organizationName"`
+	DefaultIdentifier *BuiltInPermissionSet `pulumi:"defaultIdentifier,optional"`
+	Name              *string               `pulumi:"name,optional"`
 }
 
 type GetOrganizationPermissionSetOutput struct {
@@ -59,10 +71,7 @@ func (GetOrganizationPermissionSetFunction) Annotate(a infer.Annotator) {
 
 func (i *GetOrganizationPermissionSetInput) Annotate(a infer.Annotator) {
 	a.Describe(&i.OrganizationName, "The Pulumi Cloud organization name.")
-	a.Describe(&i.DefaultIdentifier, "The built-in permission set's identifier: `stack-read`, `stack-write`, "+
-		"`stack-admin`, `environment-read`, `environment-open`, `environment-write`, `environment-admin`, "+
-		"`insights-account-read`, `insights-account-write`, `insights-account-admin`, "+
-		"`org-settings-standard`, `org-settings-read-only`, or `org-settings-billing`.")
+	a.Describe(&i.DefaultIdentifier, "The built-in permission set's identifier, such as `stack-read`.")
 	a.Describe(&i.Name, "The permission set's display name.")
 }
 
@@ -100,7 +109,7 @@ func (GetOrganizationPermissionSetFunction) Invoke(
 	}
 	var matches []apitype.PermissionDescriptorRecord
 	for _, s := range sets {
-		if (in.DefaultIdentifier != nil && s.DefaultIdentifier == *in.DefaultIdentifier) ||
+		if (in.DefaultIdentifier != nil && s.DefaultIdentifier == string(*in.DefaultIdentifier)) ||
 			(in.Name != nil && s.Name == *in.Name) {
 			matches = append(matches, s)
 		}

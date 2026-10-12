@@ -47,7 +47,8 @@ func (RbacEnvironmentScope) Values() []infer.EnumValue[RbacEnvironmentScope] {
 	return rbacEnvironmentScopeValues
 }
 
-// RbacInsightsAccountScope is a scope that applies to Insights accounts.
+// RbacInsightsAccountScope is a scope that applies to cloud accounts
+// (Discovery), which the API calls Insights accounts.
 type RbacInsightsAccountScope string
 
 func (RbacInsightsAccountScope) Values() []infer.EnumValue[RbacInsightsAccountScope] {

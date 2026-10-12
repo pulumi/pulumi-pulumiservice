@@ -13,6 +13,7 @@ if sys.version_info >= (3, 11):
 else:
     from typing_extensions import NotRequired, TypedDict, TypeAlias
 from . import _utilities
+from ._enums import *
 
 __all__ = [
     'GetOrganizationPermissionSetResult',
@@ -106,14 +107,14 @@ class AwaitableGetOrganizationPermissionSetResult(GetOrganizationPermissionSetRe
             resource_type=self.resource_type)
 
 
-def get_organization_permission_set(default_identifier: Optional[_builtins.str] = None,
+def get_organization_permission_set(default_identifier: Optional['BuiltInPermissionSet'] = None,
                                     name: Optional[_builtins.str] = None,
                                     organization_name: Optional[_builtins.str] = None,
                                     opts: Optional[pulumi.InvokeOptions] = None) -> AwaitableGetOrganizationPermissionSetResult:
     """
     Looks up a permission set in an organization by built-in identifier or by name. Use it to grant built-in permission sets, such as "Stack Read" (`stack-read`) or "Read Only" (`org-settings-read-only`), through `buildRolePermissions`: pass its `permissionSetId` and `resourceType` in `permissionSets`. Exactly one of `defaultIdentifier` or `name` must be set.
 
-    :param _builtins.str default_identifier: The built-in permission set's identifier: `stack-read`, `stack-write`, `stack-admin`, `environment-read`, `environment-open`, `environment-write`, `environment-admin`, `insights-account-read`, `insights-account-write`, `insights-account-admin`, `org-settings-standard`, `org-settings-read-only`, or `org-settings-billing`.
+    :param 'BuiltInPermissionSet' default_identifier: The built-in permission set's identifier, such as `stack-read`.
     :param _builtins.str name: The permission set's display name.
     :param _builtins.str organization_name: The Pulumi Cloud organization name.
     """
@@ -131,14 +132,14 @@ def get_organization_permission_set(default_identifier: Optional[_builtins.str] 
         permission_set_id=pulumi.get(__ret__, 'permission_set_id'),
         permissions=pulumi.get(__ret__, 'permissions'),
         resource_type=pulumi.get(__ret__, 'resource_type'))
-def get_organization_permission_set_output(default_identifier: pulumi.Input[Optional[Optional[_builtins.str]]] = None,
+def get_organization_permission_set_output(default_identifier: pulumi.Input[Optional[Optional['BuiltInPermissionSet']]] = None,
                                            name: pulumi.Input[Optional[Optional[_builtins.str]]] = None,
                                            organization_name: pulumi.Input[Optional[_builtins.str]] = None,
                                            opts: Optional[Union[pulumi.InvokeOptions, pulumi.InvokeOutputOptions]] = None) -> pulumi.Output[GetOrganizationPermissionSetResult]:
     """
     Looks up a permission set in an organization by built-in identifier or by name. Use it to grant built-in permission sets, such as "Stack Read" (`stack-read`) or "Read Only" (`org-settings-read-only`), through `buildRolePermissions`: pass its `permissionSetId` and `resourceType` in `permissionSets`. Exactly one of `defaultIdentifier` or `name` must be set.
 
-    :param _builtins.str default_identifier: The built-in permission set's identifier: `stack-read`, `stack-write`, `stack-admin`, `environment-read`, `environment-open`, `environment-write`, `environment-admin`, `insights-account-read`, `insights-account-write`, `insights-account-admin`, `org-settings-standard`, `org-settings-read-only`, or `org-settings-billing`.
+    :param 'BuiltInPermissionSet' default_identifier: The built-in permission set's identifier, such as `stack-read`.
     :param _builtins.str name: The permission set's display name.
     :param _builtins.str organization_name: The Pulumi Cloud organization name.
     """

@@ -519,7 +519,7 @@ export interface RoleEnvironmentRule {
      */
     all?: boolean;
     /**
-     * Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or an Insights account's `insightsAccountId`.
+     * Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
      */
     id?: string;
     /**
@@ -542,7 +542,7 @@ export interface RoleEnvironmentRuleArgs {
      */
     all?: pulumi.Input<boolean | undefined>;
     /**
-     * Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or an Insights account's `insightsAccountId`.
+     * Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
      */
     id?: pulumi.Input<string | undefined>;
     /**
@@ -565,7 +565,7 @@ export interface RoleInsightsAccountRule {
      */
     all?: boolean;
     /**
-     * Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or an Insights account's `insightsAccountId`.
+     * Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
      */
     id?: string;
     /**
@@ -573,7 +573,7 @@ export interface RoleInsightsAccountRule {
      */
     permissionSets?: inputs.RolePermissionSetRef[];
     /**
-     * Insights account scopes to grant on the selected accounts.
+     * Cloud account scopes to grant on the selected accounts.
      */
     scopes?: enums.RbacInsightsAccountScope[];
     /**
@@ -588,7 +588,7 @@ export interface RoleInsightsAccountRuleArgs {
      */
     all?: pulumi.Input<boolean | undefined>;
     /**
-     * Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or an Insights account's `insightsAccountId`.
+     * Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
      */
     id?: pulumi.Input<string | undefined>;
     /**
@@ -596,7 +596,7 @@ export interface RoleInsightsAccountRuleArgs {
      */
     permissionSets?: pulumi.Input<pulumi.Input<inputs.RolePermissionSetRefArgs>[] | undefined>;
     /**
-     * Insights account scopes to grant on the selected accounts.
+     * Cloud account scopes to grant on the selected accounts.
      */
     scopes?: pulumi.Input<pulumi.Input<enums.RbacInsightsAccountScope>[] | undefined>;
     /**
@@ -633,7 +633,7 @@ export interface RoleStackRule {
      */
     all?: boolean;
     /**
-     * Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or an Insights account's `insightsAccountId`.
+     * Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
      */
     id?: string;
     /**
@@ -656,7 +656,7 @@ export interface RoleStackRuleArgs {
      */
     all?: pulumi.Input<boolean | undefined>;
     /**
-     * Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or an Insights account's `insightsAccountId`.
+     * Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
      */
     id?: pulumi.Input<string | undefined>;
     /**

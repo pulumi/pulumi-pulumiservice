@@ -118,7 +118,7 @@ func (s *RoleRuleSelector) Annotate(a infer.Annotator) {
 	a.Describe(&s.All, "Apply to every entity of this type in the organization. Exactly one of `all`, `id`, "+
 		"or `tags` must be set.")
 	a.Describe(&s.Id, "Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's "+
-		"`environmentId`, or an Insights account's `insightsAccountId`.")
+		"`environmentId`, or a cloud account's `insightsAccountId`.")
 	a.Describe(&s.Tags, "Apply to entities whose tags match every condition.")
 }
 
@@ -155,7 +155,7 @@ type RoleInsightsAccountRule struct {
 }
 
 func (r *RoleInsightsAccountRule) Annotate(a infer.Annotator) {
-	a.Describe(&r.Scopes, "Insights account scopes to grant on the selected accounts.")
+	a.Describe(&r.Scopes, "Cloud account scopes to grant on the selected accounts.")
 	a.Describe(&r.PermissionSets, permissionSetsDoc)
 }
 
@@ -178,7 +178,8 @@ func (BuildRolePermissionsFunction) Annotate(a infer.Annotator) {
 	a.Describe(
 		&BuildRolePermissionsFunction{},
 		"Builds a complete `OrganizationRole.permissions` descriptor from organization-level access and "+
-			"rules for stacks, environments, and Insights accounts, the same model as the role editor in the "+
+			"rules for stacks, environments, and cloud accounts (Discovery; `InsightsAccount` in the API and this "+
+			"provider), the same model as the role editor in the "+
 			"Pulumi Cloud console. Each rule grants scopes and/or permission sets on every entity of its type, "+
 			"on one specific entity, or on entities matching tag conditions. Each rule list accepts only scopes "+
 			"and permission sets for its own entity type. Use `additionalEntries` to fold in the output of the "+
@@ -197,7 +198,7 @@ func (i *BuildRolePermissionsInput) Annotate(a infer.Annotator) {
 		"as the built-in `org-settings-read-only` set from `getOrganizationPermissionSet`.")
 	a.Describe(&i.StackRules, "Grants on stacks.")
 	a.Describe(&i.EnvironmentRules, "Grants on ESC environments.")
-	a.Describe(&i.InsightsAccountRules, "Grants on Insights accounts.")
+	a.Describe(&i.InsightsAccountRules, "Grants on cloud accounts (`InsightsAccount`).")
 	a.Describe(&i.AdditionalEntries, "Further descriptors to include in the role, typically the "+
 		"`permissions` output of `buildAllowPermissions`, `buildStackScopedPermissions`, "+
 		"`buildEnvironmentScopedPermissions`, or `buildInsightsAccountScopedPermissions`.")
@@ -225,7 +226,7 @@ func (BuildRolePermissionsFunction) Invoke(
 	}, nil
 }
 
-// rule is a stack, environment, or Insights account rule with its scopes
+// rule is a stack, environment, or cloud account rule with its scopes
 // checked against its entity type.
 type rule struct {
 	path       string // e.g. "stackRules[2]", for error messages
@@ -330,7 +331,7 @@ func collectRules(in BuildRolePermissionsInput) ([]rule, error) {
 			r.RoleRuleSelector, scopes, r.PermissionSets})
 	}
 	for i, r := range in.InsightsAccountRules {
-		scopes, err := checkScopes(r.Scopes, rbacInsightsAccountScopeValues, "an Insights account")
+		scopes, err := checkScopes(r.Scopes, rbacInsightsAccountScopeValues, "a cloud account")
 		if err != nil {
 			return nil, fmt.Errorf("insightsAccountRules[%d].scopes: %w", i, err)
 		}

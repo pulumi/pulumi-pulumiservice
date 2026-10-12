@@ -36,14 +36,14 @@ public final class RoleStackRuleArgs extends com.pulumi.resources.ResourceArgs {
     }
 
     /**
-     * Apply to a single entity: a stack&#39;s `stackId` (from `getStack`), an environment&#39;s `environmentId`, or an Insights account&#39;s `insightsAccountId`.
+     * Apply to a single entity: a stack&#39;s `stackId` (from `getStack`), an environment&#39;s `environmentId`, or a cloud account&#39;s `insightsAccountId`.
      * 
      */
     @Import(name="id")
     private @Nullable Output<String> id;
 
     /**
-     * @return Apply to a single entity: a stack&#39;s `stackId` (from `getStack`), an environment&#39;s `environmentId`, or an Insights account&#39;s `insightsAccountId`.
+     * @return Apply to a single entity: a stack&#39;s `stackId` (from `getStack`), an environment&#39;s `environmentId`, or a cloud account&#39;s `insightsAccountId`.
      * 
      */
     public Optional<Output<String>> id() {
@@ -145,7 +145,7 @@ public final class RoleStackRuleArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param id Apply to a single entity: a stack&#39;s `stackId` (from `getStack`), an environment&#39;s `environmentId`, or an Insights account&#39;s `insightsAccountId`.
+         * @param id Apply to a single entity: a stack&#39;s `stackId` (from `getStack`), an environment&#39;s `environmentId`, or a cloud account&#39;s `insightsAccountId`.
          * 
          * @return builder
          * 
@@ -156,7 +156,7 @@ public final class RoleStackRuleArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param id Apply to a single entity: a stack&#39;s `stackId` (from `getStack`), an environment&#39;s `environmentId`, or an Insights account&#39;s `insightsAccountId`.
+         * @param id Apply to a single entity: a stack&#39;s `stackId` (from `getStack`), an environment&#39;s `environmentId`, or a cloud account&#39;s `insightsAccountId`.
          * 
          * @return builder
          * 

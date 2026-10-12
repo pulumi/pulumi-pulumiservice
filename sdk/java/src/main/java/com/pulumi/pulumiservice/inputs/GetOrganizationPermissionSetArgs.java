@@ -6,6 +6,7 @@ package com.pulumi.pulumiservice.inputs;
 import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
 import com.pulumi.exceptions.MissingRequiredPropertyException;
+import com.pulumi.pulumiservice.enums.BuiltInPermissionSet;
 import java.lang.String;
 import java.util.Objects;
 import java.util.Optional;
@@ -17,17 +18,17 @@ public final class GetOrganizationPermissionSetArgs extends com.pulumi.resources
     public static final GetOrganizationPermissionSetArgs Empty = new GetOrganizationPermissionSetArgs();
 
     /**
-     * The built-in permission set&#39;s identifier: `stack-read`, `stack-write`, `stack-admin`, `environment-read`, `environment-open`, `environment-write`, `environment-admin`, `insights-account-read`, `insights-account-write`, `insights-account-admin`, `org-settings-standard`, `org-settings-read-only`, or `org-settings-billing`.
+     * The built-in permission set&#39;s identifier, such as `stack-read`.
      * 
      */
     @Import(name="defaultIdentifier")
-    private @Nullable Output<String> defaultIdentifier;
+    private @Nullable Output<BuiltInPermissionSet> defaultIdentifier;
 
     /**
-     * @return The built-in permission set&#39;s identifier: `stack-read`, `stack-write`, `stack-admin`, `environment-read`, `environment-open`, `environment-write`, `environment-admin`, `insights-account-read`, `insights-account-write`, `insights-account-admin`, `org-settings-standard`, `org-settings-read-only`, or `org-settings-billing`.
+     * @return The built-in permission set&#39;s identifier, such as `stack-read`.
      * 
      */
-    public Optional<Output<String>> defaultIdentifier() {
+    public Optional<Output<BuiltInPermissionSet>> defaultIdentifier() {
         return Optional.ofNullable(this.defaultIdentifier);
     }
 
@@ -88,23 +89,23 @@ public final class GetOrganizationPermissionSetArgs extends com.pulumi.resources
         }
 
         /**
-         * @param defaultIdentifier The built-in permission set&#39;s identifier: `stack-read`, `stack-write`, `stack-admin`, `environment-read`, `environment-open`, `environment-write`, `environment-admin`, `insights-account-read`, `insights-account-write`, `insights-account-admin`, `org-settings-standard`, `org-settings-read-only`, or `org-settings-billing`.
+         * @param defaultIdentifier The built-in permission set&#39;s identifier, such as `stack-read`.
          * 
          * @return builder
          * 
          */
-        public Builder defaultIdentifier(@Nullable Output<String> defaultIdentifier) {
+        public Builder defaultIdentifier(@Nullable Output<BuiltInPermissionSet> defaultIdentifier) {
             $.defaultIdentifier = defaultIdentifier;
             return this;
         }
 
         /**
-         * @param defaultIdentifier The built-in permission set&#39;s identifier: `stack-read`, `stack-write`, `stack-admin`, `environment-read`, `environment-open`, `environment-write`, `environment-admin`, `insights-account-read`, `insights-account-write`, `insights-account-admin`, `org-settings-standard`, `org-settings-read-only`, or `org-settings-billing`.
+         * @param defaultIdentifier The built-in permission set&#39;s identifier, such as `stack-read`.
          * 
          * @return builder
          * 
          */
-        public Builder defaultIdentifier(String defaultIdentifier) {
+        public Builder defaultIdentifier(BuiltInPermissionSet defaultIdentifier) {
             return defaultIdentifier(Output.of(defaultIdentifier));
         }
 

@@ -32,7 +32,7 @@ variables:
           - environment:rotate
 
   # A role built from scopes, with every selector kind for stacks and
-  # environments. Insights accounts can't be created here, so their rules
+  # environments. Cloud accounts can't be created here, so their rules
   # use `all` and tags only.
   platformPermissions:
     fn::invoke:
@@ -163,7 +163,7 @@ resources:
     properties:
       organizationName: ${organizationName}
       name: Platform Engineers ${digits}
-      description: Scopes on platform stacks, environments, and Insights accounts.
+      description: Scopes on platform stacks, environments, and cloud accounts.
       permissions: ${platformPermissions.permissions}
 
   operatorPolicy:

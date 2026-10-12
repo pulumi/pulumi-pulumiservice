@@ -34,10 +34,10 @@ namespace Pulumi.PulumiService
     public sealed class GetOrganizationPermissionSetArgs : global::Pulumi.InvokeArgs
     {
         /// <summary>
-        /// The built-in permission set's identifier: `stack-read`, `stack-write`, `stack-admin`, `environment-read`, `environment-open`, `environment-write`, `environment-admin`, `insights-account-read`, `insights-account-write`, `insights-account-admin`, `org-settings-standard`, `org-settings-read-only`, or `org-settings-billing`.
+        /// The built-in permission set's identifier, such as `stack-read`.
         /// </summary>
         [Input("defaultIdentifier")]
-        public string? DefaultIdentifier { get; set; }
+        public Pulumi.PulumiService.BuiltInPermissionSet? DefaultIdentifier { get; set; }
 
         /// <summary>
         /// The permission set's display name.
@@ -60,10 +60,10 @@ namespace Pulumi.PulumiService
     public sealed class GetOrganizationPermissionSetInvokeArgs : global::Pulumi.InvokeArgs
     {
         /// <summary>
-        /// The built-in permission set's identifier: `stack-read`, `stack-write`, `stack-admin`, `environment-read`, `environment-open`, `environment-write`, `environment-admin`, `insights-account-read`, `insights-account-write`, `insights-account-admin`, `org-settings-standard`, `org-settings-read-only`, or `org-settings-billing`.
+        /// The built-in permission set's identifier, such as `stack-read`.
         /// </summary>
         [Input("defaultIdentifier")]
-        public Input<string>? DefaultIdentifier { get; set; }
+        public Input<Pulumi.PulumiService.BuiltInPermissionSet>? DefaultIdentifier { get; set; }
 
         /// <summary>
         /// The permission set's display name.

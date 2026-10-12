@@ -118,6 +118,84 @@ namespace Pulumi.PulumiService
     }
 
     [EnumType]
+    public readonly struct BuiltInPermissionSet : IEquatable<BuiltInPermissionSet>
+    {
+        private readonly string _value;
+
+        private BuiltInPermissionSet(string value)
+        {
+            _value = value ?? throw new ArgumentNullException(nameof(value));
+        }
+
+        /// <summary>
+        /// Environment Admin (environment): Admin access to environments.
+        /// </summary>
+        public static BuiltInPermissionSet EnvironmentAdmin { get; } = new BuiltInPermissionSet("environment-admin");
+        /// <summary>
+        /// Environment Open (environment): Read/open access to environments.
+        /// </summary>
+        public static BuiltInPermissionSet EnvironmentOpen { get; } = new BuiltInPermissionSet("environment-open");
+        /// <summary>
+        /// Environment Read (environment): Read access to environments.
+        /// </summary>
+        public static BuiltInPermissionSet EnvironmentRead { get; } = new BuiltInPermissionSet("environment-read");
+        /// <summary>
+        /// Environment Write (environment): Read/open/write access to environments.
+        /// </summary>
+        public static BuiltInPermissionSet EnvironmentWrite { get; } = new BuiltInPermissionSet("environment-write");
+        /// <summary>
+        /// Account Admin (insights-account): Admin access to insights accounts.
+        /// </summary>
+        public static BuiltInPermissionSet InsightsAccountAdmin { get; } = new BuiltInPermissionSet("insights-account-admin");
+        /// <summary>
+        /// Account Read (insights-account): Read access to insights accounts.
+        /// </summary>
+        public static BuiltInPermissionSet InsightsAccountRead { get; } = new BuiltInPermissionSet("insights-account-read");
+        /// <summary>
+        /// Account Write (insights-account): Read/write access to insights accounts.
+        /// </summary>
+        public static BuiltInPermissionSet InsightsAccountWrite { get; } = new BuiltInPermissionSet("insights-account-write");
+        /// <summary>
+        /// Organization Settings Billing (global): Billing access.
+        /// </summary>
+        public static BuiltInPermissionSet OrgSettingsBilling { get; } = new BuiltInPermissionSet("org-settings-billing");
+        /// <summary>
+        /// Read Only (global): View-only org access: usage, members, stacks, environments, teams, Insights accounts; read deployments, integrations, services, templates, and resources. No create/update/delete.
+        /// </summary>
+        public static BuiltInPermissionSet OrgSettingsReadOnly { get; } = new BuiltInPermissionSet("org-settings-read-only");
+        /// <summary>
+        /// Standard (global): View org usage and members; list stacks, environments, teams, and Insights accounts; use deployments, integrations, services, and resources; create resources (stacks, environments, teams, Insights accounts). Excludes billing and member or org admin settings.
+        /// </summary>
+        public static BuiltInPermissionSet OrgSettingsStandard { get; } = new BuiltInPermissionSet("org-settings-standard");
+        /// <summary>
+        /// Stack Admin (stack): Admin access to stacks, including deployment settings.
+        /// </summary>
+        public static BuiltInPermissionSet StackAdmin { get; } = new BuiltInPermissionSet("stack-admin");
+        /// <summary>
+        /// Stack Read (stack): Read access to stacks, including deployment settings.
+        /// </summary>
+        public static BuiltInPermissionSet StackRead { get; } = new BuiltInPermissionSet("stack-read");
+        /// <summary>
+        /// Stack Write (stack): Read/write access to stacks, including deployment settings.
+        /// </summary>
+        public static BuiltInPermissionSet StackWrite { get; } = new BuiltInPermissionSet("stack-write");
+
+        public static bool operator ==(BuiltInPermissionSet left, BuiltInPermissionSet right) => left.Equals(right);
+        public static bool operator !=(BuiltInPermissionSet left, BuiltInPermissionSet right) => !left.Equals(right);
+
+        public static explicit operator string(BuiltInPermissionSet value) => value._value;
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public override bool Equals(object? obj) => obj is BuiltInPermissionSet other && Equals(other);
+        public bool Equals(BuiltInPermissionSet other) => string.Equals(_value, other._value, StringComparison.Ordinal);
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public override int GetHashCode() => _value?.GetHashCode() ?? 0;
+
+        public override string ToString() => _value;
+    }
+
+    [EnumType]
     public readonly struct CloudProvider : IEquatable<CloudProvider>
     {
         private readonly string _value;

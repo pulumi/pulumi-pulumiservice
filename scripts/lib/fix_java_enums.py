@@ -2,8 +2,9 @@
 # Copyright 2026, Pulumi Corporation.
 #
 # `pulumi convert --language java` writes enum-typed values as string
-# literals, which don't compile against the Java SDK. This rewrites the scope
-# and RoleTagOperator arguments of a generated Java program into enum
+# literals, which don't compile against the Java SDK. This rewrites the scope,
+# RoleTagOperator, and BuiltInPermissionSet arguments of a generated Java
+# program into enum
 # constants, using the names from the provider schema. A rule's `scopes`
 # enum depends on the rule type, taken from the nearest preceding
 # `Role<Type>RuleArgs.builder()`.
@@ -18,7 +19,7 @@ STRING_LITERAL = re.compile(r'"([^"]*)"')
 
 RULE_BUILDER = re.compile(r"Role(Stack|Environment|InsightsAccount)RuleArgs\.builder\(\)")
 ENUM_TYPES = ("RbacOrganizationScope", "RbacStackScope", "RbacEnvironmentScope",
-              "RbacInsightsAccountScope", "RoleTagOperator")
+              "RbacInsightsAccountScope", "RoleTagOperator", "BuiltInPermissionSet")
 
 
 def enum_for(method, src, pos):
@@ -26,6 +27,8 @@ def enum_for(method, src, pos):
         return "RbacOrganizationScope"
     if method == "operator":
         return "RoleTagOperator"
+    if method == "defaultIdentifier":
+        return "BuiltInPermissionSet"
     rules = list(RULE_BUILDER.finditer(src, 0, pos))
     if not rules:
         sys.exit(f"`.scopes(` at offset {pos} is not inside a rule builder")
@@ -55,7 +58,7 @@ def main():
 
         return f".{method}({STRING_LITERAL.sub(constant, args)})"
 
-    src = re.sub(r"\.(scopes|organizationScopes|operator)\(([^()]*)\)", rewrite, src)
+    src = re.sub(r"\.(scopes|organizationScopes|operator|defaultIdentifier)\(([^()]*)\)", rewrite, src)
     imports = "".join(f"import com.pulumi.pulumiservice.enums.{e};\n" for e in sorted(used))
     src = src.replace("import com.pulumi.core.Output;\n", "import com.pulumi.core.Output;\n" + imports, 1)
     open(target, "w").write(src)

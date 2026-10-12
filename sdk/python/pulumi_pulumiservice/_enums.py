@@ -10,6 +10,7 @@ __all__ = [
     'AuthPolicyDecision',
     'AuthPolicyPermissionLevel',
     'AuthPolicyTokenType',
+    'BuiltInPermissionSet',
     'CloudProvider',
     'EnvironmentPermission',
     'PulumiOperation',
@@ -69,6 +70,62 @@ class AuthPolicyTokenType(_builtins.str, Enum):
     RUNNER = "runner"
     """
     Deployment Runner Pulumi token. Requires runnerID field to be filled.
+    """
+
+
+@pulumi.type_token("pulumiservice:index:BuiltInPermissionSet")
+class BuiltInPermissionSet(_builtins.str, Enum):
+    ENVIRONMENT_ADMIN = "environment-admin"
+    """
+    Environment Admin (environment): Admin access to environments.
+    """
+    ENVIRONMENT_OPEN = "environment-open"
+    """
+    Environment Open (environment): Read/open access to environments.
+    """
+    ENVIRONMENT_READ = "environment-read"
+    """
+    Environment Read (environment): Read access to environments.
+    """
+    ENVIRONMENT_WRITE = "environment-write"
+    """
+    Environment Write (environment): Read/open/write access to environments.
+    """
+    INSIGHTS_ACCOUNT_ADMIN = "insights-account-admin"
+    """
+    Account Admin (insights-account): Admin access to insights accounts.
+    """
+    INSIGHTS_ACCOUNT_READ = "insights-account-read"
+    """
+    Account Read (insights-account): Read access to insights accounts.
+    """
+    INSIGHTS_ACCOUNT_WRITE = "insights-account-write"
+    """
+    Account Write (insights-account): Read/write access to insights accounts.
+    """
+    ORG_SETTINGS_BILLING = "org-settings-billing"
+    """
+    Organization Settings Billing (global): Billing access.
+    """
+    ORG_SETTINGS_READ_ONLY = "org-settings-read-only"
+    """
+    Read Only (global): View-only org access: usage, members, stacks, environments, teams, Insights accounts; read deployments, integrations, services, templates, and resources. No create/update/delete.
+    """
+    ORG_SETTINGS_STANDARD = "org-settings-standard"
+    """
+    Standard (global): View org usage and members; list stacks, environments, teams, and Insights accounts; use deployments, integrations, services, and resources; create resources (stacks, environments, teams, Insights accounts). Excludes billing and member or org admin settings.
+    """
+    STACK_ADMIN = "stack-admin"
+    """
+    Stack Admin (stack): Admin access to stacks, including deployment settings.
+    """
+    STACK_READ = "stack-read"
+    """
+    Stack Read (stack): Read access to stacks, including deployment settings.
+    """
+    STACK_WRITE = "stack-write"
+    """
+    Stack Write (stack): Read/write access to stacks, including deployment settings.
     """
 
 
