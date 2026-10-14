@@ -914,6 +914,179 @@ func (in *environmentPermissionPtr) ToEnvironmentPermissionPtrOutputWithContext(
 	return pulumi.ToOutputWithContext(ctx, in).(EnvironmentPermissionPtrOutput)
 }
 
+type PolicyGroupTagOperator string
+
+const (
+	// The tag is set to `value`.
+	PolicyGroupTagOperatorEquals = PolicyGroupTagOperator("equals")
+	// The tag isn't set to `value`. Also matches entities that don't have the tag.
+	PolicyGroupTagOperatorNotEquals = PolicyGroupTagOperator("notEquals")
+	// The entity has the tag, with any value.
+	PolicyGroupTagOperatorExists = PolicyGroupTagOperator("exists")
+	// The entity doesn't have the tag.
+	PolicyGroupTagOperatorNotExists = PolicyGroupTagOperator("notExists")
+)
+
+func (PolicyGroupTagOperator) ElementType() reflect.Type {
+	return reflect.TypeOf((*PolicyGroupTagOperator)(nil)).Elem()
+}
+
+func (e PolicyGroupTagOperator) ToPolicyGroupTagOperatorOutput() PolicyGroupTagOperatorOutput {
+	return pulumi.ToOutput(e).(PolicyGroupTagOperatorOutput)
+}
+
+func (e PolicyGroupTagOperator) ToPolicyGroupTagOperatorOutputWithContext(ctx context.Context) PolicyGroupTagOperatorOutput {
+	return pulumi.ToOutputWithContext(ctx, e).(PolicyGroupTagOperatorOutput)
+}
+
+func (e PolicyGroupTagOperator) ToPolicyGroupTagOperatorPtrOutput() PolicyGroupTagOperatorPtrOutput {
+	return e.ToPolicyGroupTagOperatorPtrOutputWithContext(context.Background())
+}
+
+func (e PolicyGroupTagOperator) ToPolicyGroupTagOperatorPtrOutputWithContext(ctx context.Context) PolicyGroupTagOperatorPtrOutput {
+	return PolicyGroupTagOperator(e).ToPolicyGroupTagOperatorOutputWithContext(ctx).ToPolicyGroupTagOperatorPtrOutputWithContext(ctx)
+}
+
+func (e PolicyGroupTagOperator) ToStringOutput() pulumi.StringOutput {
+	return pulumi.ToOutput(pulumi.String(e)).(pulumi.StringOutput)
+}
+
+func (e PolicyGroupTagOperator) ToStringOutputWithContext(ctx context.Context) pulumi.StringOutput {
+	return pulumi.ToOutputWithContext(ctx, pulumi.String(e)).(pulumi.StringOutput)
+}
+
+func (e PolicyGroupTagOperator) ToStringPtrOutput() pulumi.StringPtrOutput {
+	return pulumi.String(e).ToStringPtrOutputWithContext(context.Background())
+}
+
+func (e PolicyGroupTagOperator) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
+	return pulumi.String(e).ToStringOutputWithContext(ctx).ToStringPtrOutputWithContext(ctx)
+}
+
+type PolicyGroupTagOperatorOutput struct{ *pulumi.OutputState }
+
+func (PolicyGroupTagOperatorOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*PolicyGroupTagOperator)(nil)).Elem()
+}
+
+func (o PolicyGroupTagOperatorOutput) ToPolicyGroupTagOperatorOutput() PolicyGroupTagOperatorOutput {
+	return o
+}
+
+func (o PolicyGroupTagOperatorOutput) ToPolicyGroupTagOperatorOutputWithContext(ctx context.Context) PolicyGroupTagOperatorOutput {
+	return o
+}
+
+func (o PolicyGroupTagOperatorOutput) ToPolicyGroupTagOperatorPtrOutput() PolicyGroupTagOperatorPtrOutput {
+	return o.ToPolicyGroupTagOperatorPtrOutputWithContext(context.Background())
+}
+
+func (o PolicyGroupTagOperatorOutput) ToPolicyGroupTagOperatorPtrOutputWithContext(ctx context.Context) PolicyGroupTagOperatorPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v PolicyGroupTagOperator) *PolicyGroupTagOperator {
+		return &v
+	}).(PolicyGroupTagOperatorPtrOutput)
+}
+
+func (o PolicyGroupTagOperatorOutput) ToStringOutput() pulumi.StringOutput {
+	return o.ToStringOutputWithContext(context.Background())
+}
+
+func (o PolicyGroupTagOperatorOutput) ToStringOutputWithContext(ctx context.Context) pulumi.StringOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e PolicyGroupTagOperator) string {
+		return string(e)
+	}).(pulumi.StringOutput)
+}
+
+func (o PolicyGroupTagOperatorOutput) ToStringPtrOutput() pulumi.StringPtrOutput {
+	return o.ToStringPtrOutputWithContext(context.Background())
+}
+
+func (o PolicyGroupTagOperatorOutput) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e PolicyGroupTagOperator) *string {
+		v := string(e)
+		return &v
+	}).(pulumi.StringPtrOutput)
+}
+
+type PolicyGroupTagOperatorPtrOutput struct{ *pulumi.OutputState }
+
+func (PolicyGroupTagOperatorPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**PolicyGroupTagOperator)(nil)).Elem()
+}
+
+func (o PolicyGroupTagOperatorPtrOutput) ToPolicyGroupTagOperatorPtrOutput() PolicyGroupTagOperatorPtrOutput {
+	return o
+}
+
+func (o PolicyGroupTagOperatorPtrOutput) ToPolicyGroupTagOperatorPtrOutputWithContext(ctx context.Context) PolicyGroupTagOperatorPtrOutput {
+	return o
+}
+
+func (o PolicyGroupTagOperatorPtrOutput) Elem() PolicyGroupTagOperatorOutput {
+	return o.ApplyT(func(v *PolicyGroupTagOperator) PolicyGroupTagOperator {
+		if v != nil {
+			return *v
+		}
+		var ret PolicyGroupTagOperator
+		return ret
+	}).(PolicyGroupTagOperatorOutput)
+}
+
+func (o PolicyGroupTagOperatorPtrOutput) ToStringPtrOutput() pulumi.StringPtrOutput {
+	return o.ToStringPtrOutputWithContext(context.Background())
+}
+
+func (o PolicyGroupTagOperatorPtrOutput) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e *PolicyGroupTagOperator) *string {
+		if e == nil {
+			return nil
+		}
+		v := string(*e)
+		return &v
+	}).(pulumi.StringPtrOutput)
+}
+
+// PolicyGroupTagOperatorInput is an input type that accepts values of the PolicyGroupTagOperator enum
+// A concrete instance of `PolicyGroupTagOperatorInput` can be one of the following:
+//
+//	PolicyGroupTagOperatorEquals
+//	PolicyGroupTagOperatorNotEquals
+//	PolicyGroupTagOperatorExists
+//	PolicyGroupTagOperatorNotExists
+type PolicyGroupTagOperatorInput interface {
+	pulumi.Input
+
+	ToPolicyGroupTagOperatorOutput() PolicyGroupTagOperatorOutput
+	ToPolicyGroupTagOperatorOutputWithContext(context.Context) PolicyGroupTagOperatorOutput
+}
+
+var policyGroupTagOperatorPtrType = reflect.TypeOf((**PolicyGroupTagOperator)(nil)).Elem()
+
+type PolicyGroupTagOperatorPtrInput interface {
+	pulumi.Input
+
+	ToPolicyGroupTagOperatorPtrOutput() PolicyGroupTagOperatorPtrOutput
+	ToPolicyGroupTagOperatorPtrOutputWithContext(context.Context) PolicyGroupTagOperatorPtrOutput
+}
+
+type policyGroupTagOperatorPtr string
+
+func PolicyGroupTagOperatorPtr(v string) PolicyGroupTagOperatorPtrInput {
+	return (*policyGroupTagOperatorPtr)(&v)
+}
+
+func (*policyGroupTagOperatorPtr) ElementType() reflect.Type {
+	return policyGroupTagOperatorPtrType
+}
+
+func (in *policyGroupTagOperatorPtr) ToPolicyGroupTagOperatorPtrOutput() PolicyGroupTagOperatorPtrOutput {
+	return pulumi.ToOutput(in).(PolicyGroupTagOperatorPtrOutput)
+}
+
+func (in *policyGroupTagOperatorPtr) ToPolicyGroupTagOperatorPtrOutputWithContext(ctx context.Context) PolicyGroupTagOperatorPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, in).(PolicyGroupTagOperatorPtrOutput)
+}
+
 type PulumiOperation string
 
 const (
@@ -2520,6 +2693,8 @@ func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*CloudProviderPtrInput)(nil)).Elem(), CloudProvider("aws"))
 	pulumi.RegisterInputType(reflect.TypeOf((*EnvironmentPermissionInput)(nil)).Elem(), EnvironmentPermission("none"))
 	pulumi.RegisterInputType(reflect.TypeOf((*EnvironmentPermissionPtrInput)(nil)).Elem(), EnvironmentPermission("none"))
+	pulumi.RegisterInputType(reflect.TypeOf((*PolicyGroupTagOperatorInput)(nil)).Elem(), PolicyGroupTagOperator("equals"))
+	pulumi.RegisterInputType(reflect.TypeOf((*PolicyGroupTagOperatorPtrInput)(nil)).Elem(), PolicyGroupTagOperator("equals"))
 	pulumi.RegisterInputType(reflect.TypeOf((*PulumiOperationInput)(nil)).Elem(), PulumiOperation("update"))
 	pulumi.RegisterInputType(reflect.TypeOf((*PulumiOperationPtrInput)(nil)).Elem(), PulumiOperation("update"))
 	pulumi.RegisterInputType(reflect.TypeOf((*RbacPermissionInput)(nil)).Elem(), RbacPermission("environment:read"))
@@ -2550,6 +2725,8 @@ func init() {
 	pulumi.RegisterOutputType(CloudProviderPtrOutput{})
 	pulumi.RegisterOutputType(EnvironmentPermissionOutput{})
 	pulumi.RegisterOutputType(EnvironmentPermissionPtrOutput{})
+	pulumi.RegisterOutputType(PolicyGroupTagOperatorOutput{})
+	pulumi.RegisterOutputType(PolicyGroupTagOperatorPtrOutput{})
 	pulumi.RegisterOutputType(PulumiOperationOutput{})
 	pulumi.RegisterOutputType(PulumiOperationPtrOutput{})
 	pulumi.RegisterOutputType(RbacPermissionOutput{})
