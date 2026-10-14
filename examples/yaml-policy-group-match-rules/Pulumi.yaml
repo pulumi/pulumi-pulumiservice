@@ -1,0 +1,43 @@
+name: yaml-policy-group-match-rules
+runtime: yaml
+description: Builds policy group match rules that add stacks and Insights accounts by their tags
+
+variables:
+  # A stack matches if it matches any rule, and a rule matches when all of
+  # its conditions hold.
+  stackMatchRule:
+    fn::invoke:
+      function: pulumiservice:buildStackMatchRule
+      arguments:
+        rules:
+          # team = platform
+          - conditions:
+              - key: team
+                value: platform
+          # env = prod AND team != legacy AND has a cost-center tag AND has no
+          # deprecated tag
+          - conditions:
+              - key: env
+                value: prod
+              - key: team
+                operator: notEquals
+                value: legacy
+              - key: cost-center
+                operator: exists
+              - key: deprecated
+                operator: notExists
+      return: matchRule
+
+  accountMatchRule:
+    fn::invoke:
+      function: pulumiservice:buildAccountMatchRule
+      arguments:
+        rules:
+          - conditions:
+              - key: cost-center
+                operator: exists
+      return: matchRule
+
+outputs:
+  stackMatchRule: ${stackMatchRule}
+  accountMatchRule: ${accountMatchRule}

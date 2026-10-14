@@ -174,9 +174,11 @@ func MakeProvider(host *provider.HostClient, name, version string) (pulumirpc.Re
 			infer.Resource(&resources.Webhook{}),
 		).
 		WithFunctions(
+			infer.Function(&functions.BuildAccountMatchRuleFunction{}),
 			infer.Function(&functions.BuildAllowPermissionsFunction{}),
 			infer.Function(&functions.BuildEnvironmentScopedPermissionsFunction{}),
 			infer.Function(&functions.BuildInsightsAccountScopedPermissionsFunction{}),
+			infer.Function(&functions.BuildStackMatchRuleFunction{}),
 			infer.Function(&functions.BuildStackScopedPermissionsFunction{}),
 			infer.Function(&functions.GetCurrentUserFunction{}),
 			infer.Function(&functions.GetEnvironmentFunction{}),

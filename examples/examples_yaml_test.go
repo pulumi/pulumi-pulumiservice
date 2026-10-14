@@ -550,6 +550,20 @@ func TestYamlPolicyGroupsAccountsExample(t *testing.T) {
 	})
 }
 
+func TestYamlPolicyGroupMatchRulesExample(t *testing.T) {
+	test := pulumitest.NewPulumiTest(t,
+		filepath.Join(getCwd(t), "yaml-policy-group-match-rules"),
+		inMemoryProvider(),
+		opttest.UseAmbientBackend(),
+		opttest.StackName(randomStackName()),
+	)
+	up := runPulumiTest(t, test)
+	stackRule, _ := up.Outputs["stackMatchRule"].Value.(map[string]any)
+	assert.Equal(t, "PermissionExpressionOr", stackRule["__type"])
+	accountRule, _ := up.Outputs["accountMatchRule"].Value.(map[string]any)
+	assert.Equal(t, "PermissionExpressionHasTag", accountRule["__type"])
+}
+
 func TestYamlApprovalRuleExample(t *testing.T) {
 	cwd := getCwd(t)
 	digits := generateRandomFiveDigits()
