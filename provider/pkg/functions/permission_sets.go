@@ -49,12 +49,11 @@ type GetOrganizationPermissionSetInput struct {
 }
 
 type GetOrganizationPermissionSetOutput struct {
-	PermissionSetId   string   `pulumi:"permissionSetId"` //nolint:revive // matches the SDK property name
-	Name              string   `pulumi:"name"`
-	Description       string   `pulumi:"description"`
-	ResourceType      string   `pulumi:"resourceType"`
-	DefaultIdentifier *string  `pulumi:"defaultIdentifier,optional"`
-	Permissions       []string `pulumi:"permissions"`
+	PermissionSetId   string  `pulumi:"permissionSetId"` //nolint:revive // matches the SDK property name
+	Name              string  `pulumi:"name"`
+	Description       string  `pulumi:"description"`
+	ResourceType      string  `pulumi:"resourceType"`
+	DefaultIdentifier *string `pulumi:"defaultIdentifier,optional"`
 }
 
 func (GetOrganizationPermissionSetFunction) Annotate(a infer.Annotator) {
@@ -84,8 +83,6 @@ func (o *GetOrganizationPermissionSetOutput) Annotate(a infer.Annotator) {
 		"`environment`, `insights-account`, or `global` for organization-level sets.")
 	a.Describe(&o.DefaultIdentifier, "For built-in permission sets, a stable identifier such as `stack-read`. "+
 		"Unset for custom permission sets.")
-	a.Describe(&o.Permissions, "The scopes the permission set grants. Only populated for permission sets "+
-		"that grant a flat list of scopes.")
 }
 
 func (GetOrganizationPermissionSetFunction) Invoke(
@@ -134,12 +131,6 @@ func permissionSetOutput(s apitype.PermissionDescriptorRecord) GetOrganizationPe
 		Name:            s.Name,
 		Description:     s.Description,
 		ResourceType:    s.ResourceType,
-		Permissions:     []string{},
-	}
-	if allow, ok := s.Details.(apitype.PermissionDescriptorAllow); ok {
-		for _, p := range allow.Permissions() {
-			out.Permissions = append(out.Permissions, string(p))
-		}
 	}
 	if s.DefaultIdentifier != "" {
 		id := s.DefaultIdentifier

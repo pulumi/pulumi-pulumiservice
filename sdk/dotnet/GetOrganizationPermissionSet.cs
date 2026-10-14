@@ -104,10 +104,6 @@ namespace Pulumi.PulumiService
         /// </summary>
         public readonly string PermissionSetId;
         /// <summary>
-        /// The scopes the permission set grants. Only populated for permission sets that grant a flat list of scopes.
-        /// </summary>
-        public readonly ImmutableArray<string> Permissions;
-        /// <summary>
         /// The kind of entity the permission set applies to, such as `stack`, `environment`, `insights-account`, or `global` for organization-level sets.
         /// </summary>
         public readonly string ResourceType;
@@ -122,15 +118,12 @@ namespace Pulumi.PulumiService
 
             string permissionSetId,
 
-            ImmutableArray<string> permissions,
-
             string resourceType)
         {
             DefaultIdentifier = defaultIdentifier;
             Description = description;
             Name = name;
             PermissionSetId = permissionSetId;
-            Permissions = permissions;
             ResourceType = resourceType;
         }
     }

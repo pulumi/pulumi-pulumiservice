@@ -52,10 +52,6 @@ export interface GetOrganizationPermissionSetResult {
      */
     readonly permissionSetId: string;
     /**
-     * The scopes the permission set grants. Only populated for permission sets that grant a flat list of scopes.
-     */
-    readonly permissions: string[];
-    /**
      * The kind of entity the permission set applies to, such as `stack`, `environment`, `insights-account`, or `global` for organization-level sets.
      */
     readonly resourceType: string;

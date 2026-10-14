@@ -40,8 +40,6 @@ type GetOrganizationPermissionSetResult struct {
 	Name string `pulumi:"name"`
 	// The permission set's unique ID. Pass it, with `resourceType`, to `buildRolePermissions`.
 	PermissionSetId string `pulumi:"permissionSetId"`
-	// The scopes the permission set grants. Only populated for permission sets that grant a flat list of scopes.
-	Permissions []string `pulumi:"permissions"`
 	// The kind of entity the permission set applies to, such as `stack`, `environment`, `insights-account`, or `global` for organization-level sets.
 	ResourceType string `pulumi:"resourceType"`
 }
@@ -96,11 +94,6 @@ func (o GetOrganizationPermissionSetResultOutput) Name() pulumi.StringOutput {
 // The permission set's unique ID. Pass it, with `resourceType`, to `buildRolePermissions`.
 func (o GetOrganizationPermissionSetResultOutput) PermissionSetId() pulumi.StringOutput {
 	return o.ApplyT(func(v GetOrganizationPermissionSetResult) string { return v.PermissionSetId }).(pulumi.StringOutput)
-}
-
-// The scopes the permission set grants. Only populated for permission sets that grant a flat list of scopes.
-func (o GetOrganizationPermissionSetResultOutput) Permissions() pulumi.StringArrayOutput {
-	return o.ApplyT(func(v GetOrganizationPermissionSetResult) []string { return v.Permissions }).(pulumi.StringArrayOutput)
 }
 
 // The kind of entity the permission set applies to, such as `stack`, `environment`, `insights-account`, or `global` for organization-level sets.

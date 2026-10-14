@@ -93,7 +93,6 @@ func TestGetOrganizationPermissionSet(t *testing.T) {
 			Description:       "Read stacks.",
 			ResourceType:      testResourceType,
 			DefaultIdentifier: ptr(testStackReadSetID),
-			Permissions:       []string{permStackRead},
 		}, got)
 	})
 
@@ -104,7 +103,6 @@ func TestGetOrganizationPermissionSet(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, "set-2", got.PermissionSetId)
 		assert.Nil(t, got.DefaultIdentifier)
-		assert.Empty(t, got.Permissions)
 	})
 
 	t.Run("not found", func(t *testing.T) {

@@ -24,7 +24,7 @@ __all__ = [
 
 @pulumi.output_type
 class GetOrganizationPermissionSetResult:
-    def __init__(__self__, default_identifier=None, description=None, name=None, permission_set_id=None, permissions=None, resource_type=None):
+    def __init__(__self__, default_identifier=None, description=None, name=None, permission_set_id=None, resource_type=None):
         if default_identifier and not isinstance(default_identifier, str):
             raise TypeError("Expected argument 'default_identifier' to be a str")
         pulumi.set(__self__, "default_identifier", default_identifier)
@@ -37,9 +37,6 @@ class GetOrganizationPermissionSetResult:
         if permission_set_id and not isinstance(permission_set_id, str):
             raise TypeError("Expected argument 'permission_set_id' to be a str")
         pulumi.set(__self__, "permission_set_id", permission_set_id)
-        if permissions and not isinstance(permissions, list):
-            raise TypeError("Expected argument 'permissions' to be a list")
-        pulumi.set(__self__, "permissions", permissions)
         if resource_type and not isinstance(resource_type, str):
             raise TypeError("Expected argument 'resource_type' to be a str")
         pulumi.set(__self__, "resource_type", resource_type)
@@ -77,14 +74,6 @@ class GetOrganizationPermissionSetResult:
         return pulumi.get(self, "permission_set_id")
 
     @_builtins.property
-    @pulumi.getter
-    def permissions(self) -> Sequence[_builtins.str]:
-        """
-        The scopes the permission set grants. Only populated for permission sets that grant a flat list of scopes.
-        """
-        return pulumi.get(self, "permissions")
-
-    @_builtins.property
     @pulumi.getter(name="resourceType")
     def resource_type(self) -> _builtins.str:
         """
@@ -103,7 +92,6 @@ class AwaitableGetOrganizationPermissionSetResult(GetOrganizationPermissionSetRe
             description=self.description,
             name=self.name,
             permission_set_id=self.permission_set_id,
-            permissions=self.permissions,
             resource_type=self.resource_type)
 
 
@@ -130,7 +118,6 @@ def get_organization_permission_set(default_identifier: Optional['BuiltInPermiss
         description=pulumi.get(__ret__, 'description'),
         name=pulumi.get(__ret__, 'name'),
         permission_set_id=pulumi.get(__ret__, 'permission_set_id'),
-        permissions=pulumi.get(__ret__, 'permissions'),
         resource_type=pulumi.get(__ret__, 'resource_type'))
 def get_organization_permission_set_output(default_identifier: pulumi.Input[Optional[Optional['BuiltInPermissionSet']]] = None,
                                            name: pulumi.Input[Optional[Optional[_builtins.str]]] = None,
@@ -154,5 +141,4 @@ def get_organization_permission_set_output(default_identifier: pulumi.Input[Opti
         description=pulumi.get(__response__, 'description'),
         name=pulumi.get(__response__, 'name'),
         permission_set_id=pulumi.get(__response__, 'permission_set_id'),
-        permissions=pulumi.get(__response__, 'permissions'),
         resource_type=pulumi.get(__response__, 'resource_type')))

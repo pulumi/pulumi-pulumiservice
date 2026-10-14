@@ -6,7 +6,6 @@ package com.pulumi.pulumiservice.outputs;
 import com.pulumi.core.annotations.CustomType;
 import com.pulumi.exceptions.MissingRequiredPropertyException;
 import java.lang.String;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import javax.annotation.Nullable;
@@ -33,11 +32,6 @@ public final class GetOrganizationPermissionSetResult {
      * 
      */
     private String permissionSetId;
-    /**
-     * @return The scopes the permission set grants. Only populated for permission sets that grant a flat list of scopes.
-     * 
-     */
-    private List<String> permissions;
     /**
      * @return The kind of entity the permission set applies to, such as `stack`, `environment`, `insights-account`, or `global` for organization-level sets.
      * 
@@ -74,13 +68,6 @@ public final class GetOrganizationPermissionSetResult {
         return this.permissionSetId;
     }
     /**
-     * @return The scopes the permission set grants. Only populated for permission sets that grant a flat list of scopes.
-     * 
-     */
-    public List<String> permissions() {
-        return this.permissions;
-    }
-    /**
      * @return The kind of entity the permission set applies to, such as `stack`, `environment`, `insights-account`, or `global` for organization-level sets.
      * 
      */
@@ -101,7 +88,6 @@ public final class GetOrganizationPermissionSetResult {
         private String description;
         private String name;
         private String permissionSetId;
-        private List<String> permissions;
         private String resourceType;
         public Builder() {}
         public Builder(GetOrganizationPermissionSetResult defaults) {
@@ -110,7 +96,6 @@ public final class GetOrganizationPermissionSetResult {
     	      this.description = defaults.description;
     	      this.name = defaults.name;
     	      this.permissionSetId = defaults.permissionSetId;
-    	      this.permissions = defaults.permissions;
     	      this.resourceType = defaults.resourceType;
         }
 
@@ -145,17 +130,6 @@ public final class GetOrganizationPermissionSetResult {
             return this;
         }
         @CustomType.Setter
-        public Builder permissions(List<String> permissions) {
-            if (permissions == null) {
-              throw new MissingRequiredPropertyException("GetOrganizationPermissionSetResult", "permissions");
-            }
-            this.permissions = permissions;
-            return this;
-        }
-        public Builder permissions(String... permissions) {
-            return permissions(List.of(permissions));
-        }
-        @CustomType.Setter
         public Builder resourceType(String resourceType) {
             if (resourceType == null) {
               throw new MissingRequiredPropertyException("GetOrganizationPermissionSetResult", "resourceType");
@@ -169,7 +143,6 @@ public final class GetOrganizationPermissionSetResult {
             _resultValue.description = description;
             _resultValue.name = name;
             _resultValue.permissionSetId = permissionSetId;
-            _resultValue.permissions = permissions;
             _resultValue.resourceType = resourceType;
             return _resultValue;
         }
