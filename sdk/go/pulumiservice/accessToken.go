@@ -12,7 +12,9 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
-// Access tokens allow a user to authenticate against the Pulumi Cloud.
+// Creates a personal access token for the Pulumi Cloud user that the provider is authenticated as. The token acts with that user's permissions.
+//
+// To create a token that isn't tied to a user, use `OrgAccessToken` or `TeamAccessToken`.
 type AccessToken struct {
 	pulumi.CustomResourceState
 

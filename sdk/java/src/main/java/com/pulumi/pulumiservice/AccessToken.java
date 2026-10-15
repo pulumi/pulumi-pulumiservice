@@ -14,7 +14,9 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 /**
- * Access tokens allow a user to authenticate against the Pulumi Cloud.
+ * Creates a personal access token for the Pulumi Cloud user that the provider is authenticated as. The token acts with that user&#39;s permissions.
+ * 
+ * To create a token that isn&#39;t tied to a user, use `OrgAccessToken` or `TeamAccessToken`.
  * 
  */
 @ResourceType(type="pulumiservice:index:AccessToken")

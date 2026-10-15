@@ -16,36 +16,36 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 
 /**
- * Creates an access token scoped to a Pulumi Cloud organization.
+ * Creates an organization access token in Pulumi Cloud. Organization tokens aren&#39;t tied to a user, so they suit CI/CD and other automation.
  * 
- * The provider must be authenticated as a user, for example with a personal access token, to create or delete this resource. Organization and team access tokens cannot create or delete organization tokens, even when they have the Admin role, so that a token cannot be used to mint further organization tokens. Such requests fail with `403 Machine tokens are not allowed to perform this operation`. For automation, use the personal access token of a dedicated service-account user. `TeamAccessToken` does not have this restriction.
+ * The provider must authenticate as a user, for example with a personal access token, to create or delete this resource. Pulumi Cloud rejects organization and team access tokens here, even Admin ones, with `403 Machine tokens are not allowed to perform this operation`, so that one machine token can&#39;t mint another. For automation, use the personal access token of a dedicated service-account user, or use `TeamAccessToken`, which has no such restriction.
  * 
  */
 @ResourceType(type="pulumiservice:index:OrgAccessToken")
 public class OrgAccessToken extends com.pulumi.resources.CustomResource {
     /**
-     * Optional. True if this is an admin token.
+     * Whether the token has the Admin role. Defaults to `false`.
      * 
      */
     @Export(name="admin", refs={Boolean.class}, tree="[0]")
     private Output<Boolean> admin;
 
     /**
-     * @return Optional. True if this is an admin token.
+     * @return Whether the token has the Admin role. Defaults to `false`.
      * 
      */
     public Output<Boolean> admin() {
         return this.admin;
     }
     /**
-     * Optional. Description for the token.
+     * A description of the token.
      * 
      */
     @Export(name="description", refs={String.class}, tree="[0]")
     private Output</* @Nullable */ String> description;
 
     /**
-     * @return Optional. Description for the token.
+     * @return A description of the token.
      * 
      */
     public Output<Optional<String>> description() {
