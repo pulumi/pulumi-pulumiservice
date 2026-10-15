@@ -85,11 +85,11 @@ func (PolicyGroupState) ElementType() reflect.Type {
 type policyGroupArgs struct {
 	// Agent pool ID for policy evaluation. Defaults to Pulumi hosted pool if not specified.
 	AgentPoolId *string `pulumi:"agentPoolId"`
-	// The type of entities this policy group applies to (stacks or accounts).
+	// The type of entities this policy group applies to (stacks or accounts). Fixed at creation; it cannot be changed later.
 	EntityType string `pulumi:"entityType"`
-	// The enforcement mode for the policy group (audit or preventative). Defaults to 'audit' for account policy groups, 'preventative' for stack policy groups.
+	// The enforcement mode for the policy group (audit or preventative). Defaults to 'audit' for account policy groups, 'preventative' for stack policy groups. Fixed at creation; it cannot be changed later.
 	Mode *string `pulumi:"mode"`
-	// The name of the new policy group.
+	// The name of the new policy group. Up to 100 characters, made up of letters, numbers, hyphens, underscores, periods, or spaces, and may not begin or end with a space.
 	Name string `pulumi:"name"`
 	// The organization name
 	OrgName string `pulumi:"orgName"`
@@ -99,11 +99,11 @@ type policyGroupArgs struct {
 type PolicyGroupArgs struct {
 	// Agent pool ID for policy evaluation. Defaults to Pulumi hosted pool if not specified.
 	AgentPoolId pulumi.StringPtrInput
-	// The type of entities this policy group applies to (stacks or accounts).
+	// The type of entities this policy group applies to (stacks or accounts). Fixed at creation; it cannot be changed later.
 	EntityType pulumi.StringInput
-	// The enforcement mode for the policy group (audit or preventative). Defaults to 'audit' for account policy groups, 'preventative' for stack policy groups.
+	// The enforcement mode for the policy group (audit or preventative). Defaults to 'audit' for account policy groups, 'preventative' for stack policy groups. Fixed at creation; it cannot be changed later.
 	Mode pulumi.StringPtrInput
-	// The name of the new policy group.
+	// The name of the new policy group. Up to 100 characters, made up of letters, numbers, hyphens, underscores, periods, or spaces, and may not begin or end with a space.
 	Name pulumi.StringInput
 	// The organization name
 	OrgName pulumi.StringInput

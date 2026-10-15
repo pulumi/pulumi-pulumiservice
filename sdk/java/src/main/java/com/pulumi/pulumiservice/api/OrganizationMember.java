@@ -97,6 +97,24 @@ public class OrganizationMember extends com.pulumi.resources.CustomResource {
         return this.role;
     }
     /**
+     * Suspended indicates that the membership is suspended: the member keeps their
+     * place in the organization but has no access until an administrator restores them.
+     * Suspended members are only included in responses when explicitly requested.
+     * 
+     */
+    @Export(name="suspended", refs={Boolean.class}, tree="[0]")
+    private Output</* @Nullable */ Boolean> suspended;
+
+    /**
+     * @return Suspended indicates that the membership is suspended: the member keeps their
+     * place in the organization but has no access until an administrator restores them.
+     * Suspended members are only included in responses when explicitly requested.
+     * 
+     */
+    public Output<Optional<Boolean>> suspended() {
+        return Codegen.optional(this.suspended);
+    }
+    /**
      * Deprecated. Use GetOrganizationMemberTeams to list teams.
      * 
      */

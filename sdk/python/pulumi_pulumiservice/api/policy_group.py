@@ -27,11 +27,11 @@ class PolicyGroupArgs:
         """
         The set of arguments for constructing a PolicyGroup resource.
 
-        :param pulumi.Input[_builtins.str] entity_type: The type of entities this policy group applies to (stacks or accounts).
-        :param pulumi.Input[_builtins.str] name: The name of the new policy group.
+        :param pulumi.Input[_builtins.str] entity_type: The type of entities this policy group applies to (stacks or accounts). Fixed at creation; it cannot be changed later.
+        :param pulumi.Input[_builtins.str] name: The name of the new policy group. Up to 100 characters, made up of letters, numbers, hyphens, underscores, periods, or spaces, and may not begin or end with a space.
         :param pulumi.Input[_builtins.str] org_name: The organization name
         :param pulumi.Input[_builtins.str] agent_pool_id: Agent pool ID for policy evaluation. Defaults to Pulumi hosted pool if not specified.
-        :param pulumi.Input[_builtins.str] mode: The enforcement mode for the policy group (audit or preventative). Defaults to 'audit' for account policy groups, 'preventative' for stack policy groups.
+        :param pulumi.Input[_builtins.str] mode: The enforcement mode for the policy group (audit or preventative). Defaults to 'audit' for account policy groups, 'preventative' for stack policy groups. Fixed at creation; it cannot be changed later.
         """
         pulumi.set(__self__, "entity_type", entity_type)
         pulumi.set(__self__, "name", name)
@@ -45,7 +45,7 @@ class PolicyGroupArgs:
     @pulumi.getter(name="entityType")
     def entity_type(self) -> pulumi.Input[_builtins.str]:
         """
-        The type of entities this policy group applies to (stacks or accounts).
+        The type of entities this policy group applies to (stacks or accounts). Fixed at creation; it cannot be changed later.
         """
         return pulumi.get(self, "entity_type")
 
@@ -57,7 +57,7 @@ class PolicyGroupArgs:
     @pulumi.getter
     def name(self) -> pulumi.Input[_builtins.str]:
         """
-        The name of the new policy group.
+        The name of the new policy group. Up to 100 characters, made up of letters, numbers, hyphens, underscores, periods, or spaces, and may not begin or end with a space.
         """
         return pulumi.get(self, "name")
 
@@ -93,7 +93,7 @@ class PolicyGroupArgs:
     @pulumi.getter
     def mode(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
-        The enforcement mode for the policy group (audit or preventative). Defaults to 'audit' for account policy groups, 'preventative' for stack policy groups.
+        The enforcement mode for the policy group (audit or preventative). Defaults to 'audit' for account policy groups, 'preventative' for stack policy groups. Fixed at creation; it cannot be changed later.
         """
         return pulumi.get(self, "mode")
 
@@ -120,9 +120,9 @@ class PolicyGroup(pulumi.CustomResource):
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] agent_pool_id: Agent pool ID for policy evaluation. Defaults to Pulumi hosted pool if not specified.
-        :param pulumi.Input[_builtins.str] entity_type: The type of entities this policy group applies to (stacks or accounts).
-        :param pulumi.Input[_builtins.str] mode: The enforcement mode for the policy group (audit or preventative). Defaults to 'audit' for account policy groups, 'preventative' for stack policy groups.
-        :param pulumi.Input[_builtins.str] name: The name of the new policy group.
+        :param pulumi.Input[_builtins.str] entity_type: The type of entities this policy group applies to (stacks or accounts). Fixed at creation; it cannot be changed later.
+        :param pulumi.Input[_builtins.str] mode: The enforcement mode for the policy group (audit or preventative). Defaults to 'audit' for account policy groups, 'preventative' for stack policy groups. Fixed at creation; it cannot be changed later.
+        :param pulumi.Input[_builtins.str] name: The name of the new policy group. Up to 100 characters, made up of letters, numbers, hyphens, underscores, periods, or spaces, and may not begin or end with a space.
         :param pulumi.Input[_builtins.str] org_name: The organization name
         """
         ...

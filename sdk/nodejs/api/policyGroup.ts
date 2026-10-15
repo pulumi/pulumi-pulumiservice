@@ -120,15 +120,15 @@ export interface PolicyGroupArgs {
      */
     agentPoolId?: pulumi.Input<string | undefined>;
     /**
-     * The type of entities this policy group applies to (stacks or accounts).
+     * The type of entities this policy group applies to (stacks or accounts). Fixed at creation; it cannot be changed later.
      */
     entityType: pulumi.Input<string>;
     /**
-     * The enforcement mode for the policy group (audit or preventative). Defaults to 'audit' for account policy groups, 'preventative' for stack policy groups.
+     * The enforcement mode for the policy group (audit or preventative). Defaults to 'audit' for account policy groups, 'preventative' for stack policy groups. Fixed at creation; it cannot be changed later.
      */
     mode?: pulumi.Input<string | undefined>;
     /**
-     * The name of the new policy group.
+     * The name of the new policy group. Up to 100 characters, made up of letters, numbers, hyphens, underscores, periods, or spaces, and may not begin or end with a space.
      */
     name: pulumi.Input<string>;
     /**

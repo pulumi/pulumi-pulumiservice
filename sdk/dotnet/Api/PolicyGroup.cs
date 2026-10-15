@@ -115,19 +115,19 @@ namespace Pulumi.PulumiService.Api
         public Input<string>? AgentPoolId { get; set; }
 
         /// <summary>
-        /// The type of entities this policy group applies to (stacks or accounts).
+        /// The type of entities this policy group applies to (stacks or accounts). Fixed at creation; it cannot be changed later.
         /// </summary>
         [Input("entityType", required: true)]
         public Input<string> EntityType { get; set; } = null!;
 
         /// <summary>
-        /// The enforcement mode for the policy group (audit or preventative). Defaults to 'audit' for account policy groups, 'preventative' for stack policy groups.
+        /// The enforcement mode for the policy group (audit or preventative). Defaults to 'audit' for account policy groups, 'preventative' for stack policy groups. Fixed at creation; it cannot be changed later.
         /// </summary>
         [Input("mode")]
         public Input<string>? Mode { get; set; }
 
         /// <summary>
-        /// The name of the new policy group.
+        /// The name of the new policy group. Up to 100 characters, made up of letters, numbers, hyphens, underscores, periods, or spaces, and may not begin or end with a space.
         /// </summary>
         [Input("name", required: true)]
         public Input<string> Name { get; set; } = null!;

@@ -59,6 +59,12 @@ export class OrganizationMember extends pulumi.CustomResource {
      */
     declare public readonly role: pulumi.Output<string>;
     /**
+     * Suspended indicates that the membership is suspended: the member keeps their
+     * place in the organization but has no access until an administrator restores them.
+     * Suspended members are only included in responses when explicitly requested.
+     */
+    declare public /*out*/ readonly suspended: pulumi.Output<boolean | undefined>;
+    /**
      * Deprecated. Use GetOrganizationMemberTeams to list teams.
      */
     declare public /*out*/ readonly teams: pulumi.Output<string[] | undefined>;
@@ -99,6 +105,7 @@ export class OrganizationMember extends pulumi.CustomResource {
             resourceInputs["fgaRole"] = undefined /*out*/;
             resourceInputs["knownToPulumi"] = undefined /*out*/;
             resourceInputs["links"] = undefined /*out*/;
+            resourceInputs["suspended"] = undefined /*out*/;
             resourceInputs["teams"] = undefined /*out*/;
             resourceInputs["user"] = undefined /*out*/;
             resourceInputs["virtualAdmin"] = undefined /*out*/;
@@ -108,6 +115,7 @@ export class OrganizationMember extends pulumi.CustomResource {
             resourceInputs["knownToPulumi"] = undefined /*out*/;
             resourceInputs["links"] = undefined /*out*/;
             resourceInputs["role"] = undefined /*out*/;
+            resourceInputs["suspended"] = undefined /*out*/;
             resourceInputs["teams"] = undefined /*out*/;
             resourceInputs["user"] = undefined /*out*/;
             resourceInputs["virtualAdmin"] = undefined /*out*/;
