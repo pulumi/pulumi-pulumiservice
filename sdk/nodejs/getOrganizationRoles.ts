@@ -14,13 +14,13 @@ import * as utilities from "./utilities";
  * ### List all roles
  *
  * ```typescript
+ * import * as pulumi from "@pulumi/pulumi";
  * import * as pulumiservice from "@pulumi/pulumiservice";
  *
- * const allRoles = pulumiservice.getOrganizationRolesOutput({ organizationName: "my-org" });
- *
- * // Map each role name to its ID.
- * export const roleIdsByName = allRoles.roles.apply(roles =>
- *     Object.fromEntries(roles.map(r => [r.name, r.roleId])));
+ * const allRoles = pulumiservice.getOrganizationRolesOutput({
+ *     organizationName: "my-org",
+ * });
+ * export const roles = allRoles.apply(allRoles => allRoles.roles);
  * ```
  */
 export function getOrganizationRoles(args: GetOrganizationRolesArgs, opts?: pulumi.InvokeOptions): Promise<GetOrganizationRolesResult> {
@@ -47,13 +47,13 @@ export interface GetOrganizationRolesResult {
  * ### List all roles
  *
  * ```typescript
+ * import * as pulumi from "@pulumi/pulumi";
  * import * as pulumiservice from "@pulumi/pulumiservice";
  *
- * const allRoles = pulumiservice.getOrganizationRolesOutput({ organizationName: "my-org" });
- *
- * // Map each role name to its ID.
- * export const roleIdsByName = allRoles.roles.apply(roles =>
- *     Object.fromEntries(roles.map(r => [r.name, r.roleId])));
+ * const allRoles = pulumiservice.getOrganizationRolesOutput({
+ *     organizationName: "my-org",
+ * });
+ * export const roles = allRoles.apply(allRoles => allRoles.roles);
  * ```
  */
 export function getOrganizationRolesOutput(args: GetOrganizationRolesOutputArgs, opts?: pulumi.InvokeOutputOptions): pulumi.Output<GetOrganizationRolesResult> {

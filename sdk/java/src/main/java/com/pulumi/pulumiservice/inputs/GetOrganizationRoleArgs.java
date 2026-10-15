@@ -15,14 +15,14 @@ public final class GetOrganizationRoleArgs extends com.pulumi.resources.InvokeAr
     public static final GetOrganizationRoleArgs Empty = new GetOrganizationRoleArgs();
 
     /**
-     * The role&#39;s name, exactly as shown in the Pulumi Cloud console. The match is case-sensitive.
+     * The role&#39;s name, as shown in the Pulumi Cloud console. The match is case-insensitive, as role names are unique within an organization regardless of case.
      * 
      */
     @Import(name="name", required=true)
     private Output<String> name;
 
     /**
-     * @return The role&#39;s name, exactly as shown in the Pulumi Cloud console. The match is case-sensitive.
+     * @return The role&#39;s name, as shown in the Pulumi Cloud console. The match is case-insensitive, as role names are unique within an organization regardless of case.
      * 
      */
     public Output<String> name() {
@@ -70,7 +70,7 @@ public final class GetOrganizationRoleArgs extends com.pulumi.resources.InvokeAr
         }
 
         /**
-         * @param name The role&#39;s name, exactly as shown in the Pulumi Cloud console. The match is case-sensitive.
+         * @param name The role&#39;s name, as shown in the Pulumi Cloud console. The match is case-insensitive, as role names are unique within an organization regardless of case.
          * 
          * @return builder
          * 
@@ -81,7 +81,7 @@ public final class GetOrganizationRoleArgs extends com.pulumi.resources.InvokeAr
         }
 
         /**
-         * @param name The role&#39;s name, exactly as shown in the Pulumi Cloud console. The match is case-sensitive.
+         * @param name The role&#39;s name, as shown in the Pulumi Cloud console. The match is case-insensitive, as role names are unique within an organization regardless of case.
          * 
          * @return builder
          * 

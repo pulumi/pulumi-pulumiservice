@@ -50,6 +50,16 @@ def get_organization_roles(organization_name: Optional[_builtins.str] = None,
     Lists the roles in a Pulumi Cloud organization, including both built-in and custom roles, sorted by name. To look up a single role by the name shown in the Pulumi Cloud console, use `getOrganizationRole`.
 
     ## Example Usage
+    ### List all roles
+
+    ```python
+    import pulumi
+    import pulumi_pulumiservice as pulumiservice
+
+    all_roles = pulumiservice.get_organization_roles_output(organization_name="my-org")
+    pulumi.export("roles", all_roles.roles)
+    ```
+
 
     :param _builtins.str organization_name: The name of the Pulumi organization.
     """
@@ -66,6 +76,16 @@ def get_organization_roles_output(organization_name: pulumi.Input[Optional[_buil
     Lists the roles in a Pulumi Cloud organization, including both built-in and custom roles, sorted by name. To look up a single role by the name shown in the Pulumi Cloud console, use `getOrganizationRole`.
 
     ## Example Usage
+    ### List all roles
+
+    ```python
+    import pulumi
+    import pulumi_pulumiservice as pulumiservice
+
+    all_roles = pulumiservice.get_organization_roles_output(organization_name="my-org")
+    pulumi.export("roles", all_roles.roles)
+    ```
+
 
     :param _builtins.str organization_name: The name of the Pulumi organization.
     """

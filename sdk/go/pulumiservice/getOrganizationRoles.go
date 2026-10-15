@@ -14,6 +14,31 @@ import (
 // Lists the roles in a Pulumi Cloud organization, including both built-in and custom roles, sorted by name. To look up a single role by the name shown in the Pulumi Cloud console, use `getOrganizationRole`.
 //
 // ## Example Usage
+// ### List all roles
+//
+// ```go
+// package main
+//
+// import (
+//
+//	"github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice"
+//	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
+//
+// )
+//
+//	func main() {
+//		pulumi.Run(func(ctx *pulumi.Context) error {
+//			allRoles := pulumiservice.GetOrganizationRolesOutput(ctx, pulumiservice.GetOrganizationRolesOutputArgs{
+//				OrganizationName: pulumi.String("my-org"),
+//			}, nil)
+//			ctx.Export("roles", allRoles.ApplyT(func(allRoles pulumiservice.GetOrganizationRolesResult) ([]pulumiservice.OrganizationRoleInfo, error) {
+//				return allRoles.Roles.([]pulumiservice.OrganizationRoleInfo), nil
+//			}).(pulumi.ArrayOutput))
+//			return nil
+//		})
+//	}
+//
+// ```
 func GetOrganizationRoles(ctx *pulumi.Context, args *GetOrganizationRolesArgs, opts ...pulumi.InvokeOption) (*GetOrganizationRolesResult, error) {
 	opts = internal.PkgInvokeDefaultOpts(opts)
 	var rv GetOrganizationRolesResult

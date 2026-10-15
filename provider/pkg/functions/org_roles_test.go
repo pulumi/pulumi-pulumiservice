@@ -20,12 +20,17 @@ const testFunctionRolesOrgName = "test-org"
 
 type orgRolesClientMock struct {
 	config.Client
-	listOrgRolesFunc func(ctx context.Context, orgName, uxPurpose string) ([]apitype.PermissionDescriptorRecord, error)
+	listOrgRolesFunc func(
+		ctx context.Context,
+		orgName string,
+		uxPurpose apitype.PermissionDescriptorUXPurpose,
+	) ([]apitype.PermissionDescriptorRecord, error)
 }
 
 func (c *orgRolesClientMock) ListOrgRoles(
 	ctx context.Context,
-	orgName, uxPurpose string,
+	orgName string,
+	uxPurpose apitype.PermissionDescriptorUXPurpose,
 ) ([]apitype.PermissionDescriptorRecord, error) {
 	if c.listOrgRolesFunc == nil {
 		return nil, nil
@@ -52,9 +57,13 @@ func testRole(id, name, defaultIdentifier string) apitype.PermissionDescriptorRe
 // for the console's role catalogue.
 func stubOrgRoles(t *testing.T, roles ...apitype.PermissionDescriptorRecord) *orgRolesClientMock {
 	return &orgRolesClientMock{
-		listOrgRolesFunc: func(_ context.Context, orgName, uxPurpose string) ([]apitype.PermissionDescriptorRecord, error) {
+		listOrgRolesFunc: func(
+			_ context.Context,
+			orgName string,
+			uxPurpose apitype.PermissionDescriptorUXPurpose,
+		) ([]apitype.PermissionDescriptorRecord, error) {
 			assert.Equal(t, testFunctionRolesOrgName, orgName)
-			assert.Equal(t, "role", uxPurpose)
+			assert.Equal(t, apitype.PermissionDescriptorUXPurposeRole, uxPurpose)
 			return roles, nil
 		},
 	}
@@ -118,12 +127,13 @@ func TestGetOrganizationRoleFunction(t *testing.T) {
 		assert.Equal(t, "custom-id", resp.Output.RoleId)
 	})
 
-	t.Run("match is case-sensitive", func(t *testing.T) {
+	t.Run("match is case-insensitive", func(t *testing.T) {
 		t.Parallel()
 		client := stubOrgRoles(t, testRole("custom-id", "CI Deployer", ""))
 
-		_, err := invokeGetOrganizationRole(t, client, "ci deployer")
-		assert.ErrorContains(t, err, `organization "test-org" has no role named "ci deployer"`)
+		resp, err := invokeGetOrganizationRole(t, client, "ci deployer")
+		require.NoError(t, err)
+		assert.Equal(t, "custom-id", resp.Output.RoleId)
 	})
 
 	t.Run("errors when no role matches", func(t *testing.T) {
@@ -134,21 +144,12 @@ func TestGetOrganizationRoleFunction(t *testing.T) {
 		assert.ErrorContains(t, err, `organization "test-org" has no role named "Missing"`)
 	})
 
-	t.Run("errors when more than one role matches", func(t *testing.T) {
-		t.Parallel()
-		client := stubOrgRoles(t,
-			testRole("id-1", "Deployer", ""),
-			testRole("id-2", "Deployer", ""),
-		)
-
-		_, err := invokeGetOrganizationRole(t, client, "Deployer")
-		assert.ErrorContains(t, err, `organization "test-org" has 2 roles named "Deployer" (IDs: id-1, id-2)`)
-	})
-
 	t.Run("errors on an empty name without calling the API", func(t *testing.T) {
 		t.Parallel()
 		client := &orgRolesClientMock{
-			listOrgRolesFunc: func(context.Context, string, string) ([]apitype.PermissionDescriptorRecord, error) {
+			listOrgRolesFunc: func(
+				context.Context, string, apitype.PermissionDescriptorUXPurpose,
+			) ([]apitype.PermissionDescriptorRecord, error) {
 				t.Fatal("ListOrgRoles should not be called")
 				return nil, nil
 			},
@@ -161,7 +162,9 @@ func TestGetOrganizationRoleFunction(t *testing.T) {
 	t.Run("propagates API errors", func(t *testing.T) {
 		t.Parallel()
 		client := &orgRolesClientMock{
-			listOrgRolesFunc: func(context.Context, string, string) ([]apitype.PermissionDescriptorRecord, error) {
+			listOrgRolesFunc: func(
+				context.Context, string, apitype.PermissionDescriptorUXPurpose,
+			) ([]apitype.PermissionDescriptorRecord, error) {
 				return nil, errors.New("boom")
 			},
 		}
@@ -199,7 +202,9 @@ func TestGetOrganizationRolesFunction(t *testing.T) {
 	t.Run("propagates API errors", func(t *testing.T) {
 		t.Parallel()
 		client := &orgRolesClientMock{
-			listOrgRolesFunc: func(context.Context, string, string) ([]apitype.PermissionDescriptorRecord, error) {
+			listOrgRolesFunc: func(
+				context.Context, string, apitype.PermissionDescriptorUXPurpose,
+			) ([]apitype.PermissionDescriptorRecord, error) {
 				return nil, errors.New("boom")
 			},
 		}

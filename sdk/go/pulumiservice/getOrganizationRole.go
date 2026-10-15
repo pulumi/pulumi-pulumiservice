@@ -11,9 +11,64 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
-// Looks up a role in a Pulumi Cloud organization by the name shown in the Pulumi Cloud console. Finds both built-in and custom roles. Use the returned `roleId` for inputs that take a role ID, such as `TeamRoleAssignment.roleId` and `OrganizationMember.roleId`, instead of hardcoding the ID. Returns an error when no role has the given name, or when more than one does.
+// Looks up a role in a Pulumi Cloud organization by the name shown in the Pulumi Cloud console. Finds both built-in and custom roles. Use the returned `roleId` for inputs that take a role ID, such as `TeamRoleAssignment.roleId` and `OrganizationMember.roleId`, instead of hardcoding the ID. Returns an error when no role has the given name.
 //
 // ## Example Usage
+// ### Look up a role you defined
+//
+// ```go
+// package main
+//
+// import (
+//
+//	"github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice"
+//	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
+//
+// )
+//
+//	func main() {
+//		pulumi.Run(func(ctx *pulumi.Context) error {
+//			ciDeployerRole := pulumiservice.GetOrganizationRoleOutput(ctx, pulumiservice.GetOrganizationRoleOutputArgs{
+//				OrganizationName: pulumi.String("my-org"),
+//				Name:             pulumi.String("CI Deployer"),
+//			}, nil)
+//			_, err := pulumiservice.NewTeamRoleAssignment(ctx, "platformTeamRole", &pulumiservice.TeamRoleAssignmentArgs{
+//				OrganizationName: pulumi.String("my-org"),
+//				TeamName:         pulumi.String("platform"),
+//				RoleId:           ciDeployerRole.RoleId(),
+//			})
+//			if err != nil {
+//				return err
+//			}
+//			return nil
+//		})
+//	}
+//
+// ```
+// ### Look up a built-in role
+//
+// ```go
+// package main
+//
+// import (
+//
+//	"github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice"
+//	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
+//
+// )
+//
+//	func main() {
+//		pulumi.Run(func(ctx *pulumi.Context) error {
+//			adminRole := pulumiservice.GetOrganizationRoleOutput(ctx, pulumiservice.GetOrganizationRoleOutputArgs{
+//				OrganizationName: pulumi.String("my-org"),
+//				Name:             pulumi.String("Admin"),
+//			}, nil)
+//			ctx.Export("adminRoleId", adminRole.RoleId())
+//			return nil
+//		})
+//	}
+//
+// ```
 func LookupOrganizationRole(ctx *pulumi.Context, args *LookupOrganizationRoleArgs, opts ...pulumi.InvokeOption) (*LookupOrganizationRoleResult, error) {
 	opts = internal.PkgInvokeDefaultOpts(opts)
 	var rv LookupOrganizationRoleResult
@@ -25,7 +80,7 @@ func LookupOrganizationRole(ctx *pulumi.Context, args *LookupOrganizationRoleArg
 }
 
 type LookupOrganizationRoleArgs struct {
-	// The role's name, exactly as shown in the Pulumi Cloud console. The match is case-sensitive.
+	// The role's name, as shown in the Pulumi Cloud console. The match is case-insensitive, as role names are unique within an organization regardless of case.
 	Name string `pulumi:"name"`
 	// The name of the Pulumi organization.
 	OrganizationName string `pulumi:"organizationName"`
@@ -52,7 +107,7 @@ func LookupOrganizationRoleOutput(ctx *pulumi.Context, args LookupOrganizationRo
 }
 
 type LookupOrganizationRoleOutputArgs struct {
-	// The role's name, exactly as shown in the Pulumi Cloud console. The match is case-sensitive.
+	// The role's name, as shown in the Pulumi Cloud console. The match is case-insensitive, as role names are unique within an organization regardless of case.
 	Name pulumi.StringInput `pulumi:"name"`
 	// The name of the Pulumi organization.
 	OrganizationName pulumi.StringInput `pulumi:"organizationName"`

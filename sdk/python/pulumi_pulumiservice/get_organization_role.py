@@ -110,11 +110,35 @@ def get_organization_role(name: Optional[_builtins.str] = None,
                           organization_name: Optional[_builtins.str] = None,
                           opts: Optional[pulumi.InvokeOptions] = None) -> AwaitableGetOrganizationRoleResult:
     """
-    Looks up a role in a Pulumi Cloud organization by the name shown in the Pulumi Cloud console. Finds both built-in and custom roles. Use the returned `roleId` for inputs that take a role ID, such as `TeamRoleAssignment.roleId` and `OrganizationMember.roleId`, instead of hardcoding the ID. Returns an error when no role has the given name, or when more than one does.
+    Looks up a role in a Pulumi Cloud organization by the name shown in the Pulumi Cloud console. Finds both built-in and custom roles. Use the returned `roleId` for inputs that take a role ID, such as `TeamRoleAssignment.roleId` and `OrganizationMember.roleId`, instead of hardcoding the ID. Returns an error when no role has the given name.
 
     ## Example Usage
+    ### Look up a role you defined
 
-    :param _builtins.str name: The role's name, exactly as shown in the Pulumi Cloud console. The match is case-sensitive.
+    ```python
+    import pulumi
+    import pulumi_pulumiservice as pulumiservice
+
+    ci_deployer_role = pulumiservice.get_organization_role_output(organization_name="my-org",
+        name="CI Deployer")
+    platform_team_role = pulumiservice.TeamRoleAssignment("platformTeamRole",
+        organization_name="my-org",
+        team_name="platform",
+        role_id=ci_deployer_role.role_id)
+    ```
+    ### Look up a built-in role
+
+    ```python
+    import pulumi
+    import pulumi_pulumiservice as pulumiservice
+
+    admin_role = pulumiservice.get_organization_role_output(organization_name="my-org",
+        name="Admin")
+    pulumi.export("adminRoleId", admin_role.role_id)
+    ```
+
+
+    :param _builtins.str name: The role's name, as shown in the Pulumi Cloud console. The match is case-insensitive, as role names are unique within an organization regardless of case.
     :param _builtins.str organization_name: The name of the Pulumi organization.
     """
     __args__ = dict()
@@ -134,11 +158,35 @@ def get_organization_role_output(name: pulumi.Input[Optional[_builtins.str]] = N
                                  organization_name: pulumi.Input[Optional[_builtins.str]] = None,
                                  opts: Optional[Union[pulumi.InvokeOptions, pulumi.InvokeOutputOptions]] = None) -> pulumi.Output[GetOrganizationRoleResult]:
     """
-    Looks up a role in a Pulumi Cloud organization by the name shown in the Pulumi Cloud console. Finds both built-in and custom roles. Use the returned `roleId` for inputs that take a role ID, such as `TeamRoleAssignment.roleId` and `OrganizationMember.roleId`, instead of hardcoding the ID. Returns an error when no role has the given name, or when more than one does.
+    Looks up a role in a Pulumi Cloud organization by the name shown in the Pulumi Cloud console. Finds both built-in and custom roles. Use the returned `roleId` for inputs that take a role ID, such as `TeamRoleAssignment.roleId` and `OrganizationMember.roleId`, instead of hardcoding the ID. Returns an error when no role has the given name.
 
     ## Example Usage
+    ### Look up a role you defined
 
-    :param _builtins.str name: The role's name, exactly as shown in the Pulumi Cloud console. The match is case-sensitive.
+    ```python
+    import pulumi
+    import pulumi_pulumiservice as pulumiservice
+
+    ci_deployer_role = pulumiservice.get_organization_role_output(organization_name="my-org",
+        name="CI Deployer")
+    platform_team_role = pulumiservice.TeamRoleAssignment("platformTeamRole",
+        organization_name="my-org",
+        team_name="platform",
+        role_id=ci_deployer_role.role_id)
+    ```
+    ### Look up a built-in role
+
+    ```python
+    import pulumi
+    import pulumi_pulumiservice as pulumiservice
+
+    admin_role = pulumiservice.get_organization_role_output(organization_name="my-org",
+        name="Admin")
+    pulumi.export("adminRoleId", admin_role.role_id)
+    ```
+
+
+    :param _builtins.str name: The role's name, as shown in the Pulumi Cloud console. The match is case-insensitive, as role names are unique within an organization regardless of case.
     :param _builtins.str organization_name: The name of the Pulumi organization.
     """
     __args__ = dict()

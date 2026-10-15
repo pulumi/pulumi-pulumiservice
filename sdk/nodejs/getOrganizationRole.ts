@@ -5,23 +5,20 @@ import * as pulumi from "@pulumi/pulumi";
 import * as utilities from "./utilities";
 
 /**
- * Looks up a role in a Pulumi Cloud organization by the name shown in the Pulumi Cloud console. Finds both built-in and custom roles. Use the returned `roleId` for inputs that take a role ID, such as `TeamRoleAssignment.roleId` and `OrganizationMember.roleId`, instead of hardcoding the ID. Returns an error when no role has the given name, or when more than one does.
+ * Looks up a role in a Pulumi Cloud organization by the name shown in the Pulumi Cloud console. Finds both built-in and custom roles. Use the returned `roleId` for inputs that take a role ID, such as `TeamRoleAssignment.roleId` and `OrganizationMember.roleId`, instead of hardcoding the ID. Returns an error when no role has the given name.
  *
  * ## Example Usage
  * ### Look up a role you defined
  *
  * ```typescript
+ * import * as pulumi from "@pulumi/pulumi";
  * import * as pulumiservice from "@pulumi/pulumiservice";
  *
- * // A custom role managed in the Pulumi Cloud console.
- * // The name must match exactly (case-sensitive).
  * const ciDeployerRole = pulumiservice.getOrganizationRoleOutput({
  *     organizationName: "my-org",
  *     name: "CI Deployer",
  * });
- *
- * // Assign it to a team without hardcoding the role ID.
- * const platformTeamRole = new pulumiservice.TeamRoleAssignment("platform-team-role", {
+ * const platformTeamRole = new pulumiservice.TeamRoleAssignment("platformTeamRole", {
  *     organizationName: "my-org",
  *     teamName: "platform",
  *     roleId: ciDeployerRole.roleId,
@@ -30,13 +27,13 @@ import * as utilities from "./utilities";
  * ### Look up a built-in role
  *
  * ```typescript
+ * import * as pulumi from "@pulumi/pulumi";
  * import * as pulumiservice from "@pulumi/pulumiservice";
  *
  * const adminRole = pulumiservice.getOrganizationRoleOutput({
  *     organizationName: "my-org",
  *     name: "Admin",
  * });
- *
  * export const adminRoleId = adminRole.roleId;
  * ```
  */
@@ -50,7 +47,7 @@ export function getOrganizationRole(args: GetOrganizationRoleArgs, opts?: pulumi
 
 export interface GetOrganizationRoleArgs {
     /**
-     * The role's name, exactly as shown in the Pulumi Cloud console. The match is case-sensitive.
+     * The role's name, as shown in the Pulumi Cloud console. The match is case-insensitive, as role names are unique within an organization regardless of case.
      */
     name: string;
     /**
@@ -86,23 +83,20 @@ export interface GetOrganizationRoleResult {
     readonly roleId: string;
 }
 /**
- * Looks up a role in a Pulumi Cloud organization by the name shown in the Pulumi Cloud console. Finds both built-in and custom roles. Use the returned `roleId` for inputs that take a role ID, such as `TeamRoleAssignment.roleId` and `OrganizationMember.roleId`, instead of hardcoding the ID. Returns an error when no role has the given name, or when more than one does.
+ * Looks up a role in a Pulumi Cloud organization by the name shown in the Pulumi Cloud console. Finds both built-in and custom roles. Use the returned `roleId` for inputs that take a role ID, such as `TeamRoleAssignment.roleId` and `OrganizationMember.roleId`, instead of hardcoding the ID. Returns an error when no role has the given name.
  *
  * ## Example Usage
  * ### Look up a role you defined
  *
  * ```typescript
+ * import * as pulumi from "@pulumi/pulumi";
  * import * as pulumiservice from "@pulumi/pulumiservice";
  *
- * // A custom role managed in the Pulumi Cloud console.
- * // The name must match exactly (case-sensitive).
  * const ciDeployerRole = pulumiservice.getOrganizationRoleOutput({
  *     organizationName: "my-org",
  *     name: "CI Deployer",
  * });
- *
- * // Assign it to a team without hardcoding the role ID.
- * const platformTeamRole = new pulumiservice.TeamRoleAssignment("platform-team-role", {
+ * const platformTeamRole = new pulumiservice.TeamRoleAssignment("platformTeamRole", {
  *     organizationName: "my-org",
  *     teamName: "platform",
  *     roleId: ciDeployerRole.roleId,
@@ -111,13 +105,13 @@ export interface GetOrganizationRoleResult {
  * ### Look up a built-in role
  *
  * ```typescript
+ * import * as pulumi from "@pulumi/pulumi";
  * import * as pulumiservice from "@pulumi/pulumiservice";
  *
  * const adminRole = pulumiservice.getOrganizationRoleOutput({
  *     organizationName: "my-org",
  *     name: "Admin",
  * });
- *
  * export const adminRoleId = adminRole.roleId;
  * ```
  */
@@ -131,7 +125,7 @@ export function getOrganizationRoleOutput(args: GetOrganizationRoleOutputArgs, o
 
 export interface GetOrganizationRoleOutputArgs {
     /**
-     * The role's name, exactly as shown in the Pulumi Cloud console. The match is case-sensitive.
+     * The role's name, as shown in the Pulumi Cloud console. The match is case-insensitive, as role names are unique within an organization regardless of case.
      */
     name: pulumi.Input<string>;
     /**

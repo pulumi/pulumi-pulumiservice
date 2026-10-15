@@ -17,10 +17,11 @@ package functions
 import (
 	"context"
 	"fmt"
+	"slices"
 	"sort"
 	"strings"
 
-	_ "embed"
+	_ "embed" // for the //go:embed example files below
 
 	"github.com/pulumi/pulumi-cloud-sdk/go/apitype"
 	"github.com/pulumi/pulumi-go-provider/infer"
@@ -28,19 +29,16 @@ import (
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 )
 
-// The examples use the docs `{{% examples %}}` shortcodes, which SDK
-// generation and the registry render per language.
+// The example files are generated from the Pulumi YAML in examples/; edit
+// those and run `make generate_examples`.
+//
+//go:generate go run ../../tools/gen-examples examples .
 var (
 	//go:embed get_organization_role_examples.md
 	getOrganizationRoleExamples string
 	//go:embed get_organization_roles_examples.md
 	getOrganizationRolesExamples string
 )
-
-// orgRoleUXPurpose is the uxPurpose that selects the roles shown on the
-// Roles page of the Pulumi Cloud console: the built-in roles plus the org's
-// custom roles.
-const orgRoleUXPurpose = "role"
 
 // GetOrganizationRolesFunction lists the roles defined in a Pulumi Cloud
 // organization, built-in and custom.
@@ -131,8 +129,7 @@ func (GetOrganizationRolesFunction) Invoke(
 }
 
 // GetOrganizationRoleFunction looks up a single Pulumi Cloud role by the
-// name shown in the console. Returns an error when no role, or more than
-// one role, has that name.
+// name shown in the console. Returns an error when no role has that name.
 type GetOrganizationRoleFunction struct{}
 
 type GetOrganizationRoleInput struct {
@@ -150,7 +147,7 @@ func (GetOrganizationRoleFunction) Annotate(a infer.Annotator) {
 		"Looks up a role in a Pulumi Cloud organization by the name shown in the Pulumi Cloud console. "+
 			"Finds both built-in and custom roles. Use the returned `roleId` for inputs that take a role ID, "+
 			"such as `TeamRoleAssignment.roleId` and `OrganizationMember.roleId`, instead of hardcoding the ID. "+
-			"Returns an error when no role has the given name, or when more than one does.\n\n"+
+			"Returns an error when no role has the given name.\n\n"+
 			getOrganizationRoleExamples,
 	)
 	a.SetToken("index", "getOrganizationRole")
@@ -160,7 +157,8 @@ func (i *GetOrganizationRoleInput) Annotate(a infer.Annotator) {
 	a.Describe(&i.OrganizationName, "The name of the Pulumi organization.")
 	a.Describe(
 		&i.Name,
-		"The role's name, exactly as shown in the Pulumi Cloud console. The match is case-sensitive.",
+		"The role's name, as shown in the Pulumi Cloud console. The match is case-insensitive, "+
+			"as role names are unique within an organization regardless of case.",
 	)
 }
 
@@ -179,35 +177,19 @@ func (GetOrganizationRoleFunction) Invoke(
 		return infer.FunctionResponse[GetOrganizationRoleOutput]{}, err
 	}
 
-	var matches []apitype.PermissionDescriptorRecord
-	for _, r := range roles {
-		if r.Name == name {
-			matches = append(matches, r)
-		}
-	}
-	switch len(matches) {
-	case 0:
+	// Pulumi Cloud keeps role names unique per organization, ignoring case.
+	i := slices.IndexFunc(roles, func(r apitype.PermissionDescriptorRecord) bool {
+		return strings.EqualFold(r.Name, name)
+	})
+	if i < 0 {
 		return infer.FunctionResponse[GetOrganizationRoleOutput]{}, fmt.Errorf(
 			"organization %q has no role named %q",
 			orgName,
 			name,
 		)
-	case 1:
-	default:
-		ids := make([]string, 0, len(matches))
-		for _, m := range matches {
-			ids = append(ids, m.ID)
-		}
-		return infer.FunctionResponse[GetOrganizationRoleOutput]{}, fmt.Errorf(
-			"organization %q has %d roles named %q (IDs: %s); use the role ID directly instead",
-			orgName,
-			len(matches),
-			name,
-			strings.Join(ids, ", "),
-		)
 	}
 
-	info, err := roleInfoFrom(matches[0])
+	info, err := roleInfoFrom(roles[i])
 	if err != nil {
 		return infer.FunctionResponse[GetOrganizationRoleOutput]{}, err
 	}
@@ -217,7 +199,7 @@ func (GetOrganizationRoleFunction) Invoke(
 }
 
 func listOrgRoles(ctx context.Context, orgName string) ([]apitype.PermissionDescriptorRecord, error) {
-	roles, err := config.GetClient(ctx).ListOrgRoles(ctx, orgName, orgRoleUXPurpose)
+	roles, err := config.GetClient(ctx).ListOrgRoles(ctx, orgName, apitype.PermissionDescriptorUXPurposeRole)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list roles for organization %q: %w", orgName, err)
 	}
