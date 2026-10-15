@@ -15,36 +15,36 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 
 /**
- * Creates an access token scoped to a Pulumi Cloud team.
+ * Creates a team access token in Pulumi Cloud. The token isn&#39;t tied to a user, and it has the permissions granted to its team.
  * 
- * Unlike `OrgAccessToken`, this resource can be created by a provider authenticated with an organization or team access token.
+ * Unlike `OrgAccessToken`, a provider authenticated with an organization or team access token can create this resource.
  * 
  */
 @ResourceType(type="pulumiservice:index:TeamAccessToken")
 public class TeamAccessToken extends com.pulumi.resources.CustomResource {
     /**
-     * Optional. Description for the token.
+     * A description of the token.
      * 
      */
     @Export(name="description", refs={String.class}, tree="[0]")
     private Output</* @Nullable */ String> description;
 
     /**
-     * @return Optional. Description for the token.
+     * @return A description of the token.
      * 
      */
     public Output<Optional<String>> description() {
         return Codegen.optional(this.description);
     }
     /**
-     * The name for the token. This must be unique amongst all machine tokens within your organization.
+     * The name for the token. This must be unique among all organization and team tokens in the organization.
      * 
      */
     @Export(name="name", refs={String.class}, tree="[0]")
     private Output<String> name;
 
     /**
-     * @return The name for the token. This must be unique amongst all machine tokens within your organization.
+     * @return The name for the token. This must be unique among all organization and team tokens in the organization.
      * 
      */
     public Output<String> name() {

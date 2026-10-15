@@ -28,8 +28,8 @@ class OrgAccessTokenArgs:
 
         :param pulumi.Input[_builtins.str] name: The name for the token.
         :param pulumi.Input[_builtins.str] organization_name: The organization's name.
-        :param pulumi.Input[_builtins.bool] admin: Optional. True if this is an admin token.
-        :param pulumi.Input[_builtins.str] description: Optional. Description for the token.
+        :param pulumi.Input[_builtins.bool] admin: Whether the token has the Admin role. Defaults to `false`.
+        :param pulumi.Input[_builtins.str] description: A description of the token.
         """
         pulumi.set(__self__, "name", name)
         pulumi.set(__self__, "organization_name", organization_name)
@@ -68,7 +68,7 @@ class OrgAccessTokenArgs:
     @pulumi.getter
     def admin(self) -> pulumi.Input[Optional[_builtins.bool]]:
         """
-        Optional. True if this is an admin token.
+        Whether the token has the Admin role. Defaults to `false`.
         """
         return pulumi.get(self, "admin")
 
@@ -80,7 +80,7 @@ class OrgAccessTokenArgs:
     @pulumi.getter
     def description(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
-        Optional. Description for the token.
+        A description of the token.
         """
         return pulumi.get(self, "description")
 
@@ -101,14 +101,14 @@ class OrgAccessToken(pulumi.CustomResource):
                  organization_name: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         """
-        Creates an access token scoped to a Pulumi Cloud organization.
+        Creates an organization access token in Pulumi Cloud. Organization tokens aren't tied to a user, so they suit CI/CD and other automation.
 
-        The provider must be authenticated as a user, for example with a personal access token, to create or delete this resource. Organization and team access tokens cannot create or delete organization tokens, even when they have the Admin role, so that a token cannot be used to mint further organization tokens. Such requests fail with `403 Machine tokens are not allowed to perform this operation`. For automation, use the personal access token of a dedicated service-account user. `TeamAccessToken` does not have this restriction.
+        The provider must authenticate as a user, for example with a personal access token, to create or delete this resource. Pulumi Cloud rejects organization and team access tokens here, even Admin ones, with `403 Machine tokens are not allowed to perform this operation`, so that one machine token can't mint another. For automation, use the personal access token of a dedicated service-account user, or use `TeamAccessToken`, which has no such restriction.
 
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
-        :param pulumi.Input[_builtins.bool] admin: Optional. True if this is an admin token.
-        :param pulumi.Input[_builtins.str] description: Optional. Description for the token.
+        :param pulumi.Input[_builtins.bool] admin: Whether the token has the Admin role. Defaults to `false`.
+        :param pulumi.Input[_builtins.str] description: A description of the token.
         :param pulumi.Input[_builtins.str] name: The name for the token.
         :param pulumi.Input[_builtins.str] organization_name: The organization's name.
         """
@@ -119,9 +119,9 @@ class OrgAccessToken(pulumi.CustomResource):
                  args: OrgAccessTokenArgs,
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
-        Creates an access token scoped to a Pulumi Cloud organization.
+        Creates an organization access token in Pulumi Cloud. Organization tokens aren't tied to a user, so they suit CI/CD and other automation.
 
-        The provider must be authenticated as a user, for example with a personal access token, to create or delete this resource. Organization and team access tokens cannot create or delete organization tokens, even when they have the Admin role, so that a token cannot be used to mint further organization tokens. Such requests fail with `403 Machine tokens are not allowed to perform this operation`. For automation, use the personal access token of a dedicated service-account user. `TeamAccessToken` does not have this restriction.
+        The provider must authenticate as a user, for example with a personal access token, to create or delete this resource. Pulumi Cloud rejects organization and team access tokens here, even Admin ones, with `403 Machine tokens are not allowed to perform this operation`, so that one machine token can't mint another. For automation, use the personal access token of a dedicated service-account user, or use `TeamAccessToken`, which has no such restriction.
 
         :param str resource_name: The name of the resource.
         :param OrgAccessTokenArgs args: The arguments to use to populate this resource's properties.
@@ -199,7 +199,7 @@ class OrgAccessToken(pulumi.CustomResource):
     @pulumi.getter
     def admin(self) -> pulumi.Output[_builtins.bool]:
         """
-        Optional. True if this is an admin token.
+        Whether the token has the Admin role. Defaults to `false`.
         """
         return pulumi.get(self, "admin")
 
@@ -207,7 +207,7 @@ class OrgAccessToken(pulumi.CustomResource):
     @pulumi.getter
     def description(self) -> pulumi.Output[Optional[_builtins.str]]:
         """
-        Optional. Description for the token.
+        A description of the token.
         """
         return pulumi.get(self, "description")
 

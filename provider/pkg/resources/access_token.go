@@ -40,7 +40,12 @@ var (
 )
 
 func (*AccessToken) Annotate(a infer.Annotator) {
-	a.Describe(&AccessToken{}, "Access tokens allow a user to authenticate against the Pulumi Cloud.")
+	a.Describe(
+		&AccessToken{},
+		"Creates a personal access token for the Pulumi Cloud user that the provider is authenticated as. "+
+			"The token acts with that user's permissions.\n\n"+
+			"To create a token that isn't tied to a user, use `OrgAccessToken` or `TeamAccessToken`.",
+	)
 }
 
 type AccessTokenInput struct {

@@ -10,21 +10,21 @@ using Pulumi.Serialization;
 namespace Pulumi.PulumiService
 {
     /// <summary>
-    /// Creates an access token scoped to a Pulumi Cloud team.
+    /// Creates a team access token in Pulumi Cloud. The token isn't tied to a user, and it has the permissions granted to its team.
     /// 
-    /// Unlike `OrgAccessToken`, this resource can be created by a provider authenticated with an organization or team access token.
+    /// Unlike `OrgAccessToken`, a provider authenticated with an organization or team access token can create this resource.
     /// </summary>
     [PulumiServiceResourceType("pulumiservice:index:TeamAccessToken")]
     public partial class TeamAccessToken : global::Pulumi.CustomResource
     {
         /// <summary>
-        /// Optional. Description for the token.
+        /// A description of the token.
         /// </summary>
         [Output("description")]
         public Output<string?> Description { get; private set; } = null!;
 
         /// <summary>
-        /// The name for the token. This must be unique amongst all machine tokens within your organization.
+        /// The name for the token. This must be unique among all organization and team tokens in the organization.
         /// </summary>
         [Output("name")]
         public Output<string> Name { get; private set; } = null!;
@@ -104,13 +104,13 @@ namespace Pulumi.PulumiService
     public sealed class TeamAccessTokenArgs : global::Pulumi.ResourceArgs
     {
         /// <summary>
-        /// Optional. Description for the token.
+        /// A description of the token.
         /// </summary>
         [Input("description")]
         public Input<string>? Description { get; set; }
 
         /// <summary>
-        /// The name for the token. This must be unique amongst all machine tokens within your organization.
+        /// The name for the token. This must be unique among all organization and team tokens in the organization.
         /// </summary>
         [Input("name", required: true)]
         public Input<string> Name { get; set; } = null!;

@@ -10,7 +10,9 @@ using Pulumi.Serialization;
 namespace Pulumi.PulumiService
 {
     /// <summary>
-    /// Access tokens allow a user to authenticate against the Pulumi Cloud.
+    /// Creates a personal access token for the Pulumi Cloud user that the provider is authenticated as. The token acts with that user's permissions.
+    /// 
+    /// To create a token that isn't tied to a user, use `OrgAccessToken` or `TeamAccessToken`.
     /// </summary>
     [PulumiServiceResourceType("pulumiservice:index:AccessToken")]
     public partial class AccessToken : global::Pulumi.CustomResource

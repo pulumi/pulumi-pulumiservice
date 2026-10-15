@@ -37,14 +37,13 @@ var (
 func (*OrgAccessToken) Annotate(a infer.Annotator) {
 	a.Describe(
 		&OrgAccessToken{},
-		"Creates an access token scoped to a Pulumi Cloud organization.\n\n"+
-			"The provider must be authenticated as a user, for example with a personal access token, "+
-			"to create or delete this resource. Organization and team access tokens cannot create or "+
-			"delete organization tokens, even when they have the Admin role, so that a token cannot be "+
-			"used to mint further organization tokens. Such requests fail with "+
-			"`403 Machine tokens are not allowed to perform this operation`. "+
-			"For automation, use the personal access token of a dedicated service-account user. "+
-			"`TeamAccessToken` does not have this restriction.",
+		"Creates an organization access token in Pulumi Cloud. Organization tokens aren't tied to a user, "+
+			"so they suit CI/CD and other automation.\n\n"+
+			"The provider must authenticate as a user, for example with a personal access token, to create "+
+			"or delete this resource. Pulumi Cloud rejects organization and team access tokens here, even "+
+			"Admin ones, with `403 Machine tokens are not allowed to perform this operation`, so that one "+
+			"machine token can't mint another. For automation, use the personal access token of a dedicated "+
+			"service-account user, or use `TeamAccessToken`, which has no such restriction.",
 	)
 }
 
@@ -58,8 +57,8 @@ type OrgAccessTokenInput struct {
 func (i *OrgAccessTokenInput) Annotate(a infer.Annotator) {
 	a.Describe(&i.Name, "The name for the token.")
 	a.Describe(&i.OrganizationName, "The organization's name.")
-	a.Describe(&i.Description, "Optional. Description for the token.")
-	a.Describe(&i.Admin, "Optional. True if this is an admin token.")
+	a.Describe(&i.Description, "A description of the token.")
+	a.Describe(&i.Admin, "Whether the token has the Admin role. Defaults to `false`.")
 	a.SetDefault(&i.Admin, false)
 }
 

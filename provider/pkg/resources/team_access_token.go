@@ -41,9 +41,10 @@ var (
 func (*TeamAccessToken) Annotate(a infer.Annotator) {
 	a.Describe(
 		&TeamAccessToken{},
-		"Creates an access token scoped to a Pulumi Cloud team.\n\n"+
-			"Unlike `OrgAccessToken`, this resource can be created by a provider authenticated with "+
-			"an organization or team access token.",
+		"Creates a team access token in Pulumi Cloud. The token isn't tied to a user, and it has the "+
+			"permissions granted to its team.\n\n"+
+			"Unlike `OrgAccessToken`, a provider authenticated with an organization or team access token "+
+			"can create this resource.",
 	)
 }
 
@@ -55,10 +56,13 @@ type TeamAccessTokenInput struct {
 }
 
 func (i *TeamAccessTokenInput) Annotate(a infer.Annotator) {
-	a.Describe(&i.Name, "The name for the token. This must be unique amongst all machine tokens within your organization.")
+	a.Describe(
+		&i.Name,
+		"The name for the token. This must be unique among all organization and team tokens in the organization.",
+	)
 	a.Describe(&i.OrganizationName, "The organization's name.")
 	a.Describe(&i.TeamName, "The team name.")
-	a.Describe(&i.Description, "Optional. Description for the token.")
+	a.Describe(&i.Description, "A description of the token.")
 }
 
 type TeamAccessTokenState struct {
