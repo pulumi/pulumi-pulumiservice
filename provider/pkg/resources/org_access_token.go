@@ -20,7 +20,7 @@ import (
 	"strings"
 	"time"
 
-	_ "embed"
+	_ "embed" // for the //go:embed example file below
 
 	p "github.com/pulumi/pulumi-go-provider"
 	"github.com/pulumi/pulumi-go-provider/infer"
@@ -30,9 +30,11 @@ import (
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 )
 
-// The examples use the docs `{{% examples %}}` shortcodes, which SDK
-// generation and the registry render per language.
+// The example file is generated from the Pulumi YAML in examples/; edit
+// that and run `make generate_examples`.
 //
+//go:generate go run ../../tools/gen-examples examples .
+
 //go:embed org_access_token_examples.md
 var orgAccessTokenExamples string
 

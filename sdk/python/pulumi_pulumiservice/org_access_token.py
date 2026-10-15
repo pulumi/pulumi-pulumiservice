@@ -141,25 +141,22 @@ class OrgAccessToken(pulumi.CustomResource):
 
         ## Example Usage
         ### Token with an expiry and a custom role
+
         ```python
         import pulumi
         import pulumi_pulumiservice as pulumiservice
 
-        ci_deployer_role = pulumiservice.get_organization_role_output(
-            organization_name="my-org",
-            name="CI Deployer",
-        )
-
+        ci_deployer_role = pulumiservice.get_organization_role_output(organization_name="my-org",
+            name="CI Deployer")
         ci_token = pulumiservice.OrgAccessToken("ciToken",
             organization_name="my-org",
             name="ci-token",
             description="Token for CI pipelines",
             expires="2027-06-30T17:00:00Z",
-            role_id=ci_deployer_role.role_id,
-        )
-
+            role_id=ci_deployer_role.role_id)
         pulumi.export("ciTokenValue", ci_token.value)
         ```
+
 
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
@@ -183,25 +180,22 @@ class OrgAccessToken(pulumi.CustomResource):
 
         ## Example Usage
         ### Token with an expiry and a custom role
+
         ```python
         import pulumi
         import pulumi_pulumiservice as pulumiservice
 
-        ci_deployer_role = pulumiservice.get_organization_role_output(
-            organization_name="my-org",
-            name="CI Deployer",
-        )
-
+        ci_deployer_role = pulumiservice.get_organization_role_output(organization_name="my-org",
+            name="CI Deployer")
         ci_token = pulumiservice.OrgAccessToken("ciToken",
             organization_name="my-org",
             name="ci-token",
             description="Token for CI pipelines",
             expires="2027-06-30T17:00:00Z",
-            role_id=ci_deployer_role.role_id,
-        )
-
+            role_id=ci_deployer_role.role_id)
         pulumi.export("ciTokenValue", ci_token.value)
         ```
+
 
         :param str resource_name: The name of the resource.
         :param OrgAccessTokenArgs args: The arguments to use to populate this resource's properties.

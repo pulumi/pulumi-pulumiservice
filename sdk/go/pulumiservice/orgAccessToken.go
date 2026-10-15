@@ -18,6 +18,7 @@ import (
 //
 // ## Example Usage
 // ### Token with an expiry and a custom role
+//
 // ```go
 // package main
 //
@@ -30,11 +31,10 @@ import (
 //
 //	func main() {
 //		pulumi.Run(func(ctx *pulumi.Context) error {
-//			ciDeployerRole := pulumiservice.LookupOrganizationRoleOutput(ctx, pulumiservice.LookupOrganizationRoleOutputArgs{
+//			ciDeployerRole := pulumiservice.GetOrganizationRoleOutput(ctx, pulumiservice.GetOrganizationRoleOutputArgs{
 //				OrganizationName: pulumi.String("my-org"),
 //				Name:             pulumi.String("CI Deployer"),
-//			})
-//
+//			}, nil)
 //			ciToken, err := pulumiservice.NewOrgAccessToken(ctx, "ciToken", &pulumiservice.OrgAccessTokenArgs{
 //				OrganizationName: pulumi.String("my-org"),
 //				Name:             pulumi.String("ci-token"),
@@ -45,7 +45,6 @@ import (
 //			if err != nil {
 //				return err
 //			}
-//
 //			ctx.Export("ciTokenValue", ciToken.Value)
 //			return nil
 //		})

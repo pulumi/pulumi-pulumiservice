@@ -22,16 +22,24 @@ import javax.annotation.Nullable;
  * 
  * ## Example Usage
  * ### Token with an expiry and a custom role
+ * 
  * <pre>
  * {@code
  * package generated_program;
  * 
  * import com.pulumi.Context;
  * import com.pulumi.Pulumi;
- * import com.pulumi.pulumiservice.OrgAccessToken;
- * import com.pulumi.pulumiservice.OrgAccessTokenArgs;
+ * import com.pulumi.core.Output;
  * import com.pulumi.pulumiservice.PulumiserviceFunctions;
  * import com.pulumi.pulumiservice.inputs.GetOrganizationRoleArgs;
+ * import com.pulumi.pulumiservice.OrgAccessToken;
+ * import com.pulumi.pulumiservice.OrgAccessTokenArgs;
+ * import java.util.ArrayList;
+ * import java.util.Arrays;
+ * import java.util.Map;
+ * import java.io.File;
+ * import java.nio.file.Files;
+ * import java.nio.file.Paths;
  * 
  * public class App {
  *     public static void main(String[] args) {
@@ -49,7 +57,7 @@ import javax.annotation.Nullable;
  *             .name("ci-token")
  *             .description("Token for CI pipelines")
  *             .expires("2027-06-30T17:00:00Z")
- *             .roleId(ciDeployerRole.applyValue(role -> role.roleId()))
+ *             .roleId(ciDeployerRole.applyValue(_ciDeployerRole -> _ciDeployerRole.roleId()))
  *             .build());
  * 
  *         ctx.export("ciTokenValue", ciToken.value());

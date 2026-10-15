@@ -13,13 +13,13 @@ import * as utilities from "./utilities";
  * ### Token with an expiry and a custom role
  *
  * ```typescript
+ * import * as pulumi from "@pulumi/pulumi";
  * import * as pulumiservice from "@pulumi/pulumiservice";
  *
  * const ciDeployerRole = pulumiservice.getOrganizationRoleOutput({
  *     organizationName: "my-org",
  *     name: "CI Deployer",
  * });
- *
  * const ciToken = new pulumiservice.OrgAccessToken("ciToken", {
  *     organizationName: "my-org",
  *     name: "ci-token",
@@ -27,7 +27,6 @@ import * as utilities from "./utilities";
  *     expires: "2027-06-30T17:00:00Z",
  *     roleId: ciDeployerRole.roleId,
  * });
- *
  * export const ciTokenValue = ciToken.value;
  * ```
  */

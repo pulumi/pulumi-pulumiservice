@@ -16,12 +16,14 @@ namespace Pulumi.PulumiService
     /// 
     /// ## Example Usage
     /// ### Token with an expiry and a custom role
+    /// 
     /// ```csharp
     /// using System.Collections.Generic;
+    /// using System.Linq;
     /// using Pulumi;
     /// using PulumiService = Pulumi.PulumiService;
     /// 
-    /// return await Deployment.RunAsync(() =&gt;
+    /// return await Deployment.RunAsync(() =&gt; 
     /// {
     ///     var ciDeployerRole = PulumiService.GetOrganizationRole.Invoke(new()
     ///     {
@@ -35,7 +37,7 @@ namespace Pulumi.PulumiService
     ///         Name = "ci-token",
     ///         Description = "Token for CI pipelines",
     ///         Expires = "2027-06-30T17:00:00Z",
-    ///         RoleId = ciDeployerRole.Apply(role =&gt; role.RoleId),
+    ///         RoleId = ciDeployerRole.Apply(getOrganizationRoleResult =&gt; getOrganizationRoleResult.RoleId),
     ///     });
     /// 
     ///     return new Dictionary&lt;string, object?&gt;
