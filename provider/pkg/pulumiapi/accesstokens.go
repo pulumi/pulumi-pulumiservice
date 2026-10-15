@@ -33,6 +33,8 @@ type AccessToken struct {
 	TokenValue  string `json:"tokenValue"`
 	Description string `json:"description"`
 	Admin       bool   `json:"admin"`
+	Expires     int64  `json:"expires"`
+	RoleID      string `json:"roleId"`
 }
 
 type createTokenResponse struct {
@@ -45,11 +47,18 @@ type createTokenRequest struct {
 }
 
 type accessTokenResponse struct {
-	ID          string `json:"id"`
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	LastUsed    int    `json:"lastUsed"`
-	Admin       bool   `json:"admin"`
+	ID          string           `json:"id"`
+	Name        string           `json:"name"`
+	Description string           `json:"description"`
+	LastUsed    int              `json:"lastUsed"`
+	Admin       bool             `json:"admin"`
+	Expires     int64            `json:"expires"`
+	Role        *accessTokenRole `json:"role,omitempty"`
+}
+
+type accessTokenRole struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
 }
 
 type listTokenResponse struct {

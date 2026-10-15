@@ -22,7 +22,9 @@ import (
 )
 
 type OrgAccessTokenClient interface {
-	CreateOrgAccessToken(ctx context.Context, name, orgName, description string, admin bool) (*AccessToken, error)
+	CreateOrgAccessToken(
+		ctx context.Context, name, orgName, description string, admin bool, expires int64, roleID string,
+	) (*AccessToken, error)
 	DeleteOrgAccessToken(ctx context.Context, tokenID, orgName string) error
 	GetOrgAccessToken(ctx context.Context, tokenID, orgName string) (*AccessToken, error)
 }
@@ -36,12 +38,16 @@ type createOrgTokenRequest struct {
 	Description string `json:"description"`
 	Name        string `json:"name"`
 	Admin       bool   `json:"admin"`
+	Expires     int64  `json:"expires,omitempty"`
+	RoleID      string `json:"roleID,omitempty"`
 }
 
 func (c *Client) CreateOrgAccessToken(
 	ctx context.Context,
 	name, orgName, description string,
 	admin bool,
+	expires int64,
+	roleID string,
 ) (*AccessToken, error) {
 
 	if len(orgName) == 0 {
@@ -58,6 +64,8 @@ func (c *Client) CreateOrgAccessToken(
 		Name:        name,
 		Description: description,
 		Admin:       admin,
+		Expires:     expires,
+		RoleID:      roleID,
 	}
 
 	var createRes createOrgTokenResponse
@@ -111,12 +119,17 @@ func (c *Client) GetOrgAccessToken(ctx context.Context, tokenID, orgName string)
 	for i := 0; i < len(listRes.Tokens); i++ {
 		token := listRes.Tokens[i]
 		if token.ID == tokenID {
-			return &AccessToken{
+			accessToken := &AccessToken{
 				ID:          token.ID,
 				Name:        token.Name,
 				Description: token.Description,
 				Admin:       token.Admin,
-			}, nil
+				Expires:     token.Expires,
+			}
+			if token.Role != nil {
+				accessToken.RoleID = token.Role.ID
+			}
+			return accessToken, nil
 		}
 	}
 

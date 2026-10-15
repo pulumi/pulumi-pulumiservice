@@ -8,6 +8,28 @@ import * as utilities from "./utilities";
  * Creates an organization access token in Pulumi Cloud. Organization tokens aren't tied to a user, so they suit CI/CD and other automation.
  *
  * The provider must authenticate as a user, for example with a personal access token, to create or delete this resource. Pulumi Cloud rejects organization and team access tokens here, even Admin ones, with `403 Machine tokens are not allowed to perform this operation`, so that one machine token can't mint another. For automation, use the personal access token of a dedicated service-account user, or use `TeamAccessToken`, which has no such restriction.
+ *
+ * ## Example Usage
+ * ### Token with an expiry and a custom role
+ *
+ * ```typescript
+ * import * as pulumiservice from "@pulumi/pulumiservice";
+ *
+ * const ciDeployerRole = pulumiservice.getOrganizationRoleOutput({
+ *     organizationName: "my-org",
+ *     name: "CI Deployer",
+ * });
+ *
+ * const ciToken = new pulumiservice.OrgAccessToken("ciToken", {
+ *     organizationName: "my-org",
+ *     name: "ci-token",
+ *     description: "Token for CI pipelines",
+ *     expires: "2027-06-30T17:00:00Z",
+ *     roleId: ciDeployerRole.roleId,
+ * });
+ *
+ * export const ciTokenValue = ciToken.value;
+ * ```
  */
 export class OrgAccessToken extends pulumi.CustomResource {
     /**
@@ -37,13 +59,17 @@ export class OrgAccessToken extends pulumi.CustomResource {
     }
 
     /**
-     * Whether the token has the Admin role. Defaults to `false`.
+     * Whether the token has the Admin role. Defaults to `false`. Can't be `true` when `roleId` is set.
      */
     declare public readonly admin: pulumi.Output<boolean>;
     /**
      * A description of the token.
      */
     declare public readonly description: pulumi.Output<string | undefined>;
+    /**
+     * When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`, or a date such as `2027-06-30`, which means midnight UTC at the start of that day. Must be in the future and no more than two years away. Omit it for a token that never expires.
+     */
+    declare public readonly expires: pulumi.Output<string | undefined>;
     /**
      * The name for the token.
      */
@@ -52,6 +78,10 @@ export class OrgAccessToken extends pulumi.CustomResource {
      * The organization's name.
      */
     declare public readonly organizationName: pulumi.Output<string>;
+    /**
+     * The ID of the role to assign to the token. Use `getOrganizationRole` to look up a role's ID by its name. Can't be combined with `admin: true`. When neither is set, the token gets the Member role.
+     */
+    declare public readonly roleId: pulumi.Output<string | undefined>;
     /**
      * The token's value.
      */
@@ -76,20 +106,24 @@ export class OrgAccessToken extends pulumi.CustomResource {
             }
             resourceInputs["admin"] = (args?.admin) ?? false;
             resourceInputs["description"] = args?.description;
+            resourceInputs["expires"] = args?.expires;
             resourceInputs["name"] = args?.name;
             resourceInputs["organizationName"] = args?.organizationName;
+            resourceInputs["roleId"] = args?.roleId;
             resourceInputs["value"] = undefined /*out*/;
         } else {
             resourceInputs["admin"] = undefined /*out*/;
             resourceInputs["description"] = undefined /*out*/;
+            resourceInputs["expires"] = undefined /*out*/;
             resourceInputs["name"] = undefined /*out*/;
             resourceInputs["organizationName"] = undefined /*out*/;
+            resourceInputs["roleId"] = undefined /*out*/;
             resourceInputs["value"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
         const secretOpts = { additionalSecretOutputs: ["value"] };
         opts = pulumi.mergeOptions(opts, secretOpts);
-        const replaceOnChanges = { replaceOnChanges: ["admin", "description", "name", "organizationName"] };
+        const replaceOnChanges = { replaceOnChanges: ["admin", "description", "expires", "name", "organizationName", "roleId"] };
         opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(OrgAccessToken.__pulumiType, name, resourceInputs, opts);
     }
@@ -100,13 +134,17 @@ export class OrgAccessToken extends pulumi.CustomResource {
  */
 export interface OrgAccessTokenArgs {
     /**
-     * Whether the token has the Admin role. Defaults to `false`.
+     * Whether the token has the Admin role. Defaults to `false`. Can't be `true` when `roleId` is set.
      */
     admin?: pulumi.Input<boolean | undefined>;
     /**
      * A description of the token.
      */
     description?: pulumi.Input<string | undefined>;
+    /**
+     * When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`, or a date such as `2027-06-30`, which means midnight UTC at the start of that day. Must be in the future and no more than two years away. Omit it for a token that never expires.
+     */
+    expires?: pulumi.Input<string | undefined>;
     /**
      * The name for the token.
      */
@@ -115,4 +153,8 @@ export interface OrgAccessTokenArgs {
      * The organization's name.
      */
     organizationName: pulumi.Input<string>;
+    /**
+     * The ID of the role to assign to the token. Use `getOrganizationRole` to look up a role's ID by its name. Can't be combined with `admin: true`. When neither is set, the token gets the Member role.
+     */
+    roleId?: pulumi.Input<string | undefined>;
 }

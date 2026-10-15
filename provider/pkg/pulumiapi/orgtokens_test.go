@@ -15,6 +15,7 @@ const (
 	tokenIDKey              = "token_id"
 	secretKey               = "secret"
 	orgTokPath              = "/api/orgs/anOrg/tokens"
+	testOrgTokenRoleID      = "role-123"
 )
 
 func TestDeleteOrgAccessToken(t *testing.T) {
@@ -67,7 +68,7 @@ func TestCreateOrgAccessToken(t *testing.T) {
 			ResponseCode:    201,
 			ResponseBody:    resp,
 		})
-		token, err := c.CreateOrgAccessToken(teamCtx, name, orgName, desc, false)
+		token, err := c.CreateOrgAccessToken(teamCtx, name, orgName, desc, false, 0, "")
 		assert.NoError(t, err)
 		assert.Equal(t, &AccessToken{
 			ID:          resp.ID,
@@ -92,7 +93,33 @@ func TestCreateOrgAccessToken(t *testing.T) {
 			ResponseCode:    201,
 			ResponseBody:    resp,
 		})
-		token, err := c.CreateOrgAccessToken(teamCtx, name, orgName, desc, true)
+		token, err := c.CreateOrgAccessToken(teamCtx, name, orgName, desc, true, 0, "")
+		assert.NoError(t, err)
+		assert.Equal(t, &AccessToken{
+			ID:          resp.ID,
+			TokenValue:  resp.TokenValue,
+			Description: desc,
+		}, token)
+	})
+
+	t.Run("Expiry and role", func(t *testing.T) {
+		resp := createTokenResponse{
+			ID:         tokenIDKey,
+			TokenValue: secretKey,
+		}
+		c := startTestServer(t, testServerConfig{
+			ExpectedReqMethod: http.MethodPost,
+			ExpectedReqBody: createOrgTokenRequest{
+				Description: desc,
+				Name:        name,
+				Expires:     1814374800,
+				RoleID:      testOrgTokenRoleID,
+			},
+			ExpectedReqPath: orgTokPath,
+			ResponseCode:    201,
+			ResponseBody:    resp,
+		})
+		token, err := c.CreateOrgAccessToken(teamCtx, name, orgName, desc, false, 1814374800, testOrgTokenRoleID)
 		assert.NoError(t, err)
 		assert.Equal(t, &AccessToken{
 			ID:          resp.ID,
@@ -115,7 +142,7 @@ func TestCreateOrgAccessToken(t *testing.T) {
 				Message:    unauthorizedError,
 			},
 		})
-		token, err := c.CreateOrgAccessToken(teamCtx, name, orgName, desc, false)
+		token, err := c.CreateOrgAccessToken(teamCtx, name, orgName, desc, false, 0, "")
 		assert.Nil(t, token, "token should be nil")
 		assert.EqualError(t,
 			err,
@@ -136,6 +163,8 @@ func TestGetOrgAccessToken(t *testing.T) {
 					ID:          id,
 					Description: desc,
 					LastUsed:    lastUsed,
+					Expires:     1814374800,
+					Role:        &accessTokenRole{ID: testOrgTokenRoleID, Name: "CI Deployer"},
 				},
 				{
 					ID:          otherValue,
@@ -156,6 +185,8 @@ func TestGetOrgAccessToken(t *testing.T) {
 		assert.Equal(t, &AccessToken{
 			ID:          id,
 			Description: desc,
+			Expires:     1814374800,
+			RoleID:      testOrgTokenRoleID,
 		}, token)
 	})
 
