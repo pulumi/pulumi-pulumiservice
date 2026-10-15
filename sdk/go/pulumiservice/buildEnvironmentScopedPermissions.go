@@ -11,7 +11,7 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
-// Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named environment. Pair with `Environment.environmentId` (or the `getEnvironment` data source) to avoid hand-rolling the `PermissionDescriptorCondition` tree yourself. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls the output of each helper.
+// Builds a permission descriptor that grants the supplied scopes or permission sets only on the named environment. Pair with `Environment.environmentId` (or the `getEnvironment` data source) to avoid hand-rolling the `PermissionDescriptorCondition` tree yourself. The result is directly assignable to `OrganizationRole.permissions` or `api.Role.details`. To combine several grants in one descriptor, pass the output of each helper to `buildGroupPermissions`.
 func BuildEnvironmentScopedPermissions(ctx *pulumi.Context, args *BuildEnvironmentScopedPermissionsArgs, opts ...pulumi.InvokeOption) (*BuildEnvironmentScopedPermissionsResult, error) {
 	opts = internal.PkgInvokeDefaultOpts(opts)
 	var rv BuildEnvironmentScopedPermissionsResult
@@ -27,10 +27,12 @@ type BuildEnvironmentScopedPermissionsArgs struct {
 	EnvironmentId string `pulumi:"environmentId"`
 	// The set of `environment:*` scopes to grant on the target environment (e.g. `environment:read`, `environment:open`, `environment:update`). Discover valid scope names via the `getOrganizationRoleScopes` data source.
 	Permissions []string `pulumi:"permissions"`
+	// The IDs of the permission sets to grant on the target environment. Set exactly one of `permissions` or `setIds`. `permissions` grants the scopes inline. `setIds` grants the referenced permission sets (`api.Role` with `uxPurpose: set`), which is the shape Pulumi Cloud uses for policies (`api.Role` with `uxPurpose: policy`).
+	SetIds []string `pulumi:"setIds"`
 }
 
 type BuildEnvironmentScopedPermissionsResult struct {
-	// A `PermissionDescriptorCondition` tree gating a `PermissionDescriptorAllow` on the named environment, ready to assign to `OrganizationRole.permissions`.
+	// A `PermissionDescriptorCondition` tree gating the grant on the named environment.
 	Permissions map[string]interface{} `pulumi:"permissions"`
 }
 
@@ -44,6 +46,8 @@ type BuildEnvironmentScopedPermissionsOutputArgs struct {
 	EnvironmentId pulumi.StringInput `pulumi:"environmentId"`
 	// The set of `environment:*` scopes to grant on the target environment (e.g. `environment:read`, `environment:open`, `environment:update`). Discover valid scope names via the `getOrganizationRoleScopes` data source.
 	Permissions pulumi.StringArrayInput `pulumi:"permissions"`
+	// The IDs of the permission sets to grant on the target environment. Set exactly one of `permissions` or `setIds`. `permissions` grants the scopes inline. `setIds` grants the referenced permission sets (`api.Role` with `uxPurpose: set`), which is the shape Pulumi Cloud uses for policies (`api.Role` with `uxPurpose: policy`).
+	SetIds pulumi.StringArrayInput `pulumi:"setIds"`
 }
 
 func (BuildEnvironmentScopedPermissionsOutputArgs) ElementType() reflect.Type {
@@ -64,7 +68,7 @@ func (o BuildEnvironmentScopedPermissionsResultOutput) ToBuildEnvironmentScopedP
 	return o
 }
 
-// A `PermissionDescriptorCondition` tree gating a `PermissionDescriptorAllow` on the named environment, ready to assign to `OrganizationRole.permissions`.
+// A `PermissionDescriptorCondition` tree gating the grant on the named environment.
 func (o BuildEnvironmentScopedPermissionsResultOutput) Permissions() pulumi.MapOutput {
 	return o.ApplyT(func(v BuildEnvironmentScopedPermissionsResult) map[string]interface{} { return v.Permissions }).(pulumi.MapOutput)
 }

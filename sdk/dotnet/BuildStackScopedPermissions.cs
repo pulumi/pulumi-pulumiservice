@@ -12,19 +12,19 @@ namespace Pulumi.PulumiService
     public static class BuildStackScopedPermissions
     {
         /// <summary>
-        /// Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named stack. The `stackId` is the stack's opaque Pulumi Cloud identifier — distinct from the `organization/project/stack` triple. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls the output of each helper.
+        /// Builds a permission descriptor that grants the supplied scopes or permission sets only on the named stack. The `stackId` is the stack's opaque Pulumi Cloud identifier — distinct from the `organization/project/stack` triple. The result is directly assignable to `OrganizationRole.permissions` or `api.Role.details`. To combine several grants in one descriptor, pass the output of each helper to `buildGroupPermissions`.
         /// </summary>
         public static Task<BuildStackScopedPermissionsResult> InvokeAsync(BuildStackScopedPermissionsArgs args, InvokeOptions? options = null)
             => global::Pulumi.Deployment.Instance.InvokeAsync<BuildStackScopedPermissionsResult>("pulumiservice:index:buildStackScopedPermissions", args ?? new BuildStackScopedPermissionsArgs(), options.WithDefaults());
 
         /// <summary>
-        /// Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named stack. The `stackId` is the stack's opaque Pulumi Cloud identifier — distinct from the `organization/project/stack` triple. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls the output of each helper.
+        /// Builds a permission descriptor that grants the supplied scopes or permission sets only on the named stack. The `stackId` is the stack's opaque Pulumi Cloud identifier — distinct from the `organization/project/stack` triple. The result is directly assignable to `OrganizationRole.permissions` or `api.Role.details`. To combine several grants in one descriptor, pass the output of each helper to `buildGroupPermissions`.
         /// </summary>
         public static Output<BuildStackScopedPermissionsResult> Invoke(BuildStackScopedPermissionsInvokeArgs args, InvokeOptions? options = null)
             => global::Pulumi.Deployment.Instance.Invoke<BuildStackScopedPermissionsResult>("pulumiservice:index:buildStackScopedPermissions", args ?? new BuildStackScopedPermissionsInvokeArgs(), options.WithDefaults());
 
         /// <summary>
-        /// Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named stack. The `stackId` is the stack's opaque Pulumi Cloud identifier — distinct from the `organization/project/stack` triple. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls the output of each helper.
+        /// Builds a permission descriptor that grants the supplied scopes or permission sets only on the named stack. The `stackId` is the stack's opaque Pulumi Cloud identifier — distinct from the `organization/project/stack` triple. The result is directly assignable to `OrganizationRole.permissions` or `api.Role.details`. To combine several grants in one descriptor, pass the output of each helper to `buildGroupPermissions`.
         /// </summary>
         public static Output<BuildStackScopedPermissionsResult> Invoke(BuildStackScopedPermissionsInvokeArgs args, InvokeOutputOptions options)
             => global::Pulumi.Deployment.Instance.Invoke<BuildStackScopedPermissionsResult>("pulumiservice:index:buildStackScopedPermissions", args ?? new BuildStackScopedPermissionsInvokeArgs(), options.WithDefaults());
@@ -33,7 +33,7 @@ namespace Pulumi.PulumiService
 
     public sealed class BuildStackScopedPermissionsArgs : global::Pulumi.InvokeArgs
     {
-        [Input("permissions", required: true)]
+        [Input("permissions")]
         private List<string>? _permissions;
 
         /// <summary>
@@ -43,6 +43,18 @@ namespace Pulumi.PulumiService
         {
             get => _permissions ?? (_permissions = new List<string>());
             set => _permissions = value;
+        }
+
+        [Input("setIds")]
+        private List<string>? _setIds;
+
+        /// <summary>
+        /// The IDs of the permission sets to grant on the target stack. Set exactly one of `permissions` or `setIds`. `permissions` grants the scopes inline. `setIds` grants the referenced permission sets (`api.Role` with `uxPurpose: set`), which is the shape Pulumi Cloud uses for policies (`api.Role` with `uxPurpose: policy`).
+        /// </summary>
+        public List<string> SetIds
+        {
+            get => _setIds ?? (_setIds = new List<string>());
+            set => _setIds = value;
         }
 
         /// <summary>
@@ -59,7 +71,7 @@ namespace Pulumi.PulumiService
 
     public sealed class BuildStackScopedPermissionsInvokeArgs : global::Pulumi.InvokeArgs
     {
-        [Input("permissions", required: true)]
+        [Input("permissions")]
         private InputList<string>? _permissions;
 
         /// <summary>
@@ -69,6 +81,18 @@ namespace Pulumi.PulumiService
         {
             get => _permissions ?? (_permissions = new InputList<string>());
             set => _permissions = value;
+        }
+
+        [Input("setIds")]
+        private InputList<string>? _setIds;
+
+        /// <summary>
+        /// The IDs of the permission sets to grant on the target stack. Set exactly one of `permissions` or `setIds`. `permissions` grants the scopes inline. `setIds` grants the referenced permission sets (`api.Role` with `uxPurpose: set`), which is the shape Pulumi Cloud uses for policies (`api.Role` with `uxPurpose: policy`).
+        /// </summary>
+        public InputList<string> SetIds
+        {
+            get => _setIds ?? (_setIds = new InputList<string>());
+            set => _setIds = value;
         }
 
         /// <summary>
@@ -88,7 +112,7 @@ namespace Pulumi.PulumiService
     public sealed class BuildStackScopedPermissionsResult
     {
         /// <summary>
-        /// A `PermissionDescriptorCondition` tree gating a `PermissionDescriptorAllow` on the named stack, ready to assign to `OrganizationRole.permissions`.
+        /// A `PermissionDescriptorCondition` tree gating the grant on the named stack.
         /// </summary>
         public readonly ImmutableDictionary<string, object> Permissions;
 

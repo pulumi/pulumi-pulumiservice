@@ -13,14 +13,14 @@ import java.util.Objects;
 @CustomType
 public final class BuildEnvironmentScopedPermissionsResult {
     /**
-     * @return A `PermissionDescriptorCondition` tree gating a `PermissionDescriptorAllow` on the named environment, ready to assign to `OrganizationRole.permissions`.
+     * @return A `PermissionDescriptorCondition` tree gating the grant on the named environment.
      * 
      */
     private Map<String,Object> permissions;
 
     private BuildEnvironmentScopedPermissionsResult() {}
     /**
-     * @return A `PermissionDescriptorCondition` tree gating a `PermissionDescriptorAllow` on the named environment, ready to assign to `OrganizationRole.permissions`.
+     * @return A `PermissionDescriptorCondition` tree gating the grant on the named environment.
      * 
      */
     public Map<String,Object> permissions() {

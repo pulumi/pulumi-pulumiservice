@@ -5,12 +5,13 @@ import * as pulumi from "@pulumi/pulumi";
 import * as utilities from "./utilities";
 
 /**
- * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named stack. The `stackId` is the stack's opaque Pulumi Cloud identifier — distinct from the `organization/project/stack` triple. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls the output of each helper.
+ * Builds a permission descriptor that grants the supplied scopes or permission sets only on the named stack. The `stackId` is the stack's opaque Pulumi Cloud identifier — distinct from the `organization/project/stack` triple. The result is directly assignable to `OrganizationRole.permissions` or `api.Role.details`. To combine several grants in one descriptor, pass the output of each helper to `buildGroupPermissions`.
  */
 export function buildStackScopedPermissions(args: BuildStackScopedPermissionsArgs, opts?: pulumi.InvokeOptions): Promise<BuildStackScopedPermissionsResult> {
     opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts || {});
     return pulumi.runtime.invoke("pulumiservice:index:buildStackScopedPermissions", {
         "permissions": args.permissions,
+        "setIds": args.setIds,
         "stackId": args.stackId,
     }, opts);
 }
@@ -19,7 +20,11 @@ export interface BuildStackScopedPermissionsArgs {
     /**
      * The set of `stack:*` scopes to grant on the target stack (e.g. `stack:read`, `stack:edit`, `stack:admin`). Discover valid scope names via the `getOrganizationRoleScopes` data source.
      */
-    permissions: string[];
+    permissions?: string[];
+    /**
+     * The IDs of the permission sets to grant on the target stack. Set exactly one of `permissions` or `setIds`. `permissions` grants the scopes inline. `setIds` grants the referenced permission sets (`api.Role` with `uxPurpose: set`), which is the shape Pulumi Cloud uses for policies (`api.Role` with `uxPurpose: policy`).
+     */
+    setIds?: string[];
     /**
      * The target stack's opaque Pulumi Cloud identifier (not the `organization/project/stack` triple).
      */
@@ -28,17 +33,18 @@ export interface BuildStackScopedPermissionsArgs {
 
 export interface BuildStackScopedPermissionsResult {
     /**
-     * A `PermissionDescriptorCondition` tree gating a `PermissionDescriptorAllow` on the named stack, ready to assign to `OrganizationRole.permissions`.
+     * A `PermissionDescriptorCondition` tree gating the grant on the named stack.
      */
     readonly permissions: {[key: string]: any};
 }
 /**
- * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named stack. The `stackId` is the stack's opaque Pulumi Cloud identifier — distinct from the `organization/project/stack` triple. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls the output of each helper.
+ * Builds a permission descriptor that grants the supplied scopes or permission sets only on the named stack. The `stackId` is the stack's opaque Pulumi Cloud identifier — distinct from the `organization/project/stack` triple. The result is directly assignable to `OrganizationRole.permissions` or `api.Role.details`. To combine several grants in one descriptor, pass the output of each helper to `buildGroupPermissions`.
  */
 export function buildStackScopedPermissionsOutput(args: BuildStackScopedPermissionsOutputArgs, opts?: pulumi.InvokeOutputOptions): pulumi.Output<BuildStackScopedPermissionsResult> {
     opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts || {});
     return pulumi.runtime.invokeOutput("pulumiservice:index:buildStackScopedPermissions", {
         "permissions": args.permissions,
+        "setIds": args.setIds,
         "stackId": args.stackId,
     }, opts);
 }
@@ -47,7 +53,11 @@ export interface BuildStackScopedPermissionsOutputArgs {
     /**
      * The set of `stack:*` scopes to grant on the target stack (e.g. `stack:read`, `stack:edit`, `stack:admin`). Discover valid scope names via the `getOrganizationRoleScopes` data source.
      */
-    permissions: pulumi.Input<pulumi.Input<string>[]>;
+    permissions?: pulumi.Input<pulumi.Input<string>[] | undefined>;
+    /**
+     * The IDs of the permission sets to grant on the target stack. Set exactly one of `permissions` or `setIds`. `permissions` grants the scopes inline. `setIds` grants the referenced permission sets (`api.Role` with `uxPurpose: set`), which is the shape Pulumi Cloud uses for policies (`api.Role` with `uxPurpose: policy`).
+     */
+    setIds?: pulumi.Input<pulumi.Input<string>[] | undefined>;
     /**
      * The target stack's opaque Pulumi Cloud identifier (not the `organization/project/stack` triple).
      */

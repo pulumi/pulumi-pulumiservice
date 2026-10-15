@@ -32,7 +32,7 @@ class BuildEnvironmentScopedPermissionsResult:
     @pulumi.getter
     def permissions(self) -> Mapping[str, Any]:
         """
-        A `PermissionDescriptorCondition` tree gating a `PermissionDescriptorAllow` on the named environment, ready to assign to `OrganizationRole.permissions`.
+        A `PermissionDescriptorCondition` tree gating the grant on the named environment.
         """
         return pulumi.get(self, "permissions")
 
@@ -48,33 +48,39 @@ class AwaitableBuildEnvironmentScopedPermissionsResult(BuildEnvironmentScopedPer
 
 def build_environment_scoped_permissions(environment_id: Optional[_builtins.str] = None,
                                          permissions: Optional[Sequence[_builtins.str]] = None,
+                                         set_ids: Optional[Sequence[_builtins.str]] = None,
                                          opts: Optional[pulumi.InvokeOptions] = None) -> AwaitableBuildEnvironmentScopedPermissionsResult:
     """
-    Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named environment. Pair with `Environment.environmentId` (or the `getEnvironment` data source) to avoid hand-rolling the `PermissionDescriptorCondition` tree yourself. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls the output of each helper.
+    Builds a permission descriptor that grants the supplied scopes or permission sets only on the named environment. Pair with `Environment.environmentId` (or the `getEnvironment` data source) to avoid hand-rolling the `PermissionDescriptorCondition` tree yourself. The result is directly assignable to `OrganizationRole.permissions` or `api.Role.details`. To combine several grants in one descriptor, pass the output of each helper to `buildGroupPermissions`.
 
     :param _builtins.str environment_id: The target environment's UUID. Use the `environmentId` output of an `Environment` resource or the `getEnvironment` data source.
     :param Sequence[_builtins.str] permissions: The set of `environment:*` scopes to grant on the target environment (e.g. `environment:read`, `environment:open`, `environment:update`). Discover valid scope names via the `getOrganizationRoleScopes` data source.
+    :param Sequence[_builtins.str] set_ids: The IDs of the permission sets to grant on the target environment. Set exactly one of `permissions` or `setIds`. `permissions` grants the scopes inline. `setIds` grants the referenced permission sets (`api.Role` with `uxPurpose: set`), which is the shape Pulumi Cloud uses for policies (`api.Role` with `uxPurpose: policy`).
     """
     __args__ = dict()
     __args__['environmentId'] = environment_id
     __args__['permissions'] = permissions
+    __args__['setIds'] = set_ids
     opts = pulumi.InvokeOptions.merge(_utilities.get_invoke_opts_defaults(), opts)
     __ret__ = pulumi.runtime.invoke('pulumiservice:index:buildEnvironmentScopedPermissions', __args__, opts=opts, typ=BuildEnvironmentScopedPermissionsResult).value
 
     return AwaitableBuildEnvironmentScopedPermissionsResult(
         permissions=pulumi.get(__ret__, 'permissions'))
 def build_environment_scoped_permissions_output(environment_id: pulumi.Input[Optional[_builtins.str]] = None,
-                                                permissions: pulumi.Input[Optional[Sequence[_builtins.str]]] = None,
+                                                permissions: pulumi.Input[Optional[Optional[Sequence[_builtins.str]]]] = None,
+                                                set_ids: pulumi.Input[Optional[Optional[Sequence[_builtins.str]]]] = None,
                                                 opts: Optional[Union[pulumi.InvokeOptions, pulumi.InvokeOutputOptions]] = None) -> pulumi.Output[BuildEnvironmentScopedPermissionsResult]:
     """
-    Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named environment. Pair with `Environment.environmentId` (or the `getEnvironment` data source) to avoid hand-rolling the `PermissionDescriptorCondition` tree yourself. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls the output of each helper.
+    Builds a permission descriptor that grants the supplied scopes or permission sets only on the named environment. Pair with `Environment.environmentId` (or the `getEnvironment` data source) to avoid hand-rolling the `PermissionDescriptorCondition` tree yourself. The result is directly assignable to `OrganizationRole.permissions` or `api.Role.details`. To combine several grants in one descriptor, pass the output of each helper to `buildGroupPermissions`.
 
     :param _builtins.str environment_id: The target environment's UUID. Use the `environmentId` output of an `Environment` resource or the `getEnvironment` data source.
     :param Sequence[_builtins.str] permissions: The set of `environment:*` scopes to grant on the target environment (e.g. `environment:read`, `environment:open`, `environment:update`). Discover valid scope names via the `getOrganizationRoleScopes` data source.
+    :param Sequence[_builtins.str] set_ids: The IDs of the permission sets to grant on the target environment. Set exactly one of `permissions` or `setIds`. `permissions` grants the scopes inline. `setIds` grants the referenced permission sets (`api.Role` with `uxPurpose: set`), which is the shape Pulumi Cloud uses for policies (`api.Role` with `uxPurpose: policy`).
     """
     __args__ = dict()
     __args__['environmentId'] = environment_id
     __args__['permissions'] = permissions
+    __args__['setIds'] = set_ids
     opts = pulumi.InvokeOutputOptions.merge(_utilities.get_invoke_opts_defaults(), opts)
     __ret__ = pulumi.runtime.invoke_output('pulumiservice:index:buildEnvironmentScopedPermissions', __args__, opts=opts, typ=BuildEnvironmentScopedPermissionsResult)
     return __ret__.apply(lambda __response__: BuildEnvironmentScopedPermissionsResult(

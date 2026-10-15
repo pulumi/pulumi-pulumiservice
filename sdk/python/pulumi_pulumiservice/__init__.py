@@ -11,9 +11,12 @@ from .access_token import *
 from .agent_pool import *
 from .approval_rule import *
 from .build_allow_permissions import *
+from .build_compose_permissions import *
 from .build_environment_scoped_permissions import *
+from .build_group_permissions import *
 from .build_insights_account_scoped_permissions import *
 from .build_stack_scoped_permissions import *
+from .build_tag_conditional_permissions import *
 from .deployment_schedule import *
 from .deployment_settings import *
 from .drift_schedule import *

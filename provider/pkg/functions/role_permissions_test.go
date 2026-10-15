@@ -29,6 +29,16 @@ const (
 	permEnvironmentRead     = "environment:read"
 	permInsightsAccountRead = "insights_account:read"
 	permStackRead           = "stack:read"
+
+	keyType                  = "__type"
+	keyPermissionDescriptors = "permissionDescriptors"
+	typeCompose              = "PermissionDescriptorCompose"
+	testEnvironmentID        = "env-uuid-1"
+	testStackID              = "stack-id-1"
+	testInsightsAccountID    = "acct-1"
+	testSetID                = "set-1"
+	testPolicyID             = "policy-1"
+	testTagKey               = "team"
 )
 
 // assertScopedConditionShape verifies a helper's output is the
@@ -46,25 +56,25 @@ func assertScopedConditionShape(
 ) {
 	t.Helper()
 
-	assert.Equal(t, "PermissionDescriptorCondition", got["__type"],
+	assert.Equal(t, "PermissionDescriptorCondition", got[keyType],
 		"top-level __type must be PermissionDescriptorCondition")
 
 	cond, ok := got["condition"].(map[string]interface{})
 	require.True(t, ok, "condition must be a map; got %T", got["condition"])
-	assert.Equal(t, "PermissionExpressionEqual", cond["__type"])
+	assert.Equal(t, "PermissionExpressionEqual", cond[keyType])
 
 	left, ok := cond["left"].(map[string]interface{})
 	require.True(t, ok, "condition.left must be a map; got %T", cond["left"])
-	assert.Equal(t, expectedExpressionType, left["__type"])
+	assert.Equal(t, expectedExpressionType, left[keyType])
 
 	right, ok := cond["right"].(map[string]interface{})
 	require.True(t, ok, "condition.right must be a map; got %T", cond["right"])
-	assert.Equal(t, expectedLiteralType, right["__type"])
+	assert.Equal(t, expectedLiteralType, right[keyType])
 	assert.Equal(t, expectedIdentity, right["identity"])
 
 	sub, ok := got["subNode"].(map[string]interface{})
 	require.True(t, ok, "subNode must be a map; got %T", got["subNode"])
-	assert.Equal(t, "PermissionDescriptorAllow", sub["__type"])
+	assert.Equal(t, "PermissionDescriptorAllow", sub[keyType])
 
 	rawPerms, ok := sub["permissions"].([]interface{})
 	require.True(t, ok, "subNode.permissions must be a list; got %T", sub["permissions"])
@@ -90,7 +100,7 @@ func TestBuildAllowPermissions(t *testing.T) {
 		)
 		require.NoError(t, err)
 		got := resp.Output.Permissions
-		assert.Equal(t, "PermissionDescriptorAllow", got["__type"])
+		assert.Equal(t, "PermissionDescriptorAllow", got[keyType])
 		// Permissions list passes through verbatim.
 		perms, ok := got["permissions"].([]interface{})
 		require.True(t, ok)
@@ -118,7 +128,7 @@ func TestBuildEnvironmentScopedPermissions(t *testing.T) {
 			context.Background(),
 			infer.FunctionRequest[BuildEnvironmentScopedPermissionsInput]{
 				Input: BuildEnvironmentScopedPermissionsInput{
-					EnvironmentID: "env-uuid-1",
+					EnvironmentID: testEnvironmentID,
 					Permissions:   []string{permEnvironmentRead, permEnvironmentOpen},
 				},
 			},
@@ -128,7 +138,7 @@ func TestBuildEnvironmentScopedPermissions(t *testing.T) {
 			t, resp.Output.Permissions,
 			"PermissionExpressionEnvironment",
 			"PermissionLiteralExpressionEnvironment",
-			"env-uuid-1",
+			testEnvironmentID,
 			[]string{permEnvironmentRead, permEnvironmentOpen},
 		)
 	})
@@ -152,7 +162,7 @@ func TestBuildEnvironmentScopedPermissions(t *testing.T) {
 			context.Background(),
 			infer.FunctionRequest[BuildEnvironmentScopedPermissionsInput]{
 				Input: BuildEnvironmentScopedPermissionsInput{
-					EnvironmentID: "env-uuid-1",
+					EnvironmentID: testEnvironmentID,
 				},
 			},
 		)
@@ -169,7 +179,7 @@ func TestBuildStackScopedPermissions(t *testing.T) {
 			context.Background(),
 			infer.FunctionRequest[BuildStackScopedPermissionsInput]{
 				Input: BuildStackScopedPermissionsInput{
-					StackID:     "stack-id-1",
+					StackID:     testStackID,
 					Permissions: []string{permStackRead},
 				},
 			},
@@ -179,7 +189,7 @@ func TestBuildStackScopedPermissions(t *testing.T) {
 			t, resp.Output.Permissions,
 			"PermissionExpressionStack",
 			"PermissionLiteralExpressionStack",
-			"stack-id-1",
+			testStackID,
 			[]string{permStackRead},
 		)
 	})
@@ -203,7 +213,7 @@ func TestBuildStackScopedPermissions(t *testing.T) {
 			context.Background(),
 			infer.FunctionRequest[BuildStackScopedPermissionsInput]{
 				Input: BuildStackScopedPermissionsInput{
-					StackID: "stack-id-1",
+					StackID: testStackID,
 				},
 			},
 		)
@@ -220,7 +230,7 @@ func TestBuildInsightsAccountScopedPermissions(t *testing.T) {
 			context.Background(),
 			infer.FunctionRequest[BuildInsightsAccountScopedPermissionsInput]{
 				Input: BuildInsightsAccountScopedPermissionsInput{
-					InsightsAccountID: "acct-1",
+					InsightsAccountID: testInsightsAccountID,
 					Permissions:       []string{permInsightsAccountRead},
 				},
 			},
@@ -230,7 +240,7 @@ func TestBuildInsightsAccountScopedPermissions(t *testing.T) {
 			t, resp.Output.Permissions,
 			"PermissionExpressionInsightsAccount",
 			"PermissionLiteralExpressionInsightsAccount",
-			"acct-1",
+			testInsightsAccountID,
 			[]string{permInsightsAccountRead},
 		)
 	})
@@ -254,10 +264,256 @@ func TestBuildInsightsAccountScopedPermissions(t *testing.T) {
 			context.Background(),
 			infer.FunctionRequest[BuildInsightsAccountScopedPermissionsInput]{
 				Input: BuildInsightsAccountScopedPermissionsInput{
-					InsightsAccountID: "acct-1",
+					InsightsAccountID: testInsightsAccountID,
 				},
 			},
 		)
 		assert.ErrorContains(t, err, "permissions")
 	})
+}
+
+func TestScopedPermissionsWithSetIDs(t *testing.T) {
+	t.Parallel()
+
+	t.Run("wraps a Compose of the sets", func(t *testing.T) {
+		t.Parallel()
+		resp, err := BuildEnvironmentScopedPermissionsFunction{}.Invoke(
+			context.Background(),
+			infer.FunctionRequest[BuildEnvironmentScopedPermissionsInput]{
+				Input: BuildEnvironmentScopedPermissionsInput{
+					EnvironmentID: testEnvironmentID,
+					SetIDs:        []string{testSetID, "set-2"},
+				},
+			},
+		)
+		require.NoError(t, err)
+		sub, ok := resp.Output.Permissions["subNode"].(map[string]interface{})
+		require.True(t, ok)
+		assert.Equal(t, typeCompose, sub[keyType])
+		assert.Equal(t, []interface{}{testSetID, "set-2"}, sub[keyPermissionDescriptors])
+	})
+
+	t.Run("rejects both permissions and setIds", func(t *testing.T) {
+		t.Parallel()
+		_, err := BuildStackScopedPermissionsFunction{}.Invoke(
+			context.Background(),
+			infer.FunctionRequest[BuildStackScopedPermissionsInput]{
+				Input: BuildStackScopedPermissionsInput{
+					StackID:     testStackID,
+					Permissions: []string{permStackRead},
+					SetIDs:      []string{testSetID},
+				},
+			},
+		)
+		assert.ErrorContains(t, err, "exactly one of `permissions` or `setIds`")
+	})
+
+	t.Run("rejects an empty set ID", func(t *testing.T) {
+		t.Parallel()
+		_, err := BuildInsightsAccountScopedPermissionsFunction{}.Invoke(
+			context.Background(),
+			infer.FunctionRequest[BuildInsightsAccountScopedPermissionsInput]{
+				Input: BuildInsightsAccountScopedPermissionsInput{
+					InsightsAccountID: testInsightsAccountID,
+					SetIDs:            []string{""},
+				},
+			},
+		)
+		assert.ErrorContains(t, err, "setIds")
+	})
+}
+
+func TestBuildTagConditionalPermissions(t *testing.T) {
+	t.Parallel()
+
+	t.Run("tag value gates on Equal(Tag, String)", func(t *testing.T) {
+		t.Parallel()
+		resp, err := BuildTagConditionalPermissionsFunction{}.Invoke(
+			context.Background(),
+			infer.FunctionRequest[BuildTagConditionalPermissionsInput]{
+				Input: BuildTagConditionalPermissionsInput{
+					EntityType: RbacEntityTypeStack,
+					TagKey:     testTagKey,
+					TagValue:   "platform",
+					SetIDs:     []string{testSetID},
+				},
+			},
+		)
+		require.NoError(t, err)
+		got := resp.Output.Permissions
+		assert.Equal(t, "PermissionDescriptorCondition", got[keyType])
+		assert.Equal(t, map[string]interface{}{
+			keyType: "PermissionExpressionEqual",
+			"left": map[string]interface{}{
+				keyType:   "PermissionExpressionTag",
+				"context": map[string]interface{}{keyType: "PermissionExpressionStack"},
+				"key":     testTagKey,
+			},
+			"right": map[string]interface{}{
+				keyType: "PermissionLiteralExpressionString",
+				"value": "platform",
+			},
+		}, got["condition"])
+		assert.Equal(t, map[string]interface{}{
+			keyType:                  typeCompose,
+			keyPermissionDescriptors: []interface{}{testSetID},
+		}, got["subNode"])
+	})
+
+	t.Run("no tag value gates on HasTag", func(t *testing.T) {
+		t.Parallel()
+		resp, err := BuildTagConditionalPermissionsFunction{}.Invoke(
+			context.Background(),
+			infer.FunctionRequest[BuildTagConditionalPermissionsInput]{
+				Input: BuildTagConditionalPermissionsInput{
+					EntityType:  RbacEntityTypeInsightsAccount,
+					TagKey:      "owner",
+					Permissions: []RbacScope{permInsightsAccountRead},
+				},
+			},
+		)
+		require.NoError(t, err)
+		got := resp.Output.Permissions
+		assert.Equal(t, map[string]interface{}{
+			keyType:   "PermissionExpressionHasTag",
+			"context": map[string]interface{}{keyType: "PermissionExpressionInsightsAccount"},
+			"key":     "owner",
+		}, got["condition"])
+		sub, ok := got["subNode"].(map[string]interface{})
+		require.True(t, ok)
+		assert.Equal(t, "PermissionDescriptorAllow", sub[keyType])
+	})
+
+	t.Run("rejects an unknown entity type", func(t *testing.T) {
+		t.Parallel()
+		_, err := BuildTagConditionalPermissionsFunction{}.Invoke(
+			context.Background(),
+			infer.FunctionRequest[BuildTagConditionalPermissionsInput]{
+				Input: BuildTagConditionalPermissionsInput{
+					EntityType: "global",
+					TagKey:     "k",
+					SetIDs:     []string{testSetID},
+				},
+			},
+		)
+		assert.ErrorContains(t, err, "entityType")
+	})
+
+	t.Run("rejects an empty tag key", func(t *testing.T) {
+		t.Parallel()
+		_, err := BuildTagConditionalPermissionsFunction{}.Invoke(
+			context.Background(),
+			infer.FunctionRequest[BuildTagConditionalPermissionsInput]{
+				Input: BuildTagConditionalPermissionsInput{
+					EntityType: RbacEntityTypeEnvironment,
+					SetIDs:     []string{testSetID},
+				},
+			},
+		)
+		assert.ErrorContains(t, err, "tagKey")
+	})
+
+	t.Run("rejects a missing grant", func(t *testing.T) {
+		t.Parallel()
+		_, err := BuildTagConditionalPermissionsFunction{}.Invoke(
+			context.Background(),
+			infer.FunctionRequest[BuildTagConditionalPermissionsInput]{
+				Input: BuildTagConditionalPermissionsInput{
+					EntityType: RbacEntityTypeEnvironment,
+					TagKey:     "k",
+				},
+			},
+		)
+		assert.ErrorContains(t, err, "exactly one of `permissions` or `setIds`")
+	})
+}
+
+func TestBuildComposePermissions(t *testing.T) {
+	t.Parallel()
+
+	t.Run("happy path", func(t *testing.T) {
+		t.Parallel()
+		resp, err := BuildComposePermissionsFunction{}.Invoke(
+			context.Background(),
+			infer.FunctionRequest[BuildComposePermissionsInput]{
+				Input: BuildComposePermissionsInput{PermissionDescriptorIDs: []string{testPolicyID}},
+			},
+		)
+		require.NoError(t, err)
+		assert.Equal(t, map[string]interface{}{
+			keyType:                  typeCompose,
+			keyPermissionDescriptors: []interface{}{testPolicyID},
+		}, resp.Output.Permissions)
+	})
+
+	t.Run("rejects empty IDs", func(t *testing.T) {
+		t.Parallel()
+		_, err := BuildComposePermissionsFunction{}.Invoke(
+			context.Background(),
+			infer.FunctionRequest[BuildComposePermissionsInput]{
+				Input: BuildComposePermissionsInput{PermissionDescriptorIDs: []string{testPolicyID, ""}},
+			},
+		)
+		assert.ErrorContains(t, err, "permissionDescriptorIds")
+	})
+}
+
+func TestBuildGroupPermissions(t *testing.T) {
+	t.Parallel()
+
+	entry := map[string]interface{}{
+		keyType:                  typeCompose,
+		keyPermissionDescriptors: []interface{}{testSetID},
+	}
+
+	t.Run("passes entries through verbatim", func(t *testing.T) {
+		t.Parallel()
+		resp, err := BuildGroupPermissionsFunction{}.Invoke(
+			context.Background(),
+			infer.FunctionRequest[BuildGroupPermissionsInput]{
+				Input: BuildGroupPermissionsInput{Entries: []map[string]any{entry, entry}},
+			},
+		)
+		require.NoError(t, err)
+		assert.Equal(t, map[string]interface{}{
+			keyType:   "PermissionDescriptorGroup",
+			"entries": []map[string]any{entry, entry},
+		}, resp.Output.Permissions)
+	})
+
+	t.Run("rejects no entries", func(t *testing.T) {
+		t.Parallel()
+		_, err := BuildGroupPermissionsFunction{}.Invoke(
+			context.Background(),
+			infer.FunctionRequest[BuildGroupPermissionsInput]{Input: BuildGroupPermissionsInput{}},
+		)
+		assert.ErrorContains(t, err, "entries")
+	})
+
+	t.Run("rejects an entry that is not a descriptor", func(t *testing.T) {
+		t.Parallel()
+		_, err := BuildGroupPermissionsFunction{}.Invoke(
+			context.Background(),
+			infer.FunctionRequest[BuildGroupPermissionsInput]{
+				Input: BuildGroupPermissionsInput{Entries: []map[string]any{{"permissions": []any{"stack:read"}}}},
+			},
+		)
+		assert.ErrorContains(t, err, "entries[0]")
+	})
+}
+
+func TestRbacScopeEnumMatchesValidation(t *testing.T) {
+	t.Parallel()
+
+	values := RbacScope("").Values()
+	require.NotEmpty(t, values)
+	names := map[string]bool{}
+	for _, v := range values {
+		_, err := rbacPermissionSlice([]string{string(v.Value)})
+		assert.NoError(t, err)
+		assert.NotEmpty(t, v.Name)
+		assert.False(t, names[v.Name], "duplicate enum name %q", v.Name)
+		names[v.Name] = true
+	}
+	assert.True(t, names["InsightsAccountRead"])
 }

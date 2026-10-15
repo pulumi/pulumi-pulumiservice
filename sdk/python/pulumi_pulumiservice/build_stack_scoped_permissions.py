@@ -32,7 +32,7 @@ class BuildStackScopedPermissionsResult:
     @pulumi.getter
     def permissions(self) -> Mapping[str, Any]:
         """
-        A `PermissionDescriptorCondition` tree gating a `PermissionDescriptorAllow` on the named stack, ready to assign to `OrganizationRole.permissions`.
+        A `PermissionDescriptorCondition` tree gating the grant on the named stack.
         """
         return pulumi.get(self, "permissions")
 
@@ -47,33 +47,39 @@ class AwaitableBuildStackScopedPermissionsResult(BuildStackScopedPermissionsResu
 
 
 def build_stack_scoped_permissions(permissions: Optional[Sequence[_builtins.str]] = None,
+                                   set_ids: Optional[Sequence[_builtins.str]] = None,
                                    stack_id: Optional[_builtins.str] = None,
                                    opts: Optional[pulumi.InvokeOptions] = None) -> AwaitableBuildStackScopedPermissionsResult:
     """
-    Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named stack. The `stackId` is the stack's opaque Pulumi Cloud identifier — distinct from the `organization/project/stack` triple. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls the output of each helper.
+    Builds a permission descriptor that grants the supplied scopes or permission sets only on the named stack. The `stackId` is the stack's opaque Pulumi Cloud identifier — distinct from the `organization/project/stack` triple. The result is directly assignable to `OrganizationRole.permissions` or `api.Role.details`. To combine several grants in one descriptor, pass the output of each helper to `buildGroupPermissions`.
 
     :param Sequence[_builtins.str] permissions: The set of `stack:*` scopes to grant on the target stack (e.g. `stack:read`, `stack:edit`, `stack:admin`). Discover valid scope names via the `getOrganizationRoleScopes` data source.
+    :param Sequence[_builtins.str] set_ids: The IDs of the permission sets to grant on the target stack. Set exactly one of `permissions` or `setIds`. `permissions` grants the scopes inline. `setIds` grants the referenced permission sets (`api.Role` with `uxPurpose: set`), which is the shape Pulumi Cloud uses for policies (`api.Role` with `uxPurpose: policy`).
     :param _builtins.str stack_id: The target stack's opaque Pulumi Cloud identifier (not the `organization/project/stack` triple).
     """
     __args__ = dict()
     __args__['permissions'] = permissions
+    __args__['setIds'] = set_ids
     __args__['stackId'] = stack_id
     opts = pulumi.InvokeOptions.merge(_utilities.get_invoke_opts_defaults(), opts)
     __ret__ = pulumi.runtime.invoke('pulumiservice:index:buildStackScopedPermissions', __args__, opts=opts, typ=BuildStackScopedPermissionsResult).value
 
     return AwaitableBuildStackScopedPermissionsResult(
         permissions=pulumi.get(__ret__, 'permissions'))
-def build_stack_scoped_permissions_output(permissions: pulumi.Input[Optional[Sequence[_builtins.str]]] = None,
+def build_stack_scoped_permissions_output(permissions: pulumi.Input[Optional[Optional[Sequence[_builtins.str]]]] = None,
+                                          set_ids: pulumi.Input[Optional[Optional[Sequence[_builtins.str]]]] = None,
                                           stack_id: pulumi.Input[Optional[_builtins.str]] = None,
                                           opts: Optional[Union[pulumi.InvokeOptions, pulumi.InvokeOutputOptions]] = None) -> pulumi.Output[BuildStackScopedPermissionsResult]:
     """
-    Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named stack. The `stackId` is the stack's opaque Pulumi Cloud identifier — distinct from the `organization/project/stack` triple. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls the output of each helper.
+    Builds a permission descriptor that grants the supplied scopes or permission sets only on the named stack. The `stackId` is the stack's opaque Pulumi Cloud identifier — distinct from the `organization/project/stack` triple. The result is directly assignable to `OrganizationRole.permissions` or `api.Role.details`. To combine several grants in one descriptor, pass the output of each helper to `buildGroupPermissions`.
 
     :param Sequence[_builtins.str] permissions: The set of `stack:*` scopes to grant on the target stack (e.g. `stack:read`, `stack:edit`, `stack:admin`). Discover valid scope names via the `getOrganizationRoleScopes` data source.
+    :param Sequence[_builtins.str] set_ids: The IDs of the permission sets to grant on the target stack. Set exactly one of `permissions` or `setIds`. `permissions` grants the scopes inline. `setIds` grants the referenced permission sets (`api.Role` with `uxPurpose: set`), which is the shape Pulumi Cloud uses for policies (`api.Role` with `uxPurpose: policy`).
     :param _builtins.str stack_id: The target stack's opaque Pulumi Cloud identifier (not the `organization/project/stack` triple).
     """
     __args__ = dict()
     __args__['permissions'] = permissions
+    __args__['setIds'] = set_ids
     __args__['stackId'] = stack_id
     opts = pulumi.InvokeOutputOptions.merge(_utilities.get_invoke_opts_defaults(), opts)
     __ret__ = pulumi.runtime.invoke_output('pulumiservice:index:buildStackScopedPermissions', __args__, opts=opts, typ=BuildStackScopedPermissionsResult)

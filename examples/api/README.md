@@ -93,7 +93,7 @@ representation lives in the language files directly.
 | policy-packs        | 1 × PolicyPack | preview-only — Create returns an upload URL we don't POST against |
 | environments        | 1 × Environment_esc + 2 × RevisionTag_esc | preview-only — CreateEnvironment returns empty 200 (no /id) |
 | approval-rules      | 1 × PolicyGroup | preview-only — same as policy-groups |
-| rbac                | 1 × Role + 1 × Team | preview-only |
+| rbac                | 4 × Role (2 sets, 1 policy, 1 role) + 1 × Team | full E2E |
 | schedules           | 1 × ScheduledDeployment + 1 × EnvironmentSchedule | preview-only — depends on DeploymentSettings idField |
 | stack               | 1 × Stack | preview-only — CreateStack response is `{messages}`-only |
 | deployment-settings | 1 × DeploymentSettings | preview-only — singleton, no /id in response |

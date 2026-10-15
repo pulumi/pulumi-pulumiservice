@@ -12,19 +12,19 @@ namespace Pulumi.PulumiService
     public static class BuildInsightsAccountScopedPermissions
     {
         /// <summary>
-        /// Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named insights account. Pair with `InsightsAccount.insightsAccountId` (or the `getInsightsAccount` data source). The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls the output of each helper.
+        /// Builds a permission descriptor that grants the supplied scopes or permission sets only on the named insights account. Pair with `InsightsAccount.insightsAccountId` (or the `getInsightsAccount` data source). The result is directly assignable to `OrganizationRole.permissions` or `api.Role.details`. To combine several grants in one descriptor, pass the output of each helper to `buildGroupPermissions`.
         /// </summary>
         public static Task<BuildInsightsAccountScopedPermissionsResult> InvokeAsync(BuildInsightsAccountScopedPermissionsArgs args, InvokeOptions? options = null)
             => global::Pulumi.Deployment.Instance.InvokeAsync<BuildInsightsAccountScopedPermissionsResult>("pulumiservice:index:buildInsightsAccountScopedPermissions", args ?? new BuildInsightsAccountScopedPermissionsArgs(), options.WithDefaults());
 
         /// <summary>
-        /// Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named insights account. Pair with `InsightsAccount.insightsAccountId` (or the `getInsightsAccount` data source). The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls the output of each helper.
+        /// Builds a permission descriptor that grants the supplied scopes or permission sets only on the named insights account. Pair with `InsightsAccount.insightsAccountId` (or the `getInsightsAccount` data source). The result is directly assignable to `OrganizationRole.permissions` or `api.Role.details`. To combine several grants in one descriptor, pass the output of each helper to `buildGroupPermissions`.
         /// </summary>
         public static Output<BuildInsightsAccountScopedPermissionsResult> Invoke(BuildInsightsAccountScopedPermissionsInvokeArgs args, InvokeOptions? options = null)
             => global::Pulumi.Deployment.Instance.Invoke<BuildInsightsAccountScopedPermissionsResult>("pulumiservice:index:buildInsightsAccountScopedPermissions", args ?? new BuildInsightsAccountScopedPermissionsInvokeArgs(), options.WithDefaults());
 
         /// <summary>
-        /// Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named insights account. Pair with `InsightsAccount.insightsAccountId` (or the `getInsightsAccount` data source). The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls the output of each helper.
+        /// Builds a permission descriptor that grants the supplied scopes or permission sets only on the named insights account. Pair with `InsightsAccount.insightsAccountId` (or the `getInsightsAccount` data source). The result is directly assignable to `OrganizationRole.permissions` or `api.Role.details`. To combine several grants in one descriptor, pass the output of each helper to `buildGroupPermissions`.
         /// </summary>
         public static Output<BuildInsightsAccountScopedPermissionsResult> Invoke(BuildInsightsAccountScopedPermissionsInvokeArgs args, InvokeOutputOptions options)
             => global::Pulumi.Deployment.Instance.Invoke<BuildInsightsAccountScopedPermissionsResult>("pulumiservice:index:buildInsightsAccountScopedPermissions", args ?? new BuildInsightsAccountScopedPermissionsInvokeArgs(), options.WithDefaults());
@@ -39,7 +39,7 @@ namespace Pulumi.PulumiService
         [Input("insightsAccountId", required: true)]
         public string InsightsAccountId { get; set; } = null!;
 
-        [Input("permissions", required: true)]
+        [Input("permissions")]
         private List<string>? _permissions;
 
         /// <summary>
@@ -49,6 +49,18 @@ namespace Pulumi.PulumiService
         {
             get => _permissions ?? (_permissions = new List<string>());
             set => _permissions = value;
+        }
+
+        [Input("setIds")]
+        private List<string>? _setIds;
+
+        /// <summary>
+        /// The IDs of the permission sets to grant on the target insights account. Set exactly one of `permissions` or `setIds`. `permissions` grants the scopes inline. `setIds` grants the referenced permission sets (`api.Role` with `uxPurpose: set`), which is the shape Pulumi Cloud uses for policies (`api.Role` with `uxPurpose: policy`).
+        /// </summary>
+        public List<string> SetIds
+        {
+            get => _setIds ?? (_setIds = new List<string>());
+            set => _setIds = value;
         }
 
         public BuildInsightsAccountScopedPermissionsArgs()
@@ -65,7 +77,7 @@ namespace Pulumi.PulumiService
         [Input("insightsAccountId", required: true)]
         public Input<string> InsightsAccountId { get; set; } = null!;
 
-        [Input("permissions", required: true)]
+        [Input("permissions")]
         private InputList<string>? _permissions;
 
         /// <summary>
@@ -75,6 +87,18 @@ namespace Pulumi.PulumiService
         {
             get => _permissions ?? (_permissions = new InputList<string>());
             set => _permissions = value;
+        }
+
+        [Input("setIds")]
+        private InputList<string>? _setIds;
+
+        /// <summary>
+        /// The IDs of the permission sets to grant on the target insights account. Set exactly one of `permissions` or `setIds`. `permissions` grants the scopes inline. `setIds` grants the referenced permission sets (`api.Role` with `uxPurpose: set`), which is the shape Pulumi Cloud uses for policies (`api.Role` with `uxPurpose: policy`).
+        /// </summary>
+        public InputList<string> SetIds
+        {
+            get => _setIds ?? (_setIds = new InputList<string>());
+            set => _setIds = value;
         }
 
         public BuildInsightsAccountScopedPermissionsInvokeArgs()
@@ -88,7 +112,7 @@ namespace Pulumi.PulumiService
     public sealed class BuildInsightsAccountScopedPermissionsResult
     {
         /// <summary>
-        /// A `PermissionDescriptorCondition` tree gating a `PermissionDescriptorAllow` on the named insights account, ready to assign to `OrganizationRole.permissions`.
+        /// A `PermissionDescriptorCondition` tree gating the grant on the named insights account.
         /// </summary>
         public readonly ImmutableDictionary<string, object> Permissions;
 
