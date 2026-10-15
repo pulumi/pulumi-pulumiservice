@@ -195,7 +195,7 @@ import javax.annotation.Nullable;
  * 
  *         final var orgReadOnly = PulumiserviceFunctions.getOrganizationPermissionSet(GetOrganizationPermissionSetArgs.builder()
  *             .organizationName(organizationName)
- *             .defaultIdentifier(BuiltInPermissionSet.OrgSettingsReadOnly)
+ *             .name("Read Only")
  *             .build());
  * 
  *         final var stackWrite = PulumiserviceFunctions.getOrganizationPermissionSet(GetOrganizationPermissionSetArgs.builder()

@@ -8,7 +8,7 @@ import * as enums from "./types/enums";
 import * as utilities from "./utilities";
 
 /**
- * Looks up a permission set in an organization by built-in identifier or by name. Use it to grant built-in permission sets, such as "Stack Read" (`stack-read`) or "Read Only" (`org-settings-read-only`), through `buildRolePermissions`: pass its `permissionSetId` and `resourceType` in `permissionSets`. Exactly one of `defaultIdentifier` or `name` must be set.
+ * Looks up a permission set in an organization by built-in identifier or by name. Use it to grant built-in permission sets, such as "Stack Read" (`stack-read`), through `buildRolePermissions`: pass its `permissionSetId` and `resourceType` in `permissionSets`. Exactly one of `defaultIdentifier` or `name` must be set.
  */
 export function getOrganizationPermissionSet(args: GetOrganizationPermissionSetArgs, opts?: pulumi.InvokeOptions): Promise<GetOrganizationPermissionSetResult> {
     opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts || {});
@@ -57,7 +57,7 @@ export interface GetOrganizationPermissionSetResult {
     readonly resourceType: string;
 }
 /**
- * Looks up a permission set in an organization by built-in identifier or by name. Use it to grant built-in permission sets, such as "Stack Read" (`stack-read`) or "Read Only" (`org-settings-read-only`), through `buildRolePermissions`: pass its `permissionSetId` and `resourceType` in `permissionSets`. Exactly one of `defaultIdentifier` or `name` must be set.
+ * Looks up a permission set in an organization by built-in identifier or by name. Use it to grant built-in permission sets, such as "Stack Read" (`stack-read`), through `buildRolePermissions`: pass its `permissionSetId` and `resourceType` in `permissionSets`. Exactly one of `defaultIdentifier` or `name` must be set.
  */
 export function getOrganizationPermissionSetOutput(args: GetOrganizationPermissionSetOutputArgs, opts?: pulumi.InvokeOutputOptions): pulumi.Output<GetOrganizationPermissionSetResult> {
     opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts || {});

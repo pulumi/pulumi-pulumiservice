@@ -156,18 +156,6 @@ namespace Pulumi.PulumiService
         /// </summary>
         public static BuiltInPermissionSet InsightsAccountWrite { get; } = new BuiltInPermissionSet("insights-account-write");
         /// <summary>
-        /// Organization Settings Billing (global): Billing access.
-        /// </summary>
-        public static BuiltInPermissionSet OrgSettingsBilling { get; } = new BuiltInPermissionSet("org-settings-billing");
-        /// <summary>
-        /// Read Only (global): View-only org access: usage, members, stacks, environments, teams, Insights accounts; read deployments, integrations, services, templates, and resources. No create/update/delete.
-        /// </summary>
-        public static BuiltInPermissionSet OrgSettingsReadOnly { get; } = new BuiltInPermissionSet("org-settings-read-only");
-        /// <summary>
-        /// Standard (global): View org usage and members; list stacks, environments, teams, and Insights accounts; use deployments, integrations, services, and resources; create resources (stacks, environments, teams, Insights accounts). Excludes billing and member or org admin settings.
-        /// </summary>
-        public static BuiltInPermissionSet OrgSettingsStandard { get; } = new BuiltInPermissionSet("org-settings-standard");
-        /// <summary>
         /// Stack Admin (stack): Admin access to stacks, including deployment settings.
         /// </summary>
         public static BuiltInPermissionSet StackAdmin { get; } = new BuiltInPermissionSet("stack-admin");

@@ -100,7 +100,7 @@ def get_organization_permission_set(default_identifier: Optional['BuiltInPermiss
                                     organization_name: Optional[_builtins.str] = None,
                                     opts: Optional[pulumi.InvokeOptions] = None) -> AwaitableGetOrganizationPermissionSetResult:
     """
-    Looks up a permission set in an organization by built-in identifier or by name. Use it to grant built-in permission sets, such as "Stack Read" (`stack-read`) or "Read Only" (`org-settings-read-only`), through `buildRolePermissions`: pass its `permissionSetId` and `resourceType` in `permissionSets`. Exactly one of `defaultIdentifier` or `name` must be set.
+    Looks up a permission set in an organization by built-in identifier or by name. Use it to grant built-in permission sets, such as "Stack Read" (`stack-read`), through `buildRolePermissions`: pass its `permissionSetId` and `resourceType` in `permissionSets`. Exactly one of `defaultIdentifier` or `name` must be set.
 
     :param 'BuiltInPermissionSet' default_identifier: The built-in permission set's identifier, such as `stack-read`.
     :param _builtins.str name: The permission set's display name.
@@ -124,7 +124,7 @@ def get_organization_permission_set_output(default_identifier: pulumi.Input[Opti
                                            organization_name: pulumi.Input[Optional[_builtins.str]] = None,
                                            opts: Optional[Union[pulumi.InvokeOptions, pulumi.InvokeOutputOptions]] = None) -> pulumi.Output[GetOrganizationPermissionSetResult]:
     """
-    Looks up a permission set in an organization by built-in identifier or by name. Use it to grant built-in permission sets, such as "Stack Read" (`stack-read`) or "Read Only" (`org-settings-read-only`), through `buildRolePermissions`: pass its `permissionSetId` and `resourceType` in `permissionSets`. Exactly one of `defaultIdentifier` or `name` must be set.
+    Looks up a permission set in an organization by built-in identifier or by name. Use it to grant built-in permission sets, such as "Stack Read" (`stack-read`), through `buildRolePermissions`: pass its `permissionSetId` and `resourceType` in `permissionSets`. Exactly one of `defaultIdentifier` or `name` must be set.
 
     :param 'BuiltInPermissionSet' default_identifier: The built-in permission set's identifier, such as `stack-read`.
     :param _builtins.str name: The permission set's display name.

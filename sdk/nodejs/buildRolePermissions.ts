@@ -39,7 +39,7 @@ export interface BuildRolePermissionsArgs {
      */
     insightsAccountRules?: inputs.RoleInsightsAccountRule[];
     /**
-     * Organization-level (`global`) permission sets to grant, such as the built-in `org-settings-read-only` set from `getOrganizationPermissionSet`.
+     * Organization-level (`global`) permission sets to grant, such as the built-in "Read Only" set from `getOrganizationPermissionSet`.
      */
     organizationPermissionSets?: inputs.RolePermissionSetRef[];
     /**
@@ -90,7 +90,7 @@ export interface BuildRolePermissionsOutputArgs {
      */
     insightsAccountRules?: pulumi.Input<pulumi.Input<inputs.RoleInsightsAccountRuleArgs>[] | undefined>;
     /**
-     * Organization-level (`global`) permission sets to grant, such as the built-in `org-settings-read-only` set from `getOrganizationPermissionSet`.
+     * Organization-level (`global`) permission sets to grant, such as the built-in "Read Only" set from `getOrganizationPermissionSet`.
      */
     organizationPermissionSets?: pulumi.Input<pulumi.Input<inputs.RolePermissionSetRefArgs>[] | undefined>;
     /**

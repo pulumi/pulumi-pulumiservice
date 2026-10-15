@@ -579,12 +579,6 @@ const (
 	BuiltInPermissionSetInsightsAccountRead = BuiltInPermissionSet("insights-account-read")
 	// Account Write (insights-account): Read/write access to insights accounts.
 	BuiltInPermissionSetInsightsAccountWrite = BuiltInPermissionSet("insights-account-write")
-	// Organization Settings Billing (global): Billing access.
-	BuiltInPermissionSetOrgSettingsBilling = BuiltInPermissionSet("org-settings-billing")
-	// Read Only (global): View-only org access: usage, members, stacks, environments, teams, Insights accounts; read deployments, integrations, services, templates, and resources. No create/update/delete.
-	BuiltInPermissionSetOrgSettingsReadOnly = BuiltInPermissionSet("org-settings-read-only")
-	// Standard (global): View org usage and members; list stacks, environments, teams, and Insights accounts; use deployments, integrations, services, and resources; create resources (stacks, environments, teams, Insights accounts). Excludes billing and member or org admin settings.
-	BuiltInPermissionSetOrgSettingsStandard = BuiltInPermissionSet("org-settings-standard")
 	// Stack Admin (stack): Admin access to stacks, including deployment settings.
 	BuiltInPermissionSetStackAdmin = BuiltInPermissionSet("stack-admin")
 	// Stack Read (stack): Read access to stacks, including deployment settings.
@@ -722,9 +716,6 @@ func (o BuiltInPermissionSetPtrOutput) ToStringPtrOutputWithContext(ctx context.
 //	BuiltInPermissionSetInsightsAccountAdmin
 //	BuiltInPermissionSetInsightsAccountRead
 //	BuiltInPermissionSetInsightsAccountWrite
-//	BuiltInPermissionSetOrgSettingsBilling
-//	BuiltInPermissionSetOrgSettingsReadOnly
-//	BuiltInPermissionSetOrgSettingsStandard
 //	BuiltInPermissionSetStackAdmin
 //	BuiltInPermissionSetStackRead
 //	BuiltInPermissionSetStackWrite

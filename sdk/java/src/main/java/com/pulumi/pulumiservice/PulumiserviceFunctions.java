@@ -606,35 +606,35 @@ public final class PulumiserviceFunctions {
         return Deployment.getInstance().invokeAsync("pulumiservice:index:getOrganizationMembers", TypeShape.of(GetOrganizationMembersResult.class), args, Utilities.withVersion(options));
     }
     /**
-     * Looks up a permission set in an organization by built-in identifier or by name. Use it to grant built-in permission sets, such as &#34;Stack Read&#34; (`stack-read`) or &#34;Read Only&#34; (`org-settings-read-only`), through `buildRolePermissions`: pass its `permissionSetId` and `resourceType` in `permissionSets`. Exactly one of `defaultIdentifier` or `name` must be set.
+     * Looks up a permission set in an organization by built-in identifier or by name. Use it to grant built-in permission sets, such as &#34;Stack Read&#34; (`stack-read`), through `buildRolePermissions`: pass its `permissionSetId` and `resourceType` in `permissionSets`. Exactly one of `defaultIdentifier` or `name` must be set.
      * 
      */
     public static Output<GetOrganizationPermissionSetResult> getOrganizationPermissionSet(GetOrganizationPermissionSetArgs args) {
         return getOrganizationPermissionSet(args, InvokeOptions.Empty);
     }
     /**
-     * Looks up a permission set in an organization by built-in identifier or by name. Use it to grant built-in permission sets, such as &#34;Stack Read&#34; (`stack-read`) or &#34;Read Only&#34; (`org-settings-read-only`), through `buildRolePermissions`: pass its `permissionSetId` and `resourceType` in `permissionSets`. Exactly one of `defaultIdentifier` or `name` must be set.
+     * Looks up a permission set in an organization by built-in identifier or by name. Use it to grant built-in permission sets, such as &#34;Stack Read&#34; (`stack-read`), through `buildRolePermissions`: pass its `permissionSetId` and `resourceType` in `permissionSets`. Exactly one of `defaultIdentifier` or `name` must be set.
      * 
      */
     public static CompletableFuture<GetOrganizationPermissionSetResult> getOrganizationPermissionSetPlain(GetOrganizationPermissionSetPlainArgs args) {
         return getOrganizationPermissionSetPlain(args, InvokeOptions.Empty);
     }
     /**
-     * Looks up a permission set in an organization by built-in identifier or by name. Use it to grant built-in permission sets, such as &#34;Stack Read&#34; (`stack-read`) or &#34;Read Only&#34; (`org-settings-read-only`), through `buildRolePermissions`: pass its `permissionSetId` and `resourceType` in `permissionSets`. Exactly one of `defaultIdentifier` or `name` must be set.
+     * Looks up a permission set in an organization by built-in identifier or by name. Use it to grant built-in permission sets, such as &#34;Stack Read&#34; (`stack-read`), through `buildRolePermissions`: pass its `permissionSetId` and `resourceType` in `permissionSets`. Exactly one of `defaultIdentifier` or `name` must be set.
      * 
      */
     public static Output<GetOrganizationPermissionSetResult> getOrganizationPermissionSet(GetOrganizationPermissionSetArgs args, InvokeOptions options) {
         return Deployment.getInstance().invoke("pulumiservice:index:getOrganizationPermissionSet", TypeShape.of(GetOrganizationPermissionSetResult.class), args, Utilities.withVersion(options));
     }
     /**
-     * Looks up a permission set in an organization by built-in identifier or by name. Use it to grant built-in permission sets, such as &#34;Stack Read&#34; (`stack-read`) or &#34;Read Only&#34; (`org-settings-read-only`), through `buildRolePermissions`: pass its `permissionSetId` and `resourceType` in `permissionSets`. Exactly one of `defaultIdentifier` or `name` must be set.
+     * Looks up a permission set in an organization by built-in identifier or by name. Use it to grant built-in permission sets, such as &#34;Stack Read&#34; (`stack-read`), through `buildRolePermissions`: pass its `permissionSetId` and `resourceType` in `permissionSets`. Exactly one of `defaultIdentifier` or `name` must be set.
      * 
      */
     public static Output<GetOrganizationPermissionSetResult> getOrganizationPermissionSet(GetOrganizationPermissionSetArgs args, InvokeOutputOptions options) {
         return Deployment.getInstance().invoke("pulumiservice:index:getOrganizationPermissionSet", TypeShape.of(GetOrganizationPermissionSetResult.class), args, Utilities.withVersion(options));
     }
     /**
-     * Looks up a permission set in an organization by built-in identifier or by name. Use it to grant built-in permission sets, such as &#34;Stack Read&#34; (`stack-read`) or &#34;Read Only&#34; (`org-settings-read-only`), through `buildRolePermissions`: pass its `permissionSetId` and `resourceType` in `permissionSets`. Exactly one of `defaultIdentifier` or `name` must be set.
+     * Looks up a permission set in an organization by built-in identifier or by name. Use it to grant built-in permission sets, such as &#34;Stack Read&#34; (`stack-read`), through `buildRolePermissions`: pass its `permissionSetId` and `resourceType` in `permissionSets`. Exactly one of `defaultIdentifier` or `name` must be set.
      * 
      */
     public static CompletableFuture<GetOrganizationPermissionSetResult> getOrganizationPermissionSetPlain(GetOrganizationPermissionSetPlainArgs args, InvokeOptions options) {

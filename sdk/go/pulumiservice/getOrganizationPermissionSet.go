@@ -11,7 +11,7 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
-// Looks up a permission set in an organization by built-in identifier or by name. Use it to grant built-in permission sets, such as "Stack Read" (`stack-read`) or "Read Only" (`org-settings-read-only`), through `buildRolePermissions`: pass its `permissionSetId` and `resourceType` in `permissionSets`. Exactly one of `defaultIdentifier` or `name` must be set.
+// Looks up a permission set in an organization by built-in identifier or by name. Use it to grant built-in permission sets, such as "Stack Read" (`stack-read`), through `buildRolePermissions`: pass its `permissionSetId` and `resourceType` in `permissionSets`. Exactly one of `defaultIdentifier` or `name` must be set.
 func GetOrganizationPermissionSet(ctx *pulumi.Context, args *GetOrganizationPermissionSetArgs, opts ...pulumi.InvokeOption) (*GetOrganizationPermissionSetResult, error) {
 	opts = internal.PkgInvokeDefaultOpts(opts)
 	var rv GetOrganizationPermissionSetResult

@@ -68,14 +68,14 @@ public final class BuildRolePermissionsPlainArgs extends com.pulumi.resources.In
     }
 
     /**
-     * Organization-level (`global`) permission sets to grant, such as the built-in `org-settings-read-only` set from `getOrganizationPermissionSet`.
+     * Organization-level (`global`) permission sets to grant, such as the built-in &#34;Read Only&#34; set from `getOrganizationPermissionSet`.
      * 
      */
     @Import(name="organizationPermissionSets")
     private @Nullable List<RolePermissionSetRef> organizationPermissionSets;
 
     /**
-     * @return Organization-level (`global`) permission sets to grant, such as the built-in `org-settings-read-only` set from `getOrganizationPermissionSet`.
+     * @return Organization-level (`global`) permission sets to grant, such as the built-in &#34;Read Only&#34; set from `getOrganizationPermissionSet`.
      * 
      */
     public Optional<List<RolePermissionSetRef>> organizationPermissionSets() {
@@ -205,7 +205,7 @@ public final class BuildRolePermissionsPlainArgs extends com.pulumi.resources.In
         }
 
         /**
-         * @param organizationPermissionSets Organization-level (`global`) permission sets to grant, such as the built-in `org-settings-read-only` set from `getOrganizationPermissionSet`.
+         * @param organizationPermissionSets Organization-level (`global`) permission sets to grant, such as the built-in &#34;Read Only&#34; set from `getOrganizationPermissionSet`.
          * 
          * @return builder
          * 
@@ -216,7 +216,7 @@ public final class BuildRolePermissionsPlainArgs extends com.pulumi.resources.In
         }
 
         /**
-         * @param organizationPermissionSets Organization-level (`global`) permission sets to grant, such as the built-in `org-settings-read-only` set from `getOrganizationPermissionSet`.
+         * @param organizationPermissionSets Organization-level (`global`) permission sets to grant, such as the built-in &#34;Read Only&#34; set from `getOrganizationPermissionSet`.
          * 
          * @return builder
          * 

@@ -306,7 +306,7 @@ class OrganizationRole(pulumi.CustomResource):
                 },
             ])
         org_read_only = pulumiservice.get_organization_permission_set_output(organization_name=organization_name,
-            default_identifier=pulumiservice.BuiltInPermissionSet.ORG_SETTINGS_READ_ONLY)
+            name="Read Only")
         stack_write = pulumiservice.get_organization_permission_set_output(organization_name=organization_name,
             default_identifier=pulumiservice.BuiltInPermissionSet.STACK_WRITE)
         environment_read = pulumiservice.get_organization_permission_set_output(organization_name=organization_name,
@@ -544,7 +544,7 @@ class OrganizationRole(pulumi.CustomResource):
                 },
             ])
         org_read_only = pulumiservice.get_organization_permission_set_output(organization_name=organization_name,
-            default_identifier=pulumiservice.BuiltInPermissionSet.ORG_SETTINGS_READ_ONLY)
+            name="Read Only")
         stack_write = pulumiservice.get_organization_permission_set_output(organization_name=organization_name,
             default_identifier=pulumiservice.BuiltInPermissionSet.STACK_WRITE)
         environment_read = pulumiservice.get_organization_permission_set_output(organization_name=organization_name,

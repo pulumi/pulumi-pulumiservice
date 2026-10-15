@@ -63,7 +63,7 @@ def build_role_permissions(additional_entries: Optional[Sequence[Mapping[str, An
     :param Sequence[Mapping[str, Any]] additional_entries: Further descriptors to include in the role, in the Pulumi Cloud wire format, for grants the rules can't express. For example, `{__type: "PermissionDescriptorAllow", permissions: ["agent_task:read"]}` grants a scope the enums don't list yet. Scopes the provider doesn't recognize at all, including misspelled ones, are silently removed rather than rejected.
     :param Sequence[Union['RoleEnvironmentRule', 'RoleEnvironmentRuleDict']] environment_rules: Grants on ESC environments.
     :param Sequence[Union['RoleInsightsAccountRule', 'RoleInsightsAccountRuleDict']] insights_account_rules: Grants on cloud accounts (`InsightsAccount`).
-    :param Sequence[Union['RolePermissionSetRef', 'RolePermissionSetRefDict']] organization_permission_sets: Organization-level (`global`) permission sets to grant, such as the built-in `org-settings-read-only` set from `getOrganizationPermissionSet`.
+    :param Sequence[Union['RolePermissionSetRef', 'RolePermissionSetRefDict']] organization_permission_sets: Organization-level (`global`) permission sets to grant, such as the built-in "Read Only" set from `getOrganizationPermissionSet`.
     :param Sequence['RbacOrganizationScope'] organization_scopes: Organization-level scopes to grant (e.g. `team:read`).
     :param Sequence[Union['RoleStackRule', 'RoleStackRuleDict']] stack_rules: Grants on stacks.
     """
@@ -94,7 +94,7 @@ def build_role_permissions_output(additional_entries: pulumi.Input[Optional[Opti
     :param Sequence[Mapping[str, Any]] additional_entries: Further descriptors to include in the role, in the Pulumi Cloud wire format, for grants the rules can't express. For example, `{__type: "PermissionDescriptorAllow", permissions: ["agent_task:read"]}` grants a scope the enums don't list yet. Scopes the provider doesn't recognize at all, including misspelled ones, are silently removed rather than rejected.
     :param Sequence[Union['RoleEnvironmentRule', 'RoleEnvironmentRuleDict']] environment_rules: Grants on ESC environments.
     :param Sequence[Union['RoleInsightsAccountRule', 'RoleInsightsAccountRuleDict']] insights_account_rules: Grants on cloud accounts (`InsightsAccount`).
-    :param Sequence[Union['RolePermissionSetRef', 'RolePermissionSetRefDict']] organization_permission_sets: Organization-level (`global`) permission sets to grant, such as the built-in `org-settings-read-only` set from `getOrganizationPermissionSet`.
+    :param Sequence[Union['RolePermissionSetRef', 'RolePermissionSetRefDict']] organization_permission_sets: Organization-level (`global`) permission sets to grant, such as the built-in "Read Only" set from `getOrganizationPermissionSet`.
     :param Sequence['RbacOrganizationScope'] organization_scopes: Organization-level scopes to grant (e.g. `team:read`).
     :param Sequence[Union['RoleStackRule', 'RoleStackRuleDict']] stack_rules: Grants on stacks.
     """

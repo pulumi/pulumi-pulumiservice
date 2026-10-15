@@ -31,7 +31,7 @@ type BuildRolePermissionsArgs struct {
 	EnvironmentRules []RoleEnvironmentRule `pulumi:"environmentRules"`
 	// Grants on cloud accounts (`InsightsAccount`).
 	InsightsAccountRules []RoleInsightsAccountRule `pulumi:"insightsAccountRules"`
-	// Organization-level (`global`) permission sets to grant, such as the built-in `org-settings-read-only` set from `getOrganizationPermissionSet`.
+	// Organization-level (`global`) permission sets to grant, such as the built-in "Read Only" set from `getOrganizationPermissionSet`.
 	OrganizationPermissionSets []RolePermissionSetRef `pulumi:"organizationPermissionSets"`
 	// Organization-level scopes to grant (e.g. `team:read`).
 	OrganizationScopes []RbacOrganizationScope `pulumi:"organizationScopes"`
@@ -56,7 +56,7 @@ type BuildRolePermissionsOutputArgs struct {
 	EnvironmentRules RoleEnvironmentRuleArrayInput `pulumi:"environmentRules"`
 	// Grants on cloud accounts (`InsightsAccount`).
 	InsightsAccountRules RoleInsightsAccountRuleArrayInput `pulumi:"insightsAccountRules"`
-	// Organization-level (`global`) permission sets to grant, such as the built-in `org-settings-read-only` set from `getOrganizationPermissionSet`.
+	// Organization-level (`global`) permission sets to grant, such as the built-in "Read Only" set from `getOrganizationPermissionSet`.
 	OrganizationPermissionSets RolePermissionSetRefArrayInput `pulumi:"organizationPermissionSets"`
 	// Organization-level scopes to grant (e.g. `team:read`).
 	OrganizationScopes RbacOrganizationScopeArrayInput `pulumi:"organizationScopes"`

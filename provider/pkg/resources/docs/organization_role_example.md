@@ -137,7 +137,7 @@ const platformPermissions = pulumiservice.buildRolePermissionsOutput({
 });
 const orgReadOnly = pulumiservice.getOrganizationPermissionSetOutput({
     organizationName: organizationName,
-    defaultIdentifier: pulumiservice.BuiltInPermissionSet.OrgSettingsReadOnly,
+    name: "Read Only",
 });
 const stackWrite = pulumiservice.getOrganizationPermissionSetOutput({
     organizationName: organizationName,
@@ -333,7 +333,7 @@ platform_permissions = pulumiservice.build_role_permissions_output(organization_
         },
     ])
 org_read_only = pulumiservice.get_organization_permission_set_output(organization_name=organization_name,
-    default_identifier=pulumiservice.BuiltInPermissionSet.ORG_SETTINGS_READ_ONLY)
+    name="Read Only")
 stack_write = pulumiservice.get_organization_permission_set_output(organization_name=organization_name,
     default_identifier=pulumiservice.BuiltInPermissionSet.STACK_WRITE)
 environment_read = pulumiservice.get_organization_permission_set_output(organization_name=organization_name,
@@ -558,8 +558,8 @@ func main() {
 			},
 		}, nil)
 		orgReadOnly := pulumiservice.GetOrganizationPermissionSetOutput(ctx, pulumiservice.GetOrganizationPermissionSetOutputArgs{
-			OrganizationName:  pulumi.String(organizationName),
-			DefaultIdentifier: pulumiservice.BuiltInPermissionSetOrgSettingsReadOnly,
+			OrganizationName: pulumi.String(organizationName),
+			Name:             pulumi.String("Read Only"),
 		}, nil)
 		stackWrite := pulumiservice.GetOrganizationPermissionSetOutput(ctx, pulumiservice.GetOrganizationPermissionSetOutputArgs{
 			OrganizationName:  pulumi.String(organizationName),
@@ -874,7 +874,7 @@ return await Deployment.RunAsync(() =>
     var orgReadOnly = PulumiService.GetOrganizationPermissionSet.Invoke(new()
     {
         OrganizationName = organizationName,
-        DefaultIdentifier = PulumiService.BuiltInPermissionSet.OrgSettingsReadOnly,
+        Name = "Read Only",
     });
 
     var stackWrite = PulumiService.GetOrganizationPermissionSet.Invoke(new()
@@ -1166,7 +1166,7 @@ public class App {
 
         final var orgReadOnly = PulumiserviceFunctions.getOrganizationPermissionSet(GetOrganizationPermissionSetArgs.builder()
             .organizationName(organizationName)
-            .defaultIdentifier(BuiltInPermissionSet.OrgSettingsReadOnly)
+            .name("Read Only")
             .build());
 
         final var stackWrite = PulumiserviceFunctions.getOrganizationPermissionSet(GetOrganizationPermissionSetArgs.builder()
@@ -1367,7 +1367,7 @@ variables:
       function: pulumiservice:getOrganizationPermissionSet
       arguments:
         organizationName: ${organizationName}
-        defaultIdentifier: org-settings-read-only
+        name: Read Only
   stackWrite:
     fn::invoke:
       function: pulumiservice:getOrganizationPermissionSet

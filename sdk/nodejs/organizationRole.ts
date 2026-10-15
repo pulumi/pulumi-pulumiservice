@@ -149,7 +149,7 @@ import * as utilities from "./utilities";
  * });
  * const orgReadOnly = pulumiservice.getOrganizationPermissionSetOutput({
  *     organizationName: organizationName,
- *     defaultIdentifier: pulumiservice.BuiltInPermissionSet.OrgSettingsReadOnly,
+ *     name: "Read Only",
  * });
  * const stackWrite = pulumiservice.getOrganizationPermissionSetOutput({
  *     organizationName: organizationName,

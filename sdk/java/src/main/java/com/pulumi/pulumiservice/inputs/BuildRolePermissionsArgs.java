@@ -69,14 +69,14 @@ public final class BuildRolePermissionsArgs extends com.pulumi.resources.InvokeA
     }
 
     /**
-     * Organization-level (`global`) permission sets to grant, such as the built-in `org-settings-read-only` set from `getOrganizationPermissionSet`.
+     * Organization-level (`global`) permission sets to grant, such as the built-in &#34;Read Only&#34; set from `getOrganizationPermissionSet`.
      * 
      */
     @Import(name="organizationPermissionSets")
     private @Nullable Output<List<RolePermissionSetRefArgs>> organizationPermissionSets;
 
     /**
-     * @return Organization-level (`global`) permission sets to grant, such as the built-in `org-settings-read-only` set from `getOrganizationPermissionSet`.
+     * @return Organization-level (`global`) permission sets to grant, such as the built-in &#34;Read Only&#34; set from `getOrganizationPermissionSet`.
      * 
      */
     public Optional<Output<List<RolePermissionSetRefArgs>>> organizationPermissionSets() {
@@ -236,7 +236,7 @@ public final class BuildRolePermissionsArgs extends com.pulumi.resources.InvokeA
         }
 
         /**
-         * @param organizationPermissionSets Organization-level (`global`) permission sets to grant, such as the built-in `org-settings-read-only` set from `getOrganizationPermissionSet`.
+         * @param organizationPermissionSets Organization-level (`global`) permission sets to grant, such as the built-in &#34;Read Only&#34; set from `getOrganizationPermissionSet`.
          * 
          * @return builder
          * 
@@ -247,7 +247,7 @@ public final class BuildRolePermissionsArgs extends com.pulumi.resources.InvokeA
         }
 
         /**
-         * @param organizationPermissionSets Organization-level (`global`) permission sets to grant, such as the built-in `org-settings-read-only` set from `getOrganizationPermissionSet`.
+         * @param organizationPermissionSets Organization-level (`global`) permission sets to grant, such as the built-in &#34;Read Only&#34; set from `getOrganizationPermissionSet`.
          * 
          * @return builder
          * 
@@ -257,7 +257,7 @@ public final class BuildRolePermissionsArgs extends com.pulumi.resources.InvokeA
         }
 
         /**
-         * @param organizationPermissionSets Organization-level (`global`) permission sets to grant, such as the built-in `org-settings-read-only` set from `getOrganizationPermissionSet`.
+         * @param organizationPermissionSets Organization-level (`global`) permission sets to grant, such as the built-in &#34;Read Only&#34; set from `getOrganizationPermissionSet`.
          * 
          * @return builder
          * 

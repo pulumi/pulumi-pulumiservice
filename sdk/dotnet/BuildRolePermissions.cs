@@ -79,7 +79,7 @@ namespace Pulumi.PulumiService
         private List<Inputs.RolePermissionSetRef>? _organizationPermissionSets;
 
         /// <summary>
-        /// Organization-level (`global`) permission sets to grant, such as the built-in `org-settings-read-only` set from `getOrganizationPermissionSet`.
+        /// Organization-level (`global`) permission sets to grant, such as the built-in "Read Only" set from `getOrganizationPermissionSet`.
         /// </summary>
         public List<Inputs.RolePermissionSetRef> OrganizationPermissionSets
         {
@@ -159,7 +159,7 @@ namespace Pulumi.PulumiService
         private InputList<Inputs.RolePermissionSetRefArgs>? _organizationPermissionSets;
 
         /// <summary>
-        /// Organization-level (`global`) permission sets to grant, such as the built-in `org-settings-read-only` set from `getOrganizationPermissionSet`.
+        /// Organization-level (`global`) permission sets to grant, such as the built-in "Read Only" set from `getOrganizationPermissionSet`.
         /// </summary>
         public InputList<Inputs.RolePermissionSetRefArgs> OrganizationPermissionSets
         {

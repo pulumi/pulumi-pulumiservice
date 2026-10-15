@@ -234,7 +234,7 @@ namespace Pulumi.PulumiService
     ///     var orgReadOnly = PulumiService.GetOrganizationPermissionSet.Invoke(new()
     ///     {
     ///         OrganizationName = organizationName,
-    ///         DefaultIdentifier = PulumiService.BuiltInPermissionSet.OrgSettingsReadOnly,
+    ///         Name = "Read Only",
     ///     });
     /// 
     ///     var stackWrite = PulumiService.GetOrganizationPermissionSet.Invoke(new()

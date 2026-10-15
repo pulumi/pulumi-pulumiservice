@@ -194,8 +194,8 @@ import (
 //				},
 //			}, nil)
 //			orgReadOnly := pulumiservice.GetOrganizationPermissionSetOutput(ctx, pulumiservice.GetOrganizationPermissionSetOutputArgs{
-//				OrganizationName:  pulumi.String(organizationName),
-//				DefaultIdentifier: pulumiservice.BuiltInPermissionSetOrgSettingsReadOnly,
+//				OrganizationName: pulumi.String(organizationName),
+//				Name:             pulumi.String("Read Only"),
 //			}, nil)
 //			stackWrite := pulumiservice.GetOrganizationPermissionSetOutput(ctx, pulumiservice.GetOrganizationPermissionSetOutputArgs{
 //				OrganizationName:  pulumi.String(organizationName),

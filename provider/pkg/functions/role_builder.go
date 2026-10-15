@@ -195,7 +195,7 @@ func (BuildRolePermissionsFunction) Annotate(a infer.Annotator) {
 func (i *BuildRolePermissionsInput) Annotate(a infer.Annotator) {
 	a.Describe(&i.OrganizationScopes, "Organization-level scopes to grant (e.g. `team:read`).")
 	a.Describe(&i.OrganizationPermissionSets, "Organization-level (`global`) permission sets to grant, such "+
-		"as the built-in `org-settings-read-only` set from `getOrganizationPermissionSet`.")
+		"as the built-in \"Read Only\" set from `getOrganizationPermissionSet`.")
 	a.Describe(&i.StackRules, "Grants on stacks.")
 	a.Describe(&i.EnvironmentRules, "Grants on ESC environments.")
 	a.Describe(&i.InsightsAccountRules, "Grants on cloud accounts (`InsightsAccount`).")

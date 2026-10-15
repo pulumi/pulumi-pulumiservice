@@ -134,7 +134,9 @@ func scopeEnums(in string) map[string][]scope {
 
 // permissionSets reads the built-in permission sets, sorted by identifier.
 // Each member's description leads with the set's display name, as the
-// Pulumi Cloud console shows it.
+// Pulumi Cloud console shows it. Sets the Pulumi Cloud SDK's
+// DefaultIdentifier doesn't list yet are skipped, like scopes in
+// bucketScopes; bump the SDK and regenerate to pick them up.
 func permissionSets(in string) []scope {
 	raw, err := os.ReadFile(in)
 	if err != nil {
@@ -149,6 +151,11 @@ func permissionSets(in string) []scope {
 	}
 	sets := make([]scope, 0, len(catalog))
 	for _, s := range catalog {
+		if !apitype.DefaultIdentifier(s.DefaultIdentifier).IsValid() {
+			fmt.Fprintf(os.Stderr, "gen-rbac-scopes: skipping permission set %q: not in the Pulumi Cloud SDK yet\n",
+				s.DefaultIdentifier)
+			continue
+		}
 		if _, ok := enumTypes[s.ResourceType]; !ok {
 			fail("permission set %q has unknown entity type %q; add it to enumTypes",
 				s.DefaultIdentifier, s.ResourceType)

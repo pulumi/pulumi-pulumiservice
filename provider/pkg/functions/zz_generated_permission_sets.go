@@ -13,9 +13,6 @@ const (
 	BuiltInPermissionSetInsightsAccountAdmin BuiltInPermissionSet = "insights-account-admin"
 	BuiltInPermissionSetInsightsAccountRead  BuiltInPermissionSet = "insights-account-read"
 	BuiltInPermissionSetInsightsAccountWrite BuiltInPermissionSet = "insights-account-write"
-	BuiltInPermissionSetOrgSettingsBilling   BuiltInPermissionSet = "org-settings-billing"
-	BuiltInPermissionSetOrgSettingsReadOnly  BuiltInPermissionSet = "org-settings-read-only"
-	BuiltInPermissionSetOrgSettingsStandard  BuiltInPermissionSet = "org-settings-standard"
 	BuiltInPermissionSetStackAdmin           BuiltInPermissionSet = "stack-admin"
 	BuiltInPermissionSetStackRead            BuiltInPermissionSet = "stack-read"
 	BuiltInPermissionSetStackWrite           BuiltInPermissionSet = "stack-write"
@@ -29,9 +26,6 @@ var builtInPermissionSetValues = []infer.EnumValue[BuiltInPermissionSet]{
 	{Name: "InsightsAccountAdmin", Value: BuiltInPermissionSetInsightsAccountAdmin, Description: "Account Admin (insights-account): Admin access to insights accounts."},
 	{Name: "InsightsAccountRead", Value: BuiltInPermissionSetInsightsAccountRead, Description: "Account Read (insights-account): Read access to insights accounts."},
 	{Name: "InsightsAccountWrite", Value: BuiltInPermissionSetInsightsAccountWrite, Description: "Account Write (insights-account): Read/write access to insights accounts."},
-	{Name: "OrgSettingsBilling", Value: BuiltInPermissionSetOrgSettingsBilling, Description: "Organization Settings Billing (global): Billing access."},
-	{Name: "OrgSettingsReadOnly", Value: BuiltInPermissionSetOrgSettingsReadOnly, Description: "Read Only (global): View-only org access: usage, members, stacks, environments, teams, Insights accounts; read deployments, integrations, services, templates, and resources. No create/update/delete."},
-	{Name: "OrgSettingsStandard", Value: BuiltInPermissionSetOrgSettingsStandard, Description: "Standard (global): View org usage and members; list stacks, environments, teams, and Insights accounts; use deployments, integrations, services, and resources; create resources (stacks, environments, teams, Insights accounts). Excludes billing and member or org admin settings."},
 	{Name: "StackAdmin", Value: BuiltInPermissionSetStackAdmin, Description: "Stack Admin (stack): Admin access to stacks, including deployment settings."},
 	{Name: "StackRead", Value: BuiltInPermissionSetStackRead, Description: "Stack Read (stack): Read access to stacks, including deployment settings."},
 	{Name: "StackWrite", Value: BuiltInPermissionSetStackWrite, Description: "Stack Write (stack): Read/write access to stacks, including deployment settings."},

@@ -119,7 +119,7 @@ variables:
       function: pulumiservice:getOrganizationPermissionSet
       arguments:
         organizationName: ${organizationName}
-        defaultIdentifier: org-settings-read-only
+        name: Read Only
   stackWrite:
     fn::invoke:
       function: pulumiservice:getOrganizationPermissionSet

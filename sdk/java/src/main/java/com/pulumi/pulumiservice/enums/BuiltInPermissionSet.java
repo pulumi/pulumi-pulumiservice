@@ -46,21 +46,6 @@ import java.util.StringJoiner;
          */
         InsightsAccountWrite("insights-account-write"),
         /**
-         * Organization Settings Billing (global): Billing access.
-         * 
-         */
-        OrgSettingsBilling("org-settings-billing"),
-        /**
-         * Read Only (global): View-only org access: usage, members, stacks, environments, teams, Insights accounts; read deployments, integrations, services, templates, and resources. No create/update/delete.
-         * 
-         */
-        OrgSettingsReadOnly("org-settings-read-only"),
-        /**
-         * Standard (global): View org usage and members; list stacks, environments, teams, and Insights accounts; use deployments, integrations, services, and resources; create resources (stacks, environments, teams, Insights accounts). Excludes billing and member or org admin settings.
-         * 
-         */
-        OrgSettingsStandard("org-settings-standard"),
-        /**
          * Stack Admin (stack): Admin access to stacks, including deployment settings.
          * 
          */
