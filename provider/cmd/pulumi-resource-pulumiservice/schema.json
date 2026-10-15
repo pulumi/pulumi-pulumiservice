@@ -758,6 +758,21 @@
         "virtualAdmin"
       ]
     },
+    "pulumiservice:index:PolicyGroupMatchRule": {
+      "properties": {
+        "conditions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/types/pulumiservice:index:PolicyGroupTagCondition"
+          },
+          "description": "Tag conditions that must all hold for the rule to match. At least one is required."
+        }
+      },
+      "type": "object",
+      "required": [
+        "conditions"
+      ]
+    },
     "pulumiservice:index:PolicyGroupPolicyPackReference": {
       "description": "A reference to a policy pack within a policy group.",
       "properties": {
@@ -834,6 +849,51 @@
       "required": [
         "name",
         "routingProject"
+      ]
+    },
+    "pulumiservice:index:PolicyGroupTagCondition": {
+      "properties": {
+        "key": {
+          "type": "string",
+          "description": "The tag key."
+        },
+        "operator": {
+          "$ref": "#/types/pulumiservice:index:PolicyGroupTagOperator",
+          "description": "How the tag is compared. Defaults to `equals`."
+        },
+        "value": {
+          "type": "string",
+          "description": "The tag value. Required with `equals` and `notEquals`, and not allowed with `exists` and `notExists`."
+        }
+      },
+      "type": "object",
+      "required": [
+        "key"
+      ]
+    },
+    "pulumiservice:index:PolicyGroupTagOperator": {
+      "type": "string",
+      "enum": [
+        {
+          "name": "Equals",
+          "description": "The tag is set to `value`.",
+          "value": "equals"
+        },
+        {
+          "name": "NotEquals",
+          "description": "The tag isn't set to `value`. Also matches entities that don't have the tag.",
+          "value": "notEquals"
+        },
+        {
+          "name": "Exists",
+          "description": "The entity has the tag, with any value.",
+          "value": "exists"
+        },
+        {
+          "name": "NotExists",
+          "description": "The entity doesn't have the tag.",
+          "value": "notExists"
+        }
       ]
     },
     "pulumiservice:index:PolicyPackComplianceFrameworkInput": {
@@ -6993,6 +7053,39 @@
     }
   },
   "functions": {
+    "pulumiservice:index:buildAccountMatchRule": {
+      "description": "Builds a policy group's Insights account match rule from tag rules, without writing Pulumi Cloud's expression format by hand. Use the result as a policy group's `accountMatchRule`. Pulumi Cloud adds the accounts the rule matches to the group, alongside the accounts added individually, and keeps membership up to date as account tags change. Only `audit` policy groups support account rules. Match rules are a preview feature of Pulumi Cloud.",
+      "inputs": {
+        "properties": {
+          "rules": {
+            "type": "array",
+            "items": {
+              "$ref": "#/types/pulumiservice:index:PolicyGroupMatchRule"
+            },
+            "description": "The rules. An entity matches if it matches any rule."
+          }
+        },
+        "type": "object",
+        "required": [
+          "rules"
+        ]
+      },
+      "outputs": {
+        "properties": {
+          "matchRule": {
+            "additionalProperties": {
+              "$ref": "pulumi.json#/Any"
+            },
+            "description": "The match rule, as the Pulumi Cloud expression a policy group's match rule field takes.",
+            "type": "object"
+          }
+        },
+        "required": [
+          "matchRule"
+        ],
+        "type": "object"
+      }
+    },
     "pulumiservice:index:buildAllowPermissions": {
       "description": "Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes globally — i.e. on every entity of the matching resource type. This is the simplest descriptor: a flat `PermissionDescriptorAllow`. Use this helper instead of hand-authoring the descriptor literal so the wire-format `__type` discriminator stays an implementation detail. For grants scoped to a specific entity, see `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, or `buildInsightsAccountScopedPermissions`. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls the output of each helper.",
       "inputs": {
@@ -7098,6 +7191,39 @@
         },
         "required": [
           "permissions"
+        ],
+        "type": "object"
+      }
+    },
+    "pulumiservice:index:buildStackMatchRule": {
+      "description": "Builds a policy group's stack match rule from tag rules, without writing Pulumi Cloud's expression format by hand. Use the result as a policy group's `stackMatchRule`. Pulumi Cloud adds the stacks the rule matches to the group, alongside the stacks added individually, and keeps membership up to date as stack tags change. Match rules are a preview feature of Pulumi Cloud.",
+      "inputs": {
+        "properties": {
+          "rules": {
+            "type": "array",
+            "items": {
+              "$ref": "#/types/pulumiservice:index:PolicyGroupMatchRule"
+            },
+            "description": "The rules. An entity matches if it matches any rule."
+          }
+        },
+        "type": "object",
+        "required": [
+          "rules"
+        ]
+      },
+      "outputs": {
+        "properties": {
+          "matchRule": {
+            "additionalProperties": {
+              "$ref": "pulumi.json#/Any"
+            },
+            "description": "The match rule, as the Pulumi Cloud expression a policy group's match rule field takes.",
+            "type": "object"
+          }
+        },
+        "required": [
+          "matchRule"
         ],
         "type": "object"
       }

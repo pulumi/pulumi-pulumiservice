@@ -56,10 +56,14 @@ __all__ = [
     'OperationContextOIDCArgsDict',
     'OperationContextOptionsArgs',
     'OperationContextOptionsArgsDict',
+    'PolicyGroupMatchRule',
+    'PolicyGroupMatchRuleDict',
     'PolicyGroupPolicyPackReferenceInputArgs',
     'PolicyGroupPolicyPackReferenceInputArgsDict',
     'PolicyGroupStackReferenceArgs',
     'PolicyGroupStackReferenceArgsDict',
+    'PolicyGroupTagCondition',
+    'PolicyGroupTagConditionDict',
     'PolicyPackComplianceFrameworkInputArgs',
     'PolicyPackComplianceFrameworkInputArgsDict',
     'PolicyPackPolicyInputArgs',
@@ -1731,6 +1735,34 @@ class OperationContextOptionsArgs:
         pulumi.set(self, "skip_intermediate_deployments", value)
 
 
+class PolicyGroupMatchRuleDict(TypedDict):
+    conditions: Sequence['PolicyGroupTagConditionDict']
+    """
+    Tag conditions that must all hold for the rule to match. At least one is required.
+    """
+
+@pulumi.input_type
+class PolicyGroupMatchRule:
+    def __init__(__self__, *,
+                 conditions: Sequence['PolicyGroupTagCondition']):
+        """
+        :param Sequence['PolicyGroupTagCondition'] conditions: Tag conditions that must all hold for the rule to match. At least one is required.
+        """
+        pulumi.set(__self__, "conditions", conditions)
+
+    @_builtins.property
+    @pulumi.getter
+    def conditions(self) -> Sequence['PolicyGroupTagCondition']:
+        """
+        Tag conditions that must all hold for the rule to match. At least one is required.
+        """
+        return pulumi.get(self, "conditions")
+
+    @conditions.setter
+    def conditions(self, value: Sequence['PolicyGroupTagCondition']):
+        pulumi.set(self, "conditions", value)
+
+
 class PolicyGroupPolicyPackReferenceInputArgsDict(TypedDict):
     """
     A reference to a policy pack within a policy group (input).
@@ -1874,6 +1906,74 @@ class PolicyGroupStackReferenceArgs:
     @routing_project.setter
     def routing_project(self, value: pulumi.Input[_builtins.str]):
         pulumi.set(self, "routing_project", value)
+
+
+class PolicyGroupTagConditionDict(TypedDict):
+    key: _builtins.str
+    """
+    The tag key.
+    """
+    operator: NotRequired['PolicyGroupTagOperator']
+    """
+    How the tag is compared. Defaults to `equals`.
+    """
+    value: NotRequired[_builtins.str]
+    """
+    The tag value. Required with `equals` and `notEquals`, and not allowed with `exists` and `notExists`.
+    """
+
+@pulumi.input_type
+class PolicyGroupTagCondition:
+    def __init__(__self__, *,
+                 key: _builtins.str,
+                 operator: Optional['PolicyGroupTagOperator'] = None,
+                 value: Optional[_builtins.str] = None):
+        """
+        :param _builtins.str key: The tag key.
+        :param 'PolicyGroupTagOperator' operator: How the tag is compared. Defaults to `equals`.
+        :param _builtins.str value: The tag value. Required with `equals` and `notEquals`, and not allowed with `exists` and `notExists`.
+        """
+        pulumi.set(__self__, "key", key)
+        if operator is not None:
+            pulumi.set(__self__, "operator", operator)
+        if value is not None:
+            pulumi.set(__self__, "value", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def key(self) -> _builtins.str:
+        """
+        The tag key.
+        """
+        return pulumi.get(self, "key")
+
+    @key.setter
+    def key(self, value: _builtins.str):
+        pulumi.set(self, "key", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def operator(self) -> Optional['PolicyGroupTagOperator']:
+        """
+        How the tag is compared. Defaults to `equals`.
+        """
+        return pulumi.get(self, "operator")
+
+    @operator.setter
+    def operator(self, value: Optional['PolicyGroupTagOperator']):
+        pulumi.set(self, "operator", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def value(self) -> Optional[_builtins.str]:
+        """
+        The tag value. Required with `equals` and `notEquals`, and not allowed with `exists` and `notExists`.
+        """
+        return pulumi.get(self, "value")
+
+    @value.setter
+    def value(self, value: Optional[_builtins.str]):
+        pulumi.set(self, "value", value)
 
 
 class PolicyPackComplianceFrameworkInputArgsDict(TypedDict):

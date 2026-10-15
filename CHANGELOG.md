@@ -5,6 +5,7 @@
 ### Improvements
 
 - Documented that `OrgAccessToken` must be created and deleted by a provider authenticated as a user, for example with a personal access token. Pulumi Cloud rejects organization and team access tokens, even Admin ones, with `403 Machine tokens are not allowed to perform this operation`. `TeamAccessToken` has no such restriction. No behavior change. [#1112](https://github.com/pulumi/pulumi-pulumiservice/issues/1112)
+- Added the `buildStackMatchRule` and `buildAccountMatchRule` functions, which build a policy group's stack or Insights account match rule from tag rules, without writing Pulumi Cloud's `__type` expression format by hand. An entity matches if it matches any rule, and a rule matches when all of its conditions hold. Each condition compares one tag with `equals`, `notEquals`, `exists`, or `notExists`. Match rules are a preview feature of Pulumi Cloud. [#1172](https://github.com/pulumi/pulumi-pulumiservice/pull/1172)
 
 ### Bug Fixes
 

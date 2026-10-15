@@ -99,6 +99,27 @@ export const EnvironmentPermission = {
 
 export type EnvironmentPermission = (typeof EnvironmentPermission)[keyof typeof EnvironmentPermission];
 
+export const PolicyGroupTagOperator = {
+    /**
+     * The tag is set to `value`.
+     */
+    Equals: "equals",
+    /**
+     * The tag isn't set to `value`. Also matches entities that don't have the tag.
+     */
+    NotEquals: "notEquals",
+    /**
+     * The entity has the tag, with any value.
+     */
+    Exists: "exists",
+    /**
+     * The entity doesn't have the tag.
+     */
+    NotExists: "notExists",
+} as const;
+
+export type PolicyGroupTagOperator = (typeof PolicyGroupTagOperator)[keyof typeof PolicyGroupTagOperator];
+
 export const PulumiOperation = {
     /**
      * Analogous to `pulumi up` command.

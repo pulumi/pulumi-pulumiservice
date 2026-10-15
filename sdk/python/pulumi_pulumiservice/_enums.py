@@ -12,6 +12,7 @@ __all__ = [
     'AuthPolicyTokenType',
     'CloudProvider',
     'EnvironmentPermission',
+    'PolicyGroupTagOperator',
     'PulumiOperation',
     'RbacPermission',
     'ScanSchedule',
@@ -112,6 +113,26 @@ class EnvironmentPermission(_builtins.str, Enum):
     ADMIN = "admin"
     """
     Permission for all operations on the environment.
+    """
+
+
+@pulumi.type_token("pulumiservice:index:PolicyGroupTagOperator")
+class PolicyGroupTagOperator(_builtins.str, Enum):
+    EQUALS = "equals"
+    """
+    The tag is set to `value`.
+    """
+    NOT_EQUALS = "notEquals"
+    """
+    The tag isn't set to `value`. Also matches entities that don't have the tag.
+    """
+    EXISTS = "exists"
+    """
+    The entity has the tag, with any value.
+    """
+    NOT_EXISTS = "notExists"
+    """
+    The entity doesn't have the tag.
     """
 
 
