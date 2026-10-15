@@ -20,6 +20,8 @@ import (
 	"sort"
 	"strings"
 
+	_ "embed"
+
 	"github.com/pulumi/pulumi-cloud-sdk/go/apitype"
 	"github.com/pulumi/pulumi-go-provider/infer"
 
@@ -28,48 +30,12 @@ import (
 
 // The examples use the docs `{{% examples %}}` shortcodes, which SDK
 // generation and the registry render per language.
-const getOrganizationRoleExamples = "{{% examples %}}\n## Example Usage\n\n" +
-	"{{% example %}}\n### Look up a role you defined\n\n" +
-	"```typescript\n" +
-	`import * as pulumiservice from "@pulumi/pulumiservice";
-
-// A custom role managed in the Pulumi Cloud console.
-// The name must match exactly (case-sensitive).
-const ciDeployerRole = pulumiservice.getOrganizationRoleOutput({
-    organizationName: "my-org",
-    name: "CI Deployer",
-});
-
-// Assign it to a team without hardcoding the role ID.
-const platformTeamRole = new pulumiservice.TeamRoleAssignment("platform-team-role", {
-    organizationName: "my-org",
-    teamName: "platform",
-    roleId: ciDeployerRole.roleId,
-});
-` + "```\n{{% /example %}}\n\n" +
-	"{{% example %}}\n### Look up a built-in role\n\n" +
-	"```typescript\n" +
-	`import * as pulumiservice from "@pulumi/pulumiservice";
-
-const adminRole = pulumiservice.getOrganizationRoleOutput({
-    organizationName: "my-org",
-    name: "Admin",
-});
-
-export const adminRoleId = adminRole.roleId;
-` + "```\n{{% /example %}}\n{{% /examples %}}"
-
-const getOrganizationRolesExamples = "{{% examples %}}\n## Example Usage\n\n" +
-	"{{% example %}}\n### List all roles\n\n" +
-	"```typescript\n" +
-	`import * as pulumiservice from "@pulumi/pulumiservice";
-
-const allRoles = pulumiservice.getOrganizationRolesOutput({ organizationName: "my-org" });
-
-// Map each role name to its ID.
-export const roleIdsByName = allRoles.roles.apply(roles =>
-    Object.fromEntries(roles.map(r => [r.name, r.roleId])));
-` + "```\n{{% /example %}}\n{{% /examples %}}"
+var (
+	//go:embed get_organization_role_examples.md
+	getOrganizationRoleExamples string
+	//go:embed get_organization_roles_examples.md
+	getOrganizationRolesExamples string
+)
 
 // orgRoleUXPurpose is the uxPurpose that selects the roles shown on the
 // Roles page of the Pulumi Cloud console: the built-in roles plus the org's
