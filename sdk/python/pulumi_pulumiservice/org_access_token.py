@@ -30,10 +30,10 @@ class OrgAccessTokenArgs:
 
         :param pulumi.Input[_builtins.str] name: The name for the token.
         :param pulumi.Input[_builtins.str] organization_name: The organization's name.
-        :param pulumi.Input[_builtins.bool] admin: Whether the token has the Admin role. Defaults to `false`. Can't be `true` when `roleId` is set.
+        :param pulumi.Input[_builtins.bool] admin: Whether the token has the Admin role. Defaults to `false`. Mutually exclusive with `roleId`: set `admin: true` or `roleId`, not both.
         :param pulumi.Input[_builtins.str] description: A description of the token.
-        :param pulumi.Input[_builtins.str] expires: When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`, or a date such as `2027-06-30`, which means midnight UTC at the start of that day. Must be in the future and no more than two years away. Omit it for a token that never expires.
-        :param pulumi.Input[_builtins.str] role_id: The ID of the role to assign to the token. Use `getOrganizationRole` to look up a role's ID by its name. Can't be combined with `admin: true`. When neither is set, the token gets the Member role.
+        :param pulumi.Input[_builtins.str] expires: When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`. Omit it for a token that never expires. Pulumi Cloud rejects an expiry that is in the past, more than two years away, or beyond the organization's maximum token lifetime.
+        :param pulumi.Input[_builtins.str] role_id: The ID of the role to assign to the token. Use `getOrganizationRole` to look up a role's ID by its name. Mutually exclusive with `admin: true`: set one or the other, not both. Pulumi Cloud accepts both, but some of its permission checks still treat such a token as an Admin whatever its role, so the provider rejects the combination. When neither is set, the token gets the Member role.
         """
         pulumi.set(__self__, "name", name)
         pulumi.set(__self__, "organization_name", organization_name)
@@ -76,7 +76,7 @@ class OrgAccessTokenArgs:
     @pulumi.getter
     def admin(self) -> pulumi.Input[Optional[_builtins.bool]]:
         """
-        Whether the token has the Admin role. Defaults to `false`. Can't be `true` when `roleId` is set.
+        Whether the token has the Admin role. Defaults to `false`. Mutually exclusive with `roleId`: set `admin: true` or `roleId`, not both.
         """
         return pulumi.get(self, "admin")
 
@@ -100,7 +100,7 @@ class OrgAccessTokenArgs:
     @pulumi.getter
     def expires(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
-        When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`, or a date such as `2027-06-30`, which means midnight UTC at the start of that day. Must be in the future and no more than two years away. Omit it for a token that never expires.
+        When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`. Omit it for a token that never expires. Pulumi Cloud rejects an expiry that is in the past, more than two years away, or beyond the organization's maximum token lifetime.
         """
         return pulumi.get(self, "expires")
 
@@ -112,7 +112,7 @@ class OrgAccessTokenArgs:
     @pulumi.getter(name="roleId")
     def role_id(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
-        The ID of the role to assign to the token. Use `getOrganizationRole` to look up a role's ID by its name. Can't be combined with `admin: true`. When neither is set, the token gets the Member role.
+        The ID of the role to assign to the token. Use `getOrganizationRole` to look up a role's ID by its name. Mutually exclusive with `admin: true`: set one or the other, not both. Pulumi Cloud accepts both, but some of its permission checks still treat such a token as an Admin whatever its role, so the provider rejects the combination. When neither is set, the token gets the Member role.
         """
         return pulumi.get(self, "role_id")
 
@@ -163,12 +163,12 @@ class OrgAccessToken(pulumi.CustomResource):
 
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
-        :param pulumi.Input[_builtins.bool] admin: Whether the token has the Admin role. Defaults to `false`. Can't be `true` when `roleId` is set.
+        :param pulumi.Input[_builtins.bool] admin: Whether the token has the Admin role. Defaults to `false`. Mutually exclusive with `roleId`: set `admin: true` or `roleId`, not both.
         :param pulumi.Input[_builtins.str] description: A description of the token.
-        :param pulumi.Input[_builtins.str] expires: When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`, or a date such as `2027-06-30`, which means midnight UTC at the start of that day. Must be in the future and no more than two years away. Omit it for a token that never expires.
+        :param pulumi.Input[_builtins.str] expires: When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`. Omit it for a token that never expires. Pulumi Cloud rejects an expiry that is in the past, more than two years away, or beyond the organization's maximum token lifetime.
         :param pulumi.Input[_builtins.str] name: The name for the token.
         :param pulumi.Input[_builtins.str] organization_name: The organization's name.
-        :param pulumi.Input[_builtins.str] role_id: The ID of the role to assign to the token. Use `getOrganizationRole` to look up a role's ID by its name. Can't be combined with `admin: true`. When neither is set, the token gets the Member role.
+        :param pulumi.Input[_builtins.str] role_id: The ID of the role to assign to the token. Use `getOrganizationRole` to look up a role's ID by its name. Mutually exclusive with `admin: true`: set one or the other, not both. Pulumi Cloud accepts both, but some of its permission checks still treat such a token as an Admin whatever its role, so the provider rejects the combination. When neither is set, the token gets the Member role.
         """
         ...
     @overload
@@ -285,7 +285,7 @@ class OrgAccessToken(pulumi.CustomResource):
     @pulumi.getter
     def admin(self) -> pulumi.Output[_builtins.bool]:
         """
-        Whether the token has the Admin role. Defaults to `false`. Can't be `true` when `roleId` is set.
+        Whether the token has the Admin role. Defaults to `false`. Mutually exclusive with `roleId`: set `admin: true` or `roleId`, not both.
         """
         return pulumi.get(self, "admin")
 
@@ -301,7 +301,7 @@ class OrgAccessToken(pulumi.CustomResource):
     @pulumi.getter
     def expires(self) -> pulumi.Output[Optional[_builtins.str]]:
         """
-        When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`, or a date such as `2027-06-30`, which means midnight UTC at the start of that day. Must be in the future and no more than two years away. Omit it for a token that never expires.
+        When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`. Omit it for a token that never expires. Pulumi Cloud rejects an expiry that is in the past, more than two years away, or beyond the organization's maximum token lifetime.
         """
         return pulumi.get(self, "expires")
 
@@ -325,7 +325,7 @@ class OrgAccessToken(pulumi.CustomResource):
     @pulumi.getter(name="roleId")
     def role_id(self) -> pulumi.Output[Optional[_builtins.str]]:
         """
-        The ID of the role to assign to the token. Use `getOrganizationRole` to look up a role's ID by its name. Can't be combined with `admin: true`. When neither is set, the token gets the Member role.
+        The ID of the role to assign to the token. Use `getOrganizationRole` to look up a role's ID by its name. Mutually exclusive with `admin: true`: set one or the other, not both. Pulumi Cloud accepts both, but some of its permission checks still treat such a token as an Admin whatever its role, so the provider rejects the combination. When neither is set, the token gets the Member role.
         """
         return pulumi.get(self, "role_id")
 

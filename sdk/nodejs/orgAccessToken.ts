@@ -59,7 +59,7 @@ export class OrgAccessToken extends pulumi.CustomResource {
     }
 
     /**
-     * Whether the token has the Admin role. Defaults to `false`. Can't be `true` when `roleId` is set.
+     * Whether the token has the Admin role. Defaults to `false`. Mutually exclusive with `roleId`: set `admin: true` or `roleId`, not both.
      */
     declare public readonly admin: pulumi.Output<boolean>;
     /**
@@ -67,7 +67,7 @@ export class OrgAccessToken extends pulumi.CustomResource {
      */
     declare public readonly description: pulumi.Output<string | undefined>;
     /**
-     * When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`, or a date such as `2027-06-30`, which means midnight UTC at the start of that day. Must be in the future and no more than two years away. Omit it for a token that never expires.
+     * When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`. Omit it for a token that never expires. Pulumi Cloud rejects an expiry that is in the past, more than two years away, or beyond the organization's maximum token lifetime.
      */
     declare public readonly expires: pulumi.Output<string | undefined>;
     /**
@@ -79,7 +79,7 @@ export class OrgAccessToken extends pulumi.CustomResource {
      */
     declare public readonly organizationName: pulumi.Output<string>;
     /**
-     * The ID of the role to assign to the token. Use `getOrganizationRole` to look up a role's ID by its name. Can't be combined with `admin: true`. When neither is set, the token gets the Member role.
+     * The ID of the role to assign to the token. Use `getOrganizationRole` to look up a role's ID by its name. Mutually exclusive with `admin: true`: set one or the other, not both. Pulumi Cloud accepts both, but some of its permission checks still treat such a token as an Admin whatever its role, so the provider rejects the combination. When neither is set, the token gets the Member role.
      */
     declare public readonly roleId: pulumi.Output<string | undefined>;
     /**
@@ -134,7 +134,7 @@ export class OrgAccessToken extends pulumi.CustomResource {
  */
 export interface OrgAccessTokenArgs {
     /**
-     * Whether the token has the Admin role. Defaults to `false`. Can't be `true` when `roleId` is set.
+     * Whether the token has the Admin role. Defaults to `false`. Mutually exclusive with `roleId`: set `admin: true` or `roleId`, not both.
      */
     admin?: pulumi.Input<boolean | undefined>;
     /**
@@ -142,7 +142,7 @@ export interface OrgAccessTokenArgs {
      */
     description?: pulumi.Input<string | undefined>;
     /**
-     * When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`, or a date such as `2027-06-30`, which means midnight UTC at the start of that day. Must be in the future and no more than two years away. Omit it for a token that never expires.
+     * When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`. Omit it for a token that never expires. Pulumi Cloud rejects an expiry that is in the past, more than two years away, or beyond the organization's maximum token lifetime.
      */
     expires?: pulumi.Input<string | undefined>;
     /**
@@ -154,7 +154,7 @@ export interface OrgAccessTokenArgs {
      */
     organizationName: pulumi.Input<string>;
     /**
-     * The ID of the role to assign to the token. Use `getOrganizationRole` to look up a role's ID by its name. Can't be combined with `admin: true`. When neither is set, the token gets the Member role.
+     * The ID of the role to assign to the token. Use `getOrganizationRole` to look up a role's ID by its name. Mutually exclusive with `admin: true`: set one or the other, not both. Pulumi Cloud accepts both, but some of its permission checks still treat such a token as an Admin whatever its role, so the provider rejects the combination. When neither is set, the token gets the Member role.
      */
     roleId?: pulumi.Input<string | undefined>;
 }

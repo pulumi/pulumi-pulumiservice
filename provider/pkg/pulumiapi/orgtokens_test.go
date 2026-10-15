@@ -54,21 +54,22 @@ func TestCreateOrgAccessToken(t *testing.T) {
 	desc := testOrgTokenDescription
 
 	t.Run("Happy Path", func(t *testing.T) {
+		req := CreateOrgAccessTokenRequest{
+			Name:        name,
+			Description: desc,
+		}
 		resp := createTokenResponse{
 			ID:         tokenIDKey,
 			TokenValue: secretKey,
 		}
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPost,
-			ExpectedReqBody: createOrgTokenRequest{
-				Description: desc,
-				Name:        name,
-			},
-			ExpectedReqPath: orgTokPath,
-			ResponseCode:    201,
-			ResponseBody:    resp,
+			ExpectedReqBody:   req,
+			ExpectedReqPath:   orgTokPath,
+			ResponseCode:      201,
+			ResponseBody:      resp,
 		})
-		token, err := c.CreateOrgAccessToken(teamCtx, name, orgName, desc, false, 0, "")
+		token, err := c.CreateOrgAccessToken(teamCtx, orgName, req)
 		assert.NoError(t, err)
 		assert.Equal(t, &AccessToken{
 			ID:          resp.ID,
@@ -78,22 +79,23 @@ func TestCreateOrgAccessToken(t *testing.T) {
 	})
 
 	t.Run("Admin token", func(t *testing.T) {
+		req := CreateOrgAccessTokenRequest{
+			Name:        name,
+			Description: desc,
+			Admin:       true,
+		}
 		resp := createTokenResponse{
 			ID:         tokenIDKey,
 			TokenValue: secretKey,
 		}
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPost,
-			ExpectedReqBody: createOrgTokenRequest{
-				Description: desc,
-				Name:        name,
-				Admin:       true,
-			},
-			ExpectedReqPath: orgTokPath,
-			ResponseCode:    201,
-			ResponseBody:    resp,
+			ExpectedReqBody:   req,
+			ExpectedReqPath:   orgTokPath,
+			ResponseCode:      201,
+			ResponseBody:      resp,
 		})
-		token, err := c.CreateOrgAccessToken(teamCtx, name, orgName, desc, true, 0, "")
+		token, err := c.CreateOrgAccessToken(teamCtx, orgName, req)
 		assert.NoError(t, err)
 		assert.Equal(t, &AccessToken{
 			ID:          resp.ID,
@@ -103,23 +105,24 @@ func TestCreateOrgAccessToken(t *testing.T) {
 	})
 
 	t.Run("Expiry and role", func(t *testing.T) {
+		req := CreateOrgAccessTokenRequest{
+			Name:        name,
+			Description: desc,
+			Expires:     1814374800,
+			RoleID:      testOrgTokenRoleID,
+		}
 		resp := createTokenResponse{
 			ID:         tokenIDKey,
 			TokenValue: secretKey,
 		}
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPost,
-			ExpectedReqBody: createOrgTokenRequest{
-				Description: desc,
-				Name:        name,
-				Expires:     1814374800,
-				RoleID:      testOrgTokenRoleID,
-			},
-			ExpectedReqPath: orgTokPath,
-			ResponseCode:    201,
-			ResponseBody:    resp,
+			ExpectedReqBody:   req,
+			ExpectedReqPath:   orgTokPath,
+			ResponseCode:      201,
+			ResponseBody:      resp,
 		})
-		token, err := c.CreateOrgAccessToken(teamCtx, name, orgName, desc, false, 1814374800, testOrgTokenRoleID)
+		token, err := c.CreateOrgAccessToken(teamCtx, orgName, req)
 		assert.NoError(t, err)
 		assert.Equal(t, &AccessToken{
 			ID:          resp.ID,
@@ -129,20 +132,21 @@ func TestCreateOrgAccessToken(t *testing.T) {
 	})
 
 	t.Run("Error", func(t *testing.T) {
+		req := CreateOrgAccessTokenRequest{
+			Name:        name,
+			Description: desc,
+		}
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPost,
 			ExpectedReqPath:   orgTokPath,
-			ExpectedReqBody: createOrgTokenRequest{
-				Description: desc,
-				Name:        name,
-			},
-			ResponseCode: 401,
+			ExpectedReqBody:   req,
+			ResponseCode:      401,
 			ResponseBody: ErrorResponse{
 				StatusCode: 401,
 				Message:    unauthorizedError,
 			},
 		})
-		token, err := c.CreateOrgAccessToken(teamCtx, name, orgName, desc, false, 0, "")
+		token, err := c.CreateOrgAccessToken(teamCtx, orgName, req)
 		assert.Nil(t, token, "token should be nil")
 		assert.EqualError(t,
 			err,

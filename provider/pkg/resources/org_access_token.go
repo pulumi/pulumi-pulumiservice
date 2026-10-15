@@ -20,168 +20,21 @@ import (
 	"strings"
 	"time"
 
+	_ "embed"
+
 	p "github.com/pulumi/pulumi-go-provider"
 	"github.com/pulumi/pulumi-go-provider/infer"
 	"github.com/pulumi/pulumi/sdk/v3/go/property"
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 )
 
 // The examples use the docs `{{% examples %}}` shortcodes, which SDK
 // generation and the registry render per language.
-const orgAccessTokenExamples = "{{% examples %}}\n## Example Usage\n\n" +
-	"{{% example %}}\n### Token with an expiry and a custom role\n\n" +
-	"```typescript\n" +
-	`import * as pulumiservice from "@pulumi/pulumiservice";
-
-const ciDeployerRole = pulumiservice.getOrganizationRoleOutput({
-    organizationName: "my-org",
-    name: "CI Deployer",
-});
-
-const ciToken = new pulumiservice.OrgAccessToken("ciToken", {
-    organizationName: "my-org",
-    name: "ci-token",
-    description: "Token for CI pipelines",
-    expires: "2027-06-30T17:00:00Z",
-    roleId: ciDeployerRole.roleId,
-});
-
-export const ciTokenValue = ciToken.value;
-` + "```\n" +
-	"```python\n" +
-	`import pulumi
-import pulumi_pulumiservice as pulumiservice
-
-ci_deployer_role = pulumiservice.get_organization_role_output(
-    organization_name="my-org",
-    name="CI Deployer",
-)
-
-ci_token = pulumiservice.OrgAccessToken("ciToken",
-    organization_name="my-org",
-    name="ci-token",
-    description="Token for CI pipelines",
-    expires="2027-06-30T17:00:00Z",
-    role_id=ci_deployer_role.role_id,
-)
-
-pulumi.export("ciTokenValue", ci_token.value)
-` + "```\n" +
-	"```go\n" +
-	`package main
-
-import (
-	"github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice"
-	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
-)
-
-func main() {
-	pulumi.Run(func(ctx *pulumi.Context) error {
-		ciDeployerRole := pulumiservice.LookupOrganizationRoleOutput(ctx, pulumiservice.LookupOrganizationRoleOutputArgs{
-			OrganizationName: pulumi.String("my-org"),
-			Name:             pulumi.String("CI Deployer"),
-		})
-
-		ciToken, err := pulumiservice.NewOrgAccessToken(ctx, "ciToken", &pulumiservice.OrgAccessTokenArgs{
-			OrganizationName: pulumi.String("my-org"),
-			Name:             pulumi.String("ci-token"),
-			Description:      pulumi.String("Token for CI pipelines"),
-			Expires:          pulumi.String("2027-06-30T17:00:00Z"),
-			RoleId:           ciDeployerRole.RoleId(),
-		})
-		if err != nil {
-			return err
-		}
-
-		ctx.Export("ciTokenValue", ciToken.Value)
-		return nil
-	})
-}
-` + "```\n" +
-	"```csharp\n" +
-	`using System.Collections.Generic;
-using Pulumi;
-using PulumiService = Pulumi.PulumiService;
-
-return await Deployment.RunAsync(() =>
-{
-    var ciDeployerRole = PulumiService.GetOrganizationRole.Invoke(new()
-    {
-        OrganizationName = "my-org",
-        Name = "CI Deployer",
-    });
-
-    var ciToken = new PulumiService.OrgAccessToken("ciToken", new()
-    {
-        OrganizationName = "my-org",
-        Name = "ci-token",
-        Description = "Token for CI pipelines",
-        Expires = "2027-06-30T17:00:00Z",
-        RoleId = ciDeployerRole.Apply(role => role.RoleId),
-    });
-
-    return new Dictionary<string, object?>
-    {
-        ["ciTokenValue"] = ciToken.Value,
-    };
-});
-` + "```\n" +
-	"```java\n" +
-	`package generated_program;
-
-import com.pulumi.Context;
-import com.pulumi.Pulumi;
-import com.pulumi.pulumiservice.OrgAccessToken;
-import com.pulumi.pulumiservice.OrgAccessTokenArgs;
-import com.pulumi.pulumiservice.PulumiserviceFunctions;
-import com.pulumi.pulumiservice.inputs.GetOrganizationRoleArgs;
-
-public class App {
-    public static void main(String[] args) {
-        Pulumi.run(App::stack);
-    }
-
-    public static void stack(Context ctx) {
-        final var ciDeployerRole = PulumiserviceFunctions.getOrganizationRole(GetOrganizationRoleArgs.builder()
-            .organizationName("my-org")
-            .name("CI Deployer")
-            .build());
-
-        var ciToken = new OrgAccessToken("ciToken", OrgAccessTokenArgs.builder()
-            .organizationName("my-org")
-            .name("ci-token")
-            .description("Token for CI pipelines")
-            .expires("2027-06-30T17:00:00Z")
-            .roleId(ciDeployerRole.applyValue(role -> role.roleId()))
-            .build());
-
-        ctx.export("ciTokenValue", ciToken.value());
-    }
-}
-` + "```\n" +
-	"```yaml\n" +
-	`variables:
-  ciDeployerRole:
-    fn::invoke:
-      function: pulumiservice:getOrganizationRole
-      arguments:
-        organizationName: my-org
-        name: CI Deployer
-
-resources:
-  ciToken:
-    type: pulumiservice:OrgAccessToken
-    properties:
-      organizationName: my-org
-      name: ci-token
-      description: Token for CI pipelines
-      expires: "2027-06-30T17:00:00Z"
-      roleId: ${ciDeployerRole.roleId}
-
-outputs:
-  ciTokenValue: ${ciToken.value}
-` + "```\n{{% /example %}}\n{{% /examples %}}"
+//
+//go:embed org_access_token_examples.md
+var orgAccessTokenExamples string
 
 type OrgAccessToken struct{}
 
@@ -222,19 +75,23 @@ func (i *OrgAccessTokenInput) Annotate(a infer.Annotator) {
 	a.Describe(&i.Description, "A description of the token.")
 	a.Describe(
 		&i.Admin,
-		"Whether the token has the Admin role. Defaults to `false`. Can't be `true` when `roleId` is set.",
+		"Whether the token has the Admin role. Defaults to `false`. Mutually exclusive with `roleId`: "+
+			"set `admin: true` or `roleId`, not both.",
 	)
 	a.SetDefault(&i.Admin, false)
 	a.Describe(
 		&i.Expires,
-		"When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`, or a date such as "+
-			"`2027-06-30`, which means midnight UTC at the start of that day. Must be in the future and no more "+
-			"than two years away. Omit it for a token that never expires.",
+		"When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`. Omit it for a "+
+			"token that never expires. Pulumi Cloud rejects an expiry that is in the past, more than two "+
+			"years away, or beyond the organization's maximum token lifetime.",
 	)
 	a.Describe(
 		&i.RoleID,
 		"The ID of the role to assign to the token. Use `getOrganizationRole` to look up a role's ID by its "+
-			"name. Can't be combined with `admin: true`. When neither is set, the token gets the Member role.",
+			"name. Mutually exclusive with `admin: true`: set one or the other, not both. Pulumi Cloud "+
+			"accepts both, but some of its permission checks still treat such a token as an Admin "+
+			"whatever its role, so the provider rejects the combination. When neither is set, the token "+
+			"gets the Member role.",
 	)
 }
 
@@ -256,29 +113,24 @@ func (*OrgAccessToken) Create(
 			Output: OrgAccessTokenState{OrgAccessTokenInput: req.Inputs},
 		}, nil
 	}
-	desc := ""
+	createReq := pulumiapi.CreateOrgAccessTokenRequest{Name: req.Inputs.Name}
 	if req.Inputs.Description != nil {
-		desc = *req.Inputs.Description
+		createReq.Description = *req.Inputs.Description
 	}
-	admin := false
 	if req.Inputs.Admin != nil {
-		admin = *req.Inputs.Admin
+		createReq.Admin = *req.Inputs.Admin
 	}
-	var expires int64
 	if req.Inputs.Expires != nil {
 		t, err := parseTokenExpiry(*req.Inputs.Expires)
 		if err != nil {
 			return infer.CreateResponse[OrgAccessTokenState]{}, err
 		}
-		expires = t.Unix()
+		createReq.Expires = t.Unix()
 	}
-	roleID := ""
 	if req.Inputs.RoleID != nil {
-		roleID = *req.Inputs.RoleID
+		createReq.RoleID = *req.Inputs.RoleID
 	}
-	token, err := config.GetClient(ctx).CreateOrgAccessToken(
-		ctx, req.Inputs.Name, req.Inputs.OrganizationName, desc, admin, expires, roleID,
-	)
+	token, err := config.GetClient(ctx).CreateOrgAccessToken(ctx, req.Inputs.OrganizationName, createReq)
 	if err != nil {
 		return infer.CreateResponse[OrgAccessTokenState]{}, fmt.Errorf(
 			"error creating org access token %q: %w", req.Inputs.Name, err,
@@ -352,25 +204,19 @@ func (*OrgAccessToken) Check(
 	}
 
 	if in.Expires != nil && !isUnknownInput(req.NewInputs, gcExpires) {
-		// Only range-check a new or changed value. An expiry that was valid
-		// when the token was created will eventually be in the past, and that
-		// must not make every later preview fail.
-		var old *string
-		if v, ok := req.OldInputs.GetOk(gcExpires); ok && v.IsString() {
-			s := v.AsString()
-			old = &s
-		}
-		changed := old == nil || *old != *in.Expires
-		if reason := checkTokenExpiry(*in.Expires, changed, tokenExpiryNow()); reason != "" {
-			failures = append(failures, p.CheckFailure{Property: gcExpires, Reason: reason})
+		if _, err := parseTokenExpiry(*in.Expires); err != nil {
+			failures = append(failures, p.CheckFailure{Property: gcExpires, Reason: err.Error()})
 		}
 	}
 
+	// Pulumi Cloud accepts admin together with a role, but some of its
+	// permission checks still elevate an admin token to Admin whatever the
+	// role says, so the two are mutually exclusive here.
 	if in.Admin != nil && *in.Admin && in.RoleID != nil && *in.RoleID != "" &&
-		!isUnknownInput(req.NewInputs, gcAdmin) {
+		!isUnknownInput(req.NewInputs, gcAdmin) && !isUnknownInput(req.NewInputs, gcRoleID) {
 		failures = append(failures, p.CheckFailure{
-			Property: gcRoleIDKey,
-			Reason:   "roleId can't be combined with admin: true; set one or the other",
+			Property: gcRoleID,
+			Reason:   "admin and roleId are mutually exclusive; set admin: true or roleId, not both",
 		})
 	}
 
@@ -415,61 +261,17 @@ func migrateOrgAccessTokenLegacyInputs(
 }
 
 const (
-	gcExpires   = "expires"
-	gcRoleIDKey = "roleId"
-
-	expiryDateLayout = "2006-01-02"
+	gcExpires = "expires"
+	gcRoleID  = "roleId"
 )
 
-// tokenExpiryMaxYears is the furthest ahead Pulumi Cloud lets a token expire.
-const tokenExpiryMaxYears = 2
-
-// tokenExpiryNow is a variable so tests can pin the clock.
-var tokenExpiryNow = time.Now
-
-// parseTokenExpiry accepts an RFC 3339 date-time or a YYYY-MM-DD date, which
-// it treats as midnight UTC.
 func parseTokenExpiry(s string) (time.Time, error) {
-	if t, err := time.Parse(time.RFC3339, s); err == nil {
-		return t, nil
-	}
-	if t, err := time.Parse(expiryDateLayout, s); err == nil {
-		return t, nil
-	}
-	return time.Time{}, fmt.Errorf(
-		"%q is not a valid expiry; use an RFC 3339 date-time such as \"2027-06-30T17:00:00Z\" "+
-			"or a date such as \"2027-06-30\"", s,
-	)
-}
-
-// checkTokenExpiry returns a failure reason, or "" when s is acceptable. The
-// range check only applies when checkRange is set.
-func checkTokenExpiry(s string, checkRange bool, now time.Time) string {
-	t, err := parseTokenExpiry(s)
+	t, err := time.Parse(time.RFC3339, s)
 	if err != nil {
-		return err.Error()
+		return time.Time{}, fmt.Errorf(
+			"%q is not a valid expiry; use an RFC 3339 date-time such as \"2027-06-30T17:00:00Z\"", s)
 	}
-	if !checkRange {
-		return ""
-	}
-	if !t.After(now) {
-		return fmt.Sprintf("expires %q is in the past", s)
-	}
-	if t.After(now.AddDate(tokenExpiryMaxYears, 0, 0)) {
-		return fmt.Sprintf("expires %q is more than %d years away, which Pulumi Cloud doesn't allow",
-			s, tokenExpiryMaxYears)
-	}
-	return ""
-}
-
-// formatTokenExpiry renders unix seconds as a date when the time is midnight
-// UTC, and as an RFC 3339 date-time otherwise.
-func formatTokenExpiry(epoch int64) string {
-	t := time.Unix(epoch, 0).UTC()
-	if t.Hour() == 0 && t.Minute() == 0 && t.Second() == 0 {
-		return t.Format(expiryDateLayout)
-	}
-	return t.Format(time.RFC3339)
+	return t, nil
 }
 
 // readTokenExpiry converts the API's expiry to the input value. When the prior
@@ -484,7 +286,7 @@ func readTokenExpiry(epoch int64, prior *string) *string {
 			return prior
 		}
 	}
-	s := formatTokenExpiry(epoch)
+	s := time.Unix(epoch, 0).UTC().Format(time.RFC3339)
 	return &s
 }
 

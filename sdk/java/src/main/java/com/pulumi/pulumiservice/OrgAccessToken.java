@@ -62,14 +62,14 @@ import javax.annotation.Nullable;
 @ResourceType(type="pulumiservice:index:OrgAccessToken")
 public class OrgAccessToken extends com.pulumi.resources.CustomResource {
     /**
-     * Whether the token has the Admin role. Defaults to `false`. Can&#39;t be `true` when `roleId` is set.
+     * Whether the token has the Admin role. Defaults to `false`. Mutually exclusive with `roleId`: set `admin: true` or `roleId`, not both.
      * 
      */
     @Export(name="admin", refs={Boolean.class}, tree="[0]")
     private Output<Boolean> admin;
 
     /**
-     * @return Whether the token has the Admin role. Defaults to `false`. Can&#39;t be `true` when `roleId` is set.
+     * @return Whether the token has the Admin role. Defaults to `false`. Mutually exclusive with `roleId`: set `admin: true` or `roleId`, not both.
      * 
      */
     public Output<Boolean> admin() {
@@ -90,14 +90,14 @@ public class OrgAccessToken extends com.pulumi.resources.CustomResource {
         return Codegen.optional(this.description);
     }
     /**
-     * When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`, or a date such as `2027-06-30`, which means midnight UTC at the start of that day. Must be in the future and no more than two years away. Omit it for a token that never expires.
+     * When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`. Omit it for a token that never expires. Pulumi Cloud rejects an expiry that is in the past, more than two years away, or beyond the organization&#39;s maximum token lifetime.
      * 
      */
     @Export(name="expires", refs={String.class}, tree="[0]")
     private Output</* @Nullable */ String> expires;
 
     /**
-     * @return When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`, or a date such as `2027-06-30`, which means midnight UTC at the start of that day. Must be in the future and no more than two years away. Omit it for a token that never expires.
+     * @return When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`. Omit it for a token that never expires. Pulumi Cloud rejects an expiry that is in the past, more than two years away, or beyond the organization&#39;s maximum token lifetime.
      * 
      */
     public Output<Optional<String>> expires() {
@@ -132,14 +132,14 @@ public class OrgAccessToken extends com.pulumi.resources.CustomResource {
         return this.organizationName;
     }
     /**
-     * The ID of the role to assign to the token. Use `getOrganizationRole` to look up a role&#39;s ID by its name. Can&#39;t be combined with `admin: true`. When neither is set, the token gets the Member role.
+     * The ID of the role to assign to the token. Use `getOrganizationRole` to look up a role&#39;s ID by its name. Mutually exclusive with `admin: true`: set one or the other, not both. Pulumi Cloud accepts both, but some of its permission checks still treat such a token as an Admin whatever its role, so the provider rejects the combination. When neither is set, the token gets the Member role.
      * 
      */
     @Export(name="roleId", refs={String.class}, tree="[0]")
     private Output</* @Nullable */ String> roleId;
 
     /**
-     * @return The ID of the role to assign to the token. Use `getOrganizationRole` to look up a role&#39;s ID by its name. Can&#39;t be combined with `admin: true`. When neither is set, the token gets the Member role.
+     * @return The ID of the role to assign to the token. Use `getOrganizationRole` to look up a role&#39;s ID by its name. Mutually exclusive with `admin: true`: set one or the other, not both. Pulumi Cloud accepts both, but some of its permission checks still treat such a token as an Admin whatever its role, so the provider rejects the combination. When neither is set, the token gets the Member role.
      * 
      */
     public Output<Optional<String>> roleId() {

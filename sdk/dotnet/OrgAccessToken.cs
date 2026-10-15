@@ -49,7 +49,7 @@ namespace Pulumi.PulumiService
     public partial class OrgAccessToken : global::Pulumi.CustomResource
     {
         /// <summary>
-        /// Whether the token has the Admin role. Defaults to `false`. Can't be `true` when `roleId` is set.
+        /// Whether the token has the Admin role. Defaults to `false`. Mutually exclusive with `roleId`: set `admin: true` or `roleId`, not both.
         /// </summary>
         [Output("admin")]
         public Output<bool> Admin { get; private set; } = null!;
@@ -61,7 +61,7 @@ namespace Pulumi.PulumiService
         public Output<string?> Description { get; private set; } = null!;
 
         /// <summary>
-        /// When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`, or a date such as `2027-06-30`, which means midnight UTC at the start of that day. Must be in the future and no more than two years away. Omit it for a token that never expires.
+        /// When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`. Omit it for a token that never expires. Pulumi Cloud rejects an expiry that is in the past, more than two years away, or beyond the organization's maximum token lifetime.
         /// </summary>
         [Output("expires")]
         public Output<string?> Expires { get; private set; } = null!;
@@ -79,7 +79,7 @@ namespace Pulumi.PulumiService
         public Output<string> OrganizationName { get; private set; } = null!;
 
         /// <summary>
-        /// The ID of the role to assign to the token. Use `getOrganizationRole` to look up a role's ID by its name. Can't be combined with `admin: true`. When neither is set, the token gets the Member role.
+        /// The ID of the role to assign to the token. Use `getOrganizationRole` to look up a role's ID by its name. Mutually exclusive with `admin: true`: set one or the other, not both. Pulumi Cloud accepts both, but some of its permission checks still treat such a token as an Admin whatever its role, so the provider rejects the combination. When neither is set, the token gets the Member role.
         /// </summary>
         [Output("roleId")]
         public Output<string?> RoleId { get; private set; } = null!;
@@ -149,7 +149,7 @@ namespace Pulumi.PulumiService
     public sealed class OrgAccessTokenArgs : global::Pulumi.ResourceArgs
     {
         /// <summary>
-        /// Whether the token has the Admin role. Defaults to `false`. Can't be `true` when `roleId` is set.
+        /// Whether the token has the Admin role. Defaults to `false`. Mutually exclusive with `roleId`: set `admin: true` or `roleId`, not both.
         /// </summary>
         [Input("admin")]
         public Input<bool>? Admin { get; set; }
@@ -161,7 +161,7 @@ namespace Pulumi.PulumiService
         public Input<string>? Description { get; set; }
 
         /// <summary>
-        /// When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`, or a date such as `2027-06-30`, which means midnight UTC at the start of that day. Must be in the future and no more than two years away. Omit it for a token that never expires.
+        /// When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`. Omit it for a token that never expires. Pulumi Cloud rejects an expiry that is in the past, more than two years away, or beyond the organization's maximum token lifetime.
         /// </summary>
         [Input("expires")]
         public Input<string>? Expires { get; set; }
@@ -179,7 +179,7 @@ namespace Pulumi.PulumiService
         public Input<string> OrganizationName { get; set; } = null!;
 
         /// <summary>
-        /// The ID of the role to assign to the token. Use `getOrganizationRole` to look up a role's ID by its name. Can't be combined with `admin: true`. When neither is set, the token gets the Member role.
+        /// The ID of the role to assign to the token. Use `getOrganizationRole` to look up a role's ID by its name. Mutually exclusive with `admin: true`: set one or the other, not both. Pulumi Cloud accepts both, but some of its permission checks still treat such a token as an Admin whatever its role, so the provider rejects the combination. When neither is set, the token gets the Member role.
         /// </summary>
         [Input("roleId")]
         public Input<string>? RoleId { get; set; }
