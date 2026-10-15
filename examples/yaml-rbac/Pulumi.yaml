@@ -135,6 +135,29 @@ variables:
         permissions:
           - environment:read
           - environment:open
+  # Data source: look up a role you defined, by the name shown in the Pulumi
+  # Cloud console. Here we look up the custom role created above, so the test
+  # can check that the lookup returns the same ID. In real programs, `name` is
+  # usually a literal for a role managed in the console, e.g. "CI Deployer".
+  lookedUpRole:
+    fn::invoke:
+      function: pulumiservice:getOrganizationRole
+      arguments:
+        organizationName: ${organizationName}
+        name: ${readOnlyRole.name}
+  # Data source: look up a built-in role the same way, by its console name.
+  adminRole:
+    fn::invoke:
+      function: pulumiservice:getOrganizationRole
+      arguments:
+        organizationName: ${organizationName}
+        name: Admin
+  # Data source: list every role in the organization, built-in and custom.
+  allRoles:
+    fn::invoke:
+      function: pulumiservice:getOrganizationRoles
+      arguments:
+        organizationName: ${organizationName}
 
 outputs:
   roleId: ${readOnlyRole.roleId}
@@ -148,3 +171,7 @@ outputs:
   # the role's permission tree, so the test can verify both pieces line up.
   scopedEnvironmentId: ${scopedEnv.environmentId}
   scopedRoleId: ${scopedReadOnlyRole.roleId}
+  lookedUpRoleId: ${lookedUpRole.roleId}
+  lookedUpRoleResourceType: ${lookedUpRole.resourceType}
+  adminRoleId: ${adminRole.roleId}
+  firstRoleName: ${allRoles.roles[0].name}

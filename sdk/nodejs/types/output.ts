@@ -491,6 +491,33 @@ export interface OrganizationMemberInfo {
     virtualAdmin: boolean;
 }
 
+export interface OrganizationRoleInfo {
+    /**
+     * The stable identifier of a built-in role, such as `admin` or `member`. Absent for custom roles.
+     */
+    defaultIdentifier?: string;
+    /**
+     * The role's description, if it has one.
+     */
+    description?: string;
+    /**
+     * The role's permission descriptor tree, in the same shape as `OrganizationRole.permissions`.
+     */
+    details?: {[key: string]: any};
+    /**
+     * The role's name, as shown in the Pulumi Cloud console.
+     */
+    name: string;
+    /**
+     * The type of resource the role applies to, such as `global`, `stack` or `environment`.
+     */
+    resourceType: string;
+    /**
+     * The role's ID. Pass it to inputs that take a role ID, such as `TeamRoleAssignment.roleId` and `OrganizationMember.roleId`.
+     */
+    roleId: string;
+}
+
 /**
  * A reference to a policy pack within a policy group.
  */

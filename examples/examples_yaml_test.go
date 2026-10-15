@@ -632,6 +632,16 @@ func TestYamlRbacExample(t *testing.T) {
 	if scopedRoleID, ok := up.Outputs["scopedRoleId"]; ok {
 		assert.NotEmpty(t, scopedRoleID.Value, "expected env-scoped OrganizationRole to be created")
 	}
+	if lookedUp, ok := up.Outputs["lookedUpRoleId"]; ok {
+		assert.Equal(t, up.Outputs["roleId"].Value, lookedUp.Value,
+			"expected getOrganizationRole to find the role created by the example")
+	}
+	if adminRoleID, ok := up.Outputs["adminRoleId"]; ok {
+		assert.NotEmpty(t, adminRoleID.Value, "expected getOrganizationRole to find the built-in Admin role")
+	}
+	if first, ok := up.Outputs["firstRoleName"]; ok {
+		assert.NotEmpty(t, first.Value, "expected getOrganizationRoles to return at least one role")
+	}
 	preview := test.Preview(t)
 	assertpreview.HasNoChanges(t, preview)
 	refresh := test.Refresh(t)

@@ -758,6 +758,43 @@
         "virtualAdmin"
       ]
     },
+    "pulumiservice:index:OrganizationRoleInfo": {
+      "properties": {
+        "defaultIdentifier": {
+          "type": "string",
+          "description": "The stable identifier of a built-in role, such as `admin` or `member`. Absent for custom roles."
+        },
+        "description": {
+          "type": "string",
+          "description": "The role's description, if it has one."
+        },
+        "details": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "pulumi.json#/Any"
+          },
+          "description": "The role's permission descriptor tree, in the same shape as `OrganizationRole.permissions`."
+        },
+        "name": {
+          "type": "string",
+          "description": "The role's name, as shown in the Pulumi Cloud console."
+        },
+        "resourceType": {
+          "type": "string",
+          "description": "The type of resource the role applies to, such as `global`, `stack` or `environment`."
+        },
+        "roleId": {
+          "type": "string",
+          "description": "The role's ID. Pass it to inputs that take a role ID, such as `TeamRoleAssignment.roleId` and `OrganizationMember.roleId`."
+        }
+      },
+      "type": "object",
+      "required": [
+        "roleId",
+        "name",
+        "resourceType"
+      ]
+    },
     "pulumiservice:index:PolicyGroupPolicyPackReference": {
       "description": "A reference to a policy pack within a policy group.",
       "properties": {
@@ -7408,6 +7445,63 @@
         "type": "object"
       }
     },
+    "pulumiservice:index:getOrganizationRole": {
+      "description": "Looks up a role in a Pulumi Cloud organization by the name shown in the Pulumi Cloud console. Finds both built-in and custom roles. Use the returned `roleId` for inputs that take a role ID, such as `TeamRoleAssignment.roleId` and `OrganizationMember.roleId`, instead of hardcoding the ID. Returns an error when no role has the given name, or when more than one does.\n\n{{% examples %}}\n## Example Usage\n\n{{% example %}}\n### Look up a role you defined\n\n```typescript\nimport * as pulumiservice from \"@pulumi/pulumiservice\";\n\n// A custom role managed in the Pulumi Cloud console.\n// The name must match exactly (case-sensitive).\nconst ciDeployerRole = pulumiservice.getOrganizationRoleOutput({\n    organizationName: \"my-org\",\n    name: \"CI Deployer\",\n});\n\n// Assign it to a team without hardcoding the role ID.\nconst platformTeamRole = new pulumiservice.TeamRoleAssignment(\"platform-team-role\", {\n    organizationName: \"my-org\",\n    teamName: \"platform\",\n    roleId: ciDeployerRole.roleId,\n});\n```\n{{% /example %}}\n\n{{% example %}}\n### Look up a built-in role\n\n```typescript\nimport * as pulumiservice from \"@pulumi/pulumiservice\";\n\nconst adminRole = pulumiservice.getOrganizationRoleOutput({\n    organizationName: \"my-org\",\n    name: \"Admin\",\n});\n\nexport const adminRoleId = adminRole.roleId;\n```\n{{% /example %}}\n{{% /examples %}}",
+      "inputs": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The role's name, exactly as shown in the Pulumi Cloud console. The match is case-sensitive."
+          },
+          "organizationName": {
+            "type": "string",
+            "description": "The name of the Pulumi organization."
+          }
+        },
+        "type": "object",
+        "required": [
+          "organizationName",
+          "name"
+        ]
+      },
+      "outputs": {
+        "properties": {
+          "defaultIdentifier": {
+            "description": "The stable identifier of a built-in role, such as `admin` or `member`. Absent for custom roles.",
+            "type": "string"
+          },
+          "description": {
+            "description": "The role's description, if it has one.",
+            "type": "string"
+          },
+          "details": {
+            "additionalProperties": {
+              "$ref": "pulumi.json#/Any"
+            },
+            "description": "The role's permission descriptor tree, in the same shape as `OrganizationRole.permissions`.",
+            "type": "object"
+          },
+          "name": {
+            "description": "The role's name, as shown in the Pulumi Cloud console.",
+            "type": "string"
+          },
+          "resourceType": {
+            "description": "The type of resource the role applies to, such as `global`, `stack` or `environment`.",
+            "type": "string"
+          },
+          "roleId": {
+            "description": "The role's ID. Pass it to inputs that take a role ID, such as `TeamRoleAssignment.roleId` and `OrganizationMember.roleId`.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "roleId",
+          "name",
+          "resourceType"
+        ],
+        "type": "object"
+      }
+    },
     "pulumiservice:index:getOrganizationRoleScopes": {
       "description": "Lists the permission scopes available for custom roles in an organization. Use this to discover valid scope names before setting `OrganizationRole.permissions`. The catalogue is flattened into a single list with resource type and group context, sorted deterministically.",
       "inputs": {
@@ -7433,6 +7527,35 @@
         },
         "required": [
           "scopes"
+        ],
+        "type": "object"
+      }
+    },
+    "pulumiservice:index:getOrganizationRoles": {
+      "description": "Lists the roles in a Pulumi Cloud organization, including both built-in and custom roles, sorted by name. To look up a single role by the name shown in the Pulumi Cloud console, use `getOrganizationRole`.\n\n{{% examples %}}\n## Example Usage\n\n{{% example %}}\n### List all roles\n\n```typescript\nimport * as pulumiservice from \"@pulumi/pulumiservice\";\n\nconst allRoles = pulumiservice.getOrganizationRolesOutput({ organizationName: \"my-org\" });\n\n// Map each role name to its ID.\nexport const roleIdsByName = allRoles.roles.apply(roles =>\n    Object.fromEntries(roles.map(r => [r.name, r.roleId])));\n```\n{{% /example %}}\n{{% /examples %}}",
+      "inputs": {
+        "properties": {
+          "organizationName": {
+            "type": "string",
+            "description": "The name of the Pulumi organization."
+          }
+        },
+        "type": "object",
+        "required": [
+          "organizationName"
+        ]
+      },
+      "outputs": {
+        "properties": {
+          "roles": {
+            "items": {
+              "$ref": "#/types/pulumiservice:index:OrganizationRoleInfo"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "roles"
         ],
         "type": "object"
       }

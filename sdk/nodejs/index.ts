@@ -100,10 +100,20 @@ export const getOrganizationMembers: typeof import("./getOrganizationMembers").g
 export const getOrganizationMembersOutput: typeof import("./getOrganizationMembers").getOrganizationMembersOutput = null as any;
 utilities.lazyLoad(exports, ["getOrganizationMembers","getOrganizationMembersOutput"], () => require("./getOrganizationMembers"));
 
+export { GetOrganizationRoleArgs, GetOrganizationRoleResult, GetOrganizationRoleOutputArgs } from "./getOrganizationRole";
+export const getOrganizationRole: typeof import("./getOrganizationRole").getOrganizationRole = null as any;
+export const getOrganizationRoleOutput: typeof import("./getOrganizationRole").getOrganizationRoleOutput = null as any;
+utilities.lazyLoad(exports, ["getOrganizationRole","getOrganizationRoleOutput"], () => require("./getOrganizationRole"));
+
 export { GetOrganizationRoleScopesArgs, GetOrganizationRoleScopesResult, GetOrganizationRoleScopesOutputArgs } from "./getOrganizationRoleScopes";
 export const getOrganizationRoleScopes: typeof import("./getOrganizationRoleScopes").getOrganizationRoleScopes = null as any;
 export const getOrganizationRoleScopesOutput: typeof import("./getOrganizationRoleScopes").getOrganizationRoleScopesOutput = null as any;
 utilities.lazyLoad(exports, ["getOrganizationRoleScopes","getOrganizationRoleScopesOutput"], () => require("./getOrganizationRoleScopes"));
+
+export { GetOrganizationRolesArgs, GetOrganizationRolesResult, GetOrganizationRolesOutputArgs } from "./getOrganizationRoles";
+export const getOrganizationRoles: typeof import("./getOrganizationRoles").getOrganizationRoles = null as any;
+export const getOrganizationRolesOutput: typeof import("./getOrganizationRoles").getOrganizationRolesOutput = null as any;
+utilities.lazyLoad(exports, ["getOrganizationRoles","getOrganizationRolesOutput"], () => require("./getOrganizationRoles"));
 
 export { GetPolicyPackArgs, GetPolicyPackResult, GetPolicyPackOutputArgs } from "./getPolicyPack";
 export const getPolicyPack: typeof import("./getPolicyPack").getPolicyPack = null as any;

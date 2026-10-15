@@ -3670,6 +3670,85 @@ func (o OrganizationMemberInfoArrayOutput) Index(i pulumi.IntInput) Organization
 	}).(OrganizationMemberInfoOutput)
 }
 
+type OrganizationRoleInfo struct {
+	// The stable identifier of a built-in role, such as `admin` or `member`. Absent for custom roles.
+	DefaultIdentifier *string `pulumi:"defaultIdentifier"`
+	// The role's description, if it has one.
+	Description *string `pulumi:"description"`
+	// The role's permission descriptor tree, in the same shape as `OrganizationRole.permissions`.
+	Details map[string]interface{} `pulumi:"details"`
+	// The role's name, as shown in the Pulumi Cloud console.
+	Name string `pulumi:"name"`
+	// The type of resource the role applies to, such as `global`, `stack` or `environment`.
+	ResourceType string `pulumi:"resourceType"`
+	// The role's ID. Pass it to inputs that take a role ID, such as `TeamRoleAssignment.roleId` and `OrganizationMember.roleId`.
+	RoleId string `pulumi:"roleId"`
+}
+
+type OrganizationRoleInfoOutput struct{ *pulumi.OutputState }
+
+func (OrganizationRoleInfoOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*OrganizationRoleInfo)(nil)).Elem()
+}
+
+func (o OrganizationRoleInfoOutput) ToOrganizationRoleInfoOutput() OrganizationRoleInfoOutput {
+	return o
+}
+
+func (o OrganizationRoleInfoOutput) ToOrganizationRoleInfoOutputWithContext(ctx context.Context) OrganizationRoleInfoOutput {
+	return o
+}
+
+// The stable identifier of a built-in role, such as `admin` or `member`. Absent for custom roles.
+func (o OrganizationRoleInfoOutput) DefaultIdentifier() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v OrganizationRoleInfo) *string { return v.DefaultIdentifier }).(pulumi.StringPtrOutput)
+}
+
+// The role's description, if it has one.
+func (o OrganizationRoleInfoOutput) Description() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v OrganizationRoleInfo) *string { return v.Description }).(pulumi.StringPtrOutput)
+}
+
+// The role's permission descriptor tree, in the same shape as `OrganizationRole.permissions`.
+func (o OrganizationRoleInfoOutput) Details() pulumi.MapOutput {
+	return o.ApplyT(func(v OrganizationRoleInfo) map[string]interface{} { return v.Details }).(pulumi.MapOutput)
+}
+
+// The role's name, as shown in the Pulumi Cloud console.
+func (o OrganizationRoleInfoOutput) Name() pulumi.StringOutput {
+	return o.ApplyT(func(v OrganizationRoleInfo) string { return v.Name }).(pulumi.StringOutput)
+}
+
+// The type of resource the role applies to, such as `global`, `stack` or `environment`.
+func (o OrganizationRoleInfoOutput) ResourceType() pulumi.StringOutput {
+	return o.ApplyT(func(v OrganizationRoleInfo) string { return v.ResourceType }).(pulumi.StringOutput)
+}
+
+// The role's ID. Pass it to inputs that take a role ID, such as `TeamRoleAssignment.roleId` and `OrganizationMember.roleId`.
+func (o OrganizationRoleInfoOutput) RoleId() pulumi.StringOutput {
+	return o.ApplyT(func(v OrganizationRoleInfo) string { return v.RoleId }).(pulumi.StringOutput)
+}
+
+type OrganizationRoleInfoArrayOutput struct{ *pulumi.OutputState }
+
+func (OrganizationRoleInfoArrayOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]OrganizationRoleInfo)(nil)).Elem()
+}
+
+func (o OrganizationRoleInfoArrayOutput) ToOrganizationRoleInfoArrayOutput() OrganizationRoleInfoArrayOutput {
+	return o
+}
+
+func (o OrganizationRoleInfoArrayOutput) ToOrganizationRoleInfoArrayOutputWithContext(ctx context.Context) OrganizationRoleInfoArrayOutput {
+	return o
+}
+
+func (o OrganizationRoleInfoArrayOutput) Index(i pulumi.IntInput) OrganizationRoleInfoOutput {
+	return pulumi.All(o, i).ApplyT(func(vs []interface{}) OrganizationRoleInfo {
+		return vs[0].([]OrganizationRoleInfo)[vs[1].(int)]
+	}).(OrganizationRoleInfoOutput)
+}
+
 // A reference to a policy pack within a policy group.
 type PolicyGroupPolicyPackReference struct {
 	// Optional configuration for the policy pack. The special key `all` sets the default enforcement level for every policy in the pack; per-policy entries override it.
@@ -4726,6 +4805,8 @@ func init() {
 	pulumi.RegisterOutputType(OperationContextOptionsPtrOutput{})
 	pulumi.RegisterOutputType(OrganizationMemberInfoOutput{})
 	pulumi.RegisterOutputType(OrganizationMemberInfoArrayOutput{})
+	pulumi.RegisterOutputType(OrganizationRoleInfoOutput{})
+	pulumi.RegisterOutputType(OrganizationRoleInfoArrayOutput{})
 	pulumi.RegisterOutputType(PolicyGroupPolicyPackReferenceOutput{})
 	pulumi.RegisterOutputType(PolicyGroupPolicyPackReferenceArrayOutput{})
 	pulumi.RegisterOutputType(PolicyGroupPolicyPackReferenceInputTypeOutput{})
