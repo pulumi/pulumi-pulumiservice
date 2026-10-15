@@ -26,10 +26,10 @@ class TeamAccessTokenArgs:
         """
         The set of arguments for constructing a TeamAccessToken resource.
 
-        :param pulumi.Input[_builtins.str] name: The name for the token. This must be unique amongst all machine tokens within your organization.
+        :param pulumi.Input[_builtins.str] name: The name for the token. This must be unique among all organization and team tokens in the organization.
         :param pulumi.Input[_builtins.str] organization_name: The organization's name.
         :param pulumi.Input[_builtins.str] team_name: The team name.
-        :param pulumi.Input[_builtins.str] description: Optional. Description for the token.
+        :param pulumi.Input[_builtins.str] description: A description of the token.
         """
         pulumi.set(__self__, "name", name)
         pulumi.set(__self__, "organization_name", organization_name)
@@ -41,7 +41,7 @@ class TeamAccessTokenArgs:
     @pulumi.getter
     def name(self) -> pulumi.Input[_builtins.str]:
         """
-        The name for the token. This must be unique amongst all machine tokens within your organization.
+        The name for the token. This must be unique among all organization and team tokens in the organization.
         """
         return pulumi.get(self, "name")
 
@@ -77,7 +77,7 @@ class TeamAccessTokenArgs:
     @pulumi.getter
     def description(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
-        Optional. Description for the token.
+        A description of the token.
         """
         return pulumi.get(self, "description")
 
@@ -98,14 +98,14 @@ class TeamAccessToken(pulumi.CustomResource):
                  team_name: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         """
-        Creates an access token scoped to a Pulumi Cloud team.
+        Creates a team access token in Pulumi Cloud. The token isn't tied to a user, and it has the permissions granted to its team.
 
-        Unlike `OrgAccessToken`, this resource can be created by a provider authenticated with an organization or team access token.
+        Unlike `OrgAccessToken`, a provider authenticated with an organization or team access token can create this resource.
 
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
-        :param pulumi.Input[_builtins.str] description: Optional. Description for the token.
-        :param pulumi.Input[_builtins.str] name: The name for the token. This must be unique amongst all machine tokens within your organization.
+        :param pulumi.Input[_builtins.str] description: A description of the token.
+        :param pulumi.Input[_builtins.str] name: The name for the token. This must be unique among all organization and team tokens in the organization.
         :param pulumi.Input[_builtins.str] organization_name: The organization's name.
         :param pulumi.Input[_builtins.str] team_name: The team name.
         """
@@ -116,9 +116,9 @@ class TeamAccessToken(pulumi.CustomResource):
                  args: TeamAccessTokenArgs,
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
-        Creates an access token scoped to a Pulumi Cloud team.
+        Creates a team access token in Pulumi Cloud. The token isn't tied to a user, and it has the permissions granted to its team.
 
-        Unlike `OrgAccessToken`, this resource can be created by a provider authenticated with an organization or team access token.
+        Unlike `OrgAccessToken`, a provider authenticated with an organization or team access token can create this resource.
 
         :param str resource_name: The name of the resource.
         :param TeamAccessTokenArgs args: The arguments to use to populate this resource's properties.
@@ -196,7 +196,7 @@ class TeamAccessToken(pulumi.CustomResource):
     @pulumi.getter
     def description(self) -> pulumi.Output[Optional[_builtins.str]]:
         """
-        Optional. Description for the token.
+        A description of the token.
         """
         return pulumi.get(self, "description")
 
@@ -204,7 +204,7 @@ class TeamAccessToken(pulumi.CustomResource):
     @pulumi.getter
     def name(self) -> pulumi.Output[_builtins.str]:
         """
-        The name for the token. This must be unique amongst all machine tokens within your organization.
+        The name for the token. This must be unique among all organization and team tokens in the organization.
         """
         return pulumi.get(self, "name")
 

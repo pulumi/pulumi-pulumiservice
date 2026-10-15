@@ -49,7 +49,9 @@ class AccessToken(pulumi.CustomResource):
                  description: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         """
-        Access tokens allow a user to authenticate against the Pulumi Cloud.
+        Creates a personal access token for the Pulumi Cloud user that the provider is authenticated as. The token acts with that user's permissions.
+
+        To create a token that isn't tied to a user, use `OrgAccessToken` or `TeamAccessToken`.
 
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
@@ -62,7 +64,9 @@ class AccessToken(pulumi.CustomResource):
                  args: AccessTokenArgs,
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
-        Access tokens allow a user to authenticate against the Pulumi Cloud.
+        Creates a personal access token for the Pulumi Cloud user that the provider is authenticated as. The token acts with that user's permissions.
+
+        To create a token that isn't tied to a user, use `OrgAccessToken` or `TeamAccessToken`.
 
         :param str resource_name: The name of the resource.
         :param AccessTokenArgs args: The arguments to use to populate this resource's properties.

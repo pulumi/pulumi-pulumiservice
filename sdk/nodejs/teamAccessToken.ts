@@ -5,9 +5,9 @@ import * as pulumi from "@pulumi/pulumi";
 import * as utilities from "./utilities";
 
 /**
- * Creates an access token scoped to a Pulumi Cloud team.
+ * Creates a team access token in Pulumi Cloud. The token isn't tied to a user, and it has the permissions granted to its team.
  *
- * Unlike `OrgAccessToken`, this resource can be created by a provider authenticated with an organization or team access token.
+ * Unlike `OrgAccessToken`, a provider authenticated with an organization or team access token can create this resource.
  */
 export class TeamAccessToken extends pulumi.CustomResource {
     /**
@@ -37,11 +37,11 @@ export class TeamAccessToken extends pulumi.CustomResource {
     }
 
     /**
-     * Optional. Description for the token.
+     * A description of the token.
      */
     declare public readonly description: pulumi.Output<string | undefined>;
     /**
-     * The name for the token. This must be unique amongst all machine tokens within your organization.
+     * The name for the token. This must be unique among all organization and team tokens in the organization.
      */
     declare public readonly name: pulumi.Output<string>;
     /**
@@ -103,11 +103,11 @@ export class TeamAccessToken extends pulumi.CustomResource {
  */
 export interface TeamAccessTokenArgs {
     /**
-     * Optional. Description for the token.
+     * A description of the token.
      */
     description?: pulumi.Input<string | undefined>;
     /**
-     * The name for the token. This must be unique amongst all machine tokens within your organization.
+     * The name for the token. This must be unique among all organization and team tokens in the organization.
      */
     name: pulumi.Input<string>;
     /**

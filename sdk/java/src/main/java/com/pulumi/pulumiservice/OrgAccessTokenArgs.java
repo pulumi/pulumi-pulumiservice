@@ -19,14 +19,14 @@ public final class OrgAccessTokenArgs extends com.pulumi.resources.ResourceArgs 
     public static final OrgAccessTokenArgs Empty = new OrgAccessTokenArgs();
 
     /**
-     * Optional. True if this is an admin token.
+     * Whether the token has the Admin role. Defaults to `false`.
      * 
      */
     @Import(name="admin")
     private @Nullable Output<Boolean> admin;
 
     /**
-     * @return Optional. True if this is an admin token.
+     * @return Whether the token has the Admin role. Defaults to `false`.
      * 
      */
     public Optional<Output<Boolean>> admin() {
@@ -34,14 +34,14 @@ public final class OrgAccessTokenArgs extends com.pulumi.resources.ResourceArgs 
     }
 
     /**
-     * Optional. Description for the token.
+     * A description of the token.
      * 
      */
     @Import(name="description")
     private @Nullable Output<String> description;
 
     /**
-     * @return Optional. Description for the token.
+     * @return A description of the token.
      * 
      */
     public Optional<Output<String>> description() {
@@ -106,7 +106,7 @@ public final class OrgAccessTokenArgs extends com.pulumi.resources.ResourceArgs 
         }
 
         /**
-         * @param admin Optional. True if this is an admin token.
+         * @param admin Whether the token has the Admin role. Defaults to `false`.
          * 
          * @return builder
          * 
@@ -117,7 +117,7 @@ public final class OrgAccessTokenArgs extends com.pulumi.resources.ResourceArgs 
         }
 
         /**
-         * @param admin Optional. True if this is an admin token.
+         * @param admin Whether the token has the Admin role. Defaults to `false`.
          * 
          * @return builder
          * 
@@ -127,7 +127,7 @@ public final class OrgAccessTokenArgs extends com.pulumi.resources.ResourceArgs 
         }
 
         /**
-         * @param description Optional. Description for the token.
+         * @param description A description of the token.
          * 
          * @return builder
          * 
@@ -138,7 +138,7 @@ public final class OrgAccessTokenArgs extends com.pulumi.resources.ResourceArgs 
         }
 
         /**
-         * @param description Optional. Description for the token.
+         * @param description A description of the token.
          * 
          * @return builder
          * 

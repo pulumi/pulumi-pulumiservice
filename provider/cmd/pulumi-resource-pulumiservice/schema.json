@@ -6101,7 +6101,7 @@
       ]
     },
     "pulumiservice:index:AccessToken": {
-      "description": "Access tokens allow a user to authenticate against the Pulumi Cloud.",
+      "description": "Creates a personal access token for the Pulumi Cloud user that the provider is authenticated as. The token acts with that user's permissions.\n\nTo create a token that isn't tied to a user, use `OrgAccessToken` or `TeamAccessToken`.",
       "properties": {
         "description": {
           "type": "string",
@@ -6904,17 +6904,17 @@
       ]
     },
     "pulumiservice:index:OrgAccessToken": {
-      "description": "Creates an access token scoped to a Pulumi Cloud organization.\n\nThe provider must be authenticated as a user, for example with a personal access token, to create or delete this resource. Organization and team access tokens cannot create or delete organization tokens, even when they have the Admin role, so that a token cannot be used to mint further organization tokens. Such requests fail with `403 Machine tokens are not allowed to perform this operation`. For automation, use the personal access token of a dedicated service-account user. `TeamAccessToken` does not have this restriction.",
+      "description": "Creates an organization access token in Pulumi Cloud. Organization tokens aren't tied to a user, so they suit CI/CD and other automation.\n\nThe provider must authenticate as a user, for example with a personal access token, to create or delete this resource. Pulumi Cloud rejects organization and team access tokens here, even Admin ones, with `403 Machine tokens are not allowed to perform this operation`, so that one machine token can't mint another. For automation, use the personal access token of a dedicated service-account user, or use `TeamAccessToken`, which has no such restriction.",
       "properties": {
         "admin": {
           "type": "boolean",
-          "description": "Optional. True if this is an admin token.",
+          "description": "Whether the token has the Admin role. Defaults to `false`.",
           "default": false,
           "replaceOnChanges": true
         },
         "description": {
           "type": "string",
-          "description": "Optional. Description for the token.",
+          "description": "A description of the token.",
           "replaceOnChanges": true
         },
         "name": {
@@ -6942,13 +6942,13 @@
       "inputProperties": {
         "admin": {
           "type": "boolean",
-          "description": "Optional. True if this is an admin token.",
+          "description": "Whether the token has the Admin role. Defaults to `false`.",
           "default": false,
           "replaceOnChanges": true
         },
         "description": {
           "type": "string",
-          "description": "Optional. Description for the token.",
+          "description": "A description of the token.",
           "replaceOnChanges": true
         },
         "name": {
@@ -7565,16 +7565,16 @@
       ]
     },
     "pulumiservice:index:TeamAccessToken": {
-      "description": "Creates an access token scoped to a Pulumi Cloud team.\n\nUnlike `OrgAccessToken`, this resource can be created by a provider authenticated with an organization or team access token.",
+      "description": "Creates a team access token in Pulumi Cloud. The token isn't tied to a user, and it has the permissions granted to its team.\n\nUnlike `OrgAccessToken`, a provider authenticated with an organization or team access token can create this resource.",
       "properties": {
         "description": {
           "type": "string",
-          "description": "Optional. Description for the token.",
+          "description": "A description of the token.",
           "replaceOnChanges": true
         },
         "name": {
           "type": "string",
-          "description": "The name for the token. This must be unique amongst all machine tokens within your organization.",
+          "description": "The name for the token. This must be unique among all organization and team tokens in the organization.",
           "replaceOnChanges": true
         },
         "organizationName": {
@@ -7602,12 +7602,12 @@
       "inputProperties": {
         "description": {
           "type": "string",
-          "description": "Optional. Description for the token.",
+          "description": "A description of the token.",
           "replaceOnChanges": true
         },
         "name": {
           "type": "string",
-          "description": "The name for the token. This must be unique amongst all machine tokens within your organization.",
+          "description": "The name for the token. This must be unique among all organization and team tokens in the organization.",
           "replaceOnChanges": true
         },
         "organizationName": {

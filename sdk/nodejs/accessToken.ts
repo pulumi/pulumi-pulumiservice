@@ -5,7 +5,9 @@ import * as pulumi from "@pulumi/pulumi";
 import * as utilities from "./utilities";
 
 /**
- * Access tokens allow a user to authenticate against the Pulumi Cloud.
+ * Creates a personal access token for the Pulumi Cloud user that the provider is authenticated as. The token acts with that user's permissions.
+ *
+ * To create a token that isn't tied to a user, use `OrgAccessToken` or `TeamAccessToken`.
  */
 export class AccessToken extends pulumi.CustomResource {
     /**

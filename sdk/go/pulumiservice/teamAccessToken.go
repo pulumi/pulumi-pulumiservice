@@ -12,15 +12,15 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
-// Creates an access token scoped to a Pulumi Cloud team.
+// Creates a team access token in Pulumi Cloud. The token isn't tied to a user, and it has the permissions granted to its team.
 //
-// Unlike `OrgAccessToken`, this resource can be created by a provider authenticated with an organization or team access token.
+// Unlike `OrgAccessToken`, a provider authenticated with an organization or team access token can create this resource.
 type TeamAccessToken struct {
 	pulumi.CustomResourceState
 
-	// Optional. Description for the token.
+	// A description of the token.
 	Description pulumi.StringPtrOutput `pulumi:"description"`
-	// The name for the token. This must be unique amongst all machine tokens within your organization.
+	// The name for the token. This must be unique among all organization and team tokens in the organization.
 	Name pulumi.StringOutput `pulumi:"name"`
 	// The organization's name.
 	OrganizationName pulumi.StringOutput `pulumi:"organizationName"`
@@ -90,9 +90,9 @@ func (TeamAccessTokenState) ElementType() reflect.Type {
 }
 
 type teamAccessTokenArgs struct {
-	// Optional. Description for the token.
+	// A description of the token.
 	Description *string `pulumi:"description"`
-	// The name for the token. This must be unique amongst all machine tokens within your organization.
+	// The name for the token. This must be unique among all organization and team tokens in the organization.
 	Name string `pulumi:"name"`
 	// The organization's name.
 	OrganizationName string `pulumi:"organizationName"`
@@ -102,9 +102,9 @@ type teamAccessTokenArgs struct {
 
 // The set of arguments for constructing a TeamAccessToken resource.
 type TeamAccessTokenArgs struct {
-	// Optional. Description for the token.
+	// A description of the token.
 	Description pulumi.StringPtrInput
-	// The name for the token. This must be unique amongst all machine tokens within your organization.
+	// The name for the token. This must be unique among all organization and team tokens in the organization.
 	Name pulumi.StringInput
 	// The organization's name.
 	OrganizationName pulumi.StringInput
@@ -199,12 +199,12 @@ func (o TeamAccessTokenOutput) ToTeamAccessTokenOutputWithContext(ctx context.Co
 	return o
 }
 
-// Optional. Description for the token.
+// A description of the token.
 func (o TeamAccessTokenOutput) Description() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *TeamAccessToken) pulumi.StringPtrOutput { return v.Description }).(pulumi.StringPtrOutput)
 }
 
-// The name for the token. This must be unique amongst all machine tokens within your organization.
+// The name for the token. This must be unique among all organization and team tokens in the organization.
 func (o TeamAccessTokenOutput) Name() pulumi.StringOutput {
 	return o.ApplyT(func(v *TeamAccessToken) pulumi.StringOutput { return v.Name }).(pulumi.StringOutput)
 }
