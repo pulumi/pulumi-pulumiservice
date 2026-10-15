@@ -11,9 +11,17 @@ import java.util.Objects;
 
 @CustomType
 public final class GetOrganizationRolesResult {
+    /**
+     * @return The organization&#39;s roles, built-in and custom, sorted by name.
+     * 
+     */
     private List<OrganizationRoleInfo> roles;
 
     private GetOrganizationRolesResult() {}
+    /**
+     * @return The organization&#39;s roles, built-in and custom, sorted by name.
+     * 
+     */
     public List<OrganizationRoleInfo> roles() {
         return this.roles;
     }

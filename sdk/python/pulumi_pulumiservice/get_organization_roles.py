@@ -32,6 +32,9 @@ class GetOrganizationRolesResult:
     @_builtins.property
     @pulumi.getter
     def roles(self) -> Sequence['outputs.OrganizationRoleInfo']:
+        """
+        The organization's roles, built-in and custom, sorted by name.
+        """
         return pulumi.get(self, "roles")
 
 

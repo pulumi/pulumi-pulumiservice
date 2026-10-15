@@ -1570,29 +1570,29 @@ class OrganizationMemberInfo(dict):
 @pulumi.output_type
 class OrganizationRoleInfo(dict):
     def __init__(__self__, *,
+                 built_in: _builtins.bool,
                  name: _builtins.str,
-                 resource_type: _builtins.str,
                  role_id: _builtins.str,
-                 default_identifier: Optional[_builtins.str] = None,
-                 description: Optional[_builtins.str] = None,
-                 details: Optional[Mapping[str, Any]] = None):
+                 description: Optional[_builtins.str] = None):
         """
+        :param _builtins.bool built_in: Whether this is one of the roles every organization has (Admin, Member and Billing Manager), rather than a custom role.
         :param _builtins.str name: The role's name, as shown in the Pulumi Cloud console.
-        :param _builtins.str resource_type: The type of resource the role applies to, such as `global`, `stack` or `environment`.
         :param _builtins.str role_id: The role's ID. Pass it to inputs that take a role ID, such as `TeamRoleAssignment.roleId` and `OrganizationMember.roleId`.
-        :param _builtins.str default_identifier: The stable identifier of a built-in role, such as `admin` or `member`. Absent for custom roles.
         :param _builtins.str description: The role's description, if it has one.
-        :param Mapping[str, Any] details: The role's permission descriptor tree, in the same shape as `OrganizationRole.permissions`.
         """
+        pulumi.set(__self__, "built_in", built_in)
         pulumi.set(__self__, "name", name)
-        pulumi.set(__self__, "resource_type", resource_type)
         pulumi.set(__self__, "role_id", role_id)
-        if default_identifier is not None:
-            pulumi.set(__self__, "default_identifier", default_identifier)
         if description is not None:
             pulumi.set(__self__, "description", description)
-        if details is not None:
-            pulumi.set(__self__, "details", details)
+
+    @_builtins.property
+    @pulumi.getter(name="builtIn")
+    def built_in(self) -> _builtins.bool:
+        """
+        Whether this is one of the roles every organization has (Admin, Member and Billing Manager), rather than a custom role.
+        """
+        return pulumi.get(self, "built_in")
 
     @_builtins.property
     @pulumi.getter
@@ -1603,14 +1603,6 @@ class OrganizationRoleInfo(dict):
         return pulumi.get(self, "name")
 
     @_builtins.property
-    @pulumi.getter(name="resourceType")
-    def resource_type(self) -> _builtins.str:
-        """
-        The type of resource the role applies to, such as `global`, `stack` or `environment`.
-        """
-        return pulumi.get(self, "resource_type")
-
-    @_builtins.property
     @pulumi.getter(name="roleId")
     def role_id(self) -> _builtins.str:
         """
@@ -1619,28 +1611,12 @@ class OrganizationRoleInfo(dict):
         return pulumi.get(self, "role_id")
 
     @_builtins.property
-    @pulumi.getter(name="defaultIdentifier")
-    def default_identifier(self) -> Optional[_builtins.str]:
-        """
-        The stable identifier of a built-in role, such as `admin` or `member`. Absent for custom roles.
-        """
-        return pulumi.get(self, "default_identifier")
-
-    @_builtins.property
     @pulumi.getter
     def description(self) -> Optional[_builtins.str]:
         """
         The role's description, if it has one.
         """
         return pulumi.get(self, "description")
-
-    @_builtins.property
-    @pulumi.getter
-    def details(self) -> Optional[Mapping[str, Any]]:
-        """
-        The role's permission descriptor tree, in the same shape as `OrganizationRole.permissions`.
-        """
-        return pulumi.get(self, "details")
 
 
 @pulumi.output_type

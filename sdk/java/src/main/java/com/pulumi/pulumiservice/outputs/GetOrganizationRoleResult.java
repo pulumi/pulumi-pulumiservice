@@ -5,9 +5,8 @@ package com.pulumi.pulumiservice.outputs;
 
 import com.pulumi.core.annotations.CustomType;
 import com.pulumi.exceptions.MissingRequiredPropertyException;
-import java.lang.Object;
+import java.lang.Boolean;
 import java.lang.String;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import javax.annotation.Nullable;
@@ -15,30 +14,20 @@ import javax.annotation.Nullable;
 @CustomType
 public final class GetOrganizationRoleResult {
     /**
-     * @return The stable identifier of a built-in role, such as `admin` or `member`. Absent for custom roles.
+     * @return Whether this is one of the roles every organization has (Admin, Member and Billing Manager), rather than a custom role.
      * 
      */
-    private @Nullable String defaultIdentifier;
+    private Boolean builtIn;
     /**
      * @return The role&#39;s description, if it has one.
      * 
      */
     private @Nullable String description;
     /**
-     * @return The role&#39;s permission descriptor tree, in the same shape as `OrganizationRole.permissions`.
-     * 
-     */
-    private @Nullable Map<String,Object> details;
-    /**
      * @return The role&#39;s name, as shown in the Pulumi Cloud console.
      * 
      */
     private String name;
-    /**
-     * @return The type of resource the role applies to, such as `global`, `stack` or `environment`.
-     * 
-     */
-    private String resourceType;
     /**
      * @return The role&#39;s ID. Pass it to inputs that take a role ID, such as `TeamRoleAssignment.roleId` and `OrganizationMember.roleId`.
      * 
@@ -47,11 +36,11 @@ public final class GetOrganizationRoleResult {
 
     private GetOrganizationRoleResult() {}
     /**
-     * @return The stable identifier of a built-in role, such as `admin` or `member`. Absent for custom roles.
+     * @return Whether this is one of the roles every organization has (Admin, Member and Billing Manager), rather than a custom role.
      * 
      */
-    public Optional<String> defaultIdentifier() {
-        return Optional.ofNullable(this.defaultIdentifier);
+    public Boolean builtIn() {
+        return this.builtIn;
     }
     /**
      * @return The role&#39;s description, if it has one.
@@ -61,25 +50,11 @@ public final class GetOrganizationRoleResult {
         return Optional.ofNullable(this.description);
     }
     /**
-     * @return The role&#39;s permission descriptor tree, in the same shape as `OrganizationRole.permissions`.
-     * 
-     */
-    public Map<String,Object> details() {
-        return this.details == null ? Map.of() : this.details;
-    }
-    /**
      * @return The role&#39;s name, as shown in the Pulumi Cloud console.
      * 
      */
     public String name() {
         return this.name;
-    }
-    /**
-     * @return The type of resource the role applies to, such as `global`, `stack` or `environment`.
-     * 
-     */
-    public String resourceType() {
-        return this.resourceType;
     }
     /**
      * @return The role&#39;s ID. Pass it to inputs that take a role ID, such as `TeamRoleAssignment.roleId` and `OrganizationMember.roleId`.
@@ -98,27 +73,25 @@ public final class GetOrganizationRoleResult {
     }
     @CustomType.Builder
     public static final class Builder {
-        private @Nullable String defaultIdentifier;
+        private Boolean builtIn;
         private @Nullable String description;
-        private @Nullable Map<String,Object> details;
         private String name;
-        private String resourceType;
         private String roleId;
         public Builder() {}
         public Builder(GetOrganizationRoleResult defaults) {
     	      Objects.requireNonNull(defaults);
-    	      this.defaultIdentifier = defaults.defaultIdentifier;
+    	      this.builtIn = defaults.builtIn;
     	      this.description = defaults.description;
-    	      this.details = defaults.details;
     	      this.name = defaults.name;
-    	      this.resourceType = defaults.resourceType;
     	      this.roleId = defaults.roleId;
         }
 
         @CustomType.Setter
-        public Builder defaultIdentifier(@Nullable String defaultIdentifier) {
-
-            this.defaultIdentifier = defaultIdentifier;
+        public Builder builtIn(Boolean builtIn) {
+            if (builtIn == null) {
+              throw new MissingRequiredPropertyException("GetOrganizationRoleResult", "builtIn");
+            }
+            this.builtIn = builtIn;
             return this;
         }
         @CustomType.Setter
@@ -128,25 +101,11 @@ public final class GetOrganizationRoleResult {
             return this;
         }
         @CustomType.Setter
-        public Builder details(@Nullable Map<String,Object> details) {
-
-            this.details = details;
-            return this;
-        }
-        @CustomType.Setter
         public Builder name(String name) {
             if (name == null) {
               throw new MissingRequiredPropertyException("GetOrganizationRoleResult", "name");
             }
             this.name = name;
-            return this;
-        }
-        @CustomType.Setter
-        public Builder resourceType(String resourceType) {
-            if (resourceType == null) {
-              throw new MissingRequiredPropertyException("GetOrganizationRoleResult", "resourceType");
-            }
-            this.resourceType = resourceType;
             return this;
         }
         @CustomType.Setter
@@ -159,11 +118,9 @@ public final class GetOrganizationRoleResult {
         }
         public GetOrganizationRoleResult build() {
             final var _resultValue = new GetOrganizationRoleResult();
-            _resultValue.defaultIdentifier = defaultIdentifier;
+            _resultValue.builtIn = builtIn;
             _resultValue.description = description;
-            _resultValue.details = details;
             _resultValue.name = name;
-            _resultValue.resourceType = resourceType;
             _resultValue.roleId = roleId;
             return _resultValue;
         }

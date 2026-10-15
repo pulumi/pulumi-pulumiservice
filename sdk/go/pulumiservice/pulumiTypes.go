@@ -3671,16 +3671,12 @@ func (o OrganizationMemberInfoArrayOutput) Index(i pulumi.IntInput) Organization
 }
 
 type OrganizationRoleInfo struct {
-	// The stable identifier of a built-in role, such as `admin` or `member`. Absent for custom roles.
-	DefaultIdentifier *string `pulumi:"defaultIdentifier"`
+	// Whether this is one of the roles every organization has (Admin, Member and Billing Manager), rather than a custom role.
+	BuiltIn bool `pulumi:"builtIn"`
 	// The role's description, if it has one.
 	Description *string `pulumi:"description"`
-	// The role's permission descriptor tree, in the same shape as `OrganizationRole.permissions`.
-	Details map[string]interface{} `pulumi:"details"`
 	// The role's name, as shown in the Pulumi Cloud console.
 	Name string `pulumi:"name"`
-	// The type of resource the role applies to, such as `global`, `stack` or `environment`.
-	ResourceType string `pulumi:"resourceType"`
 	// The role's ID. Pass it to inputs that take a role ID, such as `TeamRoleAssignment.roleId` and `OrganizationMember.roleId`.
 	RoleId string `pulumi:"roleId"`
 }
@@ -3699,9 +3695,9 @@ func (o OrganizationRoleInfoOutput) ToOrganizationRoleInfoOutputWithContext(ctx 
 	return o
 }
 
-// The stable identifier of a built-in role, such as `admin` or `member`. Absent for custom roles.
-func (o OrganizationRoleInfoOutput) DefaultIdentifier() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v OrganizationRoleInfo) *string { return v.DefaultIdentifier }).(pulumi.StringPtrOutput)
+// Whether this is one of the roles every organization has (Admin, Member and Billing Manager), rather than a custom role.
+func (o OrganizationRoleInfoOutput) BuiltIn() pulumi.BoolOutput {
+	return o.ApplyT(func(v OrganizationRoleInfo) bool { return v.BuiltIn }).(pulumi.BoolOutput)
 }
 
 // The role's description, if it has one.
@@ -3709,19 +3705,9 @@ func (o OrganizationRoleInfoOutput) Description() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v OrganizationRoleInfo) *string { return v.Description }).(pulumi.StringPtrOutput)
 }
 
-// The role's permission descriptor tree, in the same shape as `OrganizationRole.permissions`.
-func (o OrganizationRoleInfoOutput) Details() pulumi.MapOutput {
-	return o.ApplyT(func(v OrganizationRoleInfo) map[string]interface{} { return v.Details }).(pulumi.MapOutput)
-}
-
 // The role's name, as shown in the Pulumi Cloud console.
 func (o OrganizationRoleInfoOutput) Name() pulumi.StringOutput {
 	return o.ApplyT(func(v OrganizationRoleInfo) string { return v.Name }).(pulumi.StringOutput)
-}
-
-// The type of resource the role applies to, such as `global`, `stack` or `environment`.
-func (o OrganizationRoleInfoOutput) ResourceType() pulumi.StringOutput {
-	return o.ApplyT(func(v OrganizationRoleInfo) string { return v.ResourceType }).(pulumi.StringOutput)
 }
 
 // The role's ID. Pass it to inputs that take a role ID, such as `TeamRoleAssignment.roleId` and `OrganizationMember.roleId`.

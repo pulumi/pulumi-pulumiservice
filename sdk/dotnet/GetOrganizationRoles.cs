@@ -387,6 +387,9 @@ namespace Pulumi.PulumiService
     [OutputType]
     public sealed class GetOrganizationRolesResult
     {
+        /// <summary>
+        /// The organization's roles, built-in and custom, sorted by name.
+        /// </summary>
         public readonly ImmutableArray<Outputs.OrganizationRoleInfo> Roles;
 
         [OutputConstructor]

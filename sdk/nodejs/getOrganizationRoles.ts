@@ -38,6 +38,9 @@ export interface GetOrganizationRolesArgs {
 }
 
 export interface GetOrganizationRolesResult {
+    /**
+     * The organization's roles, built-in and custom, sorted by name.
+     */
     readonly roles: outputs.OrganizationRoleInfo[];
 }
 /**

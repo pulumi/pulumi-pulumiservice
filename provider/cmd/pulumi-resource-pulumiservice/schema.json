@@ -760,28 +760,17 @@
     },
     "pulumiservice:index:OrganizationRoleInfo": {
       "properties": {
-        "defaultIdentifier": {
-          "type": "string",
-          "description": "The stable identifier of a built-in role, such as `admin` or `member`. Absent for custom roles."
+        "builtIn": {
+          "type": "boolean",
+          "description": "Whether this is one of the roles every organization has (Admin, Member and Billing Manager), rather than a custom role."
         },
         "description": {
           "type": "string",
           "description": "The role's description, if it has one."
         },
-        "details": {
-          "type": "object",
-          "additionalProperties": {
-            "$ref": "pulumi.json#/Any"
-          },
-          "description": "The role's permission descriptor tree, in the same shape as `OrganizationRole.permissions`."
-        },
         "name": {
           "type": "string",
           "description": "The role's name, as shown in the Pulumi Cloud console."
-        },
-        "resourceType": {
-          "type": "string",
-          "description": "The type of resource the role applies to, such as `global`, `stack` or `environment`."
         },
         "roleId": {
           "type": "string",
@@ -792,7 +781,7 @@
       "required": [
         "roleId",
         "name",
-        "resourceType"
+        "builtIn"
       ]
     },
     "pulumiservice:index:PolicyGroupPolicyPackReference": {
@@ -7466,27 +7455,16 @@
       },
       "outputs": {
         "properties": {
-          "defaultIdentifier": {
-            "description": "The stable identifier of a built-in role, such as `admin` or `member`. Absent for custom roles.",
-            "type": "string"
+          "builtIn": {
+            "description": "Whether this is one of the roles every organization has (Admin, Member and Billing Manager), rather than a custom role.",
+            "type": "boolean"
           },
           "description": {
             "description": "The role's description, if it has one.",
             "type": "string"
           },
-          "details": {
-            "additionalProperties": {
-              "$ref": "pulumi.json#/Any"
-            },
-            "description": "The role's permission descriptor tree, in the same shape as `OrganizationRole.permissions`.",
-            "type": "object"
-          },
           "name": {
             "description": "The role's name, as shown in the Pulumi Cloud console.",
-            "type": "string"
-          },
-          "resourceType": {
-            "description": "The type of resource the role applies to, such as `global`, `stack` or `environment`.",
             "type": "string"
           },
           "roleId": {
@@ -7497,7 +7475,7 @@
         "required": [
           "roleId",
           "name",
-          "resourceType"
+          "builtIn"
         ],
         "type": "object"
       }
@@ -7548,6 +7526,7 @@
       "outputs": {
         "properties": {
           "roles": {
+            "description": "The organization's roles, built-in and custom, sorted by name.",
             "items": {
               "$ref": "#/types/pulumiservice:index:OrganizationRoleInfo"
             },

@@ -44,6 +44,7 @@ func testRole(id, name, defaultIdentifier string) apitype.PermissionDescriptorRe
 			Name:         name,
 			Description:  name + " description",
 			ResourceType: "global",
+			UxPurpose:    apitype.PermissionDescriptorUXPurposeRole,
 			Details: apitype.PermissionDescriptorAllowBuilder{
 				Permissions: apitype.RbacPermissionSlice{apitype.RbacPermission("stack:read")},
 			}.Build(),
@@ -51,6 +52,14 @@ func testRole(id, name, defaultIdentifier string) apitype.PermissionDescriptorRe
 		ID:                id,
 		DefaultIdentifier: defaultIdentifier,
 	}
+}
+
+// notRole returns a permission descriptor record of another kind, such as a
+// permission set or policy, which the role functions must never return.
+func notRole(id, name string, uxPurpose apitype.PermissionDescriptorUXPurpose) apitype.PermissionDescriptorRecord {
+	r := testRole(id, name, "")
+	r.UxPurpose = uxPurpose
+	return r
 }
 
 // stubOrgRoles returns a fixed role list and checks that the function asks
@@ -98,10 +107,7 @@ func TestGetOrganizationRoleFunction(t *testing.T) {
 		assert.Equal(t, "CI Deployer", out.Name)
 		require.NotNil(t, out.Description)
 		assert.Equal(t, "CI Deployer description", *out.Description)
-		assert.Equal(t, "global", out.ResourceType)
-		assert.Nil(t, out.DefaultIdentifier)
-		assert.Equal(t, "PermissionDescriptorAllow", out.Details["__type"])
-		assert.Equal(t, []any{"stack:read"}, out.Details["permissions"])
+		assert.False(t, out.BuiltIn)
 	})
 
 	t.Run("finds a built-in role by name", func(t *testing.T) {
@@ -114,8 +120,7 @@ func TestGetOrganizationRoleFunction(t *testing.T) {
 		resp, err := invokeGetOrganizationRole(t, client, "Admin")
 		require.NoError(t, err)
 		assert.Equal(t, "admin-id", resp.Output.RoleId)
-		require.NotNil(t, resp.Output.DefaultIdentifier)
-		assert.Equal(t, "admin", *resp.Output.DefaultIdentifier)
+		assert.True(t, resp.Output.BuiltIn)
 	})
 
 	t.Run("trims surrounding whitespace from the name", func(t *testing.T) {
@@ -134,6 +139,14 @@ func TestGetOrganizationRoleFunction(t *testing.T) {
 		resp, err := invokeGetOrganizationRole(t, client, "ci deployer")
 		require.NoError(t, err)
 		assert.Equal(t, "custom-id", resp.Output.RoleId)
+	})
+
+	t.Run("does not find a permission set by name", func(t *testing.T) {
+		t.Parallel()
+		client := stubOrgRoles(t, notRole("set-id", "Stack Write", apitype.PermissionDescriptorUXPurposeSet))
+
+		_, err := invokeGetOrganizationRole(t, client, "Stack Write")
+		assert.ErrorContains(t, err, `organization "test-org" has no role named "Stack Write"`)
 	})
 
 	t.Run("errors when no role matches", func(t *testing.T) {
@@ -196,7 +209,23 @@ func TestGetOrganizationRolesFunction(t *testing.T) {
 			names = append(names, r.Name)
 		}
 		assert.Equal(t, []string{"Admin", "CI Deployer", "Member"}, names)
-		assert.Equal(t, "PermissionDescriptorAllow", resp.Output.Roles[0].Details["__type"])
+	})
+
+	t.Run("leaves out permission sets and policies", func(t *testing.T) {
+		t.Parallel()
+		client := stubOrgRoles(t,
+			testRole("admin-id", "Admin", "admin"),
+			notRole("set-id", "Stack Write", apitype.PermissionDescriptorUXPurposeSet),
+			notRole("policy-id", "Deploy Policy", apitype.PermissionDescriptorUXPurposePolicy),
+		)
+		ctx := config.WithMockClient(t.Context(), client)
+
+		resp, err := GetOrganizationRolesFunction{}.Invoke(ctx, infer.FunctionRequest[GetOrganizationRolesInput]{
+			Input: GetOrganizationRolesInput{OrganizationName: testFunctionRolesOrgName},
+		})
+		require.NoError(t, err)
+		require.Len(t, resp.Output.Roles, 1)
+		assert.Equal(t, "admin-id", resp.Output.Roles[0].RoleId)
 	})
 
 	t.Run("propagates API errors", func(t *testing.T) {

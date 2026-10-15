@@ -23,33 +23,27 @@ __all__ = [
 
 @pulumi.output_type
 class GetOrganizationRoleResult:
-    def __init__(__self__, default_identifier=None, description=None, details=None, name=None, resource_type=None, role_id=None):
-        if default_identifier and not isinstance(default_identifier, str):
-            raise TypeError("Expected argument 'default_identifier' to be a str")
-        pulumi.set(__self__, "default_identifier", default_identifier)
+    def __init__(__self__, built_in=None, description=None, name=None, role_id=None):
+        if built_in and not isinstance(built_in, bool):
+            raise TypeError("Expected argument 'built_in' to be a bool")
+        pulumi.set(__self__, "built_in", built_in)
         if description and not isinstance(description, str):
             raise TypeError("Expected argument 'description' to be a str")
         pulumi.set(__self__, "description", description)
-        if details and not isinstance(details, dict):
-            raise TypeError("Expected argument 'details' to be a dict")
-        pulumi.set(__self__, "details", details)
         if name and not isinstance(name, str):
             raise TypeError("Expected argument 'name' to be a str")
         pulumi.set(__self__, "name", name)
-        if resource_type and not isinstance(resource_type, str):
-            raise TypeError("Expected argument 'resource_type' to be a str")
-        pulumi.set(__self__, "resource_type", resource_type)
         if role_id and not isinstance(role_id, str):
             raise TypeError("Expected argument 'role_id' to be a str")
         pulumi.set(__self__, "role_id", role_id)
 
     @_builtins.property
-    @pulumi.getter(name="defaultIdentifier")
-    def default_identifier(self) -> Optional[_builtins.str]:
+    @pulumi.getter(name="builtIn")
+    def built_in(self) -> _builtins.bool:
         """
-        The stable identifier of a built-in role, such as `admin` or `member`. Absent for custom roles.
+        Whether this is one of the roles every organization has (Admin, Member and Billing Manager), rather than a custom role.
         """
-        return pulumi.get(self, "default_identifier")
+        return pulumi.get(self, "built_in")
 
     @_builtins.property
     @pulumi.getter
@@ -61,27 +55,11 @@ class GetOrganizationRoleResult:
 
     @_builtins.property
     @pulumi.getter
-    def details(self) -> Optional[Mapping[str, Any]]:
-        """
-        The role's permission descriptor tree, in the same shape as `OrganizationRole.permissions`.
-        """
-        return pulumi.get(self, "details")
-
-    @_builtins.property
-    @pulumi.getter
     def name(self) -> _builtins.str:
         """
         The role's name, as shown in the Pulumi Cloud console.
         """
         return pulumi.get(self, "name")
-
-    @_builtins.property
-    @pulumi.getter(name="resourceType")
-    def resource_type(self) -> _builtins.str:
-        """
-        The type of resource the role applies to, such as `global`, `stack` or `environment`.
-        """
-        return pulumi.get(self, "resource_type")
 
     @_builtins.property
     @pulumi.getter(name="roleId")
@@ -98,11 +76,9 @@ class AwaitableGetOrganizationRoleResult(GetOrganizationRoleResult):
         if False:
             yield self
         return GetOrganizationRoleResult(
-            default_identifier=self.default_identifier,
+            built_in=self.built_in,
             description=self.description,
-            details=self.details,
             name=self.name,
-            resource_type=self.resource_type,
             role_id=self.role_id)
 
 
@@ -148,11 +124,9 @@ def get_organization_role(name: Optional[_builtins.str] = None,
     __ret__ = pulumi.runtime.invoke('pulumiservice:index:getOrganizationRole', __args__, opts=opts, typ=GetOrganizationRoleResult).value
 
     return AwaitableGetOrganizationRoleResult(
-        default_identifier=pulumi.get(__ret__, 'default_identifier'),
+        built_in=pulumi.get(__ret__, 'built_in'),
         description=pulumi.get(__ret__, 'description'),
-        details=pulumi.get(__ret__, 'details'),
         name=pulumi.get(__ret__, 'name'),
-        resource_type=pulumi.get(__ret__, 'resource_type'),
         role_id=pulumi.get(__ret__, 'role_id'))
 def get_organization_role_output(name: pulumi.Input[Optional[_builtins.str]] = None,
                                  organization_name: pulumi.Input[Optional[_builtins.str]] = None,
@@ -195,9 +169,7 @@ def get_organization_role_output(name: pulumi.Input[Optional[_builtins.str]] = N
     opts = pulumi.InvokeOutputOptions.merge(_utilities.get_invoke_opts_defaults(), opts)
     __ret__ = pulumi.runtime.invoke_output('pulumiservice:index:getOrganizationRole', __args__, opts=opts, typ=GetOrganizationRoleResult)
     return __ret__.apply(lambda __response__: GetOrganizationRoleResult(
-        default_identifier=pulumi.get(__response__, 'default_identifier'),
+        built_in=pulumi.get(__response__, 'built_in'),
         description=pulumi.get(__response__, 'description'),
-        details=pulumi.get(__response__, 'details'),
         name=pulumi.get(__response__, 'name'),
-        resource_type=pulumi.get(__response__, 'resource_type'),
         role_id=pulumi.get(__response__, 'role_id')))

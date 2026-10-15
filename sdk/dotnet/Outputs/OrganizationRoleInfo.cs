@@ -14,25 +14,17 @@ namespace Pulumi.PulumiService.Outputs
     public sealed class OrganizationRoleInfo
     {
         /// <summary>
-        /// The stable identifier of a built-in role, such as `admin` or `member`. Absent for custom roles.
+        /// Whether this is one of the roles every organization has (Admin, Member and Billing Manager), rather than a custom role.
         /// </summary>
-        public readonly string? DefaultIdentifier;
+        public readonly bool BuiltIn;
         /// <summary>
         /// The role's description, if it has one.
         /// </summary>
         public readonly string? Description;
         /// <summary>
-        /// The role's permission descriptor tree, in the same shape as `OrganizationRole.permissions`.
-        /// </summary>
-        public readonly ImmutableDictionary<string, object>? Details;
-        /// <summary>
         /// The role's name, as shown in the Pulumi Cloud console.
         /// </summary>
         public readonly string Name;
-        /// <summary>
-        /// The type of resource the role applies to, such as `global`, `stack` or `environment`.
-        /// </summary>
-        public readonly string ResourceType;
         /// <summary>
         /// The role's ID. Pass it to inputs that take a role ID, such as `TeamRoleAssignment.roleId` and `OrganizationMember.roleId`.
         /// </summary>
@@ -40,23 +32,17 @@ namespace Pulumi.PulumiService.Outputs
 
         [OutputConstructor]
         private OrganizationRoleInfo(
-            string? defaultIdentifier,
+            bool builtIn,
 
             string? description,
 
-            ImmutableDictionary<string, object>? details,
-
             string name,
-
-            string resourceType,
 
             string roleId)
         {
-            DefaultIdentifier = defaultIdentifier;
+            BuiltIn = builtIn;
             Description = description;
-            Details = details;
             Name = name;
-            ResourceType = resourceType;
             RoleId = roleId;
         }
     }

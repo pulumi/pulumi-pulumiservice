@@ -55,6 +55,7 @@ type GetOrganizationRolesArgs struct {
 }
 
 type GetOrganizationRolesResult struct {
+	// The organization's roles, built-in and custom, sorted by name.
 	Roles []OrganizationRoleInfo `pulumi:"roles"`
 }
 
@@ -86,6 +87,7 @@ func (o GetOrganizationRolesResultOutput) ToGetOrganizationRolesResultOutputWith
 	return o
 }
 
+// The organization's roles, built-in and custom, sorted by name.
 func (o GetOrganizationRolesResultOutput) Roles() OrganizationRoleInfoArrayOutput {
 	return o.ApplyT(func(v GetOrganizationRolesResult) []OrganizationRoleInfo { return v.Roles }).(OrganizationRoleInfoArrayOutput)
 }

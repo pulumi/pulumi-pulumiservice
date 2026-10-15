@@ -50,16 +50,18 @@ type GetOrganizationRolesInput struct {
 
 // OrganizationRoleInfo carries the fields of a single Pulumi Cloud role.
 type OrganizationRoleInfo struct {
-	RoleId            string         `pulumi:"roleId"`
-	Name              string         `pulumi:"name"`
-	Description       *string        `pulumi:"description,optional"`
-	ResourceType      string         `pulumi:"resourceType"`
-	DefaultIdentifier *string        `pulumi:"defaultIdentifier,optional"`
-	Details           map[string]any `pulumi:"details,optional"`
+	RoleId      string  `pulumi:"roleId"`
+	Name        string  `pulumi:"name"`
+	Description *string `pulumi:"description,optional"`
+	BuiltIn     bool    `pulumi:"builtIn"`
 }
 
 type GetOrganizationRolesOutput struct {
 	Roles []OrganizationRoleInfo `pulumi:"roles"`
+}
+
+func (o *GetOrganizationRolesOutput) Annotate(a infer.Annotator) {
+	a.Describe(&o.Roles, "The organization's roles, built-in and custom, sorted by name.")
 }
 
 func (GetOrganizationRolesFunction) Annotate(a infer.Annotator) {
@@ -86,16 +88,9 @@ func (r *OrganizationRoleInfo) Annotate(a infer.Annotator) {
 	a.Describe(&r.Name, "The role's name, as shown in the Pulumi Cloud console.")
 	a.Describe(&r.Description, "The role's description, if it has one.")
 	a.Describe(
-		&r.ResourceType,
-		"The type of resource the role applies to, such as `global`, `stack` or `environment`.",
-	)
-	a.Describe(
-		&r.DefaultIdentifier,
-		"The stable identifier of a built-in role, such as `admin` or `member`. Absent for custom roles.",
-	)
-	a.Describe(
-		&r.Details,
-		"The role's permission descriptor tree, in the same shape as `OrganizationRole.permissions`.",
+		&r.BuiltIn,
+		"Whether this is one of the roles every organization has (Admin, Member and Billing Manager), "+
+			"rather than a custom role.",
 	)
 }
 
@@ -110,11 +105,7 @@ func (GetOrganizationRolesFunction) Invoke(
 
 	out := make([]OrganizationRoleInfo, 0, len(roles))
 	for _, r := range roles {
-		info, err := roleInfoFrom(r)
-		if err != nil {
-			return infer.FunctionResponse[GetOrganizationRolesOutput]{}, err
-		}
-		out = append(out, info)
+		out = append(out, roleInfoFrom(r))
 	}
 	sort.SliceStable(out, func(i, j int) bool {
 		if out[i].Name != out[j].Name {
@@ -189,43 +180,37 @@ func (GetOrganizationRoleFunction) Invoke(
 		)
 	}
 
-	info, err := roleInfoFrom(roles[i])
-	if err != nil {
-		return infer.FunctionResponse[GetOrganizationRoleOutput]{}, err
-	}
 	return infer.FunctionResponse[GetOrganizationRoleOutput]{
-		Output: GetOrganizationRoleOutput{OrganizationRoleInfo: info},
+		Output: GetOrganizationRoleOutput{OrganizationRoleInfo: roleInfoFrom(roles[i])},
 	}, nil
 }
 
+// listOrgRoles returns the organization's roles, built-in and custom. Pulumi
+// Cloud stores roles alongside permission sets and policies; only roles are
+// returned, even if the API's uxPurpose filter lets another kind through.
 func listOrgRoles(ctx context.Context, orgName string) ([]apitype.PermissionDescriptorRecord, error) {
-	roles, err := config.GetClient(ctx).ListOrgRoles(ctx, orgName, apitype.PermissionDescriptorUXPurposeRole)
+	records, err := config.GetClient(ctx).ListOrgRoles(ctx, orgName, apitype.PermissionDescriptorUXPurposeRole)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list roles for organization %q: %w", orgName, err)
 	}
-	return roles, nil
+	return slices.DeleteFunc(records, func(r apitype.PermissionDescriptorRecord) bool {
+		return r.UxPurpose != apitype.PermissionDescriptorUXPurposeRole
+	}), nil
 }
 
-func roleInfoFrom(r apitype.PermissionDescriptorRecord) (OrganizationRoleInfo, error) {
+// roleInfoFrom keeps only the fields that describe a role. The record's
+// resourceType and permission descriptor tree are left out: they describe
+// permission sets and policies, which these functions don't expose.
+func roleInfoFrom(r apitype.PermissionDescriptorRecord) OrganizationRoleInfo {
 	info := OrganizationRoleInfo{
-		RoleId:       r.ID,
-		Name:         r.Name,
-		ResourceType: r.ResourceType,
+		RoleId: r.ID,
+		Name:   r.Name,
+		// Only built-in roles carry a default identifier (admin, member, ...).
+		BuiltIn: r.DefaultIdentifier != "",
 	}
 	if r.Description != "" {
 		description := r.Description
 		info.Description = &description
 	}
-	if r.DefaultIdentifier != "" {
-		defaultIdentifier := r.DefaultIdentifier
-		info.DefaultIdentifier = &defaultIdentifier
-	}
-	if r.Details != nil {
-		details, err := descriptorToSDKMap(r.Details)
-		if err != nil {
-			return OrganizationRoleInfo{}, fmt.Errorf("converting details of role %q: %w", r.Name, err)
-		}
-		info.Details = details
-	}
-	return info, nil
+	return info
 }

@@ -58,25 +58,17 @@ export interface GetOrganizationRoleArgs {
 
 export interface GetOrganizationRoleResult {
     /**
-     * The stable identifier of a built-in role, such as `admin` or `member`. Absent for custom roles.
+     * Whether this is one of the roles every organization has (Admin, Member and Billing Manager), rather than a custom role.
      */
-    readonly defaultIdentifier?: string;
+    readonly builtIn: boolean;
     /**
      * The role's description, if it has one.
      */
     readonly description?: string;
     /**
-     * The role's permission descriptor tree, in the same shape as `OrganizationRole.permissions`.
-     */
-    readonly details?: {[key: string]: any};
-    /**
      * The role's name, as shown in the Pulumi Cloud console.
      */
     readonly name: string;
-    /**
-     * The type of resource the role applies to, such as `global`, `stack` or `environment`.
-     */
-    readonly resourceType: string;
     /**
      * The role's ID. Pass it to inputs that take a role ID, such as `TeamRoleAssignment.roleId` and `OrganizationMember.roleId`.
      */
