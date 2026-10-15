@@ -270,30 +270,16 @@ type PulumiServiceResource interface {
 }
 ```
 
-### Adding Resource Methods
+### Resource Methods
 
-Resource methods enable runtime operations on resources (e.g.,
-`account.triggerScan()`). See
-[InsightsAccount implementation](provider/pkg/resources/insights_account.go)
-and [Pulumi blog](https://www.pulumi.com/blog/resource-methods-for-pulumi-packages/).
-
-**Key steps:**
-
-1. Add API client methods in `provider/pkg/pulumiapi/`
-2. Add `methods` section to resource in `manual-schema.json`, define functions
-   with `__self__` parameter
-3. Implement `Call()` RPC in resource - handle preview mode (empty ID) by
-   returning computed values with `KeepUnknowns: true`:
-   ```go
-   resource.MakeComputed(resource.NewStringProperty(""))
-   resource.MakeComputed(resource.NewNumberProperty(0))
-   ```
-4. **REQUIRED**: Add preview test verifying computed markers
-   (`04da6b54-80e4-46f7-96ec-b56ff0331ba9` for strings,
-   `3eeb2bf0-c639-47a8-9e75-3b44932eb421` for numbers)
-5. Update provider Call() routing in `provider.go`
-6. Create TypeScript integration test with `Quick: true` option
-7. Run `make build_sdks` to regenerate SDKs with methods
+No resource in this provider exposes methods (e.g. `account.triggerScan()`).
+The `infer` framework in `pulumi-go-provider` v1.7.0 has no resource-method
+support, and the provider does not route the `Call` RPC. Adding a method would
+require new plumbing in `provider/pkg/provider/provider.go`, so agree on the
+approach with maintainers before starting. Background:
+[Resource methods for Pulumi packages](https://www.pulumi.com/blog/resource-methods-for-pulumi-packages/).
+Prefer an `infer.Function` invoke (see `provider/pkg/functions/`) when it can
+do the job.
 
 ## API Client Architecture
 
