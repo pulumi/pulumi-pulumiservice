@@ -142,22 +142,45 @@ CHANGELOG.
 
 ### Schema Changes
 
-The provider schema is **manually maintained** at `provider/pkg/provider/manual-schema.json`. When adding/modifying resources:
+The provider schema is assembled from three sources in `MakeProvider`
+(`provider/pkg/provider/provider.go`). Find which one owns a resource before
+editing it:
 
-1. Update `manual-schema.json` with the new resource/property definitions
-2. Run `make provider` to regenerate the provider binary (uses `go generate`)
-3. Run `make build_sdks` to regenerate all language SDKs from the schema
-4. The schema is embedded into the provider binary at build time
+- **`infer` resources and functions (most `pulumiservice:index:*` tokens)**: the
+  schema is derived from Go types in `provider/pkg/resources/` and
+  `provider/pkg/functions/`. Resource, property and function descriptions live in
+  each type's `Annotate(a infer.Annotator)` method (`a.Describe(...)`), and
+  defaults are set with `a.SetDefault(...)`. Registered via
+  `infer.Resource(...)` / `infer.Function(...)` in `provider.go`.
+- **Legacy resources in `provider/pkg/provider/manual-schema.json`**: currently
+  only `DeploymentSettings`, `Environment` and `PolicyGroup`, plus the shared
+  `types` they use. These are served by the custom gRPC server and implement
+  `PulumiServiceResource`.
+- **`pulumiservice:api:*` resources**: generated at runtime from the Pulumi
+  Cloud OpenAPI spec plus `provider/pkg/cloud/metadata.json`.
 
-**CRITICAL**: After changing `manual-schema.json`, you MUST run `make build_sdks`
-to regenerate all language SDKs (Node.js, Python, Go, .NET, Java). Skipping this
-step will cause the SDKs to be out of sync with the schema, leading to runtime
-errors and test failures. The SDKs are generated code and must be rebuilt after
-every schema change.
+`provider/cmd/pulumi-resource-pulumiservice/schema.json` is **generated**. Never
+edit it by hand.
+
+After any schema-affecting change (an `Annotate` method, a Go input/state
+struct, or `manual-schema.json`):
+
+1. `make provider`: rebuild the provider binary
+2. `make schema`: regenerate `schema.json` from the binary
+3. `make build_sdks`: regenerate all language SDKs
+
+**CRITICAL**: Skipping these steps leaves the SDKs out of sync with the schema,
+which causes runtime errors and test failures.
+
+The SDK build also stamps a local dev version into version files
+(`sdk/*/pulumi-plugin.json`, `sdk/nodejs/package.json`,
+`sdk/python/pyproject.toml`, `sdk/dotnet/*.csproj`, `sdk/java/build.gradle`,
+`sdk/go/pulumiservice/internal/pulumiUtilities.go`). Revert those with
+`git checkout --` before committing.
 
 #### Schema JSON Syntax Guidelines
 
-**Important**: The schema JSON must follow strict syntax rules. Common patterns:
+These apply when editing `manual-schema.json`. The schema JSON must follow strict syntax rules. Common patterns:
 
 **Complex Nested Objects**:
 - ❌ **NEVER** define inline objects directly in array `items`:
@@ -196,13 +219,19 @@ every schema change.
 
 ### Adding a New Resource
 
-1. Add resource definition to `provider/pkg/provider/manual-schema.json`
-2. Create API client methods in `provider/pkg/pulumiapi/` (e.g., `teams.go`, `webhooks.go`)
-3. Create resource implementation in `provider/pkg/resources/` implementing `PulumiServiceResource` interface
-4. Register the resource in `provider/pkg/provider/provider.go`
-5. Rebuild provider and SDKs: `make build`
-6. Add examples in `examples/` directory
-7. **IMPORTANT**: Always create a YAML example for the new resource:
+New `index:` resources use `infer`. Don't add resources to `manual-schema.json`.
+Use an existing `infer` resource such as
+`provider/pkg/resources/team_access_token.go` as a template.
+
+1. Create API client methods in `provider/pkg/pulumiapi/` (e.g., `teams.go`, `webhooks.go`)
+2. Create the resource in `provider/pkg/resources/`: a resource struct plus
+   input and state structs with `pulumi:"..."` tags, `Annotate` methods for
+   descriptions, and the `infer.Custom*` CRUD interfaces
+3. Register it with `infer.Resource(&resources.YourResource{})` in
+   `provider/pkg/provider/provider.go`
+4. Regenerate the schema and SDKs (see [Schema Changes](#schema-changes))
+5. Add examples in `examples/` directory
+6. **IMPORTANT**: Always create a YAML example for the new resource:
    - Add a `yaml-*` example directory in `examples/`
    - Create a `README.md` in the example directory that includes a link to the `pulumi convert` documentation (https://www.pulumi.com/docs/iac/cli/commands/pulumi_convert/) for converting the example to other programming languages
    - Register the example test in `examples/examples_yaml_test.go`
@@ -225,7 +254,9 @@ every schema change.
 
 ### Resource Interface
 
-All resources must implement the `PulumiServiceResource` interface:
+The legacy `manual-schema.json` resources implement the `PulumiServiceResource`
+interface (`provider/pkg/provider/provider.go`). `infer` resources don't; they
+implement `infer.CustomCreate`, `infer.CustomRead`, etc. instead:
 
 ```go
 type PulumiServiceResource interface {
