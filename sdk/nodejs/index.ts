@@ -25,6 +25,11 @@ export const buildAllowPermissions: typeof import("./buildAllowPermissions").bui
 export const buildAllowPermissionsOutput: typeof import("./buildAllowPermissions").buildAllowPermissionsOutput = null as any;
 utilities.lazyLoad(exports, ["buildAllowPermissions","buildAllowPermissionsOutput"], () => require("./buildAllowPermissions"));
 
+export { BuildComposePermissionsArgs, BuildComposePermissionsResult, BuildComposePermissionsOutputArgs } from "./buildComposePermissions";
+export const buildComposePermissions: typeof import("./buildComposePermissions").buildComposePermissions = null as any;
+export const buildComposePermissionsOutput: typeof import("./buildComposePermissions").buildComposePermissionsOutput = null as any;
+utilities.lazyLoad(exports, ["buildComposePermissions","buildComposePermissionsOutput"], () => require("./buildComposePermissions"));
+
 export { BuildEnvironmentScopedPermissionsArgs, BuildEnvironmentScopedPermissionsResult, BuildEnvironmentScopedPermissionsOutputArgs } from "./buildEnvironmentScopedPermissions";
 export const buildEnvironmentScopedPermissions: typeof import("./buildEnvironmentScopedPermissions").buildEnvironmentScopedPermissions = null as any;
 export const buildEnvironmentScopedPermissionsOutput: typeof import("./buildEnvironmentScopedPermissions").buildEnvironmentScopedPermissionsOutput = null as any;
@@ -34,6 +39,11 @@ export { BuildInsightsAccountScopedPermissionsArgs, BuildInsightsAccountScopedPe
 export const buildInsightsAccountScopedPermissions: typeof import("./buildInsightsAccountScopedPermissions").buildInsightsAccountScopedPermissions = null as any;
 export const buildInsightsAccountScopedPermissionsOutput: typeof import("./buildInsightsAccountScopedPermissions").buildInsightsAccountScopedPermissionsOutput = null as any;
 utilities.lazyLoad(exports, ["buildInsightsAccountScopedPermissions","buildInsightsAccountScopedPermissionsOutput"], () => require("./buildInsightsAccountScopedPermissions"));
+
+export { BuildRolePermissionsArgs, BuildRolePermissionsResult, BuildRolePermissionsOutputArgs } from "./buildRolePermissions";
+export const buildRolePermissions: typeof import("./buildRolePermissions").buildRolePermissions = null as any;
+export const buildRolePermissionsOutput: typeof import("./buildRolePermissions").buildRolePermissionsOutput = null as any;
+utilities.lazyLoad(exports, ["buildRolePermissions","buildRolePermissionsOutput"], () => require("./buildRolePermissions"));
 
 export { BuildStackScopedPermissionsArgs, BuildStackScopedPermissionsResult, BuildStackScopedPermissionsOutputArgs } from "./buildStackScopedPermissions";
 export const buildStackScopedPermissions: typeof import("./buildStackScopedPermissions").buildStackScopedPermissions = null as any;
@@ -100,6 +110,11 @@ export const getOrganizationMembers: typeof import("./getOrganizationMembers").g
 export const getOrganizationMembersOutput: typeof import("./getOrganizationMembers").getOrganizationMembersOutput = null as any;
 utilities.lazyLoad(exports, ["getOrganizationMembers","getOrganizationMembersOutput"], () => require("./getOrganizationMembers"));
 
+export { GetOrganizationPermissionSetArgs, GetOrganizationPermissionSetResult, GetOrganizationPermissionSetOutputArgs } from "./getOrganizationPermissionSet";
+export const getOrganizationPermissionSet: typeof import("./getOrganizationPermissionSet").getOrganizationPermissionSet = null as any;
+export const getOrganizationPermissionSetOutput: typeof import("./getOrganizationPermissionSet").getOrganizationPermissionSetOutput = null as any;
+utilities.lazyLoad(exports, ["getOrganizationPermissionSet","getOrganizationPermissionSetOutput"], () => require("./getOrganizationPermissionSet"));
+
 export { GetOrganizationRoleScopesArgs, GetOrganizationRoleScopesResult, GetOrganizationRoleScopesOutputArgs } from "./getOrganizationRoleScopes";
 export const getOrganizationRoleScopes: typeof import("./getOrganizationRoleScopes").getOrganizationRoleScopes = null as any;
 export const getOrganizationRoleScopesOutput: typeof import("./getOrganizationRoleScopes").getOrganizationRoleScopesOutput = null as any;
@@ -114,6 +129,11 @@ export { GetPolicyPacksArgs, GetPolicyPacksResult, GetPolicyPacksOutputArgs } fr
 export const getPolicyPacks: typeof import("./getPolicyPacks").getPolicyPacks = null as any;
 export const getPolicyPacksOutput: typeof import("./getPolicyPacks").getPolicyPacksOutput = null as any;
 utilities.lazyLoad(exports, ["getPolicyPacks","getPolicyPacksOutput"], () => require("./getPolicyPacks"));
+
+export { GetStackArgs, GetStackResult, GetStackOutputArgs } from "./getStack";
+export const getStack: typeof import("./getStack").getStack = null as any;
+export const getStackOutput: typeof import("./getStack").getStackOutput = null as any;
+utilities.lazyLoad(exports, ["getStack","getStackOutput"], () => require("./getStack"));
 
 export { InsightsAccountArgs } from "./insightsAccount";
 export type InsightsAccount = import("./insightsAccount").InsightsAccount;

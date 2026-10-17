@@ -1,0 +1,80 @@
+[
+  {
+    "defaultIdentifier": "environment-admin",
+    "description": "Admin access to environments.",
+    "name": "Environment Admin",
+    "resourceType": "environment"
+  },
+  {
+    "defaultIdentifier": "environment-open",
+    "description": "Read/open access to environments.",
+    "name": "Environment Open",
+    "resourceType": "environment"
+  },
+  {
+    "defaultIdentifier": "environment-read",
+    "description": "Read access to environments.",
+    "name": "Environment Read",
+    "resourceType": "environment"
+  },
+  {
+    "defaultIdentifier": "environment-write",
+    "description": "Read/open/write access to environments.",
+    "name": "Environment Write",
+    "resourceType": "environment"
+  },
+  {
+    "defaultIdentifier": "insights-account-admin",
+    "description": "Admin access to insights accounts.",
+    "name": "Account Admin",
+    "resourceType": "insights-account"
+  },
+  {
+    "defaultIdentifier": "insights-account-read",
+    "description": "Read access to insights accounts.",
+    "name": "Account Read",
+    "resourceType": "insights-account"
+  },
+  {
+    "defaultIdentifier": "insights-account-write",
+    "description": "Read/write access to insights accounts.",
+    "name": "Account Write",
+    "resourceType": "insights-account"
+  },
+  {
+    "defaultIdentifier": "org-settings-billing",
+    "description": "Billing access.",
+    "name": "Organization Settings Billing",
+    "resourceType": "global"
+  },
+  {
+    "defaultIdentifier": "org-settings-read-only",
+    "description": "View-only org access: usage, members, stacks, environments, teams, Insights accounts; read deployments, integrations, services, templates, and resources. No create/update/delete.",
+    "name": "Read Only",
+    "resourceType": "global"
+  },
+  {
+    "defaultIdentifier": "org-settings-standard",
+    "description": "View org usage and members; list stacks, environments, teams, and Insights accounts; use deployments, integrations, services, and resources; create resources (stacks, environments, teams, Insights accounts). Excludes billing and member or org admin settings.",
+    "name": "Standard",
+    "resourceType": "global"
+  },
+  {
+    "defaultIdentifier": "stack-admin",
+    "description": "Admin access to stacks, including deployment settings.",
+    "name": "Stack Admin",
+    "resourceType": "stack"
+  },
+  {
+    "defaultIdentifier": "stack-read",
+    "description": "Read access to stacks, including deployment settings.",
+    "name": "Stack Read",
+    "resourceType": "stack"
+  },
+  {
+    "defaultIdentifier": "stack-write",
+    "description": "Read/write access to stacks, including deployment settings.",
+    "name": "Stack Write",
+    "resourceType": "stack"
+  }
+]
