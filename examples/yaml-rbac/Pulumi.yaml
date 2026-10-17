@@ -172,6 +172,6 @@ outputs:
   scopedEnvironmentId: ${scopedEnv.environmentId}
   scopedRoleId: ${scopedReadOnlyRole.roleId}
   lookedUpRoleId: ${lookedUpRole.roleId}
-  lookedUpRoleResourceType: ${lookedUpRole.resourceType}
+  lookedUpRoleBuiltIn: ${lookedUpRole.builtIn}
   adminRoleId: ${adminRole.roleId}
   firstRoleName: ${allRoles.roles[0].name}
