@@ -52,7 +52,7 @@ require (
 	github.com/muesli/termenv v0.16.0 // indirect
 	github.com/pgavlin/fx v0.1.6 // indirect
 	github.com/pulumi/appdash v0.0.0-20231130102222-75f619a67231 // indirect
-	github.com/pulumi/pulumi-cloud-sdk/go v1.20261015.0 // indirect
+	github.com/pulumi/pulumi-cloud-sdk/go v1.20261016.0 // indirect
 	github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e // indirect
 	github.com/zalando/go-keyring v0.2.8 // indirect
 	github.com/zclconf/go-cty v1.16.3 // indirect
