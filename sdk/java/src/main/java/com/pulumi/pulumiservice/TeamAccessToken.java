@@ -19,6 +19,23 @@ import javax.annotation.Nullable;
  * 
  * Unlike `OrgAccessToken`, a provider authenticated with an organization or team access token can create this resource.
  * 
+ * ## Import
+ * 
+ * This resource can be imported using its `id`, which has the format `{organization}/{team}/{name}/{tokenId}`, e.g.,
+ * 
+ * ```sh
+ *  $ pulumi import pulumiservice:index:TeamAccessToken my-team-access-token my-org/my-team/my-token/5c7e0a92-1b3d-4f6e-8a24-9d1b7e3c0f58
+ * ```
+ * 
+ * The Pulumi Cloud console doesn&#39;t show the token ID. List it with the [Pulumi Cloud REST API](https://www.pulumi.com/docs/reference/cloud-rest-api/):
+ * 
+ * ```sh
+ * curl -s -H &#34;Authorization: token $PULUMI_ACCESS_TOKEN&#34; \
+ *   https://api.pulumi.com/api/orgs/my-org/teams/my-team/tokens | jq &#39;.tokens[] | {name, id}&#39;
+ * ```
+ * 
+ * The token&#39;s `value` can&#39;t be read back from Pulumi Cloud, so it&#39;s empty after import.
+ * 
  */
 @ResourceType(type="pulumiservice:index:TeamAccessToken")
 public class TeamAccessToken extends com.pulumi.resources.CustomResource {

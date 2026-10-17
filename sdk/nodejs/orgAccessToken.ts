@@ -8,6 +8,23 @@ import * as utilities from "./utilities";
  * Creates an organization access token in Pulumi Cloud. Organization tokens aren't tied to a user, so they suit CI/CD and other automation.
  *
  * The provider must authenticate as a user, for example with a personal access token, to create or delete this resource. Pulumi Cloud rejects organization and team access tokens here, even Admin ones, with `403 Machine tokens are not allowed to perform this operation`, so that one machine token can't mint another. For automation, use the personal access token of a dedicated service-account user, or use `TeamAccessToken`, which has no such restriction.
+ *
+ * ## Import
+ *
+ * This resource can be imported using its `id`, which has the format `{organization}/{name}/{tokenId}`, e.g.,
+ *
+ * ```sh
+ *  $ pulumi import pulumiservice:index:OrgAccessToken my-org-access-token my-org/my-token/a81d4c3e-52f0-4b7a-b9e2-6d0f1c8e2a47
+ * ```
+ *
+ * The Pulumi Cloud console doesn't show the token ID. List it with the [Pulumi Cloud REST API](https://www.pulumi.com/docs/reference/cloud-rest-api/):
+ *
+ * ```sh
+ * curl -s -H "Authorization: token $PULUMI_ACCESS_TOKEN" \
+ *   https://api.pulumi.com/api/orgs/my-org/tokens | jq '.tokens[] | {name, id}'
+ * ```
+ *
+ * The token's `value` can't be read back from Pulumi Cloud, so it's empty after import.
  */
 export class OrgAccessToken extends pulumi.CustomResource {
     /**
