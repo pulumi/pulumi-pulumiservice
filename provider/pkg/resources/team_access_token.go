@@ -23,6 +23,7 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/property"
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 )
 
 const (
@@ -44,7 +45,11 @@ func (*TeamAccessToken) Annotate(a infer.Annotator) {
 		"Creates a team access token in Pulumi Cloud. The token isn't tied to a user, and it has the "+
 			"permissions granted to its team.\n\n"+
 			"Unlike `OrgAccessToken`, a provider authenticated with an organization or team access token "+
-			"can create this resource.",
+			"can create this resource."+
+			util.ImportDocs("pulumiservice:index:TeamAccessToken", "{organization}/{team}/{name}/{tokenId}",
+				"my-org/my-team/my-token/5c7e0a92-1b3d-4f6e-8a24-9d1b7e3c0f58",
+				util.APIIDHint("token ID", "/api/orgs/my-org/teams/my-team/tokens", ".tokens[] | {name, id}"),
+				"The token's `value` can't be read back from Pulumi Cloud, so it's empty after import."),
 	)
 }
 

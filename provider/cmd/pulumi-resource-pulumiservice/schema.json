@@ -4997,7 +4997,7 @@
       ]
     },
     "pulumiservice:index:AccessToken": {
-      "description": "Creates a personal access token for the Pulumi Cloud user that the provider is authenticated as. The token acts with that user's permissions.\n\nTo create a token that isn't tied to a user, use `OrgAccessToken` or `TeamAccessToken`.",
+      "description": "Creates a personal access token for the Pulumi Cloud user that the provider is authenticated as. The token acts with that user's permissions.\n\nTo create a token that isn't tied to a user, use `OrgAccessToken` or `TeamAccessToken`.\n\n## Import\n\nThis resource can be imported using its `id`, which has the format `{tokenId}`, e.g.,\n\n```sh\n $ pulumi import pulumiservice:index:AccessToken my-access-token 3f2b9c1e-7d4a-4e8b-9a61-0c5d2e8f7b13\n```\n\nThe Pulumi Cloud console doesn't show the token ID. List it with the [Pulumi Cloud REST API](https://www.pulumi.com/docs/reference/cloud-rest-api/):\n\n```sh\ncurl -s -H \"Authorization: token $PULUMI_ACCESS_TOKEN\" \\\n  https://api.pulumi.com/api/user/tokens | jq '.tokens[] | {name, id}'\n```\n\nThe token's `value` can't be read back from Pulumi Cloud, so it's empty after import.\n",
       "properties": {
         "description": {
           "type": "string",
@@ -5026,7 +5026,7 @@
       ]
     },
     "pulumiservice:index:AgentPool": {
-      "description": "Agent Pool for customer managed deployments.",
+      "description": "Agent Pool for customer managed deployments.\n\n## Import\n\nThis resource can be imported using its `id`, which has the format `{organization}/{name}/{agentPoolId}`, e.g.,\n\n```sh\n $ pulumi import pulumiservice:index:AgentPool my-agent-pool my-org/my-pool/e4a1b7c2-9f30-4d58-b6e1-2a7c9d0f4e86\n```\n\nThe agent pool ID is the last segment of its page URL in the Pulumi Cloud console, for example `https://app.pulumi.com/my-org/settings/workflow-runner-pools/e4a1b7c2-9f30-4d58-b6e1-2a7c9d0f4e86`.\n\nThe pool's `tokenValue` can't be read back from Pulumi Cloud, so it's empty after import.\n",
       "properties": {
         "agentPoolId": {
           "type": "string",
@@ -5086,7 +5086,7 @@
       ]
     },
     "pulumiservice:index:ApprovalRule": {
-      "description": "An approval rule for environment deployments.",
+      "description": "An approval rule for environment deployments.\n\n## Import\n\nThis resource can be imported using its `id`, which has the format `environment/{organization}/{project}/{environment}/{ruleId}`, e.g.,\n\n```sh\n $ pulumi import pulumiservice:index:ApprovalRule my-approval-rule environment/my-org/my-project/my-environment/0b9e6f2d-4c81-4a37-9e5b-7f2d1a6c8e03\n```\n\nThe ID starts with the literal segment `environment`.\n\nThe rule ID is the last segment of its page URL in the Pulumi Cloud console, for example `https://app.pulumi.com/my-org/esc/my-project/my-environment/change-requests/ruleset/0b9e6f2d-4c81-4a37-9e5b-7f2d1a6c8e03`.\n",
       "properties": {
         "approvalRuleConfig": {
           "$ref": "#/types/pulumiservice:index:ApprovalRuleConfig",
@@ -5155,7 +5155,7 @@
       ]
     },
     "pulumiservice:index:DeploymentSchedule": {
-      "description": "A scheduled recurring or single time run of a pulumi command.",
+      "description": "A scheduled recurring or single time run of a pulumi command.\n\n## Import\n\nThis resource can be imported using its `id`, which has the format `{organization}/{project}/{stack}/{scheduleId}`, e.g.,\n\n```sh\n $ pulumi import pulumiservice:index:DeploymentSchedule my-deployment-schedule my-org/my-project/my-stack/7d3c5e1a-0f8b-4b26-a9d4-3e6f2b8c1a59\n```\n\nThe Pulumi Cloud console doesn't show the schedule ID. List it with the [Pulumi Cloud REST API](https://www.pulumi.com/docs/reference/cloud-rest-api/):\n\n```sh\ncurl -s -H \"Authorization: token $PULUMI_ACCESS_TOKEN\" \\\n  https://api.pulumi.com/api/stacks/my-org/my-project/my-stack/deployments/schedules | jq '.schedules[]'\n```\n",
       "properties": {
         "organization": {
           "type": "string",
@@ -5235,7 +5235,7 @@
       ]
     },
     "pulumiservice:index:DeploymentSettings": {
-      "description": "Deployment settings configure Pulumi Deployments for a stack.\n\n### Import\n\nDeployment settings can be imported using the `id`, which for deployment settings is `{org}/{project}/{stack}` e.g.,\n\n```sh\n $ pulumi import pulumiservice:index:DeploymentSettings my_settings my-org/my-project/my-stack\n```\n\n",
+      "description": "Deployment settings configure Pulumi Deployments for a stack.\n\n## Import\n\nThis resource can be imported using its `id`, which has the format `{organization}/{project}/{stack}`, e.g.,\n\n```sh\n $ pulumi import pulumiservice:index:DeploymentSettings my-deployment-settings my-org/my-project/my-stack\n```\n\nSecret values can't be read back from Pulumi Cloud, so import sets each one to the placeholder `<REPLACE WITH ACTUAL SECRET VALUE>`. Replace them with the real values in your program.\n",
       "properties": {
         "agentPoolId": {
           "type": "string",
@@ -5337,7 +5337,7 @@
       ]
     },
     "pulumiservice:index:DriftSchedule": {
-      "description": "A cron schedule to run drift detection.",
+      "description": "A cron schedule to run drift detection.\n\n## Import\n\nThis resource can be imported using its `id`, which has the format `{organization}/{project}/{stack}/drift/{scheduleId}`, e.g.,\n\n```sh\n $ pulumi import pulumiservice:index:DriftSchedule my-drift-schedule my-org/my-project/my-stack/drift/7d3c5e1a-0f8b-4b26-a9d4-3e6f2b8c1a59\n```\n\nThe Pulumi Cloud console doesn't show the schedule ID. List it with the [Pulumi Cloud REST API](https://www.pulumi.com/docs/reference/cloud-rest-api/):\n\n```sh\ncurl -s -H \"Authorization: token $PULUMI_ACCESS_TOKEN\" \\\n  https://api.pulumi.com/api/stacks/my-org/my-project/my-stack/deployments/schedules | jq '.schedules[]'\n```\n",
       "properties": {
         "autoRemediate": {
           "type": "boolean",
@@ -5410,7 +5410,7 @@
       ]
     },
     "pulumiservice:index:Environment": {
-      "description": "An ESC Environment.",
+      "description": "An ESC Environment.\n\n## Import\n\nThis resource can be imported using its `id`, which has the format `{organization}/{project}/{environment}`, e.g.,\n\n```sh\n $ pulumi import pulumiservice:index:Environment my-environment my-org/my-project/my-environment\n```\n\nThe legacy format `{organization}/{environment}` is also accepted, and uses the `default` project.\n",
       "properties": {
         "environmentId": {
           "type": "string",
@@ -5470,7 +5470,7 @@
       ]
     },
     "pulumiservice:index:EnvironmentRotationSchedule": {
-      "description": "A scheduled recurring or single time environment rotation.",
+      "description": "A scheduled recurring or single time environment rotation.\n\n## Import\n\nThis resource can be imported using its `id`, which has the format `{organization}/{project}/{environment}/rotations/{scheduleId}`, e.g.,\n\n```sh\n $ pulumi import pulumiservice:index:EnvironmentRotationSchedule my-environment-rotation-schedule my-org/my-project/my-environment/rotations/c2f8a4d6-3e1b-4c97-8b50-1d9e7a2f6c34\n```\n\nThe Pulumi Cloud console doesn't show the schedule ID. List it with the [Pulumi Cloud REST API](https://www.pulumi.com/docs/reference/cloud-rest-api/):\n\n```sh\ncurl -s -H \"Authorization: token $PULUMI_ACCESS_TOKEN\" \\\n  https://api.pulumi.com/api/esc/environments/my-org/my-project/my-environment/schedules | jq '.schedules[]'\n```\n",
       "properties": {
         "environment": {
           "type": "string",
@@ -5540,7 +5540,7 @@
       ]
     },
     "pulumiservice:index:EnvironmentVersionTag": {
-      "description": "A tag on a specific revision of an environment.",
+      "description": "A tag on a specific revision of an environment.\n\n## Import\n\nThis resource can be imported using its `id`, which has the format `{organization}/{project}/{environment}/{tagName}`, e.g.,\n\n```sh\n $ pulumi import pulumiservice:index:EnvironmentVersionTag my-environment-version-tag my-org/my-project/my-environment/my-tag\n```\n\nThe legacy format `{organization}/{environment}/{tagName}` is also accepted, and uses the `default` project.\n",
       "properties": {
         "environment": {
           "type": "string",
@@ -5610,7 +5610,7 @@
       ]
     },
     "pulumiservice:index:InsightsAccount": {
-      "description": "Insights Account for cloud resource scanning and analysis across AWS, Azure, and GCP.",
+      "description": "Insights Account for cloud resource scanning and analysis across AWS, Azure, and GCP.\n\n## Import\n\nThis resource can be imported using its `id`, which has the format `{organization}/{accountName}`, e.g.,\n\n```sh\n $ pulumi import pulumiservice:index:InsightsAccount my-insights-account my-org/my-account\n```\n\n`scanSchedule` isn't read back from Pulumi Cloud, so set it in your program after import.\n",
       "properties": {
         "accountName": {
           "type": "string",
@@ -5717,7 +5717,7 @@
       ]
     },
     "pulumiservice:index:OidcIssuer": {
-      "description": "Register an OIDC Provider to establish a trust relationship between third-party systems like GitHub Actions and Pulumi Cloud, obviating the need to store a hard-coded Pulumi Cloud token in systems that need to run Pulumi commands or consume Pulumi Cloud APIs. Instead of a hard-coded, static token that must be manually rotated, trusted systems are granted temporary Pulumi Cloud tokens on an as-needed basis, which is more secure than static tokens.",
+      "description": "Register an OIDC Provider to establish a trust relationship between third-party systems like GitHub Actions and Pulumi Cloud, obviating the need to store a hard-coded Pulumi Cloud token in systems that need to run Pulumi commands or consume Pulumi Cloud APIs. Instead of a hard-coded, static token that must be manually rotated, trusted systems are granted temporary Pulumi Cloud tokens on an as-needed basis, which is more secure than static tokens.\n\n## Import\n\nThis resource can be imported using its `id`, which has the format `{organization}/{issuerId}`, e.g.,\n\n```sh\n $ pulumi import pulumiservice:index:OidcIssuer my-oidc-issuer my-org/9a6e2c4f-8b17-4d03-a5c9-6f1e3b7d2a80\n```\n\nThe Pulumi Cloud console doesn't show the issuer ID. List it with the [Pulumi Cloud REST API](https://www.pulumi.com/docs/reference/cloud-rest-api/):\n\n```sh\ncurl -s -H \"Authorization: token $PULUMI_ACCESS_TOKEN\" \\\n  https://api.pulumi.com/api/orgs/my-org/oidc/issuers | jq '.oidcIssuers[] | {name, id}'\n```\n",
       "properties": {
         "maxExpirationSeconds": {
           "type": "integer",
@@ -5800,7 +5800,7 @@
       ]
     },
     "pulumiservice:index:OrgAccessToken": {
-      "description": "Creates an organization access token in Pulumi Cloud. Organization tokens aren't tied to a user, so they suit CI/CD and other automation.\n\nThe provider must authenticate as a user, for example with a personal access token, to create or delete this resource. Pulumi Cloud rejects organization and team access tokens here, even Admin ones, with `403 Machine tokens are not allowed to perform this operation`, so that one machine token can't mint another. For automation, use the personal access token of a dedicated service-account user, or use `TeamAccessToken`, which has no such restriction.",
+      "description": "Creates an organization access token in Pulumi Cloud. Organization tokens aren't tied to a user, so they suit CI/CD and other automation.\n\nThe provider must authenticate as a user, for example with a personal access token, to create or delete this resource. Pulumi Cloud rejects organization and team access tokens here, even Admin ones, with `403 Machine tokens are not allowed to perform this operation`, so that one machine token can't mint another. For automation, use the personal access token of a dedicated service-account user, or use `TeamAccessToken`, which has no such restriction.\n\n## Import\n\nThis resource can be imported using its `id`, which has the format `{organization}/{name}/{tokenId}`, e.g.,\n\n```sh\n $ pulumi import pulumiservice:index:OrgAccessToken my-org-access-token my-org/my-token/a81d4c3e-52f0-4b7a-b9e2-6d0f1c8e2a47\n```\n\nThe Pulumi Cloud console doesn't show the token ID. List it with the [Pulumi Cloud REST API](https://www.pulumi.com/docs/reference/cloud-rest-api/):\n\n```sh\ncurl -s -H \"Authorization: token $PULUMI_ACCESS_TOKEN\" \\\n  https://api.pulumi.com/api/orgs/my-org/tokens | jq '.tokens[] | {name, id}'\n```\n\nThe token's `value` can't be read back from Pulumi Cloud, so it's empty after import.\n",
       "properties": {
         "admin": {
           "type": "boolean",
@@ -5864,7 +5864,7 @@
       ]
     },
     "pulumiservice:index:OrganizationMember": {
-      "description": "Manages a user's membership in a Pulumi Cloud organization and their assigned role. The user must already have a Pulumi Cloud account before they can be added. Custom (fine-grained) roles are assigned by setting `roleId`; built-in roles are assigned by setting `role`. When both are set, `roleId` takes precedence.",
+      "description": "Manages a user's membership in a Pulumi Cloud organization and their assigned role. The user must already have a Pulumi Cloud account before they can be added. Custom (fine-grained) roles are assigned by setting `roleId`; built-in roles are assigned by setting `role`. When both are set, `roleId` takes precedence.\n\n## Import\n\nThis resource can be imported using its `id`, which has the format `{organization}/{username}`, e.g.,\n\n```sh\n $ pulumi import pulumiservice:index:OrganizationMember my-organization-member my-org/my-user\n```\n",
       "properties": {
         "adopted": {
           "type": "boolean",
@@ -5935,7 +5935,7 @@
       ]
     },
     "pulumiservice:index:OrganizationRole": {
-      "description": "A custom (fine-grained) role defined on a Pulumi Cloud organization. Custom roles allow precise permission control beyond the built-in `admin` / `member` / `billing-manager` roles. Assign them to members via the `OrganizationMember.roleId` field or to teams via `TeamRoleAssignment`.\n\nRequires the Custom Roles feature to be enabled on the organization. See the [Pulumi Cloud RBAC docs](https://www.pulumi.com/docs/pulumi-cloud/access-management/rbac/) for the shape of the `permissions` descriptor.\n\nThis resource manages only permission descriptors with `uxPurpose=\"role\"`. Pulumi Cloud uses `uxPurpose` to split the permission-descriptor table into roles and other kinds (for example `policy`). Use `pulumiservice:api:Role`, which exposes `uxPurpose` directly, to manage the other kinds.",
+      "description": "A custom (fine-grained) role defined on a Pulumi Cloud organization. Custom roles allow precise permission control beyond the built-in `admin` / `member` / `billing-manager` roles. Assign them to members via the `OrganizationMember.roleId` field or to teams via `TeamRoleAssignment`.\n\nRequires the Custom Roles feature to be enabled on the organization. See the [Pulumi Cloud RBAC docs](https://www.pulumi.com/docs/pulumi-cloud/access-management/rbac/) for the shape of the `permissions` descriptor.\n\nThis resource manages only permission descriptors with `uxPurpose=\"role\"`. Pulumi Cloud uses `uxPurpose` to split the permission-descriptor table into roles and other kinds (for example `policy`). Use `pulumiservice:api:Role`, which exposes `uxPurpose` directly, to manage the other kinds.\n\n## Import\n\nThis resource can be imported using its `id`, which has the format `{organization}/{roleId}`, e.g.,\n\n```sh\n $ pulumi import pulumiservice:index:OrganizationRole my-organization-role my-org/1e5b8d3a-6c42-4f90-b7a1-8d2c4e6f0b95\n```\n\nThe role ID is the last segment of its page URL in the Pulumi Cloud console, for example `https://app.pulumi.com/my-org/settings/access-management/roles/details/1e5b8d3a-6c42-4f90-b7a1-8d2c4e6f0b95`.\n",
       "properties": {
         "description": {
           "type": "string",
@@ -6010,7 +6010,7 @@
       ]
     },
     "pulumiservice:index:PolicyGroup": {
-      "description": "A Policy Group allows you to apply policy packs to a set of stacks in your organization.",
+      "description": "A Policy Group allows you to apply policy packs to a set of stacks in your organization.\n\n## Import\n\nThis resource can be imported using its `id`, which has the format `{organization}/{policyGroupName}`, e.g.,\n\n```sh\n $ pulumi import pulumiservice:index:PolicyGroup my-policy-group my-org/my-policy-group\n```\n",
       "properties": {
         "accounts": {
           "type": "array",
@@ -6107,7 +6107,7 @@
       ]
     },
     "pulumiservice:index:PolicyPack": {
-      "description": "A Policy Pack published to Pulumi Cloud. The source directory is tarballed and uploaded on Create; changing source content publishes a new version (replace).",
+      "description": "A Policy Pack published to Pulumi Cloud. The source directory is tarballed and uploaded on Create; changing source content publishes a new version (replace).\n\n## Import\n\nThis resource can be imported using its `id`, which has the format `{organization}/{name}/{versionTag}`, e.g.,\n\n```sh\n $ pulumi import pulumiservice:index:PolicyPack my-policy-pack my-org/my-policy-pack/1.0.0\n```\n\nOnly the organization, name, version tag and display name are read back. Set `sourcePath` in your program after import.\n",
       "properties": {
         "contentHash": {
           "type": "string"
@@ -6188,7 +6188,7 @@
       ]
     },
     "pulumiservice:index:Stack": {
-      "description": "A stack is a collection of resources that share a common lifecycle. Stacks are uniquely identified by their name and the project they belong to.",
+      "description": "A stack is a collection of resources that share a common lifecycle. Stacks are uniquely identified by their name and the project they belong to.\n\n## Import\n\nThis resource can be imported using its `id`, which has the format `{organization}/{project}/{stack}`, e.g.,\n\n```sh\n $ pulumi import pulumiservice:index:Stack my-stack my-org/my-project/my-stack\n```\n",
       "properties": {
         "forceDestroy": {
           "type": "boolean",
@@ -6243,7 +6243,7 @@
       ]
     },
     "pulumiservice:index:StackTag": {
-      "description": "Stacks have associated metadata in the form of tags. Each tag consists of a name and value.",
+      "description": "Stacks have associated metadata in the form of tags. Each tag consists of a name and value.\n\n## Import\n\nThis resource can be imported using its `id`, which has the format `{organization}/{project}/{stack}/{tagName}`, e.g.,\n\n```sh\n $ pulumi import pulumiservice:index:StackTag my-stack-tag my-org/my-project/my-stack/my-tag\n```\n",
       "properties": {
         "name": {
           "type": "string",
@@ -6314,7 +6314,7 @@
       ]
     },
     "pulumiservice:index:StackTags": {
-      "description": "Manages a set of stack tags as a single resource via a `tags` map, instead of one `StackTag` per key — useful for YAML programs.\n\nOnly tags declared in `tags` are managed; tags added out-of-band (CLI, pulumibot, a singular `StackTag` resource) are left alone. Tag values are immutable in Pulumi Cloud, so a value change is implemented as delete-and-recreate.\n\nImporting with ID `{organization}/{project}/{stack}/tags` adopts every tag currently on the stack; declare `tags` explicitly after import so subsequent updates match your intent. See the [registry docs](https://www.pulumi.com/registry/packages/pulumiservice/api-docs/stacktags/) for full usage and examples.\n",
+      "description": "Manages a set of stack tags as a single resource via a `tags` map, instead of one `StackTag` per key — useful for YAML programs.\n\nOnly tags declared in `tags` are managed; tags added out-of-band (CLI, pulumibot, a singular `StackTag` resource) are left alone. Tag values are immutable in Pulumi Cloud, so a value change is implemented as delete-and-recreate.\n\n## Import\n\nThis resource can be imported using its `id`, which has the format `{organization}/{project}/{stack}/tags`, e.g.,\n\n```sh\n $ pulumi import pulumiservice:index:StackTags my-stack-tags my-org/my-project/my-stack/tags\n```\n\nThe ID ends with the literal segment `tags`. Import adopts every tag currently on the stack; declare `tags` explicitly after import so subsequent updates match your intent.\n",
       "properties": {
         "organization": {
           "type": "string",
@@ -6377,7 +6377,7 @@
       ]
     },
     "pulumiservice:index:Team": {
-      "description": "The Pulumi Cloud offers role-based access control (RBAC) using teams. Teams allow organization admins to assign a set of stack permissions to a group of users.",
+      "description": "The Pulumi Cloud offers role-based access control (RBAC) using teams. Teams allow organization admins to assign a set of stack permissions to a group of users.\n\n## Import\n\nThis resource can be imported using its `id`, which has the format `{organization}/{teamName}`, e.g.,\n\n```sh\n $ pulumi import pulumiservice:index:Team my-team my-org/my-team\n```\n\nFor GitHub teams, `githubTeamId` isn't read back, so set it in your program after import.\n",
       "properties": {
         "description": {
           "type": "string",
@@ -6461,7 +6461,7 @@
       ]
     },
     "pulumiservice:index:TeamAccessToken": {
-      "description": "Creates a team access token in Pulumi Cloud. The token isn't tied to a user, and it has the permissions granted to its team.\n\nUnlike `OrgAccessToken`, a provider authenticated with an organization or team access token can create this resource.",
+      "description": "Creates a team access token in Pulumi Cloud. The token isn't tied to a user, and it has the permissions granted to its team.\n\nUnlike `OrgAccessToken`, a provider authenticated with an organization or team access token can create this resource.\n\n## Import\n\nThis resource can be imported using its `id`, which has the format `{organization}/{team}/{name}/{tokenId}`, e.g.,\n\n```sh\n $ pulumi import pulumiservice:index:TeamAccessToken my-team-access-token my-org/my-team/my-token/5c7e0a92-1b3d-4f6e-8a24-9d1b7e3c0f58\n```\n\nThe Pulumi Cloud console doesn't show the token ID. List it with the [Pulumi Cloud REST API](https://www.pulumi.com/docs/reference/cloud-rest-api/):\n\n```sh\ncurl -s -H \"Authorization: token $PULUMI_ACCESS_TOKEN\" \\\n  https://api.pulumi.com/api/orgs/my-org/teams/my-team/tokens | jq '.tokens[] | {name, id}'\n```\n\nThe token's `value` can't be read back from Pulumi Cloud, so it's empty after import.\n",
       "properties": {
         "description": {
           "type": "string",
@@ -6524,7 +6524,7 @@
       ]
     },
     "pulumiservice:index:TeamEnvironmentPermission": {
-      "description": "A permission for a team to use an environment.",
+      "description": "A permission for a team to use an environment.\n\n## Import\n\nThis resource can be imported using its `id`, which has the format `{organization}/{team}/{project}+{environment}`, e.g.,\n\n```sh\n $ pulumi import pulumiservice:index:TeamEnvironmentPermission my-team-environment-permission my-org/my-team/my-project+my-environment\n```\n\nThe project and environment are joined with `+`, not `/`. The legacy format `{organization}/{team}/{environment}` is also accepted, and uses the `default` project.\n",
       "properties": {
         "environment": {
           "type": "string",
@@ -6606,7 +6606,7 @@
       ]
     },
     "pulumiservice:index:TeamRoleAssignment": {
-      "description": "Assigns a custom (fine-grained) role to a Pulumi Cloud team. The Pulumi Cloud API currently supports one role per team; creating a second assignment replaces the first. The team's organization must already have the custom-roles feature enabled.",
+      "description": "Assigns a custom (fine-grained) role to a Pulumi Cloud team. The Pulumi Cloud API currently supports one role per team; creating a second assignment replaces the first. The team's organization must already have the custom-roles feature enabled.\n\n## Import\n\nThis resource can be imported using its `id`, which has the format `{organization}/{team}/{roleId}`, e.g.,\n\n```sh\n $ pulumi import pulumiservice:index:TeamRoleAssignment my-team-role-assignment my-org/my-team/1e5b8d3a-6c42-4f90-b7a1-8d2c4e6f0b95\n```\n\nThe role ID is the last segment of its page URL in the Pulumi Cloud console, for example `https://app.pulumi.com/my-org/settings/access-management/roles/details/1e5b8d3a-6c42-4f90-b7a1-8d2c4e6f0b95`.\n",
       "properties": {
         "organizationName": {
           "type": "string",
@@ -6658,7 +6658,7 @@
       ]
     },
     "pulumiservice:index:TeamStackPermission": {
-      "description": "Grants a team permissions to the specified stack.",
+      "description": "Grants a team permissions to the specified stack.\n\n## Import\n\nThis resource can be imported using its `id`, which has the format `{organization}/{project}/{stack}/{team}`, e.g.,\n\n```sh\n $ pulumi import pulumiservice:index:TeamStackPermission my-team-stack-permission my-org/my-project/my-stack/my-team\n```\n",
       "properties": {
         "organization": {
           "type": "string",
@@ -6729,7 +6729,7 @@
       ]
     },
     "pulumiservice:index:TemplateSource": {
-      "description": "A source for Pulumi templates.",
+      "description": "A source for Pulumi templates.\n\n## Import\n\nThis resource can be imported using its `id`, which has the format `{organization}/{templateSourceId}`, e.g.,\n\n```sh\n $ pulumi import pulumiservice:index:TemplateSource my-template-source my-org/6f0d3b9e-2a75-4c18-9e46-b3a8c1d7e520\n```\n\nThe Pulumi Cloud console doesn't show the template source ID. List it with the [Pulumi Cloud REST API](https://www.pulumi.com/docs/reference/cloud-rest-api/):\n\n```sh\ncurl -s -H \"Authorization: token $PULUMI_ACCESS_TOKEN\" \\\n  https://api.pulumi.com/api/orgs/my-org/templates/sources | jq '.sources[] | {name, id}'\n```\n",
       "properties": {
         "destination": {
           "$ref": "#/types/pulumiservice:index:TemplateSourceDestination",
@@ -6780,7 +6780,7 @@
       ]
     },
     "pulumiservice:index:TtlSchedule": {
-      "description": "A scheduled stack destroy run.",
+      "description": "A scheduled stack destroy run.\n\n## Import\n\nThis resource can be imported using its `id`, which has the format `{organization}/{project}/{stack}/ttl/{scheduleId}`, e.g.,\n\n```sh\n $ pulumi import pulumiservice:index:TtlSchedule my-ttl-schedule my-org/my-project/my-stack/ttl/7d3c5e1a-0f8b-4b26-a9d4-3e6f2b8c1a59\n```\n\nThe Pulumi Cloud console doesn't show the schedule ID. List it with the [Pulumi Cloud REST API](https://www.pulumi.com/docs/reference/cloud-rest-api/):\n\n```sh\ncurl -s -H \"Authorization: token $PULUMI_ACCESS_TOKEN\" \\\n  https://api.pulumi.com/api/stacks/my-org/my-project/my-stack/deployments/schedules | jq '.schedules[]'\n```\n",
       "properties": {
         "deleteAfterDestroy": {
           "type": "boolean",
@@ -6855,7 +6855,7 @@
       ]
     },
     "pulumiservice:index:Webhook": {
-      "description": "Pulumi Webhooks allow you to notify external services of events happening within your Pulumi organization or stack. For example, you can trigger a notification whenever a stack is updated. Whenever an event occurs, Pulumi will send an HTTP POST request to all registered webhooks. The webhook can then be used to emit some notification, start running integration tests, or even update additional stacks.\n\n### Import\n\nPulumi webhooks can be imported using the `id`, which for webhooks is `{org}/{project}/{stack}/{webhook-name}` e.g.,\n\n```sh\n $ pulumi import pulumiservice:index:Webhook my_webhook my-org/my-project/my-stack/4b0d0671\n```\n\n",
+      "description": "Pulumi Webhooks allow you to notify external services of events happening within your Pulumi organization or stack. For example, you can trigger a notification whenever a stack is updated. Whenever an event occurs, Pulumi will send an HTTP POST request to all registered webhooks. The webhook can then be used to emit some notification, start running integration tests, or even update additional stacks.\n\n## Import\n\nThis resource can be imported using its `id`, which has the format `{organization}/{project}/{stack}/{webhookName}`, e.g.,\n\n```sh\n $ pulumi import pulumiservice:index:Webhook my-webhook my-org/my-project/my-stack/4b0d0671\n```\n\nOrganization webhooks use `{organization}/{webhookName}`, and environment webhooks use `{organization}/environment/{project}/{environment}/{webhookName}`.\n\nThe webhook name is the last segment of its page URL in the Pulumi Cloud console, for example `https://app.pulumi.com/my-org/my-project/my-stack/settings/webhooks/4b0d0671`. It's an 8-character hex value that Pulumi Cloud assigned, not the webhook's display name.\n\nThe webhook's `secret` can't be read back from Pulumi Cloud, so it's empty after import.\n",
       "properties": {
         "active": {
           "type": "boolean",

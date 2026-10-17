@@ -25,6 +25,7 @@ import (
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 )
 
 type EnvironmentPermission string
@@ -63,7 +64,11 @@ var (
 )
 
 func (*TeamEnvironmentPermission) Annotate(a infer.Annotator) {
-	a.Describe(&TeamEnvironmentPermission{}, "A permission for a team to use an environment.")
+	a.Describe(&TeamEnvironmentPermission{}, "A permission for a team to use an environment."+
+		util.ImportDocs("pulumiservice:index:TeamEnvironmentPermission",
+			"{organization}/{team}/{project}+{environment}", "my-org/my-team/my-project+my-environment",
+			"The project and environment are joined with `+`, not `/`. The legacy format "+
+				"`{organization}/{team}/{environment}` is also accepted, and uses the `default` project."))
 	a.SetToken("index", "TeamEnvironmentPermission")
 }
 

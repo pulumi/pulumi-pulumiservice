@@ -21,13 +21,19 @@ import javax.annotation.Nullable;
 /**
  * Pulumi Webhooks allow you to notify external services of events happening within your Pulumi organization or stack. For example, you can trigger a notification whenever a stack is updated. Whenever an event occurs, Pulumi will send an HTTP POST request to all registered webhooks. The webhook can then be used to emit some notification, start running integration tests, or even update additional stacks.
  * 
- * ### Import
+ * ## Import
  * 
- * Pulumi webhooks can be imported using the `id`, which for webhooks is `{org}/{project}/{stack}/{webhook-name}` e.g.,
+ * This resource can be imported using its `id`, which has the format `{organization}/{project}/{stack}/{webhookName}`, e.g.,
  * 
  * ```sh
- *  $ pulumi import pulumiservice:index:Webhook my_webhook my-org/my-project/my-stack/4b0d0671
+ *  $ pulumi import pulumiservice:index:Webhook my-webhook my-org/my-project/my-stack/4b0d0671
  * ```
+ * 
+ * Organization webhooks use `{organization}/{webhookName}`, and environment webhooks use `{organization}/environment/{project}/{environment}/{webhookName}`.
+ * 
+ * The webhook name is the last segment of its page URL in the Pulumi Cloud console, for example `https://app.pulumi.com/my-org/my-project/my-stack/settings/webhooks/4b0d0671`. It&#39;s an 8-character hex value that Pulumi Cloud assigned, not the webhook&#39;s display name.
+ * 
+ * The webhook&#39;s `secret` can&#39;t be read back from Pulumi Cloud, so it&#39;s empty after import.
  * 
  */
 @ResourceType(type="pulumiservice:index:Webhook")

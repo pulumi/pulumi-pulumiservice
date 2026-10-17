@@ -13,6 +13,16 @@ import (
 )
 
 // Manages a user's membership in a Pulumi Cloud organization and their assigned role. The user must already have a Pulumi Cloud account before they can be added. Custom (fine-grained) roles are assigned by setting `roleId`; built-in roles are assigned by setting `role`. When both are set, `roleId` takes precedence.
+//
+// ## Import
+//
+// This resource can be imported using its `id`, which has the format `{organization}/{username}`, e.g.,
+//
+// ```sh
+//
+//	$ pulumi import pulumiservice:index:OrganizationMember my-organization-member my-org/my-user
+//
+// ```
 type OrganizationMember struct {
 	pulumi.CustomResourceState
 

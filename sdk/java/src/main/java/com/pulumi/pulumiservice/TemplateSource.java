@@ -18,6 +18,21 @@ import javax.annotation.Nullable;
 /**
  * A source for Pulumi templates.
  * 
+ * ## Import
+ * 
+ * This resource can be imported using its `id`, which has the format `{organization}/{templateSourceId}`, e.g.,
+ * 
+ * ```sh
+ *  $ pulumi import pulumiservice:index:TemplateSource my-template-source my-org/6f0d3b9e-2a75-4c18-9e46-b3a8c1d7e520
+ * ```
+ * 
+ * The Pulumi Cloud console doesn&#39;t show the template source ID. List it with the [Pulumi Cloud REST API](https://www.pulumi.com/docs/reference/cloud-rest-api/):
+ * 
+ * ```sh
+ * curl -s -H &#34;Authorization: token $PULUMI_ACCESS_TOKEN&#34; \
+ *   https://api.pulumi.com/api/orgs/my-org/templates/sources | jq &#39;.sources[] | {name, id}&#39;
+ * ```
+ * 
  */
 @ResourceType(type="pulumiservice:index:TemplateSource")
 public class TemplateSource extends com.pulumi.resources.CustomResource {
