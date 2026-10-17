@@ -642,6 +642,9 @@ func TestYamlRbacExample(t *testing.T) {
 		assert.Equal(t, up.Outputs["roleId"].Value, lookedUp.Value,
 			"expected getOrganizationRole to find the role created by the example")
 	}
+	if builtIn, ok := up.Outputs["lookedUpRoleBuiltIn"]; ok {
+		assert.Equal(t, false, builtIn.Value, "expected the looked-up custom role not to be built in")
+	}
 	if adminRoleID, ok := up.Outputs["adminRoleId"]; ok {
 		assert.NotEmpty(t, adminRoleID.Value, "expected getOrganizationRole to find the built-in Admin role")
 	}
