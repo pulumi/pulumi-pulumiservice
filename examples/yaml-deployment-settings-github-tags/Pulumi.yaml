@@ -1,11 +1,13 @@
-# Requires an organization with the Pulumi GitHub app installed on
-# `repository`. TestYamlDeploymentSettingsGitHubTagsExample skips unless
-# PULUMI_TEST_GITHUB_REPOSITORY is set, so it doesn't run in CI today.
+# This example requires an organization with the Pulumi GitHub app
+# installed on the repository. It cannot run in CI automatically.
 #
 # To test manually:
-#   export PULUMI_TEST_OWNER=<org with the GitHub app installed>
-#   export PULUMI_TEST_GITHUB_REPOSITORY=<owner/repo the app can access>
-#   go test -v -run TestYamlDeploymentSettingsGitHubTagsExample -tags yaml -timeout 10m
+#   1. Set PULUMI_BACKEND_URL and PULUMI_ACCESS_TOKEN for your environment
+#   2. Set the organizationName and repository config values to an
+#      organization and repository the GitHub app can access
+#   3. Run: pulumi up, then pulumi refresh
+#   4. Check that the stack's deployment settings in Pulumi Cloud deploy
+#      on tags matching the filters
 name: yaml-deployment-settings-github-tags
 runtime: yaml
 description: Deployment settings that deploy on git tags
