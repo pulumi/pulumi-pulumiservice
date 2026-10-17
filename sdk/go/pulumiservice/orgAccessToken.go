@@ -15,17 +15,57 @@ import (
 // Creates an organization access token in Pulumi Cloud. Organization tokens aren't tied to a user, so they suit CI/CD and other automation.
 //
 // The provider must authenticate as a user, for example with a personal access token, to create or delete this resource. Pulumi Cloud rejects organization and team access tokens here, even Admin ones, with `403 Machine tokens are not allowed to perform this operation`, so that one machine token can't mint another. For automation, use the personal access token of a dedicated service-account user, or use `TeamAccessToken`, which has no such restriction.
+//
+// ## Example Usage
+// ### Token with an expiry and a custom role
+//
+// ```go
+// package main
+//
+// import (
+//
+//	"github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice"
+//	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
+//
+// )
+//
+//	func main() {
+//		pulumi.Run(func(ctx *pulumi.Context) error {
+//			ciDeployerRole := pulumiservice.GetOrganizationRoleOutput(ctx, pulumiservice.GetOrganizationRoleOutputArgs{
+//				OrganizationName: pulumi.String("my-org"),
+//				Name:             pulumi.String("CI Deployer"),
+//			}, nil)
+//			ciToken, err := pulumiservice.NewOrgAccessToken(ctx, "ciToken", &pulumiservice.OrgAccessTokenArgs{
+//				OrganizationName: pulumi.String("my-org"),
+//				Name:             pulumi.String("ci-token"),
+//				Description:      pulumi.String("Token for CI pipelines"),
+//				Expires:          pulumi.String("2027-06-30T17:00:00Z"),
+//				RoleId:           ciDeployerRole.RoleId(),
+//			})
+//			if err != nil {
+//				return err
+//			}
+//			ctx.Export("ciTokenValue", ciToken.Value)
+//			return nil
+//		})
+//	}
+//
+// ```
 type OrgAccessToken struct {
 	pulumi.CustomResourceState
 
-	// Whether the token has the Admin role. Defaults to `false`.
+	// Whether the token has the Admin role. Defaults to `false`. Mutually exclusive with `roleId`: set `admin: true` or `roleId`, not both.
 	Admin pulumi.BoolOutput `pulumi:"admin"`
 	// A description of the token.
 	Description pulumi.StringPtrOutput `pulumi:"description"`
+	// When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`. Omit it for a token that never expires. Pulumi Cloud rejects an expiry that is in the past, more than two years away, or beyond the organization's maximum token lifetime.
+	Expires pulumi.StringPtrOutput `pulumi:"expires"`
 	// The name for the token.
 	Name pulumi.StringOutput `pulumi:"name"`
 	// The organization's name.
 	OrganizationName pulumi.StringOutput `pulumi:"organizationName"`
+	// The ID of the role to assign to the token. Use `getOrganizationRole` to look up a role's ID by its name. Mutually exclusive with `admin: true`: set one or the other, not both. Pulumi Cloud accepts both, but some of its permission checks still treat such a token as an Admin whatever its role, so the provider rejects the combination. When neither is set, the token gets the Member role.
+	RoleId pulumi.StringPtrOutput `pulumi:"roleId"`
 	// The token's value.
 	Value pulumi.StringOutput `pulumi:"value"`
 }
@@ -53,8 +93,10 @@ func NewOrgAccessToken(ctx *pulumi.Context,
 	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
 		"admin",
 		"description",
+		"expires",
 		"name",
 		"organizationName",
+		"roleId",
 	})
 	opts = append(opts, replaceOnChanges)
 	opts = internal.PkgResourceDefaultOpts(opts)
@@ -90,26 +132,34 @@ func (OrgAccessTokenState) ElementType() reflect.Type {
 }
 
 type orgAccessTokenArgs struct {
-	// Whether the token has the Admin role. Defaults to `false`.
+	// Whether the token has the Admin role. Defaults to `false`. Mutually exclusive with `roleId`: set `admin: true` or `roleId`, not both.
 	Admin *bool `pulumi:"admin"`
 	// A description of the token.
 	Description *string `pulumi:"description"`
+	// When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`. Omit it for a token that never expires. Pulumi Cloud rejects an expiry that is in the past, more than two years away, or beyond the organization's maximum token lifetime.
+	Expires *string `pulumi:"expires"`
 	// The name for the token.
 	Name string `pulumi:"name"`
 	// The organization's name.
 	OrganizationName string `pulumi:"organizationName"`
+	// The ID of the role to assign to the token. Use `getOrganizationRole` to look up a role's ID by its name. Mutually exclusive with `admin: true`: set one or the other, not both. Pulumi Cloud accepts both, but some of its permission checks still treat such a token as an Admin whatever its role, so the provider rejects the combination. When neither is set, the token gets the Member role.
+	RoleId *string `pulumi:"roleId"`
 }
 
 // The set of arguments for constructing a OrgAccessToken resource.
 type OrgAccessTokenArgs struct {
-	// Whether the token has the Admin role. Defaults to `false`.
+	// Whether the token has the Admin role. Defaults to `false`. Mutually exclusive with `roleId`: set `admin: true` or `roleId`, not both.
 	Admin pulumi.BoolPtrInput
 	// A description of the token.
 	Description pulumi.StringPtrInput
+	// When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`. Omit it for a token that never expires. Pulumi Cloud rejects an expiry that is in the past, more than two years away, or beyond the organization's maximum token lifetime.
+	Expires pulumi.StringPtrInput
 	// The name for the token.
 	Name pulumi.StringInput
 	// The organization's name.
 	OrganizationName pulumi.StringInput
+	// The ID of the role to assign to the token. Use `getOrganizationRole` to look up a role's ID by its name. Mutually exclusive with `admin: true`: set one or the other, not both. Pulumi Cloud accepts both, but some of its permission checks still treat such a token as an Admin whatever its role, so the provider rejects the combination. When neither is set, the token gets the Member role.
+	RoleId pulumi.StringPtrInput
 }
 
 func (OrgAccessTokenArgs) ElementType() reflect.Type {
@@ -199,7 +249,7 @@ func (o OrgAccessTokenOutput) ToOrgAccessTokenOutputWithContext(ctx context.Cont
 	return o
 }
 
-// Whether the token has the Admin role. Defaults to `false`.
+// Whether the token has the Admin role. Defaults to `false`. Mutually exclusive with `roleId`: set `admin: true` or `roleId`, not both.
 func (o OrgAccessTokenOutput) Admin() pulumi.BoolOutput {
 	return o.ApplyT(func(v *OrgAccessToken) pulumi.BoolOutput { return v.Admin }).(pulumi.BoolOutput)
 }
@@ -207,6 +257,11 @@ func (o OrgAccessTokenOutput) Admin() pulumi.BoolOutput {
 // A description of the token.
 func (o OrgAccessTokenOutput) Description() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *OrgAccessToken) pulumi.StringPtrOutput { return v.Description }).(pulumi.StringPtrOutput)
+}
+
+// When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`. Omit it for a token that never expires. Pulumi Cloud rejects an expiry that is in the past, more than two years away, or beyond the organization's maximum token lifetime.
+func (o OrgAccessTokenOutput) Expires() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *OrgAccessToken) pulumi.StringPtrOutput { return v.Expires }).(pulumi.StringPtrOutput)
 }
 
 // The name for the token.
@@ -217,6 +272,11 @@ func (o OrgAccessTokenOutput) Name() pulumi.StringOutput {
 // The organization's name.
 func (o OrgAccessTokenOutput) OrganizationName() pulumi.StringOutput {
 	return o.ApplyT(func(v *OrgAccessToken) pulumi.StringOutput { return v.OrganizationName }).(pulumi.StringOutput)
+}
+
+// The ID of the role to assign to the token. Use `getOrganizationRole` to look up a role's ID by its name. Mutually exclusive with `admin: true`: set one or the other, not both. Pulumi Cloud accepts both, but some of its permission checks still treat such a token as an Admin whatever its role, so the provider rejects the combination. When neither is set, the token gets the Member role.
+func (o OrgAccessTokenOutput) RoleId() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *OrgAccessToken) pulumi.StringPtrOutput { return v.RoleId }).(pulumi.StringPtrOutput)
 }
 
 // The token's value.

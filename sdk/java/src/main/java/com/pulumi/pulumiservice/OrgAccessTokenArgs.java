@@ -19,14 +19,14 @@ public final class OrgAccessTokenArgs extends com.pulumi.resources.ResourceArgs 
     public static final OrgAccessTokenArgs Empty = new OrgAccessTokenArgs();
 
     /**
-     * Whether the token has the Admin role. Defaults to `false`.
+     * Whether the token has the Admin role. Defaults to `false`. Mutually exclusive with `roleId`: set `admin: true` or `roleId`, not both.
      * 
      */
     @Import(name="admin")
     private @Nullable Output<Boolean> admin;
 
     /**
-     * @return Whether the token has the Admin role. Defaults to `false`.
+     * @return Whether the token has the Admin role. Defaults to `false`. Mutually exclusive with `roleId`: set `admin: true` or `roleId`, not both.
      * 
      */
     public Optional<Output<Boolean>> admin() {
@@ -46,6 +46,21 @@ public final class OrgAccessTokenArgs extends com.pulumi.resources.ResourceArgs 
      */
     public Optional<Output<String>> description() {
         return Optional.ofNullable(this.description);
+    }
+
+    /**
+     * When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`. Omit it for a token that never expires. Pulumi Cloud rejects an expiry that is in the past, more than two years away, or beyond the organization&#39;s maximum token lifetime.
+     * 
+     */
+    @Import(name="expires")
+    private @Nullable Output<String> expires;
+
+    /**
+     * @return When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`. Omit it for a token that never expires. Pulumi Cloud rejects an expiry that is in the past, more than two years away, or beyond the organization&#39;s maximum token lifetime.
+     * 
+     */
+    public Optional<Output<String>> expires() {
+        return Optional.ofNullable(this.expires);
     }
 
     /**
@@ -78,13 +93,30 @@ public final class OrgAccessTokenArgs extends com.pulumi.resources.ResourceArgs 
         return this.organizationName;
     }
 
+    /**
+     * The ID of the role to assign to the token. Use `getOrganizationRole` to look up a role&#39;s ID by its name. Mutually exclusive with `admin: true`: set one or the other, not both. Pulumi Cloud accepts both, but some of its permission checks still treat such a token as an Admin whatever its role, so the provider rejects the combination. When neither is set, the token gets the Member role.
+     * 
+     */
+    @Import(name="roleId")
+    private @Nullable Output<String> roleId;
+
+    /**
+     * @return The ID of the role to assign to the token. Use `getOrganizationRole` to look up a role&#39;s ID by its name. Mutually exclusive with `admin: true`: set one or the other, not both. Pulumi Cloud accepts both, but some of its permission checks still treat such a token as an Admin whatever its role, so the provider rejects the combination. When neither is set, the token gets the Member role.
+     * 
+     */
+    public Optional<Output<String>> roleId() {
+        return Optional.ofNullable(this.roleId);
+    }
+
     private OrgAccessTokenArgs() {}
 
     private OrgAccessTokenArgs(OrgAccessTokenArgs $) {
         this.admin = $.admin;
         this.description = $.description;
+        this.expires = $.expires;
         this.name = $.name;
         this.organizationName = $.organizationName;
+        this.roleId = $.roleId;
     }
 
     public static Builder builder() {
@@ -106,7 +138,7 @@ public final class OrgAccessTokenArgs extends com.pulumi.resources.ResourceArgs 
         }
 
         /**
-         * @param admin Whether the token has the Admin role. Defaults to `false`.
+         * @param admin Whether the token has the Admin role. Defaults to `false`. Mutually exclusive with `roleId`: set `admin: true` or `roleId`, not both.
          * 
          * @return builder
          * 
@@ -117,7 +149,7 @@ public final class OrgAccessTokenArgs extends com.pulumi.resources.ResourceArgs 
         }
 
         /**
-         * @param admin Whether the token has the Admin role. Defaults to `false`.
+         * @param admin Whether the token has the Admin role. Defaults to `false`. Mutually exclusive with `roleId`: set `admin: true` or `roleId`, not both.
          * 
          * @return builder
          * 
@@ -145,6 +177,27 @@ public final class OrgAccessTokenArgs extends com.pulumi.resources.ResourceArgs 
          */
         public Builder description(String description) {
             return description(Output.of(description));
+        }
+
+        /**
+         * @param expires When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`. Omit it for a token that never expires. Pulumi Cloud rejects an expiry that is in the past, more than two years away, or beyond the organization&#39;s maximum token lifetime.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder expires(@Nullable Output<String> expires) {
+            $.expires = expires;
+            return this;
+        }
+
+        /**
+         * @param expires When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`. Omit it for a token that never expires. Pulumi Cloud rejects an expiry that is in the past, more than two years away, or beyond the organization&#39;s maximum token lifetime.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder expires(String expires) {
+            return expires(Output.of(expires));
         }
 
         /**
@@ -187,6 +240,27 @@ public final class OrgAccessTokenArgs extends com.pulumi.resources.ResourceArgs 
          */
         public Builder organizationName(String organizationName) {
             return organizationName(Output.of(organizationName));
+        }
+
+        /**
+         * @param roleId The ID of the role to assign to the token. Use `getOrganizationRole` to look up a role&#39;s ID by its name. Mutually exclusive with `admin: true`: set one or the other, not both. Pulumi Cloud accepts both, but some of its permission checks still treat such a token as an Admin whatever its role, so the provider rejects the combination. When neither is set, the token gets the Member role.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder roleId(@Nullable Output<String> roleId) {
+            $.roleId = roleId;
+            return this;
+        }
+
+        /**
+         * @param roleId The ID of the role to assign to the token. Use `getOrganizationRole` to look up a role&#39;s ID by its name. Mutually exclusive with `admin: true`: set one or the other, not both. Pulumi Cloud accepts both, but some of its permission checks still treat such a token as an Admin whatever its role, so the provider rejects the combination. When neither is set, the token gets the Member role.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder roleId(String roleId) {
+            return roleId(Output.of(roleId));
         }
 
         public OrgAccessTokenArgs build() {

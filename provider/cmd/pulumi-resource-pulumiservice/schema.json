@@ -5826,17 +5826,22 @@
       ]
     },
     "pulumiservice:index:OrgAccessToken": {
-      "description": "Creates an organization access token in Pulumi Cloud. Organization tokens aren't tied to a user, so they suit CI/CD and other automation.\n\nThe provider must authenticate as a user, for example with a personal access token, to create or delete this resource. Pulumi Cloud rejects organization and team access tokens here, even Admin ones, with `403 Machine tokens are not allowed to perform this operation`, so that one machine token can't mint another. For automation, use the personal access token of a dedicated service-account user, or use `TeamAccessToken`, which has no such restriction.",
+      "description": "Creates an organization access token in Pulumi Cloud. Organization tokens aren't tied to a user, so they suit CI/CD and other automation.\n\nThe provider must authenticate as a user, for example with a personal access token, to create or delete this resource. Pulumi Cloud rejects organization and team access tokens here, even Admin ones, with `403 Machine tokens are not allowed to perform this operation`, so that one machine token can't mint another. For automation, use the personal access token of a dedicated service-account user, or use `TeamAccessToken`, which has no such restriction.\n\n{{% examples %}}\n## Example Usage\n\n{{% example %}}\n### Token with an expiry and a custom role\n\n```typescript\nimport * as pulumi from \"@pulumi/pulumi\";\nimport * as pulumiservice from \"@pulumi/pulumiservice\";\n\nconst ciDeployerRole = pulumiservice.getOrganizationRoleOutput({\n    organizationName: \"my-org\",\n    name: \"CI Deployer\",\n});\nconst ciToken = new pulumiservice.OrgAccessToken(\"ciToken\", {\n    organizationName: \"my-org\",\n    name: \"ci-token\",\n    description: \"Token for CI pipelines\",\n    expires: \"2027-06-30T17:00:00Z\",\n    roleId: ciDeployerRole.roleId,\n});\nexport const ciTokenValue = ciToken.value;\n```\n\n```python\nimport pulumi\nimport pulumi_pulumiservice as pulumiservice\n\nci_deployer_role = pulumiservice.get_organization_role_output(organization_name=\"my-org\",\n    name=\"CI Deployer\")\nci_token = pulumiservice.OrgAccessToken(\"ciToken\",\n    organization_name=\"my-org\",\n    name=\"ci-token\",\n    description=\"Token for CI pipelines\",\n    expires=\"2027-06-30T17:00:00Z\",\n    role_id=ci_deployer_role.role_id)\npulumi.export(\"ciTokenValue\", ci_token.value)\n```\n\n```go\npackage main\n\nimport (\n\t\"github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice\"\n\t\"github.com/pulumi/pulumi/sdk/v3/go/pulumi\"\n)\n\nfunc main() {\n\tpulumi.Run(func(ctx *pulumi.Context) error {\n\t\tciDeployerRole := pulumiservice.GetOrganizationRoleOutput(ctx, pulumiservice.GetOrganizationRoleOutputArgs{\n\t\t\tOrganizationName: pulumi.String(\"my-org\"),\n\t\t\tName:             pulumi.String(\"CI Deployer\"),\n\t\t}, nil)\n\t\tciToken, err := pulumiservice.NewOrgAccessToken(ctx, \"ciToken\", &pulumiservice.OrgAccessTokenArgs{\n\t\t\tOrganizationName: pulumi.String(\"my-org\"),\n\t\t\tName:             pulumi.String(\"ci-token\"),\n\t\t\tDescription:      pulumi.String(\"Token for CI pipelines\"),\n\t\t\tExpires:          pulumi.String(\"2027-06-30T17:00:00Z\"),\n\t\t\tRoleId:           ciDeployerRole.RoleId(),\n\t\t})\n\t\tif err != nil {\n\t\t\treturn err\n\t\t}\n\t\tctx.Export(\"ciTokenValue\", ciToken.Value)\n\t\treturn nil\n\t})\n}\n```\n\n```csharp\nusing System.Collections.Generic;\nusing System.Linq;\nusing Pulumi;\nusing PulumiService = Pulumi.PulumiService;\n\nreturn await Deployment.RunAsync(() => \n{\n    var ciDeployerRole = PulumiService.GetOrganizationRole.Invoke(new()\n    {\n        OrganizationName = \"my-org\",\n        Name = \"CI Deployer\",\n    });\n\n    var ciToken = new PulumiService.OrgAccessToken(\"ciToken\", new()\n    {\n        OrganizationName = \"my-org\",\n        Name = \"ci-token\",\n        Description = \"Token for CI pipelines\",\n        Expires = \"2027-06-30T17:00:00Z\",\n        RoleId = ciDeployerRole.Apply(getOrganizationRoleResult => getOrganizationRoleResult.RoleId),\n    });\n\n    return new Dictionary<string, object?>\n    {\n        [\"ciTokenValue\"] = ciToken.Value,\n    };\n});\n```\n\n```java\npackage generated_program;\n\nimport com.pulumi.Context;\nimport com.pulumi.Pulumi;\nimport com.pulumi.core.Output;\nimport com.pulumi.pulumiservice.PulumiserviceFunctions;\nimport com.pulumi.pulumiservice.inputs.GetOrganizationRoleArgs;\nimport com.pulumi.pulumiservice.OrgAccessToken;\nimport com.pulumi.pulumiservice.OrgAccessTokenArgs;\nimport java.util.ArrayList;\nimport java.util.Arrays;\nimport java.util.Map;\nimport java.io.File;\nimport java.nio.file.Files;\nimport java.nio.file.Paths;\n\npublic class App {\n    public static void main(String[] args) {\n        Pulumi.run(App::stack);\n    }\n\n    public static void stack(Context ctx) {\n        final var ciDeployerRole = PulumiserviceFunctions.getOrganizationRole(GetOrganizationRoleArgs.builder()\n            .organizationName(\"my-org\")\n            .name(\"CI Deployer\")\n            .build());\n\n        var ciToken = new OrgAccessToken(\"ciToken\", OrgAccessTokenArgs.builder()\n            .organizationName(\"my-org\")\n            .name(\"ci-token\")\n            .description(\"Token for CI pipelines\")\n            .expires(\"2027-06-30T17:00:00Z\")\n            .roleId(ciDeployerRole.applyValue(_ciDeployerRole -> _ciDeployerRole.roleId()))\n            .build());\n\n        ctx.export(\"ciTokenValue\", ciToken.value());\n    }\n}\n```\n\n```yaml\nvariables:\n  ciDeployerRole:\n    fn::invoke:\n      function: pulumiservice:getOrganizationRole\n      arguments:\n        organizationName: my-org\n        name: CI Deployer\nresources:\n  ciToken:\n    type: pulumiservice:OrgAccessToken\n    properties:\n      organizationName: my-org\n      name: ci-token\n      description: Token for CI pipelines\n      expires: \"2027-06-30T17:00:00Z\"\n      roleId: ${ciDeployerRole.roleId}\noutputs:\n  ciTokenValue: ${ciToken.value}\n```\n{{% /example %}}\n{{% /examples %}}\n",
       "properties": {
         "admin": {
           "type": "boolean",
-          "description": "Whether the token has the Admin role. Defaults to `false`.",
+          "description": "Whether the token has the Admin role. Defaults to `false`. Mutually exclusive with `roleId`: set `admin: true` or `roleId`, not both.",
           "default": false,
           "replaceOnChanges": true
         },
         "description": {
           "type": "string",
           "description": "A description of the token.",
+          "replaceOnChanges": true
+        },
+        "expires": {
+          "type": "string",
+          "description": "When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`. Omit it for a token that never expires. Pulumi Cloud rejects an expiry that is in the past, more than two years away, or beyond the organization's maximum token lifetime.",
           "replaceOnChanges": true
         },
         "name": {
@@ -5847,6 +5852,11 @@
         "organizationName": {
           "type": "string",
           "description": "The organization's name.",
+          "replaceOnChanges": true
+        },
+        "roleId": {
+          "type": "string",
+          "description": "The ID of the role to assign to the token. Use `getOrganizationRole` to look up a role's ID by its name. Mutually exclusive with `admin: true`: set one or the other, not both. Pulumi Cloud accepts both, but some of its permission checks still treat such a token as an Admin whatever its role, so the provider rejects the combination. When neither is set, the token gets the Member role.",
           "replaceOnChanges": true
         },
         "value": {
@@ -5864,13 +5874,18 @@
       "inputProperties": {
         "admin": {
           "type": "boolean",
-          "description": "Whether the token has the Admin role. Defaults to `false`.",
+          "description": "Whether the token has the Admin role. Defaults to `false`. Mutually exclusive with `roleId`: set `admin: true` or `roleId`, not both.",
           "default": false,
           "replaceOnChanges": true
         },
         "description": {
           "type": "string",
           "description": "A description of the token.",
+          "replaceOnChanges": true
+        },
+        "expires": {
+          "type": "string",
+          "description": "When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`. Omit it for a token that never expires. Pulumi Cloud rejects an expiry that is in the past, more than two years away, or beyond the organization's maximum token lifetime.",
           "replaceOnChanges": true
         },
         "name": {
@@ -5881,6 +5896,11 @@
         "organizationName": {
           "type": "string",
           "description": "The organization's name.",
+          "replaceOnChanges": true
+        },
+        "roleId": {
+          "type": "string",
+          "description": "The ID of the role to assign to the token. Use `getOrganizationRole` to look up a role's ID by its name. Mutually exclusive with `admin: true`: set one or the other, not both. Pulumi Cloud accepts both, but some of its permission checks still treat such a token as an Admin whatever its role, so the provider rejects the combination. When neither is set, the token gets the Member role.",
           "replaceOnChanges": true
         }
       },
