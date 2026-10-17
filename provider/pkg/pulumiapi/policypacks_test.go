@@ -35,6 +35,7 @@ const (
 	notFoundError         = "not found"
 	policyPackVersion     = "1.0.0"
 	policyPackVersionPath = "/api/orgs/anOrg/policypacks/alpha/versions/1.0.0"
+	alpha110Path          = "/api/orgs/anOrg/policypacks/alpha/versions/1.1.0"
 	alphaPolicyPack       = "alpha"
 )
 
@@ -69,15 +70,17 @@ func TestListPolicyPacks(t *testing.T) {
 }
 
 func TestGetPolicyPack(t *testing.T) {
-	t.Run("happy path", func(t *testing.T) {
+	// The API keys this route by version tag. Requesting the numeric version
+	// (`/versions/2`) 404s against the real service; see #1012.
+	t.Run("requests the version tag", func(t *testing.T) {
 		want := &PolicyPackDetail{Name: alphaPolicyPack, Version: 2, VersionTag: policyPackVersion110}
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodGet,
-			ExpectedReqPath:   "/api/orgs/anOrg/policypacks/alpha/versions/2",
+			ExpectedReqPath:   alpha110Path,
 			ResponseCode:      http.StatusOK,
 			ResponseBody:      want,
 		})
-		got, err := c.GetPolicyPack(ctx, "anOrg", alphaPolicyPack, 2)
+		got, err := c.GetPolicyPack(ctx, "anOrg", alphaPolicyPack, policyPackVersion110)
 		require.NoError(t, err)
 		assert.Equal(t, want, got)
 	})
@@ -85,48 +88,103 @@ func TestGetPolicyPack(t *testing.T) {
 	t.Run("404 returns nil pack and nil error", func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodGet,
-			ExpectedReqPath:   "/api/orgs/anOrg/policypacks/missing/versions/1",
+			ExpectedReqPath:   "/api/orgs/anOrg/policypacks/missing/versions/1.0.0",
 			ResponseCode:      http.StatusNotFound,
 			ResponseBody:      ErrorResponse{StatusCode: 404, Message: notFoundError},
 		})
-		got, err := c.GetPolicyPack(ctx, "anOrg", "missing", 1)
+		got, err := c.GetPolicyPack(ctx, "anOrg", "missing", policyPackVersion)
 		require.NoError(t, err)
 		assert.Nil(t, got)
 	})
 
 	t.Run("input validation", func(t *testing.T) {
 		c := &Client{}
-		_, err := c.GetPolicyPack(ctx, "", alphaPolicyPack, 1)
+		_, err := c.GetPolicyPack(ctx, "", alphaPolicyPack, policyPackVersion)
 		assert.EqualError(t, err, "empty orgName")
-		_, err = c.GetPolicyPack(ctx, "anOrg", "", 1)
+		_, err = c.GetPolicyPack(ctx, "anOrg", "", policyPackVersion)
 		assert.EqualError(t, err, "empty policyPackName")
+		_, err = c.GetPolicyPack(ctx, "anOrg", alphaPolicyPack, "")
+		assert.EqualError(t, err, "empty versionTag")
 	})
 }
 
 func TestGetLatestPolicyPack(t *testing.T) {
-	t.Run("happy path", func(t *testing.T) {
-		want := &PolicyPackDetail{Name: alphaPolicyPack, Version: 9, VersionTag: "9.0.0"}
-		c := startTestServer(t, testServerConfig{
-			ExpectedReqMethod: http.MethodGet,
-			ExpectedReqPath:   "/api/orgs/anOrg/policypacks/alpha/latest",
-			ResponseCode:      http.StatusOK,
-			ResponseBody:      want,
+	// The API has no `/latest` route, so the client lists the org's packs,
+	// resolves the newest tag and fetches that version.
+	listing := listPolicyPacksResponse{PolicyPacks: []PolicyPackWithVersions{
+		{Name: "other", Versions: []int{7}, VersionTags: []string{"7.0.0"}},
+		{Name: alphaPolicyPack, Versions: []int{2, 1}, VersionTags: []string{policyPackVersion110, policyPackVersion}},
+	}}
+
+	t.Run("fetches the newest version tag", func(t *testing.T) {
+		want := &PolicyPackDetail{Name: alphaPolicyPack, Version: 2, VersionTag: policyPackVersion110}
+		var paths []string
+		c := startTestServerMulti(t, func(r *http.Request) (int, any) {
+			paths = append(paths, r.URL.Path)
+			switch r.URL.Path {
+			case policyPacksPath:
+				return http.StatusOK, listing
+			case alpha110Path:
+				return http.StatusOK, want
+			default:
+				return http.StatusNotFound, ErrorResponse{StatusCode: 404, Message: notFoundError}
+			}
 		})
 		got, err := c.GetLatestPolicyPack(ctx, "anOrg", alphaPolicyPack)
 		require.NoError(t, err)
 		assert.Equal(t, want, got)
+		assert.Equal(t, []string{policyPacksPath, alpha110Path}, paths)
 	})
 
-	t.Run("404 returns nil pack and nil error", func(t *testing.T) {
+	t.Run("does not depend on list order", func(t *testing.T) {
+		oldestFirst := listPolicyPacksResponse{PolicyPacks: []PolicyPackWithVersions{
+			{Name: alphaPolicyPack, Versions: []int{1, 2}, VersionTags: []string{policyPackVersion, policyPackVersion110}},
+		}}
+		c := startTestServerMulti(t, func(r *http.Request) (int, any) {
+			switch r.URL.Path {
+			case policyPacksPath:
+				return http.StatusOK, oldestFirst
+			case alpha110Path:
+				return http.StatusOK, PolicyPackDetail{Name: alphaPolicyPack, Version: 2, VersionTag: policyPackVersion110}
+			default:
+				return http.StatusNotFound, ErrorResponse{StatusCode: 404, Message: notFoundError}
+			}
+		})
+		got, err := c.GetLatestPolicyPack(ctx, "anOrg", alphaPolicyPack)
+		require.NoError(t, err)
+		require.NotNil(t, got)
+		assert.Equal(t, policyPackVersion110, got.VersionTag)
+	})
+
+	t.Run("pack missing from list returns nil pack and nil error", func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodGet,
-			ExpectedReqPath:   "/api/orgs/anOrg/policypacks/missing/latest",
-			ResponseCode:      http.StatusNotFound,
-			ResponseBody:      ErrorResponse{StatusCode: 404, Message: notFoundError},
+			ExpectedReqPath:   policyPacksPath,
+			ResponseCode:      http.StatusOK,
+			ResponseBody:      listing,
 		})
 		got, err := c.GetLatestPolicyPack(ctx, "anOrg", "missing")
 		require.NoError(t, err)
 		assert.Nil(t, got)
+	})
+
+	t.Run("list error is returned", func(t *testing.T) {
+		c := startTestServer(t, testServerConfig{
+			ExpectedReqMethod: http.MethodGet,
+			ExpectedReqPath:   policyPacksPath,
+			ResponseCode:      http.StatusForbidden,
+			ResponseBody:      ErrorResponse{StatusCode: 403, Message: "forbidden"},
+		})
+		_, err := c.GetLatestPolicyPack(ctx, "anOrg", alphaPolicyPack)
+		assert.ErrorContains(t, err, "failed to get latest policy pack")
+	})
+
+	t.Run("input validation", func(t *testing.T) {
+		c := &Client{}
+		_, err := c.GetLatestPolicyPack(ctx, "", alphaPolicyPack)
+		assert.EqualError(t, err, "empty orgName")
+		_, err = c.GetLatestPolicyPack(ctx, "anOrg", "")
+		assert.EqualError(t, err, "empty policyPackName")
 	})
 }
 

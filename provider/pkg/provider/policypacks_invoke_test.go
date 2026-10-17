@@ -19,6 +19,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -36,11 +37,15 @@ const (
 	orgPolicyPacksPath = "/api/orgs/anOrg/policypacks"
 	registryListPath   = "/api/registry/policypacks"
 	orgRegistryPath    = "/api/orgs/anOrg/registry/policypacks/alpha"
-	latestPolicyPack   = "/api/orgs/anOrg/policypacks/alpha/latest"
+	alphaVersionsPath  = "/api/orgs/anOrg/policypacks/alpha/versions/"
 	testSourcePulumi   = "pulumi"
 	testSourcePrivate  = "private"
 	cisAwsPack         = "cis-aws"
 	alphaPack          = "alpha"
+	alphaDisplayName   = "Alpha"
+	alphaLatestTag     = "0.0.5"
+	alphaOlderTag      = "0.0.4"
+	messageKey         = "message"
 )
 
 // newInvokeTestProvider wires a provider against a test server that serves both
@@ -82,7 +87,7 @@ func policyPacksHandler(
 			writeJSON(t, w, http.StatusOK, map[string]any{policyPacksKey: orgPacks})
 		case registryListPath:
 			if registryCode != http.StatusOK {
-				writeJSON(t, w, registryCode, map[string]any{"message": "nope"})
+				writeJSON(t, w, registryCode, map[string]any{messageKey: "nope"})
 				return
 			}
 			writeJSON(t, w, http.StatusOK, map[string]any{policyPacksKey: registryPacks})
@@ -122,7 +127,10 @@ func returnedPacks(t *testing.T, resp *pulumirpc.InvokeResponse) []resource.Prop
 func orgPackFixtures() []map[string]any {
 	return []map[string]any{
 		{nameKey: cisAwsPack, displayNameKey: "CIS AWS", versionsKey: []int{1}, versionTagsKey: []string{"1.0.2"}},
-		{nameKey: alphaPack, displayNameKey: "Alpha", versionsKey: []int{1, 2}, versionTagsKey: []string{"0.0.5"}},
+		{
+			nameKey: alphaPack, displayNameKey: alphaDisplayName,
+			versionsKey: []int{1, 2}, versionTagsKey: []string{alphaLatestTag},
+		},
 	}
 }
 
@@ -203,12 +211,22 @@ func TestInvokeGetPolicyPacks_UnmatchedPackOmitsFields(t *testing.T) {
 	assert.False(t, hasPublisher)
 }
 
-func invokeGetPolicyPack(t *testing.T, k *pulumiserviceProvider) (*pulumirpc.InvokeResponse, error) {
+// invokeGetPolicyPack calls getPolicyPack for the alpha pack. An empty
+// versionTag omits the input, which asks for the latest version.
+func invokeGetPolicyPack(
+	t *testing.T,
+	k *pulumiserviceProvider,
+	versionTag string,
+) (*pulumirpc.InvokeResponse, error) {
 	t.Helper()
-	args, err := plugin.MarshalProperties(resource.PropertyMap{
+	inputs := resource.PropertyMap{
 		"organizationName": resource.NewStringProperty(invokeTestOrg),
 		"policyPackName":   resource.NewStringProperty(alphaPack),
-	}, plugin.MarshalOptions{})
+	}
+	if versionTag != "" {
+		inputs["versionTag"] = resource.NewStringProperty(versionTag)
+	}
+	args, err := plugin.MarshalProperties(inputs, plugin.MarshalOptions{})
 	require.NoError(t, err)
 
 	return k.Invoke(context.Background(), &pulumirpc.InvokeRequest{
@@ -217,22 +235,43 @@ func invokeGetPolicyPack(t *testing.T, k *pulumiserviceProvider) (*pulumirpc.Inv
 	})
 }
 
+// singlePolicyPackHandler serves the routes the real service exposes for one
+// pack: the org list, the tag-keyed version route and the registry lookup. alpha
+// has versions 2 (`0.0.5`) and 1 (`0.0.4`), listed newest first. There is
+// deliberately no numeric-version or `/latest` route, because the service has
+// neither (#1012).
 func singlePolicyPackHandler(t *testing.T, registryCode int) http.HandlerFunc {
 	t.Helper()
+	versions := map[string]int{alphaLatestTag: 2, alphaOlderTag: 1}
+	var fetchedTag string
 	return func(w http.ResponseWriter, r *http.Request) {
-		switch r.URL.Path {
-		case latestPolicyPack:
+		switch {
+		case r.URL.Path == orgPolicyPacksPath:
+			writeJSON(t, w, http.StatusOK, map[string]any{policyPacksKey: []map[string]any{
+				{
+					nameKey: alphaPack, displayNameKey: alphaDisplayName,
+					versionsKey: []int{2, 1}, versionTagsKey: []string{alphaLatestTag, alphaOlderTag},
+				},
+			}})
+		case strings.HasPrefix(r.URL.Path, alphaVersionsPath):
+			tag := strings.TrimPrefix(r.URL.Path, alphaVersionsPath)
+			version, ok := versions[tag]
+			if !ok {
+				writeJSON(t, w, http.StatusNotFound, map[string]any{messageKey: "not found"})
+				return
+			}
+			fetchedTag = tag
 			writeJSON(t, w, http.StatusOK, map[string]any{
-				nameKey: alphaPack, displayNameKey: "Alpha", versionKey: 2, "versionTag": "0.0.5",
+				nameKey: alphaPack, displayNameKey: alphaDisplayName, versionKey: version, "versionTag": tag,
 			})
-		case orgRegistryPath:
+		case r.URL.Path == orgRegistryPath:
 			// The resolved tag must be forwarded. Omitting it makes the real
 			// service look for the literal tag `latest`, which a pack tagged
 			// only `0.0.5` does not have, and provenance silently disappears.
-			assert.Equal(t, "0.0.5", r.URL.Query().Get("tag"),
+			assert.Equal(t, fetchedTag, r.URL.Query().Get("tag"),
 				"registry lookup must carry the pack's resolved version tag")
 			if registryCode != http.StatusOK {
-				writeJSON(t, w, registryCode, map[string]any{"message": "nope"})
+				writeJSON(t, w, registryCode, map[string]any{messageKey: "nope"})
 				return
 			}
 			writeJSON(t, w, http.StatusOK, map[string]any{
@@ -247,10 +286,43 @@ func singlePolicyPackHandler(t *testing.T, registryCode int) http.HandlerFunc {
 	}
 }
 
+func TestInvokeGetPolicyPack_LatestVersion(t *testing.T) {
+	k := newInvokeTestProvider(t, singlePolicyPackHandler(t, http.StatusOK))
+
+	resp, err := invokeGetPolicyPack(t, k, "")
+	require.NoError(t, err)
+
+	out, err := plugin.UnmarshalProperties(resp.GetReturn(), plugin.MarshalOptions{})
+	require.NoError(t, err)
+	assert.Equal(t, alphaPack, out[nameKey].StringValue())
+	assert.EqualValues(t, 2, out[versionKey].NumberValue())
+	assert.Equal(t, alphaLatestTag, out["versionTag"].StringValue())
+}
+
+func TestInvokeGetPolicyPack_ByVersionTag(t *testing.T) {
+	k := newInvokeTestProvider(t, singlePolicyPackHandler(t, http.StatusOK))
+
+	resp, err := invokeGetPolicyPack(t, k, alphaOlderTag)
+	require.NoError(t, err)
+
+	out, err := plugin.UnmarshalProperties(resp.GetReturn(), plugin.MarshalOptions{})
+	require.NoError(t, err)
+	assert.Equal(t, alphaPack, out[nameKey].StringValue())
+	assert.EqualValues(t, 1, out[versionKey].NumberValue())
+	assert.Equal(t, alphaOlderTag, out["versionTag"].StringValue())
+}
+
+func TestInvokeGetPolicyPack_UnknownVersionTag(t *testing.T) {
+	k := newInvokeTestProvider(t, singlePolicyPackHandler(t, http.StatusOK))
+
+	_, err := invokeGetPolicyPack(t, k, "9.9.9")
+	assert.ErrorContains(t, err, "policy pack not found")
+}
+
 func TestInvokeGetPolicyPack_IncludesSourceAndPublisher(t *testing.T) {
 	k := newInvokeTestProvider(t, singlePolicyPackHandler(t, http.StatusOK))
 
-	resp, err := invokeGetPolicyPack(t, k)
+	resp, err := invokeGetPolicyPack(t, k, "")
 	require.NoError(t, err)
 
 	out, err := plugin.UnmarshalProperties(resp.GetReturn(), plugin.MarshalOptions{})
@@ -267,7 +339,7 @@ func TestInvokeGetPolicyPack_SucceedsWhenRegistryFails(t *testing.T) {
 	for _, code := range []int{http.StatusNotFound, http.StatusForbidden} {
 		k := newInvokeTestProvider(t, singlePolicyPackHandler(t, code))
 
-		resp, err := invokeGetPolicyPack(t, k)
+		resp, err := invokeGetPolicyPack(t, k, "")
 		require.NoErrorf(t, err, "registry status %d should not fail the invoke", code)
 
 		out, err := plugin.UnmarshalProperties(resp.GetReturn(), plugin.MarshalOptions{})

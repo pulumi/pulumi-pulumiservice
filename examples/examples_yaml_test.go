@@ -534,7 +534,14 @@ func TestYamlPolicyPackExample(t *testing.T) {
 	)
 	test.SetConfig(t, "digits", generateRandomFiveDigits())
 	test.SetConfig(t, "organizationName", getOrgName())
-	runPulumiTest(t, test)
+	up := runPulumiTest(t, test)
+
+	// getPolicyPack reads the pack back from the real service, both by tag and
+	// as latest. Unit tests use a fake server, which once encoded routes the
+	// service doesn't have, so only a live read proves the lookup works (#1012).
+	assert.Equal(t, "1.0.0", up.Outputs["packByTagVersionTag"].Value)
+	assert.Len(t, up.Outputs["packByTagPolicies"].Value, 2)
+	assert.Equal(t, "1.0.0", up.Outputs["packLatestVersionTag"].Value)
 }
 
 func TestYamlPolicyGroupsAccountsExample(t *testing.T) {
