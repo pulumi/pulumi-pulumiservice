@@ -49,6 +49,13 @@ func NewEnvironment(ctx *pulumi.Context,
 	if args.Project == nil {
 		args.Project = pulumi.StringPtr("default")
 	}
+	if args.Yaml != nil {
+		args.Yaml = pulumi.ToSecret(args.Yaml).(pulumi.AssetOrArchiveInput)
+	}
+	secrets := pulumi.AdditionalSecretOutputs([]string{
+		"yaml",
+	})
+	opts = append(opts, secrets)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource Environment
 	err := ctx.RegisterResource("pulumiservice:index:Environment", name, args, &resource, opts...)

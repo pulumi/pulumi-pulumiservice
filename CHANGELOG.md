@@ -11,6 +11,7 @@
 ### Bug Fixes
 
 - Updated the Pulumi Cloud SDK so `OrganizationRole.permissions` and the permission builder helpers accept scopes and permission descriptor types that Pulumi Cloud added recently. The previous version rejected them, or silently dropped scopes it didn't recognize. [#1162](https://github.com/pulumi/pulumi-pulumiservice/issues/1162)
+- `Environment` refresh no longer removes the environment from state when Pulumi Cloud returns an error other than 404, such as an authentication or network error. It now reports the error. `Environment` updates also report API errors, which were previously ignored. [#1204](https://github.com/pulumi/pulumi-pulumiservice/issues/1204)
 
 ## 1.4.0
 
