@@ -22,6 +22,106 @@ import javax.annotation.Nullable;
 /**
  * Deployment settings configure Pulumi Deployments for a stack.
  * 
+ * ## Example Usage
+ * ### Deploy on every commit
+ * 
+ * This runs `pulumi up` on each push to `main` that changes a file under `infra/`, and `pulumi preview` on pull requests. The organization must have the Pulumi GitHub app installed on the repository.
+ * <pre>
+ * {@code
+ * package generated_program;
+ * 
+ * import com.pulumi.Context;
+ * import com.pulumi.Pulumi;
+ * import com.pulumi.core.Output;
+ * import com.pulumi.pulumiservice.DeploymentSettings;
+ * import com.pulumi.pulumiservice.DeploymentSettingsArgs;
+ * import com.pulumi.pulumiservice.inputs.DeploymentSettingsSourceContextArgs;
+ * import com.pulumi.pulumiservice.inputs.DeploymentSettingsGitSourceArgs;
+ * import com.pulumi.pulumiservice.inputs.DeploymentSettingsGithubArgs;
+ * import java.util.ArrayList;
+ * import java.util.Arrays;
+ * import java.util.Map;
+ * import java.io.File;
+ * import java.nio.file.Files;
+ * import java.nio.file.Paths;
+ * 
+ * public class App {
+ *     public static void main(String[] args) {
+ *         Pulumi.run(App::stack);
+ *     }
+ * 
+ *     public static void stack(Context ctx) {
+ *         var settings = new DeploymentSettings("settings", DeploymentSettingsArgs.builder()
+ *             .organization("my-org")
+ *             .project("my-project")
+ *             .stack("dev")
+ *             .sourceContext(DeploymentSettingsSourceContextArgs.builder()
+ *                 .git(DeploymentSettingsGitSourceArgs.builder()
+ *                     .branch("refs/heads/main")
+ *                     .build())
+ *                 .build())
+ *             .github(DeploymentSettingsGithubArgs.builder()
+ *                 .repository("my-org/my-repo")
+ *                 .deployCommits(true)
+ *                 .previewPullRequests(true)
+ *                 .paths("infra/**")
+ *                 .build())
+ *             .build());
+ *     }
+ * }
+ * }
+ * </pre>
+ * ### Deploy when a git tag is pushed
+ * 
+ * This runs `pulumi up` when a tag matching `v*` is pushed, except release candidates such as `v1.2.0-rc1`. Pulumi Cloud rejects `deployCommits` and `deployTags` together, and `deployCommits` defaults to `true`, so set `deployCommits` to `false` when you enable `deployTags`. The organization must have the Pulumi GitHub app installed on the repository.
+ * <pre>
+ * {@code
+ * package generated_program;
+ * 
+ * import com.pulumi.Context;
+ * import com.pulumi.Pulumi;
+ * import com.pulumi.core.Output;
+ * import com.pulumi.pulumiservice.DeploymentSettings;
+ * import com.pulumi.pulumiservice.DeploymentSettingsArgs;
+ * import com.pulumi.pulumiservice.inputs.DeploymentSettingsSourceContextArgs;
+ * import com.pulumi.pulumiservice.inputs.DeploymentSettingsGitSourceArgs;
+ * import com.pulumi.pulumiservice.inputs.DeploymentSettingsGithubArgs;
+ * import java.util.ArrayList;
+ * import java.util.Arrays;
+ * import java.util.Map;
+ * import java.io.File;
+ * import java.nio.file.Files;
+ * import java.nio.file.Paths;
+ * 
+ * public class App {
+ *     public static void main(String[] args) {
+ *         Pulumi.run(App::stack);
+ *     }
+ * 
+ *     public static void stack(Context ctx) {
+ *         var settings = new DeploymentSettings("settings", DeploymentSettingsArgs.builder()
+ *             .organization("my-org")
+ *             .project("my-project")
+ *             .stack("production")
+ *             .sourceContext(DeploymentSettingsSourceContextArgs.builder()
+ *                 .git(DeploymentSettingsGitSourceArgs.builder()
+ *                     .branch("refs/heads/main")
+ *                     .build())
+ *                 .build())
+ *             .github(DeploymentSettingsGithubArgs.builder()
+ *                 .repository("my-org/my-repo")
+ *                 .deployCommits(false)
+ *                 .deployTags(true)
+ *                 .tagFilters(
+ *                     "v*",
+ *                     "!*-rc*")
+ *                 .build())
+ *             .build());
+ *     }
+ * }
+ * }
+ * </pre>
+ * 
  * ### Import
  * 
  * Deployment settings can be imported using the `id`, which for deployment settings is `{org}/{project}/{stack}` e.g.,

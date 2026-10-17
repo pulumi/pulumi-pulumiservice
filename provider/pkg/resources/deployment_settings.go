@@ -345,6 +345,10 @@ func (ds *PulumiServiceDeploymentSettingsInput) ToPropertyMap(
 		if len(ds.GitHub.Paths) > 0 {
 			githubMap["paths"] = resource.NewPropertyValue(ds.GitHub.Paths)
 		}
+		githubMap["deployTags"] = resource.NewPropertyValue(ds.GitHub.DeployTags)
+		if len(ds.GitHub.TagFilters) > 0 {
+			githubMap["tagFilters"] = resource.NewPropertyValue(ds.GitHub.TagFilters)
+		}
 		pm["github"] = resource.PropertyValue{V: githubMap}
 	}
 
@@ -363,6 +367,10 @@ func (ds *PulumiServiceDeploymentSettingsInput) ToPropertyMap(
 		}
 		if len(ds.Vcs.Paths()) > 0 {
 			vcsMap["paths"] = resource.NewPropertyValue(ds.Vcs.Paths())
+		}
+		vcsMap["deployTags"] = resource.NewPropertyValue(ds.Vcs.DeployTags())
+		if len(ds.Vcs.TagFilters()) > 0 {
+			vcsMap["tagFilters"] = resource.NewPropertyValue(ds.Vcs.TagFilters())
 		}
 		if ds.Vcs.DeployPullRequest() != nil {
 			vcsMap["deployPullRequest"] = resource.NewPropertyValue(float64(*ds.Vcs.DeployPullRequest()))
@@ -525,6 +533,19 @@ func toGitHubConfig(inputMap resource.PropertyMap) *pulumiapi.DeploymentSettings
 
 		github.Paths = paths
 	}
+	if githubInput["deployTags"].HasValue() {
+		github.DeployTags = util.GetSecretOrBoolValue(githubInput["deployTags"])
+	}
+	if githubInput["tagFilters"].HasValue() {
+		tagFiltersInput := util.GetSecretOrArrayValue(githubInput["tagFilters"])
+		tagFilters := make([]string, len(tagFiltersInput))
+
+		for i, v := range tagFiltersInput {
+			tagFilters[i] = util.GetSecretOrStringValue(v)
+		}
+
+		github.TagFilters = tagFilters
+	}
 
 	return &github
 }
@@ -582,6 +603,17 @@ func toVCSConfig(inputMap resource.PropertyMap) pulumiapi.DeploymentSettingsVCS 
 			paths[i] = util.GetSecretOrStringValue(v)
 		}
 		_ = vcs.SetPaths(paths)
+	}
+	if vcsInput["deployTags"].HasValue() {
+		_ = vcs.SetDeployTags(util.GetSecretOrBoolValue(vcsInput["deployTags"]))
+	}
+	if vcsInput["tagFilters"].HasValue() {
+		tagFiltersInput := util.GetSecretOrArrayValue(vcsInput["tagFilters"])
+		tagFilters := make([]string, len(tagFiltersInput))
+		for i, v := range tagFiltersInput {
+			tagFilters[i] = util.GetSecretOrStringValue(v)
+		}
+		_ = vcs.SetTagFilters(tagFilters)
 	}
 	if vcsInput["deployPullRequest"].HasValue() {
 		val := int64(util.GetSecretOrNumberValue(vcsInput["deployPullRequest"]))

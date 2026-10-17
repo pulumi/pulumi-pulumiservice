@@ -1,0 +1,38 @@
+# Requires an organization with the Pulumi GitHub app installed on
+# `repository`. TestYamlDeploymentSettingsGitHubTagsExample skips unless
+# PULUMI_TEST_GITHUB_REPOSITORY is set, so it doesn't run in CI today.
+#
+# To test manually:
+#   export PULUMI_TEST_OWNER=<org with the GitHub app installed>
+#   export PULUMI_TEST_GITHUB_REPOSITORY=<owner/repo the app can access>
+#   go test -v -run TestYamlDeploymentSettingsGitHubTagsExample -tags yaml -timeout 10m
+name: yaml-deployment-settings-github-tags
+runtime: yaml
+description: Deployment settings that deploy on git tags
+config:
+  organizationName:
+    type: string
+    default: service-provider-test-org
+  repository:
+    type: string
+resources:
+  settings:
+    type: pulumiservice:DeploymentSettings
+    properties:
+      organization: ${organizationName}
+      project: ${pulumi.project}
+      stack: ${pulumi.stack}
+      sourceContext:
+        git:
+          branch: refs/heads/main
+      github:
+        repository: ${repository}
+        # Pulumi Cloud rejects deployCommits and deployTags together, and
+        # deployCommits defaults to true.
+        deployCommits: false
+        deployTags: true
+        tagFilters:
+          - "v*"
+          - "!*-rc*"
+outputs:
+  github: ${settings.github}

@@ -97,6 +97,17 @@ func runPulumiTestAfterUp(
 // stateInputs returns the state inputs of the single resource of the given type.
 func stateInputs(t *testing.T, test *pulumitest.PulumiTest, resourceType string) map[string]any {
 	t.Helper()
+	return stateResource(t, test, resourceType).Inputs
+}
+
+// stateOutputs returns the state outputs of the single resource of the given type.
+func stateOutputs(t *testing.T, test *pulumitest.PulumiTest, resourceType string) map[string]any {
+	t.Helper()
+	return stateResource(t, test, resourceType).Outputs
+}
+
+func stateResource(t *testing.T, test *pulumitest.PulumiTest, resourceType string) apitype.ResourceV3 {
+	t.Helper()
 
 	var deployment apitype.DeploymentV3
 	exported := test.ExportStack(t)
@@ -104,11 +115,11 @@ func stateInputs(t *testing.T, test *pulumitest.PulumiTest, resourceType string)
 
 	for _, res := range deployment.Resources {
 		if string(res.Type) == resourceType {
-			return res.Inputs
+			return res
 		}
 	}
 	t.Fatalf("no %s resource found in the exported stack", resourceType)
-	return nil
+	return apitype.ResourceV3{}
 }
 
 // assertStateSecret asserts that the value at path within inputs is stored as an

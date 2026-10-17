@@ -16,7 +16,7 @@ import javax.annotation.Nullable;
 @CustomType
 public final class DeploymentSettingsVcs {
     /**
-     * @return Trigger a deployment running `pulumi up` on commit.
+     * @return Trigger a deployment running `pulumi up` on commit. Must be `false` when `deployTags` is `true`, because Pulumi Cloud rejects the two together.
      * 
      */
     private @Nullable Boolean deployCommits;
@@ -25,6 +25,11 @@ public final class DeploymentSettingsVcs {
      * 
      */
     private @Nullable Integer deployPullRequest;
+    /**
+     * @return Trigger a deployment running `pulumi up` when a tag matching `tagFilters` is pushed. Can&#39;t be combined with `deployCommits`, which defaults to `true`, so set `deployCommits` to `false` when you enable this.
+     * 
+     */
+    private @Nullable Boolean deployTags;
     /**
      * @return The VCS integration installation ID. Use to disambiguate when an organization has multiple integrations of the same provider type (e.g., two GitHub Apps). If omitted, the API resolves the integration automatically from `provider` and `repository`.
      * 
@@ -55,10 +60,15 @@ public final class DeploymentSettingsVcs {
      * 
      */
     private @Nullable String repository;
+    /**
+     * @return Glob patterns matching the tag names that trigger a deployment when `deployTags` is true. Prefix a pattern with `!` to exclude matching tags, for example `!*-rc*`. An empty list matches all tags.
+     * 
+     */
+    private @Nullable List<String> tagFilters;
 
     private DeploymentSettingsVcs() {}
     /**
-     * @return Trigger a deployment running `pulumi up` on commit.
+     * @return Trigger a deployment running `pulumi up` on commit. Must be `false` when `deployTags` is `true`, because Pulumi Cloud rejects the two together.
      * 
      */
     public Optional<Boolean> deployCommits() {
@@ -70,6 +80,13 @@ public final class DeploymentSettingsVcs {
      */
     public Optional<Integer> deployPullRequest() {
         return Optional.ofNullable(this.deployPullRequest);
+    }
+    /**
+     * @return Trigger a deployment running `pulumi up` when a tag matching `tagFilters` is pushed. Can&#39;t be combined with `deployCommits`, which defaults to `true`, so set `deployCommits` to `false` when you enable this.
+     * 
+     */
+    public Optional<Boolean> deployTags() {
+        return Optional.ofNullable(this.deployTags);
     }
     /**
      * @return The VCS integration installation ID. Use to disambiguate when an organization has multiple integrations of the same provider type (e.g., two GitHub Apps). If omitted, the API resolves the integration automatically from `provider` and `repository`.
@@ -113,6 +130,13 @@ public final class DeploymentSettingsVcs {
     public Optional<String> repository() {
         return Optional.ofNullable(this.repository);
     }
+    /**
+     * @return Glob patterns matching the tag names that trigger a deployment when `deployTags` is true. Prefix a pattern with `!` to exclude matching tags, for example `!*-rc*`. An empty list matches all tags.
+     * 
+     */
+    public List<String> tagFilters() {
+        return this.tagFilters == null ? List.of() : this.tagFilters;
+    }
 
     public static Builder builder() {
         return new Builder();
@@ -125,23 +149,27 @@ public final class DeploymentSettingsVcs {
     public static final class Builder {
         private @Nullable Boolean deployCommits;
         private @Nullable Integer deployPullRequest;
+        private @Nullable Boolean deployTags;
         private @Nullable String installationId;
         private @Nullable List<String> paths;
         private @Nullable Boolean previewPullRequests;
         private String provider;
         private @Nullable Boolean pullRequestTemplate;
         private @Nullable String repository;
+        private @Nullable List<String> tagFilters;
         public Builder() {}
         public Builder(DeploymentSettingsVcs defaults) {
     	      Objects.requireNonNull(defaults);
     	      this.deployCommits = defaults.deployCommits;
     	      this.deployPullRequest = defaults.deployPullRequest;
+    	      this.deployTags = defaults.deployTags;
     	      this.installationId = defaults.installationId;
     	      this.paths = defaults.paths;
     	      this.previewPullRequests = defaults.previewPullRequests;
     	      this.provider = defaults.provider;
     	      this.pullRequestTemplate = defaults.pullRequestTemplate;
     	      this.repository = defaults.repository;
+    	      this.tagFilters = defaults.tagFilters;
         }
 
         @CustomType.Setter
@@ -154,6 +182,12 @@ public final class DeploymentSettingsVcs {
         public Builder deployPullRequest(@Nullable Integer deployPullRequest) {
 
             this.deployPullRequest = deployPullRequest;
+            return this;
+        }
+        @CustomType.Setter
+        public Builder deployTags(@Nullable Boolean deployTags) {
+
+            this.deployTags = deployTags;
             return this;
         }
         @CustomType.Setter
@@ -197,16 +231,27 @@ public final class DeploymentSettingsVcs {
             this.repository = repository;
             return this;
         }
+        @CustomType.Setter
+        public Builder tagFilters(@Nullable List<String> tagFilters) {
+
+            this.tagFilters = tagFilters;
+            return this;
+        }
+        public Builder tagFilters(String... tagFilters) {
+            return tagFilters(List.of(tagFilters));
+        }
         public DeploymentSettingsVcs build() {
             final var _resultValue = new DeploymentSettingsVcs();
             _resultValue.deployCommits = deployCommits;
             _resultValue.deployPullRequest = deployPullRequest;
+            _resultValue.deployTags = deployTags;
             _resultValue.installationId = installationId;
             _resultValue.paths = paths;
             _resultValue.previewPullRequests = previewPullRequests;
             _resultValue.provider = provider;
             _resultValue.pullRequestTemplate = pullRequestTemplate;
             _resultValue.repository = repository;
+            _resultValue.tagFilters = tagFilters;
             return _resultValue;
         }
     }

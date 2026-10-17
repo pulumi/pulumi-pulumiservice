@@ -17,9 +17,13 @@ namespace Pulumi.PulumiService.Outputs
     public sealed class DeploymentSettingsGithub
     {
         /// <summary>
-        /// Trigger a deployment running `pulumi up` on commit.
+        /// Trigger a deployment running `pulumi up` on commit. Must be `false` when `deployTags` is `true`, because Pulumi Cloud rejects the two together.
         /// </summary>
         public readonly bool? DeployCommits;
+        /// <summary>
+        /// Trigger a deployment running `pulumi up` when a tag matching `tagFilters` is pushed. Can't be combined with `deployCommits`, which defaults to `true`, so set `deployCommits` to `false` when you enable this.
+        /// </summary>
+        public readonly bool? DeployTags;
         /// <summary>
         /// The paths within the repo that deployments should be filtered to.
         /// </summary>
@@ -36,10 +40,16 @@ namespace Pulumi.PulumiService.Outputs
         /// The GitHub repository in the format org/repo.
         /// </summary>
         public readonly string? Repository;
+        /// <summary>
+        /// Glob patterns matching the tag names that trigger a deployment when `deployTags` is true. Prefix a pattern with `!` to exclude matching tags, for example `!*-rc*`. An empty list matches all tags.
+        /// </summary>
+        public readonly ImmutableArray<string> TagFilters;
 
         [OutputConstructor]
         private DeploymentSettingsGithub(
             bool? deployCommits,
+
+            bool? deployTags,
 
             ImmutableArray<string> paths,
 
@@ -47,13 +57,17 @@ namespace Pulumi.PulumiService.Outputs
 
             bool? pullRequestTemplate,
 
-            string? repository)
+            string? repository,
+
+            ImmutableArray<string> tagFilters)
         {
             DeployCommits = deployCommits;
+            DeployTags = deployTags;
             Paths = paths;
             PreviewPullRequests = previewPullRequests;
             PullRequestTemplate = pullRequestTemplate;
             Repository = repository;
+            TagFilters = tagFilters;
         }
     }
 }

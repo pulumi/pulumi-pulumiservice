@@ -593,6 +593,41 @@ func TestYamlDeploymentSettingsVcsExample(t *testing.T) {
 	t.Skip("requires an existing Azure DevOps integration; run manually against a configured environment")
 }
 
+// TestYamlDeploymentSettingsGitHubTagsExample checks that Pulumi Cloud accepts
+// `deployTags` and `tagFilters` and returns them on read. It needs an
+// organization with the Pulumi GitHub app installed on the repository, which
+// the CI org doesn't have, so it skips unless PULUMI_TEST_GITHUB_REPOSITORY
+// is set.
+//
+// It doesn't use runPulumiTest, because a refresh of any `github` settings
+// block shows drift today: Pulumi Cloud mirrors the block into `vcs` on read.
+func TestYamlDeploymentSettingsGitHubTagsExample(t *testing.T) {
+	repository := os.Getenv("PULUMI_TEST_GITHUB_REPOSITORY")
+	if repository == "" {
+		t.Skip("requires PULUMI_TEST_GITHUB_REPOSITORY, an owner/repo that the " +
+			"PULUMI_TEST_OWNER organization's Pulumi GitHub app can access")
+	}
+
+	test := pulumitest.NewPulumiTest(t,
+		filepath.Join(getCwd(t), "yaml-deployment-settings-github-tags"),
+		inMemoryProvider(),
+		opttest.UseAmbientBackend(),
+		opttest.StackName(randomStackName()),
+	)
+	test.SetConfig(t, "organizationName", getOrgName())
+	test.SetConfig(t, "repository", repository)
+
+	test.Up(t)
+	test.Refresh(t)
+
+	github, ok := stateOutputs(t, test, "pulumiservice:index:DeploymentSettings")["github"].(map[string]any)
+	require.True(t, ok, "github settings should be present after refresh")
+	assert.Equal(t, true, github["deployTags"])
+	assert.Equal(t, []any{"v*", "!*-rc*"}, github["tagFilters"])
+
+	test.Destroy(t)
+}
+
 func TestYamlRbacExample(t *testing.T) {
 	// Requires the Custom Roles feature to be enabled on the test
 	// organization. If it isn't, CreateRole will return a feature-flag

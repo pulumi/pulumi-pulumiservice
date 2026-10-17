@@ -892,7 +892,11 @@ class DeploymentSettingsGithubArgsDict(TypedDict):
     """
     deploy_commits: NotRequired[pulumi.Input[Optional[_builtins.bool]]]
     """
-    Trigger a deployment running `pulumi up` on commit.
+    Trigger a deployment running `pulumi up` on commit. Must be `false` when `deployTags` is `true`, because Pulumi Cloud rejects the two together.
+    """
+    deploy_tags: NotRequired[pulumi.Input[Optional[_builtins.bool]]]
+    """
+    Trigger a deployment running `pulumi up` when a tag matching `tagFilters` is pushed. Can't be combined with `deployCommits`, which defaults to `true`, so set `deployCommits` to `false` when you enable this.
     """
     paths: NotRequired[pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]]]
     """
@@ -910,28 +914,40 @@ class DeploymentSettingsGithubArgsDict(TypedDict):
     """
     The GitHub repository in the format org/repo.
     """
+    tag_filters: NotRequired[pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]]]
+    """
+    Glob patterns matching the tag names that trigger a deployment when `deployTags` is true. Prefix a pattern with `!` to exclude matching tags, for example `!*-rc*`. An empty list matches all tags.
+    """
 
 @pulumi.input_type
 class DeploymentSettingsGithubArgs:
     def __init__(__self__, *,
                  deploy_commits: pulumi.Input[Optional[_builtins.bool]] = None,
+                 deploy_tags: pulumi.Input[Optional[_builtins.bool]] = None,
                  paths: pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]] = None,
                  preview_pull_requests: pulumi.Input[Optional[_builtins.bool]] = None,
                  pull_request_template: pulumi.Input[Optional[_builtins.bool]] = None,
-                 repository: pulumi.Input[Optional[_builtins.str]] = None):
+                 repository: pulumi.Input[Optional[_builtins.str]] = None,
+                 tag_filters: pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]] = None):
         """
         GitHub settings for the deployment.
 
-        :param pulumi.Input[_builtins.bool] deploy_commits: Trigger a deployment running `pulumi up` on commit.
+        :param pulumi.Input[_builtins.bool] deploy_commits: Trigger a deployment running `pulumi up` on commit. Must be `false` when `deployTags` is `true`, because Pulumi Cloud rejects the two together.
+        :param pulumi.Input[_builtins.bool] deploy_tags: Trigger a deployment running `pulumi up` when a tag matching `tagFilters` is pushed. Can't be combined with `deployCommits`, which defaults to `true`, so set `deployCommits` to `false` when you enable this.
         :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] paths: The paths within the repo that deployments should be filtered to.
         :param pulumi.Input[_builtins.bool] preview_pull_requests: Trigger a deployment running `pulumi preview` when a PR is opened.
         :param pulumi.Input[_builtins.bool] pull_request_template: Use this stack as a template for pull request review stacks.
         :param pulumi.Input[_builtins.str] repository: The GitHub repository in the format org/repo.
+        :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] tag_filters: Glob patterns matching the tag names that trigger a deployment when `deployTags` is true. Prefix a pattern with `!` to exclude matching tags, for example `!*-rc*`. An empty list matches all tags.
         """
         if deploy_commits is None:
             deploy_commits = True
         if deploy_commits is not None:
             pulumi.set(__self__, "deploy_commits", deploy_commits)
+        if deploy_tags is None:
+            deploy_tags = False
+        if deploy_tags is not None:
+            pulumi.set(__self__, "deploy_tags", deploy_tags)
         if paths is not None:
             pulumi.set(__self__, "paths", paths)
         if preview_pull_requests is None:
@@ -944,18 +960,32 @@ class DeploymentSettingsGithubArgs:
             pulumi.set(__self__, "pull_request_template", pull_request_template)
         if repository is not None:
             pulumi.set(__self__, "repository", repository)
+        if tag_filters is not None:
+            pulumi.set(__self__, "tag_filters", tag_filters)
 
     @_builtins.property
     @pulumi.getter(name="deployCommits")
     def deploy_commits(self) -> pulumi.Input[Optional[_builtins.bool]]:
         """
-        Trigger a deployment running `pulumi up` on commit.
+        Trigger a deployment running `pulumi up` on commit. Must be `false` when `deployTags` is `true`, because Pulumi Cloud rejects the two together.
         """
         return pulumi.get(self, "deploy_commits")
 
     @deploy_commits.setter
     def deploy_commits(self, value: pulumi.Input[Optional[_builtins.bool]]):
         pulumi.set(self, "deploy_commits", value)
+
+    @_builtins.property
+    @pulumi.getter(name="deployTags")
+    def deploy_tags(self) -> pulumi.Input[Optional[_builtins.bool]]:
+        """
+        Trigger a deployment running `pulumi up` when a tag matching `tagFilters` is pushed. Can't be combined with `deployCommits`, which defaults to `true`, so set `deployCommits` to `false` when you enable this.
+        """
+        return pulumi.get(self, "deploy_tags")
+
+    @deploy_tags.setter
+    def deploy_tags(self, value: pulumi.Input[Optional[_builtins.bool]]):
+        pulumi.set(self, "deploy_tags", value)
 
     @_builtins.property
     @pulumi.getter
@@ -1004,6 +1034,18 @@ class DeploymentSettingsGithubArgs:
     @repository.setter
     def repository(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "repository", value)
+
+    @_builtins.property
+    @pulumi.getter(name="tagFilters")
+    def tag_filters(self) -> pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]]:
+        """
+        Glob patterns matching the tag names that trigger a deployment when `deployTags` is true. Prefix a pattern with `!` to exclude matching tags, for example `!*-rc*`. An empty list matches all tags.
+        """
+        return pulumi.get(self, "tag_filters")
+
+    @tag_filters.setter
+    def tag_filters(self, value: pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]]):
+        pulumi.set(self, "tag_filters", value)
 
 
 class DeploymentSettingsOperationContextArgsDict(TypedDict):
@@ -1144,11 +1186,15 @@ class DeploymentSettingsVcsArgsDict(TypedDict):
     """
     deploy_commits: NotRequired[pulumi.Input[Optional[_builtins.bool]]]
     """
-    Trigger a deployment running `pulumi up` on commit.
+    Trigger a deployment running `pulumi up` on commit. Must be `false` when `deployTags` is `true`, because Pulumi Cloud rejects the two together.
     """
     deploy_pull_request: NotRequired[pulumi.Input[Optional[_builtins.int]]]
     """
     Deploy a specific pull request number.
+    """
+    deploy_tags: NotRequired[pulumi.Input[Optional[_builtins.bool]]]
+    """
+    Trigger a deployment running `pulumi up` when a tag matching `tagFilters` is pushed. Can't be combined with `deployCommits`, which defaults to `true`, so set `deployCommits` to `false` when you enable this.
     """
     installation_id: NotRequired[pulumi.Input[Optional[_builtins.str]]]
     """
@@ -1170,6 +1216,10 @@ class DeploymentSettingsVcsArgsDict(TypedDict):
     """
     The repository identifier (e.g., 'ProjectName/RepoName' for Azure DevOps, 'org/repo' for GitHub).
     """
+    tag_filters: NotRequired[pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]]]
+    """
+    Glob patterns matching the tag names that trigger a deployment when `deployTags` is true. Prefix a pattern with `!` to exclude matching tags, for example `!*-rc*`. An empty list matches all tags.
+    """
 
 @pulumi.input_type
 class DeploymentSettingsVcsArgs:
@@ -1177,22 +1227,26 @@ class DeploymentSettingsVcsArgs:
                  provider: pulumi.Input[_builtins.str],
                  deploy_commits: pulumi.Input[Optional[_builtins.bool]] = None,
                  deploy_pull_request: pulumi.Input[Optional[_builtins.int]] = None,
+                 deploy_tags: pulumi.Input[Optional[_builtins.bool]] = None,
                  installation_id: pulumi.Input[Optional[_builtins.str]] = None,
                  paths: pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]] = None,
                  preview_pull_requests: pulumi.Input[Optional[_builtins.bool]] = None,
                  pull_request_template: pulumi.Input[Optional[_builtins.bool]] = None,
-                 repository: pulumi.Input[Optional[_builtins.str]] = None):
+                 repository: pulumi.Input[Optional[_builtins.str]] = None,
+                 tag_filters: pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]] = None):
         """
         VCS settings for the deployment, supporting multiple VCS providers.
 
         :param pulumi.Input[_builtins.str] provider: The VCS provider type.
-        :param pulumi.Input[_builtins.bool] deploy_commits: Trigger a deployment running `pulumi up` on commit.
+        :param pulumi.Input[_builtins.bool] deploy_commits: Trigger a deployment running `pulumi up` on commit. Must be `false` when `deployTags` is `true`, because Pulumi Cloud rejects the two together.
         :param pulumi.Input[_builtins.int] deploy_pull_request: Deploy a specific pull request number.
+        :param pulumi.Input[_builtins.bool] deploy_tags: Trigger a deployment running `pulumi up` when a tag matching `tagFilters` is pushed. Can't be combined with `deployCommits`, which defaults to `true`, so set `deployCommits` to `false` when you enable this.
         :param pulumi.Input[_builtins.str] installation_id: The VCS integration installation ID. Use to disambiguate when an organization has multiple integrations of the same provider type (e.g., two GitHub Apps). If omitted, the API resolves the integration automatically from `provider` and `repository`.
         :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] paths: The paths within the repo that deployments should be filtered to.
         :param pulumi.Input[_builtins.bool] preview_pull_requests: Trigger a deployment running `pulumi preview` when a PR is opened.
         :param pulumi.Input[_builtins.bool] pull_request_template: Use this stack as a template for pull request review stacks.
         :param pulumi.Input[_builtins.str] repository: The repository identifier (e.g., 'ProjectName/RepoName' for Azure DevOps, 'org/repo' for GitHub).
+        :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] tag_filters: Glob patterns matching the tag names that trigger a deployment when `deployTags` is true. Prefix a pattern with `!` to exclude matching tags, for example `!*-rc*`. An empty list matches all tags.
         """
         pulumi.set(__self__, "provider", provider)
         if deploy_commits is None:
@@ -1201,6 +1255,10 @@ class DeploymentSettingsVcsArgs:
             pulumi.set(__self__, "deploy_commits", deploy_commits)
         if deploy_pull_request is not None:
             pulumi.set(__self__, "deploy_pull_request", deploy_pull_request)
+        if deploy_tags is None:
+            deploy_tags = False
+        if deploy_tags is not None:
+            pulumi.set(__self__, "deploy_tags", deploy_tags)
         if installation_id is not None:
             pulumi.set(__self__, "installation_id", installation_id)
         if paths is not None:
@@ -1215,6 +1273,8 @@ class DeploymentSettingsVcsArgs:
             pulumi.set(__self__, "pull_request_template", pull_request_template)
         if repository is not None:
             pulumi.set(__self__, "repository", repository)
+        if tag_filters is not None:
+            pulumi.set(__self__, "tag_filters", tag_filters)
 
     @_builtins.property
     @pulumi.getter
@@ -1232,7 +1292,7 @@ class DeploymentSettingsVcsArgs:
     @pulumi.getter(name="deployCommits")
     def deploy_commits(self) -> pulumi.Input[Optional[_builtins.bool]]:
         """
-        Trigger a deployment running `pulumi up` on commit.
+        Trigger a deployment running `pulumi up` on commit. Must be `false` when `deployTags` is `true`, because Pulumi Cloud rejects the two together.
         """
         return pulumi.get(self, "deploy_commits")
 
@@ -1251,6 +1311,18 @@ class DeploymentSettingsVcsArgs:
     @deploy_pull_request.setter
     def deploy_pull_request(self, value: pulumi.Input[Optional[_builtins.int]]):
         pulumi.set(self, "deploy_pull_request", value)
+
+    @_builtins.property
+    @pulumi.getter(name="deployTags")
+    def deploy_tags(self) -> pulumi.Input[Optional[_builtins.bool]]:
+        """
+        Trigger a deployment running `pulumi up` when a tag matching `tagFilters` is pushed. Can't be combined with `deployCommits`, which defaults to `true`, so set `deployCommits` to `false` when you enable this.
+        """
+        return pulumi.get(self, "deploy_tags")
+
+    @deploy_tags.setter
+    def deploy_tags(self, value: pulumi.Input[Optional[_builtins.bool]]):
+        pulumi.set(self, "deploy_tags", value)
 
     @_builtins.property
     @pulumi.getter(name="installationId")
@@ -1311,6 +1383,18 @@ class DeploymentSettingsVcsArgs:
     @repository.setter
     def repository(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "repository", value)
+
+    @_builtins.property
+    @pulumi.getter(name="tagFilters")
+    def tag_filters(self) -> pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]]:
+        """
+        Glob patterns matching the tag names that trigger a deployment when `deployTags` is true. Prefix a pattern with `!` to exclude matching tags, for example `!*-rc*`. An empty list matches all tags.
+        """
+        return pulumi.get(self, "tag_filters")
+
+    @tag_filters.setter
+    def tag_filters(self, value: pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]]):
+        pulumi.set(self, "tag_filters", value)
 
 
 class EligibleApproverArgsDict(TypedDict):

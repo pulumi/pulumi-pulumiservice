@@ -25,14 +25,14 @@ public final class DeploymentSettingsVcsArgs extends com.pulumi.resources.Resour
     public static final DeploymentSettingsVcsArgs Empty = new DeploymentSettingsVcsArgs();
 
     /**
-     * Trigger a deployment running `pulumi up` on commit.
+     * Trigger a deployment running `pulumi up` on commit. Must be `false` when `deployTags` is `true`, because Pulumi Cloud rejects the two together.
      * 
      */
     @Import(name="deployCommits")
     private @Nullable Output<Boolean> deployCommits;
 
     /**
-     * @return Trigger a deployment running `pulumi up` on commit.
+     * @return Trigger a deployment running `pulumi up` on commit. Must be `false` when `deployTags` is `true`, because Pulumi Cloud rejects the two together.
      * 
      */
     public Optional<Output<Boolean>> deployCommits() {
@@ -52,6 +52,21 @@ public final class DeploymentSettingsVcsArgs extends com.pulumi.resources.Resour
      */
     public Optional<Output<Integer>> deployPullRequest() {
         return Optional.ofNullable(this.deployPullRequest);
+    }
+
+    /**
+     * Trigger a deployment running `pulumi up` when a tag matching `tagFilters` is pushed. Can&#39;t be combined with `deployCommits`, which defaults to `true`, so set `deployCommits` to `false` when you enable this.
+     * 
+     */
+    @Import(name="deployTags")
+    private @Nullable Output<Boolean> deployTags;
+
+    /**
+     * @return Trigger a deployment running `pulumi up` when a tag matching `tagFilters` is pushed. Can&#39;t be combined with `deployCommits`, which defaults to `true`, so set `deployCommits` to `false` when you enable this.
+     * 
+     */
+    public Optional<Output<Boolean>> deployTags() {
+        return Optional.ofNullable(this.deployTags);
     }
 
     /**
@@ -144,17 +159,34 @@ public final class DeploymentSettingsVcsArgs extends com.pulumi.resources.Resour
         return Optional.ofNullable(this.repository);
     }
 
+    /**
+     * Glob patterns matching the tag names that trigger a deployment when `deployTags` is true. Prefix a pattern with `!` to exclude matching tags, for example `!*-rc*`. An empty list matches all tags.
+     * 
+     */
+    @Import(name="tagFilters")
+    private @Nullable Output<List<String>> tagFilters;
+
+    /**
+     * @return Glob patterns matching the tag names that trigger a deployment when `deployTags` is true. Prefix a pattern with `!` to exclude matching tags, for example `!*-rc*`. An empty list matches all tags.
+     * 
+     */
+    public Optional<Output<List<String>>> tagFilters() {
+        return Optional.ofNullable(this.tagFilters);
+    }
+
     private DeploymentSettingsVcsArgs() {}
 
     private DeploymentSettingsVcsArgs(DeploymentSettingsVcsArgs $) {
         this.deployCommits = $.deployCommits;
         this.deployPullRequest = $.deployPullRequest;
+        this.deployTags = $.deployTags;
         this.installationId = $.installationId;
         this.paths = $.paths;
         this.previewPullRequests = $.previewPullRequests;
         this.provider = $.provider;
         this.pullRequestTemplate = $.pullRequestTemplate;
         this.repository = $.repository;
+        this.tagFilters = $.tagFilters;
     }
 
     public static Builder builder() {
@@ -176,7 +208,7 @@ public final class DeploymentSettingsVcsArgs extends com.pulumi.resources.Resour
         }
 
         /**
-         * @param deployCommits Trigger a deployment running `pulumi up` on commit.
+         * @param deployCommits Trigger a deployment running `pulumi up` on commit. Must be `false` when `deployTags` is `true`, because Pulumi Cloud rejects the two together.
          * 
          * @return builder
          * 
@@ -187,7 +219,7 @@ public final class DeploymentSettingsVcsArgs extends com.pulumi.resources.Resour
         }
 
         /**
-         * @param deployCommits Trigger a deployment running `pulumi up` on commit.
+         * @param deployCommits Trigger a deployment running `pulumi up` on commit. Must be `false` when `deployTags` is `true`, because Pulumi Cloud rejects the two together.
          * 
          * @return builder
          * 
@@ -215,6 +247,27 @@ public final class DeploymentSettingsVcsArgs extends com.pulumi.resources.Resour
          */
         public Builder deployPullRequest(Integer deployPullRequest) {
             return deployPullRequest(Output.of(deployPullRequest));
+        }
+
+        /**
+         * @param deployTags Trigger a deployment running `pulumi up` when a tag matching `tagFilters` is pushed. Can&#39;t be combined with `deployCommits`, which defaults to `true`, so set `deployCommits` to `false` when you enable this.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder deployTags(@Nullable Output<Boolean> deployTags) {
+            $.deployTags = deployTags;
+            return this;
+        }
+
+        /**
+         * @param deployTags Trigger a deployment running `pulumi up` when a tag matching `tagFilters` is pushed. Can&#39;t be combined with `deployCommits`, which defaults to `true`, so set `deployCommits` to `false` when you enable this.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder deployTags(Boolean deployTags) {
+            return deployTags(Output.of(deployTags));
         }
 
         /**
@@ -353,8 +406,40 @@ public final class DeploymentSettingsVcsArgs extends com.pulumi.resources.Resour
             return repository(Output.of(repository));
         }
 
+        /**
+         * @param tagFilters Glob patterns matching the tag names that trigger a deployment when `deployTags` is true. Prefix a pattern with `!` to exclude matching tags, for example `!*-rc*`. An empty list matches all tags.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder tagFilters(@Nullable Output<List<String>> tagFilters) {
+            $.tagFilters = tagFilters;
+            return this;
+        }
+
+        /**
+         * @param tagFilters Glob patterns matching the tag names that trigger a deployment when `deployTags` is true. Prefix a pattern with `!` to exclude matching tags, for example `!*-rc*`. An empty list matches all tags.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder tagFilters(List<String> tagFilters) {
+            return tagFilters(Output.of(tagFilters));
+        }
+
+        /**
+         * @param tagFilters Glob patterns matching the tag names that trigger a deployment when `deployTags` is true. Prefix a pattern with `!` to exclude matching tags, for example `!*-rc*`. An empty list matches all tags.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder tagFilters(String... tagFilters) {
+            return tagFilters(List.of(tagFilters));
+        }
+
         public DeploymentSettingsVcsArgs build() {
             $.deployCommits = Codegen.booleanProp("deployCommits").output().arg($.deployCommits).def(true).getNullable();
+            $.deployTags = Codegen.booleanProp("deployTags").output().arg($.deployTags).def(false).getNullable();
             $.previewPullRequests = Codegen.booleanProp("previewPullRequests").output().arg($.previewPullRequests).def(true).getNullable();
             if ($.provider == null) {
                 throw new MissingRequiredPropertyException("DeploymentSettingsVcsArgs", "provider");
