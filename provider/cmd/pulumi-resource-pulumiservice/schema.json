@@ -758,6 +758,32 @@
         "virtualAdmin"
       ]
     },
+    "pulumiservice:index:OrganizationRoleInfo": {
+      "properties": {
+        "builtIn": {
+          "type": "boolean",
+          "description": "Whether this is one of the roles every organization has (Admin, Member and Billing Manager), rather than a custom role."
+        },
+        "description": {
+          "type": "string",
+          "description": "The role's description, if it has one."
+        },
+        "name": {
+          "type": "string",
+          "description": "The role's name, as shown in the Pulumi Cloud console."
+        },
+        "roleId": {
+          "type": "string",
+          "description": "The role's ID. Pass it to inputs that take a role ID, such as `TeamRoleAssignment.roleId` and `OrganizationMember.roleId`."
+        }
+      },
+      "type": "object",
+      "required": [
+        "roleId",
+        "name",
+        "builtIn"
+      ]
+    },
     "pulumiservice:index:PolicyGroupPolicyPackReference": {
       "description": "A reference to a policy pack within a policy group.",
       "properties": {
@@ -7408,6 +7434,52 @@
         "type": "object"
       }
     },
+    "pulumiservice:index:getOrganizationRole": {
+      "description": "Looks up a role in a Pulumi Cloud organization by the name shown in the Pulumi Cloud console. Finds both built-in and custom roles. Use the returned `roleId` for inputs that take a role ID, such as `TeamRoleAssignment.roleId` and `OrganizationMember.roleId`, instead of hardcoding the ID. Returns an error when no role has the given name.\n\n{{% examples %}}\n## Example Usage\n\n{{% example %}}\n### Look up a role you defined\n\n```typescript\nimport * as pulumi from \"@pulumi/pulumi\";\nimport * as pulumiservice from \"@pulumi/pulumiservice\";\n\nconst ciDeployerRole = pulumiservice.getOrganizationRoleOutput({\n    organizationName: \"my-org\",\n    name: \"CI Deployer\",\n});\nconst platformTeamRole = new pulumiservice.TeamRoleAssignment(\"platformTeamRole\", {\n    organizationName: \"my-org\",\n    teamName: \"platform\",\n    roleId: ciDeployerRole.roleId,\n});\n```\n\n```python\nimport pulumi\nimport pulumi_pulumiservice as pulumiservice\n\nci_deployer_role = pulumiservice.get_organization_role_output(organization_name=\"my-org\",\n    name=\"CI Deployer\")\nplatform_team_role = pulumiservice.TeamRoleAssignment(\"platformTeamRole\",\n    organization_name=\"my-org\",\n    team_name=\"platform\",\n    role_id=ci_deployer_role.role_id)\n```\n\n```go\npackage main\n\nimport (\n\t\"github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice\"\n\t\"github.com/pulumi/pulumi/sdk/v3/go/pulumi\"\n)\n\nfunc main() {\n\tpulumi.Run(func(ctx *pulumi.Context) error {\n\t\tciDeployerRole := pulumiservice.GetOrganizationRoleOutput(ctx, pulumiservice.GetOrganizationRoleOutputArgs{\n\t\t\tOrganizationName: pulumi.String(\"my-org\"),\n\t\t\tName:             pulumi.String(\"CI Deployer\"),\n\t\t}, nil)\n\t\t_, err := pulumiservice.NewTeamRoleAssignment(ctx, \"platformTeamRole\", &pulumiservice.TeamRoleAssignmentArgs{\n\t\t\tOrganizationName: pulumi.String(\"my-org\"),\n\t\t\tTeamName:         pulumi.String(\"platform\"),\n\t\t\tRoleId:           ciDeployerRole.RoleId(),\n\t\t})\n\t\tif err != nil {\n\t\t\treturn err\n\t\t}\n\t\treturn nil\n\t})\n}\n```\n\n```csharp\nusing System.Collections.Generic;\nusing System.Linq;\nusing Pulumi;\nusing PulumiService = Pulumi.PulumiService;\n\nreturn await Deployment.RunAsync(() => \n{\n    var ciDeployerRole = PulumiService.GetOrganizationRole.Invoke(new()\n    {\n        OrganizationName = \"my-org\",\n        Name = \"CI Deployer\",\n    });\n\n    var platformTeamRole = new PulumiService.TeamRoleAssignment(\"platformTeamRole\", new()\n    {\n        OrganizationName = \"my-org\",\n        TeamName = \"platform\",\n        RoleId = ciDeployerRole.Apply(getOrganizationRoleResult => getOrganizationRoleResult.RoleId),\n    });\n\n});\n```\n\n```java\npackage generated_program;\n\nimport com.pulumi.Context;\nimport com.pulumi.Pulumi;\nimport com.pulumi.core.Output;\nimport com.pulumi.pulumiservice.PulumiserviceFunctions;\nimport com.pulumi.pulumiservice.inputs.GetOrganizationRoleArgs;\nimport com.pulumi.pulumiservice.TeamRoleAssignment;\nimport com.pulumi.pulumiservice.TeamRoleAssignmentArgs;\nimport java.util.ArrayList;\nimport java.util.Arrays;\nimport java.util.Map;\nimport java.io.File;\nimport java.nio.file.Files;\nimport java.nio.file.Paths;\n\npublic class App {\n    public static void main(String[] args) {\n        Pulumi.run(App::stack);\n    }\n\n    public static void stack(Context ctx) {\n        final var ciDeployerRole = PulumiserviceFunctions.getOrganizationRole(GetOrganizationRoleArgs.builder()\n            .organizationName(\"my-org\")\n            .name(\"CI Deployer\")\n            .build());\n\n        var platformTeamRole = new TeamRoleAssignment(\"platformTeamRole\", TeamRoleAssignmentArgs.builder()\n            .organizationName(\"my-org\")\n            .teamName(\"platform\")\n            .roleId(ciDeployerRole.applyValue(_ciDeployerRole -> _ciDeployerRole.roleId()))\n            .build());\n\n    }\n}\n```\n\n```yaml\nvariables:\n  ciDeployerRole:\n    fn::invoke:\n      function: pulumiservice:getOrganizationRole\n      arguments:\n        organizationName: my-org\n        name: CI Deployer\nresources:\n  platformTeamRole:\n    type: pulumiservice:TeamRoleAssignment\n    properties:\n      organizationName: my-org\n      teamName: platform\n      roleId: ${ciDeployerRole.roleId}\n```\n{{% /example %}}\n\n{{% example %}}\n### Look up a built-in role\n\n```typescript\nimport * as pulumi from \"@pulumi/pulumi\";\nimport * as pulumiservice from \"@pulumi/pulumiservice\";\n\nconst adminRole = pulumiservice.getOrganizationRoleOutput({\n    organizationName: \"my-org\",\n    name: \"Admin\",\n});\nexport const adminRoleId = adminRole.roleId;\n```\n\n```python\nimport pulumi\nimport pulumi_pulumiservice as pulumiservice\n\nadmin_role = pulumiservice.get_organization_role_output(organization_name=\"my-org\",\n    name=\"Admin\")\npulumi.export(\"adminRoleId\", admin_role.role_id)\n```\n\n```go\npackage main\n\nimport (\n\t\"github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice\"\n\t\"github.com/pulumi/pulumi/sdk/v3/go/pulumi\"\n)\n\nfunc main() {\n\tpulumi.Run(func(ctx *pulumi.Context) error {\n\t\tadminRole := pulumiservice.GetOrganizationRoleOutput(ctx, pulumiservice.GetOrganizationRoleOutputArgs{\n\t\t\tOrganizationName: pulumi.String(\"my-org\"),\n\t\t\tName:             pulumi.String(\"Admin\"),\n\t\t}, nil)\n\t\tctx.Export(\"adminRoleId\", adminRole.RoleId())\n\t\treturn nil\n\t})\n}\n```\n\n```csharp\nusing System.Collections.Generic;\nusing System.Linq;\nusing Pulumi;\nusing PulumiService = Pulumi.PulumiService;\n\nreturn await Deployment.RunAsync(() => \n{\n    var adminRole = PulumiService.GetOrganizationRole.Invoke(new()\n    {\n        OrganizationName = \"my-org\",\n        Name = \"Admin\",\n    });\n\n    return new Dictionary<string, object?>\n    {\n        [\"adminRoleId\"] = adminRole.Apply(getOrganizationRoleResult => getOrganizationRoleResult.RoleId),\n    };\n});\n```\n\n```java\npackage generated_program;\n\nimport com.pulumi.Context;\nimport com.pulumi.Pulumi;\nimport com.pulumi.core.Output;\nimport com.pulumi.pulumiservice.PulumiserviceFunctions;\nimport com.pulumi.pulumiservice.inputs.GetOrganizationRoleArgs;\nimport java.util.ArrayList;\nimport java.util.Arrays;\nimport java.util.Map;\nimport java.io.File;\nimport java.nio.file.Files;\nimport java.nio.file.Paths;\n\npublic class App {\n    public static void main(String[] args) {\n        Pulumi.run(App::stack);\n    }\n\n    public static void stack(Context ctx) {\n        final var adminRole = PulumiserviceFunctions.getOrganizationRole(GetOrganizationRoleArgs.builder()\n            .organizationName(\"my-org\")\n            .name(\"Admin\")\n            .build());\n\n        ctx.export(\"adminRoleId\", adminRole.applyValue(_adminRole -> _adminRole.roleId()));\n    }\n}\n```\n\n```yaml\nvariables:\n  adminRole:\n    fn::invoke:\n      function: pulumiservice:getOrganizationRole\n      arguments:\n        organizationName: my-org\n        name: Admin\noutputs:\n  adminRoleId: ${adminRole.roleId}\n```\n{{% /example %}}\n{{% /examples %}}\n",
+      "inputs": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The role's name, as shown in the Pulumi Cloud console. The match is case-insensitive, as role names are unique within an organization regardless of case."
+          },
+          "organizationName": {
+            "type": "string",
+            "description": "The name of the Pulumi organization."
+          }
+        },
+        "type": "object",
+        "required": [
+          "organizationName",
+          "name"
+        ]
+      },
+      "outputs": {
+        "properties": {
+          "builtIn": {
+            "description": "Whether this is one of the roles every organization has (Admin, Member and Billing Manager), rather than a custom role.",
+            "type": "boolean"
+          },
+          "description": {
+            "description": "The role's description, if it has one.",
+            "type": "string"
+          },
+          "name": {
+            "description": "The role's name, as shown in the Pulumi Cloud console.",
+            "type": "string"
+          },
+          "roleId": {
+            "description": "The role's ID. Pass it to inputs that take a role ID, such as `TeamRoleAssignment.roleId` and `OrganizationMember.roleId`.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "roleId",
+          "name",
+          "builtIn"
+        ],
+        "type": "object"
+      }
+    },
     "pulumiservice:index:getOrganizationRoleScopes": {
       "description": "Lists the permission scopes available for custom roles in an organization. Use this to discover valid scope names before setting `OrganizationRole.permissions`. The catalogue is flattened into a single list with resource type and group context, sorted deterministically.",
       "inputs": {
@@ -7433,6 +7505,36 @@
         },
         "required": [
           "scopes"
+        ],
+        "type": "object"
+      }
+    },
+    "pulumiservice:index:getOrganizationRoles": {
+      "description": "Lists the roles in a Pulumi Cloud organization, including both built-in and custom roles, sorted by name. To look up a single role by the name shown in the Pulumi Cloud console, use `getOrganizationRole`.\n\n{{% examples %}}\n## Example Usage\n\n{{% example %}}\n### List all roles\n\n```typescript\nimport * as pulumi from \"@pulumi/pulumi\";\nimport * as pulumiservice from \"@pulumi/pulumiservice\";\n\nconst allRoles = pulumiservice.getOrganizationRolesOutput({\n    organizationName: \"my-org\",\n});\nexport const roles = allRoles.apply(allRoles => allRoles.roles);\n```\n\n```python\nimport pulumi\nimport pulumi_pulumiservice as pulumiservice\n\nall_roles = pulumiservice.get_organization_roles_output(organization_name=\"my-org\")\npulumi.export(\"roles\", all_roles.roles)\n```\n\n```go\npackage main\n\nimport (\n\t\"github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice\"\n\t\"github.com/pulumi/pulumi/sdk/v3/go/pulumi\"\n)\n\nfunc main() {\n\tpulumi.Run(func(ctx *pulumi.Context) error {\n\t\tallRoles := pulumiservice.GetOrganizationRolesOutput(ctx, pulumiservice.GetOrganizationRolesOutputArgs{\n\t\t\tOrganizationName: pulumi.String(\"my-org\"),\n\t\t}, nil)\n\t\tctx.Export(\"roles\", allRoles.ApplyT(func(allRoles pulumiservice.GetOrganizationRolesResult) ([]pulumiservice.OrganizationRoleInfo, error) {\n\t\t\treturn allRoles.Roles.([]pulumiservice.OrganizationRoleInfo), nil\n\t\t}).(pulumi.ArrayOutput))\n\t\treturn nil\n\t})\n}\n```\n\n```csharp\nusing System.Collections.Generic;\nusing System.Linq;\nusing Pulumi;\nusing PulumiService = Pulumi.PulumiService;\n\nreturn await Deployment.RunAsync(() => \n{\n    var allRoles = PulumiService.GetOrganizationRoles.Invoke(new()\n    {\n        OrganizationName = \"my-org\",\n    });\n\n    return new Dictionary<string, object?>\n    {\n        [\"roles\"] = allRoles.Apply(getOrganizationRolesResult => getOrganizationRolesResult.Roles),\n    };\n});\n```\n\n```java\npackage generated_program;\n\nimport com.pulumi.Context;\nimport com.pulumi.Pulumi;\nimport com.pulumi.core.Output;\nimport com.pulumi.pulumiservice.PulumiserviceFunctions;\nimport com.pulumi.pulumiservice.inputs.GetOrganizationRolesArgs;\nimport java.util.ArrayList;\nimport java.util.Arrays;\nimport java.util.Map;\nimport java.io.File;\nimport java.nio.file.Files;\nimport java.nio.file.Paths;\n\npublic class App {\n    public static void main(String[] args) {\n        Pulumi.run(App::stack);\n    }\n\n    public static void stack(Context ctx) {\n        final var allRoles = PulumiserviceFunctions.getOrganizationRoles(GetOrganizationRolesArgs.builder()\n            .organizationName(\"my-org\")\n            .build());\n\n        ctx.export(\"roles\", allRoles.applyValue(_allRoles -> _allRoles.roles()));\n    }\n}\n```\n\n```yaml\nvariables:\n  allRoles:\n    fn::invoke:\n      function: pulumiservice:getOrganizationRoles\n      arguments:\n        organizationName: my-org\noutputs:\n  roles: ${allRoles.roles}\n```\n{{% /example %}}\n{{% /examples %}}\n",
+      "inputs": {
+        "properties": {
+          "organizationName": {
+            "type": "string",
+            "description": "The name of the Pulumi organization."
+          }
+        },
+        "type": "object",
+        "required": [
+          "organizationName"
+        ]
+      },
+      "outputs": {
+        "properties": {
+          "roles": {
+            "description": "The organization's roles, built-in and custom, sorted by name.",
+            "items": {
+              "$ref": "#/types/pulumiservice:index:OrganizationRoleInfo"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "roles"
         ],
         "type": "object"
       }

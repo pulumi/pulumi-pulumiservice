@@ -184,7 +184,9 @@ func MakeProvider(host *provider.HostClient, name, version string) (pulumirpc.Re
 			infer.Function(&functions.GetInsightsAccountsFunction{}),
 			infer.Function(&functions.GetOrganizationMemberFunction{}),
 			infer.Function(&functions.GetOrganizationMembersFunction{}),
+			infer.Function(&functions.GetOrganizationRoleFunction{}),
 			infer.Function(&functions.GetOrganizationRoleScopesFunction{}),
+			infer.Function(&functions.GetOrganizationRolesFunction{}),
 		).
 		WithModuleMap(map[tokens.ModuleName]tokens.ModuleName{
 			"resources": "index",

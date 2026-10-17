@@ -29,8 +29,12 @@ import com.pulumi.pulumiservice.inputs.GetOrganizationMemberArgs;
 import com.pulumi.pulumiservice.inputs.GetOrganizationMemberPlainArgs;
 import com.pulumi.pulumiservice.inputs.GetOrganizationMembersArgs;
 import com.pulumi.pulumiservice.inputs.GetOrganizationMembersPlainArgs;
+import com.pulumi.pulumiservice.inputs.GetOrganizationRoleArgs;
+import com.pulumi.pulumiservice.inputs.GetOrganizationRolePlainArgs;
 import com.pulumi.pulumiservice.inputs.GetOrganizationRoleScopesArgs;
 import com.pulumi.pulumiservice.inputs.GetOrganizationRoleScopesPlainArgs;
+import com.pulumi.pulumiservice.inputs.GetOrganizationRolesArgs;
+import com.pulumi.pulumiservice.inputs.GetOrganizationRolesPlainArgs;
 import com.pulumi.pulumiservice.inputs.GetPolicyPackArgs;
 import com.pulumi.pulumiservice.inputs.GetPolicyPackPlainArgs;
 import com.pulumi.pulumiservice.inputs.GetPolicyPacksArgs;
@@ -45,7 +49,9 @@ import com.pulumi.pulumiservice.outputs.GetInsightsAccountResult;
 import com.pulumi.pulumiservice.outputs.GetInsightsAccountsResult;
 import com.pulumi.pulumiservice.outputs.GetOrganizationMemberResult;
 import com.pulumi.pulumiservice.outputs.GetOrganizationMembersResult;
+import com.pulumi.pulumiservice.outputs.GetOrganizationRoleResult;
 import com.pulumi.pulumiservice.outputs.GetOrganizationRoleScopesResult;
+import com.pulumi.pulumiservice.outputs.GetOrganizationRolesResult;
 import com.pulumi.pulumiservice.outputs.GetPolicyPackResult;
 import com.pulumi.pulumiservice.outputs.GetPolicyPacksResult;
 import java.util.concurrent.CompletableFuture;
@@ -416,6 +422,426 @@ public final class PulumiserviceFunctions {
         return Deployment.getInstance().invokeAsync("pulumiservice:index:getOrganizationMembers", TypeShape.of(GetOrganizationMembersResult.class), args, Utilities.withVersion(options));
     }
     /**
+     * Looks up a role in a Pulumi Cloud organization by the name shown in the Pulumi Cloud console. Finds both built-in and custom roles. Use the returned `roleId` for inputs that take a role ID, such as `TeamRoleAssignment.roleId` and `OrganizationMember.roleId`, instead of hardcoding the ID. Returns an error when no role has the given name.
+     * 
+     * ## Example Usage
+     * ### Look up a role you defined
+     * 
+     * <pre>
+     * {@code
+     * package generated_program;
+     * 
+     * import com.pulumi.Context;
+     * import com.pulumi.Pulumi;
+     * import com.pulumi.core.Output;
+     * import com.pulumi.pulumiservice.PulumiserviceFunctions;
+     * import com.pulumi.pulumiservice.inputs.GetOrganizationRoleArgs;
+     * import com.pulumi.pulumiservice.TeamRoleAssignment;
+     * import com.pulumi.pulumiservice.TeamRoleAssignmentArgs;
+     * import java.util.ArrayList;
+     * import java.util.Arrays;
+     * import java.util.Map;
+     * import java.io.File;
+     * import java.nio.file.Files;
+     * import java.nio.file.Paths;
+     * 
+     * public class App {
+     *     public static void main(String[] args) {
+     *         Pulumi.run(App::stack);
+     *     }
+     * 
+     *     public static void stack(Context ctx) {
+     *         final var ciDeployerRole = PulumiserviceFunctions.getOrganizationRole(GetOrganizationRoleArgs.builder()
+     *             .organizationName("my-org")
+     *             .name("CI Deployer")
+     *             .build());
+     * 
+     *         var platformTeamRole = new TeamRoleAssignment("platformTeamRole", TeamRoleAssignmentArgs.builder()
+     *             .organizationName("my-org")
+     *             .teamName("platform")
+     *             .roleId(ciDeployerRole.applyValue(_ciDeployerRole -> _ciDeployerRole.roleId()))
+     *             .build());
+     * 
+     *     }
+     * }
+     * }
+     * </pre>
+     * ### Look up a built-in role
+     * 
+     * <pre>
+     * {@code
+     * package generated_program;
+     * 
+     * import com.pulumi.Context;
+     * import com.pulumi.Pulumi;
+     * import com.pulumi.core.Output;
+     * import com.pulumi.pulumiservice.PulumiserviceFunctions;
+     * import com.pulumi.pulumiservice.inputs.GetOrganizationRoleArgs;
+     * import java.util.ArrayList;
+     * import java.util.Arrays;
+     * import java.util.Map;
+     * import java.io.File;
+     * import java.nio.file.Files;
+     * import java.nio.file.Paths;
+     * 
+     * public class App {
+     *     public static void main(String[] args) {
+     *         Pulumi.run(App::stack);
+     *     }
+     * 
+     *     public static void stack(Context ctx) {
+     *         final var adminRole = PulumiserviceFunctions.getOrganizationRole(GetOrganizationRoleArgs.builder()
+     *             .organizationName("my-org")
+     *             .name("Admin")
+     *             .build());
+     * 
+     *         ctx.export("adminRoleId", adminRole.applyValue(_adminRole -> _adminRole.roleId()));
+     *     }
+     * }
+     * }
+     * </pre>
+     * 
+     */
+    public static Output<GetOrganizationRoleResult> getOrganizationRole(GetOrganizationRoleArgs args) {
+        return getOrganizationRole(args, InvokeOptions.Empty);
+    }
+    /**
+     * Looks up a role in a Pulumi Cloud organization by the name shown in the Pulumi Cloud console. Finds both built-in and custom roles. Use the returned `roleId` for inputs that take a role ID, such as `TeamRoleAssignment.roleId` and `OrganizationMember.roleId`, instead of hardcoding the ID. Returns an error when no role has the given name.
+     * 
+     * ## Example Usage
+     * ### Look up a role you defined
+     * 
+     * <pre>
+     * {@code
+     * package generated_program;
+     * 
+     * import com.pulumi.Context;
+     * import com.pulumi.Pulumi;
+     * import com.pulumi.core.Output;
+     * import com.pulumi.pulumiservice.PulumiserviceFunctions;
+     * import com.pulumi.pulumiservice.inputs.GetOrganizationRoleArgs;
+     * import com.pulumi.pulumiservice.TeamRoleAssignment;
+     * import com.pulumi.pulumiservice.TeamRoleAssignmentArgs;
+     * import java.util.ArrayList;
+     * import java.util.Arrays;
+     * import java.util.Map;
+     * import java.io.File;
+     * import java.nio.file.Files;
+     * import java.nio.file.Paths;
+     * 
+     * public class App {
+     *     public static void main(String[] args) {
+     *         Pulumi.run(App::stack);
+     *     }
+     * 
+     *     public static void stack(Context ctx) {
+     *         final var ciDeployerRole = PulumiserviceFunctions.getOrganizationRole(GetOrganizationRoleArgs.builder()
+     *             .organizationName("my-org")
+     *             .name("CI Deployer")
+     *             .build());
+     * 
+     *         var platformTeamRole = new TeamRoleAssignment("platformTeamRole", TeamRoleAssignmentArgs.builder()
+     *             .organizationName("my-org")
+     *             .teamName("platform")
+     *             .roleId(ciDeployerRole.applyValue(_ciDeployerRole -> _ciDeployerRole.roleId()))
+     *             .build());
+     * 
+     *     }
+     * }
+     * }
+     * </pre>
+     * ### Look up a built-in role
+     * 
+     * <pre>
+     * {@code
+     * package generated_program;
+     * 
+     * import com.pulumi.Context;
+     * import com.pulumi.Pulumi;
+     * import com.pulumi.core.Output;
+     * import com.pulumi.pulumiservice.PulumiserviceFunctions;
+     * import com.pulumi.pulumiservice.inputs.GetOrganizationRoleArgs;
+     * import java.util.ArrayList;
+     * import java.util.Arrays;
+     * import java.util.Map;
+     * import java.io.File;
+     * import java.nio.file.Files;
+     * import java.nio.file.Paths;
+     * 
+     * public class App {
+     *     public static void main(String[] args) {
+     *         Pulumi.run(App::stack);
+     *     }
+     * 
+     *     public static void stack(Context ctx) {
+     *         final var adminRole = PulumiserviceFunctions.getOrganizationRole(GetOrganizationRoleArgs.builder()
+     *             .organizationName("my-org")
+     *             .name("Admin")
+     *             .build());
+     * 
+     *         ctx.export("adminRoleId", adminRole.applyValue(_adminRole -> _adminRole.roleId()));
+     *     }
+     * }
+     * }
+     * </pre>
+     * 
+     */
+    public static CompletableFuture<GetOrganizationRoleResult> getOrganizationRolePlain(GetOrganizationRolePlainArgs args) {
+        return getOrganizationRolePlain(args, InvokeOptions.Empty);
+    }
+    /**
+     * Looks up a role in a Pulumi Cloud organization by the name shown in the Pulumi Cloud console. Finds both built-in and custom roles. Use the returned `roleId` for inputs that take a role ID, such as `TeamRoleAssignment.roleId` and `OrganizationMember.roleId`, instead of hardcoding the ID. Returns an error when no role has the given name.
+     * 
+     * ## Example Usage
+     * ### Look up a role you defined
+     * 
+     * <pre>
+     * {@code
+     * package generated_program;
+     * 
+     * import com.pulumi.Context;
+     * import com.pulumi.Pulumi;
+     * import com.pulumi.core.Output;
+     * import com.pulumi.pulumiservice.PulumiserviceFunctions;
+     * import com.pulumi.pulumiservice.inputs.GetOrganizationRoleArgs;
+     * import com.pulumi.pulumiservice.TeamRoleAssignment;
+     * import com.pulumi.pulumiservice.TeamRoleAssignmentArgs;
+     * import java.util.ArrayList;
+     * import java.util.Arrays;
+     * import java.util.Map;
+     * import java.io.File;
+     * import java.nio.file.Files;
+     * import java.nio.file.Paths;
+     * 
+     * public class App {
+     *     public static void main(String[] args) {
+     *         Pulumi.run(App::stack);
+     *     }
+     * 
+     *     public static void stack(Context ctx) {
+     *         final var ciDeployerRole = PulumiserviceFunctions.getOrganizationRole(GetOrganizationRoleArgs.builder()
+     *             .organizationName("my-org")
+     *             .name("CI Deployer")
+     *             .build());
+     * 
+     *         var platformTeamRole = new TeamRoleAssignment("platformTeamRole", TeamRoleAssignmentArgs.builder()
+     *             .organizationName("my-org")
+     *             .teamName("platform")
+     *             .roleId(ciDeployerRole.applyValue(_ciDeployerRole -> _ciDeployerRole.roleId()))
+     *             .build());
+     * 
+     *     }
+     * }
+     * }
+     * </pre>
+     * ### Look up a built-in role
+     * 
+     * <pre>
+     * {@code
+     * package generated_program;
+     * 
+     * import com.pulumi.Context;
+     * import com.pulumi.Pulumi;
+     * import com.pulumi.core.Output;
+     * import com.pulumi.pulumiservice.PulumiserviceFunctions;
+     * import com.pulumi.pulumiservice.inputs.GetOrganizationRoleArgs;
+     * import java.util.ArrayList;
+     * import java.util.Arrays;
+     * import java.util.Map;
+     * import java.io.File;
+     * import java.nio.file.Files;
+     * import java.nio.file.Paths;
+     * 
+     * public class App {
+     *     public static void main(String[] args) {
+     *         Pulumi.run(App::stack);
+     *     }
+     * 
+     *     public static void stack(Context ctx) {
+     *         final var adminRole = PulumiserviceFunctions.getOrganizationRole(GetOrganizationRoleArgs.builder()
+     *             .organizationName("my-org")
+     *             .name("Admin")
+     *             .build());
+     * 
+     *         ctx.export("adminRoleId", adminRole.applyValue(_adminRole -> _adminRole.roleId()));
+     *     }
+     * }
+     * }
+     * </pre>
+     * 
+     */
+    public static Output<GetOrganizationRoleResult> getOrganizationRole(GetOrganizationRoleArgs args, InvokeOptions options) {
+        return Deployment.getInstance().invoke("pulumiservice:index:getOrganizationRole", TypeShape.of(GetOrganizationRoleResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Looks up a role in a Pulumi Cloud organization by the name shown in the Pulumi Cloud console. Finds both built-in and custom roles. Use the returned `roleId` for inputs that take a role ID, such as `TeamRoleAssignment.roleId` and `OrganizationMember.roleId`, instead of hardcoding the ID. Returns an error when no role has the given name.
+     * 
+     * ## Example Usage
+     * ### Look up a role you defined
+     * 
+     * <pre>
+     * {@code
+     * package generated_program;
+     * 
+     * import com.pulumi.Context;
+     * import com.pulumi.Pulumi;
+     * import com.pulumi.core.Output;
+     * import com.pulumi.pulumiservice.PulumiserviceFunctions;
+     * import com.pulumi.pulumiservice.inputs.GetOrganizationRoleArgs;
+     * import com.pulumi.pulumiservice.TeamRoleAssignment;
+     * import com.pulumi.pulumiservice.TeamRoleAssignmentArgs;
+     * import java.util.ArrayList;
+     * import java.util.Arrays;
+     * import java.util.Map;
+     * import java.io.File;
+     * import java.nio.file.Files;
+     * import java.nio.file.Paths;
+     * 
+     * public class App {
+     *     public static void main(String[] args) {
+     *         Pulumi.run(App::stack);
+     *     }
+     * 
+     *     public static void stack(Context ctx) {
+     *         final var ciDeployerRole = PulumiserviceFunctions.getOrganizationRole(GetOrganizationRoleArgs.builder()
+     *             .organizationName("my-org")
+     *             .name("CI Deployer")
+     *             .build());
+     * 
+     *         var platformTeamRole = new TeamRoleAssignment("platformTeamRole", TeamRoleAssignmentArgs.builder()
+     *             .organizationName("my-org")
+     *             .teamName("platform")
+     *             .roleId(ciDeployerRole.applyValue(_ciDeployerRole -> _ciDeployerRole.roleId()))
+     *             .build());
+     * 
+     *     }
+     * }
+     * }
+     * </pre>
+     * ### Look up a built-in role
+     * 
+     * <pre>
+     * {@code
+     * package generated_program;
+     * 
+     * import com.pulumi.Context;
+     * import com.pulumi.Pulumi;
+     * import com.pulumi.core.Output;
+     * import com.pulumi.pulumiservice.PulumiserviceFunctions;
+     * import com.pulumi.pulumiservice.inputs.GetOrganizationRoleArgs;
+     * import java.util.ArrayList;
+     * import java.util.Arrays;
+     * import java.util.Map;
+     * import java.io.File;
+     * import java.nio.file.Files;
+     * import java.nio.file.Paths;
+     * 
+     * public class App {
+     *     public static void main(String[] args) {
+     *         Pulumi.run(App::stack);
+     *     }
+     * 
+     *     public static void stack(Context ctx) {
+     *         final var adminRole = PulumiserviceFunctions.getOrganizationRole(GetOrganizationRoleArgs.builder()
+     *             .organizationName("my-org")
+     *             .name("Admin")
+     *             .build());
+     * 
+     *         ctx.export("adminRoleId", adminRole.applyValue(_adminRole -> _adminRole.roleId()));
+     *     }
+     * }
+     * }
+     * </pre>
+     * 
+     */
+    public static Output<GetOrganizationRoleResult> getOrganizationRole(GetOrganizationRoleArgs args, InvokeOutputOptions options) {
+        return Deployment.getInstance().invoke("pulumiservice:index:getOrganizationRole", TypeShape.of(GetOrganizationRoleResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Looks up a role in a Pulumi Cloud organization by the name shown in the Pulumi Cloud console. Finds both built-in and custom roles. Use the returned `roleId` for inputs that take a role ID, such as `TeamRoleAssignment.roleId` and `OrganizationMember.roleId`, instead of hardcoding the ID. Returns an error when no role has the given name.
+     * 
+     * ## Example Usage
+     * ### Look up a role you defined
+     * 
+     * <pre>
+     * {@code
+     * package generated_program;
+     * 
+     * import com.pulumi.Context;
+     * import com.pulumi.Pulumi;
+     * import com.pulumi.core.Output;
+     * import com.pulumi.pulumiservice.PulumiserviceFunctions;
+     * import com.pulumi.pulumiservice.inputs.GetOrganizationRoleArgs;
+     * import com.pulumi.pulumiservice.TeamRoleAssignment;
+     * import com.pulumi.pulumiservice.TeamRoleAssignmentArgs;
+     * import java.util.ArrayList;
+     * import java.util.Arrays;
+     * import java.util.Map;
+     * import java.io.File;
+     * import java.nio.file.Files;
+     * import java.nio.file.Paths;
+     * 
+     * public class App {
+     *     public static void main(String[] args) {
+     *         Pulumi.run(App::stack);
+     *     }
+     * 
+     *     public static void stack(Context ctx) {
+     *         final var ciDeployerRole = PulumiserviceFunctions.getOrganizationRole(GetOrganizationRoleArgs.builder()
+     *             .organizationName("my-org")
+     *             .name("CI Deployer")
+     *             .build());
+     * 
+     *         var platformTeamRole = new TeamRoleAssignment("platformTeamRole", TeamRoleAssignmentArgs.builder()
+     *             .organizationName("my-org")
+     *             .teamName("platform")
+     *             .roleId(ciDeployerRole.applyValue(_ciDeployerRole -> _ciDeployerRole.roleId()))
+     *             .build());
+     * 
+     *     }
+     * }
+     * }
+     * </pre>
+     * ### Look up a built-in role
+     * 
+     * <pre>
+     * {@code
+     * package generated_program;
+     * 
+     * import com.pulumi.Context;
+     * import com.pulumi.Pulumi;
+     * import com.pulumi.core.Output;
+     * import com.pulumi.pulumiservice.PulumiserviceFunctions;
+     * import com.pulumi.pulumiservice.inputs.GetOrganizationRoleArgs;
+     * import java.util.ArrayList;
+     * import java.util.Arrays;
+     * import java.util.Map;
+     * import java.io.File;
+     * import java.nio.file.Files;
+     * import java.nio.file.Paths;
+     * 
+     * public class App {
+     *     public static void main(String[] args) {
+     *         Pulumi.run(App::stack);
+     *     }
+     * 
+     *     public static void stack(Context ctx) {
+     *         final var adminRole = PulumiserviceFunctions.getOrganizationRole(GetOrganizationRoleArgs.builder()
+     *             .organizationName("my-org")
+     *             .name("Admin")
+     *             .build());
+     * 
+     *         ctx.export("adminRoleId", adminRole.applyValue(_adminRole -> _adminRole.roleId()));
+     *     }
+     * }
+     * }
+     * </pre>
+     * 
+     */
+    public static CompletableFuture<GetOrganizationRoleResult> getOrganizationRolePlain(GetOrganizationRolePlainArgs args, InvokeOptions options) {
+        return Deployment.getInstance().invokeAsync("pulumiservice:index:getOrganizationRole", TypeShape.of(GetOrganizationRoleResult.class), args, Utilities.withVersion(options));
+    }
+    /**
      * Lists the permission scopes available for custom roles in an organization. Use this to discover valid scope names before setting `OrganizationRole.permissions`. The catalogue is flattened into a single list with resource type and group context, sorted deterministically.
      * 
      */
@@ -449,6 +875,216 @@ public final class PulumiserviceFunctions {
      */
     public static CompletableFuture<GetOrganizationRoleScopesResult> getOrganizationRoleScopesPlain(GetOrganizationRoleScopesPlainArgs args, InvokeOptions options) {
         return Deployment.getInstance().invokeAsync("pulumiservice:index:getOrganizationRoleScopes", TypeShape.of(GetOrganizationRoleScopesResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Lists the roles in a Pulumi Cloud organization, including both built-in and custom roles, sorted by name. To look up a single role by the name shown in the Pulumi Cloud console, use `getOrganizationRole`.
+     * 
+     * ## Example Usage
+     * ### List all roles
+     * 
+     * <pre>
+     * {@code
+     * package generated_program;
+     * 
+     * import com.pulumi.Context;
+     * import com.pulumi.Pulumi;
+     * import com.pulumi.core.Output;
+     * import com.pulumi.pulumiservice.PulumiserviceFunctions;
+     * import com.pulumi.pulumiservice.inputs.GetOrganizationRolesArgs;
+     * import java.util.ArrayList;
+     * import java.util.Arrays;
+     * import java.util.Map;
+     * import java.io.File;
+     * import java.nio.file.Files;
+     * import java.nio.file.Paths;
+     * 
+     * public class App {
+     *     public static void main(String[] args) {
+     *         Pulumi.run(App::stack);
+     *     }
+     * 
+     *     public static void stack(Context ctx) {
+     *         final var allRoles = PulumiserviceFunctions.getOrganizationRoles(GetOrganizationRolesArgs.builder()
+     *             .organizationName("my-org")
+     *             .build());
+     * 
+     *         ctx.export("roles", allRoles.applyValue(_allRoles -> _allRoles.roles()));
+     *     }
+     * }
+     * }
+     * </pre>
+     * 
+     */
+    public static Output<GetOrganizationRolesResult> getOrganizationRoles(GetOrganizationRolesArgs args) {
+        return getOrganizationRoles(args, InvokeOptions.Empty);
+    }
+    /**
+     * Lists the roles in a Pulumi Cloud organization, including both built-in and custom roles, sorted by name. To look up a single role by the name shown in the Pulumi Cloud console, use `getOrganizationRole`.
+     * 
+     * ## Example Usage
+     * ### List all roles
+     * 
+     * <pre>
+     * {@code
+     * package generated_program;
+     * 
+     * import com.pulumi.Context;
+     * import com.pulumi.Pulumi;
+     * import com.pulumi.core.Output;
+     * import com.pulumi.pulumiservice.PulumiserviceFunctions;
+     * import com.pulumi.pulumiservice.inputs.GetOrganizationRolesArgs;
+     * import java.util.ArrayList;
+     * import java.util.Arrays;
+     * import java.util.Map;
+     * import java.io.File;
+     * import java.nio.file.Files;
+     * import java.nio.file.Paths;
+     * 
+     * public class App {
+     *     public static void main(String[] args) {
+     *         Pulumi.run(App::stack);
+     *     }
+     * 
+     *     public static void stack(Context ctx) {
+     *         final var allRoles = PulumiserviceFunctions.getOrganizationRoles(GetOrganizationRolesArgs.builder()
+     *             .organizationName("my-org")
+     *             .build());
+     * 
+     *         ctx.export("roles", allRoles.applyValue(_allRoles -> _allRoles.roles()));
+     *     }
+     * }
+     * }
+     * </pre>
+     * 
+     */
+    public static CompletableFuture<GetOrganizationRolesResult> getOrganizationRolesPlain(GetOrganizationRolesPlainArgs args) {
+        return getOrganizationRolesPlain(args, InvokeOptions.Empty);
+    }
+    /**
+     * Lists the roles in a Pulumi Cloud organization, including both built-in and custom roles, sorted by name. To look up a single role by the name shown in the Pulumi Cloud console, use `getOrganizationRole`.
+     * 
+     * ## Example Usage
+     * ### List all roles
+     * 
+     * <pre>
+     * {@code
+     * package generated_program;
+     * 
+     * import com.pulumi.Context;
+     * import com.pulumi.Pulumi;
+     * import com.pulumi.core.Output;
+     * import com.pulumi.pulumiservice.PulumiserviceFunctions;
+     * import com.pulumi.pulumiservice.inputs.GetOrganizationRolesArgs;
+     * import java.util.ArrayList;
+     * import java.util.Arrays;
+     * import java.util.Map;
+     * import java.io.File;
+     * import java.nio.file.Files;
+     * import java.nio.file.Paths;
+     * 
+     * public class App {
+     *     public static void main(String[] args) {
+     *         Pulumi.run(App::stack);
+     *     }
+     * 
+     *     public static void stack(Context ctx) {
+     *         final var allRoles = PulumiserviceFunctions.getOrganizationRoles(GetOrganizationRolesArgs.builder()
+     *             .organizationName("my-org")
+     *             .build());
+     * 
+     *         ctx.export("roles", allRoles.applyValue(_allRoles -> _allRoles.roles()));
+     *     }
+     * }
+     * }
+     * </pre>
+     * 
+     */
+    public static Output<GetOrganizationRolesResult> getOrganizationRoles(GetOrganizationRolesArgs args, InvokeOptions options) {
+        return Deployment.getInstance().invoke("pulumiservice:index:getOrganizationRoles", TypeShape.of(GetOrganizationRolesResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Lists the roles in a Pulumi Cloud organization, including both built-in and custom roles, sorted by name. To look up a single role by the name shown in the Pulumi Cloud console, use `getOrganizationRole`.
+     * 
+     * ## Example Usage
+     * ### List all roles
+     * 
+     * <pre>
+     * {@code
+     * package generated_program;
+     * 
+     * import com.pulumi.Context;
+     * import com.pulumi.Pulumi;
+     * import com.pulumi.core.Output;
+     * import com.pulumi.pulumiservice.PulumiserviceFunctions;
+     * import com.pulumi.pulumiservice.inputs.GetOrganizationRolesArgs;
+     * import java.util.ArrayList;
+     * import java.util.Arrays;
+     * import java.util.Map;
+     * import java.io.File;
+     * import java.nio.file.Files;
+     * import java.nio.file.Paths;
+     * 
+     * public class App {
+     *     public static void main(String[] args) {
+     *         Pulumi.run(App::stack);
+     *     }
+     * 
+     *     public static void stack(Context ctx) {
+     *         final var allRoles = PulumiserviceFunctions.getOrganizationRoles(GetOrganizationRolesArgs.builder()
+     *             .organizationName("my-org")
+     *             .build());
+     * 
+     *         ctx.export("roles", allRoles.applyValue(_allRoles -> _allRoles.roles()));
+     *     }
+     * }
+     * }
+     * </pre>
+     * 
+     */
+    public static Output<GetOrganizationRolesResult> getOrganizationRoles(GetOrganizationRolesArgs args, InvokeOutputOptions options) {
+        return Deployment.getInstance().invoke("pulumiservice:index:getOrganizationRoles", TypeShape.of(GetOrganizationRolesResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Lists the roles in a Pulumi Cloud organization, including both built-in and custom roles, sorted by name. To look up a single role by the name shown in the Pulumi Cloud console, use `getOrganizationRole`.
+     * 
+     * ## Example Usage
+     * ### List all roles
+     * 
+     * <pre>
+     * {@code
+     * package generated_program;
+     * 
+     * import com.pulumi.Context;
+     * import com.pulumi.Pulumi;
+     * import com.pulumi.core.Output;
+     * import com.pulumi.pulumiservice.PulumiserviceFunctions;
+     * import com.pulumi.pulumiservice.inputs.GetOrganizationRolesArgs;
+     * import java.util.ArrayList;
+     * import java.util.Arrays;
+     * import java.util.Map;
+     * import java.io.File;
+     * import java.nio.file.Files;
+     * import java.nio.file.Paths;
+     * 
+     * public class App {
+     *     public static void main(String[] args) {
+     *         Pulumi.run(App::stack);
+     *     }
+     * 
+     *     public static void stack(Context ctx) {
+     *         final var allRoles = PulumiserviceFunctions.getOrganizationRoles(GetOrganizationRolesArgs.builder()
+     *             .organizationName("my-org")
+     *             .build());
+     * 
+     *         ctx.export("roles", allRoles.applyValue(_allRoles -> _allRoles.roles()));
+     *     }
+     * }
+     * }
+     * </pre>
+     * 
+     */
+    public static CompletableFuture<GetOrganizationRolesResult> getOrganizationRolesPlain(GetOrganizationRolesPlainArgs args, InvokeOptions options) {
+        return Deployment.getInstance().invokeAsync("pulumiservice:index:getOrganizationRoles", TypeShape.of(GetOrganizationRolesResult.class), args, Utilities.withVersion(options));
     }
     /**
      * Get details about a specific version of a policy pack.
