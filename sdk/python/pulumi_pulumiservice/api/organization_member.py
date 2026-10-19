@@ -146,6 +146,7 @@ class OrganizationMember(pulumi.CustomResource):
             __props__.__dict__["fga_role"] = None
             __props__.__dict__["known_to_pulumi"] = None
             __props__.__dict__["links"] = None
+            __props__.__dict__["suspended"] = None
             __props__.__dict__["teams"] = None
             __props__.__dict__["user"] = None
             __props__.__dict__["virtual_admin"] = None
@@ -176,6 +177,7 @@ class OrganizationMember(pulumi.CustomResource):
         __props__.__dict__["known_to_pulumi"] = None
         __props__.__dict__["links"] = None
         __props__.__dict__["role"] = None
+        __props__.__dict__["suspended"] = None
         __props__.__dict__["teams"] = None
         __props__.__dict__["user"] = None
         __props__.__dict__["virtual_admin"] = None
@@ -220,6 +222,16 @@ class OrganizationMember(pulumi.CustomResource):
         **Deprecated:** Use `fgaRole` instead. The member's built-in role within the organization. For members assigned a custom role, this is the closest built-in projection (`member`, `admin`, or `billingManager`) and may lose detail; `fgaRole` is authoritative.
         """
         return pulumi.get(self, "role")
+
+    @_builtins.property
+    @pulumi.getter
+    def suspended(self) -> pulumi.Output[Optional[_builtins.bool]]:
+        """
+        Suspended indicates that the membership is suspended: the member keeps their
+        place in the organization but has no access until an administrator restores them.
+        Suspended members are only included in responses when explicitly requested.
+        """
+        return pulumi.get(self, "suspended")
 
     @_builtins.property
     @pulumi.getter

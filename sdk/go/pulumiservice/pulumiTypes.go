@@ -3735,6 +3735,103 @@ func (o OrganizationRoleInfoArrayOutput) Index(i pulumi.IntInput) OrganizationRo
 	}).(OrganizationRoleInfoOutput)
 }
 
+type PolicyGroupMatchRule struct {
+	// Tag conditions that must all hold for the rule to match. At least one is required.
+	Conditions []PolicyGroupTagCondition `pulumi:"conditions"`
+}
+
+// PolicyGroupMatchRuleInput is an input type that accepts PolicyGroupMatchRuleArgs and PolicyGroupMatchRuleOutput values.
+// You can construct a concrete instance of `PolicyGroupMatchRuleInput` via:
+//
+//	PolicyGroupMatchRuleArgs{...}
+type PolicyGroupMatchRuleInput interface {
+	pulumi.Input
+
+	ToPolicyGroupMatchRuleOutput() PolicyGroupMatchRuleOutput
+	ToPolicyGroupMatchRuleOutputWithContext(context.Context) PolicyGroupMatchRuleOutput
+}
+
+type PolicyGroupMatchRuleArgs struct {
+	// Tag conditions that must all hold for the rule to match. At least one is required.
+	Conditions PolicyGroupTagConditionArrayInput `pulumi:"conditions"`
+}
+
+func (PolicyGroupMatchRuleArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*PolicyGroupMatchRule)(nil)).Elem()
+}
+
+func (i PolicyGroupMatchRuleArgs) ToPolicyGroupMatchRuleOutput() PolicyGroupMatchRuleOutput {
+	return i.ToPolicyGroupMatchRuleOutputWithContext(context.Background())
+}
+
+func (i PolicyGroupMatchRuleArgs) ToPolicyGroupMatchRuleOutputWithContext(ctx context.Context) PolicyGroupMatchRuleOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(PolicyGroupMatchRuleOutput)
+}
+
+// PolicyGroupMatchRuleArrayInput is an input type that accepts PolicyGroupMatchRuleArray and PolicyGroupMatchRuleArrayOutput values.
+// You can construct a concrete instance of `PolicyGroupMatchRuleArrayInput` via:
+//
+//	PolicyGroupMatchRuleArray{ PolicyGroupMatchRuleArgs{...} }
+type PolicyGroupMatchRuleArrayInput interface {
+	pulumi.Input
+
+	ToPolicyGroupMatchRuleArrayOutput() PolicyGroupMatchRuleArrayOutput
+	ToPolicyGroupMatchRuleArrayOutputWithContext(context.Context) PolicyGroupMatchRuleArrayOutput
+}
+
+type PolicyGroupMatchRuleArray []PolicyGroupMatchRuleInput
+
+func (PolicyGroupMatchRuleArray) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]PolicyGroupMatchRule)(nil)).Elem()
+}
+
+func (i PolicyGroupMatchRuleArray) ToPolicyGroupMatchRuleArrayOutput() PolicyGroupMatchRuleArrayOutput {
+	return i.ToPolicyGroupMatchRuleArrayOutputWithContext(context.Background())
+}
+
+func (i PolicyGroupMatchRuleArray) ToPolicyGroupMatchRuleArrayOutputWithContext(ctx context.Context) PolicyGroupMatchRuleArrayOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(PolicyGroupMatchRuleArrayOutput)
+}
+
+type PolicyGroupMatchRuleOutput struct{ *pulumi.OutputState }
+
+func (PolicyGroupMatchRuleOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*PolicyGroupMatchRule)(nil)).Elem()
+}
+
+func (o PolicyGroupMatchRuleOutput) ToPolicyGroupMatchRuleOutput() PolicyGroupMatchRuleOutput {
+	return o
+}
+
+func (o PolicyGroupMatchRuleOutput) ToPolicyGroupMatchRuleOutputWithContext(ctx context.Context) PolicyGroupMatchRuleOutput {
+	return o
+}
+
+// Tag conditions that must all hold for the rule to match. At least one is required.
+func (o PolicyGroupMatchRuleOutput) Conditions() PolicyGroupTagConditionArrayOutput {
+	return o.ApplyT(func(v PolicyGroupMatchRule) []PolicyGroupTagCondition { return v.Conditions }).(PolicyGroupTagConditionArrayOutput)
+}
+
+type PolicyGroupMatchRuleArrayOutput struct{ *pulumi.OutputState }
+
+func (PolicyGroupMatchRuleArrayOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]PolicyGroupMatchRule)(nil)).Elem()
+}
+
+func (o PolicyGroupMatchRuleArrayOutput) ToPolicyGroupMatchRuleArrayOutput() PolicyGroupMatchRuleArrayOutput {
+	return o
+}
+
+func (o PolicyGroupMatchRuleArrayOutput) ToPolicyGroupMatchRuleArrayOutputWithContext(ctx context.Context) PolicyGroupMatchRuleArrayOutput {
+	return o
+}
+
+func (o PolicyGroupMatchRuleArrayOutput) Index(i pulumi.IntInput) PolicyGroupMatchRuleOutput {
+	return pulumi.All(o, i).ApplyT(func(vs []interface{}) PolicyGroupMatchRule {
+		return vs[0].([]PolicyGroupMatchRule)[vs[1].(int)]
+	}).(PolicyGroupMatchRuleOutput)
+}
+
 // A reference to a policy pack within a policy group.
 type PolicyGroupPolicyPackReference struct {
 	// Optional configuration for the policy pack. The special key `all` sets the default enforcement level for every policy in the pack; per-policy entries override it.
@@ -4043,6 +4140,121 @@ func (o PolicyGroupStackReferenceArrayOutput) Index(i pulumi.IntInput) PolicyGro
 	return pulumi.All(o, i).ApplyT(func(vs []interface{}) PolicyGroupStackReference {
 		return vs[0].([]PolicyGroupStackReference)[vs[1].(int)]
 	}).(PolicyGroupStackReferenceOutput)
+}
+
+type PolicyGroupTagCondition struct {
+	// The tag key.
+	Key string `pulumi:"key"`
+	// How the tag is compared. Defaults to `equals`.
+	Operator *PolicyGroupTagOperator `pulumi:"operator"`
+	// The tag value. Required with `equals` and `notEquals`, and not allowed with `exists` and `notExists`.
+	Value *string `pulumi:"value"`
+}
+
+// PolicyGroupTagConditionInput is an input type that accepts PolicyGroupTagConditionArgs and PolicyGroupTagConditionOutput values.
+// You can construct a concrete instance of `PolicyGroupTagConditionInput` via:
+//
+//	PolicyGroupTagConditionArgs{...}
+type PolicyGroupTagConditionInput interface {
+	pulumi.Input
+
+	ToPolicyGroupTagConditionOutput() PolicyGroupTagConditionOutput
+	ToPolicyGroupTagConditionOutputWithContext(context.Context) PolicyGroupTagConditionOutput
+}
+
+type PolicyGroupTagConditionArgs struct {
+	// The tag key.
+	Key pulumi.StringInput `pulumi:"key"`
+	// How the tag is compared. Defaults to `equals`.
+	Operator PolicyGroupTagOperatorPtrInput `pulumi:"operator"`
+	// The tag value. Required with `equals` and `notEquals`, and not allowed with `exists` and `notExists`.
+	Value pulumi.StringPtrInput `pulumi:"value"`
+}
+
+func (PolicyGroupTagConditionArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*PolicyGroupTagCondition)(nil)).Elem()
+}
+
+func (i PolicyGroupTagConditionArgs) ToPolicyGroupTagConditionOutput() PolicyGroupTagConditionOutput {
+	return i.ToPolicyGroupTagConditionOutputWithContext(context.Background())
+}
+
+func (i PolicyGroupTagConditionArgs) ToPolicyGroupTagConditionOutputWithContext(ctx context.Context) PolicyGroupTagConditionOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(PolicyGroupTagConditionOutput)
+}
+
+// PolicyGroupTagConditionArrayInput is an input type that accepts PolicyGroupTagConditionArray and PolicyGroupTagConditionArrayOutput values.
+// You can construct a concrete instance of `PolicyGroupTagConditionArrayInput` via:
+//
+//	PolicyGroupTagConditionArray{ PolicyGroupTagConditionArgs{...} }
+type PolicyGroupTagConditionArrayInput interface {
+	pulumi.Input
+
+	ToPolicyGroupTagConditionArrayOutput() PolicyGroupTagConditionArrayOutput
+	ToPolicyGroupTagConditionArrayOutputWithContext(context.Context) PolicyGroupTagConditionArrayOutput
+}
+
+type PolicyGroupTagConditionArray []PolicyGroupTagConditionInput
+
+func (PolicyGroupTagConditionArray) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]PolicyGroupTagCondition)(nil)).Elem()
+}
+
+func (i PolicyGroupTagConditionArray) ToPolicyGroupTagConditionArrayOutput() PolicyGroupTagConditionArrayOutput {
+	return i.ToPolicyGroupTagConditionArrayOutputWithContext(context.Background())
+}
+
+func (i PolicyGroupTagConditionArray) ToPolicyGroupTagConditionArrayOutputWithContext(ctx context.Context) PolicyGroupTagConditionArrayOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(PolicyGroupTagConditionArrayOutput)
+}
+
+type PolicyGroupTagConditionOutput struct{ *pulumi.OutputState }
+
+func (PolicyGroupTagConditionOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*PolicyGroupTagCondition)(nil)).Elem()
+}
+
+func (o PolicyGroupTagConditionOutput) ToPolicyGroupTagConditionOutput() PolicyGroupTagConditionOutput {
+	return o
+}
+
+func (o PolicyGroupTagConditionOutput) ToPolicyGroupTagConditionOutputWithContext(ctx context.Context) PolicyGroupTagConditionOutput {
+	return o
+}
+
+// The tag key.
+func (o PolicyGroupTagConditionOutput) Key() pulumi.StringOutput {
+	return o.ApplyT(func(v PolicyGroupTagCondition) string { return v.Key }).(pulumi.StringOutput)
+}
+
+// How the tag is compared. Defaults to `equals`.
+func (o PolicyGroupTagConditionOutput) Operator() PolicyGroupTagOperatorPtrOutput {
+	return o.ApplyT(func(v PolicyGroupTagCondition) *PolicyGroupTagOperator { return v.Operator }).(PolicyGroupTagOperatorPtrOutput)
+}
+
+// The tag value. Required with `equals` and `notEquals`, and not allowed with `exists` and `notExists`.
+func (o PolicyGroupTagConditionOutput) Value() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v PolicyGroupTagCondition) *string { return v.Value }).(pulumi.StringPtrOutput)
+}
+
+type PolicyGroupTagConditionArrayOutput struct{ *pulumi.OutputState }
+
+func (PolicyGroupTagConditionArrayOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]PolicyGroupTagCondition)(nil)).Elem()
+}
+
+func (o PolicyGroupTagConditionArrayOutput) ToPolicyGroupTagConditionArrayOutput() PolicyGroupTagConditionArrayOutput {
+	return o
+}
+
+func (o PolicyGroupTagConditionArrayOutput) ToPolicyGroupTagConditionArrayOutputWithContext(ctx context.Context) PolicyGroupTagConditionArrayOutput {
+	return o
+}
+
+func (o PolicyGroupTagConditionArrayOutput) Index(i pulumi.IntInput) PolicyGroupTagConditionOutput {
+	return pulumi.All(o, i).ApplyT(func(vs []interface{}) PolicyGroupTagCondition {
+		return vs[0].([]PolicyGroupTagCondition)[vs[1].(int)]
+	}).(PolicyGroupTagConditionOutput)
 }
 
 type PolicyPackComplianceFrameworkInput struct {
@@ -4739,10 +4951,14 @@ func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*OperationContextOIDCPtrInput)(nil)).Elem(), OperationContextOIDCArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*OperationContextOptionsInput)(nil)).Elem(), OperationContextOptionsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*OperationContextOptionsPtrInput)(nil)).Elem(), OperationContextOptionsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*PolicyGroupMatchRuleInput)(nil)).Elem(), PolicyGroupMatchRuleArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*PolicyGroupMatchRuleArrayInput)(nil)).Elem(), PolicyGroupMatchRuleArray{})
 	pulumi.RegisterInputType(reflect.TypeOf((*PolicyGroupPolicyPackReferenceInputTypeInput)(nil)).Elem(), PolicyGroupPolicyPackReferenceInputTypeArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*PolicyGroupPolicyPackReferenceInputTypeArrayInput)(nil)).Elem(), PolicyGroupPolicyPackReferenceInputTypeArray{})
 	pulumi.RegisterInputType(reflect.TypeOf((*PolicyGroupStackReferenceInput)(nil)).Elem(), PolicyGroupStackReferenceArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*PolicyGroupStackReferenceArrayInput)(nil)).Elem(), PolicyGroupStackReferenceArray{})
+	pulumi.RegisterInputType(reflect.TypeOf((*PolicyGroupTagConditionInput)(nil)).Elem(), PolicyGroupTagConditionArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*PolicyGroupTagConditionArrayInput)(nil)).Elem(), PolicyGroupTagConditionArray{})
 	pulumi.RegisterInputType(reflect.TypeOf((*PolicyPackComplianceFrameworkInputInput)(nil)).Elem(), PolicyPackComplianceFrameworkInputArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*PolicyPackComplianceFrameworkInputPtrInput)(nil)).Elem(), PolicyPackComplianceFrameworkInputArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*PolicyPackPolicyInputInput)(nil)).Elem(), PolicyPackPolicyInputArgs{})
@@ -4793,12 +5009,16 @@ func init() {
 	pulumi.RegisterOutputType(OrganizationMemberInfoArrayOutput{})
 	pulumi.RegisterOutputType(OrganizationRoleInfoOutput{})
 	pulumi.RegisterOutputType(OrganizationRoleInfoArrayOutput{})
+	pulumi.RegisterOutputType(PolicyGroupMatchRuleOutput{})
+	pulumi.RegisterOutputType(PolicyGroupMatchRuleArrayOutput{})
 	pulumi.RegisterOutputType(PolicyGroupPolicyPackReferenceOutput{})
 	pulumi.RegisterOutputType(PolicyGroupPolicyPackReferenceArrayOutput{})
 	pulumi.RegisterOutputType(PolicyGroupPolicyPackReferenceInputTypeOutput{})
 	pulumi.RegisterOutputType(PolicyGroupPolicyPackReferenceInputTypeArrayOutput{})
 	pulumi.RegisterOutputType(PolicyGroupStackReferenceOutput{})
 	pulumi.RegisterOutputType(PolicyGroupStackReferenceArrayOutput{})
+	pulumi.RegisterOutputType(PolicyGroupTagConditionOutput{})
+	pulumi.RegisterOutputType(PolicyGroupTagConditionArrayOutput{})
 	pulumi.RegisterOutputType(PolicyPackComplianceFrameworkInputOutput{})
 	pulumi.RegisterOutputType(PolicyPackComplianceFrameworkInputPtrOutput{})
 	pulumi.RegisterOutputType(PolicyPackPolicyInputOutput{})

@@ -9,12 +9,16 @@ import com.pulumi.deployment.Deployment;
 import com.pulumi.deployment.InvokeOptions;
 import com.pulumi.deployment.InvokeOutputOptions;
 import com.pulumi.pulumiservice.Utilities;
+import com.pulumi.pulumiservice.inputs.BuildAccountMatchRuleArgs;
+import com.pulumi.pulumiservice.inputs.BuildAccountMatchRulePlainArgs;
 import com.pulumi.pulumiservice.inputs.BuildAllowPermissionsArgs;
 import com.pulumi.pulumiservice.inputs.BuildAllowPermissionsPlainArgs;
 import com.pulumi.pulumiservice.inputs.BuildEnvironmentScopedPermissionsArgs;
 import com.pulumi.pulumiservice.inputs.BuildEnvironmentScopedPermissionsPlainArgs;
 import com.pulumi.pulumiservice.inputs.BuildInsightsAccountScopedPermissionsArgs;
 import com.pulumi.pulumiservice.inputs.BuildInsightsAccountScopedPermissionsPlainArgs;
+import com.pulumi.pulumiservice.inputs.BuildStackMatchRuleArgs;
+import com.pulumi.pulumiservice.inputs.BuildStackMatchRulePlainArgs;
 import com.pulumi.pulumiservice.inputs.BuildStackScopedPermissionsArgs;
 import com.pulumi.pulumiservice.inputs.BuildStackScopedPermissionsPlainArgs;
 import com.pulumi.pulumiservice.inputs.GetCurrentUserArgs;
@@ -39,9 +43,11 @@ import com.pulumi.pulumiservice.inputs.GetPolicyPackArgs;
 import com.pulumi.pulumiservice.inputs.GetPolicyPackPlainArgs;
 import com.pulumi.pulumiservice.inputs.GetPolicyPacksArgs;
 import com.pulumi.pulumiservice.inputs.GetPolicyPacksPlainArgs;
+import com.pulumi.pulumiservice.outputs.BuildAccountMatchRuleResult;
 import com.pulumi.pulumiservice.outputs.BuildAllowPermissionsResult;
 import com.pulumi.pulumiservice.outputs.BuildEnvironmentScopedPermissionsResult;
 import com.pulumi.pulumiservice.outputs.BuildInsightsAccountScopedPermissionsResult;
+import com.pulumi.pulumiservice.outputs.BuildStackMatchRuleResult;
 import com.pulumi.pulumiservice.outputs.BuildStackScopedPermissionsResult;
 import com.pulumi.pulumiservice.outputs.GetCurrentUserResult;
 import com.pulumi.pulumiservice.outputs.GetEnvironmentResult;
@@ -57,6 +63,41 @@ import com.pulumi.pulumiservice.outputs.GetPolicyPacksResult;
 import java.util.concurrent.CompletableFuture;
 
 public final class PulumiserviceFunctions {
+    /**
+     * Builds a policy group&#39;s Insights account match rule from tag rules, without writing Pulumi Cloud&#39;s expression format by hand. Use the result as a policy group&#39;s `accountMatchRule`. Pulumi Cloud adds the accounts the rule matches to the group, alongside the accounts added individually, and keeps membership up to date as account tags change. Only `audit` policy groups support account rules. Match rules are a preview feature of Pulumi Cloud.
+     * 
+     */
+    public static Output<BuildAccountMatchRuleResult> buildAccountMatchRule(BuildAccountMatchRuleArgs args) {
+        return buildAccountMatchRule(args, InvokeOptions.Empty);
+    }
+    /**
+     * Builds a policy group&#39;s Insights account match rule from tag rules, without writing Pulumi Cloud&#39;s expression format by hand. Use the result as a policy group&#39;s `accountMatchRule`. Pulumi Cloud adds the accounts the rule matches to the group, alongside the accounts added individually, and keeps membership up to date as account tags change. Only `audit` policy groups support account rules. Match rules are a preview feature of Pulumi Cloud.
+     * 
+     */
+    public static CompletableFuture<BuildAccountMatchRuleResult> buildAccountMatchRulePlain(BuildAccountMatchRulePlainArgs args) {
+        return buildAccountMatchRulePlain(args, InvokeOptions.Empty);
+    }
+    /**
+     * Builds a policy group&#39;s Insights account match rule from tag rules, without writing Pulumi Cloud&#39;s expression format by hand. Use the result as a policy group&#39;s `accountMatchRule`. Pulumi Cloud adds the accounts the rule matches to the group, alongside the accounts added individually, and keeps membership up to date as account tags change. Only `audit` policy groups support account rules. Match rules are a preview feature of Pulumi Cloud.
+     * 
+     */
+    public static Output<BuildAccountMatchRuleResult> buildAccountMatchRule(BuildAccountMatchRuleArgs args, InvokeOptions options) {
+        return Deployment.getInstance().invoke("pulumiservice:index:buildAccountMatchRule", TypeShape.of(BuildAccountMatchRuleResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Builds a policy group&#39;s Insights account match rule from tag rules, without writing Pulumi Cloud&#39;s expression format by hand. Use the result as a policy group&#39;s `accountMatchRule`. Pulumi Cloud adds the accounts the rule matches to the group, alongside the accounts added individually, and keeps membership up to date as account tags change. Only `audit` policy groups support account rules. Match rules are a preview feature of Pulumi Cloud.
+     * 
+     */
+    public static Output<BuildAccountMatchRuleResult> buildAccountMatchRule(BuildAccountMatchRuleArgs args, InvokeOutputOptions options) {
+        return Deployment.getInstance().invoke("pulumiservice:index:buildAccountMatchRule", TypeShape.of(BuildAccountMatchRuleResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Builds a policy group&#39;s Insights account match rule from tag rules, without writing Pulumi Cloud&#39;s expression format by hand. Use the result as a policy group&#39;s `accountMatchRule`. Pulumi Cloud adds the accounts the rule matches to the group, alongside the accounts added individually, and keeps membership up to date as account tags change. Only `audit` policy groups support account rules. Match rules are a preview feature of Pulumi Cloud.
+     * 
+     */
+    public static CompletableFuture<BuildAccountMatchRuleResult> buildAccountMatchRulePlain(BuildAccountMatchRulePlainArgs args, InvokeOptions options) {
+        return Deployment.getInstance().invokeAsync("pulumiservice:index:buildAccountMatchRule", TypeShape.of(BuildAccountMatchRuleResult.class), args, Utilities.withVersion(options));
+    }
     /**
      * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes globally — i.e. on every entity of the matching resource type. This is the simplest descriptor: a flat `PermissionDescriptorAllow`. Use this helper instead of hand-authoring the descriptor literal so the wire-format `__type` discriminator stays an implementation detail. For grants scoped to a specific entity, see `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, or `buildInsightsAccountScopedPermissions`. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls the output of each helper.
      * 
@@ -161,6 +202,41 @@ public final class PulumiserviceFunctions {
      */
     public static CompletableFuture<BuildInsightsAccountScopedPermissionsResult> buildInsightsAccountScopedPermissionsPlain(BuildInsightsAccountScopedPermissionsPlainArgs args, InvokeOptions options) {
         return Deployment.getInstance().invokeAsync("pulumiservice:index:buildInsightsAccountScopedPermissions", TypeShape.of(BuildInsightsAccountScopedPermissionsResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Builds a policy group&#39;s stack match rule from tag rules, without writing Pulumi Cloud&#39;s expression format by hand. Use the result as a policy group&#39;s `stackMatchRule`. Pulumi Cloud adds the stacks the rule matches to the group, alongside the stacks added individually, and keeps membership up to date as stack tags change. Match rules are a preview feature of Pulumi Cloud.
+     * 
+     */
+    public static Output<BuildStackMatchRuleResult> buildStackMatchRule(BuildStackMatchRuleArgs args) {
+        return buildStackMatchRule(args, InvokeOptions.Empty);
+    }
+    /**
+     * Builds a policy group&#39;s stack match rule from tag rules, without writing Pulumi Cloud&#39;s expression format by hand. Use the result as a policy group&#39;s `stackMatchRule`. Pulumi Cloud adds the stacks the rule matches to the group, alongside the stacks added individually, and keeps membership up to date as stack tags change. Match rules are a preview feature of Pulumi Cloud.
+     * 
+     */
+    public static CompletableFuture<BuildStackMatchRuleResult> buildStackMatchRulePlain(BuildStackMatchRulePlainArgs args) {
+        return buildStackMatchRulePlain(args, InvokeOptions.Empty);
+    }
+    /**
+     * Builds a policy group&#39;s stack match rule from tag rules, without writing Pulumi Cloud&#39;s expression format by hand. Use the result as a policy group&#39;s `stackMatchRule`. Pulumi Cloud adds the stacks the rule matches to the group, alongside the stacks added individually, and keeps membership up to date as stack tags change. Match rules are a preview feature of Pulumi Cloud.
+     * 
+     */
+    public static Output<BuildStackMatchRuleResult> buildStackMatchRule(BuildStackMatchRuleArgs args, InvokeOptions options) {
+        return Deployment.getInstance().invoke("pulumiservice:index:buildStackMatchRule", TypeShape.of(BuildStackMatchRuleResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Builds a policy group&#39;s stack match rule from tag rules, without writing Pulumi Cloud&#39;s expression format by hand. Use the result as a policy group&#39;s `stackMatchRule`. Pulumi Cloud adds the stacks the rule matches to the group, alongside the stacks added individually, and keeps membership up to date as stack tags change. Match rules are a preview feature of Pulumi Cloud.
+     * 
+     */
+    public static Output<BuildStackMatchRuleResult> buildStackMatchRule(BuildStackMatchRuleArgs args, InvokeOutputOptions options) {
+        return Deployment.getInstance().invoke("pulumiservice:index:buildStackMatchRule", TypeShape.of(BuildStackMatchRuleResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Builds a policy group&#39;s stack match rule from tag rules, without writing Pulumi Cloud&#39;s expression format by hand. Use the result as a policy group&#39;s `stackMatchRule`. Pulumi Cloud adds the stacks the rule matches to the group, alongside the stacks added individually, and keeps membership up to date as stack tags change. Match rules are a preview feature of Pulumi Cloud.
+     * 
+     */
+    public static CompletableFuture<BuildStackMatchRuleResult> buildStackMatchRulePlain(BuildStackMatchRulePlainArgs args, InvokeOptions options) {
+        return Deployment.getInstance().invokeAsync("pulumiservice:index:buildStackMatchRule", TypeShape.of(BuildStackMatchRuleResult.class), args, Utilities.withVersion(options));
     }
     /**
      * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named stack. The `stackId` is the stack&#39;s opaque Pulumi Cloud identifier — distinct from the `organization/project/stack` triple. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls the output of each helper.
