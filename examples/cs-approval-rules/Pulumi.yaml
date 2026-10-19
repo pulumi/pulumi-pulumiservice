@@ -1,3 +1,0 @@
-name: cs-approval-rules
-runtime: dotnet
-description: A minimal C# Pulumi Approval Rules Example
