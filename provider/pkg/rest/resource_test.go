@@ -96,6 +96,8 @@ const (
 	permExprEqualVal     = "PermissionExpressionEqual"
 	pg1Val               = "pg1"
 	testOrgPG1ID         = "test-org/pg1"
+	poolAVal             = "pool-a"
+	poolBVal             = "pool-b"
 )
 
 // mockTransport serves canned responses keyed by "<METHOD> <path>". Set
@@ -2089,8 +2091,8 @@ func TestUpdateSkipsAliasForReplaceTriggeringField(t *testing.T) {
 	}
 	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
 
-	prior := propMap(map[string]any{orgNameKey: testOrgName, nameKey: pg1Val, agentPoolIDKey: "pool-a"})
-	newInputs := propMap(map[string]any{orgNameKey: testOrgName, nameKey: pg1Val, agentPoolIDKey: "pool-b"})
+	prior := propMap(map[string]any{orgNameKey: testOrgName, nameKey: pg1Val, agentPoolIDKey: poolAVal})
+	newInputs := propMap(map[string]any{orgNameKey: testOrgName, nameKey: pg1Val, agentPoolIDKey: poolBVal})
 	if _, err := r.Update(t.Context(), p.UpdateRequest{
 		ID: testOrgPG1ID, OldInputs: prior, State: prior, Inputs: newInputs,
 	}); err != nil {
@@ -2246,12 +2248,12 @@ func TestUpdateSendsClearFieldWhenInputDropped(t *testing.T) {
 
 func TestUpdateOmitsClearFieldWhenInputNeverSet(t *testing.T) {
 	r, patchBody := policyGroupPatchCapture(t)
-	prior := propMap(map[string]any{orgNameKey: testOrgName, nameKey: pg1Val, agentPoolIDKey: "pool-a"})
+	prior := propMap(map[string]any{orgNameKey: testOrgName, nameKey: pg1Val, agentPoolIDKey: poolAVal})
 	state := propMap(map[string]any{
-		orgNameKey: testOrgName, nameKey: pg1Val, agentPoolIDKey: "pool-a",
+		orgNameKey: testOrgName, nameKey: pg1Val, agentPoolIDKey: poolAVal,
 		"stackMatchRule": map[string]any{discriminatorKey: permExprEqualVal},
 	})
-	newInputs := propMap(map[string]any{orgNameKey: testOrgName, nameKey: pg1Val, agentPoolIDKey: "pool-b"})
+	newInputs := propMap(map[string]any{orgNameKey: testOrgName, nameKey: pg1Val, agentPoolIDKey: poolBVal})
 	if _, err := r.Update(t.Context(), p.UpdateRequest{
 		ID: testOrgPG1ID, OldInputs: prior, State: state, Inputs: newInputs,
 	}); err != nil {
