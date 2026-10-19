@@ -17,14 +17,14 @@ public final class ProviderArgs extends com.pulumi.resources.ResourceArgs {
     public static final ProviderArgs Empty = new ProviderArgs();
 
     /**
-     * Access Token to authenticate with Pulumi Cloud.
+     * Access token to authenticate with Pulumi Cloud. Optional: if unset, the provider uses the `PULUMI_ACCESS_TOKEN` environment variable, then the access token of the account you&#39;re logged in to with `pulumi login`. The API URL doesn&#39;t come from that login, so when you&#39;re logged in to a self-hosted Pulumi Cloud, also set `apiUrl` or `PULUMI_BACKEND_URL`.
      * 
      */
     @Import(name="accessToken")
     private @Nullable Output<String> accessToken;
 
     /**
-     * @return Access Token to authenticate with Pulumi Cloud.
+     * @return Access token to authenticate with Pulumi Cloud. Optional: if unset, the provider uses the `PULUMI_ACCESS_TOKEN` environment variable, then the access token of the account you&#39;re logged in to with `pulumi login`. The API URL doesn&#39;t come from that login, so when you&#39;re logged in to a self-hosted Pulumi Cloud, also set `apiUrl` or `PULUMI_BACKEND_URL`.
      * 
      */
     public Optional<Output<String>> accessToken() {
@@ -72,7 +72,7 @@ public final class ProviderArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param accessToken Access Token to authenticate with Pulumi Cloud.
+         * @param accessToken Access token to authenticate with Pulumi Cloud. Optional: if unset, the provider uses the `PULUMI_ACCESS_TOKEN` environment variable, then the access token of the account you&#39;re logged in to with `pulumi login`. The API URL doesn&#39;t come from that login, so when you&#39;re logged in to a self-hosted Pulumi Cloud, also set `apiUrl` or `PULUMI_BACKEND_URL`.
          * 
          * @return builder
          * 
@@ -83,7 +83,7 @@ public final class ProviderArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param accessToken Access Token to authenticate with Pulumi Cloud.
+         * @param accessToken Access token to authenticate with Pulumi Cloud. Optional: if unset, the provider uses the `PULUMI_ACCESS_TOKEN` environment variable, then the access token of the account you&#39;re logged in to with `pulumi login`. The API URL doesn&#39;t come from that login, so when you&#39;re logged in to a self-hosted Pulumi Cloud, also set `apiUrl` or `PULUMI_BACKEND_URL`.
          * 
          * @return builder
          * 
