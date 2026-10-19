@@ -88,6 +88,14 @@ const (
 	itemsKey             = "items"
 	envVarsKey           = "environmentVariables"
 	newDescriptionKey    = "newDescription"
+	agentPoolIDKey       = "agentPoolId"
+	entityTypeKey        = "entityType"
+	discriminatorKey     = "__type"
+	auditVal             = "audit"
+	preventativeVal      = "preventative"
+	permExprEqualVal     = "PermissionExpressionEqual"
+	pg1Val               = "pg1"
+	testOrgPG1ID         = "test-org/pg1"
 )
 
 // mockTransport serves canned responses keyed by "<METHOD> <path>". Set
@@ -2081,10 +2089,10 @@ func TestUpdateSkipsAliasForReplaceTriggeringField(t *testing.T) {
 	}
 	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
 
-	prior := propMap(map[string]any{orgNameKey: testOrgName, nameKey: "pg1", "agentPoolId": "pool-a"})
-	newInputs := propMap(map[string]any{orgNameKey: testOrgName, nameKey: "pg1", "agentPoolId": "pool-b"})
+	prior := propMap(map[string]any{orgNameKey: testOrgName, nameKey: pg1Val, agentPoolIDKey: "pool-a"})
+	newInputs := propMap(map[string]any{orgNameKey: testOrgName, nameKey: pg1Val, agentPoolIDKey: "pool-b"})
 	if _, err := r.Update(t.Context(), p.UpdateRequest{
-		ID: "test-org/pg1", OldInputs: prior, State: prior, Inputs: newInputs,
+		ID: testOrgPG1ID, OldInputs: prior, State: prior, Inputs: newInputs,
 	}); err != nil {
 		t.Fatalf("update: %v\n  calls: %v", err, mock.calls)
 	}
@@ -2209,19 +2217,19 @@ func policyGroupPatchCapture(t *testing.T) (*Resource, *map[string]any) {
 
 func TestUpdateSendsClearFieldWhenInputDropped(t *testing.T) {
 	r, patchBody := policyGroupPatchCapture(t)
-	stackRule := map[string]any{"__type": "PermissionExpressionEqual", "key": "env"}
-	accountRule := map[string]any{"__type": "PermissionExpressionEqual", "key": "team"}
+	stackRule := map[string]any{discriminatorKey: permExprEqualVal, "key": "env"}
+	accountRule := map[string]any{discriminatorKey: permExprEqualVal, "key": "team"}
 
 	prior := propMap(map[string]any{
-		orgNameKey: testOrgName, nameKey: "pg1", "mode": "audit",
+		orgNameKey: testOrgName, nameKey: pg1Val, modeKey: auditVal,
 		"stackMatchRule": stackRule, "accountMatchRule": accountRule,
 	})
 	newInputs := propMap(map[string]any{
-		orgNameKey: testOrgName, nameKey: "pg1", "mode": "audit",
+		orgNameKey: testOrgName, nameKey: pg1Val, modeKey: auditVal,
 		"accountMatchRule": accountRule,
 	})
 	if _, err := r.Update(t.Context(), p.UpdateRequest{
-		ID: "test-org/pg1", OldInputs: prior, State: prior, Inputs: newInputs,
+		ID: testOrgPG1ID, OldInputs: prior, State: prior, Inputs: newInputs,
 	}); err != nil {
 		t.Fatalf("update: %v", err)
 	}
@@ -2238,14 +2246,14 @@ func TestUpdateSendsClearFieldWhenInputDropped(t *testing.T) {
 
 func TestUpdateOmitsClearFieldWhenInputNeverSet(t *testing.T) {
 	r, patchBody := policyGroupPatchCapture(t)
-	prior := propMap(map[string]any{orgNameKey: testOrgName, nameKey: "pg1", "agentPoolId": "pool-a"})
+	prior := propMap(map[string]any{orgNameKey: testOrgName, nameKey: pg1Val, agentPoolIDKey: "pool-a"})
 	state := propMap(map[string]any{
-		orgNameKey: testOrgName, nameKey: "pg1", "agentPoolId": "pool-a",
-		"stackMatchRule": map[string]any{"__type": "PermissionExpressionEqual"},
+		orgNameKey: testOrgName, nameKey: pg1Val, agentPoolIDKey: "pool-a",
+		"stackMatchRule": map[string]any{discriminatorKey: permExprEqualVal},
 	})
-	newInputs := propMap(map[string]any{orgNameKey: testOrgName, nameKey: "pg1", "agentPoolId": "pool-b"})
+	newInputs := propMap(map[string]any{orgNameKey: testOrgName, nameKey: pg1Val, agentPoolIDKey: "pool-b"})
 	if _, err := r.Update(t.Context(), p.UpdateRequest{
-		ID: "test-org/pg1", OldInputs: prior, State: state, Inputs: newInputs,
+		ID: testOrgPG1ID, OldInputs: prior, State: state, Inputs: newInputs,
 	}); err != nil {
 		t.Fatalf("update: %v", err)
 	}
@@ -2260,13 +2268,13 @@ func TestDiffReplacesPolicyGroupOnModeChange(t *testing.T) {
 	if !ok {
 		t.Fatalf("PolicyGroup resource not found")
 	}
-	old := propMap(map[string]any{orgNameKey: testOrgName, nameKey: "pg1", "mode": "preventative"})
-	updated := propMap(map[string]any{orgNameKey: testOrgName, nameKey: "pg1", "mode": "audit"})
+	old := propMap(map[string]any{orgNameKey: testOrgName, nameKey: pg1Val, modeKey: preventativeVal})
+	updated := propMap(map[string]any{orgNameKey: testOrgName, nameKey: pg1Val, modeKey: auditVal})
 	resp, err := r.Diff(t.Context(), p.DiffRequest{OldInputs: old, Inputs: updated})
 	if err != nil {
 		t.Fatalf("diff: %v", err)
 	}
-	if got := resp.DetailedDiff["mode"].Kind; got != p.UpdateReplace {
+	if got := resp.DetailedDiff[modeKey].Kind; got != p.UpdateReplace {
 		t.Errorf("mode diff kind = %v, want UpdateReplace", got)
 	}
 }
@@ -2277,13 +2285,16 @@ func TestDiffDoesNotReplaceWhenAddedForceNewInputMatchesState(t *testing.T) {
 	if !ok {
 		t.Fatalf("PolicyGroup resource not found")
 	}
-	old := propMap(map[string]any{orgNameKey: testOrgName, nameKey: "pg1", "entityType": "stacks"})
-	state := propMap(map[string]any{orgNameKey: testOrgName, nameKey: "pg1", "entityType": "stacks", "mode": "preventative"})
+	inputs := func(mode string) property.Map {
+		m := map[string]any{orgNameKey: testOrgName, nameKey: pg1Val, entityTypeKey: stacksVal}
+		if mode != "" {
+			m[modeKey] = mode
+		}
+		return propMap(m)
+	}
+	old, state := inputs(""), inputs(preventativeVal)
 
-	resp, err := r.Diff(t.Context(), p.DiffRequest{
-		OldInputs: old, State: state,
-		Inputs: propMap(map[string]any{orgNameKey: testOrgName, nameKey: "pg1", "entityType": "stacks", "mode": "preventative"}),
-	})
+	resp, err := r.Diff(t.Context(), p.DiffRequest{OldInputs: old, State: state, Inputs: inputs(preventativeVal)})
 	if err != nil {
 		t.Fatalf("diff: %v", err)
 	}
@@ -2291,14 +2302,11 @@ func TestDiffDoesNotReplaceWhenAddedForceNewInputMatchesState(t *testing.T) {
 		t.Errorf("adding mode equal to the server's value reported changes: %v", resp.DetailedDiff)
 	}
 
-	resp, err = r.Diff(t.Context(), p.DiffRequest{
-		OldInputs: old, State: state,
-		Inputs: propMap(map[string]any{orgNameKey: testOrgName, nameKey: "pg1", "entityType": "stacks", "mode": "audit"}),
-	})
+	resp, err = r.Diff(t.Context(), p.DiffRequest{OldInputs: old, State: state, Inputs: inputs(auditVal)})
 	if err != nil {
 		t.Fatalf("diff: %v", err)
 	}
-	if got := resp.DetailedDiff["mode"].Kind; got != p.AddReplace {
+	if got := resp.DetailedDiff[modeKey].Kind; got != p.AddReplace {
 		t.Errorf("adding mode that differs from the server's value: kind = %v, want AddReplace", got)
 	}
 }
