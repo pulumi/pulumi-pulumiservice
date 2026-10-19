@@ -8,7 +8,13 @@ import * as enums from "./types/enums";
 import * as utilities from "./utilities";
 
 /**
- * Pulumi Webhooks allow you to notify external services of events happening within your Pulumi organization or stack. For example, you can trigger a notification whenever a stack is updated. Whenever an event occurs, Pulumi will send an HTTP POST request to all registered webhooks. The webhook can then be used to emit some notification, start running integration tests, or even update additional stacks.
+ * Pulumi Webhooks allow you to notify external services of events happening within your Pulumi organization, stack, or ESC environment. For example, you can trigger a notification whenever a stack is updated or an environment revision is created. Whenever an event occurs, Pulumi will send an HTTP POST request to all registered webhooks. The webhook can then be used to emit some notification, start running integration tests, or even update additional stacks.
+ *
+ * The webhook's scope is set by which properties you provide:
+ *
+ * - **Organization webhook**: `organizationName` only.
+ * - **Stack webhook**: `organizationName`, `projectName`, and `stackName`.
+ * - **Environment webhook**: `organizationName`, `projectName`, and `environmentName`. See [ESC webhooks](https://www.pulumi.com/docs/esc/concepts/webhooks/) for the available events.
  *
  * ## Import
  *
@@ -64,7 +70,7 @@ export class Webhook extends pulumi.CustomResource {
      */
     declare public readonly environmentName: pulumi.Output<string | undefined>;
     /**
-     * Optional set of filters to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#filters) for more information.
+     * Optional set of filters to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/deployments/concepts/webhooks/#event-filtering) for more information.
      */
     declare public readonly filters: pulumi.Output<enums.WebhookFilters[] | undefined>;
     /**
@@ -72,7 +78,7 @@ export class Webhook extends pulumi.CustomResource {
      */
     declare public readonly format: pulumi.Output<enums.WebhookFormat>;
     /**
-     * Optional set of filter groups to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#groups) for more information.
+     * Optional set of filter groups to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/deployments/concepts/webhooks/#event-filtering) for more information.
      */
     declare public readonly groups: pulumi.Output<enums.WebhookGroup[] | undefined>;
     /**
@@ -92,7 +98,7 @@ export class Webhook extends pulumi.CustomResource {
      */
     declare public readonly projectName: pulumi.Output<string | undefined>;
     /**
-     * Optional. secret used as the HMAC key. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#headers) for more information.
+     * Optional. secret used as the HMAC key. See [webhook docs](https://www.pulumi.com/docs/deployments/concepts/webhooks/#headers) for more information.
      */
     declare public readonly secret: pulumi.Output<string | undefined>;
     /**
@@ -175,7 +181,7 @@ export interface WebhookArgs {
      */
     environmentName?: pulumi.Input<string | undefined>;
     /**
-     * Optional set of filters to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#filters) for more information.
+     * Optional set of filters to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/deployments/concepts/webhooks/#event-filtering) for more information.
      */
     filters?: pulumi.Input<pulumi.Input<enums.WebhookFilters>[] | undefined>;
     /**
@@ -183,7 +189,7 @@ export interface WebhookArgs {
      */
     format?: pulumi.Input<enums.WebhookFormat | undefined>;
     /**
-     * Optional set of filter groups to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#groups) for more information.
+     * Optional set of filter groups to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/deployments/concepts/webhooks/#event-filtering) for more information.
      */
     groups?: pulumi.Input<pulumi.Input<enums.WebhookGroup>[] | undefined>;
     /**
@@ -199,7 +205,7 @@ export interface WebhookArgs {
      */
     projectName?: pulumi.Input<string | undefined>;
     /**
-     * Optional. secret used as the HMAC key. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#headers) for more information.
+     * Optional. secret used as the HMAC key. See [webhook docs](https://www.pulumi.com/docs/deployments/concepts/webhooks/#headers) for more information.
      */
     secret?: pulumi.Input<string | undefined>;
     /**

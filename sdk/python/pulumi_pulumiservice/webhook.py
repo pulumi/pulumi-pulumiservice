@@ -39,11 +39,11 @@ class WebhookArgs:
         :param pulumi.Input[_builtins.str] organization_name: Name of the organization.
         :param pulumi.Input[_builtins.str] payload_url: URL to send request to.
         :param pulumi.Input[_builtins.str] environment_name: Name of the environment. Only specified if this is an environment webhook.
-        :param pulumi.Input[Sequence[pulumi.Input['WebhookFilters']]] filters: Optional set of filters to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#filters) for more information.
+        :param pulumi.Input[Sequence[pulumi.Input['WebhookFilters']]] filters: Optional set of filters to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/deployments/concepts/webhooks/#event-filtering) for more information.
         :param pulumi.Input['WebhookFormat'] format: Format of the webhook payload. Can be either `raw`, `slack`, `ms_teams` or `pulumi_deployments`. Defaults to `raw`.
-        :param pulumi.Input[Sequence[pulumi.Input['WebhookGroup']]] groups: Optional set of filter groups to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#groups) for more information.
+        :param pulumi.Input[Sequence[pulumi.Input['WebhookGroup']]] groups: Optional set of filter groups to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/deployments/concepts/webhooks/#event-filtering) for more information.
         :param pulumi.Input[_builtins.str] project_name: Name of the project. Only specified if this is a stack or environment webhook.
-        :param pulumi.Input[_builtins.str] secret: Optional. secret used as the HMAC key. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#headers) for more information.
+        :param pulumi.Input[_builtins.str] secret: Optional. secret used as the HMAC key. See [webhook docs](https://www.pulumi.com/docs/deployments/concepts/webhooks/#headers) for more information.
         :param pulumi.Input[_builtins.str] stack_name: Name of the stack. Only needed if this is a stack webhook.
         """
         pulumi.set(__self__, "active", active)
@@ -131,7 +131,7 @@ class WebhookArgs:
     @pulumi.getter
     def filters(self) -> pulumi.Input[Optional[Sequence[pulumi.Input['WebhookFilters']]]]:
         """
-        Optional set of filters to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#filters) for more information.
+        Optional set of filters to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/deployments/concepts/webhooks/#event-filtering) for more information.
         """
         return pulumi.get(self, "filters")
 
@@ -155,7 +155,7 @@ class WebhookArgs:
     @pulumi.getter
     def groups(self) -> pulumi.Input[Optional[Sequence[pulumi.Input['WebhookGroup']]]]:
         """
-        Optional set of filter groups to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#groups) for more information.
+        Optional set of filter groups to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/deployments/concepts/webhooks/#event-filtering) for more information.
         """
         return pulumi.get(self, "groups")
 
@@ -179,7 +179,7 @@ class WebhookArgs:
     @pulumi.getter
     def secret(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
-        Optional. secret used as the HMAC key. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#headers) for more information.
+        Optional. secret used as the HMAC key. See [webhook docs](https://www.pulumi.com/docs/deployments/concepts/webhooks/#headers) for more information.
         """
         return pulumi.get(self, "secret")
 
@@ -219,7 +219,13 @@ class Webhook(pulumi.CustomResource):
                  stack_name: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         """
-        Pulumi Webhooks allow you to notify external services of events happening within your Pulumi organization or stack. For example, you can trigger a notification whenever a stack is updated. Whenever an event occurs, Pulumi will send an HTTP POST request to all registered webhooks. The webhook can then be used to emit some notification, start running integration tests, or even update additional stacks.
+        Pulumi Webhooks allow you to notify external services of events happening within your Pulumi organization, stack, or ESC environment. For example, you can trigger a notification whenever a stack is updated or an environment revision is created. Whenever an event occurs, Pulumi will send an HTTP POST request to all registered webhooks. The webhook can then be used to emit some notification, start running integration tests, or even update additional stacks.
+
+        The webhook's scope is set by which properties you provide:
+
+        - **Organization webhook**: `organizationName` only.
+        - **Stack webhook**: `organizationName`, `projectName`, and `stackName`.
+        - **Environment webhook**: `organizationName`, `projectName`, and `environmentName`. See [ESC webhooks](https://www.pulumi.com/docs/esc/concepts/webhooks/) for the available events.
 
         ## Import
 
@@ -241,13 +247,13 @@ class Webhook(pulumi.CustomResource):
         :param pulumi.Input[_builtins.bool] active: Indicates whether this webhook is enabled or not.
         :param pulumi.Input[_builtins.str] display_name: The friendly name displayed in the Pulumi Cloud.
         :param pulumi.Input[_builtins.str] environment_name: Name of the environment. Only specified if this is an environment webhook.
-        :param pulumi.Input[Sequence[pulumi.Input['WebhookFilters']]] filters: Optional set of filters to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#filters) for more information.
+        :param pulumi.Input[Sequence[pulumi.Input['WebhookFilters']]] filters: Optional set of filters to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/deployments/concepts/webhooks/#event-filtering) for more information.
         :param pulumi.Input['WebhookFormat'] format: Format of the webhook payload. Can be either `raw`, `slack`, `ms_teams` or `pulumi_deployments`. Defaults to `raw`.
-        :param pulumi.Input[Sequence[pulumi.Input['WebhookGroup']]] groups: Optional set of filter groups to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#groups) for more information.
+        :param pulumi.Input[Sequence[pulumi.Input['WebhookGroup']]] groups: Optional set of filter groups to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/deployments/concepts/webhooks/#event-filtering) for more information.
         :param pulumi.Input[_builtins.str] organization_name: Name of the organization.
         :param pulumi.Input[_builtins.str] payload_url: URL to send request to.
         :param pulumi.Input[_builtins.str] project_name: Name of the project. Only specified if this is a stack or environment webhook.
-        :param pulumi.Input[_builtins.str] secret: Optional. secret used as the HMAC key. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#headers) for more information.
+        :param pulumi.Input[_builtins.str] secret: Optional. secret used as the HMAC key. See [webhook docs](https://www.pulumi.com/docs/deployments/concepts/webhooks/#headers) for more information.
         :param pulumi.Input[_builtins.str] stack_name: Name of the stack. Only needed if this is a stack webhook.
         """
         ...
@@ -257,7 +263,13 @@ class Webhook(pulumi.CustomResource):
                  args: WebhookArgs,
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
-        Pulumi Webhooks allow you to notify external services of events happening within your Pulumi organization or stack. For example, you can trigger a notification whenever a stack is updated. Whenever an event occurs, Pulumi will send an HTTP POST request to all registered webhooks. The webhook can then be used to emit some notification, start running integration tests, or even update additional stacks.
+        Pulumi Webhooks allow you to notify external services of events happening within your Pulumi organization, stack, or ESC environment. For example, you can trigger a notification whenever a stack is updated or an environment revision is created. Whenever an event occurs, Pulumi will send an HTTP POST request to all registered webhooks. The webhook can then be used to emit some notification, start running integration tests, or even update additional stacks.
+
+        The webhook's scope is set by which properties you provide:
+
+        - **Organization webhook**: `organizationName` only.
+        - **Stack webhook**: `organizationName`, `projectName`, and `stackName`.
+        - **Environment webhook**: `organizationName`, `projectName`, and `environmentName`. See [ESC webhooks](https://www.pulumi.com/docs/esc/concepts/webhooks/) for the available events.
 
         ## Import
 
@@ -399,7 +411,7 @@ class Webhook(pulumi.CustomResource):
     @pulumi.getter
     def filters(self) -> pulumi.Output[Optional[Sequence['WebhookFilters']]]:
         """
-        Optional set of filters to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#filters) for more information.
+        Optional set of filters to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/deployments/concepts/webhooks/#event-filtering) for more information.
         """
         return pulumi.get(self, "filters")
 
@@ -415,7 +427,7 @@ class Webhook(pulumi.CustomResource):
     @pulumi.getter
     def groups(self) -> pulumi.Output[Optional[Sequence['WebhookGroup']]]:
         """
-        Optional set of filter groups to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#groups) for more information.
+        Optional set of filter groups to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/deployments/concepts/webhooks/#event-filtering) for more information.
         """
         return pulumi.get(self, "groups")
 
@@ -455,7 +467,7 @@ class Webhook(pulumi.CustomResource):
     @pulumi.getter
     def secret(self) -> pulumi.Output[Optional[_builtins.str]]:
         """
-        Optional. secret used as the HMAC key. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#headers) for more information.
+        Optional. secret used as the HMAC key. See [webhook docs](https://www.pulumi.com/docs/deployments/concepts/webhooks/#headers) for more information.
         """
         return pulumi.get(self, "secret")
 

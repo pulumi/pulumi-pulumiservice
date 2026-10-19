@@ -310,10 +310,15 @@ var (
 func (*Webhook) Annotate(a infer.Annotator) {
 	a.Describe(&Webhook{},
 		"Pulumi Webhooks allow you to notify external services of events happening within your Pulumi "+
-			"organization or stack. For example, you can trigger a notification whenever a stack is updated. "+
-			"Whenever an event occurs, Pulumi will send an HTTP POST request to all registered webhooks. The "+
-			"webhook can then be used to emit some notification, start running integration tests, or even "+
-			"update additional stacks."+
+			"organization, stack, or ESC environment. For example, you can trigger a notification whenever a "+
+			"stack is updated or an environment revision is created. Whenever an event occurs, Pulumi will send "+
+			"an HTTP POST request to all registered webhooks. The webhook can then be used to emit some "+
+			"notification, start running integration tests, or even update additional stacks.\n\n"+
+			"The webhook's scope is set by which properties you provide:\n\n"+
+			"- **Organization webhook**: `organizationName` only.\n"+
+			"- **Stack webhook**: `organizationName`, `projectName`, and `stackName`.\n"+
+			"- **Environment webhook**: `organizationName`, `projectName`, and `environmentName`. See "+
+			"[ESC webhooks](https://www.pulumi.com/docs/esc/concepts/webhooks/) for the available events."+
 			util.ImportDocs("pulumiservice:index:Webhook", "{organization}/{project}/{stack}/{webhookName}",
 				"my-org/my-project/my-stack/4b0d0671",
 				"Organization webhooks use `{organization}/{webhookName}`, and environment webhooks use "+
@@ -346,7 +351,7 @@ func (i *WebhookInput) Annotate(a infer.Annotator) {
 	a.Describe(
 		&i.Secret,
 		"Optional. secret used as the HMAC key. See [webhook docs]"+
-			"(https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#headers) for more information.",
+			"(https://www.pulumi.com/docs/deployments/concepts/webhooks/#headers) for more information.",
 	)
 	a.Describe(&i.OrganizationName, "Name of the organization.")
 	a.Describe(&i.ProjectName, "Name of the project. Only specified if this is a stack or environment webhook.")
@@ -361,12 +366,12 @@ func (i *WebhookInput) Annotate(a infer.Annotator) {
 	a.Describe(
 		&i.Filters,
 		"Optional set of filters to apply to the webhook. See [webhook docs]"+
-			"(https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#filters) for more information.",
+			"(https://www.pulumi.com/docs/deployments/concepts/webhooks/#event-filtering) for more information.",
 	)
 	a.Describe(
 		&i.Groups,
 		"Optional set of filter groups to apply to the webhook. See [webhook docs]"+
-			"(https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#groups) for more information.",
+			"(https://www.pulumi.com/docs/deployments/concepts/webhooks/#event-filtering) for more information.",
 	)
 }
 

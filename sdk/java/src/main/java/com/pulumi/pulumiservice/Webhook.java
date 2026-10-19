@@ -19,7 +19,13 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 
 /**
- * Pulumi Webhooks allow you to notify external services of events happening within your Pulumi organization or stack. For example, you can trigger a notification whenever a stack is updated. Whenever an event occurs, Pulumi will send an HTTP POST request to all registered webhooks. The webhook can then be used to emit some notification, start running integration tests, or even update additional stacks.
+ * Pulumi Webhooks allow you to notify external services of events happening within your Pulumi organization, stack, or ESC environment. For example, you can trigger a notification whenever a stack is updated or an environment revision is created. Whenever an event occurs, Pulumi will send an HTTP POST request to all registered webhooks. The webhook can then be used to emit some notification, start running integration tests, or even update additional stacks.
+ * 
+ * The webhook&#39;s scope is set by which properties you provide:
+ * 
+ * - **Organization webhook**: `organizationName` only.
+ * - **Stack webhook**: `organizationName`, `projectName`, and `stackName`.
+ * - **Environment webhook**: `organizationName`, `projectName`, and `environmentName`. See [ESC webhooks](https://www.pulumi.com/docs/esc/concepts/webhooks/) for the available events.
  * 
  * ## Import
  * 
@@ -81,14 +87,14 @@ public class Webhook extends com.pulumi.resources.CustomResource {
         return Codegen.optional(this.environmentName);
     }
     /**
-     * Optional set of filters to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#filters) for more information.
+     * Optional set of filters to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/deployments/concepts/webhooks/#event-filtering) for more information.
      * 
      */
     @Export(name="filters", refs={List.class,WebhookFilters.class}, tree="[0,1]")
     private Output</* @Nullable */ List<WebhookFilters>> filters;
 
     /**
-     * @return Optional set of filters to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#filters) for more information.
+     * @return Optional set of filters to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/deployments/concepts/webhooks/#event-filtering) for more information.
      * 
      */
     public Output<Optional<List<WebhookFilters>>> filters() {
@@ -109,14 +115,14 @@ public class Webhook extends com.pulumi.resources.CustomResource {
         return this.format;
     }
     /**
-     * Optional set of filter groups to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#groups) for more information.
+     * Optional set of filter groups to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/deployments/concepts/webhooks/#event-filtering) for more information.
      * 
      */
     @Export(name="groups", refs={List.class,WebhookGroup.class}, tree="[0,1]")
     private Output</* @Nullable */ List<WebhookGroup>> groups;
 
     /**
-     * @return Optional set of filter groups to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#groups) for more information.
+     * @return Optional set of filter groups to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/deployments/concepts/webhooks/#event-filtering) for more information.
      * 
      */
     public Output<Optional<List<WebhookGroup>>> groups() {
@@ -179,14 +185,14 @@ public class Webhook extends com.pulumi.resources.CustomResource {
         return Codegen.optional(this.projectName);
     }
     /**
-     * Optional. secret used as the HMAC key. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#headers) for more information.
+     * Optional. secret used as the HMAC key. See [webhook docs](https://www.pulumi.com/docs/deployments/concepts/webhooks/#headers) for more information.
      * 
      */
     @Export(name="secret", refs={String.class}, tree="[0]")
     private Output</* @Nullable */ String> secret;
 
     /**
-     * @return Optional. secret used as the HMAC key. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#headers) for more information.
+     * @return Optional. secret used as the HMAC key. See [webhook docs](https://www.pulumi.com/docs/deployments/concepts/webhooks/#headers) for more information.
      * 
      */
     public Output<Optional<String>> secret() {
