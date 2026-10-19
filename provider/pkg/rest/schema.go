@@ -176,6 +176,15 @@ func buildResource(spec *Spec, _ *Metadata, _ string, rm ResourceMeta) (*schema.
 		if !inInputs && !inOutputs {
 			return nil, fmt.Errorf("metadata.fields[%q] does not match any input or output field", fieldName)
 		}
+		if cf := rm.Fields[fieldName].ClearField; cf != "" {
+			updOp := opOrNil(spec, rm.Operations.Update)
+			if updOp == nil {
+				return nil, fmt.Errorf("metadata.fields[%q].clearField set but the resource has no update operation", fieldName)
+			}
+			if _, ok := flattenedRequestProperties(spec, updOp)[cf]; !ok {
+				return nil, fmt.Errorf("metadata.fields[%q].clearField %q is not a field of %s's request body", fieldName, cf, updOp.ID)
+			}
+		}
 	}
 
 	desc := rm.Description

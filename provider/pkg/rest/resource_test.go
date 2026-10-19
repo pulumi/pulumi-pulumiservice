@@ -2179,3 +2179,126 @@ func TestReadKeepsResponseOnlyItemFieldsOutOfInputs(t *testing.T) {
 		}
 	}
 }
+
+func policyGroupPatchCapture(t *testing.T) (*Resource, *map[string]any) {
+	t.Helper()
+	spec, meta := loadFixtures(t)
+	r, ok := Resources(spec, meta)["pulumiservice:api:PolicyGroup"]
+	if !ok {
+		t.Fatalf("PolicyGroup resource not found")
+	}
+	var patchBody map[string]any
+	mock := &mockTransport{
+		responseFn: func(req *http.Request) mockResponse {
+			switch req.Method {
+			case http.MethodPatch:
+				b, _ := io.ReadAll(req.Body)
+				if err := json.Unmarshal(b, &patchBody); err != nil {
+					t.Fatalf("unmarshal patch body %q: %v", b, err)
+				}
+				return mockResponse{status: 204, body: ""}
+			case http.MethodGet:
+				return mockResponse{status: 200, body: `{"name":"pg1"}`}
+			}
+			return mockResponse{status: 500, body: unexpectedBody}
+		},
+	}
+	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
+	return r, &patchBody
+}
+
+func TestUpdateSendsClearFieldWhenInputDropped(t *testing.T) {
+	r, patchBody := policyGroupPatchCapture(t)
+	stackRule := map[string]any{"__type": "PermissionExpressionEqual", "key": "env"}
+	accountRule := map[string]any{"__type": "PermissionExpressionEqual", "key": "team"}
+
+	prior := propMap(map[string]any{
+		orgNameKey: testOrgName, nameKey: "pg1", "mode": "audit",
+		"stackMatchRule": stackRule, "accountMatchRule": accountRule,
+	})
+	newInputs := propMap(map[string]any{
+		orgNameKey: testOrgName, nameKey: "pg1", "mode": "audit",
+		"accountMatchRule": accountRule,
+	})
+	if _, err := r.Update(t.Context(), p.UpdateRequest{
+		ID: "test-org/pg1", OldInputs: prior, State: prior, Inputs: newInputs,
+	}); err != nil {
+		t.Fatalf("update: %v", err)
+	}
+	if got := (*patchBody)["removeStackMatchRule"]; got != true {
+		t.Errorf("removeStackMatchRule = %#v, want true; body=%v", got, *patchBody)
+	}
+	if v, ok := (*patchBody)["stackMatchRule"]; ok {
+		t.Errorf("dropped stackMatchRule re-sent from prior inputs/state: %v", v)
+	}
+	if _, ok := (*patchBody)["removeAccountMatchRule"]; ok {
+		t.Errorf("removeAccountMatchRule sent though accountMatchRule is still set; body=%v", *patchBody)
+	}
+}
+
+func TestUpdateOmitsClearFieldWhenInputNeverSet(t *testing.T) {
+	r, patchBody := policyGroupPatchCapture(t)
+	prior := propMap(map[string]any{orgNameKey: testOrgName, nameKey: "pg1", "agentPoolId": "pool-a"})
+	state := propMap(map[string]any{
+		orgNameKey: testOrgName, nameKey: "pg1", "agentPoolId": "pool-a",
+		"stackMatchRule": map[string]any{"__type": "PermissionExpressionEqual"},
+	})
+	newInputs := propMap(map[string]any{orgNameKey: testOrgName, nameKey: "pg1", "agentPoolId": "pool-b"})
+	if _, err := r.Update(t.Context(), p.UpdateRequest{
+		ID: "test-org/pg1", OldInputs: prior, State: state, Inputs: newInputs,
+	}); err != nil {
+		t.Fatalf("update: %v", err)
+	}
+	if _, ok := (*patchBody)["removeStackMatchRule"]; ok {
+		t.Errorf("removeStackMatchRule sent for a rule the program never managed; body=%v", *patchBody)
+	}
+}
+
+func TestDiffReplacesPolicyGroupOnModeChange(t *testing.T) {
+	spec, meta := loadFixtures(t)
+	r, ok := Resources(spec, meta)["pulumiservice:api:PolicyGroup"]
+	if !ok {
+		t.Fatalf("PolicyGroup resource not found")
+	}
+	old := propMap(map[string]any{orgNameKey: testOrgName, nameKey: "pg1", "mode": "preventative"})
+	updated := propMap(map[string]any{orgNameKey: testOrgName, nameKey: "pg1", "mode": "audit"})
+	resp, err := r.Diff(t.Context(), p.DiffRequest{OldInputs: old, Inputs: updated})
+	if err != nil {
+		t.Fatalf("diff: %v", err)
+	}
+	if got := resp.DetailedDiff["mode"].Kind; got != p.UpdateReplace {
+		t.Errorf("mode diff kind = %v, want UpdateReplace", got)
+	}
+}
+
+func TestDiffDoesNotReplaceWhenAddedForceNewInputMatchesState(t *testing.T) {
+	spec, meta := loadFixtures(t)
+	r, ok := Resources(spec, meta)["pulumiservice:api:PolicyGroup"]
+	if !ok {
+		t.Fatalf("PolicyGroup resource not found")
+	}
+	old := propMap(map[string]any{orgNameKey: testOrgName, nameKey: "pg1", "entityType": "stacks"})
+	state := propMap(map[string]any{orgNameKey: testOrgName, nameKey: "pg1", "entityType": "stacks", "mode": "preventative"})
+
+	resp, err := r.Diff(t.Context(), p.DiffRequest{
+		OldInputs: old, State: state,
+		Inputs: propMap(map[string]any{orgNameKey: testOrgName, nameKey: "pg1", "entityType": "stacks", "mode": "preventative"}),
+	})
+	if err != nil {
+		t.Fatalf("diff: %v", err)
+	}
+	if resp.HasChanges {
+		t.Errorf("adding mode equal to the server's value reported changes: %v", resp.DetailedDiff)
+	}
+
+	resp, err = r.Diff(t.Context(), p.DiffRequest{
+		OldInputs: old, State: state,
+		Inputs: propMap(map[string]any{orgNameKey: testOrgName, nameKey: "pg1", "entityType": "stacks", "mode": "audit"}),
+	})
+	if err != nil {
+		t.Fatalf("diff: %v", err)
+	}
+	if got := resp.DetailedDiff["mode"].Kind; got != p.AddReplace {
+		t.Errorf("adding mode that differs from the server's value: kind = %v, want AddReplace", got)
+	}
+}

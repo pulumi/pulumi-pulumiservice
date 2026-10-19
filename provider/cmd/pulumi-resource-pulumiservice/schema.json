@@ -4779,7 +4779,9 @@
         },
         "mode": {
           "type": "string",
-          "description": "The enforcement mode for the policy group (audit or preventative)."
+          "description": "The enforcement mode for the policy group (audit or preventative).",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
         },
         "name": {
           "type": "string",
@@ -4822,7 +4824,9 @@
         },
         "mode": {
           "type": "string",
-          "description": "The enforcement mode for the policy group (audit or preventative). The mode decides what the group can hold: an audit group holds stacks and Insights accounts, a preventative group holds stacks only. Required unless the deprecated `entityType` is sent. Fixed at creation; it cannot be changed later."
+          "description": "The enforcement mode for the policy group (audit or preventative). The mode decides what the group can hold: an audit group holds stacks and Insights accounts, a preventative group holds stacks only. Required unless the deprecated `entityType` is sent. Fixed at creation; it cannot be changed later.",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
         },
         "name": {
           "type": "string",

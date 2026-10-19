@@ -10,6 +10,8 @@
 
 ### Bug Fixes
 
+- Removing `stackMatchRule` or `accountMatchRule` from a `pulumiservice:api:PolicyGroup` now removes the rule in Pulumi Cloud. Previously the update re-sent the prior rule, so the rule stayed in place while `pulumi up` reported success and refresh showed no drift.
+- Changing `mode` on a `pulumiservice:api:PolicyGroup` now replaces the group. Pulumi Cloud fixes the mode at creation, so the in-place update the provider used to send was silently ignored. Adding `mode` to a program for a group that already has that mode, for example after `pulumi import` or when moving off the deprecated `entityType`, is not a change and does not replace the group.
 - Updated the Pulumi Cloud SDK so `OrganizationRole.permissions` and the permission builder helpers accept scopes and permission descriptor types that Pulumi Cloud added recently. The previous version rejected them, or silently dropped scopes it didn't recognize. [#1162](https://github.com/pulumi/pulumi-pulumiservice/issues/1162)
 
 ## 1.4.0
