@@ -61,7 +61,8 @@ func (i *StackInput) Annotate(a infer.Annotator) {
 	a.Describe(&i.StackName, "The name of the stack.")
 	a.Describe(
 		&i.ForceDestroy,
-		"Optional. Flag indicating whether to delete the stack even if it still contains resources.",
+		"Optional. Flag indicating whether to delete the stack even if it still contains resources. "+
+			"Defaults to `false`.",
 	)
 }
 

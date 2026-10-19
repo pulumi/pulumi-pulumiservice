@@ -22,14 +22,14 @@ import javax.annotation.Nullable;
 @ResourceType(type="pulumiservice:index:Stack")
 public class Stack extends com.pulumi.resources.CustomResource {
     /**
-     * Optional. Flag indicating whether to delete the stack even if it still contains resources.
+     * Optional. Flag indicating whether to delete the stack even if it still contains resources. Defaults to `false`.
      * 
      */
     @Export(name="forceDestroy", refs={Boolean.class}, tree="[0]")
     private Output</* @Nullable */ Boolean> forceDestroy;
 
     /**
-     * @return Optional. Flag indicating whether to delete the stack even if it still contains resources.
+     * @return Optional. Flag indicating whether to delete the stack even if it still contains resources. Defaults to `false`.
      * 
      */
     public Output<Optional<Boolean>> forceDestroy() {
