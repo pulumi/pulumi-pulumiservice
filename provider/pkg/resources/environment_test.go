@@ -3,6 +3,7 @@ package resources
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"testing"
 	"time"
 
@@ -10,6 +11,7 @@ import (
 
 	"github.com/pulumi/esc"
 	"github.com/pulumi/esc/cmd/esc/cli/client"
+	"github.com/pulumi/pulumi/sdk/v3/go/common/apitype"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/asset"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
@@ -550,10 +552,34 @@ func TestEnvironmentDiff(t *testing.T) {
 }
 
 func TestEnvironment(t *testing.T) {
+	t.Run("Read keeps the resource when the API fails with a non-404 error", func(t *testing.T) {
+		mockedClient := buildEscClientMock(
+			func(_ context.Context, _ string, _ string, _ string, _ bool) (yaml []byte, etag string, revision int, err error) {
+				return nil, "", 0, &apitype.ErrorResponse{Code: http.StatusInternalServerError, Message: "internal error"}
+			},
+			func(_ context.Context, _, _, _ string) (*client.EnvironmentRevisionTag, error) {
+				return nil, nil
+			},
+		)
+
+		provider := PulumiServiceEnvironmentResource{
+			Client: mockedClient,
+		}
+
+		req := pulumirpc.ReadRequest{
+			Id: "org/env",
+		}
+
+		resp, err := provider.Read(&req)
+
+		assert.Error(t, err)
+		assert.Nil(t, resp)
+	})
+
 	t.Run("Read when the resource is not found", func(t *testing.T) {
 		mockedClient := buildEscClientMock(
 			func(_ context.Context, _ string, _ string, _ string, _ bool) (yaml []byte, etag string, revision int, err error) {
-				return nil, "", 0, fmt.Errorf("not found")
+				return nil, "", 0, &apitype.ErrorResponse{Code: http.StatusNotFound, Message: "not found"}
 			},
 			func(_ context.Context, _, _, _ string) (*client.EnvironmentRevisionTag, error) {
 				return nil, nil

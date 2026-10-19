@@ -418,7 +418,13 @@ func (st *PulumiServiceEnvironmentResource) Read(req *pulumirpc.ReadRequest) (*p
 		false,
 	)
 	if err != nil {
-		return &pulumirpc.ReadResponse{Id: "", Properties: nil}, nil
+		// Only a 404 means the environment is gone. Any other failure (5xx,
+		// auth, network) must surface, or the engine would drop the resource
+		// from state during refresh.
+		if esc_client.IsNotFound(err) {
+			return &pulumirpc.ReadResponse{Id: "", Properties: nil}, nil
+		}
+		return nil, err
 	}
 
 	stringYaml := string(retrievedYaml)
