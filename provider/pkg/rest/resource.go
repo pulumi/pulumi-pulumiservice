@@ -282,6 +282,11 @@ func (r *Resource) Diff(_ context.Context, req p.DiffRequest) (p.DiffResponse, e
 	}
 	for k := range req.OldInputs.AllStable {
 		if _, ok := req.Inputs.GetOk(k); !ok {
+			// A replace-triggering input dropped from the program leaves the
+			// server's value in place, so there is nothing to replace.
+			if _, inState := req.State.GetOk(k); replaces[k] && inState {
+				continue
+			}
 			detailed[k] = p.PropertyDiff{Kind: deleteKind(replaces[k])}
 		}
 	}
@@ -761,10 +766,10 @@ func (r *Resource) applyClearFields(oldInputs, inputs, bodySrc property.Map) pro
 		if fm.ClearField == "" {
 			continue
 		}
-		if _, kept := inputs.GetOk(name); kept {
+		if v, kept := inputs.GetOk(name); kept && !v.IsNull() {
 			continue
 		}
-		if _, had := oldInputs.GetOk(name); !had {
+		if v, had := oldInputs.GetOk(name); !had || v.IsNull() {
 			continue
 		}
 		delete(out, name)

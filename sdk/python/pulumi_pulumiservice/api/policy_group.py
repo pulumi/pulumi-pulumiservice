@@ -217,8 +217,6 @@ class PolicyGroup(pulumi.CustomResource):
             __props__.__dict__["applied_policy_packs"] = None
             __props__.__dict__["is_org_default"] = None
             __props__.__dict__["stacks"] = None
-        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["mode"])
-        opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(PolicyGroup, __self__).__init__(
             'pulumiservice:api:PolicyGroup',
             resource_name,

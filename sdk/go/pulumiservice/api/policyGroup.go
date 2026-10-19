@@ -51,10 +51,6 @@ func NewPolicyGroup(ctx *pulumi.Context,
 	if args.OrgName == nil {
 		return nil, errors.New("invalid value for required argument 'OrgName'")
 	}
-	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
-		"mode",
-	})
-	opts = append(opts, replaceOnChanges)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource PolicyGroup
 	err := ctx.RegisterResource("pulumiservice:api:PolicyGroup", name, args, &resource, opts...)

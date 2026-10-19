@@ -166,6 +166,14 @@ func buildResource(spec *Spec, _ *Metadata, _ string, rm ResourceMeta) (*schema.
 	if err := mergeEmitOnCreateOutputs(spec, create, rm, outputs); err != nil {
 		return nil, fmt.Errorf("outputs (emitOnCreate): %w", err)
 	}
+	// SDK codegen turns replaceOnChanges on outputs into a default
+	// ReplaceOnChanges resource option, which would bypass Diff's
+	// replace decisions.
+	for k, v := range outputs {
+		v.WillReplaceOnChanges = false
+		v.ReplaceOnChanges = false
+		outputs[k] = v
+	}
 
 	requiredInputs = filterAutoNamedRequired(requiredInputs, rm)
 
@@ -177,6 +185,9 @@ func buildResource(spec *Spec, _ *Metadata, _ string, rm ResourceMeta) (*schema.
 			return nil, fmt.Errorf("metadata.fields[%q] does not match any input or output field", fieldName)
 		}
 		if cf := rm.Fields[fieldName].ClearField; cf != "" {
+			if rm.UpdateEnvelope != nil {
+				return nil, fmt.Errorf("metadata.fields[%q].clearField is not supported with updateEnvelope", fieldName)
+			}
 			updOp := opOrNil(spec, rm.Operations.Update)
 			if updOp == nil {
 				return nil, fmt.Errorf("metadata.fields[%q].clearField set but the resource has no update operation", fieldName)

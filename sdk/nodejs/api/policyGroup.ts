@@ -116,8 +116,6 @@ export class PolicyGroup extends pulumi.CustomResource {
             resourceInputs["stacks"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
-        const replaceOnChanges = { replaceOnChanges: ["mode"] };
-        opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(PolicyGroup.__pulumiType, name, resourceInputs, opts);
     }
 }

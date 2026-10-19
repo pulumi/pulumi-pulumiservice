@@ -4779,9 +4779,7 @@
         },
         "mode": {
           "type": "string",
-          "description": "The enforcement mode for the policy group (audit or preventative).",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
+          "description": "The enforcement mode for the policy group (audit or preventative)."
         },
         "name": {
           "type": "string",
