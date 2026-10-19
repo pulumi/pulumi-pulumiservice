@@ -35,7 +35,11 @@ export class PolicyGroup extends pulumi.CustomResource {
     }
 
     /**
-     * List of Insights account names that are members of this policy group.
+     * Preview: the account match rule, a boolean expression over Insights account tags. Accounts whose tags satisfy it are members of the group alongside the accounts added individually. Absent when the group has no rule.
+     */
+    declare public readonly accountMatchRule: pulumi.Output<any | undefined>;
+    /**
+     * The Insights accounts added to this policy group individually, with `addInsightsAccount`.
      */
     declare public /*out*/ readonly accounts: pulumi.Output<string[]>;
     /**
@@ -47,7 +51,7 @@ export class PolicyGroup extends pulumi.CustomResource {
      */
     declare public /*out*/ readonly appliedPolicyPacks: pulumi.Output<any[]>;
     /**
-     * The type of entities this policy group applies to (stacks or accounts).
+     * Deprecated: a legacy label set when the policy group was created. It does not restrict which entities the group holds; `mode` does.
      */
     declare public readonly entityType: pulumi.Output<string>;
     /**
@@ -63,7 +67,11 @@ export class PolicyGroup extends pulumi.CustomResource {
      */
     declare public readonly name: pulumi.Output<string>;
     /**
-     * List of stacks that are members of this policy group.
+     * Preview: the stack match rule, a boolean expression over stack tags. Stacks whose tags satisfy it are members of the group alongside the stacks added individually. Absent when the group has no rule.
+     */
+    declare public readonly stackMatchRule: pulumi.Output<any | undefined>;
+    /**
+     * The stacks added to this policy group individually, with `addStack`.
      */
     declare public /*out*/ readonly stacks: pulumi.Output<any[]>;
 
@@ -78,25 +86,25 @@ export class PolicyGroup extends pulumi.CustomResource {
         let resourceInputs: pulumi.Inputs = {};
         opts = opts || {};
         if (!opts.id) {
-            if (args?.entityType === undefined && !opts.urn) {
-                throw new Error("Missing required property 'entityType'");
-            }
             if (args?.name === undefined && !opts.urn) {
                 throw new Error("Missing required property 'name'");
             }
             if (args?.orgName === undefined && !opts.urn) {
                 throw new Error("Missing required property 'orgName'");
             }
+            resourceInputs["accountMatchRule"] = args?.accountMatchRule;
             resourceInputs["agentPoolId"] = args?.agentPoolId;
             resourceInputs["entityType"] = args?.entityType;
             resourceInputs["mode"] = args?.mode;
             resourceInputs["name"] = args?.name;
             resourceInputs["orgName"] = args?.orgName;
+            resourceInputs["stackMatchRule"] = args?.stackMatchRule;
             resourceInputs["accounts"] = undefined /*out*/;
             resourceInputs["appliedPolicyPacks"] = undefined /*out*/;
             resourceInputs["isOrgDefault"] = undefined /*out*/;
             resourceInputs["stacks"] = undefined /*out*/;
         } else {
+            resourceInputs["accountMatchRule"] = undefined /*out*/;
             resourceInputs["accounts"] = undefined /*out*/;
             resourceInputs["agentPoolId"] = undefined /*out*/;
             resourceInputs["appliedPolicyPacks"] = undefined /*out*/;
@@ -104,6 +112,7 @@ export class PolicyGroup extends pulumi.CustomResource {
             resourceInputs["isOrgDefault"] = undefined /*out*/;
             resourceInputs["mode"] = undefined /*out*/;
             resourceInputs["name"] = undefined /*out*/;
+            resourceInputs["stackMatchRule"] = undefined /*out*/;
             resourceInputs["stacks"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
@@ -116,23 +125,31 @@ export class PolicyGroup extends pulumi.CustomResource {
  */
 export interface PolicyGroupArgs {
     /**
+     * Preview: an account match rule to create the group with, a boolean expression over Insights account tags. Requires the tag-based policy groups feature; not allowed on preventative groups.
+     */
+    accountMatchRule?: any | undefined;
+    /**
      * Agent pool ID for policy evaluation. Defaults to Pulumi hosted pool if not specified.
      */
     agentPoolId?: pulumi.Input<string | undefined>;
     /**
-     * The type of entities this policy group applies to (stacks or accounts).
+     * Deprecated: a legacy label, `stacks` or `accounts`. When `mode` is omitted it picks the mode (`accounts` → audit, `stacks` → preventative). When this is omitted, it is derived from `mode`. It does not restrict which entities the group can hold.
      */
-    entityType: pulumi.Input<string>;
+    entityType?: pulumi.Input<string | undefined>;
     /**
-     * The enforcement mode for the policy group (audit or preventative). Defaults to 'audit' for account policy groups, 'preventative' for stack policy groups.
+     * The enforcement mode for the policy group (audit or preventative). The mode decides what the group can hold: an audit group holds stacks and Insights accounts, a preventative group holds stacks only. Required unless the deprecated `entityType` is sent. Fixed at creation; it cannot be changed later.
      */
     mode?: pulumi.Input<string | undefined>;
     /**
-     * The name of the new policy group.
+     * The name of the new policy group. Up to 100 characters, made up of letters, numbers, hyphens, underscores, periods, or spaces, and may not begin or end with a space.
      */
     name: pulumi.Input<string>;
     /**
      * The organization name
      */
     orgName: pulumi.Input<string>;
+    /**
+     * Preview: a stack match rule to create the group with, a boolean expression over stack tags. Requires the tag-based policy groups feature.
+     */
+    stackMatchRule?: any | undefined;
 }
