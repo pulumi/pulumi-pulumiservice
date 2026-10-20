@@ -22,6 +22,7 @@ import (
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 )
 
 type DriftSchedule struct{}
@@ -34,7 +35,12 @@ var (
 )
 
 func (*DriftSchedule) Annotate(a infer.Annotator) {
-	a.Describe(&DriftSchedule{}, "A cron schedule to run drift detection.")
+	a.Describe(&DriftSchedule{}, "A cron schedule to run drift detection."+
+		util.ImportDocs("pulumiservice:index:DriftSchedule",
+			"{organization}/{project}/{stack}/drift/{scheduleId}",
+			"my-org/my-project/my-stack/drift/7d3c5e1a-0f8b-4b26-a9d4-3e6f2b8c1a59",
+			util.APIIDHint("schedule ID", "/api/stacks/my-org/my-project/my-stack/deployments/schedules",
+				".schedules[]")))
 	a.SetToken("index", "DriftSchedule")
 }
 

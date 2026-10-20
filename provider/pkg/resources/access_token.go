@@ -22,6 +22,7 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/property"
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 )
 
 const (
@@ -44,7 +45,11 @@ func (*AccessToken) Annotate(a infer.Annotator) {
 		&AccessToken{},
 		"Creates a personal access token for the Pulumi Cloud user that the provider is authenticated as. "+
 			"The token acts with that user's permissions.\n\n"+
-			"To create a token that isn't tied to a user, use `OrgAccessToken` or `TeamAccessToken`.",
+			"To create a token that isn't tied to a user, use `OrgAccessToken` or `TeamAccessToken`."+
+			util.ImportDocs("pulumiservice:index:AccessToken", "{tokenId}",
+				"3f2b9c1e-7d4a-4e8b-9a61-0c5d2e8f7b13",
+				util.APIIDHint("token ID", "/api/user/tokens", ".tokens[] | {name, id}"),
+				"The token's `value` can't be read back from Pulumi Cloud, so it's empty after import."),
 	)
 }
 

@@ -73,7 +73,11 @@ func (*OrganizationRole) Annotate(a infer.Annotator) {
 			"**Manage these roles in code, not in the Pulumi Cloud console.** In the console's role editor, "+
 			"every rule grants a permission set (the \"access level\"); it can't show scopes granted "+
 			"directly. Roles that grant scopes directly, as `buildRolePermissions` does, open read-only "+
-			"there.\n\n"+organizationRoleExampleDocs,
+			"there.\n\n"+strings.TrimSpace(organizationRoleExampleDocs)+
+			util.ImportDocs("pulumiservice:index:OrganizationRole", "{organization}/{roleId}",
+				"my-org/1e5b8d3a-6c42-4f90-b7a1-8d2c4e6f0b95",
+				util.ConsoleIDHint("role ID", "https://app.pulumi.com/my-org/settings/access-management/roles/"+
+					"details/1e5b8d3a-6c42-4f90-b7a1-8d2c4e6f0b95")),
 	)
 }
 

@@ -466,11 +466,8 @@ func TestYamlTemplateSourcesExample(t *testing.T) {
 func TestYamlOidcIssuerExample(t *testing.T) {
 	cwd := getCwd(t)
 	integration.ProgramTest(t, &integration.ProgramTestOptions{
-		Dir: path.Join(cwd, ".", "yaml-oidc-issuer"),
-		Config: map[string]string{
-			"pulumiThumbprint": tlsThumbprint("api.pulumi.com"),
-			"githubThumbprint": tlsThumbprint("token.actions.githubusercontent.com"),
-		},
+		Dir:    path.Join(cwd, ".", "yaml-oidc-issuer"),
+		Config: oidcIssuerTestConfig(),
 	})
 }
 

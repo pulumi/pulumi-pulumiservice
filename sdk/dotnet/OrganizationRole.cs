@@ -262,6 +262,16 @@ namespace Pulumi.PulumiService
     /// 
     /// 
     /// ```
+    /// 
+    /// ## Import
+    /// 
+    /// This resource can be imported using its `id`, which has the format `{organization}/{roleId}`, e.g.,
+    /// 
+    /// ```sh
+    ///  $ pulumi import pulumiservice:index:OrganizationRole my-organization-role my-org/1e5b8d3a-6c42-4f90-b7a1-8d2c4e6f0b95
+    /// ```
+    /// 
+    /// The role ID is the last segment of its page URL in the Pulumi Cloud console, for example `https://app.pulumi.com/my-org/settings/access-management/roles/details/1e5b8d3a-6c42-4f90-b7a1-8d2c4e6f0b95`.
     /// </summary>
     [PulumiServiceResourceType("pulumiservice:index:OrganizationRole")]
     public partial class OrganizationRole : global::Pulumi.CustomResource

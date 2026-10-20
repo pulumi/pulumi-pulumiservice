@@ -4,6 +4,8 @@
 
 ### Improvements
 
+- Added an Import section to the docs of every `pulumiservice:index:*` resource, giving the ID format, a sample `pulumi import` command, and caveats such as secrets that can't be read back. `DeploymentSettings` and `Webhook` import docs now render as their own section instead of inline in the description. No behavior change. [#344](https://github.com/pulumi/pulumi-pulumiservice/issues/344)
+- Documented that `Webhook` supports ESC environment webhooks, and which properties select an organization, stack or environment webhook. No behavior change. [#482](https://github.com/pulumi/pulumi-pulumiservice/issues/482)
 - Added the `getOrganizationRole` function, which looks up a role by the name shown in the Pulumi Cloud console, and `getOrganizationRoles`, which lists an organization's built-in and custom roles. Use the returned `roleId` instead of hardcoding role IDs. [#1185](https://github.com/pulumi/pulumi-pulumiservice/issues/1185)
 - Documented that `OrgAccessToken` must be created and deleted by a provider authenticated as a user, for example with a personal access token. Pulumi Cloud rejects organization and team access tokens, even Admin ones, with `403 Machine tokens are not allowed to perform this operation`. `TeamAccessToken` has no such restriction. No behavior change. [#1112](https://github.com/pulumi/pulumi-pulumiservice/issues/1112)
 - Clarified the `AccessToken`, `OrgAccessToken` and `TeamAccessToken` descriptions. `AccessToken` now states that it creates a personal access token. No behavior change. [#1183](https://github.com/pulumi/pulumi-pulumiservice/pull/1183)

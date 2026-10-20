@@ -23,6 +23,7 @@ import (
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 )
 
 type OidcIssuer struct{}
@@ -39,7 +40,10 @@ func (*OidcIssuer) Annotate(a infer.Annotator) {
 		"systems like GitHub Actions and Pulumi Cloud, obviating the need to store a hard-coded Pulumi Cloud token "+
 		"in systems that need to run Pulumi commands or consume Pulumi Cloud APIs. Instead of a hard-coded, static "+
 		"token that must be manually rotated, trusted systems are granted temporary Pulumi Cloud tokens on an "+
-		"as-needed basis, which is more secure than static tokens.")
+		"as-needed basis, which is more secure than static tokens."+
+		util.ImportDocs("pulumiservice:index:OidcIssuer", "{organization}/{issuerId}",
+			"my-org/9a6e2c4f-8b17-4d03-a5c9-6f1e3b7d2a80",
+			util.APIIDHint("issuer ID", "/api/orgs/my-org/oidc/issuers", ".oidcIssuers[] | {name, id}")))
 	a.SetToken("index", "OidcIssuer")
 }
 
