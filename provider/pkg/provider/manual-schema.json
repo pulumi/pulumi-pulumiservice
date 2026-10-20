@@ -513,7 +513,7 @@
   },
   "resources": {
     "pulumiservice:index:DeploymentSettings": {
-      "description": "Deployment settings configure Pulumi Deployments for a stack.\n\n### Import\n\nDeployment settings can be imported using the `id`, which for deployment settings is `{org}/{project}/{stack}` e.g.,\n\n```sh\n $ pulumi import pulumiservice:index:DeploymentSettings my_settings my-org/my-project/my-stack\n```\n\n",
+      "description": "Deployment settings configure Pulumi Deployments for a stack.\n\n## Import\n\nThis resource can be imported using its `id`, which has the format `{organization}/{project}/{stack}`, e.g.,\n\n```sh\n $ pulumi import pulumiservice:index:DeploymentSettings my-deployment-settings my-org/my-project/my-stack\n```\n\nSecret values can't be read back from Pulumi Cloud, so import sets each one to the placeholder `<REPLACE WITH ACTUAL SECRET VALUE>`. Replace them with the real values in your program.\n",
       "properties": {
         "organization": {
           "description": "Organization name.",
@@ -615,7 +615,7 @@
       ]
     },
     "pulumiservice:index:PolicyGroup": {
-      "description": "A Policy Group allows you to apply policy packs to a set of stacks in your organization.",
+      "description": "A Policy Group allows you to apply policy packs to a set of stacks in your organization.\n\n## Import\n\nThis resource can be imported using its `id`, which has the format `{organization}/{policyGroupName}`, e.g.,\n\n```sh\n $ pulumi import pulumiservice:index:PolicyGroup my-policy-group my-org/my-policy-group\n```\n",
       "properties": {
         "name": {
           "description": "The name of the policy group.",

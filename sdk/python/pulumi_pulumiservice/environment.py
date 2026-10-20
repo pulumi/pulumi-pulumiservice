@@ -102,6 +102,17 @@ class Environment(pulumi.CustomResource):
         """
         An ESC Environment.
 
+        ## Import
+
+        This resource can be imported using its `id`, which has the format `{organization}/{project}/{environment}`, e.g.,
+
+        ```sh
+         $ pulumi import pulumiservice:index:Environment my-environment my-org/my-project/my-environment
+        ```
+
+        The legacy format `{organization}/{environment}` is also accepted, and uses the `default` project.
+
+
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] name: Environment name.
@@ -117,6 +128,17 @@ class Environment(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         An ESC Environment.
+
+        ## Import
+
+        This resource can be imported using its `id`, which has the format `{organization}/{project}/{environment}`, e.g.,
+
+        ```sh
+         $ pulumi import pulumiservice:index:Environment my-environment my-org/my-project/my-environment
+        ```
+
+        The legacy format `{organization}/{environment}` is also accepted, and uses the `default` project.
+
 
         :param str resource_name: The name of the resource.
         :param EnvironmentArgs args: The arguments to use to populate this resource's properties.

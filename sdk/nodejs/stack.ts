@@ -6,6 +6,14 @@ import * as utilities from "./utilities";
 
 /**
  * A stack is a collection of resources that share a common lifecycle. Stacks are uniquely identified by their name and the project they belong to.
+ *
+ * ## Import
+ *
+ * This resource can be imported using its `id`, which has the format `{organization}/{project}/{stack}`, e.g.,
+ *
+ * ```sh
+ *  $ pulumi import pulumiservice:index:Stack my-stack my-org/my-project/my-stack
+ * ```
  */
 export class Stack extends pulumi.CustomResource {
     /**

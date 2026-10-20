@@ -13,6 +13,18 @@ import (
 )
 
 // An ESC Environment.
+//
+// ## Import
+//
+// This resource can be imported using its `id`, which has the format `{organization}/{project}/{environment}`, e.g.,
+//
+// ```sh
+//
+//	$ pulumi import pulumiservice:index:Environment my-environment my-org/my-project/my-environment
+//
+// ```
+//
+// The legacy format `{organization}/{environment}` is also accepted, and uses the `default` project.
 type Environment struct {
 	pulumi.CustomResourceState
 

@@ -18,6 +18,7 @@ import (
 	"context"
 	"encoding/json"
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -193,6 +194,29 @@ func TestProvider_LayeredSchema(t *testing.T) {
 		assert.Truef(t, ok, "missing %s — expected from %s", c.token, c.source)
 	}
 
+}
+
+// TestProvider_EveryResourceDocumentsImport keeps new index resources from shipping
+// without an Import section in their registry docs (#344). The registry docs
+// generator splits descriptions on exactly "\n\n## Import", so check for that.
+func TestProvider_EveryResourceDocumentsImport(t *testing.T) {
+	provider, err := MakeProvider(nil, "pulumiservice", "1.0.0")
+	require.NoError(t, err)
+
+	resp, err := provider.GetSchema(context.Background(), &pulumirpc.GetSchemaRequest{})
+	require.NoError(t, err)
+
+	var spec schema.PackageSpec
+	require.NoError(t, json.Unmarshal([]byte(resp.Schema), &spec))
+
+	for token, rs := range spec.Resources {
+		// pulumiservice:api:* resources are generated from the OpenAPI spec and
+		// don't document import yet.
+		if !strings.HasPrefix(token, "pulumiservice:index:") {
+			continue
+		}
+		assert.Contains(t, rs.Description, "\n\n## Import", "%s: description has no `## Import` section", token)
+	}
 }
 
 // getPolicyPacks' result must be a named type, not an inline object.
