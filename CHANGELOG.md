@@ -11,6 +11,7 @@
 ### Bug Fixes
 
 - Updated the Pulumi Cloud SDK so `OrganizationRole.permissions` and the permission builder helpers accept scopes and permission descriptor types that Pulumi Cloud added recently. The previous version rejected them, or silently dropped scopes it didn't recognize. [#1162](https://github.com/pulumi/pulumi-pulumiservice/issues/1162)
+- `Environment` no longer replaces the environment when `organization`, `project` or `name` changes only in case. Pulumi Cloud looks environments up case-insensitively, so the replace deleted the environment and its revision history to recreate the same one. Other replaces now create the new environment before deleting the old one, Pulumi's default order. [#1214](https://github.com/pulumi/pulumi-pulumiservice/pull/1214)
 - `Environment` refresh no longer removes the environment from state when Pulumi Cloud returns an error other than 404, such as an authentication or network error. It now reports the error. `Environment` updates also report API errors, which were previously ignored. [#1204](https://github.com/pulumi/pulumi-pulumiservice/issues/1204)
 
 ## 1.4.0

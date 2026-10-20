@@ -7,6 +7,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
@@ -644,9 +645,19 @@ func TestEnvironmentDiff(t *testing.T) {
 			assert.True(t, resp.HasChanges)
 			require.Contains(t, resp.DetailedDiff, field)
 			assert.Equal(t, p.UpdateReplace, resp.DetailedDiff[field].Kind)
-			// ESC names are case-insensitive, so a case-only rename collides
-			// with the original unless it's deleted first.
-			assert.True(t, resp.DeleteBeforeReplace)
+			assert.False(t, resp.DeleteBeforeReplace)
+		})
+
+		t.Run(field+" case-only change is ignored", func(t *testing.T) {
+			// ESC looks environments up case-insensitively, so this names the
+			// same environment.
+			state := legacyEnvState(gcEnvProj, gcEnvYaml)
+			old, ok := state.GetOk(field)
+			require.True(t, ok)
+			resp := diff(t, state,
+				envInputs(gcEnvProj, newYaml).Set(field, property.New(strings.ToUpper(old.AsString()))))
+			assert.False(t, resp.HasChanges)
+			assert.Empty(t, resp.DetailedDiff)
 		})
 	}
 }
@@ -738,6 +749,30 @@ func TestEnvironmentDiffOldInputs(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, pulumirpc.DiffResponse_DIFF_NONE, resp.GetChanges())
 		assert.Empty(t, resp.GetDetailedDiff())
+	})
+
+	t.Run("case-only name change is ignored", func(t *testing.T) {
+		olds := legacy(gcEnvProj)
+		news := legacy(gcEnvProj)
+		news[gcName] = resource.NewProperty(strings.ToUpper(gcEnv))
+		news[gcYaml] = resource.NewProperty(textAsset(t, gcEnvYaml))
+		checked, err := server.Check(t.Context(), &pulumirpc.CheckRequest{
+			Urn:  string(envURN),
+			News: marshal(news),
+		})
+		require.NoError(t, err)
+		state := olds.Copy()
+		state["revision"] = resource.NewProperty(3.0)
+		resp, err := server.Diff(t.Context(), &pulumirpc.DiffRequest{
+			Id:        gcEnvProjID,
+			Urn:       string(envURN),
+			Olds:      marshal(state),
+			OldInputs: marshal(olds),
+			News:      checked.GetInputs(),
+		})
+		require.NoError(t, err)
+		assert.Equal(t, pulumirpc.DiffResponse_DIFF_NONE, resp.GetChanges())
+		assert.Empty(t, resp.GetReplaces())
 	})
 
 	t.Run("yaml change is an update", func(t *testing.T) {

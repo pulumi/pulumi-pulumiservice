@@ -381,7 +381,8 @@ func normalizeLegacyEnvironment(m property.Map) property.Map {
 }
 
 // WithEnvironmentCompat keeps the infer-based Environment compatible with the
-// pre-infer resource. It applies only to Environment requests.
+// pre-infer resource, and adjusts the default Diff where infer can't express
+// ESC's behavior. It applies only to Environment requests.
 //
 //   - It normalizes, with [normalizeLegacyEnvironment], the old inputs and
 //     state written by the pre-infer resource. A [infer.CustomStateMigrations]
@@ -389,9 +390,11 @@ func normalizeLegacyEnvironment(m property.Map) property.Map {
 //     legacy inputs would show a phantom `yaml` update and, without `project`,
 //     a phantom replace. During refresh, the engine also calls Diff with the
 //     old inputs from state as the new inputs, which never pass through Check.
-//   - It deletes before replacing, as the pre-infer resource did. ESC
-//     environment names are case-insensitive, so creating the replacement
-//     first fails with a 409 when a rename only changes case.
+//   - It ignores changes to `organization`, `project` and `name` that only
+//     change case, with [keepIdentityCase]. ESC looks environments up
+//     case-insensitively, so such a change names the same environment. A
+//     replace would delete it, with its revision history, and creating the
+//     replacement first would fail with a 409.
 //   - It returns the `yaml` output as a secret string, as the pre-infer
 //     resource did, even though the schema types it as an asset. Programs in
 //     dynamic languages read it as a string.
@@ -416,14 +419,14 @@ func WithEnvironmentCompat(prov p.Provider) p.Provider {
 			req.OldInputs = normalizeLegacyEnvironment(req.OldInputs)
 			req.State = normalizeLegacyEnvironment(req.State)
 			req.Inputs = normalizeLegacyEnvironment(req.Inputs)
-			resp, err := diff(ctx, req)
-			for _, d := range resp.DetailedDiff {
-				switch d.Kind {
-				case p.AddReplace, p.DeleteReplace, p.UpdateReplace:
-					resp.DeleteBeforeReplace = true
-				}
+			// The default Diff compares old inputs when the engine sends them,
+			// and state otherwise.
+			olds := req.OldInputs
+			if olds.Len() == 0 {
+				olds = req.State
 			}
-			return resp, err
+			req.Inputs = keepIdentityCase(req.Inputs, olds)
+			return diff(ctx, req)
 		}
 	}
 	if read != nil {
@@ -461,6 +464,22 @@ func WithEnvironmentCompat(prov p.Provider) p.Provider {
 		}
 	}
 	return prov
+}
+
+// keepIdentityCase sets each of `organization`, `project` and `name` in news to
+// its value in olds when the two differ only in case.
+func keepIdentityCase(news, olds property.Map) property.Map {
+	for _, k := range []string{gcOrganization, gcProject, gcName} {
+		n, nok := news.GetOk(k)
+		o, ook := olds.GetOk(k)
+		if !nok || !ook || !n.IsString() || !o.IsString() {
+			continue
+		}
+		if n.AsString() != o.AsString() && strings.EqualFold(n.AsString(), o.AsString()) {
+			news = news.Set(k, o.WithSecret(n.Secret()))
+		}
+	}
+	return news
 }
 
 // legacyYamlOutput converts a `yaml` text asset in m to a secret string.
