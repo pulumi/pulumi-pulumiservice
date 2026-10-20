@@ -873,17 +873,11 @@ func teamsConfig() map[string]string {
 }
 
 func oidcIssuerConfig() map[string]string {
-	// RegisterOidcIssuer 409s if the issuer URL is already registered.
-	// The pre-test sweeper deletes any prior pulumi_issuer/github_issuer
-	// before the run, so the URLs are reusable. issuerSuffix kept for
-	// per-test name uniqueness.
-	return map[string]string{
-		"organizationName": ServiceProviderTestOrg,
-		"issuerSuffix":     generateRandomFiveDigits(),
-		"maxExpiration":    "3600",
-		"pulumiThumbprint": tlsThumbprint("api.pulumi.com"),
-		"githubThumbprint": tlsThumbprint("token.actions.githubusercontent.com"),
-	}
+	cfg := oidcIssuerTestConfig()
+	cfg["organizationName"] = ServiceProviderTestOrg
+	cfg["issuerSuffix"] = generateRandomFiveDigits()
+	cfg["maxExpiration"] = "3600"
+	return cfg
 }
 
 func accessTokensConfig() map[string]string {
