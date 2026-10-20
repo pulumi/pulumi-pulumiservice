@@ -438,6 +438,20 @@ export interface OperationContextOptionsArgs {
     skipIntermediateDeployments?: pulumi.Input<boolean | undefined>;
 }
 
+export interface PolicyGroupMatchRule {
+    /**
+     * Tag conditions that must all hold for the rule to match. At least one is required.
+     */
+    conditions: inputs.PolicyGroupTagCondition[];
+}
+
+export interface PolicyGroupMatchRuleArgs {
+    /**
+     * Tag conditions that must all hold for the rule to match. At least one is required.
+     */
+    conditions: pulumi.Input<pulumi.Input<inputs.PolicyGroupTagConditionArgs>[]>;
+}
+
 /**
  * A reference to a policy pack within a policy group (input).
  */
@@ -472,6 +486,36 @@ export interface PolicyGroupStackReferenceArgs {
      * The routing project name (also known as project name).
      */
     routingProject: pulumi.Input<string>;
+}
+
+export interface PolicyGroupTagCondition {
+    /**
+     * The tag key.
+     */
+    key: string;
+    /**
+     * How the tag is compared. Defaults to `equals`.
+     */
+    operator?: enums.PolicyGroupTagOperator;
+    /**
+     * The tag value. Required with `equals` and `notEquals`, and not allowed with `exists` and `notExists`.
+     */
+    value?: string;
+}
+
+export interface PolicyGroupTagConditionArgs {
+    /**
+     * The tag key.
+     */
+    key: pulumi.Input<string>;
+    /**
+     * How the tag is compared. Defaults to `equals`.
+     */
+    operator?: pulumi.Input<enums.PolicyGroupTagOperator | undefined>;
+    /**
+     * The tag value. Required with `equals` and `notEquals`, and not allowed with `exists` and `notExists`.
+     */
+    value?: pulumi.Input<string | undefined>;
 }
 
 export interface PolicyPackComplianceFrameworkInputArgs {

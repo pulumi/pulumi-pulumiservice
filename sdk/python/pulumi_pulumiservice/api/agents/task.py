@@ -20,6 +20,7 @@ __all__ = ['TaskArgs', 'Task']
 class TaskArgs:
     def __init__(__self__, *,
                  org_name: pulumi.Input[_builtins.str],
+                 agent_definition_id: pulumi.Input[Optional[_builtins.str]] = None,
                  approval_mode: pulumi.Input[Optional[_builtins.str]] = None,
                  cli_integrations: pulumi.Input[Optional[Sequence[Any]]] = None,
                  enabled_integrations: pulumi.Input[Optional[Sequence[Any]]] = None,
@@ -34,6 +35,7 @@ class TaskArgs:
         The set of arguments for constructing a Task resource.
 
         :param pulumi.Input[_builtins.str] org_name: The organization name
+        :param pulumi.Input[_builtins.str] agent_definition_id: Optional Custom Agent definition id to run this task as. When set, the task's role, permission mode, and enabled integrations are taken from the named agent definition instead of from this request, and the task is attributed to that agent. The agent's instructions and approval mode are not copied at creation: they are read from the definition on every turn, so editing the agent applies to the next turn of every run. A preview capability, gated per organization.
         :param pulumi.Input[_builtins.str] approval_mode: Optional approval mode override for this task. If omitted, org default is used.
         :param pulumi.Input[Sequence[Any]] cli_integrations: Optional filter for CLI integrations to enable for this task. Semantics: omitted/null → enable all CLI integrations connected for the org; empty list → explicit opt-out (no CLI integrations for this task); populated list → whitelist by (catalogId, name) of the configured instances to enable. Entries with missing or unknown catalogId, missing name, or referencing a (catalogId, name) pair that is not connected for the organization are rejected with a 400 response. catalogId matching is case-insensitive.
         :param pulumi.Input[Sequence[Any]] enabled_integrations: Optional list of integrations to enable for this task. Semantics: omitted/null → inherit all org-enabled integrations; empty list → explicit opt-out (no integration credentials for this task); populated list → whitelist of specific integrations by ID. Modeled as an object array rather than a bare string array so multi-instance support (instance_name, scope, etc.) can be added later without a wire break.
@@ -46,6 +48,8 @@ class TaskArgs:
         :param pulumi.Input[_builtins.str] tool_execution_mode: Where tools should be executed. Defaults to 'cloud' if omitted.
         """
         pulumi.set(__self__, "org_name", org_name)
+        if agent_definition_id is not None:
+            pulumi.set(__self__, "agent_definition_id", agent_definition_id)
         if approval_mode is not None:
             pulumi.set(__self__, "approval_mode", approval_mode)
         if cli_integrations is not None:
@@ -78,6 +82,18 @@ class TaskArgs:
     @org_name.setter
     def org_name(self, value: pulumi.Input[_builtins.str]):
         pulumi.set(self, "org_name", value)
+
+    @_builtins.property
+    @pulumi.getter(name="agentDefinitionId")
+    def agent_definition_id(self) -> pulumi.Input[Optional[_builtins.str]]:
+        """
+        Optional Custom Agent definition id to run this task as. When set, the task's role, permission mode, and enabled integrations are taken from the named agent definition instead of from this request, and the task is attributed to that agent. The agent's instructions and approval mode are not copied at creation: they are read from the definition on every turn, so editing the agent applies to the next turn of every run. A preview capability, gated per organization.
+        """
+        return pulumi.get(self, "agent_definition_id")
+
+    @agent_definition_id.setter
+    def agent_definition_id(self, value: pulumi.Input[Optional[_builtins.str]]):
+        pulumi.set(self, "agent_definition_id", value)
 
     @_builtins.property
     @pulumi.getter(name="approvalMode")
@@ -206,6 +222,7 @@ class Task(pulumi.CustomResource):
     def __init__(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
+                 agent_definition_id: pulumi.Input[Optional[_builtins.str]] = None,
                  approval_mode: pulumi.Input[Optional[_builtins.str]] = None,
                  cli_integrations: pulumi.Input[Optional[Sequence[Any]]] = None,
                  enabled_integrations: pulumi.Input[Optional[Sequence[Any]]] = None,
@@ -223,6 +240,7 @@ class Task(pulumi.CustomResource):
 
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
+        :param pulumi.Input[_builtins.str] agent_definition_id: Optional Custom Agent definition id to run this task as. When set, the task's role, permission mode, and enabled integrations are taken from the named agent definition instead of from this request, and the task is attributed to that agent. The agent's instructions and approval mode are not copied at creation: they are read from the definition on every turn, so editing the agent applies to the next turn of every run. A preview capability, gated per organization.
         :param pulumi.Input[_builtins.str] approval_mode: Optional approval mode override for this task. If omitted, org default is used.
         :param pulumi.Input[Sequence[Any]] cli_integrations: Optional filter for CLI integrations to enable for this task. Semantics: omitted/null → enable all CLI integrations connected for the org; empty list → explicit opt-out (no CLI integrations for this task); populated list → whitelist by (catalogId, name) of the configured instances to enable. Entries with missing or unknown catalogId, missing name, or referencing a (catalogId, name) pair that is not connected for the organization are rejected with a 400 response. catalogId matching is case-insensitive.
         :param pulumi.Input[Sequence[Any]] enabled_integrations: Optional list of integrations to enable for this task. Semantics: omitted/null → inherit all org-enabled integrations; empty list → explicit opt-out (no integration credentials for this task); populated list → whitelist of specific integrations by ID. Modeled as an object array rather than a bare string array so multi-instance support (instance_name, scope, etc.) can be added later without a wire break.
@@ -259,6 +277,7 @@ class Task(pulumi.CustomResource):
     def _internal_init(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
+                 agent_definition_id: pulumi.Input[Optional[_builtins.str]] = None,
                  approval_mode: pulumi.Input[Optional[_builtins.str]] = None,
                  cli_integrations: pulumi.Input[Optional[Sequence[Any]]] = None,
                  enabled_integrations: pulumi.Input[Optional[Sequence[Any]]] = None,
@@ -279,6 +298,7 @@ class Task(pulumi.CustomResource):
                 raise TypeError('__props__ is only valid when passed in combination with a valid opts.id to get an existing resource')
             __props__ = TaskArgs.__new__(TaskArgs)
 
+            __props__.__dict__["agent_definition_id"] = agent_definition_id
             __props__.__dict__["approval_mode"] = approval_mode
             __props__.__dict__["cli_integrations"] = cli_integrations
             __props__.__dict__["enabled_integrations"] = enabled_integrations
@@ -302,6 +322,8 @@ class Task(pulumi.CustomResource):
             __props__.__dict__["is_shared"] = None
             __props__.__dict__["last_heartbeat"] = None
             __props__.__dict__["name"] = None
+            __props__.__dict__["pending_input_count"] = None
+            __props__.__dict__["role_name"] = None
             __props__.__dict__["runtime_phase"] = None
             __props__.__dict__["shared_at"] = None
             __props__.__dict__["source_automation_id"] = None
@@ -331,6 +353,7 @@ class Task(pulumi.CustomResource):
 
         __props__ = TaskArgs.__new__(TaskArgs)
 
+        __props__.__dict__["agent_definition_id"] = None
         __props__.__dict__["approval_mode"] = None
         __props__.__dict__["async_trigger_type"] = None
         __props__.__dict__["context_compaction_threshold_percent"] = None
@@ -342,9 +365,11 @@ class Task(pulumi.CustomResource):
         __props__.__dict__["is_shared"] = None
         __props__.__dict__["last_heartbeat"] = None
         __props__.__dict__["name"] = None
+        __props__.__dict__["pending_input_count"] = None
         __props__.__dict__["permission_mode"] = None
         __props__.__dict__["plan_mode"] = None
         __props__.__dict__["role"] = None
+        __props__.__dict__["role_name"] = None
         __props__.__dict__["runtime_phase"] = None
         __props__.__dict__["shared_at"] = None
         __props__.__dict__["source"] = None
@@ -355,6 +380,14 @@ class Task(pulumi.CustomResource):
         __props__.__dict__["tool_execution_mode"] = None
         __props__.__dict__["vcs_provider"] = None
         return Task(resource_name, opts=opts, __props__=__props__)
+
+    @_builtins.property
+    @pulumi.getter(name="agentDefinitionId")
+    def agent_definition_id(self) -> pulumi.Output[Optional[_builtins.str]]:
+        """
+        The Custom Agent definition this task was run as, if any. Null for tasks run by a user directly rather than as a saved agent.
+        """
+        return pulumi.get(self, "agent_definition_id")
 
     @_builtins.property
     @pulumi.getter(name="approvalMode")
@@ -445,6 +478,14 @@ class Task(pulumi.CustomResource):
         return pulumi.get(self, "name")
 
     @_builtins.property
+    @pulumi.getter(name="pendingInputCount")
+    def pending_input_count(self) -> pulumi.Output[Optional[_builtins.int]]:
+        """
+        The number of pending inputs waiting behind this task. Present for tasks that can receive asynchronous inputs.
+        """
+        return pulumi.get(self, "pending_input_count")
+
+    @_builtins.property
     @pulumi.getter(name="permissionMode")
     def permission_mode(self) -> pulumi.Output[Optional[_builtins.str]]:
         """
@@ -467,6 +508,14 @@ class Task(pulumi.CustomResource):
         The id of the RBAC role this task assumes. Null when the task runs with the creating user's own permissions (no assumed role).
         """
         return pulumi.get(self, "role")
+
+    @_builtins.property
+    @pulumi.getter(name="roleName")
+    def role_name(self) -> pulumi.Output[Optional[_builtins.str]]:
+        """
+        The display name of the RBAC role this task assumes. Null when the task has no assumed role or the role no longer exists.
+        """
+        return pulumi.get(self, "role_name")
 
     @_builtins.property
     @pulumi.getter(name="runtimePhase")

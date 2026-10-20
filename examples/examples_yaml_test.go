@@ -5,6 +5,7 @@ package examples
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -550,6 +551,58 @@ func TestYamlPolicyGroupsAccountsExample(t *testing.T) {
 	})
 }
 
+func TestYamlPolicyGroupMatchRulesExample(t *testing.T) {
+	test := pulumitest.NewPulumiTest(t,
+		filepath.Join(getCwd(t), "yaml-policy-group-match-rules"),
+		inMemoryProvider(),
+		opttest.UseAmbientBackend(),
+		opttest.StackName(randomStackName()),
+	)
+	test.SetConfig(t, "organizationName", getOrgName())
+	test.SetConfig(t, "digits", generateRandomFiveDigits())
+	up := runPulumiTest(t, test)
+
+	stackTag := func(key string) string {
+		return `{"__type": "PermissionExpressionTag", "context": {"__type": "PermissionExpressionStack"}, "key": "` +
+			key + `"}`
+	}
+	stackHasTag := func(key string) string {
+		return `{"__type": "PermissionExpressionHasTag", "context": {"__type": "PermissionExpressionStack"}, "key": "` +
+			key + `"}`
+	}
+	equal := func(left, value string) string {
+		return `{"__type": "PermissionExpressionEqual", "left": ` + left +
+			`, "right": {"__type": "PermissionLiteralExpressionString", "value": "` + value + `"}}`
+	}
+	not := func(node string) string { return `{"__type": "PermissionExpressionNot", "node": ` + node + `}` }
+	binary := func(typ, left, right string) string {
+		return `{"__type": "` + typ + `", "left": ` + left + `, "right": ` + right + `}`
+	}
+	and := func(left, right string) string { return binary("PermissionExpressionAnd", left, right) }
+
+	assertOutputJSON := func(name, expected string) {
+		t.Helper()
+		value, ok := up.Outputs[name].Value.(map[string]any)
+		require.Truef(t, ok, "output %q is %T, not an object", name, up.Outputs[name].Value)
+		got, err := json.Marshal(value)
+		require.NoError(t, err)
+		assert.JSONEq(t, expected, string(got))
+	}
+	assertOutputJSON("stackMatchRule", binary("PermissionExpressionOr",
+		equal(stackTag("team"), "platform"),
+		and(and(and(
+			equal(stackTag("env"), "prod"),
+			not(equal(stackTag("team"), "legacy"))),
+			stackHasTag("cost-center")),
+			not(stackHasTag("deprecated"))),
+	))
+	assertOutputJSON("accountMatchRule", `{
+		"__type": "PermissionExpressionHasTag",
+		"context": {"__type": "PermissionExpressionInsightsAccount"},
+		"key": "cost-center"
+	}`)
+}
+
 func TestYamlApprovalRuleExample(t *testing.T) {
 	cwd := getCwd(t)
 	digits := generateRandomFiveDigits()
@@ -635,6 +688,19 @@ func TestYamlRbacExample(t *testing.T) {
 	}
 	if scopedRoleID, ok := up.Outputs["scopedRoleId"]; ok {
 		assert.NotEmpty(t, scopedRoleID.Value, "expected env-scoped OrganizationRole to be created")
+	}
+	if lookedUp, ok := up.Outputs["lookedUpRoleId"]; ok {
+		assert.Equal(t, up.Outputs["roleId"].Value, lookedUp.Value,
+			"expected getOrganizationRole to find the role created by the example")
+	}
+	if builtIn, ok := up.Outputs["lookedUpRoleBuiltIn"]; ok {
+		assert.Equal(t, false, builtIn.Value, "expected the looked-up custom role not to be built in")
+	}
+	if adminRoleID, ok := up.Outputs["adminRoleId"]; ok {
+		assert.NotEmpty(t, adminRoleID.Value, "expected getOrganizationRole to find the built-in Admin role")
+	}
+	if first, ok := up.Outputs["firstRoleName"]; ok {
+		assert.NotEmpty(t, first.Value, "expected getOrganizationRoles to return at least one role")
 	}
 	preview := test.Preview(t)
 	assertpreview.HasNoChanges(t, preview)

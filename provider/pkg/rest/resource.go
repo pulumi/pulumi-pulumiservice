@@ -266,6 +266,13 @@ func (r *Resource) Diff(_ context.Context, req p.DiffRequest) (p.DiffResponse, e
 	for k, newV := range req.Inputs.AllStable {
 		oldV, ok := req.OldInputs.GetOk(k)
 		if !ok {
+			// A replace-triggering input newly written into the program (after
+			// import, or when adopting a field the program used to leave to the
+			// server) must not replace the resource when it matches what the
+			// server already has.
+			if stateV, inState := req.State.GetOk(k); replaces[k] && inState && newV.Equals(stateV) {
+				continue
+			}
 			detailed[k] = p.PropertyDiff{Kind: addKind(replaces[k])}
 			continue
 		}
@@ -275,11 +282,16 @@ func (r *Resource) Diff(_ context.Context, req p.DiffRequest) (p.DiffResponse, e
 	}
 	for k := range req.OldInputs.AllStable {
 		if _, ok := req.Inputs.GetOk(k); !ok {
+			// A replace-triggering input dropped from the program leaves the
+			// server's value in place, so there is nothing to replace.
+			if _, inState := req.State.GetOk(k); replaces[k] && inState {
+				continue
+			}
 			detailed[k] = p.PropertyDiff{Kind: deleteKind(replaces[k])}
 		}
 	}
 	return p.DiffResponse{
-		HasChanges:          true,
+		HasChanges:          len(detailed) > 0,
 		DeleteBeforeReplace: r.meta.DeleteBeforeReplace,
 		DetailedDiff:        detailed,
 	}, nil
@@ -723,7 +735,7 @@ func (r *Resource) Update(ctx context.Context, req p.UpdateRequest) (p.UpdateRes
 	}
 
 	urlSrc := mergeMaps(req.State, req.OldInputs, req.Inputs)
-	bodySrc := mergeMaps(req.Inputs, req.OldInputs, req.State)
+	bodySrc := r.applyClearFields(req.OldInputs, req.Inputs, mergeMaps(req.Inputs, req.OldInputs, req.State))
 	var state property.Map
 	if r.meta.UpdateEnvelope != nil {
 		currentSrc := mergeMaps(req.State, req.OldInputs)
@@ -744,6 +756,26 @@ func (r *Resource) Update(ctx context.Context, req p.UpdateRequest) (p.UpdateRes
 		state = mergeMaps(state, req.State)
 	}
 	return p.UpdateResponse{Properties: state}, nil
+}
+
+// applyClearFields swaps each ClearField-declared input the program dropped
+// (present in oldInputs, absent from inputs) for its clear flag.
+func (r *Resource) applyClearFields(oldInputs, inputs, bodySrc property.Map) property.Map {
+	out := bodySrc.AsMap()
+	for name, fm := range r.meta.Fields {
+		if fm.ClearField == "" {
+			continue
+		}
+		if v, kept := inputs.GetOk(name); kept && !v.IsNull() {
+			continue
+		}
+		if v, had := oldInputs.GetOk(name); !had || v.IsNull() {
+			continue
+		}
+		delete(out, name)
+		out[pulumiName(fm.ClearField, r.meta.Renames)] = property.New(true)
+	}
+	return property.NewMap(out)
 }
 
 // aliasFlatNewFields sources flat new<Stem>-convention update body fields

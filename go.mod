@@ -7,7 +7,7 @@ require (
 	github.com/pgavlin/fx/v2 v2.0.12
 	github.com/pulumi/esc v0.26.0
 	github.com/pulumi/providertest v0.7.0
-	github.com/pulumi/pulumi-cloud-sdk/go v1.20261016.0
+	github.com/pulumi/pulumi-cloud-sdk/go v1.20261019.0
 	github.com/pulumi/pulumi/pkg/v3 v3.268.0
 	github.com/pulumi/pulumi/sdk/v3 v3.268.0
 	github.com/stretchr/testify v1.12.1
@@ -234,7 +234,7 @@ require (
 	google.golang.org/genproto v0.0.0-20260724162435-b2f20204f0df // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20261005182115-fad411399dd8 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20261005182115-fad411399dd8 // indirect
-	gopkg.in/yaml.v3 v3.0.1 // indirect
+	gopkg.in/yaml.v3 v3.0.1
 	lukechampine.com/frand v1.5.1 // indirect
 )
 

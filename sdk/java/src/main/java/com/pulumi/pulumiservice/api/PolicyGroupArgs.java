@@ -6,6 +6,7 @@ package com.pulumi.pulumiservice.api;
 import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
 import com.pulumi.exceptions.MissingRequiredPropertyException;
+import java.lang.Object;
 import java.lang.String;
 import java.util.Objects;
 import java.util.Optional;
@@ -15,6 +16,21 @@ import javax.annotation.Nullable;
 public final class PolicyGroupArgs extends com.pulumi.resources.ResourceArgs {
 
     public static final PolicyGroupArgs Empty = new PolicyGroupArgs();
+
+    /**
+     * Preview: an account match rule to create the group with, a boolean expression over Insights account tags. Requires the tag-based policy groups feature; not allowed on preventative groups.
+     * 
+     */
+    @Import(name="accountMatchRule")
+    private @Nullable Output<Object> accountMatchRule;
+
+    /**
+     * @return Preview: an account match rule to create the group with, a boolean expression over Insights account tags. Requires the tag-based policy groups feature; not allowed on preventative groups.
+     * 
+     */
+    public Optional<Output<Object>> accountMatchRule() {
+        return Optional.ofNullable(this.accountMatchRule);
+    }
 
     /**
      * Agent pool ID for policy evaluation. Defaults to Pulumi hosted pool if not specified.
@@ -32,29 +48,29 @@ public final class PolicyGroupArgs extends com.pulumi.resources.ResourceArgs {
     }
 
     /**
-     * The type of entities this policy group applies to (stacks or accounts).
+     * Deprecated: a legacy label, `stacks` or `accounts`. When `mode` is omitted it picks the mode (`accounts` → audit, `stacks` → preventative). When this is omitted, it is derived from `mode`. It does not restrict which entities the group can hold.
      * 
      */
-    @Import(name="entityType", required=true)
-    private Output<String> entityType;
+    @Import(name="entityType")
+    private @Nullable Output<String> entityType;
 
     /**
-     * @return The type of entities this policy group applies to (stacks or accounts).
+     * @return Deprecated: a legacy label, `stacks` or `accounts`. When `mode` is omitted it picks the mode (`accounts` → audit, `stacks` → preventative). When this is omitted, it is derived from `mode`. It does not restrict which entities the group can hold.
      * 
      */
-    public Output<String> entityType() {
-        return this.entityType;
+    public Optional<Output<String>> entityType() {
+        return Optional.ofNullable(this.entityType);
     }
 
     /**
-     * The enforcement mode for the policy group (audit or preventative). Defaults to &#39;audit&#39; for account policy groups, &#39;preventative&#39; for stack policy groups.
+     * The enforcement mode for the policy group (audit or preventative). The mode decides what the group can hold: an audit group holds stacks and Insights accounts, a preventative group holds stacks only. Required unless the deprecated `entityType` is sent. Fixed at creation; it cannot be changed later.
      * 
      */
     @Import(name="mode")
     private @Nullable Output<String> mode;
 
     /**
-     * @return The enforcement mode for the policy group (audit or preventative). Defaults to &#39;audit&#39; for account policy groups, &#39;preventative&#39; for stack policy groups.
+     * @return The enforcement mode for the policy group (audit or preventative). The mode decides what the group can hold: an audit group holds stacks and Insights accounts, a preventative group holds stacks only. Required unless the deprecated `entityType` is sent. Fixed at creation; it cannot be changed later.
      * 
      */
     public Optional<Output<String>> mode() {
@@ -62,14 +78,14 @@ public final class PolicyGroupArgs extends com.pulumi.resources.ResourceArgs {
     }
 
     /**
-     * The name of the new policy group.
+     * The name of the new policy group. Up to 100 characters, made up of letters, numbers, hyphens, underscores, periods, or spaces, and may not begin or end with a space.
      * 
      */
     @Import(name="name", required=true)
     private Output<String> name;
 
     /**
-     * @return The name of the new policy group.
+     * @return The name of the new policy group. Up to 100 characters, made up of letters, numbers, hyphens, underscores, periods, or spaces, and may not begin or end with a space.
      * 
      */
     public Output<String> name() {
@@ -91,14 +107,31 @@ public final class PolicyGroupArgs extends com.pulumi.resources.ResourceArgs {
         return this.orgName;
     }
 
+    /**
+     * Preview: a stack match rule to create the group with, a boolean expression over stack tags. Requires the tag-based policy groups feature.
+     * 
+     */
+    @Import(name="stackMatchRule")
+    private @Nullable Output<Object> stackMatchRule;
+
+    /**
+     * @return Preview: a stack match rule to create the group with, a boolean expression over stack tags. Requires the tag-based policy groups feature.
+     * 
+     */
+    public Optional<Output<Object>> stackMatchRule() {
+        return Optional.ofNullable(this.stackMatchRule);
+    }
+
     private PolicyGroupArgs() {}
 
     private PolicyGroupArgs(PolicyGroupArgs $) {
+        this.accountMatchRule = $.accountMatchRule;
         this.agentPoolId = $.agentPoolId;
         this.entityType = $.entityType;
         this.mode = $.mode;
         this.name = $.name;
         this.orgName = $.orgName;
+        this.stackMatchRule = $.stackMatchRule;
     }
 
     public static Builder builder() {
@@ -117,6 +150,27 @@ public final class PolicyGroupArgs extends com.pulumi.resources.ResourceArgs {
 
         public Builder(PolicyGroupArgs defaults) {
             $ = new PolicyGroupArgs(Objects.requireNonNull(defaults));
+        }
+
+        /**
+         * @param accountMatchRule Preview: an account match rule to create the group with, a boolean expression over Insights account tags. Requires the tag-based policy groups feature; not allowed on preventative groups.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder accountMatchRule(@Nullable Output<Object> accountMatchRule) {
+            $.accountMatchRule = accountMatchRule;
+            return this;
+        }
+
+        /**
+         * @param accountMatchRule Preview: an account match rule to create the group with, a boolean expression over Insights account tags. Requires the tag-based policy groups feature; not allowed on preventative groups.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder accountMatchRule(Object accountMatchRule) {
+            return accountMatchRule(Output.of(accountMatchRule));
         }
 
         /**
@@ -141,18 +195,18 @@ public final class PolicyGroupArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param entityType The type of entities this policy group applies to (stacks or accounts).
+         * @param entityType Deprecated: a legacy label, `stacks` or `accounts`. When `mode` is omitted it picks the mode (`accounts` → audit, `stacks` → preventative). When this is omitted, it is derived from `mode`. It does not restrict which entities the group can hold.
          * 
          * @return builder
          * 
          */
-        public Builder entityType(Output<String> entityType) {
+        public Builder entityType(@Nullable Output<String> entityType) {
             $.entityType = entityType;
             return this;
         }
 
         /**
-         * @param entityType The type of entities this policy group applies to (stacks or accounts).
+         * @param entityType Deprecated: a legacy label, `stacks` or `accounts`. When `mode` is omitted it picks the mode (`accounts` → audit, `stacks` → preventative). When this is omitted, it is derived from `mode`. It does not restrict which entities the group can hold.
          * 
          * @return builder
          * 
@@ -162,7 +216,7 @@ public final class PolicyGroupArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param mode The enforcement mode for the policy group (audit or preventative). Defaults to &#39;audit&#39; for account policy groups, &#39;preventative&#39; for stack policy groups.
+         * @param mode The enforcement mode for the policy group (audit or preventative). The mode decides what the group can hold: an audit group holds stacks and Insights accounts, a preventative group holds stacks only. Required unless the deprecated `entityType` is sent. Fixed at creation; it cannot be changed later.
          * 
          * @return builder
          * 
@@ -173,7 +227,7 @@ public final class PolicyGroupArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param mode The enforcement mode for the policy group (audit or preventative). Defaults to &#39;audit&#39; for account policy groups, &#39;preventative&#39; for stack policy groups.
+         * @param mode The enforcement mode for the policy group (audit or preventative). The mode decides what the group can hold: an audit group holds stacks and Insights accounts, a preventative group holds stacks only. Required unless the deprecated `entityType` is sent. Fixed at creation; it cannot be changed later.
          * 
          * @return builder
          * 
@@ -183,7 +237,7 @@ public final class PolicyGroupArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param name The name of the new policy group.
+         * @param name The name of the new policy group. Up to 100 characters, made up of letters, numbers, hyphens, underscores, periods, or spaces, and may not begin or end with a space.
          * 
          * @return builder
          * 
@@ -194,7 +248,7 @@ public final class PolicyGroupArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param name The name of the new policy group.
+         * @param name The name of the new policy group. Up to 100 characters, made up of letters, numbers, hyphens, underscores, periods, or spaces, and may not begin or end with a space.
          * 
          * @return builder
          * 
@@ -224,10 +278,28 @@ public final class PolicyGroupArgs extends com.pulumi.resources.ResourceArgs {
             return orgName(Output.of(orgName));
         }
 
+        /**
+         * @param stackMatchRule Preview: a stack match rule to create the group with, a boolean expression over stack tags. Requires the tag-based policy groups feature.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder stackMatchRule(@Nullable Output<Object> stackMatchRule) {
+            $.stackMatchRule = stackMatchRule;
+            return this;
+        }
+
+        /**
+         * @param stackMatchRule Preview: a stack match rule to create the group with, a boolean expression over stack tags. Requires the tag-based policy groups feature.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder stackMatchRule(Object stackMatchRule) {
+            return stackMatchRule(Output.of(stackMatchRule));
+        }
+
         public PolicyGroupArgs build() {
-            if ($.entityType == null) {
-                throw new MissingRequiredPropertyException("PolicyGroupArgs", "entityType");
-            }
             if ($.name == null) {
                 throw new MissingRequiredPropertyException("PolicyGroupArgs", "name");
             }

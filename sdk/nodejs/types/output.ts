@@ -509,6 +509,25 @@ export interface OrganizationMemberInfo {
     virtualAdmin: boolean;
 }
 
+export interface OrganizationRoleInfo {
+    /**
+     * Whether this is one of the roles every organization has (Admin, Member and Billing Manager), rather than a custom role.
+     */
+    builtIn: boolean;
+    /**
+     * The role's description, if it has one.
+     */
+    description?: string;
+    /**
+     * The role's name, as shown in the Pulumi Cloud console.
+     */
+    name: string;
+    /**
+     * The role's ID. Pass it to inputs that take a role ID, such as `TeamRoleAssignment.roleId` and `OrganizationMember.roleId`.
+     */
+    roleId: string;
+}
+
 /**
  * A reference to a policy pack within a policy group.
  */
