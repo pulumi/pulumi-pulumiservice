@@ -16,6 +16,7 @@
 
   **Check for a replace after upgrading.** If you changed `mode` on an existing group with an earlier version, Pulumi Cloud kept the original mode, and your program and the group now disagree. After the first refresh with this version, the next `pulumi up` deletes and recreates the group with your program's mode. The new group starts with no policy packs, and stacks or accounts added through `PolicyGroupStackAttachment` or `PolicyGroupInsightsAccountAttachment` are not re-added automatically. After upgrading, run `pulumi preview --refresh` and look for a replace on `pulumiservice:api:PolicyGroup`. To keep the group, set `mode` in your program to the group's current mode. To accept the recreate, run `pulumi up`, then `pulumi refresh` and `pulumi up` again to restore the attachments.
 - Updated the Pulumi Cloud SDK so `OrganizationRole.permissions` and the permission builder helpers accept scopes and permission descriptor types that Pulumi Cloud added recently. The previous version rejected them, or silently dropped scopes it didn't recognize. [#1162](https://github.com/pulumi/pulumi-pulumiservice/issues/1162)
+- Refreshing an `Environment` resource no longer removes it from state when the Pulumi ESC API fails with an error other than 404, such as a 5xx, an expired token or a network error. Only a 404 now marks the environment as gone. [#1232](https://github.com/pulumi/pulumi-pulumiservice/issues/1232)
 
 ## 1.4.0
 
