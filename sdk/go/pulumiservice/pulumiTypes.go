@@ -2886,7 +2886,7 @@ func (o EnvironmentIdentifierOutput) Project() pulumi.StringOutput {
 }
 
 type GCPOIDCConfiguration struct {
-	// The numerical ID of the GCP project.
+	// The GCP project number, a numeric value such as `123456789012`. This is not the project ID (such as `my-project`). To look up the number, run `gcloud projects describe <project-id> --format='value(projectNumber)'`.
 	ProjectId string `pulumi:"projectId"`
 	// The ID of the identity provider associated with the workload pool.
 	ProviderId string `pulumi:"providerId"`
@@ -2912,7 +2912,7 @@ type GCPOIDCConfigurationInput interface {
 }
 
 type GCPOIDCConfigurationArgs struct {
-	// The numerical ID of the GCP project.
+	// The GCP project number, a numeric value such as `123456789012`. This is not the project ID (such as `my-project`). To look up the number, run `gcloud projects describe <project-id> --format='value(projectNumber)'`.
 	ProjectId pulumi.StringInput `pulumi:"projectId"`
 	// The ID of the identity provider associated with the workload pool.
 	ProviderId pulumi.StringInput `pulumi:"providerId"`
@@ -3003,7 +3003,7 @@ func (o GCPOIDCConfigurationOutput) ToGCPOIDCConfigurationPtrOutputWithContext(c
 	}).(GCPOIDCConfigurationPtrOutput)
 }
 
-// The numerical ID of the GCP project.
+// The GCP project number, a numeric value such as `123456789012`. This is not the project ID (such as `my-project`). To look up the number, run `gcloud projects describe <project-id> --format='value(projectNumber)'`.
 func (o GCPOIDCConfigurationOutput) ProjectId() pulumi.StringOutput {
 	return o.ApplyT(func(v GCPOIDCConfiguration) string { return v.ProjectId }).(pulumi.StringOutput)
 }
@@ -3057,7 +3057,7 @@ func (o GCPOIDCConfigurationPtrOutput) Elem() GCPOIDCConfigurationOutput {
 	}).(GCPOIDCConfigurationOutput)
 }
 
-// The numerical ID of the GCP project.
+// The GCP project number, a numeric value such as `123456789012`. This is not the project ID (such as `my-project`). To look up the number, run `gcloud projects describe <project-id> --format='value(projectNumber)'`.
 func (o GCPOIDCConfigurationPtrOutput) ProjectId() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *GCPOIDCConfiguration) *string {
 		if v == nil {

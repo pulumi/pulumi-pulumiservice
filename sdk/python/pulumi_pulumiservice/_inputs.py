@@ -1455,7 +1455,7 @@ class EnvironmentIdentifierArgs:
 class GCPOIDCConfigurationArgsDict(TypedDict):
     project_id: pulumi.Input[_builtins.str]
     """
-    The numerical ID of the GCP project.
+    The GCP project number, a numeric value such as `123456789012`. This is not the project ID (such as `my-project`). To look up the number, run `gcloud projects describe <project-id> --format='value(projectNumber)'`.
     """
     provider_id: pulumi.Input[_builtins.str]
     """
@@ -1488,7 +1488,7 @@ class GCPOIDCConfigurationArgs:
                  region: pulumi.Input[Optional[_builtins.str]] = None,
                  token_lifetime: pulumi.Input[Optional[_builtins.str]] = None):
         """
-        :param pulumi.Input[_builtins.str] project_id: The numerical ID of the GCP project.
+        :param pulumi.Input[_builtins.str] project_id: The GCP project number, a numeric value such as `123456789012`. This is not the project ID (such as `my-project`). To look up the number, run `gcloud projects describe <project-id> --format='value(projectNumber)'`.
         :param pulumi.Input[_builtins.str] provider_id: The ID of the identity provider associated with the workload pool.
         :param pulumi.Input[_builtins.str] service_account: The email address of the service account to use.
         :param pulumi.Input[_builtins.str] workload_pool_id: The ID of the workload pool to use.
@@ -1508,7 +1508,7 @@ class GCPOIDCConfigurationArgs:
     @pulumi.getter(name="projectId")
     def project_id(self) -> pulumi.Input[_builtins.str]:
         """
-        The numerical ID of the GCP project.
+        The GCP project number, a numeric value such as `123456789012`. This is not the project ID (such as `my-project`). To look up the number, run `gcloud projects describe <project-id> --format='value(projectNumber)'`.
         """
         return pulumi.get(self, "project_id")
 
