@@ -29,6 +29,23 @@ import * as utilities from "./utilities";
  * });
  * export const ciTokenValue = ciToken.value;
  * ```
+ *
+ * ## Import
+ *
+ * This resource can be imported using its `id`, which has the format `{organization}/{name}/{tokenId}`, e.g.,
+ *
+ * ```sh
+ *  $ pulumi import pulumiservice:index:OrgAccessToken my-org-access-token my-org/my-token/a81d4c3e-52f0-4b7a-b9e2-6d0f1c8e2a47
+ * ```
+ *
+ * The Pulumi Cloud console doesn't show the token ID. List it with the [Pulumi Cloud REST API](https://www.pulumi.com/docs/reference/cloud-rest-api/):
+ *
+ * ```sh
+ * curl -s -H "Authorization: token $PULUMI_ACCESS_TOKEN" \
+ *   https://api.pulumi.com/api/orgs/my-org/tokens | jq '.tokens[] | {name, id}'
+ * ```
+ *
+ * The token's `value` can't be read back from Pulumi Cloud, so it's empty after import.
  */
 export class OrgAccessToken extends pulumi.CustomResource {
     /**

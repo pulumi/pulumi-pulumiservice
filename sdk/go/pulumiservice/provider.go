@@ -14,7 +14,7 @@ import (
 type Provider struct {
 	pulumi.ProviderResourceState
 
-	// Access Token to authenticate with Pulumi Cloud.
+	// Access token to authenticate with Pulumi Cloud. Optional: if unset, the provider uses the `PULUMI_ACCESS_TOKEN` environment variable, then the access token of the account you're logged in to with `pulumi login`. The API URL doesn't come from that login, so when you're logged in to a self-hosted Pulumi Cloud, also set `apiUrl` or `PULUMI_BACKEND_URL`.
 	AccessToken pulumi.StringPtrOutput `pulumi:"accessToken"`
 	// Optional override of Pulumi Cloud API endpoint.
 	ApiUrl pulumi.StringOutput `pulumi:"apiUrl"`
@@ -49,7 +49,7 @@ func NewProvider(ctx *pulumi.Context,
 }
 
 type providerArgs struct {
-	// Access Token to authenticate with Pulumi Cloud.
+	// Access token to authenticate with Pulumi Cloud. Optional: if unset, the provider uses the `PULUMI_ACCESS_TOKEN` environment variable, then the access token of the account you're logged in to with `pulumi login`. The API URL doesn't come from that login, so when you're logged in to a self-hosted Pulumi Cloud, also set `apiUrl` or `PULUMI_BACKEND_URL`.
 	AccessToken *string `pulumi:"accessToken"`
 	// Optional override of Pulumi Cloud API endpoint.
 	ApiUrl *string `pulumi:"apiUrl"`
@@ -57,7 +57,7 @@ type providerArgs struct {
 
 // The set of arguments for constructing a Provider resource.
 type ProviderArgs struct {
-	// Access Token to authenticate with Pulumi Cloud.
+	// Access token to authenticate with Pulumi Cloud. Optional: if unset, the provider uses the `PULUMI_ACCESS_TOKEN` environment variable, then the access token of the account you're logged in to with `pulumi login`. The API URL doesn't come from that login, so when you're logged in to a self-hosted Pulumi Cloud, also set `apiUrl` or `PULUMI_BACKEND_URL`.
 	AccessToken pulumi.StringPtrInput
 	// Optional override of Pulumi Cloud API endpoint.
 	ApiUrl pulumi.StringPtrInput
@@ -100,7 +100,7 @@ func (o ProviderOutput) ToProviderOutputWithContext(ctx context.Context) Provide
 	return o
 }
 
-// Access Token to authenticate with Pulumi Cloud.
+// Access token to authenticate with Pulumi Cloud. Optional: if unset, the provider uses the `PULUMI_ACCESS_TOKEN` environment variable, then the access token of the account you're logged in to with `pulumi login`. The API URL doesn't come from that login, so when you're logged in to a self-hosted Pulumi Cloud, also set `apiUrl` or `PULUMI_BACKEND_URL`.
 func (o ProviderOutput) AccessToken() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *Provider) pulumi.StringPtrOutput { return v.AccessToken }).(pulumi.StringPtrOutput)
 }

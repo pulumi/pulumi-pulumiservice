@@ -137,6 +137,22 @@ class OidcIssuer(pulumi.CustomResource):
         """
         Register an OIDC Provider to establish a trust relationship between third-party systems like GitHub Actions and Pulumi Cloud, obviating the need to store a hard-coded Pulumi Cloud token in systems that need to run Pulumi commands or consume Pulumi Cloud APIs. Instead of a hard-coded, static token that must be manually rotated, trusted systems are granted temporary Pulumi Cloud tokens on an as-needed basis, which is more secure than static tokens.
 
+        ## Import
+
+        This resource can be imported using its `id`, which has the format `{organization}/{issuerId}`, e.g.,
+
+        ```sh
+         $ pulumi import pulumiservice:index:OidcIssuer my-oidc-issuer my-org/9a6e2c4f-8b17-4d03-a5c9-6f1e3b7d2a80
+        ```
+
+        The Pulumi Cloud console doesn't show the issuer ID. List it with the [Pulumi Cloud REST API](https://www.pulumi.com/docs/reference/cloud-rest-api/):
+
+        ```sh
+        curl -s -H "Authorization: token $PULUMI_ACCESS_TOKEN" \\
+          https://api.pulumi.com/api/orgs/my-org/oidc/issuers | jq '.oidcIssuers[] | {name, id}'
+        ```
+
+
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.int] max_expiration_seconds: The maximum duration of the Pulumi access token working after an exchange, specified in seconds.
@@ -154,6 +170,22 @@ class OidcIssuer(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         Register an OIDC Provider to establish a trust relationship between third-party systems like GitHub Actions and Pulumi Cloud, obviating the need to store a hard-coded Pulumi Cloud token in systems that need to run Pulumi commands or consume Pulumi Cloud APIs. Instead of a hard-coded, static token that must be manually rotated, trusted systems are granted temporary Pulumi Cloud tokens on an as-needed basis, which is more secure than static tokens.
+
+        ## Import
+
+        This resource can be imported using its `id`, which has the format `{organization}/{issuerId}`, e.g.,
+
+        ```sh
+         $ pulumi import pulumiservice:index:OidcIssuer my-oidc-issuer my-org/9a6e2c4f-8b17-4d03-a5c9-6f1e3b7d2a80
+        ```
+
+        The Pulumi Cloud console doesn't show the issuer ID. List it with the [Pulumi Cloud REST API](https://www.pulumi.com/docs/reference/cloud-rest-api/):
+
+        ```sh
+        curl -s -H "Authorization: token $PULUMI_ACCESS_TOKEN" \\
+          https://api.pulumi.com/api/orgs/my-org/oidc/issuers | jq '.oidcIssuers[] | {name, id}'
+        ```
+
 
         :param str resource_name: The name of the resource.
         :param OidcIssuerArgs args: The arguments to use to populate this resource's properties.

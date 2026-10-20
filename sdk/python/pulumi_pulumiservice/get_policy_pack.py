@@ -132,19 +132,19 @@ class AwaitableGetPolicyPackResult(GetPolicyPackResult):
 
 def get_policy_pack(organization_name: Optional[_builtins.str] = None,
                     policy_pack_name: Optional[_builtins.str] = None,
-                    version: Optional[_builtins.int] = None,
+                    version_tag: Optional[_builtins.str] = None,
                     opts: Optional[pulumi.InvokeOptions] = None) -> AwaitableGetPolicyPackResult:
     """
     Get details about a specific version of a policy pack.
 
     :param _builtins.str organization_name: The name of the Pulumi organization.
     :param _builtins.str policy_pack_name: The name of the policy pack.
-    :param _builtins.int version: The version number of the policy pack. If not specified, returns the latest version.
+    :param _builtins.str version_tag: The version tag of the policy pack, for example `1.4.1`, as shown in Pulumi Cloud. If not specified, returns the latest version.
     """
     __args__ = dict()
     __args__['organizationName'] = organization_name
     __args__['policyPackName'] = policy_pack_name
-    __args__['version'] = version
+    __args__['versionTag'] = version_tag
     opts = pulumi.InvokeOptions.merge(_utilities.get_invoke_opts_defaults(), opts)
     __ret__ = pulumi.runtime.invoke('pulumiservice:index:getPolicyPack', __args__, opts=opts, typ=GetPolicyPackResult).value
 
@@ -159,19 +159,19 @@ def get_policy_pack(organization_name: Optional[_builtins.str] = None,
         version_tag=pulumi.get(__ret__, 'version_tag'))
 def get_policy_pack_output(organization_name: pulumi.Input[Optional[_builtins.str]] = None,
                            policy_pack_name: pulumi.Input[Optional[_builtins.str]] = None,
-                           version: pulumi.Input[Optional[Optional[_builtins.int]]] = None,
+                           version_tag: pulumi.Input[Optional[Optional[_builtins.str]]] = None,
                            opts: Optional[Union[pulumi.InvokeOptions, pulumi.InvokeOutputOptions]] = None) -> pulumi.Output[GetPolicyPackResult]:
     """
     Get details about a specific version of a policy pack.
 
     :param _builtins.str organization_name: The name of the Pulumi organization.
     :param _builtins.str policy_pack_name: The name of the policy pack.
-    :param _builtins.int version: The version number of the policy pack. If not specified, returns the latest version.
+    :param _builtins.str version_tag: The version tag of the policy pack, for example `1.4.1`, as shown in Pulumi Cloud. If not specified, returns the latest version.
     """
     __args__ = dict()
     __args__['organizationName'] = organization_name
     __args__['policyPackName'] = policy_pack_name
-    __args__['version'] = version
+    __args__['versionTag'] = version_tag
     opts = pulumi.InvokeOutputOptions.merge(_utilities.get_invoke_opts_defaults(), opts)
     __ret__ = pulumi.runtime.invoke_output('pulumiservice:index:getPolicyPack', __args__, opts=opts, typ=GetPolicyPackResult)
     return __ret__.apply(lambda __response__: GetPolicyPackResult(

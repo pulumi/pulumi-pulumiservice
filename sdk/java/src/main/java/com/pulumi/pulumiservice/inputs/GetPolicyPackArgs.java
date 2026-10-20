@@ -6,7 +6,6 @@ package com.pulumi.pulumiservice.inputs;
 import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
 import com.pulumi.exceptions.MissingRequiredPropertyException;
-import java.lang.Integer;
 import java.lang.String;
 import java.util.Objects;
 import java.util.Optional;
@@ -48,18 +47,18 @@ public final class GetPolicyPackArgs extends com.pulumi.resources.InvokeArgs {
     }
 
     /**
-     * The version number of the policy pack. If not specified, returns the latest version.
+     * The version tag of the policy pack, for example `1.4.1`, as shown in Pulumi Cloud. If not specified, returns the latest version.
      * 
      */
-    @Import(name="version")
-    private @Nullable Output<Integer> version;
+    @Import(name="versionTag")
+    private @Nullable Output<String> versionTag;
 
     /**
-     * @return The version number of the policy pack. If not specified, returns the latest version.
+     * @return The version tag of the policy pack, for example `1.4.1`, as shown in Pulumi Cloud. If not specified, returns the latest version.
      * 
      */
-    public Optional<Output<Integer>> version() {
-        return Optional.ofNullable(this.version);
+    public Optional<Output<String>> versionTag() {
+        return Optional.ofNullable(this.versionTag);
     }
 
     private GetPolicyPackArgs() {}
@@ -67,7 +66,7 @@ public final class GetPolicyPackArgs extends com.pulumi.resources.InvokeArgs {
     private GetPolicyPackArgs(GetPolicyPackArgs $) {
         this.organizationName = $.organizationName;
         this.policyPackName = $.policyPackName;
-        this.version = $.version;
+        this.versionTag = $.versionTag;
     }
 
     public static Builder builder() {
@@ -131,24 +130,24 @@ public final class GetPolicyPackArgs extends com.pulumi.resources.InvokeArgs {
         }
 
         /**
-         * @param version The version number of the policy pack. If not specified, returns the latest version.
+         * @param versionTag The version tag of the policy pack, for example `1.4.1`, as shown in Pulumi Cloud. If not specified, returns the latest version.
          * 
          * @return builder
          * 
          */
-        public Builder version(@Nullable Output<Integer> version) {
-            $.version = version;
+        public Builder versionTag(@Nullable Output<String> versionTag) {
+            $.versionTag = versionTag;
             return this;
         }
 
         /**
-         * @param version The version number of the policy pack. If not specified, returns the latest version.
+         * @param versionTag The version tag of the policy pack, for example `1.4.1`, as shown in Pulumi Cloud. If not specified, returns the latest version.
          * 
          * @return builder
          * 
          */
-        public Builder version(Integer version) {
-            return version(Output.of(version));
+        public Builder versionTag(String versionTag) {
+            return versionTag(Output.of(versionTag));
         }
 
         public GetPolicyPackArgs build() {

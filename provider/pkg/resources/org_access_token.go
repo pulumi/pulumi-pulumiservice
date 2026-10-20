@@ -28,6 +28,7 @@ import (
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 )
 
 // The example file is generated from the Pulumi YAML in examples/; edit
@@ -58,7 +59,11 @@ func (*OrgAccessToken) Annotate(a infer.Annotator) {
 			"Admin ones, with `403 Machine tokens are not allowed to perform this operation`, so that one "+
 			"machine token can't mint another. For automation, use the personal access token of a dedicated "+
 			"service-account user, or use `TeamAccessToken`, which has no such restriction.\n\n"+
-			orgAccessTokenExamples,
+			strings.TrimSpace(orgAccessTokenExamples)+
+			util.ImportDocs("pulumiservice:index:OrgAccessToken", "{organization}/{name}/{tokenId}",
+				"my-org/my-token/a81d4c3e-52f0-4b7a-b9e2-6d0f1c8e2a47",
+				util.APIIDHint("token ID", "/api/orgs/my-org/tokens", ".tokens[] | {name, id}"),
+				"The token's `value` can't be read back from Pulumi Cloud, so it's empty after import."),
 	)
 }
 

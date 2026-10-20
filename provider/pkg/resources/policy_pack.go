@@ -44,6 +44,7 @@ import (
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 )
 
 const (
@@ -64,7 +65,11 @@ var (
 
 func (*PolicyPack) Annotate(a infer.Annotator) {
 	a.Describe(&PolicyPack{}, "A Policy Pack published to Pulumi Cloud. The source directory is "+
-		"tarballed and uploaded on Create; changing source content publishes a new version (replace).")
+		"tarballed and uploaded on Create; changing source content publishes a new version (replace)."+
+		util.ImportDocs("pulumiservice:index:PolicyPack", "{organization}/{name}/{versionTag}",
+			"my-org/my-policy-pack/1.0.0",
+			"Only the organization, name, version tag and display name are read back. Set `sourcePath` "+
+				"in your program after import."))
 	a.SetToken("index", "PolicyPack")
 }
 

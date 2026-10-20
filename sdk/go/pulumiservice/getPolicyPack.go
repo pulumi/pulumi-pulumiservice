@@ -27,8 +27,8 @@ type LookupPolicyPackArgs struct {
 	OrganizationName string `pulumi:"organizationName"`
 	// The name of the policy pack.
 	PolicyPackName string `pulumi:"policyPackName"`
-	// The version number of the policy pack. If not specified, returns the latest version.
-	Version *int `pulumi:"version"`
+	// The version tag of the policy pack, for example `1.4.1`, as shown in Pulumi Cloud. If not specified, returns the latest version.
+	VersionTag *string `pulumi:"versionTag"`
 }
 
 type LookupPolicyPackResult struct {
@@ -60,8 +60,8 @@ type LookupPolicyPackOutputArgs struct {
 	OrganizationName pulumi.StringInput `pulumi:"organizationName"`
 	// The name of the policy pack.
 	PolicyPackName pulumi.StringInput `pulumi:"policyPackName"`
-	// The version number of the policy pack. If not specified, returns the latest version.
-	Version pulumi.IntPtrInput `pulumi:"version"`
+	// The version tag of the policy pack, for example `1.4.1`, as shown in Pulumi Cloud. If not specified, returns the latest version.
+	VersionTag pulumi.StringPtrInput `pulumi:"versionTag"`
 }
 
 func (LookupPolicyPackOutputArgs) ElementType() reflect.Type {

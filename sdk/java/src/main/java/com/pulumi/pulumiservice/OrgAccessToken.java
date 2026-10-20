@@ -66,6 +66,23 @@ import javax.annotation.Nullable;
  * }
  * </pre>
  * 
+ * ## Import
+ * 
+ * This resource can be imported using its `id`, which has the format `{organization}/{name}/{tokenId}`, e.g.,
+ * 
+ * ```sh
+ *  $ pulumi import pulumiservice:index:OrgAccessToken my-org-access-token my-org/my-token/a81d4c3e-52f0-4b7a-b9e2-6d0f1c8e2a47
+ * ```
+ * 
+ * The Pulumi Cloud console doesn&#39;t show the token ID. List it with the [Pulumi Cloud REST API](https://www.pulumi.com/docs/reference/cloud-rest-api/):
+ * 
+ * ```sh
+ * curl -s -H &#34;Authorization: token $PULUMI_ACCESS_TOKEN&#34; \
+ *   https://api.pulumi.com/api/orgs/my-org/tokens | jq &#39;.tokens[] | {name, id}&#39;
+ * ```
+ * 
+ * The token&#39;s `value` can&#39;t be read back from Pulumi Cloud, so it&#39;s empty after import.
+ * 
  */
 @ResourceType(type="pulumiservice:index:OrgAccessToken")
 public class OrgAccessToken extends com.pulumi.resources.CustomResource {

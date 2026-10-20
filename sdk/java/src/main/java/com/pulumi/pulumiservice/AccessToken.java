@@ -18,6 +18,23 @@ import javax.annotation.Nullable;
  * 
  * To create a token that isn&#39;t tied to a user, use `OrgAccessToken` or `TeamAccessToken`.
  * 
+ * ## Import
+ * 
+ * This resource can be imported using its `id`, which has the format `{tokenId}`, e.g.,
+ * 
+ * ```sh
+ *  $ pulumi import pulumiservice:index:AccessToken my-access-token 3f2b9c1e-7d4a-4e8b-9a61-0c5d2e8f7b13
+ * ```
+ * 
+ * The Pulumi Cloud console doesn&#39;t show the token ID. List it with the [Pulumi Cloud REST API](https://www.pulumi.com/docs/reference/cloud-rest-api/):
+ * 
+ * ```sh
+ * curl -s -H &#34;Authorization: token $PULUMI_ACCESS_TOKEN&#34; \
+ *   https://api.pulumi.com/api/user/tokens | jq &#39;.tokens[] | {name, id}&#39;
+ * ```
+ * 
+ * The token&#39;s `value` can&#39;t be read back from Pulumi Cloud, so it&#39;s empty after import.
+ * 
  */
 @ResourceType(type="pulumiservice:index:AccessToken")
 public class AccessToken extends com.pulumi.resources.CustomResource {
