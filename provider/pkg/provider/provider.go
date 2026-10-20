@@ -689,9 +689,8 @@ func (k *pulumiserviceProvider) invokeFunctionGetPolicyPack(
 
 	// Call the API - either specific version or latest
 	var policyPack *pulumiapi.PolicyPackDetail
-	if inputs["version"].HasValue() && inputs["version"].IsNumber() {
-		version := int(inputs["version"].NumberValue())
-		policyPack, err = k.client.GetPolicyPack(ctx, orgName, policyPackName, version)
+	if versionTag := inputs["versionTag"]; versionTag.IsString() && versionTag.StringValue() != "" {
+		policyPack, err = k.client.GetPolicyPack(ctx, orgName, policyPackName, versionTag.StringValue())
 	} else {
 		policyPack, err = k.client.GetLatestPolicyPack(ctx, orgName, policyPackName)
 	}

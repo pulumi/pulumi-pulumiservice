@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+- `getPolicyPack` now takes a string `versionTag` input, for example `1.4.1`, the version shown in Pulumi Cloud. It replaces the integer `version` input. No working code needs migrating: the old input never worked, because Pulumi Cloud looks policy pack versions up by tag. [#1012](https://github.com/pulumi/pulumi-pulumiservice/issues/1012)
+
 ### Improvements
 
 - Added an Import section to the docs of every `pulumiservice:index:*` resource, giving the ID format, a sample `pulumi import` command, and caveats such as secrets that can't be read back. `DeploymentSettings` and `Webhook` import docs now render as their own section instead of inline in the description. No behavior change. [#344](https://github.com/pulumi/pulumi-pulumiservice/issues/344)
@@ -19,6 +23,7 @@
 
 ### Bug Fixes
 
+- Fixed `getPolicyPack` always failing with `policy pack not found`, whether or not a version was given. It now requests versions by tag, and resolves the latest version from the organization's policy pack list. [#1012](https://github.com/pulumi/pulumi-pulumiservice/issues/1012)
 - Removing `stackMatchRule` or `accountMatchRule` from a `pulumiservice:api:PolicyGroup` now removes the rule in Pulumi Cloud. Previously the update re-sent the prior rule, so the rule stayed in place while `pulumi up` reported success and refresh showed no drift.
 - Changing `mode` on a `pulumiservice:api:PolicyGroup` now replaces the group. Pulumi Cloud fixes the mode at creation, so the in-place update the provider used to send was silently ignored. Adding `mode` to a program for a group that already has that mode, for example after `pulumi import` or when moving off the deprecated `entityType`, is not a change and does not replace the group. Neither is removing `mode` from a program.
 
