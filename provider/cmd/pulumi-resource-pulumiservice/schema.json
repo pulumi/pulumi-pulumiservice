@@ -6543,7 +6543,8 @@
         },
         "yaml": {
           "$ref": "pulumi.json#/Asset",
-          "description": "Environment's yaml file."
+          "description": "Environment's yaml file.",
+          "secret": true
         }
       },
       "required": [
@@ -6556,20 +6557,24 @@
       "inputProperties": {
         "name": {
           "type": "string",
-          "description": "Environment name."
+          "description": "Environment name.",
+          "replaceOnChanges": true
         },
         "organization": {
           "type": "string",
-          "description": "Organization name."
+          "description": "Organization name.",
+          "replaceOnChanges": true
         },
         "project": {
           "type": "string",
           "description": "Project name.",
-          "default": "default"
+          "default": "default",
+          "replaceOnChanges": true
         },
         "yaml": {
           "$ref": "pulumi.json#/Asset",
-          "description": "Environment's yaml file."
+          "description": "Environment's yaml file.",
+          "secret": true
         }
       },
       "requiredInputs": [

@@ -157,9 +157,11 @@ class Environment(pulumi.CustomResource):
             __props__.__dict__["project"] = project
             if yaml is None and not opts.urn:
                 raise TypeError("Missing required property 'yaml'")
-            __props__.__dict__["yaml"] = yaml
+            __props__.__dict__["yaml"] = None if yaml is None else pulumi.Output.secret(yaml)
             __props__.__dict__["environment_id"] = None
             __props__.__dict__["revision"] = None
+        secret_opts = pulumi.ResourceOptions(additional_secret_outputs=["yaml"])
+        opts = pulumi.ResourceOptions.merge(opts, secret_opts)
         super(Environment, __self__).__init__(
             'pulumiservice:index:Environment',
             resource_name,
