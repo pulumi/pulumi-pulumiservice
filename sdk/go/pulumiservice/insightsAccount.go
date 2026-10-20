@@ -13,6 +13,18 @@ import (
 )
 
 // Insights Account for cloud resource scanning and analysis across AWS, Azure, and GCP.
+//
+// ## Import
+//
+// This resource can be imported using its `id`, which has the format `{organization}/{accountName}`, e.g.,
+//
+// ```sh
+//
+//	$ pulumi import pulumiservice:index:InsightsAccount my-insights-account my-org/my-account
+//
+// ```
+//
+// `scanSchedule` isn't read back from Pulumi Cloud, so set it in your program after import.
 type InsightsAccount struct {
 	pulumi.CustomResourceState
 

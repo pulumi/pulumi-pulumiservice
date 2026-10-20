@@ -124,3 +124,16 @@ func TestElementsEqualFunc(t *testing.T) {
 		assert.True(t, ElementsEqualFunc(a, b, cmpFunc, eqByName))
 	})
 }
+
+func TestKebab(t *testing.T) {
+	for in, want := range map[string]string{
+		"OidcIssuer":           "oidc-issuer",
+		"CustomVCSIntegration": "custom-vcs-integration",
+		"SAML":                 "saml",
+		"Account":              "account",
+	} {
+		if got := Kebab(in); got != want {
+			t.Errorf("Kebab(%q) = %q, want %q", in, got, want)
+		}
+	}
+}

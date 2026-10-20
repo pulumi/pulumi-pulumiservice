@@ -20,6 +20,18 @@ import javax.annotation.Nullable;
 /**
  * An approval rule for environment deployments.
  * 
+ * ## Import
+ * 
+ * This resource can be imported using its `id`, which has the format `environment/{organization}/{project}/{environment}/{ruleId}`, e.g.,
+ * 
+ * ```sh
+ *  $ pulumi import pulumiservice:index:ApprovalRule my-approval-rule environment/my-org/my-project/my-environment/0b9e6f2d-4c81-4a37-9e5b-7f2d1a6c8e03
+ * ```
+ * 
+ * The ID starts with the literal segment `environment`.
+ * 
+ * The rule ID is the last segment of its page URL in the Pulumi Cloud console, for example `https://app.pulumi.com/my-org/esc/my-project/my-environment/change-requests/ruleset/0b9e6f2d-4c81-4a37-9e5b-7f2d1a6c8e03`.
+ * 
  */
 @ResourceType(type="pulumiservice:index:ApprovalRule")
 public class ApprovalRule extends com.pulumi.resources.CustomResource {

@@ -12,24 +12,35 @@ import com.pulumi.pulumiservice.EnvironmentArgs;
 import com.pulumi.pulumiservice.Utilities;
 import java.lang.Integer;
 import java.lang.String;
+import java.util.List;
 import java.util.Optional;
 import javax.annotation.Nullable;
 
 /**
  * An ESC Environment.
  * 
+ * ## Import
+ * 
+ * This resource can be imported using its `id`, which has the format `{organization}/{project}/{environment}`, e.g.,
+ * 
+ * ```sh
+ *  $ pulumi import pulumiservice:index:Environment my-environment my-org/my-project/my-environment
+ * ```
+ * 
+ * The legacy format `{organization}/{environment}` is also accepted, and uses the `default` project.
+ * 
  */
 @ResourceType(type="pulumiservice:index:Environment")
 public class Environment extends com.pulumi.resources.CustomResource {
     /**
-     * The environment&#39;s UUID. Use this as the `identity` value when pinning a custom RBAC role to this environment via a `PermissionLiteralExpressionEnvironment` in `OrganizationRole.permissions`, or pass it directly to the `buildEnvironmentScopedPermissions` helper.
+     * The environment&#39;s UUID. Use this as the `identity` value when pinning a custom RBAC role to this environment via a `PermissionLiteralExpressionEnvironment` in `OrganizationRole.permissions`, or pass it as the `id` of an `environmentRules` entry in `buildRolePermissions`.
      * 
      */
     @Export(name="environmentId", refs={String.class}, tree="[0]")
     private Output</* @Nullable */ String> environmentId;
 
     /**
-     * @return The environment&#39;s UUID. Use this as the `identity` value when pinning a custom RBAC role to this environment via a `PermissionLiteralExpressionEnvironment` in `OrganizationRole.permissions`, or pass it directly to the `buildEnvironmentScopedPermissions` helper.
+     * @return The environment&#39;s UUID. Use this as the `identity` value when pinning a custom RBAC role to this environment via a `PermissionLiteralExpressionEnvironment` in `OrganizationRole.permissions`, or pass it as the `id` of an `environmentRules` entry in `buildRolePermissions`.
      * 
      */
     public Output<Optional<String>> environmentId() {
@@ -145,6 +156,9 @@ public class Environment extends com.pulumi.resources.CustomResource {
     private static com.pulumi.resources.CustomResourceOptions makeResourceOptions(@Nullable com.pulumi.resources.CustomResourceOptions options, @Nullable Output<java.lang.String> id) {
         var defaultOptions = com.pulumi.resources.CustomResourceOptions.builder()
             .version(Utilities.getVersion())
+            .additionalSecretOutputs(List.of(
+                "yaml"
+            ))
             .build();
         return com.pulumi.resources.CustomResourceOptions.merge(defaultOptions, options, id);
     }

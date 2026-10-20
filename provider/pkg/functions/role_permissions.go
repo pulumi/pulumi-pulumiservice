@@ -26,25 +26,45 @@ import (
 // scopedPermissionsHelpDoc is the shared epilogue for the helpers'
 // descriptions, kept identical so codegen documentation stays consistent.
 const scopedPermissionsHelpDoc = "The result is directly assignable to " +
-	"`OrganizationRole.permissions`. To grant scopes on more than one entity " +
-	"in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` " +
-	"list pulls the output of each helper."
+	"`OrganizationRole.permissions`. To combine it with other grants in a " +
+	"single role, pass it to `buildRolePermissions` in `additionalEntries`."
 
-// descriptorToSDKMap marshals a typed apitype.PermissionDescriptor to the
-// SDK-boundary map shape the provider expects on
-// `OrganizationRole.permissions`. The typed Marshaler emits the wire format
+// rawDescriptorFallback ends each deprecation message, for scopes the typed
+// enums don't list yet.
+const rawDescriptorFallback = " If a scope you need isn't in the enums yet, upgrade the provider."
+
+// DeprecatedFunctions maps each deprecated function's token to its
+// deprecation message. The functions also call Annotator.Deprecate, but
+// pulumi-go-provider doesn't emit function deprecations to the schema yet
+// (pulumi/pulumi-go-provider#636), so the provider adds them to the schema
+// from this map.
+var DeprecatedFunctions = map[string]string{
+	"pulumiservice:index:buildAllowPermissions": "Use `buildRolePermissions` instead, with " +
+		"`organizationScopes` for organization-level scopes and an `all: true` rule for entity scopes." +
+		rawDescriptorFallback,
+	"pulumiservice:index:buildStackScopedPermissions": "Use `buildRolePermissions` instead, with a " +
+		"`stackRules` entry that sets `id`." + rawDescriptorFallback,
+	"pulumiservice:index:buildEnvironmentScopedPermissions": "Use `buildRolePermissions` instead, with an " +
+		"`environmentRules` entry that sets `id`." + rawDescriptorFallback,
+	"pulumiservice:index:buildInsightsAccountScopedPermissions": "Use `buildRolePermissions` instead, with " +
+		"an `accountRules` entry that sets `id`." + rawDescriptorFallback,
+}
+
+// toSDKMap marshals a typed apitype value (a PermissionDescriptor or
+// PermissionBooleanExpression) to the SDK-boundary map shape the provider
+// returns from its builder functions. The typed Marshaler emits the wire format
 // directly (`__type` discriminator at every level), which is exactly what
 // the SDK boundary now uses — the Python SDK preserves `__`-prefixed keys
 // across resource inputs as of pulumi/pulumi#22834 (3.235.0+, pinned via
 // the Python SDK's runtime requirement), so no rename is needed.
-func descriptorToSDKMap(descriptor apitype.PermissionDescriptor) (map[string]any, error) {
-	raw, err := json.Marshal(descriptor)
+func toSDKMap(v any) (map[string]any, error) {
+	raw, err := json.Marshal(v)
 	if err != nil {
-		return nil, fmt.Errorf("marshalling typed descriptor: %w", err)
+		return nil, fmt.Errorf("marshalling %T: %w", v, err)
 	}
 	var out map[string]any
 	if err := json.Unmarshal(raw, &out); err != nil {
-		return nil, fmt.Errorf("decoding descriptor JSON: %w", err)
+		return nil, fmt.Errorf("decoding %T JSON: %w", v, err)
 	}
 	return out, nil
 }
@@ -103,7 +123,7 @@ func scopedAllowDescriptor(
 			Permissions: scopes,
 		}.Build(),
 	}.Build()
-	return descriptorToSDKMap(descriptor)
+	return toSDKMap(descriptor)
 }
 
 // ----------------------------------------------------------------------------
@@ -125,16 +145,15 @@ func (BuildAllowPermissionsFunction) Annotate(a infer.Annotator) {
 		&BuildAllowPermissionsFunction{},
 		"Builds an `OrganizationRole.permissions` descriptor that grants the "+
 			"supplied scopes globally — i.e. on every entity of the matching "+
-			"resource type. This is the simplest descriptor: a flat "+
-			"`PermissionDescriptorAllow`. Use this helper instead of hand-"+
-			"authoring the descriptor literal so the wire-format `__type` "+
-			"discriminator stays an implementation detail. For grants scoped "+
+			"resource type. For grants scoped "+
 			"to a specific entity, see `buildEnvironmentScopedPermissions`, "+
 			"`buildStackScopedPermissions`, or "+
 			"`buildInsightsAccountScopedPermissions`. "+
 			scopedPermissionsHelpDoc,
 	)
 	a.SetToken("index", "buildAllowPermissions")
+	a.Deprecate(&BuildAllowPermissionsFunction{},
+		DeprecatedFunctions["pulumiservice:index:buildAllowPermissions"])
 }
 
 func (i *BuildAllowPermissionsInput) Annotate(a infer.Annotator) {
@@ -170,7 +189,7 @@ func (BuildAllowPermissionsFunction) Invoke(
 	descriptor := apitype.PermissionDescriptorAllowBuilder{
 		Permissions: scopes,
 	}.Build()
-	out, err := descriptorToSDKMap(descriptor)
+	out, err := toSDKMap(descriptor)
 	if err != nil {
 		return infer.FunctionResponse[BuildAllowPermissionsOutput]{}, err
 	}
@@ -203,6 +222,8 @@ func (BuildEnvironmentScopedPermissionsFunction) Annotate(a infer.Annotator) {
 			scopedPermissionsHelpDoc,
 	)
 	a.SetToken("index", "buildEnvironmentScopedPermissions")
+	a.Deprecate(&BuildEnvironmentScopedPermissionsFunction{},
+		DeprecatedFunctions["pulumiservice:index:buildEnvironmentScopedPermissions"])
 }
 
 func (i *BuildEnvironmentScopedPermissionsInput) Annotate(a infer.Annotator) {
@@ -275,6 +296,8 @@ func (BuildStackScopedPermissionsFunction) Annotate(a infer.Annotator) {
 			"from the `organization/project/stack` triple. "+scopedPermissionsHelpDoc,
 	)
 	a.SetToken("index", "buildStackScopedPermissions")
+	a.Deprecate(&BuildStackScopedPermissionsFunction{},
+		DeprecatedFunctions["pulumiservice:index:buildStackScopedPermissions"])
 }
 
 func (i *BuildStackScopedPermissionsInput) Annotate(a infer.Annotator) {
@@ -346,6 +369,8 @@ func (BuildInsightsAccountScopedPermissionsFunction) Annotate(a infer.Annotator)
 			"`getInsightsAccount` data source). "+scopedPermissionsHelpDoc,
 	)
 	a.SetToken("index", "buildInsightsAccountScopedPermissions")
+	a.Deprecate(&BuildInsightsAccountScopedPermissionsFunction{},
+		DeprecatedFunctions["pulumiservice:index:buildInsightsAccountScopedPermissions"])
 }
 
 func (i *BuildInsightsAccountScopedPermissionsInput) Annotate(a infer.Annotator) {

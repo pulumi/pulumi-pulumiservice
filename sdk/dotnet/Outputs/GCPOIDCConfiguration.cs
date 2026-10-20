@@ -14,7 +14,7 @@ namespace Pulumi.PulumiService.Outputs
     public sealed class GCPOIDCConfiguration
     {
         /// <summary>
-        /// The numerical ID of the GCP project.
+        /// The GCP project number, a numeric value such as `123456789012`. This is not the project ID (such as `my-project`). To look up the number, run `gcloud projects describe &lt;project-id&gt; --format='value(projectNumber)'`.
         /// </summary>
         public readonly string ProjectId;
         /// <summary>

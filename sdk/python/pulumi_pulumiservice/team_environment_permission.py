@@ -136,6 +136,17 @@ class TeamEnvironmentPermission(pulumi.CustomResource):
         """
         A permission for a team to use an environment.
 
+        ## Import
+
+        This resource can be imported using its `id`, which has the format `{organization}/{team}/{project}+{environment}`, e.g.,
+
+        ```sh
+         $ pulumi import pulumiservice:index:TeamEnvironmentPermission my-team-environment-permission my-org/my-team/my-project+my-environment
+        ```
+
+        The project and environment are joined with `+`, not `/`. The legacy format `{organization}/{team}/{environment}` is also accepted, and uses the `default` project.
+
+
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] environment: Environment name.
@@ -153,6 +164,17 @@ class TeamEnvironmentPermission(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         A permission for a team to use an environment.
+
+        ## Import
+
+        This resource can be imported using its `id`, which has the format `{organization}/{team}/{project}+{environment}`, e.g.,
+
+        ```sh
+         $ pulumi import pulumiservice:index:TeamEnvironmentPermission my-team-environment-permission my-org/my-team/my-project+my-environment
+        ```
+
+        The project and environment are joined with `+`, not `/`. The legacy format `{organization}/{team}/{environment}` is also accepted, and uses the `default` project.
+
 
         :param str resource_name: The name of the resource.
         :param TeamEnvironmentPermissionArgs args: The arguments to use to populate this resource's properties.

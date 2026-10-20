@@ -13,7 +13,7 @@ namespace Pulumi.PulumiService.Inputs
     public sealed class GCPOIDCConfigurationArgs : global::Pulumi.ResourceArgs
     {
         /// <summary>
-        /// The numerical ID of the GCP project.
+        /// The GCP project number, a numeric value such as `123456789012`. This is not the project ID (such as `my-project`). To look up the number, run `gcloud projects describe &lt;project-id&gt; --format='value(projectNumber)'`.
         /// </summary>
         [Input("projectId", required: true)]
         public Input<string> ProjectId { get; set; } = null!;

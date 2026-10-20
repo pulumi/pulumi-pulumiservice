@@ -16,6 +16,8 @@ import (
 type Task struct {
 	pulumi.CustomResourceState
 
+	// The Custom Agent definition this task was run as, if any. Null for tasks run by a user directly rather than as a saved agent.
+	AgentDefinitionId pulumi.StringPtrOutput `pulumi:"agentDefinitionId"`
 	// Approval mode for this task. Valid values: 'manual', 'auto', 'balanced'.
 	ApprovalMode pulumi.StringOutput `pulumi:"approvalMode"`
 	// The async trigger source for this task. Null for sync tasks.
@@ -38,12 +40,16 @@ type Task struct {
 	LastHeartbeat pulumi.StringPtrOutput `pulumi:"lastHeartbeat"`
 	// Display name for the task, typically auto-generated from the initial user message.
 	Name pulumi.StringOutput `pulumi:"name"`
+	// The number of pending inputs waiting behind this task. Present for tasks that can receive asynchronous inputs.
+	PendingInputCount pulumi.IntPtrOutput `pulumi:"pendingInputCount"`
 	// The permission scope for the task.
 	PermissionMode pulumi.StringPtrOutput `pulumi:"permissionMode"`
 	// Whether the task is in plan mode. Set based on the first user message.
 	PlanMode pulumi.BoolOutput `pulumi:"planMode"`
 	// The id of the RBAC role this task assumes. Null when the task runs with the creating user's own permissions (no assumed role).
 	Role pulumi.StringPtrOutput `pulumi:"role"`
+	// The display name of the RBAC role this task assumes. Null when the task has no assumed role or the role no longer exists.
+	RoleName pulumi.StringPtrOutput `pulumi:"roleName"`
 	// The current runtime phase for this task. Null until the runtime checks in.
 	RuntimePhase pulumi.StringPtrOutput `pulumi:"runtimePhase"`
 	// When the task was first shared. Null if never shared.
@@ -107,6 +113,8 @@ func (TaskState) ElementType() reflect.Type {
 }
 
 type taskArgs struct {
+	// Optional Custom Agent definition id to run this task as. When set, the task's role, permission mode, and enabled integrations are taken from the named agent definition instead of from this request, and the task is attributed to that agent. The agent's instructions and approval mode are not copied at creation: they are read from the definition on every turn, so editing the agent applies to the next turn of every run. A preview capability, gated per organization.
+	AgentDefinitionId *string `pulumi:"agentDefinitionId"`
 	// Optional approval mode override for this task. If omitted, org default is used.
 	ApprovalMode *string `pulumi:"approvalMode"`
 	// Optional filter for CLI integrations to enable for this task. Semantics: omitted/null → enable all CLI integrations connected for the org; empty list → explicit opt-out (no CLI integrations for this task); populated list → whitelist by (catalogId, name) of the configured instances to enable. Entries with missing or unknown catalogId, missing name, or referencing a (catalogId, name) pair that is not connected for the organization are rejected with a 400 response. catalogId matching is case-insensitive.
@@ -133,6 +141,8 @@ type taskArgs struct {
 
 // The set of arguments for constructing a Task resource.
 type TaskArgs struct {
+	// Optional Custom Agent definition id to run this task as. When set, the task's role, permission mode, and enabled integrations are taken from the named agent definition instead of from this request, and the task is attributed to that agent. The agent's instructions and approval mode are not copied at creation: they are read from the definition on every turn, so editing the agent applies to the next turn of every run. A preview capability, gated per organization.
+	AgentDefinitionId pulumi.StringPtrInput
 	// Optional approval mode override for this task. If omitted, org default is used.
 	ApprovalMode pulumi.StringPtrInput
 	// Optional filter for CLI integrations to enable for this task. Semantics: omitted/null → enable all CLI integrations connected for the org; empty list → explicit opt-out (no CLI integrations for this task); populated list → whitelist by (catalogId, name) of the configured instances to enable. Entries with missing or unknown catalogId, missing name, or referencing a (catalogId, name) pair that is not connected for the organization are rejected with a 400 response. catalogId matching is case-insensitive.
@@ -244,6 +254,11 @@ func (o TaskOutput) ToTaskOutputWithContext(ctx context.Context) TaskOutput {
 	return o
 }
 
+// The Custom Agent definition this task was run as, if any. Null for tasks run by a user directly rather than as a saved agent.
+func (o TaskOutput) AgentDefinitionId() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *Task) pulumi.StringPtrOutput { return v.AgentDefinitionId }).(pulumi.StringPtrOutput)
+}
+
 // Approval mode for this task. Valid values: 'manual', 'auto', 'balanced'.
 func (o TaskOutput) ApprovalMode() pulumi.StringOutput {
 	return o.ApplyT(func(v *Task) pulumi.StringOutput { return v.ApprovalMode }).(pulumi.StringOutput)
@@ -299,6 +314,11 @@ func (o TaskOutput) Name() pulumi.StringOutput {
 	return o.ApplyT(func(v *Task) pulumi.StringOutput { return v.Name }).(pulumi.StringOutput)
 }
 
+// The number of pending inputs waiting behind this task. Present for tasks that can receive asynchronous inputs.
+func (o TaskOutput) PendingInputCount() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v *Task) pulumi.IntPtrOutput { return v.PendingInputCount }).(pulumi.IntPtrOutput)
+}
+
 // The permission scope for the task.
 func (o TaskOutput) PermissionMode() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *Task) pulumi.StringPtrOutput { return v.PermissionMode }).(pulumi.StringPtrOutput)
@@ -312,6 +332,11 @@ func (o TaskOutput) PlanMode() pulumi.BoolOutput {
 // The id of the RBAC role this task assumes. Null when the task runs with the creating user's own permissions (no assumed role).
 func (o TaskOutput) Role() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *Task) pulumi.StringPtrOutput { return v.Role }).(pulumi.StringPtrOutput)
+}
+
+// The display name of the RBAC role this task assumes. Null when the task has no assumed role or the role no longer exists.
+func (o TaskOutput) RoleName() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *Task) pulumi.StringPtrOutput { return v.RoleName }).(pulumi.StringPtrOutput)
 }
 
 // The current runtime phase for this task. Null until the runtime checks in.

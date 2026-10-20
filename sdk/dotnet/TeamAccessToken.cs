@@ -13,6 +13,23 @@ namespace Pulumi.PulumiService
     /// Creates a team access token in Pulumi Cloud. The token isn't tied to a user, and it has the permissions granted to its team.
     /// 
     /// Unlike `OrgAccessToken`, a provider authenticated with an organization or team access token can create this resource.
+    /// 
+    /// ## Import
+    /// 
+    /// This resource can be imported using its `id`, which has the format `{organization}/{team}/{name}/{tokenId}`, e.g.,
+    /// 
+    /// ```sh
+    ///  $ pulumi import pulumiservice:index:TeamAccessToken my-team-access-token my-org/my-team/my-token/5c7e0a92-1b3d-4f6e-8a24-9d1b7e3c0f58
+    /// ```
+    /// 
+    /// The Pulumi Cloud console doesn't show the token ID. List it with the [Pulumi Cloud REST API](https://www.pulumi.com/docs/reference/cloud-rest-api/):
+    /// 
+    /// ```sh
+    /// curl -s -H "Authorization: token $PULUMI_ACCESS_TOKEN" \
+    ///   https://api.pulumi.com/api/orgs/my-org/teams/my-team/tokens | jq '.tokens[] | {name, id}'
+    /// ```
+    /// 
+    /// The token's `value` can't be read back from Pulumi Cloud, so it's empty after import.
     /// </summary>
     [PulumiServiceResourceType("pulumiservice:index:TeamAccessToken")]
     public partial class TeamAccessToken : global::Pulumi.CustomResource

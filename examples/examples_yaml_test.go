@@ -5,6 +5,7 @@ package examples
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -465,11 +466,8 @@ func TestYamlTemplateSourcesExample(t *testing.T) {
 func TestYamlOidcIssuerExample(t *testing.T) {
 	cwd := getCwd(t)
 	integration.ProgramTest(t, &integration.ProgramTestOptions{
-		Dir: path.Join(cwd, ".", "yaml-oidc-issuer"),
-		Config: map[string]string{
-			"pulumiThumbprint": tlsThumbprint("api.pulumi.com"),
-			"githubThumbprint": tlsThumbprint("token.actions.githubusercontent.com"),
-		},
+		Dir:    path.Join(cwd, ".", "yaml-oidc-issuer"),
+		Config: oidcIssuerTestConfig(),
 	})
 }
 
@@ -534,7 +532,14 @@ func TestYamlPolicyPackExample(t *testing.T) {
 	)
 	test.SetConfig(t, "digits", generateRandomFiveDigits())
 	test.SetConfig(t, "organizationName", getOrgName())
-	runPulumiTest(t, test)
+	up := runPulumiTest(t, test)
+
+	// getPolicyPack reads the pack back from the real service, both by tag and
+	// as latest. Unit tests use a fake server, which once encoded routes the
+	// service doesn't have, so only a live read proves the lookup works (#1012).
+	assert.Equal(t, "1.0.0", up.Outputs["packByTagVersionTag"].Value)
+	assert.Len(t, up.Outputs["packByTagPolicies"].Value, 2)
+	assert.Equal(t, "1.0.0", up.Outputs["packLatestVersionTag"].Value)
 }
 
 func TestYamlPolicyGroupsAccountsExample(t *testing.T) {
@@ -548,6 +553,58 @@ func TestYamlPolicyGroupsAccountsExample(t *testing.T) {
 			"roleArn":          getInsightsRoleArn(t),
 		},
 	})
+}
+
+func TestYamlPolicyGroupMatchRulesExample(t *testing.T) {
+	test := pulumitest.NewPulumiTest(t,
+		filepath.Join(getCwd(t), "yaml-policy-group-match-rules"),
+		inMemoryProvider(),
+		opttest.UseAmbientBackend(),
+		opttest.StackName(randomStackName()),
+	)
+	test.SetConfig(t, "organizationName", getOrgName())
+	test.SetConfig(t, "digits", generateRandomFiveDigits())
+	up := runPulumiTest(t, test)
+
+	stackTag := func(key string) string {
+		return `{"__type": "PermissionExpressionTag", "context": {"__type": "PermissionExpressionStack"}, "key": "` +
+			key + `"}`
+	}
+	stackHasTag := func(key string) string {
+		return `{"__type": "PermissionExpressionHasTag", "context": {"__type": "PermissionExpressionStack"}, "key": "` +
+			key + `"}`
+	}
+	equal := func(left, value string) string {
+		return `{"__type": "PermissionExpressionEqual", "left": ` + left +
+			`, "right": {"__type": "PermissionLiteralExpressionString", "value": "` + value + `"}}`
+	}
+	not := func(node string) string { return `{"__type": "PermissionExpressionNot", "node": ` + node + `}` }
+	binary := func(typ, left, right string) string {
+		return `{"__type": "` + typ + `", "left": ` + left + `, "right": ` + right + `}`
+	}
+	and := func(left, right string) string { return binary("PermissionExpressionAnd", left, right) }
+
+	assertOutputJSON := func(name, expected string) {
+		t.Helper()
+		value, ok := up.Outputs[name].Value.(map[string]any)
+		require.Truef(t, ok, "output %q is %T, not an object", name, up.Outputs[name].Value)
+		got, err := json.Marshal(value)
+		require.NoError(t, err)
+		assert.JSONEq(t, expected, string(got))
+	}
+	assertOutputJSON("stackMatchRule", binary("PermissionExpressionOr",
+		equal(stackTag("team"), "platform"),
+		and(and(and(
+			equal(stackTag("env"), "prod"),
+			not(equal(stackTag("team"), "legacy"))),
+			stackHasTag("cost-center")),
+			not(stackHasTag("deprecated"))),
+	))
+	assertOutputJSON("accountMatchRule", `{
+		"__type": "PermissionExpressionHasTag",
+		"context": {"__type": "PermissionExpressionInsightsAccount"},
+		"key": "cost-center"
+	}`)
 }
 
 func TestYamlApprovalRuleExample(t *testing.T) {
@@ -645,6 +702,28 @@ func TestYamlRbacExample(t *testing.T) {
 	if first, ok := up.Outputs["firstRoleName"]; ok {
 		assert.NotEmpty(t, first.Value, "expected getOrganizationRoles to return at least one role")
 	}
+	preview := test.Preview(t)
+	assertpreview.HasNoChanges(t, preview)
+	refresh := test.Refresh(t)
+	assertrefresh.HasNoChanges(t, refresh)
+	test.Destroy(t)
+}
+
+// TestYamlOrganizationRoleExample runs OrganizationRole end to end with the
+// RBAC helper functions.
+// Requires the Custom Roles feature on the test organization.
+func TestYamlOrganizationRoleExample(t *testing.T) {
+	test := pulumitest.NewPulumiTest(t,
+		filepath.Join(getCwd(t), "yaml-organization-role"),
+		inMemoryProvider(),
+		opttest.UseAmbientBackend(),
+		opttest.StackName(randomStackName()),
+	)
+	test.SetConfig(t, "digits", generateRandomFiveDigits())
+	test.SetConfig(t, "organizationName", getOrgName())
+
+	up := test.Up(t)
+	assert.NotEmpty(t, up.Outputs["platformRoleId"].Value)
 	preview := test.Preview(t)
 	assertpreview.HasNoChanges(t, preview)
 	refresh := test.Refresh(t)

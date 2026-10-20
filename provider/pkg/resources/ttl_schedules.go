@@ -25,6 +25,7 @@ import (
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 )
 
 type TTLSchedule struct{}
@@ -37,7 +38,12 @@ var (
 )
 
 func (*TTLSchedule) Annotate(a infer.Annotator) {
-	a.Describe(&TTLSchedule{}, "A scheduled stack destroy run.")
+	a.Describe(&TTLSchedule{}, "A scheduled stack destroy run."+
+		util.ImportDocs("pulumiservice:index:TtlSchedule",
+			"{organization}/{project}/{stack}/ttl/{scheduleId}",
+			"my-org/my-project/my-stack/ttl/7d3c5e1a-0f8b-4b26-a9d4-3e6f2b8c1a59",
+			util.APIIDHint("schedule ID", "/api/stacks/my-org/my-project/my-stack/deployments/schedules",
+				".schedules[]")))
 	a.SetToken("index", "TtlSchedule")
 }
 

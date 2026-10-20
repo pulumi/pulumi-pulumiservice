@@ -13,6 +13,18 @@ import (
 )
 
 // Assigns a custom (fine-grained) role to a Pulumi Cloud team. The Pulumi Cloud API currently supports one role per team; creating a second assignment replaces the first. The team's organization must already have the custom-roles feature enabled.
+//
+// ## Import
+//
+// This resource can be imported using its `id`, which has the format `{organization}/{team}/{roleId}`, e.g.,
+//
+// ```sh
+//
+//	$ pulumi import pulumiservice:index:TeamRoleAssignment my-team-role-assignment my-org/my-team/1e5b8d3a-6c42-4f90-b7a1-8d2c4e6f0b95
+//
+// ```
+//
+// The role ID is the last segment of its page URL in the Pulumi Cloud console, for example `https://app.pulumi.com/my-org/settings/access-management/roles/details/1e5b8d3a-6c42-4f90-b7a1-8d2c4e6f0b95`.
 type TeamRoleAssignment struct {
 	pulumi.CustomResourceState
 

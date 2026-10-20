@@ -9,6 +9,14 @@ import * as utilities from "./utilities";
 
 /**
  * A Policy Group allows you to apply policy packs to a set of stacks in your organization.
+ *
+ * ## Import
+ *
+ * This resource can be imported using its `id`, which has the format `{organization}/{policyGroupName}`, e.g.,
+ *
+ * ```sh
+ *  $ pulumi import pulumiservice:index:PolicyGroup my-policy-group my-org/my-policy-group
+ * ```
  */
 export class PolicyGroup extends pulumi.CustomResource {
     /**

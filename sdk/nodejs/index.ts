@@ -20,6 +20,11 @@ export type ApprovalRule = import("./approvalRule").ApprovalRule;
 export const ApprovalRule: typeof import("./approvalRule").ApprovalRule = null as any;
 utilities.lazyLoad(exports, ["ApprovalRule"], () => require("./approvalRule"));
 
+export { BuildAccountMatchRuleArgs, BuildAccountMatchRuleResult, BuildAccountMatchRuleOutputArgs } from "./buildAccountMatchRule";
+export const buildAccountMatchRule: typeof import("./buildAccountMatchRule").buildAccountMatchRule = null as any;
+export const buildAccountMatchRuleOutput: typeof import("./buildAccountMatchRule").buildAccountMatchRuleOutput = null as any;
+utilities.lazyLoad(exports, ["buildAccountMatchRule","buildAccountMatchRuleOutput"], () => require("./buildAccountMatchRule"));
+
 export { BuildAllowPermissionsArgs, BuildAllowPermissionsResult, BuildAllowPermissionsOutputArgs } from "./buildAllowPermissions";
 export const buildAllowPermissions: typeof import("./buildAllowPermissions").buildAllowPermissions = null as any;
 export const buildAllowPermissionsOutput: typeof import("./buildAllowPermissions").buildAllowPermissionsOutput = null as any;
@@ -34,6 +39,16 @@ export { BuildInsightsAccountScopedPermissionsArgs, BuildInsightsAccountScopedPe
 export const buildInsightsAccountScopedPermissions: typeof import("./buildInsightsAccountScopedPermissions").buildInsightsAccountScopedPermissions = null as any;
 export const buildInsightsAccountScopedPermissionsOutput: typeof import("./buildInsightsAccountScopedPermissions").buildInsightsAccountScopedPermissionsOutput = null as any;
 utilities.lazyLoad(exports, ["buildInsightsAccountScopedPermissions","buildInsightsAccountScopedPermissionsOutput"], () => require("./buildInsightsAccountScopedPermissions"));
+
+export { BuildRolePermissionsArgs, BuildRolePermissionsResult, BuildRolePermissionsOutputArgs } from "./buildRolePermissions";
+export const buildRolePermissions: typeof import("./buildRolePermissions").buildRolePermissions = null as any;
+export const buildRolePermissionsOutput: typeof import("./buildRolePermissions").buildRolePermissionsOutput = null as any;
+utilities.lazyLoad(exports, ["buildRolePermissions","buildRolePermissionsOutput"], () => require("./buildRolePermissions"));
+
+export { BuildStackMatchRuleArgs, BuildStackMatchRuleResult, BuildStackMatchRuleOutputArgs } from "./buildStackMatchRule";
+export const buildStackMatchRule: typeof import("./buildStackMatchRule").buildStackMatchRule = null as any;
+export const buildStackMatchRuleOutput: typeof import("./buildStackMatchRule").buildStackMatchRuleOutput = null as any;
+utilities.lazyLoad(exports, ["buildStackMatchRule","buildStackMatchRuleOutput"], () => require("./buildStackMatchRule"));
 
 export { BuildStackScopedPermissionsArgs, BuildStackScopedPermissionsResult, BuildStackScopedPermissionsOutputArgs } from "./buildStackScopedPermissions";
 export const buildStackScopedPermissions: typeof import("./buildStackScopedPermissions").buildStackScopedPermissions = null as any;
@@ -124,6 +139,11 @@ export { GetPolicyPacksArgs, GetPolicyPacksResult, GetPolicyPacksOutputArgs } fr
 export const getPolicyPacks: typeof import("./getPolicyPacks").getPolicyPacks = null as any;
 export const getPolicyPacksOutput: typeof import("./getPolicyPacks").getPolicyPacksOutput = null as any;
 utilities.lazyLoad(exports, ["getPolicyPacks","getPolicyPacksOutput"], () => require("./getPolicyPacks"));
+
+export { GetStackArgs, GetStackResult, GetStackOutputArgs } from "./getStack";
+export const getStack: typeof import("./getStack").getStack = null as any;
+export const getStackOutput: typeof import("./getStack").getStackOutput = null as any;
+utilities.lazyLoad(exports, ["getStack","getStackOutput"], () => require("./getStack"));
 
 export { InsightsAccountArgs } from "./insightsAccount";
 export type InsightsAccount = import("./insightsAccount").InsightsAccount;

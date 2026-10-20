@@ -20,7 +20,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"runtime"
 	"sync/atomic"
 	"time"
 
@@ -30,8 +29,6 @@ import (
 	"google.golang.org/grpc/status"
 	pbempty "google.golang.org/protobuf/types/known/emptypb"
 
-	esc_client "github.com/pulumi/esc/cmd/esc/cli/client"
-	"github.com/pulumi/esc/cmd/esc/cli/version"
 	p "github.com/pulumi/pulumi-go-provider"
 	"github.com/pulumi/pulumi-go-provider/infer"
 	mw "github.com/pulumi/pulumi-go-provider/middleware"
@@ -153,6 +150,7 @@ func MakeProvider(host *provider.HostClient, name, version string) (pulumirpc.Re
 			infer.Resource(&resources.ApprovalRule{}),
 			infer.Resource(&resources.DeploymentSchedule{}),
 			infer.Resource(&resources.DriftSchedule{}),
+			infer.Resource(&resources.Environment{}),
 			infer.Resource(&resources.EnvironmentRotationSchedule{}),
 			infer.Resource(&resources.EnvironmentVersionTag{}),
 			infer.Resource(&resources.InsightsAccount{}),
@@ -174,9 +172,12 @@ func MakeProvider(host *provider.HostClient, name, version string) (pulumirpc.Re
 			infer.Resource(&resources.Webhook{}),
 		).
 		WithFunctions(
+			infer.Function(&functions.BuildAccountMatchRuleFunction{}),
 			infer.Function(&functions.BuildAllowPermissionsFunction{}),
 			infer.Function(&functions.BuildEnvironmentScopedPermissionsFunction{}),
 			infer.Function(&functions.BuildInsightsAccountScopedPermissionsFunction{}),
+			infer.Function(&functions.BuildRolePermissionsFunction{}),
+			infer.Function(&functions.BuildStackMatchRuleFunction{}),
 			infer.Function(&functions.BuildStackScopedPermissionsFunction{}),
 			infer.Function(&functions.GetCurrentUserFunction{}),
 			infer.Function(&functions.GetEnvironmentFunction{}),
@@ -187,6 +188,7 @@ func MakeProvider(host *provider.HostClient, name, version string) (pulumirpc.Re
 			infer.Function(&functions.GetOrganizationRoleFunction{}),
 			infer.Function(&functions.GetOrganizationRoleScopesFunction{}),
 			infer.Function(&functions.GetOrganizationRolesFunction{}),
+			infer.Function(&functions.GetStackFunction{}),
 		).
 		WithModuleMap(map[tokens.ModuleName]tokens.ModuleName{
 			"resources": "index",
@@ -249,7 +251,8 @@ func MakeProvider(host *provider.HostClient, name, version string) (pulumirpc.Re
 	if err != nil {
 		return nil, err
 	}
-	return p.RawServer(name, version, provider)(host)
+	provider = withFunctionDeprecations(provider, functions.DeprecatedFunctions)
+	return p.RawServer(name, version, resources.WithEnvironmentCompat(provider))(host)
 }
 
 type authedTransport struct {
@@ -301,6 +304,39 @@ func withCloudApiSchema(prov p.Provider, spec *rest.Spec, metadata *rest.Metadat
 		out, err := json.Marshal(base)
 		if err != nil {
 			return resp, fmt.Errorf("withCloudApiSchema: re-encode schema: %w", err)
+		}
+		resp.Schema = string(out)
+		return resp, nil
+	}
+	return prov
+}
+
+// withFunctionDeprecations sets each function's deprecation message, which
+// pulumi-go-provider doesn't emit for functions yet
+// (pulumi/pulumi-go-provider#636). It wraps the built provider because infer
+// adds its functions to the schema outside every inner layer.
+func withFunctionDeprecations(prov p.Provider, messages map[string]string) p.Provider {
+	inner := prov.GetSchema
+	prov.GetSchema = func(ctx context.Context, req p.GetSchemaRequest) (p.GetSchemaResponse, error) {
+		resp, err := inner(ctx, req)
+		if err != nil {
+			return resp, err
+		}
+		var spec schema.PackageSpec
+		if err := json.Unmarshal([]byte(resp.Schema), &spec); err != nil {
+			return resp, fmt.Errorf("withFunctionDeprecations: parse schema: %w", err)
+		}
+		for token, message := range messages {
+			fn, ok := spec.Functions[token]
+			if !ok {
+				return resp, fmt.Errorf("withFunctionDeprecations: no function %q in the schema", token)
+			}
+			fn.DeprecationMessage = message
+			spec.Functions[token] = fn
+		}
+		out, err := json.Marshal(spec)
+		if err != nil {
+			return resp, fmt.Errorf("withFunctionDeprecations: re-encode schema: %w", err)
 		}
 		resp.Schema = string(out)
 		return resp, nil
@@ -425,23 +461,12 @@ func (k *pulumiserviceProvider) Configure(
 		return transport, nil
 	})
 
-	escClient := esc_client.New(
-		fmt.Sprintf("provider-pulumiservice/1 (%s; %s)", version.Version, runtime.GOOS),
-		*url,
-		*token,
-		false,
-	)
-
 	// Store the client for use in Invoke functions
 	k.client = client
 
 	k.pulumiResources = []PulumiServiceResource{
 		&resources.PulumiServiceDeploymentSettingsResource{
 			Client: client,
-		},
-		&resources.PulumiServiceEnvironmentResource{
-			Client:         escClient,
-			MetadataClient: client,
 		},
 		&resources.PulumiServicePolicyGroupResource{
 			Client: client,
@@ -664,9 +689,8 @@ func (k *pulumiserviceProvider) invokeFunctionGetPolicyPack(
 
 	// Call the API - either specific version or latest
 	var policyPack *pulumiapi.PolicyPackDetail
-	if inputs["version"].HasValue() && inputs["version"].IsNumber() {
-		version := int(inputs["version"].NumberValue())
-		policyPack, err = k.client.GetPolicyPack(ctx, orgName, policyPackName, version)
+	if versionTag := inputs["versionTag"]; versionTag.IsString() && versionTag.StringValue() != "" {
+		policyPack, err = k.client.GetPolicyPack(ctx, orgName, policyPackName, versionTag.StringValue())
 	} else {
 		policyPack, err = k.client.GetLatestPolicyPack(ctx, orgName, policyPackName)
 	}

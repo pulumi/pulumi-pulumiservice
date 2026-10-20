@@ -5,7 +5,6 @@ package com.pulumi.pulumiservice.inputs;
 
 import com.pulumi.core.annotations.Import;
 import com.pulumi.exceptions.MissingRequiredPropertyException;
-import java.lang.Integer;
 import java.lang.String;
 import java.util.Objects;
 import java.util.Optional;
@@ -47,18 +46,18 @@ public final class GetPolicyPackPlainArgs extends com.pulumi.resources.InvokeArg
     }
 
     /**
-     * The version number of the policy pack. If not specified, returns the latest version.
+     * The version tag of the policy pack, for example `1.4.1`, as shown in Pulumi Cloud. If not specified, returns the latest version.
      * 
      */
-    @Import(name="version")
-    private @Nullable Integer version;
+    @Import(name="versionTag")
+    private @Nullable String versionTag;
 
     /**
-     * @return The version number of the policy pack. If not specified, returns the latest version.
+     * @return The version tag of the policy pack, for example `1.4.1`, as shown in Pulumi Cloud. If not specified, returns the latest version.
      * 
      */
-    public Optional<Integer> version() {
-        return Optional.ofNullable(this.version);
+    public Optional<String> versionTag() {
+        return Optional.ofNullable(this.versionTag);
     }
 
     private GetPolicyPackPlainArgs() {}
@@ -66,7 +65,7 @@ public final class GetPolicyPackPlainArgs extends com.pulumi.resources.InvokeArg
     private GetPolicyPackPlainArgs(GetPolicyPackPlainArgs $) {
         this.organizationName = $.organizationName;
         this.policyPackName = $.policyPackName;
-        this.version = $.version;
+        this.versionTag = $.versionTag;
     }
 
     public static Builder builder() {
@@ -110,13 +109,13 @@ public final class GetPolicyPackPlainArgs extends com.pulumi.resources.InvokeArg
         }
 
         /**
-         * @param version The version number of the policy pack. If not specified, returns the latest version.
+         * @param versionTag The version tag of the policy pack, for example `1.4.1`, as shown in Pulumi Cloud. If not specified, returns the latest version.
          * 
          * @return builder
          * 
          */
-        public Builder version(@Nullable Integer version) {
-            $.version = version;
+        public Builder versionTag(@Nullable String versionTag) {
+            $.versionTag = versionTag;
             return this;
         }
 
