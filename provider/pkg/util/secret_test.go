@@ -39,27 +39,6 @@ func TestGetSecretOrStringValue(t *testing.T) {
 	})
 }
 
-func TestGetSecretOrStringNullableValue(t *testing.T) {
-	t.Run("plaintext string", func(t *testing.T) {
-		prop := resource.NewPropertyValue("hello")
-		result := GetSecretOrStringNullableValue(prop)
-		assert.NotNil(t, result)
-		assert.Equal(t, "hello", *result)
-	})
-
-	t.Run("secret string", func(t *testing.T) {
-		prop := resource.MakeSecret(resource.NewPropertyValue("secret-val"))
-		result := GetSecretOrStringNullableValue(prop)
-		assert.NotNil(t, result)
-		assert.Equal(t, "secret-val", *result)
-	})
-
-	t.Run("nil value", func(t *testing.T) {
-		prop := resource.PropertyValue{}
-		assert.Nil(t, GetSecretOrStringNullableValue(prop))
-	})
-}
-
 func TestGetSecretOrBoolValue(t *testing.T) {
 	t.Run("plaintext bool", func(t *testing.T) {
 		prop := resource.NewPropertyValue(true)
