@@ -21,6 +21,7 @@ import (
 	"slices"
 	"strings"
 
+	"github.com/pulumi/pulumi-cloud-sdk/go/apitype"
 	p "github.com/pulumi/pulumi-go-provider"
 	"github.com/pulumi/pulumi-go-provider/infer"
 
@@ -360,7 +361,7 @@ func applyMemberRoleToState(
 
 	state.RoleName = member.FGARole.Name
 
-	roles, err := client.ListOrgRoles(ctx, orgName, "role")
+	roles, err := client.ListOrgRoles(ctx, orgName, apitype.PermissionDescriptorUXPurposeRole)
 	if err != nil {
 		return fmt.Errorf("failed to resolve org role metadata: %w", err)
 	}

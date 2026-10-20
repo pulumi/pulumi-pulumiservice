@@ -39,6 +39,7 @@ __all__ = [
     'OperationContextOIDC',
     'OperationContextOptions',
     'OrganizationMemberInfo',
+    'OrganizationRoleInfo',
     'PolicyGroupPolicyPackReference',
     'PolicyGroupStackReference',
     'PolicyPackComplianceFrameworkInput',
@@ -1564,6 +1565,58 @@ class OrganizationMemberInfo(dict):
         The name of the currently assigned role (custom role name, or built-in role).
         """
         return pulumi.get(self, "role_name")
+
+
+@pulumi.output_type
+class OrganizationRoleInfo(dict):
+    def __init__(__self__, *,
+                 built_in: _builtins.bool,
+                 name: _builtins.str,
+                 role_id: _builtins.str,
+                 description: Optional[_builtins.str] = None):
+        """
+        :param _builtins.bool built_in: Whether this is one of the roles every organization has (Admin, Member and Billing Manager), rather than a custom role.
+        :param _builtins.str name: The role's name, as shown in the Pulumi Cloud console.
+        :param _builtins.str role_id: The role's ID. Pass it to inputs that take a role ID, such as `TeamRoleAssignment.roleId` and `OrganizationMember.roleId`.
+        :param _builtins.str description: The role's description, if it has one.
+        """
+        pulumi.set(__self__, "built_in", built_in)
+        pulumi.set(__self__, "name", name)
+        pulumi.set(__self__, "role_id", role_id)
+        if description is not None:
+            pulumi.set(__self__, "description", description)
+
+    @_builtins.property
+    @pulumi.getter(name="builtIn")
+    def built_in(self) -> _builtins.bool:
+        """
+        Whether this is one of the roles every organization has (Admin, Member and Billing Manager), rather than a custom role.
+        """
+        return pulumi.get(self, "built_in")
+
+    @_builtins.property
+    @pulumi.getter
+    def name(self) -> _builtins.str:
+        """
+        The role's name, as shown in the Pulumi Cloud console.
+        """
+        return pulumi.get(self, "name")
+
+    @_builtins.property
+    @pulumi.getter(name="roleId")
+    def role_id(self) -> _builtins.str:
+        """
+        The role's ID. Pass it to inputs that take a role ID, such as `TeamRoleAssignment.roleId` and `OrganizationMember.roleId`.
+        """
+        return pulumi.get(self, "role_id")
+
+    @_builtins.property
+    @pulumi.getter
+    def description(self) -> Optional[_builtins.str]:
+        """
+        The role's description, if it has one.
+        """
+        return pulumi.get(self, "description")
 
 
 @pulumi.output_type

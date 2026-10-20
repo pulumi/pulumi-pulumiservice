@@ -20,6 +20,8 @@ import javax.annotation.Nullable;
  * 
  * **Important:** The token value in the response is only returned once at creation time and cannot be retrieved later. Audit logs for actions performed with organization tokens are attributed to the organization rather than an individual user.
  * 
+ * This request must be authenticated as a user, for example with a personal access token. Organization and team access tokens cannot create organization tokens, even when they have the Admin role, so that a token cannot be used to mint further organization tokens. Such requests return a 403 error.
+ * 
  */
 @ResourceType(type="pulumiservice:api/tokens:OrgToken")
 public class OrgToken extends com.pulumi.resources.CustomResource {

@@ -178,6 +178,29 @@ The SDK build also stamps a local dev version into version files
 `sdk/go/pulumiservice/internal/pulumiUtilities.go`). Revert those with
 `git checkout --` before committing.
 
+#### Examples in `infer` Descriptions
+
+`pulumi package gen-sdk` does not convert examples between languages: it keeps
+only the code fences whose language matches the SDK being generated and drops
+the rest, including PCL in ```` ```pulumi ```` fences. Each example therefore
+needs one fence per language, inside the docs `{{% examples %}}` /
+`{{% example %}}` shortcodes.
+
+Don't write those by hand. Write each example once in Pulumi YAML and generate
+the rest:
+
+1. Add a multi-document YAML file under the package's `examples/` directory
+   (e.g. `provider/pkg/functions/examples/get_organization_role_examples.yaml`).
+   Each document is one example: a Pulumi YAML program plus a `description`
+   key, which becomes the example's heading.
+2. Embed the generated `<name>.md` with `//go:embed` and append it to the
+   type's `a.Describe(...)` text. See `provider/pkg/functions/org_roles.go`,
+   including its `//go:generate` line.
+3. Run `make generate_examples`. It builds the provider, puts it on PATH and
+   runs `provider/tools/gen-examples`, which converts each example with
+   `pulumi convert` into TypeScript, Python, Go, C# and Java.
+4. Regenerate the schema and SDKs as above.
+
 #### Schema JSON Syntax Guidelines
 
 These apply when editing `manual-schema.json`. The schema JSON must follow strict syntax rules. Common patterns:

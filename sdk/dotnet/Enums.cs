@@ -210,6 +210,48 @@ namespace Pulumi.PulumiService
     }
 
     [EnumType]
+    public readonly struct PolicyGroupTagOperator : IEquatable<PolicyGroupTagOperator>
+    {
+        private readonly string _value;
+
+        private PolicyGroupTagOperator(string value)
+        {
+            _value = value ?? throw new ArgumentNullException(nameof(value));
+        }
+
+        /// <summary>
+        /// The tag is set to `value`.
+        /// </summary>
+        public static PolicyGroupTagOperator EqualsValue { get; } = new PolicyGroupTagOperator("equals");
+        /// <summary>
+        /// The tag isn't set to `value`. Also matches entities that don't have the tag.
+        /// </summary>
+        public static PolicyGroupTagOperator NotEquals { get; } = new PolicyGroupTagOperator("notEquals");
+        /// <summary>
+        /// The entity has the tag, with any value.
+        /// </summary>
+        public static PolicyGroupTagOperator Exists { get; } = new PolicyGroupTagOperator("exists");
+        /// <summary>
+        /// The entity doesn't have the tag.
+        /// </summary>
+        public static PolicyGroupTagOperator NotExists { get; } = new PolicyGroupTagOperator("notExists");
+
+        public static bool operator ==(PolicyGroupTagOperator left, PolicyGroupTagOperator right) => left.Equals(right);
+        public static bool operator !=(PolicyGroupTagOperator left, PolicyGroupTagOperator right) => !left.Equals(right);
+
+        public static explicit operator string(PolicyGroupTagOperator value) => value._value;
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public override bool Equals(object? obj) => obj is PolicyGroupTagOperator other && Equals(other);
+        public bool Equals(PolicyGroupTagOperator other) => string.Equals(_value, other._value, StringComparison.Ordinal);
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public override int GetHashCode() => _value?.GetHashCode() ?? 0;
+
+        public override string ToString() => _value;
+    }
+
+    [EnumType]
     public readonly struct PulumiOperation : IEquatable<PulumiOperation>
     {
         private readonly string _value;

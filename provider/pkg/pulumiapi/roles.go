@@ -49,7 +49,8 @@ type RoleClient interface {
 	) (map[string][]RoleScopeGroup, error)
 	ListOrgRoles(
 		ctx context.Context,
-		orgName, uxPurpose string,
+		orgName string,
+		uxPurpose apitype.PermissionDescriptorUXPurpose,
 	) ([]apitype.PermissionDescriptorRecord, error)
 	ResolveBuiltInRoleID(
 		ctx context.Context,
@@ -193,15 +194,15 @@ func (c *Client) ListAvailableRoleScopes(
 }
 
 // ListOrgRoles returns the role catalogue for an organization filtered by
-// uxPurpose (e.g. "role", "policy"). The service requires uxPurpose — calling
-// the endpoint without it returns 400 Bad Request.
+// uxPurpose (e.g. PermissionDescriptorUXPurposeRole). The service requires
+// uxPurpose — calling the endpoint without it returns 400 Bad Request.
 func (c *Client) ListOrgRoles(
-	ctx context.Context, orgName, uxPurpose string,
+	ctx context.Context, orgName string, uxPurpose apitype.PermissionDescriptorUXPurpose,
 ) ([]apitype.PermissionDescriptorRecord, error) {
 	if len(orgName) == 0 {
 		return nil, errors.New("organization name must not be empty")
 	}
-	if len(uxPurpose) == 0 {
+	if uxPurpose == "" {
 		return nil, errors.New("uxPurpose must not be empty")
 	}
 
@@ -209,7 +210,7 @@ func (c *Client) ListOrgRoles(
 		ctx,
 		orgName,
 		nil,
-		apitype.PermissionDescriptorUXPurpose(uxPurpose),
+		uxPurpose,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list organization roles: %w", err)
@@ -222,7 +223,7 @@ func (c *Client) ListOrgRoles(
 // built-in role names in the `role` field — callers must translate to
 // `fgaRoleId` first. Each org has its own set of built-in role IDs.
 func (c *Client) ResolveBuiltInRoleID(ctx context.Context, orgName, builtInRole string) (string, error) {
-	roles, err := c.ListOrgRoles(ctx, orgName, "role")
+	roles, err := c.ListOrgRoles(ctx, orgName, apitype.PermissionDescriptorUXPurposeRole)
 	if err != nil {
 		return "", err
 	}
