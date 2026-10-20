@@ -202,7 +202,7 @@ class OrganizationRole(pulumi.CustomResource):
                     "tags": [{
                         "key": "env",
                         "value": "prod",
-                        "operator": pulumiservice.PolicyGroupTagOperator.NOT_EQUALS,
+                        "operator": pulumiservice.TagOperator.NOT_EQUALS,
                     }],
                     "scopes": [
                         pulumiservice.RbacStackScope.STACK_WRITE,
@@ -213,7 +213,7 @@ class OrganizationRole(pulumi.CustomResource):
                 {
                     "tags": [{
                         "key": "cost-center",
-                        "operator": pulumiservice.PolicyGroupTagOperator.EXISTS,
+                        "operator": pulumiservice.TagOperator.EXISTS,
                     }],
                     "scopes": [pulumiservice.RbacStackScope.STACK_DEPLOYMENT_SETTINGS_READ],
                 },
@@ -221,7 +221,7 @@ class OrganizationRole(pulumi.CustomResource):
                 {
                     "tags": [{
                         "key": "owner",
-                        "operator": pulumiservice.PolicyGroupTagOperator.NOT_EXISTS,
+                        "operator": pulumiservice.TagOperator.NOT_EXISTS,
                     }],
                     "scopes": [pulumiservice.RbacStackScope.STACK_TAGS_UPDATE],
                 },
@@ -394,7 +394,7 @@ class OrganizationRole(pulumi.CustomResource):
                     "tags": [{
                         "key": "env",
                         "value": "prod",
-                        "operator": pulumiservice.PolicyGroupTagOperator.NOT_EQUALS,
+                        "operator": pulumiservice.TagOperator.NOT_EQUALS,
                     }],
                     "scopes": [
                         pulumiservice.RbacStackScope.STACK_WRITE,
@@ -405,7 +405,7 @@ class OrganizationRole(pulumi.CustomResource):
                 {
                     "tags": [{
                         "key": "cost-center",
-                        "operator": pulumiservice.PolicyGroupTagOperator.EXISTS,
+                        "operator": pulumiservice.TagOperator.EXISTS,
                     }],
                     "scopes": [pulumiservice.RbacStackScope.STACK_DEPLOYMENT_SETTINGS_READ],
                 },
@@ -413,7 +413,7 @@ class OrganizationRole(pulumi.CustomResource):
                 {
                     "tags": [{
                         "key": "owner",
-                        "operator": pulumiservice.PolicyGroupTagOperator.NOT_EXISTS,
+                        "operator": pulumiservice.TagOperator.NOT_EXISTS,
                     }],
                     "scopes": [pulumiservice.RbacStackScope.STACK_TAGS_UPDATE],
                 },

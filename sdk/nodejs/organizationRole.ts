@@ -75,7 +75,7 @@ import * as utilities from "./utilities";
  *             tags: [{
  *                 key: "env",
  *                 value: "prod",
- *                 operator: pulumiservice.PolicyGroupTagOperator.NotEquals,
+ *                 operator: pulumiservice.TagOperator.NotEquals,
  *             }],
  *             scopes: [
  *                 pulumiservice.RbacStackScope.StackWrite,
@@ -86,7 +86,7 @@ import * as utilities from "./utilities";
  *         {
  *             tags: [{
  *                 key: "cost-center",
- *                 operator: pulumiservice.PolicyGroupTagOperator.Exists,
+ *                 operator: pulumiservice.TagOperator.Exists,
  *             }],
  *             scopes: [pulumiservice.RbacStackScope.StackDeploymentSettingsRead],
  *         },
@@ -94,7 +94,7 @@ import * as utilities from "./utilities";
  *         {
  *             tags: [{
  *                 key: "owner",
- *                 operator: pulumiservice.PolicyGroupTagOperator.NotExists,
+ *                 operator: pulumiservice.TagOperator.NotExists,
  *             }],
  *             scopes: [pulumiservice.RbacStackScope.StackTagsUpdate],
  *         },

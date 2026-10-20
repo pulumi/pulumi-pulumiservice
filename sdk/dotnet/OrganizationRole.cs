@@ -88,7 +88,7 @@ namespace Pulumi.PulumiService
     ///             {
     ///                 Tags = new[]
     ///                 {
-    ///                     new PulumiService.Inputs.PolicyGroupTagConditionInputArgs
+    ///                     new PulumiService.Inputs.TagConditionInputArgs
     ///                     {
     ///                         Key = "team",
     ///                         Value = "platform",
@@ -105,11 +105,11 @@ namespace Pulumi.PulumiService
     ///             {
     ///                 Tags = new[]
     ///                 {
-    ///                     new PulumiService.Inputs.PolicyGroupTagConditionInputArgs
+    ///                     new PulumiService.Inputs.TagConditionInputArgs
     ///                     {
     ///                         Key = "env",
     ///                         Value = "prod",
-    ///                         Operator = PulumiService.PolicyGroupTagOperator.NotEquals,
+    ///                         Operator = PulumiService.TagOperator.NotEquals,
     ///                     },
     ///                 },
     ///                 Scopes = new[]
@@ -123,10 +123,10 @@ namespace Pulumi.PulumiService
     ///             {
     ///                 Tags = new[]
     ///                 {
-    ///                     new PulumiService.Inputs.PolicyGroupTagConditionInputArgs
+    ///                     new PulumiService.Inputs.TagConditionInputArgs
     ///                     {
     ///                         Key = "cost-center",
-    ///                         Operator = PulumiService.PolicyGroupTagOperator.Exists,
+    ///                         Operator = PulumiService.TagOperator.Exists,
     ///                     },
     ///                 },
     ///                 Scopes = new[]
@@ -139,10 +139,10 @@ namespace Pulumi.PulumiService
     ///             {
     ///                 Tags = new[]
     ///                 {
-    ///                     new PulumiService.Inputs.PolicyGroupTagConditionInputArgs
+    ///                     new PulumiService.Inputs.TagConditionInputArgs
     ///                     {
     ///                         Key = "owner",
-    ///                         Operator = PulumiService.PolicyGroupTagOperator.NotExists,
+    ///                         Operator = PulumiService.TagOperator.NotExists,
     ///                     },
     ///                 },
     ///                 Scopes = new[]
@@ -155,12 +155,12 @@ namespace Pulumi.PulumiService
     ///             {
     ///                 Tags = new[]
     ///                 {
-    ///                     new PulumiService.Inputs.PolicyGroupTagConditionInputArgs
+    ///                     new PulumiService.Inputs.TagConditionInputArgs
     ///                     {
     ///                         Key = "team",
     ///                         Value = "platform",
     ///                     },
-    ///                     new PulumiService.Inputs.PolicyGroupTagConditionInputArgs
+    ///                     new PulumiService.Inputs.TagConditionInputArgs
     ///                     {
     ///                         Key = "lifecycle",
     ///                         Value = "ephemeral",
@@ -199,7 +199,7 @@ namespace Pulumi.PulumiService
     ///             {
     ///                 Tags = new[]
     ///                 {
-    ///                     new PulumiService.Inputs.PolicyGroupTagConditionInputArgs
+    ///                     new PulumiService.Inputs.TagConditionInputArgs
     ///                     {
     ///                         Key = "team",
     ///                         Value = "platform",
@@ -236,7 +236,7 @@ namespace Pulumi.PulumiService
     ///             {
     ///                 Tags = new[]
     ///                 {
-    ///                     new PulumiService.Inputs.PolicyGroupTagConditionInputArgs
+    ///                     new PulumiService.Inputs.TagConditionInputArgs
     ///                     {
     ///                         Key = "team",
     ///                         Value = "platform",

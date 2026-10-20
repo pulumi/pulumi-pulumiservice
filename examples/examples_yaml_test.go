@@ -322,6 +322,12 @@ func TestYamlOrgAccessTokenExample(t *testing.T) {
 	integration.ProgramTest(t, &integration.ProgramTestOptions{
 		Quick: true,
 		Dir:   path.Join(cwd, ".", "yaml-org-token"),
+		Config: map[string]string{
+			"organizationName": getOrgName(),
+			// Use a full date-time, not a bare date, so the test covers the
+			// time component surviving the round trip through the API.
+			"expires": time.Now().UTC().AddDate(0, 0, 30).Truncate(time.Hour).Format(time.RFC3339),
+		},
 	})
 }
 

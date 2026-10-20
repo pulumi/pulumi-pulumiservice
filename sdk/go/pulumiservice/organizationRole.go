@@ -82,8 +82,8 @@ import (
 //					},
 //					// Deploy stacks tagged team=platform (the operator defaults to equals)
 //					&pulumiservice.RoleStackRuleArgs{
-//						Tags: pulumiservice.PolicyGroupTagConditionArray{
-//							&pulumiservice.PolicyGroupTagConditionArgs{
+//						Tags: pulumiservice.TagConditionArray{
+//							&pulumiservice.TagConditionArgs{
 //								Key:   pulumi.String("team"),
 //								Value: pulumi.String("platform"),
 //							},
@@ -95,11 +95,11 @@ import (
 //					},
 //					// Deploy stacks whose env tag is anything but "prod"
 //					&pulumiservice.RoleStackRuleArgs{
-//						Tags: pulumiservice.PolicyGroupTagConditionArray{
-//							&pulumiservice.PolicyGroupTagConditionArgs{
+//						Tags: pulumiservice.TagConditionArray{
+//							&pulumiservice.TagConditionArgs{
 //								Key:      pulumi.String("env"),
 //								Value:    pulumi.String("prod"),
-//								Operator: pulumiservice.PolicyGroupTagOperatorNotEquals,
+//								Operator: pulumiservice.TagOperatorNotEquals,
 //							},
 //						},
 //						Scopes: pulumiservice.RbacStackScopeArray{
@@ -109,10 +109,10 @@ import (
 //					},
 //					// Read deployment settings on stacks that have a cost-center tag, whatever its value
 //					&pulumiservice.RoleStackRuleArgs{
-//						Tags: pulumiservice.PolicyGroupTagConditionArray{
-//							&pulumiservice.PolicyGroupTagConditionArgs{
+//						Tags: pulumiservice.TagConditionArray{
+//							&pulumiservice.TagConditionArgs{
 //								Key:      pulumi.String("cost-center"),
-//								Operator: pulumiservice.PolicyGroupTagOperatorExists,
+//								Operator: pulumiservice.TagOperatorExists,
 //							},
 //						},
 //						Scopes: pulumiservice.RbacStackScopeArray{
@@ -121,10 +121,10 @@ import (
 //					},
 //					// Tag stacks that don't have an owner tag yet
 //					&pulumiservice.RoleStackRuleArgs{
-//						Tags: pulumiservice.PolicyGroupTagConditionArray{
-//							&pulumiservice.PolicyGroupTagConditionArgs{
+//						Tags: pulumiservice.TagConditionArray{
+//							&pulumiservice.TagConditionArgs{
 //								Key:      pulumi.String("owner"),
-//								Operator: pulumiservice.PolicyGroupTagOperatorNotExists,
+//								Operator: pulumiservice.TagOperatorNotExists,
 //							},
 //						},
 //						Scopes: pulumiservice.RbacStackScopeArray{
@@ -133,12 +133,12 @@ import (
 //					},
 //					// Delete stacks that match every tag condition
 //					&pulumiservice.RoleStackRuleArgs{
-//						Tags: pulumiservice.PolicyGroupTagConditionArray{
-//							&pulumiservice.PolicyGroupTagConditionArgs{
+//						Tags: pulumiservice.TagConditionArray{
+//							&pulumiservice.TagConditionArgs{
 //								Key:   pulumi.String("team"),
 //								Value: pulumi.String("platform"),
 //							},
-//							&pulumiservice.PolicyGroupTagConditionArgs{
+//							&pulumiservice.TagConditionArgs{
 //								Key:   pulumi.String("lifecycle"),
 //								Value: pulumi.String("ephemeral"),
 //							},
@@ -167,8 +167,8 @@ import (
 //					},
 //					// Open environments tagged team=platform
 //					&pulumiservice.RoleEnvironmentRuleArgs{
-//						Tags: pulumiservice.PolicyGroupTagConditionArray{
-//							&pulumiservice.PolicyGroupTagConditionArgs{
+//						Tags: pulumiservice.TagConditionArray{
+//							&pulumiservice.TagConditionArgs{
 //								Key:   pulumi.String("team"),
 //								Value: pulumi.String("platform"),
 //							},
@@ -195,8 +195,8 @@ import (
 //					},
 //					// Update accounts tagged team=platform
 //					&pulumiservice.RoleAccountRuleArgs{
-//						Tags: pulumiservice.PolicyGroupTagConditionArray{
-//							&pulumiservice.PolicyGroupTagConditionArgs{
+//						Tags: pulumiservice.TagConditionArray{
+//							&pulumiservice.TagConditionArgs{
 //								Key:   pulumi.String("team"),
 //								Value: pulumi.String("platform"),
 //							},

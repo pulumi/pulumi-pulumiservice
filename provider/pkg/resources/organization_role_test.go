@@ -18,7 +18,7 @@ import (
 
 const (
 	gcTypeMeta = "__type"
-	gcRoleID   = "role-123"
+	testRoleID = "role-123"
 	gcReadOnly = "read-only"
 )
 
@@ -96,7 +96,7 @@ func TestOrganizationRoleCreate(t *testing.T) {
 					Name:    req.Name,
 					Details: req.Details,
 				},
-				ID:      gcRoleID,
+				ID:      testRoleID,
 				Version: 1,
 			}, nil
 		},
@@ -115,7 +115,7 @@ func TestOrganizationRoleCreate(t *testing.T) {
 	})
 	assert.NoError(t, err)
 	assert.Equal(t, "acme/role-123", resp.ID)
-	assert.Equal(t, gcRoleID, resp.Output.RoleId)
+	assert.Equal(t, testRoleID, resp.Output.RoleId)
 }
 
 func TestOrganizationRoleRead(t *testing.T) {
@@ -147,7 +147,7 @@ func TestOrganizationRoleRead(t *testing.T) {
 						UxPurpose:    apitype.PermissionDescriptorUXPurposeRole,
 						Details:      details,
 					},
-					ID:      gcRoleID,
+					ID:      testRoleID,
 					Version: 2,
 				}, nil
 			},
@@ -217,7 +217,7 @@ func TestOrganizationRoleDelete_InUseConflict(t *testing.T) {
 	_, err := r.Delete(ctx, infer.DeleteRequest[OrganizationRoleState]{
 		State: OrganizationRoleState{
 			OrganizationRoleCore: OrganizationRoleCore{OrganizationName: gcAcme},
-			RoleId:               gcRoleID,
+			RoleId:               testRoleID,
 		},
 	})
 	// Both attempts (non-force then force) must have been tried before
@@ -229,7 +229,7 @@ func TestOrganizationRoleDelete_InUseConflict(t *testing.T) {
 	assert.Error(t, err)
 	// Message must name the role, point at PermissionDescriptorCompose
 	// (the typical cause), and tell the user how to recover.
-	assert.Contains(t, err.Error(), gcRoleID)
+	assert.Contains(t, err.Error(), testRoleID)
 	assert.Contains(t, err.Error(), "PermissionDescriptorCompose")
 	assert.Contains(t, err.Error(), "destroy",
 		"error should tell the user to destroy the composing role(s) first")
@@ -265,7 +265,7 @@ func TestOrganizationRoleDelete_EscalatesForceOnConflict(t *testing.T) {
 	_, err := r.Delete(ctx, infer.DeleteRequest[OrganizationRoleState]{
 		State: OrganizationRoleState{
 			OrganizationRoleCore: OrganizationRoleCore{OrganizationName: gcAcme},
-			RoleId:               gcRoleID,
+			RoleId:               testRoleID,
 		},
 	})
 	assert.NoError(t, err, "force-true retry must succeed when assignments are the only blocker")
@@ -279,7 +279,7 @@ func TestOrganizationRoleDelete(t *testing.T) {
 		del: func(_ context.Context, org, id string, force bool) error {
 			calls = append(calls, force)
 			assert.Equal(t, gcAcme, org)
-			assert.Equal(t, gcRoleID, id)
+			assert.Equal(t, testRoleID, id)
 			return nil
 		},
 	}
@@ -288,7 +288,7 @@ func TestOrganizationRoleDelete(t *testing.T) {
 	_, err := r.Delete(ctx, infer.DeleteRequest[OrganizationRoleState]{
 		State: OrganizationRoleState{
 			OrganizationRoleCore: OrganizationRoleCore{OrganizationName: gcAcme},
-			RoleId:               gcRoleID,
+			RoleId:               testRoleID,
 		},
 	})
 	assert.NoError(t, err)
@@ -316,7 +316,7 @@ func TestOrganizationRoleUpdateOmitsDescriptionWhenUnset(t *testing.T) {
 					Name:    gcReadOnly,
 					Details: details,
 				},
-				ID:      gcRoleID,
+				ID:      testRoleID,
 				Version: 3,
 			}, nil
 		},
@@ -334,7 +334,7 @@ func TestOrganizationRoleUpdateOmitsDescriptionWhenUnset(t *testing.T) {
 		},
 		State: OrganizationRoleState{
 			OrganizationRoleCore: OrganizationRoleCore{OrganizationName: gcAcme},
-			RoleId:               gcRoleID,
+			RoleId:               testRoleID,
 		},
 	})
 	assert.NoError(t, err)

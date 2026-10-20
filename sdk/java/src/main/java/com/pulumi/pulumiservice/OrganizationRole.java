@@ -40,18 +40,18 @@ import javax.annotation.Nullable;
  * import com.pulumi.Context;
  * import com.pulumi.Pulumi;
  * import com.pulumi.core.Output;
- * import com.pulumi.pulumiservice.enums.PolicyGroupTagOperator;
  * import com.pulumi.pulumiservice.enums.RbacAccountScope;
  * import com.pulumi.pulumiservice.enums.RbacEnvironmentScope;
  * import com.pulumi.pulumiservice.enums.RbacOrganizationScope;
  * import com.pulumi.pulumiservice.enums.RbacStackScope;
+ * import com.pulumi.pulumiservice.enums.TagOperator;
  * import com.pulumi.pulumiservice.PulumiserviceFunctions;
  * import com.pulumi.pulumiservice.inputs.GetStackArgs;
  * import com.pulumi.pulumiservice.inputs.GetEnvironmentArgs;
  * import com.pulumi.pulumiservice.inputs.GetInsightsAccountArgs;
  * import com.pulumi.pulumiservice.inputs.BuildRolePermissionsArgs;
  * import com.pulumi.pulumiservice.inputs.RoleStackRuleArgs;
- * import com.pulumi.pulumiservice.inputs.PolicyGroupTagConditionArgs;
+ * import com.pulumi.pulumiservice.inputs.TagConditionArgs;
  * import com.pulumi.pulumiservice.inputs.RoleEnvironmentRuleArgs;
  * import com.pulumi.pulumiservice.inputs.RoleAccountRuleArgs;
  * import com.pulumi.pulumiservice.OrganizationRole;
@@ -107,7 +107,7 @@ import javax.annotation.Nullable;
  *                     .build(),
  *                 // Deploy stacks tagged team=platform (the operator defaults to equals)
  *                 RoleStackRuleArgs.builder()
- *                     .tags(PolicyGroupTagConditionArgs.builder()
+ *                     .tags(TagConditionArgs.builder()
  *                         .key("team")
  *                         .value("platform")
  *                         .build())
@@ -117,10 +117,10 @@ import javax.annotation.Nullable;
  *                     .build(),
  *                 // Deploy stacks whose env tag is anything but "prod"
  *                 RoleStackRuleArgs.builder()
- *                     .tags(PolicyGroupTagConditionArgs.builder()
+ *                     .tags(TagConditionArgs.builder()
  *                         .key("env")
  *                         .value("prod")
- *                         .operator(PolicyGroupTagOperator.NotEquals)
+ *                         .operator(TagOperator.NotEquals)
  *                         .build())
  *                     .scopes(                    
  *                         RbacStackScope.StackWrite,
@@ -128,28 +128,28 @@ import javax.annotation.Nullable;
  *                     .build(),
  *                 // Read deployment settings on stacks that have a cost-center tag, whatever its value
  *                 RoleStackRuleArgs.builder()
- *                     .tags(PolicyGroupTagConditionArgs.builder()
+ *                     .tags(TagConditionArgs.builder()
  *                         .key("cost-center")
- *                         .operator(PolicyGroupTagOperator.Exists)
+ *                         .operator(TagOperator.Exists)
  *                         .build())
  *                     .scopes(RbacStackScope.StackDeploymentSettingsRead)
  *                     .build(),
  *                 // Tag stacks that don't have an owner tag yet
  *                 RoleStackRuleArgs.builder()
- *                     .tags(PolicyGroupTagConditionArgs.builder()
+ *                     .tags(TagConditionArgs.builder()
  *                         .key("owner")
- *                         .operator(PolicyGroupTagOperator.NotExists)
+ *                         .operator(TagOperator.NotExists)
  *                         .build())
  *                     .scopes(RbacStackScope.StackTagsUpdate)
  *                     .build(),
  *                 // Delete stacks that match every tag condition
  *                 RoleStackRuleArgs.builder()
  *                     .tags(                    
- *                         PolicyGroupTagConditionArgs.builder()
+ *                         TagConditionArgs.builder()
  *                             .key("team")
  *                             .value("platform")
  *                             .build(),
- *                         PolicyGroupTagConditionArgs.builder()
+ *                         TagConditionArgs.builder()
  *                             .key("lifecycle")
  *                             .value("ephemeral")
  *                             .build())
@@ -171,7 +171,7 @@ import javax.annotation.Nullable;
  *                     .build(),
  *                 // Open environments tagged team=platform
  *                 RoleEnvironmentRuleArgs.builder()
- *                     .tags(PolicyGroupTagConditionArgs.builder()
+ *                     .tags(TagConditionArgs.builder()
  *                         .key("team")
  *                         .value("platform")
  *                         .build())
@@ -190,7 +190,7 @@ import javax.annotation.Nullable;
  *                     .build(),
  *                 // Update accounts tagged team=platform
  *                 RoleAccountRuleArgs.builder()
- *                     .tags(PolicyGroupTagConditionArgs.builder()
+ *                     .tags(TagConditionArgs.builder()
  *                         .key("team")
  *                         .value("platform")
  *                         .build())
