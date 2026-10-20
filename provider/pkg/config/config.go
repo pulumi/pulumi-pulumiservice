@@ -37,15 +37,27 @@ func GetClient(ctx context.Context) Client {
 // ESC-served endpoints (e.g. environment revision tags) use this in lieu of
 // the pulumiapi.Client surface.
 func GetEscClient(ctx context.Context) esc_client.Client {
+	if v := ctx.Value(mockEscClientKey{}); v != nil {
+		return v.(esc_client.Client)
+	}
 	return infer.GetConfig[Config](ctx).escClient
 }
 
-type mockClientKey struct{}
+type (
+	mockClientKey    struct{}
+	mockEscClientKey struct{}
+)
 
 // WithMockClient injects a client into the context for testing. This should only be used
 // for testing.
 func WithMockClient(ctx context.Context, client Client) context.Context {
 	return context.WithValue(ctx, mockClientKey{}, client)
+}
+
+// WithMockEscClient injects an ESC client into the context for testing. This
+// should only be used for testing.
+func WithMockEscClient(ctx context.Context, client esc_client.Client) context.Context {
+	return context.WithValue(ctx, mockEscClientKey{}, client)
 }
 
 var ErrAccessTokenNotFound = fmt.Errorf("pulumi access token not found")
