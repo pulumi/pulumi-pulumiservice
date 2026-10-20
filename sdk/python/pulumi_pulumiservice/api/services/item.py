@@ -130,7 +130,7 @@ class Item(pulumi.CustomResource):
                  service_name: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         """
-        Adds items (such as access tokens, team memberships, or stack permissions) to an existing service account. Service accounts provide programmatic, non-human access to Pulumi Cloud resources and are scoped to an organization. Items define what the service account can access and what credentials it holds. Returns the updated service details with the first page of items; if `continuationToken` is set on the response, pass it to `GetService` to fetch the remaining pages.
+        Adds items, such as stacks or ESC environments, to an existing service. A service is a Pulumi Cloud construct that groups stacks, environments, and other resources under shared metadata so members of the service can discover and access them together. Returns the updated service details with the first page of items; if `continuationToken` is set on the response, pass it to `GetService` to fetch the remaining pages.
 
         Prefer `AddServiceItemsV2`, then `GetService` to read the items.
 
@@ -150,7 +150,7 @@ class Item(pulumi.CustomResource):
                  args: ItemArgs,
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
-        Adds items (such as access tokens, team memberships, or stack permissions) to an existing service account. Service accounts provide programmatic, non-human access to Pulumi Cloud resources and are scoped to an organization. Items define what the service account can access and what credentials it holds. Returns the updated service details with the first page of items; if `continuationToken` is set on the response, pass it to `GetService` to fetch the remaining pages.
+        Adds items, such as stacks or ESC environments, to an existing service. A service is a Pulumi Cloud construct that groups stacks, environments, and other resources under shared metadata so members of the service can discover and access them together. Returns the updated service details with the first page of items; if `continuationToken` is set on the response, pass it to `GetService` to fetch the remaining pages.
 
         Prefer `AddServiceItemsV2`, then `GetService` to read the items.
 

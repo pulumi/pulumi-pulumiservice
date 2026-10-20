@@ -30,7 +30,11 @@ type orgMemberClientMock struct {
 	updateFunc    func(ctx context.Context, orgName, userName, role string, fgaRoleID *string) error
 	deleteFunc    func(ctx context.Context, orgName, userName string) error
 	getFunc       func(ctx context.Context, orgName, userName string) (*pulumiapi.Member, error)
-	listRolesFunc func(ctx context.Context, orgName, uxPurpose string) ([]apitype.PermissionDescriptorRecord, error)
+	listRolesFunc func(
+		ctx context.Context,
+		orgName string,
+		uxPurpose apitype.PermissionDescriptorUXPurpose,
+	) ([]apitype.PermissionDescriptorRecord, error)
 }
 
 func (c *orgMemberClientMock) AddMemberToOrg(ctx context.Context, userName, orgName, role string) error {
@@ -54,7 +58,7 @@ func (c *orgMemberClientMock) GetOrgMember(
 }
 
 func (c *orgMemberClientMock) ListOrgRoles(
-	ctx context.Context, orgName, uxPurpose string,
+	ctx context.Context, orgName string, uxPurpose apitype.PermissionDescriptorUXPurpose,
 ) ([]apitype.PermissionDescriptorRecord, error) {
 	if c.listRolesFunc == nil {
 		return nil, nil
@@ -84,7 +88,11 @@ var builtinRoles = []apitype.PermissionDescriptorRecord{
 	},
 }
 
-func stubBuiltinRoles(_ context.Context, _, _ string) ([]apitype.PermissionDescriptorRecord, error) {
+func stubBuiltinRoles(
+	_ context.Context,
+	_ string,
+	_ apitype.PermissionDescriptorUXPurpose,
+) ([]apitype.PermissionDescriptorRecord, error) {
 	return builtinRoles, nil
 }
 
@@ -156,7 +164,11 @@ func TestOrganizationMemberRead(t *testing.T) {
 					FGARole: &pulumiapi.FGARole{ID: fgaID, Name: "read-only-devops"},
 				}, nil
 			},
-			listRolesFunc: func(_ context.Context, _, _ string) ([]apitype.PermissionDescriptorRecord, error) {
+			listRolesFunc: func(
+				_ context.Context,
+				_ string,
+				_ apitype.PermissionDescriptorUXPurpose,
+			) ([]apitype.PermissionDescriptorRecord, error) {
 				return append([]apitype.PermissionDescriptorRecord{
 					{
 						PermissionDescriptorBase: apitype.PermissionDescriptorBase{Name: "read-only-devops"},

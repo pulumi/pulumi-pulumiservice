@@ -334,7 +334,8 @@ class Account(pulumi.CustomResource):
     @pulumi.getter(name="providerVersion")
     def provider_version(self) -> pulumi.Output[Optional[_builtins.str]]:
         """
-        The version of the Pulumi provider package used for discovery.
+        Deprecated: no longer populated. Omitted from responses, and ignored if sent.
+        The provider version used for discovery is now recorded per resource.
         """
         return pulumi.get(self, "provider_version")
 

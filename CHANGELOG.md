@@ -8,12 +8,18 @@
 
 ### Improvements
 
+- Added the `getOrganizationRole` function, which looks up a role by the name shown in the Pulumi Cloud console, and `getOrganizationRoles`, which lists an organization's built-in and custom roles. Use the returned `roleId` instead of hardcoding role IDs. [#1185](https://github.com/pulumi/pulumi-pulumiservice/issues/1185)
 - Documented that `OrgAccessToken` must be created and deleted by a provider authenticated as a user, for example with a personal access token. Pulumi Cloud rejects organization and team access tokens, even Admin ones, with `403 Machine tokens are not allowed to perform this operation`. `TeamAccessToken` has no such restriction. No behavior change. [#1112](https://github.com/pulumi/pulumi-pulumiservice/issues/1112)
 - Clarified the `AccessToken`, `OrgAccessToken` and `TeamAccessToken` descriptions. `AccessToken` now states that it creates a personal access token. No behavior change. [#1183](https://github.com/pulumi/pulumi-pulumiservice/pull/1183)
+- Added the `buildStackMatchRule` and `buildAccountMatchRule` functions, which build a policy group's stack or Insights account match rule from tag rules, without writing Pulumi Cloud's `__type` expression format by hand. An entity matches if it matches any rule, and a rule matches when all of its conditions hold. Each condition compares one tag with `equals`, `notEquals`, `exists`, or `notExists`. Match rules are a preview feature of Pulumi Cloud. [#1172](https://github.com/pulumi/pulumi-pulumiservice/pull/1172)
 
 ### Bug Fixes
 
 - Fixed `getPolicyPack` always failing with `policy pack not found`, whether or not a version was given. It now requests versions by tag, and resolves the latest version from the organization's policy pack list. [#1012](https://github.com/pulumi/pulumi-pulumiservice/issues/1012)
+- Removing `stackMatchRule` or `accountMatchRule` from a `pulumiservice:api:PolicyGroup` now removes the rule in Pulumi Cloud. Previously the update re-sent the prior rule, so the rule stayed in place while `pulumi up` reported success and refresh showed no drift.
+- Changing `mode` on a `pulumiservice:api:PolicyGroup` now replaces the group. Pulumi Cloud fixes the mode at creation, so the in-place update the provider used to send was silently ignored. Adding `mode` to a program for a group that already has that mode, for example after `pulumi import` or when moving off the deprecated `entityType`, is not a change and does not replace the group. Neither is removing `mode` from a program.
+
+  **Check for a replace after upgrading.** If you changed `mode` on an existing group with an earlier version, Pulumi Cloud kept the original mode, and your program and the group now disagree. After the first refresh with this version, the next `pulumi up` deletes and recreates the group with your program's mode. The new group starts with no policy packs, and stacks or accounts added through `PolicyGroupStackAttachment` or `PolicyGroupInsightsAccountAttachment` are not re-added automatically. After upgrading, run `pulumi preview --refresh` and look for a replace on `pulumiservice:api:PolicyGroup`. To keep the group, set `mode` in your program to the group's current mode. To accept the recreate, run `pulumi up`, then `pulumi refresh` and `pulumi up` again to restore the attachments.
 - Updated the Pulumi Cloud SDK so `OrganizationRole.permissions` and the permission builder helpers accept scopes and permission descriptor types that Pulumi Cloud added recently. The previous version rejected them, or silently dropped scopes it didn't recognize. [#1162](https://github.com/pulumi/pulumi-pulumiservice/issues/1162)
 
 ## 1.4.0

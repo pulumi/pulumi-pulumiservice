@@ -19,45 +19,42 @@ __all__ = ['PolicyGroupArgs', 'PolicyGroup']
 @pulumi.input_type
 class PolicyGroupArgs:
     def __init__(__self__, *,
-                 entity_type: pulumi.Input[_builtins.str],
                  name: pulumi.Input[_builtins.str],
                  org_name: pulumi.Input[_builtins.str],
+                 account_match_rule: Optional[Any] = None,
                  agent_pool_id: pulumi.Input[Optional[_builtins.str]] = None,
-                 mode: pulumi.Input[Optional[_builtins.str]] = None):
+                 entity_type: pulumi.Input[Optional[_builtins.str]] = None,
+                 mode: pulumi.Input[Optional[_builtins.str]] = None,
+                 stack_match_rule: Optional[Any] = None):
         """
         The set of arguments for constructing a PolicyGroup resource.
 
-        :param pulumi.Input[_builtins.str] entity_type: The type of entities this policy group applies to (stacks or accounts).
-        :param pulumi.Input[_builtins.str] name: The name of the new policy group.
+        :param pulumi.Input[_builtins.str] name: The name of the new policy group. Up to 100 characters, made up of letters, numbers, hyphens, underscores, periods, or spaces, and may not begin or end with a space.
         :param pulumi.Input[_builtins.str] org_name: The organization name
+        :param Any account_match_rule: Preview: an account match rule to create the group with, a boolean expression over Insights account tags. Requires the tag-based policy groups feature; not allowed on preventative groups.
         :param pulumi.Input[_builtins.str] agent_pool_id: Agent pool ID for policy evaluation. Defaults to Pulumi hosted pool if not specified.
-        :param pulumi.Input[_builtins.str] mode: The enforcement mode for the policy group (audit or preventative). Defaults to 'audit' for account policy groups, 'preventative' for stack policy groups.
+        :param pulumi.Input[_builtins.str] entity_type: Deprecated: a legacy label, `stacks` or `accounts`. When `mode` is omitted it picks the mode (`accounts` → audit, `stacks` → preventative). When this is omitted, it is derived from `mode`. It does not restrict which entities the group can hold.
+        :param pulumi.Input[_builtins.str] mode: The enforcement mode for the policy group (audit or preventative). The mode decides what the group can hold: an audit group holds stacks and Insights accounts, a preventative group holds stacks only. Required unless the deprecated `entityType` is sent. Fixed at creation; it cannot be changed later.
+        :param Any stack_match_rule: Preview: a stack match rule to create the group with, a boolean expression over stack tags. Requires the tag-based policy groups feature.
         """
-        pulumi.set(__self__, "entity_type", entity_type)
         pulumi.set(__self__, "name", name)
         pulumi.set(__self__, "org_name", org_name)
+        if account_match_rule is not None:
+            pulumi.set(__self__, "account_match_rule", account_match_rule)
         if agent_pool_id is not None:
             pulumi.set(__self__, "agent_pool_id", agent_pool_id)
+        if entity_type is not None:
+            pulumi.set(__self__, "entity_type", entity_type)
         if mode is not None:
             pulumi.set(__self__, "mode", mode)
-
-    @_builtins.property
-    @pulumi.getter(name="entityType")
-    def entity_type(self) -> pulumi.Input[_builtins.str]:
-        """
-        The type of entities this policy group applies to (stacks or accounts).
-        """
-        return pulumi.get(self, "entity_type")
-
-    @entity_type.setter
-    def entity_type(self, value: pulumi.Input[_builtins.str]):
-        pulumi.set(self, "entity_type", value)
+        if stack_match_rule is not None:
+            pulumi.set(__self__, "stack_match_rule", stack_match_rule)
 
     @_builtins.property
     @pulumi.getter
     def name(self) -> pulumi.Input[_builtins.str]:
         """
-        The name of the new policy group.
+        The name of the new policy group. Up to 100 characters, made up of letters, numbers, hyphens, underscores, periods, or spaces, and may not begin or end with a space.
         """
         return pulumi.get(self, "name")
 
@@ -78,6 +75,18 @@ class PolicyGroupArgs:
         pulumi.set(self, "org_name", value)
 
     @_builtins.property
+    @pulumi.getter(name="accountMatchRule")
+    def account_match_rule(self) -> Optional[Any]:
+        """
+        Preview: an account match rule to create the group with, a boolean expression over Insights account tags. Requires the tag-based policy groups feature; not allowed on preventative groups.
+        """
+        return pulumi.get(self, "account_match_rule")
+
+    @account_match_rule.setter
+    def account_match_rule(self, value: Optional[Any]):
+        pulumi.set(self, "account_match_rule", value)
+
+    @_builtins.property
     @pulumi.getter(name="agentPoolId")
     def agent_pool_id(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
@@ -90,16 +99,40 @@ class PolicyGroupArgs:
         pulumi.set(self, "agent_pool_id", value)
 
     @_builtins.property
+    @pulumi.getter(name="entityType")
+    def entity_type(self) -> pulumi.Input[Optional[_builtins.str]]:
+        """
+        Deprecated: a legacy label, `stacks` or `accounts`. When `mode` is omitted it picks the mode (`accounts` → audit, `stacks` → preventative). When this is omitted, it is derived from `mode`. It does not restrict which entities the group can hold.
+        """
+        return pulumi.get(self, "entity_type")
+
+    @entity_type.setter
+    def entity_type(self, value: pulumi.Input[Optional[_builtins.str]]):
+        pulumi.set(self, "entity_type", value)
+
+    @_builtins.property
     @pulumi.getter
     def mode(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
-        The enforcement mode for the policy group (audit or preventative). Defaults to 'audit' for account policy groups, 'preventative' for stack policy groups.
+        The enforcement mode for the policy group (audit or preventative). The mode decides what the group can hold: an audit group holds stacks and Insights accounts, a preventative group holds stacks only. Required unless the deprecated `entityType` is sent. Fixed at creation; it cannot be changed later.
         """
         return pulumi.get(self, "mode")
 
     @mode.setter
     def mode(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "mode", value)
+
+    @_builtins.property
+    @pulumi.getter(name="stackMatchRule")
+    def stack_match_rule(self) -> Optional[Any]:
+        """
+        Preview: a stack match rule to create the group with, a boolean expression over stack tags. Requires the tag-based policy groups feature.
+        """
+        return pulumi.get(self, "stack_match_rule")
+
+    @stack_match_rule.setter
+    def stack_match_rule(self, value: Optional[Any]):
+        pulumi.set(self, "stack_match_rule", value)
 
 
 @pulumi.type_token("pulumiservice:api:PolicyGroup")
@@ -108,22 +141,26 @@ class PolicyGroup(pulumi.CustomResource):
     def __init__(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
+                 account_match_rule: Optional[Any] = None,
                  agent_pool_id: pulumi.Input[Optional[_builtins.str]] = None,
                  entity_type: pulumi.Input[Optional[_builtins.str]] = None,
                  mode: pulumi.Input[Optional[_builtins.str]] = None,
                  name: pulumi.Input[Optional[_builtins.str]] = None,
                  org_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 stack_match_rule: Optional[Any] = None,
                  __props__=None):
         """
         Creates a new Policy Group for an organization. Policy Groups define which Policy Packs are enforced on which stacks or cloud accounts, with configurable enforcement levels (advisory, mandatory, or disabled) per pack. This allows different policy strictness for different environments, such as advisory-only in development and mandatory in production.
 
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
+        :param Any account_match_rule: Preview: an account match rule to create the group with, a boolean expression over Insights account tags. Requires the tag-based policy groups feature; not allowed on preventative groups.
         :param pulumi.Input[_builtins.str] agent_pool_id: Agent pool ID for policy evaluation. Defaults to Pulumi hosted pool if not specified.
-        :param pulumi.Input[_builtins.str] entity_type: The type of entities this policy group applies to (stacks or accounts).
-        :param pulumi.Input[_builtins.str] mode: The enforcement mode for the policy group (audit or preventative). Defaults to 'audit' for account policy groups, 'preventative' for stack policy groups.
-        :param pulumi.Input[_builtins.str] name: The name of the new policy group.
+        :param pulumi.Input[_builtins.str] entity_type: Deprecated: a legacy label, `stacks` or `accounts`. When `mode` is omitted it picks the mode (`accounts` → audit, `stacks` → preventative). When this is omitted, it is derived from `mode`. It does not restrict which entities the group can hold.
+        :param pulumi.Input[_builtins.str] mode: The enforcement mode for the policy group (audit or preventative). The mode decides what the group can hold: an audit group holds stacks and Insights accounts, a preventative group holds stacks only. Required unless the deprecated `entityType` is sent. Fixed at creation; it cannot be changed later.
+        :param pulumi.Input[_builtins.str] name: The name of the new policy group. Up to 100 characters, made up of letters, numbers, hyphens, underscores, periods, or spaces, and may not begin or end with a space.
         :param pulumi.Input[_builtins.str] org_name: The organization name
+        :param Any stack_match_rule: Preview: a stack match rule to create the group with, a boolean expression over stack tags. Requires the tag-based policy groups feature.
         """
         ...
     @overload
@@ -149,11 +186,13 @@ class PolicyGroup(pulumi.CustomResource):
     def _internal_init(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
+                 account_match_rule: Optional[Any] = None,
                  agent_pool_id: pulumi.Input[Optional[_builtins.str]] = None,
                  entity_type: pulumi.Input[Optional[_builtins.str]] = None,
                  mode: pulumi.Input[Optional[_builtins.str]] = None,
                  name: pulumi.Input[Optional[_builtins.str]] = None,
                  org_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 stack_match_rule: Optional[Any] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
         if not isinstance(opts, pulumi.ResourceOptions):
@@ -163,9 +202,8 @@ class PolicyGroup(pulumi.CustomResource):
                 raise TypeError('__props__ is only valid when passed in combination with a valid opts.id to get an existing resource')
             __props__ = PolicyGroupArgs.__new__(PolicyGroupArgs)
 
+            __props__.__dict__["account_match_rule"] = account_match_rule
             __props__.__dict__["agent_pool_id"] = agent_pool_id
-            if entity_type is None and not opts.urn:
-                raise TypeError("Missing required property 'entity_type'")
             __props__.__dict__["entity_type"] = entity_type
             __props__.__dict__["mode"] = mode
             if name is None and not opts.urn:
@@ -174,6 +212,7 @@ class PolicyGroup(pulumi.CustomResource):
             if org_name is None and not opts.urn:
                 raise TypeError("Missing required property 'org_name'")
             __props__.__dict__["org_name"] = org_name
+            __props__.__dict__["stack_match_rule"] = stack_match_rule
             __props__.__dict__["accounts"] = None
             __props__.__dict__["applied_policy_packs"] = None
             __props__.__dict__["is_org_default"] = None
@@ -200,6 +239,7 @@ class PolicyGroup(pulumi.CustomResource):
 
         __props__ = PolicyGroupArgs.__new__(PolicyGroupArgs)
 
+        __props__.__dict__["account_match_rule"] = None
         __props__.__dict__["accounts"] = None
         __props__.__dict__["agent_pool_id"] = None
         __props__.__dict__["applied_policy_packs"] = None
@@ -207,14 +247,23 @@ class PolicyGroup(pulumi.CustomResource):
         __props__.__dict__["is_org_default"] = None
         __props__.__dict__["mode"] = None
         __props__.__dict__["name"] = None
+        __props__.__dict__["stack_match_rule"] = None
         __props__.__dict__["stacks"] = None
         return PolicyGroup(resource_name, opts=opts, __props__=__props__)
+
+    @_builtins.property
+    @pulumi.getter(name="accountMatchRule")
+    def account_match_rule(self) -> pulumi.Output[Optional[Any]]:
+        """
+        Preview: the account match rule, a boolean expression over Insights account tags. Accounts whose tags satisfy it are members of the group alongside the accounts added individually. Absent when the group has no rule.
+        """
+        return pulumi.get(self, "account_match_rule")
 
     @_builtins.property
     @pulumi.getter
     def accounts(self) -> pulumi.Output[Sequence[_builtins.str]]:
         """
-        List of Insights account names that are members of this policy group.
+        The Insights accounts added to this policy group individually, with `addInsightsAccount`.
         """
         return pulumi.get(self, "accounts")
 
@@ -238,7 +287,7 @@ class PolicyGroup(pulumi.CustomResource):
     @pulumi.getter(name="entityType")
     def entity_type(self) -> pulumi.Output[_builtins.str]:
         """
-        The type of entities this policy group applies to (stacks or accounts).
+        Deprecated: a legacy label set when the policy group was created. It does not restrict which entities the group holds; `mode` does.
         """
         return pulumi.get(self, "entity_type")
 
@@ -267,10 +316,18 @@ class PolicyGroup(pulumi.CustomResource):
         return pulumi.get(self, "name")
 
     @_builtins.property
+    @pulumi.getter(name="stackMatchRule")
+    def stack_match_rule(self) -> pulumi.Output[Optional[Any]]:
+        """
+        Preview: the stack match rule, a boolean expression over stack tags. Stacks whose tags satisfy it are members of the group alongside the stacks added individually. Absent when the group has no rule.
+        """
+        return pulumi.get(self, "stack_match_rule")
+
+    @_builtins.property
     @pulumi.getter
     def stacks(self) -> pulumi.Output[Sequence[Any]]:
         """
-        List of stacks that are members of this policy group.
+        The stacks added to this policy group individually, with `addStack`.
         """
         return pulumi.get(self, "stacks")
 

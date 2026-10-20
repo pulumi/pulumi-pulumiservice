@@ -170,6 +170,12 @@ type FieldMeta struct {
 	// AutoName, when >0, makes the field optional on create and Check
 	// generates one (from URN + random seed) capped at this max length.
 	AutoName int `json:"autoName,omitempty"`
+
+	// ClearField names a boolean update-body field that clears this input
+	// server-side. Update sends it when the input is dropped from the
+	// program: to such APIs an absent field means "leave unchanged", and
+	// Update would otherwise re-send the prior value from old inputs/state.
+	ClearField string `json:"clearField,omitempty"`
 }
 
 // ParseMetadata parses metadata.json.
