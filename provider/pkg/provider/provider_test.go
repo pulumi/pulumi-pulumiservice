@@ -27,6 +27,8 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
+
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/functions"
 )
 
 func TestDiffConfig(t *testing.T) {
@@ -193,6 +195,28 @@ func TestProvider_LayeredSchema(t *testing.T) {
 		assert.Truef(t, ok, "missing %s — expected from %s", c.token, c.source)
 	}
 
+}
+
+// Every function in functions.DeprecatedFunctions must reach the schema
+// deprecated. The provider patches the messages in itself, so a misspelled
+// token would otherwise go unnoticed.
+func TestProvider_DeprecatedFunctions(t *testing.T) {
+	provider, err := MakeProvider(nil, "pulumiservice", "1.0.0")
+	require.NoError(t, err)
+
+	resp, err := provider.GetSchema(context.Background(), &pulumirpc.GetSchemaRequest{})
+	require.NoError(t, err)
+
+	var spec schema.PackageSpec
+	require.NoError(t, json.Unmarshal([]byte(resp.Schema), &spec))
+
+	require.NotEmpty(t, functions.DeprecatedFunctions)
+	for token, message := range functions.DeprecatedFunctions {
+		fn, ok := spec.Functions[token]
+		if assert.Truef(t, ok, "%s is not in the schema", token) {
+			assert.Equal(t, message, fn.DeprecationMessage, token)
+		}
+	}
 }
 
 // getPolicyPacks' result must be a named type, not an inline object.

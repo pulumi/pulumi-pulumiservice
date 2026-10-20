@@ -17,6 +17,210 @@ import (
 // Requires the Custom Roles feature to be enabled on the organization. See the [Pulumi Cloud RBAC docs](https://www.pulumi.com/docs/pulumi-cloud/access-management/rbac/) for the shape of the `permissions` descriptor.
 //
 // This resource manages only permission descriptors with `uxPurpose="role"`. Pulumi Cloud uses `uxPurpose` to split the permission-descriptor table into roles and other kinds (for example `policy`). Use `pulumiservice:api:Role`, which exposes `uxPurpose` directly, to manage the other kinds.
+//
+// Build the role's `permissions` with the `buildRolePermissions` helper function, as in the example below.
+//
+// **Manage these roles in code, not in the Pulumi Cloud console.** In the console's role editor, every rule grants a permission set (the "access level"); it can't show scopes granted directly. Roles that grant scopes directly, as `buildRolePermissions` does, open read-only there.
+//
+// ## Example Usage
+// ### A role with organization-level access and entity rules
+//
+// The program looks up an existing stack, environment, and cloud account, then defines a role that grants scopes at the organization level and on each kind of entity.
+//
+// ```go
+// package main
+//
+// import (
+//
+//	"github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice"
+//	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
+//	"github.com/pulumi/pulumi/sdk/v3/go/pulumi/config"
+//
+// )
+//
+//	func main() {
+//		pulumi.Run(func(ctx *pulumi.Context) error {
+//			cfg := config.New(ctx, "")
+//			organizationName := "my-org"
+//			if param := cfg.Get("organizationName"); param != "" {
+//				organizationName = param
+//			}
+//			prodStack := pulumiservice.GetStackOutput(ctx, pulumiservice.GetStackOutputArgs{
+//				OrganizationName: pulumi.String(organizationName),
+//				ProjectName:      pulumi.String("networking"),
+//				StackName:        pulumi.String("prod"),
+//			}, nil)
+//			sharedEnvironment := pulumiservice.GetEnvironmentOutput(ctx, pulumiservice.GetEnvironmentOutputArgs{
+//				OrganizationName: pulumi.String(organizationName),
+//				ProjectName:      pulumi.String("platform"),
+//				Name:             pulumi.String("shared"),
+//			}, nil)
+//			awsAccount := pulumiservice.GetInsightsAccountOutput(ctx, pulumiservice.GetInsightsAccountOutputArgs{
+//				OrganizationName: pulumi.String(organizationName),
+//				AccountName:      pulumi.String("aws-production"),
+//			}, nil)
+//			platformPermissions := pulumiservice.BuildRolePermissionsOutput(ctx, pulumiservice.BuildRolePermissionsOutputArgs{
+//				OrganizationScopes: pulumiservice.RbacOrganizationScopeArray{
+//					pulumiservice.RbacOrganizationScopeTeamRead,
+//					pulumiservice.RbacOrganizationScopeStackCreate,
+//				},
+//				StackRules: pulumiservice.RoleStackRuleArray{
+//					// Read every stack in the organization
+//					&pulumiservice.RoleStackRuleArgs{
+//						All: pulumi.Bool(true),
+//						Scopes: pulumiservice.RbacStackScopeArray{
+//							pulumiservice.RbacStackScopeStackRead,
+//						},
+//					},
+//					// Deploy one specific stack
+//					&pulumiservice.RoleStackRuleArgs{
+//						Id: prodStack.StackId(),
+//						Scopes: pulumiservice.RbacStackScopeArray{
+//							pulumiservice.RbacStackScopeStackWrite,
+//							pulumiservice.RbacStackScopeStackDeploymentCreate,
+//						},
+//					},
+//					// Deploy stacks tagged team=platform (the operator defaults to equals)
+//					&pulumiservice.RoleStackRuleArgs{
+//						Tags: pulumiservice.PolicyGroupTagConditionArray{
+//							&pulumiservice.PolicyGroupTagConditionArgs{
+//								Key:   pulumi.String("team"),
+//								Value: pulumi.String("platform"),
+//							},
+//						},
+//						Scopes: pulumiservice.RbacStackScopeArray{
+//							pulumiservice.RbacStackScopeStackWrite,
+//							pulumiservice.RbacStackScopeStackDeploymentCreate,
+//						},
+//					},
+//					// Deploy stacks whose env tag is anything but "prod"
+//					&pulumiservice.RoleStackRuleArgs{
+//						Tags: pulumiservice.PolicyGroupTagConditionArray{
+//							&pulumiservice.PolicyGroupTagConditionArgs{
+//								Key:      pulumi.String("env"),
+//								Value:    pulumi.String("prod"),
+//								Operator: pulumiservice.PolicyGroupTagOperatorNotEquals,
+//							},
+//						},
+//						Scopes: pulumiservice.RbacStackScopeArray{
+//							pulumiservice.RbacStackScopeStackWrite,
+//							pulumiservice.RbacStackScopeStackDeploymentCreate,
+//						},
+//					},
+//					// Read deployment settings on stacks that have a cost-center tag, whatever its value
+//					&pulumiservice.RoleStackRuleArgs{
+//						Tags: pulumiservice.PolicyGroupTagConditionArray{
+//							&pulumiservice.PolicyGroupTagConditionArgs{
+//								Key:      pulumi.String("cost-center"),
+//								Operator: pulumiservice.PolicyGroupTagOperatorExists,
+//							},
+//						},
+//						Scopes: pulumiservice.RbacStackScopeArray{
+//							pulumiservice.RbacStackScopeStackDeploymentSettingsRead,
+//						},
+//					},
+//					// Tag stacks that don't have an owner tag yet
+//					&pulumiservice.RoleStackRuleArgs{
+//						Tags: pulumiservice.PolicyGroupTagConditionArray{
+//							&pulumiservice.PolicyGroupTagConditionArgs{
+//								Key:      pulumi.String("owner"),
+//								Operator: pulumiservice.PolicyGroupTagOperatorNotExists,
+//							},
+//						},
+//						Scopes: pulumiservice.RbacStackScopeArray{
+//							pulumiservice.RbacStackScopeStackTagsUpdate,
+//						},
+//					},
+//					// Delete stacks that match every tag condition
+//					&pulumiservice.RoleStackRuleArgs{
+//						Tags: pulumiservice.PolicyGroupTagConditionArray{
+//							&pulumiservice.PolicyGroupTagConditionArgs{
+//								Key:   pulumi.String("team"),
+//								Value: pulumi.String("platform"),
+//							},
+//							&pulumiservice.PolicyGroupTagConditionArgs{
+//								Key:   pulumi.String("lifecycle"),
+//								Value: pulumi.String("ephemeral"),
+//							},
+//						},
+//						Scopes: pulumiservice.RbacStackScopeArray{
+//							pulumiservice.RbacStackScopeStackDelete,
+//						},
+//					},
+//				},
+//				EnvironmentRules: pulumiservice.RoleEnvironmentRuleArray{
+//					// Read every environment
+//					&pulumiservice.RoleEnvironmentRuleArgs{
+//						All: pulumi.Bool(true),
+//						Scopes: pulumiservice.RbacEnvironmentScopeArray{
+//							pulumiservice.RbacEnvironmentScopeEnvironmentRead,
+//						},
+//					},
+//					// Open, update, and rotate one specific environment
+//					&pulumiservice.RoleEnvironmentRuleArgs{
+//						Id: sharedEnvironment.EnvironmentId(),
+//						Scopes: pulumiservice.RbacEnvironmentScopeArray{
+//							pulumiservice.RbacEnvironmentScopeEnvironmentOpen,
+//							pulumiservice.RbacEnvironmentScopeEnvironmentWrite,
+//							pulumiservice.RbacEnvironmentScopeEnvironmentRotate,
+//						},
+//					},
+//					// Open environments tagged team=platform
+//					&pulumiservice.RoleEnvironmentRuleArgs{
+//						Tags: pulumiservice.PolicyGroupTagConditionArray{
+//							&pulumiservice.PolicyGroupTagConditionArgs{
+//								Key:   pulumi.String("team"),
+//								Value: pulumi.String("platform"),
+//							},
+//						},
+//						Scopes: pulumiservice.RbacEnvironmentScopeArray{
+//							pulumiservice.RbacEnvironmentScopeEnvironmentOpen,
+//						},
+//					},
+//				},
+//				AccountRules: pulumiservice.RoleAccountRuleArray{
+//					// Read every cloud account
+//					&pulumiservice.RoleAccountRuleArgs{
+//						All: pulumi.Bool(true),
+//						Scopes: pulumiservice.RbacAccountScopeArray{
+//							pulumiservice.RbacAccountScopeInsightsAccountRead,
+//						},
+//					},
+//					// Scan one specific account
+//					&pulumiservice.RoleAccountRuleArgs{
+//						Id: awsAccount.InsightsAccountId(),
+//						Scopes: pulumiservice.RbacAccountScopeArray{
+//							pulumiservice.RbacAccountScopeInsightsAccountScan,
+//						},
+//					},
+//					// Update accounts tagged team=platform
+//					&pulumiservice.RoleAccountRuleArgs{
+//						Tags: pulumiservice.PolicyGroupTagConditionArray{
+//							&pulumiservice.PolicyGroupTagConditionArgs{
+//								Key:   pulumi.String("team"),
+//								Value: pulumi.String("platform"),
+//							},
+//						},
+//						Scopes: pulumiservice.RbacAccountScopeArray{
+//							pulumiservice.RbacAccountScopeInsightsAccountUpdate,
+//						},
+//					},
+//				},
+//			}, nil)
+//			_, err := pulumiservice.NewOrganizationRole(ctx, "platformRole", &pulumiservice.OrganizationRoleArgs{
+//				OrganizationName: pulumi.String(organizationName),
+//				Name:             pulumi.String("Platform Engineers"),
+//				Description:      pulumi.String("Read access across the organization, plus deploy access to platform stacks."),
+//				Permissions:      platformPermissions.Permissions(),
+//			})
+//			if err != nil {
+//				return err
+//			}
+//			return nil
+//		})
+//	}
+//
+// ```
 type OrganizationRole struct {
 	pulumi.CustomResourceState
 
@@ -26,19 +230,18 @@ type OrganizationRole struct {
 	Name pulumi.StringOutput `pulumi:"name"`
 	// The Pulumi Cloud organization name.
 	OrganizationName pulumi.StringOutput `pulumi:"organizationName"`
-	// The role's permission descriptor tree, expressed in the Pulumi Cloud wire grammar. The provider exposes the descriptor as `map[string]Any` and passes it through verbatim — the wire-format `__type` discriminator is used at every level (SDK and API alike).
+	// The role's permission descriptor tree.
 	//
-	// Common top-level descriptors:
-	// - `PermissionDescriptorAllow` — `{__type: "PermissionDescriptorAllow", permissions: ["<scope>", ...]}` grants the listed scopes.
-	// - `PermissionDescriptorGroup` — `{__type: "PermissionDescriptorGroup", entries: [{__type: "PermissionDescriptorAllow", ...}, ...]}` composes multiple descriptors; the role grants the union of every entry.
-	// - `PermissionDescriptorCondition` — `{__type: "PermissionDescriptorCondition", condition: {__type: ...}, subNode: {__type: ...}}` gates a sub-descriptor on a boolean expression.
-	// - `PermissionDescriptorCompose` — references other roles by ID; `{__type: "PermissionDescriptorCompose", permissionDescriptors: [<roleId>, ...]}`.
+	// **Build this with the helper functions.** They construct the tree for you and validate it before anything reaches Pulumi Cloud:
+	// - `buildRolePermissions`: start here. It builds a complete role from organization-level scopes and `stackRules`, `environmentRules`, and `accountRules` (cloud accounts: Discovery; `InsightsAccount` in the API and this provider). Each rule grants scopes on every entity of its type, on one specific entity, or on entities matching tags. Each rule list accepts only scopes for its own entity type, so a stack scope can't end up on an environment rule.
 	//
-	// Pulumi Cloud's REST API also accepts `PermissionDescriptorIfThenElse`, `PermissionDescriptorSelect`, and the `PermissionExpression*` / `PermissionLiteralExpression*` boolean operators (And, Or, Not, Equal, Environment, Stack, Team, InsightsAccount, …); the provider does not inspect anything below the top, so future Cloud additions work without a provider release.
+	// `buildAllowPermissions`, `buildStackScopedPermissions`, `buildEnvironmentScopedPermissions`, and `buildInsightsAccountScopedPermissions` are deprecated: `buildRolePermissions` does what they do with typed scopes. Look up stack IDs with `getStack`, environment IDs with `getEnvironment`, and cloud account IDs with `getInsightsAccount`. To assign the role, use `TeamRoleAssignment` or `OrganizationMember.roleId`.
 	//
-	// For the common case of granting a set of scopes on one entity, prefer the `buildAllowPermissions`, `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, and `buildInsightsAccountScopedPermissions` helpers, which build the descriptor tree for you. To grant a role to a team, use the `TeamRoleAssignment` resource — roles are *associated with* teams, not gated on them via a permission descriptor.
+	// **Permission sets** (such as the built-in Stack Write) aren't supported by the helpers yet. Grant the scopes they contain instead; `getOrganizationRoleScopes` lists the available scopes.
 	//
-	// Note: the `__type` field name uses Pulumi's `__`-prefixed-key passthrough (pulumi/pulumi#22834, available in pulumi 3.235.0+). Earlier pulumi runtimes will drop these keys at the SDK boundary; the Python SDK pins the minimum runtime version automatically.
+	// **When Pulumi Cloud adds a scope** that this provider's enums don't list yet, upgrade the provider to grant it.
+	//
+	// Note: the helpers' output requires pulumi 3.235.0 or later (pulumi/pulumi#22834). Earlier runtimes drop part of it at the SDK boundary; the Python SDK pins the minimum runtime version automatically.
 	Permissions pulumi.MapOutput `pulumi:"permissions"`
 	// The resource type the role's permissions apply to. Defaults to `global` (the org-wide role that can be assigned to members and teams). Other valid values: `stack`, `environment`, `insights-account`.
 	ResourceType pulumi.StringPtrOutput `pulumi:"resourceType"`
@@ -107,19 +310,18 @@ type organizationRoleArgs struct {
 	Name string `pulumi:"name"`
 	// The Pulumi Cloud organization name.
 	OrganizationName string `pulumi:"organizationName"`
-	// The role's permission descriptor tree, expressed in the Pulumi Cloud wire grammar. The provider exposes the descriptor as `map[string]Any` and passes it through verbatim — the wire-format `__type` discriminator is used at every level (SDK and API alike).
+	// The role's permission descriptor tree.
 	//
-	// Common top-level descriptors:
-	// - `PermissionDescriptorAllow` — `{__type: "PermissionDescriptorAllow", permissions: ["<scope>", ...]}` grants the listed scopes.
-	// - `PermissionDescriptorGroup` — `{__type: "PermissionDescriptorGroup", entries: [{__type: "PermissionDescriptorAllow", ...}, ...]}` composes multiple descriptors; the role grants the union of every entry.
-	// - `PermissionDescriptorCondition` — `{__type: "PermissionDescriptorCondition", condition: {__type: ...}, subNode: {__type: ...}}` gates a sub-descriptor on a boolean expression.
-	// - `PermissionDescriptorCompose` — references other roles by ID; `{__type: "PermissionDescriptorCompose", permissionDescriptors: [<roleId>, ...]}`.
+	// **Build this with the helper functions.** They construct the tree for you and validate it before anything reaches Pulumi Cloud:
+	// - `buildRolePermissions`: start here. It builds a complete role from organization-level scopes and `stackRules`, `environmentRules`, and `accountRules` (cloud accounts: Discovery; `InsightsAccount` in the API and this provider). Each rule grants scopes on every entity of its type, on one specific entity, or on entities matching tags. Each rule list accepts only scopes for its own entity type, so a stack scope can't end up on an environment rule.
 	//
-	// Pulumi Cloud's REST API also accepts `PermissionDescriptorIfThenElse`, `PermissionDescriptorSelect`, and the `PermissionExpression*` / `PermissionLiteralExpression*` boolean operators (And, Or, Not, Equal, Environment, Stack, Team, InsightsAccount, …); the provider does not inspect anything below the top, so future Cloud additions work without a provider release.
+	// `buildAllowPermissions`, `buildStackScopedPermissions`, `buildEnvironmentScopedPermissions`, and `buildInsightsAccountScopedPermissions` are deprecated: `buildRolePermissions` does what they do with typed scopes. Look up stack IDs with `getStack`, environment IDs with `getEnvironment`, and cloud account IDs with `getInsightsAccount`. To assign the role, use `TeamRoleAssignment` or `OrganizationMember.roleId`.
 	//
-	// For the common case of granting a set of scopes on one entity, prefer the `buildAllowPermissions`, `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, and `buildInsightsAccountScopedPermissions` helpers, which build the descriptor tree for you. To grant a role to a team, use the `TeamRoleAssignment` resource — roles are *associated with* teams, not gated on them via a permission descriptor.
+	// **Permission sets** (such as the built-in Stack Write) aren't supported by the helpers yet. Grant the scopes they contain instead; `getOrganizationRoleScopes` lists the available scopes.
 	//
-	// Note: the `__type` field name uses Pulumi's `__`-prefixed-key passthrough (pulumi/pulumi#22834, available in pulumi 3.235.0+). Earlier pulumi runtimes will drop these keys at the SDK boundary; the Python SDK pins the minimum runtime version automatically.
+	// **When Pulumi Cloud adds a scope** that this provider's enums don't list yet, upgrade the provider to grant it.
+	//
+	// Note: the helpers' output requires pulumi 3.235.0 or later (pulumi/pulumi#22834). Earlier runtimes drop part of it at the SDK boundary; the Python SDK pins the minimum runtime version automatically.
 	Permissions map[string]interface{} `pulumi:"permissions"`
 	// The resource type the role's permissions apply to. Defaults to `global` (the org-wide role that can be assigned to members and teams). Other valid values: `stack`, `environment`, `insights-account`.
 	ResourceType *string `pulumi:"resourceType"`
@@ -133,19 +335,18 @@ type OrganizationRoleArgs struct {
 	Name pulumi.StringInput
 	// The Pulumi Cloud organization name.
 	OrganizationName pulumi.StringInput
-	// The role's permission descriptor tree, expressed in the Pulumi Cloud wire grammar. The provider exposes the descriptor as `map[string]Any` and passes it through verbatim — the wire-format `__type` discriminator is used at every level (SDK and API alike).
+	// The role's permission descriptor tree.
 	//
-	// Common top-level descriptors:
-	// - `PermissionDescriptorAllow` — `{__type: "PermissionDescriptorAllow", permissions: ["<scope>", ...]}` grants the listed scopes.
-	// - `PermissionDescriptorGroup` — `{__type: "PermissionDescriptorGroup", entries: [{__type: "PermissionDescriptorAllow", ...}, ...]}` composes multiple descriptors; the role grants the union of every entry.
-	// - `PermissionDescriptorCondition` — `{__type: "PermissionDescriptorCondition", condition: {__type: ...}, subNode: {__type: ...}}` gates a sub-descriptor on a boolean expression.
-	// - `PermissionDescriptorCompose` — references other roles by ID; `{__type: "PermissionDescriptorCompose", permissionDescriptors: [<roleId>, ...]}`.
+	// **Build this with the helper functions.** They construct the tree for you and validate it before anything reaches Pulumi Cloud:
+	// - `buildRolePermissions`: start here. It builds a complete role from organization-level scopes and `stackRules`, `environmentRules`, and `accountRules` (cloud accounts: Discovery; `InsightsAccount` in the API and this provider). Each rule grants scopes on every entity of its type, on one specific entity, or on entities matching tags. Each rule list accepts only scopes for its own entity type, so a stack scope can't end up on an environment rule.
 	//
-	// Pulumi Cloud's REST API also accepts `PermissionDescriptorIfThenElse`, `PermissionDescriptorSelect`, and the `PermissionExpression*` / `PermissionLiteralExpression*` boolean operators (And, Or, Not, Equal, Environment, Stack, Team, InsightsAccount, …); the provider does not inspect anything below the top, so future Cloud additions work without a provider release.
+	// `buildAllowPermissions`, `buildStackScopedPermissions`, `buildEnvironmentScopedPermissions`, and `buildInsightsAccountScopedPermissions` are deprecated: `buildRolePermissions` does what they do with typed scopes. Look up stack IDs with `getStack`, environment IDs with `getEnvironment`, and cloud account IDs with `getInsightsAccount`. To assign the role, use `TeamRoleAssignment` or `OrganizationMember.roleId`.
 	//
-	// For the common case of granting a set of scopes on one entity, prefer the `buildAllowPermissions`, `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, and `buildInsightsAccountScopedPermissions` helpers, which build the descriptor tree for you. To grant a role to a team, use the `TeamRoleAssignment` resource — roles are *associated with* teams, not gated on them via a permission descriptor.
+	// **Permission sets** (such as the built-in Stack Write) aren't supported by the helpers yet. Grant the scopes they contain instead; `getOrganizationRoleScopes` lists the available scopes.
 	//
-	// Note: the `__type` field name uses Pulumi's `__`-prefixed-key passthrough (pulumi/pulumi#22834, available in pulumi 3.235.0+). Earlier pulumi runtimes will drop these keys at the SDK boundary; the Python SDK pins the minimum runtime version automatically.
+	// **When Pulumi Cloud adds a scope** that this provider's enums don't list yet, upgrade the provider to grant it.
+	//
+	// Note: the helpers' output requires pulumi 3.235.0 or later (pulumi/pulumi#22834). Earlier runtimes drop part of it at the SDK boundary; the Python SDK pins the minimum runtime version automatically.
 	Permissions pulumi.MapInput
 	// The resource type the role's permissions apply to. Defaults to `global` (the org-wide role that can be assigned to members and teams). Other valid values: `stack`, `environment`, `insights-account`.
 	ResourceType pulumi.StringPtrInput
@@ -253,19 +454,18 @@ func (o OrganizationRoleOutput) OrganizationName() pulumi.StringOutput {
 	return o.ApplyT(func(v *OrganizationRole) pulumi.StringOutput { return v.OrganizationName }).(pulumi.StringOutput)
 }
 
-// The role's permission descriptor tree, expressed in the Pulumi Cloud wire grammar. The provider exposes the descriptor as `map[string]Any` and passes it through verbatim — the wire-format `__type` discriminator is used at every level (SDK and API alike).
+// The role's permission descriptor tree.
 //
-// Common top-level descriptors:
-// - `PermissionDescriptorAllow` — `{__type: "PermissionDescriptorAllow", permissions: ["<scope>", ...]}` grants the listed scopes.
-// - `PermissionDescriptorGroup` — `{__type: "PermissionDescriptorGroup", entries: [{__type: "PermissionDescriptorAllow", ...}, ...]}` composes multiple descriptors; the role grants the union of every entry.
-// - `PermissionDescriptorCondition` — `{__type: "PermissionDescriptorCondition", condition: {__type: ...}, subNode: {__type: ...}}` gates a sub-descriptor on a boolean expression.
-// - `PermissionDescriptorCompose` — references other roles by ID; `{__type: "PermissionDescriptorCompose", permissionDescriptors: [<roleId>, ...]}`.
+// **Build this with the helper functions.** They construct the tree for you and validate it before anything reaches Pulumi Cloud:
+// - `buildRolePermissions`: start here. It builds a complete role from organization-level scopes and `stackRules`, `environmentRules`, and `accountRules` (cloud accounts: Discovery; `InsightsAccount` in the API and this provider). Each rule grants scopes on every entity of its type, on one specific entity, or on entities matching tags. Each rule list accepts only scopes for its own entity type, so a stack scope can't end up on an environment rule.
 //
-// Pulumi Cloud's REST API also accepts `PermissionDescriptorIfThenElse`, `PermissionDescriptorSelect`, and the `PermissionExpression*` / `PermissionLiteralExpression*` boolean operators (And, Or, Not, Equal, Environment, Stack, Team, InsightsAccount, …); the provider does not inspect anything below the top, so future Cloud additions work without a provider release.
+// `buildAllowPermissions`, `buildStackScopedPermissions`, `buildEnvironmentScopedPermissions`, and `buildInsightsAccountScopedPermissions` are deprecated: `buildRolePermissions` does what they do with typed scopes. Look up stack IDs with `getStack`, environment IDs with `getEnvironment`, and cloud account IDs with `getInsightsAccount`. To assign the role, use `TeamRoleAssignment` or `OrganizationMember.roleId`.
 //
-// For the common case of granting a set of scopes on one entity, prefer the `buildAllowPermissions`, `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, and `buildInsightsAccountScopedPermissions` helpers, which build the descriptor tree for you. To grant a role to a team, use the `TeamRoleAssignment` resource — roles are *associated with* teams, not gated on them via a permission descriptor.
+// **Permission sets** (such as the built-in Stack Write) aren't supported by the helpers yet. Grant the scopes they contain instead; `getOrganizationRoleScopes` lists the available scopes.
 //
-// Note: the `__type` field name uses Pulumi's `__`-prefixed-key passthrough (pulumi/pulumi#22834, available in pulumi 3.235.0+). Earlier pulumi runtimes will drop these keys at the SDK boundary; the Python SDK pins the minimum runtime version automatically.
+// **When Pulumi Cloud adds a scope** that this provider's enums don't list yet, upgrade the provider to grant it.
+//
+// Note: the helpers' output requires pulumi 3.235.0 or later (pulumi/pulumi#22834). Earlier runtimes drop part of it at the SDK boundary; the Python SDK pins the minimum runtime version automatically.
 func (o OrganizationRoleOutput) Permissions() pulumi.MapOutput {
 	return o.ApplyT(func(v *OrganizationRole) pulumi.MapOutput { return v.Permissions }).(pulumi.MapOutput)
 }

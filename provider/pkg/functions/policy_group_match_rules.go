@@ -173,6 +173,19 @@ func tagConditionExpression(
 	case strings.HasPrefix(c.Key, teamAccessTagKeyPrefix):
 		return nil, fmt.Errorf("match rules can't use team-access tags (%s*)", teamAccessTagKeyPrefix)
 	}
+	return tagExpression(entity, c)
+}
+
+// tagExpression encodes one tag condition the way the console does. Match
+// rules and buildRolePermissions' tag rules share it, so a condition means the
+// same thing in both.
+func tagExpression(
+	entity apitype.PermissionContextExpression,
+	c PolicyGroupTagCondition,
+) (apitype.PermissionBooleanExpression, error) {
+	if strings.TrimSpace(c.Key) == "" {
+		return nil, errors.New("`key` must not be empty")
+	}
 	operator := PolicyGroupTagOperatorEquals
 	if c.Operator != nil {
 		operator = *c.Operator

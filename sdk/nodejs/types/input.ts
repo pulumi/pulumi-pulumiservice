@@ -557,6 +557,120 @@ export interface PolicyPackPolicyInputArgs {
     url?: pulumi.Input<string | undefined>;
 }
 
+export interface RoleAccountRule {
+    /**
+     * Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+     */
+    all?: boolean;
+    /**
+     * Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
+     */
+    id?: string;
+    /**
+     * Cloud account scopes to grant on the selected accounts.
+     */
+    scopes?: enums.RbacAccountScope[];
+    /**
+     * Apply to entities whose tags match every condition.
+     */
+    tags?: inputs.PolicyGroupTagCondition[];
+}
+
+export interface RoleAccountRuleArgs {
+    /**
+     * Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+     */
+    all?: pulumi.Input<boolean | undefined>;
+    /**
+     * Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
+     */
+    id?: pulumi.Input<string | undefined>;
+    /**
+     * Cloud account scopes to grant on the selected accounts.
+     */
+    scopes?: pulumi.Input<pulumi.Input<enums.RbacAccountScope>[] | undefined>;
+    /**
+     * Apply to entities whose tags match every condition.
+     */
+    tags?: pulumi.Input<pulumi.Input<inputs.PolicyGroupTagConditionArgs>[] | undefined>;
+}
+
+export interface RoleEnvironmentRule {
+    /**
+     * Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+     */
+    all?: boolean;
+    /**
+     * Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
+     */
+    id?: string;
+    /**
+     * Environment scopes to grant on the selected environments.
+     */
+    scopes?: enums.RbacEnvironmentScope[];
+    /**
+     * Apply to entities whose tags match every condition.
+     */
+    tags?: inputs.PolicyGroupTagCondition[];
+}
+
+export interface RoleEnvironmentRuleArgs {
+    /**
+     * Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+     */
+    all?: pulumi.Input<boolean | undefined>;
+    /**
+     * Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
+     */
+    id?: pulumi.Input<string | undefined>;
+    /**
+     * Environment scopes to grant on the selected environments.
+     */
+    scopes?: pulumi.Input<pulumi.Input<enums.RbacEnvironmentScope>[] | undefined>;
+    /**
+     * Apply to entities whose tags match every condition.
+     */
+    tags?: pulumi.Input<pulumi.Input<inputs.PolicyGroupTagConditionArgs>[] | undefined>;
+}
+
+export interface RoleStackRule {
+    /**
+     * Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+     */
+    all?: boolean;
+    /**
+     * Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
+     */
+    id?: string;
+    /**
+     * Stack scopes to grant on the selected stacks.
+     */
+    scopes?: enums.RbacStackScope[];
+    /**
+     * Apply to entities whose tags match every condition.
+     */
+    tags?: inputs.PolicyGroupTagCondition[];
+}
+
+export interface RoleStackRuleArgs {
+    /**
+     * Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+     */
+    all?: pulumi.Input<boolean | undefined>;
+    /**
+     * Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
+     */
+    id?: pulumi.Input<string | undefined>;
+    /**
+     * Stack scopes to grant on the selected stacks.
+     */
+    scopes?: pulumi.Input<pulumi.Input<enums.RbacStackScope>[] | undefined>;
+    /**
+     * Apply to entities whose tags match every condition.
+     */
+    tags?: pulumi.Input<pulumi.Input<inputs.PolicyGroupTagConditionArgs>[] | undefined>;
+}
+
 export interface TemplateSourceDestinationArgs {
     /**
      * Destination URL that gets filled in on new project creation.

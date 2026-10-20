@@ -68,6 +68,12 @@ __all__ = [
     'PolicyPackComplianceFrameworkInputArgsDict',
     'PolicyPackPolicyInputArgs',
     'PolicyPackPolicyInputArgsDict',
+    'RoleAccountRule',
+    'RoleAccountRuleDict',
+    'RoleEnvironmentRule',
+    'RoleEnvironmentRuleDict',
+    'RoleStackRule',
+    'RoleStackRuleDict',
     'TemplateSourceDestinationArgs',
     'TemplateSourceDestinationArgsDict',
 ]
@@ -2269,6 +2275,273 @@ class PolicyPackPolicyInputArgs:
     @url.setter
     def url(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "url", value)
+
+
+class RoleAccountRuleDict(TypedDict):
+    all: NotRequired[_builtins.bool]
+    """
+    Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+    """
+    id: NotRequired[_builtins.str]
+    """
+    Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
+    """
+    scopes: NotRequired[Sequence['RbacAccountScope']]
+    """
+    Cloud account scopes to grant on the selected accounts.
+    """
+    tags: NotRequired[Sequence['PolicyGroupTagConditionDict']]
+    """
+    Apply to entities whose tags match every condition.
+    """
+
+@pulumi.input_type
+class RoleAccountRule:
+    def __init__(__self__, *,
+                 all: Optional[_builtins.bool] = None,
+                 id: Optional[_builtins.str] = None,
+                 scopes: Optional[Sequence['RbacAccountScope']] = None,
+                 tags: Optional[Sequence['PolicyGroupTagCondition']] = None):
+        """
+        :param _builtins.bool all: Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+        :param _builtins.str id: Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
+        :param Sequence['RbacAccountScope'] scopes: Cloud account scopes to grant on the selected accounts.
+        :param Sequence['PolicyGroupTagCondition'] tags: Apply to entities whose tags match every condition.
+        """
+        if all is not None:
+            pulumi.set(__self__, "all", all)
+        if id is not None:
+            pulumi.set(__self__, "id", id)
+        if scopes is not None:
+            pulumi.set(__self__, "scopes", scopes)
+        if tags is not None:
+            pulumi.set(__self__, "tags", tags)
+
+    @_builtins.property
+    @pulumi.getter
+    def all(self) -> Optional[_builtins.bool]:
+        """
+        Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+        """
+        return pulumi.get(self, "all")
+
+    @all.setter
+    def all(self, value: Optional[_builtins.bool]):
+        pulumi.set(self, "all", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def id(self) -> Optional[_builtins.str]:
+        """
+        Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
+        """
+        return pulumi.get(self, "id")
+
+    @id.setter
+    def id(self, value: Optional[_builtins.str]):
+        pulumi.set(self, "id", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def scopes(self) -> Optional[Sequence['RbacAccountScope']]:
+        """
+        Cloud account scopes to grant on the selected accounts.
+        """
+        return pulumi.get(self, "scopes")
+
+    @scopes.setter
+    def scopes(self, value: Optional[Sequence['RbacAccountScope']]):
+        pulumi.set(self, "scopes", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def tags(self) -> Optional[Sequence['PolicyGroupTagCondition']]:
+        """
+        Apply to entities whose tags match every condition.
+        """
+        return pulumi.get(self, "tags")
+
+    @tags.setter
+    def tags(self, value: Optional[Sequence['PolicyGroupTagCondition']]):
+        pulumi.set(self, "tags", value)
+
+
+class RoleEnvironmentRuleDict(TypedDict):
+    all: NotRequired[_builtins.bool]
+    """
+    Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+    """
+    id: NotRequired[_builtins.str]
+    """
+    Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
+    """
+    scopes: NotRequired[Sequence['RbacEnvironmentScope']]
+    """
+    Environment scopes to grant on the selected environments.
+    """
+    tags: NotRequired[Sequence['PolicyGroupTagConditionDict']]
+    """
+    Apply to entities whose tags match every condition.
+    """
+
+@pulumi.input_type
+class RoleEnvironmentRule:
+    def __init__(__self__, *,
+                 all: Optional[_builtins.bool] = None,
+                 id: Optional[_builtins.str] = None,
+                 scopes: Optional[Sequence['RbacEnvironmentScope']] = None,
+                 tags: Optional[Sequence['PolicyGroupTagCondition']] = None):
+        """
+        :param _builtins.bool all: Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+        :param _builtins.str id: Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
+        :param Sequence['RbacEnvironmentScope'] scopes: Environment scopes to grant on the selected environments.
+        :param Sequence['PolicyGroupTagCondition'] tags: Apply to entities whose tags match every condition.
+        """
+        if all is not None:
+            pulumi.set(__self__, "all", all)
+        if id is not None:
+            pulumi.set(__self__, "id", id)
+        if scopes is not None:
+            pulumi.set(__self__, "scopes", scopes)
+        if tags is not None:
+            pulumi.set(__self__, "tags", tags)
+
+    @_builtins.property
+    @pulumi.getter
+    def all(self) -> Optional[_builtins.bool]:
+        """
+        Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+        """
+        return pulumi.get(self, "all")
+
+    @all.setter
+    def all(self, value: Optional[_builtins.bool]):
+        pulumi.set(self, "all", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def id(self) -> Optional[_builtins.str]:
+        """
+        Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
+        """
+        return pulumi.get(self, "id")
+
+    @id.setter
+    def id(self, value: Optional[_builtins.str]):
+        pulumi.set(self, "id", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def scopes(self) -> Optional[Sequence['RbacEnvironmentScope']]:
+        """
+        Environment scopes to grant on the selected environments.
+        """
+        return pulumi.get(self, "scopes")
+
+    @scopes.setter
+    def scopes(self, value: Optional[Sequence['RbacEnvironmentScope']]):
+        pulumi.set(self, "scopes", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def tags(self) -> Optional[Sequence['PolicyGroupTagCondition']]:
+        """
+        Apply to entities whose tags match every condition.
+        """
+        return pulumi.get(self, "tags")
+
+    @tags.setter
+    def tags(self, value: Optional[Sequence['PolicyGroupTagCondition']]):
+        pulumi.set(self, "tags", value)
+
+
+class RoleStackRuleDict(TypedDict):
+    all: NotRequired[_builtins.bool]
+    """
+    Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+    """
+    id: NotRequired[_builtins.str]
+    """
+    Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
+    """
+    scopes: NotRequired[Sequence['RbacStackScope']]
+    """
+    Stack scopes to grant on the selected stacks.
+    """
+    tags: NotRequired[Sequence['PolicyGroupTagConditionDict']]
+    """
+    Apply to entities whose tags match every condition.
+    """
+
+@pulumi.input_type
+class RoleStackRule:
+    def __init__(__self__, *,
+                 all: Optional[_builtins.bool] = None,
+                 id: Optional[_builtins.str] = None,
+                 scopes: Optional[Sequence['RbacStackScope']] = None,
+                 tags: Optional[Sequence['PolicyGroupTagCondition']] = None):
+        """
+        :param _builtins.bool all: Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+        :param _builtins.str id: Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
+        :param Sequence['RbacStackScope'] scopes: Stack scopes to grant on the selected stacks.
+        :param Sequence['PolicyGroupTagCondition'] tags: Apply to entities whose tags match every condition.
+        """
+        if all is not None:
+            pulumi.set(__self__, "all", all)
+        if id is not None:
+            pulumi.set(__self__, "id", id)
+        if scopes is not None:
+            pulumi.set(__self__, "scopes", scopes)
+        if tags is not None:
+            pulumi.set(__self__, "tags", tags)
+
+    @_builtins.property
+    @pulumi.getter
+    def all(self) -> Optional[_builtins.bool]:
+        """
+        Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+        """
+        return pulumi.get(self, "all")
+
+    @all.setter
+    def all(self, value: Optional[_builtins.bool]):
+        pulumi.set(self, "all", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def id(self) -> Optional[_builtins.str]:
+        """
+        Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
+        """
+        return pulumi.get(self, "id")
+
+    @id.setter
+    def id(self, value: Optional[_builtins.str]):
+        pulumi.set(self, "id", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def scopes(self) -> Optional[Sequence['RbacStackScope']]:
+        """
+        Stack scopes to grant on the selected stacks.
+        """
+        return pulumi.get(self, "scopes")
+
+    @scopes.setter
+    def scopes(self, value: Optional[Sequence['RbacStackScope']]):
+        pulumi.set(self, "scopes", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def tags(self) -> Optional[Sequence['PolicyGroupTagCondition']]:
+        """
+        Apply to entities whose tags match every condition.
+        """
+        return pulumi.get(self, "tags")
+
+    @tags.setter
+    def tags(self, value: Optional[Sequence['PolicyGroupTagCondition']]):
+        pulumi.set(self, "tags", value)
 
 
 class TemplateSourceDestinationArgsDict(TypedDict):

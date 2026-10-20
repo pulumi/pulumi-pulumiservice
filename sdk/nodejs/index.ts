@@ -40,6 +40,11 @@ export const buildInsightsAccountScopedPermissions: typeof import("./buildInsigh
 export const buildInsightsAccountScopedPermissionsOutput: typeof import("./buildInsightsAccountScopedPermissions").buildInsightsAccountScopedPermissionsOutput = null as any;
 utilities.lazyLoad(exports, ["buildInsightsAccountScopedPermissions","buildInsightsAccountScopedPermissionsOutput"], () => require("./buildInsightsAccountScopedPermissions"));
 
+export { BuildRolePermissionsArgs, BuildRolePermissionsResult, BuildRolePermissionsOutputArgs } from "./buildRolePermissions";
+export const buildRolePermissions: typeof import("./buildRolePermissions").buildRolePermissions = null as any;
+export const buildRolePermissionsOutput: typeof import("./buildRolePermissions").buildRolePermissionsOutput = null as any;
+utilities.lazyLoad(exports, ["buildRolePermissions","buildRolePermissionsOutput"], () => require("./buildRolePermissions"));
+
 export { BuildStackMatchRuleArgs, BuildStackMatchRuleResult, BuildStackMatchRuleOutputArgs } from "./buildStackMatchRule";
 export const buildStackMatchRule: typeof import("./buildStackMatchRule").buildStackMatchRule = null as any;
 export const buildStackMatchRuleOutput: typeof import("./buildStackMatchRule").buildStackMatchRuleOutput = null as any;
@@ -134,6 +139,11 @@ export { GetPolicyPacksArgs, GetPolicyPacksResult, GetPolicyPacksOutputArgs } fr
 export const getPolicyPacks: typeof import("./getPolicyPacks").getPolicyPacks = null as any;
 export const getPolicyPacksOutput: typeof import("./getPolicyPacks").getPolicyPacksOutput = null as any;
 utilities.lazyLoad(exports, ["getPolicyPacks","getPolicyPacksOutput"], () => require("./getPolicyPacks"));
+
+export { GetStackArgs, GetStackResult, GetStackOutputArgs } from "./getStack";
+export const getStack: typeof import("./getStack").getStack = null as any;
+export const getStackOutput: typeof import("./getStack").getStackOutput = null as any;
+utilities.lazyLoad(exports, ["getStack","getStackOutput"], () => require("./getStack"));
 
 export { InsightsAccountArgs } from "./insightsAccount";
 export type InsightsAccount = import("./insightsAccount").InsightsAccount;
