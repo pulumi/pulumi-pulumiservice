@@ -24,6 +24,7 @@ import (
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 )
 
 type StackTag struct{}
@@ -38,7 +39,9 @@ var (
 )
 
 func (s *StackTag) Annotate(a infer.Annotator) {
-	a.Describe(s, "Stacks have associated metadata in the form of tags. Each tag consists of a name and value.")
+	a.Describe(s, "Stacks have associated metadata in the form of tags. Each tag consists of a name and value."+
+		util.ImportDocs("pulumiservice:index:StackTag", "{organization}/{project}/{stack}/{tagName}",
+			"my-org/my-project/my-stack/my-tag"))
 }
 
 type StackTagInput struct {

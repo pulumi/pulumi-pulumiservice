@@ -21,6 +21,8 @@ __all__ = [
     'build_allow_permissions_output',
 ]
 
+warnings.warn("""Use `buildRolePermissions` instead, with `organizationScopes` for organization-level scopes and an `all: true` rule for entity scopes. If a scope you need isn't in the enums yet, upgrade the provider.""", DeprecationWarning)
+
 @pulumi.output_type
 class BuildAllowPermissionsResult:
     def __init__(__self__, permissions=None):
@@ -49,10 +51,11 @@ class AwaitableBuildAllowPermissionsResult(BuildAllowPermissionsResult):
 def build_allow_permissions(permissions: Optional[Sequence[_builtins.str]] = None,
                             opts: Optional[pulumi.InvokeOptions] = None) -> AwaitableBuildAllowPermissionsResult:
     """
-    Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes globally — i.e. on every entity of the matching resource type. This is the simplest descriptor: a flat `PermissionDescriptorAllow`. Use this helper instead of hand-authoring the descriptor literal so the wire-format `__type` discriminator stays an implementation detail. For grants scoped to a specific entity, see `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, or `buildInsightsAccountScopedPermissions`. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls the output of each helper.
+    Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes globally — i.e. on every entity of the matching resource type. For grants scoped to a specific entity, see `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, or `buildInsightsAccountScopedPermissions`. The result is directly assignable to `OrganizationRole.permissions`. To combine it with other grants in a single role, pass it to `buildRolePermissions` in `additionalEntries`.
 
     :param Sequence[_builtins.str] permissions: The set of scopes to grant globally (e.g. `stack:read`, `environment:open`, `organization:billingManager`). Discover valid scope names via the `getOrganizationRoleScopes` data source.
     """
+    pulumi.log.warn("""build_allow_permissions is deprecated: Use `buildRolePermissions` instead, with `organizationScopes` for organization-level scopes and an `all: true` rule for entity scopes. If a scope you need isn't in the enums yet, upgrade the provider.""")
     __args__ = dict()
     __args__['permissions'] = permissions
     opts = pulumi.InvokeOptions.merge(_utilities.get_invoke_opts_defaults(), opts)
@@ -63,10 +66,11 @@ def build_allow_permissions(permissions: Optional[Sequence[_builtins.str]] = Non
 def build_allow_permissions_output(permissions: pulumi.Input[Optional[Sequence[_builtins.str]]] = None,
                                    opts: Optional[Union[pulumi.InvokeOptions, pulumi.InvokeOutputOptions]] = None) -> pulumi.Output[BuildAllowPermissionsResult]:
     """
-    Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes globally — i.e. on every entity of the matching resource type. This is the simplest descriptor: a flat `PermissionDescriptorAllow`. Use this helper instead of hand-authoring the descriptor literal so the wire-format `__type` discriminator stays an implementation detail. For grants scoped to a specific entity, see `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, or `buildInsightsAccountScopedPermissions`. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls the output of each helper.
+    Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes globally — i.e. on every entity of the matching resource type. For grants scoped to a specific entity, see `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, or `buildInsightsAccountScopedPermissions`. The result is directly assignable to `OrganizationRole.permissions`. To combine it with other grants in a single role, pass it to `buildRolePermissions` in `additionalEntries`.
 
     :param Sequence[_builtins.str] permissions: The set of scopes to grant globally (e.g. `stack:read`, `environment:open`, `organization:billingManager`). Discover valid scope names via the `getOrganizationRoleScopes` data source.
     """
+    pulumi.log.warn("""build_allow_permissions is deprecated: Use `buildRolePermissions` instead, with `organizationScopes` for organization-level scopes and an `all: true` rule for entity scopes. If a scope you need isn't in the enums yet, upgrade the provider.""")
     __args__ = dict()
     __args__['permissions'] = permissions
     opts = pulumi.InvokeOutputOptions.merge(_utilities.get_invoke_opts_defaults(), opts)

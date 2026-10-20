@@ -46,10 +46,10 @@ namespace Pulumi.PulumiService
         public string PolicyPackName { get; set; } = null!;
 
         /// <summary>
-        /// The version number of the policy pack. If not specified, returns the latest version.
+        /// The version tag of the policy pack, for example `1.4.1`, as shown in Pulumi Cloud. If not specified, returns the latest version.
         /// </summary>
-        [Input("version")]
-        public int? Version { get; set; }
+        [Input("versionTag")]
+        public string? VersionTag { get; set; }
 
         public GetPolicyPackArgs()
         {
@@ -72,10 +72,10 @@ namespace Pulumi.PulumiService
         public Input<string> PolicyPackName { get; set; } = null!;
 
         /// <summary>
-        /// The version number of the policy pack. If not specified, returns the latest version.
+        /// The version tag of the policy pack, for example `1.4.1`, as shown in Pulumi Cloud. If not specified, returns the latest version.
         /// </summary>
-        [Input("version")]
-        public Input<int>? Version { get; set; }
+        [Input("versionTag")]
+        public Input<string>? VersionTag { get; set; }
 
         public GetPolicyPackInvokeArgs()
         {

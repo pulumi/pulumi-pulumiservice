@@ -23,6 +23,7 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/property"
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 )
 
 const (
@@ -41,7 +42,12 @@ var (
 )
 
 func (*AgentPool) Annotate(a infer.Annotator) {
-	a.Describe(&AgentPool{}, "Agent Pool for customer managed deployments.")
+	a.Describe(&AgentPool{}, "Agent Pool for customer managed deployments."+
+		util.ImportDocs("pulumiservice:index:AgentPool", "{organization}/{name}/{agentPoolId}",
+			"my-org/my-pool/e4a1b7c2-9f30-4d58-b6e1-2a7c9d0f4e86",
+			util.ConsoleIDHint("agent pool ID",
+				"https://app.pulumi.com/my-org/settings/workflow-runner-pools/e4a1b7c2-9f30-4d58-b6e1-2a7c9d0f4e86"),
+			"The pool's `tokenValue` can't be read back from Pulumi Cloud, so it's empty after import."))
 	a.SetToken("index", "AgentPool")
 }
 

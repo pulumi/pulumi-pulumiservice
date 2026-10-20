@@ -12,7 +12,7 @@ export function getPolicyPack(args: GetPolicyPackArgs, opts?: pulumi.InvokeOptio
     return pulumi.runtime.invoke("pulumiservice:index:getPolicyPack", {
         "organizationName": args.organizationName,
         "policyPackName": args.policyPackName,
-        "version": args.version,
+        "versionTag": args.versionTag,
     }, opts);
 }
 
@@ -26,9 +26,9 @@ export interface GetPolicyPackArgs {
      */
     policyPackName: string;
     /**
-     * The version number of the policy pack. If not specified, returns the latest version.
+     * The version tag of the policy pack, for example `1.4.1`, as shown in Pulumi Cloud. If not specified, returns the latest version.
      */
-    version?: number;
+    versionTag?: string;
 }
 
 export interface GetPolicyPackResult {
@@ -73,7 +73,7 @@ export function getPolicyPackOutput(args: GetPolicyPackOutputArgs, opts?: pulumi
     return pulumi.runtime.invokeOutput("pulumiservice:index:getPolicyPack", {
         "organizationName": args.organizationName,
         "policyPackName": args.policyPackName,
-        "version": args.version,
+        "versionTag": args.versionTag,
     }, opts);
 }
 
@@ -87,7 +87,7 @@ export interface GetPolicyPackOutputArgs {
      */
     policyPackName: pulumi.Input<string>;
     /**
-     * The version number of the policy pack. If not specified, returns the latest version.
+     * The version tag of the policy pack, for example `1.4.1`, as shown in Pulumi Cloud. If not specified, returns the latest version.
      */
-    version?: pulumi.Input<number | undefined>;
+    versionTag?: pulumi.Input<string | undefined>;
 }

@@ -27,6 +27,7 @@ import (
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 )
 
 type StackTags struct{}
@@ -44,11 +45,11 @@ func (*StackTags) Annotate(a infer.Annotator) {
 			"useful for YAML programs.\n\n"+
 			"Only tags declared in `tags` are managed; tags added out-of-band (CLI, pulumibot, a singular `StackTag` "+
 			"resource) are left alone. Tag values are immutable in Pulumi Cloud, so a value change is implemented as "+
-			"delete-and-recreate.\n\n"+
-			"Importing with ID `{organization}/{project}/{stack}/tags` adopts every tag currently on the stack; "+
-			"declare `tags` explicitly after import so subsequent updates match your intent. See the "+
-			"[registry docs](https://www.pulumi.com/registry/packages/pulumiservice/api-docs/stacktags/) for full "+
-			"usage and examples.\n",
+			"delete-and-recreate."+
+			util.ImportDocs("pulumiservice:index:StackTags", "{organization}/{project}/{stack}/tags",
+				"my-org/my-project/my-stack/tags",
+				"The ID ends with the literal segment `tags`. Import adopts every tag currently on the stack; "+
+					"declare `tags` explicitly after import so subsequent updates match your intent."),
 	)
 	a.SetToken("index", "StackTags")
 }

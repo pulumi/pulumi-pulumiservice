@@ -27,9 +27,7 @@ import (
 // (organization, project, name) and returns its UUID. Useful when the
 // environment is managed outside Pulumi (or in a different stack) and the
 // caller needs its `environmentId` to scope a custom RBAC role to it
-// (typically via the `buildEnvironmentScopedPermissions` helper, or a
-// hand-rolled `PermissionLiteralExpressionEnvironment` in
-// `OrganizationRole.permissions`).
+// (typically via an `id` environment rule in `buildRolePermissions`).
 type GetEnvironmentFunction struct{}
 
 type GetEnvironmentInput struct {
@@ -49,9 +47,8 @@ func (GetEnvironmentFunction) Annotate(a infer.Annotator) {
 	a.Describe(
 		&GetEnvironmentFunction{},
 		"Looks up an existing ESC environment by name and returns its UUID. Use this to scope a custom "+
-			"RBAC role to a specific environment — pass the returned UUID into "+
-			"`buildEnvironmentScopedPermissions`, or use it as the `identity` field of a "+
-			"hand-rolled `PermissionLiteralExpressionEnvironment` in `OrganizationRole.permissions`. "+
+			"RBAC role to a specific environment — pass the returned UUID as the `id` of an "+
+			"`environmentRules` entry in `buildRolePermissions`. "+
 			"Errors when the environment is not found.",
 	)
 	a.SetToken("index", "getEnvironment")
@@ -69,9 +66,8 @@ func (o *GetEnvironmentOutput) Annotate(a infer.Annotator) {
 	a.Describe(&o.Name, "The environment name.")
 	a.Describe(
 		&o.EnvironmentID,
-		"The environment's UUID. Pass it to `buildEnvironmentScopedPermissions` (preferred) or use it "+
-			"as the `identity` field of a hand-rolled `PermissionLiteralExpressionEnvironment` in "+
-			"`OrganizationRole.permissions`.",
+		"The environment's UUID. Pass it as the `id` of an `environmentRules` entry in "+
+			"`buildRolePermissions`.",
 	)
 }
 

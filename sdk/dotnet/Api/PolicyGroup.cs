@@ -16,7 +16,13 @@ namespace Pulumi.PulumiService.Api
     public partial class PolicyGroup : global::Pulumi.CustomResource
     {
         /// <summary>
-        /// List of Insights account names that are members of this policy group.
+        /// Preview: the account match rule, a boolean expression over Insights account tags. Accounts whose tags satisfy it are members of the group alongside the accounts added individually. Absent when the group has no rule.
+        /// </summary>
+        [Output("accountMatchRule")]
+        public Output<object?> AccountMatchRule { get; private set; } = null!;
+
+        /// <summary>
+        /// The Insights accounts added to this policy group individually, with `addInsightsAccount`.
         /// </summary>
         [Output("accounts")]
         public Output<ImmutableArray<string>> Accounts { get; private set; } = null!;
@@ -34,7 +40,7 @@ namespace Pulumi.PulumiService.Api
         public Output<ImmutableArray<object>> AppliedPolicyPacks { get; private set; } = null!;
 
         /// <summary>
-        /// The type of entities this policy group applies to (stacks or accounts).
+        /// Deprecated: a legacy label set when the policy group was created. It does not restrict which entities the group holds; `mode` does.
         /// </summary>
         [Output("entityType")]
         public Output<string> EntityType { get; private set; } = null!;
@@ -58,7 +64,13 @@ namespace Pulumi.PulumiService.Api
         public Output<string> Name { get; private set; } = null!;
 
         /// <summary>
-        /// List of stacks that are members of this policy group.
+        /// Preview: the stack match rule, a boolean expression over stack tags. Stacks whose tags satisfy it are members of the group alongside the stacks added individually. Absent when the group has no rule.
+        /// </summary>
+        [Output("stackMatchRule")]
+        public Output<object?> StackMatchRule { get; private set; } = null!;
+
+        /// <summary>
+        /// The stacks added to this policy group individually, with `addStack`.
         /// </summary>
         [Output("stacks")]
         public Output<ImmutableArray<object>> Stacks { get; private set; } = null!;
@@ -109,25 +121,31 @@ namespace Pulumi.PulumiService.Api
     public sealed class PolicyGroupArgs : global::Pulumi.ResourceArgs
     {
         /// <summary>
+        /// Preview: an account match rule to create the group with, a boolean expression over Insights account tags. Requires the tag-based policy groups feature; not allowed on preventative groups.
+        /// </summary>
+        [Input("accountMatchRule")]
+        public Input<object>? AccountMatchRule { get; set; }
+
+        /// <summary>
         /// Agent pool ID for policy evaluation. Defaults to Pulumi hosted pool if not specified.
         /// </summary>
         [Input("agentPoolId")]
         public Input<string>? AgentPoolId { get; set; }
 
         /// <summary>
-        /// The type of entities this policy group applies to (stacks or accounts).
+        /// Deprecated: a legacy label, `stacks` or `accounts`. When `mode` is omitted it picks the mode (`accounts` → audit, `stacks` → preventative). When this is omitted, it is derived from `mode`. It does not restrict which entities the group can hold.
         /// </summary>
-        [Input("entityType", required: true)]
-        public Input<string> EntityType { get; set; } = null!;
+        [Input("entityType")]
+        public Input<string>? EntityType { get; set; }
 
         /// <summary>
-        /// The enforcement mode for the policy group (audit or preventative). Defaults to 'audit' for account policy groups, 'preventative' for stack policy groups.
+        /// The enforcement mode for the policy group (audit or preventative). The mode decides what the group can hold: an audit group holds stacks and Insights accounts, a preventative group holds stacks only. Required unless the deprecated `entityType` is sent. Fixed at creation; it cannot be changed later.
         /// </summary>
         [Input("mode")]
         public Input<string>? Mode { get; set; }
 
         /// <summary>
-        /// The name of the new policy group.
+        /// The name of the new policy group. Up to 100 characters, made up of letters, numbers, hyphens, underscores, periods, or spaces, and may not begin or end with a space.
         /// </summary>
         [Input("name", required: true)]
         public Input<string> Name { get; set; } = null!;
@@ -137,6 +155,12 @@ namespace Pulumi.PulumiService.Api
         /// </summary>
         [Input("orgName", required: true)]
         public Input<string> OrgName { get; set; } = null!;
+
+        /// <summary>
+        /// Preview: a stack match rule to create the group with, a boolean expression over stack tags. Requires the tag-based policy groups feature.
+        /// </summary>
+        [Input("stackMatchRule")]
+        public Input<object>? StackMatchRule { get; set; }
 
         public PolicyGroupArgs()
         {

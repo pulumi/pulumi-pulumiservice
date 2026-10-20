@@ -361,7 +361,7 @@ export interface EnvironmentIdentifierArgs {
 
 export interface GCPOIDCConfigurationArgs {
     /**
-     * The numerical ID of the GCP project.
+     * The GCP project number, a numeric value such as `123456789012`. This is not the project ID (such as `my-project`). To look up the number, run `gcloud projects describe <project-id> --format='value(projectNumber)'`.
      */
     projectId: pulumi.Input<string>;
     /**
@@ -420,6 +420,20 @@ export interface OperationContextOptionsArgs {
     skipIntermediateDeployments?: pulumi.Input<boolean | undefined>;
 }
 
+export interface PolicyGroupMatchRule {
+    /**
+     * Tag conditions that must all hold for the rule to match. At least one is required.
+     */
+    conditions: inputs.PolicyGroupTagCondition[];
+}
+
+export interface PolicyGroupMatchRuleArgs {
+    /**
+     * Tag conditions that must all hold for the rule to match. At least one is required.
+     */
+    conditions: pulumi.Input<pulumi.Input<inputs.PolicyGroupTagConditionArgs>[]>;
+}
+
 /**
  * A reference to a policy pack within a policy group (input).
  */
@@ -454,6 +468,36 @@ export interface PolicyGroupStackReferenceArgs {
      * The routing project name (also known as project name).
      */
     routingProject: pulumi.Input<string>;
+}
+
+export interface PolicyGroupTagCondition {
+    /**
+     * The tag key.
+     */
+    key: string;
+    /**
+     * How the tag is compared. Defaults to `equals`.
+     */
+    operator?: enums.PolicyGroupTagOperator;
+    /**
+     * The tag value. Required with `equals` and `notEquals`, and not allowed with `exists` and `notExists`.
+     */
+    value?: string;
+}
+
+export interface PolicyGroupTagConditionArgs {
+    /**
+     * The tag key.
+     */
+    key: pulumi.Input<string>;
+    /**
+     * How the tag is compared. Defaults to `equals`.
+     */
+    operator?: pulumi.Input<enums.PolicyGroupTagOperator | undefined>;
+    /**
+     * The tag value. Required with `equals` and `notEquals`, and not allowed with `exists` and `notExists`.
+     */
+    value?: pulumi.Input<string | undefined>;
 }
 
 export interface PolicyPackComplianceFrameworkInputArgs {
@@ -511,6 +555,150 @@ export interface PolicyPackPolicyInputArgs {
      * URL with more information about the policy.
      */
     url?: pulumi.Input<string | undefined>;
+}
+
+export interface RoleAccountRule {
+    /**
+     * Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+     */
+    all?: boolean;
+    /**
+     * Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
+     */
+    id?: string;
+    /**
+     * Cloud account scopes to grant on the selected accounts.
+     */
+    scopes?: enums.RbacAccountScope[];
+    /**
+     * Apply to entities whose tags match every condition.
+     */
+    tags?: inputs.TagCondition[];
+}
+
+export interface RoleAccountRuleArgs {
+    /**
+     * Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+     */
+    all?: pulumi.Input<boolean | undefined>;
+    /**
+     * Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
+     */
+    id?: pulumi.Input<string | undefined>;
+    /**
+     * Cloud account scopes to grant on the selected accounts.
+     */
+    scopes?: pulumi.Input<pulumi.Input<enums.RbacAccountScope>[] | undefined>;
+    /**
+     * Apply to entities whose tags match every condition.
+     */
+    tags?: pulumi.Input<pulumi.Input<inputs.TagConditionArgs>[] | undefined>;
+}
+
+export interface RoleEnvironmentRule {
+    /**
+     * Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+     */
+    all?: boolean;
+    /**
+     * Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
+     */
+    id?: string;
+    /**
+     * Environment scopes to grant on the selected environments.
+     */
+    scopes?: enums.RbacEnvironmentScope[];
+    /**
+     * Apply to entities whose tags match every condition.
+     */
+    tags?: inputs.TagCondition[];
+}
+
+export interface RoleEnvironmentRuleArgs {
+    /**
+     * Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+     */
+    all?: pulumi.Input<boolean | undefined>;
+    /**
+     * Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
+     */
+    id?: pulumi.Input<string | undefined>;
+    /**
+     * Environment scopes to grant on the selected environments.
+     */
+    scopes?: pulumi.Input<pulumi.Input<enums.RbacEnvironmentScope>[] | undefined>;
+    /**
+     * Apply to entities whose tags match every condition.
+     */
+    tags?: pulumi.Input<pulumi.Input<inputs.TagConditionArgs>[] | undefined>;
+}
+
+export interface RoleStackRule {
+    /**
+     * Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+     */
+    all?: boolean;
+    /**
+     * Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
+     */
+    id?: string;
+    /**
+     * Stack scopes to grant on the selected stacks.
+     */
+    scopes?: enums.RbacStackScope[];
+    /**
+     * Apply to entities whose tags match every condition.
+     */
+    tags?: inputs.TagCondition[];
+}
+
+export interface RoleStackRuleArgs {
+    /**
+     * Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+     */
+    all?: pulumi.Input<boolean | undefined>;
+    /**
+     * Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
+     */
+    id?: pulumi.Input<string | undefined>;
+    /**
+     * Stack scopes to grant on the selected stacks.
+     */
+    scopes?: pulumi.Input<pulumi.Input<enums.RbacStackScope>[] | undefined>;
+    /**
+     * Apply to entities whose tags match every condition.
+     */
+    tags?: pulumi.Input<pulumi.Input<inputs.TagConditionArgs>[] | undefined>;
+}
+
+export interface TagCondition {
+    /**
+     * The tag key.
+     */
+    key: string;
+    /**
+     * How the tag is compared. Defaults to `equals`.
+     */
+    operator?: enums.TagOperator;
+    /**
+     * The tag value. Required with `equals` and `notEquals`, and not allowed with `exists` and `notExists`.
+     */
+    value?: string;
+}
+
+export interface TagConditionArgs {
+    /**
+     * The tag key.
+     */
+    key: pulumi.Input<string>;
+    /**
+     * How the tag is compared. Defaults to `equals`.
+     */
+    operator?: pulumi.Input<enums.TagOperator | undefined>;
+    /**
+     * The tag value. Required with `equals` and `notEquals`, and not allowed with `exists` and `notExists`.
+     */
+    value?: pulumi.Input<string | undefined>;
 }
 
 export interface TemplateSourceDestinationArgs {

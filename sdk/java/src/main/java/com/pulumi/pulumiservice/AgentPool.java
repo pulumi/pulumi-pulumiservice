@@ -18,6 +18,18 @@ import javax.annotation.Nullable;
 /**
  * Agent Pool for customer managed deployments.
  * 
+ * ## Import
+ * 
+ * This resource can be imported using its `id`, which has the format `{organization}/{name}/{agentPoolId}`, e.g.,
+ * 
+ * ```sh
+ *  $ pulumi import pulumiservice:index:AgentPool my-agent-pool my-org/my-pool/e4a1b7c2-9f30-4d58-b6e1-2a7c9d0f4e86
+ * ```
+ * 
+ * The agent pool ID is the last segment of its page URL in the Pulumi Cloud console, for example `https://app.pulumi.com/my-org/settings/workflow-runner-pools/e4a1b7c2-9f30-4d58-b6e1-2a7c9d0f4e86`.
+ * 
+ * The pool&#39;s `tokenValue` can&#39;t be read back from Pulumi Cloud, so it&#39;s empty after import.
+ * 
  */
 @ResourceType(type="pulumiservice:index:AgentPool")
 public class AgentPool extends com.pulumi.resources.CustomResource {

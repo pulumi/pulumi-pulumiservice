@@ -11,6 +11,14 @@ namespace Pulumi.PulumiService
 {
     /// <summary>
     /// A stack is a collection of resources that share a common lifecycle. Stacks are uniquely identified by their name and the project they belong to.
+    /// 
+    /// ## Import
+    /// 
+    /// This resource can be imported using its `id`, which has the format `{organization}/{project}/{stack}`, e.g.,
+    /// 
+    /// ```sh
+    ///  $ pulumi import pulumiservice:index:Stack my-stack my-org/my-project/my-stack
+    /// ```
     /// </summary>
     [PulumiServiceResourceType("pulumiservice:index:Stack")]
     public partial class Stack : global::Pulumi.CustomResource
