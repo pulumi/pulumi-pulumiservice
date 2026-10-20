@@ -573,7 +573,7 @@ export interface RoleAccountRule {
     /**
      * Apply to entities whose tags match every condition.
      */
-    tags?: inputs.PolicyGroupTagCondition[];
+    tags?: inputs.TagCondition[];
 }
 
 export interface RoleAccountRuleArgs {
@@ -592,7 +592,7 @@ export interface RoleAccountRuleArgs {
     /**
      * Apply to entities whose tags match every condition.
      */
-    tags?: pulumi.Input<pulumi.Input<inputs.PolicyGroupTagConditionArgs>[] | undefined>;
+    tags?: pulumi.Input<pulumi.Input<inputs.TagConditionArgs>[] | undefined>;
 }
 
 export interface RoleEnvironmentRule {
@@ -611,7 +611,7 @@ export interface RoleEnvironmentRule {
     /**
      * Apply to entities whose tags match every condition.
      */
-    tags?: inputs.PolicyGroupTagCondition[];
+    tags?: inputs.TagCondition[];
 }
 
 export interface RoleEnvironmentRuleArgs {
@@ -630,7 +630,7 @@ export interface RoleEnvironmentRuleArgs {
     /**
      * Apply to entities whose tags match every condition.
      */
-    tags?: pulumi.Input<pulumi.Input<inputs.PolicyGroupTagConditionArgs>[] | undefined>;
+    tags?: pulumi.Input<pulumi.Input<inputs.TagConditionArgs>[] | undefined>;
 }
 
 export interface RoleStackRule {
@@ -649,7 +649,7 @@ export interface RoleStackRule {
     /**
      * Apply to entities whose tags match every condition.
      */
-    tags?: inputs.PolicyGroupTagCondition[];
+    tags?: inputs.TagCondition[];
 }
 
 export interface RoleStackRuleArgs {
@@ -668,7 +668,37 @@ export interface RoleStackRuleArgs {
     /**
      * Apply to entities whose tags match every condition.
      */
-    tags?: pulumi.Input<pulumi.Input<inputs.PolicyGroupTagConditionArgs>[] | undefined>;
+    tags?: pulumi.Input<pulumi.Input<inputs.TagConditionArgs>[] | undefined>;
+}
+
+export interface TagCondition {
+    /**
+     * The tag key.
+     */
+    key: string;
+    /**
+     * How the tag is compared. Defaults to `equals`.
+     */
+    operator?: enums.TagOperator;
+    /**
+     * The tag value. Required with `equals` and `notEquals`, and not allowed with `exists` and `notExists`.
+     */
+    value?: string;
+}
+
+export interface TagConditionArgs {
+    /**
+     * The tag key.
+     */
+    key: pulumi.Input<string>;
+    /**
+     * How the tag is compared. Defaults to `equals`.
+     */
+    operator?: pulumi.Input<enums.TagOperator | undefined>;
+    /**
+     * The tag value. Required with `equals` and `notEquals`, and not allowed with `exists` and `notExists`.
+     */
+    value?: pulumi.Input<string | undefined>;
 }
 
 export interface TemplateSourceDestinationArgs {

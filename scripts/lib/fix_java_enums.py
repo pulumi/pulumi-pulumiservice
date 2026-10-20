@@ -3,7 +3,7 @@
 #
 # `pulumi convert --language java` writes enum-typed values as string
 # literals, which don't compile against the Java SDK. This rewrites the scope
-# and PolicyGroupTagOperator arguments of a generated Java program into enum
+# and TagOperator arguments of a generated Java program into enum
 # constants, using the names from the provider schema. A rule's `scopes`
 # enum depends on the rule type, taken from the nearest preceding
 # `Role<Type>RuleArgs.builder()`.
@@ -18,14 +18,14 @@ STRING_LITERAL = re.compile(r'"([^"]*)"')
 
 RULE_BUILDER = re.compile(r"Role(Stack|Environment|Account)RuleArgs\.builder\(\)")
 ENUM_TYPES = ("RbacOrganizationScope", "RbacStackScope", "RbacEnvironmentScope",
-              "RbacAccountScope", "PolicyGroupTagOperator")
+              "RbacAccountScope", "TagOperator")
 
 
 def enum_for(method, src, pos):
     if method == "organizationScopes":
         return "RbacOrganizationScope"
     if method == "operator":
-        return "PolicyGroupTagOperator"
+        return "TagOperator"
     rules = list(RULE_BUILDER.finditer(src, 0, pos))
     if not rules:
         sys.exit(f"`.scopes(` at offset {pos} is not inside a rule builder")

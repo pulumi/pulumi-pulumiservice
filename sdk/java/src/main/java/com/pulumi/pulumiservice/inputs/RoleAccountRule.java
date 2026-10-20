@@ -5,7 +5,7 @@ package com.pulumi.pulumiservice.inputs;
 
 import com.pulumi.core.annotations.Import;
 import com.pulumi.pulumiservice.enums.RbacAccountScope;
-import com.pulumi.pulumiservice.inputs.PolicyGroupTagCondition;
+import com.pulumi.pulumiservice.inputs.TagCondition;
 import java.lang.Boolean;
 import java.lang.String;
 import java.util.List;
@@ -68,13 +68,13 @@ public final class RoleAccountRule extends com.pulumi.resources.InvokeArgs {
      * 
      */
     @Import(name="tags")
-    private @Nullable List<PolicyGroupTagCondition> tags;
+    private @Nullable List<TagCondition> tags;
 
     /**
      * @return Apply to entities whose tags match every condition.
      * 
      */
-    public Optional<List<PolicyGroupTagCondition>> tags() {
+    public Optional<List<TagCondition>> tags() {
         return Optional.ofNullable(this.tags);
     }
 
@@ -154,7 +154,7 @@ public final class RoleAccountRule extends com.pulumi.resources.InvokeArgs {
          * @return builder
          * 
          */
-        public Builder tags(@Nullable List<PolicyGroupTagCondition> tags) {
+        public Builder tags(@Nullable List<TagCondition> tags) {
             $.tags = tags;
             return this;
         }
@@ -165,7 +165,7 @@ public final class RoleAccountRule extends com.pulumi.resources.InvokeArgs {
          * @return builder
          * 
          */
-        public Builder tags(PolicyGroupTagCondition... tags) {
+        public Builder tags(TagCondition... tags) {
             return tags(List.of(tags));
         }
 

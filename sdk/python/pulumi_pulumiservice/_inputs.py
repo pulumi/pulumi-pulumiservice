@@ -74,6 +74,8 @@ __all__ = [
     'RoleEnvironmentRuleDict',
     'RoleStackRule',
     'RoleStackRuleDict',
+    'TagCondition',
+    'TagConditionDict',
     'TemplateSourceDestinationArgs',
     'TemplateSourceDestinationArgsDict',
 ]
@@ -2290,7 +2292,7 @@ class RoleAccountRuleDict(TypedDict):
     """
     Cloud account scopes to grant on the selected accounts.
     """
-    tags: NotRequired[Sequence['PolicyGroupTagConditionDict']]
+    tags: NotRequired[Sequence['TagConditionDict']]
     """
     Apply to entities whose tags match every condition.
     """
@@ -2301,12 +2303,12 @@ class RoleAccountRule:
                  all: Optional[_builtins.bool] = None,
                  id: Optional[_builtins.str] = None,
                  scopes: Optional[Sequence['RbacAccountScope']] = None,
-                 tags: Optional[Sequence['PolicyGroupTagCondition']] = None):
+                 tags: Optional[Sequence['TagCondition']] = None):
         """
         :param _builtins.bool all: Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
         :param _builtins.str id: Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
         :param Sequence['RbacAccountScope'] scopes: Cloud account scopes to grant on the selected accounts.
-        :param Sequence['PolicyGroupTagCondition'] tags: Apply to entities whose tags match every condition.
+        :param Sequence['TagCondition'] tags: Apply to entities whose tags match every condition.
         """
         if all is not None:
             pulumi.set(__self__, "all", all)
@@ -2355,14 +2357,14 @@ class RoleAccountRule:
 
     @_builtins.property
     @pulumi.getter
-    def tags(self) -> Optional[Sequence['PolicyGroupTagCondition']]:
+    def tags(self) -> Optional[Sequence['TagCondition']]:
         """
         Apply to entities whose tags match every condition.
         """
         return pulumi.get(self, "tags")
 
     @tags.setter
-    def tags(self, value: Optional[Sequence['PolicyGroupTagCondition']]):
+    def tags(self, value: Optional[Sequence['TagCondition']]):
         pulumi.set(self, "tags", value)
 
 
@@ -2379,7 +2381,7 @@ class RoleEnvironmentRuleDict(TypedDict):
     """
     Environment scopes to grant on the selected environments.
     """
-    tags: NotRequired[Sequence['PolicyGroupTagConditionDict']]
+    tags: NotRequired[Sequence['TagConditionDict']]
     """
     Apply to entities whose tags match every condition.
     """
@@ -2390,12 +2392,12 @@ class RoleEnvironmentRule:
                  all: Optional[_builtins.bool] = None,
                  id: Optional[_builtins.str] = None,
                  scopes: Optional[Sequence['RbacEnvironmentScope']] = None,
-                 tags: Optional[Sequence['PolicyGroupTagCondition']] = None):
+                 tags: Optional[Sequence['TagCondition']] = None):
         """
         :param _builtins.bool all: Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
         :param _builtins.str id: Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
         :param Sequence['RbacEnvironmentScope'] scopes: Environment scopes to grant on the selected environments.
-        :param Sequence['PolicyGroupTagCondition'] tags: Apply to entities whose tags match every condition.
+        :param Sequence['TagCondition'] tags: Apply to entities whose tags match every condition.
         """
         if all is not None:
             pulumi.set(__self__, "all", all)
@@ -2444,14 +2446,14 @@ class RoleEnvironmentRule:
 
     @_builtins.property
     @pulumi.getter
-    def tags(self) -> Optional[Sequence['PolicyGroupTagCondition']]:
+    def tags(self) -> Optional[Sequence['TagCondition']]:
         """
         Apply to entities whose tags match every condition.
         """
         return pulumi.get(self, "tags")
 
     @tags.setter
-    def tags(self, value: Optional[Sequence['PolicyGroupTagCondition']]):
+    def tags(self, value: Optional[Sequence['TagCondition']]):
         pulumi.set(self, "tags", value)
 
 
@@ -2468,7 +2470,7 @@ class RoleStackRuleDict(TypedDict):
     """
     Stack scopes to grant on the selected stacks.
     """
-    tags: NotRequired[Sequence['PolicyGroupTagConditionDict']]
+    tags: NotRequired[Sequence['TagConditionDict']]
     """
     Apply to entities whose tags match every condition.
     """
@@ -2479,12 +2481,12 @@ class RoleStackRule:
                  all: Optional[_builtins.bool] = None,
                  id: Optional[_builtins.str] = None,
                  scopes: Optional[Sequence['RbacStackScope']] = None,
-                 tags: Optional[Sequence['PolicyGroupTagCondition']] = None):
+                 tags: Optional[Sequence['TagCondition']] = None):
         """
         :param _builtins.bool all: Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
         :param _builtins.str id: Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
         :param Sequence['RbacStackScope'] scopes: Stack scopes to grant on the selected stacks.
-        :param Sequence['PolicyGroupTagCondition'] tags: Apply to entities whose tags match every condition.
+        :param Sequence['TagCondition'] tags: Apply to entities whose tags match every condition.
         """
         if all is not None:
             pulumi.set(__self__, "all", all)
@@ -2533,15 +2535,83 @@ class RoleStackRule:
 
     @_builtins.property
     @pulumi.getter
-    def tags(self) -> Optional[Sequence['PolicyGroupTagCondition']]:
+    def tags(self) -> Optional[Sequence['TagCondition']]:
         """
         Apply to entities whose tags match every condition.
         """
         return pulumi.get(self, "tags")
 
     @tags.setter
-    def tags(self, value: Optional[Sequence['PolicyGroupTagCondition']]):
+    def tags(self, value: Optional[Sequence['TagCondition']]):
         pulumi.set(self, "tags", value)
+
+
+class TagConditionDict(TypedDict):
+    key: _builtins.str
+    """
+    The tag key.
+    """
+    operator: NotRequired['TagOperator']
+    """
+    How the tag is compared. Defaults to `equals`.
+    """
+    value: NotRequired[_builtins.str]
+    """
+    The tag value. Required with `equals` and `notEquals`, and not allowed with `exists` and `notExists`.
+    """
+
+@pulumi.input_type
+class TagCondition:
+    def __init__(__self__, *,
+                 key: _builtins.str,
+                 operator: Optional['TagOperator'] = None,
+                 value: Optional[_builtins.str] = None):
+        """
+        :param _builtins.str key: The tag key.
+        :param 'TagOperator' operator: How the tag is compared. Defaults to `equals`.
+        :param _builtins.str value: The tag value. Required with `equals` and `notEquals`, and not allowed with `exists` and `notExists`.
+        """
+        pulumi.set(__self__, "key", key)
+        if operator is not None:
+            pulumi.set(__self__, "operator", operator)
+        if value is not None:
+            pulumi.set(__self__, "value", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def key(self) -> _builtins.str:
+        """
+        The tag key.
+        """
+        return pulumi.get(self, "key")
+
+    @key.setter
+    def key(self, value: _builtins.str):
+        pulumi.set(self, "key", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def operator(self) -> Optional['TagOperator']:
+        """
+        How the tag is compared. Defaults to `equals`.
+        """
+        return pulumi.get(self, "operator")
+
+    @operator.setter
+    def operator(self, value: Optional['TagOperator']):
+        pulumi.set(self, "operator", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def value(self) -> Optional[_builtins.str]:
+        """
+        The tag value. Required with `equals` and `notEquals`, and not allowed with `exists` and `notExists`.
+        """
+        return pulumi.get(self, "value")
+
+    @value.setter
+    def value(self, value: Optional[_builtins.str]):
+        pulumi.set(self, "value", value)
 
 
 class TemplateSourceDestinationArgsDict(TypedDict):

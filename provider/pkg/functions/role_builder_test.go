@@ -157,33 +157,33 @@ func TestBuildRolePermissions(t *testing.T) {
 			in: BuildRolePermissionsInput{
 				StackRules: []RoleStackRule{
 					{
-						RoleRuleSelector: RoleRuleSelector{Tags: []PolicyGroupTagCondition{
+						RoleRuleSelector: RoleRuleSelector{Tags: []TagCondition{
 							{Key: testTagKeyTeam, Value: ptr("platform")},
 						}},
 						Scopes: []RbacStackScope{RbacStackScopeStackRead},
 					},
 					{
-						RoleRuleSelector: RoleRuleSelector{Tags: []PolicyGroupTagCondition{
-							{Key: "env", Value: ptr("prod"), Operator: ptr(PolicyGroupTagOperatorNotEquals)},
+						RoleRuleSelector: RoleRuleSelector{Tags: []TagCondition{
+							{Key: "env", Value: ptr("prod"), Operator: ptr(TagOperatorNotEquals)},
 						}},
 						Scopes: []RbacStackScope{RbacStackScopeStackRead},
 					},
 					{
-						RoleRuleSelector: RoleRuleSelector{Tags: []PolicyGroupTagCondition{
-							{Key: testTagKeyCost, Operator: ptr(PolicyGroupTagOperatorExists)},
+						RoleRuleSelector: RoleRuleSelector{Tags: []TagCondition{
+							{Key: testTagKeyCost, Operator: ptr(TagOperatorExists)},
 						}},
 						Scopes: []RbacStackScope{RbacStackScopeStackRead},
 					},
 					{
-						RoleRuleSelector: RoleRuleSelector{Tags: []PolicyGroupTagCondition{
-							{Key: testTagKeyCost, Operator: ptr(PolicyGroupTagOperatorNotExists)},
+						RoleRuleSelector: RoleRuleSelector{Tags: []TagCondition{
+							{Key: testTagKeyCost, Operator: ptr(TagOperatorNotExists)},
 						}},
 						Scopes: []RbacStackScope{RbacStackScopeStackRead},
 					},
 					{
-						RoleRuleSelector: RoleRuleSelector{Tags: []PolicyGroupTagCondition{
-							{Key: testTagKeyTeam, Value: ptr("platform"), Operator: ptr(PolicyGroupTagOperatorEquals)},
-							{Key: "env", Value: ptr("prod"), Operator: ptr(PolicyGroupTagOperatorNotEquals)},
+						RoleRuleSelector: RoleRuleSelector{Tags: []TagCondition{
+							{Key: testTagKeyTeam, Value: ptr("platform"), Operator: ptr(TagOperatorEquals)},
+							{Key: "env", Value: ptr("prod"), Operator: ptr(TagOperatorNotEquals)},
 						}},
 						Scopes: []RbacStackScope{RbacStackScopeStackRead},
 					},
@@ -249,34 +249,34 @@ func TestBuildRolePermissionsErrors(t *testing.T) {
 		}, "exactly one of `all`, `id`, or `tags`"},
 		{"id combined with tags", BuildRolePermissionsInput{
 			StackRules: []RoleStackRule{{
-				RoleRuleSelector: RoleRuleSelector{Id: ptr("x"), Tags: []PolicyGroupTagCondition{{Key: "k", Value: ptr("v")}}},
+				RoleRuleSelector: RoleRuleSelector{Id: ptr("x"), Tags: []TagCondition{{Key: "k", Value: ptr("v")}}},
 				Scopes:           []RbacStackScope{RbacStackScopeStackRead},
 			}},
 		}, "exactly one of `all`, `id`, or `tags`"},
 		{"empty tag key", BuildRolePermissionsInput{
 			StackRules: []RoleStackRule{{
-				RoleRuleSelector: RoleRuleSelector{Tags: []PolicyGroupTagCondition{{Key: " "}}},
+				RoleRuleSelector: RoleRuleSelector{Tags: []TagCondition{{Key: " "}}},
 				Scopes:           []RbacStackScope{RbacStackScopeStackRead},
 			}},
 		}, "tags[0]: `key` must not be empty"},
 		{"equals without a value", BuildRolePermissionsInput{
 			StackRules: []RoleStackRule{{
-				RoleRuleSelector: RoleRuleSelector{Tags: []PolicyGroupTagCondition{{Key: testTagKeyCost}}},
+				RoleRuleSelector: RoleRuleSelector{Tags: []TagCondition{{Key: testTagKeyCost}}},
 				Scopes:           []RbacStackScope{RbacStackScopeStackRead},
 			}},
 		}, "tags[0]: `value` is required with the \"equals\" operator"},
 		{"exists with a value", BuildRolePermissionsInput{
 			StackRules: []RoleStackRule{{
-				RoleRuleSelector: RoleRuleSelector{Tags: []PolicyGroupTagCondition{{
-					Key: testTagKeyCost, Value: ptr("v"), Operator: ptr(PolicyGroupTagOperatorExists),
+				RoleRuleSelector: RoleRuleSelector{Tags: []TagCondition{{
+					Key: testTagKeyCost, Value: ptr("v"), Operator: ptr(TagOperatorExists),
 				}}},
 				Scopes: []RbacStackScope{RbacStackScopeStackRead},
 			}},
 		}, "tags[0]: `value` can't be set with the \"exists\" operator"},
 		{testUnknownOp, BuildRolePermissionsInput{
 			StackRules: []RoleStackRule{{
-				RoleRuleSelector: RoleRuleSelector{Tags: []PolicyGroupTagCondition{{
-					Key: "k", Value: ptr("v"), Operator: ptr(PolicyGroupTagOperator("contains")),
+				RoleRuleSelector: RoleRuleSelector{Tags: []TagCondition{{
+					Key: "k", Value: ptr("v"), Operator: ptr(TagOperator("contains")),
 				}}},
 				Scopes: []RbacStackScope{RbacStackScopeStackRead},
 			}},

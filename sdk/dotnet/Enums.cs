@@ -1198,6 +1198,48 @@ namespace Pulumi.PulumiService
     }
 
     [EnumType]
+    public readonly struct TagOperator : IEquatable<TagOperator>
+    {
+        private readonly string _value;
+
+        private TagOperator(string value)
+        {
+            _value = value ?? throw new ArgumentNullException(nameof(value));
+        }
+
+        /// <summary>
+        /// The tag is set to `value`.
+        /// </summary>
+        public static TagOperator EqualsValue { get; } = new TagOperator("equals");
+        /// <summary>
+        /// The tag isn't set to `value`. Also matches entities that don't have the tag.
+        /// </summary>
+        public static TagOperator NotEquals { get; } = new TagOperator("notEquals");
+        /// <summary>
+        /// The entity has the tag, with any value.
+        /// </summary>
+        public static TagOperator Exists { get; } = new TagOperator("exists");
+        /// <summary>
+        /// The entity doesn't have the tag.
+        /// </summary>
+        public static TagOperator NotExists { get; } = new TagOperator("notExists");
+
+        public static bool operator ==(TagOperator left, TagOperator right) => left.Equals(right);
+        public static bool operator !=(TagOperator left, TagOperator right) => !left.Equals(right);
+
+        public static explicit operator string(TagOperator value) => value._value;
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public override bool Equals(object? obj) => obj is TagOperator other && Equals(other);
+        public bool Equals(TagOperator other) => string.Equals(_value, other._value, StringComparison.Ordinal);
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public override int GetHashCode() => _value?.GetHashCode() ?? 0;
+
+        public override string ToString() => _value;
+    }
+
+    [EnumType]
     public readonly struct TargetActionType : IEquatable<TargetActionType>
     {
         private readonly string _value;

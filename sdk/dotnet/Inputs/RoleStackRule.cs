@@ -37,14 +37,14 @@ namespace Pulumi.PulumiService.Inputs
         }
 
         [Input("tags")]
-        private List<Inputs.PolicyGroupTagCondition>? _tags;
+        private List<Inputs.TagCondition>? _tags;
 
         /// <summary>
         /// Apply to entities whose tags match every condition.
         /// </summary>
-        public List<Inputs.PolicyGroupTagCondition> Tags
+        public List<Inputs.TagCondition> Tags
         {
-            get => _tags ?? (_tags = new List<Inputs.PolicyGroupTagCondition>());
+            get => _tags ?? (_tags = new List<Inputs.TagCondition>());
             set => _tags = value;
         }
 

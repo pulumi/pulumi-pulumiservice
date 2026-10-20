@@ -32,6 +32,10 @@ const teamAccessTagKeyPrefix = "pulumi:team-access:"
 // The tag key pattern Pulumi Cloud enforces on stack and Insights account tags.
 var tagKeyPattern = regexp.MustCompile(`^[a-zA-Z0-9-_.:]+$`)
 
+// PolicyGroupTagOperator and PolicyGroupTagCondition are the match rule
+// counterparts of TagOperator and TagCondition. They shipped before the role
+// builder needed tag conditions too, and stay separate schema types because
+// renaming them would break released SDKs.
 type PolicyGroupTagOperator string
 
 const (
@@ -42,16 +46,14 @@ const (
 )
 
 func (PolicyGroupTagOperator) Values() []infer.EnumValue[PolicyGroupTagOperator] {
-	return []infer.EnumValue[PolicyGroupTagOperator]{
-		{Name: "Equals", Value: PolicyGroupTagOperatorEquals, Description: "The tag is set to `value`."},
-		{
-			Name:        "NotEquals",
-			Value:       PolicyGroupTagOperatorNotEquals,
-			Description: "The tag isn't set to `value`. Also matches entities that don't have the tag.",
-		},
-		{Name: "Exists", Value: PolicyGroupTagOperatorExists, Description: "The entity has the tag, with any value."},
-		{Name: "NotExists", Value: PolicyGroupTagOperatorNotExists, Description: "The entity doesn't have the tag."},
+	tagValues := TagOperator("").Values()
+	values := make([]infer.EnumValue[PolicyGroupTagOperator], len(tagValues))
+	for i, v := range tagValues {
+		values[i] = infer.EnumValue[PolicyGroupTagOperator]{
+			Name: v.Name, Value: PolicyGroupTagOperator(v.Value), Description: v.Description,
+		}
 	}
+	return values
 }
 
 type PolicyGroupTagCondition struct {
@@ -173,49 +175,16 @@ func tagConditionExpression(
 	case strings.HasPrefix(c.Key, teamAccessTagKeyPrefix):
 		return nil, fmt.Errorf("match rules can't use team-access tags (%s*)", teamAccessTagKeyPrefix)
 	}
-	return tagExpression(entity, c)
+	return tagExpression(entity, c.tagCondition())
 }
 
-// tagExpression encodes one tag condition the way the console does. Match
-// rules and buildRolePermissions' tag rules share it, so a condition means the
-// same thing in both.
-func tagExpression(
-	entity apitype.PermissionContextExpression,
-	c PolicyGroupTagCondition,
-) (apitype.PermissionBooleanExpression, error) {
-	if strings.TrimSpace(c.Key) == "" {
-		return nil, errors.New("`key` must not be empty")
-	}
-	operator := PolicyGroupTagOperatorEquals
+func (c PolicyGroupTagCondition) tagCondition() TagCondition {
+	var operator *TagOperator
 	if c.Operator != nil {
-		operator = *c.Operator
+		o := TagOperator(*c.Operator)
+		operator = &o
 	}
-
-	var positive apitype.PermissionBooleanExpression
-	switch operator {
-	case PolicyGroupTagOperatorEquals, PolicyGroupTagOperatorNotEquals:
-		if c.Value == nil || *c.Value == "" {
-			return nil, fmt.Errorf("`value` is required with the %q operator", operator)
-		}
-		positive = apitype.PermissionExpressionEqualBuilder{
-			Left:  apitype.PermissionExpressionTagBuilder{Context: entity, Key: c.Key}.Build(),
-			Right: apitype.PermissionLiteralExpressionStringBuilder{Value: *c.Value}.Build(),
-		}.Build()
-	case PolicyGroupTagOperatorExists, PolicyGroupTagOperatorNotExists:
-		if c.Value != nil {
-			return nil, fmt.Errorf("`value` can't be set with the %q operator", operator)
-		}
-		positive = apitype.PermissionExpressionHasTagBuilder{Context: entity, Key: c.Key}.Build()
-	default:
-		return nil, fmt.Errorf("unknown operator %q; use `equals`, `notEquals`, `exists`, or `notExists`", operator)
-	}
-
-	if operator == PolicyGroupTagOperatorEquals || operator == PolicyGroupTagOperatorExists {
-		return positive, nil
-	}
-	return apitype.PermissionExpressionNotBuilder{
-		PermissionBooleanExpressionUnaryBuilder: apitype.PermissionBooleanExpressionUnaryBuilder{Node: positive},
-	}.Build(), nil
+	return TagCondition{Key: c.Key, Operator: operator, Value: c.Value}
 }
 
 func andExpression(l, r apitype.PermissionBooleanExpression) apitype.PermissionBooleanExpression {

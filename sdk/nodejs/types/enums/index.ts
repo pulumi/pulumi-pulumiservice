@@ -919,6 +919,27 @@ export const ScanSchedule = {
 
 export type ScanSchedule = (typeof ScanSchedule)[keyof typeof ScanSchedule];
 
+export const TagOperator = {
+    /**
+     * The tag is set to `value`.
+     */
+    Equals: "equals",
+    /**
+     * The tag isn't set to `value`. Also matches entities that don't have the tag.
+     */
+    NotEquals: "notEquals",
+    /**
+     * The entity has the tag, with any value.
+     */
+    Exists: "exists",
+    /**
+     * The entity doesn't have the tag.
+     */
+    NotExists: "notExists",
+} as const;
+
+export type TagOperator = (typeof TagOperator)[keyof typeof TagOperator];
+
 export const TargetActionType = {
     /**
      * Update action type for approval rules.

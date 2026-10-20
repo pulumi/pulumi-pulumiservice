@@ -6,7 +6,7 @@ package com.pulumi.pulumiservice.inputs;
 import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
 import com.pulumi.pulumiservice.enums.RbacEnvironmentScope;
-import com.pulumi.pulumiservice.inputs.PolicyGroupTagConditionArgs;
+import com.pulumi.pulumiservice.inputs.TagConditionArgs;
 import java.lang.Boolean;
 import java.lang.String;
 import java.util.List;
@@ -69,13 +69,13 @@ public final class RoleEnvironmentRuleArgs extends com.pulumi.resources.Resource
      * 
      */
     @Import(name="tags")
-    private @Nullable Output<List<PolicyGroupTagConditionArgs>> tags;
+    private @Nullable Output<List<TagConditionArgs>> tags;
 
     /**
      * @return Apply to entities whose tags match every condition.
      * 
      */
-    public Optional<Output<List<PolicyGroupTagConditionArgs>>> tags() {
+    public Optional<Output<List<TagConditionArgs>>> tags() {
         return Optional.ofNullable(this.tags);
     }
 
@@ -185,7 +185,7 @@ public final class RoleEnvironmentRuleArgs extends com.pulumi.resources.Resource
          * @return builder
          * 
          */
-        public Builder tags(@Nullable Output<List<PolicyGroupTagConditionArgs>> tags) {
+        public Builder tags(@Nullable Output<List<TagConditionArgs>> tags) {
             $.tags = tags;
             return this;
         }
@@ -196,7 +196,7 @@ public final class RoleEnvironmentRuleArgs extends com.pulumi.resources.Resource
          * @return builder
          * 
          */
-        public Builder tags(List<PolicyGroupTagConditionArgs> tags) {
+        public Builder tags(List<TagConditionArgs> tags) {
             return tags(Output.of(tags));
         }
 
@@ -206,7 +206,7 @@ public final class RoleEnvironmentRuleArgs extends com.pulumi.resources.Resource
          * @return builder
          * 
          */
-        public Builder tags(PolicyGroupTagConditionArgs... tags) {
+        public Builder tags(TagConditionArgs... tags) {
             return tags(List.of(tags));
         }
 

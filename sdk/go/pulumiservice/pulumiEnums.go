@@ -2967,6 +2967,179 @@ func (in *scanSchedulePtr) ToScanSchedulePtrOutputWithContext(ctx context.Contex
 	return pulumi.ToOutputWithContext(ctx, in).(ScanSchedulePtrOutput)
 }
 
+type TagOperator string
+
+const (
+	// The tag is set to `value`.
+	TagOperatorEquals = TagOperator("equals")
+	// The tag isn't set to `value`. Also matches entities that don't have the tag.
+	TagOperatorNotEquals = TagOperator("notEquals")
+	// The entity has the tag, with any value.
+	TagOperatorExists = TagOperator("exists")
+	// The entity doesn't have the tag.
+	TagOperatorNotExists = TagOperator("notExists")
+)
+
+func (TagOperator) ElementType() reflect.Type {
+	return reflect.TypeOf((*TagOperator)(nil)).Elem()
+}
+
+func (e TagOperator) ToTagOperatorOutput() TagOperatorOutput {
+	return pulumi.ToOutput(e).(TagOperatorOutput)
+}
+
+func (e TagOperator) ToTagOperatorOutputWithContext(ctx context.Context) TagOperatorOutput {
+	return pulumi.ToOutputWithContext(ctx, e).(TagOperatorOutput)
+}
+
+func (e TagOperator) ToTagOperatorPtrOutput() TagOperatorPtrOutput {
+	return e.ToTagOperatorPtrOutputWithContext(context.Background())
+}
+
+func (e TagOperator) ToTagOperatorPtrOutputWithContext(ctx context.Context) TagOperatorPtrOutput {
+	return TagOperator(e).ToTagOperatorOutputWithContext(ctx).ToTagOperatorPtrOutputWithContext(ctx)
+}
+
+func (e TagOperator) ToStringOutput() pulumi.StringOutput {
+	return pulumi.ToOutput(pulumi.String(e)).(pulumi.StringOutput)
+}
+
+func (e TagOperator) ToStringOutputWithContext(ctx context.Context) pulumi.StringOutput {
+	return pulumi.ToOutputWithContext(ctx, pulumi.String(e)).(pulumi.StringOutput)
+}
+
+func (e TagOperator) ToStringPtrOutput() pulumi.StringPtrOutput {
+	return pulumi.String(e).ToStringPtrOutputWithContext(context.Background())
+}
+
+func (e TagOperator) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
+	return pulumi.String(e).ToStringOutputWithContext(ctx).ToStringPtrOutputWithContext(ctx)
+}
+
+type TagOperatorOutput struct{ *pulumi.OutputState }
+
+func (TagOperatorOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*TagOperator)(nil)).Elem()
+}
+
+func (o TagOperatorOutput) ToTagOperatorOutput() TagOperatorOutput {
+	return o
+}
+
+func (o TagOperatorOutput) ToTagOperatorOutputWithContext(ctx context.Context) TagOperatorOutput {
+	return o
+}
+
+func (o TagOperatorOutput) ToTagOperatorPtrOutput() TagOperatorPtrOutput {
+	return o.ToTagOperatorPtrOutputWithContext(context.Background())
+}
+
+func (o TagOperatorOutput) ToTagOperatorPtrOutputWithContext(ctx context.Context) TagOperatorPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v TagOperator) *TagOperator {
+		return &v
+	}).(TagOperatorPtrOutput)
+}
+
+func (o TagOperatorOutput) ToStringOutput() pulumi.StringOutput {
+	return o.ToStringOutputWithContext(context.Background())
+}
+
+func (o TagOperatorOutput) ToStringOutputWithContext(ctx context.Context) pulumi.StringOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e TagOperator) string {
+		return string(e)
+	}).(pulumi.StringOutput)
+}
+
+func (o TagOperatorOutput) ToStringPtrOutput() pulumi.StringPtrOutput {
+	return o.ToStringPtrOutputWithContext(context.Background())
+}
+
+func (o TagOperatorOutput) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e TagOperator) *string {
+		v := string(e)
+		return &v
+	}).(pulumi.StringPtrOutput)
+}
+
+type TagOperatorPtrOutput struct{ *pulumi.OutputState }
+
+func (TagOperatorPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**TagOperator)(nil)).Elem()
+}
+
+func (o TagOperatorPtrOutput) ToTagOperatorPtrOutput() TagOperatorPtrOutput {
+	return o
+}
+
+func (o TagOperatorPtrOutput) ToTagOperatorPtrOutputWithContext(ctx context.Context) TagOperatorPtrOutput {
+	return o
+}
+
+func (o TagOperatorPtrOutput) Elem() TagOperatorOutput {
+	return o.ApplyT(func(v *TagOperator) TagOperator {
+		if v != nil {
+			return *v
+		}
+		var ret TagOperator
+		return ret
+	}).(TagOperatorOutput)
+}
+
+func (o TagOperatorPtrOutput) ToStringPtrOutput() pulumi.StringPtrOutput {
+	return o.ToStringPtrOutputWithContext(context.Background())
+}
+
+func (o TagOperatorPtrOutput) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e *TagOperator) *string {
+		if e == nil {
+			return nil
+		}
+		v := string(*e)
+		return &v
+	}).(pulumi.StringPtrOutput)
+}
+
+// TagOperatorInput is an input type that accepts values of the TagOperator enum
+// A concrete instance of `TagOperatorInput` can be one of the following:
+//
+//	TagOperatorEquals
+//	TagOperatorNotEquals
+//	TagOperatorExists
+//	TagOperatorNotExists
+type TagOperatorInput interface {
+	pulumi.Input
+
+	ToTagOperatorOutput() TagOperatorOutput
+	ToTagOperatorOutputWithContext(context.Context) TagOperatorOutput
+}
+
+var tagOperatorPtrType = reflect.TypeOf((**TagOperator)(nil)).Elem()
+
+type TagOperatorPtrInput interface {
+	pulumi.Input
+
+	ToTagOperatorPtrOutput() TagOperatorPtrOutput
+	ToTagOperatorPtrOutputWithContext(context.Context) TagOperatorPtrOutput
+}
+
+type tagOperatorPtr string
+
+func TagOperatorPtr(v string) TagOperatorPtrInput {
+	return (*tagOperatorPtr)(&v)
+}
+
+func (*tagOperatorPtr) ElementType() reflect.Type {
+	return tagOperatorPtrType
+}
+
+func (in *tagOperatorPtr) ToTagOperatorPtrOutput() TagOperatorPtrOutput {
+	return pulumi.ToOutput(in).(TagOperatorPtrOutput)
+}
+
+func (in *tagOperatorPtr) ToTagOperatorPtrOutputWithContext(ctx context.Context) TagOperatorPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, in).(TagOperatorPtrOutput)
+}
+
 type TargetActionType string
 
 const (
@@ -4068,6 +4241,8 @@ func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*RbacStackScopeArrayInput)(nil)).Elem(), RbacStackScopeArray{})
 	pulumi.RegisterInputType(reflect.TypeOf((*ScanScheduleInput)(nil)).Elem(), ScanSchedule("none"))
 	pulumi.RegisterInputType(reflect.TypeOf((*ScanSchedulePtrInput)(nil)).Elem(), ScanSchedule("none"))
+	pulumi.RegisterInputType(reflect.TypeOf((*TagOperatorInput)(nil)).Elem(), TagOperator("equals"))
+	pulumi.RegisterInputType(reflect.TypeOf((*TagOperatorPtrInput)(nil)).Elem(), TagOperator("equals"))
 	pulumi.RegisterInputType(reflect.TypeOf((*TargetActionTypeInput)(nil)).Elem(), TargetActionType("update"))
 	pulumi.RegisterInputType(reflect.TypeOf((*TargetActionTypePtrInput)(nil)).Elem(), TargetActionType("update"))
 	pulumi.RegisterInputType(reflect.TypeOf((*TargetActionTypeArrayInput)(nil)).Elem(), TargetActionTypeArray{})
@@ -4112,6 +4287,8 @@ func init() {
 	pulumi.RegisterOutputType(RbacStackScopeArrayOutput{})
 	pulumi.RegisterOutputType(ScanScheduleOutput{})
 	pulumi.RegisterOutputType(ScanSchedulePtrOutput{})
+	pulumi.RegisterOutputType(TagOperatorOutput{})
+	pulumi.RegisterOutputType(TagOperatorPtrOutput{})
 	pulumi.RegisterOutputType(TargetActionTypeOutput{})
 	pulumi.RegisterOutputType(TargetActionTypePtrOutput{})
 	pulumi.RegisterOutputType(TargetActionTypeArrayOutput{})

@@ -2033,7 +2033,7 @@
         "tags": {
           "type": "array",
           "items": {
-            "$ref": "#/types/pulumiservice:index:PolicyGroupTagCondition"
+            "$ref": "#/types/pulumiservice:index:TagCondition"
           },
           "description": "Apply to entities whose tags match every condition."
         }
@@ -2060,7 +2060,7 @@
         "tags": {
           "type": "array",
           "items": {
-            "$ref": "#/types/pulumiservice:index:PolicyGroupTagCondition"
+            "$ref": "#/types/pulumiservice:index:TagCondition"
           },
           "description": "Apply to entities whose tags match every condition."
         }
@@ -2114,7 +2114,7 @@
         "tags": {
           "type": "array",
           "items": {
-            "$ref": "#/types/pulumiservice:index:PolicyGroupTagCondition"
+            "$ref": "#/types/pulumiservice:index:TagCondition"
           },
           "description": "Apply to entities whose tags match every condition."
         }
@@ -2137,6 +2137,51 @@
           "name": "daily",
           "description": "Run automated scans once per day.",
           "value": "daily"
+        }
+      ]
+    },
+    "pulumiservice:index:TagCondition": {
+      "properties": {
+        "key": {
+          "type": "string",
+          "description": "The tag key."
+        },
+        "operator": {
+          "$ref": "#/types/pulumiservice:index:TagOperator",
+          "description": "How the tag is compared. Defaults to `equals`."
+        },
+        "value": {
+          "type": "string",
+          "description": "The tag value. Required with `equals` and `notEquals`, and not allowed with `exists` and `notExists`."
+        }
+      },
+      "type": "object",
+      "required": [
+        "key"
+      ]
+    },
+    "pulumiservice:index:TagOperator": {
+      "type": "string",
+      "enum": [
+        {
+          "name": "Equals",
+          "description": "The tag is set to `value`.",
+          "value": "equals"
+        },
+        {
+          "name": "NotEquals",
+          "description": "The tag isn't set to `value`. Also matches entities that don't have the tag.",
+          "value": "notEquals"
+        },
+        {
+          "name": "Exists",
+          "description": "The entity has the tag, with any value.",
+          "value": "exists"
+        },
+        {
+          "name": "NotExists",
+          "description": "The entity doesn't have the tag.",
+          "value": "notExists"
         }
       ]
     },

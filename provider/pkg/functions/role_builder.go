@@ -54,9 +54,9 @@ const (
 
 // RoleRuleSelector chooses which entities a rule applies to.
 type RoleRuleSelector struct {
-	All  *bool                     `pulumi:"all,optional"`
-	Id   *string                   `pulumi:"id,optional"` //nolint:revive // matches the SDK property name
-	Tags []PolicyGroupTagCondition `pulumi:"tags,optional"`
+	All  *bool          `pulumi:"all,optional"`
+	Id   *string        `pulumi:"id,optional"` //nolint:revive // matches the SDK property name
+	Tags []TagCondition `pulumi:"tags,optional"`
 }
 
 func (s *RoleRuleSelector) Annotate(a infer.Annotator) {

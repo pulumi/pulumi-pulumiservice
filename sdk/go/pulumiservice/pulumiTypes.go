@@ -4718,7 +4718,7 @@ type RoleAccountRule struct {
 	// Cloud account scopes to grant on the selected accounts.
 	Scopes []RbacAccountScope `pulumi:"scopes"`
 	// Apply to entities whose tags match every condition.
-	Tags []PolicyGroupTagCondition `pulumi:"tags"`
+	Tags []TagCondition `pulumi:"tags"`
 }
 
 // RoleAccountRuleInput is an input type that accepts RoleAccountRuleArgs and RoleAccountRuleOutput values.
@@ -4740,7 +4740,7 @@ type RoleAccountRuleArgs struct {
 	// Cloud account scopes to grant on the selected accounts.
 	Scopes RbacAccountScopeArrayInput `pulumi:"scopes"`
 	// Apply to entities whose tags match every condition.
-	Tags PolicyGroupTagConditionArrayInput `pulumi:"tags"`
+	Tags TagConditionArrayInput `pulumi:"tags"`
 }
 
 func (RoleAccountRuleArgs) ElementType() reflect.Type {
@@ -4810,8 +4810,8 @@ func (o RoleAccountRuleOutput) Scopes() RbacAccountScopeArrayOutput {
 }
 
 // Apply to entities whose tags match every condition.
-func (o RoleAccountRuleOutput) Tags() PolicyGroupTagConditionArrayOutput {
-	return o.ApplyT(func(v RoleAccountRule) []PolicyGroupTagCondition { return v.Tags }).(PolicyGroupTagConditionArrayOutput)
+func (o RoleAccountRuleOutput) Tags() TagConditionArrayOutput {
+	return o.ApplyT(func(v RoleAccountRule) []TagCondition { return v.Tags }).(TagConditionArrayOutput)
 }
 
 type RoleAccountRuleArrayOutput struct{ *pulumi.OutputState }
@@ -4842,7 +4842,7 @@ type RoleEnvironmentRule struct {
 	// Environment scopes to grant on the selected environments.
 	Scopes []RbacEnvironmentScope `pulumi:"scopes"`
 	// Apply to entities whose tags match every condition.
-	Tags []PolicyGroupTagCondition `pulumi:"tags"`
+	Tags []TagCondition `pulumi:"tags"`
 }
 
 // RoleEnvironmentRuleInput is an input type that accepts RoleEnvironmentRuleArgs and RoleEnvironmentRuleOutput values.
@@ -4864,7 +4864,7 @@ type RoleEnvironmentRuleArgs struct {
 	// Environment scopes to grant on the selected environments.
 	Scopes RbacEnvironmentScopeArrayInput `pulumi:"scopes"`
 	// Apply to entities whose tags match every condition.
-	Tags PolicyGroupTagConditionArrayInput `pulumi:"tags"`
+	Tags TagConditionArrayInput `pulumi:"tags"`
 }
 
 func (RoleEnvironmentRuleArgs) ElementType() reflect.Type {
@@ -4934,8 +4934,8 @@ func (o RoleEnvironmentRuleOutput) Scopes() RbacEnvironmentScopeArrayOutput {
 }
 
 // Apply to entities whose tags match every condition.
-func (o RoleEnvironmentRuleOutput) Tags() PolicyGroupTagConditionArrayOutput {
-	return o.ApplyT(func(v RoleEnvironmentRule) []PolicyGroupTagCondition { return v.Tags }).(PolicyGroupTagConditionArrayOutput)
+func (o RoleEnvironmentRuleOutput) Tags() TagConditionArrayOutput {
+	return o.ApplyT(func(v RoleEnvironmentRule) []TagCondition { return v.Tags }).(TagConditionArrayOutput)
 }
 
 type RoleEnvironmentRuleArrayOutput struct{ *pulumi.OutputState }
@@ -5031,7 +5031,7 @@ type RoleStackRule struct {
 	// Stack scopes to grant on the selected stacks.
 	Scopes []RbacStackScope `pulumi:"scopes"`
 	// Apply to entities whose tags match every condition.
-	Tags []PolicyGroupTagCondition `pulumi:"tags"`
+	Tags []TagCondition `pulumi:"tags"`
 }
 
 // RoleStackRuleInput is an input type that accepts RoleStackRuleArgs and RoleStackRuleOutput values.
@@ -5053,7 +5053,7 @@ type RoleStackRuleArgs struct {
 	// Stack scopes to grant on the selected stacks.
 	Scopes RbacStackScopeArrayInput `pulumi:"scopes"`
 	// Apply to entities whose tags match every condition.
-	Tags PolicyGroupTagConditionArrayInput `pulumi:"tags"`
+	Tags TagConditionArrayInput `pulumi:"tags"`
 }
 
 func (RoleStackRuleArgs) ElementType() reflect.Type {
@@ -5123,8 +5123,8 @@ func (o RoleStackRuleOutput) Scopes() RbacStackScopeArrayOutput {
 }
 
 // Apply to entities whose tags match every condition.
-func (o RoleStackRuleOutput) Tags() PolicyGroupTagConditionArrayOutput {
-	return o.ApplyT(func(v RoleStackRule) []PolicyGroupTagCondition { return v.Tags }).(PolicyGroupTagConditionArrayOutput)
+func (o RoleStackRuleOutput) Tags() TagConditionArrayOutput {
+	return o.ApplyT(func(v RoleStackRule) []TagCondition { return v.Tags }).(TagConditionArrayOutput)
 }
 
 type RoleStackRuleArrayOutput struct{ *pulumi.OutputState }
@@ -5145,6 +5145,121 @@ func (o RoleStackRuleArrayOutput) Index(i pulumi.IntInput) RoleStackRuleOutput {
 	return pulumi.All(o, i).ApplyT(func(vs []interface{}) RoleStackRule {
 		return vs[0].([]RoleStackRule)[vs[1].(int)]
 	}).(RoleStackRuleOutput)
+}
+
+type TagCondition struct {
+	// The tag key.
+	Key string `pulumi:"key"`
+	// How the tag is compared. Defaults to `equals`.
+	Operator *TagOperator `pulumi:"operator"`
+	// The tag value. Required with `equals` and `notEquals`, and not allowed with `exists` and `notExists`.
+	Value *string `pulumi:"value"`
+}
+
+// TagConditionInput is an input type that accepts TagConditionArgs and TagConditionOutput values.
+// You can construct a concrete instance of `TagConditionInput` via:
+//
+//	TagConditionArgs{...}
+type TagConditionInput interface {
+	pulumi.Input
+
+	ToTagConditionOutput() TagConditionOutput
+	ToTagConditionOutputWithContext(context.Context) TagConditionOutput
+}
+
+type TagConditionArgs struct {
+	// The tag key.
+	Key pulumi.StringInput `pulumi:"key"`
+	// How the tag is compared. Defaults to `equals`.
+	Operator TagOperatorPtrInput `pulumi:"operator"`
+	// The tag value. Required with `equals` and `notEquals`, and not allowed with `exists` and `notExists`.
+	Value pulumi.StringPtrInput `pulumi:"value"`
+}
+
+func (TagConditionArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*TagCondition)(nil)).Elem()
+}
+
+func (i TagConditionArgs) ToTagConditionOutput() TagConditionOutput {
+	return i.ToTagConditionOutputWithContext(context.Background())
+}
+
+func (i TagConditionArgs) ToTagConditionOutputWithContext(ctx context.Context) TagConditionOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(TagConditionOutput)
+}
+
+// TagConditionArrayInput is an input type that accepts TagConditionArray and TagConditionArrayOutput values.
+// You can construct a concrete instance of `TagConditionArrayInput` via:
+//
+//	TagConditionArray{ TagConditionArgs{...} }
+type TagConditionArrayInput interface {
+	pulumi.Input
+
+	ToTagConditionArrayOutput() TagConditionArrayOutput
+	ToTagConditionArrayOutputWithContext(context.Context) TagConditionArrayOutput
+}
+
+type TagConditionArray []TagConditionInput
+
+func (TagConditionArray) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]TagCondition)(nil)).Elem()
+}
+
+func (i TagConditionArray) ToTagConditionArrayOutput() TagConditionArrayOutput {
+	return i.ToTagConditionArrayOutputWithContext(context.Background())
+}
+
+func (i TagConditionArray) ToTagConditionArrayOutputWithContext(ctx context.Context) TagConditionArrayOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(TagConditionArrayOutput)
+}
+
+type TagConditionOutput struct{ *pulumi.OutputState }
+
+func (TagConditionOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*TagCondition)(nil)).Elem()
+}
+
+func (o TagConditionOutput) ToTagConditionOutput() TagConditionOutput {
+	return o
+}
+
+func (o TagConditionOutput) ToTagConditionOutputWithContext(ctx context.Context) TagConditionOutput {
+	return o
+}
+
+// The tag key.
+func (o TagConditionOutput) Key() pulumi.StringOutput {
+	return o.ApplyT(func(v TagCondition) string { return v.Key }).(pulumi.StringOutput)
+}
+
+// How the tag is compared. Defaults to `equals`.
+func (o TagConditionOutput) Operator() TagOperatorPtrOutput {
+	return o.ApplyT(func(v TagCondition) *TagOperator { return v.Operator }).(TagOperatorPtrOutput)
+}
+
+// The tag value. Required with `equals` and `notEquals`, and not allowed with `exists` and `notExists`.
+func (o TagConditionOutput) Value() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v TagCondition) *string { return v.Value }).(pulumi.StringPtrOutput)
+}
+
+type TagConditionArrayOutput struct{ *pulumi.OutputState }
+
+func (TagConditionArrayOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]TagCondition)(nil)).Elem()
+}
+
+func (o TagConditionArrayOutput) ToTagConditionArrayOutput() TagConditionArrayOutput {
+	return o
+}
+
+func (o TagConditionArrayOutput) ToTagConditionArrayOutputWithContext(ctx context.Context) TagConditionArrayOutput {
+	return o
+}
+
+func (o TagConditionArrayOutput) Index(i pulumi.IntInput) TagConditionOutput {
+	return pulumi.All(o, i).ApplyT(func(vs []interface{}) TagCondition {
+		return vs[0].([]TagCondition)[vs[1].(int)]
+	}).(TagConditionOutput)
 }
 
 type TemplateSourceDestination struct {
@@ -5341,6 +5456,8 @@ func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*RoleEnvironmentRuleArrayInput)(nil)).Elem(), RoleEnvironmentRuleArray{})
 	pulumi.RegisterInputType(reflect.TypeOf((*RoleStackRuleInput)(nil)).Elem(), RoleStackRuleArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*RoleStackRuleArrayInput)(nil)).Elem(), RoleStackRuleArray{})
+	pulumi.RegisterInputType(reflect.TypeOf((*TagConditionInput)(nil)).Elem(), TagConditionArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*TagConditionArrayInput)(nil)).Elem(), TagConditionArray{})
 	pulumi.RegisterInputType(reflect.TypeOf((*TemplateSourceDestinationInput)(nil)).Elem(), TemplateSourceDestinationArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*TemplateSourceDestinationPtrInput)(nil)).Elem(), TemplateSourceDestinationArgs{})
 	pulumi.RegisterOutputType(AWSOIDCConfigurationOutput{})
@@ -5411,6 +5528,8 @@ func init() {
 	pulumi.RegisterOutputType(RoleScopeInfoArrayOutput{})
 	pulumi.RegisterOutputType(RoleStackRuleOutput{})
 	pulumi.RegisterOutputType(RoleStackRuleArrayOutput{})
+	pulumi.RegisterOutputType(TagConditionOutput{})
+	pulumi.RegisterOutputType(TagConditionArrayOutput{})
 	pulumi.RegisterOutputType(TemplateSourceDestinationOutput{})
 	pulumi.RegisterOutputType(TemplateSourceDestinationPtrOutput{})
 }

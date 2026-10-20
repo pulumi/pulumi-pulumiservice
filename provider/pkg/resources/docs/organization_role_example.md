@@ -61,7 +61,7 @@ const platformPermissions = pulumiservice.buildRolePermissionsOutput({
             tags: [{
                 key: "env",
                 value: "prod",
-                operator: pulumiservice.PolicyGroupTagOperator.NotEquals,
+                operator: pulumiservice.TagOperator.NotEquals,
             }],
             scopes: [
                 pulumiservice.RbacStackScope.StackWrite,
@@ -72,7 +72,7 @@ const platformPermissions = pulumiservice.buildRolePermissionsOutput({
         {
             tags: [{
                 key: "cost-center",
-                operator: pulumiservice.PolicyGroupTagOperator.Exists,
+                operator: pulumiservice.TagOperator.Exists,
             }],
             scopes: [pulumiservice.RbacStackScope.StackDeploymentSettingsRead],
         },
@@ -80,7 +80,7 @@ const platformPermissions = pulumiservice.buildRolePermissionsOutput({
         {
             tags: [{
                 key: "owner",
-                operator: pulumiservice.PolicyGroupTagOperator.NotExists,
+                operator: pulumiservice.TagOperator.NotExists,
             }],
             scopes: [pulumiservice.RbacStackScope.StackTagsUpdate],
         },
@@ -203,7 +203,7 @@ platform_permissions = pulumiservice.build_role_permissions_output(organization_
             "tags": [{
                 "key": "env",
                 "value": "prod",
-                "operator": pulumiservice.PolicyGroupTagOperator.NOT_EQUALS,
+                "operator": pulumiservice.TagOperator.NOT_EQUALS,
             }],
             "scopes": [
                 pulumiservice.RbacStackScope.STACK_WRITE,
@@ -214,7 +214,7 @@ platform_permissions = pulumiservice.build_role_permissions_output(organization_
         {
             "tags": [{
                 "key": "cost-center",
-                "operator": pulumiservice.PolicyGroupTagOperator.EXISTS,
+                "operator": pulumiservice.TagOperator.EXISTS,
             }],
             "scopes": [pulumiservice.RbacStackScope.STACK_DEPLOYMENT_SETTINGS_READ],
         },
@@ -222,7 +222,7 @@ platform_permissions = pulumiservice.build_role_permissions_output(organization_
         {
             "tags": [{
                 "key": "owner",
-                "operator": pulumiservice.PolicyGroupTagOperator.NOT_EXISTS,
+                "operator": pulumiservice.TagOperator.NOT_EXISTS,
             }],
             "scopes": [pulumiservice.RbacStackScope.STACK_TAGS_UPDATE],
         },
@@ -346,8 +346,8 @@ func main() {
 				},
 				// Deploy stacks tagged team=platform (the operator defaults to equals)
 				&pulumiservice.RoleStackRuleArgs{
-					Tags: pulumiservice.PolicyGroupTagConditionArray{
-						&pulumiservice.PolicyGroupTagConditionArgs{
+					Tags: pulumiservice.TagConditionArray{
+						&pulumiservice.TagConditionArgs{
 							Key:   pulumi.String("team"),
 							Value: pulumi.String("platform"),
 						},
@@ -359,11 +359,11 @@ func main() {
 				},
 				// Deploy stacks whose env tag is anything but "prod"
 				&pulumiservice.RoleStackRuleArgs{
-					Tags: pulumiservice.PolicyGroupTagConditionArray{
-						&pulumiservice.PolicyGroupTagConditionArgs{
+					Tags: pulumiservice.TagConditionArray{
+						&pulumiservice.TagConditionArgs{
 							Key:      pulumi.String("env"),
 							Value:    pulumi.String("prod"),
-							Operator: pulumiservice.PolicyGroupTagOperatorNotEquals,
+							Operator: pulumiservice.TagOperatorNotEquals,
 						},
 					},
 					Scopes: pulumiservice.RbacStackScopeArray{
@@ -373,10 +373,10 @@ func main() {
 				},
 				// Read deployment settings on stacks that have a cost-center tag, whatever its value
 				&pulumiservice.RoleStackRuleArgs{
-					Tags: pulumiservice.PolicyGroupTagConditionArray{
-						&pulumiservice.PolicyGroupTagConditionArgs{
+					Tags: pulumiservice.TagConditionArray{
+						&pulumiservice.TagConditionArgs{
 							Key:      pulumi.String("cost-center"),
-							Operator: pulumiservice.PolicyGroupTagOperatorExists,
+							Operator: pulumiservice.TagOperatorExists,
 						},
 					},
 					Scopes: pulumiservice.RbacStackScopeArray{
@@ -385,10 +385,10 @@ func main() {
 				},
 				// Tag stacks that don't have an owner tag yet
 				&pulumiservice.RoleStackRuleArgs{
-					Tags: pulumiservice.PolicyGroupTagConditionArray{
-						&pulumiservice.PolicyGroupTagConditionArgs{
+					Tags: pulumiservice.TagConditionArray{
+						&pulumiservice.TagConditionArgs{
 							Key:      pulumi.String("owner"),
-							Operator: pulumiservice.PolicyGroupTagOperatorNotExists,
+							Operator: pulumiservice.TagOperatorNotExists,
 						},
 					},
 					Scopes: pulumiservice.RbacStackScopeArray{
@@ -397,12 +397,12 @@ func main() {
 				},
 				// Delete stacks that match every tag condition
 				&pulumiservice.RoleStackRuleArgs{
-					Tags: pulumiservice.PolicyGroupTagConditionArray{
-						&pulumiservice.PolicyGroupTagConditionArgs{
+					Tags: pulumiservice.TagConditionArray{
+						&pulumiservice.TagConditionArgs{
 							Key:   pulumi.String("team"),
 							Value: pulumi.String("platform"),
 						},
-						&pulumiservice.PolicyGroupTagConditionArgs{
+						&pulumiservice.TagConditionArgs{
 							Key:   pulumi.String("lifecycle"),
 							Value: pulumi.String("ephemeral"),
 						},
@@ -431,8 +431,8 @@ func main() {
 				},
 				// Open environments tagged team=platform
 				&pulumiservice.RoleEnvironmentRuleArgs{
-					Tags: pulumiservice.PolicyGroupTagConditionArray{
-						&pulumiservice.PolicyGroupTagConditionArgs{
+					Tags: pulumiservice.TagConditionArray{
+						&pulumiservice.TagConditionArgs{
 							Key:   pulumi.String("team"),
 							Value: pulumi.String("platform"),
 						},
@@ -459,8 +459,8 @@ func main() {
 				},
 				// Update accounts tagged team=platform
 				&pulumiservice.RoleAccountRuleArgs{
-					Tags: pulumiservice.PolicyGroupTagConditionArray{
-						&pulumiservice.PolicyGroupTagConditionArgs{
+					Tags: pulumiservice.TagConditionArray{
+						&pulumiservice.TagConditionArgs{
 							Key:   pulumi.String("team"),
 							Value: pulumi.String("platform"),
 						},
@@ -549,7 +549,7 @@ return await Deployment.RunAsync(() =>
             {
                 Tags = new[]
                 {
-                    new PulumiService.Inputs.PolicyGroupTagConditionInputArgs
+                    new PulumiService.Inputs.TagConditionInputArgs
                     {
                         Key = "team",
                         Value = "platform",
@@ -566,11 +566,11 @@ return await Deployment.RunAsync(() =>
             {
                 Tags = new[]
                 {
-                    new PulumiService.Inputs.PolicyGroupTagConditionInputArgs
+                    new PulumiService.Inputs.TagConditionInputArgs
                     {
                         Key = "env",
                         Value = "prod",
-                        Operator = PulumiService.PolicyGroupTagOperator.NotEquals,
+                        Operator = PulumiService.TagOperator.NotEquals,
                     },
                 },
                 Scopes = new[]
@@ -584,10 +584,10 @@ return await Deployment.RunAsync(() =>
             {
                 Tags = new[]
                 {
-                    new PulumiService.Inputs.PolicyGroupTagConditionInputArgs
+                    new PulumiService.Inputs.TagConditionInputArgs
                     {
                         Key = "cost-center",
-                        Operator = PulumiService.PolicyGroupTagOperator.Exists,
+                        Operator = PulumiService.TagOperator.Exists,
                     },
                 },
                 Scopes = new[]
@@ -600,10 +600,10 @@ return await Deployment.RunAsync(() =>
             {
                 Tags = new[]
                 {
-                    new PulumiService.Inputs.PolicyGroupTagConditionInputArgs
+                    new PulumiService.Inputs.TagConditionInputArgs
                     {
                         Key = "owner",
-                        Operator = PulumiService.PolicyGroupTagOperator.NotExists,
+                        Operator = PulumiService.TagOperator.NotExists,
                     },
                 },
                 Scopes = new[]
@@ -616,12 +616,12 @@ return await Deployment.RunAsync(() =>
             {
                 Tags = new[]
                 {
-                    new PulumiService.Inputs.PolicyGroupTagConditionInputArgs
+                    new PulumiService.Inputs.TagConditionInputArgs
                     {
                         Key = "team",
                         Value = "platform",
                     },
-                    new PulumiService.Inputs.PolicyGroupTagConditionInputArgs
+                    new PulumiService.Inputs.TagConditionInputArgs
                     {
                         Key = "lifecycle",
                         Value = "ephemeral",
@@ -660,7 +660,7 @@ return await Deployment.RunAsync(() =>
             {
                 Tags = new[]
                 {
-                    new PulumiService.Inputs.PolicyGroupTagConditionInputArgs
+                    new PulumiService.Inputs.TagConditionInputArgs
                     {
                         Key = "team",
                         Value = "platform",
@@ -697,7 +697,7 @@ return await Deployment.RunAsync(() =>
             {
                 Tags = new[]
                 {
-                    new PulumiService.Inputs.PolicyGroupTagConditionInputArgs
+                    new PulumiService.Inputs.TagConditionInputArgs
                     {
                         Key = "team",
                         Value = "platform",
@@ -730,18 +730,18 @@ package generated_program;
 import com.pulumi.Context;
 import com.pulumi.Pulumi;
 import com.pulumi.core.Output;
-import com.pulumi.pulumiservice.enums.PolicyGroupTagOperator;
 import com.pulumi.pulumiservice.enums.RbacAccountScope;
 import com.pulumi.pulumiservice.enums.RbacEnvironmentScope;
 import com.pulumi.pulumiservice.enums.RbacOrganizationScope;
 import com.pulumi.pulumiservice.enums.RbacStackScope;
+import com.pulumi.pulumiservice.enums.TagOperator;
 import com.pulumi.pulumiservice.PulumiserviceFunctions;
 import com.pulumi.pulumiservice.inputs.GetStackArgs;
 import com.pulumi.pulumiservice.inputs.GetEnvironmentArgs;
 import com.pulumi.pulumiservice.inputs.GetInsightsAccountArgs;
 import com.pulumi.pulumiservice.inputs.BuildRolePermissionsArgs;
 import com.pulumi.pulumiservice.inputs.RoleStackRuleArgs;
-import com.pulumi.pulumiservice.inputs.PolicyGroupTagConditionArgs;
+import com.pulumi.pulumiservice.inputs.TagConditionArgs;
 import com.pulumi.pulumiservice.inputs.RoleEnvironmentRuleArgs;
 import com.pulumi.pulumiservice.inputs.RoleAccountRuleArgs;
 import com.pulumi.pulumiservice.OrganizationRole;
@@ -797,7 +797,7 @@ public class App {
                     .build(),
                 // Deploy stacks tagged team=platform (the operator defaults to equals)
                 RoleStackRuleArgs.builder()
-                    .tags(PolicyGroupTagConditionArgs.builder()
+                    .tags(TagConditionArgs.builder()
                         .key("team")
                         .value("platform")
                         .build())
@@ -807,10 +807,10 @@ public class App {
                     .build(),
                 // Deploy stacks whose env tag is anything but "prod"
                 RoleStackRuleArgs.builder()
-                    .tags(PolicyGroupTagConditionArgs.builder()
+                    .tags(TagConditionArgs.builder()
                         .key("env")
                         .value("prod")
-                        .operator(PolicyGroupTagOperator.NotEquals)
+                        .operator(TagOperator.NotEquals)
                         .build())
                     .scopes(                    
                         RbacStackScope.StackWrite,
@@ -818,28 +818,28 @@ public class App {
                     .build(),
                 // Read deployment settings on stacks that have a cost-center tag, whatever its value
                 RoleStackRuleArgs.builder()
-                    .tags(PolicyGroupTagConditionArgs.builder()
+                    .tags(TagConditionArgs.builder()
                         .key("cost-center")
-                        .operator(PolicyGroupTagOperator.Exists)
+                        .operator(TagOperator.Exists)
                         .build())
                     .scopes(RbacStackScope.StackDeploymentSettingsRead)
                     .build(),
                 // Tag stacks that don't have an owner tag yet
                 RoleStackRuleArgs.builder()
-                    .tags(PolicyGroupTagConditionArgs.builder()
+                    .tags(TagConditionArgs.builder()
                         .key("owner")
-                        .operator(PolicyGroupTagOperator.NotExists)
+                        .operator(TagOperator.NotExists)
                         .build())
                     .scopes(RbacStackScope.StackTagsUpdate)
                     .build(),
                 // Delete stacks that match every tag condition
                 RoleStackRuleArgs.builder()
                     .tags(                    
-                        PolicyGroupTagConditionArgs.builder()
+                        TagConditionArgs.builder()
                             .key("team")
                             .value("platform")
                             .build(),
-                        PolicyGroupTagConditionArgs.builder()
+                        TagConditionArgs.builder()
                             .key("lifecycle")
                             .value("ephemeral")
                             .build())
@@ -861,7 +861,7 @@ public class App {
                     .build(),
                 // Open environments tagged team=platform
                 RoleEnvironmentRuleArgs.builder()
-                    .tags(PolicyGroupTagConditionArgs.builder()
+                    .tags(TagConditionArgs.builder()
                         .key("team")
                         .value("platform")
                         .build())
@@ -880,7 +880,7 @@ public class App {
                     .build(),
                 // Update accounts tagged team=platform
                 RoleAccountRuleArgs.builder()
-                    .tags(PolicyGroupTagConditionArgs.builder()
+                    .tags(TagConditionArgs.builder()
                         .key("team")
                         .value("platform")
                         .build())

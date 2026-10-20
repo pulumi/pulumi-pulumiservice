@@ -20,6 +20,7 @@ __all__ = [
     'RbacPermission',
     'RbacStackScope',
     'ScanSchedule',
+    'TagOperator',
     'TargetActionType',
     'TeamStackPermissionScope',
     'WebhookFilters',
@@ -929,6 +930,26 @@ class ScanSchedule(_builtins.str, Enum):
     DAILY = "daily"
     """
     Run automated scans once per day.
+    """
+
+
+@pulumi.type_token("pulumiservice:index:TagOperator")
+class TagOperator(_builtins.str, Enum):
+    EQUALS = "equals"
+    """
+    The tag is set to `value`.
+    """
+    NOT_EQUALS = "notEquals"
+    """
+    The tag isn't set to `value`. Also matches entities that don't have the tag.
+    """
+    EXISTS = "exists"
+    """
+    The entity has the tag, with any value.
+    """
+    NOT_EXISTS = "notExists"
+    """
+    The entity doesn't have the tag.
     """
 
 
