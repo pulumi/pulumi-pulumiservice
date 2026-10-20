@@ -8,10 +8,16 @@
 // non-idempotent endpoints, or shared singletons on the org).
 //
 // sweepOnce runs once per `go test` invocation, before TestApi starts,
-// and deletes any leftover resources matching the test-naming
-// conventions used by this suite.
+// and deletes leftover resources matching the test-naming conventions
+// used by this suite. Every CI suite and every concurrent PR run shares
+// the same org, so the sweeper only deletes resources older than
+// sweepMinAge: anything younger may belong to a run still in progress.
+// Resource types whose list endpoints return no timestamp are swept only
+// when PULUMITEST_SWEEP_UNDATED=1, for manual cleanup when nothing else is
+// running.
 //
-// Set PULUMITEST_SKIP_SWEEP=1 to bypass.
+// Set PULUMITEST_SKIP_SWEEP=1 to bypass. See "Shared test org" in
+// CONTRIBUTING.md; update it when changing what this sweeps.
 
 package examples
 
@@ -28,6 +34,11 @@ import (
 )
 
 var sweepOnce sync.Once
+
+// sweepMinAge is longer than the longest test run (the 2h `go test`
+// timeout in the Makefile), so the sweeper never deletes a resource that a
+// live run could still be using.
+const sweepMinAge = 3 * time.Hour
 
 // sweepApiTestState removes leftover test resources from the configured
 // Pulumi org. Best-effort: failures are logged, never fatal.
@@ -51,14 +62,16 @@ func sweepApiTestState(t *testing.T) {
 			http:   &http.Client{Timeout: 30 * time.Second},
 		}
 		s.sweepOidcIssuers()
-		s.sweepOrgWebhooks()
-		s.sweepPolicyGroups()
 		s.sweepRoles()
-		s.sweepTeams()
 		s.sweepEnvironments()
 		s.sweepAgentPools()
 		s.sweepOrgTokens()
-		s.sweepTemplateCollections()
+		if os.Getenv("PULUMITEST_SWEEP_UNDATED") != "" {
+			s.sweepOrgWebhooks()
+			s.sweepPolicyGroups()
+			s.sweepTeams()
+			s.sweepTemplateCollections()
+		}
 	})
 }
 
@@ -89,6 +102,36 @@ func (s *sweeper) shouldSweep(name string) bool {
 		}
 	}
 	return false
+}
+
+// apiTime is a timestamp from a Pulumi Cloud list endpoint. Endpoints
+// disagree on the format: RFC 3339, "2006-01-02 15:04:05.000" in UTC, or
+// Unix milliseconds. A missing or unparseable value stays zero.
+type apiTime struct{ time.Time }
+
+func (a *apiTime) UnmarshalJSON(b []byte) error {
+	var ms int64
+	if err := json.Unmarshal(b, &ms); err == nil {
+		a.Time = time.UnixMilli(ms)
+		return nil
+	}
+	var str string
+	if err := json.Unmarshal(b, &str); err != nil {
+		return nil
+	}
+	for _, layout := range []string{time.RFC3339Nano, "2006-01-02 15:04:05.999999999"} {
+		if t, err := time.Parse(layout, str); err == nil {
+			a.Time = t
+			return nil
+		}
+	}
+	return nil
+}
+
+// oldEnough reports whether a resource last touched at t can be swept. A
+// zero t means the age is unknown, so the resource is kept.
+func (s *sweeper) oldEnough(t apiTime) bool {
+	return !t.IsZero() && time.Since(t.Time) > sweepMinAge
 }
 
 func (s *sweeper) get(path string, out any) error {
@@ -124,8 +167,9 @@ func (s *sweeper) del(path string) error {
 func (s *sweeper) sweepOidcIssuers() {
 	var resp struct {
 		OidcIssuers []struct {
-			ID   string `json:"id"`
-			Name string `json:"name"`
+			ID       string  `json:"id"`
+			Name     string  `json:"name"`
+			Modified apiTime `json:"modified"`
 		} `json:"oidcIssuers"`
 	}
 	if err := s.get("/api/orgs/"+s.org+"/oidc/issuers", &resp); err != nil {
@@ -133,7 +177,7 @@ func (s *sweeper) sweepOidcIssuers() {
 		return
 	}
 	for _, iss := range resp.OidcIssuers {
-		if !s.shouldSweep(iss.Name) {
+		if !s.shouldSweep(iss.Name) || !s.oldEnough(iss.Modified) {
 			continue
 		}
 		if err := s.del("/api/orgs/" + s.org + "/oidc/issuers/" + iss.ID); err != nil {
@@ -189,8 +233,9 @@ func (s *sweeper) sweepPolicyGroups() {
 func (s *sweeper) sweepRoles() {
 	var resp struct {
 		Roles []struct {
-			ID   string `json:"id"`
-			Name string `json:"name"`
+			ID         string  `json:"id"`
+			Name       string  `json:"name"`
+			ModifiedAt apiTime `json:"modifiedAt"`
 		} `json:"roles"`
 	}
 	if err := s.get("/api/orgs/"+s.org+"/roles", &resp); err != nil {
@@ -198,7 +243,7 @@ func (s *sweeper) sweepRoles() {
 		return
 	}
 	for _, r := range resp.Roles {
-		if !s.shouldSweep(r.Name) {
+		if !s.shouldSweep(r.Name) || !s.oldEnough(r.ModifiedAt) {
 			continue
 		}
 		if err := s.del("/api/orgs/" + s.org + "/roles/" + r.ID); err != nil {
@@ -234,8 +279,9 @@ func (s *sweeper) sweepTeams() {
 func (s *sweeper) sweepAgentPools() {
 	var resp struct {
 		AgentPools []struct {
-			ID   string `json:"id"`
-			Name string `json:"name"`
+			ID      string  `json:"id"`
+			Name    string  `json:"name"`
+			Created apiTime `json:"created"`
 		} `json:"agentPools"`
 	}
 	if err := s.get("/api/orgs/"+s.org+"/agent-pools", &resp); err != nil {
@@ -243,7 +289,7 @@ func (s *sweeper) sweepAgentPools() {
 		return
 	}
 	for _, p := range resp.AgentPools {
-		if !s.shouldSweep(p.Name) {
+		if !s.shouldSweep(p.Name) || !s.oldEnough(p.Created) {
 			continue
 		}
 		if err := s.del("/api/orgs/" + s.org + "/agent-pools/" + p.ID); err != nil {
@@ -257,8 +303,9 @@ func (s *sweeper) sweepAgentPools() {
 func (s *sweeper) sweepOrgTokens() {
 	var resp struct {
 		Tokens []struct {
-			ID   string `json:"id"`
-			Name string `json:"name"`
+			ID      string  `json:"id"`
+			Name    string  `json:"name"`
+			Created apiTime `json:"created"`
 		} `json:"tokens"`
 	}
 	if err := s.get("/api/orgs/"+s.org+"/tokens", &resp); err != nil {
@@ -266,7 +313,7 @@ func (s *sweeper) sweepOrgTokens() {
 		return
 	}
 	for _, tk := range resp.Tokens {
-		if !s.shouldSweep(tk.Name) {
+		if !s.shouldSweep(tk.Name) || !s.oldEnough(tk.Created) {
 			continue
 		}
 		if err := s.del("/api/orgs/" + s.org + "/tokens/" + tk.ID); err != nil {
@@ -305,8 +352,9 @@ func (s *sweeper) sweepEnvironments() {
 	// filter applies. Best-effort — projects with no envs return 404.
 	var resp struct {
 		Environments []struct {
-			Project string `json:"project"`
-			Name    string `json:"name"`
+			Project  string  `json:"project"`
+			Name     string  `json:"name"`
+			Modified apiTime `json:"modified"`
 		} `json:"environments"`
 	}
 	if err := s.get("/api/esc/environments/"+s.org, &resp); err != nil {
@@ -314,7 +362,7 @@ func (s *sweeper) sweepEnvironments() {
 		return
 	}
 	for _, e := range resp.Environments {
-		if !s.shouldSweep(e.Name) && !s.shouldSweep(e.Project) {
+		if (!s.shouldSweep(e.Name) && !s.shouldSweep(e.Project)) || !s.oldEnough(e.Modified) {
 			continue
 		}
 		path := "/api/esc/environments/" + s.org + "/" + e.Project + "/" + e.Name
@@ -323,5 +371,35 @@ func (s *sweeper) sweepEnvironments() {
 			continue
 		}
 		s.t.Logf("sweep: deleted env %s/%s", e.Project, e.Name)
+	}
+}
+
+func TestSweepApiTime(t *testing.T) {
+	want := time.Date(2026, 10, 15, 21, 29, 36, 0, time.UTC)
+	for _, in := range []string{
+		`"2026-10-15T21:29:36Z"`,
+		`"2026-10-15 21:29:36"`,
+		`"2026-10-15 21:29:36.000"`,
+		`1792099776000`,
+	} {
+		var got apiTime
+		if err := json.Unmarshal([]byte(in), &got); err != nil || !got.Equal(want) {
+			t.Errorf("apiTime(%s) = %v, %v; want %v", in, got.Time, err, want)
+		}
+	}
+
+	s := &sweeper{}
+	for _, tc := range []struct {
+		name string
+		at   apiTime
+		want bool
+	}{
+		{"unknown age", apiTime{}, false},
+		{"recent", apiTime{time.Now().Add(-time.Minute)}, false},
+		{"old", apiTime{time.Now().Add(-sweepMinAge - time.Minute)}, true},
+	} {
+		if got := s.oldEnough(tc.at); got != tc.want {
+			t.Errorf("oldEnough(%s) = %v, want %v", tc.name, got, tc.want)
+		}
 	}
 }
