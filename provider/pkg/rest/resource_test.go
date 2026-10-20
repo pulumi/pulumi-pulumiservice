@@ -88,6 +88,20 @@ const (
 	itemsKey             = "items"
 	envVarsKey           = "environmentVariables"
 	newDescriptionKey    = "newDescription"
+	agentPoolIDKey       = "agentPoolId"
+	entityTypeKey        = "entityType"
+	discriminatorKey     = "__type"
+	auditVal             = "audit"
+	preventativeVal      = "preventative"
+	permExprEqualVal     = "PermissionExpressionEqual"
+	pg1Val               = "pg1"
+	testOrgPG1ID         = "test-org/pg1"
+	poolAVal             = "pool-a"
+	poolBVal             = "pool-b"
+	stackMatchRuleKey    = "stackMatchRule"
+	removeStackRuleKey   = "removeStackMatchRule"
+	envTagVal            = "env"
+	tagKeyKey            = "key"
 )
 
 // mockTransport serves canned responses keyed by "<METHOD> <path>". Set
@@ -2081,10 +2095,10 @@ func TestUpdateSkipsAliasForReplaceTriggeringField(t *testing.T) {
 	}
 	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
 
-	prior := propMap(map[string]any{orgNameKey: testOrgName, nameKey: "pg1", "agentPoolId": "pool-a"})
-	newInputs := propMap(map[string]any{orgNameKey: testOrgName, nameKey: "pg1", "agentPoolId": "pool-b"})
+	prior := propMap(map[string]any{orgNameKey: testOrgName, nameKey: pg1Val, agentPoolIDKey: poolAVal})
+	newInputs := propMap(map[string]any{orgNameKey: testOrgName, nameKey: pg1Val, agentPoolIDKey: poolBVal})
 	if _, err := r.Update(t.Context(), p.UpdateRequest{
-		ID: "test-org/pg1", OldInputs: prior, State: prior, Inputs: newInputs,
+		ID: testOrgPG1ID, OldInputs: prior, State: prior, Inputs: newInputs,
 	}); err != nil {
 		t.Fatalf("update: %v\n  calls: %v", err, mock.calls)
 	}
@@ -2177,5 +2191,242 @@ func TestReadKeepsResponseOnlyItemFieldsOutOfInputs(t *testing.T) {
 		if _, ok := item.AsMap().GetOk(k); ok {
 			t.Errorf("response-only key %q leaked into inputs: %v", k, item)
 		}
+	}
+}
+
+func policyGroupPatchCapture(t *testing.T) (*Resource, *map[string]any) {
+	t.Helper()
+	spec, meta := loadFixtures(t)
+	r, ok := Resources(spec, meta)["pulumiservice:api:PolicyGroup"]
+	if !ok {
+		t.Fatalf("PolicyGroup resource not found")
+	}
+	var patchBody map[string]any
+	mock := &mockTransport{
+		responseFn: func(req *http.Request) mockResponse {
+			switch req.Method {
+			case http.MethodPatch:
+				b, _ := io.ReadAll(req.Body)
+				if err := json.Unmarshal(b, &patchBody); err != nil {
+					t.Fatalf("unmarshal patch body %q: %v", b, err)
+				}
+				return mockResponse{status: 204, body: ""}
+			case http.MethodGet:
+				return mockResponse{status: 200, body: `{"name":"pg1"}`}
+			}
+			return mockResponse{status: 500, body: unexpectedBody}
+		},
+	}
+	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
+	return r, &patchBody
+}
+
+func TestUpdateSendsClearFieldWhenInputDropped(t *testing.T) {
+	r, patchBody := policyGroupPatchCapture(t)
+	stackRule := map[string]any{discriminatorKey: permExprEqualVal, tagKeyKey: envTagVal}
+	accountRule := map[string]any{discriminatorKey: permExprEqualVal, tagKeyKey: "team"}
+
+	prior := propMap(map[string]any{
+		orgNameKey: testOrgName, nameKey: pg1Val, modeKey: auditVal,
+		stackMatchRuleKey: stackRule, "accountMatchRule": accountRule,
+	})
+	newInputs := propMap(map[string]any{
+		orgNameKey: testOrgName, nameKey: pg1Val, modeKey: auditVal,
+		"accountMatchRule": accountRule,
+	})
+	if _, err := r.Update(t.Context(), p.UpdateRequest{
+		ID: testOrgPG1ID, OldInputs: prior, State: prior, Inputs: newInputs,
+	}); err != nil {
+		t.Fatalf("update: %v", err)
+	}
+	if got := (*patchBody)[removeStackRuleKey]; got != true {
+		t.Errorf("removeStackMatchRule = %#v, want true; body=%v", got, *patchBody)
+	}
+	if v, ok := (*patchBody)[stackMatchRuleKey]; ok {
+		t.Errorf("dropped stackMatchRule re-sent from prior inputs/state: %v", v)
+	}
+	if _, ok := (*patchBody)["removeAccountMatchRule"]; ok {
+		t.Errorf("removeAccountMatchRule sent though accountMatchRule is still set; body=%v", *patchBody)
+	}
+}
+
+func TestUpdateOmitsClearFieldWhenInputNeverSet(t *testing.T) {
+	r, patchBody := policyGroupPatchCapture(t)
+	prior := propMap(map[string]any{orgNameKey: testOrgName, nameKey: pg1Val, agentPoolIDKey: poolAVal})
+	state := propMap(map[string]any{
+		orgNameKey: testOrgName, nameKey: pg1Val, agentPoolIDKey: poolAVal,
+		stackMatchRuleKey: map[string]any{discriminatorKey: permExprEqualVal},
+	})
+	newInputs := propMap(map[string]any{orgNameKey: testOrgName, nameKey: pg1Val, agentPoolIDKey: poolBVal})
+	if _, err := r.Update(t.Context(), p.UpdateRequest{
+		ID: testOrgPG1ID, OldInputs: prior, State: state, Inputs: newInputs,
+	}); err != nil {
+		t.Fatalf("update: %v", err)
+	}
+	if _, ok := (*patchBody)[removeStackRuleKey]; ok {
+		t.Errorf("removeStackMatchRule sent for a rule the program never managed; body=%v", *patchBody)
+	}
+}
+
+func TestDiffReplacesPolicyGroupOnModeChange(t *testing.T) {
+	spec, meta := loadFixtures(t)
+	r, ok := Resources(spec, meta)["pulumiservice:api:PolicyGroup"]
+	if !ok {
+		t.Fatalf("PolicyGroup resource not found")
+	}
+	old := propMap(map[string]any{orgNameKey: testOrgName, nameKey: pg1Val, modeKey: preventativeVal})
+	updated := propMap(map[string]any{orgNameKey: testOrgName, nameKey: pg1Val, modeKey: auditVal})
+	resp, err := r.Diff(t.Context(), p.DiffRequest{OldInputs: old, Inputs: updated})
+	if err != nil {
+		t.Fatalf("diff: %v", err)
+	}
+	if got := resp.DetailedDiff[modeKey].Kind; got != p.UpdateReplace {
+		t.Errorf("mode diff kind = %v, want UpdateReplace", got)
+	}
+}
+
+func TestDiffDoesNotReplaceWhenAddedForceNewInputMatchesState(t *testing.T) {
+	spec, meta := loadFixtures(t)
+	r, ok := Resources(spec, meta)["pulumiservice:api:PolicyGroup"]
+	if !ok {
+		t.Fatalf("PolicyGroup resource not found")
+	}
+	inputs := func(mode string) property.Map {
+		m := map[string]any{orgNameKey: testOrgName, nameKey: pg1Val, entityTypeKey: stacksVal}
+		if mode != "" {
+			m[modeKey] = mode
+		}
+		return propMap(m)
+	}
+	old, state := inputs(""), inputs(preventativeVal)
+
+	resp, err := r.Diff(t.Context(), p.DiffRequest{OldInputs: old, State: state, Inputs: inputs(preventativeVal)})
+	if err != nil {
+		t.Fatalf("diff: %v", err)
+	}
+	if resp.HasChanges {
+		t.Errorf("adding mode equal to the server's value reported changes: %v", resp.DetailedDiff)
+	}
+
+	resp, err = r.Diff(t.Context(), p.DiffRequest{OldInputs: old, State: state, Inputs: inputs(auditVal)})
+	if err != nil {
+		t.Fatalf("diff: %v", err)
+	}
+	if got := resp.DetailedDiff[modeKey].Kind; got != p.AddReplace {
+		t.Errorf("adding mode that differs from the server's value: kind = %v, want AddReplace", got)
+	}
+}
+
+func TestDiffDoesNotReplaceWhenForceNewInputDropped(t *testing.T) {
+	spec, meta := loadFixtures(t)
+	r := Resources(spec, meta)["pulumiservice:api:PolicyGroup"]
+	old := propMap(map[string]any{orgNameKey: testOrgName, nameKey: pg1Val, modeKey: auditVal})
+	state := propMap(map[string]any{
+		orgNameKey: testOrgName, nameKey: pg1Val, modeKey: auditVal, entityTypeKey: accountsKey,
+	})
+	inputs := propMap(map[string]any{orgNameKey: testOrgName, nameKey: pg1Val, entityTypeKey: accountsKey})
+
+	resp, err := r.Diff(t.Context(), p.DiffRequest{OldInputs: old, State: state, Inputs: inputs})
+	if err != nil {
+		t.Fatalf("diff: %v", err)
+	}
+	if d, ok := resp.DetailedDiff[modeKey]; ok {
+		t.Errorf("dropping mode reported %v; the server keeps its mode", d.Kind)
+	}
+	for k, d := range resp.DetailedDiff {
+		if d.Kind == p.AddReplace || d.Kind == p.UpdateReplace || d.Kind == p.DeleteReplace {
+			t.Errorf("%s: unexpected replace %v", k, d.Kind)
+		}
+	}
+}
+
+func TestDiffSkipsMatchingForceNewInputAlongsideOtherChanges(t *testing.T) {
+	spec, meta := loadFixtures(t)
+	r := Resources(spec, meta)["pulumiservice:api:PolicyGroup"]
+	old := propMap(map[string]any{orgNameKey: testOrgName, nameKey: pg1Val, agentPoolIDKey: poolAVal})
+	state := propMap(map[string]any{orgNameKey: testOrgName, nameKey: pg1Val, agentPoolIDKey: poolAVal, modeKey: auditVal})
+	inputs := propMap(map[string]any{
+		orgNameKey: testOrgName, nameKey: pg1Val, agentPoolIDKey: poolBVal, modeKey: auditVal,
+	})
+
+	resp, err := r.Diff(t.Context(), p.DiffRequest{OldInputs: old, State: state, Inputs: inputs})
+	if err != nil {
+		t.Fatalf("diff: %v", err)
+	}
+	if d, ok := resp.DetailedDiff[modeKey]; ok {
+		t.Errorf("mode matching state reported %v", d.Kind)
+	}
+	if got := resp.DetailedDiff[agentPoolIDKey].Kind; got != p.Update {
+		t.Errorf("agentPoolId kind = %v, want Update", got)
+	}
+}
+
+func TestUpdateClearFieldOverridesStateHeldRule(t *testing.T) {
+	r, patchBody := policyGroupPatchCapture(t)
+	prior := propMap(map[string]any{
+		orgNameKey: testOrgName, nameKey: pg1Val, modeKey: auditVal,
+		stackMatchRuleKey: map[string]any{discriminatorKey: permExprEqualVal, tagKeyKey: envTagVal},
+	})
+	state := propMap(map[string]any{
+		orgNameKey: testOrgName, nameKey: pg1Val, modeKey: auditVal,
+		stackMatchRuleKey: map[string]any{discriminatorKey: permExprEqualVal, tagKeyKey: "region"},
+	})
+	newInputs := propMap(map[string]any{orgNameKey: testOrgName, nameKey: pg1Val, modeKey: auditVal})
+	if _, err := r.Update(t.Context(), p.UpdateRequest{
+		ID: testOrgPG1ID, OldInputs: prior, State: state, Inputs: newInputs,
+	}); err != nil {
+		t.Fatalf("update: %v", err)
+	}
+	if got := (*patchBody)[removeStackRuleKey]; got != true {
+		t.Errorf("removeStackMatchRule = %#v, want true; body=%v", got, *patchBody)
+	}
+	if v, ok := (*patchBody)[stackMatchRuleKey]; ok {
+		t.Errorf("state-held stackMatchRule re-sent: %v", v)
+	}
+}
+
+func TestUpdateSendsClearFieldWhenInputSetToNull(t *testing.T) {
+	r, patchBody := policyGroupPatchCapture(t)
+	prior := propMap(map[string]any{
+		orgNameKey: testOrgName, nameKey: pg1Val, modeKey: auditVal,
+		stackMatchRuleKey: map[string]any{discriminatorKey: permExprEqualVal, tagKeyKey: envTagVal},
+	})
+	newInputs := property.NewMap(map[string]property.Value{
+		orgNameKey:        property.New(testOrgName),
+		nameKey:           property.New(pg1Val),
+		modeKey:           property.New(auditVal),
+		stackMatchRuleKey: property.New(property.Null),
+	})
+	if _, err := r.Update(t.Context(), p.UpdateRequest{
+		ID: testOrgPG1ID, OldInputs: prior, State: prior, Inputs: newInputs,
+	}); err != nil {
+		t.Fatalf("update: %v", err)
+	}
+	if got := (*patchBody)[removeStackRuleKey]; got != true {
+		t.Errorf("removeStackMatchRule = %#v, want true; body=%v", got, *patchBody)
+	}
+}
+
+func TestBuildResourceKeepsReplaceOnChangesOffOutputs(t *testing.T) {
+	spec, meta := loadFixtures(t)
+	rs, err := buildResource(spec, meta, "pulumiservice:api:PolicyGroup", meta.Resources["pulumiservice:api:PolicyGroup"])
+	if err != nil {
+		t.Fatalf("build: %v", err)
+	}
+	if !rs.InputProperties[modeKey].ReplaceOnChanges {
+		t.Errorf("input mode: ReplaceOnChanges = false, want true")
+	}
+	if out := rs.Properties[modeKey]; out.ReplaceOnChanges || out.WillReplaceOnChanges {
+		t.Errorf("output mode carries replaceOnChanges, which SDKs emit as a default resource option")
+	}
+}
+
+func TestBuildResourceRejectsClearFieldWithUpdateEnvelope(t *testing.T) {
+	spec, meta := loadFixtures(t)
+	rm := meta.Resources["pulumiservice:api:EnvironmentTag_esc_environments"]
+	rm.Fields = map[string]FieldMeta{"value": {ClearField: "removeValue"}}
+	_, err := buildResource(spec, meta, "pulumiservice:api:EnvironmentTag_esc_environments", rm)
+	if err == nil || !strings.Contains(err.Error(), "updateEnvelope") {
+		t.Fatalf("want updateEnvelope error, got %v", err)
 	}
 }

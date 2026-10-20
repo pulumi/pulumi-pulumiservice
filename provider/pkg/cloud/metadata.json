@@ -369,6 +369,17 @@
     },
     "pulumiservice:api:PolicyGroup": {
       "deleteBeforeReplace": true,
+      "fields": {
+        "accountMatchRule": {
+          "clearField": "removeAccountMatchRule"
+        },
+        "mode": {
+          "forceNew": true
+        },
+        "stackMatchRule": {
+          "clearField": "removeStackMatchRule"
+        }
+      },
       "idFormat": "{orgName}/{name}",
       "operations": {
         "create": "NewPolicyGroup",

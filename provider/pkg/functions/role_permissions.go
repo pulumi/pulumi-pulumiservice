@@ -30,21 +30,21 @@ const scopedPermissionsHelpDoc = "The result is directly assignable to " +
 	"in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` " +
 	"list pulls the output of each helper."
 
-// descriptorToSDKMap marshals a typed apitype.PermissionDescriptor to the
-// SDK-boundary map shape the provider expects on
-// `OrganizationRole.permissions`. The typed Marshaler emits the wire format
+// toSDKMap marshals a typed apitype value (a PermissionDescriptor or
+// PermissionBooleanExpression) to the SDK-boundary map shape the provider
+// returns from its builder functions. The typed Marshaler emits the wire format
 // directly (`__type` discriminator at every level), which is exactly what
 // the SDK boundary now uses — the Python SDK preserves `__`-prefixed keys
 // across resource inputs as of pulumi/pulumi#22834 (3.235.0+, pinned via
 // the Python SDK's runtime requirement), so no rename is needed.
-func descriptorToSDKMap(descriptor apitype.PermissionDescriptor) (map[string]any, error) {
-	raw, err := json.Marshal(descriptor)
+func toSDKMap(v any) (map[string]any, error) {
+	raw, err := json.Marshal(v)
 	if err != nil {
-		return nil, fmt.Errorf("marshalling typed descriptor: %w", err)
+		return nil, fmt.Errorf("marshalling %T: %w", v, err)
 	}
 	var out map[string]any
 	if err := json.Unmarshal(raw, &out); err != nil {
-		return nil, fmt.Errorf("decoding descriptor JSON: %w", err)
+		return nil, fmt.Errorf("decoding %T JSON: %w", v, err)
 	}
 	return out, nil
 }
@@ -103,7 +103,7 @@ func scopedAllowDescriptor(
 			Permissions: scopes,
 		}.Build(),
 	}.Build()
-	return descriptorToSDKMap(descriptor)
+	return toSDKMap(descriptor)
 }
 
 // ----------------------------------------------------------------------------
@@ -170,7 +170,7 @@ func (BuildAllowPermissionsFunction) Invoke(
 	descriptor := apitype.PermissionDescriptorAllowBuilder{
 		Permissions: scopes,
 	}.Build()
-	out, err := descriptorToSDKMap(descriptor)
+	out, err := toSDKMap(descriptor)
 	if err != nil {
 		return infer.FunctionResponse[BuildAllowPermissionsOutput]{}, err
 	}
