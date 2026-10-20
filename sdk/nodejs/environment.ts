@@ -92,7 +92,7 @@ export class Environment extends pulumi.CustomResource {
             resourceInputs["name"] = args?.name;
             resourceInputs["organization"] = args?.organization;
             resourceInputs["project"] = (args?.project) ?? "default";
-            resourceInputs["yaml"] = args?.yaml;
+            resourceInputs["yaml"] = args?.yaml ? pulumi.secret(args.yaml) : undefined;
             resourceInputs["environmentId"] = undefined /*out*/;
             resourceInputs["revision"] = undefined /*out*/;
         } else {
@@ -104,6 +104,8 @@ export class Environment extends pulumi.CustomResource {
             resourceInputs["yaml"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
+        const secretOpts = { additionalSecretOutputs: ["yaml"] };
+        opts = pulumi.mergeOptions(opts, secretOpts);
         super(Environment.__pulumiType, name, resourceInputs, opts);
     }
 }
