@@ -165,8 +165,9 @@ func TestNodejsOidcIssuerExample(t *testing.T) {
 		opttest.YarnLink("@pulumi/pulumiservice"),
 		opttest.StackName(randomStackName()),
 	)
-	test.SetConfig(t, "pulumiThumbprint", tlsThumbprint("api.pulumi.com"))
-	test.SetConfig(t, "githubThumbprint", tlsThumbprint("token.actions.githubusercontent.com"))
+	for k, v := range oidcIssuerTestConfig() {
+		test.SetConfig(t, k, v)
+	}
 	runPulumiTest(t, test)
 }
 
