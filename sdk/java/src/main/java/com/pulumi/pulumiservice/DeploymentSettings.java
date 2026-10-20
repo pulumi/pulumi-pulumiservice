@@ -22,6 +22,8 @@ import javax.annotation.Nullable;
 /**
  * Deployment settings configure Pulumi Deployments for a stack.
  * 
+ * Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/) to choose between ESC and Deployments OIDC (`operationContext.oidc`).
+ * 
  * ## Import
  * 
  * This resource can be imported using its `id`, which has the format `{organization}/{project}/{stack}`, e.g.,

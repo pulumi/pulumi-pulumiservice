@@ -13,6 +13,17 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 
 
+/**
+ * Deployments OIDC configuration for obtaining cloud credentials during a deployment.
+ * 
+ * Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. Deployments OIDC predates Pulumi ESC and still works, but for most users ESC is the better choice. Deployments OIDC is still a good fit when:
+ * 
+ * - A customer-managed runner can&#39;t reach Pulumi Cloud over the network to use ESC.
+ * - Pre-run commands need credentials. An ESC environment applies only to the Pulumi operation itself, unless the command is wrapped in `pulumi env run`.
+ * 
+ * See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
+ * 
+ */
 public final class OperationContextOIDCArgs extends com.pulumi.resources.ResourceArgs {
 
     public static final OperationContextOIDCArgs Empty = new OperationContextOIDCArgs();

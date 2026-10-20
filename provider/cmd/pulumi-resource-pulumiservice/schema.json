@@ -82,6 +82,7 @@
   },
   "types": {
     "pulumiservice:index:AWSOIDCConfiguration": {
+      "description": "AWS configuration for Deployments OIDC. Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).",
       "properties": {
         "duration": {
           "type": "string",
@@ -235,6 +236,7 @@
       ]
     },
     "pulumiservice:index:AzureOIDCConfiguration": {
+      "description": "Azure configuration for Deployments OIDC. Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).",
       "properties": {
         "clientId": {
           "type": "string",
@@ -456,7 +458,7 @@
         },
         "oidc": {
           "$ref": "#/types/pulumiservice:index:OperationContextOIDC",
-          "description": "OIDC configuration to use during the deployment."
+          "description": "Deployments OIDC configuration for obtaining cloud credentials during the deployment. Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. Deployments OIDC still fits when a customer-managed runner can't reach Pulumi Cloud to use ESC, or when pre-run commands need credentials and aren't wrapped in `pulumi env run`. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/)."
         },
         "options": {
           "$ref": "#/types/pulumiservice:index:OperationContextOptions",
@@ -597,6 +599,7 @@
       ]
     },
     "pulumiservice:index:GCPOIDCConfiguration": {
+      "description": "GCP configuration for Deployments OIDC. Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).",
       "properties": {
         "projectId": {
           "type": "string",
@@ -692,6 +695,7 @@
       ]
     },
     "pulumiservice:index:OperationContextOIDC": {
+      "description": "Deployments OIDC configuration for obtaining cloud credentials during a deployment.\n\nPulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. Deployments OIDC predates Pulumi ESC and still works, but for most users ESC is the better choice. Deployments OIDC is still a good fit when:\n\n- A customer-managed runner can't reach Pulumi Cloud over the network to use ESC.\n- Pre-run commands need credentials. An ESC environment applies only to the Pulumi operation itself, unless the command is wrapped in `pulumi env run`.\n\nSee [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).",
       "properties": {
         "aws": {
           "$ref": "#/types/pulumiservice:index:AWSOIDCConfiguration",
@@ -5358,7 +5362,7 @@
       ]
     },
     "pulumiservice:index:DeploymentSettings": {
-      "description": "Deployment settings configure Pulumi Deployments for a stack.\n\n## Import\n\nThis resource can be imported using its `id`, which has the format `{organization}/{project}/{stack}`, e.g.,\n\n```sh\n $ pulumi import pulumiservice:index:DeploymentSettings my-deployment-settings my-org/my-project/my-stack\n```\n\nSecret values can't be read back from Pulumi Cloud, so import sets each one to the placeholder `<REPLACE WITH ACTUAL SECRET VALUE>`. Replace them with the real values in your program.\n",
+      "description": "Deployment settings configure Pulumi Deployments for a stack.\n\nPulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/) to choose between ESC and Deployments OIDC (`operationContext.oidc`).\n\n## Import\n\nThis resource can be imported using its `id`, which has the format `{organization}/{project}/{stack}`, e.g.,\n\n```sh\n $ pulumi import pulumiservice:index:DeploymentSettings my-deployment-settings my-org/my-project/my-stack\n```\n\nSecret values can't be read back from Pulumi Cloud, so import sets each one to the placeholder `<REPLACE WITH ACTUAL SECRET VALUE>`. Replace them with the real values in your program.\n",
       "properties": {
         "agentPoolId": {
           "type": "string",

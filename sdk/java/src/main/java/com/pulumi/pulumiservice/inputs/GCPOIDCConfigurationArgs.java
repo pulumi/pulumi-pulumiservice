@@ -12,6 +12,10 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 
 
+/**
+ * GCP configuration for Deployments OIDC. Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
+ * 
+ */
 public final class GCPOIDCConfigurationArgs extends com.pulumi.resources.ResourceArgs {
 
     public static final GCPOIDCConfigurationArgs Empty = new GCPOIDCConfigurationArgs();
