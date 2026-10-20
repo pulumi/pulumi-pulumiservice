@@ -15,6 +15,16 @@ namespace Pulumi.PulumiService
     /// Requires the Custom Roles feature to be enabled on the organization. See the [Pulumi Cloud RBAC docs](https://www.pulumi.com/docs/pulumi-cloud/access-management/rbac/) for the shape of the `permissions` descriptor.
     /// 
     /// This resource manages only permission descriptors with `uxPurpose="role"`. Pulumi Cloud uses `uxPurpose` to split the permission-descriptor table into roles and other kinds (for example `policy`). Use `pulumiservice:api:Role`, which exposes `uxPurpose` directly, to manage the other kinds.
+    /// 
+    /// ## Import
+    /// 
+    /// This resource can be imported using its `id`, which has the format `{organization}/{roleId}`, e.g.,
+    /// 
+    /// ```sh
+    ///  $ pulumi import pulumiservice:index:OrganizationRole my-organization-role my-org/1e5b8d3a-6c42-4f90-b7a1-8d2c4e6f0b95
+    /// ```
+    /// 
+    /// The role ID is the last segment of its page URL in the Pulumi Cloud console, for example `https://app.pulumi.com/my-org/settings/access-management/roles/details/1e5b8d3a-6c42-4f90-b7a1-8d2c4e6f0b95`.
     /// </summary>
     [PulumiServiceResourceType("pulumiservice:index:OrganizationRole")]
     public partial class OrganizationRole : global::Pulumi.CustomResource

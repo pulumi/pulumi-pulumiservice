@@ -53,6 +53,24 @@ class AccessToken(pulumi.CustomResource):
 
         To create a token that isn't tied to a user, use `OrgAccessToken` or `TeamAccessToken`.
 
+        ## Import
+
+        This resource can be imported using its `id`, which has the format `{tokenId}`, e.g.,
+
+        ```sh
+         $ pulumi import pulumiservice:index:AccessToken my-access-token 3f2b9c1e-7d4a-4e8b-9a61-0c5d2e8f7b13
+        ```
+
+        The Pulumi Cloud console doesn't show the token ID. List it with the [Pulumi Cloud REST API](https://www.pulumi.com/docs/reference/cloud-rest-api/):
+
+        ```sh
+        curl -s -H "Authorization: token $PULUMI_ACCESS_TOKEN" \\
+          https://api.pulumi.com/api/user/tokens | jq '.tokens[] | {name, id}'
+        ```
+
+        The token's `value` can't be read back from Pulumi Cloud, so it's empty after import.
+
+
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] description: Description of the access token.
@@ -67,6 +85,24 @@ class AccessToken(pulumi.CustomResource):
         Creates a personal access token for the Pulumi Cloud user that the provider is authenticated as. The token acts with that user's permissions.
 
         To create a token that isn't tied to a user, use `OrgAccessToken` or `TeamAccessToken`.
+
+        ## Import
+
+        This resource can be imported using its `id`, which has the format `{tokenId}`, e.g.,
+
+        ```sh
+         $ pulumi import pulumiservice:index:AccessToken my-access-token 3f2b9c1e-7d4a-4e8b-9a61-0c5d2e8f7b13
+        ```
+
+        The Pulumi Cloud console doesn't show the token ID. List it with the [Pulumi Cloud REST API](https://www.pulumi.com/docs/reference/cloud-rest-api/):
+
+        ```sh
+        curl -s -H "Authorization: token $PULUMI_ACCESS_TOKEN" \\
+          https://api.pulumi.com/api/user/tokens | jq '.tokens[] | {name, id}'
+        ```
+
+        The token's `value` can't be read back from Pulumi Cloud, so it's empty after import.
+
 
         :param str resource_name: The name of the resource.
         :param AccessTokenArgs args: The arguments to use to populate this resource's properties.

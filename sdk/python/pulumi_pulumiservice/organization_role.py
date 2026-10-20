@@ -145,6 +145,17 @@ class OrganizationRole(pulumi.CustomResource):
 
         This resource manages only permission descriptors with `uxPurpose="role"`. Pulumi Cloud uses `uxPurpose` to split the permission-descriptor table into roles and other kinds (for example `policy`). Use `pulumiservice:api:Role`, which exposes `uxPurpose` directly, to manage the other kinds.
 
+        ## Import
+
+        This resource can be imported using its `id`, which has the format `{organization}/{roleId}`, e.g.,
+
+        ```sh
+         $ pulumi import pulumiservice:index:OrganizationRole my-organization-role my-org/1e5b8d3a-6c42-4f90-b7a1-8d2c4e6f0b95
+        ```
+
+        The role ID is the last segment of its page URL in the Pulumi Cloud console, for example `https://app.pulumi.com/my-org/settings/access-management/roles/details/1e5b8d3a-6c42-4f90-b7a1-8d2c4e6f0b95`.
+
+
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] description: Human-readable description of what the role grants.
@@ -177,6 +188,17 @@ class OrganizationRole(pulumi.CustomResource):
         Requires the Custom Roles feature to be enabled on the organization. See the [Pulumi Cloud RBAC docs](https://www.pulumi.com/docs/pulumi-cloud/access-management/rbac/) for the shape of the `permissions` descriptor.
 
         This resource manages only permission descriptors with `uxPurpose="role"`. Pulumi Cloud uses `uxPurpose` to split the permission-descriptor table into roles and other kinds (for example `policy`). Use `pulumiservice:api:Role`, which exposes `uxPurpose` directly, to manage the other kinds.
+
+        ## Import
+
+        This resource can be imported using its `id`, which has the format `{organization}/{roleId}`, e.g.,
+
+        ```sh
+         $ pulumi import pulumiservice:index:OrganizationRole my-organization-role my-org/1e5b8d3a-6c42-4f90-b7a1-8d2c4e6f0b95
+        ```
+
+        The role ID is the last segment of its page URL in the Pulumi Cloud console, for example `https://app.pulumi.com/my-org/settings/access-management/roles/details/1e5b8d3a-6c42-4f90-b7a1-8d2c4e6f0b95`.
+
 
         :param str resource_name: The name of the resource.
         :param OrganizationRoleArgs args: The arguments to use to populate this resource's properties.

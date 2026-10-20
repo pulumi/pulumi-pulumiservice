@@ -7,6 +7,10 @@ const serviceOrg = "service-provider-test-org2";
 // are supplied via config rather than hardcoded. Compute one with:
 //   openssl s_client -connect <issuer-host>:443 </dev/null | openssl x509 -fingerprint -sha256 -noout
 const config = new pulumi.Config();
+// Tests override the issuer URLs so that concurrent runs don't conflict;
+// see oidcIssuerTestConfig in examples/examples_utils_test.go.
+const pulumiIssuerUrl = config.get("pulumiIssuerUrl") ?? "https://api.pulumi.com/oidc";
+const githubIssuerUrl = config.get("githubIssuerUrl") ?? "https://token.actions.githubusercontent.com";
 const pulumiThumbprint = config.require("pulumiThumbprint");
 const githubThumbprint = config.require("githubThumbprint");
 
@@ -14,7 +18,7 @@ const githubThumbprint = config.require("githubThumbprint");
 const pulumiOidcIssuer = new service.OidcIssuer("pulumi_issuer", {
   organization: serviceOrg,
   name: "pulumi_issuer",
-  url: "https://api.pulumi.com/oidc",
+  url: pulumiIssuerUrl,
   thumbprints: [pulumiThumbprint],
   policies: [
     {
@@ -33,7 +37,7 @@ const pulumiOidcIssuer = new service.OidcIssuer("pulumi_issuer", {
 const githubOidcIssuer = new service.OidcIssuer("github_issuer", {
   organization: serviceOrg,
   name: "github_issuer",
-  url: "https://token.actions.githubusercontent.com",
+  url: githubIssuerUrl,
   thumbprints: [githubThumbprint],
   policies: [
     {

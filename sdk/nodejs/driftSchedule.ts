@@ -6,6 +6,21 @@ import * as utilities from "./utilities";
 
 /**
  * A cron schedule to run drift detection.
+ *
+ * ## Import
+ *
+ * This resource can be imported using its `id`, which has the format `{organization}/{project}/{stack}/drift/{scheduleId}`, e.g.,
+ *
+ * ```sh
+ *  $ pulumi import pulumiservice:index:DriftSchedule my-drift-schedule my-org/my-project/my-stack/drift/7d3c5e1a-0f8b-4b26-a9d4-3e6f2b8c1a59
+ * ```
+ *
+ * The Pulumi Cloud console doesn't show the schedule ID. List it with the [Pulumi Cloud REST API](https://www.pulumi.com/docs/reference/cloud-rest-api/):
+ *
+ * ```sh
+ * curl -s -H "Authorization: token $PULUMI_ACCESS_TOKEN" \
+ *   https://api.pulumi.com/api/stacks/my-org/my-project/my-stack/deployments/schedules | jq '.schedules[]'
+ * ```
  */
 export class DriftSchedule extends pulumi.CustomResource {
     /**

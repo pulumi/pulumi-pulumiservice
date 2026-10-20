@@ -6,6 +6,16 @@ import * as utilities from "./utilities";
 
 /**
  * An ESC Environment.
+ *
+ * ## Import
+ *
+ * This resource can be imported using its `id`, which has the format `{organization}/{project}/{environment}`, e.g.,
+ *
+ * ```sh
+ *  $ pulumi import pulumiservice:index:Environment my-environment my-org/my-project/my-environment
+ * ```
+ *
+ * The legacy format `{organization}/{environment}` is also accepted, and uses the `default` project.
  */
 export class Environment extends pulumi.CustomResource {
     /**
@@ -82,7 +92,7 @@ export class Environment extends pulumi.CustomResource {
             resourceInputs["name"] = args?.name;
             resourceInputs["organization"] = args?.organization;
             resourceInputs["project"] = (args?.project) ?? "default";
-            resourceInputs["yaml"] = args?.yaml;
+            resourceInputs["yaml"] = args?.yaml ? pulumi.secret(args.yaml) : undefined;
             resourceInputs["environmentId"] = undefined /*out*/;
             resourceInputs["revision"] = undefined /*out*/;
         } else {
@@ -94,6 +104,8 @@ export class Environment extends pulumi.CustomResource {
             resourceInputs["yaml"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
+        const secretOpts = { additionalSecretOutputs: ["yaml"] };
+        opts = pulumi.mergeOptions(opts, secretOpts);
         super(Environment.__pulumiType, name, resourceInputs, opts);
     }
 }

@@ -135,6 +135,17 @@ class PolicyPack(pulumi.CustomResource):
         """
         A Policy Pack published to Pulumi Cloud. The source directory is tarballed and uploaded on Create; changing source content publishes a new version (replace).
 
+        ## Import
+
+        This resource can be imported using its `id`, which has the format `{organization}/{name}/{versionTag}`, e.g.,
+
+        ```sh
+         $ pulumi import pulumiservice:index:PolicyPack my-policy-pack my-org/my-policy-pack/1.0.0
+        ```
+
+        Only the organization, name, version tag and display name are read back. Set `sourcePath` in your program after import.
+
+
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] display_name: Optional display name. Changing it requires a new versionTag (policy pack versions are immutable in Pulumi Cloud).
@@ -152,6 +163,17 @@ class PolicyPack(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         A Policy Pack published to Pulumi Cloud. The source directory is tarballed and uploaded on Create; changing source content publishes a new version (replace).
+
+        ## Import
+
+        This resource can be imported using its `id`, which has the format `{organization}/{name}/{versionTag}`, e.g.,
+
+        ```sh
+         $ pulumi import pulumiservice:index:PolicyPack my-policy-pack my-org/my-policy-pack/1.0.0
+        ```
+
+        Only the organization, name, version tag and display name are read back. Set `sourcePath` in your program after import.
+
 
         :param str resource_name: The name of the resource.
         :param PolicyPackArgs args: The arguments to use to populate this resource's properties.

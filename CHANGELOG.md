@@ -8,6 +8,8 @@
 
 ### Improvements
 
+- Added an Import section to the docs of every `pulumiservice:index:*` resource, giving the ID format, a sample `pulumi import` command, and caveats such as secrets that can't be read back. `DeploymentSettings` and `Webhook` import docs now render as their own section instead of inline in the description. No behavior change. [#344](https://github.com/pulumi/pulumi-pulumiservice/issues/344)
+- Documented that `Webhook` supports ESC environment webhooks, and which properties select an organization, stack or environment webhook. No behavior change. [#482](https://github.com/pulumi/pulumi-pulumiservice/issues/482)
 - Added the `getOrganizationRole` function, which looks up a role by the name shown in the Pulumi Cloud console, and `getOrganizationRoles`, which lists an organization's built-in and custom roles. Use the returned `roleId` instead of hardcoding role IDs. [#1185](https://github.com/pulumi/pulumi-pulumiservice/issues/1185)
 - Documented that `OrgAccessToken` must be created and deleted by a provider authenticated as a user, for example with a personal access token. Pulumi Cloud rejects organization and team access tokens, even Admin ones, with `403 Machine tokens are not allowed to perform this operation`. `TeamAccessToken` has no such restriction. No behavior change. [#1112](https://github.com/pulumi/pulumi-pulumiservice/issues/1112)
 - Clarified the `AccessToken`, `OrgAccessToken` and `TeamAccessToken` descriptions. `AccessToken` now states that it creates a personal access token. No behavior change. [#1183](https://github.com/pulumi/pulumi-pulumiservice/pull/1183)
@@ -21,6 +23,8 @@
 
   **Check for a replace after upgrading.** If you changed `mode` on an existing group with an earlier version, Pulumi Cloud kept the original mode, and your program and the group now disagree. After the first refresh with this version, the next `pulumi up` deletes and recreates the group with your program's mode. The new group starts with no policy packs, and stacks or accounts added through `PolicyGroupStackAttachment` or `PolicyGroupInsightsAccountAttachment` are not re-added automatically. After upgrading, run `pulumi preview --refresh` and look for a replace on `pulumiservice:api:PolicyGroup`. To keep the group, set `mode` in your program to the group's current mode. To accept the recreate, run `pulumi up`, then `pulumi refresh` and `pulumi up` again to restore the attachments.
 - Updated the Pulumi Cloud SDK so `OrganizationRole.permissions` and the permission builder helpers accept scopes and permission descriptor types that Pulumi Cloud added recently. The previous version rejected them, or silently dropped scopes it didn't recognize. [#1162](https://github.com/pulumi/pulumi-pulumiservice/issues/1162)
+- `Environment` no longer replaces the environment when `organization`, `project` or `name` changes only in case. Pulumi Cloud looks environments up case-insensitively, so the replace deleted the environment and its revision history to recreate the same one. Other replaces now create the new environment before deleting the old one, Pulumi's default order. [#1214](https://github.com/pulumi/pulumi-pulumiservice/pull/1214)
+- `Environment` refresh no longer removes the environment from state when Pulumi Cloud returns an error other than 404, such as an authentication or network error. It now reports the error. `Environment` updates also report API errors, which were previously ignored. [#1204](https://github.com/pulumi/pulumi-pulumiservice/issues/1204)
 
 ## 1.4.0
 

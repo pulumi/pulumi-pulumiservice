@@ -58,7 +58,11 @@ func (*OrganizationRole) Annotate(a infer.Annotator) {
 			"This resource manages only permission descriptors with `uxPurpose=\"role\"`. Pulumi Cloud uses "+
 			"`uxPurpose` to split the permission-descriptor table into roles and other kinds (for example "+
 			"`policy`). Use `pulumiservice:api:Role`, which exposes `uxPurpose` directly, to manage the "+
-			"other kinds.",
+			"other kinds."+
+			util.ImportDocs("pulumiservice:index:OrganizationRole", "{organization}/{roleId}",
+				"my-org/1e5b8d3a-6c42-4f90-b7a1-8d2c4e6f0b95",
+				util.ConsoleIDHint("role ID", "https://app.pulumi.com/my-org/settings/access-management/roles/"+
+					"details/1e5b8d3a-6c42-4f90-b7a1-8d2c4e6f0b95")),
 	)
 }
 

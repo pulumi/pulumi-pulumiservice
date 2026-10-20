@@ -25,6 +25,7 @@ import (
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 )
 
 type EnvironmentRotationSchedule struct{}
@@ -43,7 +44,12 @@ var (
 )
 
 func (*EnvironmentRotationSchedule) Annotate(a infer.Annotator) {
-	a.Describe(&EnvironmentRotationSchedule{}, "A scheduled recurring or single time environment rotation.")
+	a.Describe(&EnvironmentRotationSchedule{}, "A scheduled recurring or single time environment rotation."+
+		util.ImportDocs("pulumiservice:index:EnvironmentRotationSchedule",
+			"{organization}/{project}/{environment}/rotations/{scheduleId}",
+			"my-org/my-project/my-environment/rotations/c2f8a4d6-3e1b-4c97-8b50-1d9e7a2f6c34",
+			util.APIIDHint("schedule ID", "/api/esc/environments/my-org/my-project/my-environment/schedules",
+				".schedules[]")))
 	a.SetToken("index", "EnvironmentRotationSchedule")
 }
 

@@ -11,6 +11,16 @@ namespace Pulumi.PulumiService
 {
     /// <summary>
     /// An ESC Environment.
+    /// 
+    /// ## Import
+    /// 
+    /// This resource can be imported using its `id`, which has the format `{organization}/{project}/{environment}`, e.g.,
+    /// 
+    /// ```sh
+    ///  $ pulumi import pulumiservice:index:Environment my-environment my-org/my-project/my-environment
+    /// ```
+    /// 
+    /// The legacy format `{organization}/{environment}` is also accepted, and uses the `default` project.
     /// </summary>
     [PulumiServiceResourceType("pulumiservice:index:Environment")]
     public partial class Environment : global::Pulumi.CustomResource
@@ -74,6 +84,10 @@ namespace Pulumi.PulumiService
             var defaultOptions = new CustomResourceOptions
             {
                 Version = Utilities.Version,
+                AdditionalSecretOutputs =
+                {
+                    "yaml",
+                },
             };
             var merged = CustomResourceOptions.Merge(defaultOptions, options);
             // Override the ID if one was specified for consistency with other language SDKs.
@@ -114,11 +128,21 @@ namespace Pulumi.PulumiService
         [Input("project")]
         public Input<string>? Project { get; set; }
 
+        [Input("yaml", required: true)]
+        private Input<AssetOrArchive>? _yaml;
+
         /// <summary>
         /// Environment's yaml file.
         /// </summary>
-        [Input("yaml", required: true)]
-        public Input<AssetOrArchive> Yaml { get; set; } = null!;
+        public Input<AssetOrArchive>? Yaml
+        {
+            get => _yaml;
+            set
+            {
+                var emptySecret = Output.CreateSecret(0);
+                _yaml = Output.Tuple<Input<AssetOrArchive>?, int>(value, emptySecret).Apply(t => t.Item1);
+            }
+        }
 
         public EnvironmentArgs()
         {
