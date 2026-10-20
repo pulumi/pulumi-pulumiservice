@@ -83,23 +83,6 @@ type UserInfo struct {
 	GithubLogin string `json:"githubLogin"`
 }
 
-func (out EligibleApproverOutput) toApprover() EligibleApprover {
-	return EligibleApprover{
-		EligibilityType: out.EligibilityType,
-		TeamName:        out.TeamName,
-		User:            out.User.GithubLogin,
-		RbacPermission:  out.RbacPermission,
-	}
-}
-
-func ToApprovers(input []EligibleApproverOutput) []EligibleApprover {
-	approvers := []EligibleApprover{}
-	for _, approver := range input {
-		approvers = append(approvers, approver.toApprover())
-	}
-	return approvers
-}
-
 type CreateApprovalRuleRequest struct {
 	Name    string                `json:"name"`
 	Enabled bool                  `json:"enabled"`
