@@ -61,7 +61,8 @@ export class Account extends pulumi.CustomResource {
      */
     declare public /*out*/ readonly providerEnvRef: pulumi.Output<string | undefined>;
     /**
-     * The version of the Pulumi provider package used for discovery.
+     * Deprecated: no longer populated. Omitted from responses, and ignored if sent.
+     * The provider version used for discovery is now recorded per resource.
      */
     declare public /*out*/ readonly providerVersion: pulumi.Output<string | undefined>;
     /**

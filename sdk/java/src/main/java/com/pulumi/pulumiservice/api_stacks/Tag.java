@@ -11,7 +11,7 @@ import com.pulumi.pulumiservice.api_stacks.TagArgs;
 import javax.annotation.Nullable;
 
 /**
- * Creates a new tag on the specified stack. Tags are key-value metadata pairs that can be used for organization, filtering, and storing additional information about stacks. The request body must include both a tag name and value. Returns 400 if the tag name is invalid or the tag already exists. Built-in tags (such as those automatically set by the Pulumi CLI) follow specific naming conventions.
+ * Creates a new tag on the specified stack. Tags are key-value metadata pairs that can be used for organization, filtering, and storing additional information about stacks. The request body must include both a tag name and value. Returns 400 if the tag name is invalid or the tag already exists. The &#39;pulumi:&#39;, &#39;gitHub:&#39; and &#39;vcs:&#39; name prefixes are reserved for built-in tags that Pulumi manages automatically: deploys refresh them from project metadata, so a value written directly is overwritten by the next update. In particular, a stack&#39;s description is the &#39;description&#39; field in the project&#39;s Pulumi.yaml, surfaced as the &#39;pulumi:description&#39; tag — set it by editing Pulumi.yaml rather than by creating the tag.
  * 
  */
 @ResourceType(type="pulumiservice:api/stacks:Tag")

@@ -16,13 +16,15 @@ import (
 type PolicyGroup struct {
 	pulumi.CustomResourceState
 
-	// List of Insights account names that are members of this policy group.
+	// Preview: the account match rule, a boolean expression over Insights account tags. Accounts whose tags satisfy it are members of the group alongside the accounts added individually. Absent when the group has no rule.
+	AccountMatchRule pulumi.AnyOutput `pulumi:"accountMatchRule"`
+	// The Insights accounts added to this policy group individually, with `addInsightsAccount`.
 	Accounts pulumi.StringArrayOutput `pulumi:"accounts"`
 	// Agent pool ID for audit policy evaluation. Defaults to Pulumi hosted pool if not specified.
 	AgentPoolId pulumi.StringPtrOutput `pulumi:"agentPoolId"`
 	// List of policy packs that are applied to this policy group.
 	AppliedPolicyPacks pulumi.ArrayOutput `pulumi:"appliedPolicyPacks"`
-	// The type of entities this policy group applies to (stacks or accounts).
+	// Deprecated: a legacy label set when the policy group was created. It does not restrict which entities the group holds; `mode` does.
 	EntityType pulumi.StringOutput `pulumi:"entityType"`
 	// True if this is either the default stacks or default accounts policy group for the organization.
 	IsOrgDefault pulumi.BoolOutput `pulumi:"isOrgDefault"`
@@ -30,7 +32,9 @@ type PolicyGroup struct {
 	Mode pulumi.StringOutput `pulumi:"mode"`
 	// The name of the policy group.
 	Name pulumi.StringOutput `pulumi:"name"`
-	// List of stacks that are members of this policy group.
+	// Preview: the stack match rule, a boolean expression over stack tags. Stacks whose tags satisfy it are members of the group alongside the stacks added individually. Absent when the group has no rule.
+	StackMatchRule pulumi.AnyOutput `pulumi:"stackMatchRule"`
+	// The stacks added to this policy group individually, with `addStack`.
 	Stacks pulumi.ArrayOutput `pulumi:"stacks"`
 }
 
@@ -41,9 +45,6 @@ func NewPolicyGroup(ctx *pulumi.Context,
 		return nil, errors.New("missing one or more required arguments")
 	}
 
-	if args.EntityType == nil {
-		return nil, errors.New("invalid value for required argument 'EntityType'")
-	}
 	if args.Name == nil {
 		return nil, errors.New("invalid value for required argument 'Name'")
 	}
@@ -83,30 +84,38 @@ func (PolicyGroupState) ElementType() reflect.Type {
 }
 
 type policyGroupArgs struct {
+	// Preview: an account match rule to create the group with, a boolean expression over Insights account tags. Requires the tag-based policy groups feature; not allowed on preventative groups.
+	AccountMatchRule interface{} `pulumi:"accountMatchRule"`
 	// Agent pool ID for policy evaluation. Defaults to Pulumi hosted pool if not specified.
 	AgentPoolId *string `pulumi:"agentPoolId"`
-	// The type of entities this policy group applies to (stacks or accounts).
-	EntityType string `pulumi:"entityType"`
-	// The enforcement mode for the policy group (audit or preventative). Defaults to 'audit' for account policy groups, 'preventative' for stack policy groups.
+	// Deprecated: a legacy label, `stacks` or `accounts`. When `mode` is omitted it picks the mode (`accounts` → audit, `stacks` → preventative). When this is omitted, it is derived from `mode`. It does not restrict which entities the group can hold.
+	EntityType *string `pulumi:"entityType"`
+	// The enforcement mode for the policy group (audit or preventative). The mode decides what the group can hold: an audit group holds stacks and Insights accounts, a preventative group holds stacks only. Required unless the deprecated `entityType` is sent. Fixed at creation; it cannot be changed later.
 	Mode *string `pulumi:"mode"`
-	// The name of the new policy group.
+	// The name of the new policy group. Up to 100 characters, made up of letters, numbers, hyphens, underscores, periods, or spaces, and may not begin or end with a space.
 	Name string `pulumi:"name"`
 	// The organization name
 	OrgName string `pulumi:"orgName"`
+	// Preview: a stack match rule to create the group with, a boolean expression over stack tags. Requires the tag-based policy groups feature.
+	StackMatchRule interface{} `pulumi:"stackMatchRule"`
 }
 
 // The set of arguments for constructing a PolicyGroup resource.
 type PolicyGroupArgs struct {
+	// Preview: an account match rule to create the group with, a boolean expression over Insights account tags. Requires the tag-based policy groups feature; not allowed on preventative groups.
+	AccountMatchRule pulumi.Input
 	// Agent pool ID for policy evaluation. Defaults to Pulumi hosted pool if not specified.
 	AgentPoolId pulumi.StringPtrInput
-	// The type of entities this policy group applies to (stacks or accounts).
-	EntityType pulumi.StringInput
-	// The enforcement mode for the policy group (audit or preventative). Defaults to 'audit' for account policy groups, 'preventative' for stack policy groups.
+	// Deprecated: a legacy label, `stacks` or `accounts`. When `mode` is omitted it picks the mode (`accounts` → audit, `stacks` → preventative). When this is omitted, it is derived from `mode`. It does not restrict which entities the group can hold.
+	EntityType pulumi.StringPtrInput
+	// The enforcement mode for the policy group (audit or preventative). The mode decides what the group can hold: an audit group holds stacks and Insights accounts, a preventative group holds stacks only. Required unless the deprecated `entityType` is sent. Fixed at creation; it cannot be changed later.
 	Mode pulumi.StringPtrInput
-	// The name of the new policy group.
+	// The name of the new policy group. Up to 100 characters, made up of letters, numbers, hyphens, underscores, periods, or spaces, and may not begin or end with a space.
 	Name pulumi.StringInput
 	// The organization name
 	OrgName pulumi.StringInput
+	// Preview: a stack match rule to create the group with, a boolean expression over stack tags. Requires the tag-based policy groups feature.
+	StackMatchRule pulumi.Input
 }
 
 func (PolicyGroupArgs) ElementType() reflect.Type {
@@ -196,7 +205,12 @@ func (o PolicyGroupOutput) ToPolicyGroupOutputWithContext(ctx context.Context) P
 	return o
 }
 
-// List of Insights account names that are members of this policy group.
+// Preview: the account match rule, a boolean expression over Insights account tags. Accounts whose tags satisfy it are members of the group alongside the accounts added individually. Absent when the group has no rule.
+func (o PolicyGroupOutput) AccountMatchRule() pulumi.AnyOutput {
+	return o.ApplyT(func(v *PolicyGroup) pulumi.AnyOutput { return v.AccountMatchRule }).(pulumi.AnyOutput)
+}
+
+// The Insights accounts added to this policy group individually, with `addInsightsAccount`.
 func (o PolicyGroupOutput) Accounts() pulumi.StringArrayOutput {
 	return o.ApplyT(func(v *PolicyGroup) pulumi.StringArrayOutput { return v.Accounts }).(pulumi.StringArrayOutput)
 }
@@ -211,7 +225,7 @@ func (o PolicyGroupOutput) AppliedPolicyPacks() pulumi.ArrayOutput {
 	return o.ApplyT(func(v *PolicyGroup) pulumi.ArrayOutput { return v.AppliedPolicyPacks }).(pulumi.ArrayOutput)
 }
 
-// The type of entities this policy group applies to (stacks or accounts).
+// Deprecated: a legacy label set when the policy group was created. It does not restrict which entities the group holds; `mode` does.
 func (o PolicyGroupOutput) EntityType() pulumi.StringOutput {
 	return o.ApplyT(func(v *PolicyGroup) pulumi.StringOutput { return v.EntityType }).(pulumi.StringOutput)
 }
@@ -231,7 +245,12 @@ func (o PolicyGroupOutput) Name() pulumi.StringOutput {
 	return o.ApplyT(func(v *PolicyGroup) pulumi.StringOutput { return v.Name }).(pulumi.StringOutput)
 }
 
-// List of stacks that are members of this policy group.
+// Preview: the stack match rule, a boolean expression over stack tags. Stacks whose tags satisfy it are members of the group alongside the stacks added individually. Absent when the group has no rule.
+func (o PolicyGroupOutput) StackMatchRule() pulumi.AnyOutput {
+	return o.ApplyT(func(v *PolicyGroup) pulumi.AnyOutput { return v.StackMatchRule }).(pulumi.AnyOutput)
+}
+
+// The stacks added to this policy group individually, with `addStack`.
 func (o PolicyGroupOutput) Stacks() pulumi.ArrayOutput {
 	return o.ApplyT(func(v *PolicyGroup) pulumi.ArrayOutput { return v.Stacks }).(pulumi.ArrayOutput)
 }

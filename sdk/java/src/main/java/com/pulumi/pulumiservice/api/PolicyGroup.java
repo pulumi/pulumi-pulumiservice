@@ -23,14 +23,28 @@ import javax.annotation.Nullable;
 @ResourceType(type="pulumiservice:api:PolicyGroup")
 public class PolicyGroup extends com.pulumi.resources.CustomResource {
     /**
-     * List of Insights account names that are members of this policy group.
+     * Preview: the account match rule, a boolean expression over Insights account tags. Accounts whose tags satisfy it are members of the group alongside the accounts added individually. Absent when the group has no rule.
+     * 
+     */
+    @Export(name="accountMatchRule", refs={Object.class}, tree="[0]")
+    private Output</* @Nullable */ Object> accountMatchRule;
+
+    /**
+     * @return Preview: the account match rule, a boolean expression over Insights account tags. Accounts whose tags satisfy it are members of the group alongside the accounts added individually. Absent when the group has no rule.
+     * 
+     */
+    public Output<Optional<Object>> accountMatchRule() {
+        return Codegen.optional(this.accountMatchRule);
+    }
+    /**
+     * The Insights accounts added to this policy group individually, with `addInsightsAccount`.
      * 
      */
     @Export(name="accounts", refs={List.class,String.class}, tree="[0,1]")
     private Output<List<String>> accounts;
 
     /**
-     * @return List of Insights account names that are members of this policy group.
+     * @return The Insights accounts added to this policy group individually, with `addInsightsAccount`.
      * 
      */
     public Output<List<String>> accounts() {
@@ -65,14 +79,14 @@ public class PolicyGroup extends com.pulumi.resources.CustomResource {
         return this.appliedPolicyPacks;
     }
     /**
-     * The type of entities this policy group applies to (stacks or accounts).
+     * Deprecated: a legacy label set when the policy group was created. It does not restrict which entities the group holds; `mode` does.
      * 
      */
     @Export(name="entityType", refs={String.class}, tree="[0]")
     private Output<String> entityType;
 
     /**
-     * @return The type of entities this policy group applies to (stacks or accounts).
+     * @return Deprecated: a legacy label set when the policy group was created. It does not restrict which entities the group holds; `mode` does.
      * 
      */
     public Output<String> entityType() {
@@ -121,14 +135,28 @@ public class PolicyGroup extends com.pulumi.resources.CustomResource {
         return this.name;
     }
     /**
-     * List of stacks that are members of this policy group.
+     * Preview: the stack match rule, a boolean expression over stack tags. Stacks whose tags satisfy it are members of the group alongside the stacks added individually. Absent when the group has no rule.
+     * 
+     */
+    @Export(name="stackMatchRule", refs={Object.class}, tree="[0]")
+    private Output</* @Nullable */ Object> stackMatchRule;
+
+    /**
+     * @return Preview: the stack match rule, a boolean expression over stack tags. Stacks whose tags satisfy it are members of the group alongside the stacks added individually. Absent when the group has no rule.
+     * 
+     */
+    public Output<Optional<Object>> stackMatchRule() {
+        return Codegen.optional(this.stackMatchRule);
+    }
+    /**
+     * The stacks added to this policy group individually, with `addStack`.
      * 
      */
     @Export(name="stacks", refs={List.class,Object.class}, tree="[0,1]")
     private Output<List<Object>> stacks;
 
     /**
-     * @return List of stacks that are members of this policy group.
+     * @return The stacks added to this policy group individually, with `addStack`.
      * 
      */
     public Output<List<Object>> stacks() {
