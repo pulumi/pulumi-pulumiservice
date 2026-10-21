@@ -13,7 +13,7 @@ namespace Pulumi.PulumiService
     public partial class Provider : global::Pulumi.ProviderResource
     {
         /// <summary>
-        /// Access token to authenticate with Pulumi Cloud. Optional: if unset, the provider uses the `PULUMI_ACCESS_TOKEN` environment variable, then the access token of the account you're logged in to with `pulumi login`. The API URL doesn't come from that login, so when you're logged in to a self-hosted Pulumi Cloud, also set `apiUrl` or `PULUMI_BACKEND_URL`.
+        /// Access token to authenticate with Pulumi Cloud. Optional: if unset, the provider uses the `PULUMI_ACCESS_TOKEN` environment variable, then the access token of the account you're logged in to with `pulumi login`.
         /// </summary>
         [Output("accessToken")]
         public Output<string?> AccessToken { get; private set; } = null!;
@@ -60,7 +60,7 @@ namespace Pulumi.PulumiService
         private Input<string>? _accessToken;
 
         /// <summary>
-        /// Access token to authenticate with Pulumi Cloud. Optional: if unset, the provider uses the `PULUMI_ACCESS_TOKEN` environment variable, then the access token of the account you're logged in to with `pulumi login`. The API URL doesn't come from that login, so when you're logged in to a self-hosted Pulumi Cloud, also set `apiUrl` or `PULUMI_BACKEND_URL`.
+        /// Access token to authenticate with Pulumi Cloud. Optional: if unset, the provider uses the `PULUMI_ACCESS_TOKEN` environment variable, then the access token of the account you're logged in to with `pulumi login`.
         /// </summary>
         public Input<string>? AccessToken
         {
