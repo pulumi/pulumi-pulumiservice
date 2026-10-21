@@ -330,7 +330,7 @@
       "properties": {
         "projectId": {
           "type": "string",
-          "description": "The numerical ID of the GCP project."
+          "description": "The GCP project number, a numeric value such as `123456789012`. This is not the project ID (such as `my-project`). To look up the number, run `gcloud projects describe <project-id> --format='value(projectNumber)'`."
         },
         "region": {
           "type": "string",
@@ -801,9 +801,9 @@
             "type": "string",
             "description": "The name of the policy pack."
           },
-          "version": {
-            "type": "integer",
-            "description": "The version number of the policy pack. If not specified, returns the latest version."
+          "versionTag": {
+            "type": "string",
+            "description": "The version tag of the policy pack, for example `1.4.1`, as shown in Pulumi Cloud. If not specified, returns the latest version."
           }
         },
         "required": [

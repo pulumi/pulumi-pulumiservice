@@ -97,7 +97,7 @@ func (s *EnvironmentState) Annotate(a infer.Annotator) {
 	a.Describe(&s.EnvironmentID,
 		"The environment's UUID. Use this as the `identity` value when pinning a custom RBAC role to this "+
 			"environment via a `PermissionLiteralExpressionEnvironment` in `OrganizationRole.permissions`, or pass "+
-			"it directly to the `buildEnvironmentScopedPermissions` helper.")
+			"it as the `id` of an `environmentRules` entry in `buildRolePermissions`.")
 }
 
 func (*Environment) Check(

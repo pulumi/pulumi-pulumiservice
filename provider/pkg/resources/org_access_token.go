@@ -18,17 +18,31 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"time"
 
+	_ "embed" // for the //go:embed example file below
+
+	p "github.com/pulumi/pulumi-go-provider"
 	"github.com/pulumi/pulumi-go-provider/infer"
 	"github.com/pulumi/pulumi/sdk/v3/go/property"
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 )
+
+// The example file is generated from the Pulumi YAML in examples/; edit
+// that and run `make generate_examples`.
+//
+//go:generate go run ../../tools/gen-examples examples .
+
+//go:embed org_access_token_examples.md
+var orgAccessTokenExamples string
 
 type OrgAccessToken struct{}
 
 var (
+	_ infer.CustomCheck[OrgAccessTokenInput]                       = &OrgAccessToken{}
 	_ infer.CustomCreate[OrgAccessTokenInput, OrgAccessTokenState] = &OrgAccessToken{}
 	_ infer.CustomDelete[OrgAccessTokenState]                      = &OrgAccessToken{}
 	_ infer.CustomRead[OrgAccessTokenInput, OrgAccessTokenState]   = &OrgAccessToken{}
@@ -44,7 +58,8 @@ func (*OrgAccessToken) Annotate(a infer.Annotator) {
 			"or delete this resource. Pulumi Cloud rejects organization and team access tokens here, even "+
 			"Admin ones, with `403 Machine tokens are not allowed to perform this operation`, so that one "+
 			"machine token can't mint another. For automation, use the personal access token of a dedicated "+
-			"service-account user, or use `TeamAccessToken`, which has no such restriction."+
+			"service-account user, or use `TeamAccessToken`, which has no such restriction.\n\n"+
+			strings.TrimSpace(orgAccessTokenExamples)+
 			util.ImportDocs("pulumiservice:index:OrgAccessToken", "{organization}/{name}/{tokenId}",
 				"my-org/my-token/a81d4c3e-52f0-4b7a-b9e2-6d0f1c8e2a47",
 				util.APIIDHint("token ID", "/api/orgs/my-org/tokens", ".tokens[] | {name, id}"),
@@ -57,14 +72,34 @@ type OrgAccessTokenInput struct {
 	OrganizationName string  `pulumi:"organizationName"     provider:"replaceOnChanges"`
 	Description      *string `pulumi:"description,optional" provider:"replaceOnChanges"`
 	Admin            *bool   `pulumi:"admin,optional"       provider:"replaceOnChanges"`
+	Expires          *string `pulumi:"expires,optional"     provider:"replaceOnChanges"`
+	RoleID           *string `pulumi:"roleId,optional"      provider:"replaceOnChanges"`
 }
 
 func (i *OrgAccessTokenInput) Annotate(a infer.Annotator) {
 	a.Describe(&i.Name, "The name for the token.")
 	a.Describe(&i.OrganizationName, "The organization's name.")
 	a.Describe(&i.Description, "A description of the token.")
-	a.Describe(&i.Admin, "Whether the token has the Admin role. Defaults to `false`.")
+	a.Describe(
+		&i.Admin,
+		"Whether the token has the Admin role. Defaults to `false`. Mutually exclusive with `roleId`: "+
+			"set `admin: true` or `roleId`, not both.",
+	)
 	a.SetDefault(&i.Admin, false)
+	a.Describe(
+		&i.Expires,
+		"When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`. Omit it for a "+
+			"token that never expires. Pulumi Cloud rejects an expiry that is in the past, more than two "+
+			"years away, or beyond the organization's maximum token lifetime.",
+	)
+	a.Describe(
+		&i.RoleID,
+		"The ID of the role to assign to the token. Use `getOrganizationRole` to look up a role's ID by its "+
+			"name. Mutually exclusive with `admin: true`: set one or the other, not both. Pulumi Cloud "+
+			"accepts both, but some of its permission checks still treat such a token as an Admin "+
+			"whatever its role, so the provider rejects the combination. When neither is set, the token "+
+			"gets the Member role.",
+	)
 }
 
 type OrgAccessTokenState struct {
@@ -85,17 +120,24 @@ func (*OrgAccessToken) Create(
 			Output: OrgAccessTokenState{OrgAccessTokenInput: req.Inputs},
 		}, nil
 	}
-	desc := ""
+	createReq := pulumiapi.CreateOrgAccessTokenRequest{Name: req.Inputs.Name}
 	if req.Inputs.Description != nil {
-		desc = *req.Inputs.Description
+		createReq.Description = *req.Inputs.Description
 	}
-	admin := false
 	if req.Inputs.Admin != nil {
-		admin = *req.Inputs.Admin
+		createReq.Admin = *req.Inputs.Admin
 	}
-	token, err := config.GetClient(ctx).CreateOrgAccessToken(
-		ctx, req.Inputs.Name, req.Inputs.OrganizationName, desc, admin,
-	)
+	if req.Inputs.Expires != nil {
+		t, err := parseTokenExpiry(*req.Inputs.Expires)
+		if err != nil {
+			return infer.CreateResponse[OrgAccessTokenState]{}, err
+		}
+		createReq.Expires = t.Unix()
+	}
+	if req.Inputs.RoleID != nil {
+		createReq.RoleID = *req.Inputs.RoleID
+	}
+	token, err := config.GetClient(ctx).CreateOrgAccessToken(ctx, req.Inputs.OrganizationName, createReq)
 	if err != nil {
 		return infer.CreateResponse[OrgAccessTokenState]{}, fmt.Errorf(
 			"error creating org access token %q: %w", req.Inputs.Name, err,
@@ -144,6 +186,8 @@ func (*OrgAccessToken) Read(
 		OrganizationName: orgName,
 		Description:      stringPtrIfNonEmpty(token.Description),
 		Admin:            &admin,
+		Expires:          readTokenExpiry(token.Expires, req.State.Expires),
+		RoleID:           stringPtrIfNonEmpty(token.RoleID),
 	}
 	return infer.ReadResponse[OrgAccessTokenInput, OrgAccessTokenState]{
 		ID:     req.ID,
@@ -155,6 +199,35 @@ func (*OrgAccessToken) Read(
 			Value: req.State.Value,
 		},
 	}, nil
+}
+
+func (*OrgAccessToken) Check(
+	ctx context.Context,
+	req infer.CheckRequest,
+) (infer.CheckResponse[OrgAccessTokenInput], error) {
+	in, failures, err := infer.DefaultCheck[OrgAccessTokenInput](ctx, req.NewInputs)
+	if err != nil {
+		return infer.CheckResponse[OrgAccessTokenInput]{}, err
+	}
+
+	if in.Expires != nil && !isUnknownInput(req.NewInputs, gcExpires) {
+		if _, err := parseTokenExpiry(*in.Expires); err != nil {
+			failures = append(failures, p.CheckFailure{Property: gcExpires, Reason: err.Error()})
+		}
+	}
+
+	// Pulumi Cloud accepts admin together with a role, but some of its
+	// permission checks still elevate an admin token to Admin whatever the
+	// role says, so the two are mutually exclusive here.
+	if in.Admin != nil && *in.Admin && in.RoleID != nil && *in.RoleID != "" &&
+		!isUnknownInput(req.NewInputs, gcAdmin) && !isUnknownInput(req.NewInputs, gcRoleID) {
+		failures = append(failures, p.CheckFailure{
+			Property: gcRoleID,
+			Reason:   "admin and roleId are mutually exclusive; set admin: true or roleId, not both",
+		})
+	}
+
+	return infer.CheckResponse[OrgAccessTokenInput]{Inputs: in, Failures: failures}, nil
 }
 
 // StateMigrations strips the legacy "__inputs" outputs property that the
@@ -192,6 +265,36 @@ func migrateOrgAccessTokenLegacyInputs(
 		state.Value = v.AsString()
 	}
 	return infer.MigrationResult[OrgAccessTokenState]{Result: &state}, nil
+}
+
+const (
+	gcExpires = "expires"
+	gcRoleID  = "roleId"
+)
+
+func parseTokenExpiry(s string) (time.Time, error) {
+	t, err := time.Parse(time.RFC3339, s)
+	if err != nil {
+		return time.Time{}, fmt.Errorf(
+			"%q is not a valid expiry; use an RFC 3339 date-time such as \"2027-06-30T17:00:00Z\"", s)
+	}
+	return t, nil
+}
+
+// readTokenExpiry converts the API's expiry to the input value. When the prior
+// value denotes the same instant, it keeps the user's spelling (for example
+// "2027-06-30T12:00:00-05:00") so refresh doesn't report a change.
+func readTokenExpiry(epoch int64, prior *string) *string {
+	if epoch == 0 {
+		return nil
+	}
+	if prior != nil {
+		if t, err := parseTokenExpiry(*prior); err == nil && t.Unix() == epoch {
+			return prior
+		}
+	}
+	s := time.Unix(epoch, 0).UTC().Format(time.RFC3339)
+	return &s
 }
 
 func orgAccessTokenID(org, name, tokenID string) string {

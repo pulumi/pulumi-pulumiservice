@@ -33,14 +33,14 @@ import javax.annotation.Nullable;
 @ResourceType(type="pulumiservice:index:Environment")
 public class Environment extends com.pulumi.resources.CustomResource {
     /**
-     * The environment&#39;s UUID. Use this as the `identity` value when pinning a custom RBAC role to this environment via a `PermissionLiteralExpressionEnvironment` in `OrganizationRole.permissions`, or pass it directly to the `buildEnvironmentScopedPermissions` helper.
+     * The environment&#39;s UUID. Use this as the `identity` value when pinning a custom RBAC role to this environment via a `PermissionLiteralExpressionEnvironment` in `OrganizationRole.permissions`, or pass it as the `id` of an `environmentRules` entry in `buildRolePermissions`.
      * 
      */
     @Export(name="environmentId", refs={String.class}, tree="[0]")
     private Output</* @Nullable */ String> environmentId;
 
     /**
-     * @return The environment&#39;s UUID. Use this as the `identity` value when pinning a custom RBAC role to this environment via a `PermissionLiteralExpressionEnvironment` in `OrganizationRole.permissions`, or pass it directly to the `buildEnvironmentScopedPermissions` helper.
+     * @return The environment&#39;s UUID. Use this as the `identity` value when pinning a custom RBAC role to this environment via a `PermissionLiteralExpressionEnvironment` in `OrganizationRole.permissions`, or pass it as the `id` of an `environmentRules` entry in `buildRolePermissions`.
      * 
      */
     public Output<Optional<String>> environmentId() {

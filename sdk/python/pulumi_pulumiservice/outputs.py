@@ -1223,7 +1223,7 @@ class GCPOIDCConfiguration(dict):
         """
         GCP configuration for Deployments OIDC. Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
 
-        :param _builtins.str project_id: The numerical ID of the GCP project.
+        :param _builtins.str project_id: The GCP project number, a numeric value such as `123456789012`. This is not the project ID (such as `my-project`). To look up the number, run `gcloud projects describe <project-id> --format='value(projectNumber)'`.
         :param _builtins.str provider_id: The ID of the identity provider associated with the workload pool.
         :param _builtins.str service_account: The email address of the service account to use.
         :param _builtins.str workload_pool_id: The ID of the workload pool to use.
@@ -1243,7 +1243,7 @@ class GCPOIDCConfiguration(dict):
     @pulumi.getter(name="projectId")
     def project_id(self) -> _builtins.str:
         """
-        The numerical ID of the GCP project.
+        The GCP project number, a numeric value such as `123456789012`. This is not the project ID (such as `my-project`). To look up the number, run `gcloud projects describe <project-id> --format='value(projectNumber)'`.
         """
         return pulumi.get(self, "project_id")
 

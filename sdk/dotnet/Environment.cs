@@ -26,7 +26,7 @@ namespace Pulumi.PulumiService
     public partial class Environment : global::Pulumi.CustomResource
     {
         /// <summary>
-        /// The environment's UUID. Use this as the `identity` value when pinning a custom RBAC role to this environment via a `PermissionLiteralExpressionEnvironment` in `OrganizationRole.permissions`, or pass it directly to the `buildEnvironmentScopedPermissions` helper.
+        /// The environment's UUID. Use this as the `identity` value when pinning a custom RBAC role to this environment via a `PermissionLiteralExpressionEnvironment` in `OrganizationRole.permissions`, or pass it as the `id` of an `environmentRules` entry in `buildRolePermissions`.
         /// </summary>
         [Output("environmentId")]
         public Output<string?> EnvironmentId { get; private set; } = null!;

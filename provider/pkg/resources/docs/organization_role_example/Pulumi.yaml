@@ -1,0 +1,127 @@
+name: organization-role
+runtime: yaml
+description: Source of the OrganizationRole Example Usage docs. Regenerate with scripts/gen-organization-role-example-docs.sh.
+
+config:
+  organizationName:
+    type: string
+    default: my-org
+
+variables:
+  # Look up the entities the rules below grant access to. They already exist.
+  prodStack:
+    fn::invoke:
+      function: pulumiservice:getStack
+      arguments:
+        organizationName: ${organizationName}
+        projectName: networking
+        stackName: prod
+  sharedEnvironment:
+    fn::invoke:
+      function: pulumiservice:getEnvironment
+      arguments:
+        organizationName: ${organizationName}
+        projectName: platform
+        name: shared
+  awsAccount:
+    fn::invoke:
+      function: pulumiservice:getInsightsAccount
+      arguments:
+        organizationName: ${organizationName}
+        accountName: aws-production
+
+  # Organization-level access plus rules for stacks, environments, and cloud
+  # accounts. Each rule list accepts only scopes for its own entity type.
+  platformPermissions:
+    fn::invoke:
+      function: pulumiservice:buildRolePermissions
+      arguments:
+        organizationScopes:
+          - team:read
+          - stack:create
+        stackRules:
+          # Read every stack in the organization
+          - all: true
+            scopes:
+              - stack:read
+          # Deploy one specific stack
+          - id: ${prodStack.stackId}
+            scopes:
+              - stack:write
+              - stack_deployment:create
+          # Deploy stacks tagged team=platform (the operator defaults to equals)
+          - tags:
+              - key: team
+                value: platform
+            scopes:
+              - stack:write
+              - stack_deployment:create
+          # Deploy stacks whose env tag is anything but "prod"
+          - tags:
+              - key: env
+                value: prod
+                operator: notEquals
+            scopes:
+              - stack:write
+              - stack_deployment:create
+          # Read deployment settings on stacks that have a cost-center tag, whatever its value
+          - tags:
+              - key: cost-center
+                operator: exists
+            scopes:
+              - stack_deployment_settings:read
+          # Tag stacks that don't have an owner tag yet
+          - tags:
+              - key: owner
+                operator: notExists
+            scopes:
+              - stack_tags:update
+          # Delete stacks that match every tag condition
+          - tags:
+              - key: team
+                value: platform
+              - key: lifecycle
+                value: ephemeral
+            scopes:
+              - stack:delete
+        environmentRules:
+          # Read every environment
+          - all: true
+            scopes:
+              - environment:read
+          # Open, update, and rotate one specific environment
+          - id: ${sharedEnvironment.environmentId}
+            scopes:
+              - environment:open
+              - environment:write
+              - environment:rotate
+          # Open environments tagged team=platform
+          - tags:
+              - key: team
+                value: platform
+            scopes:
+              - environment:open
+        accountRules:
+          # Read every cloud account
+          - all: true
+            scopes:
+              - insights_account:read
+          # Scan one specific account
+          - id: ${awsAccount.insightsAccountId}
+            scopes:
+              - insights_account:scan
+          # Update accounts tagged team=platform
+          - tags:
+              - key: team
+                value: platform
+            scopes:
+              - insights_account:update
+
+resources:
+  platformRole:
+    type: pulumiservice:OrganizationRole
+    properties:
+      organizationName: ${organizationName}
+      name: Platform Engineers
+      description: Read access across the organization, plus deploy access to platform stacks.
+      permissions: ${platformPermissions.permissions}

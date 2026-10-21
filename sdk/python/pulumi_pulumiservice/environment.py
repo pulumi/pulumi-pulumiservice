@@ -218,7 +218,7 @@ class Environment(pulumi.CustomResource):
     @pulumi.getter(name="environmentId")
     def environment_id(self) -> pulumi.Output[Optional[_builtins.str]]:
         """
-        The environment's UUID. Use this as the `identity` value when pinning a custom RBAC role to this environment via a `PermissionLiteralExpressionEnvironment` in `OrganizationRole.permissions`, or pass it directly to the `buildEnvironmentScopedPermissions` helper.
+        The environment's UUID. Use this as the `identity` value when pinning a custom RBAC role to this environment via a `PermissionLiteralExpressionEnvironment` in `OrganizationRole.permissions`, or pass it as the `id` of an `environmentRules` entry in `buildRolePermissions`.
         """
         return pulumi.get(self, "environment_id")
 

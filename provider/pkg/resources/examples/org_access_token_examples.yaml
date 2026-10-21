@@ -1,0 +1,19 @@
+description: Token with an expiry and a custom role
+variables:
+  ciDeployerRole:
+    fn::invoke:
+      function: pulumiservice:getOrganizationRole
+      arguments:
+        organizationName: my-org
+        name: CI Deployer
+resources:
+  ciToken:
+    type: pulumiservice:OrgAccessToken
+    properties:
+      organizationName: my-org
+      name: ci-token
+      description: Token for CI pipelines
+      expires: "2027-06-30T17:00:00Z"
+      roleId: ${ciDeployerRole.roleId}
+outputs:
+  ciTokenValue: ${ciToken.value}

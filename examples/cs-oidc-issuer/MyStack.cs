@@ -13,6 +13,10 @@ class MyStack : Pulumi.Stack
         // are supplied via config rather than hardcoded. Compute one with:
         //   openssl s_client -connect <issuer-host>:443 </dev/null | openssl x509 -fingerprint -sha256 -noout
         var config = new Pulumi.Config();
+        // Tests override the issuer URLs so that concurrent runs don't conflict;
+        // see oidcIssuerTestConfig in examples/examples_utils_test.go.
+        var pulumiIssuerUrl = config.Get("pulumiIssuerUrl") ?? "https://api.pulumi.com/oidc";
+        var githubIssuerUrl = config.Get("githubIssuerUrl") ?? "https://token.actions.githubusercontent.com";
         var pulumiThumbprint = config.Require("pulumiThumbprint");
         var githubThumbprint = config.Require("githubThumbprint");
 
@@ -21,7 +25,7 @@ class MyStack : Pulumi.Stack
         {
             Organization = serviceOrg,
             Name = "pulumi_issuer",
-            Url = "https://api.pulumi.com/oidc",
+            Url = pulumiIssuerUrl,
             Thumbprints = { pulumiThumbprint },
             Policies = {
               new AuthPolicyDefinitionArgs
@@ -42,7 +46,7 @@ class MyStack : Pulumi.Stack
         {
           Organization = serviceOrg,
           Name = "github_issuer",
-          Url = "https://token.actions.githubusercontent.com",
+          Url = githubIssuerUrl,
           Thumbprints = { githubThumbprint },
           Policies = {
             new AuthPolicyDefinitionArgs

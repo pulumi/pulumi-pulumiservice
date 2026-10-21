@@ -21,14 +21,14 @@ public final class GCPOIDCConfigurationArgs extends com.pulumi.resources.Resourc
     public static final GCPOIDCConfigurationArgs Empty = new GCPOIDCConfigurationArgs();
 
     /**
-     * The numerical ID of the GCP project.
+     * The GCP project number, a numeric value such as `123456789012`. This is not the project ID (such as `my-project`). To look up the number, run `gcloud projects describe &lt;project-id&gt; --format=&#39;value(projectNumber)&#39;`.
      * 
      */
     @Import(name="projectId", required=true)
     private Output<String> projectId;
 
     /**
-     * @return The numerical ID of the GCP project.
+     * @return The GCP project number, a numeric value such as `123456789012`. This is not the project ID (such as `my-project`). To look up the number, run `gcloud projects describe &lt;project-id&gt; --format=&#39;value(projectNumber)&#39;`.
      * 
      */
     public Output<String> projectId() {
@@ -140,7 +140,7 @@ public final class GCPOIDCConfigurationArgs extends com.pulumi.resources.Resourc
         }
 
         /**
-         * @param projectId The numerical ID of the GCP project.
+         * @param projectId The GCP project number, a numeric value such as `123456789012`. This is not the project ID (such as `my-project`). To look up the number, run `gcloud projects describe &lt;project-id&gt; --format=&#39;value(projectNumber)&#39;`.
          * 
          * @return builder
          * 
@@ -151,7 +151,7 @@ public final class GCPOIDCConfigurationArgs extends com.pulumi.resources.Resourc
         }
 
         /**
-         * @param projectId The numerical ID of the GCP project.
+         * @param projectId The GCP project number, a numeric value such as `123456789012`. This is not the project ID (such as `my-project`). To look up the number, run `gcloud projects describe &lt;project-id&gt; --format=&#39;value(projectNumber)&#39;`.
          * 
          * @return builder
          * 

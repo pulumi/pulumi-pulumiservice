@@ -15,6 +15,7 @@ const (
 	tokenIDKey              = "token_id"
 	secretKey               = "secret"
 	orgTokPath              = "/api/orgs/anOrg/tokens"
+	testOrgTokenRoleID      = "role-123"
 )
 
 func TestDeleteOrgAccessToken(t *testing.T) {
@@ -53,21 +54,22 @@ func TestCreateOrgAccessToken(t *testing.T) {
 	desc := testOrgTokenDescription
 
 	t.Run("Happy Path", func(t *testing.T) {
+		req := CreateOrgAccessTokenRequest{
+			Name:        name,
+			Description: desc,
+		}
 		resp := createTokenResponse{
 			ID:         tokenIDKey,
 			TokenValue: secretKey,
 		}
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPost,
-			ExpectedReqBody: createOrgTokenRequest{
-				Description: desc,
-				Name:        name,
-			},
-			ExpectedReqPath: orgTokPath,
-			ResponseCode:    201,
-			ResponseBody:    resp,
+			ExpectedReqBody:   req,
+			ExpectedReqPath:   orgTokPath,
+			ResponseCode:      201,
+			ResponseBody:      resp,
 		})
-		token, err := c.CreateOrgAccessToken(teamCtx, name, orgName, desc, false)
+		token, err := c.CreateOrgAccessToken(teamCtx, orgName, req)
 		assert.NoError(t, err)
 		assert.Equal(t, &AccessToken{
 			ID:          resp.ID,
@@ -77,22 +79,50 @@ func TestCreateOrgAccessToken(t *testing.T) {
 	})
 
 	t.Run("Admin token", func(t *testing.T) {
+		req := CreateOrgAccessTokenRequest{
+			Name:        name,
+			Description: desc,
+			Admin:       true,
+		}
 		resp := createTokenResponse{
 			ID:         tokenIDKey,
 			TokenValue: secretKey,
 		}
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPost,
-			ExpectedReqBody: createOrgTokenRequest{
-				Description: desc,
-				Name:        name,
-				Admin:       true,
-			},
-			ExpectedReqPath: orgTokPath,
-			ResponseCode:    201,
-			ResponseBody:    resp,
+			ExpectedReqBody:   req,
+			ExpectedReqPath:   orgTokPath,
+			ResponseCode:      201,
+			ResponseBody:      resp,
 		})
-		token, err := c.CreateOrgAccessToken(teamCtx, name, orgName, desc, true)
+		token, err := c.CreateOrgAccessToken(teamCtx, orgName, req)
+		assert.NoError(t, err)
+		assert.Equal(t, &AccessToken{
+			ID:          resp.ID,
+			TokenValue:  resp.TokenValue,
+			Description: desc,
+		}, token)
+	})
+
+	t.Run("Expiry and role", func(t *testing.T) {
+		req := CreateOrgAccessTokenRequest{
+			Name:        name,
+			Description: desc,
+			Expires:     1814374800,
+			RoleID:      testOrgTokenRoleID,
+		}
+		resp := createTokenResponse{
+			ID:         tokenIDKey,
+			TokenValue: secretKey,
+		}
+		c := startTestServer(t, testServerConfig{
+			ExpectedReqMethod: http.MethodPost,
+			ExpectedReqBody:   req,
+			ExpectedReqPath:   orgTokPath,
+			ResponseCode:      201,
+			ResponseBody:      resp,
+		})
+		token, err := c.CreateOrgAccessToken(teamCtx, orgName, req)
 		assert.NoError(t, err)
 		assert.Equal(t, &AccessToken{
 			ID:          resp.ID,
@@ -102,20 +132,21 @@ func TestCreateOrgAccessToken(t *testing.T) {
 	})
 
 	t.Run("Error", func(t *testing.T) {
+		req := CreateOrgAccessTokenRequest{
+			Name:        name,
+			Description: desc,
+		}
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPost,
 			ExpectedReqPath:   orgTokPath,
-			ExpectedReqBody: createOrgTokenRequest{
-				Description: desc,
-				Name:        name,
-			},
-			ResponseCode: 401,
+			ExpectedReqBody:   req,
+			ResponseCode:      401,
 			ResponseBody: ErrorResponse{
 				StatusCode: 401,
 				Message:    unauthorizedError,
 			},
 		})
-		token, err := c.CreateOrgAccessToken(teamCtx, name, orgName, desc, false)
+		token, err := c.CreateOrgAccessToken(teamCtx, orgName, req)
 		assert.Nil(t, token, "token should be nil")
 		assert.EqualError(t,
 			err,
@@ -136,6 +167,8 @@ func TestGetOrgAccessToken(t *testing.T) {
 					ID:          id,
 					Description: desc,
 					LastUsed:    lastUsed,
+					Expires:     1814374800,
+					Role:        &accessTokenRole{ID: testOrgTokenRoleID, Name: "CI Deployer"},
 				},
 				{
 					ID:          otherValue,
@@ -156,6 +189,8 @@ func TestGetOrgAccessToken(t *testing.T) {
 		assert.Equal(t, &AccessToken{
 			ID:          id,
 			Description: desc,
+			Expires:     1814374800,
+			RoleID:      testOrgTokenRoleID,
 		}, token)
 	})
 

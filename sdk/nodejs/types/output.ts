@@ -370,7 +370,7 @@ export interface EnvironmentIdentifier {
  */
 export interface GCPOIDCConfiguration {
     /**
-     * The numerical ID of the GCP project.
+     * The GCP project number, a numeric value such as `123456789012`. This is not the project ID (such as `my-project`). To look up the number, run `gcloud projects describe <project-id> --format='value(projectNumber)'`.
      */
     projectId: string;
     /**
