@@ -13,6 +13,7 @@ import (
 
 var _ = internal.GetEnvOrDefault
 
+// AWS configuration for Deployments OIDC. Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
 type AWSOIDCConfiguration struct {
 	// Duration of the assume-role session in “XhYmZs” format
 	Duration *string `pulumi:"duration"`
@@ -35,6 +36,7 @@ type AWSOIDCConfigurationInput interface {
 	ToAWSOIDCConfigurationOutputWithContext(context.Context) AWSOIDCConfigurationOutput
 }
 
+// AWS configuration for Deployments OIDC. Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
 type AWSOIDCConfigurationArgs struct {
 	// Duration of the assume-role session in “XhYmZs” format
 	Duration pulumi.StringPtrInput `pulumi:"duration"`
@@ -99,6 +101,7 @@ func (i *awsoidcconfigurationPtrType) ToAWSOIDCConfigurationPtrOutputWithContext
 	return pulumi.ToOutputWithContext(ctx, i).(AWSOIDCConfigurationPtrOutput)
 }
 
+// AWS configuration for Deployments OIDC. Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
 type AWSOIDCConfigurationOutput struct{ *pulumi.OutputState }
 
 func (AWSOIDCConfigurationOutput) ElementType() reflect.Type {
@@ -446,6 +449,7 @@ func (o AuthPolicyDefinitionArrayOutput) Index(i pulumi.IntInput) AuthPolicyDefi
 	}).(AuthPolicyDefinitionOutput)
 }
 
+// Azure configuration for Deployments OIDC. Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
 type AzureOIDCConfiguration struct {
 	// The client ID of the federated workload identity.
 	ClientId string `pulumi:"clientId"`
@@ -466,6 +470,7 @@ type AzureOIDCConfigurationInput interface {
 	ToAzureOIDCConfigurationOutputWithContext(context.Context) AzureOIDCConfigurationOutput
 }
 
+// Azure configuration for Deployments OIDC. Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
 type AzureOIDCConfigurationArgs struct {
 	// The client ID of the federated workload identity.
 	ClientId pulumi.StringInput `pulumi:"clientId"`
@@ -528,6 +533,7 @@ func (i *azureOIDCConfigurationPtrType) ToAzureOIDCConfigurationPtrOutputWithCon
 	return pulumi.ToOutputWithContext(ctx, i).(AzureOIDCConfigurationPtrOutput)
 }
 
+// Azure configuration for Deployments OIDC. Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
 type AzureOIDCConfigurationOutput struct{ *pulumi.OutputState }
 
 func (AzureOIDCConfigurationOutput) ElementType() reflect.Type {
@@ -2056,7 +2062,7 @@ func (o DeploymentSettingsGithubPtrOutput) Repository() pulumi.StringPtrOutput {
 type DeploymentSettingsOperationContext struct {
 	// Environment variables to set for the deployment.
 	EnvironmentVariables map[string]string `pulumi:"environmentVariables"`
-	// OIDC configuration to use during the deployment.
+	// Deployments OIDC configuration for obtaining cloud credentials during the deployment. Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. Deployments OIDC still fits when a customer-managed runner can't reach Pulumi Cloud to use ESC, or when pre-run commands need credentials and aren't wrapped in `pulumi env run`. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
 	Oidc *OperationContextOIDC `pulumi:"oidc"`
 	// Options to override default behavior during the deployment.
 	Options *OperationContextOptions `pulumi:"options"`
@@ -2079,7 +2085,7 @@ type DeploymentSettingsOperationContextInput interface {
 type DeploymentSettingsOperationContextArgs struct {
 	// Environment variables to set for the deployment.
 	EnvironmentVariables pulumi.StringMapInput `pulumi:"environmentVariables"`
-	// OIDC configuration to use during the deployment.
+	// Deployments OIDC configuration for obtaining cloud credentials during the deployment. Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. Deployments OIDC still fits when a customer-managed runner can't reach Pulumi Cloud to use ESC, or when pre-run commands need credentials and aren't wrapped in `pulumi env run`. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
 	Oidc OperationContextOIDCPtrInput `pulumi:"oidc"`
 	// Options to override default behavior during the deployment.
 	Options OperationContextOptionsPtrInput `pulumi:"options"`
@@ -2170,7 +2176,7 @@ func (o DeploymentSettingsOperationContextOutput) EnvironmentVariables() pulumi.
 	return o.ApplyT(func(v DeploymentSettingsOperationContext) map[string]string { return v.EnvironmentVariables }).(pulumi.StringMapOutput)
 }
 
-// OIDC configuration to use during the deployment.
+// Deployments OIDC configuration for obtaining cloud credentials during the deployment. Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. Deployments OIDC still fits when a customer-managed runner can't reach Pulumi Cloud to use ESC, or when pre-run commands need credentials and aren't wrapped in `pulumi env run`. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
 func (o DeploymentSettingsOperationContextOutput) Oidc() OperationContextOIDCPtrOutput {
 	return o.ApplyT(func(v DeploymentSettingsOperationContext) *OperationContextOIDC { return v.Oidc }).(OperationContextOIDCPtrOutput)
 }
@@ -2219,7 +2225,7 @@ func (o DeploymentSettingsOperationContextPtrOutput) EnvironmentVariables() pulu
 	}).(pulumi.StringMapOutput)
 }
 
-// OIDC configuration to use during the deployment.
+// Deployments OIDC configuration for obtaining cloud credentials during the deployment. Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. Deployments OIDC still fits when a customer-managed runner can't reach Pulumi Cloud to use ESC, or when pre-run commands need credentials and aren't wrapped in `pulumi env run`. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
 func (o DeploymentSettingsOperationContextPtrOutput) Oidc() OperationContextOIDCPtrOutput {
 	return o.ApplyT(func(v *DeploymentSettingsOperationContext) *OperationContextOIDC {
 		if v == nil {
@@ -2885,6 +2891,7 @@ func (o EnvironmentIdentifierOutput) Project() pulumi.StringOutput {
 	return o.ApplyT(func(v EnvironmentIdentifier) string { return v.Project }).(pulumi.StringOutput)
 }
 
+// GCP configuration for Deployments OIDC. Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
 type GCPOIDCConfiguration struct {
 	// The GCP project number, a numeric value such as `123456789012`. This is not the project ID (such as `my-project`). To look up the number, run `gcloud projects describe <project-id> --format='value(projectNumber)'`.
 	ProjectId string `pulumi:"projectId"`
@@ -2911,6 +2918,7 @@ type GCPOIDCConfigurationInput interface {
 	ToGCPOIDCConfigurationOutputWithContext(context.Context) GCPOIDCConfigurationOutput
 }
 
+// GCP configuration for Deployments OIDC. Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
 type GCPOIDCConfigurationArgs struct {
 	// The GCP project number, a numeric value such as `123456789012`. This is not the project ID (such as `my-project`). To look up the number, run `gcloud projects describe <project-id> --format='value(projectNumber)'`.
 	ProjectId pulumi.StringInput `pulumi:"projectId"`
@@ -2979,6 +2987,7 @@ func (i *gcpoidcconfigurationPtrType) ToGCPOIDCConfigurationPtrOutputWithContext
 	return pulumi.ToOutputWithContext(ctx, i).(GCPOIDCConfigurationPtrOutput)
 }
 
+// GCP configuration for Deployments OIDC. Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
 type GCPOIDCConfigurationOutput struct{ *pulumi.OutputState }
 
 func (GCPOIDCConfigurationOutput) ElementType() reflect.Type {
@@ -3229,6 +3238,14 @@ func (o InsightsAccountStateTypeArrayOutput) Index(i pulumi.IntInput) InsightsAc
 	}).(InsightsAccountStateTypeOutput)
 }
 
+// Deployments OIDC configuration for obtaining cloud credentials during a deployment.
+//
+// Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. Deployments OIDC predates Pulumi ESC and still works, but for most users ESC is the better choice. Deployments OIDC is still a good fit when:
+//
+// - A customer-managed runner can't reach Pulumi Cloud over the network to use ESC.
+// - Pre-run commands need credentials. An ESC environment applies only to the Pulumi operation itself, unless the command is wrapped in `pulumi env run`.
+//
+// See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
 type OperationContextOIDC struct {
 	// AWS-specific OIDC configuration.
 	Aws *AWSOIDCConfiguration `pulumi:"aws"`
@@ -3249,6 +3266,14 @@ type OperationContextOIDCInput interface {
 	ToOperationContextOIDCOutputWithContext(context.Context) OperationContextOIDCOutput
 }
 
+// Deployments OIDC configuration for obtaining cloud credentials during a deployment.
+//
+// Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. Deployments OIDC predates Pulumi ESC and still works, but for most users ESC is the better choice. Deployments OIDC is still a good fit when:
+//
+// - A customer-managed runner can't reach Pulumi Cloud over the network to use ESC.
+// - Pre-run commands need credentials. An ESC environment applies only to the Pulumi operation itself, unless the command is wrapped in `pulumi env run`.
+//
+// See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
 type OperationContextOIDCArgs struct {
 	// AWS-specific OIDC configuration.
 	Aws AWSOIDCConfigurationPtrInput `pulumi:"aws"`
@@ -3311,6 +3336,14 @@ func (i *operationContextOIDCPtrType) ToOperationContextOIDCPtrOutputWithContext
 	return pulumi.ToOutputWithContext(ctx, i).(OperationContextOIDCPtrOutput)
 }
 
+// Deployments OIDC configuration for obtaining cloud credentials during a deployment.
+//
+// Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. Deployments OIDC predates Pulumi ESC and still works, but for most users ESC is the better choice. Deployments OIDC is still a good fit when:
+//
+// - A customer-managed runner can't reach Pulumi Cloud over the network to use ESC.
+// - Pre-run commands need credentials. An ESC environment applies only to the Pulumi operation itself, unless the command is wrapped in `pulumi env run`.
+//
+// See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
 type OperationContextOIDCOutput struct{ *pulumi.OutputState }
 
 func (OperationContextOIDCOutput) ElementType() reflect.Type {
