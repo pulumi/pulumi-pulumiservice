@@ -24,7 +24,7 @@ namespace Pulumi.PulumiService
     public partial class Stack : global::Pulumi.CustomResource
     {
         /// <summary>
-        /// Optional. Flag indicating whether to delete the stack even if it still contains resources.
+        /// Optional. Flag indicating whether to delete the stack even if it still contains resources. Defaults to `false`.
         /// </summary>
         [Output("forceDestroy")]
         public Output<bool?> ForceDestroy { get; private set; } = null!;
@@ -99,7 +99,7 @@ namespace Pulumi.PulumiService
     public sealed class StackArgs : global::Pulumi.ResourceArgs
     {
         /// <summary>
-        /// Optional. Flag indicating whether to delete the stack even if it still contains resources.
+        /// Optional. Flag indicating whether to delete the stack even if it still contains resources. Defaults to `false`.
         /// </summary>
         [Input("forceDestroy")]
         public Input<bool>? ForceDestroy { get; set; }

@@ -43,7 +43,7 @@ export class Stack extends pulumi.CustomResource {
     }
 
     /**
-     * Optional. Flag indicating whether to delete the stack even if it still contains resources.
+     * Optional. Flag indicating whether to delete the stack even if it still contains resources. Defaults to `false`.
      */
     declare public readonly forceDestroy: pulumi.Output<boolean | undefined>;
     /**
@@ -101,7 +101,7 @@ export class Stack extends pulumi.CustomResource {
  */
 export interface StackArgs {
     /**
-     * Optional. Flag indicating whether to delete the stack even if it still contains resources.
+     * Optional. Flag indicating whether to delete the stack even if it still contains resources. Defaults to `false`.
      */
     forceDestroy?: pulumi.Input<boolean | undefined>;
     /**
