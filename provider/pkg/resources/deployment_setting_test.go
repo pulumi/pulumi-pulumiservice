@@ -145,6 +145,14 @@ func checkGitAuth(t *testing.T, gitAuth resource.PropertyMap) resource.PropertyM
 	return checkedGitAuth.ObjectValue()
 }
 
+// decodeSettings decodes a property map the way Create, Update and Read do.
+func decodeSettings(t *testing.T, props resource.PropertyMap) PulumiServiceDeploymentSettingsInput {
+	t.Helper()
+	decoded, err := decodeDeploymentSettingsInput(props)
+	assert.NoError(t, err)
+	return decoded
+}
+
 // assertSecret asserts that prop is a secret wrapping the given plaintext.
 func assertSecret(t *testing.T, prop resource.PropertyValue, want string) {
 	t.Helper()
@@ -321,7 +329,7 @@ func TestDeploymentSettingsBasicAuthRoundtrip(t *testing.T) {
 
 	// Create mode: plaintext inputs are available, no prior cipher state yet.
 	encoded := initial.ToPropertyMap(&settings, nil, true)
-	decoded := (&PulumiServiceDeploymentSettingsResource{}).ToPulumiServiceDeploymentSettingsInput(encoded)
+	decoded := decodeSettings(t, encoded)
 
 	assert.EqualValues(t, initial, decoded)
 	assertSecret(t, basicAuthPropertyMap(t, encoded)[gcUsername], "alice")
@@ -386,7 +394,7 @@ func TestDeploymentSettingsRoundtrip(t *testing.T) {
 		}}
 
 	encoded := initial.ToPropertyMap(nil, nil, true)
-	decoded := (&PulumiServiceDeploymentSettingsResource{}).ToPulumiServiceDeploymentSettingsInput(encoded)
+	decoded := decodeSettings(t, encoded)
 
 	assert.EqualValues(t, initial, decoded)
 }
@@ -446,7 +454,7 @@ func TestDeploymentSettingsExecutorImageCredentialsRoundtrip(t *testing.T) {
 
 	// Create mode: plaintext inputs are available, no prior cipher state yet.
 	encoded := initial.ToPropertyMap(&settings, nil, true)
-	decoded := (&PulumiServiceDeploymentSettingsResource{}).ToPulumiServiceDeploymentSettingsInput(encoded)
+	decoded := decodeSettings(t, encoded)
 
 	assert.EqualValues(t, initial, decoded)
 	assert.Equal(t, testRegistryPassword, decoded.Executor.ExecutorImage.Credentials.Password.Value)
@@ -463,7 +471,7 @@ func TestDeploymentSettingsExecutorImageWithoutCredentialsRoundtrip(t *testing.T
 	initial := PulumiServiceDeploymentSettingsInput{DeploymentSettings: settings}
 
 	encoded := initial.ToPropertyMap(&settings, nil, true)
-	decoded := (&PulumiServiceDeploymentSettingsResource{}).ToPulumiServiceDeploymentSettingsInput(encoded)
+	decoded := decodeSettings(t, encoded)
 
 	assert.EqualValues(t, initial, decoded)
 	assert.NotContains(t, encoded["executorContext"].ObjectValue(), resource.PropertyKey("credentials"))
@@ -534,7 +542,7 @@ func TestDeploymentSettingsVcsRoundtrip(t *testing.T) {
 	}
 
 	encoded := initial.ToPropertyMap(nil, nil, true)
-	decoded := (&PulumiServiceDeploymentSettingsResource{}).ToPulumiServiceDeploymentSettingsInput(encoded)
+	decoded := decodeSettings(t, encoded)
 
 	assert.EqualValues(t, initial, decoded)
 }
@@ -555,7 +563,7 @@ func TestDeploymentSettingsGitHubRoundtrip(t *testing.T) {
 	}
 
 	encoded := initial.ToPropertyMap(nil, nil, true)
-	decoded := (&PulumiServiceDeploymentSettingsResource{}).ToPulumiServiceDeploymentSettingsInput(encoded)
+	decoded := decodeSettings(t, encoded)
 
 	assert.EqualValues(t, initial, decoded)
 }
