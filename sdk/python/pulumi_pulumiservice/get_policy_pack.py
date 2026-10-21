@@ -75,7 +75,7 @@ class GetPolicyPackResult:
 
     @_builtins.property
     @pulumi.getter
-    def policies(self) -> Optional[Sequence[Mapping[str, _builtins.str]]]:
+    def policies(self) -> Optional[Sequence[Mapping[str, Any]]]:
         """
         List of policies in this pack.
         """

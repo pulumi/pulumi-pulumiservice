@@ -35,7 +35,7 @@ public final class GetPolicyPackResult {
      * @return List of policies in this pack.
      * 
      */
-    private @Nullable List<Map<String,String>> policies;
+    private @Nullable List<Map<String,Object>> policies;
     /**
      * @return The organization or user that published the policy pack. `pulumi` for Pulumi-published packs, otherwise the publishing organization&#39;s name. Omitted when the provider could not determine registry metadata for this pack.
      * 
@@ -83,7 +83,7 @@ public final class GetPolicyPackResult {
      * @return List of policies in this pack.
      * 
      */
-    public List<Map<String,String>> policies() {
+    public List<Map<String,Object>> policies() {
         return this.policies == null ? List.of() : this.policies;
     }
     /**
@@ -127,7 +127,7 @@ public final class GetPolicyPackResult {
         private @Nullable Map<String,Object> config;
         private String displayName;
         private String name;
-        private @Nullable List<Map<String,String>> policies;
+        private @Nullable List<Map<String,Object>> policies;
         private @Nullable String publisher;
         private @Nullable String source;
         private Integer version;
@@ -168,7 +168,7 @@ public final class GetPolicyPackResult {
             return this;
         }
         @CustomType.Setter
-        public Builder policies(@Nullable List<Map<String,String>> policies) {
+        public Builder policies(@Nullable List<Map<String,Object>> policies) {
 
             this.policies = policies;
             return this;
