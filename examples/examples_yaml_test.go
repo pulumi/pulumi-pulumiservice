@@ -4,6 +4,7 @@
 package examples
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -27,6 +28,8 @@ import (
 	"github.com/pulumi/providertest/pulumitest/opttest"
 	"github.com/pulumi/pulumi-cloud-sdk/go/apitype"
 	"github.com/pulumi/pulumi/pkg/v3/testing/integration"
+	"github.com/pulumi/pulumi/sdk/v3/go/auto"
+	sdkapitype "github.com/pulumi/pulumi/sdk/v3/go/common/apitype"
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 )
@@ -222,8 +225,9 @@ func TestYamlDeploymentSettingsExample(t *testing.T) {
 		Dir:       path.Join(cwd, ".", "yaml-deployment-settings"),
 		StackName: "test-stack-" + digits,
 		Config: map[string]string{
-			"digits":        digits,
-			"imageUsername": "registry-user",
+			"digits":           digits,
+			"imageUsername":    "registry-user",
+			"organizationName": getOrgName(),
 		},
 		Secrets: map[string]string{
 			"imagePassword": "registry-password",
@@ -294,7 +298,8 @@ func TestYamlDeploymentSettingsCommitExample(t *testing.T) {
 		Dir:       path.Join(cwd, ".", "yaml-deployment-settings-commit"),
 		StackName: "test-stack-" + digits,
 		Config: map[string]string{
-			"digits": digits,
+			"digits":           digits,
+			"organizationName": getOrgName(),
 		},
 		EditDirs: []integration.EditDir{
 			{
@@ -307,6 +312,73 @@ func TestYamlDeploymentSettingsCommitExample(t *testing.T) {
 			},
 		},
 	})
+}
+
+// deploymentSettingsBaselineVersion is the released provider whose state the
+// DeploymentSettings upgrade test reads.
+const deploymentSettingsBaselineVersion = "1.5.0"
+
+// TestYamlDeploymentSettingsUpgrade checks that a stack written by the released
+// provider previews with no changes under the current one, secrets included.
+// It guards the move of DeploymentSettings to infer (#1206).
+func TestYamlDeploymentSettingsUpgrade(t *testing.T) {
+	examples := map[string]map[string]string{
+		"yaml-deployment-settings":        {"imageUsername": "registry-user"},
+		"yaml-deployment-settings-commit": {},
+	}
+	for dir, config := range examples {
+		t.Run(dir, func(t *testing.T) {
+			digits := generateRandomFiveDigits()
+			configure := func(test *pulumitest.PulumiTest) {
+				test.SetConfig(t, "organizationName", getOrgName())
+				test.SetConfig(t, "digits", digits)
+				for k, v := range config {
+					test.SetConfig(t, k, v)
+				}
+				if dir == "yaml-deployment-settings" {
+					err := test.CurrentStack().SetConfig(test.Context(), "imagePassword",
+						auto.ConfigValue{Value: "registry-password", Secret: true})
+					require.NoError(t, err)
+				}
+			}
+
+			// The settings belong to this stack, so it must exist in Pulumi Cloud
+			// under the name the program gives it.
+			baseline := pulumitest.NewPulumiTest(t, filepath.Join(getCwd(t), dir),
+				opttest.DownloadProviderVersion("pulumiservice", deploymentSettingsBaselineVersion),
+				opttest.UseAmbientBackend(),
+				opttest.StackName("test-stack-"+digits),
+			)
+			configure(baseline)
+			baseline.Up(t)
+			state := baseline.ExportStack(t)
+
+			current := pulumitest.NewPulumiTest(t, filepath.Join(getCwd(t), dir),
+				inMemoryProvider(),
+				opttest.UseAmbientBackend(),
+			)
+			configure(current)
+			// Retarget the state at the current stack: its URNs, and the root
+			// stack resource's name, which ends in the stack name. The settings'
+			// own `stack` input still names the baseline stack, as it should.
+			from, to := baseline.CurrentStack().Name(), current.CurrentStack().Name()
+			for _, r := range [][2]string{
+				{"urn:pulumi:" + from + "::", "urn:pulumi:" + to + "::"},
+				{"-" + from + `"`, "-" + to + `"`},
+			} {
+				state.Deployment = bytes.ReplaceAll(state.Deployment, []byte(r[0]), []byte(r[1]))
+			}
+			current.ImportStack(t, state)
+			// The current stack now owns the settings and deletes them on cleanup.
+			// Empty the baseline stack so its cleanup doesn't delete them twice.
+			baseline.ImportStack(t, sdkapitype.UntypedDeployment{
+				Version:    3,
+				Deployment: json.RawMessage(`{}`),
+			})
+
+			assertpreview.HasNoChanges(t, current.Preview(t))
+		})
+	}
 }
 
 func TestYamlTeamAccessTokenExample(t *testing.T) {
