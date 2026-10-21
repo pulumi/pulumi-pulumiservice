@@ -19,6 +19,7 @@ import (
 	"encoding/json"
 	"os"
 	"strings"
+	"sync/atomic"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -30,7 +31,6 @@ import (
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/functions"
-	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/resources"
 )
 
 func TestDiffConfig(t *testing.T) {
@@ -150,17 +150,16 @@ func TestConfigure_SetsAccessToken(t *testing.T) {
 	require.NoError(t, err)
 
 	// Configure the raw provider directly: MakeProvider wraps it, which
-	// hides the resources this test asserts on.
-	raw := &pulumiserviceProvider{}
+	// hides the transport this test asserts on.
+	raw := &pulumiserviceProvider{transportRef: &atomic.Value{}}
 	_, err = raw.Configure(ctx, &pulumirpc.ConfigureRequest{
 		Args: configArgs,
 	})
 	require.NoError(t, err)
 
-	require.Len(t, raw.pulumiResources, 1)
-	ds, ok := raw.pulumiResources[0].(*resources.PulumiServiceDeploymentSettingsResource)
-	require.True(t, ok, "expected the DeploymentSettings resource")
-	assert.NotNil(t, ds.Client, "client should be initialized after Configure")
+	transport, ok := raw.transportRef.Load().(*authedTransport)
+	require.True(t, ok, "Configure should store the API transport")
+	assert.Equal(t, "pul-test0token", transport.token)
 }
 
 // TestProvider_LayeredSchema verifies the unified provider serves three
