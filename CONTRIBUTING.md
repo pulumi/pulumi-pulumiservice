@@ -36,6 +36,23 @@ Ideally, every change should include unit tests, and every new resource a matchi
 
 You should also test changes manually using a Pulumi program that uses the updated SDKs. Here are some language-specific hints:
 
+### Shared test org
+
+Every CI test suite (`test`, the acceptance tests and the `api` tests), on every PR, creates real resources in one org: `service-provider-test-org` on `https://api.pulumi-staging.io`. Runs from different PRs overlap, so tests must not assume they have the org to themselves:
+
+- Give every resource a name with a random suffix (`generateRandomFiveDigits()` in `examples/examples_utils_test.go`), so concurrent runs and resources leaked by failed runs can't collide.
+- Avoid org-wide singletons. For example, an OIDC issuer URL can be registered only once per org, so two runs that both register `https://api.pulumi.com/oidc` conflict.
+
+The `api` test suite starts with a sweeper (`examples/sweep_api_test.go`) that deletes resources leaked by earlier runs. It deletes a resource only if all of these hold:
+
+- Its name, or for an environment its project, starts with one of the test prefixes in `shouldSweep`, such as `api-`, `test-` or `org-webhook-`.
+- It was last modified more than 3 hours ago (`sweepMinAge`), longer than any test run, so it can't belong to a run still in progress.
+- Its type's list endpoint returns a timestamp: OIDC issuers, roles, ESC environments, agent pools and organization tokens.
+
+Webhooks, teams, policy groups and template sources have no timestamp, so the sweeper deletes them only when `PULUMITEST_SWEEP_UNDATED=1` is set, regardless of age. Use it for manual cleanup only, when nothing else is running against the org. Set `PULUMITEST_SKIP_SWEEP=1` to skip the sweeper entirely.
+
+The sweeper targets `PULUMI_TEST_OWNER`. If you run `go test -tags api` locally against your own org, it deletes anything there whose name matches a test prefix, including resources you made by hand. Set `PULUMITEST_SKIP_SWEEP=1` if that org has anything you want to keep.
+
 ### .NET
 
 - To import generated Nuget package, use this command inside your Pulumi program
