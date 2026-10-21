@@ -264,7 +264,8 @@ func TestYamlDeploymentSettingsNoSourceExample(t *testing.T) {
 		Dir:       path.Join(cwd, ".", "yaml-deployment-settings-no-source"),
 		StackName: "test-stack-" + digits,
 		Config: map[string]string{
-			"digits": digits,
+			"digits":           digits,
+			"organizationName": getOrgName(),
 		},
 		EditDirs: []integration.EditDir{
 			{
