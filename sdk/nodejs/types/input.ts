@@ -8,6 +8,9 @@ import * as enums from "../types/enums";
 
 import * as utilities from "../utilities";
 
+/**
+ * AWS configuration for Deployments OIDC. Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
+ */
 export interface AWSOIDCConfigurationArgs {
     /**
      * Duration of the assume-role session in “XhYmZs” format
@@ -81,6 +84,9 @@ export interface AuthPolicyDefinitionArgs {
     userLogin?: pulumi.Input<string | undefined>;
 }
 
+/**
+ * Azure configuration for Deployments OIDC. Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
+ */
 export interface AzureOIDCConfigurationArgs {
     /**
      * The client ID of the federated workload identity.
@@ -266,7 +272,7 @@ export interface DeploymentSettingsOperationContextArgs {
      */
     environmentVariables?: pulumi.Input<{[key: string]: pulumi.Input<string>} | undefined>;
     /**
-     * OIDC configuration to use during the deployment.
+     * Deployments OIDC configuration for obtaining cloud credentials during the deployment. Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. Deployments OIDC still fits when a customer-managed runner can't reach Pulumi Cloud to use ESC, or when pre-run commands need credentials and aren't wrapped in `pulumi env run`. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
      */
     oidc?: pulumi.Input<inputs.OperationContextOIDCArgs | undefined>;
     /**
@@ -377,9 +383,12 @@ export interface EnvironmentIdentifierArgs {
     project: pulumi.Input<string>;
 }
 
+/**
+ * GCP configuration for Deployments OIDC. Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
+ */
 export interface GCPOIDCConfigurationArgs {
     /**
-     * The numerical ID of the GCP project.
+     * The GCP project number, a numeric value such as `123456789012`. This is not the project ID (such as `my-project`). To look up the number, run `gcloud projects describe <project-id> --format='value(projectNumber)'`.
      */
     projectId: pulumi.Input<string>;
     /**
@@ -404,6 +413,16 @@ export interface GCPOIDCConfigurationArgs {
     workloadPoolId: pulumi.Input<string>;
 }
 
+/**
+ * Deployments OIDC configuration for obtaining cloud credentials during a deployment.
+ *
+ * Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. Deployments OIDC predates Pulumi ESC and still works, but for most users ESC is the better choice. Deployments OIDC is still a good fit when:
+ *
+ * - A customer-managed runner can't reach Pulumi Cloud over the network to use ESC.
+ * - Pre-run commands need credentials. An ESC environment applies only to the Pulumi operation itself, unless the command is wrapped in `pulumi env run`.
+ *
+ * See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
+ */
 export interface OperationContextOIDCArgs {
     /**
      * AWS-specific OIDC configuration.
@@ -573,6 +592,150 @@ export interface PolicyPackPolicyInputArgs {
      * URL with more information about the policy.
      */
     url?: pulumi.Input<string | undefined>;
+}
+
+export interface RoleAccountRule {
+    /**
+     * Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+     */
+    all?: boolean;
+    /**
+     * Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
+     */
+    id?: string;
+    /**
+     * Cloud account scopes to grant on the selected accounts.
+     */
+    scopes?: enums.RbacAccountScope[];
+    /**
+     * Apply to entities whose tags match every condition.
+     */
+    tags?: inputs.TagCondition[];
+}
+
+export interface RoleAccountRuleArgs {
+    /**
+     * Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+     */
+    all?: pulumi.Input<boolean | undefined>;
+    /**
+     * Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
+     */
+    id?: pulumi.Input<string | undefined>;
+    /**
+     * Cloud account scopes to grant on the selected accounts.
+     */
+    scopes?: pulumi.Input<pulumi.Input<enums.RbacAccountScope>[] | undefined>;
+    /**
+     * Apply to entities whose tags match every condition.
+     */
+    tags?: pulumi.Input<pulumi.Input<inputs.TagConditionArgs>[] | undefined>;
+}
+
+export interface RoleEnvironmentRule {
+    /**
+     * Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+     */
+    all?: boolean;
+    /**
+     * Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
+     */
+    id?: string;
+    /**
+     * Environment scopes to grant on the selected environments.
+     */
+    scopes?: enums.RbacEnvironmentScope[];
+    /**
+     * Apply to entities whose tags match every condition.
+     */
+    tags?: inputs.TagCondition[];
+}
+
+export interface RoleEnvironmentRuleArgs {
+    /**
+     * Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+     */
+    all?: pulumi.Input<boolean | undefined>;
+    /**
+     * Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
+     */
+    id?: pulumi.Input<string | undefined>;
+    /**
+     * Environment scopes to grant on the selected environments.
+     */
+    scopes?: pulumi.Input<pulumi.Input<enums.RbacEnvironmentScope>[] | undefined>;
+    /**
+     * Apply to entities whose tags match every condition.
+     */
+    tags?: pulumi.Input<pulumi.Input<inputs.TagConditionArgs>[] | undefined>;
+}
+
+export interface RoleStackRule {
+    /**
+     * Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+     */
+    all?: boolean;
+    /**
+     * Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
+     */
+    id?: string;
+    /**
+     * Stack scopes to grant on the selected stacks.
+     */
+    scopes?: enums.RbacStackScope[];
+    /**
+     * Apply to entities whose tags match every condition.
+     */
+    tags?: inputs.TagCondition[];
+}
+
+export interface RoleStackRuleArgs {
+    /**
+     * Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+     */
+    all?: pulumi.Input<boolean | undefined>;
+    /**
+     * Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
+     */
+    id?: pulumi.Input<string | undefined>;
+    /**
+     * Stack scopes to grant on the selected stacks.
+     */
+    scopes?: pulumi.Input<pulumi.Input<enums.RbacStackScope>[] | undefined>;
+    /**
+     * Apply to entities whose tags match every condition.
+     */
+    tags?: pulumi.Input<pulumi.Input<inputs.TagConditionArgs>[] | undefined>;
+}
+
+export interface TagCondition {
+    /**
+     * The tag key.
+     */
+    key: string;
+    /**
+     * How the tag is compared. Defaults to `equals`.
+     */
+    operator?: enums.TagOperator;
+    /**
+     * The tag value. Required with `equals` and `notEquals`, and not allowed with `exists` and `notExists`.
+     */
+    value?: string;
+}
+
+export interface TagConditionArgs {
+    /**
+     * The tag key.
+     */
+    key: pulumi.Input<string>;
+    /**
+     * How the tag is compared. Defaults to `equals`.
+     */
+    operator?: pulumi.Input<enums.TagOperator | undefined>;
+    /**
+     * The tag value. Required with `equals` and `notEquals`, and not allowed with `exists` and `notExists`.
+     */
+    value?: pulumi.Input<string | undefined>;
 }
 
 export interface TemplateSourceDestinationArgs {

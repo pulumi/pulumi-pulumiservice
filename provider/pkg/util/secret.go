@@ -1,8 +1,6 @@
 package util
 
 import (
-	"bytes"
-
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
 
@@ -35,19 +33,6 @@ func GetSecretOrStringValue(prop resource.PropertyValue) string {
 	default:
 		return prop.StringValue()
 	}
-}
-
-func GetSecretOrStringNullableValue(prop resource.PropertyValue) *string {
-	var resultString string
-	switch prop.V.(type) {
-	case *resource.Secret:
-		resultString = prop.SecretValue().Element.StringValue()
-	case nil:
-		return nil
-	default:
-		resultString = prop.StringValue()
-	}
-	return &resultString
 }
 
 func GetSecretOrBoolValue(prop resource.PropertyValue) bool {
@@ -168,9 +153,7 @@ func CreateSecretValue(
 // rotation. As long as we have any prior cipher state for this secret, we
 // trust the user's plaintext input. Use this when the server returns
 // non-deterministic ciphertext per call (e.g. AES-GCM with a random IV, as
-// the Pulumi Cloud deployment-settings endpoint does today). Once the
-// service exposes a stable per-secret identity (e.g. a SecretHash sibling
-// to ciphertext, mirroring the webhook response), prefer MergeSecretValueStrict.
+// the Pulumi Cloud deployment-settings endpoint does today).
 //
 // Output properties are just replaced with ciphertext retrieved from Pulumi Service.
 // Inputs:
@@ -186,35 +169,6 @@ func MergeSecretValue(
 ) {
 	if isInput {
 		if oldCipherValue != nil && cipherValue.Value == oldCipherValue.Value {
-			propertyMap[resource.PropertyKey(propertyName)] = resource.MakeSecret(
-				resource.NewPropertyValue(plaintextValue.Value),
-			)
-		} else {
-			propertyMap[resource.PropertyKey(propertyName)] = resource.MakeSecret(resource.NewPropertyValue(""))
-		}
-	} else {
-		propertyMap[resource.PropertyKey(propertyName)] = resource.NewPropertyValue(cipherValue.Value)
-	}
-}
-
-// MergeSecretValueStrict is the strict merge: it compares ciphertext bytes
-// across calls and only keeps the user's plaintext input when those bytes
-// match. Use this only when the server returns a stable per-secret identity
-// (e.g. webhooks, where SecretCiphertext is hex(sha256(plaintext))). Calling
-// this against a non-deterministic ciphertext source produces spurious
-// refresh diffs.
-func MergeSecretValueStrict(
-	propertyMap resource.PropertyMap,
-	propertyName string,
-	cipherValue pulumiapi.SecretValue,
-	plaintextValue *pulumiapi.SecretValue,
-	oldCipherValue *pulumiapi.SecretValue,
-	isInput bool,
-) {
-	if isInput {
-		if oldCipherValue != nil &&
-			cipherValue.Value == oldCipherValue.Value &&
-			bytes.Equal(cipherValue.Ciphertext, oldCipherValue.Ciphertext) {
 			propertyMap[resource.PropertyKey(propertyName)] = resource.MakeSecret(
 				resource.NewPropertyValue(plaintextValue.Value),
 			)

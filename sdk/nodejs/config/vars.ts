@@ -8,7 +8,7 @@ declare var exports: any;
 const __config = new pulumi.Config("pulumiservice");
 
 /**
- * Access Token to authenticate with Pulumi Cloud.
+ * Access token to authenticate with Pulumi Cloud. Optional: if unset, the provider uses the `PULUMI_ACCESS_TOKEN` environment variable, then the access token of the account you're logged in to with `pulumi login`. The API URL doesn't come from that login, so when you're logged in to a self-hosted Pulumi Cloud, also set `apiUrl` or `PULUMI_BACKEND_URL`.
  */
 export declare const accessToken: string | undefined;
 Object.defineProperty(exports, "accessToken", {

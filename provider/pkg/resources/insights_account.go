@@ -23,6 +23,7 @@ import (
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 )
 
 type InsightsAccount struct{}
@@ -35,7 +36,10 @@ var (
 )
 
 func (ia *InsightsAccount) Annotate(a infer.Annotator) {
-	a.Describe(ia, "Insights Account for cloud resource scanning and analysis across AWS, Azure, and GCP.")
+	a.Describe(ia, "Insights Account for cloud resource scanning and analysis across AWS, Azure, and GCP."+
+		util.ImportDocs("pulumiservice:index:InsightsAccount", "{organization}/{accountName}",
+			"my-org/my-account",
+			"`scanSchedule` isn't read back from Pulumi Cloud, so set it in your program after import."))
 }
 
 // CloudProvider enum for supported cloud providers

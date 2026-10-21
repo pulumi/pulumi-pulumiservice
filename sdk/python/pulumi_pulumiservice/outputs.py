@@ -51,6 +51,9 @@ __all__ = [
 
 @pulumi.output_type
 class AWSOIDCConfiguration(dict):
+    """
+    AWS configuration for Deployments OIDC. Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
+    """
     @staticmethod
     def __key_warning(key: str):
         suggest = None
@@ -78,6 +81,8 @@ class AWSOIDCConfiguration(dict):
                  duration: Optional[_builtins.str] = None,
                  policy_arns: Optional[Sequence[_builtins.str]] = None):
         """
+        AWS configuration for Deployments OIDC. Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
+
         :param _builtins.str role_arn: The ARN of the role to assume using the OIDC token.
         :param _builtins.str session_name: The name of the assume-role session.
         :param _builtins.str duration: Duration of the assume-role session in “XhYmZs” format
@@ -326,6 +331,9 @@ class AuthPolicyDefinition(dict):
 
 @pulumi.output_type
 class AzureOIDCConfiguration(dict):
+    """
+    Azure configuration for Deployments OIDC. Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
+    """
     @staticmethod
     def __key_warning(key: str):
         suggest = None
@@ -352,6 +360,8 @@ class AzureOIDCConfiguration(dict):
                  subscription_id: _builtins.str,
                  tenant_id: _builtins.str):
         """
+        Azure configuration for Deployments OIDC. Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
+
         :param _builtins.str client_id: The client ID of the federated workload identity.
         :param _builtins.str subscription_id: The subscription ID of the federated workload identity.
         :param _builtins.str tenant_id: The tenant ID of the federated workload identity.
@@ -893,7 +903,7 @@ class DeploymentSettingsOperationContext(dict):
         Settings related to the Pulumi operation environment during the deployment.
 
         :param Mapping[str, _builtins.str] environment_variables: Environment variables to set for the deployment.
-        :param 'OperationContextOIDC' oidc: OIDC configuration to use during the deployment.
+        :param 'OperationContextOIDC' oidc: Deployments OIDC configuration for obtaining cloud credentials during the deployment. Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. Deployments OIDC still fits when a customer-managed runner can't reach Pulumi Cloud to use ESC, or when pre-run commands need credentials and aren't wrapped in `pulumi env run`. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
         :param 'OperationContextOptions' options: Options to override default behavior during the deployment.
         :param Sequence[_builtins.str] pre_run_commands: Shell commands to run before the Pulumi operation executes.
         """
@@ -918,7 +928,7 @@ class DeploymentSettingsOperationContext(dict):
     @pulumi.getter
     def oidc(self) -> Optional['outputs.OperationContextOIDC']:
         """
-        OIDC configuration to use during the deployment.
+        Deployments OIDC configuration for obtaining cloud credentials during the deployment. Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. Deployments OIDC still fits when a customer-managed runner can't reach Pulumi Cloud to use ESC, or when pre-run commands need credentials and aren't wrapped in `pulumi env run`. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
         """
         return pulumi.get(self, "oidc")
 
@@ -1235,6 +1245,9 @@ class EnvironmentIdentifier(dict):
 
 @pulumi.output_type
 class GCPOIDCConfiguration(dict):
+    """
+    GCP configuration for Deployments OIDC. Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
+    """
     @staticmethod
     def __key_warning(key: str):
         suggest = None
@@ -1268,7 +1281,9 @@ class GCPOIDCConfiguration(dict):
                  region: Optional[_builtins.str] = None,
                  token_lifetime: Optional[_builtins.str] = None):
         """
-        :param _builtins.str project_id: The numerical ID of the GCP project.
+        GCP configuration for Deployments OIDC. Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
+
+        :param _builtins.str project_id: The GCP project number, a numeric value such as `123456789012`. This is not the project ID (such as `my-project`). To look up the number, run `gcloud projects describe <project-id> --format='value(projectNumber)'`.
         :param _builtins.str provider_id: The ID of the identity provider associated with the workload pool.
         :param _builtins.str service_account: The email address of the service account to use.
         :param _builtins.str workload_pool_id: The ID of the workload pool to use.
@@ -1288,7 +1303,7 @@ class GCPOIDCConfiguration(dict):
     @pulumi.getter(name="projectId")
     def project_id(self) -> _builtins.str:
         """
-        The numerical ID of the GCP project.
+        The GCP project number, a numeric value such as `123456789012`. This is not the project ID (such as `my-project`). To look up the number, run `gcloud projects describe <project-id> --format='value(projectNumber)'`.
         """
         return pulumi.get(self, "project_id")
 
@@ -1445,11 +1460,30 @@ class InsightsAccountState(dict):
 
 @pulumi.output_type
 class OperationContextOIDC(dict):
+    """
+    Deployments OIDC configuration for obtaining cloud credentials during a deployment.
+
+    Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. Deployments OIDC predates Pulumi ESC and still works, but for most users ESC is the better choice. Deployments OIDC is still a good fit when:
+
+    - A customer-managed runner can't reach Pulumi Cloud over the network to use ESC.
+    - Pre-run commands need credentials. An ESC environment applies only to the Pulumi operation itself, unless the command is wrapped in `pulumi env run`.
+
+    See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
+    """
     def __init__(__self__, *,
                  aws: Optional['outputs.AWSOIDCConfiguration'] = None,
                  azure: Optional['outputs.AzureOIDCConfiguration'] = None,
                  gcp: Optional['outputs.GCPOIDCConfiguration'] = None):
         """
+        Deployments OIDC configuration for obtaining cloud credentials during a deployment.
+
+        Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. Deployments OIDC predates Pulumi ESC and still works, but for most users ESC is the better choice. Deployments OIDC is still a good fit when:
+
+        - A customer-managed runner can't reach Pulumi Cloud over the network to use ESC.
+        - Pre-run commands need credentials. An ESC environment applies only to the Pulumi operation itself, unless the command is wrapped in `pulumi env run`.
+
+        See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
+
         :param 'AWSOIDCConfiguration' aws: AWS-specific OIDC configuration.
         :param 'AzureOIDCConfiguration' azure: Azure-specific OIDC configuration.
         :param 'GCPOIDCConfiguration' gcp: GCP-specific OIDC configuration.

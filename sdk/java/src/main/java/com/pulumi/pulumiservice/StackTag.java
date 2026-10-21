@@ -16,6 +16,14 @@ import javax.annotation.Nullable;
 /**
  * Stacks have associated metadata in the form of tags. Each tag consists of a name and value.
  * 
+ * ## Import
+ * 
+ * This resource can be imported using its `id`, which has the format `{organization}/{project}/{stack}/{tagName}`, e.g.,
+ * 
+ * ```sh
+ *  $ pulumi import pulumiservice:index:StackTag my-stack-tag my-org/my-project/my-stack/my-tag
+ * ```
+ * 
  */
 @ResourceType(type="pulumiservice:index:StackTag")
 public class StackTag extends com.pulumi.resources.CustomResource {

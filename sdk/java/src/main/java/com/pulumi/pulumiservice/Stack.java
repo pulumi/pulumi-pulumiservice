@@ -18,18 +18,26 @@ import javax.annotation.Nullable;
 /**
  * A stack is a collection of resources that share a common lifecycle. Stacks are uniquely identified by their name and the project they belong to.
  * 
+ * ## Import
+ * 
+ * This resource can be imported using its `id`, which has the format `{organization}/{project}/{stack}`, e.g.,
+ * 
+ * ```sh
+ *  $ pulumi import pulumiservice:index:Stack my-stack my-org/my-project/my-stack
+ * ```
+ * 
  */
 @ResourceType(type="pulumiservice:index:Stack")
 public class Stack extends com.pulumi.resources.CustomResource {
     /**
-     * Optional. Flag indicating whether to delete the stack even if it still contains resources.
+     * Optional. Flag indicating whether to delete the stack even if it still contains resources. Defaults to `false`.
      * 
      */
     @Export(name="forceDestroy", refs={Boolean.class}, tree="[0]")
     private Output</* @Nullable */ Boolean> forceDestroy;
 
     /**
-     * @return Optional. Flag indicating whether to delete the stack even if it still contains resources.
+     * @return Optional. Flag indicating whether to delete the stack even if it still contains resources. Defaults to `false`.
      * 
      */
     public Output<Optional<Boolean>> forceDestroy() {

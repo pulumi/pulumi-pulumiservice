@@ -21,7 +21,7 @@ public final class DeploymentSettingsOperationContext {
      */
     private @Nullable Map<String,String> environmentVariables;
     /**
-     * @return OIDC configuration to use during the deployment.
+     * @return Deployments OIDC configuration for obtaining cloud credentials during the deployment. Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. Deployments OIDC still fits when a customer-managed runner can&#39;t reach Pulumi Cloud to use ESC, or when pre-run commands need credentials and aren&#39;t wrapped in `pulumi env run`. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
      * 
      */
     private @Nullable OperationContextOIDC oidc;
@@ -45,7 +45,7 @@ public final class DeploymentSettingsOperationContext {
         return this.environmentVariables == null ? Map.of() : this.environmentVariables;
     }
     /**
-     * @return OIDC configuration to use during the deployment.
+     * @return Deployments OIDC configuration for obtaining cloud credentials during the deployment. Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. Deployments OIDC still fits when a customer-managed runner can&#39;t reach Pulumi Cloud to use ESC, or when pre-run commands need credentials and aren&#39;t wrapped in `pulumi env run`. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
      * 
      */
     public Optional<OperationContextOIDC> oidc() {

@@ -1,6 +1,15 @@
 name: pulumi-service-teams-access-token-yaml
 runtime: yaml
 description: An example of using yaml to create an org token
+config:
+  organizationName:
+    type: string
+    default: service-provider-test-org
+  # When the scoped token expires, as an RFC 3339 date-time. Pulumi Cloud
+  # rejects expiries in the past or more than two years out, so the test
+  # passes a date relative to the current time.
+  expires:
+    type: string
 resources:
   rand:
     type: random:RandomString
@@ -9,9 +18,33 @@ resources:
       # team names may only contain alphanumeric, hyphens, underscores, or periods
       special: false
   token:
-    type: pulumiservice:index:OrgAccessToken
+    type: pulumiservice:OrgAccessToken
     properties:
       name: test-${rand.result}
-      organizationName: service-provider-test-org
+      organizationName: ${organizationName}
       description: "example org access token"
       admin: false
+  # A custom role for the scoped token below.
+  tokenRole:
+    type: pulumiservice:OrganizationRole
+    properties:
+      organizationName: ${organizationName}
+      name: yaml-org-token-role-${rand.result}
+      description: Stack read access, created by the yaml-org-token example.
+      permissions: ${readOnlyPermissions.permissions}
+  # A token that expires and carries the custom role.
+  scopedToken:
+    type: pulumiservice:OrgAccessToken
+    properties:
+      name: test-scoped-${rand.result}
+      organizationName: ${organizationName}
+      description: "example org access token with an expiry and a role"
+      expires: ${expires}
+      roleId: ${tokenRole.roleId}
+variables:
+  readOnlyPermissions:
+    fn::invoke:
+      function: pulumiservice:buildAllowPermissions
+      arguments:
+        permissions:
+          - stack:read

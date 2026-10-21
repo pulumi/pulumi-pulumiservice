@@ -20,7 +20,7 @@ export class Provider extends pulumi.ProviderResource {
     }
 
     /**
-     * Access Token to authenticate with Pulumi Cloud.
+     * Access token to authenticate with Pulumi Cloud. Optional: if unset, the provider uses the `PULUMI_ACCESS_TOKEN` environment variable, then the access token of the account you're logged in to with `pulumi login`. The API URL doesn't come from that login, so when you're logged in to a self-hosted Pulumi Cloud, also set `apiUrl` or `PULUMI_BACKEND_URL`.
      */
     declare public readonly accessToken: pulumi.Output<string | undefined>;
     /**
@@ -54,7 +54,7 @@ export class Provider extends pulumi.ProviderResource {
  */
 export interface ProviderArgs {
     /**
-     * Access Token to authenticate with Pulumi Cloud.
+     * Access token to authenticate with Pulumi Cloud. Optional: if unset, the provider uses the `PULUMI_ACCESS_TOKEN` environment variable, then the access token of the account you're logged in to with `pulumi login`. The API URL doesn't come from that login, so when you're logged in to a self-hosted Pulumi Cloud, also set `apiUrl` or `PULUMI_BACKEND_URL`.
      */
     accessToken?: pulumi.Input<string | undefined>;
     /**

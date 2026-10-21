@@ -13,6 +13,7 @@ import (
 
 var _ = internal.GetEnvOrDefault
 
+// AWS configuration for Deployments OIDC. Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
 type AWSOIDCConfiguration struct {
 	// Duration of the assume-role session in “XhYmZs” format
 	Duration *string `pulumi:"duration"`
@@ -35,6 +36,7 @@ type AWSOIDCConfigurationInput interface {
 	ToAWSOIDCConfigurationOutputWithContext(context.Context) AWSOIDCConfigurationOutput
 }
 
+// AWS configuration for Deployments OIDC. Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
 type AWSOIDCConfigurationArgs struct {
 	// Duration of the assume-role session in “XhYmZs” format
 	Duration pulumi.StringPtrInput `pulumi:"duration"`
@@ -99,6 +101,7 @@ func (i *awsoidcconfigurationPtrType) ToAWSOIDCConfigurationPtrOutputWithContext
 	return pulumi.ToOutputWithContext(ctx, i).(AWSOIDCConfigurationPtrOutput)
 }
 
+// AWS configuration for Deployments OIDC. Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
 type AWSOIDCConfigurationOutput struct{ *pulumi.OutputState }
 
 func (AWSOIDCConfigurationOutput) ElementType() reflect.Type {
@@ -446,6 +449,7 @@ func (o AuthPolicyDefinitionArrayOutput) Index(i pulumi.IntInput) AuthPolicyDefi
 	}).(AuthPolicyDefinitionOutput)
 }
 
+// Azure configuration for Deployments OIDC. Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
 type AzureOIDCConfiguration struct {
 	// The client ID of the federated workload identity.
 	ClientId string `pulumi:"clientId"`
@@ -466,6 +470,7 @@ type AzureOIDCConfigurationInput interface {
 	ToAzureOIDCConfigurationOutputWithContext(context.Context) AzureOIDCConfigurationOutput
 }
 
+// Azure configuration for Deployments OIDC. Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
 type AzureOIDCConfigurationArgs struct {
 	// The client ID of the federated workload identity.
 	ClientId pulumi.StringInput `pulumi:"clientId"`
@@ -528,6 +533,7 @@ func (i *azureOIDCConfigurationPtrType) ToAzureOIDCConfigurationPtrOutputWithCon
 	return pulumi.ToOutputWithContext(ctx, i).(AzureOIDCConfigurationPtrOutput)
 }
 
+// Azure configuration for Deployments OIDC. Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
 type AzureOIDCConfigurationOutput struct{ *pulumi.OutputState }
 
 func (AzureOIDCConfigurationOutput) ElementType() reflect.Type {
@@ -2101,7 +2107,7 @@ func (o DeploymentSettingsGithubPtrOutput) TagFilters() pulumi.StringArrayOutput
 type DeploymentSettingsOperationContext struct {
 	// Environment variables to set for the deployment.
 	EnvironmentVariables map[string]string `pulumi:"environmentVariables"`
-	// OIDC configuration to use during the deployment.
+	// Deployments OIDC configuration for obtaining cloud credentials during the deployment. Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. Deployments OIDC still fits when a customer-managed runner can't reach Pulumi Cloud to use ESC, or when pre-run commands need credentials and aren't wrapped in `pulumi env run`. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
 	Oidc *OperationContextOIDC `pulumi:"oidc"`
 	// Options to override default behavior during the deployment.
 	Options *OperationContextOptions `pulumi:"options"`
@@ -2124,7 +2130,7 @@ type DeploymentSettingsOperationContextInput interface {
 type DeploymentSettingsOperationContextArgs struct {
 	// Environment variables to set for the deployment.
 	EnvironmentVariables pulumi.StringMapInput `pulumi:"environmentVariables"`
-	// OIDC configuration to use during the deployment.
+	// Deployments OIDC configuration for obtaining cloud credentials during the deployment. Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. Deployments OIDC still fits when a customer-managed runner can't reach Pulumi Cloud to use ESC, or when pre-run commands need credentials and aren't wrapped in `pulumi env run`. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
 	Oidc OperationContextOIDCPtrInput `pulumi:"oidc"`
 	// Options to override default behavior during the deployment.
 	Options OperationContextOptionsPtrInput `pulumi:"options"`
@@ -2215,7 +2221,7 @@ func (o DeploymentSettingsOperationContextOutput) EnvironmentVariables() pulumi.
 	return o.ApplyT(func(v DeploymentSettingsOperationContext) map[string]string { return v.EnvironmentVariables }).(pulumi.StringMapOutput)
 }
 
-// OIDC configuration to use during the deployment.
+// Deployments OIDC configuration for obtaining cloud credentials during the deployment. Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. Deployments OIDC still fits when a customer-managed runner can't reach Pulumi Cloud to use ESC, or when pre-run commands need credentials and aren't wrapped in `pulumi env run`. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
 func (o DeploymentSettingsOperationContextOutput) Oidc() OperationContextOIDCPtrOutput {
 	return o.ApplyT(func(v DeploymentSettingsOperationContext) *OperationContextOIDC { return v.Oidc }).(OperationContextOIDCPtrOutput)
 }
@@ -2264,7 +2270,7 @@ func (o DeploymentSettingsOperationContextPtrOutput) EnvironmentVariables() pulu
 	}).(pulumi.StringMapOutput)
 }
 
-// OIDC configuration to use during the deployment.
+// Deployments OIDC configuration for obtaining cloud credentials during the deployment. Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. Deployments OIDC still fits when a customer-managed runner can't reach Pulumi Cloud to use ESC, or when pre-run commands need credentials and aren't wrapped in `pulumi env run`. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
 func (o DeploymentSettingsOperationContextPtrOutput) Oidc() OperationContextOIDCPtrOutput {
 	return o.ApplyT(func(v *DeploymentSettingsOperationContext) *OperationContextOIDC {
 		if v == nil {
@@ -2975,8 +2981,9 @@ func (o EnvironmentIdentifierOutput) Project() pulumi.StringOutput {
 	return o.ApplyT(func(v EnvironmentIdentifier) string { return v.Project }).(pulumi.StringOutput)
 }
 
+// GCP configuration for Deployments OIDC. Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
 type GCPOIDCConfiguration struct {
-	// The numerical ID of the GCP project.
+	// The GCP project number, a numeric value such as `123456789012`. This is not the project ID (such as `my-project`). To look up the number, run `gcloud projects describe <project-id> --format='value(projectNumber)'`.
 	ProjectId string `pulumi:"projectId"`
 	// The ID of the identity provider associated with the workload pool.
 	ProviderId string `pulumi:"providerId"`
@@ -3001,8 +3008,9 @@ type GCPOIDCConfigurationInput interface {
 	ToGCPOIDCConfigurationOutputWithContext(context.Context) GCPOIDCConfigurationOutput
 }
 
+// GCP configuration for Deployments OIDC. Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
 type GCPOIDCConfigurationArgs struct {
-	// The numerical ID of the GCP project.
+	// The GCP project number, a numeric value such as `123456789012`. This is not the project ID (such as `my-project`). To look up the number, run `gcloud projects describe <project-id> --format='value(projectNumber)'`.
 	ProjectId pulumi.StringInput `pulumi:"projectId"`
 	// The ID of the identity provider associated with the workload pool.
 	ProviderId pulumi.StringInput `pulumi:"providerId"`
@@ -3069,6 +3077,7 @@ func (i *gcpoidcconfigurationPtrType) ToGCPOIDCConfigurationPtrOutputWithContext
 	return pulumi.ToOutputWithContext(ctx, i).(GCPOIDCConfigurationPtrOutput)
 }
 
+// GCP configuration for Deployments OIDC. Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
 type GCPOIDCConfigurationOutput struct{ *pulumi.OutputState }
 
 func (GCPOIDCConfigurationOutput) ElementType() reflect.Type {
@@ -3093,7 +3102,7 @@ func (o GCPOIDCConfigurationOutput) ToGCPOIDCConfigurationPtrOutputWithContext(c
 	}).(GCPOIDCConfigurationPtrOutput)
 }
 
-// The numerical ID of the GCP project.
+// The GCP project number, a numeric value such as `123456789012`. This is not the project ID (such as `my-project`). To look up the number, run `gcloud projects describe <project-id> --format='value(projectNumber)'`.
 func (o GCPOIDCConfigurationOutput) ProjectId() pulumi.StringOutput {
 	return o.ApplyT(func(v GCPOIDCConfiguration) string { return v.ProjectId }).(pulumi.StringOutput)
 }
@@ -3147,7 +3156,7 @@ func (o GCPOIDCConfigurationPtrOutput) Elem() GCPOIDCConfigurationOutput {
 	}).(GCPOIDCConfigurationOutput)
 }
 
-// The numerical ID of the GCP project.
+// The GCP project number, a numeric value such as `123456789012`. This is not the project ID (such as `my-project`). To look up the number, run `gcloud projects describe <project-id> --format='value(projectNumber)'`.
 func (o GCPOIDCConfigurationPtrOutput) ProjectId() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *GCPOIDCConfiguration) *string {
 		if v == nil {
@@ -3319,6 +3328,14 @@ func (o InsightsAccountStateTypeArrayOutput) Index(i pulumi.IntInput) InsightsAc
 	}).(InsightsAccountStateTypeOutput)
 }
 
+// Deployments OIDC configuration for obtaining cloud credentials during a deployment.
+//
+// Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. Deployments OIDC predates Pulumi ESC and still works, but for most users ESC is the better choice. Deployments OIDC is still a good fit when:
+//
+// - A customer-managed runner can't reach Pulumi Cloud over the network to use ESC.
+// - Pre-run commands need credentials. An ESC environment applies only to the Pulumi operation itself, unless the command is wrapped in `pulumi env run`.
+//
+// See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
 type OperationContextOIDC struct {
 	// AWS-specific OIDC configuration.
 	Aws *AWSOIDCConfiguration `pulumi:"aws"`
@@ -3339,6 +3356,14 @@ type OperationContextOIDCInput interface {
 	ToOperationContextOIDCOutputWithContext(context.Context) OperationContextOIDCOutput
 }
 
+// Deployments OIDC configuration for obtaining cloud credentials during a deployment.
+//
+// Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. Deployments OIDC predates Pulumi ESC and still works, but for most users ESC is the better choice. Deployments OIDC is still a good fit when:
+//
+// - A customer-managed runner can't reach Pulumi Cloud over the network to use ESC.
+// - Pre-run commands need credentials. An ESC environment applies only to the Pulumi operation itself, unless the command is wrapped in `pulumi env run`.
+//
+// See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
 type OperationContextOIDCArgs struct {
 	// AWS-specific OIDC configuration.
 	Aws AWSOIDCConfigurationPtrInput `pulumi:"aws"`
@@ -3401,6 +3426,14 @@ func (i *operationContextOIDCPtrType) ToOperationContextOIDCPtrOutputWithContext
 	return pulumi.ToOutputWithContext(ctx, i).(OperationContextOIDCPtrOutput)
 }
 
+// Deployments OIDC configuration for obtaining cloud credentials during a deployment.
+//
+// Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. Deployments OIDC predates Pulumi ESC and still works, but for most users ESC is the better choice. Deployments OIDC is still a good fit when:
+//
+// - A customer-managed runner can't reach Pulumi Cloud over the network to use ESC.
+// - Pre-run commands need credentials. An ESC environment applies only to the Pulumi operation itself, unless the command is wrapped in `pulumi env run`.
+//
+// See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
 type OperationContextOIDCOutput struct{ *pulumi.OutputState }
 
 func (OperationContextOIDCOutput) ElementType() reflect.Type {
@@ -4800,6 +4833,254 @@ func (o PolicyPackSummaryArrayOutput) Index(i pulumi.IntInput) PolicyPackSummary
 	}).(PolicyPackSummaryOutput)
 }
 
+type RoleAccountRule struct {
+	// Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+	All *bool `pulumi:"all"`
+	// Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
+	Id *string `pulumi:"id"`
+	// Cloud account scopes to grant on the selected accounts.
+	Scopes []RbacAccountScope `pulumi:"scopes"`
+	// Apply to entities whose tags match every condition.
+	Tags []TagCondition `pulumi:"tags"`
+}
+
+// RoleAccountRuleInput is an input type that accepts RoleAccountRuleArgs and RoleAccountRuleOutput values.
+// You can construct a concrete instance of `RoleAccountRuleInput` via:
+//
+//	RoleAccountRuleArgs{...}
+type RoleAccountRuleInput interface {
+	pulumi.Input
+
+	ToRoleAccountRuleOutput() RoleAccountRuleOutput
+	ToRoleAccountRuleOutputWithContext(context.Context) RoleAccountRuleOutput
+}
+
+type RoleAccountRuleArgs struct {
+	// Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+	All pulumi.BoolPtrInput `pulumi:"all"`
+	// Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
+	Id pulumi.StringPtrInput `pulumi:"id"`
+	// Cloud account scopes to grant on the selected accounts.
+	Scopes RbacAccountScopeArrayInput `pulumi:"scopes"`
+	// Apply to entities whose tags match every condition.
+	Tags TagConditionArrayInput `pulumi:"tags"`
+}
+
+func (RoleAccountRuleArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*RoleAccountRule)(nil)).Elem()
+}
+
+func (i RoleAccountRuleArgs) ToRoleAccountRuleOutput() RoleAccountRuleOutput {
+	return i.ToRoleAccountRuleOutputWithContext(context.Background())
+}
+
+func (i RoleAccountRuleArgs) ToRoleAccountRuleOutputWithContext(ctx context.Context) RoleAccountRuleOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(RoleAccountRuleOutput)
+}
+
+// RoleAccountRuleArrayInput is an input type that accepts RoleAccountRuleArray and RoleAccountRuleArrayOutput values.
+// You can construct a concrete instance of `RoleAccountRuleArrayInput` via:
+//
+//	RoleAccountRuleArray{ RoleAccountRuleArgs{...} }
+type RoleAccountRuleArrayInput interface {
+	pulumi.Input
+
+	ToRoleAccountRuleArrayOutput() RoleAccountRuleArrayOutput
+	ToRoleAccountRuleArrayOutputWithContext(context.Context) RoleAccountRuleArrayOutput
+}
+
+type RoleAccountRuleArray []RoleAccountRuleInput
+
+func (RoleAccountRuleArray) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]RoleAccountRule)(nil)).Elem()
+}
+
+func (i RoleAccountRuleArray) ToRoleAccountRuleArrayOutput() RoleAccountRuleArrayOutput {
+	return i.ToRoleAccountRuleArrayOutputWithContext(context.Background())
+}
+
+func (i RoleAccountRuleArray) ToRoleAccountRuleArrayOutputWithContext(ctx context.Context) RoleAccountRuleArrayOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(RoleAccountRuleArrayOutput)
+}
+
+type RoleAccountRuleOutput struct{ *pulumi.OutputState }
+
+func (RoleAccountRuleOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*RoleAccountRule)(nil)).Elem()
+}
+
+func (o RoleAccountRuleOutput) ToRoleAccountRuleOutput() RoleAccountRuleOutput {
+	return o
+}
+
+func (o RoleAccountRuleOutput) ToRoleAccountRuleOutputWithContext(ctx context.Context) RoleAccountRuleOutput {
+	return o
+}
+
+// Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+func (o RoleAccountRuleOutput) All() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v RoleAccountRule) *bool { return v.All }).(pulumi.BoolPtrOutput)
+}
+
+// Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
+func (o RoleAccountRuleOutput) Id() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v RoleAccountRule) *string { return v.Id }).(pulumi.StringPtrOutput)
+}
+
+// Cloud account scopes to grant on the selected accounts.
+func (o RoleAccountRuleOutput) Scopes() RbacAccountScopeArrayOutput {
+	return o.ApplyT(func(v RoleAccountRule) []RbacAccountScope { return v.Scopes }).(RbacAccountScopeArrayOutput)
+}
+
+// Apply to entities whose tags match every condition.
+func (o RoleAccountRuleOutput) Tags() TagConditionArrayOutput {
+	return o.ApplyT(func(v RoleAccountRule) []TagCondition { return v.Tags }).(TagConditionArrayOutput)
+}
+
+type RoleAccountRuleArrayOutput struct{ *pulumi.OutputState }
+
+func (RoleAccountRuleArrayOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]RoleAccountRule)(nil)).Elem()
+}
+
+func (o RoleAccountRuleArrayOutput) ToRoleAccountRuleArrayOutput() RoleAccountRuleArrayOutput {
+	return o
+}
+
+func (o RoleAccountRuleArrayOutput) ToRoleAccountRuleArrayOutputWithContext(ctx context.Context) RoleAccountRuleArrayOutput {
+	return o
+}
+
+func (o RoleAccountRuleArrayOutput) Index(i pulumi.IntInput) RoleAccountRuleOutput {
+	return pulumi.All(o, i).ApplyT(func(vs []interface{}) RoleAccountRule {
+		return vs[0].([]RoleAccountRule)[vs[1].(int)]
+	}).(RoleAccountRuleOutput)
+}
+
+type RoleEnvironmentRule struct {
+	// Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+	All *bool `pulumi:"all"`
+	// Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
+	Id *string `pulumi:"id"`
+	// Environment scopes to grant on the selected environments.
+	Scopes []RbacEnvironmentScope `pulumi:"scopes"`
+	// Apply to entities whose tags match every condition.
+	Tags []TagCondition `pulumi:"tags"`
+}
+
+// RoleEnvironmentRuleInput is an input type that accepts RoleEnvironmentRuleArgs and RoleEnvironmentRuleOutput values.
+// You can construct a concrete instance of `RoleEnvironmentRuleInput` via:
+//
+//	RoleEnvironmentRuleArgs{...}
+type RoleEnvironmentRuleInput interface {
+	pulumi.Input
+
+	ToRoleEnvironmentRuleOutput() RoleEnvironmentRuleOutput
+	ToRoleEnvironmentRuleOutputWithContext(context.Context) RoleEnvironmentRuleOutput
+}
+
+type RoleEnvironmentRuleArgs struct {
+	// Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+	All pulumi.BoolPtrInput `pulumi:"all"`
+	// Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
+	Id pulumi.StringPtrInput `pulumi:"id"`
+	// Environment scopes to grant on the selected environments.
+	Scopes RbacEnvironmentScopeArrayInput `pulumi:"scopes"`
+	// Apply to entities whose tags match every condition.
+	Tags TagConditionArrayInput `pulumi:"tags"`
+}
+
+func (RoleEnvironmentRuleArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*RoleEnvironmentRule)(nil)).Elem()
+}
+
+func (i RoleEnvironmentRuleArgs) ToRoleEnvironmentRuleOutput() RoleEnvironmentRuleOutput {
+	return i.ToRoleEnvironmentRuleOutputWithContext(context.Background())
+}
+
+func (i RoleEnvironmentRuleArgs) ToRoleEnvironmentRuleOutputWithContext(ctx context.Context) RoleEnvironmentRuleOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(RoleEnvironmentRuleOutput)
+}
+
+// RoleEnvironmentRuleArrayInput is an input type that accepts RoleEnvironmentRuleArray and RoleEnvironmentRuleArrayOutput values.
+// You can construct a concrete instance of `RoleEnvironmentRuleArrayInput` via:
+//
+//	RoleEnvironmentRuleArray{ RoleEnvironmentRuleArgs{...} }
+type RoleEnvironmentRuleArrayInput interface {
+	pulumi.Input
+
+	ToRoleEnvironmentRuleArrayOutput() RoleEnvironmentRuleArrayOutput
+	ToRoleEnvironmentRuleArrayOutputWithContext(context.Context) RoleEnvironmentRuleArrayOutput
+}
+
+type RoleEnvironmentRuleArray []RoleEnvironmentRuleInput
+
+func (RoleEnvironmentRuleArray) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]RoleEnvironmentRule)(nil)).Elem()
+}
+
+func (i RoleEnvironmentRuleArray) ToRoleEnvironmentRuleArrayOutput() RoleEnvironmentRuleArrayOutput {
+	return i.ToRoleEnvironmentRuleArrayOutputWithContext(context.Background())
+}
+
+func (i RoleEnvironmentRuleArray) ToRoleEnvironmentRuleArrayOutputWithContext(ctx context.Context) RoleEnvironmentRuleArrayOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(RoleEnvironmentRuleArrayOutput)
+}
+
+type RoleEnvironmentRuleOutput struct{ *pulumi.OutputState }
+
+func (RoleEnvironmentRuleOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*RoleEnvironmentRule)(nil)).Elem()
+}
+
+func (o RoleEnvironmentRuleOutput) ToRoleEnvironmentRuleOutput() RoleEnvironmentRuleOutput {
+	return o
+}
+
+func (o RoleEnvironmentRuleOutput) ToRoleEnvironmentRuleOutputWithContext(ctx context.Context) RoleEnvironmentRuleOutput {
+	return o
+}
+
+// Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+func (o RoleEnvironmentRuleOutput) All() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v RoleEnvironmentRule) *bool { return v.All }).(pulumi.BoolPtrOutput)
+}
+
+// Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
+func (o RoleEnvironmentRuleOutput) Id() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v RoleEnvironmentRule) *string { return v.Id }).(pulumi.StringPtrOutput)
+}
+
+// Environment scopes to grant on the selected environments.
+func (o RoleEnvironmentRuleOutput) Scopes() RbacEnvironmentScopeArrayOutput {
+	return o.ApplyT(func(v RoleEnvironmentRule) []RbacEnvironmentScope { return v.Scopes }).(RbacEnvironmentScopeArrayOutput)
+}
+
+// Apply to entities whose tags match every condition.
+func (o RoleEnvironmentRuleOutput) Tags() TagConditionArrayOutput {
+	return o.ApplyT(func(v RoleEnvironmentRule) []TagCondition { return v.Tags }).(TagConditionArrayOutput)
+}
+
+type RoleEnvironmentRuleArrayOutput struct{ *pulumi.OutputState }
+
+func (RoleEnvironmentRuleArrayOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]RoleEnvironmentRule)(nil)).Elem()
+}
+
+func (o RoleEnvironmentRuleArrayOutput) ToRoleEnvironmentRuleArrayOutput() RoleEnvironmentRuleArrayOutput {
+	return o
+}
+
+func (o RoleEnvironmentRuleArrayOutput) ToRoleEnvironmentRuleArrayOutputWithContext(ctx context.Context) RoleEnvironmentRuleArrayOutput {
+	return o
+}
+
+func (o RoleEnvironmentRuleArrayOutput) Index(i pulumi.IntInput) RoleEnvironmentRuleOutput {
+	return pulumi.All(o, i).ApplyT(func(vs []interface{}) RoleEnvironmentRule {
+		return vs[0].([]RoleEnvironmentRule)[vs[1].(int)]
+	}).(RoleEnvironmentRuleOutput)
+}
+
 type RoleScopeInfo struct {
 	// Human-readable description of what the scope grants.
 	Description string `pulumi:"description"`
@@ -4863,6 +5144,245 @@ func (o RoleScopeInfoArrayOutput) Index(i pulumi.IntInput) RoleScopeInfoOutput {
 	return pulumi.All(o, i).ApplyT(func(vs []interface{}) RoleScopeInfo {
 		return vs[0].([]RoleScopeInfo)[vs[1].(int)]
 	}).(RoleScopeInfoOutput)
+}
+
+type RoleStackRule struct {
+	// Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+	All *bool `pulumi:"all"`
+	// Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
+	Id *string `pulumi:"id"`
+	// Stack scopes to grant on the selected stacks.
+	Scopes []RbacStackScope `pulumi:"scopes"`
+	// Apply to entities whose tags match every condition.
+	Tags []TagCondition `pulumi:"tags"`
+}
+
+// RoleStackRuleInput is an input type that accepts RoleStackRuleArgs and RoleStackRuleOutput values.
+// You can construct a concrete instance of `RoleStackRuleInput` via:
+//
+//	RoleStackRuleArgs{...}
+type RoleStackRuleInput interface {
+	pulumi.Input
+
+	ToRoleStackRuleOutput() RoleStackRuleOutput
+	ToRoleStackRuleOutputWithContext(context.Context) RoleStackRuleOutput
+}
+
+type RoleStackRuleArgs struct {
+	// Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+	All pulumi.BoolPtrInput `pulumi:"all"`
+	// Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
+	Id pulumi.StringPtrInput `pulumi:"id"`
+	// Stack scopes to grant on the selected stacks.
+	Scopes RbacStackScopeArrayInput `pulumi:"scopes"`
+	// Apply to entities whose tags match every condition.
+	Tags TagConditionArrayInput `pulumi:"tags"`
+}
+
+func (RoleStackRuleArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*RoleStackRule)(nil)).Elem()
+}
+
+func (i RoleStackRuleArgs) ToRoleStackRuleOutput() RoleStackRuleOutput {
+	return i.ToRoleStackRuleOutputWithContext(context.Background())
+}
+
+func (i RoleStackRuleArgs) ToRoleStackRuleOutputWithContext(ctx context.Context) RoleStackRuleOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(RoleStackRuleOutput)
+}
+
+// RoleStackRuleArrayInput is an input type that accepts RoleStackRuleArray and RoleStackRuleArrayOutput values.
+// You can construct a concrete instance of `RoleStackRuleArrayInput` via:
+//
+//	RoleStackRuleArray{ RoleStackRuleArgs{...} }
+type RoleStackRuleArrayInput interface {
+	pulumi.Input
+
+	ToRoleStackRuleArrayOutput() RoleStackRuleArrayOutput
+	ToRoleStackRuleArrayOutputWithContext(context.Context) RoleStackRuleArrayOutput
+}
+
+type RoleStackRuleArray []RoleStackRuleInput
+
+func (RoleStackRuleArray) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]RoleStackRule)(nil)).Elem()
+}
+
+func (i RoleStackRuleArray) ToRoleStackRuleArrayOutput() RoleStackRuleArrayOutput {
+	return i.ToRoleStackRuleArrayOutputWithContext(context.Background())
+}
+
+func (i RoleStackRuleArray) ToRoleStackRuleArrayOutputWithContext(ctx context.Context) RoleStackRuleArrayOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(RoleStackRuleArrayOutput)
+}
+
+type RoleStackRuleOutput struct{ *pulumi.OutputState }
+
+func (RoleStackRuleOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*RoleStackRule)(nil)).Elem()
+}
+
+func (o RoleStackRuleOutput) ToRoleStackRuleOutput() RoleStackRuleOutput {
+	return o
+}
+
+func (o RoleStackRuleOutput) ToRoleStackRuleOutputWithContext(ctx context.Context) RoleStackRuleOutput {
+	return o
+}
+
+// Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+func (o RoleStackRuleOutput) All() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v RoleStackRule) *bool { return v.All }).(pulumi.BoolPtrOutput)
+}
+
+// Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
+func (o RoleStackRuleOutput) Id() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v RoleStackRule) *string { return v.Id }).(pulumi.StringPtrOutput)
+}
+
+// Stack scopes to grant on the selected stacks.
+func (o RoleStackRuleOutput) Scopes() RbacStackScopeArrayOutput {
+	return o.ApplyT(func(v RoleStackRule) []RbacStackScope { return v.Scopes }).(RbacStackScopeArrayOutput)
+}
+
+// Apply to entities whose tags match every condition.
+func (o RoleStackRuleOutput) Tags() TagConditionArrayOutput {
+	return o.ApplyT(func(v RoleStackRule) []TagCondition { return v.Tags }).(TagConditionArrayOutput)
+}
+
+type RoleStackRuleArrayOutput struct{ *pulumi.OutputState }
+
+func (RoleStackRuleArrayOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]RoleStackRule)(nil)).Elem()
+}
+
+func (o RoleStackRuleArrayOutput) ToRoleStackRuleArrayOutput() RoleStackRuleArrayOutput {
+	return o
+}
+
+func (o RoleStackRuleArrayOutput) ToRoleStackRuleArrayOutputWithContext(ctx context.Context) RoleStackRuleArrayOutput {
+	return o
+}
+
+func (o RoleStackRuleArrayOutput) Index(i pulumi.IntInput) RoleStackRuleOutput {
+	return pulumi.All(o, i).ApplyT(func(vs []interface{}) RoleStackRule {
+		return vs[0].([]RoleStackRule)[vs[1].(int)]
+	}).(RoleStackRuleOutput)
+}
+
+type TagCondition struct {
+	// The tag key.
+	Key string `pulumi:"key"`
+	// How the tag is compared. Defaults to `equals`.
+	Operator *TagOperator `pulumi:"operator"`
+	// The tag value. Required with `equals` and `notEquals`, and not allowed with `exists` and `notExists`.
+	Value *string `pulumi:"value"`
+}
+
+// TagConditionInput is an input type that accepts TagConditionArgs and TagConditionOutput values.
+// You can construct a concrete instance of `TagConditionInput` via:
+//
+//	TagConditionArgs{...}
+type TagConditionInput interface {
+	pulumi.Input
+
+	ToTagConditionOutput() TagConditionOutput
+	ToTagConditionOutputWithContext(context.Context) TagConditionOutput
+}
+
+type TagConditionArgs struct {
+	// The tag key.
+	Key pulumi.StringInput `pulumi:"key"`
+	// How the tag is compared. Defaults to `equals`.
+	Operator TagOperatorPtrInput `pulumi:"operator"`
+	// The tag value. Required with `equals` and `notEquals`, and not allowed with `exists` and `notExists`.
+	Value pulumi.StringPtrInput `pulumi:"value"`
+}
+
+func (TagConditionArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*TagCondition)(nil)).Elem()
+}
+
+func (i TagConditionArgs) ToTagConditionOutput() TagConditionOutput {
+	return i.ToTagConditionOutputWithContext(context.Background())
+}
+
+func (i TagConditionArgs) ToTagConditionOutputWithContext(ctx context.Context) TagConditionOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(TagConditionOutput)
+}
+
+// TagConditionArrayInput is an input type that accepts TagConditionArray and TagConditionArrayOutput values.
+// You can construct a concrete instance of `TagConditionArrayInput` via:
+//
+//	TagConditionArray{ TagConditionArgs{...} }
+type TagConditionArrayInput interface {
+	pulumi.Input
+
+	ToTagConditionArrayOutput() TagConditionArrayOutput
+	ToTagConditionArrayOutputWithContext(context.Context) TagConditionArrayOutput
+}
+
+type TagConditionArray []TagConditionInput
+
+func (TagConditionArray) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]TagCondition)(nil)).Elem()
+}
+
+func (i TagConditionArray) ToTagConditionArrayOutput() TagConditionArrayOutput {
+	return i.ToTagConditionArrayOutputWithContext(context.Background())
+}
+
+func (i TagConditionArray) ToTagConditionArrayOutputWithContext(ctx context.Context) TagConditionArrayOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(TagConditionArrayOutput)
+}
+
+type TagConditionOutput struct{ *pulumi.OutputState }
+
+func (TagConditionOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*TagCondition)(nil)).Elem()
+}
+
+func (o TagConditionOutput) ToTagConditionOutput() TagConditionOutput {
+	return o
+}
+
+func (o TagConditionOutput) ToTagConditionOutputWithContext(ctx context.Context) TagConditionOutput {
+	return o
+}
+
+// The tag key.
+func (o TagConditionOutput) Key() pulumi.StringOutput {
+	return o.ApplyT(func(v TagCondition) string { return v.Key }).(pulumi.StringOutput)
+}
+
+// How the tag is compared. Defaults to `equals`.
+func (o TagConditionOutput) Operator() TagOperatorPtrOutput {
+	return o.ApplyT(func(v TagCondition) *TagOperator { return v.Operator }).(TagOperatorPtrOutput)
+}
+
+// The tag value. Required with `equals` and `notEquals`, and not allowed with `exists` and `notExists`.
+func (o TagConditionOutput) Value() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v TagCondition) *string { return v.Value }).(pulumi.StringPtrOutput)
+}
+
+type TagConditionArrayOutput struct{ *pulumi.OutputState }
+
+func (TagConditionArrayOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]TagCondition)(nil)).Elem()
+}
+
+func (o TagConditionArrayOutput) ToTagConditionArrayOutput() TagConditionArrayOutput {
+	return o
+}
+
+func (o TagConditionArrayOutput) ToTagConditionArrayOutputWithContext(ctx context.Context) TagConditionArrayOutput {
+	return o
+}
+
+func (o TagConditionArrayOutput) Index(i pulumi.IntInput) TagConditionOutput {
+	return pulumi.All(o, i).ApplyT(func(vs []interface{}) TagCondition {
+		return vs[0].([]TagCondition)[vs[1].(int)]
+	}).(TagConditionOutput)
 }
 
 type TemplateSourceDestination struct {
@@ -5053,6 +5573,14 @@ func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*PolicyPackComplianceFrameworkInputPtrInput)(nil)).Elem(), PolicyPackComplianceFrameworkInputArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*PolicyPackPolicyInputInput)(nil)).Elem(), PolicyPackPolicyInputArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*PolicyPackPolicyInputArrayInput)(nil)).Elem(), PolicyPackPolicyInputArray{})
+	pulumi.RegisterInputType(reflect.TypeOf((*RoleAccountRuleInput)(nil)).Elem(), RoleAccountRuleArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*RoleAccountRuleArrayInput)(nil)).Elem(), RoleAccountRuleArray{})
+	pulumi.RegisterInputType(reflect.TypeOf((*RoleEnvironmentRuleInput)(nil)).Elem(), RoleEnvironmentRuleArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*RoleEnvironmentRuleArrayInput)(nil)).Elem(), RoleEnvironmentRuleArray{})
+	pulumi.RegisterInputType(reflect.TypeOf((*RoleStackRuleInput)(nil)).Elem(), RoleStackRuleArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*RoleStackRuleArrayInput)(nil)).Elem(), RoleStackRuleArray{})
+	pulumi.RegisterInputType(reflect.TypeOf((*TagConditionInput)(nil)).Elem(), TagConditionArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*TagConditionArrayInput)(nil)).Elem(), TagConditionArray{})
 	pulumi.RegisterInputType(reflect.TypeOf((*TemplateSourceDestinationInput)(nil)).Elem(), TemplateSourceDestinationArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*TemplateSourceDestinationPtrInput)(nil)).Elem(), TemplateSourceDestinationArgs{})
 	pulumi.RegisterOutputType(AWSOIDCConfigurationOutput{})
@@ -5115,8 +5643,16 @@ func init() {
 	pulumi.RegisterOutputType(PolicyPackPolicyInputArrayOutput{})
 	pulumi.RegisterOutputType(PolicyPackSummaryOutput{})
 	pulumi.RegisterOutputType(PolicyPackSummaryArrayOutput{})
+	pulumi.RegisterOutputType(RoleAccountRuleOutput{})
+	pulumi.RegisterOutputType(RoleAccountRuleArrayOutput{})
+	pulumi.RegisterOutputType(RoleEnvironmentRuleOutput{})
+	pulumi.RegisterOutputType(RoleEnvironmentRuleArrayOutput{})
 	pulumi.RegisterOutputType(RoleScopeInfoOutput{})
 	pulumi.RegisterOutputType(RoleScopeInfoArrayOutput{})
+	pulumi.RegisterOutputType(RoleStackRuleOutput{})
+	pulumi.RegisterOutputType(RoleStackRuleArrayOutput{})
+	pulumi.RegisterOutputType(TagConditionOutput{})
+	pulumi.RegisterOutputType(TagConditionArrayOutput{})
 	pulumi.RegisterOutputType(TemplateSourceDestinationOutput{})
 	pulumi.RegisterOutputType(TemplateSourceDestinationPtrOutput{})
 }

@@ -322,6 +322,12 @@ func TestYamlOrgAccessTokenExample(t *testing.T) {
 	integration.ProgramTest(t, &integration.ProgramTestOptions{
 		Quick: true,
 		Dir:   path.Join(cwd, ".", "yaml-org-token"),
+		Config: map[string]string{
+			"organizationName": getOrgName(),
+			// Use a full date-time, not a bare date, so the test covers the
+			// time component surviving the round trip through the API.
+			"expires": time.Now().UTC().AddDate(0, 0, 30).Truncate(time.Hour).Format(time.RFC3339),
+		},
 	})
 }
 
@@ -466,11 +472,8 @@ func TestYamlTemplateSourcesExample(t *testing.T) {
 func TestYamlOidcIssuerExample(t *testing.T) {
 	cwd := getCwd(t)
 	integration.ProgramTest(t, &integration.ProgramTestOptions{
-		Dir: path.Join(cwd, ".", "yaml-oidc-issuer"),
-		Config: map[string]string{
-			"pulumiThumbprint": tlsThumbprint("api.pulumi.com"),
-			"githubThumbprint": tlsThumbprint("token.actions.githubusercontent.com"),
-		},
+		Dir:    path.Join(cwd, ".", "yaml-oidc-issuer"),
+		Config: oidcIssuerTestConfig(),
 	})
 }
 
@@ -535,7 +538,14 @@ func TestYamlPolicyPackExample(t *testing.T) {
 	)
 	test.SetConfig(t, "digits", generateRandomFiveDigits())
 	test.SetConfig(t, "organizationName", getOrgName())
-	runPulumiTest(t, test)
+	up := runPulumiTest(t, test)
+
+	// getPolicyPack reads the pack back from the real service, both by tag and
+	// as latest. Unit tests use a fake server, which once encoded routes the
+	// service doesn't have, so only a live read proves the lookup works (#1012).
+	assert.Equal(t, "1.0.0", up.Outputs["packByTagVersionTag"].Value)
+	assert.Len(t, up.Outputs["packByTagPolicies"].Value, 2)
+	assert.Equal(t, "1.0.0", up.Outputs["packLatestVersionTag"].Value)
 }
 
 func TestYamlPolicyGroupsAccountsExample(t *testing.T) {
@@ -702,6 +712,28 @@ func TestYamlRbacExample(t *testing.T) {
 	if first, ok := up.Outputs["firstRoleName"]; ok {
 		assert.NotEmpty(t, first.Value, "expected getOrganizationRoles to return at least one role")
 	}
+	preview := test.Preview(t)
+	assertpreview.HasNoChanges(t, preview)
+	refresh := test.Refresh(t)
+	assertrefresh.HasNoChanges(t, refresh)
+	test.Destroy(t)
+}
+
+// TestYamlOrganizationRoleExample runs OrganizationRole end to end with the
+// RBAC helper functions.
+// Requires the Custom Roles feature on the test organization.
+func TestYamlOrganizationRoleExample(t *testing.T) {
+	test := pulumitest.NewPulumiTest(t,
+		filepath.Join(getCwd(t), "yaml-organization-role"),
+		inMemoryProvider(),
+		opttest.UseAmbientBackend(),
+		opttest.StackName(randomStackName()),
+	)
+	test.SetConfig(t, "digits", generateRandomFiveDigits())
+	test.SetConfig(t, "organizationName", getOrgName())
+
+	up := test.Up(t)
+	assert.NotEmpty(t, up.Outputs["platformRoleId"].Value)
 	preview := test.Preview(t)
 	assertpreview.HasNoChanges(t, preview)
 	refresh := test.Refresh(t)

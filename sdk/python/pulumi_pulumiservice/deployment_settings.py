@@ -208,6 +208,8 @@ class DeploymentSettings(pulumi.CustomResource):
         """
         Deployment settings configure Pulumi Deployments for a stack.
 
+        Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/) to choose between ESC and Deployments OIDC (`operationContext.oidc`).
+
         ## Example Usage
         ### Deploy on every commit
 
@@ -259,13 +261,15 @@ class DeploymentSettings(pulumi.CustomResource):
             })
         ```
 
-        ### Import
+        ## Import
 
-        Deployment settings can be imported using the `id`, which for deployment settings is `{org}/{project}/{stack}` e.g.,
+        This resource can be imported using its `id`, which has the format `{organization}/{project}/{stack}`, e.g.,
 
         ```sh
-         $ pulumi import pulumiservice:index:DeploymentSettings my_settings my-org/my-project/my-stack
+         $ pulumi import pulumiservice:index:DeploymentSettings my-deployment-settings my-org/my-project/my-stack
         ```
+
+        Secret values can't be read back from Pulumi Cloud, so import sets each one to the placeholder `<REPLACE WITH ACTUAL SECRET VALUE>`. Replace them with the real values in your program.
 
 
         :param str resource_name: The name of the resource.
@@ -290,6 +294,8 @@ class DeploymentSettings(pulumi.CustomResource):
         """
         Deployment settings configure Pulumi Deployments for a stack.
 
+        Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/) to choose between ESC and Deployments OIDC (`operationContext.oidc`).
+
         ## Example Usage
         ### Deploy on every commit
 
@@ -341,13 +347,15 @@ class DeploymentSettings(pulumi.CustomResource):
             })
         ```
 
-        ### Import
+        ## Import
 
-        Deployment settings can be imported using the `id`, which for deployment settings is `{org}/{project}/{stack}` e.g.,
+        This resource can be imported using its `id`, which has the format `{organization}/{project}/{stack}`, e.g.,
 
         ```sh
-         $ pulumi import pulumiservice:index:DeploymentSettings my_settings my-org/my-project/my-stack
+         $ pulumi import pulumiservice:index:DeploymentSettings my-deployment-settings my-org/my-project/my-stack
         ```
+
+        Secret values can't be read back from Pulumi Cloud, so import sets each one to the placeholder `<REPLACE WITH ACTUAL SECRET VALUE>`. Replace them with the real values in your program.
 
 
         :param str resource_name: The name of the resource.

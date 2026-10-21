@@ -8,6 +8,10 @@ return await Deployment.RunAsync(() =>
     var organizationName = config.Get("organizationName") ?? "service-provider-test-org";
     var issuerSuffix = config.Get("issuerSuffix") ?? "dev";
     var maxExpiration = config.GetInt32("maxExpiration") ?? 3600;
+    // Tests override the issuer URLs so that concurrent runs don't conflict;
+    // see oidcIssuerTestConfig in examples/examples_utils_test.go.
+    var pulumiIssuerUrl = config.Get("pulumiIssuerUrl") ?? "https://api.pulumi.com/oidc";
+    var githubIssuerUrl = config.Get("githubIssuerUrl") ?? "https://token.actions.githubusercontent.com";
     // Thumbprints must match the certificate the issuer currently serves, so they
     // have no static default. Compute one with:
     //   openssl s_client -connect <issuer-host>:443 </dev/null | openssl x509 -fingerprint -sha256 -noout
@@ -18,7 +22,7 @@ return await Deployment.RunAsync(() =>
     {
         OrgName = organizationName,
         Name = $"pulumi_issuer_{issuerSuffix}",
-        Url = "https://api.pulumi.com/oidc",
+        Url = pulumiIssuerUrl,
         Thumbprints = new[] { pulumiThumbprint },
     });
 
@@ -26,7 +30,7 @@ return await Deployment.RunAsync(() =>
     {
         OrgName = organizationName,
         Name = $"github_issuer_{issuerSuffix}",
-        Url = "https://token.actions.githubusercontent.com",
+        Url = githubIssuerUrl,
         Thumbprints = new[] { githubThumbprint },
         MaxExpiration = maxExpiration,
     });

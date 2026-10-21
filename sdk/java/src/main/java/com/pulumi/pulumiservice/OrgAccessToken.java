@@ -20,18 +20,81 @@ import javax.annotation.Nullable;
  * 
  * The provider must authenticate as a user, for example with a personal access token, to create or delete this resource. Pulumi Cloud rejects organization and team access tokens here, even Admin ones, with `403 Machine tokens are not allowed to perform this operation`, so that one machine token can&#39;t mint another. For automation, use the personal access token of a dedicated service-account user, or use `TeamAccessToken`, which has no such restriction.
  * 
+ * ## Example Usage
+ * ### Token with an expiry and a custom role
+ * 
+ * <pre>
+ * {@code
+ * package generated_program;
+ * 
+ * import com.pulumi.Context;
+ * import com.pulumi.Pulumi;
+ * import com.pulumi.core.Output;
+ * import com.pulumi.pulumiservice.PulumiserviceFunctions;
+ * import com.pulumi.pulumiservice.inputs.GetOrganizationRoleArgs;
+ * import com.pulumi.pulumiservice.OrgAccessToken;
+ * import com.pulumi.pulumiservice.OrgAccessTokenArgs;
+ * import java.util.ArrayList;
+ * import java.util.Arrays;
+ * import java.util.Map;
+ * import java.io.File;
+ * import java.nio.file.Files;
+ * import java.nio.file.Paths;
+ * 
+ * public class App {
+ *     public static void main(String[] args) {
+ *         Pulumi.run(App::stack);
+ *     }
+ * 
+ *     public static void stack(Context ctx) {
+ *         final var ciDeployerRole = PulumiserviceFunctions.getOrganizationRole(GetOrganizationRoleArgs.builder()
+ *             .organizationName("my-org")
+ *             .name("CI Deployer")
+ *             .build());
+ * 
+ *         var ciToken = new OrgAccessToken("ciToken", OrgAccessTokenArgs.builder()
+ *             .organizationName("my-org")
+ *             .name("ci-token")
+ *             .description("Token for CI pipelines")
+ *             .expires("2027-06-30T17:00:00Z")
+ *             .roleId(ciDeployerRole.applyValue(_ciDeployerRole -> _ciDeployerRole.roleId()))
+ *             .build());
+ * 
+ *         ctx.export("ciTokenValue", ciToken.value());
+ *     }
+ * }
+ * }
+ * </pre>
+ * 
+ * ## Import
+ * 
+ * This resource can be imported using its `id`, which has the format `{organization}/{name}/{tokenId}`, e.g.,
+ * 
+ * ```sh
+ *  $ pulumi import pulumiservice:index:OrgAccessToken my-org-access-token my-org/my-token/a81d4c3e-52f0-4b7a-b9e2-6d0f1c8e2a47
+ * ```
+ * 
+ * The Pulumi Cloud console doesn&#39;t show the token ID. List it with the [Pulumi Cloud REST API](https://www.pulumi.com/docs/reference/cloud-rest-api/):
+ * 
+ * ```sh
+ * curl -s -H &#34;Authorization: token $PULUMI_ACCESS_TOKEN&#34; \
+ *   https://api.pulumi.com/api/orgs/my-org/tokens | jq &#39;.tokens[] | {name, id}&#39;
+ * ```
+ * 
+ * The token&#39;s `value` can&#39;t be read back from Pulumi Cloud, so it&#39;s empty after import.
+ * 
  */
 @ResourceType(type="pulumiservice:index:OrgAccessToken")
 public class OrgAccessToken extends com.pulumi.resources.CustomResource {
     /**
-     * Whether the token has the Admin role. Defaults to `false`.
+     * Whether the token has the Admin role. Defaults to `false`. Mutually exclusive with `roleId`: set `admin: true` or `roleId`, not both.
      * 
      */
     @Export(name="admin", refs={Boolean.class}, tree="[0]")
     private Output<Boolean> admin;
 
     /**
-     * @return Whether the token has the Admin role. Defaults to `false`.
+     * @return Whether the token has the Admin role. Defaults to `false`. Mutually exclusive with `roleId`: set `admin: true` or `roleId`, not both.
      * 
      */
     public Output<Boolean> admin() {
@@ -50,6 +113,20 @@ public class OrgAccessToken extends com.pulumi.resources.CustomResource {
      */
     public Output<Optional<String>> description() {
         return Codegen.optional(this.description);
+    }
+    /**
+     * When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`. Omit it for a token that never expires. Pulumi Cloud rejects an expiry that is in the past, more than two years away, or beyond the organization&#39;s maximum token lifetime.
+     * 
+     */
+    @Export(name="expires", refs={String.class}, tree="[0]")
+    private Output</* @Nullable */ String> expires;
+
+    /**
+     * @return When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`. Omit it for a token that never expires. Pulumi Cloud rejects an expiry that is in the past, more than two years away, or beyond the organization&#39;s maximum token lifetime.
+     * 
+     */
+    public Output<Optional<String>> expires() {
+        return Codegen.optional(this.expires);
     }
     /**
      * The name for the token.
@@ -78,6 +155,20 @@ public class OrgAccessToken extends com.pulumi.resources.CustomResource {
      */
     public Output<String> organizationName() {
         return this.organizationName;
+    }
+    /**
+     * The ID of the role to assign to the token. Use `getOrganizationRole` to look up a role&#39;s ID by its name. Mutually exclusive with `admin: true`: set one or the other, not both. Pulumi Cloud accepts both, but some of its permission checks still treat such a token as an Admin whatever its role, so the provider rejects the combination. When neither is set, the token gets the Member role.
+     * 
+     */
+    @Export(name="roleId", refs={String.class}, tree="[0]")
+    private Output</* @Nullable */ String> roleId;
+
+    /**
+     * @return The ID of the role to assign to the token. Use `getOrganizationRole` to look up a role&#39;s ID by its name. Mutually exclusive with `admin: true`: set one or the other, not both. Pulumi Cloud accepts both, but some of its permission checks still treat such a token as an Admin whatever its role, so the provider rejects the combination. When neither is set, the token gets the Member role.
+     * 
+     */
+    public Output<Optional<String>> roleId() {
+        return Codegen.optional(this.roleId);
     }
     /**
      * The token&#39;s value.
@@ -139,8 +230,10 @@ public class OrgAccessToken extends com.pulumi.resources.CustomResource {
             .replaceOnChanges(List.of(
                 "admin",
                 "description",
+                "expires",
                 "name",
-                "organizationName"
+                "organizationName",
+                "roleId"
             ))
             .build();
         return com.pulumi.resources.CustomResourceOptions.merge(defaultOptions, options, id);

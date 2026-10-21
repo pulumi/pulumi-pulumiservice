@@ -134,6 +134,22 @@ class DeploymentSchedule(pulumi.CustomResource):
         """
         A scheduled recurring or single time run of a pulumi command.
 
+        ## Import
+
+        This resource can be imported using its `id`, which has the format `{organization}/{project}/{stack}/{scheduleId}`, e.g.,
+
+        ```sh
+         $ pulumi import pulumiservice:index:DeploymentSchedule my-deployment-schedule my-org/my-project/my-stack/7d3c5e1a-0f8b-4b26-a9d4-3e6f2b8c1a59
+        ```
+
+        The Pulumi Cloud console doesn't show the schedule ID. List it with the [Pulumi Cloud REST API](https://www.pulumi.com/docs/reference/cloud-rest-api/):
+
+        ```sh
+        curl -s -H "Authorization: token $PULUMI_ACCESS_TOKEN" \\
+          https://api.pulumi.com/api/stacks/my-org/my-project/my-stack/deployments/schedules | jq '.schedules[]'
+        ```
+
+
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] organization: Organization name.
@@ -151,6 +167,22 @@ class DeploymentSchedule(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         A scheduled recurring or single time run of a pulumi command.
+
+        ## Import
+
+        This resource can be imported using its `id`, which has the format `{organization}/{project}/{stack}/{scheduleId}`, e.g.,
+
+        ```sh
+         $ pulumi import pulumiservice:index:DeploymentSchedule my-deployment-schedule my-org/my-project/my-stack/7d3c5e1a-0f8b-4b26-a9d4-3e6f2b8c1a59
+        ```
+
+        The Pulumi Cloud console doesn't show the schedule ID. List it with the [Pulumi Cloud REST API](https://www.pulumi.com/docs/reference/cloud-rest-api/):
+
+        ```sh
+        curl -s -H "Authorization: token $PULUMI_ACCESS_TOKEN" \\
+          https://api.pulumi.com/api/stacks/my-org/my-project/my-stack/deployments/schedules | jq '.schedules[]'
+        ```
+
 
         :param str resource_name: The name of the resource.
         :param DeploymentScheduleArgs args: The arguments to use to populate this resource's properties.
