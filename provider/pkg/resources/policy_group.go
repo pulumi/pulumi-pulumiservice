@@ -1,4 +1,4 @@
-// Copyright 2016-2025, Pulumi Corporation.
+// Copyright 2016-2026, Pulumi Corporation.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,15 +22,11 @@ import (
 	"strings"
 	"time"
 
-	"google.golang.org/grpc/codes"
-	pbempty "google.golang.org/protobuf/types/known/emptypb"
-	"google.golang.org/protobuf/types/known/structpb"
+	p "github.com/pulumi/pulumi-go-provider"
+	"github.com/pulumi/pulumi-go-provider/infer"
+	"github.com/pulumi/pulumi/sdk/v3/go/property"
 
-	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
-	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
-	"github.com/pulumi/pulumi/sdk/v3/go/common/util/rpcutil/rpcerror"
-	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
-
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 )
@@ -49,796 +45,561 @@ const (
 	gcPreventative     = "preventative"
 )
 
-type PulumiServicePolicyGroupResource struct {
-	Client pulumiapi.PolicyGroupClient
+const gcPolicyPackVersion = "version"
+
+// PolicyGroup manages a Pulumi Cloud policy group: a set of stacks or
+// Insights accounts that a set of policy packs applies to.
+type PolicyGroup struct{}
+
+var (
+	_ infer.CustomCheck[PolicyGroupInput]                    = &PolicyGroup{}
+	_ infer.CustomDiff[PolicyGroupInput, PolicyGroupState]   = &PolicyGroup{}
+	_ infer.CustomCreate[PolicyGroupInput, PolicyGroupState] = &PolicyGroup{}
+	_ infer.CustomUpdate[PolicyGroupInput, PolicyGroupState] = &PolicyGroup{}
+	_ infer.CustomDelete[PolicyGroupState]                   = &PolicyGroup{}
+	_ infer.CustomRead[PolicyGroupInput, PolicyGroupState]   = &PolicyGroup{}
+)
+
+func (*PolicyGroup) Annotate(a infer.Annotator) {
+	a.Describe(&PolicyGroup{},
+		"A Policy Group allows you to apply policy packs to a set of stacks in your organization."+
+			util.ImportDocs("pulumiservice:index:PolicyGroup",
+				"{organization}/{policyGroupName}", "my-org/my-policy-group"))
+	a.SetToken("index", "PolicyGroup")
 }
 
-type PulumiServicePolicyGroupInput struct {
-	Name             string
-	OrganizationName string
-	EntityType       string
-	Mode             string
-	Stacks           []pulumiapi.StackReference
-	Accounts         []string
-	PolicyPacks      []pulumiapi.PolicyPackMetadata
+// PolicyGroupStackReference is a reference to a stack within a policy group.
+type PolicyGroupStackReference struct {
+	Name           string `pulumi:"name"`
+	RoutingProject string `pulumi:"routingProject"`
 }
 
-func (i *PulumiServicePolicyGroupInput) ToPropertyMap() resource.PropertyMap {
-	// Convert the entire struct to a map first, then use helper
-	inputMap := map[string]interface{}{
-		gcName:             i.Name,
-		gcOrganizationName: i.OrganizationName,
-		gcEntityType:       i.EntityType,
-		gcMode:             i.Mode,
-		gcStacks:           convertStacksToInterfaceArray(i.Stacks),
-		gcAccounts:         i.Accounts,
-		gcPolicyPacks:      convertPolicyPacksToInterfaceArray(i.PolicyPacks),
-	}
-
-	return resource.NewPropertyMapFromMap(inputMap)
+func (s *PolicyGroupStackReference) Annotate(a infer.Annotator) {
+	a.Describe(s, "A reference to a stack within a policy group.")
+	a.Describe(&s.Name, "The name of the stack.")
+	a.Describe(&s.RoutingProject, "The routing project name (also known as project name).")
 }
 
-// convertStacksToInterfaceArray converts []pulumiapi.StackReference to []interface{}
-func convertStacksToInterfaceArray(stacks []pulumiapi.StackReference) []interface{} {
-	result := make([]interface{}, len(stacks))
-	for i, stack := range stacks {
-		result[i] = map[string]interface{}{
-			gcName:           stack.Name,
-			"routingProject": stack.RoutingProject,
-		}
-	}
-	return result
+const policyPackConfigDescription = "Optional configuration for the policy pack. The special key `all` sets " +
+	"the default enforcement level for every policy in the pack; per-policy entries override it."
+
+// PolicyGroupPolicyPackReferenceInput is the input shape of a policy pack
+// applied to a policy group. It has no `version`: that's derived by the
+// server from `versionTag` and only appears in outputs.
+type PolicyGroupPolicyPackReferenceInput struct {
+	Name        string         `pulumi:"name"`
+	DisplayName string         `pulumi:"displayName,optional"`
+	VersionTag  string         `pulumi:"versionTag,optional"`
+	Config      map[string]any `pulumi:"config,optional"`
 }
 
-// convertPolicyPacksToInterfaceArray converts []pulumiapi.PolicyPackMetadata to []interface{}
-func convertPolicyPacksToInterfaceArray(policyPacks []pulumiapi.PolicyPackMetadata) []interface{} {
-	result := make([]interface{}, len(policyPacks))
-	for i, pp := range policyPacks {
-		ppMap := map[string]interface{}{
-			gcName:        pp.Name,
-			gcDisplayName: pp.DisplayName,
-			"version":     float64(pp.Version),
-			gcVersionTag:  pp.VersionTag,
-		}
-		if pp.Config != nil {
-			ppMap["config"] = pp.Config
-		}
-		result[i] = ppMap
-	}
-	return result
+func (r *PolicyGroupPolicyPackReferenceInput) Annotate(a infer.Annotator) {
+	a.Describe(r, "A reference to a policy pack within a policy group (input).")
+	a.Describe(&r.Name, "The name of the policy pack.")
+	a.Describe(&r.DisplayName, "The display name of the policy pack.")
+	a.Describe(&r.VersionTag, "The version tag of the policy pack.")
+	a.Describe(&r.Config, policyPackConfigDescription)
 }
 
-// convertInterfaceArrayToStacks converts []interface{} to []pulumiapi.StackReference using helpers
-func convertInterfaceArrayToStacks(arr []interface{}) []pulumiapi.StackReference {
-	result := make([]pulumiapi.StackReference, 0, len(arr))
-	for _, item := range arr {
-		if stackMap, ok := item.(map[string]interface{}); ok {
-			stack := pulumiapi.StackReference{}
-			if name, ok := stackMap[gcName].(string); ok {
-				stack.Name = name
-			}
-			if routingProject, ok := stackMap["routingProject"].(string); ok {
-				stack.RoutingProject = routingProject
-			}
-			result = append(result, stack)
-		}
-	}
-	return result
+// PolicyGroupPolicyPackReference is the output shape of a policy pack applied
+// to a policy group.
+//
+// Version is a float64 so the schema keeps the `number` type that the
+// pre-infer resource published. Changing it to `integer` would change the
+// generated SDK types.
+type PolicyGroupPolicyPackReference struct {
+	Name        string         `pulumi:"name"`
+	DisplayName string         `pulumi:"displayName,optional"`
+	Version     float64        `pulumi:"version,optional"`
+	VersionTag  string         `pulumi:"versionTag,optional"`
+	Config      map[string]any `pulumi:"config,optional"`
 }
 
-// convertInterfaceArrayToPolicyPacks converts []interface{} to []pulumiapi.PolicyPackMetadata using helpers
-func convertInterfaceArrayToPolicyPacks(arr []interface{}) []pulumiapi.PolicyPackMetadata {
-	result := make([]pulumiapi.PolicyPackMetadata, 0, len(arr))
-	for _, item := range arr {
-		if ppMap, ok := item.(map[string]interface{}); ok {
-			pp := pulumiapi.PolicyPackMetadata{}
-			if name, ok := ppMap[gcName].(string); ok {
-				pp.Name = name
-			}
-			if displayName, ok := ppMap[gcDisplayName].(string); ok {
-				pp.DisplayName = displayName
-			}
-			if version, ok := ppMap["version"].(float64); ok {
-				pp.Version = int(version)
-			}
-			if versionTag, ok := ppMap[gcVersionTag].(string); ok {
-				pp.VersionTag = versionTag
-			}
-			if config, ok := ppMap["config"].(map[string]interface{}); ok {
-				pp.Config = config
-			}
-			result = append(result, pp)
-		}
-	}
-	return result
+func (r *PolicyGroupPolicyPackReference) Annotate(a infer.Annotator) {
+	a.Describe(r, "A reference to a policy pack within a policy group.")
+	a.Describe(&r.Name, "The name of the policy pack.")
+	a.Describe(&r.DisplayName, "The display name of the policy pack.")
+	a.Describe(&r.Version, "The server-derived numeric version of the policy pack. This is output-only; "+
+		"use `versionTag` to pin a specific version.")
+	a.Describe(&r.VersionTag, "The version tag of the policy pack.")
+	a.Describe(&r.Config, policyPackConfigDescription)
 }
 
-// convertInterfaceArrayToStrings converts []interface{} to []string
-func convertInterfaceArrayToStrings(arr []interface{}) []string {
-	result := make([]string, 0, len(arr))
-	for _, item := range arr {
-		if s, ok := item.(string); ok {
-			result = append(result, s)
-		}
-	}
-	return result
+const (
+	policyGroupEntityTypeDescription = "The entity type for the policy group. Valid values are 'stacks' or " +
+		"'accounts'. Defaults to 'stacks'."
+	policyGroupModeDescription = "The mode for the policy group. Valid values are 'audit' (reports violations) " +
+		"or 'preventative' (blocks operations). Defaults to 'audit'."
+)
+
+type PolicyGroupInput struct {
+	Name             string                                `pulumi:"name"                provider:"replaceOnChanges"`
+	OrganizationName string                                `pulumi:"organizationName"    provider:"replaceOnChanges"`
+	EntityType       string                                `pulumi:"entityType,optional" provider:"replaceOnChanges"`
+	Mode             string                                `pulumi:"mode,optional"       provider:"replaceOnChanges"`
+	Stacks           []PolicyGroupStackReference           `pulumi:"stacks,optional"`
+	Accounts         []string                              `pulumi:"accounts,optional"`
+	PolicyPacks      []PolicyGroupPolicyPackReferenceInput `pulumi:"policyPacks,optional"`
 }
 
-func (i *PulumiServicePolicyGroupInput) ToRPC() (*structpb.Struct, error) {
-	return plugin.MarshalProperties(i.ToPropertyMap(), plugin.MarshalOptions{
-		KeepOutputValues: true,
-	})
+func (i *PolicyGroupInput) Annotate(a infer.Annotator) {
+	a.Describe(&i.Name, "The name of the policy group.")
+	a.Describe(&i.OrganizationName, "The name of the Pulumi organization the policy group belongs to.")
+	a.Describe(&i.EntityType, policyGroupEntityTypeDescription)
+	a.SetDefault(&i.EntityType, gcStacks)
+	a.Describe(&i.Mode, policyGroupModeDescription)
+	a.SetDefault(&i.Mode, gcAudit)
+	a.Describe(&i.Stacks, "List of stack references that belong to this policy group.")
+	a.Describe(&i.Accounts, "List of accounts that belong to this policy group.")
+	a.Describe(&i.PolicyPacks, "List of policy packs applied to this policy group.")
 }
 
-func ToPulumiServicePolicyGroupInput(inputMap resource.PropertyMap) PulumiServicePolicyGroupInput {
-	// Convert PropertyMap to regular map using helper, then extract fields
-	interfaceMap := inputMap.Mappable()
-
-	input := PulumiServicePolicyGroupInput{}
-
-	if name, ok := interfaceMap[gcName].(string); ok {
-		input.Name = name
-	}
-
-	if organizationName, ok := interfaceMap[gcOrganizationName].(string); ok {
-		input.OrganizationName = organizationName
-	}
-
-	if entityType, ok := interfaceMap[gcEntityType].(string); ok {
-		input.EntityType = entityType
-	}
-
-	if mode, ok := interfaceMap[gcMode].(string); ok {
-		input.Mode = mode
-	}
-
-	// Parse stacks using helper
-	if stacksInterface, ok := interfaceMap[gcStacks].([]interface{}); ok {
-		input.Stacks = convertInterfaceArrayToStacks(stacksInterface)
-	}
-
-	// Parse policy packs using helper
-	if policyPacksInterface, ok := interfaceMap[gcPolicyPacks].([]interface{}); ok {
-		input.PolicyPacks = convertInterfaceArrayToPolicyPacks(policyPacksInterface)
-	}
-
-	// Parse accounts using helper
-	if accountsInterface, ok := interfaceMap[gcAccounts].([]interface{}); ok {
-		input.Accounts = convertInterfaceArrayToStrings(accountsInterface)
-	}
-
-	return input
+// PolicyGroupState doesn't embed PolicyGroupInput: its policy packs carry the
+// server-derived `version`.
+type PolicyGroupState struct {
+	Name             string                           `pulumi:"name"`
+	OrganizationName string                           `pulumi:"organizationName"`
+	EntityType       string                           `pulumi:"entityType"`
+	Mode             string                           `pulumi:"mode"`
+	Stacks           []PolicyGroupStackReference      `pulumi:"stacks,optional"`
+	Accounts         []string                         `pulumi:"accounts,optional"`
+	PolicyPacks      []PolicyGroupPolicyPackReference `pulumi:"policyPacks,optional"`
 }
 
-func (p *PulumiServicePolicyGroupResource) Name() string {
-	return "pulumiservice:index:PolicyGroup"
+func (s *PolicyGroupState) Annotate(a infer.Annotator) {
+	a.Describe(&s.Name, "The name of the policy group.")
+	a.Describe(&s.OrganizationName, "The name of the Pulumi organization the policy group belongs to.")
+	a.Describe(&s.EntityType, policyGroupEntityTypeDescription)
+	a.Describe(&s.Mode, policyGroupModeDescription)
+	a.Describe(&s.Stacks, "List of stack references that belong to this policy group.")
+	a.Describe(&s.Accounts, "List of accounts that belong to this policy group.")
+	a.Describe(&s.PolicyPacks, "List of policy packs applied to this policy group.")
 }
 
-func (p *PulumiServicePolicyGroupResource) Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
-	news := req.GetNews()
-	newsMap, err := plugin.UnmarshalProperties(news, plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
-	if err != nil {
-		return nil, err
+// Check applies defaults and validates `entityType` and `mode`. It also strips
+// `version` from each policy pack: that field is derived by the server and is
+// output-only, but older programs may still set it.
+func (*PolicyGroup) Check(
+	ctx context.Context, req infer.CheckRequest,
+) (infer.CheckResponse[PolicyGroupInput], error) {
+	news := stripPolicyPackVersion(req.NewInputs)
+	inputs, failures, err := infer.DefaultCheck[PolicyGroupInput](ctx, news)
+	if err != nil || len(failures) > 0 {
+		return infer.CheckResponse[PolicyGroupInput]{Inputs: inputs, Failures: failures}, err
 	}
 
-	var failures []*pulumirpc.CheckFailure
-
-	if !newsMap[gcName].HasValue() {
-		failures = append(failures, &pulumirpc.CheckFailure{
-			Reason:   "missing required property 'name'",
-			Property: gcName,
+	// Only validate values that are known. An unknown value decodes as "".
+	known := func(key string) bool {
+		v, ok := news.GetOk(key)
+		return !ok || !v.IsComputed()
+	}
+	if known(gcEntityType) && inputs.EntityType != gcStacks && inputs.EntityType != gcAccounts {
+		failures = append(failures, p.CheckFailure{
+			Property: gcEntityType,
+			Reason:   "entityType must be either 'stacks' or 'accounts'",
 		})
 	}
-
-	if !newsMap[gcOrganizationName].HasValue() {
-		failures = append(failures, &pulumirpc.CheckFailure{
-			Reason:   "missing required property 'organizationName'",
-			Property: gcOrganizationName,
+	if known(gcMode) && inputs.Mode != gcAudit && inputs.Mode != gcPreventative {
+		failures = append(failures, p.CheckFailure{
+			Property: gcMode,
+			Reason:   "mode must be either 'audit' or 'preventative'",
 		})
 	}
+	return infer.CheckResponse[PolicyGroupInput]{Inputs: inputs, Failures: failures}, nil
+}
 
-	// Apply defaults if not provided
-	if !newsMap[gcEntityType].HasValue() {
-		newsMap[gcEntityType] = resource.NewPropertyValue(gcStacks)
+// stripPolicyPackVersion removes `version` from each policy pack in inputs.
+func stripPolicyPackVersion(inputs property.Map) property.Map {
+	packs, ok := inputs.GetOk(gcPolicyPacks)
+	if !ok || !packs.IsArray() {
+		return inputs
 	}
-	if !newsMap[gcMode].HasValue() {
-		newsMap[gcMode] = resource.NewPropertyValue(gcAudit)
+	items := packs.AsArray().AsSlice()
+	stripped := make([]property.Value, len(items))
+	for i, item := range items {
+		if item.IsMap() {
+			item = property.New(item.AsMap().Delete(gcPolicyPackVersion)).
+				WithSecret(item.Secret()).WithDependencies(item.Dependencies())
+		}
+		stripped[i] = item
 	}
+	return inputs.Set(gcPolicyPacks, property.New(property.NewArray(stripped)).
+		WithSecret(packs.Secret()).WithDependencies(packs.Dependencies()))
+}
 
-	// Validate enum values
-	if newsMap[gcEntityType].HasValue() {
-		entityType := newsMap[gcEntityType].StringValue()
-		if entityType != gcStacks && entityType != gcAccounts {
-			failures = append(failures, &pulumirpc.CheckFailure{
-				Reason:   "entityType must be either 'stacks' or 'accounts'",
-				Property: gcEntityType,
-			})
+// Diff compares the inputs against the state without regard to the order of
+// stacks, accounts and policy packs. A list differs exactly when Update would
+// send an operation for it; see [policyGroupOps].
+func (*PolicyGroup) Diff(
+	_ context.Context, req infer.DiffRequest[PolicyGroupInput, PolicyGroupState],
+) (infer.DiffResponse, error) {
+	diff := map[string]p.PropertyDiff{}
+	for _, f := range []struct {
+		name       string
+		state, new string
+	}{
+		{gcName, req.State.Name, req.Inputs.Name},
+		{gcOrganizationName, req.State.OrganizationName, req.Inputs.OrganizationName},
+		{gcEntityType, req.State.EntityType, req.Inputs.EntityType},
+		// The API can't change the mode of a policy group.
+		{gcMode, req.State.Mode, req.Inputs.Mode},
+	} {
+		if f.state != f.new {
+			diff[f.name] = p.PropertyDiff{Kind: p.UpdateReplace, InputDiff: true}
 		}
 	}
 
-	if newsMap[gcMode].HasValue() {
-		mode := newsMap[gcMode].StringValue()
-		if mode != gcAudit && mode != gcPreventative {
-			failures = append(failures, &pulumirpc.CheckFailure{
-				Reason:   "mode must be either 'audit' or 'preventative'",
-				Property: gcMode,
-			})
+	ops := policyGroupOps(req.State, req.Inputs)
+	for name, ops := range map[string][]pulumiapi.UpdatePolicyGroupRequest{
+		gcStacks:      ops.stacks,
+		gcPolicyPacks: ops.policyPacks,
+		gcAccounts:    ops.accounts,
+	} {
+		if len(ops) > 0 {
+			diff[name] = p.PropertyDiff{Kind: p.Update, InputDiff: true}
 		}
 	}
 
-	// The numeric `version` on policy packs is server-derived from `versionTag`
-	// and is output-only. Strip it from inputs so legacy programs that still set
-	// it upgrade cleanly without spurious diffs.
-	stripPolicyPackVersion(newsMap)
-
-	inputs, err := plugin.MarshalProperties(newsMap, plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
-	if err != nil {
-		return nil, err
-	}
-
-	return &pulumirpc.CheckResponse{Inputs: inputs, Failures: failures}, nil
-}
-
-func (p *PulumiServicePolicyGroupResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
-	ctx := context.Background()
-	orgName, policyGroupName, err := splitSingleSlashString(req.Id)
-	if err != nil {
-		return &pbempty.Empty{}, err
-	}
-
-	err = p.Client.DeletePolicyGroup(ctx, orgName, policyGroupName)
-	if err != nil {
-		return &pbempty.Empty{}, fmt.Errorf("failed to delete policy group %q: %w", req.Id, err)
-	}
-
-	return &pbempty.Empty{}, nil
-}
-
-func (p *PulumiServicePolicyGroupResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-	olds, err := plugin.UnmarshalProperties(
-		req.GetOldInputs(),
-		plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true},
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	news, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: false})
-	if err != nil {
-		return nil, err
-	}
-
-	oldPolicyGroup := ToPulumiServicePolicyGroupInput(olds)
-	newPolicyGroup := ToPulumiServicePolicyGroupInput(news)
-
-	changes := pulumirpc.DiffResponse_DIFF_NONE
-
-	// Compare using order-independent comparison for arrays
-	// This prevents spurious diffs when array elements are in different order
-	if !policyGroupInputsEqual(oldPolicyGroup, newPolicyGroup) {
-		changes = pulumirpc.DiffResponse_DIFF_SOME
-	}
-
-	// Name change requires replacement
-	replaces := []string{}
-	if oldPolicyGroup.Name != newPolicyGroup.Name {
-		replaces = append(replaces, gcName)
-	}
-
-	// EntityType change requires replacement
-	if oldPolicyGroup.EntityType != newPolicyGroup.EntityType {
-		replaces = append(replaces, gcEntityType)
-	}
-
-	// Mode change requires replacement (API doesn't support update yet)
-	if oldPolicyGroup.Mode != newPolicyGroup.Mode {
-		replaces = append(replaces, gcMode)
-	}
-
-	return &pulumirpc.DiffResponse{
-		Changes:             changes,
-		Replaces:            replaces,
-		Stables:             []string{},
+	return infer.DiffResponse{
+		HasChanges:          len(diff) > 0,
+		DetailedDiff:        diff,
 		DeleteBeforeReplace: true,
 	}, nil
 }
 
-func (p *PulumiServicePolicyGroupResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
-	ctx := context.Background()
-
-	orgName, policyGroupName, err := splitSingleSlashString(req.Id)
-	if err != nil {
-		return nil, err
+func (*PolicyGroup) Create(
+	ctx context.Context, req infer.CreateRequest[PolicyGroupInput],
+) (infer.CreateResponse[PolicyGroupState], error) {
+	in := req.Inputs
+	id := policyGroupID(in.OrganizationName, in.Name)
+	if req.DryRun {
+		return infer.CreateResponse[PolicyGroupState]{ID: id, Output: policyGroupStateFromInputs(in)}, nil
 	}
 
-	policyGroup, err := p.Client.GetPolicyGroup(ctx, orgName, policyGroupName)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read policy group (%q): %w", req.Id, err)
-	}
-	if policyGroup == nil {
-		return &pulumirpc.ReadResponse{}, nil
+	client := config.GetClient(ctx)
+	if err := client.CreatePolicyGroup(ctx, in.OrganizationName, in.Name, in.EntityType, in.Mode); err != nil {
+		return infer.CreateResponse[PolicyGroupState]{}, fmt.Errorf(
+			"error creating policy group '%s': %w", in.Name, err)
 	}
 
-	// Get the previous state and inputs if available
-	previousStateAccounts, previousInputAccounts := parsePreviousAccounts(req.Properties, req.Inputs)
-
-	// Determine which accounts to use for inputs
-	// If the API accounts match the previous state, preserve the original inputs
-	// This prevents auto-added child accounts from polluting the inputs
-	inputAccounts := policyGroup.Accounts
-	if util.ElementsEqual(previousStateAccounts, policyGroup.Accounts) {
-		inputAccounts = previousInputAccounts
+	// The policy group exists from here on, so failures return
+	// ResourceInitFailedError to keep it in state.
+	initFailed := func(state PolicyGroupState, reason string) (infer.CreateResponse[PolicyGroupState], error) {
+		return infer.CreateResponse[PolicyGroupState]{ID: id, Output: state},
+			infer.ResourceInitFailedError{Reasons: []string{reason}}
 	}
 
-	// Properties (state) always reflect the full API response
-	propsMap := map[string]interface{}{
-		gcName:             policyGroup.Name,
-		gcOrganizationName: orgName,
-		gcEntityType:       policyGroup.EntityType,
-		gcMode:             policyGroup.Mode,
-		gcStacks:           convertStacksToInterfaceArray(policyGroup.Stacks),
-		gcAccounts:         policyGroup.Accounts,
-		gcPolicyPacks:      convertPolicyPacksToInterfaceArray(policyGroup.AppliedPolicyPacks),
-	}
-
-	props, err := plugin.MarshalProperties(resource.NewPropertyMapFromMap(propsMap), plugin.MarshalOptions{})
-	if err != nil {
-		return nil, fmt.Errorf("failed to marshal properties: %w", err)
-	}
-
-	propsMap[gcAccounts] = inputAccounts
-	inputs, err := plugin.MarshalProperties(resource.NewPropertyMapFromMap(propsMap), plugin.MarshalOptions{})
-	if err != nil {
-		return nil, fmt.Errorf("failed to marshal inputs: %w", err)
-	}
-
-	return &pulumirpc.ReadResponse{
-		Id:         req.Id,
-		Properties: props,
-		Inputs:     inputs,
-	}, nil
-}
-
-func (p *PulumiServicePolicyGroupResource) Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
-	ctx := context.Background()
-	inputsOld, err := plugin.UnmarshalProperties(
-		req.GetOlds(),
-		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true},
-	)
-	if err != nil {
-		return nil, err
-	}
-	inputsNew, err := plugin.UnmarshalProperties(
-		req.GetNews(),
-		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true},
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	policyGroupOld := ToPulumiServicePolicyGroupInput(inputsOld)
-	policyGroupNew := ToPulumiServicePolicyGroupInput(inputsNew)
-
-	// Collect all update operations into a batch request
-	var batchReqs []pulumiapi.UpdatePolicyGroupRequest
-
-	// Handle stack changes
-	if !stackReferencesEqual(policyGroupOld.Stacks, policyGroupNew.Stacks) {
-		// Remove stacks that are no longer in the new list
-		for _, oldStack := range policyGroupOld.Stacks {
-			if !containsStackReference(policyGroupNew.Stacks, oldStack) {
-				stack := oldStack
-				batchReqs = append(batchReqs, pulumiapi.UpdatePolicyGroupRequest{
-					RemoveStack: &stack,
-				})
-			}
-		}
-
-		// Add stacks that are new in the new list
-		for _, newStack := range policyGroupNew.Stacks {
-			if !containsStackReference(policyGroupOld.Stacks, newStack) {
-				stack := newStack
-				batchReqs = append(batchReqs, pulumiapi.UpdatePolicyGroupRequest{
-					AddStack: &stack,
-				})
-			}
+	// Create only adds, so the Cloud's reorder/upsert-by-name behavior that
+	// Update works around doesn't apply. Send everything in one request.
+	ops := policyGroupOps(PolicyGroupState{}, in)
+	batch := slices.Concat(ops.stacks, ops.policyPacks, ops.accounts)
+	if len(batch) > 0 {
+		if err := client.BatchUpdatePolicyGroup(ctx, in.OrganizationName, in.Name, batch); err != nil {
+			return initFailed(policyGroupStateFromInputs(in), fmt.Sprintf("failed to add items to policy group: %s", err))
 		}
 	}
 
-	// Handle policy pack changes
-	if !policyPacksEqual(policyGroupOld.PolicyPacks, policyGroupNew.PolicyPacks) {
-		// Remove policy packs that are no longer in the new list
-		for _, oldPP := range policyGroupOld.PolicyPacks {
-			if !containsPolicyPack(policyGroupNew.PolicyPacks, oldPP) {
-				pp := oldPP
-				batchReqs = append(batchReqs, pulumiapi.UpdatePolicyGroupRequest{
-					RemovePolicyPack: &pp,
-				})
-			}
-		}
-
-		// Add policy packs that are new in the new list
-		for _, newPP := range policyGroupNew.PolicyPacks {
-			if !containsPolicyPack(policyGroupOld.PolicyPacks, newPP) {
-				pp := newPP
-				batchReqs = append(batchReqs, pulumiapi.UpdatePolicyGroupRequest{
-					AddPolicyPack: &pp,
-				})
-			}
-		}
-	}
-
-	// Handle account changes
-	if !util.ElementsEqual(policyGroupOld.Accounts, policyGroupNew.Accounts) {
-		// Remove accounts that are no longer in the new list
-		for _, oldAccount := range policyGroupOld.Accounts {
-			if !slices.Contains(policyGroupNew.Accounts, oldAccount) {
-				// Don't remove child accounts if their parent is still in the new list
-				// Child accounts are auto-managed when a parent account is added
-				if !hasParentAccount(oldAccount, policyGroupNew.Accounts) {
-					account := pulumiapi.InsightsAccountReference{Name: oldAccount}
-					batchReqs = append(batchReqs, pulumiapi.UpdatePolicyGroupRequest{
-						RemoveInsightsAccount: &account,
-					})
-				}
-			}
-		}
-
-		// Add accounts that are new in the new list
-		for _, newAccount := range policyGroupNew.Accounts {
-			if !slices.Contains(policyGroupOld.Accounts, newAccount) {
-				account := pulumiapi.InsightsAccountReference{Name: newAccount}
-				batchReqs = append(batchReqs, pulumiapi.UpdatePolicyGroupRequest{
-					AddInsightsAccount: &account,
-				})
-			}
-		}
-	}
-
-	policyGroupID := fmt.Sprintf("%s/%s", policyGroupNew.OrganizationName, policyGroupNew.Name)
-	for i := range batchReqs {
-		err = p.Client.BatchUpdatePolicyGroup(
-			ctx, policyGroupNew.OrganizationName, policyGroupNew.Name, batchReqs[i:i+1],
-		)
-		if err != nil {
-			// Earlier ops have mutated the cloud — fetch the real state for the
-			// checkpoint. Detach ctx so a cancellation that caused the failure
-			// doesn't also kill the read (which would force the fallback path).
-			readCtx, cancel := context.WithTimeout(context.WithoutCancel(ctx), 30*time.Second)
-			actual := policyGroupNew
-			if pg, getErr := p.Client.GetPolicyGroup(
-				readCtx, policyGroupNew.OrganizationName, policyGroupNew.Name,
-			); getErr == nil && pg != nil {
-				actual = PulumiServicePolicyGroupInput{
-					Name:             pg.Name,
-					OrganizationName: policyGroupNew.OrganizationName,
-					Stacks:           pg.Stacks,
-					Accounts:         pg.Accounts,
-					PolicyPacks:      pg.AppliedPolicyPacks,
-					EntityType:       pg.EntityType,
-					Mode:             pg.Mode,
-				}
-			}
-			cancel()
-			return nil, partialErrorPolicyGroup(
-				policyGroupID,
-				fmt.Errorf("failed to update policy group: %w", err),
-				actual,
-				policyGroupNew,
-			)
-		}
-	}
-
-	// Read back the policy group to get the full state
-	// This is important because adding accounts may auto-add child accounts
-	policyGroup, err := p.Client.GetPolicyGroup(ctx, policyGroupNew.OrganizationName, policyGroupNew.Name)
+	pg, err := client.GetPolicyGroup(ctx, in.OrganizationName, in.Name)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read policy group after update: %w", err)
+		return initFailed(policyGroupStateFromInputs(in), err.Error())
 	}
-
-	outputs := PulumiServicePolicyGroupInput{
-		Name:             policyGroup.Name,
-		OrganizationName: policyGroupNew.OrganizationName,
-		Stacks:           policyGroup.Stacks,
-		Accounts:         policyGroup.Accounts,
-		PolicyPacks:      policyGroup.AppliedPolicyPacks,
-		EntityType:       policyGroup.EntityType,
-		Mode:             policyGroup.Mode,
+	if pg == nil {
+		return initFailed(policyGroupStateFromInputs(in),
+			fmt.Sprintf("policy group %q not found after creation", id))
 	}
-
-	outputProperties, err := outputs.ToRPC()
-	if err != nil {
-		return nil, err
-	}
-
-	return &pulumirpc.UpdateResponse{
-		Properties: outputProperties,
-	}, nil
+	return infer.CreateResponse[PolicyGroupState]{ID: id, Output: policyGroupStateFromAPI(in.OrganizationName, pg)}, nil
 }
 
-func (p *PulumiServicePolicyGroupResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
-	ctx := context.Background()
-	inputs, err := plugin.UnmarshalProperties(
-		req.GetProperties(),
-		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true},
-	)
-	if err != nil {
-		return nil, err
+// Update sends each operation in its own request: when one batch holds
+// several policy pack changes, the Cloud reorders them and upserts by name.
+// If an operation fails, earlier ones have already changed the policy group,
+// so Update reads back the real state and returns it with
+// ResourceInitFailedError.
+func (*PolicyGroup) Update(
+	ctx context.Context, req infer.UpdateRequest[PolicyGroupInput, PolicyGroupState],
+) (infer.UpdateResponse[PolicyGroupState], error) {
+	in := req.Inputs
+	if req.DryRun {
+		return infer.UpdateResponse[PolicyGroupState]{Output: policyGroupStateFromInputs(in)}, nil
 	}
 
-	inputsPolicyGroup := ToPulumiServicePolicyGroupInput(inputs)
-
-	// Create the policy group
-	err = p.Client.CreatePolicyGroup(
-		ctx,
-		inputsPolicyGroup.OrganizationName,
-		inputsPolicyGroup.Name,
-		inputsPolicyGroup.EntityType,
-		inputsPolicyGroup.Mode,
-	)
-	if err != nil {
-		return nil, fmt.Errorf("error creating policy group '%s': %w", inputsPolicyGroup.Name, err)
-	}
-
-	policyGroupID := fmt.Sprintf("%s/%s", inputsPolicyGroup.OrganizationName, inputsPolicyGroup.Name)
-
-	// Collect all add operations into a batch request
-	var batchReqs []pulumiapi.UpdatePolicyGroupRequest
-
-	// Add stacks to the policy group
-	for _, stack := range inputsPolicyGroup.Stacks {
-		s := stack
-		batchReqs = append(batchReqs, pulumiapi.UpdatePolicyGroupRequest{
-			AddStack: &s,
-		})
-	}
-
-	// Add policy packs to the policy group
-	for _, pp := range inputsPolicyGroup.PolicyPacks {
-		p := pp
-		batchReqs = append(batchReqs, pulumiapi.UpdatePolicyGroupRequest{
-			AddPolicyPack: &p,
-		})
-	}
-
-	// Add accounts to the policy group
-	for _, account := range inputsPolicyGroup.Accounts {
-		a := account
-		batchReqs = append(batchReqs, pulumiapi.UpdatePolicyGroupRequest{
-			AddInsightsAccount: &pulumiapi.InsightsAccountReference{Name: a},
-		})
-	}
-
-	// Create is adds-only, so the cloud's reorder/upsert-by-name bug doesn't
-	// apply here — batch the whole thing in a single request.
-	if len(batchReqs) > 0 {
-		err = p.Client.BatchUpdatePolicyGroup(
-			ctx,
-			inputsPolicyGroup.OrganizationName,
-			inputsPolicyGroup.Name,
-			batchReqs,
-		)
-		if err != nil {
-			return nil, partialErrorPolicyGroup(
-				policyGroupID,
-				fmt.Errorf("failed to add items to policy group: %w", err),
-				inputsPolicyGroup,
-				inputsPolicyGroup,
-			)
-		}
-	}
-
-	// Read back the policy group to get the full state
-	policyGroup, err := p.Client.GetPolicyGroup(ctx, inputsPolicyGroup.OrganizationName, inputsPolicyGroup.Name)
-	if err != nil {
-		return nil, partialErrorPolicyGroup(policyGroupID, err, inputsPolicyGroup, inputsPolicyGroup)
-	}
-
-	outputs := PulumiServicePolicyGroupInput{
-		Name:             policyGroup.Name,
-		OrganizationName: inputsPolicyGroup.OrganizationName,
-		Stacks:           policyGroup.Stacks,
-		Accounts:         policyGroup.Accounts,
-		PolicyPacks:      policyGroup.AppliedPolicyPacks,
-		EntityType:       policyGroup.EntityType,
-		Mode:             policyGroup.Mode,
-	}
-
-	outputProperties, err := outputs.ToRPC()
-	if err != nil {
-		return nil, partialErrorPolicyGroup(policyGroupID, err, outputs, inputsPolicyGroup)
-	}
-
-	return &pulumirpc.CreateResponse{
-		Id:         policyGroupID,
-		Properties: outputProperties,
-	}, nil
-}
-
-// Helper functions
-
-func stackReferencesEqual(a, b []pulumiapi.StackReference) bool {
-	return util.ElementsEqualFunc(a, b, compareStackReferences, stackReferencesEq)
-}
-
-func compareStackReferences(i, j pulumiapi.StackReference) int {
-	if i.RoutingProject != j.RoutingProject {
-		if i.RoutingProject < j.RoutingProject {
-			return -1
-		}
-		return 1
-	}
-	if i.Name < j.Name {
-		return -1
-	}
-	if i.Name > j.Name {
-		return 1
-	}
-	return 0
-}
-
-func stackReferencesEq(x, y pulumiapi.StackReference) bool {
-	return x.Name == y.Name && x.RoutingProject == y.RoutingProject
-}
-
-func containsStackReference(stacks []pulumiapi.StackReference, target pulumiapi.StackReference) bool {
-	for _, stack := range stacks {
-		if stack.Name == target.Name && stack.RoutingProject == target.RoutingProject {
-			return true
-		}
-	}
-	return false
-}
-
-func policyPacksEqual(a, b []pulumiapi.PolicyPackMetadata) bool {
-	return util.ElementsEqualFunc(a, b, comparePolicyPacks, policyPacksEq)
-}
-
-func comparePolicyPacks(i, j pulumiapi.PolicyPackMetadata) int {
-	if i.Name < j.Name {
-		return -1
-	}
-	if i.Name > j.Name {
-		return 1
-	}
-	if i.VersionTag < j.VersionTag {
-		return -1
-	}
-	if i.VersionTag > j.VersionTag {
-		return 1
-	}
-	return 0
-}
-
-func policyPacksEq(x, y pulumiapi.PolicyPackMetadata) bool {
-	if x.Name != y.Name || x.VersionTag != y.VersionTag {
-		return false
-	}
-	// nil and empty map are equivalent for diff purposes — both mean "no config".
-	xc, yc := x.Config, y.Config
-	if len(xc) == 0 && len(yc) == 0 {
-		return true
-	}
-	return reflect.DeepEqual(xc, yc)
-}
-
-func containsPolicyPack(packs []pulumiapi.PolicyPackMetadata, target pulumiapi.PolicyPackMetadata) bool {
-	for _, pp := range packs {
-		if pp.Name == target.Name && pp.VersionTag == target.VersionTag {
-			return true
-		}
-	}
-	return false
-}
-
-// stripPolicyPackVersion removes the server-derived `version` field from each
-// policy pack in the given inputs map. See Check for rationale.
-func stripPolicyPackVersion(news resource.PropertyMap) {
-	packs, ok := news[gcPolicyPacks]
-	if !ok || !packs.IsArray() {
-		return
-	}
-	items := packs.ArrayValue()
-	for i, item := range items {
-		if !item.IsObject() {
+	client := config.GetClient(ctx)
+	ops := policyGroupOps(req.State, in)
+	for _, op := range slices.Concat(ops.stacks, ops.policyPacks, ops.accounts) {
+		err := client.BatchUpdatePolicyGroup(ctx, in.OrganizationName, in.Name,
+			[]pulumiapi.UpdatePolicyGroupRequest{op})
+		if err == nil {
 			continue
 		}
-		obj := item.ObjectValue()
-		if _, has := obj["version"]; has {
-			delete(obj, "version")
-			items[i] = resource.NewObjectProperty(obj)
+		// Detach ctx so a cancellation that caused the failure doesn't also
+		// stop the read.
+		readCtx, cancel := context.WithTimeout(context.WithoutCancel(ctx), 30*time.Second)
+		defer cancel()
+		state := policyGroupStateFromInputs(in)
+		if pg, getErr := client.GetPolicyGroup(readCtx, in.OrganizationName, in.Name); getErr == nil && pg != nil {
+			state = policyGroupStateFromAPI(in.OrganizationName, pg)
+		}
+		return infer.UpdateResponse[PolicyGroupState]{Output: state}, infer.ResourceInitFailedError{
+			Reasons: []string{fmt.Sprintf("failed to update policy group: %s", err)},
 		}
 	}
-	news[gcPolicyPacks] = resource.NewArrayProperty(items)
+
+	// Read back the full state: adding an account also adds its child accounts.
+	pg, err := client.GetPolicyGroup(ctx, in.OrganizationName, in.Name)
+	if err != nil {
+		return infer.UpdateResponse[PolicyGroupState]{}, fmt.Errorf("failed to read policy group after update: %w", err)
+	}
+	if pg == nil {
+		return infer.UpdateResponse[PolicyGroupState]{}, fmt.Errorf(
+			"policy group %q not found after update", policyGroupID(in.OrganizationName, in.Name))
+	}
+	return infer.UpdateResponse[PolicyGroupState]{Output: policyGroupStateFromAPI(in.OrganizationName, pg)}, nil
 }
 
-// parsePreviousAccounts extracts the accounts from previous state and inputs.
-// This is used during Read to determine if we should preserve original inputs.
-func parsePreviousAccounts(properties, inputs *structpb.Struct) (stateAccounts, inputAccounts []string) {
-	if properties != nil {
-		oldProps, err := plugin.UnmarshalProperties(
-			properties,
-			plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true},
-		)
-		if err == nil {
-			oldState := ToPulumiServicePolicyGroupInput(oldProps)
-			stateAccounts = oldState.Accounts
+func (*PolicyGroup) Delete(
+	ctx context.Context, req infer.DeleteRequest[PolicyGroupState],
+) (infer.DeleteResponse, error) {
+	orgName, name, err := splitSingleSlashString(req.ID)
+	if err != nil {
+		return infer.DeleteResponse{}, err
+	}
+	if err := config.GetClient(ctx).DeletePolicyGroup(ctx, orgName, name); err != nil {
+		return infer.DeleteResponse{}, fmt.Errorf("failed to delete policy group %q: %w", req.ID, err)
+	}
+	return infer.DeleteResponse{}, nil
+}
+
+// Read returns the policy group's current state. Adding an account also adds
+// its child accounts, so when the accounts haven't changed since the last
+// operation, Read keeps the accounts from the previous inputs. Otherwise the
+// child accounts would show up in the program's inputs.
+func (*PolicyGroup) Read(
+	ctx context.Context, req infer.ReadRequest[PolicyGroupInput, PolicyGroupState],
+) (infer.ReadResponse[PolicyGroupInput, PolicyGroupState], error) {
+	orgName, name, err := splitSingleSlashString(req.ID)
+	if err != nil {
+		return infer.ReadResponse[PolicyGroupInput, PolicyGroupState]{}, err
+	}
+
+	pg, err := config.GetClient(ctx).GetPolicyGroup(ctx, orgName, name)
+	if err != nil {
+		return infer.ReadResponse[PolicyGroupInput, PolicyGroupState]{}, fmt.Errorf(
+			"failed to read policy group (%q): %w", req.ID, err)
+	}
+	if pg == nil {
+		return infer.ReadResponse[PolicyGroupInput, PolicyGroupState]{}, nil
+	}
+
+	state := policyGroupStateFromAPI(orgName, pg)
+	inputAccounts := state.Accounts
+	if sameStrings(req.State.Accounts, state.Accounts) {
+		inputAccounts = req.Inputs.Accounts
+	}
+
+	inputs := PolicyGroupInput{
+		Name:             state.Name,
+		OrganizationName: state.OrganizationName,
+		EntityType:       state.EntityType,
+		Mode:             state.Mode,
+		Stacks:           state.Stacks,
+		Accounts:         inputAccounts,
+	}
+	for _, pp := range state.PolicyPacks {
+		inputs.PolicyPacks = append(inputs.PolicyPacks, PolicyGroupPolicyPackReferenceInput{
+			Name:        pp.Name,
+			DisplayName: pp.DisplayName,
+			VersionTag:  pp.VersionTag,
+			Config:      pp.Config,
+		})
+	}
+
+	return infer.ReadResponse[PolicyGroupInput, PolicyGroupState]{ID: req.ID, Inputs: inputs, State: state}, nil
+}
+
+func policyGroupID(orgName, name string) string {
+	return fmt.Sprintf("%s/%s", orgName, name)
+}
+
+func policyGroupStateFromAPI(orgName string, pg *pulumiapi.PolicyGroup) PolicyGroupState {
+	state := PolicyGroupState{
+		Name:             pg.Name,
+		OrganizationName: orgName,
+		EntityType:       pg.EntityType,
+		Mode:             pg.Mode,
+		Accounts:         pg.Accounts,
+	}
+	for _, s := range pg.Stacks {
+		state.Stacks = append(state.Stacks, PolicyGroupStackReference(s))
+	}
+	for _, pp := range pg.AppliedPolicyPacks {
+		state.PolicyPacks = append(state.PolicyPacks, PolicyGroupPolicyPackReference{
+			Name:        pp.Name,
+			DisplayName: pp.DisplayName,
+			Version:     float64(pp.Version),
+			VersionTag:  pp.VersionTag,
+			Config:      pp.Config,
+		})
+	}
+	return state
+}
+
+// policyGroupStateFromInputs builds the state to report when the API can't
+// say what it is: on preview, and when an operation fails before the policy
+// group can be read back. It has no policy pack `version`.
+func policyGroupStateFromInputs(in PolicyGroupInput) PolicyGroupState {
+	state := PolicyGroupState{
+		Name:             in.Name,
+		OrganizationName: in.OrganizationName,
+		EntityType:       in.EntityType,
+		Mode:             in.Mode,
+		Stacks:           in.Stacks,
+		Accounts:         in.Accounts,
+	}
+	for _, pp := range in.PolicyPacks {
+		state.PolicyPacks = append(state.PolicyPacks, PolicyGroupPolicyPackReference{
+			Name:        pp.Name,
+			DisplayName: pp.DisplayName,
+			VersionTag:  pp.VersionTag,
+			Config:      pp.Config,
+		})
+	}
+	return state
+}
+
+// policyGroupUpdateOps holds the operations that bring a policy group from
+// its state to its inputs, by list. Removals come before additions.
+type policyGroupUpdateOps struct {
+	stacks, policyPacks, accounts []pulumiapi.UpdatePolicyGroupRequest
+}
+
+// policyGroupOps computes the operations that bring a policy group from state
+// to inputs. Order within each list doesn't matter.
+//
+//   - Stacks match on name and routing project.
+//   - Policy packs match on name and version tag. A pack without a version tag
+//     in the inputs matches a pack of that name at any version. A matched pack
+//     whose config changed is removed and added again. A nil config and an
+//     empty one are equal.
+//   - An account that's no longer in the inputs isn't removed while its parent
+//     account still is: the Cloud manages child accounts along with their
+//     parent.
+func policyGroupOps(state PolicyGroupState, in PolicyGroupInput) policyGroupUpdateOps {
+	var ops policyGroupUpdateOps
+
+	// Stacks
+	for _, s := range state.Stacks {
+		if !slices.Contains(in.Stacks, s) {
+			ref := pulumiapi.StackReference(s)
+			ops.stacks = append(ops.stacks, pulumiapi.UpdatePolicyGroupRequest{RemoveStack: &ref})
 		}
 	}
-	if inputs != nil {
-		oldInputs, err := plugin.UnmarshalProperties(
-			inputs,
-			plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true},
-		)
-		if err == nil {
-			oldInput := ToPulumiServicePolicyGroupInput(oldInputs)
-			inputAccounts = oldInput.Accounts
+	for _, s := range in.Stacks {
+		if !slices.Contains(state.Stacks, s) {
+			ref := pulumiapi.StackReference(s)
+			ops.stacks = append(ops.stacks, pulumiapi.UpdatePolicyGroupRequest{AddStack: &ref})
 		}
 	}
-	return stateAccounts, inputAccounts
+
+	// Policy packs
+	matched := make([]bool, len(state.PolicyPacks))
+	var removes, adds []pulumiapi.UpdatePolicyGroupRequest
+	match := func(want PolicyGroupPolicyPackReferenceInput, anyVersion bool) int {
+		for j, have := range state.PolicyPacks {
+			if !matched[j] && have.Name == want.Name &&
+				(have.VersionTag == want.VersionTag || anyVersion && want.VersionTag == "") {
+				return j
+			}
+		}
+		return -1
+	}
+	// Match exact version tags first, so a pack without a version tag can't
+	// claim a state entry that another input names exactly.
+	inputMatch := make([]int, len(in.PolicyPacks))
+	for i, want := range in.PolicyPacks {
+		if inputMatch[i] = match(want, false); inputMatch[i] >= 0 {
+			matched[inputMatch[i]] = true
+		}
+	}
+	for i, want := range in.PolicyPacks {
+		if inputMatch[i] < 0 {
+			if inputMatch[i] = match(want, true); inputMatch[i] >= 0 {
+				matched[inputMatch[i]] = true
+			}
+		}
+	}
+	for i, want := range in.PolicyPacks {
+		add := pulumiapi.PolicyPackMetadata{
+			Name:        want.Name,
+			DisplayName: want.DisplayName,
+			VersionTag:  want.VersionTag,
+			Config:      want.Config,
+		}
+		if j := inputMatch[i]; j >= 0 {
+			if policyPackConfigEqual(state.PolicyPacks[j].Config, want.Config) {
+				continue
+			}
+			matched[j] = false // Remove it below, then add it back.
+		}
+		adds = append(adds, pulumiapi.UpdatePolicyGroupRequest{AddPolicyPack: &add})
+	}
+	for j, have := range state.PolicyPacks {
+		if !matched[j] {
+			remove := pulumiapi.PolicyPackMetadata{
+				Name:        have.Name,
+				DisplayName: have.DisplayName,
+				Version:     int(have.Version),
+				VersionTag:  have.VersionTag,
+				Config:      have.Config,
+			}
+			removes = append(removes, pulumiapi.UpdatePolicyGroupRequest{RemovePolicyPack: &remove})
+		}
+	}
+	ops.policyPacks = append(removes, adds...)
+
+	// Accounts
+	for _, a := range state.Accounts {
+		if !slices.Contains(in.Accounts, a) && !hasParentAccount(a, in.Accounts) {
+			ref := pulumiapi.InsightsAccountReference{Name: a}
+			ops.accounts = append(ops.accounts, pulumiapi.UpdatePolicyGroupRequest{RemoveInsightsAccount: &ref})
+		}
+	}
+	for _, a := range in.Accounts {
+		if !slices.Contains(state.Accounts, a) {
+			ref := pulumiapi.InsightsAccountReference{Name: a}
+			ops.accounts = append(ops.accounts, pulumiapi.UpdatePolicyGroupRequest{AddInsightsAccount: &ref})
+		}
+	}
+
+	return ops
+}
+
+// policyPackConfigEqual reports whether two policy pack configs are equal. A
+// nil config and an empty one both mean "no config".
+func policyPackConfigEqual(x, y map[string]any) bool {
+	if len(x) == 0 && len(y) == 0 {
+		return true
+	}
+	return reflect.DeepEqual(x, y)
+}
+
+// sameStrings reports whether a and b hold the same strings, ignoring order.
+func sameStrings(a, b []string) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	a, b = slices.Clone(a), slices.Clone(b)
+	slices.Sort(a)
+	slices.Sort(b)
+	return slices.Equal(a, b)
 }
 
 // hasParentAccount checks if the given account has a parent account in the list.
 // Account names use "/" as a separator, so "parent/child" has parent "parent".
 func hasParentAccount(account string, accounts []string) bool {
 	for _, acc := range accounts {
-		// Check if account starts with acc + "/" (meaning acc is a parent of account)
 		if strings.HasPrefix(account, acc+"/") {
 			return true
 		}
 	}
 	return false
-}
-
-// policyGroupInputsEqual compares two PulumiServicePolicyGroupInput structs using order-independent
-// comparison for array fields (stacks, accounts, policyPacks). This prevents spurious diffs when
-// array elements are in different order but contain the same values.
-func policyGroupInputsEqual(a, b PulumiServicePolicyGroupInput) bool {
-	// Compare scalar fields
-	if a.Name != b.Name ||
-		a.OrganizationName != b.OrganizationName ||
-		a.EntityType != b.EntityType ||
-		a.Mode != b.Mode {
-		return false
-	}
-
-	// Compare arrays using order-independent comparison
-	if !stackReferencesEqual(a.Stacks, b.Stacks) {
-		return false
-	}
-	if !util.ElementsEqual(a.Accounts, b.Accounts) {
-		return false
-	}
-	if !policyPacksEqual(a.PolicyPacks, b.PolicyPacks) {
-		return false
-	}
-
-	return true
-}
-
-// partialErrorPolicyGroup creates an error for resources that did not complete an operation in progress.
-// The last known state of the object is included in the error so that it can be checkpointed.
-func partialErrorPolicyGroup(
-	id string,
-	err error,
-	state PulumiServicePolicyGroupInput,
-	inputs PulumiServicePolicyGroupInput,
-) error {
-	stateRPC, stateSerErr := state.ToRPC()
-	inputRPC, inputSerErr := inputs.ToRPC()
-
-	// combine errors if we can't serialize state or inputs for some reason
-	if stateSerErr != nil {
-		err = fmt.Errorf("err serializing state: %v, (src error: %v)", stateSerErr, err)
-	}
-	if inputSerErr != nil {
-		err = fmt.Errorf("err serializing inputs: %v (src error: %v)", inputSerErr, err)
-	}
-	detail := pulumirpc.ErrorResourceInitFailed{
-		Id:         id,
-		Properties: stateRPC,
-		Reasons:    []string{err.Error()},
-		Inputs:     inputRPC,
-	}
-	return rpcerror.WithDetails(rpcerror.New(codes.Unknown, err.Error()), &detail)
 }
