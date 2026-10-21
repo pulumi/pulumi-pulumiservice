@@ -17,14 +17,14 @@ import javax.annotation.Nullable;
 @ResourceType(type="pulumi:providers:pulumiservice")
 public class Provider extends com.pulumi.resources.ProviderResource {
     /**
-     * Access token to authenticate with Pulumi Cloud. Optional: if unset, the provider uses the `PULUMI_ACCESS_TOKEN` environment variable, then the access token of the account you&#39;re logged in to with `pulumi login`. The API URL doesn&#39;t come from that login, so when you&#39;re logged in to a self-hosted Pulumi Cloud, also set `apiUrl` or `PULUMI_BACKEND_URL`.
+     * Access token to authenticate with Pulumi Cloud. Optional: if unset, the provider uses the `PULUMI_ACCESS_TOKEN` environment variable, then the access token of the account you&#39;re logged in to with `pulumi login`.
      * 
      */
     @Export(name="accessToken", refs={String.class}, tree="[0]")
     private Output</* @Nullable */ String> accessToken;
 
     /**
-     * @return Access token to authenticate with Pulumi Cloud. Optional: if unset, the provider uses the `PULUMI_ACCESS_TOKEN` environment variable, then the access token of the account you&#39;re logged in to with `pulumi login`. The API URL doesn&#39;t come from that login, so when you&#39;re logged in to a self-hosted Pulumi Cloud, also set `apiUrl` or `PULUMI_BACKEND_URL`.
+     * @return Access token to authenticate with Pulumi Cloud. Optional: if unset, the provider uses the `PULUMI_ACCESS_TOKEN` environment variable, then the access token of the account you&#39;re logged in to with `pulumi login`.
      * 
      */
     public Output<Optional<String>> accessToken() {

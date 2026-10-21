@@ -11,7 +11,7 @@ public final class Config {
 
     private static final com.pulumi.Config config = com.pulumi.Config.of("pulumiservice");
 /**
- * Access token to authenticate with Pulumi Cloud. Optional: if unset, the provider uses the `PULUMI_ACCESS_TOKEN` environment variable, then the access token of the account you&#39;re logged in to with `pulumi login`. The API URL doesn&#39;t come from that login, so when you&#39;re logged in to a self-hosted Pulumi Cloud, also set `apiUrl` or `PULUMI_BACKEND_URL`.
+ * Access token to authenticate with Pulumi Cloud. Optional: if unset, the provider uses the `PULUMI_ACCESS_TOKEN` environment variable, then the access token of the account you&#39;re logged in to with `pulumi login`.
  * 
  */
     public Optional<String> accessToken() {
