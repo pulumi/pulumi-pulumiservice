@@ -30,6 +30,7 @@ import (
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/functions"
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/resources"
 )
 
 func TestDiffConfig(t *testing.T) {
@@ -149,14 +150,17 @@ func TestConfigure_SetsAccessToken(t *testing.T) {
 	require.NoError(t, err)
 
 	// Configure the raw provider directly: MakeProvider wraps it, which
-	// hides the client field this test asserts on.
+	// hides the resources this test asserts on.
 	raw := &pulumiserviceProvider{}
 	_, err = raw.Configure(ctx, &pulumirpc.ConfigureRequest{
 		Args: configArgs,
 	})
 	require.NoError(t, err)
 
-	assert.NotNil(t, raw.client, "client should be initialized after Configure")
+	require.Len(t, raw.pulumiResources, 1)
+	ds, ok := raw.pulumiResources[0].(*resources.PulumiServiceDeploymentSettingsResource)
+	require.True(t, ok, "expected the DeploymentSettings resource")
+	assert.NotNil(t, ds.Client, "client should be initialized after Configure")
 }
 
 // TestProvider_LayeredSchema verifies the unified provider serves three
@@ -267,7 +271,7 @@ func TestProvider_PolicyPackSummaryIsANamedType(t *testing.T) {
 	require.NotNil(t, fn.ReturnType)
 	require.NotNil(t, fn.ReturnType.ObjectTypeSpec)
 
-	packs, ok := fn.ReturnType.ObjectTypeSpec.Properties[policyPacksKey]
+	packs, ok := fn.ReturnType.ObjectTypeSpec.Properties["policyPacks"]
 	require.True(t, ok, "policyPacks output should be present")
 	require.NotNil(t, packs.Items, "policyPacks items should survive schema generation")
 	assert.Equal(t, "#/types/pulumiservice:index:PolicyPackSummary", packs.Items.Ref)
@@ -275,20 +279,20 @@ func TestProvider_PolicyPackSummaryIsANamedType(t *testing.T) {
 	summary, ok := spec.Types["pulumiservice:index:PolicyPackSummary"]
 	require.True(t, ok, "PolicyPackSummary type should be present")
 
-	for _, field := range []string{nameKey, displayNameKey, versionsKey, versionTagsKey, sourceKey, publisherKey} {
+	for _, field := range []string{"name", "displayName", "versions", "versionTags", "source", "publisher"} {
 		_, ok := summary.Properties[field]
 		assert.Truef(t, ok, "PolicyPackSummary should declare %q", field)
 	}
 
 	// Optional so a degraded lookup is distinguishable from real data in typed SDKs.
-	assert.NotContains(t, summary.Required, sourceKey)
-	assert.NotContains(t, summary.Required, publisherKey)
+	assert.NotContains(t, summary.Required, "source")
+	assert.NotContains(t, summary.Required, "publisher")
 
 	single, ok := spec.Functions["pulumiservice:index:getPolicyPack"]
 	require.True(t, ok, "getPolicyPack should be present")
 	require.NotNil(t, single.ReturnType)
 	require.NotNil(t, single.ReturnType.ObjectTypeSpec)
-	for _, field := range []string{sourceKey, publisherKey} {
+	for _, field := range []string{"source", "publisher"} {
 		_, ok := single.ReturnType.ObjectTypeSpec.Properties[field]
 		assert.Truef(t, ok, "getPolicyPack should declare %q", field)
 		assert.NotContains(t, single.ReturnType.ObjectTypeSpec.Required, field)

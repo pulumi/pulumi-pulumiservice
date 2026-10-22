@@ -5,6 +5,7 @@
 ### Breaking Changes
 
 - `getPolicyPack` now takes a string `versionTag` input, for example `1.4.1`, the version shown in Pulumi Cloud. It replaces the integer `version` input. No working code needs migrating: the old input never worked, because Pulumi Cloud looks policy pack versions up by tag. [#1012](https://github.com/pulumi/pulumi-pulumiservice/issues/1012)
+- `getPolicyPack`'s `policies` output is now a list of maps of any value, instead of a list of string maps, so each policy's nested `configSchema` object comes through intact. In Go, `LookupPolicyPackResultOutput.Policies()` now returns `pulumi.MapArrayOutput` instead of `pulumi.StringMapArrayOutput`. No working code needs migrating: `getPolicyPack` always failed in earlier releases. [#1207](https://github.com/pulumi/pulumi-pulumiservice/issues/1207)
 
 ### Improvements
 

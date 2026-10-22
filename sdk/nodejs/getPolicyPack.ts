@@ -47,7 +47,7 @@ export interface GetPolicyPackResult {
     /**
      * List of policies in this pack.
      */
-    readonly policies?: {[key: string]: string}[];
+    readonly policies?: {[key: string]: any}[];
     /**
      * The organization or user that published the policy pack. `pulumi` for Pulumi-published packs, otherwise the publishing organization's name. Omitted when the provider could not determine registry metadata for this pack.
      */

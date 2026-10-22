@@ -8868,6 +8868,7 @@
             "description": "The version tag of the policy pack, for example `1.4.1`, as shown in Pulumi Cloud. If not specified, returns the latest version."
           }
         },
+        "type": "object",
         "required": [
           "organizationName",
           "policyPackName"
@@ -8893,6 +8894,9 @@
           "policies": {
             "description": "List of policies in this pack.",
             "items": {
+              "additionalProperties": {
+                "$ref": "pulumi.json#/Any"
+              },
               "type": "object"
             },
             "type": "array"
@@ -8918,7 +8922,8 @@
           "name",
           "displayName",
           "version"
-        ]
+        ],
+        "type": "object"
       }
     },
     "pulumiservice:index:getPolicyPacks": {
@@ -8930,6 +8935,7 @@
             "description": "The name of the Pulumi organization."
           }
         },
+        "type": "object",
         "required": [
           "organizationName"
         ]
@@ -8946,7 +8952,8 @@
         },
         "required": [
           "policyPacks"
-        ]
+        ],
+        "type": "object"
       }
     },
     "pulumiservice:index:getStack": {

@@ -102,7 +102,7 @@ namespace Pulumi.PulumiService
         /// <summary>
         /// List of policies in this pack.
         /// </summary>
-        public readonly ImmutableArray<ImmutableDictionary<string, string>> Policies;
+        public readonly ImmutableArray<ImmutableDictionary<string, object>> Policies;
         /// <summary>
         /// The organization or user that published the policy pack. `pulumi` for Pulumi-published packs, otherwise the publishing organization's name. Omitted when the provider could not determine registry metadata for this pack.
         /// </summary>
@@ -128,7 +128,7 @@ namespace Pulumi.PulumiService
 
             string name,
 
-            ImmutableArray<ImmutableDictionary<string, string>> policies,
+            ImmutableArray<ImmutableDictionary<string, object>> policies,
 
             string? publisher,
 
