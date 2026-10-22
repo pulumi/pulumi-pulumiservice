@@ -357,6 +357,7 @@ func TestYamlDeploymentSettingsUpgrade(t *testing.T) {
 			current := pulumitest.NewPulumiTest(t, filepath.Join(getCwd(t), dir),
 				inMemoryProvider(),
 				opttest.UseAmbientBackend(),
+				opttest.StackName(randomStackName()),
 			)
 			configure(current)
 			// Retarget the state at the current stack: its URNs, and the root
