@@ -729,6 +729,10 @@ func TestYamlDeploymentSettingsVcsExample(t *testing.T) {
 	t.Skip("requires an existing Azure DevOps integration; run manually against a configured environment")
 }
 
+func TestYamlDeploymentSettingsGitHubTagsExample(t *testing.T) {
+	t.Skip("requires an existing GitHub integration; run manually against a configured environment")
+}
+
 func TestYamlRbacExample(t *testing.T) {
 	// Requires the Custom Roles feature to be enabled on the test
 	// organization. If it isn't, CreateRole will return a feature-flag

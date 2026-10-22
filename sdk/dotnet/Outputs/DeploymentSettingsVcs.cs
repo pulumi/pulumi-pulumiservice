@@ -17,13 +17,17 @@ namespace Pulumi.PulumiService.Outputs
     public sealed class DeploymentSettingsVcs
     {
         /// <summary>
-        /// Trigger a deployment running `pulumi up` on commit.
+        /// Trigger a deployment running `pulumi up` on commit. Must be `false` when `deployTags` is `true`, because Pulumi Cloud rejects the two together.
         /// </summary>
         public readonly bool? DeployCommits;
         /// <summary>
         /// Deploy a specific pull request number.
         /// </summary>
         public readonly int? DeployPullRequest;
+        /// <summary>
+        /// Trigger a deployment running `pulumi up` when a tag matching `tagFilters` is pushed. Can't be combined with `deployCommits`, which defaults to `true`, so set `deployCommits` to `false` when you enable this.
+        /// </summary>
+        public readonly bool? DeployTags;
         /// <summary>
         /// The VCS integration installation ID. Use to disambiguate when an organization has multiple integrations of the same provider type (e.g., two GitHub Apps). If omitted, the API resolves the integration automatically from `provider` and `repository`.
         /// </summary>
@@ -48,12 +52,18 @@ namespace Pulumi.PulumiService.Outputs
         /// The repository identifier (e.g., 'ProjectName/RepoName' for Azure DevOps, 'org/repo' for GitHub).
         /// </summary>
         public readonly string? Repository;
+        /// <summary>
+        /// Glob patterns matching the tag names that trigger a deployment when `deployTags` is true. Prefix a pattern with `!` to exclude matching tags, for example `!*-rc*`. An empty list matches all tags.
+        /// </summary>
+        public readonly ImmutableArray<string> TagFilters;
 
         [OutputConstructor]
         private DeploymentSettingsVcs(
             bool? deployCommits,
 
             int? deployPullRequest,
+
+            bool? deployTags,
 
             string? installationId,
 
@@ -65,16 +75,20 @@ namespace Pulumi.PulumiService.Outputs
 
             bool? pullRequestTemplate,
 
-            string? repository)
+            string? repository,
+
+            ImmutableArray<string> tagFilters)
         {
             DeployCommits = deployCommits;
             DeployPullRequest = deployPullRequest;
+            DeployTags = deployTags;
             InstallationId = installationId;
             Paths = paths;
             PreviewPullRequests = previewPullRequests;
             Provider = provider;
             PullRequestTemplate = pullRequestTemplate;
             Repository = repository;
+            TagFilters = tagFilters;
         }
     }
 }

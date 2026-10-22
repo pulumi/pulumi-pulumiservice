@@ -526,8 +526,31 @@ func TestDeploymentSettingsVcsRoundtrip(t *testing.T) {
 					PullRequestTemplate: false,
 					Paths:               []string{"infra/**"},
 					DeployPullRequest:   &deployPR,
+					DeployTags:          true,
+					TagFilters:          []string{"v*", "!*-rc*"},
 				},
 			}.Build(),
+		},
+	}
+
+	encoded := initial.ToPropertyMap(nil, nil, true)
+	decoded := (&PulumiServiceDeploymentSettingsResource{}).ToPulumiServiceDeploymentSettingsInput(encoded)
+
+	assert.EqualValues(t, initial, decoded)
+}
+
+func TestDeploymentSettingsGitHubRoundtrip(t *testing.T) {
+	initial := PulumiServiceDeploymentSettingsInput{
+		DeploymentSettings: pulumiapi.DeploymentSettings{
+			GitHub: &pulumiapi.DeploymentSettingsGitHub{
+				Repository:          "my-org/my-repo",
+				DeployCommits:       true,
+				PreviewPullRequests: true,
+				PullRequestTemplate: false,
+				Paths:               []string{"infra/**"},
+				DeployTags:          true,
+				TagFilters:          []string{"v*", "!*-rc*"},
+			},
 		},
 	}
 

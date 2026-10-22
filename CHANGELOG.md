@@ -8,6 +8,7 @@
 
 ### Improvements
 
+- Added `deployTags` and `tagFilters` to the `github` and `vcs` settings of `DeploymentSettings`, so a deployment can run when a matching git tag is pushed. Set `deployCommits` to `false` when you enable `deployTags`, because Pulumi Cloud rejects the two together [#1042](https://github.com/pulumi/pulumi-pulumiservice/issues/1042)
 - Added an Import section to the docs of every `pulumiservice:index:*` resource, giving the ID format, a sample `pulumi import` command, and caveats such as secrets that can't be read back. `DeploymentSettings` and `Webhook` import docs now render as their own section instead of inline in the description. No behavior change. [#344](https://github.com/pulumi/pulumi-pulumiservice/issues/344)
 - Documented that `Webhook` supports ESC environment webhooks, and which properties select an organization, stack or environment webhook. No behavior change. [#482](https://github.com/pulumi/pulumi-pulumiservice/issues/482)
 - Added the `getOrganizationRole` function, which looks up a role by the name shown in the Pulumi Cloud console, and `getOrganizationRoles`, which lists an organization's built-in and custom roles. Use the returned `roleId` instead of hardcoding role IDs. [#1185](https://github.com/pulumi/pulumi-pulumiservice/issues/1185)

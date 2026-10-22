@@ -1806,8 +1806,10 @@ func (o DeploymentSettingsGitSourceGitAuthPtrOutput) SshAuth() DeploymentSetting
 
 // GitHub settings for the deployment.
 type DeploymentSettingsGithub struct {
-	// Trigger a deployment running `pulumi up` on commit.
+	// Trigger a deployment running `pulumi up` on commit. Must be `false` when `deployTags` is `true`, because Pulumi Cloud rejects the two together.
 	DeployCommits *bool `pulumi:"deployCommits"`
+	// Trigger a deployment running `pulumi up` when a tag matching `tagFilters` is pushed. Can't be combined with `deployCommits`, which defaults to `true`, so set `deployCommits` to `false` when you enable this.
+	DeployTags *bool `pulumi:"deployTags"`
 	// The paths within the repo that deployments should be filtered to.
 	Paths []string `pulumi:"paths"`
 	// Trigger a deployment running `pulumi preview` when a PR is opened.
@@ -1816,6 +1818,8 @@ type DeploymentSettingsGithub struct {
 	PullRequestTemplate *bool `pulumi:"pullRequestTemplate"`
 	// The GitHub repository in the format org/repo.
 	Repository *string `pulumi:"repository"`
+	// Glob patterns matching the tag names that trigger a deployment when `deployTags` is true. Prefix a pattern with `!` to exclude matching tags, for example `!*-rc*`. An empty list matches all tags.
+	TagFilters []string `pulumi:"tagFilters"`
 }
 
 // Defaults sets the appropriate defaults for DeploymentSettingsGithub
@@ -1827,6 +1831,10 @@ func (val *DeploymentSettingsGithub) Defaults() *DeploymentSettingsGithub {
 	if tmp.DeployCommits == nil {
 		deployCommits_ := true
 		tmp.DeployCommits = &deployCommits_
+	}
+	if tmp.DeployTags == nil {
+		deployTags_ := false
+		tmp.DeployTags = &deployTags_
 	}
 	if tmp.PreviewPullRequests == nil {
 		previewPullRequests_ := true
@@ -1852,8 +1860,10 @@ type DeploymentSettingsGithubInput interface {
 
 // GitHub settings for the deployment.
 type DeploymentSettingsGithubArgs struct {
-	// Trigger a deployment running `pulumi up` on commit.
+	// Trigger a deployment running `pulumi up` on commit. Must be `false` when `deployTags` is `true`, because Pulumi Cloud rejects the two together.
 	DeployCommits pulumi.BoolPtrInput `pulumi:"deployCommits"`
+	// Trigger a deployment running `pulumi up` when a tag matching `tagFilters` is pushed. Can't be combined with `deployCommits`, which defaults to `true`, so set `deployCommits` to `false` when you enable this.
+	DeployTags pulumi.BoolPtrInput `pulumi:"deployTags"`
 	// The paths within the repo that deployments should be filtered to.
 	Paths pulumi.StringArrayInput `pulumi:"paths"`
 	// Trigger a deployment running `pulumi preview` when a PR is opened.
@@ -1862,6 +1872,8 @@ type DeploymentSettingsGithubArgs struct {
 	PullRequestTemplate pulumi.BoolPtrInput `pulumi:"pullRequestTemplate"`
 	// The GitHub repository in the format org/repo.
 	Repository pulumi.StringPtrInput `pulumi:"repository"`
+	// Glob patterns matching the tag names that trigger a deployment when `deployTags` is true. Prefix a pattern with `!` to exclude matching tags, for example `!*-rc*`. An empty list matches all tags.
+	TagFilters pulumi.StringArrayInput `pulumi:"tagFilters"`
 }
 
 // Defaults sets the appropriate defaults for DeploymentSettingsGithubArgs
@@ -1872,6 +1884,9 @@ func (val *DeploymentSettingsGithubArgs) Defaults() *DeploymentSettingsGithubArg
 	tmp := *val
 	if tmp.DeployCommits == nil {
 		tmp.DeployCommits = pulumi.BoolPtr(true)
+	}
+	if tmp.DeployTags == nil {
+		tmp.DeployTags = pulumi.BoolPtr(false)
 	}
 	if tmp.PreviewPullRequests == nil {
 		tmp.PreviewPullRequests = pulumi.BoolPtr(true)
@@ -1959,9 +1974,14 @@ func (o DeploymentSettingsGithubOutput) ToDeploymentSettingsGithubPtrOutputWithC
 	}).(DeploymentSettingsGithubPtrOutput)
 }
 
-// Trigger a deployment running `pulumi up` on commit.
+// Trigger a deployment running `pulumi up` on commit. Must be `false` when `deployTags` is `true`, because Pulumi Cloud rejects the two together.
 func (o DeploymentSettingsGithubOutput) DeployCommits() pulumi.BoolPtrOutput {
 	return o.ApplyT(func(v DeploymentSettingsGithub) *bool { return v.DeployCommits }).(pulumi.BoolPtrOutput)
+}
+
+// Trigger a deployment running `pulumi up` when a tag matching `tagFilters` is pushed. Can't be combined with `deployCommits`, which defaults to `true`, so set `deployCommits` to `false` when you enable this.
+func (o DeploymentSettingsGithubOutput) DeployTags() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v DeploymentSettingsGithub) *bool { return v.DeployTags }).(pulumi.BoolPtrOutput)
 }
 
 // The paths within the repo that deployments should be filtered to.
@@ -1982,6 +2002,11 @@ func (o DeploymentSettingsGithubOutput) PullRequestTemplate() pulumi.BoolPtrOutp
 // The GitHub repository in the format org/repo.
 func (o DeploymentSettingsGithubOutput) Repository() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v DeploymentSettingsGithub) *string { return v.Repository }).(pulumi.StringPtrOutput)
+}
+
+// Glob patterns matching the tag names that trigger a deployment when `deployTags` is true. Prefix a pattern with `!` to exclude matching tags, for example `!*-rc*`. An empty list matches all tags.
+func (o DeploymentSettingsGithubOutput) TagFilters() pulumi.StringArrayOutput {
+	return o.ApplyT(func(v DeploymentSettingsGithub) []string { return v.TagFilters }).(pulumi.StringArrayOutput)
 }
 
 type DeploymentSettingsGithubPtrOutput struct{ *pulumi.OutputState }
@@ -2008,13 +2033,23 @@ func (o DeploymentSettingsGithubPtrOutput) Elem() DeploymentSettingsGithubOutput
 	}).(DeploymentSettingsGithubOutput)
 }
 
-// Trigger a deployment running `pulumi up` on commit.
+// Trigger a deployment running `pulumi up` on commit. Must be `false` when `deployTags` is `true`, because Pulumi Cloud rejects the two together.
 func (o DeploymentSettingsGithubPtrOutput) DeployCommits() pulumi.BoolPtrOutput {
 	return o.ApplyT(func(v *DeploymentSettingsGithub) *bool {
 		if v == nil {
 			return nil
 		}
 		return v.DeployCommits
+	}).(pulumi.BoolPtrOutput)
+}
+
+// Trigger a deployment running `pulumi up` when a tag matching `tagFilters` is pushed. Can't be combined with `deployCommits`, which defaults to `true`, so set `deployCommits` to `false` when you enable this.
+func (o DeploymentSettingsGithubPtrOutput) DeployTags() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v *DeploymentSettingsGithub) *bool {
+		if v == nil {
+			return nil
+		}
+		return v.DeployTags
 	}).(pulumi.BoolPtrOutput)
 }
 
@@ -2056,6 +2091,16 @@ func (o DeploymentSettingsGithubPtrOutput) Repository() pulumi.StringPtrOutput {
 		}
 		return v.Repository
 	}).(pulumi.StringPtrOutput)
+}
+
+// Glob patterns matching the tag names that trigger a deployment when `deployTags` is true. Prefix a pattern with `!` to exclude matching tags, for example `!*-rc*`. An empty list matches all tags.
+func (o DeploymentSettingsGithubPtrOutput) TagFilters() pulumi.StringArrayOutput {
+	return o.ApplyT(func(v *DeploymentSettingsGithub) []string {
+		if v == nil {
+			return nil
+		}
+		return v.TagFilters
+	}).(pulumi.StringArrayOutput)
 }
 
 // Settings related to the Pulumi operation environment during the deployment.
@@ -2397,10 +2442,12 @@ func (o DeploymentSettingsSourceContextPtrOutput) Git() DeploymentSettingsGitSou
 
 // VCS settings for the deployment, supporting multiple VCS providers.
 type DeploymentSettingsVcs struct {
-	// Trigger a deployment running `pulumi up` on commit.
+	// Trigger a deployment running `pulumi up` on commit. Must be `false` when `deployTags` is `true`, because Pulumi Cloud rejects the two together.
 	DeployCommits *bool `pulumi:"deployCommits"`
 	// Deploy a specific pull request number.
 	DeployPullRequest *int `pulumi:"deployPullRequest"`
+	// Trigger a deployment running `pulumi up` when a tag matching `tagFilters` is pushed. Can't be combined with `deployCommits`, which defaults to `true`, so set `deployCommits` to `false` when you enable this.
+	DeployTags *bool `pulumi:"deployTags"`
 	// The VCS integration installation ID. Use to disambiguate when an organization has multiple integrations of the same provider type (e.g., two GitHub Apps). If omitted, the API resolves the integration automatically from `provider` and `repository`.
 	InstallationId *string `pulumi:"installationId"`
 	// The paths within the repo that deployments should be filtered to.
@@ -2413,6 +2460,8 @@ type DeploymentSettingsVcs struct {
 	PullRequestTemplate *bool `pulumi:"pullRequestTemplate"`
 	// The repository identifier (e.g., 'ProjectName/RepoName' for Azure DevOps, 'org/repo' for GitHub).
 	Repository *string `pulumi:"repository"`
+	// Glob patterns matching the tag names that trigger a deployment when `deployTags` is true. Prefix a pattern with `!` to exclude matching tags, for example `!*-rc*`. An empty list matches all tags.
+	TagFilters []string `pulumi:"tagFilters"`
 }
 
 // Defaults sets the appropriate defaults for DeploymentSettingsVcs
@@ -2424,6 +2473,10 @@ func (val *DeploymentSettingsVcs) Defaults() *DeploymentSettingsVcs {
 	if tmp.DeployCommits == nil {
 		deployCommits_ := true
 		tmp.DeployCommits = &deployCommits_
+	}
+	if tmp.DeployTags == nil {
+		deployTags_ := false
+		tmp.DeployTags = &deployTags_
 	}
 	if tmp.PreviewPullRequests == nil {
 		previewPullRequests_ := true
@@ -2449,10 +2502,12 @@ type DeploymentSettingsVcsInput interface {
 
 // VCS settings for the deployment, supporting multiple VCS providers.
 type DeploymentSettingsVcsArgs struct {
-	// Trigger a deployment running `pulumi up` on commit.
+	// Trigger a deployment running `pulumi up` on commit. Must be `false` when `deployTags` is `true`, because Pulumi Cloud rejects the two together.
 	DeployCommits pulumi.BoolPtrInput `pulumi:"deployCommits"`
 	// Deploy a specific pull request number.
 	DeployPullRequest pulumi.IntPtrInput `pulumi:"deployPullRequest"`
+	// Trigger a deployment running `pulumi up` when a tag matching `tagFilters` is pushed. Can't be combined with `deployCommits`, which defaults to `true`, so set `deployCommits` to `false` when you enable this.
+	DeployTags pulumi.BoolPtrInput `pulumi:"deployTags"`
 	// The VCS integration installation ID. Use to disambiguate when an organization has multiple integrations of the same provider type (e.g., two GitHub Apps). If omitted, the API resolves the integration automatically from `provider` and `repository`.
 	InstallationId pulumi.StringPtrInput `pulumi:"installationId"`
 	// The paths within the repo that deployments should be filtered to.
@@ -2465,6 +2520,8 @@ type DeploymentSettingsVcsArgs struct {
 	PullRequestTemplate pulumi.BoolPtrInput `pulumi:"pullRequestTemplate"`
 	// The repository identifier (e.g., 'ProjectName/RepoName' for Azure DevOps, 'org/repo' for GitHub).
 	Repository pulumi.StringPtrInput `pulumi:"repository"`
+	// Glob patterns matching the tag names that trigger a deployment when `deployTags` is true. Prefix a pattern with `!` to exclude matching tags, for example `!*-rc*`. An empty list matches all tags.
+	TagFilters pulumi.StringArrayInput `pulumi:"tagFilters"`
 }
 
 // Defaults sets the appropriate defaults for DeploymentSettingsVcsArgs
@@ -2475,6 +2532,9 @@ func (val *DeploymentSettingsVcsArgs) Defaults() *DeploymentSettingsVcsArgs {
 	tmp := *val
 	if tmp.DeployCommits == nil {
 		tmp.DeployCommits = pulumi.BoolPtr(true)
+	}
+	if tmp.DeployTags == nil {
+		tmp.DeployTags = pulumi.BoolPtr(false)
 	}
 	if tmp.PreviewPullRequests == nil {
 		tmp.PreviewPullRequests = pulumi.BoolPtr(true)
@@ -2562,7 +2622,7 @@ func (o DeploymentSettingsVcsOutput) ToDeploymentSettingsVcsPtrOutputWithContext
 	}).(DeploymentSettingsVcsPtrOutput)
 }
 
-// Trigger a deployment running `pulumi up` on commit.
+// Trigger a deployment running `pulumi up` on commit. Must be `false` when `deployTags` is `true`, because Pulumi Cloud rejects the two together.
 func (o DeploymentSettingsVcsOutput) DeployCommits() pulumi.BoolPtrOutput {
 	return o.ApplyT(func(v DeploymentSettingsVcs) *bool { return v.DeployCommits }).(pulumi.BoolPtrOutput)
 }
@@ -2570,6 +2630,11 @@ func (o DeploymentSettingsVcsOutput) DeployCommits() pulumi.BoolPtrOutput {
 // Deploy a specific pull request number.
 func (o DeploymentSettingsVcsOutput) DeployPullRequest() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v DeploymentSettingsVcs) *int { return v.DeployPullRequest }).(pulumi.IntPtrOutput)
+}
+
+// Trigger a deployment running `pulumi up` when a tag matching `tagFilters` is pushed. Can't be combined with `deployCommits`, which defaults to `true`, so set `deployCommits` to `false` when you enable this.
+func (o DeploymentSettingsVcsOutput) DeployTags() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v DeploymentSettingsVcs) *bool { return v.DeployTags }).(pulumi.BoolPtrOutput)
 }
 
 // The VCS integration installation ID. Use to disambiguate when an organization has multiple integrations of the same provider type (e.g., two GitHub Apps). If omitted, the API resolves the integration automatically from `provider` and `repository`.
@@ -2602,6 +2667,11 @@ func (o DeploymentSettingsVcsOutput) Repository() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v DeploymentSettingsVcs) *string { return v.Repository }).(pulumi.StringPtrOutput)
 }
 
+// Glob patterns matching the tag names that trigger a deployment when `deployTags` is true. Prefix a pattern with `!` to exclude matching tags, for example `!*-rc*`. An empty list matches all tags.
+func (o DeploymentSettingsVcsOutput) TagFilters() pulumi.StringArrayOutput {
+	return o.ApplyT(func(v DeploymentSettingsVcs) []string { return v.TagFilters }).(pulumi.StringArrayOutput)
+}
+
 type DeploymentSettingsVcsPtrOutput struct{ *pulumi.OutputState }
 
 func (DeploymentSettingsVcsPtrOutput) ElementType() reflect.Type {
@@ -2626,7 +2696,7 @@ func (o DeploymentSettingsVcsPtrOutput) Elem() DeploymentSettingsVcsOutput {
 	}).(DeploymentSettingsVcsOutput)
 }
 
-// Trigger a deployment running `pulumi up` on commit.
+// Trigger a deployment running `pulumi up` on commit. Must be `false` when `deployTags` is `true`, because Pulumi Cloud rejects the two together.
 func (o DeploymentSettingsVcsPtrOutput) DeployCommits() pulumi.BoolPtrOutput {
 	return o.ApplyT(func(v *DeploymentSettingsVcs) *bool {
 		if v == nil {
@@ -2644,6 +2714,16 @@ func (o DeploymentSettingsVcsPtrOutput) DeployPullRequest() pulumi.IntPtrOutput 
 		}
 		return v.DeployPullRequest
 	}).(pulumi.IntPtrOutput)
+}
+
+// Trigger a deployment running `pulumi up` when a tag matching `tagFilters` is pushed. Can't be combined with `deployCommits`, which defaults to `true`, so set `deployCommits` to `false` when you enable this.
+func (o DeploymentSettingsVcsPtrOutput) DeployTags() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v *DeploymentSettingsVcs) *bool {
+		if v == nil {
+			return nil
+		}
+		return v.DeployTags
+	}).(pulumi.BoolPtrOutput)
 }
 
 // The VCS integration installation ID. Use to disambiguate when an organization has multiple integrations of the same provider type (e.g., two GitHub Apps). If omitted, the API resolves the integration automatically from `provider` and `repository`.
@@ -2704,6 +2784,16 @@ func (o DeploymentSettingsVcsPtrOutput) Repository() pulumi.StringPtrOutput {
 		}
 		return v.Repository
 	}).(pulumi.StringPtrOutput)
+}
+
+// Glob patterns matching the tag names that trigger a deployment when `deployTags` is true. Prefix a pattern with `!` to exclude matching tags, for example `!*-rc*`. An empty list matches all tags.
+func (o DeploymentSettingsVcsPtrOutput) TagFilters() pulumi.StringArrayOutput {
+	return o.ApplyT(func(v *DeploymentSettingsVcs) []string {
+		if v == nil {
+			return nil
+		}
+		return v.TagFilters
+	}).(pulumi.StringArrayOutput)
 }
 
 type EligibleApprover struct {

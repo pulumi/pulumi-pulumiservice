@@ -12,6 +12,61 @@ import * as utilities from "./utilities";
  *
  * Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/) to choose between ESC and Deployments OIDC (`operationContext.oidc`).
  *
+ * ## Example Usage
+ * ### Deploy on every commit
+ *
+ * This runs `pulumi up` on each push to `main` that changes a file under `infra/`, and `pulumi preview` on pull requests. The organization must have the Pulumi GitHub app installed on the repository.
+ *
+ * ```typescript
+ * import * as pulumi from "@pulumi/pulumi";
+ * import * as pulumiservice from "@pulumi/pulumiservice";
+ *
+ * const settings = new pulumiservice.DeploymentSettings("settings", {
+ *     organization: "my-org",
+ *     project: "my-project",
+ *     stack: "dev",
+ *     sourceContext: {
+ *         git: {
+ *             branch: "refs/heads/main",
+ *         },
+ *     },
+ *     github: {
+ *         repository: "my-org/my-repo",
+ *         deployCommits: true,
+ *         previewPullRequests: true,
+ *         paths: ["infra/**"],
+ *     },
+ * });
+ * ```
+ * ### Deploy when a git tag is pushed
+ *
+ * This runs `pulumi up` when a tag matching `v*` is pushed, except release candidates such as `v1.2.0-rc1`. Pulumi Cloud rejects `deployCommits` and `deployTags` together, and `deployCommits` defaults to `true`, so set `deployCommits` to `false` when you enable `deployTags`. The organization must have the Pulumi GitHub app installed on the repository.
+ *
+ * ```typescript
+ * import * as pulumi from "@pulumi/pulumi";
+ * import * as pulumiservice from "@pulumi/pulumiservice";
+ *
+ * const settings = new pulumiservice.DeploymentSettings("settings", {
+ *     organization: "my-org",
+ *     project: "my-project",
+ *     stack: "production",
+ *     sourceContext: {
+ *         git: {
+ *             branch: "refs/heads/main",
+ *         },
+ *     },
+ *     github: {
+ *         repository: "my-org/my-repo",
+ *         deployCommits: false,
+ *         deployTags: true,
+ *         tagFilters: [
+ *             "v*",
+ *             "!*-rc*",
+ *         ],
+ *     },
+ * });
+ * ```
+ *
  * ## Import
  *
  * This resource can be imported using its `id`, which has the format `{organization}/{project}/{stack}`, e.g.,

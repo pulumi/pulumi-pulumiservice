@@ -222,9 +222,13 @@ export interface DeploymentSettingsGitSourceGitAuth {
  */
 export interface DeploymentSettingsGithub {
     /**
-     * Trigger a deployment running `pulumi up` on commit.
+     * Trigger a deployment running `pulumi up` on commit. Must be `false` when `deployTags` is `true`, because Pulumi Cloud rejects the two together.
      */
     deployCommits?: boolean;
+    /**
+     * Trigger a deployment running `pulumi up` when a tag matching `tagFilters` is pushed. Can't be combined with `deployCommits`, which defaults to `true`, so set `deployCommits` to `false` when you enable this.
+     */
+    deployTags?: boolean;
     /**
      * The paths within the repo that deployments should be filtered to.
      */
@@ -241,6 +245,10 @@ export interface DeploymentSettingsGithub {
      * The GitHub repository in the format org/repo.
      */
     repository?: string;
+    /**
+     * Glob patterns matching the tag names that trigger a deployment when `deployTags` is true. Prefix a pattern with `!` to exclude matching tags, for example `!*-rc*`. An empty list matches all tags.
+     */
+    tagFilters?: string[];
 }
 /**
  * deploymentSettingsGithubProvideDefaults sets the appropriate defaults for DeploymentSettingsGithub
@@ -249,6 +257,7 @@ export function deploymentSettingsGithubProvideDefaults(val: DeploymentSettingsG
     return {
         ...val,
         deployCommits: (val.deployCommits) ?? true,
+        deployTags: (val.deployTags) ?? false,
         previewPullRequests: (val.previewPullRequests) ?? true,
         pullRequestTemplate: (val.pullRequestTemplate) ?? false,
     };
@@ -291,13 +300,17 @@ export interface DeploymentSettingsSourceContext {
  */
 export interface DeploymentSettingsVcs {
     /**
-     * Trigger a deployment running `pulumi up` on commit.
+     * Trigger a deployment running `pulumi up` on commit. Must be `false` when `deployTags` is `true`, because Pulumi Cloud rejects the two together.
      */
     deployCommits?: boolean;
     /**
      * Deploy a specific pull request number.
      */
     deployPullRequest?: number;
+    /**
+     * Trigger a deployment running `pulumi up` when a tag matching `tagFilters` is pushed. Can't be combined with `deployCommits`, which defaults to `true`, so set `deployCommits` to `false` when you enable this.
+     */
+    deployTags?: boolean;
     /**
      * The VCS integration installation ID. Use to disambiguate when an organization has multiple integrations of the same provider type (e.g., two GitHub Apps). If omitted, the API resolves the integration automatically from `provider` and `repository`.
      */
@@ -322,6 +335,10 @@ export interface DeploymentSettingsVcs {
      * The repository identifier (e.g., 'ProjectName/RepoName' for Azure DevOps, 'org/repo' for GitHub).
      */
     repository?: string;
+    /**
+     * Glob patterns matching the tag names that trigger a deployment when `deployTags` is true. Prefix a pattern with `!` to exclude matching tags, for example `!*-rc*`. An empty list matches all tags.
+     */
+    tagFilters?: string[];
 }
 /**
  * deploymentSettingsVcsProvideDefaults sets the appropriate defaults for DeploymentSettingsVcs
@@ -330,6 +347,7 @@ export function deploymentSettingsVcsProvideDefaults(val: DeploymentSettingsVcs)
     return {
         ...val,
         deployCommits: (val.deployCommits) ?? true,
+        deployTags: (val.deployTags) ?? false,
         previewPullRequests: (val.previewPullRequests) ?? true,
         pullRequestTemplate: (val.pullRequestTemplate) ?? false,
     };

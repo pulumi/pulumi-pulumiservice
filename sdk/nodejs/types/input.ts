@@ -222,9 +222,13 @@ export interface DeploymentSettingsGitSourceGitAuthArgs {
  */
 export interface DeploymentSettingsGithubArgs {
     /**
-     * Trigger a deployment running `pulumi up` on commit.
+     * Trigger a deployment running `pulumi up` on commit. Must be `false` when `deployTags` is `true`, because Pulumi Cloud rejects the two together.
      */
     deployCommits?: pulumi.Input<boolean | undefined>;
+    /**
+     * Trigger a deployment running `pulumi up` when a tag matching `tagFilters` is pushed. Can't be combined with `deployCommits`, which defaults to `true`, so set `deployCommits` to `false` when you enable this.
+     */
+    deployTags?: pulumi.Input<boolean | undefined>;
     /**
      * The paths within the repo that deployments should be filtered to.
      */
@@ -241,6 +245,10 @@ export interface DeploymentSettingsGithubArgs {
      * The GitHub repository in the format org/repo.
      */
     repository?: pulumi.Input<string | undefined>;
+    /**
+     * Glob patterns matching the tag names that trigger a deployment when `deployTags` is true. Prefix a pattern with `!` to exclude matching tags, for example `!*-rc*`. An empty list matches all tags.
+     */
+    tagFilters?: pulumi.Input<pulumi.Input<string>[] | undefined>;
 }
 /**
  * deploymentSettingsGithubArgsProvideDefaults sets the appropriate defaults for DeploymentSettingsGithubArgs
@@ -249,6 +257,7 @@ export function deploymentSettingsGithubArgsProvideDefaults(val: DeploymentSetti
     return {
         ...val,
         deployCommits: (val.deployCommits) ?? true,
+        deployTags: (val.deployTags) ?? false,
         previewPullRequests: (val.previewPullRequests) ?? true,
         pullRequestTemplate: (val.pullRequestTemplate) ?? false,
     };
@@ -291,13 +300,17 @@ export interface DeploymentSettingsSourceContextArgs {
  */
 export interface DeploymentSettingsVcsArgs {
     /**
-     * Trigger a deployment running `pulumi up` on commit.
+     * Trigger a deployment running `pulumi up` on commit. Must be `false` when `deployTags` is `true`, because Pulumi Cloud rejects the two together.
      */
     deployCommits?: pulumi.Input<boolean | undefined>;
     /**
      * Deploy a specific pull request number.
      */
     deployPullRequest?: pulumi.Input<number | undefined>;
+    /**
+     * Trigger a deployment running `pulumi up` when a tag matching `tagFilters` is pushed. Can't be combined with `deployCommits`, which defaults to `true`, so set `deployCommits` to `false` when you enable this.
+     */
+    deployTags?: pulumi.Input<boolean | undefined>;
     /**
      * The VCS integration installation ID. Use to disambiguate when an organization has multiple integrations of the same provider type (e.g., two GitHub Apps). If omitted, the API resolves the integration automatically from `provider` and `repository`.
      */
@@ -322,6 +335,10 @@ export interface DeploymentSettingsVcsArgs {
      * The repository identifier (e.g., 'ProjectName/RepoName' for Azure DevOps, 'org/repo' for GitHub).
      */
     repository?: pulumi.Input<string | undefined>;
+    /**
+     * Glob patterns matching the tag names that trigger a deployment when `deployTags` is true. Prefix a pattern with `!` to exclude matching tags, for example `!*-rc*`. An empty list matches all tags.
+     */
+    tagFilters?: pulumi.Input<pulumi.Input<string>[] | undefined>;
 }
 /**
  * deploymentSettingsVcsArgsProvideDefaults sets the appropriate defaults for DeploymentSettingsVcsArgs
@@ -330,6 +347,7 @@ export function deploymentSettingsVcsArgsProvideDefaults(val: DeploymentSettings
     return {
         ...val,
         deployCommits: (val.deployCommits) ?? true,
+        deployTags: (val.deployTags) ?? false,
         previewPullRequests: (val.previewPullRequests) ?? true,
         pullRequestTemplate: (val.pullRequestTemplate) ?? false,
     };

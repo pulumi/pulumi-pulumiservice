@@ -210,6 +210,57 @@ class DeploymentSettings(pulumi.CustomResource):
 
         Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/) to choose between ESC and Deployments OIDC (`operationContext.oidc`).
 
+        ## Example Usage
+        ### Deploy on every commit
+
+        This runs `pulumi up` on each push to `main` that changes a file under `infra/`, and `pulumi preview` on pull requests. The organization must have the Pulumi GitHub app installed on the repository.
+        ```python
+        import pulumi
+        import pulumi_pulumiservice as pulumiservice
+
+        settings = pulumiservice.DeploymentSettings("settings",
+            organization="my-org",
+            project="my-project",
+            stack="dev",
+            source_context={
+                "git": {
+                    "branch": "refs/heads/main",
+                },
+            },
+            github={
+                "repository": "my-org/my-repo",
+                "deploy_commits": True,
+                "preview_pull_requests": True,
+                "paths": ["infra/**"],
+            })
+        ```
+        ### Deploy when a git tag is pushed
+
+        This runs `pulumi up` when a tag matching `v*` is pushed, except release candidates such as `v1.2.0-rc1`. Pulumi Cloud rejects `deployCommits` and `deployTags` together, and `deployCommits` defaults to `true`, so set `deployCommits` to `false` when you enable `deployTags`. The organization must have the Pulumi GitHub app installed on the repository.
+        ```python
+        import pulumi
+        import pulumi_pulumiservice as pulumiservice
+
+        settings = pulumiservice.DeploymentSettings("settings",
+            organization="my-org",
+            project="my-project",
+            stack="production",
+            source_context={
+                "git": {
+                    "branch": "refs/heads/main",
+                },
+            },
+            github={
+                "repository": "my-org/my-repo",
+                "deploy_commits": False,
+                "deploy_tags": True,
+                "tag_filters": [
+                    "v*",
+                    "!*-rc*",
+                ],
+            })
+        ```
+
         ## Import
 
         This resource can be imported using its `id`, which has the format `{organization}/{project}/{stack}`, e.g.,
@@ -244,6 +295,57 @@ class DeploymentSettings(pulumi.CustomResource):
         Deployment settings configure Pulumi Deployments for a stack.
 
         Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/) to choose between ESC and Deployments OIDC (`operationContext.oidc`).
+
+        ## Example Usage
+        ### Deploy on every commit
+
+        This runs `pulumi up` on each push to `main` that changes a file under `infra/`, and `pulumi preview` on pull requests. The organization must have the Pulumi GitHub app installed on the repository.
+        ```python
+        import pulumi
+        import pulumi_pulumiservice as pulumiservice
+
+        settings = pulumiservice.DeploymentSettings("settings",
+            organization="my-org",
+            project="my-project",
+            stack="dev",
+            source_context={
+                "git": {
+                    "branch": "refs/heads/main",
+                },
+            },
+            github={
+                "repository": "my-org/my-repo",
+                "deploy_commits": True,
+                "preview_pull_requests": True,
+                "paths": ["infra/**"],
+            })
+        ```
+        ### Deploy when a git tag is pushed
+
+        This runs `pulumi up` when a tag matching `v*` is pushed, except release candidates such as `v1.2.0-rc1`. Pulumi Cloud rejects `deployCommits` and `deployTags` together, and `deployCommits` defaults to `true`, so set `deployCommits` to `false` when you enable `deployTags`. The organization must have the Pulumi GitHub app installed on the repository.
+        ```python
+        import pulumi
+        import pulumi_pulumiservice as pulumiservice
+
+        settings = pulumiservice.DeploymentSettings("settings",
+            organization="my-org",
+            project="my-project",
+            stack="production",
+            source_context={
+                "git": {
+                    "branch": "refs/heads/main",
+                },
+            },
+            github={
+                "repository": "my-org/my-repo",
+                "deploy_commits": False,
+                "deploy_tags": True,
+                "tag_filters": [
+                    "v*",
+                    "!*-rc*",
+                ],
+            })
+        ```
 
         ## Import
 
