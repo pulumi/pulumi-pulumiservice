@@ -17,9 +17,6 @@ package rest
 import (
 	"bytes"
 	"context"
-	"crypto/rand"
-	"crypto/sha256"
-	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -35,6 +32,8 @@ import (
 
 	p "github.com/pulumi/pulumi-go-provider"
 	"github.com/pulumi/pulumi/sdk/v3/go/property"
+
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 )
 
 // pathParamRE matches OpenAPI {param} placeholders in path strings.
@@ -136,7 +135,7 @@ func (r *Resource) Check(_ context.Context, req p.CheckRequest) (p.CheckResponse
 		if _, ok := out[name]; ok {
 			continue
 		}
-		out[name] = property.New(generateAutoName(string(req.Urn), req.RandomSeed, fm.AutoName))
+		out[name] = property.New(util.GenerateAutoName(string(req.Urn), req.RandomSeed, fm.AutoName))
 	}
 	return p.CheckResponse{Inputs: property.NewMap(out)}, nil
 }
@@ -197,36 +196,6 @@ func sortArrayValue(arr property.Array) property.Array {
 		return strings.Compare(a.AsString(), b.AsString())
 	})
 	return property.NewArray(sorted)
-}
-
-// generateAutoName produces a deterministic name from the URN and the
-// engine-supplied random seed, capped at maxLen. Falls back to crypto/rand
-// when seed is nil.
-func generateAutoName(urn string, seed []byte, maxLen int) string {
-	parts := strings.Split(urn, "::")
-	base := parts[len(parts)-1]
-	if base == "" {
-		base = "resource"
-	}
-	const suffixLen = 7
-	var suffix string
-	if len(seed) > 0 {
-		h := sha256.Sum256(seed)
-		suffix = hex.EncodeToString(h[:4])[:suffixLen]
-	} else {
-		buf := make([]byte, 4)
-		_, _ = rand.Read(buf)
-		suffix = hex.EncodeToString(buf)[:suffixLen]
-	}
-	candidate := base + "-" + suffix
-	if maxLen > 0 && len(candidate) > maxLen {
-		budget := maxLen - suffixLen - 1
-		if budget < 1 {
-			return candidate[:maxLen]
-		}
-		candidate = base[:budget] + "-" + suffix
-	}
-	return candidate
 }
 
 // wireSideName inverts the renames map: Pulumi-side → wire-side.

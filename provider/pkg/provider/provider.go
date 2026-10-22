@@ -48,6 +48,7 @@ import (
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/resources"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/rest"
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 )
 
 const (
@@ -245,6 +246,9 @@ func MakeProvider(host *provider.HostClient, name, version string) (pulumirpc.Re
 		return nil, err
 	}
 	provider = withFunctionDeprecations(provider, functions.DeprecatedFunctions)
+	// infer doesn't pass the URN or random seed to a resource's Check, so
+	// carry them in the context for util.AutoName.
+	provider = util.WithAutoNameContext(provider)
 	return p.RawServer(name, version, resources.WithEnvironmentCompat(provider))(host)
 }
 
