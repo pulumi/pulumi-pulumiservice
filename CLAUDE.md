@@ -140,6 +140,14 @@ cd examples && go test -v -run TestYamlStackTagsPluralExample -tags yaml -timeou
 These changes are important but not user-facing, so they don't belong in the
 CHANGELOG.
 
+**Every PR needs a CHANGELOG entry or the `impact/no-changelog-required`
+label.** The `Update Changelog` status check from pulumi-bot fails otherwise.
+When a PR falls under the exceptions above, add the label when you open it:
+`gh pr create --label impact/no-changelog-required`, or
+`gh pr edit <number> --add-label impact/no-changelog-required` for an existing
+PR. This check is a commit status, not an Actions job, so `gh run` doesn't show
+it. Look for it in `gh pr checks <number>`.
+
 ### Schema Changes
 
 The provider schema is assembled from three sources in `MakeProvider`
