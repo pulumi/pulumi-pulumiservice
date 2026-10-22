@@ -461,6 +461,7 @@ func TestYamlAgentPoolsExample(t *testing.T) {
 func TestYamlTemplateSourcesExample(t *testing.T) {
 	cwd := getCwd(t)
 	digits := generateRandomFiveDigits()
+	deleteLeakedTemplateSources(t, "service-provider-test-org", "https://github.com/pulumi/pulumi")
 	integration.ProgramTest(t, &integration.ProgramTestOptions{
 		Dir: path.Join(cwd, ".", "yaml-template-sources"),
 		Config: map[string]string{

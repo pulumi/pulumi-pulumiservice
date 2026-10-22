@@ -8,10 +8,12 @@ import (
 	"math/rand"
 	"net/http"
 	"os"
+	"strings"
 	"testing"
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/stretchr/testify/require"
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 )
@@ -174,5 +176,31 @@ func snapshotFixtureOrgMember(t *testing.T, orgName, userName string) func() {
 		if restoreErr != nil {
 			t.Logf("restore fixture user role: %v", restoreErr)
 		}
+	}
+}
+
+// deleteLeakedTemplateSources deletes the template sources in orgName that an
+// earlier run of TestYamlTemplateSourcesExample left behind, for example when
+// CI was cancelled before destroy. Pulumi Cloud allows one template source per
+// sourceURL in an org and reports a 409 naming the new source, so a single
+// leak fails every later run whatever name it picks.
+func deleteLeakedTemplateSources(t *testing.T, orgName, sourceURL string) {
+	t.Helper()
+	token := os.Getenv("PULUMI_ACCESS_TOKEN")
+	apiURL := os.Getenv("PULUMI_BACKEND_URL")
+	if token == "" || apiURL == "" {
+		return
+	}
+	client, err := pulumiapi.NewClient(&http.Client{Timeout: 60 * time.Second}, token, apiURL)
+	require.NoError(t, err)
+	ctx := context.Background()
+	sources, err := client.ListTemplateSources(ctx, orgName)
+	require.NoError(t, err)
+	for _, source := range sources {
+		if source.SourceURL != sourceURL || !strings.HasPrefix(source.Name, "bootstrap-") {
+			continue
+		}
+		t.Logf("deleting leaked template source %q (%s)", source.Name, source.ID)
+		require.NoError(t, client.DeleteTemplateSource(ctx, orgName, source.ID))
 	}
 }

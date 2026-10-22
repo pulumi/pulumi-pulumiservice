@@ -82,6 +82,23 @@ func (c *Client) UpdateTemplateSource(
 	return &response, nil
 }
 
+func (c *Client) ListTemplateSources(
+	ctx context.Context,
+	organizationName string,
+) ([]TemplateSourceResponse, error) {
+	apiPath := path.Join("orgs", organizationName, "templates/sources")
+	var templateSources ListResponse
+	_, err := c.do(ctx, http.MethodGet, apiPath, nil, &templateSources)
+	if err != nil {
+		return nil, fmt.Errorf(
+			"failed to list template sources in org %s due to error: %w",
+			organizationName,
+			err,
+		)
+	}
+	return templateSources.Sources, nil
+}
+
 func (c *Client) GetTemplateSource(
 	ctx context.Context,
 	organizationName string,
@@ -91,9 +108,7 @@ func (c *Client) GetTemplateSource(
 	// Thus, using a List and then finding by ID
 	// TODO issue to improve this - https://github.com/pulumi/pulumi-service/issues/21637
 
-	apiPath := path.Join("orgs", organizationName, "templates/sources")
-	var templateSources ListResponse
-	_, err := c.do(ctx, http.MethodGet, apiPath, nil, &templateSources)
+	sources, err := c.ListTemplateSources(ctx, organizationName)
 	if err != nil {
 		return nil, fmt.Errorf(
 			"failed to get template source in org %s with id %s due to error: %w",
@@ -103,7 +118,7 @@ func (c *Client) GetTemplateSource(
 		)
 	}
 
-	for _, source := range templateSources.Sources {
+	for _, source := range sources {
 		if source.ID == templateID {
 			return &source, nil
 		}
