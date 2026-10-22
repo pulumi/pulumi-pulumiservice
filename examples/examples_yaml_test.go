@@ -323,24 +323,24 @@ const deploymentSettingsBaselineVersion = "1.5.0"
 // provider previews with no changes under the current one, secrets included.
 // It guards the move of DeploymentSettings to infer (#1206).
 func TestYamlDeploymentSettingsUpgrade(t *testing.T) {
-	examples := map[string]map[string]string{
-		"yaml-deployment-settings":        {"imageUsername": "registry-user"},
-		"yaml-deployment-settings-commit": {},
+	// Each example maps to a callback that sets the config it needs beyond
+	// organizationName and digits.
+	examples := map[string]func(ctx context.Context, t *testing.T, stack *auto.Stack){
+		"yaml-deployment-settings": func(ctx context.Context, t *testing.T, stack *auto.Stack) {
+			require.NoError(t, stack.SetAllConfig(ctx, auto.ConfigMap{
+				"imageUsername": {Value: "registry-user"},
+				"imagePassword": {Value: "registry-password", Secret: true},
+			}))
+		},
+		"yaml-deployment-settings-commit": func(context.Context, *testing.T, *auto.Stack) {},
 	}
-	for dir, config := range examples {
+	for dir, configureExample := range examples {
 		t.Run(dir, func(t *testing.T) {
 			digits := generateRandomFiveDigits()
 			configure := func(test *pulumitest.PulumiTest) {
 				test.SetConfig(t, "organizationName", getOrgName())
 				test.SetConfig(t, "digits", digits)
-				for k, v := range config {
-					test.SetConfig(t, k, v)
-				}
-				if dir == "yaml-deployment-settings" {
-					err := test.CurrentStack().SetConfig(test.Context(), "imagePassword",
-						auto.ConfigValue{Value: "registry-password", Secret: true})
-					require.NoError(t, err)
-				}
+				configureExample(test.Context(), t, test.CurrentStack())
 			}
 
 			// The settings belong to this stack, so it must exist in Pulumi Cloud
