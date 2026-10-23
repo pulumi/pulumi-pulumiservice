@@ -95,6 +95,7 @@
         "environment.ts",
         "environmentRotationSchedule.ts",
         "environmentVersionTag.ts",
+        "getAgent.ts",
         "getCurrentUser.ts",
         "getEnvironment.ts",
         "getInsightsAccount.ts",

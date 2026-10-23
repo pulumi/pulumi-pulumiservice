@@ -1,0 +1,16 @@
+description: Reference a saved Custom Agent by durable ID
+config:
+  organization:
+    type: string
+  scoutAgentId:
+    type: string
+variables:
+  scout:
+    fn::invoke:
+      function: pulumiservice:getAgent
+      arguments:
+        organization: ${organization}
+        agentId: ${scoutAgentId}
+outputs:
+  agentId: ${scout.agentId}
+  displayName: ${scout.displayName}

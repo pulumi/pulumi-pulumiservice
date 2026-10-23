@@ -170,6 +170,7 @@ func MakeProvider(host *provider.HostClient, name, version string) (pulumirpc.Re
 			infer.Function(&functions.BuildRolePermissionsFunction{}),
 			infer.Function(&functions.BuildStackMatchRuleFunction{}),
 			infer.Function(&functions.BuildStackScopedPermissionsFunction{}),
+			infer.Function(&functions.GetAgentFunction{}),
 			infer.Function(&functions.GetCurrentUserFunction{}),
 			infer.Function(&functions.GetEnvironmentFunction{}),
 			infer.Function(&functions.GetInsightsAccountFunction{}),

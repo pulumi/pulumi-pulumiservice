@@ -85,6 +85,11 @@ export type EnvironmentVersionTag = import("./environmentVersionTag").Environmen
 export const EnvironmentVersionTag: typeof import("./environmentVersionTag").EnvironmentVersionTag = null as any;
 utilities.lazyLoad(exports, ["EnvironmentVersionTag"], () => require("./environmentVersionTag"));
 
+export { GetAgentArgs, GetAgentResult, GetAgentOutputArgs } from "./getAgent";
+export const getAgent: typeof import("./getAgent").getAgent = null as any;
+export const getAgentOutput: typeof import("./getAgent").getAgentOutput = null as any;
+utilities.lazyLoad(exports, ["getAgent","getAgentOutput"], () => require("./getAgent"));
+
 export { GetCurrentUserArgs, GetCurrentUserResult } from "./getCurrentUser";
 export const getCurrentUser: typeof import("./getCurrentUser").getCurrentUser = null as any;
 export const getCurrentUserOutput: typeof import("./getCurrentUser").getCurrentUserOutput = null as any;

@@ -23,6 +23,8 @@ import com.pulumi.pulumiservice.inputs.BuildStackMatchRuleArgs;
 import com.pulumi.pulumiservice.inputs.BuildStackMatchRulePlainArgs;
 import com.pulumi.pulumiservice.inputs.BuildStackScopedPermissionsArgs;
 import com.pulumi.pulumiservice.inputs.BuildStackScopedPermissionsPlainArgs;
+import com.pulumi.pulumiservice.inputs.GetAgentArgs;
+import com.pulumi.pulumiservice.inputs.GetAgentPlainArgs;
 import com.pulumi.pulumiservice.inputs.GetCurrentUserArgs;
 import com.pulumi.pulumiservice.inputs.GetCurrentUserPlainArgs;
 import com.pulumi.pulumiservice.inputs.GetEnvironmentArgs;
@@ -54,6 +56,7 @@ import com.pulumi.pulumiservice.outputs.BuildInsightsAccountScopedPermissionsRes
 import com.pulumi.pulumiservice.outputs.BuildRolePermissionsResult;
 import com.pulumi.pulumiservice.outputs.BuildStackMatchRuleResult;
 import com.pulumi.pulumiservice.outputs.BuildStackScopedPermissionsResult;
+import com.pulumi.pulumiservice.outputs.GetAgentResult;
 import com.pulumi.pulumiservice.outputs.GetCurrentUserResult;
 import com.pulumi.pulumiservice.outputs.GetEnvironmentResult;
 import com.pulumi.pulumiservice.outputs.GetInsightsAccountResult;
@@ -407,6 +410,241 @@ public final class PulumiserviceFunctions {
     @Deprecated /* Use `buildRolePermissions` instead, with a `stackRules` entry that sets `id`. If a scope you need isn't in the enums yet, upgrade the provider. */
     public static CompletableFuture<BuildStackScopedPermissionsResult> buildStackScopedPermissionsPlain(BuildStackScopedPermissionsPlainArgs args, InvokeOptions options) {
         return Deployment.getInstance().invokeAsync("pulumiservice:index:buildStackScopedPermissions", TypeShape.of(BuildStackScopedPermissionsResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Looks up an active saved Custom Agent in Pulumi Cloud by its durable definition ID. Pass the returned `agentId` to `delivery.Agent.agent`. Renaming the agent does not change this ID. The provider&#39;s caller must be allowed to use the agent&#39;s role. Deleted, missing, or invisible agents fail the lookup. This lookup returns identity metadata only; it does not create a task or grant permission to run one.
+     * 
+     * ## Example Usage
+     * ### Reference a saved Custom Agent by durable ID
+     * 
+     * <pre>
+     * {@code
+     * package generated_program;
+     * 
+     * import com.pulumi.Context;
+     * import com.pulumi.Pulumi;
+     * import com.pulumi.core.Output;
+     * import com.pulumi.pulumiservice.PulumiserviceFunctions;
+     * import com.pulumi.pulumiservice.inputs.GetAgentArgs;
+     * import java.util.ArrayList;
+     * import java.util.Arrays;
+     * import java.util.Map;
+     * import java.io.File;
+     * import java.nio.file.Files;
+     * import java.nio.file.Paths;
+     * 
+     * public class App {
+     *     public static void main(String[] args) {
+     *         Pulumi.run(App::stack);
+     *     }
+     * 
+     *     public static void stack(Context ctx) {
+     *         final var config = ctx.config();
+     *         final var organization0 = config.require("organization");
+     *         final var scoutAgentId = config.require("scoutAgentId");
+     *         final var scout = PulumiserviceFunctions.getAgent(GetAgentArgs.builder()
+     *             .organization(organization0)
+     *             .agentId(scoutAgentId)
+     *             .build());
+     * 
+     *         ctx.export("agentId", scout.applyValue(_scout -> _scout.agentId()));
+     *         ctx.export("displayName", scout.applyValue(_scout -> _scout.displayName()));
+     *     }
+     * }
+     * }
+     * </pre>
+     * 
+     */
+    public static Output<GetAgentResult> getAgent(GetAgentArgs args) {
+        return getAgent(args, InvokeOptions.Empty);
+    }
+    /**
+     * Looks up an active saved Custom Agent in Pulumi Cloud by its durable definition ID. Pass the returned `agentId` to `delivery.Agent.agent`. Renaming the agent does not change this ID. The provider&#39;s caller must be allowed to use the agent&#39;s role. Deleted, missing, or invisible agents fail the lookup. This lookup returns identity metadata only; it does not create a task or grant permission to run one.
+     * 
+     * ## Example Usage
+     * ### Reference a saved Custom Agent by durable ID
+     * 
+     * <pre>
+     * {@code
+     * package generated_program;
+     * 
+     * import com.pulumi.Context;
+     * import com.pulumi.Pulumi;
+     * import com.pulumi.core.Output;
+     * import com.pulumi.pulumiservice.PulumiserviceFunctions;
+     * import com.pulumi.pulumiservice.inputs.GetAgentArgs;
+     * import java.util.ArrayList;
+     * import java.util.Arrays;
+     * import java.util.Map;
+     * import java.io.File;
+     * import java.nio.file.Files;
+     * import java.nio.file.Paths;
+     * 
+     * public class App {
+     *     public static void main(String[] args) {
+     *         Pulumi.run(App::stack);
+     *     }
+     * 
+     *     public static void stack(Context ctx) {
+     *         final var config = ctx.config();
+     *         final var organization0 = config.require("organization");
+     *         final var scoutAgentId = config.require("scoutAgentId");
+     *         final var scout = PulumiserviceFunctions.getAgent(GetAgentArgs.builder()
+     *             .organization(organization0)
+     *             .agentId(scoutAgentId)
+     *             .build());
+     * 
+     *         ctx.export("agentId", scout.applyValue(_scout -> _scout.agentId()));
+     *         ctx.export("displayName", scout.applyValue(_scout -> _scout.displayName()));
+     *     }
+     * }
+     * }
+     * </pre>
+     * 
+     */
+    public static CompletableFuture<GetAgentResult> getAgentPlain(GetAgentPlainArgs args) {
+        return getAgentPlain(args, InvokeOptions.Empty);
+    }
+    /**
+     * Looks up an active saved Custom Agent in Pulumi Cloud by its durable definition ID. Pass the returned `agentId` to `delivery.Agent.agent`. Renaming the agent does not change this ID. The provider&#39;s caller must be allowed to use the agent&#39;s role. Deleted, missing, or invisible agents fail the lookup. This lookup returns identity metadata only; it does not create a task or grant permission to run one.
+     * 
+     * ## Example Usage
+     * ### Reference a saved Custom Agent by durable ID
+     * 
+     * <pre>
+     * {@code
+     * package generated_program;
+     * 
+     * import com.pulumi.Context;
+     * import com.pulumi.Pulumi;
+     * import com.pulumi.core.Output;
+     * import com.pulumi.pulumiservice.PulumiserviceFunctions;
+     * import com.pulumi.pulumiservice.inputs.GetAgentArgs;
+     * import java.util.ArrayList;
+     * import java.util.Arrays;
+     * import java.util.Map;
+     * import java.io.File;
+     * import java.nio.file.Files;
+     * import java.nio.file.Paths;
+     * 
+     * public class App {
+     *     public static void main(String[] args) {
+     *         Pulumi.run(App::stack);
+     *     }
+     * 
+     *     public static void stack(Context ctx) {
+     *         final var config = ctx.config();
+     *         final var organization0 = config.require("organization");
+     *         final var scoutAgentId = config.require("scoutAgentId");
+     *         final var scout = PulumiserviceFunctions.getAgent(GetAgentArgs.builder()
+     *             .organization(organization0)
+     *             .agentId(scoutAgentId)
+     *             .build());
+     * 
+     *         ctx.export("agentId", scout.applyValue(_scout -> _scout.agentId()));
+     *         ctx.export("displayName", scout.applyValue(_scout -> _scout.displayName()));
+     *     }
+     * }
+     * }
+     * </pre>
+     * 
+     */
+    public static Output<GetAgentResult> getAgent(GetAgentArgs args, InvokeOptions options) {
+        return Deployment.getInstance().invoke("pulumiservice:index:getAgent", TypeShape.of(GetAgentResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Looks up an active saved Custom Agent in Pulumi Cloud by its durable definition ID. Pass the returned `agentId` to `delivery.Agent.agent`. Renaming the agent does not change this ID. The provider&#39;s caller must be allowed to use the agent&#39;s role. Deleted, missing, or invisible agents fail the lookup. This lookup returns identity metadata only; it does not create a task or grant permission to run one.
+     * 
+     * ## Example Usage
+     * ### Reference a saved Custom Agent by durable ID
+     * 
+     * <pre>
+     * {@code
+     * package generated_program;
+     * 
+     * import com.pulumi.Context;
+     * import com.pulumi.Pulumi;
+     * import com.pulumi.core.Output;
+     * import com.pulumi.pulumiservice.PulumiserviceFunctions;
+     * import com.pulumi.pulumiservice.inputs.GetAgentArgs;
+     * import java.util.ArrayList;
+     * import java.util.Arrays;
+     * import java.util.Map;
+     * import java.io.File;
+     * import java.nio.file.Files;
+     * import java.nio.file.Paths;
+     * 
+     * public class App {
+     *     public static void main(String[] args) {
+     *         Pulumi.run(App::stack);
+     *     }
+     * 
+     *     public static void stack(Context ctx) {
+     *         final var config = ctx.config();
+     *         final var organization0 = config.require("organization");
+     *         final var scoutAgentId = config.require("scoutAgentId");
+     *         final var scout = PulumiserviceFunctions.getAgent(GetAgentArgs.builder()
+     *             .organization(organization0)
+     *             .agentId(scoutAgentId)
+     *             .build());
+     * 
+     *         ctx.export("agentId", scout.applyValue(_scout -> _scout.agentId()));
+     *         ctx.export("displayName", scout.applyValue(_scout -> _scout.displayName()));
+     *     }
+     * }
+     * }
+     * </pre>
+     * 
+     */
+    public static Output<GetAgentResult> getAgent(GetAgentArgs args, InvokeOutputOptions options) {
+        return Deployment.getInstance().invoke("pulumiservice:index:getAgent", TypeShape.of(GetAgentResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Looks up an active saved Custom Agent in Pulumi Cloud by its durable definition ID. Pass the returned `agentId` to `delivery.Agent.agent`. Renaming the agent does not change this ID. The provider&#39;s caller must be allowed to use the agent&#39;s role. Deleted, missing, or invisible agents fail the lookup. This lookup returns identity metadata only; it does not create a task or grant permission to run one.
+     * 
+     * ## Example Usage
+     * ### Reference a saved Custom Agent by durable ID
+     * 
+     * <pre>
+     * {@code
+     * package generated_program;
+     * 
+     * import com.pulumi.Context;
+     * import com.pulumi.Pulumi;
+     * import com.pulumi.core.Output;
+     * import com.pulumi.pulumiservice.PulumiserviceFunctions;
+     * import com.pulumi.pulumiservice.inputs.GetAgentArgs;
+     * import java.util.ArrayList;
+     * import java.util.Arrays;
+     * import java.util.Map;
+     * import java.io.File;
+     * import java.nio.file.Files;
+     * import java.nio.file.Paths;
+     * 
+     * public class App {
+     *     public static void main(String[] args) {
+     *         Pulumi.run(App::stack);
+     *     }
+     * 
+     *     public static void stack(Context ctx) {
+     *         final var config = ctx.config();
+     *         final var organization0 = config.require("organization");
+     *         final var scoutAgentId = config.require("scoutAgentId");
+     *         final var scout = PulumiserviceFunctions.getAgent(GetAgentArgs.builder()
+     *             .organization(organization0)
+     *             .agentId(scoutAgentId)
+     *             .build());
+     * 
+     *         ctx.export("agentId", scout.applyValue(_scout -> _scout.agentId()));
+     *         ctx.export("displayName", scout.applyValue(_scout -> _scout.displayName()));
+     *     }
+     * }
+     * }
+     * </pre>
+     * 
+     */
+    public static CompletableFuture<GetAgentResult> getAgentPlain(GetAgentPlainArgs args, InvokeOptions options) {
+        return Deployment.getInstance().invokeAsync("pulumiservice:index:getAgent", TypeShape.of(GetAgentResult.class), args, Utilities.withVersion(options));
     }
     /**
      * Returns the Pulumi Cloud user that the provider&#39;s access token belongs to. Useful for seeding a newly-created `Team` with the creator as a member, since Pulumi Cloud auto-adds the creator. Omitting this user from the team will result in a refresh drift.

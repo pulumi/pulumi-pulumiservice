@@ -8478,6 +8478,53 @@
         "type": "object"
       }
     },
+    "pulumiservice:index:getAgent": {
+      "description": "Looks up an active saved Custom Agent in Pulumi Cloud by its durable definition ID. Pass the returned `agentId` to `delivery.Agent.agent`. Renaming the agent does not change this ID. The provider's caller must be allowed to use the agent's role. Deleted, missing, or invisible agents fail the lookup. This lookup returns identity metadata only; it does not create a task or grant permission to run one.\n\n{{% examples %}}\n## Example Usage\n\n{{% example %}}\n### Reference a saved Custom Agent by durable ID\n\n```typescript\nimport * as pulumi from \"@pulumi/pulumi\";\nimport * as pulumiservice from \"@pulumi/pulumiservice\";\n\nconst config = new pulumi.Config();\nconst organization0 = config.require(\"organization\");\nconst scoutAgentId = config.require(\"scoutAgentId\");\nconst scout = pulumiservice.getAgentOutput({\n    organization: organization0,\n    agentId: scoutAgentId,\n});\nexport const agentId = scout.agentId;\nexport const displayName = scout.displayName;\n```\n\n```python\nimport pulumi\nimport pulumi_pulumiservice as pulumiservice\n\nconfig = pulumi.Config()\norganization0 = config.require(\"organization\")\nscout_agent_id = config.require(\"scoutAgentId\")\nscout = pulumiservice.get_agent_output(organization=organization0,\n    agent_id=scout_agent_id)\npulumi.export(\"agentId\", scout.agent_id)\npulumi.export(\"displayName\", scout.display_name)\n```\n\n```go\npackage main\n\nimport (\n\t\"github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice\"\n\t\"github.com/pulumi/pulumi/sdk/v3/go/pulumi\"\n\t\"github.com/pulumi/pulumi/sdk/v3/go/pulumi/config\"\n)\n\nfunc main() {\n\tpulumi.Run(func(ctx *pulumi.Context) error {\n\t\tcfg := config.New(ctx, \"\")\n\t\torganization0 := cfg.Require(\"organization\")\n\t\tscoutAgentId := cfg.Require(\"scoutAgentId\")\n\t\tscout := pulumiservice.GetAgentOutput(ctx, pulumiservice.GetAgentOutputArgs{\n\t\t\tOrganization: pulumi.String(organization0),\n\t\t\tAgentId:      pulumi.String(scoutAgentId),\n\t\t}, nil)\n\t\tctx.Export(\"agentId\", scout.AgentId())\n\t\tctx.Export(\"displayName\", scout.DisplayName())\n\t\treturn nil\n\t})\n}\n```\n\n```csharp\nusing System.Collections.Generic;\nusing System.Linq;\nusing Pulumi;\nusing PulumiService = Pulumi.PulumiService;\n\nreturn await Deployment.RunAsync(() => \n{\n    var config = new Config();\n    var organization0 = config.Require(\"organization\");\n    var scoutAgentId = config.Require(\"scoutAgentId\");\n    var scout = PulumiService.GetAgent.Invoke(new()\n    {\n        Organization = organization0,\n        AgentId = scoutAgentId,\n    });\n\n    return new Dictionary<string, object?>\n    {\n        [\"agentId\"] = scout.Apply(getAgentResult => getAgentResult.AgentId),\n        [\"displayName\"] = scout.Apply(getAgentResult => getAgentResult.DisplayName),\n    };\n});\n```\n\n```java\npackage generated_program;\n\nimport com.pulumi.Context;\nimport com.pulumi.Pulumi;\nimport com.pulumi.core.Output;\nimport com.pulumi.pulumiservice.PulumiserviceFunctions;\nimport com.pulumi.pulumiservice.inputs.GetAgentArgs;\nimport java.util.ArrayList;\nimport java.util.Arrays;\nimport java.util.Map;\nimport java.io.File;\nimport java.nio.file.Files;\nimport java.nio.file.Paths;\n\npublic class App {\n    public static void main(String[] args) {\n        Pulumi.run(App::stack);\n    }\n\n    public static void stack(Context ctx) {\n        final var config = ctx.config();\n        final var organization0 = config.require(\"organization\");\n        final var scoutAgentId = config.require(\"scoutAgentId\");\n        final var scout = PulumiserviceFunctions.getAgent(GetAgentArgs.builder()\n            .organization(organization0)\n            .agentId(scoutAgentId)\n            .build());\n\n        ctx.export(\"agentId\", scout.applyValue(_scout -> _scout.agentId()));\n        ctx.export(\"displayName\", scout.applyValue(_scout -> _scout.displayName()));\n    }\n}\n```\n\n```yaml\nconfig:\n  organization:\n    type: string\n  scoutAgentId:\n    type: string\nvariables:\n  scout:\n    fn::invoke:\n      function: pulumiservice:getAgent\n      arguments:\n        organization: ${organization}\n        agentId: ${scoutAgentId}\noutputs:\n  agentId: ${scout.agentId}\n  displayName: ${scout.displayName}\n```\n{{% /example %}}\n{{% /examples %}}\n",
+      "inputs": {
+        "properties": {
+          "agentId": {
+            "type": "string",
+            "description": "The durable Custom Agent definition ID from Pulumi Cloud, not its name or an agent task ID."
+          },
+          "organization": {
+            "type": "string",
+            "description": "The Pulumi Cloud organization that owns the Custom Agent."
+          }
+        },
+        "type": "object",
+        "required": [
+          "organization",
+          "agentId"
+        ]
+      },
+      "outputs": {
+        "properties": {
+          "agentId": {
+            "description": "The durable Custom Agent definition ID. Use this value in `delivery.Agent.agent`.",
+            "type": "string"
+          },
+          "displayName": {
+            "description": "The agent's current display name.",
+            "type": "string"
+          },
+          "name": {
+            "description": "The agent's current name. This is descriptive metadata, not its identity.",
+            "type": "string"
+          },
+          "organization": {
+            "description": "The Pulumi Cloud organization that owns the Custom Agent.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "organization",
+          "agentId",
+          "name",
+          "displayName"
+        ],
+        "type": "object"
+      }
+    },
     "pulumiservice:index:getCurrentUser": {
       "description": "Returns the Pulumi Cloud user that the provider's access token belongs to. Useful for seeding a newly-created `Team` with the creator as a member, since Pulumi Cloud auto-adds the creator. Omitting this user from the team will result in a refresh drift.",
       "inputs": {
