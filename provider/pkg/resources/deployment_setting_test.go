@@ -145,6 +145,14 @@ func checkGitAuth(t *testing.T, gitAuth resource.PropertyMap) resource.PropertyM
 	return checkedGitAuth.ObjectValue()
 }
 
+// decodeSettings decodes a property map the way Create, Update and Read do.
+func decodeSettings(t *testing.T, props resource.PropertyMap) PulumiServiceDeploymentSettingsInput {
+	t.Helper()
+	decoded, err := decodeDeploymentSettingsInput(props)
+	assert.NoError(t, err)
+	return decoded
+}
+
 // assertSecret asserts that prop is a secret wrapping the given plaintext.
 func assertSecret(t *testing.T, prop resource.PropertyValue, want string) {
 	t.Helper()
@@ -321,7 +329,7 @@ func TestDeploymentSettingsBasicAuthRoundtrip(t *testing.T) {
 
 	// Create mode: plaintext inputs are available, no prior cipher state yet.
 	encoded := initial.ToPropertyMap(&settings, nil, true)
-	decoded := (&PulumiServiceDeploymentSettingsResource{}).ToPulumiServiceDeploymentSettingsInput(encoded)
+	decoded := decodeSettings(t, encoded)
 
 	assert.EqualValues(t, initial, decoded)
 	assertSecret(t, basicAuthPropertyMap(t, encoded)[gcUsername], "alice")
@@ -386,7 +394,7 @@ func TestDeploymentSettingsRoundtrip(t *testing.T) {
 		}}
 
 	encoded := initial.ToPropertyMap(nil, nil, true)
-	decoded := (&PulumiServiceDeploymentSettingsResource{}).ToPulumiServiceDeploymentSettingsInput(encoded)
+	decoded := decodeSettings(t, encoded)
 
 	assert.EqualValues(t, initial, decoded)
 }
@@ -446,7 +454,7 @@ func TestDeploymentSettingsExecutorImageCredentialsRoundtrip(t *testing.T) {
 
 	// Create mode: plaintext inputs are available, no prior cipher state yet.
 	encoded := initial.ToPropertyMap(&settings, nil, true)
-	decoded := (&PulumiServiceDeploymentSettingsResource{}).ToPulumiServiceDeploymentSettingsInput(encoded)
+	decoded := decodeSettings(t, encoded)
 
 	assert.EqualValues(t, initial, decoded)
 	assert.Equal(t, testRegistryPassword, decoded.Executor.ExecutorImage.Credentials.Password.Value)
@@ -463,7 +471,7 @@ func TestDeploymentSettingsExecutorImageWithoutCredentialsRoundtrip(t *testing.T
 	initial := PulumiServiceDeploymentSettingsInput{DeploymentSettings: settings}
 
 	encoded := initial.ToPropertyMap(&settings, nil, true)
-	decoded := (&PulumiServiceDeploymentSettingsResource{}).ToPulumiServiceDeploymentSettingsInput(encoded)
+	decoded := decodeSettings(t, encoded)
 
 	assert.EqualValues(t, initial, decoded)
 	assert.NotContains(t, encoded["executorContext"].ObjectValue(), resource.PropertyKey("credentials"))
@@ -534,7 +542,7 @@ func TestDeploymentSettingsVcsRoundtrip(t *testing.T) {
 	}
 
 	encoded := initial.ToPropertyMap(nil, nil, true)
-	decoded := (&PulumiServiceDeploymentSettingsResource{}).ToPulumiServiceDeploymentSettingsInput(encoded)
+	decoded := decodeSettings(t, encoded)
 
 	assert.EqualValues(t, initial, decoded)
 }
@@ -555,7 +563,146 @@ func TestDeploymentSettingsGitHubRoundtrip(t *testing.T) {
 	}
 
 	encoded := initial.ToPropertyMap(nil, nil, true)
-	decoded := (&PulumiServiceDeploymentSettingsResource{}).ToPulumiServiceDeploymentSettingsInput(encoded)
+	decoded := decodeSettings(t, encoded)
 
 	assert.EqualValues(t, initial, decoded)
+}
+
+func TestDecodeDeploymentSettingsVcsProviders(t *testing.T) {
+	vcsProps := func(provider string) resource.PropertyMap {
+		return resource.PropertyMap{
+			"vcs": resource.NewObjectProperty(resource.PropertyMap{
+				"provider":   resource.NewStringProperty(provider),
+				"repository": resource.NewStringProperty("my-org/my-repo"),
+			}),
+		}
+	}
+
+	for _, want := range []pulumiapi.DeploymentSettingsVCS{
+		pulumiapi.DeploymentSettingsVCSAzureDevOpsBuilder{}.Build(),
+		pulumiapi.DeploymentSettingsVCSBitbucketBuilder{}.Build(),
+		pulumiapi.DeploymentSettingsVCSCustomBuilder{}.Build(),
+		pulumiapi.DeploymentSettingsVCSGitHubBuilder{}.Build(),
+		pulumiapi.DeploymentSettingsVCSGitLabBuilder{}.Build(),
+	} {
+		provider, err := want.GetDiscriminatorValue()
+		assert.NoError(t, err)
+		t.Run(provider, func(t *testing.T) {
+			decoded := decodeSettings(t, vcsProps(provider))
+			got, err := decoded.Vcs.GetDiscriminatorValue()
+			assert.NoError(t, err)
+			assert.Equal(t, provider, got)
+			assert.Equal(t, "my-org/my-repo", decoded.Vcs.Repository())
+		})
+	}
+
+	t.Run("unknown provider", func(t *testing.T) {
+		assert.Nil(t, decodeSettings(t, vcsProps("svn")).Vcs)
+	})
+}
+
+func TestDecodeDeploymentSettingsOperationContext(t *testing.T) {
+	const (
+		plainKey    = "PLAIN"
+		plainValue  = "plain-value"
+		secretKey   = "SECRET"
+		secretValue = "secret-value"
+	)
+	operationContext := func(envVars resource.PropertyValue) resource.PropertyMap {
+		return resource.PropertyMap{
+			"preRunCommands":       resource.NewArrayProperty([]resource.PropertyValue{resource.NewStringProperty("make")}),
+			"environmentVariables": envVars,
+			"options": resource.NewObjectProperty(resource.PropertyMap{
+				"skipInstallDependencies":     resource.NewBoolProperty(true),
+				"skipIntermediateDeployments": resource.NewBoolProperty(true),
+				"deleteAfterDestroy":          resource.NewBoolProperty(true),
+				"shell":                       resource.NewStringProperty("/bin/bash"),
+			}),
+			"oidc": resource.NewObjectProperty(resource.PropertyMap{
+				"aws": resource.NewObjectProperty(resource.PropertyMap{
+					"roleARN":     resource.NewStringProperty("arn:aws:iam::123456789012:role/deploy"),
+					"sessionName": resource.NewStringProperty("deploy"),
+					"duration":    resource.NewStringProperty("1h"),
+					"policyARNs": resource.NewArrayProperty([]resource.PropertyValue{
+						resource.NewStringProperty("arn:aws:iam::aws:policy/ReadOnlyAccess"),
+					}),
+				}),
+				"gcp": resource.NewObjectProperty(resource.PropertyMap{
+					"projectId":      resource.NewStringProperty("123456789"),
+					"workloadPoolId": resource.NewStringProperty("pool"),
+					"providerId":     resource.NewStringProperty("oidc-provider"),
+					"serviceAccount": resource.NewStringProperty("deploy@example.iam.gserviceaccount.com"),
+					"tokenLifetime":  resource.NewStringProperty("3600s"),
+				}),
+				"azure": resource.NewObjectProperty(resource.PropertyMap{
+					"clientId":       resource.NewStringProperty("client"),
+					"tenantId":       resource.NewStringProperty("tenant"),
+					"subscriptionId": resource.NewStringProperty("subscription"),
+				}),
+			}),
+		}
+	}
+	envVars := resource.NewObjectProperty(resource.PropertyMap{
+		plainKey:  resource.NewStringProperty(plainValue),
+		secretKey: resource.MakeSecret(resource.NewStringProperty(secretValue)),
+	})
+	allSecret := map[string]pulumiapi.SecretValue{
+		plainKey:  {Secret: true, Value: plainValue},
+		secretKey: {Secret: true, Value: secretValue},
+	}
+	decode := func(t *testing.T, oc resource.PropertyValue) *pulumiapi.OperationContext {
+		return decodeSettings(t, resource.PropertyMap{"operationContext": oc}).Operation
+	}
+
+	t.Run("per-variable secrets", func(t *testing.T) {
+		oc := decode(t, resource.NewObjectProperty(operationContext(envVars)))
+		assert.Equal(t, []string{"make"}, oc.PreRunCommands)
+		assert.Equal(t, map[string]pulumiapi.SecretValue{
+			plainKey:  {Value: plainValue},
+			secretKey: {Secret: true, Value: secretValue},
+		}, oc.EnvironmentVariables)
+		// Shell is deliberately not sent; see DeploymentSettingsOperationContext.toAPI.
+		assert.Equal(t, &pulumiapi.OperationContextOptions{
+			SkipInstallDependencies:     true,
+			SkipIntermediateDeployments: true,
+			DeleteAfterDestroy:          true,
+		}, oc.Options)
+		assert.Equal(t, &pulumiapi.OperationContextAWSOIDCConfiguration{
+			RoleARN:     "arn:aws:iam::123456789012:role/deploy",
+			SessionName: "deploy",
+			Duration:    "1h",
+			PolicyARNs:  []string{"arn:aws:iam::aws:policy/ReadOnlyAccess"},
+		}, oc.OIDC.AWS)
+		assert.Equal(t, &pulumiapi.OperationContextGCPOIDCConfiguration{
+			ProjectID:      "123456789",
+			WorkloadPoolID: "pool",
+			ProviderID:     "oidc-provider",
+			ServiceAccount: "deploy@example.iam.gserviceaccount.com",
+			TokenLifetime:  "3600s",
+		}, oc.OIDC.GCP)
+		assert.Equal(t, &pulumiapi.OperationContextAzureOIDCConfiguration{
+			ClientID:       "client",
+			TenantID:       "tenant",
+			SubscriptionID: "subscription",
+		}, oc.OIDC.Azure)
+	})
+
+	t.Run("secret operationContext makes every variable secret", func(t *testing.T) {
+		oc := decode(t, resource.MakeSecret(resource.NewObjectProperty(operationContext(envVars))))
+		assert.Equal(t, allSecret, oc.EnvironmentVariables)
+	})
+
+	t.Run("secret environmentVariables makes every variable secret", func(t *testing.T) {
+		oc := decode(t, resource.NewObjectProperty(operationContext(resource.MakeSecret(envVars))))
+		assert.Equal(t, allSecret, oc.EnvironmentVariables)
+	})
+}
+
+func TestDecodeDeploymentSettingsInputWrongType(t *testing.T) {
+	_, err := decodeDeploymentSettingsInput(resource.PropertyMap{
+		"github": resource.NewObjectProperty(resource.PropertyMap{
+			"deployCommits": resource.NewStringProperty("yes"),
+		}),
+	})
+	assert.Error(t, err)
 }
