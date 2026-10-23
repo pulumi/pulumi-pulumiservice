@@ -54,7 +54,6 @@ import javax.annotation.Nullable;
  * 
  *         var ciToken = new OrgAccessToken("ciToken", OrgAccessTokenArgs.builder()
  *             .organizationName("my-org")
- *             .name("ci-token")
  *             .description("Token for CI pipelines")
  *             .expires("2027-06-30T17:00:00Z")
  *             .roleId(ciDeployerRole.applyValue(_ciDeployerRole -> _ciDeployerRole.roleId()))
@@ -129,14 +128,22 @@ public class OrgAccessToken extends com.pulumi.resources.CustomResource {
         return Codegen.optional(this.expires);
     }
     /**
-     * The name for the token.
+     * The name for the token, up to 40 characters. Organization and team tokens share one set of names per organization, and Pulumi Cloud never frees a deleted token&#39;s name, so the name must not have been used by any other token in the organization.
+     * 
+     * If omitted, Pulumi generates a name from the resource&#39;s logical name plus a random suffix, and generates a fresh one whenever the token is replaced. Removing `name` from an existing token keeps its current name until the next replacement.
+     * 
+     * Every input on this resource triggers a replacement, so when `name` is set explicitly, changing any other input fails with `409 Conflict: token name already exists`. Omit `name`, or change it along with the other input.
      * 
      */
     @Export(name="name", refs={String.class}, tree="[0]")
     private Output<String> name;
 
     /**
-     * @return The name for the token.
+     * @return The name for the token, up to 40 characters. Organization and team tokens share one set of names per organization, and Pulumi Cloud never frees a deleted token&#39;s name, so the name must not have been used by any other token in the organization.
+     * 
+     * If omitted, Pulumi generates a name from the resource&#39;s logical name plus a random suffix, and generates a fresh one whenever the token is replaced. Removing `name` from an existing token keeps its current name until the next replacement.
+     * 
+     * Every input on this resource triggers a replacement, so when `name` is set explicitly, changing any other input fails with `409 Conflict: token name already exists`. Omit `name`, or change it along with the other input.
      * 
      */
     public Output<String> name() {

@@ -32,18 +32,26 @@ public final class TeamAccessTokenArgs extends com.pulumi.resources.ResourceArgs
     }
 
     /**
-     * The name for the token. This must be unique among all organization and team tokens in the organization.
+     * The name for the token, up to 40 characters. Organization and team tokens share one set of names per organization, and Pulumi Cloud never frees a deleted token&#39;s name, so the name must not have been used by any other token in the organization.
+     * 
+     * If omitted, Pulumi generates a name from the resource&#39;s logical name plus a random suffix, and generates a fresh one whenever the token is replaced. Removing `name` from an existing token keeps its current name until the next replacement.
+     * 
+     * Every input on this resource triggers a replacement, so when `name` is set explicitly, changing any other input fails with `409 Conflict: token name already exists`. Omit `name`, or change it along with the other input.
      * 
      */
-    @Import(name="name", required=true)
-    private Output<String> name;
+    @Import(name="name")
+    private @Nullable Output<String> name;
 
     /**
-     * @return The name for the token. This must be unique among all organization and team tokens in the organization.
+     * @return The name for the token, up to 40 characters. Organization and team tokens share one set of names per organization, and Pulumi Cloud never frees a deleted token&#39;s name, so the name must not have been used by any other token in the organization.
+     * 
+     * If omitted, Pulumi generates a name from the resource&#39;s logical name plus a random suffix, and generates a fresh one whenever the token is replaced. Removing `name` from an existing token keeps its current name until the next replacement.
+     * 
+     * Every input on this resource triggers a replacement, so when `name` is set explicitly, changing any other input fails with `409 Conflict: token name already exists`. Omit `name`, or change it along with the other input.
      * 
      */
-    public Output<String> name() {
-        return this.name;
+    public Optional<Output<String>> name() {
+        return Optional.ofNullable(this.name);
     }
 
     /**
@@ -125,18 +133,26 @@ public final class TeamAccessTokenArgs extends com.pulumi.resources.ResourceArgs
         }
 
         /**
-         * @param name The name for the token. This must be unique among all organization and team tokens in the organization.
+         * @param name The name for the token, up to 40 characters. Organization and team tokens share one set of names per organization, and Pulumi Cloud never frees a deleted token&#39;s name, so the name must not have been used by any other token in the organization.
+         * 
+         * If omitted, Pulumi generates a name from the resource&#39;s logical name plus a random suffix, and generates a fresh one whenever the token is replaced. Removing `name` from an existing token keeps its current name until the next replacement.
+         * 
+         * Every input on this resource triggers a replacement, so when `name` is set explicitly, changing any other input fails with `409 Conflict: token name already exists`. Omit `name`, or change it along with the other input.
          * 
          * @return builder
          * 
          */
-        public Builder name(Output<String> name) {
+        public Builder name(@Nullable Output<String> name) {
             $.name = name;
             return this;
         }
 
         /**
-         * @param name The name for the token. This must be unique among all organization and team tokens in the organization.
+         * @param name The name for the token, up to 40 characters. Organization and team tokens share one set of names per organization, and Pulumi Cloud never frees a deleted token&#39;s name, so the name must not have been used by any other token in the organization.
+         * 
+         * If omitted, Pulumi generates a name from the resource&#39;s logical name plus a random suffix, and generates a fresh one whenever the token is replaced. Removing `name` from an existing token keeps its current name until the next replacement.
+         * 
+         * Every input on this resource triggers a replacement, so when `name` is set explicitly, changing any other input fails with `409 Conflict: token name already exists`. Omit `name`, or change it along with the other input.
          * 
          * @return builder
          * 
@@ -188,9 +204,6 @@ public final class TeamAccessTokenArgs extends com.pulumi.resources.ResourceArgs
         }
 
         public TeamAccessTokenArgs build() {
-            if ($.name == null) {
-                throw new MissingRequiredPropertyException("TeamAccessTokenArgs", "name");
-            }
             if ($.organizationName == null) {
                 throw new MissingRequiredPropertyException("TeamAccessTokenArgs", "organizationName");
             }

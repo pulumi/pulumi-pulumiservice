@@ -33,6 +33,7 @@ const (
 type TeamAccessToken struct{}
 
 var (
+	_ infer.CustomCheck[TeamAccessTokenInput]                        = &TeamAccessToken{}
 	_ infer.CustomCreate[TeamAccessTokenInput, TeamAccessTokenState] = &TeamAccessToken{}
 	_ infer.CustomDelete[TeamAccessTokenState]                       = &TeamAccessToken{}
 	_ infer.CustomRead[TeamAccessTokenInput, TeamAccessTokenState]   = &TeamAccessToken{}
@@ -54,17 +55,14 @@ func (*TeamAccessToken) Annotate(a infer.Annotator) {
 }
 
 type TeamAccessTokenInput struct {
-	Name             string  `pulumi:"name"             provider:"replaceOnChanges"`
-	OrganizationName string  `pulumi:"organizationName" provider:"replaceOnChanges"`
-	TeamName         string  `pulumi:"teamName"         provider:"replaceOnChanges"`
+	Name             string  `pulumi:"name,optional"        provider:"replaceOnChanges"`
+	OrganizationName string  `pulumi:"organizationName"     provider:"replaceOnChanges"`
+	TeamName         string  `pulumi:"teamName"             provider:"replaceOnChanges"`
 	Description      *string `pulumi:"description,optional" provider:"replaceOnChanges"`
 }
 
 func (i *TeamAccessTokenInput) Annotate(a infer.Annotator) {
-	a.Describe(
-		&i.Name,
-		"The name for the token. This must be unique among all organization and team tokens in the organization.",
-	)
+	a.Describe(&i.Name, tokenNameDescription)
 	a.Describe(&i.OrganizationName, "The organization's name.")
 	a.Describe(&i.TeamName, "The team name.")
 	a.Describe(&i.Description, "A description of the token.")
@@ -72,11 +70,22 @@ func (i *TeamAccessTokenInput) Annotate(a infer.Annotator) {
 
 type TeamAccessTokenState struct {
 	TeamAccessTokenInput
+	// name is optional to supply but always set once Check has run, so it's a
+	// required output. Shadowing the embedded optional input keeps the output
+	// type non-optional in the SDKs.
+	Name  string `pulumi:"name"  provider:"replaceOnChanges"`
 	Value string `pulumi:"value" provider:"secret"`
 }
 
 func (s *TeamAccessTokenState) Annotate(a infer.Annotator) {
+	a.Describe(&s.Name, tokenNameDescription)
 	a.Describe(&s.Value, "The token's value.")
+}
+
+// newTeamAccessTokenState builds the state from a set of inputs, populating
+// the required name output that shadows the optional input.
+func newTeamAccessTokenState(input TeamAccessTokenInput, value string) TeamAccessTokenState {
+	return TeamAccessTokenState{TeamAccessTokenInput: input, Name: input.Name, Value: value}
 }
 
 func (*TeamAccessToken) Create(
@@ -85,7 +94,7 @@ func (*TeamAccessToken) Create(
 ) (infer.CreateResponse[TeamAccessTokenState], error) {
 	if req.DryRun {
 		return infer.CreateResponse[TeamAccessTokenState]{
-			Output: TeamAccessTokenState{TeamAccessTokenInput: req.Inputs},
+			Output: newTeamAccessTokenState(req.Inputs, ""),
 		}, nil
 	}
 	desc := ""
@@ -101,11 +110,8 @@ func (*TeamAccessToken) Create(
 		)
 	}
 	return infer.CreateResponse[TeamAccessTokenState]{
-		ID: teamAccessTokenID(req.Inputs.OrganizationName, req.Inputs.TeamName, req.Inputs.Name, token.ID),
-		Output: TeamAccessTokenState{
-			TeamAccessTokenInput: req.Inputs,
-			Value:                token.TokenValue,
-		},
+		ID:     teamAccessTokenID(req.Inputs.OrganizationName, req.Inputs.TeamName, req.Inputs.Name, token.ID),
+		Output: newTeamAccessTokenState(req.Inputs, token.TokenValue),
 	}, nil
 }
 
@@ -146,13 +152,22 @@ func (*TeamAccessToken) Read(
 	return infer.ReadResponse[TeamAccessTokenInput, TeamAccessTokenState]{
 		ID:     req.ID,
 		Inputs: inputs,
-		State: TeamAccessTokenState{
-			TeamAccessTokenInput: inputs,
-			// Token values aren't retrievable from the API after creation; carry
-			// the existing secret from state so refresh does not erase it.
-			Value: req.State.Value,
-		},
+		// Token values aren't retrievable from the API after creation; carry
+		// the existing secret from state so refresh does not erase it.
+		State: newTeamAccessTokenState(inputs, req.State.Value),
 	}, nil
+}
+
+// Check generates the token's name when the program omits it.
+func (*TeamAccessToken) Check(
+	ctx context.Context,
+	req infer.CheckRequest,
+) (infer.CheckResponse[TeamAccessTokenInput], error) {
+	in, failures, err := infer.DefaultCheck[TeamAccessTokenInput](ctx, util.AutoName(ctx, req, gcName, tokenNameMaxLen))
+	if err != nil {
+		return infer.CheckResponse[TeamAccessTokenInput]{}, err
+	}
+	return infer.CheckResponse[TeamAccessTokenInput]{Inputs: in, Failures: failures}, nil
 }
 
 // StateMigrations strips the legacy "__inputs" outputs property that the
@@ -174,6 +189,7 @@ func migrateTeamAccessTokenLegacyInputs(
 	state := TeamAccessTokenState{}
 	if v, ok := old.GetOk(gcName); ok && v.IsString() {
 		state.Name = v.AsString()
+		state.TeamAccessTokenInput.Name = v.AsString()
 	}
 	if v, ok := old.GetOk(gcOrganizationName); ok && v.IsString() {
 		state.OrganizationName = v.AsString()

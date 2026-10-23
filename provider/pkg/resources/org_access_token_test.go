@@ -13,6 +13,7 @@ import (
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 )
 
 const (
@@ -52,6 +53,7 @@ func TestOrgAccessTokenLegacyInputsMigration(t *testing.T) {
 				Description:      &desc,
 				Admin:            &admin,
 			},
+			Name:  "admin-token",
 			Value: gcTokSecretValue,
 		}, got.Result)
 	})
@@ -71,6 +73,7 @@ func TestOrgAccessTokenLegacyInputsMigration(t *testing.T) {
 				Name:             "plain-token",
 				OrganizationName: gcMyOrg,
 			},
+			Name:  "plain-token",
 			Value: gcTokSecretValue,
 		}, got.Result)
 	})
@@ -250,6 +253,37 @@ func TestOrgAccessTokenCheck(t *testing.T) {
 		assert.Empty(t, check(inputs(map[string]property.Value{
 			gcRoleID: property.New(testRoleID),
 		}), property.Map{}))
+	})
+}
+
+func TestOrgAccessTokenCheckAutoName(t *testing.T) {
+	urn := "urn:pulumi:dev::demo::pulumiservice:index:OrgAccessToken::" + testTokenLogicalName
+	ctx := autoNameTestContext(t, urn)
+	base := map[string]property.Value{gcOrganizationName: property.New(gcMyOrg)}
+	check := func(news, olds property.Map) OrgAccessTokenInput {
+		resp, err := (&OrgAccessToken{}).Check(ctx, infer.CheckRequest{
+			Name: testTokenLogicalName, NewInputs: news, OldInputs: olds,
+		})
+		require.NoError(t, err)
+		require.Empty(t, resp.Failures)
+		return resp.Inputs
+	}
+
+	t.Run("generates a seeded name when omitted", func(t *testing.T) {
+		in := check(property.NewMap(base), property.Map{})
+		assert.Equal(t, util.GenerateAutoName(urn, testTokenSeed, tokenNameMaxLen), in.Name)
+		assert.Equal(t, in.Name, check(property.NewMap(base), property.Map{}).Name)
+		assert.LessOrEqual(t, len(in.Name), tokenNameMaxLen)
+	})
+
+	t.Run("reuses the old name on update", func(t *testing.T) {
+		olds := property.NewMap(base).Set(gcName, property.New(testTokenOldName))
+		assert.Equal(t, testTokenOldName, check(property.NewMap(base), olds).Name)
+	})
+
+	t.Run("keeps an explicit name", func(t *testing.T) {
+		news := property.NewMap(base).Set(gcName, property.New("explicit"))
+		assert.Equal(t, "explicit", check(news, property.Map{}).Name)
 	})
 }
 

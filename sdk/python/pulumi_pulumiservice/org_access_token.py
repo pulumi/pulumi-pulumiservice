@@ -19,23 +19,26 @@ __all__ = ['OrgAccessTokenArgs', 'OrgAccessToken']
 @pulumi.input_type
 class OrgAccessTokenArgs:
     def __init__(__self__, *,
-                 name: pulumi.Input[_builtins.str],
                  organization_name: pulumi.Input[_builtins.str],
                  admin: pulumi.Input[Optional[_builtins.bool]] = None,
                  description: pulumi.Input[Optional[_builtins.str]] = None,
                  expires: pulumi.Input[Optional[_builtins.str]] = None,
+                 name: pulumi.Input[Optional[_builtins.str]] = None,
                  role_id: pulumi.Input[Optional[_builtins.str]] = None):
         """
         The set of arguments for constructing a OrgAccessToken resource.
 
-        :param pulumi.Input[_builtins.str] name: The name for the token.
         :param pulumi.Input[_builtins.str] organization_name: The organization's name.
         :param pulumi.Input[_builtins.bool] admin: Whether the token has the Admin role. Defaults to `false`. Mutually exclusive with `roleId`: set `admin: true` or `roleId`, not both.
         :param pulumi.Input[_builtins.str] description: A description of the token.
         :param pulumi.Input[_builtins.str] expires: When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`. Omit it for a token that never expires. Pulumi Cloud rejects an expiry that is in the past, more than two years away, or beyond the organization's maximum token lifetime.
+        :param pulumi.Input[_builtins.str] name: The name for the token, up to 40 characters. Organization and team tokens share one set of names per organization, and Pulumi Cloud never frees a deleted token's name, so the name must not have been used by any other token in the organization.
+               
+               If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, and generates a fresh one whenever the token is replaced. Removing `name` from an existing token keeps its current name until the next replacement.
+               
+               Every input on this resource triggers a replacement, so when `name` is set explicitly, changing any other input fails with `409 Conflict: token name already exists`. Omit `name`, or change it along with the other input.
         :param pulumi.Input[_builtins.str] role_id: The ID of the role to assign to the token. Use `getOrganizationRole` to look up a role's ID by its name. Mutually exclusive with `admin: true`: set one or the other, not both. Pulumi Cloud accepts both, but some of its permission checks still treat such a token as an Admin whatever its role, so the provider rejects the combination. When neither is set, the token gets the Member role.
         """
-        pulumi.set(__self__, "name", name)
         pulumi.set(__self__, "organization_name", organization_name)
         if admin is None:
             admin = False
@@ -45,20 +48,10 @@ class OrgAccessTokenArgs:
             pulumi.set(__self__, "description", description)
         if expires is not None:
             pulumi.set(__self__, "expires", expires)
+        if name is not None:
+            pulumi.set(__self__, "name", name)
         if role_id is not None:
             pulumi.set(__self__, "role_id", role_id)
-
-    @_builtins.property
-    @pulumi.getter
-    def name(self) -> pulumi.Input[_builtins.str]:
-        """
-        The name for the token.
-        """
-        return pulumi.get(self, "name")
-
-    @name.setter
-    def name(self, value: pulumi.Input[_builtins.str]):
-        pulumi.set(self, "name", value)
 
     @_builtins.property
     @pulumi.getter(name="organizationName")
@@ -109,6 +102,22 @@ class OrgAccessTokenArgs:
         pulumi.set(self, "expires", value)
 
     @_builtins.property
+    @pulumi.getter
+    def name(self) -> pulumi.Input[Optional[_builtins.str]]:
+        """
+        The name for the token, up to 40 characters. Organization and team tokens share one set of names per organization, and Pulumi Cloud never frees a deleted token's name, so the name must not have been used by any other token in the organization.
+
+        If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, and generates a fresh one whenever the token is replaced. Removing `name` from an existing token keeps its current name until the next replacement.
+
+        Every input on this resource triggers a replacement, so when `name` is set explicitly, changing any other input fails with `409 Conflict: token name already exists`. Omit `name`, or change it along with the other input.
+        """
+        return pulumi.get(self, "name")
+
+    @name.setter
+    def name(self, value: pulumi.Input[Optional[_builtins.str]]):
+        pulumi.set(self, "name", value)
+
+    @_builtins.property
     @pulumi.getter(name="roleId")
     def role_id(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
@@ -150,7 +159,6 @@ class OrgAccessToken(pulumi.CustomResource):
             name="CI Deployer")
         ci_token = pulumiservice.OrgAccessToken("ciToken",
             organization_name="my-org",
-            name="ci-token",
             description="Token for CI pipelines",
             expires="2027-06-30T17:00:00Z",
             role_id=ci_deployer_role.role_id)
@@ -180,7 +188,11 @@ class OrgAccessToken(pulumi.CustomResource):
         :param pulumi.Input[_builtins.bool] admin: Whether the token has the Admin role. Defaults to `false`. Mutually exclusive with `roleId`: set `admin: true` or `roleId`, not both.
         :param pulumi.Input[_builtins.str] description: A description of the token.
         :param pulumi.Input[_builtins.str] expires: When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`. Omit it for a token that never expires. Pulumi Cloud rejects an expiry that is in the past, more than two years away, or beyond the organization's maximum token lifetime.
-        :param pulumi.Input[_builtins.str] name: The name for the token.
+        :param pulumi.Input[_builtins.str] name: The name for the token, up to 40 characters. Organization and team tokens share one set of names per organization, and Pulumi Cloud never frees a deleted token's name, so the name must not have been used by any other token in the organization.
+               
+               If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, and generates a fresh one whenever the token is replaced. Removing `name` from an existing token keeps its current name until the next replacement.
+               
+               Every input on this resource triggers a replacement, so when `name` is set explicitly, changing any other input fails with `409 Conflict: token name already exists`. Omit `name`, or change it along with the other input.
         :param pulumi.Input[_builtins.str] organization_name: The organization's name.
         :param pulumi.Input[_builtins.str] role_id: The ID of the role to assign to the token. Use `getOrganizationRole` to look up a role's ID by its name. Mutually exclusive with `admin: true`: set one or the other, not both. Pulumi Cloud accepts both, but some of its permission checks still treat such a token as an Admin whatever its role, so the provider rejects the combination. When neither is set, the token gets the Member role.
         """
@@ -206,7 +218,6 @@ class OrgAccessToken(pulumi.CustomResource):
             name="CI Deployer")
         ci_token = pulumiservice.OrgAccessToken("ciToken",
             organization_name="my-org",
-            name="ci-token",
             description="Token for CI pipelines",
             expires="2027-06-30T17:00:00Z",
             role_id=ci_deployer_role.role_id)
@@ -266,8 +277,6 @@ class OrgAccessToken(pulumi.CustomResource):
             __props__.__dict__["admin"] = admin
             __props__.__dict__["description"] = description
             __props__.__dict__["expires"] = expires
-            if name is None and not opts.urn:
-                raise TypeError("Missing required property 'name'")
             __props__.__dict__["name"] = name
             if organization_name is None and not opts.urn:
                 raise TypeError("Missing required property 'organization_name'")
@@ -337,7 +346,11 @@ class OrgAccessToken(pulumi.CustomResource):
     @pulumi.getter
     def name(self) -> pulumi.Output[_builtins.str]:
         """
-        The name for the token.
+        The name for the token, up to 40 characters. Organization and team tokens share one set of names per organization, and Pulumi Cloud never frees a deleted token's name, so the name must not have been used by any other token in the organization.
+
+        If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, and generates a fresh one whenever the token is replaced. Removing `name` from an existing token keeps its current name until the next replacement.
+
+        Every input on this resource triggers a replacement, so when `name` is set explicitly, changing any other input fails with `409 Conflict: token name already exists`. Omit `name`, or change it along with the other input.
         """
         return pulumi.get(self, "name")
 

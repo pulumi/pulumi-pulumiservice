@@ -68,7 +68,7 @@ func (*OrgAccessToken) Annotate(a infer.Annotator) {
 }
 
 type OrgAccessTokenInput struct {
-	Name             string  `pulumi:"name"                 provider:"replaceOnChanges"`
+	Name             string  `pulumi:"name,optional"        provider:"replaceOnChanges"`
 	OrganizationName string  `pulumi:"organizationName"     provider:"replaceOnChanges"`
 	Description      *string `pulumi:"description,optional" provider:"replaceOnChanges"`
 	Admin            *bool   `pulumi:"admin,optional"       provider:"replaceOnChanges"`
@@ -77,7 +77,7 @@ type OrgAccessTokenInput struct {
 }
 
 func (i *OrgAccessTokenInput) Annotate(a infer.Annotator) {
-	a.Describe(&i.Name, "The name for the token.")
+	a.Describe(&i.Name, tokenNameDescription)
 	a.Describe(&i.OrganizationName, "The organization's name.")
 	a.Describe(&i.Description, "A description of the token.")
 	a.Describe(
@@ -104,11 +104,22 @@ func (i *OrgAccessTokenInput) Annotate(a infer.Annotator) {
 
 type OrgAccessTokenState struct {
 	OrgAccessTokenInput
+	// name is optional to supply but always set once Check has run, so it's a
+	// required output. Shadowing the embedded optional input keeps the output
+	// type non-optional in the SDKs.
+	Name  string `pulumi:"name"  provider:"replaceOnChanges"`
 	Value string `pulumi:"value" provider:"secret"`
 }
 
 func (s *OrgAccessTokenState) Annotate(a infer.Annotator) {
+	a.Describe(&s.Name, tokenNameDescription)
 	a.Describe(&s.Value, "The token's value.")
+}
+
+// newOrgAccessTokenState builds the state from a set of inputs, populating the
+// required name output that shadows the optional input.
+func newOrgAccessTokenState(input OrgAccessTokenInput, value string) OrgAccessTokenState {
+	return OrgAccessTokenState{OrgAccessTokenInput: input, Name: input.Name, Value: value}
 }
 
 func (*OrgAccessToken) Create(
@@ -117,7 +128,7 @@ func (*OrgAccessToken) Create(
 ) (infer.CreateResponse[OrgAccessTokenState], error) {
 	if req.DryRun {
 		return infer.CreateResponse[OrgAccessTokenState]{
-			Output: OrgAccessTokenState{OrgAccessTokenInput: req.Inputs},
+			Output: newOrgAccessTokenState(req.Inputs, ""),
 		}, nil
 	}
 	createReq := pulumiapi.CreateOrgAccessTokenRequest{Name: req.Inputs.Name}
@@ -144,11 +155,8 @@ func (*OrgAccessToken) Create(
 		)
 	}
 	return infer.CreateResponse[OrgAccessTokenState]{
-		ID: orgAccessTokenID(req.Inputs.OrganizationName, req.Inputs.Name, token.ID),
-		Output: OrgAccessTokenState{
-			OrgAccessTokenInput: req.Inputs,
-			Value:               token.TokenValue,
-		},
+		ID:     orgAccessTokenID(req.Inputs.OrganizationName, req.Inputs.Name, token.ID),
+		Output: newOrgAccessTokenState(req.Inputs, token.TokenValue),
 	}, nil
 }
 
@@ -192,12 +200,9 @@ func (*OrgAccessToken) Read(
 	return infer.ReadResponse[OrgAccessTokenInput, OrgAccessTokenState]{
 		ID:     req.ID,
 		Inputs: inputs,
-		State: OrgAccessTokenState{
-			OrgAccessTokenInput: inputs,
-			// Token values aren't retrievable from the API after creation; carry
-			// the existing secret from state so refresh does not erase it.
-			Value: req.State.Value,
-		},
+		// Token values aren't retrievable from the API after creation; carry
+		// the existing secret from state so refresh does not erase it.
+		State: newOrgAccessTokenState(inputs, req.State.Value),
 	}, nil
 }
 
@@ -205,12 +210,13 @@ func (*OrgAccessToken) Check(
 	ctx context.Context,
 	req infer.CheckRequest,
 ) (infer.CheckResponse[OrgAccessTokenInput], error) {
-	in, failures, err := infer.DefaultCheck[OrgAccessTokenInput](ctx, req.NewInputs)
+	newInputs := util.AutoName(ctx, req, gcName, tokenNameMaxLen)
+	in, failures, err := infer.DefaultCheck[OrgAccessTokenInput](ctx, newInputs)
 	if err != nil {
 		return infer.CheckResponse[OrgAccessTokenInput]{}, err
 	}
 
-	if in.Expires != nil && !isUnknownInput(req.NewInputs, gcExpires) {
+	if in.Expires != nil && !isUnknownInput(newInputs, gcExpires) {
 		if _, err := parseTokenExpiry(*in.Expires); err != nil {
 			failures = append(failures, p.CheckFailure{Property: gcExpires, Reason: err.Error()})
 		}
@@ -220,7 +226,7 @@ func (*OrgAccessToken) Check(
 	// permission checks still elevate an admin token to Admin whatever the
 	// role says, so the two are mutually exclusive here.
 	if in.Admin != nil && *in.Admin && in.RoleID != nil && *in.RoleID != "" &&
-		!isUnknownInput(req.NewInputs, gcAdmin) && !isUnknownInput(req.NewInputs, gcRoleID) {
+		!isUnknownInput(newInputs, gcAdmin) && !isUnknownInput(newInputs, gcRoleID) {
 		failures = append(failures, p.CheckFailure{
 			Property: gcRoleID,
 			Reason:   "admin and roleId are mutually exclusive; set admin: true or roleId, not both",
@@ -249,6 +255,7 @@ func migrateOrgAccessTokenLegacyInputs(
 	state := OrgAccessTokenState{}
 	if v, ok := old.GetOk(gcName); ok && v.IsString() {
 		state.Name = v.AsString()
+		state.OrgAccessTokenInput.Name = v.AsString()
 	}
 	if v, ok := old.GetOk(gcOrganizationName); ok && v.IsString() {
 		state.OrganizationName = v.AsString()
@@ -271,6 +278,24 @@ const (
 	gcExpires = "expires"
 	gcRoleID  = "roleId"
 )
+
+// tokenNameMaxLen is the longest name Pulumi Cloud accepts for an organization
+// or team access token. Longer names fail with `400 Bad Request: the access
+// token name is too long (max length 40 characters)`. The OpenAPI spec
+// doesn't state the limit.
+const tokenNameMaxLen = 40
+
+// tokenNameDescription documents `name` on OrgAccessToken and TeamAccessToken,
+// which share a namespace and the same rules.
+const tokenNameDescription = "The name for the token, up to 40 characters. Organization and team tokens " +
+	"share one set of names per organization, and Pulumi Cloud never frees a deleted token's name, so the " +
+	"name must not have been used by any other token in the organization.\n\n" +
+	"If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, and " +
+	"generates a fresh one whenever the token is replaced. Removing `name` from an existing token keeps " +
+	"its current name until the next replacement.\n\n" +
+	"Every input on this resource triggers a replacement, so when `name` is set explicitly, changing any " +
+	"other input fails with `409 Conflict: token name already exists`. Omit `name`, or change it along " +
+	"with the other input."
 
 func parseTokenExpiry(s string) (time.Time, error) {
 	t, err := time.Parse(time.RFC3339, s)

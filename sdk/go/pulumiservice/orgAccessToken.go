@@ -37,7 +37,6 @@ import (
 //			}, nil)
 //			ciToken, err := pulumiservice.NewOrgAccessToken(ctx, "ciToken", &pulumiservice.OrgAccessTokenArgs{
 //				OrganizationName: pulumi.String("my-org"),
-//				Name:             pulumi.String("ci-token"),
 //				Description:      pulumi.String("Token for CI pipelines"),
 //				Expires:          pulumi.String("2027-06-30T17:00:00Z"),
 //				RoleId:           ciDeployerRole.RoleId(),
@@ -81,7 +80,11 @@ type OrgAccessToken struct {
 	Description pulumi.StringPtrOutput `pulumi:"description"`
 	// When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`. Omit it for a token that never expires. Pulumi Cloud rejects an expiry that is in the past, more than two years away, or beyond the organization's maximum token lifetime.
 	Expires pulumi.StringPtrOutput `pulumi:"expires"`
-	// The name for the token.
+	// The name for the token, up to 40 characters. Organization and team tokens share one set of names per organization, and Pulumi Cloud never frees a deleted token's name, so the name must not have been used by any other token in the organization.
+	//
+	// If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, and generates a fresh one whenever the token is replaced. Removing `name` from an existing token keeps its current name until the next replacement.
+	//
+	// Every input on this resource triggers a replacement, so when `name` is set explicitly, changing any other input fails with `409 Conflict: token name already exists`. Omit `name`, or change it along with the other input.
 	Name pulumi.StringOutput `pulumi:"name"`
 	// The organization's name.
 	OrganizationName pulumi.StringOutput `pulumi:"organizationName"`
@@ -98,9 +101,6 @@ func NewOrgAccessToken(ctx *pulumi.Context,
 		return nil, errors.New("missing one or more required arguments")
 	}
 
-	if args.Name == nil {
-		return nil, errors.New("invalid value for required argument 'Name'")
-	}
 	if args.OrganizationName == nil {
 		return nil, errors.New("invalid value for required argument 'OrganizationName'")
 	}
@@ -159,8 +159,12 @@ type orgAccessTokenArgs struct {
 	Description *string `pulumi:"description"`
 	// When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`. Omit it for a token that never expires. Pulumi Cloud rejects an expiry that is in the past, more than two years away, or beyond the organization's maximum token lifetime.
 	Expires *string `pulumi:"expires"`
-	// The name for the token.
-	Name string `pulumi:"name"`
+	// The name for the token, up to 40 characters. Organization and team tokens share one set of names per organization, and Pulumi Cloud never frees a deleted token's name, so the name must not have been used by any other token in the organization.
+	//
+	// If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, and generates a fresh one whenever the token is replaced. Removing `name` from an existing token keeps its current name until the next replacement.
+	//
+	// Every input on this resource triggers a replacement, so when `name` is set explicitly, changing any other input fails with `409 Conflict: token name already exists`. Omit `name`, or change it along with the other input.
+	Name *string `pulumi:"name"`
 	// The organization's name.
 	OrganizationName string `pulumi:"organizationName"`
 	// The ID of the role to assign to the token. Use `getOrganizationRole` to look up a role's ID by its name. Mutually exclusive with `admin: true`: set one or the other, not both. Pulumi Cloud accepts both, but some of its permission checks still treat such a token as an Admin whatever its role, so the provider rejects the combination. When neither is set, the token gets the Member role.
@@ -175,8 +179,12 @@ type OrgAccessTokenArgs struct {
 	Description pulumi.StringPtrInput
 	// When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`. Omit it for a token that never expires. Pulumi Cloud rejects an expiry that is in the past, more than two years away, or beyond the organization's maximum token lifetime.
 	Expires pulumi.StringPtrInput
-	// The name for the token.
-	Name pulumi.StringInput
+	// The name for the token, up to 40 characters. Organization and team tokens share one set of names per organization, and Pulumi Cloud never frees a deleted token's name, so the name must not have been used by any other token in the organization.
+	//
+	// If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, and generates a fresh one whenever the token is replaced. Removing `name` from an existing token keeps its current name until the next replacement.
+	//
+	// Every input on this resource triggers a replacement, so when `name` is set explicitly, changing any other input fails with `409 Conflict: token name already exists`. Omit `name`, or change it along with the other input.
+	Name pulumi.StringPtrInput
 	// The organization's name.
 	OrganizationName pulumi.StringInput
 	// The ID of the role to assign to the token. Use `getOrganizationRole` to look up a role's ID by its name. Mutually exclusive with `admin: true`: set one or the other, not both. Pulumi Cloud accepts both, but some of its permission checks still treat such a token as an Admin whatever its role, so the provider rejects the combination. When neither is set, the token gets the Member role.
@@ -285,7 +293,11 @@ func (o OrgAccessTokenOutput) Expires() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *OrgAccessToken) pulumi.StringPtrOutput { return v.Expires }).(pulumi.StringPtrOutput)
 }
 
-// The name for the token.
+// The name for the token, up to 40 characters. Organization and team tokens share one set of names per organization, and Pulumi Cloud never frees a deleted token's name, so the name must not have been used by any other token in the organization.
+//
+// If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, and generates a fresh one whenever the token is replaced. Removing `name` from an existing token keeps its current name until the next replacement.
+//
+// Every input on this resource triggers a replacement, so when `name` is set explicitly, changing any other input fails with `409 Conflict: token name already exists`. Omit `name`, or change it along with the other input.
 func (o OrgAccessTokenOutput) Name() pulumi.StringOutput {
 	return o.ApplyT(func(v *OrgAccessToken) pulumi.StringOutput { return v.Name }).(pulumi.StringOutput)
 }

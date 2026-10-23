@@ -41,7 +41,11 @@ type TeamAccessToken struct {
 
 	// A description of the token.
 	Description pulumi.StringPtrOutput `pulumi:"description"`
-	// The name for the token. This must be unique among all organization and team tokens in the organization.
+	// The name for the token, up to 40 characters. Organization and team tokens share one set of names per organization, and Pulumi Cloud never frees a deleted token's name, so the name must not have been used by any other token in the organization.
+	//
+	// If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, and generates a fresh one whenever the token is replaced. Removing `name` from an existing token keeps its current name until the next replacement.
+	//
+	// Every input on this resource triggers a replacement, so when `name` is set explicitly, changing any other input fails with `409 Conflict: token name already exists`. Omit `name`, or change it along with the other input.
 	Name pulumi.StringOutput `pulumi:"name"`
 	// The organization's name.
 	OrganizationName pulumi.StringOutput `pulumi:"organizationName"`
@@ -58,9 +62,6 @@ func NewTeamAccessToken(ctx *pulumi.Context,
 		return nil, errors.New("missing one or more required arguments")
 	}
 
-	if args.Name == nil {
-		return nil, errors.New("invalid value for required argument 'Name'")
-	}
 	if args.OrganizationName == nil {
 		return nil, errors.New("invalid value for required argument 'OrganizationName'")
 	}
@@ -113,8 +114,12 @@ func (TeamAccessTokenState) ElementType() reflect.Type {
 type teamAccessTokenArgs struct {
 	// A description of the token.
 	Description *string `pulumi:"description"`
-	// The name for the token. This must be unique among all organization and team tokens in the organization.
-	Name string `pulumi:"name"`
+	// The name for the token, up to 40 characters. Organization and team tokens share one set of names per organization, and Pulumi Cloud never frees a deleted token's name, so the name must not have been used by any other token in the organization.
+	//
+	// If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, and generates a fresh one whenever the token is replaced. Removing `name` from an existing token keeps its current name until the next replacement.
+	//
+	// Every input on this resource triggers a replacement, so when `name` is set explicitly, changing any other input fails with `409 Conflict: token name already exists`. Omit `name`, or change it along with the other input.
+	Name *string `pulumi:"name"`
 	// The organization's name.
 	OrganizationName string `pulumi:"organizationName"`
 	// The team name.
@@ -125,8 +130,12 @@ type teamAccessTokenArgs struct {
 type TeamAccessTokenArgs struct {
 	// A description of the token.
 	Description pulumi.StringPtrInput
-	// The name for the token. This must be unique among all organization and team tokens in the organization.
-	Name pulumi.StringInput
+	// The name for the token, up to 40 characters. Organization and team tokens share one set of names per organization, and Pulumi Cloud never frees a deleted token's name, so the name must not have been used by any other token in the organization.
+	//
+	// If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, and generates a fresh one whenever the token is replaced. Removing `name` from an existing token keeps its current name until the next replacement.
+	//
+	// Every input on this resource triggers a replacement, so when `name` is set explicitly, changing any other input fails with `409 Conflict: token name already exists`. Omit `name`, or change it along with the other input.
+	Name pulumi.StringPtrInput
 	// The organization's name.
 	OrganizationName pulumi.StringInput
 	// The team name.
@@ -225,7 +234,11 @@ func (o TeamAccessTokenOutput) Description() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *TeamAccessToken) pulumi.StringPtrOutput { return v.Description }).(pulumi.StringPtrOutput)
 }
 
-// The name for the token. This must be unique among all organization and team tokens in the organization.
+// The name for the token, up to 40 characters. Organization and team tokens share one set of names per organization, and Pulumi Cloud never frees a deleted token's name, so the name must not have been used by any other token in the organization.
+//
+// If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, and generates a fresh one whenever the token is replaced. Removing `name` from an existing token keeps its current name until the next replacement.
+//
+// Every input on this resource triggers a replacement, so when `name` is set explicitly, changing any other input fails with `409 Conflict: token name already exists`. Omit `name`, or change it along with the other input.
 func (o TeamAccessTokenOutput) Name() pulumi.StringOutput {
 	return o.ApplyT(func(v *TeamAccessToken) pulumi.StringOutput { return v.Name }).(pulumi.StringOutput)
 }
