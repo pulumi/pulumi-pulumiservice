@@ -20,6 +20,7 @@ import (
 // ### Deploy on every commit
 //
 // This runs `pulumi up` on each push to `main` that changes a file under `infra/`, and `pulumi preview` on pull requests. The organization must have the Pulumi GitHub app installed on the repository.
+//
 // ```go
 // package main
 //
@@ -61,6 +62,7 @@ import (
 // ### Deploy when a git tag is pushed
 //
 // This runs `pulumi up` when a tag matching `v*` is pushed, except release candidates such as `v1.2.0-rc1`. Pulumi Cloud rejects `deployCommits` and `deployTags` together, and `deployCommits` defaults to `true`, so set `deployCommits` to `false` when you enable `deployTags`. The organization must have the Pulumi GitHub app installed on the repository.
+//
 // ```go
 // package main
 //

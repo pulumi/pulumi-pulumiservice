@@ -18,13 +18,14 @@ namespace Pulumi.PulumiService
     /// ### Deploy on every commit
     /// 
     /// This runs `pulumi up` on each push to `main` that changes a file under `infra/`, and `pulumi preview` on pull requests. The organization must have the Pulumi GitHub app installed on the repository.
+    /// 
     /// ```csharp
     /// using System.Collections.Generic;
     /// using System.Linq;
     /// using Pulumi;
     /// using PulumiService = Pulumi.PulumiService;
     /// 
-    /// return await Deployment.RunAsync(() =&gt;
+    /// return await Deployment.RunAsync(() =&gt; 
     /// {
     ///     var settings = new PulumiService.DeploymentSettings("settings", new()
     ///     {
@@ -49,18 +50,20 @@ namespace Pulumi.PulumiService
     ///             },
     ///         },
     ///     });
+    /// 
     /// });
     /// ```
     /// ### Deploy when a git tag is pushed
     /// 
     /// This runs `pulumi up` when a tag matching `v*` is pushed, except release candidates such as `v1.2.0-rc1`. Pulumi Cloud rejects `deployCommits` and `deployTags` together, and `deployCommits` defaults to `true`, so set `deployCommits` to `false` when you enable `deployTags`. The organization must have the Pulumi GitHub app installed on the repository.
+    /// 
     /// ```csharp
     /// using System.Collections.Generic;
     /// using System.Linq;
     /// using Pulumi;
     /// using PulumiService = Pulumi.PulumiService;
     /// 
-    /// return await Deployment.RunAsync(() =&gt;
+    /// return await Deployment.RunAsync(() =&gt; 
     /// {
     ///     var settings = new PulumiService.DeploymentSettings("settings", new()
     ///     {
@@ -86,6 +89,7 @@ namespace Pulumi.PulumiService
     ///             },
     ///         },
     ///     });
+    /// 
     /// });
     /// ```
     /// 
