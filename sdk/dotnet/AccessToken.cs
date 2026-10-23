@@ -41,6 +41,12 @@ namespace Pulumi.PulumiService
         public Output<string> Description { get; private set; } = null!;
 
         /// <summary>
+        /// When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`. Omit it for a token that never expires. Pulumi Cloud rejects an expiry that is in the past or more than two years away.
+        /// </summary>
+        [Output("expires")]
+        public Output<string?> Expires { get; private set; } = null!;
+
+        /// <summary>
         /// The token's value.
         /// </summary>
         [Output("value")]
@@ -76,6 +82,7 @@ namespace Pulumi.PulumiService
                 ReplaceOnChanges =
                 {
                     "description",
+                    "expires",
                 },
             };
             var merged = CustomResourceOptions.Merge(defaultOptions, options);
@@ -104,6 +111,12 @@ namespace Pulumi.PulumiService
         /// </summary>
         [Input("description", required: true)]
         public Input<string> Description { get; set; } = null!;
+
+        /// <summary>
+        /// When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`. Omit it for a token that never expires. Pulumi Cloud rejects an expiry that is in the past or more than two years away.
+        /// </summary>
+        [Input("expires")]
+        public Input<string>? Expires { get; set; }
 
         public AccessTokenArgs()
         {

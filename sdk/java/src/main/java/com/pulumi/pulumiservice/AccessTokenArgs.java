@@ -8,6 +8,8 @@ import com.pulumi.core.annotations.Import;
 import com.pulumi.exceptions.MissingRequiredPropertyException;
 import java.lang.String;
 import java.util.Objects;
+import java.util.Optional;
+import javax.annotation.Nullable;
 
 
 public final class AccessTokenArgs extends com.pulumi.resources.ResourceArgs {
@@ -29,10 +31,26 @@ public final class AccessTokenArgs extends com.pulumi.resources.ResourceArgs {
         return this.description;
     }
 
+    /**
+     * When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`. Omit it for a token that never expires. Pulumi Cloud rejects an expiry that is in the past or more than two years away.
+     * 
+     */
+    @Import(name="expires")
+    private @Nullable Output<String> expires;
+
+    /**
+     * @return When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`. Omit it for a token that never expires. Pulumi Cloud rejects an expiry that is in the past or more than two years away.
+     * 
+     */
+    public Optional<Output<String>> expires() {
+        return Optional.ofNullable(this.expires);
+    }
+
     private AccessTokenArgs() {}
 
     private AccessTokenArgs(AccessTokenArgs $) {
         this.description = $.description;
+        this.expires = $.expires;
     }
 
     public static Builder builder() {
@@ -72,6 +90,27 @@ public final class AccessTokenArgs extends com.pulumi.resources.ResourceArgs {
          */
         public Builder description(String description) {
             return description(Output.of(description));
+        }
+
+        /**
+         * @param expires When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`. Omit it for a token that never expires. Pulumi Cloud rejects an expiry that is in the past or more than two years away.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder expires(@Nullable Output<String> expires) {
+            $.expires = expires;
+            return this;
+        }
+
+        /**
+         * @param expires When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`. Omit it for a token that never expires. Pulumi Cloud rejects an expiry that is in the past or more than two years away.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder expires(String expires) {
+            return expires(Output.of(expires));
         }
 
         public AccessTokenArgs build() {

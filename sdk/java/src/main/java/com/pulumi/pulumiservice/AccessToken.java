@@ -11,6 +11,7 @@ import com.pulumi.pulumiservice.AccessTokenArgs;
 import com.pulumi.pulumiservice.Utilities;
 import java.lang.String;
 import java.util.List;
+import java.util.Optional;
 import javax.annotation.Nullable;
 
 /**
@@ -51,6 +52,20 @@ public class AccessToken extends com.pulumi.resources.CustomResource {
      */
     public Output<String> description() {
         return this.description;
+    }
+    /**
+     * When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`. Omit it for a token that never expires. Pulumi Cloud rejects an expiry that is in the past or more than two years away.
+     * 
+     */
+    @Export(name="expires", refs={String.class}, tree="[0]")
+    private Output</* @Nullable */ String> expires;
+
+    /**
+     * @return When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`. Omit it for a token that never expires. Pulumi Cloud rejects an expiry that is in the past or more than two years away.
+     * 
+     */
+    public Output<Optional<String>> expires() {
+        return Codegen.optional(this.expires);
     }
     /**
      * The token&#39;s value.
@@ -110,7 +125,8 @@ public class AccessToken extends com.pulumi.resources.CustomResource {
                 "value"
             ))
             .replaceOnChanges(List.of(
-                "description"
+                "description",
+                "expires"
             ))
             .build();
         return com.pulumi.resources.CustomResourceOptions.merge(defaultOptions, options, id);

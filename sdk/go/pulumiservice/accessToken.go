@@ -41,6 +41,8 @@ type AccessToken struct {
 
 	// Description of the access token.
 	Description pulumi.StringOutput `pulumi:"description"`
+	// When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`. Omit it for a token that never expires. Pulumi Cloud rejects an expiry that is in the past or more than two years away.
+	Expires pulumi.StringPtrOutput `pulumi:"expires"`
 	// The token's value.
 	Value pulumi.StringOutput `pulumi:"value"`
 }
@@ -61,6 +63,7 @@ func NewAccessToken(ctx *pulumi.Context,
 	opts = append(opts, secrets)
 	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
 		"description",
+		"expires",
 	})
 	opts = append(opts, replaceOnChanges)
 	opts = internal.PkgResourceDefaultOpts(opts)
@@ -98,12 +101,16 @@ func (AccessTokenState) ElementType() reflect.Type {
 type accessTokenArgs struct {
 	// Description of the access token.
 	Description string `pulumi:"description"`
+	// When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`. Omit it for a token that never expires. Pulumi Cloud rejects an expiry that is in the past or more than two years away.
+	Expires *string `pulumi:"expires"`
 }
 
 // The set of arguments for constructing a AccessToken resource.
 type AccessTokenArgs struct {
 	// Description of the access token.
 	Description pulumi.StringInput
+	// When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`. Omit it for a token that never expires. Pulumi Cloud rejects an expiry that is in the past or more than two years away.
+	Expires pulumi.StringPtrInput
 }
 
 func (AccessTokenArgs) ElementType() reflect.Type {
@@ -196,6 +203,11 @@ func (o AccessTokenOutput) ToAccessTokenOutputWithContext(ctx context.Context) A
 // Description of the access token.
 func (o AccessTokenOutput) Description() pulumi.StringOutput {
 	return o.ApplyT(func(v *AccessToken) pulumi.StringOutput { return v.Description }).(pulumi.StringOutput)
+}
+
+// When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`. Omit it for a token that never expires. Pulumi Cloud rejects an expiry that is in the past or more than two years away.
+func (o AccessTokenOutput) Expires() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *AccessToken) pulumi.StringPtrOutput { return v.Expires }).(pulumi.StringPtrOutput)
 }
 
 // The token's value.
