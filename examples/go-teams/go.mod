@@ -1,6 +1,6 @@
 module github.com/pulumi/pulumi-pulumiservice/examples/go-teams
 
-go 1.26.6
+go 1.26.10
 
 require (
 	github.com/pulumi/pulumi-pulumiservice/sdk v1.5.0
