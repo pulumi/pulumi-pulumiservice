@@ -32985,6 +32985,777 @@
           "SubjectDomainPolicy"
         ],
         "type": "object"
+      },
+      "AgentAutomationStackOperationTrigger": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/AgentAutomationTrigger"
+          },
+          {
+            "description": "Pulumi stack-operation trigger configuration.",
+            "properties": {
+              "operations": {
+                "description": "The Pulumi operations that can trigger this automation.",
+                "items": {
+                  "enum": [
+                    "update",
+                    "preview",
+                    "refresh",
+                    "destroy",
+                    "import",
+                    "rename",
+                    "detect-drift",
+                    "remediate-drift"
+                  ],
+                  "type": "string",
+                  "x-pulumi-model-property": {
+                    "enumTypeName": "StackOperation",
+                    "enumComments": "StackOperation is the set of Pulumi stack operations that can be used as event selectors.",
+                    "enumFieldNames": [
+                      "Update",
+                      "Preview",
+                      "Refresh",
+                      "Destroy",
+                      "Import",
+                      "Rename",
+                      "DetectDrift",
+                      "RemediateDrift"
+                    ],
+                    "enumFieldComments": [
+                      "Runs a stack update.",
+                      "Runs a stack preview.",
+                      "Refreshes stack state from cloud provider state.",
+                      "Destroys stack resources.",
+                      "Imports existing cloud resources into a stack.",
+                      "Renames a stack.",
+                      "Detects stack drift.",
+                      "Remediates stack drift."
+                    ],
+                    "enumNoValidation": true
+                  }
+                },
+                "type": "array",
+                "x-order": 1
+              },
+              "results": {
+                "description": "The terminal operation results that can trigger this automation.",
+                "items": {
+                  "enum": [
+                    "succeeded",
+                    "failed",
+                    "canceled"
+                  ],
+                  "type": "string",
+                  "x-pulumi-model-property": {
+                    "enumTypeName": "AppOperationResult",
+                    "enumComments": "OperationResult is the high-level outcome of an operation.",
+                    "enumFieldComments": [
+                      "OperationResultSucceeded indicates the operation completed without error.",
+                      "OperationResultFailed indicates the operation returned an error.",
+                      "OperationResultCanceled indicates the operation was canceled by the user."
+                    ],
+                    "enumNoValidation": true
+                  }
+                },
+                "type": "array",
+                "x-order": 2
+              },
+              "stacks": {
+                "description": "The stacks whose operations can trigger this automation.",
+                "items": {
+                  "$ref": "#/components/schemas/AppPulumiStackReference"
+                },
+                "type": "array",
+                "x-order": 3
+              }
+            },
+            "required": [
+              "operations",
+              "results",
+              "stacks"
+            ],
+            "type": "object"
+          }
+        ]
+      },
+      "AgentAutomationTrigger": {
+        "description": "The event source and shared configuration for a triggered automation.",
+        "discriminator": {
+          "mapping": {
+            "stack_operation": "#/components/schemas/AgentAutomationStackOperationTrigger",
+            "webhook": "#/components/schemas/AgentAutomationWebhookTrigger"
+          },
+          "propertyName": "type"
+        },
+        "properties": {
+          "quietPeriodSeconds": {
+            "description": "The quiet period, in seconds, that bounds how long events remain associated with one task.",
+            "format": "int64",
+            "type": "integer",
+            "x-order": 1
+          },
+          "type": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "quietPeriodSeconds",
+          "type"
+        ],
+        "type": "object"
+      },
+      "AgentAutomationV2": {
+        "description": "An organization-owned agent automation. The kind field identifies which automation-specific fields are present.",
+        "properties": {
+          "asyncTriggerType": {
+            "description": "The async trigger type for this automation.",
+            "enum": [
+              "scheduled",
+              "external_signal"
+            ],
+            "type": "string",
+            "x-order": 4,
+            "x-pulumi-model-property": {
+              "enumTypeName": "AgentAsyncTriggerType",
+              "enumComments": "The async trigger source for a Neo agent task.",
+              "enumFieldNames": [
+                "Scheduled",
+                "ExternalSignal"
+              ],
+              "enumFieldComments": [
+                "The task was started by a cron-driven scheduled signal.",
+                "The task was started in reaction to an external signal payload."
+              ]
+            }
+          },
+          "id": {
+            "description": "The unique identifier for this automation.",
+            "type": "string",
+            "x-order": 2
+          },
+          "kind": {
+            "description": "The automation kind.",
+            "enum": [
+              "scheduled",
+              "triggered"
+            ],
+            "type": "string",
+            "x-order": 1,
+            "x-pulumi-model-property": {
+              "enumTypeName": "AgentAutomationKind",
+              "enumComments": "The kind of work that starts an agent automation."
+            }
+          },
+          "lastExecuted": {
+            "description": "The timestamp when this automation last ran, if any.",
+            "format": "date-time",
+            "type": "string",
+            "x-order": 11
+          },
+          "lastRunStatus": {
+            "description": "The result of the most recent automation run, if any. Valid values currently include 'succeeded', 'failed', and 'skipped'.",
+            "type": "string",
+            "x-order": 12
+          },
+          "name": {
+            "description": "A human-readable name for this automation.",
+            "type": "string",
+            "x-order": 3
+          },
+          "nextExecution": {
+            "description": "The timestamp of the next scheduled execution. Present for scheduled automations.",
+            "type": "string",
+            "x-order": 9
+          },
+          "notificationTargets": {
+            "description": "The destinations that receive notifications about automation runs.",
+            "items": {
+              "$ref": "#/components/schemas/NotificationTarget"
+            },
+            "type": "array",
+            "x-order": 7
+          },
+          "paused": {
+            "description": "Whether future executions are currently paused.",
+            "type": "boolean",
+            "x-order": 6
+          },
+          "scheduleCron": {
+            "description": "A standard five-field cron expression in UTC that controls when this automation runs. Present for scheduled automations.",
+            "type": "string",
+            "x-order": 8
+          },
+          "task": {
+            "$ref": "#/components/schemas/CreateAgentTaskRequest",
+            "description": "The task configuration used for each run of this automation, including the prompt, attached entities, and task execution settings. Each run creates a fresh task from this definition.",
+            "x-order": 5
+          },
+          "trigger": {
+            "$ref": "#/components/schemas/AgentAutomationTrigger",
+            "description": "The trigger configuration for this automation. Present for triggered automations.",
+            "x-order": 10
+          }
+        },
+        "required": [
+          "asyncTriggerType",
+          "id",
+          "kind",
+          "name",
+          "notificationTargets",
+          "paused",
+          "task"
+        ],
+        "type": "object"
+      },
+      "AgentAutomationV2EventResponse": {
+        "description": "Acknowledges an authenticated event delivered to a triggered automation.",
+        "properties": {
+          "accepted": {
+            "description": "Whether the event was accepted for batching.",
+            "type": "boolean",
+            "x-order": 1
+          }
+        },
+        "required": [
+          "accepted"
+        ],
+        "type": "object"
+      },
+      "AgentAutomationV2TriggerSecretResponse": {
+        "description": "An agent automation and a newly issued webhook trigger secret.",
+        "properties": {
+          "automation": {
+            "$ref": "#/components/schemas/AgentAutomationV2",
+            "description": "The configured automation.",
+            "x-order": 1
+          },
+          "secret": {
+            "description": "The webhook secret. This value is returned only when it is created or rotated.",
+            "type": "string",
+            "x-order": 2
+          }
+        },
+        "required": [
+          "automation",
+          "secret"
+        ],
+        "type": "object"
+      },
+      "AgentAutomationWebhookTrigger": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/AgentAutomationTrigger"
+          },
+          {
+            "description": "Webhook trigger configuration.",
+            "properties": {
+              "lastWebhookDeliveryAt": {
+                "description": "The time of the most recent webhook delivery attempt that passed Pulumi secret authentication. Null when no delivery has been observed.",
+                "format": "date-time",
+                "readOnly": true,
+                "type": "string",
+                "x-order": 7
+              },
+              "lastWebhookDeliveryStatus": {
+                "description": "The result of the most recent webhook delivery that passed Pulumi secret authentication. Null when no delivery has been observed.",
+                "enum": [
+                  "accepted",
+                  "rejected"
+                ],
+                "readOnly": true,
+                "type": "string",
+                "x-order": 6,
+                "x-pulumi-model-property": {
+                  "enumTypeName": "AgentWebhookDeliveryStatus",
+                  "enumComments": "The result of the most recent authenticated webhook delivery attempt.",
+                  "enumFieldComments": [
+                    "The webhook was accepted and durably queued for processing.",
+                    "The webhook reached Pulumi but was rejected before processing."
+                  ]
+                }
+              },
+              "verifyWebhookSignature": {
+                "description": "Whether Pulumi verifies webhook signatures before accepting events.",
+                "type": "boolean",
+                "x-order": 4
+              },
+              "webhookPreset": {
+                "description": "The provider preset used to configure webhook authentication and event handling.",
+                "enum": [
+                  "generic",
+                  "pagerduty"
+                ],
+                "type": "string",
+                "x-order": 2,
+                "x-pulumi-model-property": {
+                  "enumTypeName": "AgentWebhookPreset",
+                  "enumComments": "A provider preset that configures webhook authentication and event handling.",
+                  "enumFieldNames": [
+                    "Generic",
+                    "PagerDuty"
+                  ],
+                  "enumFieldComments": [
+                    "A generic webhook authenticated with Pulumi's generated secret header.",
+                    "A PagerDuty V3 webhook with optional signature verification."
+                  ]
+                }
+              },
+              "webhookSecret": {
+                "description": "A newly issued webhook secret. Present only when the webhook is created or rotated.",
+                "readOnly": true,
+                "type": "string",
+                "x-order": 8
+              },
+              "webhookSignatureConfigured": {
+                "description": "Whether a verification credential is configured for the webhook signature scheme.",
+                "readOnly": true,
+                "type": "boolean",
+                "x-order": 5
+              },
+              "webhookSignatureScheme": {
+                "description": "The signature scheme used to authenticate webhook requests.",
+                "enum": [
+                  "pagerduty_v3"
+                ],
+                "type": "string",
+                "x-order": 3,
+                "x-pulumi-model-property": {
+                  "enumTypeName": "AgentWebhookSignatureScheme",
+                  "enumComments": "A scheme for authenticating signed webhook requests.",
+                  "enumFieldNames": [
+                    "PagerDutyV3"
+                  ],
+                  "enumFieldComments": [
+                    "PagerDuty V3 HMAC-SHA256 request signatures."
+                  ]
+                }
+              },
+              "webhookURL": {
+                "description": "The public URL that receives webhook events.",
+                "readOnly": true,
+                "type": "string",
+                "x-order": 1
+              }
+            },
+            "required": [
+              "verifyWebhookSignature",
+              "webhookPreset",
+              "webhookSignatureConfigured",
+              "webhookURL"
+            ],
+            "type": "object"
+          }
+        ]
+      },
+      "CreateAgentAutomationStackOperationTrigger": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CreateAgentAutomationTrigger"
+          },
+          {
+            "description": "Configuration for an automation triggered by Pulumi stack operations.",
+            "properties": {
+              "operations": {
+                "description": "The Pulumi operations that can trigger this automation.",
+                "items": {
+                  "enum": [
+                    "update",
+                    "preview",
+                    "refresh",
+                    "destroy",
+                    "import",
+                    "rename",
+                    "detect-drift",
+                    "remediate-drift"
+                  ],
+                  "type": "string",
+                  "x-pulumi-model-property": {
+                    "enumTypeName": "StackOperation",
+                    "enumComments": "StackOperation is the set of Pulumi stack operations that can be used as event selectors.",
+                    "enumFieldNames": [
+                      "Update",
+                      "Preview",
+                      "Refresh",
+                      "Destroy",
+                      "Import",
+                      "Rename",
+                      "DetectDrift",
+                      "RemediateDrift"
+                    ],
+                    "enumFieldComments": [
+                      "Runs a stack update.",
+                      "Runs a stack preview.",
+                      "Refreshes stack state from cloud provider state.",
+                      "Destroys stack resources.",
+                      "Imports existing cloud resources into a stack.",
+                      "Renames a stack.",
+                      "Detects stack drift.",
+                      "Remediates stack drift."
+                    ],
+                    "enumNoValidation": true
+                  }
+                },
+                "type": "array",
+                "x-order": 1
+              },
+              "results": {
+                "description": "The terminal operation results that can trigger this automation.",
+                "items": {
+                  "enum": [
+                    "succeeded",
+                    "failed",
+                    "canceled"
+                  ],
+                  "type": "string",
+                  "x-pulumi-model-property": {
+                    "enumTypeName": "AppOperationResult",
+                    "enumComments": "OperationResult is the high-level outcome of an operation.",
+                    "enumFieldComments": [
+                      "OperationResultSucceeded indicates the operation completed without error.",
+                      "OperationResultFailed indicates the operation returned an error.",
+                      "OperationResultCanceled indicates the operation was canceled by the user."
+                    ],
+                    "enumNoValidation": true
+                  }
+                },
+                "type": "array",
+                "x-order": 2
+              },
+              "stacks": {
+                "description": "The stacks whose operations can trigger this automation.",
+                "items": {
+                  "$ref": "#/components/schemas/AppPulumiStackReference"
+                },
+                "type": "array",
+                "x-order": 3
+              }
+            },
+            "required": [
+              "operations",
+              "results",
+              "stacks"
+            ],
+            "type": "object"
+          }
+        ]
+      },
+      "CreateAgentAutomationTrigger": {
+        "description": "The shared configuration for an event-triggered automation.",
+        "discriminator": {
+          "mapping": {
+            "stack_operation": "#/components/schemas/CreateAgentAutomationStackOperationTrigger",
+            "webhook": "#/components/schemas/CreateAgentAutomationWebhookTrigger"
+          },
+          "propertyName": "type"
+        },
+        "properties": {
+          "quietPeriodSeconds": {
+            "description": "The number of quiet seconds that bounds how long events remain associated with one task. The first event dispatches immediately. Must be between 1 and 3600.",
+            "format": "int64",
+            "type": "integer",
+            "x-order": 1
+          },
+          "type": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "quietPeriodSeconds",
+          "type"
+        ],
+        "type": "object"
+      },
+      "CreateAgentAutomationV2Request": {
+        "description": "The common request fields for creating or updating an agent automation. The kind discriminator selects the required configuration.",
+        "discriminator": {
+          "mapping": {
+            "scheduled": "#/components/schemas/CreateScheduledAgentAutomationV2Request",
+            "triggered": "#/components/schemas/CreateTriggeredAgentAutomationV2Request"
+          },
+          "propertyName": "kind"
+        },
+        "properties": {
+          "kind": {
+            "type": "string"
+          },
+          "name": {
+            "description": "A human-readable name for the automation.",
+            "type": "string",
+            "x-order": 1
+          },
+          "notificationTargets": {
+            "description": "The destinations that receive notifications about automation runs.",
+            "items": {
+              "$ref": "#/components/schemas/NotificationTarget"
+            },
+            "type": "array",
+            "x-order": 3
+          },
+          "task": {
+            "$ref": "#/components/schemas/CreateAgentTaskRequest",
+            "description": "The task configuration that should be used whenever the automation runs. This includes the prompt, attached entities, and task execution settings such as plan mode, approval mode, permission mode, tool execution mode, and enabled integrations. Each automation run creates a fresh task from this definition.",
+            "x-order": 2
+          }
+        },
+        "required": [
+          "name",
+          "task",
+          "kind"
+        ],
+        "type": "object"
+      },
+      "CreateAgentAutomationWebhookTrigger": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CreateAgentAutomationTrigger"
+          },
+          {
+            "description": "Configuration for a webhook-triggered automation.",
+            "properties": {
+              "verifyWebhookSignature": {
+                "description": "Whether Pulumi must verify the webhook signature before accepting an event. Defaults to true for signed webhook presets. When false, payloads are accepted without signature verification.",
+                "type": "boolean",
+                "x-order": 2
+              },
+              "webhookPreset": {
+                "description": "The provider preset. Defaults to generic when omitted.",
+                "enum": [
+                  "generic",
+                  "pagerduty"
+                ],
+                "type": "string",
+                "x-order": 1,
+                "x-pulumi-model-property": {
+                  "enumTypeName": "AgentWebhookPreset",
+                  "enumComments": "A provider preset that configures webhook authentication and event handling.",
+                  "enumFieldNames": [
+                    "Generic",
+                    "PagerDuty"
+                  ],
+                  "enumFieldComments": [
+                    "A generic webhook authenticated with Pulumi's generated secret header.",
+                    "A PagerDuty V3 webhook with optional signature verification."
+                  ]
+                }
+              },
+              "webhookSignatureCredential": {
+                "description": "The verification credential for the selected webhook signature scheme. For PagerDuty V3 this is the shared signing secret generated after creating the subscription. It may be omitted while obtaining the Pulumi webhook URL. When updating, omit it to retain the current credential or provide a new value to rotate it.",
+                "type": "string",
+                "x-order": 4
+              },
+              "webhookSignatureScheme": {
+                "description": "The signature scheme used to authenticate webhook requests. PagerDuty presets default to pagerduty_v3 when omitted.",
+                "enum": [
+                  "pagerduty_v3"
+                ],
+                "type": "string",
+                "x-order": 3,
+                "x-pulumi-model-property": {
+                  "enumTypeName": "AgentWebhookSignatureScheme",
+                  "enumComments": "A scheme for authenticating signed webhook requests.",
+                  "enumFieldNames": [
+                    "PagerDutyV3"
+                  ],
+                  "enumFieldComments": [
+                    "PagerDuty V3 HMAC-SHA256 request signatures."
+                  ]
+                }
+              }
+            },
+            "type": "object"
+          }
+        ]
+      },
+      "CreateScheduledAgentAutomationV2Request": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CreateAgentAutomationV2Request"
+          },
+          {
+            "description": "The request body for creating or updating a scheduled agent automation.",
+            "properties": {
+              "scheduleCron": {
+                "description": "A standard five-field cron expression in UTC that controls when the automation runs. The minimum interval between consecutive runs must be at least 10 minutes; tighter schedules are rejected.",
+                "type": "string",
+                "x-order": 1
+              }
+            },
+            "required": [
+              "scheduleCron"
+            ],
+            "type": "object"
+          }
+        ]
+      },
+      "CreateTriggeredAgentAutomationV2Request": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CreateAgentAutomationV2Request"
+          },
+          {
+            "description": "The request body for creating or updating a triggered agent automation.",
+            "properties": {
+              "trigger": {
+                "$ref": "#/components/schemas/CreateAgentAutomationTrigger",
+                "description": "The event source and shared configuration for this triggered automation.",
+                "x-order": 1
+              }
+            },
+            "required": [
+              "trigger"
+            ],
+            "type": "object"
+          }
+        ]
+      },
+      "ListAgentAutomationsV2Response": {
+        "description": "A list of organization-owned agent automations in an organization.",
+        "properties": {
+          "automations": {
+            "description": "The automations visible to the caller.",
+            "items": {
+              "$ref": "#/components/schemas/AgentAutomationV2"
+            },
+            "type": "array",
+            "x-order": 1
+          },
+          "continuationToken": {
+            "description": "Token for retrieving the next page of results.",
+            "type": "string",
+            "x-order": 2
+          }
+        },
+        "required": [
+          "automations"
+        ],
+        "type": "object"
+      },
+      "ListNotificationDestinationsResponse": {
+        "description": "Destinations available to receive notifications.",
+        "properties": {
+          "destinations": {
+            "description": "Available notification destinations.",
+            "items": {
+              "$ref": "#/components/schemas/NotificationDestination"
+            },
+            "type": "array",
+            "x-order": 1
+          }
+        },
+        "required": [
+          "destinations"
+        ],
+        "type": "object"
+      },
+      "NotificationDestination": {
+        "description": "A destination that can receive a notification.",
+        "discriminator": {
+          "mapping": {
+            "slack": "#/components/schemas/SlackNotificationDestination"
+          },
+          "propertyName": "type"
+        },
+        "properties": {
+          "type": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "type"
+        ],
+        "type": "object"
+      },
+      "NotificationTarget": {
+        "description": "A destination that receives notifications about automation runs.",
+        "discriminator": {
+          "mapping": {
+            "slack": "#/components/schemas/SlackNotificationTarget"
+          },
+          "propertyName": "type"
+        },
+        "properties": {
+          "type": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "type"
+        ],
+        "type": "object"
+      },
+      "SlackNotificationDestination": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/NotificationDestination"
+          },
+          {
+            "description": "A Slack channel that can receive a notification.",
+            "properties": {
+              "channelID": {
+                "description": "The Slack channel ID.",
+                "type": "string",
+                "x-order": 1
+              },
+              "isPrivate": {
+                "description": "Whether the Slack channel is private.",
+                "type": "boolean",
+                "x-order": 3
+              },
+              "name": {
+                "description": "The human-readable Slack channel name.",
+                "type": "string",
+                "x-order": 2
+              },
+              "url": {
+                "description": "The URL that opens the channel in Slack.",
+                "type": "string",
+                "x-order": 4
+              }
+            },
+            "required": [
+              "channelID",
+              "isPrivate",
+              "name",
+              "url"
+            ],
+            "type": "object"
+          }
+        ]
+      },
+      "SlackNotificationTarget": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/NotificationTarget"
+          },
+          {
+            "description": "A Slack channel that receives notifications about automation runs.",
+            "properties": {
+              "channelID": {
+                "description": "The Slack channel ID that receives notifications.",
+                "type": "string",
+                "x-order": 1
+              }
+            },
+            "required": [
+              "channelID"
+            ],
+            "type": "object"
+          }
+        ]
+      },
+      "UpdateAgentAutomationPausedRequest": {
+        "description": "Request to pause or resume an agent automation.",
+        "properties": {
+          "paused": {
+            "description": "Whether the automation should be paused. Set to false to resume future executions.",
+            "type": "boolean",
+            "x-order": 1
+          }
+        },
+        "required": [
+          "paused"
+        ],
+        "type": "object"
       }
     }
   },
@@ -69879,6 +70650,614 @@
         "summary": "GetUserHasVerifiedEmail",
         "tags": [
           "Users"
+        ]
+      }
+    },
+    "/api/orgs/{orgName}/notifications/destinations": {
+      "get": {
+        "description": "Lists destinations available for use as notification targets. A destination provider may require the caller to connect their identity to the organization before it can be selected.",
+        "operationId": "ListNotificationDestinations",
+        "parameters": [
+          {
+            "description": "The organization name",
+            "in": "path",
+            "name": "orgName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListNotificationDestinationsResponse"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "description": "The caller has not connected a notification destination provider to the organization"
+          },
+          "429": {
+            "description": "A notification destination provider is rate limiting discovery"
+          },
+          "503": {
+            "description": "Notification destination discovery timed out"
+          }
+        },
+        "summary": "ListNotificationDestinations",
+        "tags": [
+          "Organizations"
+        ]
+      }
+    },
+    "/api/v2/agents/triggers/{automationID}/events": {
+      "post": {
+        "description": "Authenticates and queues a JSON event for a webhook trigger. Generic webhooks supply the secret in X-Pulumi-Trigger-Secret and may use Idempotency-Key. PagerDuty V3 webhooks are verified using X-PagerDuty-Signature and deduplicated by event.id.",
+        "operationId": "CreateAgentAutomationV2Event",
+        "parameters": [
+          {
+            "description": "The automation identifier",
+            "in": "path",
+            "name": "automationID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          },
+          "x-originalParamName": "body"
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentAutomationV2EventResponse"
+                }
+              }
+            },
+            "description": "Accepted"
+          },
+          "404": {
+            "description": "The trigger or secret was not recognized"
+          }
+        },
+        "summary": "CreateAgentAutomationV2Event",
+        "tags": [
+          "AI Agents"
+        ]
+      }
+    },
+    "/api/v2/agents/{orgName}/automations": {
+      "get": {
+        "description": "Lists organization-owned scheduled and triggered agent automations in the specified organization. Supports pagination via continuationToken with a configurable pageSize (1-1000, default 100).",
+        "operationId": "ListAgentAutomationsV2",
+        "parameters": [
+          {
+            "description": "The organization name",
+            "in": "path",
+            "name": "orgName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Token for retrieving the next page of results",
+            "in": "query",
+            "name": "continuationToken",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "A value to filter automations by name",
+            "in": "query",
+            "name": "filter",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "An optional automation kind filter",
+            "in": "query",
+            "name": "kind",
+            "schema": {
+              "enum": [
+                "scheduled",
+                "triggered"
+              ],
+              "type": "string",
+              "x-pulumi-model-property": {
+                "enumComments": "The kind of work that starts an agent automation.",
+                "enumTypeName": "AgentAutomationKind"
+              }
+            }
+          },
+          {
+            "description": "Number of results per page",
+            "in": "query",
+            "name": "pageSize",
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListAgentAutomationsV2Response"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "description": "pageSize must be between 1 and 1000"
+          },
+          "404": {
+            "description": "org"
+          }
+        },
+        "summary": "ListAgentAutomationsV2",
+        "tags": [
+          "AI Agents"
+        ]
+      },
+      "post": {
+        "description": "Creates an organization-owned scheduled or triggered agent automation in the specified organization. Set kind to scheduled or triggered and provide the corresponding configuration. Webhook automation responses include a secret that is shown only once.",
+        "operationId": "CreateAgentAutomationV2",
+        "parameters": [
+          {
+            "description": "The organization name",
+            "in": "path",
+            "name": "orgName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAgentAutomationV2Request"
+              }
+            }
+          },
+          "x-originalParamName": "body"
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentAutomationV2"
+                }
+              }
+            },
+            "description": "Created"
+          },
+          "400": {
+            "description": "automation configuration is invalid"
+          },
+          "404": {
+            "description": "org"
+          }
+        },
+        "summary": "CreateAgentAutomationV2",
+        "tags": [
+          "AI Agents"
+        ]
+      }
+    },
+    "/api/v2/agents/{orgName}/automations/{automationID}": {
+      "delete": {
+        "description": "Deletes an organization-owned scheduled or triggered agent automation. This removes future executions but does not delete previously created agent tasks.",
+        "operationId": "DeleteAgentAutomationV2",
+        "parameters": [
+          {
+            "description": "The organization name",
+            "in": "path",
+            "name": "orgName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The automation identifier",
+            "in": "path",
+            "name": "automationID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No content"
+          },
+          "404": {
+            "description": "automation"
+          }
+        },
+        "summary": "DeleteAgentAutomationV2",
+        "tags": [
+          "AI Agents"
+        ]
+      },
+      "get": {
+        "description": "Retrieves an organization-owned scheduled or triggered agent automation.",
+        "operationId": "GetAgentAutomationV2",
+        "parameters": [
+          {
+            "description": "The organization name",
+            "in": "path",
+            "name": "orgName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The automation identifier",
+            "in": "path",
+            "name": "automationID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentAutomationV2"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "automation"
+          }
+        },
+        "summary": "GetAgentAutomationV2",
+        "tags": [
+          "AI Agents"
+        ]
+      },
+      "patch": {
+        "description": "Updates an organization-owned scheduled or triggered agent automation. Its kind cannot be changed. Past task runs remain unchanged.",
+        "operationId": "UpdateAgentAutomationV2",
+        "parameters": [
+          {
+            "description": "The organization name",
+            "in": "path",
+            "name": "orgName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The automation identifier",
+            "in": "path",
+            "name": "automationID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAgentAutomationV2Request"
+              }
+            }
+          },
+          "x-originalParamName": "body"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentAutomationV2"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "description": "automation configuration is invalid"
+          },
+          "404": {
+            "description": "automation"
+          }
+        },
+        "summary": "UpdateAgentAutomationV2",
+        "tags": [
+          "AI Agents"
+        ]
+      }
+    },
+    "/api/v2/agents/{orgName}/automations/{automationID}/paused": {
+      "patch": {
+        "description": "Pauses or resumes an organization-owned scheduled or triggered agent automation.",
+        "operationId": "UpdateAgentAutomationV2Paused",
+        "parameters": [
+          {
+            "description": "The organization name",
+            "in": "path",
+            "name": "orgName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The automation identifier",
+            "in": "path",
+            "name": "automationID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAgentAutomationPausedRequest"
+              }
+            }
+          },
+          "x-originalParamName": "body"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentAutomationV2"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "automation"
+          }
+        },
+        "summary": "UpdateAgentAutomationV2Paused",
+        "tags": [
+          "AI Agents"
+        ]
+      }
+    },
+    "/api/v2/agents/{orgName}/automations/{automationID}/run": {
+      "post": {
+        "description": "Runs an organization-owned scheduled agent automation immediately without changing the recurring schedule.",
+        "operationId": "RunAgentAutomationV2Once",
+        "parameters": [
+          {
+            "description": "The organization name",
+            "in": "path",
+            "name": "orgName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The automation identifier",
+            "in": "path",
+            "name": "automationID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentAutomationV2"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "automation"
+          }
+        },
+        "summary": "RunAgentAutomationV2Once",
+        "tags": [
+          "AI Agents"
+        ]
+      }
+    },
+    "/api/v2/agents/{orgName}/automations/{automationID}/tasks": {
+      "get": {
+        "description": "Lists tasks created by a specific organization-owned agent automation. Supports pagination via continuationToken with a configurable pageSize (1-1000, default 100).",
+        "operationId": "ListAgentAutomationV2Tasks",
+        "parameters": [
+          {
+            "description": "The organization name",
+            "in": "path",
+            "name": "orgName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The automation identifier",
+            "in": "path",
+            "name": "automationID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Token for retrieving the next page of results",
+            "in": "query",
+            "name": "continuationToken",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Number of results per page",
+            "in": "query",
+            "name": "pageSize",
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Field to sort the results by. Defaults to lastEvent.",
+            "in": "query",
+            "name": "sortBy",
+            "schema": {
+              "enum": [
+                "lastEvent",
+                "created",
+                "status",
+                "name",
+                "tokensUsed"
+              ],
+              "type": "string",
+              "x-pulumi-model-property": {
+                "enumComments": "The field used to sort Neo agent tasks in list results.",
+                "enumFieldComments": [
+                  "Sort by the time of the most recent event on the task.",
+                  "Sort by when the task was created.",
+                  "Sort by task status, with running ordered before idle when ascending.",
+                  "Sort by task name.",
+                  "Sort by total Neo tokens consumed by the task. Tasks with no reported usage are treated as zero."
+                ],
+                "enumTypeName": "AgentTaskSortField"
+              }
+            }
+          },
+          {
+            "description": "Direction to sort the results in. Defaults to desc.",
+            "in": "query",
+            "name": "sortDirection",
+            "schema": {
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "type": "string",
+              "x-pulumi-model-property": {
+                "enumComments": "The direction used when sorting Neo agent tasks.",
+                "enumFieldComments": [
+                  "Sort in ascending order.",
+                  "Sort in descending order."
+                ],
+                "enumTypeName": "AgentTaskSortDirection"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListAgentTasksResponse"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "description": "pageSize must be between 1 and 1000"
+          },
+          "404": {
+            "description": "automation"
+          }
+        },
+        "summary": "ListAgentAutomationV2Tasks",
+        "tags": [
+          "AI Agents"
+        ]
+      }
+    },
+    "/api/v2/agents/{orgName}/automations/{automationID}/trigger-secret": {
+      "post": {
+        "description": "Invalidates the previous webhook trigger secret and returns a replacement. The replacement is shown only once and is available only for webhook-triggered automations.",
+        "operationId": "RotateAgentAutomationV2TriggerSecret",
+        "parameters": [
+          {
+            "description": "The organization name",
+            "in": "path",
+            "name": "orgName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The automation identifier",
+            "in": "path",
+            "name": "automationID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentAutomationV2TriggerSecretResponse"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "The automation does not have a webhook trigger or is not manageable by the caller"
+          }
+        },
+        "summary": "RotateAgentAutomationV2TriggerSecret",
+        "tags": [
+          "AI Agents"
         ]
       }
     }

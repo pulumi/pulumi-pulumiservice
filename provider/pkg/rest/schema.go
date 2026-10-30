@@ -16,6 +16,7 @@ package rest
 
 import (
 	"fmt"
+	"maps"
 	"slices"
 	"strings"
 
@@ -435,7 +436,7 @@ func operationInputs(spec *Spec, op *Operation, rm ResourceMeta) (map[string]sch
 
 	// Body schema (request).
 	if op.RequestRef != "" {
-		bodyProps, bodyRequired, err := flattenObjectSchema(spec, op.RequestRef)
+		bodyProps, bodyRequired, err := flattenRequestObjectSchema(spec, op.RequestRef)
 		if err != nil {
 			return nil, nil, fmt.Errorf("request body: %w", err)
 		}
@@ -454,6 +455,53 @@ func operationInputs(spec *Spec, op *Operation, rm ResourceMeta) (map[string]sch
 	}
 
 	return props, sortedKeys(required), nil
+}
+
+// flattenRequestObjectSchema returns the common properties and requirements
+// of a request body, plus the properties from each discriminator variant. A
+// Pulumi resource cannot express conditional required inputs, so requirements
+// unique to a variant intentionally remain optional; the API validates the
+// selected variant after the discriminator is supplied.
+//
+// This lets one resource model a tagged-union request such as an automation
+// that is either scheduled (scheduleCron) or triggered (trigger), without
+// dropping the variant fields from its schema or HTTP request body.
+func flattenRequestObjectSchema(spec *Spec, ref string) (map[string]any, []string, error) {
+	props, required, err := flattenObjectSchema(spec, ref)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	root, ok := spec.ResolveSchema(ref)
+	if !ok {
+		return nil, nil, fmt.Errorf("unresolvable $ref %q", ref)
+	}
+	discriminator, ok := root["discriminator"].(map[string]any)
+	if !ok {
+		return props, required, nil
+	}
+	mapping, ok := discriminator["mapping"].(map[string]any)
+	if !ok {
+		return props, required, nil
+	}
+
+	for _, variant := range slices.Sorted(maps.Keys(mapping)) {
+		variantRef, ok := mapping[variant].(string)
+		if !ok {
+			return nil, nil, fmt.Errorf("discriminator mapping %q in %s is not a schema ref", variant, ref)
+		}
+		variantProps, _, err := flattenObjectSchema(spec, variantRef)
+		if err != nil {
+			return nil, nil, fmt.Errorf("discriminator mapping %q in %s: %w", variant, ref, err)
+		}
+		for name, property := range variantProps {
+			if _, exists := props[name]; !exists {
+				props[name] = property
+			}
+		}
+	}
+
+	return props, required, nil
 }
 
 // mergePathParamsAsInputs ensures every path parameter contributes a

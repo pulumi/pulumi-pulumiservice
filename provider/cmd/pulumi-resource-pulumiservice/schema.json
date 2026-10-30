@@ -5426,6 +5426,124 @@
         "teamName"
       ]
     },
+    "pulumiservice:api:AgentAutomationV2": {
+      "description": "Creates an organization-owned scheduled or triggered agent automation in the specified organization. Set kind to scheduled or triggered and provide the corresponding configuration. Webhook automation responses include a secret that is shown only once.",
+      "properties": {
+        "asyncTriggerType": {
+          "type": "string",
+          "description": "The async trigger type for this automation."
+        },
+        "automationID": {
+          "type": "string",
+          "description": "The unique identifier for this automation."
+        },
+        "kind": {
+          "type": "string",
+          "description": "The automation kind."
+        },
+        "lastExecuted": {
+          "type": "string",
+          "description": "The timestamp when this automation last ran, if any."
+        },
+        "lastRunStatus": {
+          "type": "string",
+          "description": "The result of the most recent automation run, if any. Valid values currently include 'succeeded', 'failed', and 'skipped'."
+        },
+        "name": {
+          "type": "string",
+          "description": "A human-readable name for this automation."
+        },
+        "nextExecution": {
+          "type": "string",
+          "description": "The timestamp of the next scheduled execution. Present for scheduled automations."
+        },
+        "notificationTargets": {
+          "type": "array",
+          "items": {
+            "$ref": "pulumi.json#/Any"
+          },
+          "description": "The destinations that receive notifications about automation runs."
+        },
+        "paused": {
+          "type": "boolean",
+          "description": "Whether future executions are currently paused."
+        },
+        "scheduleCron": {
+          "type": "string",
+          "description": "A standard five-field cron expression in UTC that controls when this automation runs. Present for scheduled automations."
+        },
+        "task": {
+          "$ref": "pulumi.json#/Any",
+          "description": "The task configuration used for each run of this automation, including the prompt, attached entities, and task execution settings. Each run creates a fresh task from this definition.",
+          "secret": true
+        },
+        "trigger": {
+          "$ref": "pulumi.json#/Any",
+          "description": "The trigger configuration for this automation. Present for triggered automations.",
+          "secret": true
+        }
+      },
+      "type": "object",
+      "required": [
+        "asyncTriggerType",
+        "automationID",
+        "kind",
+        "name",
+        "notificationTargets",
+        "paused",
+        "task"
+      ],
+      "inputProperties": {
+        "automationID": {
+          "type": "string",
+          "description": "The automation identifier",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "kind": {
+          "type": "string",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "name": {
+          "type": "string",
+          "description": "A human-readable name for the automation."
+        },
+        "notificationTargets": {
+          "type": "array",
+          "items": {
+            "$ref": "pulumi.json#/Any"
+          },
+          "description": "The destinations that receive notifications about automation runs."
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "scheduleCron": {
+          "type": "string",
+          "description": "A standard five-field cron expression in UTC that controls when the automation runs. The minimum interval between consecutive runs must be at least 10 minutes; tighter schedules are rejected."
+        },
+        "task": {
+          "$ref": "pulumi.json#/Any",
+          "description": "The task configuration that should be used whenever the automation runs. This includes the prompt, attached entities, and task execution settings such as plan mode, approval mode, permission mode, tool execution mode, and enabled integrations. Each automation run creates a fresh task from this definition.",
+          "secret": true
+        },
+        "trigger": {
+          "$ref": "pulumi.json#/Any",
+          "description": "The event source and shared configuration for this triggered automation.",
+          "secret": true
+        }
+      },
+      "requiredInputs": [
+        "kind",
+        "name",
+        "orgName",
+        "task"
+      ]
+    },
     "pulumiservice:api:AuditLogExportConfiguration": {
       "description": "Creates or updates the organization's automated audit log export configuration. Audit log export enables automatic delivery of audit events to an S3 bucket for long-term retention and SIEM integration. The configuration includes the S3 bucket details and IAM role for authentication. This feature is available on Business Critical edition.",
       "properties": {

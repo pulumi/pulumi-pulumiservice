@@ -243,7 +243,7 @@ func flattenedRequestProperties(spec *Spec, op *Operation) map[string]any {
 	if op == nil || op.RequestRef == "" {
 		return nil
 	}
-	props, _, err := flattenObjectSchema(spec, op.RequestRef)
+	props, _, err := flattenRequestObjectSchema(spec, op.RequestRef)
 	if err != nil {
 		return nil
 	}
@@ -1054,7 +1054,7 @@ func (r *Resource) buildRequestBody(op *Operation, inputs property.Map) map[stri
 	if op.RequestRef == "" {
 		return propertyMapToAny(inputs)
 	}
-	bodyProps, _, err := flattenObjectSchema(r.spec, op.RequestRef)
+	bodyProps, _, err := flattenRequestObjectSchema(r.spec, op.RequestRef)
 	if err != nil {
 		return propertyMapToAny(inputs)
 	}
