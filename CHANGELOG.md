@@ -9,6 +9,7 @@
 
 ### Improvements
 
+- Added the preview `pulumiservice:api/agents:Definition` resource for managing Custom Agent definitions, including their agent role, integrations, instructions, approval mode, and paused state. An accompanying example creates a role, Custom Agent, and webhook automation that runs as the agent. [#1301](https://github.com/pulumi/pulumi-pulumiservice/pull/1301)
 - Added `deployTags` and `tagFilters` to the `github` and `vcs` settings of `DeploymentSettings`, so a deployment can run when a matching git tag is pushed. Set `deployCommits` to `false` when you enable `deployTags`, because Pulumi Cloud rejects the two together [#1042](https://github.com/pulumi/pulumi-pulumiservice/issues/1042)
 - Added an Import section to the docs of every `pulumiservice:index:*` resource, giving the ID format, a sample `pulumi import` command, and caveats such as secrets that can't be read back. `DeploymentSettings` and `Webhook` import docs now render as their own section instead of inline in the description. No behavior change. [#344](https://github.com/pulumi/pulumi-pulumiservice/issues/344)
 - Documented that `Webhook` supports ESC environment webhooks, and which properties select an organization, stack or environment webhook. No behavior change. [#482](https://github.com/pulumi/pulumi-pulumiservice/issues/482)
@@ -28,6 +29,7 @@
 
 ### Bug Fixes
 
+- Fixed refresh removing a webhook automation's `trigger.webhookSecret` from state. Pulumi Cloud returns this secret only when the automation is created; the provider now retains that create-time value across later reads. [#1301](https://github.com/pulumi/pulumi-pulumiservice/pull/1301)
 - Fixed `getPolicyPack` always failing with `policy pack not found`, whether or not a version was given. It now requests versions by tag, and resolves the latest version from the organization's policy pack list. [#1012](https://github.com/pulumi/pulumi-pulumiservice/issues/1012)
 - Removing `stackMatchRule` or `accountMatchRule` from a `pulumiservice:api:PolicyGroup` now removes the rule in Pulumi Cloud. Previously the update re-sent the prior rule, so the rule stayed in place while `pulumi up` reported success and refresh showed no drift.
 - Changing `mode` on a `pulumiservice:api:PolicyGroup` now replaces the group. Pulumi Cloud fixes the mode at creation, so the in-place update the provider used to send was silently ignored. Adding `mode` to a program for a group that already has that mode, for example after `pulumi import` or when moving off the deprecated `entityType`, is not a change and does not replace the group. Neither is removing `mode` from a program.

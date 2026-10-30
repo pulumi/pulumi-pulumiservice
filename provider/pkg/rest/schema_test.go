@@ -203,6 +203,64 @@ func TestRequiredInputsExist(t *testing.T) {
 	}
 }
 
+func TestDiscriminatorRequestVariantsAreExposedWithoutConditionalRequirements(t *testing.T) {
+	const specJSON = `{
+	  "openapi": "3.0.0",
+	  "components": {"schemas": {
+	    "CreateThing": {
+	      "type": "object",
+	      "discriminator": {"propertyName": "kind", "mapping": {
+	        "scheduled": "#/components/schemas/CreateScheduledThing",
+	        "triggered": "#/components/schemas/CreateTriggeredThing"
+	      }},
+	      "properties": {"kind": {"type": "string"}, "name": {"type": "string"}},
+	      "required": ["kind", "name"]
+	    },
+	    "CreateScheduledThing": {"allOf": [
+	      {"$ref": "#/components/schemas/CreateThing"},
+	      {"type": "object", "properties": {"scheduleCron": {"type": "string"}}, "required": ["scheduleCron"]}
+	    ]},
+	    "CreateTriggeredThing": {"allOf": [
+	      {"$ref": "#/components/schemas/CreateThing"},
+	      {"type": "object", "properties": {"trigger": {"type": "object"}}, "required": ["trigger"]}
+	    ]},
+	    "Thing": {"type": "object", "properties": {"id": {"type": "string"}}}
+	  }},
+	  "paths": {"/things/{orgName}": {"post": {
+	    "operationId": "CreateThing", "parameters": [{"name": "orgName", "in": "path", "required": true, "schema": {"type": "string"}}],
+	    "requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/CreateThing"}}}},
+	    "responses": {"200": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Thing"}}}}}
+	  }}}
+	}`
+	spec, err := ParseSpec([]byte(specJSON))
+	if err != nil {
+		t.Fatal(err)
+	}
+	rs, err := buildResource(spec, nil, "pkg:index:Thing", ResourceMeta{
+		IDFormat: "{orgName}", Operations: Operations{Create: "CreateThing"},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, name := range []string{"scheduleCron", "trigger"} {
+		if _, ok := rs.InputProperties[name]; !ok {
+			t.Errorf("variant input %q is missing", name)
+		}
+		if slices.Contains(rs.RequiredInputs, name) {
+			t.Errorf("variant input %q must not be unconditionally required", name)
+		}
+	}
+
+	op, _ := spec.Op("CreateThing")
+	r := &Resource{spec: spec}
+	got := r.buildRequestBody(op, propMap(map[string]any{
+		"kind": "scheduled", "name": "daily", "scheduleCron": "0 9 * * *",
+	}))
+	if got["scheduleCron"] != "0 9 * * *" {
+		t.Errorf("variant field omitted from request body: %v", got)
+	}
+}
+
 // TestEmitOnCreateSurfacesAsOutput: emitOnCreate fields appear as outputs
 // even when the read schema doesn't carry them.
 func TestEmitOnCreateSurfacesAsOutput(t *testing.T) {

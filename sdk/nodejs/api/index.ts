@@ -5,6 +5,11 @@ import * as pulumi from "@pulumi/pulumi";
 import * as utilities from "../utilities";
 
 // Export members:
+export { AgentAutomationV2Args } from "./agentAutomationV2";
+export type AgentAutomationV2 = import("./agentAutomationV2").AgentAutomationV2;
+export const AgentAutomationV2: typeof import("./agentAutomationV2").AgentAutomationV2 = null as any;
+utilities.lazyLoad(exports, ["AgentAutomationV2"], () => require("./agentAutomationV2"));
+
 export { AuditLogExportConfigurationArgs } from "./auditLogExportConfiguration";
 export type AuditLogExportConfiguration = import("./auditLogExportConfiguration").AuditLogExportConfiguration;
 export const AuditLogExportConfiguration: typeof import("./auditLogExportConfiguration").AuditLogExportConfiguration = null as any;
@@ -87,6 +92,8 @@ const _module = {
     version: utilities.getVersion(),
     construct: (name: string, type: string, urn: string): pulumi.Resource => {
         switch (type) {
+            case "pulumiservice:api:AgentAutomationV2":
+                return new AgentAutomationV2(name, <any>undefined, { urn })
             case "pulumiservice:api:AuditLogExportConfiguration":
                 return new AuditLogExportConfiguration(name, <any>undefined, { urn })
             case "pulumiservice:api:DefaultOrganization":

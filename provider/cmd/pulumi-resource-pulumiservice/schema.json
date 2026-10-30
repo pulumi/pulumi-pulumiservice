@@ -2503,6 +2503,132 @@
     }
   },
   "resources": {
+    "pulumiservice:api/agents:Definition": {
+      "description": "Creates a Custom Agent definition for the organization from the supplied configuration (name, optional RBAC role, integrations, and instructions). Requires agent_definitions:create, granted to organization admins by default. Returns the created definition including its generated id. Returns 404 if a supplied role does not exist in the organization.",
+      "properties": {
+        "approvalMode": {
+          "type": "string",
+          "description": "The approval posture the agent's runs inherit. When omitted, runs are auto-approved, matching scheduled automations."
+        },
+        "avatar": {
+          "type": "string",
+          "description": "A presentation token the console maps to an icon. Not an uploaded asset."
+        },
+        "customInstructions": {
+          "type": "string",
+          "description": "Instructions that shape how the agent behaves in the team's environment."
+        },
+        "definitionID": {
+          "type": "string",
+          "description": "The unique identifier of the agent definition."
+        },
+        "displayName": {
+          "type": "string",
+          "description": "The human-readable label shown wherever the agent is displayed. Falls back to the name when the agent has none."
+        },
+        "enabledIntegrations": {
+          "type": "array",
+          "items": {
+            "$ref": "pulumi.json#/Any"
+          },
+          "description": "The integrations enabled for the agent's tasks, by id. Omitted or null inherits all organization integrations; an empty list enables none."
+        },
+        "name": {
+          "type": "string",
+          "description": "The agent's name: lower-case letters, digits and hyphens, unique within the organization. This is the stable handle a person writes down -- in an automation, in a CLI invocation -- and it may be changed, because everything that references an agent internally references it by id."
+        },
+        "pausedAt": {
+          "type": "string",
+          "description": "When the agent was paused, or null if it is not paused. A paused agent starts no new runs from any source -- console, schedule, or trigger -- until it is resumed; runs already in flight continue."
+        },
+        "pausedBy": {
+          "type": "string",
+          "description": "Who paused the agent, by user id. Null when the agent is not paused. Recorded by the server from the caller rather than supplied by the client."
+        },
+        "pausedReason": {
+          "type": "string",
+          "description": "Why the agent was paused. Null when it is not paused, or when no reason was given."
+        },
+        "permissionMode": {
+          "type": "string",
+          "description": "Deprecated. Custom Agent authority is controlled by roleId."
+        },
+        "purpose": {
+          "type": "string",
+          "description": "A one-line description of what this agent is for, shown under its name in the roster."
+        },
+        "roleId": {
+          "type": "string",
+          "description": "The RBAC role id the agent's tasks assume, identified by role id. Null means no assumed role: tasks run with the invoking user's own permissions."
+        },
+        "taskCounts": {
+          "$ref": "pulumi.json#/Any",
+          "description": "Run counts for this agent, shown on its roster card."
+        }
+      },
+      "type": "object",
+      "required": [
+        "definitionID",
+        "displayName",
+        "name"
+      ],
+      "inputProperties": {
+        "approvalMode": {
+          "type": "string",
+          "description": "The approval posture the agent's runs inherit. When omitted, runs are auto-approved, matching scheduled automations. 'manual' makes the agent propose rather than act, and applies to every run of the agent, including scheduled and triggered ones -- such a run stops and waits for a person even though nothing yet notifies them it is waiting, so choose it deliberately for an unattended agent."
+        },
+        "avatar": {
+          "type": "string",
+          "description": "A presentation token the console maps to an icon. Not an uploaded asset."
+        },
+        "customInstructions": {
+          "type": "string",
+          "description": "Instructions that shape how the agent behaves in the team's environment."
+        },
+        "definitionID": {
+          "type": "string",
+          "description": "The agent definition identifier",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "displayName": {
+          "type": "string",
+          "description": "The human-readable label shown wherever the agent is displayed. Required unless name is supplied, in which case the name is used as the label too."
+        },
+        "enabledIntegrations": {
+          "type": "array",
+          "items": {
+            "$ref": "pulumi.json#/Any"
+          },
+          "description": "The integrations to enable for the agent's tasks, by id. Omitted or null inherits all organization integrations; an empty list enables none."
+        },
+        "name": {
+          "type": "string",
+          "description": "The agent's name: lower-case letters, digits and hyphens, at most 64 characters, unique within the organization. Optional -- when omitted it is derived from displayName, so a form that asks for one name still works. A name already taken by another agent is rejected with a 409 rather than silently suffixed. Supplying a different name on an update renames the agent, which is safe because every internal reference is by id."
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "permissionMode": {
+          "type": "string",
+          "description": "Deprecated. Custom Agent authority is controlled by roleId and this field is ignored."
+        },
+        "purpose": {
+          "type": "string",
+          "description": "A one-line description of what this agent is for, shown under its name in the roster."
+        },
+        "roleId": {
+          "type": "string",
+          "description": "The RBAC role id the agent's tasks assume. With Agents-as-Team-Members enabled, creation with omitted/null or empty uses the feature's read-only default; on update, omitted/null preserves the existing role and empty selects that default. A role that does not exist in the organization is rejected with a 404."
+        }
+      },
+      "requiredInputs": [
+        "orgName"
+      ]
+    },
     "pulumiservice:api/agents:Pool": {
       "description": "Creates a new agent pool for an organization. Agent pools enable self-hosted deployment agents, allowing organizations to run Pulumi Deployments on their own infrastructure rather than Pulumi-managed infrastructure. This is useful for accessing private networks, meeting compliance requirements, or using custom execution environments. The response includes an access token (agent pool secret) that self-hosted agents use to authenticate when polling for deployment work. This token is only returned once at creation time and cannot be retrieved later.",
       "properties": {
@@ -5424,6 +5550,124 @@
         "name",
         "orgName",
         "teamName"
+      ]
+    },
+    "pulumiservice:api:AgentAutomationV2": {
+      "description": "Creates an organization-owned scheduled or triggered agent automation in the specified organization. Set kind to scheduled or triggered and provide the corresponding configuration. Webhook automation responses include a secret that is shown only once.",
+      "properties": {
+        "asyncTriggerType": {
+          "type": "string",
+          "description": "The async trigger type for this automation."
+        },
+        "automationID": {
+          "type": "string",
+          "description": "The unique identifier for this automation."
+        },
+        "kind": {
+          "type": "string",
+          "description": "The automation kind."
+        },
+        "lastExecuted": {
+          "type": "string",
+          "description": "The timestamp when this automation last ran, if any."
+        },
+        "lastRunStatus": {
+          "type": "string",
+          "description": "The result of the most recent automation run, if any. Valid values currently include 'succeeded', 'failed', and 'skipped'."
+        },
+        "name": {
+          "type": "string",
+          "description": "A human-readable name for this automation."
+        },
+        "nextExecution": {
+          "type": "string",
+          "description": "The timestamp of the next scheduled execution. Present for scheduled automations."
+        },
+        "notificationTargets": {
+          "type": "array",
+          "items": {
+            "$ref": "pulumi.json#/Any"
+          },
+          "description": "The destinations that receive notifications about automation runs."
+        },
+        "paused": {
+          "type": "boolean",
+          "description": "Whether future executions are currently paused."
+        },
+        "scheduleCron": {
+          "type": "string",
+          "description": "A standard five-field cron expression in UTC that controls when this automation runs. Present for scheduled automations."
+        },
+        "task": {
+          "$ref": "pulumi.json#/Any",
+          "description": "The task configuration used for each run of this automation, including the prompt, attached entities, and task execution settings. Each run creates a fresh task from this definition.",
+          "secret": true
+        },
+        "trigger": {
+          "$ref": "pulumi.json#/Any",
+          "description": "The trigger configuration for this automation. Present for triggered automations.",
+          "secret": true
+        }
+      },
+      "type": "object",
+      "required": [
+        "asyncTriggerType",
+        "automationID",
+        "kind",
+        "name",
+        "notificationTargets",
+        "paused",
+        "task"
+      ],
+      "inputProperties": {
+        "automationID": {
+          "type": "string",
+          "description": "The automation identifier",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "kind": {
+          "type": "string",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "name": {
+          "type": "string",
+          "description": "A human-readable name for the automation."
+        },
+        "notificationTargets": {
+          "type": "array",
+          "items": {
+            "$ref": "pulumi.json#/Any"
+          },
+          "description": "The destinations that receive notifications about automation runs."
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "scheduleCron": {
+          "type": "string",
+          "description": "A standard five-field cron expression in UTC that controls when the automation runs. The minimum interval between consecutive runs must be at least 10 minutes; tighter schedules are rejected."
+        },
+        "task": {
+          "$ref": "pulumi.json#/Any",
+          "description": "The task configuration that should be used whenever the automation runs. This includes the prompt, attached entities, and task execution settings such as plan mode, approval mode, permission mode, tool execution mode, and enabled integrations. Each automation run creates a fresh task from this definition.",
+          "secret": true
+        },
+        "trigger": {
+          "$ref": "pulumi.json#/Any",
+          "description": "The event source and shared configuration for this triggered automation.",
+          "secret": true
+        }
+      },
+      "requiredInputs": [
+        "kind",
+        "name",
+        "orgName",
+        "task"
       ]
     },
     "pulumiservice:api:AuditLogExportConfiguration": {
