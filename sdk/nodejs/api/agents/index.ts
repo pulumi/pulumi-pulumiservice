@@ -5,6 +5,11 @@ import * as pulumi from "@pulumi/pulumi";
 import * as utilities from "../../utilities";
 
 // Export members:
+export { DefinitionArgs } from "./definition";
+export type Definition = import("./definition").Definition;
+export const Definition: typeof import("./definition").Definition = null as any;
+utilities.lazyLoad(exports, ["Definition"], () => require("./definition"));
+
 export { PoolArgs } from "./pool";
 export type Pool = import("./pool").Pool;
 export const Pool: typeof import("./pool").Pool = null as any;
@@ -20,6 +25,8 @@ const _module = {
     version: utilities.getVersion(),
     construct: (name: string, type: string, urn: string): pulumi.Resource => {
         switch (type) {
+            case "pulumiservice:api/agents:Definition":
+                return new Definition(name, <any>undefined, { urn })
             case "pulumiservice:api/agents:Pool":
                 return new Pool(name, <any>undefined, { urn })
             case "pulumiservice:api/agents:Task":

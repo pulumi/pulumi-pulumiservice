@@ -33756,6 +33756,248 @@
           "paused"
         ],
         "type": "object"
+      },
+      "ListAgentDefinitionsResponse": {
+        "description": "The list of Custom Agent definitions for an organization.",
+        "properties": {
+          "definitions": {
+            "description": "The organization's Custom Agent definitions, ordered by name.",
+            "items": {
+              "$ref": "#/components/schemas/AgentDefinition"
+            },
+            "type": "array",
+            "x-order": 1
+          }
+        },
+        "required": [
+          "definitions"
+        ],
+        "type": "object"
+      },
+      "AgentDefinition": {
+        "description": "A Custom Agent definition: a saved, team-owned agent configuration that a task can be run as. Its role, integrations, and instructions are applied to every task run as the agent.",
+        "properties": {
+          "approvalMode": {
+            "description": "The approval posture the agent's runs inherit. When omitted, runs are auto-approved, matching scheduled automations.",
+            "enum": [
+              "manual",
+              "auto",
+              "balanced"
+            ],
+            "type": "string",
+            "x-order": 10,
+            "x-pulumi-model-property": {
+              "enumTypeName": "NeoApprovalMode",
+              "enumComments": "NeoApprovalMode represents the default approval mode for Neo AI agent tasks in an organization"
+            }
+          },
+          "avatar": {
+            "description": "A presentation token the console maps to an icon. Not an uploaded asset.",
+            "type": "string",
+            "x-order": 9
+          },
+          "customInstructions": {
+            "description": "Instructions that shape how the agent behaves in the team's environment.",
+            "type": "string",
+            "x-order": 6
+          },
+          "displayName": {
+            "description": "The human-readable label shown wherever the agent is displayed. Falls back to the name when the agent has none.",
+            "type": "string",
+            "x-order": 3
+          },
+          "enabledIntegrations": {
+            "description": "The integrations enabled for the agent's tasks, by id. Omitted or null inherits all organization integrations; an empty list enables none.",
+            "items": {
+              "$ref": "#/components/schemas/AgentTaskIntegrationRef"
+            },
+            "type": "array",
+            "x-order": 7
+          },
+          "id": {
+            "description": "The unique identifier of the agent definition.",
+            "type": "string",
+            "x-order": 1
+          },
+          "name": {
+            "description": "The agent's name: lower-case letters, digits and hyphens, unique within the organization. This is the stable handle a person writes down -- in an automation, in a CLI invocation -- and it may be changed, because everything that references an agent internally references it by id.",
+            "type": "string",
+            "x-order": 2
+          },
+          "pausedAt": {
+            "description": "When the agent was paused, or null if it is not paused. A paused agent starts no new runs from any source -- console, schedule, or trigger -- until it is resumed; runs already in flight continue.",
+            "type": "string",
+            "x-order": 11
+          },
+          "pausedBy": {
+            "description": "Who paused the agent, by user id. Null when the agent is not paused. Recorded by the server from the caller rather than supplied by the client.",
+            "type": "string",
+            "x-order": 12
+          },
+          "pausedReason": {
+            "description": "Why the agent was paused. Null when it is not paused, or when no reason was given.",
+            "type": "string",
+            "x-order": 13
+          },
+          "permissionMode": {
+            "deprecated": true,
+            "description": "Deprecated. Custom Agent authority is controlled by roleId.",
+            "enum": [
+              "default",
+              "read-only"
+            ],
+            "type": "string",
+            "x-order": 5,
+            "x-pulumi-model-property": {
+              "enumTypeName": "NeoPermissionMode",
+              "enumComments": "Permission scope for a Neo agent task. Controls the level of access the agent has when acting on behalf of the user.",
+              "enumFieldNames": [
+                "Default",
+                "ReadOnly"
+              ],
+              "enumNoValidation": true
+            }
+          },
+          "purpose": {
+            "description": "A one-line description of what this agent is for, shown under its name in the roster.",
+            "type": "string",
+            "x-order": 8
+          },
+          "roleId": {
+            "description": "The RBAC role id the agent's tasks assume, identified by role id. Null means no assumed role: tasks run with the invoking user's own permissions.",
+            "type": "string",
+            "x-order": 4
+          },
+          "taskCounts": {
+            "$ref": "#/components/schemas/AgentDefinitionTaskCounts",
+            "description": "Run counts for this agent, shown on its roster card.",
+            "x-order": 14
+          }
+        },
+        "required": [
+          "displayName",
+          "id",
+          "name"
+        ],
+        "type": "object"
+      },
+      "AgentDefinitionTaskCounts": {
+        "description": "Run counts for a Custom Agent, aggregated across the organization rather than scoped to the caller: a run belongs to the agent, so every member who can see the agent sees the same totals.",
+        "properties": {
+          "running": {
+            "description": "How many of this agent's runs are currently running.",
+            "format": "int32",
+            "type": "integer",
+            "x-order": 2
+          },
+          "total": {
+            "description": "How many runs this agent has started in total.",
+            "format": "int32",
+            "type": "integer",
+            "x-order": 1
+          }
+        },
+        "required": [
+          "running",
+          "total"
+        ],
+        "type": "object"
+      },
+      "CreateAgentDefinitionRequest": {
+        "description": "Create or replace a Custom Agent definition. Used for both creation and full-config updates.",
+        "properties": {
+          "approvalMode": {
+            "description": "The approval posture the agent's runs inherit. When omitted, runs are auto-approved, matching scheduled automations. 'manual' makes the agent propose rather than act, and applies to every run of the agent, including scheduled and triggered ones -- such a run stops and waits for a person even though nothing yet notifies them it is waiting, so choose it deliberately for an unattended agent.",
+            "enum": [
+              "manual",
+              "auto",
+              "balanced"
+            ],
+            "type": "string",
+            "x-order": 9,
+            "x-pulumi-model-property": {
+              "enumTypeName": "NeoApprovalMode",
+              "enumComments": "NeoApprovalMode represents the default approval mode for Neo AI agent tasks in an organization"
+            }
+          },
+          "avatar": {
+            "description": "A presentation token the console maps to an icon. Not an uploaded asset.",
+            "type": "string",
+            "x-order": 8
+          },
+          "customInstructions": {
+            "description": "Instructions that shape how the agent behaves in the team's environment.",
+            "type": "string",
+            "x-order": 5
+          },
+          "displayName": {
+            "description": "The human-readable label shown wherever the agent is displayed. Required unless name is supplied, in which case the name is used as the label too.",
+            "type": "string",
+            "x-order": 2
+          },
+          "enabledIntegrations": {
+            "description": "The integrations to enable for the agent's tasks, by id. Omitted or null inherits all organization integrations; an empty list enables none.",
+            "items": {
+              "$ref": "#/components/schemas/AgentTaskIntegrationRef"
+            },
+            "type": "array",
+            "x-order": 6
+          },
+          "name": {
+            "description": "The agent's name: lower-case letters, digits and hyphens, at most 64 characters, unique within the organization. Optional -- when omitted it is derived from displayName, so a form that asks for one name still works. A name already taken by another agent is rejected with a 409 rather than silently suffixed. Supplying a different name on an update renames the agent, which is safe because every internal reference is by id.",
+            "type": "string",
+            "x-order": 1
+          },
+          "permissionMode": {
+            "deprecated": true,
+            "description": "Deprecated. Custom Agent authority is controlled by roleId and this field is ignored.",
+            "enum": [
+              "default",
+              "read-only"
+            ],
+            "type": "string",
+            "x-order": 4,
+            "x-pulumi-model-property": {
+              "enumTypeName": "NeoPermissionMode",
+              "enumComments": "Permission scope for a Neo agent task. Controls the level of access the agent has when acting on behalf of the user.",
+              "enumFieldNames": [
+                "Default",
+                "ReadOnly"
+              ],
+              "enumNoValidation": true
+            }
+          },
+          "purpose": {
+            "description": "A one-line description of what this agent is for, shown under its name in the roster.",
+            "type": "string",
+            "x-order": 7
+          },
+          "roleId": {
+            "description": "The RBAC role id the agent's tasks assume. With Agents-as-Team-Members enabled, creation with omitted/null or empty uses the feature's read-only default; on update, omitted/null preserves the existing role and empty selects that default. A role that does not exist in the organization is rejected with a 404.",
+            "type": "string",
+            "x-order": 3
+          }
+        },
+        "type": "object"
+      },
+      "UpdateAgentDefinitionPausedRequest": {
+        "description": "Pause or resume a Custom Agent. The request carries only whether and why -- who paused the agent is recorded by the server from the caller, so a pause cannot be attributed to somebody else.",
+        "properties": {
+          "paused": {
+            "description": "True to pause the agent, false to resume it. Resuming also clears the recorded reason and the user who paused it.",
+            "type": "boolean",
+            "x-order": 1
+          },
+          "reason": {
+            "description": "Why the agent is being paused. Ignored when resuming.",
+            "type": "string",
+            "x-order": 2
+          }
+        },
+        "required": [
+          "paused"
+        ],
+        "type": "object"
       }
     }
   },
@@ -71259,6 +71501,426 @@
         "tags": [
           "AI Agents"
         ]
+      }
+    },
+    "/api/preview/agents/{orgName}/definitions": {
+      "get": {
+        "description": "Lists the Custom Agent definitions configured for the organization, ordered by name. Each definition is a saved, team-owned agent configuration (role, integrations, and instructions) that a task can be run as.",
+        "operationId": "ListAgentDefinitions",
+        "parameters": [
+          {
+            "description": "The organization name",
+            "in": "path",
+            "name": "orgName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListAgentDefinitionsResponse"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "ListAgentDefinitions",
+        "tags": [
+          "AI Agents",
+          "Neo"
+        ],
+        "x-pulumi-route-property": {
+          "Visibility": "Preview"
+        }
+      },
+      "post": {
+        "description": "Creates a Custom Agent definition for the organization from the supplied configuration (name, optional RBAC role, integrations, and instructions). Requires agent_definitions:create, granted to organization admins by default. Returns the created definition including its generated id. Returns 404 if a supplied role does not exist in the organization.",
+        "operationId": "CreateAgentDefinition",
+        "parameters": [
+          {
+            "description": "The organization name",
+            "in": "path",
+            "name": "orgName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAgentDefinitionRequest"
+              }
+            }
+          },
+          "x-originalParamName": "body"
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentDefinition"
+                }
+              }
+            },
+            "description": "Created"
+          },
+          "400": {
+            "description": "name is required"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "role"
+          }
+        },
+        "summary": "CreateAgentDefinition",
+        "tags": [
+          "AI Agents",
+          "Neo"
+        ],
+        "x-pulumi-route-property": {
+          "Visibility": "Preview"
+        }
+      }
+    },
+    "/api/preview/agents/{orgName}/definitions/{definitionID}": {
+      "delete": {
+        "description": "Deletes a Custom Agent definition. Runs the agent has already produced are kept and still name it, so the audit trail survives the agent. Requires agent_definitions:delete, granted to organization admins by default. Returns 404 if the definition does not exist in the organization.",
+        "operationId": "DeleteAgentDefinition",
+        "parameters": [
+          {
+            "description": "The organization name",
+            "in": "path",
+            "name": "orgName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The agent definition identifier",
+            "in": "path",
+            "name": "definitionID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "definition"
+          }
+        },
+        "summary": "DeleteAgentDefinition",
+        "tags": [
+          "AI Agents",
+          "Neo"
+        ],
+        "x-pulumi-route-property": {
+          "Visibility": "Preview"
+        }
+      },
+      "get": {
+        "description": "Retrieves a single Custom Agent definition by id. Returns 404 if the definition does not exist in the organization.",
+        "operationId": "GetAgentDefinition",
+        "parameters": [
+          {
+            "description": "The organization name",
+            "in": "path",
+            "name": "orgName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The agent definition identifier",
+            "in": "path",
+            "name": "definitionID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentDefinition"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "definition"
+          }
+        },
+        "summary": "GetAgentDefinition",
+        "tags": [
+          "AI Agents",
+          "Neo"
+        ],
+        "x-pulumi-route-property": {
+          "Visibility": "Preview"
+        }
+      },
+      "put": {
+        "description": "Replaces the configuration of an existing Custom Agent definition (name, role, integrations, and instructions). Requires agent_definitions:update, granted to organization admins by default. Returns the updated definition. Returns 404 if the definition or a supplied role does not exist in the organization.",
+        "operationId": "UpdateAgentDefinition",
+        "parameters": [
+          {
+            "description": "The organization name",
+            "in": "path",
+            "name": "orgName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The agent definition identifier",
+            "in": "path",
+            "name": "definitionID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAgentDefinitionRequest"
+              }
+            }
+          },
+          "x-originalParamName": "body"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentDefinition"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "description": "name is required"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "definition"
+          }
+        },
+        "summary": "UpdateAgentDefinition",
+        "tags": [
+          "AI Agents",
+          "Neo"
+        ],
+        "x-pulumi-route-property": {
+          "Visibility": "Preview"
+        }
+      }
+    },
+    "/api/preview/agents/{orgName}/definitions/{definitionID}/paused": {
+      "patch": {
+        "description": "Pauses or resumes a Custom Agent. When paused, the agent remains configured but starts no new runs from any source -- console, schedule, or trigger -- until it is resumed; runs already in flight continue. Pausing is recorded against the calling user; resuming clears that attribution along with the reason. Returns 404 if the definition does not exist in the organization.",
+        "operationId": "UpdateAgentDefinitionPaused",
+        "parameters": [
+          {
+            "description": "The organization name",
+            "in": "path",
+            "name": "orgName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The agent definition identifier",
+            "in": "path",
+            "name": "definitionID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAgentDefinitionPausedRequest"
+              }
+            }
+          },
+          "x-originalParamName": "body"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentDefinition"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "definition"
+          }
+        },
+        "summary": "UpdateAgentDefinitionPaused",
+        "tags": [
+          "AI Agents",
+          "Neo"
+        ],
+        "x-pulumi-route-property": {
+          "Visibility": "Preview"
+        }
+      }
+    },
+    "/api/preview/agents/{orgName}/definitions/{definitionID}/tasks": {
+      "get": {
+        "description": "Lists the tasks that were run as a given Custom Agent, across every member of the organization — the agent's shared run history, not just the caller's own runs. Supports pagination via continuationToken with a configurable pageSize (1-1000, default 100). Returns 404 if the definition does not exist in the organization.",
+        "operationId": "ListAgentDefinitionTasks",
+        "parameters": [
+          {
+            "description": "The organization name",
+            "in": "path",
+            "name": "orgName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The agent definition identifier",
+            "in": "path",
+            "name": "definitionID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Token for retrieving the next page of results",
+            "in": "query",
+            "name": "continuationToken",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Number of results per page",
+            "in": "query",
+            "name": "pageSize",
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Field to sort the results by. Defaults to lastEvent.",
+            "in": "query",
+            "name": "sortBy",
+            "schema": {
+              "enum": [
+                "lastEvent",
+                "created",
+                "status",
+                "name",
+                "tokensUsed"
+              ],
+              "type": "string",
+              "x-pulumi-model-property": {
+                "enumComments": "The field used to sort Neo agent tasks in list results.",
+                "enumFieldComments": [
+                  "Sort by the time of the most recent event on the task.",
+                  "Sort by when the task was created.",
+                  "Sort by task status, with running ordered before idle when ascending.",
+                  "Sort by task name.",
+                  "Sort by total Neo tokens consumed by the task. Tasks with no reported usage are treated as zero."
+                ],
+                "enumTypeName": "AgentTaskSortField"
+              }
+            }
+          },
+          {
+            "description": "Direction to sort the results in. Defaults to desc.",
+            "in": "query",
+            "name": "sortDirection",
+            "schema": {
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "type": "string",
+              "x-pulumi-model-property": {
+                "enumComments": "The direction used when sorting Neo agent tasks.",
+                "enumFieldComments": [
+                  "Sort in ascending order.",
+                  "Sort in descending order."
+                ],
+                "enumTypeName": "AgentTaskSortDirection"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListAgentTasksResponse"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "description": "pageSize must be between 1 and 1000"
+          },
+          "404": {
+            "description": "definition"
+          }
+        },
+        "summary": "ListAgentDefinitionTasks",
+        "tags": [
+          "AI Agents",
+          "Neo"
+        ],
+        "x-pulumi-route-property": {
+          "Visibility": "Preview"
+        }
       }
     }
   },

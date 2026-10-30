@@ -93,6 +93,7 @@ _utilities.register(
   "mod": "api/agents",
   "fqn": "pulumi_pulumiservice.api.agents",
   "classes": {
+   "pulumiservice:api/agents:Definition": "Definition",
    "pulumiservice:api/agents:Pool": "Pool",
    "pulumiservice:api/agents:Task": "Task"
   }
