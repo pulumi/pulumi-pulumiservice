@@ -32,6 +32,9 @@
           "secret": true
         },
         "trigger": {
+          "emitOnCreateKeys": [
+            "webhookSecret"
+          ],
           "secret": true
         }
       },
