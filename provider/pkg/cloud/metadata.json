@@ -32,6 +32,9 @@
           "secret": true
         },
         "trigger": {
+          "emitOnCreateKeys": [
+            "webhookSecret"
+          ],
           "secret": true
         }
       },
@@ -46,6 +49,20 @@
         "automationID": "id"
       },
       "token": "pulumiservice:api:AgentAutomationV2"
+    },
+    "pulumiservice:api:AgentDefinition": {
+      "deleteBeforeReplace": true,
+      "idFormat": "{orgName}/{definitionID}",
+      "operations": {
+        "create": "CreateAgentDefinition",
+        "delete": "DeleteAgentDefinition",
+        "read": "GetAgentDefinition",
+        "update": "UpdateAgentDefinition"
+      },
+      "renames": {
+        "definitionID": "id"
+      },
+      "token": "pulumiservice:api/agents:Definition"
     },
     "pulumiservice:api:AgentPool": {
       "deleteBeforeReplace": true,

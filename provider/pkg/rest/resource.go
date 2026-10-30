@@ -698,6 +698,13 @@ func (r *Resource) preserveEmitOnCreate(newState, oldState property.Map) propert
 		out[k] = v
 	}
 	for name, fm := range r.meta.Fields {
+		if len(fm.EmitOnCreateKeys) > 0 {
+			if v, ok := out[name]; ok {
+				if prior, ok := oldState.GetOk(name); ok {
+					out[name] = preserveObjectKeys(v, prior, fm.EmitOnCreateKeys)
+				}
+			}
+		}
 		if !fm.EmitOnCreate {
 			continue
 		}
@@ -709,6 +716,38 @@ func (r *Resource) preserveEmitOnCreate(newState, oldState property.Map) propert
 		}
 	}
 	return property.NewMap(out)
+}
+
+// preserveObjectKeys copies keys missing from the object v out of the
+// object prior. Non-object values pass through unchanged.
+func preserveObjectKeys(v, prior property.Value, keys []string) property.Value {
+	if !v.IsMap() || !prior.IsMap() {
+		return v
+	}
+	obj := v.AsMap()
+	priorObj := prior.AsMap()
+	merged := map[string]property.Value{}
+	for k, kv := range obj.AllStable {
+		merged[k] = kv
+	}
+	changed := false
+	for _, k := range keys {
+		if _, has := merged[k]; has {
+			continue
+		}
+		if pv, ok := priorObj.GetOk(k); ok {
+			merged[k] = pv
+			changed = true
+		}
+	}
+	if !changed {
+		return v
+	}
+	out := property.New(property.NewMap(merged))
+	if v.Secret() || prior.Secret() {
+		out = out.WithSecret(true)
+	}
+	return out
 }
 
 // Update fires the update op (if declared), then mirrors Create's

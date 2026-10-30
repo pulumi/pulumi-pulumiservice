@@ -1,0 +1,44 @@
+# A Custom Agent with its own role, and a webhook automation that runs as it.
+resources:
+  agentRole:
+    type: pulumiservice:OrganizationRole
+    properties:
+      organizationName: ${organizationName}
+      name: incident-agent-role
+      description: Read access to every stack.
+      permissions:
+        fn::invoke:
+          function: pulumiservice:buildRolePermissions
+          arguments:
+            stackRules:
+              - all: true
+                scopes:
+                  - stack:read
+          return: permissions
+  incidentAgent:
+    type: pulumiservice:api/agents:Definition
+    properties:
+      orgName: ${organizationName}
+      name: incident-agent
+      displayName: Incident Agent
+      purpose: Triage incoming alerts
+      customInstructions: Summarize each alert and suggest a next step. Do not change any infrastructure.
+      roleId: ${agentRole.roleId}
+  alertWebhook:
+    type: pulumiservice:api:AgentAutomationV2
+    properties:
+      orgName: ${organizationName}
+      kind: triggered
+      name: incident-agent-alerts
+      trigger:
+        type: webhook
+        quietPeriodSeconds: 60
+      task:
+        message:
+          type: user_message
+          content: An alert arrived. Triage it.
+        agentDefinitionId: ${incidentAgent.definitionID}
+outputs:
+  agentId: ${incidentAgent.definitionID}
+  webhookUrl: ${alertWebhook.trigger.webhookURL}
+  webhookSecret: ${alertWebhook.trigger.webhookSecret}
