@@ -77,7 +77,7 @@ import javax.annotation.Nullable;
  * The Pulumi Cloud console doesn&#39;t show the token ID. List it with the [Pulumi Cloud REST API](https://www.pulumi.com/docs/reference/cloud-rest-api/):
  * 
  * ```sh
- * curl -s -H &#34;Authorization: token $PULUMI_ACCESS_TOKEN&#34; \
+ * curl -s -H &#34;Authorization: token $PULUMI_ACCESS_TOKEN&#34; &#92;
  *   https://api.pulumi.com/api/orgs/my-org/tokens | jq &#39;.tokens[] | {name, id}&#39;
  * ```
  * 
