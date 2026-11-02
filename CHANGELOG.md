@@ -28,6 +28,7 @@
 
 ### Bug Fixes
 
+- Fixed `OrganizationMember` failing to set or reset the `member` role in organizations that use the Reader, Builder and Maintainer roles, where Pulumi Cloud no longer lists a `member` role. The provider now uses the organization's default role instead.
 - Fixed `getPolicyPack` always failing with `policy pack not found`, whether or not a version was given. It now requests versions by tag, and resolves the latest version from the organization's policy pack list. [#1012](https://github.com/pulumi/pulumi-pulumiservice/issues/1012)
 - Removing `stackMatchRule` or `accountMatchRule` from a `pulumiservice:api:PolicyGroup` now removes the rule in Pulumi Cloud. Previously the update re-sent the prior rule, so the rule stayed in place while `pulumi up` reported success and refresh showed no drift.
 - Changing `mode` on a `pulumiservice:api:PolicyGroup` now replaces the group. Pulumi Cloud fixes the mode at creation, so the in-place update the provider used to send was silently ignored. Adding `mode` to a program for a group that already has that mode, for example after `pulumi import` or when moving off the deprecated `entityType`, is not a change and does not replace the group. Neither is removing `mode` from a program.
