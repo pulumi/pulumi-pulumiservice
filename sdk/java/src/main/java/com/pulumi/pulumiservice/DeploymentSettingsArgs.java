@@ -70,22 +70,20 @@ public final class DeploymentSettingsArgs extends com.pulumi.resources.ResourceA
     /**
      * GitHub settings for the deployment.
      * 
-     * @deprecated
-     * Use the &#39;vcs&#39; property instead, which supports both GitHub and Azure DevOps.
+     * @deprecated Use the &#39;vcs&#39; property instead, which supports both GitHub and Azure DevOps.
      * 
      */
-    @Deprecated /* Use the 'vcs' property instead, which supports both GitHub and Azure DevOps. */
+    @Deprecated
     @Import(name="github")
     private @Nullable Output<DeploymentSettingsGithubArgs> github;
 
     /**
      * @return GitHub settings for the deployment.
      * 
-     * @deprecated
-     * Use the &#39;vcs&#39; property instead, which supports both GitHub and Azure DevOps.
+     * @deprecated Use the &#39;vcs&#39; property instead, which supports both GitHub and Azure DevOps.
      * 
      */
-    @Deprecated /* Use the 'vcs' property instead, which supports both GitHub and Azure DevOps. */
+    @Deprecated
     public Optional<Output<DeploymentSettingsGithubArgs>> github() {
         return Optional.ofNullable(this.github);
     }
@@ -281,11 +279,10 @@ public final class DeploymentSettingsArgs extends com.pulumi.resources.ResourceA
          * 
          * @return builder
          * 
-         * @deprecated
-         * Use the &#39;vcs&#39; property instead, which supports both GitHub and Azure DevOps.
+         * @deprecated Use the &#39;vcs&#39; property instead, which supports both GitHub and Azure DevOps.
          * 
          */
-        @Deprecated /* Use the 'vcs' property instead, which supports both GitHub and Azure DevOps. */
+        @Deprecated
         public Builder github(@Nullable Output<DeploymentSettingsGithubArgs> github) {
             $.github = github;
             return this;
@@ -296,11 +293,10 @@ public final class DeploymentSettingsArgs extends com.pulumi.resources.ResourceA
          * 
          * @return builder
          * 
-         * @deprecated
-         * Use the &#39;vcs&#39; property instead, which supports both GitHub and Azure DevOps.
+         * @deprecated Use the &#39;vcs&#39; property instead, which supports both GitHub and Azure DevOps.
          * 
          */
-        @Deprecated /* Use the 'vcs' property instead, which supports both GitHub and Azure DevOps. */
+        @Deprecated
         public Builder github(DeploymentSettingsGithubArgs github) {
             return github(Output.of(github));
         }
