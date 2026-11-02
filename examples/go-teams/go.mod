@@ -3,8 +3,8 @@ module github.com/pulumi/pulumi-pulumiservice/examples/go-teams
 go 1.26.6
 
 require (
-	github.com/pulumi/pulumi-pulumiservice/sdk v1.5.0
-	github.com/pulumi/pulumi/sdk/v3 v3.268.0
+	github.com/pulumi/pulumi-pulumiservice/sdk v1.6.0
+	github.com/pulumi/pulumi/sdk/v3 v3.272.0
 )
 
 require (
@@ -99,7 +99,7 @@ require (
 	github.com/pjbgf/sha1cd v0.7.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pkg/term v1.1.0 // indirect
-	github.com/pulumi/pulumi-random/sdk/v4 v4.21.4
+	github.com/pulumi/pulumi-random/sdk/v4 v4.21.6
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/rogpeppe/go-internal v1.14.1 // indirect
 	github.com/santhosh-tekuri/jsonschema/v5 v5.0.0 // indirect
@@ -111,7 +111,7 @@ require (
 	github.com/uber/jaeger-lib v2.4.1+incompatible // indirect
 	go.uber.org/atomic v1.11.0 // indirect
 	golang.org/x/crypto v0.57.0 // indirect
-	golang.org/x/net v0.59.0 // indirect
+	golang.org/x/net v0.60.0 // indirect
 	golang.org/x/sys v0.48.0 // indirect
 	golang.org/x/term v0.46.0 // indirect
 	golang.org/x/text v0.42.0 // indirect
