@@ -6186,6 +6186,11 @@
           "description": "Description of the access token.",
           "replaceOnChanges": true
         },
+        "expires": {
+          "type": "string",
+          "description": "When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`. Omit it for a token that never expires. Pulumi Cloud rejects an expiry that is in the past or more than two years away.",
+          "replaceOnChanges": true
+        },
         "value": {
           "type": "string",
           "description": "The token's value.",
@@ -6200,6 +6205,11 @@
         "description": {
           "type": "string",
           "description": "Description of the access token.",
+          "replaceOnChanges": true
+        },
+        "expires": {
+          "type": "string",
+          "description": "When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`. Omit it for a token that never expires. Pulumi Cloud rejects an expiry that is in the past or more than two years away.",
           "replaceOnChanges": true
         }
       },

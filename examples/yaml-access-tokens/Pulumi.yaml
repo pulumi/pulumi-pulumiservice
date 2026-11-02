@@ -2,12 +2,28 @@ name: yaml-access-tokens
 runtime: yaml
 description: A minimal example of provisioning access token via Pulumi YAML
 
+config:
+  # When the expiring token expires, as an RFC 3339 date-time. Pulumi Cloud
+  # rejects expiries in the past or more than two years out, so the test
+  # passes a date relative to the current time.
+  expires:
+    type: string
+
 resources:
   access-token:
     type: pulumiservice:index:AccessToken
     properties:
       description: example token
 
+  # A personal access token that expires.
+  expiring-token:
+    type: pulumiservice:AccessToken
+    properties:
+      description: example token with an expiry
+      expires: ${expires}
+
 outputs:
   # export the value of the access token
   token: ${access-token.value}
+  expiringTokenId: ${expiring-token.id}
+  expiringTokenExpires: ${expiring-token.expires}

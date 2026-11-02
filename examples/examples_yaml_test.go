@@ -383,6 +383,41 @@ func TestYamlDeploymentSettingsUpgrade(t *testing.T) {
 	}
 }
 
+func TestYamlAccessTokenExample(t *testing.T) {
+	test := pulumitest.NewPulumiTest(t,
+		filepath.Join(getCwd(t), "yaml-access-tokens"),
+		inMemoryProvider(),
+		opttest.UseAmbientBackend(),
+		opttest.StackName(randomStackName()),
+	)
+	// Use a full date-time, not a bare date, so the test covers the time
+	// component surviving the round trip through the API.
+	expires := time.Now().UTC().AddDate(0, 0, 30).Truncate(time.Hour)
+	test.SetConfig(t, "expires", expires.Format(time.RFC3339))
+
+	runPulumiTestAfterUp(t, test, func(t *testing.T, test *pulumitest.PulumiTest) {
+		outputs, err := test.CurrentStack().Outputs(t.Context())
+		require.NoError(t, err)
+		tokenID, ok := outputs["expiringTokenId"].Value.(string)
+		require.True(t, ok, "expiringTokenId output must be a string")
+
+		// Read the token back from Pulumi Cloud, not from state, to prove the
+		// expiry was sent on create (#1215).
+		apiURL := os.Getenv("PULUMI_BACKEND_URL")
+		if apiURL == "" {
+			apiURL = "https://api.pulumi.com"
+		}
+		client, err := pulumiapi.NewClient(
+			&http.Client{Timeout: 60 * time.Second}, os.Getenv("PULUMI_ACCESS_TOKEN"), apiURL,
+		)
+		require.NoError(t, err)
+		token, err := client.GetAccessToken(t.Context(), tokenID)
+		require.NoError(t, err)
+		require.NotNil(t, token, "token %q not found", tokenID)
+		assert.Equal(t, expires.Unix(), token.Expires)
+	})
+}
+
 func TestYamlTeamAccessTokenExample(t *testing.T) {
 	cwd, _ := os.Getwd()
 	integration.ProgramTest(t, &integration.ProgramTestOptions{

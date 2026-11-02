@@ -22,7 +22,9 @@ import (
 )
 
 type AccessTokenClient interface {
-	CreateAccessToken(ctx context.Context, description string) (*AccessToken, error)
+	// CreateAccessToken creates a personal access token. expires is Unix epoch
+	// seconds; 0 means the token never expires.
+	CreateAccessToken(ctx context.Context, description string, expires int64) (*AccessToken, error)
 	DeleteAccessToken(ctx context.Context, tokenID string) error
 	GetAccessToken(ctx context.Context, id string) (*AccessToken, error)
 }
@@ -44,6 +46,7 @@ type createTokenResponse struct {
 
 type createTokenRequest struct {
 	Description string `json:"description"`
+	Expires     int64  `json:"expires,omitempty"`
 }
 
 type accessTokenResponse struct {
@@ -65,11 +68,12 @@ type listTokenResponse struct {
 	Tokens []accessTokenResponse `json:"tokens"`
 }
 
-func (c *Client) CreateAccessToken(ctx context.Context, description string) (*AccessToken, error) {
+func (c *Client) CreateAccessToken(ctx context.Context, description string, expires int64) (*AccessToken, error) {
 	apiPath := path.Join("user", "tokens")
 
 	createReq := createTokenRequest{
 		Description: description,
+		Expires:     expires,
 	}
 
 	var createRes createTokenResponse
@@ -84,6 +88,7 @@ func (c *Client) CreateAccessToken(ctx context.Context, description string) (*Ac
 		ID:          createRes.ID,
 		TokenValue:  createRes.TokenValue,
 		Description: createReq.Description,
+		Expires:     createReq.Expires,
 	}, nil
 
 }
@@ -120,6 +125,7 @@ func (c *Client) GetAccessToken(ctx context.Context, id string) (*AccessToken, e
 			return &AccessToken{
 				ID:          token.ID,
 				Description: token.Description,
+				Expires:     token.Expires,
 			}, nil
 		}
 	}
