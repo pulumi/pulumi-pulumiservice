@@ -18,10 +18,10 @@ resources:
       members:
         - pulumi-bot
         - service-provider-example-user
+  # No name: Pulumi generates one from the logical name plus a random suffix.
   token:
     type: pulumiservice:index:TeamAccessToken
     properties:
-      name: test-${rand.result}
       teamName: ${team.name}
       organizationName: service-provider-test-org
       description: "example team access token"
