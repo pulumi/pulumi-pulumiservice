@@ -1,6 +1,0 @@
-name: pulumicloud-api-saml-organization
-runtime: yaml
-config:
-  organizationName:
-    type: string
-    default: service-provider-test-org

@@ -1,2 +1,0 @@
-[env]
-_.vfox-pulumi = { module_path = "." } # Sets GO_VERSION_MISE and PULUMI_VERSION_MISE

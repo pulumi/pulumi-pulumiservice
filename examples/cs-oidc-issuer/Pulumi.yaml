@@ -1,3 +1,0 @@
-name: cs-oidc-issuer
-runtime: dotnet
-description: A minimal C# Pulumi OIDC Issuer Example
