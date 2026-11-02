@@ -70,6 +70,10 @@ export class PolicyGroup extends pulumi.CustomResource {
      */
     declare public readonly policyPacks: pulumi.Output<outputs.PolicyGroupPolicyPackReference[] | undefined>;
     /**
+     * A boolean expression over stack tags. Use the `matchRule` output from `buildStackMatchRule`. Matching stacks join the group alongside individually added stacks. Removing this input clears the rule. Requires the tag-based policy groups preview feature in Pulumi Cloud.
+     */
+    declare public readonly stackMatchRule: pulumi.Output<{[key: string]: any} | undefined>;
+    /**
      * List of stack references that belong to this policy group.
      */
     declare public readonly stacks: pulumi.Output<outputs.PolicyGroupStackReference[] | undefined>;
@@ -97,6 +101,7 @@ export class PolicyGroup extends pulumi.CustomResource {
             resourceInputs["name"] = args?.name;
             resourceInputs["organizationName"] = args?.organizationName;
             resourceInputs["policyPacks"] = args?.policyPacks;
+            resourceInputs["stackMatchRule"] = args?.stackMatchRule;
             resourceInputs["stacks"] = args?.stacks;
         } else {
             resourceInputs["accounts"] = undefined /*out*/;
@@ -105,6 +110,7 @@ export class PolicyGroup extends pulumi.CustomResource {
             resourceInputs["name"] = undefined /*out*/;
             resourceInputs["organizationName"] = undefined /*out*/;
             resourceInputs["policyPacks"] = undefined /*out*/;
+            resourceInputs["stackMatchRule"] = undefined /*out*/;
             resourceInputs["stacks"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
@@ -140,6 +146,10 @@ export interface PolicyGroupArgs {
      * List of policy packs applied to this policy group.
      */
     policyPacks?: pulumi.Input<pulumi.Input<inputs.PolicyGroupPolicyPackReferenceInputArgs>[] | undefined>;
+    /**
+     * A boolean expression over stack tags. Use the `matchRule` output from `buildStackMatchRule`. Matching stacks join the group alongside individually added stacks. Removing this input clears the rule. Requires the tag-based policy groups preview feature in Pulumi Cloud.
+     */
+    stackMatchRule?: pulumi.Input<{[key: string]: any} | undefined>;
     /**
      * List of stack references that belong to this policy group.
      */

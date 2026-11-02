@@ -2,6 +2,19 @@
 // *** Do not edit by hand unless you're certain you know what you are doing! ***
 
 
+export const AgentApprovalMode = {
+    /**
+     * Approve agent runs automatically.
+     */
+    Auto: "auto",
+    /**
+     * Pause each agent run until a person approves it.
+     */
+    Manual: "manual",
+} as const;
+
+export type AgentApprovalMode = (typeof AgentApprovalMode)[keyof typeof AgentApprovalMode];
+
 export const AuthPolicyDecision = {
     /**
      * A deny rule for Oidc Issuer Policy.

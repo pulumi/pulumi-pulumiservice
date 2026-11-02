@@ -18,6 +18,7 @@ from ._enums import *
 
 __all__ = [
     'AWSOIDCConfiguration',
+    'AgentDefinitionIntegration',
     'ApprovalRuleConfig',
     'AuthPolicyDefinition',
     'AzureOIDCConfiguration',
@@ -126,6 +127,29 @@ class AWSOIDCConfiguration(dict):
         Optional set of IAM policy ARNs that further restrict the assume-role session
         """
         return pulumi.get(self, "policy_arns")
+
+
+@pulumi.output_type
+class AgentDefinitionIntegration(dict):
+    """
+    An integration enabled for the agent's tasks.
+    """
+    def __init__(__self__, *,
+                 id: _builtins.str):
+        """
+        An integration enabled for the agent's tasks.
+
+        :param _builtins.str id: The catalog integration ID, such as `honeycomb` or `datadog`, not a GitHub installation ID.
+        """
+        pulumi.set(__self__, "id", id)
+
+    @_builtins.property
+    @pulumi.getter
+    def id(self) -> _builtins.str:
+        """
+        The catalog integration ID, such as `honeycomb` or `datadog`, not a GitHub installation ID.
+        """
+        return pulumi.get(self, "id")
 
 
 @pulumi.output_type

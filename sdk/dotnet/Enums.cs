@@ -8,6 +8,40 @@ using Pulumi;
 namespace Pulumi.PulumiService
 {
     [EnumType]
+    public readonly struct AgentApprovalMode : IEquatable<AgentApprovalMode>
+    {
+        private readonly string _value;
+
+        private AgentApprovalMode(string value)
+        {
+            _value = value ?? throw new ArgumentNullException(nameof(value));
+        }
+
+        /// <summary>
+        /// Approve agent runs automatically.
+        /// </summary>
+        public static AgentApprovalMode Auto { get; } = new AgentApprovalMode("auto");
+        /// <summary>
+        /// Pause each agent run until a person approves it.
+        /// </summary>
+        public static AgentApprovalMode Manual { get; } = new AgentApprovalMode("manual");
+
+        public static bool operator ==(AgentApprovalMode left, AgentApprovalMode right) => left.Equals(right);
+        public static bool operator !=(AgentApprovalMode left, AgentApprovalMode right) => !left.Equals(right);
+
+        public static explicit operator string(AgentApprovalMode value) => value._value;
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public override bool Equals(object? obj) => obj is AgentApprovalMode other && Equals(other);
+        public bool Equals(AgentApprovalMode other) => string.Equals(_value, other._value, StringComparison.Ordinal);
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public override int GetHashCode() => _value?.GetHashCode() ?? 0;
+
+        public override string ToString() => _value;
+    }
+
+    [EnumType]
     public readonly struct AuthPolicyDecision : IEquatable<AuthPolicyDecision>
     {
         private readonly string _value;

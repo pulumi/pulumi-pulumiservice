@@ -38,6 +38,8 @@ type PolicyGroup struct {
 	OrganizationName pulumi.StringOutput `pulumi:"organizationName"`
 	// List of policy packs applied to this policy group.
 	PolicyPacks PolicyGroupPolicyPackReferenceArrayOutput `pulumi:"policyPacks"`
+	// A boolean expression over stack tags. Use the `matchRule` output from `buildStackMatchRule`. Matching stacks join the group alongside individually added stacks. Removing this input clears the rule. Requires the tag-based policy groups preview feature in Pulumi Cloud.
+	StackMatchRule pulumi.MapOutput `pulumi:"stackMatchRule"`
 	// List of stack references that belong to this policy group.
 	Stacks PolicyGroupStackReferenceArrayOutput `pulumi:"stacks"`
 }
@@ -106,6 +108,8 @@ type policyGroupArgs struct {
 	OrganizationName string `pulumi:"organizationName"`
 	// List of policy packs applied to this policy group.
 	PolicyPacks []PolicyGroupPolicyPackReferenceInputType `pulumi:"policyPacks"`
+	// A boolean expression over stack tags. Use the `matchRule` output from `buildStackMatchRule`. Matching stacks join the group alongside individually added stacks. Removing this input clears the rule. Requires the tag-based policy groups preview feature in Pulumi Cloud.
+	StackMatchRule map[string]interface{} `pulumi:"stackMatchRule"`
 	// List of stack references that belong to this policy group.
 	Stacks []PolicyGroupStackReference `pulumi:"stacks"`
 }
@@ -124,6 +128,8 @@ type PolicyGroupArgs struct {
 	OrganizationName pulumi.StringInput
 	// List of policy packs applied to this policy group.
 	PolicyPacks PolicyGroupPolicyPackReferenceInputTypeArrayInput
+	// A boolean expression over stack tags. Use the `matchRule` output from `buildStackMatchRule`. Matching stacks join the group alongside individually added stacks. Removing this input clears the rule. Requires the tag-based policy groups preview feature in Pulumi Cloud.
+	StackMatchRule pulumi.MapInput
 	// List of stack references that belong to this policy group.
 	Stacks PolicyGroupStackReferenceArrayInput
 }
@@ -243,6 +249,11 @@ func (o PolicyGroupOutput) OrganizationName() pulumi.StringOutput {
 // List of policy packs applied to this policy group.
 func (o PolicyGroupOutput) PolicyPacks() PolicyGroupPolicyPackReferenceArrayOutput {
 	return o.ApplyT(func(v *PolicyGroup) PolicyGroupPolicyPackReferenceArrayOutput { return v.PolicyPacks }).(PolicyGroupPolicyPackReferenceArrayOutput)
+}
+
+// A boolean expression over stack tags. Use the `matchRule` output from `buildStackMatchRule`. Matching stacks join the group alongside individually added stacks. Removing this input clears the rule. Requires the tag-based policy groups preview feature in Pulumi Cloud.
+func (o PolicyGroupOutput) StackMatchRule() pulumi.MapOutput {
+	return o.ApplyT(func(v *PolicyGroup) pulumi.MapOutput { return v.StackMatchRule }).(pulumi.MapOutput)
 }
 
 // List of stack references that belong to this policy group.

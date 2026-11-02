@@ -136,6 +136,7 @@ func MakeProvider(host *provider.HostClient, name, version string) (pulumirpc.Re
 		WithWrapped(composed).
 		WithResources(
 			infer.Resource(&resources.AccessToken{}),
+			infer.Resource(&resources.AgentDefinition{}),
 			infer.Resource(&resources.AgentPool{}),
 			infer.Resource(&resources.ApprovalRule{}),
 			infer.Resource(&resources.DeploymentSchedule{}),

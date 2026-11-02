@@ -10,6 +10,11 @@ export type AccessToken = import("./accessToken").AccessToken;
 export const AccessToken: typeof import("./accessToken").AccessToken = null as any;
 utilities.lazyLoad(exports, ["AccessToken"], () => require("./accessToken"));
 
+export { AgentDefinitionArgs } from "./agentDefinition";
+export type AgentDefinition = import("./agentDefinition").AgentDefinition;
+export const AgentDefinition: typeof import("./agentDefinition").AgentDefinition = null as any;
+utilities.lazyLoad(exports, ["AgentDefinition"], () => require("./agentDefinition"));
+
 export { AgentPoolArgs } from "./agentPool";
 export type AgentPool = import("./agentPool").AgentPool;
 export const AgentPool: typeof import("./agentPool").AgentPool = null as any;
@@ -266,6 +271,8 @@ const _module = {
         switch (type) {
             case "pulumiservice:index:AccessToken":
                 return new AccessToken(name, <any>undefined, { urn })
+            case "pulumiservice:index:AgentDefinition":
+                return new AgentDefinition(name, <any>undefined, { urn })
             case "pulumiservice:index:AgentPool":
                 return new AgentPool(name, <any>undefined, { urn })
             case "pulumiservice:index:ApprovalRule":

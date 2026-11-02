@@ -18,6 +18,8 @@ from ._enums import *
 __all__ = [
     'AWSOIDCConfigurationArgs',
     'AWSOIDCConfigurationArgsDict',
+    'AgentDefinitionIntegrationArgs',
+    'AgentDefinitionIntegrationArgsDict',
     'ApprovalRuleConfigArgs',
     'ApprovalRuleConfigArgsDict',
     'AuthPolicyDefinitionArgs',
@@ -170,6 +172,39 @@ class AWSOIDCConfigurationArgs:
     @policy_arns.setter
     def policy_arns(self, value: pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]]):
         pulumi.set(self, "policy_arns", value)
+
+
+class AgentDefinitionIntegrationArgsDict(TypedDict):
+    """
+    An integration enabled for the agent's tasks.
+    """
+    id: pulumi.Input[_builtins.str]
+    """
+    The catalog integration ID, such as `honeycomb` or `datadog`, not a GitHub installation ID.
+    """
+
+@pulumi.input_type
+class AgentDefinitionIntegrationArgs:
+    def __init__(__self__, *,
+                 id: pulumi.Input[_builtins.str]):
+        """
+        An integration enabled for the agent's tasks.
+
+        :param pulumi.Input[_builtins.str] id: The catalog integration ID, such as `honeycomb` or `datadog`, not a GitHub installation ID.
+        """
+        pulumi.set(__self__, "id", id)
+
+    @_builtins.property
+    @pulumi.getter
+    def id(self) -> pulumi.Input[_builtins.str]:
+        """
+        The catalog integration ID, such as `honeycomb` or `datadog`, not a GitHub installation ID.
+        """
+        return pulumi.get(self, "id")
+
+    @id.setter
+    def id(self, value: pulumi.Input[_builtins.str]):
+        pulumi.set(self, "id", value)
 
 
 class ApprovalRuleConfigArgsDict(TypedDict):

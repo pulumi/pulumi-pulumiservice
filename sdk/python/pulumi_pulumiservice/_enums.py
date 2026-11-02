@@ -7,6 +7,7 @@ import pulumi
 from enum import Enum
 
 __all__ = [
+    'AgentApprovalMode',
     'AuthPolicyDecision',
     'AuthPolicyPermissionLevel',
     'AuthPolicyTokenType',
@@ -27,6 +28,18 @@ __all__ = [
     'WebhookFormat',
     'WebhookGroup',
 ]
+
+
+@pulumi.type_token("pulumiservice:index:AgentApprovalMode")
+class AgentApprovalMode(_builtins.str, Enum):
+    AUTO = "auto"
+    """
+    Approve agent runs automatically.
+    """
+    MANUAL = "manual"
+    """
+    Pause each agent run until a person approves it.
+    """
 
 
 @pulumi.type_token("pulumiservice:index:AuthPolicyDecision")

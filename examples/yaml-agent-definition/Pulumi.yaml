@@ -1,0 +1,39 @@
+# Copyright 2026, Pulumi Corporation.
+name: yaml-agent-definition
+runtime: yaml
+description: Creates a saved Custom Agent and exports its durable ID for Delivery workflows
+
+config:
+  organizationName:
+    type: string
+    default: service-provider-test-org
+  agentName:
+    type: string
+    default: factory-issue-scout
+
+variables:
+  memberRole:
+    fn::invoke:
+      function: pulumiservice:getOrganizationRole
+      arguments:
+        organizationName: ${organizationName}
+        name: Member
+
+resources:
+  scout:
+    type: pulumiservice:AgentDefinition
+    properties:
+      organizationName: ${organizationName}
+      name: ${agentName}
+      displayName: Issue scout
+      roleId: ${memberRole.roleId}
+      purpose: Triage incoming issues for the software factory
+      customInstructions: Review incoming issues and propose a concise implementation plan.
+      approvalMode: auto
+      # An empty list enables no integrations. Omit this property to inherit
+      # organization integrations, or use catalog references such as {id: honeycomb}.
+      enabledIntegrations: []
+
+outputs:
+  # Use this UUID as delivery.Agent.agent in each workflow that runs as scout.
+  agentId: ${scout.id}

@@ -30,6 +30,16 @@ export interface AWSOIDCConfigurationArgs {
     sessionName: pulumi.Input<string>;
 }
 
+/**
+ * An integration enabled for the agent's tasks.
+ */
+export interface AgentDefinitionIntegrationArgs {
+    /**
+     * The catalog integration ID, such as `honeycomb` or `datadog`, not a GitHub installation ID.
+     */
+    id: pulumi.Input<string>;
+}
+
 export interface ApprovalRuleConfigArgs {
     /**
      * Whether self-approval is allowed.

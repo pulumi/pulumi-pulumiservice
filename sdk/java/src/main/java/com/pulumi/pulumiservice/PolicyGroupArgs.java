@@ -9,8 +9,10 @@ import com.pulumi.core.internal.Codegen;
 import com.pulumi.exceptions.MissingRequiredPropertyException;
 import com.pulumi.pulumiservice.inputs.PolicyGroupPolicyPackReferenceInputArgs;
 import com.pulumi.pulumiservice.inputs.PolicyGroupStackReferenceArgs;
+import java.lang.Object;
 import java.lang.String;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import javax.annotation.Nullable;
@@ -111,6 +113,21 @@ public final class PolicyGroupArgs extends com.pulumi.resources.ResourceArgs {
     }
 
     /**
+     * A boolean expression over stack tags. Use the `matchRule` output from `buildStackMatchRule`. Matching stacks join the group alongside individually added stacks. Removing this input clears the rule. Requires the tag-based policy groups preview feature in Pulumi Cloud.
+     * 
+     */
+    @Import(name="stackMatchRule")
+    private @Nullable Output<Map<String,Object>> stackMatchRule;
+
+    /**
+     * @return A boolean expression over stack tags. Use the `matchRule` output from `buildStackMatchRule`. Matching stacks join the group alongside individually added stacks. Removing this input clears the rule. Requires the tag-based policy groups preview feature in Pulumi Cloud.
+     * 
+     */
+    public Optional<Output<Map<String,Object>>> stackMatchRule() {
+        return Optional.ofNullable(this.stackMatchRule);
+    }
+
+    /**
      * List of stack references that belong to this policy group.
      * 
      */
@@ -134,6 +151,7 @@ public final class PolicyGroupArgs extends com.pulumi.resources.ResourceArgs {
         this.name = $.name;
         this.organizationName = $.organizationName;
         this.policyPacks = $.policyPacks;
+        this.stackMatchRule = $.stackMatchRule;
         this.stacks = $.stacks;
     }
 
@@ -299,6 +317,27 @@ public final class PolicyGroupArgs extends com.pulumi.resources.ResourceArgs {
          */
         public Builder policyPacks(PolicyGroupPolicyPackReferenceInputArgs... policyPacks) {
             return policyPacks(List.of(policyPacks));
+        }
+
+        /**
+         * @param stackMatchRule A boolean expression over stack tags. Use the `matchRule` output from `buildStackMatchRule`. Matching stacks join the group alongside individually added stacks. Removing this input clears the rule. Requires the tag-based policy groups preview feature in Pulumi Cloud.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder stackMatchRule(@Nullable Output<Map<String,Object>> stackMatchRule) {
+            $.stackMatchRule = stackMatchRule;
+            return this;
+        }
+
+        /**
+         * @param stackMatchRule A boolean expression over stack tags. Use the `matchRule` output from `buildStackMatchRule`. Matching stacks join the group alongside individually added stacks. Removing this input clears the rule. Requires the tag-based policy groups preview feature in Pulumi Cloud.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder stackMatchRule(Map<String,Object> stackMatchRule) {
+            return stackMatchRule(Output.of(stackMatchRule));
         }
 
         /**

@@ -110,6 +110,34 @@
         "sessionName"
       ]
     },
+    "pulumiservice:index:AgentApprovalMode": {
+      "type": "string",
+      "enum": [
+        {
+          "name": "Auto",
+          "description": "Approve agent runs automatically.",
+          "value": "auto"
+        },
+        {
+          "name": "Manual",
+          "description": "Pause each agent run until a person approves it.",
+          "value": "manual"
+        }
+      ]
+    },
+    "pulumiservice:index:AgentDefinitionIntegration": {
+      "description": "An integration enabled for the agent's tasks.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The catalog integration ID, such as `honeycomb` or `datadog`, not a GitHub installation ID."
+        }
+      },
+      "type": "object",
+      "required": [
+        "id"
+      ]
+    },
     "pulumiservice:index:ApprovalRuleConfig": {
       "properties": {
         "allowSelfApproval": {
@@ -6207,6 +6235,104 @@
         "description"
       ]
     },
+    "pulumiservice:index:AgentDefinition": {
+      "description": "A saved, team-owned Custom Agent in Pulumi Cloud. Its role, instructions, and integrations apply to tasks run as the agent. The resource ID is the durable definition UUID; renaming or updating the agent preserves it. Use this ID in `delivery.Agent.agent`.\n\n## Import\n\nThis resource can be imported using its `id`, which has the format `{organization}/{definitionId}`, e.g.,\n\n```sh\n $ pulumi import pulumiservice:index:AgentDefinition my-agent-definition my-org/4f1d6f44-bf29-435b-af3c-c6309c0eacb4\n```\n\nImport resolves the active definition and stores its UUID as the resource ID. The provider's caller must be able to see the agent's role.\n",
+      "properties": {
+        "approvalMode": {
+          "$ref": "#/types/pulumiservice:index:AgentApprovalMode",
+          "description": "The approval posture inherited by agent runs. Defaults to `auto`. `manual` pauses every run for a person's approval, including scheduled and triggered runs.",
+          "default": "auto"
+        },
+        "avatar": {
+          "type": "string",
+          "description": "A presentation token the console maps to an icon, not an uploaded asset."
+        },
+        "customInstructions": {
+          "type": "string",
+          "description": "Instructions that shape how the agent behaves in the team's environment."
+        },
+        "displayName": {
+          "type": "string",
+          "description": "The human-readable label. Defaults to the agent's name."
+        },
+        "enabledIntegrations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/types/pulumiservice:index:AgentDefinitionIntegration"
+          },
+          "description": "Integrations enabled for the agent's tasks. Omitted or null inherits all organization integrations; an empty list enables none."
+        },
+        "name": {
+          "type": "string",
+          "description": "The agent's name, unique within the organization: lowercase letters, digits, and hyphens, up to 64 characters. Changing the name preserves the definition ID."
+        },
+        "organizationName": {
+          "type": "string",
+          "description": "The Pulumi Cloud organization that owns the Custom Agent.",
+          "replaceOnChanges": true
+        },
+        "purpose": {
+          "type": "string",
+          "description": "A one-line description of the agent's purpose."
+        },
+        "roleId": {
+          "type": "string",
+          "description": "The organization role ID assumed by the agent's tasks. On creation, omitted or empty uses the read-only default. On update, omitted preserves the role and empty selects the default. Use `getOrganizationRole` to resolve an existing role, for example `Member`."
+        }
+      },
+      "required": [
+        "organizationName",
+        "name",
+        "approvalMode"
+      ],
+      "inputProperties": {
+        "approvalMode": {
+          "$ref": "#/types/pulumiservice:index:AgentApprovalMode",
+          "description": "The approval posture inherited by agent runs. Defaults to `auto`. `manual` pauses every run for a person's approval, including scheduled and triggered runs.",
+          "default": "auto"
+        },
+        "avatar": {
+          "type": "string",
+          "description": "A presentation token the console maps to an icon, not an uploaded asset."
+        },
+        "customInstructions": {
+          "type": "string",
+          "description": "Instructions that shape how the agent behaves in the team's environment."
+        },
+        "displayName": {
+          "type": "string",
+          "description": "The human-readable label. Defaults to the agent's name."
+        },
+        "enabledIntegrations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/types/pulumiservice:index:AgentDefinitionIntegration"
+          },
+          "description": "Integrations enabled for the agent's tasks. Omitted or null inherits all organization integrations; an empty list enables none."
+        },
+        "name": {
+          "type": "string",
+          "description": "The agent's name, unique within the organization: lowercase letters, digits, and hyphens, up to 64 characters. Changing the name preserves the definition ID."
+        },
+        "organizationName": {
+          "type": "string",
+          "description": "The Pulumi Cloud organization that owns the Custom Agent.",
+          "replaceOnChanges": true
+        },
+        "purpose": {
+          "type": "string",
+          "description": "A one-line description of the agent's purpose."
+        },
+        "roleId": {
+          "type": "string",
+          "description": "The organization role ID assumed by the agent's tasks. On creation, omitted or empty uses the read-only default. On update, omitted preserves the role and empty selects the default. Use `getOrganizationRole` to resolve an existing role, for example `Member`."
+        }
+      },
+      "requiredInputs": [
+        "organizationName",
+        "name"
+      ]
+    },
     "pulumiservice:index:AgentPool": {
       "description": "Agent Pool for customer managed deployments.\n\n## Import\n\nThis resource can be imported using its `id`, which has the format `{organization}/{name}/{agentPoolId}`, e.g.,\n\n```sh\n $ pulumi import pulumiservice:index:AgentPool my-agent-pool my-org/my-pool/e4a1b7c2-9f30-4d58-b6e1-2a7c9d0f4e86\n```\n\nThe agent pool ID is the last segment of its page URL in the Pulumi Cloud console, for example `https://app.pulumi.com/my-org/settings/workflow-runner-pools/e4a1b7c2-9f30-4d58-b6e1-2a7c9d0f4e86`.\n\nThe pool's `tokenValue` can't be read back from Pulumi Cloud, so it's empty after import.\n",
       "properties": {
@@ -7249,6 +7375,13 @@
           },
           "description": "List of policy packs applied to this policy group."
         },
+        "stackMatchRule": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "pulumi.json#/Any"
+          },
+          "description": "A boolean expression over stack tags. Use the `matchRule` output from `buildStackMatchRule`. Matching stacks join the group alongside individually added stacks. Removing this input clears the rule. Requires the tag-based policy groups preview feature in Pulumi Cloud."
+        },
         "stacks": {
           "type": "array",
           "items": {
@@ -7299,6 +7432,13 @@
             "$ref": "#/types/pulumiservice:index:PolicyGroupPolicyPackReferenceInput"
           },
           "description": "List of policy packs applied to this policy group."
+        },
+        "stackMatchRule": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "pulumi.json#/Any"
+          },
+          "description": "A boolean expression over stack tags. Use the `matchRule` output from `buildStackMatchRule`. Matching stacks join the group alongside individually added stacks. Removing this input clears the rule. Requires the tag-based policy groups preview feature in Pulumi Cloud."
         },
         "stacks": {
           "type": "array",

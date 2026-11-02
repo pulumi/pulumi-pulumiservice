@@ -39,6 +39,7 @@ const (
 	gcStacks           = "stacks"
 	gcAccounts         = "accounts"
 	gcPolicyPacks      = "policyPacks"
+	gcStackMatchRule   = "stackMatchRule"
 	gcDisplayName      = "displayName"
 	gcVersionTag       = "versionTag"
 	gcAudit            = "audit"
@@ -126,6 +127,9 @@ func (r *PolicyGroupPolicyPackReference) Annotate(a infer.Annotator) {
 }
 
 const (
+	policyGroupStackMatchRuleDescription = "A boolean expression over stack tags. Use the `matchRule` output from " +
+		"`buildStackMatchRule`. Matching stacks join the group alongside individually added stacks. " +
+		"Removing this input clears the rule. Requires the tag-based policy groups preview feature in Pulumi Cloud."
 	policyGroupEntityTypeDescription = "The entity type for the policy group. Valid values are 'stacks' or " +
 		"'accounts'. Defaults to 'stacks'."
 	policyGroupModeDescription = "The mode for the policy group. Valid values are 'audit' (reports violations) " +
@@ -140,6 +144,7 @@ type PolicyGroupInput struct {
 	Stacks           []PolicyGroupStackReference           `pulumi:"stacks,optional"`
 	Accounts         []string                              `pulumi:"accounts,optional"`
 	PolicyPacks      []PolicyGroupPolicyPackReferenceInput `pulumi:"policyPacks,optional"`
+	StackMatchRule   map[string]any                        `pulumi:"stackMatchRule,optional"`
 }
 
 func (i *PolicyGroupInput) Annotate(a infer.Annotator) {
@@ -152,6 +157,7 @@ func (i *PolicyGroupInput) Annotate(a infer.Annotator) {
 	a.Describe(&i.Stacks, "List of stack references that belong to this policy group.")
 	a.Describe(&i.Accounts, "List of accounts that belong to this policy group.")
 	a.Describe(&i.PolicyPacks, "List of policy packs applied to this policy group.")
+	a.Describe(&i.StackMatchRule, policyGroupStackMatchRuleDescription)
 }
 
 // PolicyGroupState doesn't embed PolicyGroupInput: its policy packs carry the
@@ -164,6 +170,7 @@ type PolicyGroupState struct {
 	Stacks           []PolicyGroupStackReference      `pulumi:"stacks,optional"`
 	Accounts         []string                         `pulumi:"accounts,optional"`
 	PolicyPacks      []PolicyGroupPolicyPackReference `pulumi:"policyPacks,optional"`
+	StackMatchRule   map[string]any                   `pulumi:"stackMatchRule,optional"`
 }
 
 func (s *PolicyGroupState) Annotate(a infer.Annotator) {
@@ -174,6 +181,7 @@ func (s *PolicyGroupState) Annotate(a infer.Annotator) {
 	a.Describe(&s.Stacks, "List of stack references that belong to this policy group.")
 	a.Describe(&s.Accounts, "List of accounts that belong to this policy group.")
 	a.Describe(&s.PolicyPacks, "List of policy packs applied to this policy group.")
+	a.Describe(&s.StackMatchRule, policyGroupStackMatchRuleDescription)
 }
 
 // Check applies defaults and validates `entityType` and `mode`. It also strips
@@ -251,9 +259,10 @@ func (*PolicyGroup) Diff(
 
 	ops := policyGroupOps(req.State, req.Inputs)
 	for name, ops := range map[string][]pulumiapi.UpdatePolicyGroupRequest{
-		gcStacks:      ops.stacks,
-		gcPolicyPacks: ops.policyPacks,
-		gcAccounts:    ops.accounts,
+		gcStacks:         ops.stacks,
+		gcPolicyPacks:    ops.policyPacks,
+		gcAccounts:       ops.accounts,
+		gcStackMatchRule: ops.stackMatchRule,
 	} {
 		if len(ops) > 0 {
 			diff[name] = p.PropertyDiff{Kind: p.Update, InputDiff: true}
@@ -277,7 +286,8 @@ func (*PolicyGroup) Create(
 	}
 
 	client := config.GetClient(ctx)
-	if err := client.CreatePolicyGroup(ctx, in.OrganizationName, in.Name, in.EntityType, in.Mode); err != nil {
+	err := client.CreatePolicyGroup(ctx, in.OrganizationName, in.Name, in.EntityType, in.Mode, in.StackMatchRule)
+	if err != nil {
 		return infer.CreateResponse[PolicyGroupState]{}, fmt.Errorf(
 			"error creating policy group '%s': %w", in.Name, err)
 	}
@@ -325,7 +335,7 @@ func (*PolicyGroup) Update(
 
 	client := config.GetClient(ctx)
 	ops := policyGroupOps(req.State, in)
-	for _, op := range slices.Concat(ops.stacks, ops.policyPacks, ops.accounts) {
+	for _, op := range slices.Concat(ops.stacks, ops.policyPacks, ops.accounts, ops.stackMatchRule) {
 		err := client.BatchUpdatePolicyGroup(ctx, in.OrganizationName, in.Name,
 			[]pulumiapi.UpdatePolicyGroupRequest{op})
 		if err == nil {
@@ -403,6 +413,7 @@ func (*PolicyGroup) Read(
 		Mode:             state.Mode,
 		Stacks:           state.Stacks,
 		Accounts:         inputAccounts,
+		StackMatchRule:   state.StackMatchRule,
 	}
 	for _, pp := range state.PolicyPacks {
 		inputs.PolicyPacks = append(inputs.PolicyPacks, PolicyGroupPolicyPackReferenceInput{
@@ -427,6 +438,7 @@ func policyGroupStateFromAPI(orgName string, pg *pulumiapi.PolicyGroup) PolicyGr
 		EntityType:       pg.EntityType,
 		Mode:             pg.Mode,
 		Accounts:         pg.Accounts,
+		StackMatchRule:   pg.StackMatchRule,
 	}
 	for _, s := range pg.Stacks {
 		state.Stacks = append(state.Stacks, PolicyGroupStackReference(s))
@@ -454,6 +466,7 @@ func policyGroupStateFromInputs(in PolicyGroupInput) PolicyGroupState {
 		Mode:             in.Mode,
 		Stacks:           in.Stacks,
 		Accounts:         in.Accounts,
+		StackMatchRule:   in.StackMatchRule,
 	}
 	for _, pp := range in.PolicyPacks {
 		state.PolicyPacks = append(state.PolicyPacks, PolicyGroupPolicyPackReference{
@@ -469,7 +482,7 @@ func policyGroupStateFromInputs(in PolicyGroupInput) PolicyGroupState {
 // policyGroupUpdateOps holds the operations that bring a policy group from
 // its state to its inputs, by list. Removals come before additions.
 type policyGroupUpdateOps struct {
-	stacks, policyPacks, accounts []pulumiapi.UpdatePolicyGroupRequest
+	stacks, policyPacks, accounts, stackMatchRule []pulumiapi.UpdatePolicyGroupRequest
 }
 
 // policyGroupOps computes the operations that bring a policy group from state
@@ -485,6 +498,13 @@ type policyGroupUpdateOps struct {
 //     parent.
 func policyGroupOps(state PolicyGroupState, in PolicyGroupInput) policyGroupUpdateOps {
 	var ops policyGroupUpdateOps
+	if !reflect.DeepEqual(state.StackMatchRule, in.StackMatchRule) {
+		op := pulumiapi.UpdatePolicyGroupRequest{StackMatchRule: in.StackMatchRule}
+		if in.StackMatchRule == nil {
+			op.RemoveStackMatchRule = true
+		}
+		ops.stackMatchRule = append(ops.stackMatchRule, op)
+	}
 
 	// Stacks
 	for _, s := range state.Stacks {

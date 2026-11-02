@@ -30,6 +30,16 @@ export interface AWSOIDCConfiguration {
     sessionName: string;
 }
 
+/**
+ * An integration enabled for the agent's tasks.
+ */
+export interface AgentDefinitionIntegration {
+    /**
+     * The catalog integration ID, such as `honeycomb` or `datadog`, not a GitHub installation ID.
+     */
+    id: string;
+}
+
 export interface ApprovalRuleConfig {
     /**
      * Whether self-approval is allowed.

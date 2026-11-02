@@ -20,6 +20,7 @@
     },
     "files": [
         "accessToken.ts",
+        "agentDefinition.ts",
         "agentPool.ts",
         "api/agents/index.ts",
         "api/agents/pool.ts",

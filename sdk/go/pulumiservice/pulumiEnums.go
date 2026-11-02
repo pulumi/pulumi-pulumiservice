@@ -10,6 +10,173 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
+type AgentApprovalMode string
+
+const (
+	// Approve agent runs automatically.
+	AgentApprovalModeAuto = AgentApprovalMode("auto")
+	// Pause each agent run until a person approves it.
+	AgentApprovalModeManual = AgentApprovalMode("manual")
+)
+
+func (AgentApprovalMode) ElementType() reflect.Type {
+	return reflect.TypeOf((*AgentApprovalMode)(nil)).Elem()
+}
+
+func (e AgentApprovalMode) ToAgentApprovalModeOutput() AgentApprovalModeOutput {
+	return pulumi.ToOutput(e).(AgentApprovalModeOutput)
+}
+
+func (e AgentApprovalMode) ToAgentApprovalModeOutputWithContext(ctx context.Context) AgentApprovalModeOutput {
+	return pulumi.ToOutputWithContext(ctx, e).(AgentApprovalModeOutput)
+}
+
+func (e AgentApprovalMode) ToAgentApprovalModePtrOutput() AgentApprovalModePtrOutput {
+	return e.ToAgentApprovalModePtrOutputWithContext(context.Background())
+}
+
+func (e AgentApprovalMode) ToAgentApprovalModePtrOutputWithContext(ctx context.Context) AgentApprovalModePtrOutput {
+	return AgentApprovalMode(e).ToAgentApprovalModeOutputWithContext(ctx).ToAgentApprovalModePtrOutputWithContext(ctx)
+}
+
+func (e AgentApprovalMode) ToStringOutput() pulumi.StringOutput {
+	return pulumi.ToOutput(pulumi.String(e)).(pulumi.StringOutput)
+}
+
+func (e AgentApprovalMode) ToStringOutputWithContext(ctx context.Context) pulumi.StringOutput {
+	return pulumi.ToOutputWithContext(ctx, pulumi.String(e)).(pulumi.StringOutput)
+}
+
+func (e AgentApprovalMode) ToStringPtrOutput() pulumi.StringPtrOutput {
+	return pulumi.String(e).ToStringPtrOutputWithContext(context.Background())
+}
+
+func (e AgentApprovalMode) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
+	return pulumi.String(e).ToStringOutputWithContext(ctx).ToStringPtrOutputWithContext(ctx)
+}
+
+type AgentApprovalModeOutput struct{ *pulumi.OutputState }
+
+func (AgentApprovalModeOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*AgentApprovalMode)(nil)).Elem()
+}
+
+func (o AgentApprovalModeOutput) ToAgentApprovalModeOutput() AgentApprovalModeOutput {
+	return o
+}
+
+func (o AgentApprovalModeOutput) ToAgentApprovalModeOutputWithContext(ctx context.Context) AgentApprovalModeOutput {
+	return o
+}
+
+func (o AgentApprovalModeOutput) ToAgentApprovalModePtrOutput() AgentApprovalModePtrOutput {
+	return o.ToAgentApprovalModePtrOutputWithContext(context.Background())
+}
+
+func (o AgentApprovalModeOutput) ToAgentApprovalModePtrOutputWithContext(ctx context.Context) AgentApprovalModePtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v AgentApprovalMode) *AgentApprovalMode {
+		return &v
+	}).(AgentApprovalModePtrOutput)
+}
+
+func (o AgentApprovalModeOutput) ToStringOutput() pulumi.StringOutput {
+	return o.ToStringOutputWithContext(context.Background())
+}
+
+func (o AgentApprovalModeOutput) ToStringOutputWithContext(ctx context.Context) pulumi.StringOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e AgentApprovalMode) string {
+		return string(e)
+	}).(pulumi.StringOutput)
+}
+
+func (o AgentApprovalModeOutput) ToStringPtrOutput() pulumi.StringPtrOutput {
+	return o.ToStringPtrOutputWithContext(context.Background())
+}
+
+func (o AgentApprovalModeOutput) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e AgentApprovalMode) *string {
+		v := string(e)
+		return &v
+	}).(pulumi.StringPtrOutput)
+}
+
+type AgentApprovalModePtrOutput struct{ *pulumi.OutputState }
+
+func (AgentApprovalModePtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**AgentApprovalMode)(nil)).Elem()
+}
+
+func (o AgentApprovalModePtrOutput) ToAgentApprovalModePtrOutput() AgentApprovalModePtrOutput {
+	return o
+}
+
+func (o AgentApprovalModePtrOutput) ToAgentApprovalModePtrOutputWithContext(ctx context.Context) AgentApprovalModePtrOutput {
+	return o
+}
+
+func (o AgentApprovalModePtrOutput) Elem() AgentApprovalModeOutput {
+	return o.ApplyT(func(v *AgentApprovalMode) AgentApprovalMode {
+		if v != nil {
+			return *v
+		}
+		var ret AgentApprovalMode
+		return ret
+	}).(AgentApprovalModeOutput)
+}
+
+func (o AgentApprovalModePtrOutput) ToStringPtrOutput() pulumi.StringPtrOutput {
+	return o.ToStringPtrOutputWithContext(context.Background())
+}
+
+func (o AgentApprovalModePtrOutput) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e *AgentApprovalMode) *string {
+		if e == nil {
+			return nil
+		}
+		v := string(*e)
+		return &v
+	}).(pulumi.StringPtrOutput)
+}
+
+// AgentApprovalModeInput is an input type that accepts values of the AgentApprovalMode enum
+// A concrete instance of `AgentApprovalModeInput` can be one of the following:
+//
+//	AgentApprovalModeAuto
+//	AgentApprovalModeManual
+type AgentApprovalModeInput interface {
+	pulumi.Input
+
+	ToAgentApprovalModeOutput() AgentApprovalModeOutput
+	ToAgentApprovalModeOutputWithContext(context.Context) AgentApprovalModeOutput
+}
+
+var agentApprovalModePtrType = reflect.TypeOf((**AgentApprovalMode)(nil)).Elem()
+
+type AgentApprovalModePtrInput interface {
+	pulumi.Input
+
+	ToAgentApprovalModePtrOutput() AgentApprovalModePtrOutput
+	ToAgentApprovalModePtrOutputWithContext(context.Context) AgentApprovalModePtrOutput
+}
+
+type agentApprovalModePtr string
+
+func AgentApprovalModePtr(v string) AgentApprovalModePtrInput {
+	return (*agentApprovalModePtr)(&v)
+}
+
+func (*agentApprovalModePtr) ElementType() reflect.Type {
+	return agentApprovalModePtrType
+}
+
+func (in *agentApprovalModePtr) ToAgentApprovalModePtrOutput() AgentApprovalModePtrOutput {
+	return pulumi.ToOutput(in).(AgentApprovalModePtrOutput)
+}
+
+func (in *agentApprovalModePtr) ToAgentApprovalModePtrOutputWithContext(ctx context.Context) AgentApprovalModePtrOutput {
+	return pulumi.ToOutputWithContext(ctx, in).(AgentApprovalModePtrOutput)
+}
+
 type AuthPolicyDecision string
 
 const (
@@ -4210,6 +4377,8 @@ func (o WebhookGroupArrayOutput) Index(i pulumi.IntInput) WebhookGroupOutput {
 }
 
 func init() {
+	pulumi.RegisterInputType(reflect.TypeOf((*AgentApprovalModeInput)(nil)).Elem(), AgentApprovalMode("auto"))
+	pulumi.RegisterInputType(reflect.TypeOf((*AgentApprovalModePtrInput)(nil)).Elem(), AgentApprovalMode("auto"))
 	pulumi.RegisterInputType(reflect.TypeOf((*AuthPolicyDecisionInput)(nil)).Elem(), AuthPolicyDecision("deny"))
 	pulumi.RegisterInputType(reflect.TypeOf((*AuthPolicyDecisionPtrInput)(nil)).Elem(), AuthPolicyDecision("deny"))
 	pulumi.RegisterInputType(reflect.TypeOf((*AuthPolicyPermissionLevelInput)(nil)).Elem(), AuthPolicyPermissionLevel("standard"))
@@ -4256,6 +4425,8 @@ func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*WebhookGroupInput)(nil)).Elem(), WebhookGroup("stacks"))
 	pulumi.RegisterInputType(reflect.TypeOf((*WebhookGroupPtrInput)(nil)).Elem(), WebhookGroup("stacks"))
 	pulumi.RegisterInputType(reflect.TypeOf((*WebhookGroupArrayInput)(nil)).Elem(), WebhookGroupArray{})
+	pulumi.RegisterOutputType(AgentApprovalModeOutput{})
+	pulumi.RegisterOutputType(AgentApprovalModePtrOutput{})
 	pulumi.RegisterOutputType(AuthPolicyDecisionOutput{})
 	pulumi.RegisterOutputType(AuthPolicyDecisionPtrOutput{})
 	pulumi.RegisterOutputType(AuthPolicyPermissionLevelOutput{})

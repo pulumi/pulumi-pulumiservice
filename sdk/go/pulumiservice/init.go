@@ -23,6 +23,8 @@ func (m *module) Construct(ctx *pulumi.Context, name, typ, urn string) (r pulumi
 	switch typ {
 	case "pulumiservice:index:AccessToken":
 		r = &AccessToken{}
+	case "pulumiservice:index:AgentDefinition":
+		r = &AgentDefinition{}
 	case "pulumiservice:index:AgentPool":
 		r = &AgentPool{}
 	case "pulumiservice:index:ApprovalRule":

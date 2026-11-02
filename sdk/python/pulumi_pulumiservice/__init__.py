@@ -8,6 +8,7 @@ import typing
 # Export this package's modules as members:
 from ._enums import *
 from .access_token import *
+from .agent_definition import *
 from .agent_pool import *
 from .approval_rule import *
 from .build_account_match_rule import *
@@ -207,6 +208,7 @@ _utilities.register(
   "fqn": "pulumi_pulumiservice",
   "classes": {
    "pulumiservice:index:AccessToken": "AccessToken",
+   "pulumiservice:index:AgentDefinition": "AgentDefinition",
    "pulumiservice:index:AgentPool": "AgentPool",
    "pulumiservice:index:ApprovalRule": "ApprovalRule",
    "pulumiservice:index:DeploymentSchedule": "DeploymentSchedule",

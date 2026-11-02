@@ -9,6 +9,8 @@
 
 ### Improvements
 
+- Added `AgentDefinition` to manage saved Custom Agents with durable UUIDs, editable names, roles, instructions, integrations, and approval modes.
+- Added `stackMatchRule` to `PolicyGroup` so tag-selected stacks can receive the group's policy packs alongside individually added stacks. Use `buildStackMatchRule` to build the rule; removing the input clears it.
 - Added `getAgent` to look up an active saved Custom Agent by its durable definition ID and organization. Pass its `agentId` to `delivery.Agent.agent` so workflow references survive agent renames. The lookup respects the caller's visibility and excludes deleted definitions.
 - Added `deployTags` and `tagFilters` to the `github` and `vcs` settings of `DeploymentSettings`, so a deployment can run when a matching git tag is pushed. Set `deployCommits` to `false` when you enable `deployTags`, because Pulumi Cloud rejects the two together [#1042](https://github.com/pulumi/pulumi-pulumiservice/issues/1042)
 - Added an Import section to the docs of every `pulumiservice:index:*` resource, giving the ID format, a sample `pulumi import` command, and caveats such as secrets that can't be read back. `DeploymentSettings` and `Webhook` import docs now render as their own section instead of inline in the description. No behavior change. [#344](https://github.com/pulumi/pulumi-pulumiservice/issues/344)

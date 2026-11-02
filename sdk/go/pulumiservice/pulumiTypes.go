@@ -210,6 +210,106 @@ func (o AWSOIDCConfigurationPtrOutput) SessionName() pulumi.StringPtrOutput {
 	}).(pulumi.StringPtrOutput)
 }
 
+// An integration enabled for the agent's tasks.
+type AgentDefinitionIntegration struct {
+	// The catalog integration ID, such as `honeycomb` or `datadog`, not a GitHub installation ID.
+	Id string `pulumi:"id"`
+}
+
+// AgentDefinitionIntegrationInput is an input type that accepts AgentDefinitionIntegrationArgs and AgentDefinitionIntegrationOutput values.
+// You can construct a concrete instance of `AgentDefinitionIntegrationInput` via:
+//
+//	AgentDefinitionIntegrationArgs{...}
+type AgentDefinitionIntegrationInput interface {
+	pulumi.Input
+
+	ToAgentDefinitionIntegrationOutput() AgentDefinitionIntegrationOutput
+	ToAgentDefinitionIntegrationOutputWithContext(context.Context) AgentDefinitionIntegrationOutput
+}
+
+// An integration enabled for the agent's tasks.
+type AgentDefinitionIntegrationArgs struct {
+	// The catalog integration ID, such as `honeycomb` or `datadog`, not a GitHub installation ID.
+	Id pulumi.StringInput `pulumi:"id"`
+}
+
+func (AgentDefinitionIntegrationArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*AgentDefinitionIntegration)(nil)).Elem()
+}
+
+func (i AgentDefinitionIntegrationArgs) ToAgentDefinitionIntegrationOutput() AgentDefinitionIntegrationOutput {
+	return i.ToAgentDefinitionIntegrationOutputWithContext(context.Background())
+}
+
+func (i AgentDefinitionIntegrationArgs) ToAgentDefinitionIntegrationOutputWithContext(ctx context.Context) AgentDefinitionIntegrationOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(AgentDefinitionIntegrationOutput)
+}
+
+// AgentDefinitionIntegrationArrayInput is an input type that accepts AgentDefinitionIntegrationArray and AgentDefinitionIntegrationArrayOutput values.
+// You can construct a concrete instance of `AgentDefinitionIntegrationArrayInput` via:
+//
+//	AgentDefinitionIntegrationArray{ AgentDefinitionIntegrationArgs{...} }
+type AgentDefinitionIntegrationArrayInput interface {
+	pulumi.Input
+
+	ToAgentDefinitionIntegrationArrayOutput() AgentDefinitionIntegrationArrayOutput
+	ToAgentDefinitionIntegrationArrayOutputWithContext(context.Context) AgentDefinitionIntegrationArrayOutput
+}
+
+type AgentDefinitionIntegrationArray []AgentDefinitionIntegrationInput
+
+func (AgentDefinitionIntegrationArray) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]AgentDefinitionIntegration)(nil)).Elem()
+}
+
+func (i AgentDefinitionIntegrationArray) ToAgentDefinitionIntegrationArrayOutput() AgentDefinitionIntegrationArrayOutput {
+	return i.ToAgentDefinitionIntegrationArrayOutputWithContext(context.Background())
+}
+
+func (i AgentDefinitionIntegrationArray) ToAgentDefinitionIntegrationArrayOutputWithContext(ctx context.Context) AgentDefinitionIntegrationArrayOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(AgentDefinitionIntegrationArrayOutput)
+}
+
+// An integration enabled for the agent's tasks.
+type AgentDefinitionIntegrationOutput struct{ *pulumi.OutputState }
+
+func (AgentDefinitionIntegrationOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*AgentDefinitionIntegration)(nil)).Elem()
+}
+
+func (o AgentDefinitionIntegrationOutput) ToAgentDefinitionIntegrationOutput() AgentDefinitionIntegrationOutput {
+	return o
+}
+
+func (o AgentDefinitionIntegrationOutput) ToAgentDefinitionIntegrationOutputWithContext(ctx context.Context) AgentDefinitionIntegrationOutput {
+	return o
+}
+
+// The catalog integration ID, such as `honeycomb` or `datadog`, not a GitHub installation ID.
+func (o AgentDefinitionIntegrationOutput) Id() pulumi.StringOutput {
+	return o.ApplyT(func(v AgentDefinitionIntegration) string { return v.Id }).(pulumi.StringOutput)
+}
+
+type AgentDefinitionIntegrationArrayOutput struct{ *pulumi.OutputState }
+
+func (AgentDefinitionIntegrationArrayOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]AgentDefinitionIntegration)(nil)).Elem()
+}
+
+func (o AgentDefinitionIntegrationArrayOutput) ToAgentDefinitionIntegrationArrayOutput() AgentDefinitionIntegrationArrayOutput {
+	return o
+}
+
+func (o AgentDefinitionIntegrationArrayOutput) ToAgentDefinitionIntegrationArrayOutputWithContext(ctx context.Context) AgentDefinitionIntegrationArrayOutput {
+	return o
+}
+
+func (o AgentDefinitionIntegrationArrayOutput) Index(i pulumi.IntInput) AgentDefinitionIntegrationOutput {
+	return pulumi.All(o, i).ApplyT(func(vs []interface{}) AgentDefinitionIntegration {
+		return vs[0].([]AgentDefinitionIntegration)[vs[1].(int)]
+	}).(AgentDefinitionIntegrationOutput)
+}
+
 type ApprovalRuleConfig struct {
 	// Whether self-approval is allowed.
 	AllowSelfApproval bool `pulumi:"allowSelfApproval"`
@@ -5525,6 +5625,8 @@ func (o TemplateSourceDestinationPtrOutput) Url() pulumi.StringPtrOutput {
 func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*AWSOIDCConfigurationInput)(nil)).Elem(), AWSOIDCConfigurationArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*AWSOIDCConfigurationPtrInput)(nil)).Elem(), AWSOIDCConfigurationArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*AgentDefinitionIntegrationInput)(nil)).Elem(), AgentDefinitionIntegrationArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*AgentDefinitionIntegrationArrayInput)(nil)).Elem(), AgentDefinitionIntegrationArray{})
 	pulumi.RegisterInputType(reflect.TypeOf((*ApprovalRuleConfigInput)(nil)).Elem(), ApprovalRuleConfigArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*AuthPolicyDefinitionInput)(nil)).Elem(), AuthPolicyDefinitionArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*AuthPolicyDefinitionArrayInput)(nil)).Elem(), AuthPolicyDefinitionArray{})
@@ -5585,6 +5687,8 @@ func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*TemplateSourceDestinationPtrInput)(nil)).Elem(), TemplateSourceDestinationArgs{})
 	pulumi.RegisterOutputType(AWSOIDCConfigurationOutput{})
 	pulumi.RegisterOutputType(AWSOIDCConfigurationPtrOutput{})
+	pulumi.RegisterOutputType(AgentDefinitionIntegrationOutput{})
+	pulumi.RegisterOutputType(AgentDefinitionIntegrationArrayOutput{})
 	pulumi.RegisterOutputType(ApprovalRuleConfigOutput{})
 	pulumi.RegisterOutputType(AuthPolicyDefinitionOutput{})
 	pulumi.RegisterOutputType(AuthPolicyDefinitionArrayOutput{})

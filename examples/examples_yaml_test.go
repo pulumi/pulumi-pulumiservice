@@ -521,6 +521,22 @@ func TestYamlEnvironmentsExample(t *testing.T) {
 	})
 }
 
+func TestYamlAgentDefinitionExample(t *testing.T) {
+	test := pulumitest.NewPulumiTest(t,
+		filepath.Join(getCwd(t), "yaml-agent-definition"),
+		inMemoryProvider(),
+		opttest.UseAmbientBackend(),
+		opttest.StackName(randomStackName()),
+	)
+	test.SetConfig(t, "organizationName", getOrgName())
+	test.SetConfig(t, "agentName", "factory-issue-scout-"+generateRandomFiveDigits())
+	up := runPulumiTest(t, test)
+	agentID, ok := up.Outputs["agentId"].Value.(string)
+	require.True(t, ok)
+	_, err := uuid.Parse(agentID)
+	require.NoError(t, err, "the resource ID must be the durable definition UUID")
+}
+
 func TestYamlAgentPoolsExample(t *testing.T) {
 	cwd := getCwd(t)
 	digits := generateRandomFiveDigits()

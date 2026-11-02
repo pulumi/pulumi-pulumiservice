@@ -60,6 +60,12 @@ namespace Pulumi.PulumiService
         public Output<ImmutableArray<Outputs.PolicyGroupPolicyPackReference>> PolicyPacks { get; private set; } = null!;
 
         /// <summary>
+        /// A boolean expression over stack tags. Use the `matchRule` output from `buildStackMatchRule`. Matching stacks join the group alongside individually added stacks. Removing this input clears the rule. Requires the tag-based policy groups preview feature in Pulumi Cloud.
+        /// </summary>
+        [Output("stackMatchRule")]
+        public Output<ImmutableDictionary<string, object>?> StackMatchRule { get; private set; } = null!;
+
+        /// <summary>
         /// List of stack references that belong to this policy group.
         /// </summary>
         [Output("stacks")]
@@ -156,6 +162,18 @@ namespace Pulumi.PulumiService
         {
             get => _policyPacks ?? (_policyPacks = new InputList<Inputs.PolicyGroupPolicyPackReferenceInputArgs>());
             set => _policyPacks = value;
+        }
+
+        [Input("stackMatchRule")]
+        private InputMap<object>? _stackMatchRule;
+
+        /// <summary>
+        /// A boolean expression over stack tags. Use the `matchRule` output from `buildStackMatchRule`. Matching stacks join the group alongside individually added stacks. Removing this input clears the rule. Requires the tag-based policy groups preview feature in Pulumi Cloud.
+        /// </summary>
+        public InputMap<object> StackMatchRule
+        {
+            get => _stackMatchRule ?? (_stackMatchRule = new InputMap<object>());
+            set => _stackMatchRule = value;
         }
 
         [Input("stacks")]

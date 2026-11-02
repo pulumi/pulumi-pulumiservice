@@ -55,8 +55,10 @@ var policyGroupURN = urn.New("dev", "test", "", "pulumiservice:index:PolicyGroup
 // PolicyGroupClientMock records every batch it's sent.
 type PolicyGroupClientMock struct {
 	config.Client
-	getPolicyGroupFunc         func() (*pulumiapi.PolicyGroup, error)
-	createPolicyGroupFunc      func(ctx context.Context, orgName, policyGroupName, entityType, mode string) error
+	getPolicyGroupFunc    func() (*pulumiapi.PolicyGroup, error)
+	createPolicyGroupFunc func(
+		ctx context.Context, orgName, policyGroupName, entityType, mode string, stackMatchRule map[string]any,
+	) error
 	batchUpdatePolicyGroupFunc func(
 		ctx context.Context, orgName, policyGroupName string, reqs []pulumiapi.UpdatePolicyGroupRequest,
 	) error
@@ -73,10 +75,10 @@ func (c *PolicyGroupClientMock) GetPolicyGroup(context.Context, string, string) 
 }
 
 func (c *PolicyGroupClientMock) CreatePolicyGroup(
-	ctx context.Context, orgName, policyGroupName, entityType, mode string,
+	ctx context.Context, orgName, policyGroupName, entityType, mode string, stackMatchRule map[string]any,
 ) error {
 	if c.createPolicyGroupFunc != nil {
-		return c.createPolicyGroupFunc(ctx, orgName, policyGroupName, entityType, mode)
+		return c.createPolicyGroupFunc(ctx, orgName, policyGroupName, entityType, mode, stackMatchRule)
 	}
 	return nil
 }
@@ -633,7 +635,7 @@ func TestPolicyGroupCreate(t *testing.T) {
 	t.Run("creates empty policy group", func(t *testing.T) {
 		var created bool
 		client := &PolicyGroupClientMock{
-			createPolicyGroupFunc: func(_ context.Context, orgName, name, entityType, mode string) error {
+			createPolicyGroupFunc: func(_ context.Context, orgName, name, entityType, mode string, _ map[string]any) error {
 				created = true
 				assert.Equal(t, gcTestOrg, orgName)
 				assert.Equal(t, gcTestPolicyGroup, name)
@@ -679,7 +681,9 @@ func TestPolicyGroupCreate(t *testing.T) {
 	})
 
 	t.Run("doesn't call the API on preview", func(t *testing.T) {
-		client := &PolicyGroupClientMock{createPolicyGroupFunc: func(context.Context, string, string, string, string) error {
+		client := &PolicyGroupClientMock{createPolicyGroupFunc: func(
+			context.Context, string, string, string, string, map[string]any,
+		) error {
 			t.Fatal("CreatePolicyGroup called on preview")
 			return nil
 		}}
@@ -690,7 +694,9 @@ func TestPolicyGroupCreate(t *testing.T) {
 	})
 
 	t.Run("returns error from CreatePolicyGroup", func(t *testing.T) {
-		client := &PolicyGroupClientMock{createPolicyGroupFunc: func(context.Context, string, string, string, string) error {
+		client := &PolicyGroupClientMock{createPolicyGroupFunc: func(
+			context.Context, string, string, string, string, map[string]any,
+		) error {
 			return errors.New("create failed")
 		}}
 		_, err := create(client, newPolicyGroup().input(), false)

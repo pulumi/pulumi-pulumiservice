@@ -50,7 +50,7 @@ func TestCreatePolicyGroup_HappyPath(t *testing.T) {
 		ResponseBody:      nil,
 	})
 
-	err := c.CreatePolicyGroup(ctx, orgName, policyGroupName, entityType, mode)
+	err := c.CreatePolicyGroup(ctx, orgName, policyGroupName, entityType, mode, nil)
 	assert.NoError(t, err)
 }
 
@@ -75,7 +75,7 @@ func TestCreatePolicyGroup_AccountsPreventative(t *testing.T) {
 		ResponseBody:      nil,
 	})
 
-	err := c.CreatePolicyGroup(ctx, orgName, policyGroupName, entityType, mode)
+	err := c.CreatePolicyGroup(ctx, orgName, policyGroupName, entityType, mode, nil)
 	assert.NoError(t, err)
 }
 
@@ -83,7 +83,7 @@ func TestCreatePolicyGroup_AccountsPreventative(t *testing.T) {
 func TestCreatePolicyGroup_EmptyOrgName(t *testing.T) {
 	c := &Client{}
 
-	err := c.CreatePolicyGroup(ctx, "", "policy-group", "stacks", "audit")
+	err := c.CreatePolicyGroup(ctx, "", "policy-group", "stacks", "audit", nil)
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "orgName must not be empty")
 }
@@ -92,7 +92,7 @@ func TestCreatePolicyGroup_EmptyOrgName(t *testing.T) {
 func TestCreatePolicyGroup_EmptyPolicyGroupName(t *testing.T) {
 	c := &Client{}
 
-	err := c.CreatePolicyGroup(ctx, "test-org", "", "stacks", "audit")
+	err := c.CreatePolicyGroup(ctx, "test-org", "", "stacks", "audit", nil)
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "policyGroupName must not be empty")
 }
@@ -101,7 +101,7 @@ func TestCreatePolicyGroup_EmptyPolicyGroupName(t *testing.T) {
 func TestCreatePolicyGroup_EmptyEntityType(t *testing.T) {
 	c := &Client{}
 
-	err := c.CreatePolicyGroup(ctx, "test-org", "policy-group", "", "audit")
+	err := c.CreatePolicyGroup(ctx, "test-org", "policy-group", "", "audit", nil)
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "entityType must not be empty")
 }
@@ -110,7 +110,7 @@ func TestCreatePolicyGroup_EmptyEntityType(t *testing.T) {
 func TestCreatePolicyGroup_EmptyMode(t *testing.T) {
 	c := &Client{}
 
-	err := c.CreatePolicyGroup(ctx, "test-org", "policy-group", "stacks", "")
+	err := c.CreatePolicyGroup(ctx, "test-org", "policy-group", "stacks", "", nil)
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "mode must not be empty")
 }
@@ -138,7 +138,7 @@ func TestCreatePolicyGroup_APIError(t *testing.T) {
 		},
 	})
 
-	err := c.CreatePolicyGroup(ctx, orgName, policyGroupName, entityType, mode)
+	err := c.CreatePolicyGroup(ctx, orgName, policyGroupName, entityType, mode, nil)
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "failed to create policy group")
 	assert.Contains(t, err.Error(), "Invalid entity type")
@@ -167,7 +167,7 @@ func TestCreatePolicyGroup_Unauthorized(t *testing.T) {
 		},
 	})
 
-	err := c.CreatePolicyGroup(ctx, orgName, policyGroupName, entityType, mode)
+	err := c.CreatePolicyGroup(ctx, orgName, policyGroupName, entityType, mode, nil)
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "failed to create policy group")
 	assert.Contains(t, err.Error(), unauthorizedError)

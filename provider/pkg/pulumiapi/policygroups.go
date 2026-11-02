@@ -25,7 +25,9 @@ import (
 type PolicyGroupClient interface {
 	ListPolicyGroups(ctx context.Context, orgName string) ([]PolicyGroupSummary, error)
 	GetPolicyGroup(ctx context.Context, orgName string, policyGroupName string) (*PolicyGroup, error)
-	CreatePolicyGroup(ctx context.Context, orgName, policyGroupName, entityType, mode string) error
+	CreatePolicyGroup(
+		ctx context.Context, orgName, policyGroupName, entityType, mode string, stackMatchRule map[string]any,
+	) error
 	BatchUpdatePolicyGroup(ctx context.Context, orgName, policyGroupName string, reqs []UpdatePolicyGroupRequest) error
 	DeletePolicyGroup(ctx context.Context, orgName, policyGroupName string) error
 }
@@ -47,6 +49,7 @@ type PolicyGroup struct {
 	Stacks             []StackReference     `json:"stacks"`
 	AppliedPolicyPacks []PolicyPackMetadata `json:"appliedPolicyPacks"`
 	Accounts           []string             `json:"accounts"`
+	StackMatchRule     map[string]any       `json:"stackMatchRule,omitempty"`
 }
 
 type StackReference struct {
@@ -67,9 +70,10 @@ type listPolicyGroupsResponse struct {
 }
 
 type createPolicyGroupRequest struct {
-	Name       string `json:"name"`
-	EntityType string `json:"entityType"`
-	Mode       string `json:"mode"`
+	Name           string         `json:"name"`
+	EntityType     string         `json:"entityType"`
+	Mode           string         `json:"mode"`
+	StackMatchRule map[string]any `json:"stackMatchRule,omitempty"`
 }
 
 type InsightsAccountReference struct {
@@ -84,6 +88,8 @@ type UpdatePolicyGroupRequest struct {
 	RemovePolicyPack      *PolicyPackMetadata       `json:"removePolicyPack,omitempty"`
 	AddInsightsAccount    *InsightsAccountReference `json:"addInsightsAccount,omitempty"`
 	RemoveInsightsAccount *InsightsAccountReference `json:"removeInsightsAccount,omitempty"`
+	StackMatchRule        map[string]any            `json:"stackMatchRule,omitempty"`
+	RemoveStackMatchRule  bool                      `json:"removeStackMatchRule,omitempty"`
 }
 
 func (c *Client) ListPolicyGroups(ctx context.Context, orgName string) ([]PolicyGroupSummary, error) {
@@ -130,7 +136,9 @@ func (c *Client) GetPolicyGroup(ctx context.Context, orgName string, policyGroup
 // The entityType determines the scope of the policy group (either "stacks" or "accounts").
 // The mode determines how policy violations are handled: "audit" reports violations,
 // or "preventative" blocks operations that violate policies.
-func (c *Client) CreatePolicyGroup(ctx context.Context, orgName, policyGroupName, entityType, mode string) error {
+func (c *Client) CreatePolicyGroup(
+	ctx context.Context, orgName, policyGroupName, entityType, mode string, stackMatchRule map[string]any,
+) error {
 	if len(orgName) == 0 {
 		return errors.New("orgName must not be empty")
 	}
@@ -150,9 +158,10 @@ func (c *Client) CreatePolicyGroup(ctx context.Context, orgName, policyGroupName
 	apiPath := path.Join("orgs", orgName, "policygroups")
 
 	req := createPolicyGroupRequest{
-		Name:       policyGroupName,
-		EntityType: entityType,
-		Mode:       mode,
+		Name:           policyGroupName,
+		EntityType:     entityType,
+		Mode:           mode,
+		StackMatchRule: stackMatchRule,
 	}
 
 	_, err := c.do(ctx, http.MethodPost, apiPath, req, nil)
