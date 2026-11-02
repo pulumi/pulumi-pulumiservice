@@ -4,6 +4,7 @@
 package examples
 
 import (
+	"math/rand"
 	"path/filepath"
 	"testing"
 
@@ -142,7 +143,23 @@ func TestNodejsTemplateSourcesExample(t *testing.T) {
 		opttest.StackName(randomStackName()),
 	)
 	test.SetConfig(t, "digits", generateRandomFiveDigits())
+	test.SetConfig(t, "sourceURL", randomTemplateSourceURL())
 	runPulumiTest(t, test)
+}
+
+// templateSourceDirs are long-lived directories of this repository. Pulumi
+// Cloud allows only one template source per URL in an organization, so each
+// run picks one at random to avoid colliding with a concurrent run or with a
+// source that an earlier run left behind.
+var templateSourceDirs = []string{
+	"yaml-teams", "yaml-stack-tags", "yaml-access-tokens", "yaml-team-stack-permissions",
+	"yaml-webhooks", "yaml-team-token", "yaml-org-token", "yaml-deployment-settings",
+	"yaml-agent-pools", "yaml-schedules", "yaml-environments", "yaml-template-sources",
+}
+
+func randomTemplateSourceURL() string {
+	dir := templateSourceDirs[rand.Intn(len(templateSourceDirs))] //nolint:gosec // For testing.
+	return "https://github.com/pulumi/pulumi-pulumiservice/examples/" + dir
 }
 
 func TestNodejsEnvironmentsFileAssetExample(t *testing.T) {
