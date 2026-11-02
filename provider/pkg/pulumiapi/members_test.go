@@ -18,13 +18,14 @@ const (
 	testMemberRole     = adminRole
 	testMemberOrgName  = testDeploymentSettingsOrgName
 
-	rosterBackend  = "backend"
-	rosterFrontend = "frontend"
-	memberUserPath = "/api/orgs/an-organization/members/a-user"
-	orgRolesPath   = "/api/orgs/an-organization/roles"
-	membersPath    = "/api/orgs/an-organization/members"
-	bobUser        = "bob"
-	aliceUser      = "alice"
+	rosterBackend    = "backend"
+	rosterFrontend   = "frontend"
+	memberUserPath   = "/api/orgs/an-organization/members/a-user"
+	orgRolesPath     = "/api/orgs/an-organization/roles"
+	membersPath      = "/api/orgs/an-organization/members"
+	bobUser          = "bob"
+	aliceUser        = "alice"
+	maintainerRoleID = "maintainer-fga-id"
 )
 
 func TestAddMemberToOrg(t *testing.T) {
@@ -256,13 +257,13 @@ func TestUpdateOrgMemberRole(t *testing.T) {
 			Roles: []apitype.PermissionDescriptorRecord{
 				{
 					PermissionDescriptorBase: apitype.PermissionDescriptorBase{Name: "Maintainer"},
-					ID:                       "maintainer-fga-id",
+					ID:                       maintainerRoleID,
 					DefaultIdentifier:        "maintainer",
 					IsOrgDefault:             true,
 				},
 			},
 		}
-		maintainerID := "maintainer-fga-id"
+		maintainerID := maintainerRoleID
 		var patchBody []byte
 		c := startTestServerMulti(t, func(r *http.Request) (int, any) {
 			switch {
@@ -289,7 +290,7 @@ func TestUpdateOrgMemberRole(t *testing.T) {
 				Roles: []apitype.PermissionDescriptorRecord{
 					{
 						PermissionDescriptorBase: apitype.PermissionDescriptorBase{Name: "Maintainer"},
-						ID:                       "maintainer-fga-id",
+						ID:                       maintainerRoleID,
 						DefaultIdentifier:        "maintainer",
 						IsOrgDefault:             true,
 					},
@@ -306,7 +307,10 @@ func TestUpdateOrgMemberRole(t *testing.T) {
 			})
 
 			err := c.UpdateOrgMemberRole(ctx, orgName, userName, role, nil)
-			assert.EqualError(t, err, "failed to resolve built-in role "+strconv.Quote(role)+": built-in role "+strconv.Quote(role)+" not found in organization "+strconv.Quote(orgName))
+			expectedErr := "failed to resolve built-in role " + strconv.Quote(role) +
+				": built-in role " + strconv.Quote(role) +
+				" not found in organization " + strconv.Quote(orgName)
+			assert.EqualError(t, err, expectedErr)
 		})
 	}
 
