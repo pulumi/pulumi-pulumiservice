@@ -23,8 +23,10 @@ import (
 )
 
 const (
-	tokenValueKey = "tokenValue"
-	outputVal     = "output"
+	tokenValueKey    = "tokenValue"
+	outputVal        = "output"
+	triggerKey       = "trigger"
+	webhookSecretKey = "webhookSecret"
 )
 
 // TestBuildSchemaSucceeds catches drift between metadata and spec.json.
@@ -227,7 +229,8 @@ func TestDiscriminatorRequestVariantsAreExposedWithoutConditionalRequirements(t 
 	    "Thing": {"type": "object", "properties": {"id": {"type": "string"}}}
 	  }},
 	  "paths": {"/things/{orgName}": {"post": {
-	    "operationId": "CreateThing", "parameters": [{"name": "orgName", "in": "path", "required": true, "schema": {"type": "string"}}],
+	    "operationId": "CreateThing",
+	    "parameters": [{"name": "orgName", "in": "path", "required": true, "schema": {"type": "string"}}],
 	    "requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/CreateThing"}}}},
 	    "responses": {"200": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Thing"}}}}}
 	  }}}
@@ -242,7 +245,7 @@ func TestDiscriminatorRequestVariantsAreExposedWithoutConditionalRequirements(t 
 	if err != nil {
 		t.Fatal(err)
 	}
-	for _, name := range []string{"scheduleCron", "trigger"} {
+	for _, name := range []string{"scheduleCron", triggerKey} {
 		if _, ok := rs.InputProperties[name]; !ok {
 			t.Errorf("variant input %q is missing", name)
 		}
@@ -320,7 +323,7 @@ func TestAutoNameNotRequired(t *testing.T) {
 func TestLooksSecret(t *testing.T) {
 	cases := map[string]bool{
 		tokenValueKey:      true,
-		"webhookSecret":    true,
+		webhookSecretKey:   true,
 		passwordKey:        true,
 		"apiKey":           true,
 		"accessToken":      true,

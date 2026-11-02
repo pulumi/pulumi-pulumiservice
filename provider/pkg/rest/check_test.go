@@ -286,28 +286,28 @@ func TestPreserveEmitOnCreate(t *testing.T) {
 func TestPreserveEmitOnCreateKeys(t *testing.T) {
 	spec := syntheticSpec(t)
 	r := fooResource(spec, map[string]FieldMeta{
-		"trigger": {EmitOnCreateKeys: []string{"webhookSecret"}},
+		triggerKey: {EmitOnCreateKeys: []string{webhookSecretKey}},
 	}, "", false)
 	prior := property.NewMap(map[string]property.Value{
-		"trigger": property.New(property.NewMap(map[string]property.Value{
-			"webhookURL":    property.New("https://example.com/old"),
-			"webhookSecret": property.New("secret-from-create"),
+		triggerKey: property.New(property.NewMap(map[string]property.Value{
+			"webhookURL":     property.New("https://example.com/old"),
+			webhookSecretKey: property.New("secret-from-create"),
 		})).WithSecret(true),
 	})
 	fresh := property.NewMap(map[string]property.Value{
-		"trigger": property.New(property.NewMap(map[string]property.Value{
+		triggerKey: property.New(property.NewMap(map[string]property.Value{
 			"webhookURL": property.New("https://example.com/new"),
 		})),
 	})
 	merged := r.preserveEmitOnCreate(fresh, prior)
-	trigger, ok := merged.GetOk("trigger")
+	trigger, ok := merged.GetOk(triggerKey)
 	if !ok || !trigger.IsMap() {
 		t.Fatalf("trigger: got %v, want an object", trigger)
 	}
 	if !trigger.Secret() {
 		t.Errorf("trigger: secret marking was dropped")
 	}
-	if got, _ := trigger.AsMap().GetOk("webhookSecret"); got.AsString() != "secret-from-create" {
+	if got, _ := trigger.AsMap().GetOk(webhookSecretKey); got.AsString() != "secret-from-create" {
 		t.Errorf("webhookSecret: got %q, want \"secret-from-create\"", got.AsString())
 	}
 	if got, _ := trigger.AsMap().GetOk("webhookURL"); got.AsString() != "https://example.com/new" {
