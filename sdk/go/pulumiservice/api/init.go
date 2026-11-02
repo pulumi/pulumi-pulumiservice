@@ -21,6 +21,8 @@ func (m *module) Version() semver.Version {
 
 func (m *module) Construct(ctx *pulumi.Context, name, typ, urn string) (r pulumi.Resource, err error) {
 	switch typ {
+	case "pulumiservice:api:AgentAutomationV2":
+		r = &AgentAutomationV2{}
 	case "pulumiservice:api:AuditLogExportConfiguration":
 		r = &AuditLogExportConfiguration{}
 	case "pulumiservice:api:DefaultOrganization":

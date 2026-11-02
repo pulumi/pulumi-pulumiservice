@@ -48,7 +48,7 @@ func TestCreateRole(t *testing.T) {
 		}
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPost,
-			ExpectedReqPath:   "/api/orgs/an-organization/roles",
+			ExpectedReqPath:   orgRolesPath,
 			ExpectedReqBody: apitype.PermissionDescriptorBase{
 				Name:         readOnlyRoleName,
 				Description:  readOnlyDescription,

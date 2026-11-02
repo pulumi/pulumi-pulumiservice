@@ -20,6 +20,7 @@ const (
 	rosterBackend  = "backend"
 	rosterFrontend = "frontend"
 	memberUserPath = "/api/orgs/an-organization/members/a-user"
+	orgRolesPath   = "/api/orgs/an-organization/roles"
 	membersPath    = "/api/orgs/an-organization/members"
 	bobUser        = "bob"
 	aliceUser      = "alice"
@@ -231,7 +232,7 @@ func TestUpdateOrgMemberRole(t *testing.T) {
 		var patchBody []byte
 		c := startTestServerMulti(t, func(r *http.Request) (int, any) {
 			switch {
-			case r.Method == http.MethodGet && r.URL.Path == "/api/orgs/an-organization/roles":
+			case r.Method == http.MethodGet && r.URL.Path == orgRolesPath:
 				assert.Equal(t, "role", r.URL.Query().Get("uxPurpose"))
 				return 200, roles
 			case r.Method == http.MethodPatch && r.URL.Path == memberUserPath:
@@ -244,6 +245,38 @@ func TestUpdateOrgMemberRole(t *testing.T) {
 		})
 		assert.NoError(t, c.UpdateOrgMemberRole(ctx, orgName, userName, adminRole, nil))
 		expected, _ := json.Marshal(updateMemberRoleReq{FGARoleID: &adminID})
+		assert.JSONEq(t, string(expected), string(patchBody))
+	})
+
+	t.Run("member falls back to the org default role when not listed", func(t *testing.T) {
+		roles := struct {
+			Roles []apitype.PermissionDescriptorRecord `json:"roles"`
+		}{
+			Roles: []apitype.PermissionDescriptorRecord{
+				{
+					PermissionDescriptorBase: apitype.PermissionDescriptorBase{Name: "Maintainer"},
+					ID:                       "maintainer-fga-id",
+					DefaultIdentifier:        "maintainer",
+					IsOrgDefault:             true,
+				},
+			},
+		}
+		maintainerID := "maintainer-fga-id"
+		var patchBody []byte
+		c := startTestServerMulti(t, func(r *http.Request) (int, any) {
+			switch {
+			case r.Method == http.MethodGet && r.URL.Path == orgRolesPath:
+				return 200, roles
+			case r.Method == http.MethodPatch && r.URL.Path == memberUserPath:
+				patchBody, _ = io.ReadAll(r.Body)
+				return 204, nil
+			default:
+				t.Fatalf("unexpected request: %s %s", r.Method, r.URL.Path)
+				return 500, nil
+			}
+		})
+		assert.NoError(t, c.UpdateOrgMemberRole(ctx, orgName, userName, memberRole, nil))
+		expected, _ := json.Marshal(updateMemberRoleReq{FGARoleID: &maintainerID})
 		assert.JSONEq(t, string(expected), string(patchBody))
 	})
 
