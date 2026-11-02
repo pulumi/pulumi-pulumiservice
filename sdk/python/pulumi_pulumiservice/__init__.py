@@ -75,6 +75,7 @@ _utilities.register(
   "mod": "api",
   "fqn": "pulumi_pulumiservice.api",
   "classes": {
+   "pulumiservice:api:AgentAutomationV2": "AgentAutomationV2",
    "pulumiservice:api:AuditLogExportConfiguration": "AuditLogExportConfiguration",
    "pulumiservice:api:DefaultOrganization": "DefaultOrganization",
    "pulumiservice:api:Gate": "Gate",
@@ -92,6 +93,7 @@ _utilities.register(
   "mod": "api/agents",
   "fqn": "pulumi_pulumiservice.api.agents",
   "classes": {
+   "pulumiservice:api/agents:Definition": "Definition",
    "pulumiservice:api/agents:Pool": "Pool",
    "pulumiservice:api/agents:Task": "Task"
   }

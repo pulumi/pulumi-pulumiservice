@@ -21,6 +21,8 @@
     "files": [
         "accessToken.ts",
         "agentPool.ts",
+        "api/agentAutomationV2.ts",
+        "api/agents/definition.ts",
         "api/agents/index.ts",
         "api/agents/pool.ts",
         "api/agents/task.ts",
