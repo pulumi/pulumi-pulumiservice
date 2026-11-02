@@ -232,6 +232,15 @@ func (c *Client) ResolveBuiltInRoleID(ctx context.Context, orgName, builtInRole 
 			return r.ID, nil
 		}
 	}
+	// Orgs migrated to the Reader/Builder/Maintainer roles no longer list
+	// "member"; the org's default role is what a new member receives.
+	if builtInRole == memberRole {
+		for _, r := range roles {
+			if r.IsOrgDefault {
+				return r.ID, nil
+			}
+		}
+	}
 	return "", fmt.Errorf("built-in role %q not found in organization %q", builtInRole, orgName)
 }
 
