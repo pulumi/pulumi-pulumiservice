@@ -59,25 +59,13 @@ const (
 //go:embed README.md
 var readme string
 
-type PulumiServiceResource interface {
-	Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error)
-	Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error)
-	Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error)
-	Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error)
-	Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error)
-	Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error)
-	Name() string
-}
-
 type pulumiserviceProvider struct {
 	pulumirpc.UnimplementedResourceProviderServer
 
-	host            *provider.HostClient
-	name            string
-	version         string
-	schema          string
-	pulumiResources []PulumiServiceResource
-	AccessToken     string
+	host    *provider.HostClient
+	name    string
+	version string
+	schema  string
 	// transportRef is the per-provider api transport, populated during
 	// Configure and consumed by the ctxmw.Wrap layer to attach this
 	// provider's transport to every CRUD context — keeps multi-provider
@@ -466,61 +454,42 @@ func (k *pulumiserviceProvider) Invoke(
 	return nil, fmt.Errorf("unknown Invoke token '%s'", req.GetTok())
 }
 
-// Check validates that the given property bag is valid for a resource of the given type and returns
-// the inputs that should be passed to successive calls to Diff, Create, or Update for this
-// resource. As a rule, the provider inputs returned by a call to Check should preserve the original
-// representation of the properties as present in the program inputs. Though this rule is not
-// required for correctness, violations thereof can negatively impact the end-user experience, as
-// the provider inputs are using for detecting and rendering diffs.
+// The CRUD methods reject every resource type: all resources are served by
+// infer or by the api layer, which handle them before the request reaches this
+// server.
+
 func (k *pulumiserviceProvider) Check(
-	_ context.Context,
-	req *pulumirpc.CheckRequest,
+	_ context.Context, req *pulumirpc.CheckRequest,
 ) (*pulumirpc.CheckResponse, error) {
-	rn := getResourceNameFromRequest(req)
-	res := k.getPulumiServiceResource(rn)
-	return res.Check(req)
+	return nil, unknownResource(req.GetUrn())
 }
 
-// Diff checks what impacts a hypothetical update will have on the resource's properties.
 func (k *pulumiserviceProvider) Diff(_ context.Context, req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-	rn := getResourceNameFromRequest(req)
-	res := k.getPulumiServiceResource(rn)
-	return res.Diff(req)
+	return nil, unknownResource(req.GetUrn())
 }
 
-// Create allocates a new instance of the provided resource and returns its unique ID afterwards.
 func (k *pulumiserviceProvider) Create(
-	_ context.Context,
-	req *pulumirpc.CreateRequest,
+	_ context.Context, req *pulumirpc.CreateRequest,
 ) (*pulumirpc.CreateResponse, error) {
-	rn := getResourceNameFromRequest(req)
-	res := k.getPulumiServiceResource(rn)
-	return res.Create(req)
+	return nil, unknownResource(req.GetUrn())
 }
 
-// Read the current live state associated with a resource.
 func (k *pulumiserviceProvider) Read(_ context.Context, req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
-	rn := getResourceNameFromRequest(req)
-	res := k.getPulumiServiceResource(rn)
-	return res.Read(req)
+	return nil, unknownResource(req.GetUrn())
 }
 
-// Update updates an existing resource with new values.
 func (k *pulumiserviceProvider) Update(
-	_ context.Context,
-	req *pulumirpc.UpdateRequest,
+	_ context.Context, req *pulumirpc.UpdateRequest,
 ) (*pulumirpc.UpdateResponse, error) {
-	rn := getResourceNameFromRequest(req)
-	res := k.getPulumiServiceResource(rn)
-	return res.Update(req)
+	return nil, unknownResource(req.GetUrn())
 }
 
-// Delete tears down an existing resource with the given ID.  If it fails, the resource is assumed
-// to still exist.
 func (k *pulumiserviceProvider) Delete(_ context.Context, req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
-	rn := getResourceNameFromRequest(req)
-	res := k.getPulumiServiceResource(rn)
-	return res.Delete(req)
+	return nil, unknownResource(req.GetUrn())
+}
+
+func unknownResource(urn string) error {
+	return fmt.Errorf("unknown resource type '%s'", resource.URN(urn).Type())
 }
 
 // GetPluginInfo returns generic information about this plugin, like its version.
@@ -550,21 +519,6 @@ func (k *pulumiserviceProvider) Cancel(_ context.Context, _ *pbempty.Empty) (*pb
 	return &pbempty.Empty{}, nil
 }
 
-func (k *pulumiserviceProvider) getPulumiServiceResource(name string) PulumiServiceResource {
-	for _, r := range k.pulumiResources {
-		if r.Name() == name {
-			return r
-		}
-	}
-
-	return &PulumiServiceUnknownResource{}
-}
-
-func getResourceNameFromRequest(req ResourceBase) string {
-	urn := resource.URN(req.GetUrn())
-	return urn.Type().String()
-}
-
 // baseSchema is the schema the raw gRPC server serves: only the package name
 // and version. infer and withCloudApiSchema add everything else.
 func baseSchema(name, version string) string {
@@ -573,8 +527,4 @@ func baseSchema(name, version string) string {
 		panic(fmt.Errorf("failed to serialize base schema: %w", err))
 	}
 	return string(bytes)
-}
-
-type ResourceBase interface {
-	GetUrn() string
 }

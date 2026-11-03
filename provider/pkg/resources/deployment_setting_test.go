@@ -16,7 +16,6 @@ import (
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
-	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 )
 
 type getDeploymentSettingsFunc func() (*pulumiapi.DeploymentSettings, error)
@@ -160,6 +159,16 @@ func decodeSettings(t *testing.T, props resource.PropertyMap) PulumiServiceDeplo
 	decoded, err := decodeDeploymentSettingsInput(props)
 	require.NoError(t, err)
 	return decoded
+}
+
+func secretOrString(prop resource.PropertyValue) string {
+	if prop.IsSecret() {
+		return prop.SecretValue().Element.StringValue()
+	}
+	if prop.IsNull() {
+		return ""
+	}
+	return prop.StringValue()
 }
 
 // assertSecret asserts that prop is a secret wrapping the given plaintext.
@@ -351,7 +360,7 @@ func TestDeploymentSettingsBasicAuthRefresh(t *testing.T) {
 	assertSecret(t, inputs[gcPassword], "hunter2")
 
 	outputs := basicAuthPropertyMap(t, input.ToPropertyMap(&plaintextInputs, &priorState, false))
-	assert.Equal(t, testRedactedSecret, util.GetSecretOrStringValue(outputs[gcUsername]),
+	assert.Equal(t, testRedactedSecret, secretOrString(outputs[gcUsername]),
 		"outputs hold what the service returned, not the plaintext")
 }
 
@@ -482,11 +491,11 @@ func TestDeploymentSettingsExecutorImageCredentialsRefresh(t *testing.T) {
 	input := PulumiServiceDeploymentSettingsInput{DeploymentSettings: fromAPI}
 
 	inputs := credentialsPropertyMap(t, input.ToPropertyMap(&plaintextInputs, &priorState, true))
-	assert.Equal(t, testRegistryPassword, util.GetSecretOrStringValue(inputs["password"]),
+	assert.Equal(t, testRegistryPassword, secretOrString(inputs["password"]),
 		"refresh must preserve the plaintext password from prior inputs")
 
 	outputs := credentialsPropertyMap(t, input.ToPropertyMap(&plaintextInputs, &priorState, false))
-	assert.Equal(t, testRedactedSecret, util.GetSecretOrStringValue(outputs["password"]),
+	assert.Equal(t, testRedactedSecret, secretOrString(outputs["password"]),
 		"outputs hold what the service returned, not the plaintext")
 }
 
@@ -500,7 +509,7 @@ func TestDeploymentSettingsExecutorImageCredentialsRefreshWithoutPriorState(t *t
 	input := PulumiServiceDeploymentSettingsInput{DeploymentSettings: fromAPI}
 
 	inputs := credentialsPropertyMap(t, input.ToPropertyMap(&plaintextInputs, &priorState, true))
-	assert.Equal(t, "", util.GetSecretOrStringValue(inputs["password"]))
+	assert.Equal(t, "", secretOrString(inputs["password"]))
 }
 
 // Import has no inputs at all, so the password is replaced with the placeholder
@@ -510,8 +519,8 @@ func TestDeploymentSettingsExecutorImageCredentialsImport(t *testing.T) {
 	input := PulumiServiceDeploymentSettingsInput{DeploymentSettings: settings}
 
 	inputs := credentialsPropertyMap(t, input.ToPropertyMap(nil, nil, true))
-	assert.Equal(t, "<REPLACE WITH ACTUAL SECRET VALUE>", util.GetSecretOrStringValue(inputs["password"]))
-	assert.Equal(t, "registry-user", util.GetSecretOrStringValue(inputs["username"]))
+	assert.Equal(t, "<REPLACE WITH ACTUAL SECRET VALUE>", secretOrString(inputs["password"]))
+	assert.Equal(t, "registry-user", secretOrString(inputs["username"]))
 }
 
 func TestDeploymentSettingsVcsRoundtrip(t *testing.T) {
