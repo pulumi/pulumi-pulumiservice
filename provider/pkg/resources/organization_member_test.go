@@ -21,6 +21,8 @@ const (
 	gcAlice     = "alice"
 	gcBob       = "bob"
 
+	gcBuilder    = "builder"
+	gcReader     = "reader"
 	gcBuilderCap = "Builder"
 	gcBuilderID  = "builder-role-id"
 )
@@ -239,7 +241,7 @@ func TestOrganizationMemberRead(t *testing.T) {
 			{
 				PermissionDescriptorBase: apitype.PermissionDescriptorBase{Name: gcBuilderCap},
 				ID:                       gcBuilderID,
-				DefaultIdentifier:        "builder",
+				DefaultIdentifier:        gcBuilder,
 				IsOrgDefault:             true,
 			},
 		}, nil
@@ -310,7 +312,7 @@ func TestOrganizationMemberRead(t *testing.T) {
 					{
 						PermissionDescriptorBase: apitype.PermissionDescriptorBase{Name: gcBuilderCap},
 						ID:                       gcBuilderID,
-						DefaultIdentifier:        "builder",
+						DefaultIdentifier:        gcBuilder,
 						IsOrgDefault:             true,
 					},
 				}, nil
@@ -409,12 +411,12 @@ func TestOrganizationMemberCreate(t *testing.T) {
 				return []apitype.PermissionDescriptorRecord{{
 					PermissionDescriptorBase: apitype.PermissionDescriptorBase{Name: "Reader"},
 					ID:                       "reader-id",
-					DefaultIdentifier:        "reader",
+					DefaultIdentifier:        gcReader,
 				}}, nil
 			},
 		}
 		ctx := config.WithMockClient(context.Background(), mock)
-		role := "reader"
+		role := gcReader
 
 		r := &OrganizationMember{}
 		resp, err := r.Create(ctx, infer.CreateRequest[OrganizationMemberInput]{
@@ -424,9 +426,9 @@ func TestOrganizationMemberCreate(t *testing.T) {
 		})
 		assert.NoError(t, err)
 		assert.Equal(t, defaultOrgMemberRole, addedAs)
-		assert.Equal(t, "reader", patchedTo)
+		assert.Equal(t, gcReader, patchedTo)
 		if assert.NotNil(t, resp.Output.Role) {
-			assert.Equal(t, "reader", *resp.Output.Role)
+			assert.Equal(t, gcReader, *resp.Output.Role)
 		}
 	})
 
@@ -629,7 +631,7 @@ func TestOrganizationMemberReadPreservesAdopted(t *testing.T) {
 
 func TestOrganizationMemberCheckAcceptsStoredDefaultRoles(t *testing.T) {
 	r := &OrganizationMember{}
-	for _, role := range []string{"reader", "builder", "maintainer"} {
+	for _, role := range []string{gcReader, gcBuilder, "maintainer"} {
 		resp, err := r.Check(context.Background(), infer.CheckRequest{
 			NewInputs: property.NewMap(map[string]property.Value{
 				gcOrganizationName: property.New(gcAcme),
