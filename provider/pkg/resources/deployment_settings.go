@@ -433,30 +433,6 @@ type PulumiServiceDeploymentSettingsResource struct {
 	Client pulumiapi.DeploymentSettingsClient
 }
 
-func (ds *PulumiServiceDeploymentSettingsResource) ToPulumiServiceDeploymentSettingsInput(
-	inputMap resource.PropertyMap,
-) PulumiServiceDeploymentSettingsInput {
-	input := PulumiServiceDeploymentSettingsInput{}
-
-	input.Stack.OrgName = util.GetSecretOrStringValue(inputMap[gcOrganization])
-	input.Stack.ProjectName = util.GetSecretOrStringValue(inputMap[gcProject])
-	input.Stack.StackName = util.GetSecretOrStringValue(inputMap[gcStack])
-
-	if inputMap["agentPoolId"].HasValue() {
-		value := util.GetSecretOrStringValue(inputMap["agentPoolId"])
-		input.AgentPoolID = &value
-	}
-
-	input.Executor = toExecutorContext(inputMap)
-	input.GitHub = toGitHubConfig(inputMap)
-	input.SourceContext = toSourceContext(inputMap)
-	input.Operation = toOperationContext(inputMap)
-	input.CacheOptions = toCacheOptions(inputMap)
-	input.Vcs = toVCSConfig(inputMap)
-
-	return input
-}
-
 // executorImageCredentials walks the executor image credentials out of a settings
 // struct, tolerating a nil at any level of the chain.
 func executorImageCredentials(settings *pulumiapi.DeploymentSettings) *pulumiapi.DockerImageCredentials {
@@ -464,394 +440,6 @@ func executorImageCredentials(settings *pulumiapi.DeploymentSettings) *pulumiapi
 		return nil
 	}
 	return settings.Executor.ExecutorImage.Credentials
-}
-
-func toExecutorContext(inputMap resource.PropertyMap) *pulumiapi.ExecutorContext {
-	if !inputMap["executorContext"].HasValue() {
-		return nil
-	}
-
-	ecInput := util.GetSecretOrObjectValue(inputMap["executorContext"])
-	var ec pulumiapi.ExecutorContext
-
-	if ecInput["executorImage"].HasValue() {
-		ec.ExecutorImage = &pulumiapi.DockerImage{
-			Reference: util.GetSecretOrStringValue(ecInput["executorImage"]),
-		}
-
-		if ecInput["credentials"].HasValue() {
-			credentialsInput := util.GetSecretOrObjectValue(ecInput["credentials"])
-			var credentials pulumiapi.DockerImageCredentials
-
-			if credentialsInput["username"].HasValue() {
-				credentials.Username = util.GetSecretOrStringValue(credentialsInput["username"])
-			}
-			if credentialsInput["password"].HasValue() {
-				// Secret must be set, otherwise Pulumi Cloud stores the password
-				// in plaintext: it only encrypts SecretValues flagged as secret.
-				credentials.Password = pulumiapi.SecretValue{
-					Secret: true,
-					Value:  util.GetSecretOrStringValue(credentialsInput["password"]),
-				}
-			}
-
-			ec.ExecutorImage.Credentials = &credentials
-		}
-	}
-
-	return &ec
-}
-
-func toGitHubConfig(inputMap resource.PropertyMap) *pulumiapi.DeploymentSettingsGitHub {
-	if !inputMap["github"].HasValue() {
-		return nil
-	}
-
-	githubInput := util.GetSecretOrObjectValue(inputMap["github"])
-	var github pulumiapi.DeploymentSettingsGitHub
-
-	if githubInput["repository"].HasValue() {
-		github.Repository = util.GetSecretOrStringValue(githubInput["repository"])
-	}
-
-	if githubInput["deployCommits"].HasValue() {
-		github.DeployCommits = util.GetSecretOrBoolValue(githubInput["deployCommits"])
-	}
-	if githubInput["previewPullRequests"].HasValue() {
-		github.PreviewPullRequests = util.GetSecretOrBoolValue(githubInput["previewPullRequests"])
-	}
-	if githubInput["pullRequestTemplate"].HasValue() {
-		github.PullRequestTemplate = util.GetSecretOrBoolValue(githubInput["pullRequestTemplate"])
-	}
-	if githubInput["paths"].HasValue() {
-		pathsInput := util.GetSecretOrArrayValue(githubInput["paths"])
-		paths := make([]string, len(pathsInput))
-
-		for i, v := range pathsInput {
-			paths[i] = util.GetSecretOrStringValue(v)
-		}
-
-		github.Paths = paths
-	}
-	if githubInput["deployTags"].HasValue() {
-		github.DeployTags = util.GetSecretOrBoolValue(githubInput["deployTags"])
-	}
-	if githubInput["tagFilters"].HasValue() {
-		tagFiltersInput := util.GetSecretOrArrayValue(githubInput["tagFilters"])
-		tagFilters := make([]string, len(tagFiltersInput))
-
-		for i, v := range tagFiltersInput {
-			tagFilters[i] = util.GetSecretOrStringValue(v)
-		}
-
-		github.TagFilters = tagFilters
-	}
-
-	return &github
-}
-
-func toVCSConfig(inputMap resource.PropertyMap) pulumiapi.DeploymentSettingsVCS {
-	if !inputMap["vcs"].HasValue() {
-		return nil
-	}
-
-	vcsInput := util.GetSecretOrObjectValue(inputMap["vcs"])
-	var vcs pulumiapi.DeploymentSettingsVCS
-
-	if !vcsInput["provider"].HasValue() {
-		return nil
-	}
-	switch util.GetSecretOrStringValue(vcsInput["provider"]) {
-	case "azure_devops":
-		vcs = pulumiapi.DeploymentSettingsVCSAzureDevOpsBuilder{}.Build()
-
-	case "bitbucket":
-		vcs = pulumiapi.DeploymentSettingsVCSBitbucketBuilder{}.Build()
-
-	case "custom":
-		vcs = pulumiapi.DeploymentSettingsVCSCustomBuilder{}.Build()
-
-	case "github":
-		vcs = pulumiapi.DeploymentSettingsVCSGitHubBuilder{}.Build()
-
-	case "gitlab":
-		vcs = pulumiapi.DeploymentSettingsVCSGitLabBuilder{}.Build()
-
-	default:
-		return nil
-	}
-
-	if vcsInput["repository"].HasValue() {
-		_ = vcs.SetRepository(util.GetSecretOrStringValue(vcsInput["repository"]))
-	}
-	if vcsInput["installationId"].HasValue() {
-		_ = vcs.SetInstallationID(util.GetSecretOrStringValue(vcsInput["installationId"]))
-	}
-	if vcsInput["deployCommits"].HasValue() {
-		_ = vcs.SetDeployCommits(util.GetSecretOrBoolValue(vcsInput["deployCommits"]))
-	}
-	if vcsInput["previewPullRequests"].HasValue() {
-		_ = vcs.SetPreviewPullRequests(util.GetSecretOrBoolValue(vcsInput["previewPullRequests"]))
-	}
-	if vcsInput["pullRequestTemplate"].HasValue() {
-		_ = vcs.SetPullRequestTemplate(util.GetSecretOrBoolValue(vcsInput["pullRequestTemplate"]))
-	}
-	if vcsInput["paths"].HasValue() {
-		pathsInput := util.GetSecretOrArrayValue(vcsInput["paths"])
-		paths := make([]string, len(pathsInput))
-		for i, v := range pathsInput {
-			paths[i] = util.GetSecretOrStringValue(v)
-		}
-		_ = vcs.SetPaths(paths)
-	}
-	if vcsInput["deployTags"].HasValue() {
-		_ = vcs.SetDeployTags(util.GetSecretOrBoolValue(vcsInput["deployTags"]))
-	}
-	if vcsInput["tagFilters"].HasValue() {
-		tagFiltersInput := util.GetSecretOrArrayValue(vcsInput["tagFilters"])
-		tagFilters := make([]string, len(tagFiltersInput))
-		for i, v := range tagFiltersInput {
-			tagFilters[i] = util.GetSecretOrStringValue(v)
-		}
-		_ = vcs.SetTagFilters(tagFilters)
-	}
-	if vcsInput["deployPullRequest"].HasValue() {
-		val := int64(util.GetSecretOrNumberValue(vcsInput["deployPullRequest"]))
-		_ = vcs.SetDeployPullRequest(&val)
-	}
-
-	return vcs
-}
-
-func toSourceContext(inputMap resource.PropertyMap) *pulumiapi.SourceContext {
-	if !inputMap["sourceContext"].HasValue() {
-		return nil
-	}
-
-	scInput := util.GetSecretOrObjectValue(inputMap["sourceContext"])
-	var sc pulumiapi.SourceContext
-
-	if scInput["git"].HasValue() {
-		gitInput := util.GetSecretOrObjectValue(scInput["git"])
-		var g pulumiapi.SourceContextGit
-
-		if gitInput["repoUrl"].HasValue() {
-			g.RepoURL = util.GetSecretOrStringValue(gitInput["repoUrl"])
-		}
-		if gitInput["branch"].HasValue() {
-			g.Branch = util.GetSecretOrStringValue(gitInput["branch"])
-		}
-		if gitInput["commit"].HasValue() {
-			g.Commit = util.GetSecretOrStringValue(gitInput["commit"])
-		}
-		if gitInput["repoDir"].HasValue() {
-			g.RepoDir = util.GetSecretOrStringValue(gitInput["repoDir"])
-		}
-
-		if gitInput["gitAuth"].HasValue() {
-			authInput := util.GetSecretOrObjectValue(gitInput["gitAuth"])
-			var a pulumiapi.GitAuthConfig
-
-			if authInput["sshAuth"].HasValue() {
-				sshInput := util.GetSecretOrObjectValue(authInput["sshAuth"])
-				var s pulumiapi.SSHAuth
-
-				if sshInput["sshPrivateKey"].HasValue() || sshInput["sshPrivateKeyCipher"].HasValue() {
-					s.SSHPrivateKey = pulumiapi.SecretValue{
-						Secret: true,
-						Value:  util.GetSecretOrStringValue(sshInput["sshPrivateKey"]),
-					}
-				}
-				if sshInput["password"].HasValue() || sshInput["passwordCipher"].HasValue() {
-					s.Password = &pulumiapi.SecretValue{
-						Secret: true,
-						Value:  util.GetSecretOrStringValue(sshInput["password"]),
-					}
-				}
-
-				a.SSHAuth = &s
-			}
-
-			if authInput["basicAuth"].HasValue() {
-				basicInput := util.GetSecretOrObjectValue(authInput["basicAuth"])
-				var b pulumiapi.BasicAuth
-
-				if basicInput["username"].HasValue() || basicInput["usernameCipher"].HasValue() {
-					// Secret must be set, otherwise Pulumi Cloud stores the value in
-					// plaintext: it only encrypts SecretValues flagged as secret.
-					b.UserName = pulumiapi.SecretValue{
-						Value:  util.GetSecretOrStringValue(basicInput["username"]),
-						Secret: true,
-					}
-				}
-				if basicInput["password"].HasValue() || basicInput["passwordCipher"].HasValue() {
-					b.Password = pulumiapi.SecretValue{
-						Value:  util.GetSecretOrStringValue(basicInput["password"]),
-						Secret: true,
-					}
-				}
-
-				a.BasicAuth = &b
-			}
-
-			g.GitAuth = &a
-		}
-
-		sc.Git = &g
-	}
-
-	return &sc
-}
-
-func toOperationContext(inputMap resource.PropertyMap) *pulumiapi.OperationContext {
-	if !inputMap["operationContext"].HasValue() {
-		return nil
-	}
-
-	ocInput := util.GetSecretOrObjectValue(inputMap["operationContext"])
-	cascadeSecret := inputMap["operationContext"].IsSecret()
-	var oc pulumiapi.OperationContext
-
-	if ocInput["environmentVariables"].HasValue() {
-		ev := map[string]pulumiapi.SecretValue{}
-		evInput := util.GetSecretOrObjectValue(ocInput["environmentVariables"])
-		cascadeSecret = cascadeSecret || ocInput["environmentVariables"].IsSecret()
-
-		for k, v := range evInput {
-			value := util.GetSecretOrStringValue(v)
-			ev[string(k)] = pulumiapi.SecretValue{Secret: v.IsSecret() || cascadeSecret, Value: value}
-		}
-
-		oc.EnvironmentVariables = ev
-	}
-
-	if ocInput["preRunCommands"].HasValue() {
-		pcInput := util.GetSecretOrArrayValue(ocInput["preRunCommands"])
-		pc := make([]string, len(pcInput))
-
-		for i, v := range pcInput {
-			pc[i] = util.GetSecretOrStringValue(v)
-		}
-
-		oc.PreRunCommands = pc
-	}
-
-	if ocInput["options"].HasValue() {
-		oInput := util.GetSecretOrObjectValue(ocInput["options"])
-		var o pulumiapi.OperationContextOptions
-
-		if oInput["skipInstallDependencies"].HasValue() {
-			o.SkipInstallDependencies = util.GetSecretOrBoolValue(oInput["skipInstallDependencies"])
-		}
-
-		if oInput["skipIntermediateDeployments"].HasValue() {
-			o.SkipIntermediateDeployments = util.GetSecretOrBoolValue(oInput["skipIntermediateDeployments"])
-		}
-
-		if oInput["Shell"].HasValue() {
-			o.Shell = util.GetSecretOrStringValue(oInput["Shell"])
-		}
-
-		if oInput["deleteAfterDestroy"].HasValue() {
-			o.DeleteAfterDestroy = util.GetSecretOrBoolValue(oInput["deleteAfterDestroy"])
-		}
-
-		oc.Options = &o
-	}
-
-	if ocInput["oidc"].HasValue() {
-		oidcInput := util.GetSecretOrObjectValue(ocInput["oidc"])
-		var oidc pulumiapi.OperationContextOIDCConfiguration
-
-		if oidcInput[gcAWS].HasValue() {
-			awsInput := util.GetSecretOrObjectValue(oidcInput[gcAWS])
-			var aws pulumiapi.OperationContextAWSOIDCConfiguration
-
-			if awsInput["roleARN"].HasValue() {
-				aws.RoleARN = util.GetSecretOrStringValue(awsInput["roleARN"])
-			}
-			if awsInput["duration"].HasValue() {
-				aws.Duration = util.GetSecretOrStringValue(awsInput["duration"])
-			}
-			if awsInput["sessionName"].HasValue() {
-				aws.SessionName = util.GetSecretOrStringValue(awsInput["sessionName"])
-			}
-			if awsInput["policyARNs"].HasValue() {
-				policyARNsInput := util.GetSecretOrArrayValue(awsInput["policyARNs"])
-				policyARNs := make([]string, len(policyARNsInput))
-
-				for i, v := range policyARNsInput {
-					policyARNs[i] = util.GetSecretOrStringValue(v)
-				}
-
-				aws.PolicyARNs = policyARNs
-			}
-
-			oidc.AWS = &aws
-		}
-
-		if oidcInput["gcp"].HasValue() {
-			gcpInput := util.GetSecretOrObjectValue(oidcInput["gcp"])
-			var gcp pulumiapi.OperationContextGCPOIDCConfiguration
-
-			if gcpInput["projectId"].HasValue() {
-				gcp.ProjectID = util.GetSecretOrStringValue(gcpInput["projectId"])
-			}
-			if gcpInput["region"].HasValue() {
-				gcp.Region = util.GetSecretOrStringValue(gcpInput["region"])
-			}
-			if gcpInput["workloadPoolId"].HasValue() {
-				gcp.WorkloadPoolID = util.GetSecretOrStringValue(gcpInput["workloadPoolId"])
-			}
-			if gcpInput["providerId"].HasValue() {
-				gcp.ProviderID = util.GetSecretOrStringValue(gcpInput["providerId"])
-			}
-			if gcpInput["serviceAccount"].HasValue() {
-				gcp.ServiceAccount = util.GetSecretOrStringValue(gcpInput["serviceAccount"])
-			}
-			if gcpInput["tokenLifetime"].HasValue() {
-				gcp.TokenLifetime = util.GetSecretOrStringValue(gcpInput["tokenLifetime"])
-			}
-
-			oidc.GCP = &gcp
-		}
-
-		if oidcInput["azure"].HasValue() {
-			azureInput := util.GetSecretOrObjectValue(oidcInput["azure"])
-			var azure pulumiapi.OperationContextAzureOIDCConfiguration
-
-			if azureInput["tenantId"].HasValue() {
-				azure.TenantID = util.GetSecretOrStringValue(azureInput["tenantId"])
-			}
-			if azureInput["clientId"].HasValue() {
-				azure.ClientID = util.GetSecretOrStringValue(azureInput["clientId"])
-			}
-			if azureInput["subscriptionId"].HasValue() {
-				azure.SubscriptionID = util.GetSecretOrStringValue(azureInput["subscriptionId"])
-			}
-
-			oidc.Azure = &azure
-		}
-
-		oc.OIDC = &oidc
-	}
-
-	return &oc
-}
-
-func toCacheOptions(inputMap resource.PropertyMap) *pulumiapi.CacheOptions {
-	if !inputMap["cacheOptions"].HasValue() {
-		return nil
-	}
-
-	coInput := util.GetSecretOrObjectValue(inputMap["cacheOptions"])
-	var co pulumiapi.CacheOptions
-
-	if coInput["enable"].HasValue() {
-		co.Enable = util.GetSecretOrBoolValue(coInput["enable"])
-	}
-
-	return &co
 }
 
 func (ds *PulumiServiceDeploymentSettingsResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
@@ -1002,9 +590,15 @@ func (ds *PulumiServiceDeploymentSettingsResource) Read(req *pulumirpc.ReadReque
 		return nil, err
 	}
 	if propertyMap[gcStack].HasValue() {
-		tempPlain := ds.ToPulumiServiceDeploymentSettingsInput(inputMap)
+		tempPlain, err := decodeDeploymentSettingsInput(inputMap)
+		if err != nil {
+			return nil, err
+		}
 		plaintextSettings = &tempPlain.DeploymentSettings
-		tempCipher := ds.ToPulumiServiceDeploymentSettingsInput(propertyMap)
+		tempCipher, err := decodeDeploymentSettingsInput(propertyMap)
+		if err != nil {
+			return nil, err
+		}
 		ciphertextSettings = &tempCipher.DeploymentSettings
 	}
 
@@ -1052,7 +646,10 @@ func (ds *PulumiServiceDeploymentSettingsResource) Create(
 		return nil, err
 	}
 
-	input := ds.ToPulumiServiceDeploymentSettingsInput(inputsMap)
+	input, err := decodeDeploymentSettingsInput(inputsMap)
+	if err != nil {
+		return nil, err
+	}
 	settings := input.DeploymentSettings
 	response, err := ds.Client.CreateDeploymentSettings(ctx, input.Stack, settings)
 	if err != nil {
@@ -1086,7 +683,10 @@ func (ds *PulumiServiceDeploymentSettingsResource) Update(
 		return nil, err
 	}
 
-	input := ds.ToPulumiServiceDeploymentSettingsInput(inputsMap)
+	input, err := decodeDeploymentSettingsInput(inputsMap)
+	if err != nil {
+		return nil, err
+	}
 	settings := input.DeploymentSettings
 	response, err := ds.Client.UpdateDeploymentSettings(ctx, input.Stack, settings)
 	if err != nil {
