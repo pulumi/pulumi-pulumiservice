@@ -162,15 +162,14 @@ func TestConfigure_SetsAccessToken(t *testing.T) {
 	assert.Equal(t, "pul-test0token", transport.token)
 }
 
-// TestProvider_LayeredSchema verifies the unified provider serves three
+// TestProvider_LayeredSchema verifies the unified provider serves two
 // resource sources under one pulumiservice schema:
 //
-//  1. legacy raw gRPC server (manual-schema.json) — e.g. Stack
-//  2. modern infer (WithResources)              — e.g. Team
-//  3. metadata-driven api layer (rest.BuildSchema spliced via withCloudApiSchema)
+//  1. infer (WithResources) — e.g. Team
+//  2. metadata-driven api layer (rest.BuildSchema spliced via withCloudApiSchema)
 //     — e.g. OrganizationWebhook at pulumiservice:api:*
 //
-// All three share the pulumiservice package name; v0 surface is implicit
+// Both share the pulumiservice package name; v0 surface is implicit
 // at the package root (pulumiservice:index:*), api is an explicit module.
 // Existing user code using pulumiservice:index:* keeps working unchanged.
 func TestProvider_LayeredSchema(t *testing.T) {
@@ -190,7 +189,6 @@ func TestProvider_LayeredSchema(t *testing.T) {
 		token  string
 		source string
 	}{
-		{"pulumiservice:index:Stack", "v0: legacy raw (manual-schema.json)"},
 		{"pulumiservice:index:Team", "v0: modern infer (WithResources)"},
 		{"pulumiservice:api:OrganizationWebhook", "api: metadata-driven (withCloudApiSchema)"},
 	}

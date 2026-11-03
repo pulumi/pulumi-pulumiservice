@@ -23,7 +23,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	_ "embed" // For manualSchema.
+	_ "embed" // For the README.
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -85,16 +85,11 @@ type pulumiserviceProvider struct {
 	transportRef *atomic.Value
 }
 
-// embed manual-schema.json directly into resource binary so that we can properly serve the schema
-// directly from the resource provider.
-//
-//go:embed manual-schema.json
-var manualSchema string
-
 // MakeProvider builds the unified Pulumi Cloud Provider. Three layers:
 //
-//  1. legacyRaw — the existing custom gRPC server (pulumiserviceProvider)
-//     handling resources defined in manual-schema.json.
+//  1. legacyRaw — the custom gRPC server (pulumiserviceProvider). It serves
+//     no resources; it handles configuration, including the transport the
+//     api resources use.
 //  2. dispatch.Wrap — overlays metadata-driven api resources from
 //     provider/pkg/cloud/metadata.json. Schema for these is spliced into
 //     GetSchema responses by withCloudApiSchema.
@@ -102,15 +97,14 @@ var manualSchema string
 //     (Team, OrganizationRole, etc.) at pulumiservice:index:* and stamps
 //     in package-level metadata (display name, language map, config schema).
 //
-// Existing user code keeps working unchanged: pulumiservice:index:* tokens
-// resolve through layers 1 and 3; the new api resources at
+// pulumiservice:index:* tokens resolve through layer 3; the api resources at
 // pulumiservice:api:* resolve through layer 2.
 func MakeProvider(host *provider.HostClient, name, version string) (pulumirpc.ResourceProviderServer, error) {
 	transportRef := &atomic.Value{}
 	legacyRaw := rpc.Provider(&pulumiserviceProvider{
 		host:         host,
 		name:         name,
-		schema:       mustSetSchemaVersion(manualSchema, version),
+		schema:       baseSchema(name, version),
 		version:      version,
 		transportRef: transportRef,
 	})
@@ -132,6 +126,12 @@ func MakeProvider(host *provider.HostClient, name, version string) (pulumirpc.Re
 
 	provider, err := infer.NewProviderBuilder().
 		WithDisplayName("Pulumi Cloud").
+		WithDescription("A native Pulumi package for creating and managing Pulumi Cloud constructs.").
+		WithHomepage("https://pulumi.com").
+		WithRepository("https://github.com/pulumi/pulumi-pulumiservice").
+		WithKeywords("pulumi", "kind/native", "category/infrastructure").
+		WithLicense("Apache-2.0").
+		WithPublisher("Pulumi").
 		WithNamespace("pulumi").
 		WithWrapped(composed).
 		WithResources(
@@ -565,17 +565,12 @@ func getResourceNameFromRequest(req ResourceBase) string {
 	return urn.Type().String()
 }
 
-// mustSetSchemaVersion deserializes schemaStr from json, sets Version field
-// then serializes back to json string
-func mustSetSchemaVersion(schemaStr string, version string) string {
-	var spec schema.PackageSpec
-	if err := json.Unmarshal([]byte(schemaStr), &spec); err != nil {
-		panic(fmt.Errorf("failed to parse schema: %w", err))
-	}
-	spec.Version = version
-	bytes, err := json.Marshal(spec)
+// baseSchema is the schema the raw gRPC server serves: only the package name
+// and version. infer and withCloudApiSchema add everything else.
+func baseSchema(name, version string) string {
+	bytes, err := json.Marshal(schema.PackageSpec{Name: name, Version: version})
 	if err != nil {
-		panic(fmt.Errorf("failed to serialize versioned schema: %w", err))
+		panic(fmt.Errorf("failed to serialize base schema: %w", err))
 	}
 	return string(bytes)
 }

@@ -150,7 +150,7 @@ it. Look for it in `gh pr checks <number>`.
 
 ### Schema Changes
 
-The provider schema is assembled from three sources in `MakeProvider`
+The provider schema is assembled from two sources in `MakeProvider`
 (`provider/pkg/provider/provider.go`). Find which one owns a resource before
 editing it:
 
@@ -160,18 +160,17 @@ editing it:
   each type's `Annotate(a infer.Annotator)` method (`a.Describe(...)`), and
   defaults are set with `a.SetDefault(...)`. Registered via
   `infer.Resource(...)` / `infer.Function(...)` in `provider.go`.
-- **Legacy resources in `provider/pkg/provider/manual-schema.json`**: currently
-  only `DeploymentSettings`, `Environment` and `PolicyGroup`, plus the shared
-  `types` they use. These are served by the custom gRPC server and implement
-  `PulumiServiceResource`.
 - **`pulumiservice:api:*` resources**: generated at runtime from the Pulumi
   Cloud OpenAPI spec plus `provider/pkg/cloud/metadata.json`.
+
+Package metadata (description, keywords, language settings) is set on the
+`infer.NewProviderBuilder()` call in `MakeProvider`.
 
 `provider/cmd/pulumi-resource-pulumiservice/schema.json` is **generated**. Never
 edit it by hand.
 
 After any schema-affecting change (an `Annotate` method, a Go input/state
-struct, or `manual-schema.json`):
+struct, or the package metadata):
 
 1. `make provider`: rebuild the provider binary
 2. `make schema`: regenerate `schema.json` from the binary
@@ -218,48 +217,9 @@ the rest:
 explanation into several. It also writes Java enum values as strings, which
 `gen-examples` rewrites into enum constants using the provider schema.
 
-#### Schema JSON Syntax Guidelines
-
-These apply when editing `manual-schema.json`. The schema JSON must follow strict syntax rules. Common patterns:
-
-**Complex Nested Objects**:
-- ❌ **NEVER** define inline objects directly in array `items`:
-  ```json
-  "items": {
-    "type": "object",
-    "properties": { ... }
-  }
-  ```
-- ✅ **ALWAYS** define complex objects as separate types in the `types` section and reference them:
-  ```json
-  "items": {
-    "$ref": "#/types/pulumiservice:index:YourTypeName"
-  }
-  ```
-
-**Additional Properties**:
-- ❌ **NEVER** use boolean values: `"additionalProperties": true`
-- ✅ **ALWAYS** use type specifications:
-  ```json
-  "additionalProperties": {
-    "$ref": "pulumi.json#/Any"
-  }
-  ```
-  or
-  ```json
-  "additionalProperties": {
-    "type": "string"
-  }
-  ```
-
-**Type References**:
-- Use `"$ref": "#/types/pulumiservice:index:TypeName"` for custom types
-- Use `"$ref": "pulumi.json#/Any"` for generic object types
-- Custom types must be defined in the `types` section with full descriptions
-
 ### Adding a New Resource
 
-New `index:` resources use `infer`. Don't add resources to `manual-schema.json`.
+New `index:` resources use `infer`.
 Use an existing `infer` resource such as
 `provider/pkg/resources/team_access_token.go` as a template.
 
@@ -294,21 +254,12 @@ Use an existing `infer` resource such as
 
 ### Resource Interface
 
-The legacy `manual-schema.json` resources implement the `PulumiServiceResource`
-interface (`provider/pkg/provider/provider.go`). `infer` resources don't; they
-implement `infer.CustomCreate`, `infer.CustomRead`, etc. instead:
-
-```go
-type PulumiServiceResource interface {
-    Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error)
-    Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error)
-    Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error)
-    Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error)
-    Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error)
-    Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error)
-    Name() string
-}
-```
+Resources implement `infer`'s interfaces (`infer.CustomCreate`,
+`infer.CustomRead`, `infer.CustomUpdate`, `infer.CustomDelete`, and optionally
+`infer.CustomCheck` and `infer.CustomDiff`). When a method needs information the
+typed values can't carry, such as which elements of a map are secret, read the
+untyped request with `infer.GetRawRequest` (see
+`provider/pkg/resources/deployment_settings_resource.go`).
 
 ### Resource Methods
 
