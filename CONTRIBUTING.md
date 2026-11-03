@@ -67,6 +67,8 @@ The `auto-release` flow described under [Releasing the API Surface](#releasing-t
 
 `main` requires a status check named `Sentinel`, written by the `sentinel` job at the end of `run-acceptance-tests.yml`. That workflow ignores PRs that change only `CHANGELOG.md`, so a changelog-only release PR shows `Sentinel` as expected and never reported. To get the check, include a change to another file. Commenting `/run-acceptance-tests` runs the tests, but on a comment-triggered run the `sentinel` job writes `Sentinel` to the tip of `main` instead of the PR's commit, so the PR stays blocked.
 
+A failed test job in `release.yml` blocks `publish`, so nothing is released. Rerunning the run uses the workflows as they were at the tag, so if the failure needs a workflow or test fix, merge the fix to `main` and release the next patch version instead.
+
 ## Releasing the API Surface
 
 This section is for Pulumi employees only.

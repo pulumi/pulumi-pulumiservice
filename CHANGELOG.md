@@ -2,7 +2,9 @@
 
 ## Unreleased
 
-## 1.7.0
+## 1.7.1
+
+v1.7.0 was tagged but never published, because its release tests failed; its changes ship in this release.
 
 ### Improvements
 
