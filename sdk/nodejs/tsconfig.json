@@ -113,6 +113,7 @@
         "insightsAccount.ts",
         "oidcIssuer.ts",
         "orgAccessToken.ts",
+        "organizationDefaultRole.ts",
         "organizationMember.ts",
         "organizationRole.ts",
         "policyGroup.ts",

@@ -38,6 +38,7 @@ from .get_stack import *
 from .insights_account import *
 from .oidc_issuer import *
 from .org_access_token import *
+from .organization_default_role import *
 from .organization_member import *
 from .organization_role import *
 from .policy_group import *
@@ -219,6 +220,7 @@ _utilities.register(
    "pulumiservice:index:InsightsAccount": "InsightsAccount",
    "pulumiservice:index:OidcIssuer": "OidcIssuer",
    "pulumiservice:index:OrgAccessToken": "OrgAccessToken",
+   "pulumiservice:index:OrganizationDefaultRole": "OrganizationDefaultRole",
    "pulumiservice:index:OrganizationMember": "OrganizationMember",
    "pulumiservice:index:OrganizationRole": "OrganizationRole",
    "pulumiservice:index:PolicyGroup": "PolicyGroup",
