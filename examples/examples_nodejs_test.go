@@ -134,7 +134,7 @@ func TestNodejsEnvironmentsExample(t *testing.T) {
 }
 
 func TestNodejsTemplateSourcesExample(t *testing.T) {
-	skipUnlessTemplateSourceTests(t)
+	skipUnlessSerializedTests(t)
 	test := pulumitest.NewPulumiTest(t,
 		filepath.Join(getCwd(t), "ts-template-source"),
 		inMemoryProvider(),
@@ -244,6 +244,7 @@ func TestNodejsInsightsAccountInvokesExample(t *testing.T) {
 }
 
 func TestNodejsRbacExample(t *testing.T) {
+	skipUnlessSerializedTests(t)
 	// Requires the Custom Roles feature to be enabled on the test
 	// organization. CreateRole returns a feature-flag error otherwise,
 	// which fails the test loudly — that's the signal we want.

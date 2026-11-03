@@ -24,12 +24,12 @@ func getCwd(t *testing.T) string {
 	return cwd
 }
 
-const templateSourceTestsEnv = "PULUMI_TEST_TEMPLATE_SOURCES"
+const serializedTestsEnv = "PULUMI_TEST_SERIALIZED"
 
-func skipUnlessTemplateSourceTests(t *testing.T) {
+func skipUnlessSerializedTests(t *testing.T) {
 	t.Helper()
-	if os.Getenv(templateSourceTestsEnv) == "" {
-		t.Skipf("template source tests run in their own serialized job; set %s to run them", templateSourceTestsEnv)
+	if os.Getenv(serializedTestsEnv) == "" {
+		t.Skipf("runs in the serialized shared-org job; set %s to run it", serializedTestsEnv)
 	}
 }
 

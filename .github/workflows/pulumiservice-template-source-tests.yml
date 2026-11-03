@@ -1,4 +1,4 @@
-name: run-template-source-tests
+name: run-serialized-shared-org-tests
 
 on:
   pull_request:
@@ -15,17 +15,17 @@ env:
   PULUMI_BACKEND_URL: https://api.pulumi-staging.io
   PULUMI_TEST_OWNER: service-provider-test-org
   PULUMI_TEST_USE_SERVICE: "true"
-  PULUMI_TEST_TEMPLATE_SOURCES: "true"
+  PULUMI_TEST_SERIALIZED: "true"
   PULUMI_GO_DEP_ROOT: ${{ github.workspace }}/..
 
 jobs:
-  template-source-tests:
+  serialized-shared-org-tests:
     if: github.event_name != 'pull_request'
       || github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 60
     concurrency:
-      group: template-sources-service-provider-test-org
+      group: serialized-tests-service-provider-test-org
       cancel-in-progress: false
     permissions:
       contents: read
@@ -58,6 +58,9 @@ jobs:
       - name: Build and link nodejs SDK
         run: make build_nodejs install_nodejs_sdk
 
+      - name: Build python SDK
+        run: make build_python
+
       - name: Put locally-built provider on PATH
         run: echo "${GITHUB_WORKSPACE}/bin" >> "$GITHUB_PATH"
 
@@ -82,12 +85,12 @@ jobs:
                 curl_api --request DELETE "${sources_url}/${id}"
               done
 
-      - name: Run template source tests
+      - name: Run serialized tests
         env:
           PULUMI_ACCESS_TOKEN: ${{ steps.esc-secrets.outputs.PULUMI_ACCESS_TOKEN_STAGING }}
         run: |
           cd examples
-          go test -tags all -run '^(TestNodejsTemplateSourcesExample|TestYamlTemplateSourcesExample)$' \
-            -v -count=1 -timeout 20m .
+          go test -tags all -run '^(TestNodejsTemplateSourcesExample|TestYamlTemplateSourcesExample|TestNodejsRbacExample|TestYamlRbacExample|TestPythonRbacExample)$' \
+            -parallel 1 -v -count=1 -timeout 40m .
           go test -tags api -run 'TestApi/template-sources/yaml' \
             -v -count=1 -timeout 20m .

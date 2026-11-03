@@ -568,7 +568,7 @@ func TestYamlAgentPoolsExample(t *testing.T) {
 }
 
 func TestYamlTemplateSourcesExample(t *testing.T) {
-	skipUnlessTemplateSourceTests(t)
+	skipUnlessSerializedTests(t)
 	cwd := getCwd(t)
 	digits := generateRandomFiveDigits()
 	integration.ProgramTest(t, &integration.ProgramTestOptions{
@@ -771,6 +771,7 @@ func TestYamlDeploymentSettingsGitHubTagsExample(t *testing.T) {
 }
 
 func TestYamlRbacExample(t *testing.T) {
+	skipUnlessSerializedTests(t)
 	// Requires the Custom Roles feature to be enabled on the test
 	// organization. If it isn't, CreateRole will return a feature-flag
 	// error and the test fails loudly — which is what we want to learn.

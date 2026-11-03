@@ -351,7 +351,7 @@ func TestApi(t *testing.T) {
 					t.Skip(ex.SkipReason)
 				}
 				if ex.OneAtATime && lang == "yaml" {
-					skipUnlessTemplateSourceTests(t)
+					skipUnlessSerializedTests(t)
 				}
 				if reason := skipLangReason(t, lang); reason != "" {
 					t.Skip(reason)
