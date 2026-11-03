@@ -35,7 +35,6 @@ import (
 	ctxmw "github.com/pulumi/pulumi-go-provider/middleware/context"
 	"github.com/pulumi/pulumi-go-provider/middleware/dispatch"
 	"github.com/pulumi/pulumi-go-provider/middleware/rpc"
-	gpschema "github.com/pulumi/pulumi-go-provider/middleware/schema"
 	"github.com/pulumi/pulumi/pkg/v3/codegen/schema"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
@@ -120,18 +119,7 @@ func MakeProvider(host *provider.HostClient, name, version string) (pulumirpc.Re
 	for tok, h := range rest.Resources(cloud.Spec(), cloud.Metadata()) {
 		customs[tokens.Type(tok)] = h
 	}
-	// DeploymentSettings gets its schema from infer, but its requests are served
-	// here, inside infer's configuration, by its property-map implementation.
-	// See resources.DeploymentSettings.
-	deploymentSettings, err := resources.NewDeploymentSettingsHandler()
-	if err != nil {
-		return nil, err
-	}
-	customs[resources.DeploymentSettingsToken] = deploymentSettings
 	composed := dispatch.Wrap(legacyRaw, dispatch.Options{Customs: customs})
-	composed = gpschema.Wrap(composed, gpschema.Options{
-		Resources: []gpschema.Resource{infer.Resource(&resources.DeploymentSettings{})},
-	})
 	composed = withCloudApiSchema(composed, cloud.Spec(), cloud.Metadata(), name)
 	// Attach this provider's transport to every CRUD context. Pairs with
 	// pulumiserviceProvider.Configure storing into transportRef.
@@ -148,6 +136,7 @@ func MakeProvider(host *provider.HostClient, name, version string) (pulumirpc.Re
 		WithWrapped(composed).
 		WithResources(
 			infer.Resource(&resources.AccessToken{}),
+			infer.Resource(&resources.DeploymentSettings{}),
 			infer.Resource(&resources.AgentPool{}),
 			infer.Resource(&resources.ApprovalRule{}),
 			infer.Resource(&resources.DeploymentSchedule{}),
@@ -447,12 +436,6 @@ func (k *pulumiserviceProvider) Configure(
 	if err != nil {
 		return nil, err
 	}
-	// Nothing here uses the client any more, but building one still rejects an
-	// unparseable apiUrl at configure time.
-	if _, err := pulumiapi.NewClient(&httpClient, *token, *url); err != nil {
-		return nil, err
-	}
-
 	transport := rest.Transport(&authedTransport{
 		baseURL: *url,
 		token:   *token,

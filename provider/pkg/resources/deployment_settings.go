@@ -1,16 +1,10 @@
 package resources
 
 import (
-	"context"
 	"fmt"
-	"path"
 	"time"
 
-	pbempty "google.golang.org/protobuf/types/known/emptypb"
-
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
-	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
-	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
@@ -34,6 +28,10 @@ const (
 	gcPassword        = "password"
 	gcExecutorContext = "executorContext"
 	gcCredentials     = "credentials"
+
+	gcOperationContext     = "operationContext"
+	gcEnvironmentVariables = "environmentVariables"
+	gcVcs                  = "vcs"
 )
 
 type PulumiServiceDeploymentSettingsInput struct {
@@ -429,10 +427,6 @@ func (ds *PulumiServiceDeploymentSettingsInput) ToPropertyMap(
 	return pm
 }
 
-type PulumiServiceDeploymentSettingsResource struct {
-	Client pulumiapi.DeploymentSettingsClient
-}
-
 // executorImageCredentials walks the executor image credentials out of a settings
 // struct, tolerating a nil at any level of the chain.
 func executorImageCredentials(settings *pulumiapi.DeploymentSettings) *pulumiapi.DockerImageCredentials {
@@ -440,278 +434,6 @@ func executorImageCredentials(settings *pulumiapi.DeploymentSettings) *pulumiapi
 		return nil
 	}
 	return settings.Executor.ExecutorImage.Credentials
-}
-
-func (ds *PulumiServiceDeploymentSettingsResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-	olds, err := plugin.UnmarshalProperties(req.GetOldInputs(), util.StandardUnmarshal)
-	if err != nil {
-		return nil, err
-	}
-
-	news, err := plugin.UnmarshalProperties(req.GetNews(), util.StandardUnmarshal)
-	if err != nil {
-		return nil, err
-	}
-
-	diffs := olds.Diff(news)
-	if diffs == nil {
-		return &pulumirpc.DiffResponse{
-			Changes: pulumirpc.DiffResponse_DIFF_NONE,
-		}, nil
-	}
-
-	dd := plugin.NewDetailedDiffFromObjectDiff(diffs, false)
-
-	detailedDiffs := map[string]*pulumirpc.PropertyDiff{}
-	replaces := []string(nil)
-	replaceProperties := map[string]bool{
-		gcOrganization: true,
-		gcProject:      true,
-		gcStack:        true,
-	}
-	for k, v := range dd {
-		if _, ok := replaceProperties[k]; ok {
-			v.Kind = v.Kind.AsReplace()
-			replaces = append(replaces, k)
-		}
-		detailedDiffs[k] = &pulumirpc.PropertyDiff{
-			Kind:      pulumirpc.PropertyDiff_Kind(v.Kind), //nolint:gosec // safe conversion from plugin.DiffKind
-			InputDiff: v.InputDiff,
-		}
-	}
-
-	return &pulumirpc.DiffResponse{
-		Changes:             pulumirpc.DiffResponse_DIFF_SOME,
-		Replaces:            replaces,
-		DetailedDiff:        detailedDiffs,
-		HasDetailedDiff:     true,
-		DeleteBeforeReplace: true,
-	}, nil
-}
-
-func (ds *PulumiServiceDeploymentSettingsResource) Check(
-	req *pulumirpc.CheckRequest,
-) (*pulumirpc.CheckResponse, error) {
-	news, err := plugin.UnmarshalProperties(req.GetNews(), util.KeepSecretsUnmarshal)
-	if err != nil {
-		return nil, err
-	}
-
-	var failures []*pulumirpc.CheckFailure
-	for _, p := range []resource.PropertyKey{gcOrganization, gcProject, gcStack} {
-		if !news[(p)].HasValue() {
-			failures = append(failures, &pulumirpc.CheckFailure{
-				Reason:   fmt.Sprintf("missing required property '%s'", p),
-				Property: string(p),
-			})
-		}
-	}
-
-	// Normalizing duration input
-	if news["operationContext"].HasValue() {
-		operationContext := util.GetSecretOrObjectValue(news["operationContext"])
-		if operationContext["oidc"].HasValue() {
-			oidc := util.GetSecretOrObjectValue(operationContext["oidc"])
-			if oidc[gcAWS].HasValue() {
-				aws := util.GetSecretOrObjectValue(oidc[gcAWS])
-				if aws["duration"].HasValue() {
-					durationString := util.GetSecretOrStringValue(aws["duration"])
-					normalized, err := normalizeDurationString(durationString)
-					if err != nil {
-						failures = append(failures, &pulumirpc.CheckFailure{
-							Reason:   fmt.Sprintf("Failed to normalize duration string due to error: %s", err.Error()),
-							Property: string("operationContext.oidc.aws.duration"),
-						})
-					} else {
-						if aws["duration"].IsSecret() {
-							aws["duration"] = resource.MakeSecret(resource.NewStringProperty(*normalized))
-						} else {
-							aws["duration"] = resource.NewStringProperty(*normalized)
-						}
-					}
-				}
-			}
-		}
-	}
-
-	// Force the nested credentials to be secret. Their `"secret": true` in the
-	// schema is codegen-only, and for a property nested inside a type only the
-	// .NET SDK acts on it — so in every other language a program passing a
-	// plaintext literal would have that literal written to state verbatim. See
-	// util.MakeNestedSecret.
-	for _, path := range [][]resource.PropertyKey{
-		{gcSourceContext, gcGit, gcGitAuth, gcSSHAuth, gcSSHPrivateKey},
-		{gcSourceContext, gcGit, gcGitAuth, gcSSHAuth, gcPassword},
-		{gcSourceContext, gcGit, gcGitAuth, gcBasicAuth, gcUsername},
-		{gcSourceContext, gcGit, gcGitAuth, gcBasicAuth, gcPassword},
-		{gcExecutorContext, gcCredentials, gcPassword},
-	} {
-		util.MakeNestedSecret(news, path...)
-	}
-
-	checkedNews, err := plugin.MarshalProperties(news, util.StandardMarshal)
-	if err != nil {
-		return nil, err
-	}
-
-	return &pulumirpc.CheckResponse{Inputs: checkedNews, Failures: failures}, nil
-}
-
-func (ds *PulumiServiceDeploymentSettingsResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
-	ctx := context.Background()
-
-	stack, err := pulumiapi.NewStackIdentifier(req.GetId())
-	if err != nil {
-		return nil, err
-	}
-	settings, err := ds.Client.GetDeploymentSettings(ctx, stack)
-	if err != nil {
-		return nil, err
-	}
-
-	if settings == nil {
-		// Empty response causes the resource to be deleted from the state.
-		return &pulumirpc.ReadResponse{Id: "", Properties: nil}, nil
-	}
-
-	dsInput := PulumiServiceDeploymentSettingsInput{
-		Stack:              stack,
-		DeploymentSettings: *settings,
-	}
-
-	var plaintextSettings *pulumiapi.DeploymentSettings
-	var ciphertextSettings *pulumiapi.DeploymentSettings
-	propertyMap, err := plugin.UnmarshalProperties(req.GetProperties(), util.KeepSecretsUnmarshal)
-	if err != nil {
-		return nil, err
-	}
-	inputMap, err := plugin.UnmarshalProperties(req.GetInputs(), util.KeepSecretsUnmarshal)
-	if err != nil {
-		return nil, err
-	}
-	if propertyMap[gcStack].HasValue() {
-		tempPlain, err := decodeDeploymentSettingsInput(inputMap)
-		if err != nil {
-			return nil, err
-		}
-		plaintextSettings = &tempPlain.DeploymentSettings
-		tempCipher, err := decodeDeploymentSettingsInput(propertyMap)
-		if err != nil {
-			return nil, err
-		}
-		ciphertextSettings = &tempCipher.DeploymentSettings
-	}
-
-	properties, err := plugin.MarshalProperties(
-		dsInput.ToPropertyMap(plaintextSettings, ciphertextSettings, false), util.StandardMarshal,
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	inputs, err := plugin.MarshalProperties(
-		dsInput.ToPropertyMap(plaintextSettings, ciphertextSettings, true), util.StandardMarshal,
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	return &pulumirpc.ReadResponse{
-		Id:         req.Id,
-		Properties: properties,
-		Inputs:     inputs,
-	}, nil
-}
-
-func (ds *PulumiServiceDeploymentSettingsResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
-	ctx := context.Background()
-	stack, err := pulumiapi.NewStackIdentifier(req.GetId())
-	if err != nil {
-		return nil, err
-	}
-
-	err = ds.Client.DeleteDeploymentSettings(ctx, stack)
-	if err != nil {
-		return nil, err
-	}
-	return &pbempty.Empty{}, nil
-}
-
-func (ds *PulumiServiceDeploymentSettingsResource) Create(
-	req *pulumirpc.CreateRequest,
-) (*pulumirpc.CreateResponse, error) {
-	ctx := context.Background()
-	inputsMap, err := plugin.UnmarshalProperties(req.GetProperties(), util.KeepSecretsUnmarshal)
-	if err != nil {
-		return nil, err
-	}
-
-	input, err := decodeDeploymentSettingsInput(inputsMap)
-	if err != nil {
-		return nil, err
-	}
-	settings := input.DeploymentSettings
-	response, err := ds.Client.CreateDeploymentSettings(ctx, input.Stack, settings)
-	if err != nil {
-		return nil, err
-	}
-
-	responseInput := PulumiServiceDeploymentSettingsInput{
-		DeploymentSettings: *response,
-		Stack:              input.Stack,
-	}
-
-	outputProperties, err := plugin.MarshalProperties(
-		responseInput.ToPropertyMap(&input.DeploymentSettings, nil, false), util.StandardMarshal,
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	return &pulumirpc.CreateResponse{
-		Id:         path.Join(input.Stack.OrgName, input.Stack.ProjectName, input.Stack.StackName),
-		Properties: outputProperties,
-	}, nil
-}
-
-func (ds *PulumiServiceDeploymentSettingsResource) Update(
-	req *pulumirpc.UpdateRequest,
-) (*pulumirpc.UpdateResponse, error) {
-	ctx := context.Background()
-	inputsMap, err := plugin.UnmarshalProperties(req.GetNews(), util.KeepSecretsUnmarshal)
-	if err != nil {
-		return nil, err
-	}
-
-	input, err := decodeDeploymentSettingsInput(inputsMap)
-	if err != nil {
-		return nil, err
-	}
-	settings := input.DeploymentSettings
-	response, err := ds.Client.UpdateDeploymentSettings(ctx, input.Stack, settings)
-	if err != nil {
-		return nil, err
-	}
-
-	responseInput := PulumiServiceDeploymentSettingsInput{
-		DeploymentSettings: *response,
-		Stack:              input.Stack,
-	}
-
-	outputProperties, err := plugin.MarshalProperties(
-		responseInput.ToPropertyMap(&input.DeploymentSettings, nil, false), util.StandardMarshal,
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	return &pulumirpc.UpdateResponse{
-		Properties: outputProperties,
-	}, nil
-}
-
-func (ds *PulumiServiceDeploymentSettingsResource) Name() string {
-	return "pulumiservice:index:DeploymentSettings"
 }
 
 func normalizeDurationString(input string) (*string, error) {
