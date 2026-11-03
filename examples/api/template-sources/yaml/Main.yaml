@@ -1,9 +1,0 @@
-resources:
-  source:
-    type: pulumiservice:api:OrgTemplateCollection
-    properties:
-      orgName: ${organizationName}
-      name: api-templates-${templateSuffix}
-      sourceURL: ${sourceUrl}
-outputs:
-  collectionName: ${source.name}
