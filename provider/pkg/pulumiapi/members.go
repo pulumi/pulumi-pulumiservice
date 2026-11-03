@@ -107,10 +107,9 @@ func (c *Client) AddMemberToOrg(ctx context.Context, userName string, orgName st
 // for a built-in role (member, admin, billing-manager); pass fgaRoleID to
 // assign a custom role (takes precedence). At least one must be non-empty.
 //
-// The underlying member-PATCH endpoint rejects built-in role names in the
-// `role` field — it only accepts `fgaRoleId`. When called with a built-in
-// role name, this helper resolves the FGA ID for that built-in first and
-// sends the PATCH with `fgaRoleId` set.
+// Built-in roles are sent by name, not by ID: in organizations that store a
+// default role, "member" means the organization's default role, and only the
+// service can resolve that.
 func (c *Client) UpdateOrgMemberRole(
 	ctx context.Context,
 	orgName, userName, role string,
@@ -129,19 +128,12 @@ func (c *Client) UpdateOrgMemberRole(
 		return fmt.Errorf("role must be one of: admin, member, billing-manager")
 	}
 
-	// Translate built-in role names to their per-org FGA IDs. Custom roles
-	// (fgaRoleID already non-nil) pass through unchanged.
-	effectiveFGA := fgaRoleID
-	if effectiveFGA == nil || *effectiveFGA == "" {
-		id, err := c.ResolveBuiltInRoleID(ctx, orgName, role)
-		if err != nil {
-			return fmt.Errorf("failed to resolve built-in role %q: %w", role, err)
-		}
-		effectiveFGA = &id
+	req := updateMemberRoleReq{Role: role}
+	if fgaRoleID != nil && *fgaRoleID != "" {
+		req = updateMemberRoleReq{FGARoleID: fgaRoleID}
 	}
 
 	apiPath := path.Join("orgs", orgName, "members", userName)
-	req := updateMemberRoleReq{FGARoleID: effectiveFGA}
 	if _, err := c.do(ctx, http.MethodPatch, apiPath, req, nil); err != nil {
 		return fmt.Errorf("failed to update org member role: %w", err)
 	}
