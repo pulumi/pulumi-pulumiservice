@@ -20,7 +20,6 @@ resources:
   token:
     type: pulumiservice:OrgAccessToken
     properties:
-      name: test-${rand.result}
       organizationName: ${organizationName}
       description: "example org access token"
       admin: false

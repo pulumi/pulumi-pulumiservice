@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Improvements
+
+- `name` on `OrgAccessToken` and `TeamAccessToken` is now optional. When it's omitted, Pulumi generates a name from the resource's logical name plus a random suffix, within Pulumi Cloud's 40-character limit for token names, or follows the stack's autonaming configuration. An update keeps the generated name, and a replacement gets a new one. [#1211](https://github.com/pulumi/pulumi-pulumiservice/issues/1211)
+
+### Bug Fixes
+
+- Changing any input on an `OrgAccessToken` or `TeamAccessToken` replaces the token, and the replacement failed with `409 Conflict: token name already exists` because Pulumi Cloud doesn't let a new token reuse a deleted token's name. When `name` is omitted, the replacement now gets a new generated name and succeeds. This works for existing tokens too: removing `name` from the program keeps the current name until the next replacement. With an explicit `name`, change the name along with the other input. [#1211](https://github.com/pulumi/pulumi-pulumiservice/issues/1211), [#1216](https://github.com/pulumi/pulumi-pulumiservice/issues/1216)
+
 ## 1.7.0
 
 ### Improvements

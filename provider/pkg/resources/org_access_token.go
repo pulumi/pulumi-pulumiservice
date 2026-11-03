@@ -77,7 +77,7 @@ type OrgAccessTokenInput struct {
 }
 
 func (i *OrgAccessTokenInput) Annotate(a infer.Annotator) {
-	a.Describe(&i.Name, "The name for the token.")
+	a.Describe(&i.Name, tokenNameDescription)
 	a.Describe(&i.OrganizationName, "The organization's name.")
 	a.Describe(&i.Description, "A description of the token.")
 	a.Describe(
@@ -100,6 +100,10 @@ func (i *OrgAccessTokenInput) Annotate(a infer.Annotator) {
 			"whatever its role, so the provider rejects the combination. When neither is set, the token "+
 			"gets the Member role.",
 	)
+}
+
+func (i *OrgAccessTokenInput) AutoName(autoname infer.SetAutoName) {
+	autoname(&i.Name, tokenAutoName)
 }
 
 type OrgAccessTokenState struct {
@@ -271,6 +275,38 @@ const (
 	gcExpires = "expires"
 	gcRoleID  = "roleId"
 )
+
+// tokenNameMaxLen is the longest name Pulumi Cloud accepts for an organization
+// or team access token. Longer names fail with `400 Bad Request: the access
+// token name is too long (max length 40 characters)`. The OpenAPI spec
+// doesn't state the limit.
+const tokenNameMaxLen = 40
+
+// tokenNameDescription documents `name` on OrgAccessToken and TeamAccessToken,
+// which share a namespace and the same rules.
+const tokenNameDescription = "The name for the token, up to 40 characters. Organization and team tokens " +
+	"share one set of names per organization, and Pulumi Cloud never frees a deleted token's name, so the " +
+	"name must not have been used by any other token in the organization.\n\n" +
+	"If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows " +
+	"the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). " +
+	"A replacement gets a new name. Removing `name` from an existing token keeps its current name until the " +
+	"next replacement.\n\n" +
+	"Every input on this resource triggers a replacement, so when `name` is set explicitly, changing any " +
+	"other input fails with `409 Conflict: token name already exists`. Omit `name`, or change it along " +
+	"with the other input."
+
+// tokenAutoName shortens the logical name so that a generated name, which is
+// the logical name plus a random suffix, fits in tokenNameMaxLen.
+var tokenAutoName = infer.AutoNameConfig{
+	Generate: func(_ context.Context, args infer.AutoNameGenerateArgs) (string, error) {
+		suffix := fmt.Sprintf("-%08x", args.Rand.Uint32())
+		base := []rune(args.URN.Name())
+		if limit := tokenNameMaxLen - len(suffix); len(base) > limit {
+			base = base[:limit]
+		}
+		return string(base) + suffix, nil
+	},
+}
 
 func parseTokenExpiry(s string) (time.Time, error) {
 	t, err := time.Parse(time.RFC3339, s)
