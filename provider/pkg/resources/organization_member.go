@@ -252,11 +252,6 @@ func (*OrganizationMember) Delete(
 ) (infer.DeleteResponse, error) {
 	client := config.GetClient(ctx)
 	if req.State.Adopted {
-		// Adopted: don't remove the user from the org, but un-assign any
-		// custom role we applied. Leaving a dangling fgaRoleId would block
-		// deletion of the custom role (the service refuses "cannot delete
-		// role X, it is referenced by users or teams"). Reset to the
-		// built-in member role.
 		return infer.DeleteResponse{}, client.UpdateOrgMemberRole(
 			ctx,
 			req.State.OrganizationName,
