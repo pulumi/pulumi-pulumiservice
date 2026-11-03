@@ -114,6 +114,7 @@
         "oidcIssuer.ts",
         "orgAccessToken.ts",
         "organizationMember.ts",
+        "organizationMemberEntityAccess.ts",
         "organizationRole.ts",
         "policyGroup.ts",
         "policyPack.ts",
