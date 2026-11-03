@@ -35,6 +35,8 @@ const (
 	entityTypeStack           = "stack"
 	entityTypeEnvironment     = "environment"
 	entityTypeInsightsAccount = "insightsAccount"
+
+	permissionProperty = "permission"
 )
 
 var permissionPrefixes = map[string]string{
@@ -148,9 +150,9 @@ func (*OrganizationMemberEntityAccess) Check(
 	hasSetID := util.OrZero(in.PermissionSetId) != ""
 	switch {
 	case hasPermission == hasSetID:
-		fail("permission", "exactly one of permission and permissionSetId must be set")
+		fail(permissionProperty, "exactly one of permission and permissionSetId must be set")
 	case hasPermission && knownType && !strings.HasPrefix(*in.Permission, prefix):
-		fail("permission", fmt.Sprintf("permission for a %s must start with %q, got %q",
+		fail(permissionProperty, fmt.Sprintf("permission for a %s must start with %q, got %q",
 			in.EntityType, prefix, *in.Permission))
 	}
 	return infer.CheckResponse[OrganizationMemberEntityAccessInput]{Inputs: in, Failures: failures}, nil

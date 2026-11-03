@@ -16,6 +16,7 @@ const (
 	assignmentsOrg  = "my-org"
 	assignmentsList = "/api/orgs/my-org/assignments/list"
 	assignmentsPut  = "/api/orgs/my-org/assignments/update"
+	readSetID       = "set-id"
 )
 
 func stackEntity(id string) apitype.EntityInstance {
@@ -32,17 +33,17 @@ func TestListEntityAssignments(t *testing.T) {
 			ResponseCode:      http.StatusOK,
 			ResponseBody: apitype.EntityAssignmentsResponse{
 				Assignments: []apitype.EntityAssignment{{
-					Principal:     apitype.AssignmentPrincipal{User: &apitype.UserInfo{GitHubLogin: "alice"}},
-					PermissionSet: apitype.PermissionSet{ID: "set-id", DefaultIdentifier: &stackSet},
+					Principal:     apitype.AssignmentPrincipal{User: &apitype.UserInfo{GitHubLogin: aliceUser}},
+					PermissionSet: apitype.PermissionSet{ID: readSetID, DefaultIdentifier: &stackSet},
 					Source:        apitype.AssignmentSourceAssignment,
 				}},
-				AvailablePermissionSets: []apitype.PermissionSet{{ID: "set-id", DefaultIdentifier: &stackSet}},
+				AvailablePermissionSets: []apitype.PermissionSet{{ID: readSetID, DefaultIdentifier: &stackSet}},
 			},
 		})
 		resp, err := c.ListEntityAssignments(t.Context(), assignmentsOrg, stackEntity("stack-id"))
 		require.NoError(t, err)
 		require.Len(t, resp.Assignments, 1)
-		assert.Equal(t, "alice", resp.Assignments[0].Principal.User.GitHubLogin)
+		assert.Equal(t, aliceUser, resp.Assignments[0].Principal.User.GitHubLogin)
 	})
 
 	t.Run("missing entity returns nil", func(t *testing.T) {
@@ -69,8 +70,8 @@ func TestUpdateEntityAssignment(t *testing.T) {
 	t.Run("grant sends the permission set", func(t *testing.T) {
 		req := apitype.UpdateEntityAssignmentRequest{
 			EntityInstance:  stackEntity("stack-id"),
-			UserID:          "alice",
-			PermissionSetID: "set-id",
+			UserID:          aliceUser,
+			PermissionSetID: readSetID,
 		}
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPost,
@@ -84,14 +85,14 @@ func TestUpdateEntityAssignment(t *testing.T) {
 	})
 
 	t.Run("revoke omits the permission set", func(t *testing.T) {
-		req := apitype.UpdateEntityAssignmentRequest{EntityInstance: stackEntity("stack-id"), UserID: "alice"}
+		req := apitype.UpdateEntityAssignmentRequest{EntityInstance: stackEntity("stack-id"), UserID: aliceUser}
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPost,
 			ExpectedReqPath:   assignmentsPut,
 			ExpectedReqBody: map[string]any{
 				"context": map[string]any{"__type": "PermissionExpressionStack"},
 				"id":      "stack-id",
-				"userId":  "alice",
+				"userId":  aliceUser,
 			},
 			ResponseCode: http.StatusOK,
 			ResponseBody: apitype.UpdateEntityAssignmentResponse{},
@@ -107,7 +108,7 @@ func TestUpdateEntityAssignment(t *testing.T) {
 			ResponseCode:      http.StatusNotFound,
 		})
 		_, err := c.UpdateEntityAssignment(t.Context(), assignmentsOrg, apitype.UpdateEntityAssignmentRequest{
-			EntityInstance: stackEntity("stack-id"), UserID: "alice",
+			EntityInstance: stackEntity("stack-id"), UserID: aliceUser,
 		})
 		require.Error(t, err)
 		assert.Equal(t, http.StatusNotFound, GetErrorStatusCode(err))

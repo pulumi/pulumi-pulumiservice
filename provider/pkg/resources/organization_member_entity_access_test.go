@@ -20,7 +20,7 @@ import (
 
 const (
 	eaOrg      = "my-org"
-	eaUser     = "alice"
+	eaUser     = gcAlice
 	eaStackID  = "stack-uuid"
 	eaStackRef = "proj/dev"
 	eaID       = "my-org/alice/stack/proj/dev"
@@ -127,7 +127,7 @@ func TestOrganizationMemberEntityAccessCheck(t *testing.T) {
 		return reasons
 	}
 	perm := func(v string) map[string]property.Value {
-		return map[string]property.Value{"permission": property.New(v)}
+		return map[string]property.Value{permissionProperty: property.New(v)}
 	}
 
 	assert.Empty(t, check("stack", eaStackRef, perm("stack-write")))
@@ -137,7 +137,7 @@ func TestOrganizationMemberEntityAccessCheck(t *testing.T) {
 
 	assert.NotEmpty(t, check("stack", eaStackRef, nil), "a permission is required")
 	assert.NotEmpty(t, check("stack", eaStackRef, map[string]property.Value{
-		"permission": property.New("stack-read"), "permissionSetId": property.New("custom-id"),
+		permissionProperty: property.New("stack-read"), "permissionSetId": property.New("custom-id"),
 	}), "permission and permissionSetId are exclusive")
 	assert.NotEmpty(t, check("stack", eaStackRef, perm("environment-read")), "permission must match the entity type")
 	assert.NotEmpty(t, check("team", "x", perm("stack-read")), "unknown entity type")
