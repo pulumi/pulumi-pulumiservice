@@ -281,17 +281,6 @@ bin/$(PROVIDER):
 	$(call build_provider_cmd,$(shell go env GOOS),$(shell go env GOARCH),$(WORKING_DIR)/bin/$(PROVIDER))
 .PHONY: provider provider_no_deps
 
-# Regenerate the per-language example markdown that infer resources and
-# functions embed, from the Pulumi YAML in each package's examples/ directory.
-# `pulumi convert` loads the provider plugin, so build it first and put it on
-# PATH. That binary embeds the old markdown, so remove it afterward: `make
-# provider` only builds a missing binary.
-generate_examples: export PATH := $(WORKING_DIR)/bin:$(PATH)
-generate_examples: bin/$(PROVIDER)
-	cd provider && go generate ./pkg/functions ./pkg/resources
-	rm -f bin/$(PROVIDER)
-.PHONY: generate_examples
-
 test: export PATH := $(WORKING_DIR)/bin:$(PATH)
 test:
 	cd examples && $(GO_TEST_EXEC) -v -tags=$(TESTTAGS) -parallel $(TESTPARALLELISM) -timeout 2h $(value GOTESTARGS)

@@ -507,7 +507,7 @@ export interface OperationContextOptions {
 
 export interface OrganizationMemberInfo {
     /**
-     * The member's built-in role (member, admin, billing-manager). Absent when a custom role is assigned — check `roleId` in that case.
+     * The member's built-in role (member, admin, billing-manager, reader, builder, maintainer). Absent when a custom role is assigned — check `roleId` in that case.
      */
     role?: string;
     /**

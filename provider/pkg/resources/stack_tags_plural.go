@@ -111,11 +111,11 @@ func (*StackTags) Create(
 			partial := req.Inputs
 			partial.Tags = created
 			return infer.CreateResponse[StackTagsState]{
-					ID:     id,
-					Output: partial,
-				}, infer.ResourceInitFailedError{
-					Reasons: []string{fmt.Sprintf("failed to create tag %q: %s", name, err.Error())},
-				}
+				ID:     id,
+				Output: partial,
+			}, infer.ResourceInitFailedError{
+				Reasons: []string{fmt.Sprintf("failed to create tag %q: %s", name, err.Error())},
+			}
 		}
 		created[name] = value
 	}

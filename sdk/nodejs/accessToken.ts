@@ -39,6 +39,16 @@ export class AccessToken extends pulumi.CustomResource {
         return new AccessToken(name, undefined as any, { ...opts, id: id });
     }
 
+    /**
+     * Check whether an existing AccessToken resource with the given ID exists.
+     *
+     * @param id The _unique_ provider ID of the resource to check.
+     * @param opts Optional settings to control the behavior of the CustomResource.
+     */
+    public static exists(id: pulumi.Input<string>, opts?: pulumi.CustomResourceOptions): pulumi.Output<boolean> {
+        return pulumi.runtime.existsResource("pulumiservice:index:AccessToken", id, {}, { ...opts }, undefined);
+    }
+
     /** @internal */
     public static readonly __pulumiType = 'pulumiservice:index:AccessToken';
 
@@ -57,6 +67,10 @@ export class AccessToken extends pulumi.CustomResource {
      * Description of the access token.
      */
     declare public readonly description: pulumi.Output<string>;
+    /**
+     * When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`. Omit it for a token that never expires. Pulumi Cloud rejects an expiry that is in the past or more than two years away.
+     */
+    declare public readonly expires: pulumi.Output<string | undefined>;
     /**
      * The token's value.
      */
@@ -77,15 +91,17 @@ export class AccessToken extends pulumi.CustomResource {
                 throw new Error("Missing required property 'description'");
             }
             resourceInputs["description"] = args?.description;
+            resourceInputs["expires"] = args?.expires;
             resourceInputs["value"] = undefined /*out*/;
         } else {
             resourceInputs["description"] = undefined /*out*/;
+            resourceInputs["expires"] = undefined /*out*/;
             resourceInputs["value"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
         const secretOpts = { additionalSecretOutputs: ["value"] };
         opts = pulumi.mergeOptions(opts, secretOpts);
-        const replaceOnChanges = { replaceOnChanges: ["description"] };
+        const replaceOnChanges = { replaceOnChanges: ["description", "expires"] };
         opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(AccessToken.__pulumiType, name, resourceInputs, opts);
     }
@@ -99,4 +115,8 @@ export interface AccessTokenArgs {
      * Description of the access token.
      */
     description: pulumi.Input<string>;
+    /**
+     * When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`. Omit it for a token that never expires. Pulumi Cloud rejects an expiry that is in the past or more than two years away.
+     */
+    expires?: pulumi.Input<string | undefined>;
 }

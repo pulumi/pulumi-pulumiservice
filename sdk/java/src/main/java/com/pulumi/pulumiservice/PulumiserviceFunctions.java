@@ -107,165 +107,150 @@ public final class PulumiserviceFunctions {
     /**
      * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes globally — i.e. on every entity of the matching resource type. For grants scoped to a specific entity, see `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, or `buildInsightsAccountScopedPermissions`. The result is directly assignable to `OrganizationRole.permissions`. To combine it with other grants in a single role, pass it to `buildRolePermissions` in `additionalEntries`.
      * 
-     * @deprecated
-     * Use `buildRolePermissions` instead, with `organizationScopes` for organization-level scopes and an `all: true` rule for entity scopes. If a scope you need isn&#39;t in the enums yet, upgrade the provider.
+     * @deprecated Use `buildRolePermissions` instead, with `organizationScopes` for organization-level scopes and an `all: true` rule for entity scopes. If a scope you need isn&#39;t in the enums yet, upgrade the provider.
      * 
      */
-    @Deprecated /* Use `buildRolePermissions` instead, with `organizationScopes` for organization-level scopes and an `all: true` rule for entity scopes. If a scope you need isn't in the enums yet, upgrade the provider. */
+    @Deprecated
     public static Output<BuildAllowPermissionsResult> buildAllowPermissions(BuildAllowPermissionsArgs args) {
         return buildAllowPermissions(args, InvokeOptions.Empty);
     }
     /**
      * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes globally — i.e. on every entity of the matching resource type. For grants scoped to a specific entity, see `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, or `buildInsightsAccountScopedPermissions`. The result is directly assignable to `OrganizationRole.permissions`. To combine it with other grants in a single role, pass it to `buildRolePermissions` in `additionalEntries`.
      * 
-     * @deprecated
-     * Use `buildRolePermissions` instead, with `organizationScopes` for organization-level scopes and an `all: true` rule for entity scopes. If a scope you need isn&#39;t in the enums yet, upgrade the provider.
+     * @deprecated Use `buildRolePermissions` instead, with `organizationScopes` for organization-level scopes and an `all: true` rule for entity scopes. If a scope you need isn&#39;t in the enums yet, upgrade the provider.
      * 
      */
-    @Deprecated /* Use `buildRolePermissions` instead, with `organizationScopes` for organization-level scopes and an `all: true` rule for entity scopes. If a scope you need isn't in the enums yet, upgrade the provider. */
+    @Deprecated
     public static CompletableFuture<BuildAllowPermissionsResult> buildAllowPermissionsPlain(BuildAllowPermissionsPlainArgs args) {
         return buildAllowPermissionsPlain(args, InvokeOptions.Empty);
     }
     /**
      * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes globally — i.e. on every entity of the matching resource type. For grants scoped to a specific entity, see `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, or `buildInsightsAccountScopedPermissions`. The result is directly assignable to `OrganizationRole.permissions`. To combine it with other grants in a single role, pass it to `buildRolePermissions` in `additionalEntries`.
      * 
-     * @deprecated
-     * Use `buildRolePermissions` instead, with `organizationScopes` for organization-level scopes and an `all: true` rule for entity scopes. If a scope you need isn&#39;t in the enums yet, upgrade the provider.
+     * @deprecated Use `buildRolePermissions` instead, with `organizationScopes` for organization-level scopes and an `all: true` rule for entity scopes. If a scope you need isn&#39;t in the enums yet, upgrade the provider.
      * 
      */
-    @Deprecated /* Use `buildRolePermissions` instead, with `organizationScopes` for organization-level scopes and an `all: true` rule for entity scopes. If a scope you need isn't in the enums yet, upgrade the provider. */
+    @Deprecated
     public static Output<BuildAllowPermissionsResult> buildAllowPermissions(BuildAllowPermissionsArgs args, InvokeOptions options) {
         return Deployment.getInstance().invoke("pulumiservice:index:buildAllowPermissions", TypeShape.of(BuildAllowPermissionsResult.class), args, Utilities.withVersion(options));
     }
     /**
      * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes globally — i.e. on every entity of the matching resource type. For grants scoped to a specific entity, see `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, or `buildInsightsAccountScopedPermissions`. The result is directly assignable to `OrganizationRole.permissions`. To combine it with other grants in a single role, pass it to `buildRolePermissions` in `additionalEntries`.
      * 
-     * @deprecated
-     * Use `buildRolePermissions` instead, with `organizationScopes` for organization-level scopes and an `all: true` rule for entity scopes. If a scope you need isn&#39;t in the enums yet, upgrade the provider.
+     * @deprecated Use `buildRolePermissions` instead, with `organizationScopes` for organization-level scopes and an `all: true` rule for entity scopes. If a scope you need isn&#39;t in the enums yet, upgrade the provider.
      * 
      */
-    @Deprecated /* Use `buildRolePermissions` instead, with `organizationScopes` for organization-level scopes and an `all: true` rule for entity scopes. If a scope you need isn't in the enums yet, upgrade the provider. */
+    @Deprecated
     public static Output<BuildAllowPermissionsResult> buildAllowPermissions(BuildAllowPermissionsArgs args, InvokeOutputOptions options) {
         return Deployment.getInstance().invoke("pulumiservice:index:buildAllowPermissions", TypeShape.of(BuildAllowPermissionsResult.class), args, Utilities.withVersion(options));
     }
     /**
      * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes globally — i.e. on every entity of the matching resource type. For grants scoped to a specific entity, see `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, or `buildInsightsAccountScopedPermissions`. The result is directly assignable to `OrganizationRole.permissions`. To combine it with other grants in a single role, pass it to `buildRolePermissions` in `additionalEntries`.
      * 
-     * @deprecated
-     * Use `buildRolePermissions` instead, with `organizationScopes` for organization-level scopes and an `all: true` rule for entity scopes. If a scope you need isn&#39;t in the enums yet, upgrade the provider.
+     * @deprecated Use `buildRolePermissions` instead, with `organizationScopes` for organization-level scopes and an `all: true` rule for entity scopes. If a scope you need isn&#39;t in the enums yet, upgrade the provider.
      * 
      */
-    @Deprecated /* Use `buildRolePermissions` instead, with `organizationScopes` for organization-level scopes and an `all: true` rule for entity scopes. If a scope you need isn't in the enums yet, upgrade the provider. */
+    @Deprecated
     public static CompletableFuture<BuildAllowPermissionsResult> buildAllowPermissionsPlain(BuildAllowPermissionsPlainArgs args, InvokeOptions options) {
         return Deployment.getInstance().invokeAsync("pulumiservice:index:buildAllowPermissions", TypeShape.of(BuildAllowPermissionsResult.class), args, Utilities.withVersion(options));
     }
     /**
      * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named environment. Pair with `Environment.environmentId` (or the `getEnvironment` data source) to avoid hand-rolling the `PermissionDescriptorCondition` tree yourself. The result is directly assignable to `OrganizationRole.permissions`. To combine it with other grants in a single role, pass it to `buildRolePermissions` in `additionalEntries`.
      * 
-     * @deprecated
-     * Use `buildRolePermissions` instead, with an `environmentRules` entry that sets `id`. If a scope you need isn&#39;t in the enums yet, upgrade the provider.
+     * @deprecated Use `buildRolePermissions` instead, with an `environmentRules` entry that sets `id`. If a scope you need isn&#39;t in the enums yet, upgrade the provider.
      * 
      */
-    @Deprecated /* Use `buildRolePermissions` instead, with an `environmentRules` entry that sets `id`. If a scope you need isn't in the enums yet, upgrade the provider. */
+    @Deprecated
     public static Output<BuildEnvironmentScopedPermissionsResult> buildEnvironmentScopedPermissions(BuildEnvironmentScopedPermissionsArgs args) {
         return buildEnvironmentScopedPermissions(args, InvokeOptions.Empty);
     }
     /**
      * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named environment. Pair with `Environment.environmentId` (or the `getEnvironment` data source) to avoid hand-rolling the `PermissionDescriptorCondition` tree yourself. The result is directly assignable to `OrganizationRole.permissions`. To combine it with other grants in a single role, pass it to `buildRolePermissions` in `additionalEntries`.
      * 
-     * @deprecated
-     * Use `buildRolePermissions` instead, with an `environmentRules` entry that sets `id`. If a scope you need isn&#39;t in the enums yet, upgrade the provider.
+     * @deprecated Use `buildRolePermissions` instead, with an `environmentRules` entry that sets `id`. If a scope you need isn&#39;t in the enums yet, upgrade the provider.
      * 
      */
-    @Deprecated /* Use `buildRolePermissions` instead, with an `environmentRules` entry that sets `id`. If a scope you need isn't in the enums yet, upgrade the provider. */
+    @Deprecated
     public static CompletableFuture<BuildEnvironmentScopedPermissionsResult> buildEnvironmentScopedPermissionsPlain(BuildEnvironmentScopedPermissionsPlainArgs args) {
         return buildEnvironmentScopedPermissionsPlain(args, InvokeOptions.Empty);
     }
     /**
      * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named environment. Pair with `Environment.environmentId` (or the `getEnvironment` data source) to avoid hand-rolling the `PermissionDescriptorCondition` tree yourself. The result is directly assignable to `OrganizationRole.permissions`. To combine it with other grants in a single role, pass it to `buildRolePermissions` in `additionalEntries`.
      * 
-     * @deprecated
-     * Use `buildRolePermissions` instead, with an `environmentRules` entry that sets `id`. If a scope you need isn&#39;t in the enums yet, upgrade the provider.
+     * @deprecated Use `buildRolePermissions` instead, with an `environmentRules` entry that sets `id`. If a scope you need isn&#39;t in the enums yet, upgrade the provider.
      * 
      */
-    @Deprecated /* Use `buildRolePermissions` instead, with an `environmentRules` entry that sets `id`. If a scope you need isn't in the enums yet, upgrade the provider. */
+    @Deprecated
     public static Output<BuildEnvironmentScopedPermissionsResult> buildEnvironmentScopedPermissions(BuildEnvironmentScopedPermissionsArgs args, InvokeOptions options) {
         return Deployment.getInstance().invoke("pulumiservice:index:buildEnvironmentScopedPermissions", TypeShape.of(BuildEnvironmentScopedPermissionsResult.class), args, Utilities.withVersion(options));
     }
     /**
      * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named environment. Pair with `Environment.environmentId` (or the `getEnvironment` data source) to avoid hand-rolling the `PermissionDescriptorCondition` tree yourself. The result is directly assignable to `OrganizationRole.permissions`. To combine it with other grants in a single role, pass it to `buildRolePermissions` in `additionalEntries`.
      * 
-     * @deprecated
-     * Use `buildRolePermissions` instead, with an `environmentRules` entry that sets `id`. If a scope you need isn&#39;t in the enums yet, upgrade the provider.
+     * @deprecated Use `buildRolePermissions` instead, with an `environmentRules` entry that sets `id`. If a scope you need isn&#39;t in the enums yet, upgrade the provider.
      * 
      */
-    @Deprecated /* Use `buildRolePermissions` instead, with an `environmentRules` entry that sets `id`. If a scope you need isn't in the enums yet, upgrade the provider. */
+    @Deprecated
     public static Output<BuildEnvironmentScopedPermissionsResult> buildEnvironmentScopedPermissions(BuildEnvironmentScopedPermissionsArgs args, InvokeOutputOptions options) {
         return Deployment.getInstance().invoke("pulumiservice:index:buildEnvironmentScopedPermissions", TypeShape.of(BuildEnvironmentScopedPermissionsResult.class), args, Utilities.withVersion(options));
     }
     /**
      * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named environment. Pair with `Environment.environmentId` (or the `getEnvironment` data source) to avoid hand-rolling the `PermissionDescriptorCondition` tree yourself. The result is directly assignable to `OrganizationRole.permissions`. To combine it with other grants in a single role, pass it to `buildRolePermissions` in `additionalEntries`.
      * 
-     * @deprecated
-     * Use `buildRolePermissions` instead, with an `environmentRules` entry that sets `id`. If a scope you need isn&#39;t in the enums yet, upgrade the provider.
+     * @deprecated Use `buildRolePermissions` instead, with an `environmentRules` entry that sets `id`. If a scope you need isn&#39;t in the enums yet, upgrade the provider.
      * 
      */
-    @Deprecated /* Use `buildRolePermissions` instead, with an `environmentRules` entry that sets `id`. If a scope you need isn't in the enums yet, upgrade the provider. */
+    @Deprecated
     public static CompletableFuture<BuildEnvironmentScopedPermissionsResult> buildEnvironmentScopedPermissionsPlain(BuildEnvironmentScopedPermissionsPlainArgs args, InvokeOptions options) {
         return Deployment.getInstance().invokeAsync("pulumiservice:index:buildEnvironmentScopedPermissions", TypeShape.of(BuildEnvironmentScopedPermissionsResult.class), args, Utilities.withVersion(options));
     }
     /**
      * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named insights account. Pair with `InsightsAccount.insightsAccountId` (or the `getInsightsAccount` data source). The result is directly assignable to `OrganizationRole.permissions`. To combine it with other grants in a single role, pass it to `buildRolePermissions` in `additionalEntries`.
      * 
-     * @deprecated
-     * Use `buildRolePermissions` instead, with an `accountRules` entry that sets `id`. If a scope you need isn&#39;t in the enums yet, upgrade the provider.
+     * @deprecated Use `buildRolePermissions` instead, with an `accountRules` entry that sets `id`. If a scope you need isn&#39;t in the enums yet, upgrade the provider.
      * 
      */
-    @Deprecated /* Use `buildRolePermissions` instead, with an `accountRules` entry that sets `id`. If a scope you need isn't in the enums yet, upgrade the provider. */
+    @Deprecated
     public static Output<BuildInsightsAccountScopedPermissionsResult> buildInsightsAccountScopedPermissions(BuildInsightsAccountScopedPermissionsArgs args) {
         return buildInsightsAccountScopedPermissions(args, InvokeOptions.Empty);
     }
     /**
      * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named insights account. Pair with `InsightsAccount.insightsAccountId` (or the `getInsightsAccount` data source). The result is directly assignable to `OrganizationRole.permissions`. To combine it with other grants in a single role, pass it to `buildRolePermissions` in `additionalEntries`.
      * 
-     * @deprecated
-     * Use `buildRolePermissions` instead, with an `accountRules` entry that sets `id`. If a scope you need isn&#39;t in the enums yet, upgrade the provider.
+     * @deprecated Use `buildRolePermissions` instead, with an `accountRules` entry that sets `id`. If a scope you need isn&#39;t in the enums yet, upgrade the provider.
      * 
      */
-    @Deprecated /* Use `buildRolePermissions` instead, with an `accountRules` entry that sets `id`. If a scope you need isn't in the enums yet, upgrade the provider. */
+    @Deprecated
     public static CompletableFuture<BuildInsightsAccountScopedPermissionsResult> buildInsightsAccountScopedPermissionsPlain(BuildInsightsAccountScopedPermissionsPlainArgs args) {
         return buildInsightsAccountScopedPermissionsPlain(args, InvokeOptions.Empty);
     }
     /**
      * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named insights account. Pair with `InsightsAccount.insightsAccountId` (or the `getInsightsAccount` data source). The result is directly assignable to `OrganizationRole.permissions`. To combine it with other grants in a single role, pass it to `buildRolePermissions` in `additionalEntries`.
      * 
-     * @deprecated
-     * Use `buildRolePermissions` instead, with an `accountRules` entry that sets `id`. If a scope you need isn&#39;t in the enums yet, upgrade the provider.
+     * @deprecated Use `buildRolePermissions` instead, with an `accountRules` entry that sets `id`. If a scope you need isn&#39;t in the enums yet, upgrade the provider.
      * 
      */
-    @Deprecated /* Use `buildRolePermissions` instead, with an `accountRules` entry that sets `id`. If a scope you need isn't in the enums yet, upgrade the provider. */
+    @Deprecated
     public static Output<BuildInsightsAccountScopedPermissionsResult> buildInsightsAccountScopedPermissions(BuildInsightsAccountScopedPermissionsArgs args, InvokeOptions options) {
         return Deployment.getInstance().invoke("pulumiservice:index:buildInsightsAccountScopedPermissions", TypeShape.of(BuildInsightsAccountScopedPermissionsResult.class), args, Utilities.withVersion(options));
     }
     /**
      * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named insights account. Pair with `InsightsAccount.insightsAccountId` (or the `getInsightsAccount` data source). The result is directly assignable to `OrganizationRole.permissions`. To combine it with other grants in a single role, pass it to `buildRolePermissions` in `additionalEntries`.
      * 
-     * @deprecated
-     * Use `buildRolePermissions` instead, with an `accountRules` entry that sets `id`. If a scope you need isn&#39;t in the enums yet, upgrade the provider.
+     * @deprecated Use `buildRolePermissions` instead, with an `accountRules` entry that sets `id`. If a scope you need isn&#39;t in the enums yet, upgrade the provider.
      * 
      */
-    @Deprecated /* Use `buildRolePermissions` instead, with an `accountRules` entry that sets `id`. If a scope you need isn't in the enums yet, upgrade the provider. */
+    @Deprecated
     public static Output<BuildInsightsAccountScopedPermissionsResult> buildInsightsAccountScopedPermissions(BuildInsightsAccountScopedPermissionsArgs args, InvokeOutputOptions options) {
         return Deployment.getInstance().invoke("pulumiservice:index:buildInsightsAccountScopedPermissions", TypeShape.of(BuildInsightsAccountScopedPermissionsResult.class), args, Utilities.withVersion(options));
     }
     /**
      * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named insights account. Pair with `InsightsAccount.insightsAccountId` (or the `getInsightsAccount` data source). The result is directly assignable to `OrganizationRole.permissions`. To combine it with other grants in a single role, pass it to `buildRolePermissions` in `additionalEntries`.
      * 
-     * @deprecated
-     * Use `buildRolePermissions` instead, with an `accountRules` entry that sets `id`. If a scope you need isn&#39;t in the enums yet, upgrade the provider.
+     * @deprecated Use `buildRolePermissions` instead, with an `accountRules` entry that sets `id`. If a scope you need isn&#39;t in the enums yet, upgrade the provider.
      * 
      */
-    @Deprecated /* Use `buildRolePermissions` instead, with an `accountRules` entry that sets `id`. If a scope you need isn't in the enums yet, upgrade the provider. */
+    @Deprecated
     public static CompletableFuture<BuildInsightsAccountScopedPermissionsResult> buildInsightsAccountScopedPermissionsPlain(BuildInsightsAccountScopedPermissionsPlainArgs args, InvokeOptions options) {
         return Deployment.getInstance().invokeAsync("pulumiservice:index:buildInsightsAccountScopedPermissions", TypeShape.of(BuildInsightsAccountScopedPermissionsResult.class), args, Utilities.withVersion(options));
     }
@@ -356,55 +341,50 @@ public final class PulumiserviceFunctions {
     /**
      * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named stack. The `stackId` is the stack&#39;s opaque Pulumi Cloud identifier — distinct from the `organization/project/stack` triple. The result is directly assignable to `OrganizationRole.permissions`. To combine it with other grants in a single role, pass it to `buildRolePermissions` in `additionalEntries`.
      * 
-     * @deprecated
-     * Use `buildRolePermissions` instead, with a `stackRules` entry that sets `id`. If a scope you need isn&#39;t in the enums yet, upgrade the provider.
+     * @deprecated Use `buildRolePermissions` instead, with a `stackRules` entry that sets `id`. If a scope you need isn&#39;t in the enums yet, upgrade the provider.
      * 
      */
-    @Deprecated /* Use `buildRolePermissions` instead, with a `stackRules` entry that sets `id`. If a scope you need isn't in the enums yet, upgrade the provider. */
+    @Deprecated
     public static Output<BuildStackScopedPermissionsResult> buildStackScopedPermissions(BuildStackScopedPermissionsArgs args) {
         return buildStackScopedPermissions(args, InvokeOptions.Empty);
     }
     /**
      * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named stack. The `stackId` is the stack&#39;s opaque Pulumi Cloud identifier — distinct from the `organization/project/stack` triple. The result is directly assignable to `OrganizationRole.permissions`. To combine it with other grants in a single role, pass it to `buildRolePermissions` in `additionalEntries`.
      * 
-     * @deprecated
-     * Use `buildRolePermissions` instead, with a `stackRules` entry that sets `id`. If a scope you need isn&#39;t in the enums yet, upgrade the provider.
+     * @deprecated Use `buildRolePermissions` instead, with a `stackRules` entry that sets `id`. If a scope you need isn&#39;t in the enums yet, upgrade the provider.
      * 
      */
-    @Deprecated /* Use `buildRolePermissions` instead, with a `stackRules` entry that sets `id`. If a scope you need isn't in the enums yet, upgrade the provider. */
+    @Deprecated
     public static CompletableFuture<BuildStackScopedPermissionsResult> buildStackScopedPermissionsPlain(BuildStackScopedPermissionsPlainArgs args) {
         return buildStackScopedPermissionsPlain(args, InvokeOptions.Empty);
     }
     /**
      * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named stack. The `stackId` is the stack&#39;s opaque Pulumi Cloud identifier — distinct from the `organization/project/stack` triple. The result is directly assignable to `OrganizationRole.permissions`. To combine it with other grants in a single role, pass it to `buildRolePermissions` in `additionalEntries`.
      * 
-     * @deprecated
-     * Use `buildRolePermissions` instead, with a `stackRules` entry that sets `id`. If a scope you need isn&#39;t in the enums yet, upgrade the provider.
+     * @deprecated Use `buildRolePermissions` instead, with a `stackRules` entry that sets `id`. If a scope you need isn&#39;t in the enums yet, upgrade the provider.
      * 
      */
-    @Deprecated /* Use `buildRolePermissions` instead, with a `stackRules` entry that sets `id`. If a scope you need isn't in the enums yet, upgrade the provider. */
+    @Deprecated
     public static Output<BuildStackScopedPermissionsResult> buildStackScopedPermissions(BuildStackScopedPermissionsArgs args, InvokeOptions options) {
         return Deployment.getInstance().invoke("pulumiservice:index:buildStackScopedPermissions", TypeShape.of(BuildStackScopedPermissionsResult.class), args, Utilities.withVersion(options));
     }
     /**
      * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named stack. The `stackId` is the stack&#39;s opaque Pulumi Cloud identifier — distinct from the `organization/project/stack` triple. The result is directly assignable to `OrganizationRole.permissions`. To combine it with other grants in a single role, pass it to `buildRolePermissions` in `additionalEntries`.
      * 
-     * @deprecated
-     * Use `buildRolePermissions` instead, with a `stackRules` entry that sets `id`. If a scope you need isn&#39;t in the enums yet, upgrade the provider.
+     * @deprecated Use `buildRolePermissions` instead, with a `stackRules` entry that sets `id`. If a scope you need isn&#39;t in the enums yet, upgrade the provider.
      * 
      */
-    @Deprecated /* Use `buildRolePermissions` instead, with a `stackRules` entry that sets `id`. If a scope you need isn't in the enums yet, upgrade the provider. */
+    @Deprecated
     public static Output<BuildStackScopedPermissionsResult> buildStackScopedPermissions(BuildStackScopedPermissionsArgs args, InvokeOutputOptions options) {
         return Deployment.getInstance().invoke("pulumiservice:index:buildStackScopedPermissions", TypeShape.of(BuildStackScopedPermissionsResult.class), args, Utilities.withVersion(options));
     }
     /**
      * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named stack. The `stackId` is the stack&#39;s opaque Pulumi Cloud identifier — distinct from the `organization/project/stack` triple. The result is directly assignable to `OrganizationRole.permissions`. To combine it with other grants in a single role, pass it to `buildRolePermissions` in `additionalEntries`.
      * 
-     * @deprecated
-     * Use `buildRolePermissions` instead, with a `stackRules` entry that sets `id`. If a scope you need isn&#39;t in the enums yet, upgrade the provider.
+     * @deprecated Use `buildRolePermissions` instead, with a `stackRules` entry that sets `id`. If a scope you need isn&#39;t in the enums yet, upgrade the provider.
      * 
      */
-    @Deprecated /* Use `buildRolePermissions` instead, with a `stackRules` entry that sets `id`. If a scope you need isn't in the enums yet, upgrade the provider. */
+    @Deprecated
     public static CompletableFuture<BuildStackScopedPermissionsResult> buildStackScopedPermissionsPlain(BuildStackScopedPermissionsPlainArgs args, InvokeOptions options) {
         return Deployment.getInstance().invokeAsync("pulumiservice:index:buildStackScopedPermissions", TypeShape.of(BuildStackScopedPermissionsResult.class), args, Utilities.withVersion(options));
     }

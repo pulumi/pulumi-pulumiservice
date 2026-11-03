@@ -91,6 +91,7 @@ func run(srcDir, dstDir string) error {
 
 // render converts every example in one YAML file and returns the markdown.
 func render(path string) (string, error) {
+	//nolint:gosec // G703: path is built from build-time CLI arguments, not user input.
 	f, err := os.Open(filepath.Clean(path))
 	if err != nil {
 		return "", err

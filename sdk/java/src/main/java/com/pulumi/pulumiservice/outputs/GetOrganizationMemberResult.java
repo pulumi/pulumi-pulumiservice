@@ -14,7 +14,7 @@ import javax.annotation.Nullable;
 @CustomType
 public final class GetOrganizationMemberResult {
     /**
-     * @return The member&#39;s built-in role (member, admin, billing-manager). Absent when a custom role is assigned — check `roleId` in that case.
+     * @return The member&#39;s built-in role (member, admin, billing-manager, reader, builder, maintainer). Absent when a custom role is assigned — check `roleId` in that case.
      * 
      */
     private @Nullable String role;
@@ -41,7 +41,7 @@ public final class GetOrganizationMemberResult {
 
     private GetOrganizationMemberResult() {}
     /**
-     * @return The member&#39;s built-in role (member, admin, billing-manager). Absent when a custom role is assigned — check `roleId` in that case.
+     * @return The member&#39;s built-in role (member, admin, billing-manager, reader, builder, maintainer). Absent when a custom role is assigned — check `roleId` in that case.
      * 
      */
     public Optional<String> role() {

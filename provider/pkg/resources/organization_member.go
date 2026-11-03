@@ -64,8 +64,10 @@ func (c *OrganizationMemberCore) Annotate(a infer.Annotator) {
 	a.Describe(&c.Username, "The Pulumi Cloud username of the member.")
 	a.Describe(
 		&c.Role,
-		"The built-in organization role. One of `member`, `admin`, `billing-manager`. "+
-			"Defaults to `member` on create. Ignored when `roleId` is set.",
+		"The built-in organization role. One of `member`, `admin`, `billing-manager`, `reader`, `builder`, "+
+			"`maintainer`. `reader`, `builder` and `maintainer` exist only in organizations that use stored "+
+			"default roles. In those organizations `member` means the organization's default role: the member "+
+			"follows it if an administrator changes it. Defaults to `member` on create. Ignored when `roleId` is set.",
 	)
 	a.Describe(&c.RoleId, "The ID of a custom (fine-grained) organization role to assign. Takes precedence over `role`.")
 }
@@ -98,7 +100,14 @@ func (s *OrganizationMemberState) Annotate(a infer.Annotator) {
 
 const defaultOrgMemberRole = "member"
 
-var validOrgMemberRoles = []string{defaultOrgMemberRole, gcAdmin, "billing-manager"}
+const roleProperty = "role"
+
+var storedDefaultOrgMemberRoles = []string{"reader", "builder", "maintainer"}
+
+var validOrgMemberRoles = append(
+	[]string{defaultOrgMemberRole, gcAdmin, "billing-manager"},
+	storedDefaultOrgMemberRoles...,
+)
 
 func (*OrganizationMember) Check(
 	ctx context.Context,
@@ -110,7 +119,7 @@ func (*OrganizationMember) Check(
 	}
 	if in.Role != nil && *in.Role != "" && !slices.Contains(validOrgMemberRoles, *in.Role) {
 		failures = append(failures, p.CheckFailure{
-			Property: "role",
+			Property: roleProperty,
 			Reason:   fmt.Sprintf("role must be one of %v, got %q", validOrgMemberRoles, *in.Role),
 		})
 	}
@@ -141,7 +150,7 @@ func (*OrganizationMember) Create(
 	// The add endpoint only takes built-in roles; custom roles are applied via
 	// an update that follows the add. We always add with a built-in role first.
 	addRole := util.OrZero(core.Role)
-	if addRole == "" {
+	if addRole == "" || slices.Contains(storedDefaultOrgMemberRoles, addRole) {
 		addRole = defaultOrgMemberRole
 	}
 	// Adopt an existing membership: if the user is already in the org (409),
@@ -160,11 +169,15 @@ func (*OrganizationMember) Create(
 
 	// Always patch the role when we adopted an existing member (the built-in
 	// role from Add wasn't applied) or when a custom role was requested.
-	needsRolePatch := existingMember || (core.RoleId != nil && *core.RoleId != "")
+	needsRolePatch := existingMember || (core.RoleId != nil && *core.RoleId != "") ||
+		slices.Contains(storedDefaultOrgMemberRoles, util.OrZero(core.Role))
 	if needsRolePatch {
 		roleToSet := ""
 		if core.RoleId == nil || *core.RoleId == "" {
-			roleToSet = addRole
+			roleToSet = util.OrZero(core.Role)
+			if roleToSet == "" {
+				roleToSet = defaultOrgMemberRole
+			}
 		}
 		if err := client.UpdateOrgMemberRole(
 			ctx,
@@ -174,13 +187,13 @@ func (*OrganizationMember) Create(
 			core.RoleId,
 		); err != nil {
 			return infer.CreateResponse[OrganizationMemberState]{
-					ID: id,
-					Output: OrganizationMemberState{
-						OrganizationMemberCore: core,
-					},
-				}, infer.ResourceInitFailedError{Reasons: []string{
-					fmt.Sprintf("user added but failed to assign role: %s", err.Error()),
-				}}
+				ID: id,
+				Output: OrganizationMemberState{
+					OrganizationMemberCore: core,
+				},
+			}, infer.ResourceInitFailedError{Reasons: []string{
+				fmt.Sprintf("user added but failed to assign role: %s", err.Error()),
+			}}
 		}
 	}
 
@@ -252,13 +265,6 @@ func (*OrganizationMember) Delete(
 ) (infer.DeleteResponse, error) {
 	client := config.GetClient(ctx)
 	if req.State.Adopted {
-		// Adopted: don't remove the user from the org, but un-assign any
-		// custom role we applied. Leaving a dangling fgaRoleId would block
-		// deletion of the custom role (the service refuses "cannot delete
-		// role X, it is referenced by users or teams"). Reset to the
-		// built-in member role — UpdateOrgMemberRole resolves the built-in
-		// name to its per-org FGA ID and PATCHes with `fgaRoleId` set,
-		// which clears any custom role.
 		return infer.DeleteResponse{}, client.UpdateOrgMemberRole(
 			ctx,
 			req.State.OrganizationName,
@@ -351,7 +357,11 @@ func applyMemberRoleToState(
 	member *pulumiapi.Member,
 	state *OrganizationMemberState,
 ) error {
-	if member.FGARole == nil {
+	if !member.HasFGARole() {
+		if member.FGARole != nil && member.Role == defaultOrgMemberRole {
+			state.RoleName = member.Role
+			return nil
+		}
 		name := member.Role
 		state.Role = &name
 		state.RoleId = nil
@@ -369,7 +379,12 @@ func applyMemberRoleToState(
 		if r.Name != member.FGARole.Name {
 			continue
 		}
-		if slices.Contains(validOrgMemberRoles, r.DefaultIdentifier) {
+		if r.IsOrgDefault && util.OrZero(state.Role) == defaultOrgMemberRole {
+			state.RoleId = nil
+			return nil
+		}
+		declaredByID := state.RoleId != nil && *state.RoleId == r.ID
+		if !declaredByID && slices.Contains(validOrgMemberRoles, r.DefaultIdentifier) {
 			slug := r.DefaultIdentifier
 			state.Role = &slug
 			state.RoleId = nil

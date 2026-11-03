@@ -28,6 +28,16 @@ export class OrganizationMember extends pulumi.CustomResource {
         return new OrganizationMember(name, undefined as any, { ...opts, id: id });
     }
 
+    /**
+     * Check whether an existing OrganizationMember resource with the given ID exists.
+     *
+     * @param id The _unique_ provider ID of the resource to check.
+     * @param opts Optional settings to control the behavior of the CustomResource.
+     */
+    public static exists(id: pulumi.Input<string>, opts?: pulumi.CustomResourceOptions): pulumi.Output<boolean> {
+        return pulumi.runtime.existsResource("pulumiservice:index:OrganizationMember", id, {}, { ...opts }, undefined);
+    }
+
     /** @internal */
     public static readonly __pulumiType = 'pulumiservice:index:OrganizationMember';
 
@@ -59,7 +69,7 @@ export class OrganizationMember extends pulumi.CustomResource {
      */
     declare public readonly organizationName: pulumi.Output<string>;
     /**
-     * The built-in organization role. One of `member`, `admin`, `billing-manager`. Defaults to `member` on create. Ignored when `roleId` is set.
+     * The built-in organization role. One of `member`, `admin`, `billing-manager`, `reader`, `builder`, `maintainer`. `reader`, `builder` and `maintainer` exist only in organizations that use stored default roles. In those organizations `member` means the organization's default role: the member follows it if an administrator changes it. Defaults to `member` on create. Ignored when `roleId` is set.
      */
     declare public readonly role: pulumi.Output<string | undefined>;
     /**
@@ -126,7 +136,7 @@ export interface OrganizationMemberArgs {
      */
     organizationName: pulumi.Input<string>;
     /**
-     * The built-in organization role. One of `member`, `admin`, `billing-manager`. Defaults to `member` on create. Ignored when `roleId` is set.
+     * The built-in organization role. One of `member`, `admin`, `billing-manager`, `reader`, `builder`, `maintainer`. `reader`, `builder` and `maintainer` exist only in organizations that use stored default roles. In those organizations `member` means the organization's default role: the member follows it if an administrator changes it. Defaults to `member` on create. Ignored when `roleId` is set.
      */
     role?: pulumi.Input<string | undefined>;
     /**

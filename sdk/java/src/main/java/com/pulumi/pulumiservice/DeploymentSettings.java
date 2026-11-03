@@ -182,11 +182,10 @@ public class DeploymentSettings extends com.pulumi.resources.CustomResource {
     /**
      * GitHub settings for the deployment.
      * 
-     * @deprecated
-     * Use the &#39;vcs&#39; property instead, which supports both GitHub and Azure DevOps.
+     * @deprecated Use the &#39;vcs&#39; property instead, which supports both GitHub and Azure DevOps.
      * 
      */
-    @Deprecated /* Use the 'vcs' property instead, which supports both GitHub and Azure DevOps. */
+    @Deprecated
     @Export(name="github", refs={DeploymentSettingsGithub.class}, tree="[0]")
     private Output</* @Nullable */ DeploymentSettingsGithub> github;
 

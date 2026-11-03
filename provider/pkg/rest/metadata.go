@@ -164,6 +164,11 @@ type FieldMeta struct {
 	// The runtime preserves it from prior state on refresh.
 	EmitOnCreate bool `json:"emitOnCreate,omitempty"`
 
+	// EmitOnCreateKeys lists keys of this object field that are present
+	// only in the create response. The runtime preserves them from prior
+	// state on refresh, like EmitOnCreate does for top-level fields.
+	EmitOnCreateKeys []string `json:"emitOnCreateKeys,omitempty"`
+
 	// Unordered marks an array as set-like; Check sorts the values.
 	Unordered bool `json:"unordered,omitempty"`
 

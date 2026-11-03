@@ -360,7 +360,7 @@ func introspectPolicyPack(ctx context.Context, sourcePath string) ([]PolicyPackP
 	defer func() { _ = pctx.Close() }()
 
 	analyzer, err := plugin.NewPolicyAnalyzer(
-		pctx.Host, pctx, tokens.QName("policypack"), absPath, nil, nil,
+		pctx.Host, pctx, tokens.QName("policypack"), absPath, nil,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("spawn policy analyzer for %s: %w", absPath, err)
