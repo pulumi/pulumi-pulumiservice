@@ -20,6 +20,9 @@ const (
 	gcAcmeAlice = "acme/alice"
 	gcAlice     = "alice"
 	gcBob       = "bob"
+
+	gcBuilderCap = "Builder"
+	gcBuilderID  = "builder-role-id"
 )
 
 const testAdminRole = gcAdmin
@@ -220,6 +223,68 @@ func TestOrganizationMemberRead(t *testing.T) {
 			assert.Equal(t, gcAdmin, *resp.State.Role)
 		}
 		assert.Nil(t, resp.State.RoleId, "RoleId must be cleared in built-in branch")
+	})
+
+	migratedOrgRoles := func(
+		_ context.Context,
+		_ string,
+		_ apitype.PermissionDescriptorUXPurpose,
+	) ([]apitype.PermissionDescriptorRecord, error) {
+		return []apitype.PermissionDescriptorRecord{
+			{
+				PermissionDescriptorBase: apitype.PermissionDescriptorBase{Name: gcAdminCap},
+				ID:                       gcAdminFGA,
+				DefaultIdentifier:        gcAdmin,
+			},
+			{
+				PermissionDescriptorBase: apitype.PermissionDescriptorBase{Name: gcBuilderCap},
+				ID:                       gcBuilderID,
+				DefaultIdentifier:        "builder",
+				IsOrgDefault:             true,
+			},
+		}, nil
+	}
+	builderMember := func(_ context.Context, _, _ string) (*pulumiapi.Member, error) {
+		return &pulumiapi.Member{
+			Role:    defaultOrgMemberRole,
+			User:    pulumiapi.User{GithubLogin: gcAlice},
+			FGARole: &pulumiapi.FGARole{ID: "builder-fga", Name: gcBuilderCap},
+		}, nil
+	}
+
+	t.Run("member on the org default role keeps role member", func(t *testing.T) {
+		mock := &orgMemberClientMock{getFunc: builderMember, listRolesFunc: migratedOrgRoles}
+		ctx := config.WithMockClient(context.Background(), mock)
+		member := defaultOrgMemberRole
+
+		r := &OrganizationMember{}
+		resp, err := r.Read(ctx, infer.ReadRequest[OrganizationMemberInput, OrganizationMemberState]{
+			ID:     gcAcmeAlice,
+			Inputs: OrganizationMemberInput{OrganizationMemberCore: OrganizationMemberCore{Role: &member}},
+		})
+		assert.NoError(t, err)
+		if assert.NotNil(t, resp.Inputs.Role) {
+			assert.Equal(t, defaultOrgMemberRole, *resp.Inputs.Role)
+		}
+		assert.Nil(t, resp.Inputs.RoleId)
+		assert.Equal(t, gcBuilderCap, resp.State.RoleName)
+	})
+
+	t.Run("roleId pointing at the org default role stays a roleId", func(t *testing.T) {
+		mock := &orgMemberClientMock{getFunc: builderMember, listRolesFunc: migratedOrgRoles}
+		ctx := config.WithMockClient(context.Background(), mock)
+		roleID := gcBuilderID
+
+		r := &OrganizationMember{}
+		resp, err := r.Read(ctx, infer.ReadRequest[OrganizationMemberInput, OrganizationMemberState]{
+			ID:     gcAcmeAlice,
+			Inputs: OrganizationMemberInput{OrganizationMemberCore: OrganizationMemberCore{RoleId: &roleID}},
+		})
+		assert.NoError(t, err)
+		if assert.NotNil(t, resp.Inputs.RoleId) {
+			assert.Equal(t, gcBuilderID, *resp.Inputs.RoleId)
+		}
+		assert.Nil(t, resp.Inputs.Role)
 	})
 
 	t.Run("bad id", func(t *testing.T) {

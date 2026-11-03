@@ -52,10 +52,6 @@ type RoleClient interface {
 		orgName string,
 		uxPurpose apitype.PermissionDescriptorUXPurpose,
 	) ([]apitype.PermissionDescriptorRecord, error)
-	ResolveBuiltInRoleID(
-		ctx context.Context,
-		orgName, builtInRole string,
-	) (string, error)
 }
 
 // RoleScope is a single permission scope (e.g. "stack:read") plus its
@@ -216,32 +212,6 @@ func (c *Client) ListOrgRoles(
 		return nil, fmt.Errorf("failed to list organization roles: %w", err)
 	}
 	return resp.Roles, nil
-}
-
-// ResolveBuiltInRoleID returns the FGA role ID for a Pulumi Cloud built-in
-// role (admin, member, billing-manager). The member PATCH endpoint rejects
-// built-in role names in the `role` field — callers must translate to
-// `fgaRoleId` first. Each org has its own set of built-in role IDs.
-func (c *Client) ResolveBuiltInRoleID(ctx context.Context, orgName, builtInRole string) (string, error) {
-	roles, err := c.ListOrgRoles(ctx, orgName, apitype.PermissionDescriptorUXPurposeRole)
-	if err != nil {
-		return "", err
-	}
-	for _, r := range roles {
-		if r.DefaultIdentifier == builtInRole {
-			return r.ID, nil
-		}
-	}
-	// Orgs migrated to the Reader/Builder/Maintainer roles no longer list
-	// "member"; the org's default role is what a new member receives.
-	if builtInRole == memberRole {
-		for _, r := range roles {
-			if r.IsOrgDefault {
-				return r.ID, nil
-			}
-		}
-	}
-	return "", fmt.Errorf("built-in role %q not found in organization %q", builtInRole, orgName)
 }
 
 // DeleteRole deletes a custom role. When force is true the role is removed

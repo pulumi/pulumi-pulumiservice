@@ -1,16 +1,11 @@
 package pulumiapi
 
 import (
-	"encoding/json"
-	"io"
 	"net/http"
-	"strconv"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-
-	"github.com/pulumi/pulumi-cloud-sdk/go/apitype"
 )
 
 const (
@@ -18,14 +13,13 @@ const (
 	testMemberRole     = adminRole
 	testMemberOrgName  = testDeploymentSettingsOrgName
 
-	rosterBackend    = "backend"
-	rosterFrontend   = "frontend"
-	memberUserPath   = "/api/orgs/an-organization/members/a-user"
-	orgRolesPath     = "/api/orgs/an-organization/roles"
-	membersPath      = "/api/orgs/an-organization/members"
-	bobUser          = "bob"
-	aliceUser        = "alice"
-	maintainerRoleID = "maintainer-fga-id"
+	rosterBackend  = "backend"
+	rosterFrontend = "frontend"
+	memberUserPath = "/api/orgs/an-organization/members/a-user"
+	orgRolesPath   = "/api/orgs/an-organization/roles"
+	membersPath    = "/api/orgs/an-organization/members"
+	bobUser        = "bob"
+	aliceUser      = "alice"
 )
 
 func TestAddMemberToOrg(t *testing.T) {
@@ -213,106 +207,28 @@ func TestUpdateOrgMemberRole(t *testing.T) {
 	orgName := testMemberOrgName
 	userName := testMemberUserName
 
-	t.Run("built-in role resolves to FGA ID before PATCH", func(t *testing.T) {
-		roles := struct {
-			Roles []apitype.PermissionDescriptorRecord `json:"roles"`
-		}{
-			Roles: []apitype.PermissionDescriptorRecord{
-				{
-					PermissionDescriptorBase: apitype.PermissionDescriptorBase{Name: "Admin"},
-					ID:                       "admin-fga-id",
-					DefaultIdentifier:        adminRole,
-				},
-				{
-					PermissionDescriptorBase: apitype.PermissionDescriptorBase{Name: "Member"},
-					ID:                       "member-fga-id",
-					DefaultIdentifier:        memberRole,
-				},
-			},
-		}
-		adminID := "admin-fga-id"
-		var patchBody []byte
-		c := startTestServerMulti(t, func(r *http.Request) (int, any) {
-			switch {
-			case r.Method == http.MethodGet && r.URL.Path == orgRolesPath:
-				assert.Equal(t, "role", r.URL.Query().Get("uxPurpose"))
-				return 200, roles
-			case r.Method == http.MethodPatch && r.URL.Path == memberUserPath:
-				patchBody, _ = io.ReadAll(r.Body)
-				return 204, nil
-			default:
-				t.Fatalf("unexpected request: %s %s", r.Method, r.URL.Path)
-				return 500, nil
-			}
-		})
-		assert.NoError(t, c.UpdateOrgMemberRole(ctx, orgName, userName, adminRole, nil))
-		expected, _ := json.Marshal(updateMemberRoleReq{FGARoleID: &adminID})
-		assert.JSONEq(t, string(expected), string(patchBody))
-	})
-
-	t.Run("member falls back to the org default role when not listed", func(t *testing.T) {
-		roles := struct {
-			Roles []apitype.PermissionDescriptorRecord `json:"roles"`
-		}{
-			Roles: []apitype.PermissionDescriptorRecord{
-				{
-					PermissionDescriptorBase: apitype.PermissionDescriptorBase{Name: "Maintainer"},
-					ID:                       maintainerRoleID,
-					DefaultIdentifier:        "maintainer",
-					IsOrgDefault:             true,
-				},
-			},
-		}
-		maintainerID := maintainerRoleID
-		var patchBody []byte
-		c := startTestServerMulti(t, func(r *http.Request) (int, any) {
-			switch {
-			case r.Method == http.MethodGet && r.URL.Path == orgRolesPath:
-				return 200, roles
-			case r.Method == http.MethodPatch && r.URL.Path == memberUserPath:
-				patchBody, _ = io.ReadAll(r.Body)
-				return 204, nil
-			default:
-				t.Fatalf("unexpected request: %s %s", r.Method, r.URL.Path)
-				return 500, nil
-			}
-		})
-		assert.NoError(t, c.UpdateOrgMemberRole(ctx, orgName, userName, memberRole, nil))
-		expected, _ := json.Marshal(updateMemberRoleReq{FGARoleID: &maintainerID})
-		assert.JSONEq(t, string(expected), string(patchBody))
-	})
-
-	for _, role := range []string{adminRole, "billing-manager"} {
-		t.Run(role+" does not fall back to the org default role when not listed", func(t *testing.T) {
-			roles := struct {
-				Roles []apitype.PermissionDescriptorRecord `json:"roles"`
-			}{
-				Roles: []apitype.PermissionDescriptorRecord{
-					{
-						PermissionDescriptorBase: apitype.PermissionDescriptorBase{Name: "Maintainer"},
-						ID:                       maintainerRoleID,
-						DefaultIdentifier:        "maintainer",
-						IsOrgDefault:             true,
-					},
-				},
-			}
-			c := startTestServerMulti(t, func(r *http.Request) (int, any) {
-				switch {
-				case r.Method == http.MethodGet && r.URL.Path == orgRolesPath:
-					return 200, roles
-				default:
-					t.Fatalf("unexpected request: %s %s", r.Method, r.URL.Path)
-					return 500, nil
-				}
+	for _, role := range []string{memberRole, adminRole, "billing-manager"} {
+		t.Run(role+" is sent by name so the service resolves it", func(t *testing.T) {
+			c := startTestServer(t, testServerConfig{
+				ExpectedReqMethod: http.MethodPatch,
+				ExpectedReqPath:   memberUserPath,
+				ExpectedReqBody:   updateMemberRoleReq{Role: role},
+				ResponseCode:      204,
 			})
-
-			err := c.UpdateOrgMemberRole(ctx, orgName, userName, role, nil)
-			expectedErr := "failed to resolve built-in role " + strconv.Quote(role) +
-				": built-in role " + strconv.Quote(role) +
-				" not found in organization " + strconv.Quote(orgName)
-			assert.EqualError(t, err, expectedErr)
+			assert.NoError(t, c.UpdateOrgMemberRole(ctx, orgName, userName, role, nil))
 		})
 	}
+
+	t.Run("empty roleID sends the built-in role", func(t *testing.T) {
+		empty := ""
+		c := startTestServer(t, testServerConfig{
+			ExpectedReqMethod: http.MethodPatch,
+			ExpectedReqPath:   memberUserPath,
+			ExpectedReqBody:   updateMemberRoleReq{Role: memberRole},
+			ResponseCode:      204,
+		})
+		assert.NoError(t, c.UpdateOrgMemberRole(ctx, orgName, userName, memberRole, &empty))
+	})
 
 	t.Run("custom role", func(t *testing.T) {
 		roleID := "role-123"
