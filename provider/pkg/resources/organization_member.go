@@ -100,8 +100,6 @@ func (s *OrganizationMemberState) Annotate(a infer.Annotator) {
 
 const defaultOrgMemberRole = "member"
 
-// storedDefaultOrgMemberRoles are the roles of organizations that use stored default roles. The add-member
-// endpoint rejects them, so Create adds the user as a member and then patches the role.
 var storedDefaultOrgMemberRoles = []string{"reader", "builder", "maintainer"}
 
 var validOrgMemberRoles = append(
@@ -265,11 +263,6 @@ func (*OrganizationMember) Delete(
 ) (infer.DeleteResponse, error) {
 	client := config.GetClient(ctx)
 	if req.State.Adopted {
-		// Adopted: don't remove the user from the org, but un-assign any
-		// custom role we applied. Leaving a dangling fgaRoleId would block
-		// deletion of the custom role (the service refuses "cannot delete
-		// role X, it is referenced by users or teams"). Reset to the
-		// built-in member role.
 		return infer.DeleteResponse{}, client.UpdateOrgMemberRole(
 			ctx,
 			req.State.OrganizationName,
