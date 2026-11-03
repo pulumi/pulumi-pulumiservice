@@ -170,6 +170,11 @@ export type OrganizationMember = import("./organizationMember").OrganizationMemb
 export const OrganizationMember: typeof import("./organizationMember").OrganizationMember = null as any;
 utilities.lazyLoad(exports, ["OrganizationMember"], () => require("./organizationMember"));
 
+export { OrganizationMemberEntityAccessArgs } from "./organizationMemberEntityAccess";
+export type OrganizationMemberEntityAccess = import("./organizationMemberEntityAccess").OrganizationMemberEntityAccess;
+export const OrganizationMemberEntityAccess: typeof import("./organizationMemberEntityAccess").OrganizationMemberEntityAccess = null as any;
+utilities.lazyLoad(exports, ["OrganizationMemberEntityAccess"], () => require("./organizationMemberEntityAccess"));
+
 export { OrganizationRoleArgs } from "./organizationRole";
 export type OrganizationRole = import("./organizationRole").OrganizationRole;
 export const OrganizationRole: typeof import("./organizationRole").OrganizationRole = null as any;
@@ -292,6 +297,8 @@ const _module = {
                 return new OrganizationDefaultRole(name, <any>undefined, { urn })
             case "pulumiservice:index:OrganizationMember":
                 return new OrganizationMember(name, <any>undefined, { urn })
+            case "pulumiservice:index:OrganizationMemberEntityAccess":
+                return new OrganizationMemberEntityAccess(name, <any>undefined, { urn })
             case "pulumiservice:index:OrganizationRole":
                 return new OrganizationRole(name, <any>undefined, { urn })
             case "pulumiservice:index:PolicyGroup":

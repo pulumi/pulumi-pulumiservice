@@ -49,11 +49,11 @@ func TestTeamEnvironmentPermissionCheck(t *testing.T) {
 	r := &TeamEnvironmentPermission{}
 	base := func() map[string]property.Value {
 		return map[string]property.Value{
-			gcOrganization: property.New(gcOrg),
-			gcTeam:         property.New(gcTeam),
-			gcProject:      property.New("proj"),
-			gcEnvironment:  property.New(gcEnv),
-			"permission":   property.New("open"),
+			gcOrganization:     property.New(gcOrg),
+			gcTeam:             property.New(gcTeam),
+			gcProject:          property.New("proj"),
+			gcEnvironment:      property.New(gcEnv),
+			permissionProperty: property.New("open"),
 		}
 	}
 

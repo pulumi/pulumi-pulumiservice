@@ -75,6 +75,7 @@ type Client interface {
 	pulumiapi.AgentPoolClient
 	pulumiapi.ApprovalRuleClient
 	pulumiapi.DeploymentSettingsClient
+	pulumiapi.EntityAssignmentClient
 	pulumiapi.EnvironmentMetadataClient
 	pulumiapi.EnvironmentScheduleClient
 	pulumiapi.InsightsAccountClient

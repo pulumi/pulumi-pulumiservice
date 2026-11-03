@@ -148,6 +148,7 @@ func MakeProvider(host *provider.HostClient, name, version string) (pulumirpc.Re
 			infer.Resource(&resources.OrgAccessToken{}),
 			infer.Resource(&resources.OrganizationDefaultRole{}),
 			infer.Resource(&resources.OrganizationMember{}),
+			infer.Resource(&resources.OrganizationMemberEntityAccess{}),
 			infer.Resource(&resources.OrganizationRole{}),
 			infer.Resource(&resources.PolicyGroup{}),
 			infer.Resource(&resources.PolicyPack{}),

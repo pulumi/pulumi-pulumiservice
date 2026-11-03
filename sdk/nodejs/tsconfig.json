@@ -115,6 +115,7 @@
         "orgAccessToken.ts",
         "organizationDefaultRole.ts",
         "organizationMember.ts",
+        "organizationMemberEntityAccess.ts",
         "organizationRole.ts",
         "policyGroup.ts",
         "policyPack.ts",
