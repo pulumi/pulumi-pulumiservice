@@ -59,6 +59,10 @@ type FGARole struct {
 	Name string `json:"name"`
 }
 
+func (m Member) HasFGARole() bool {
+	return m.FGARole != nil && (m.FGARole.ID != "" || m.FGARole.Name != "")
+}
+
 type User struct {
 	Name        string `json:"name"`
 	GithubLogin string `json:"githubLogin"`
