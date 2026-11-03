@@ -38,8 +38,6 @@ var (
 	_ infer.CustomUpdate[OrganizationDefaultRoleInput, OrganizationDefaultRoleState] = &OrganizationDefaultRole{}
 )
 
-// settableDefaultRoles excludes admin and billing-manager, which can't be defaults, and member, which
-// organizations stop listing once they store a default role.
 var settableDefaultRoles = []string{"reader", "builder", "maintainer"}
 
 func (*OrganizationDefaultRole) Annotate(a infer.Annotator) {
