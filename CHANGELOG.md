@@ -9,6 +9,7 @@
 
 ### Improvements
 
+- Added the `OrganizationMemberEntityAccess` resource, which grants one organization member a permission on one stack, environment or Insights account, for the [entity access](https://www.pulumi.com/docs/administration/concepts/rbac/entities/) feature. Name the member and the entity, and set `permission` to a built-in permission set such as `stack-write`, or `permissionSetId` to a custom one. Each resource manages one member's grant on one entity and leaves other grants untouched, including the grants of the same member on other entities.
 - Added the preview `pulumiservice:api/agents:Definition` resource for managing Custom Agent definitions, including their agent role, integrations, instructions, approval mode, and paused state. An accompanying example creates a role, Custom Agent, and webhook automation that runs as the agent. [#1301](https://github.com/pulumi/pulumi-pulumiservice/pull/1301)
 - Added an `expires` input to `AccessToken`, so a personal access token can expire. It takes an RFC 3339 date-time such as `2027-06-30T17:00:00Z`, like `OrgAccessToken`'s `expires`. Changing it replaces the token. [#1215](https://github.com/pulumi/pulumi-pulumiservice/issues/1215)
 - Added `deployTags` and `tagFilters` to the `github` and `vcs` settings of `DeploymentSettings`, so a deployment can run when a matching git tag is pushed. Set `deployCommits` to `false` when you enable `deployTags`, because Pulumi Cloud rejects the two together [#1042](https://github.com/pulumi/pulumi-pulumiservice/issues/1042)
