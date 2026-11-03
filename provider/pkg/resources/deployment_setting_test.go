@@ -149,7 +149,7 @@ func checkGitAuth(t *testing.T, gitAuth resource.PropertyMap) resource.PropertyM
 func decodeSettings(t *testing.T, props resource.PropertyMap) PulumiServiceDeploymentSettingsInput {
 	t.Helper()
 	decoded, err := decodeDeploymentSettingsInput(props)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	return decoded
 }
 
