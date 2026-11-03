@@ -3,11 +3,21 @@
 package functions
 
 import (
+	"encoding/json"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 
+	"github.com/blang/semver"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	p "github.com/pulumi/pulumi-go-provider"
+	"github.com/pulumi/pulumi-go-provider/infer"
+	"github.com/pulumi/pulumi-go-provider/integration"
+	"github.com/pulumi/pulumi/sdk/v3/go/property"
+
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 )
 
@@ -43,4 +53,44 @@ func TestMemberInfoFromRoles(t *testing.T) {
 		require.NotNil(t, info.RoleName)
 		assert.Equal(t, "admin", *info.RoleName)
 	})
+}
+
+func TestGetOrganizationMemberReportsRoleFromFrontendRoster(t *testing.T) {
+	user := map[string]any{"name": "bob", "githubLogin": "bob"}
+	backend := map[string]any{"members": []any{
+		map[string]any{"role": "member", "user": user, "fgaRole": map[string]any{}},
+	}}
+	frontend := map[string]any{"members": []any{
+		map[string]any{"role": "member", "user": user, "fgaRole": map[string]any{"id": "role-1", "name": "Maintainer"}},
+	}}
+	httpServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		body := frontend
+		if r.URL.Query().Get("type") == "backend" {
+			body = backend
+		}
+		require.NoError(t, json.NewEncoder(w).Encode(body))
+	}))
+	t.Cleanup(httpServer.Close)
+
+	client, err := pulumiapi.NewClient(&http.Client{}, "tok", httpServer.URL)
+	require.NoError(t, err)
+	prov, err := infer.NewProviderBuilder().
+		WithFunctions(infer.Function(&GetOrganizationMemberFunction{})).
+		Build()
+	require.NoError(t, err)
+	server, err := integration.NewServer(config.WithMockClient(t.Context(), client),
+		"pulumiservice", semver.MustParse("0.0.0"), integration.WithProvider(prov))
+	require.NoError(t, err)
+
+	resp, err := server.Invoke(p.InvokeRequest{
+		Token: "pulumiservice:index:getOrganizationMember",
+		Args: property.NewMap(map[string]property.Value{
+			"organizationName": property.New("anOrg"),
+			"username":         property.New("bob"),
+		}),
+	})
+	require.NoError(t, err)
+	require.Empty(t, resp.Failures)
+	assert.Equal(t, "maintainer", resp.Return.Get("role").AsString())
+	assert.Equal(t, "Maintainer", resp.Return.Get("roleName").AsString())
 }
