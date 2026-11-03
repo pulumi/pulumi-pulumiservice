@@ -134,6 +134,7 @@ func TestNodejsEnvironmentsExample(t *testing.T) {
 }
 
 func TestNodejsTemplateSourcesExample(t *testing.T) {
+	skipUnlessTemplateSourceTests(t)
 	test := pulumitest.NewPulumiTest(t,
 		filepath.Join(getCwd(t), "ts-template-source"),
 		inMemoryProvider(),

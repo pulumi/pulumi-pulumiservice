@@ -24,6 +24,15 @@ func getCwd(t *testing.T) string {
 	return cwd
 }
 
+const templateSourceTestsEnv = "PULUMI_TEST_TEMPLATE_SOURCES"
+
+func skipUnlessTemplateSourceTests(t *testing.T) {
+	t.Helper()
+	if os.Getenv(templateSourceTestsEnv) == "" {
+		t.Skipf("template source tests run in their own serialized job; set %s to run them", templateSourceTestsEnv)
+	}
+}
+
 func generateRandomFiveDigits() string {
 	return fmt.Sprintf("%05d", rand.Intn(100000)) //nolint:gosec // For testing.
 }

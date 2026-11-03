@@ -1,0 +1,93 @@
+name: run-template-source-tests
+
+on:
+  pull_request:
+    paths-ignore:
+    - CHANGELOG.md
+  push:
+    tags:
+    - v*.*.*
+  workflow_dispatch:
+
+env:
+  PROVIDER: pulumiservice
+  PULUMI_API: https://api.pulumi-staging.io
+  PULUMI_BACKEND_URL: https://api.pulumi-staging.io
+  PULUMI_TEST_OWNER: service-provider-test-org
+  PULUMI_TEST_USE_SERVICE: "true"
+  PULUMI_TEST_TEMPLATE_SOURCES: "true"
+  PULUMI_GO_DEP_ROOT: ${{ github.workspace }}/..
+
+jobs:
+  template-source-tests:
+    if: github.event_name != 'pull_request'
+      || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    concurrency:
+      group: template-sources-service-provider-test-org
+      cancel-in-progress: false
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - env:
+          ESC_ACTION_ENVIRONMENT: github-secrets/${{ github.repository_owner }}-${{ github.event.repository.name }}
+          ESC_ACTION_EXPORT_ENVIRONMENT_VARIABLES: "false"
+          ESC_ACTION_OIDC_AUTH: "true"
+          ESC_ACTION_OIDC_ORGANIZATION: pulumi
+          ESC_ACTION_OIDC_REQUESTED_TOKEN_TYPE: urn:pulumi:token-type:access_token:organization
+        id: esc-secrets
+        name: Fetch secrets from ESC
+        uses: pulumi/esc-action@9eb774255b1a4afb7855678ae8d4a77359da0d9b
+
+      - name: Install mise
+        uses: jdx/mise-action@590bfd78fa3e93efd2e7ea21d65d397118ac1430
+        env:
+          MISE_FETCH_REMOTE_VERSIONS_TIMEOUT: 30s
+        with:
+          version: 2026.3.7
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          cache: true
+
+      - name: Build provider
+        run: make provider
+
+      - name: Build and link nodejs SDK
+        run: make build_nodejs install_nodejs_sdk
+
+      - name: Put locally-built provider on PATH
+        run: echo "${GITHUB_WORKSPACE}/bin" >> "$GITHUB_PATH"
+
+      - name: Delete leftover template sources
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ steps.esc-secrets.outputs.PULUMI_ACCESS_TOKEN_STAGING }}
+        run: |
+          set -euo pipefail
+          sources_url="${PULUMI_BACKEND_URL}/api/orgs/${PULUMI_TEST_OWNER}/templates/sources"
+          curl_api() {
+            curl --fail --silent --show-error \
+              --header "Authorization: token ${PULUMI_ACCESS_TOKEN}" \
+              --header "Accept: application/vnd.pulumi+9" "$@"
+          }
+          curl_api "${sources_url}" \
+            | jq -r '.sources[]
+                | select(.name | startswith("bootstrap-"))
+                | select(.sourceURL | IN("https://github.com/pulumi/pulumi", "https://github.com/pulumi/pulumi-pulumiservice"))
+                | "\(.id) \(.name)"' \
+            | while read -r id name; do
+                echo "Deleting leftover template source ${name}"
+                curl_api --request DELETE "${sources_url}/${id}"
+              done
+
+      - name: Run template source tests
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ steps.esc-secrets.outputs.PULUMI_ACCESS_TOKEN_STAGING }}
+        run: |
+          cd examples
+          go test -tags all -run '^(TestNodejsTemplateSourcesExample|TestYamlTemplateSourcesExample)$' \
+            -v -count=1 -timeout 20m .
+          go test -tags api -run 'TestApi/template-sources/yaml' \
+            -v -count=1 -timeout 20m .

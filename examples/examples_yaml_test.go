@@ -568,6 +568,7 @@ func TestYamlAgentPoolsExample(t *testing.T) {
 }
 
 func TestYamlTemplateSourcesExample(t *testing.T) {
+	skipUnlessTemplateSourceTests(t)
 	cwd := getCwd(t)
 	digits := generateRandomFiveDigits()
 	integration.ProgramTest(t, &integration.ProgramTestOptions{
