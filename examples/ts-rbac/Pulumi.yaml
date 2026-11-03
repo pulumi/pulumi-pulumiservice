@@ -1,6 +1,6 @@
 name: pulumi-service-rbac-example-ts
 runtime: nodejs
-description: Exercises the RBAC resources and data sources (OrganizationRole, TeamRoleAssignment, OrganizationMember, getOrganizationMembers, getOrganizationRoleScopes).
+description: Exercises the RBAC resources and data sources (OrganizationRole, TeamRoleAssignment, getOrganizationMember, getOrganizationMembers, getOrganizationRoleScopes).
 
 config:
   organizationName:
@@ -8,7 +8,7 @@ config:
     description: Pulumi Cloud organization to run against.
   targetUsername:
     type: string
-    description: Existing Pulumi Cloud username to adopt as an OrganizationMember and assign the custom role to.
+    description: Existing Pulumi Cloud username to look up with getOrganizationMember.
   nameSuffix:
     type: string
     description: Suffix appended to the created role and team names so repeat runs don't collide.

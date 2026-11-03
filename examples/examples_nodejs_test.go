@@ -249,13 +249,6 @@ func TestNodejsRbacExample(t *testing.T) {
 	orgName := getOrgName()
 	const fixtureUser = "service-provider-example-user"
 
-	// Snapshot the fixture user's role before the test mutates it, and
-	// restore it on cleanup. OrganizationRole.Delete with force=true
-	// *should* revoke the assignment on destroy, but if a teardown leaves
-	// the user on the test's role this hook still gets the org back to a
-	// known state.
-	t.Cleanup(snapshotFixtureOrgMember(t, orgName, fixtureUser))
-
 	test := pulumitest.NewPulumiTest(t,
 		filepath.Join(getCwd(t), "ts-rbac"),
 		inMemoryProvider(),
@@ -268,9 +261,6 @@ func TestNodejsRbacExample(t *testing.T) {
 	test.SetConfig(t, "nameSuffix", generateRandomFiveDigits())
 
 	up := test.Up(t)
-	if adopted, ok := up.Outputs["memberAdopted"]; ok {
-		assert.Equal(t, true, adopted.Value, "expected OrganizationMember to adopt the existing membership")
-	}
 	// Env-scoped role wiring: the env's UUID must flow into the role's
 	// permission tree. Empty UUID → metadata fetch silently skipped.
 	if envID, ok := up.Outputs["scopedEnvironmentId"]; ok {

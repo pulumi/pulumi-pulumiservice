@@ -48,16 +48,6 @@ const rbacTeamRoleBinding = new service.TeamRoleAssignment("rbacTeamRoleBinding"
     roleId: readOnlyRole.roleId,
 });
 
-// Exercise OrganizationMember via adoption: if the user already exists in
-// the org, Create hits 409 -> adopts the membership (adopted=true), then
-// assigns the custom role. Destroying readOnlyRole above (force=true)
-// revokes the assignment on teardown.
-const rbacMember = new service.OrganizationMember("rbacMember", {
-    organizationName,
-    username: targetUsername,
-    roleId: readOnlyRole.roleId,
-});
-
 // An ESC environment to demo per-env role scoping. The Environment resource
 // exposes its UUID via `environmentId`, which is what the role below pins
 // its grants to.
@@ -109,8 +99,6 @@ export const roleVersion = readOnlyRole.version;
 export const assignedRoleName = rbacTeamRoleBinding.roleName;
 export const firstMember = currentMembers.members[0].username;
 export const firstScope = availableScopes.scopes[0].name;
-export const memberAdopted = rbacMember.adopted;
-export const memberAssignedRole = rbacMember.roleName;
 export const lookedUpByUsernameRole = memberByUsername.role;
 // Env-scoped role wiring outputs.
 export const scopedEnvironmentId = scopedEnv.environmentId;

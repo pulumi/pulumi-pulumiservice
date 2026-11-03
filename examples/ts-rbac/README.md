@@ -7,9 +7,6 @@ the member-updates PR:
 - `pulumiservice.Team` + `pulumiservice.TeamRoleAssignment` — creates a team
   and assigns the custom role to it. Requires the custom-roles feature to
   already be enabled on the organization.
-- `pulumiservice.OrganizationMember` — adopts an existing member (hits the
-  409 branch on create) and assigns the custom role to them. On destroy the
-  membership is left in place; only the role is reset.
 - `pulumiservice.getOrganizationMembers` — lists org members.
 - `pulumiservice.getOrganizationMember` — single-member lookup by username
   (demonstrates the #41668 follow-up).
@@ -49,8 +46,7 @@ pulumi up
 
 After `pulumi up` you should see outputs including:
 
-- `memberAdopted: true` if `targetUsername` was already a member of the org.
-- `memberAssignedRole` matching the custom role name.
+- `lookedUpByUsernameRole` with `targetUsername`'s org role.
 - `firstMember` and `firstScope` from the two data sources.
 
 ## Teardown
@@ -60,6 +56,5 @@ pulumi destroy
 pulumi stack rm dev
 ```
 
-`destroy` revokes the custom-role assignment from both the team and the
-adopted member, deletes the role and the team, and leaves the adopted user
-in the organization on their default role.
+`destroy` revokes the custom-role assignment from the team and deletes the
+role and the team.

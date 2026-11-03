@@ -66,13 +66,6 @@ func TestPythonRbacExample(t *testing.T) {
 	// organization. If it isn't, CreateRole returns a feature-flag error
 	// and the test fails loudly, which is what we want to learn.
 	orgName := getOrgName()
-	const fixtureUser = "service-provider-example-user"
-
-	// Snapshot the fixture user's role before the test mutates it, and
-	// restore it on cleanup. OrganizationMember flips this user's role
-	// to "admin" during the test; the restore puts them back on whatever
-	// role they had pre-test (rather than blindly resetting to "member").
-	t.Cleanup(snapshotFixtureOrgMember(t, orgName, fixtureUser))
 
 	rbacDir := path.Join(getCwd(t), "py-rbac")
 
