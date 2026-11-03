@@ -56,12 +56,12 @@ func TestMemberInfoFromRoles(t *testing.T) {
 }
 
 func TestGetOrganizationMemberReportsRoleFromFrontendRoster(t *testing.T) {
-	user := map[string]any{"name": "bob", "githubLogin": "bob"}
+	user := map[string]any{ppKeyName: "bob", "githubLogin": "bob"}
 	backend := map[string]any{"members": []any{
 		map[string]any{"role": "member", "user": user, "fgaRole": map[string]any{}},
 	}}
 	frontend := map[string]any{"members": []any{
-		map[string]any{"role": "member", "user": user, "fgaRole": map[string]any{"id": "role-1", "name": "Maintainer"}},
+		map[string]any{"role": "member", "user": user, "fgaRole": map[string]any{"id": "role-1", ppKeyName: "Maintainer"}},
 	}}
 	httpServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		body := frontend
@@ -85,8 +85,8 @@ func TestGetOrganizationMemberReportsRoleFromFrontendRoster(t *testing.T) {
 	resp, err := server.Invoke(p.InvokeRequest{
 		Token: "pulumiservice:index:getOrganizationMember",
 		Args: property.NewMap(map[string]property.Value{
-			"organizationName": property.New("anOrg"),
-			"username":         property.New("bob"),
+			keyOrganizationName: property.New("anOrg"),
+			"username":          property.New("bob"),
 		}),
 	})
 	require.NoError(t, err)
