@@ -44,7 +44,7 @@ func defaultRoleCatalogue(defaultID string) []apitype.PermissionDescriptorRecord
 	}
 	return []apitype.PermissionDescriptorRecord{
 		record("reader-id", "Reader", "reader"),
-		record("builder-id", "Builder", "builder"),
+		record("builder-id", "Builder", gcBuilder),
 		record("custom-id", "release-managers", ""),
 	}
 }
@@ -65,15 +65,15 @@ func TestOrganizationDefaultRoleCheck(t *testing.T) {
 	}
 	org := property.New(gcAcme)
 
-	assert.Empty(t, check(map[string]property.Value{gcOrganizationName: org, "role": property.New("builder")}))
+	assert.Empty(t, check(map[string]property.Value{gcOrganizationName: org, roleProperty: property.New(gcBuilder)}))
 	assert.Empty(t, check(map[string]property.Value{gcOrganizationName: org, "roleId": property.New("custom-id")}))
 	assert.NotEmpty(t, check(map[string]property.Value{gcOrganizationName: org}), "one of role and roleId is required")
 	assert.NotEmpty(t, check(map[string]property.Value{
-		gcOrganizationName: org, "role": property.New("builder"), "roleId": property.New("custom-id"),
+		gcOrganizationName: org, roleProperty: property.New(gcBuilder), "roleId": property.New("custom-id"),
 	}), "role and roleId are mutually exclusive")
-	assert.NotEmpty(t, check(map[string]property.Value{gcOrganizationName: org, "role": property.New("admin")}),
+	assert.NotEmpty(t, check(map[string]property.Value{gcOrganizationName: org, roleProperty: property.New("admin")}),
 		"admin cannot be the default role")
-	assert.NotEmpty(t, check(map[string]property.Value{gcOrganizationName: org, "role": property.New("member")}),
+	assert.NotEmpty(t, check(map[string]property.Value{gcOrganizationName: org, roleProperty: property.New("member")}),
 		"member is not listed once an organization stores a default role")
 }
 
@@ -83,7 +83,7 @@ func TestOrganizationDefaultRoleCreate(t *testing.T) {
 		ctx := config.WithMockClient(context.Background(), mock)
 
 		resp, err := (&OrganizationDefaultRole{}).Create(ctx, infer.CreateRequest[OrganizationDefaultRoleInput]{
-			Inputs: OrganizationDefaultRoleInput{OrganizationName: gcAcme, Role: strPtr("builder")},
+			Inputs: OrganizationDefaultRoleInput{OrganizationName: gcAcme, Role: strPtr(gcBuilder)},
 		})
 		require.NoError(t, err)
 		assert.Equal(t, gcAcme, resp.ID)
@@ -119,7 +119,7 @@ func TestOrganizationDefaultRoleCreate(t *testing.T) {
 		ctx := config.WithMockClient(context.Background(), mock)
 
 		_, err := (&OrganizationDefaultRole{}).Create(ctx, infer.CreateRequest[OrganizationDefaultRoleInput]{
-			Inputs: OrganizationDefaultRoleInput{OrganizationName: gcAcme, Role: strPtr("builder")},
+			Inputs: OrganizationDefaultRoleInput{OrganizationName: gcAcme, Role: strPtr(gcBuilder)},
 			DryRun: true,
 		})
 		require.NoError(t, err)
@@ -139,7 +139,7 @@ func TestOrganizationDefaultRoleRead(t *testing.T) {
 
 	t.Run("built-in default reads as role", func(t *testing.T) {
 		got := read(t, "builder-id", OrganizationDefaultRoleInput{})
-		assert.Equal(t, strPtr("builder"), got.Role)
+		assert.Equal(t, strPtr(gcBuilder), got.Role)
 		assert.Nil(t, got.RoleId)
 	})
 
@@ -156,7 +156,7 @@ func TestOrganizationDefaultRoleRead(t *testing.T) {
 	})
 
 	t.Run("drift to another role is reported", func(t *testing.T) {
-		got := read(t, "reader-id", OrganizationDefaultRoleInput{Role: strPtr("builder")})
+		got := read(t, "reader-id", OrganizationDefaultRoleInput{Role: strPtr(gcBuilder)})
 		assert.Equal(t, strPtr("reader"), got.Role)
 	})
 }

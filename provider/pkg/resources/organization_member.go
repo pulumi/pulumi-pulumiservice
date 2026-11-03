@@ -100,6 +100,8 @@ func (s *OrganizationMemberState) Annotate(a infer.Annotator) {
 
 const defaultOrgMemberRole = "member"
 
+const roleProperty = "role"
+
 var storedDefaultOrgMemberRoles = []string{"reader", "builder", "maintainer"}
 
 var validOrgMemberRoles = append(
@@ -117,7 +119,7 @@ func (*OrganizationMember) Check(
 	}
 	if in.Role != nil && *in.Role != "" && !slices.Contains(validOrgMemberRoles, *in.Role) {
 		failures = append(failures, p.CheckFailure{
-			Property: "role",
+			Property: roleProperty,
 			Reason:   fmt.Sprintf("role must be one of %v, got %q", validOrgMemberRoles, *in.Role),
 		})
 	}

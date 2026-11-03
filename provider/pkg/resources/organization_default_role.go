@@ -93,12 +93,12 @@ func (*OrganizationDefaultRole) Check(
 	switch {
 	case hasRole == hasRoleID:
 		failures = append(failures, p.CheckFailure{
-			Property: "role",
+			Property: roleProperty,
 			Reason:   "exactly one of role and roleId must be set",
 		})
 	case hasRole && !slices.Contains(settableDefaultRoles, *in.Role):
 		failures = append(failures, p.CheckFailure{
-			Property: "role",
+			Property: roleProperty,
 			Reason:   fmt.Sprintf("role must be one of %v, got %q", settableDefaultRoles, *in.Role),
 		})
 	}
