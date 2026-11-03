@@ -357,7 +357,7 @@ func applyMemberRoleToState(
 	member *pulumiapi.Member,
 	state *OrganizationMemberState,
 ) error {
-	if member.FGARole == nil {
+	if !member.HasFGARole() {
 		name := member.Role
 		state.Role = &name
 		state.RoleId = nil

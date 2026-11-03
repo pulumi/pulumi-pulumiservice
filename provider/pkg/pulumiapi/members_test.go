@@ -1,6 +1,7 @@
 package pulumiapi
 
 import (
+	"encoding/json"
 	"io"
 	"net/http"
 	"testing"
@@ -378,4 +379,13 @@ func TestGetOrgMember(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Nil(t, got)
 	})
+}
+
+func TestBackendListingEmptyFGARoleObjectIsNotAFineGrainedRole(t *testing.T) {
+	var m Member
+	require.NoError(t, json.Unmarshal([]byte(`{"role":"admin","fgaRole":{}}`), &m))
+	assert.False(t, m.HasFGARole())
+
+	assert.False(t, Member{}.HasFGARole())
+	assert.True(t, Member{FGARole: &FGARole{ID: "id", Name: "Admin"}}.HasFGARole())
 }

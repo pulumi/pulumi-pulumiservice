@@ -227,6 +227,28 @@ func TestOrganizationMemberRead(t *testing.T) {
 		assert.Nil(t, resp.State.RoleId, "RoleId must be cleared in built-in branch")
 	})
 
+	t.Run("empty fgaRole object is treated as no FGARole", func(t *testing.T) {
+		mock := &orgMemberClientMock{
+			getFunc: func(_ context.Context, _, _ string) (*pulumiapi.Member, error) {
+				return &pulumiapi.Member{
+					Role:    gcAdmin,
+					User:    pulumiapi.User{GithubLogin: gcAlice},
+					FGARole: &pulumiapi.FGARole{},
+				}, nil
+			},
+		}
+		ctx := config.WithMockClient(context.Background(), mock)
+
+		r := &OrganizationMember{}
+		resp, err := r.Read(ctx, infer.ReadRequest[OrganizationMemberInput, OrganizationMemberState]{ID: gcAcmeAlice})
+		assert.NoError(t, err)
+		if assert.NotNil(t, resp.State.Role) {
+			assert.Equal(t, gcAdmin, *resp.State.Role)
+		}
+		assert.Equal(t, gcAdmin, resp.State.RoleName)
+		assert.Nil(t, resp.State.RoleId)
+	})
+
 	migratedOrgRoles := func(
 		_ context.Context,
 		_ string,

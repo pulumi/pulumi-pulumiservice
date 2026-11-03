@@ -175,7 +175,7 @@ func memberInfoFrom(m pulumiapi.Member) OrganizationMemberInfo {
 		Username:     m.User.GithubLogin,
 		VirtualAdmin: m.VirtualAdmin,
 	}
-	if m.FGARole != nil {
+	if m.HasFGARole() {
 		name := m.FGARole.Name
 		info.RoleName = &name
 		if slug := strings.ToLower(name); slices.Contains(builtinOrgRoles, slug) {

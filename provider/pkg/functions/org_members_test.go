@@ -34,4 +34,13 @@ func TestMemberInfoFromRoles(t *testing.T) {
 		require.NotNil(t, info.RoleId)
 		assert.Equal(t, "fga-id", *info.RoleId)
 	})
+
+	t.Run("an empty fgaRole object falls back to the legacy role", func(t *testing.T) {
+		info := memberInfoFrom(pulumiapi.Member{Role: "admin", FGARole: &pulumiapi.FGARole{}})
+		require.NotNil(t, info.Role)
+		assert.Equal(t, "admin", *info.Role)
+		assert.Nil(t, info.RoleId)
+		require.NotNil(t, info.RoleName)
+		assert.Equal(t, "admin", *info.RoleName)
+	})
 }
