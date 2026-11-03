@@ -49,17 +49,18 @@ const (
 	ppAlphaLatestTag    = "0.0.5"
 	ppAlphaOlderTag     = "0.0.4"
 
-	ppKeyName        = "name"
-	ppKeyDisplayName = "displayName"
-	ppKeyVersion     = "version"
-	ppKeyVersions    = "versions"
-	ppKeyVersionTag  = "versionTag"
-	ppKeyVersionTags = "versionTags"
-	ppKeyPolicyPacks = "policyPacks"
-	ppKeySource      = "source"
-	ppKeyPublisher   = "publisher"
-	ppKeyMessage     = "message"
-	ppKeyEnforcement = "enforcementLevel"
+	ppKeyName           = "name"
+	keyOrganizationName = "organizationName"
+	ppKeyDisplayName    = "displayName"
+	ppKeyVersion        = "version"
+	ppKeyVersions       = "versions"
+	ppKeyVersionTag     = "versionTag"
+	ppKeyVersionTags    = "versionTags"
+	ppKeyPolicyPacks    = "policyPacks"
+	ppKeySource         = "source"
+	ppKeyPublisher      = "publisher"
+	ppKeyMessage        = "message"
+	ppKeyEnforcement    = "enforcementLevel"
 
 	getPolicyPacksToken = "pulumiservice:index:getPolicyPacks"
 	getPolicyPackToken  = "pulumiservice:index:getPolicyPack"
@@ -139,7 +140,7 @@ func invokeGetPolicyPacks(t *testing.T, server integration.Server) (p.InvokeResp
 	t.Helper()
 	return server.Invoke(p.InvokeRequest{
 		Token: getPolicyPacksToken,
-		Args:  property.NewMap(map[string]property.Value{"organizationName": property.New(ppTestOrg)}),
+		Args:  property.NewMap(map[string]property.Value{keyOrganizationName: property.New(ppTestOrg)}),
 	})
 }
 
@@ -288,8 +289,8 @@ func TestGetPolicyPacks_EmptyVersionListsAreArrays(t *testing.T) {
 func invokeGetPolicyPack(t *testing.T, server integration.Server, versionTag string) (p.InvokeResponse, error) {
 	t.Helper()
 	args := map[string]property.Value{
-		"organizationName": property.New(ppTestOrg),
-		"policyPackName":   property.New(ppAlpha),
+		keyOrganizationName: property.New(ppTestOrg),
+		"policyPackName":    property.New(ppAlpha),
 	}
 	if versionTag != "" {
 		args[ppKeyVersionTag] = property.New(versionTag)
@@ -510,5 +511,5 @@ func TestPolicyPackSummaryFromAPI_OmitsEmptyRegistryFields(t *testing.T) {
 func TestPolicyToMap_EnforcementLevel(t *testing.T) {
 	t.Parallel()
 	got := policyToMap(apitype.Policy{Name: "p", EnforcementLevel: apitype.Advisory})
-	assert.Equal(t, map[string]any{"name": "p", "enforcementLevel": "advisory"}, got)
+	assert.Equal(t, map[string]any{ppKeyName: "p", "enforcementLevel": "advisory"}, got)
 }

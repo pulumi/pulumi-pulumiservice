@@ -76,7 +76,7 @@ namespace Pulumi.PulumiService
     public sealed class GetOrganizationMemberResult
     {
         /// <summary>
-        /// The member's built-in role (member, admin, billing-manager). Absent when a custom role is assigned — check `roleId` in that case.
+        /// The member's built-in role (member, admin, billing-manager, reader, builder, maintainer). Absent when a custom role is assigned — check `roleId` in that case.
         /// </summary>
         public readonly string? Role;
         /// <summary>

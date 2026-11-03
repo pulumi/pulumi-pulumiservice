@@ -64,8 +64,10 @@ func (c *OrganizationMemberCore) Annotate(a infer.Annotator) {
 	a.Describe(&c.Username, "The Pulumi Cloud username of the member.")
 	a.Describe(
 		&c.Role,
-		"The built-in organization role. One of `member`, `admin`, `billing-manager`. "+
-			"Defaults to `member` on create. Ignored when `roleId` is set.",
+		"The built-in organization role. One of `member`, `admin`, `billing-manager`, `reader`, `builder`, "+
+			"`maintainer`. `reader`, `builder` and `maintainer` exist only in organizations that use stored "+
+			"default roles. In those organizations `member` means the organization's default role: the member "+
+			"follows it if an administrator changes it. Defaults to `member` on create. Ignored when `roleId` is set.",
 	)
 	a.Describe(&c.RoleId, "The ID of a custom (fine-grained) organization role to assign. Takes precedence over `role`.")
 }
@@ -98,7 +100,12 @@ func (s *OrganizationMemberState) Annotate(a infer.Annotator) {
 
 const defaultOrgMemberRole = "member"
 
-var validOrgMemberRoles = []string{defaultOrgMemberRole, gcAdmin, "billing-manager"}
+var storedDefaultOrgMemberRoles = []string{"reader", "builder", "maintainer"}
+
+var validOrgMemberRoles = append(
+	[]string{defaultOrgMemberRole, gcAdmin, "billing-manager"},
+	storedDefaultOrgMemberRoles...,
+)
 
 func (*OrganizationMember) Check(
 	ctx context.Context,
@@ -141,7 +148,7 @@ func (*OrganizationMember) Create(
 	// The add endpoint only takes built-in roles; custom roles are applied via
 	// an update that follows the add. We always add with a built-in role first.
 	addRole := util.OrZero(core.Role)
-	if addRole == "" {
+	if addRole == "" || slices.Contains(storedDefaultOrgMemberRoles, addRole) {
 		addRole = defaultOrgMemberRole
 	}
 	// Adopt an existing membership: if the user is already in the org (409),
@@ -160,11 +167,15 @@ func (*OrganizationMember) Create(
 
 	// Always patch the role when we adopted an existing member (the built-in
 	// role from Add wasn't applied) or when a custom role was requested.
-	needsRolePatch := existingMember || (core.RoleId != nil && *core.RoleId != "")
+	needsRolePatch := existingMember || (core.RoleId != nil && *core.RoleId != "") ||
+		slices.Contains(storedDefaultOrgMemberRoles, util.OrZero(core.Role))
 	if needsRolePatch {
 		roleToSet := ""
 		if core.RoleId == nil || *core.RoleId == "" {
-			roleToSet = addRole
+			roleToSet = util.OrZero(core.Role)
+			if roleToSet == "" {
+				roleToSet = defaultOrgMemberRole
+			}
 		}
 		if err := client.UpdateOrgMemberRole(
 			ctx,
@@ -344,7 +355,11 @@ func applyMemberRoleToState(
 	member *pulumiapi.Member,
 	state *OrganizationMemberState,
 ) error {
-	if member.FGARole == nil {
+	if !member.HasFGARole() {
+		if member.FGARole != nil && member.Role == defaultOrgMemberRole {
+			state.RoleName = member.Role
+			return nil
+		}
 		name := member.Role
 		state.Role = &name
 		state.RoleId = nil
@@ -366,7 +381,8 @@ func applyMemberRoleToState(
 			state.RoleId = nil
 			return nil
 		}
-		if slices.Contains(validOrgMemberRoles, r.DefaultIdentifier) {
+		declaredByID := state.RoleId != nil && *state.RoleId == r.ID
+		if !declaredByID && slices.Contains(validOrgMemberRoles, r.DefaultIdentifier) {
 			slug := r.DefaultIdentifier
 			state.Role = &slug
 			state.RoleId = nil
