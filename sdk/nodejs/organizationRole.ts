@@ -16,42 +16,46 @@ import * as utilities from "./utilities";
  * **Manage these roles in code, not in the Pulumi Cloud console.** In the console's role editor, every rule grants a permission set (the "access level"); it can't show scopes granted directly. Roles that grant scopes directly, as `buildRolePermissions` does, open read-only there.
  *
  * ## Example Usage
- * ### A role with organization-level access and entity rules
+ * ### Organization-level scopes
  *
- * The program looks up an existing stack, environment, and cloud account, then defines a role that grants scopes at the organization level and on each kind of entity.
+ * Organization scopes apply across the whole organization rather than to a single stack, environment, or cloud account.
  *
  * ```typescript
  * import * as pulumi from "@pulumi/pulumi";
  * import * as pulumiservice from "@pulumi/pulumiservice";
  *
- * const config = new pulumi.Config();
- * const organizationName = config.get("organizationName") || "my-org";
- * const prodStack = pulumiservice.getStackOutput({
- *     organizationName: organizationName,
- *     projectName: "networking",
- *     stackName: "prod",
- * });
- * const sharedEnvironment = pulumiservice.getEnvironmentOutput({
- *     organizationName: organizationName,
- *     projectName: "platform",
- *     name: "shared",
- * });
- * const awsAccount = pulumiservice.getInsightsAccountOutput({
- *     organizationName: organizationName,
- *     accountName: "aws-production",
- * });
- * const platformPermissions = pulumiservice.buildRolePermissionsOutput({
+ * const permissions = pulumiservice.buildRolePermissionsOutput({
  *     organizationScopes: [
  *         pulumiservice.RbacOrganizationScope.TeamRead,
  *         pulumiservice.RbacOrganizationScope.StackCreate,
  *     ],
+ * });
+ * const teamReaderRole = new pulumiservice.OrganizationRole("teamReaderRole", {
+ *     organizationName: "my-org",
+ *     name: "Team Readers",
+ *     description: "Read teams and create stacks.",
+ *     permissions: permissions.permissions,
+ * });
+ * ```
+ * ### Access to every stack, or to one stack
+ *
+ * A stack rule with `all: true` applies to every stack in the organization. A rule with `id` applies to a single stack, identified by the `stackId` that `getStack` returns.
+ *
+ * ```typescript
+ * import * as pulumi from "@pulumi/pulumi";
+ * import * as pulumiservice from "@pulumi/pulumiservice";
+ *
+ * const prodStack = pulumiservice.getStackOutput({
+ *     organizationName: "my-org",
+ *     projectName: "networking",
+ *     stackName: "prod",
+ * });
+ * const permissions = pulumiservice.buildRolePermissionsOutput({
  *     stackRules: [
- *         // Read every stack in the organization
  *         {
  *             all: true,
  *             scopes: [pulumiservice.RbacStackScope.StackRead],
  *         },
- *         // Deploy one specific stack
  *         {
  *             id: prodStack.stackId,
  *             scopes: [
@@ -59,7 +63,25 @@ import * as utilities from "./utilities";
  *                 pulumiservice.RbacStackScope.StackDeploymentCreate,
  *             ],
  *         },
- *         // Deploy stacks tagged team=platform (the operator defaults to equals)
+ *     ],
+ * });
+ * const prodDeployerRole = new pulumiservice.OrganizationRole("prodDeployerRole", {
+ *     organizationName: "my-org",
+ *     name: "Prod Deployers",
+ *     description: "Read every stack and deploy networking/prod.",
+ *     permissions: permissions.permissions,
+ * });
+ * ```
+ * ### Access to stacks by tag
+ *
+ * A rule with `tags` applies to stacks whose tags match every condition in the list. A condition without an `operator` matches stacks where the tag equals `value`. `notEquals` also matches stacks that don't have the tag. `exists` and `notExists` check only whether the tag is set.
+ *
+ * ```typescript
+ * import * as pulumi from "@pulumi/pulumi";
+ * import * as pulumiservice from "@pulumi/pulumiservice";
+ *
+ * const permissions = pulumiservice.buildRolePermissionsOutput({
+ *     stackRules: [
  *         {
  *             tags: [{
  *                 key: "team",
@@ -70,19 +92,14 @@ import * as utilities from "./utilities";
  *                 pulumiservice.RbacStackScope.StackDeploymentCreate,
  *             ],
  *         },
- *         // Deploy stacks whose env tag is anything but "prod"
  *         {
  *             tags: [{
  *                 key: "env",
  *                 value: "prod",
  *                 operator: pulumiservice.TagOperator.NotEquals,
  *             }],
- *             scopes: [
- *                 pulumiservice.RbacStackScope.StackWrite,
- *                 pulumiservice.RbacStackScope.StackDeploymentCreate,
- *             ],
+ *             scopes: [pulumiservice.RbacStackScope.StackDeploymentCreate],
  *         },
- *         // Read deployment settings on stacks that have a cost-center tag, whatever its value
  *         {
  *             tags: [{
  *                 key: "cost-center",
@@ -90,7 +107,6 @@ import * as utilities from "./utilities";
  *             }],
  *             scopes: [pulumiservice.RbacStackScope.StackDeploymentSettingsRead],
  *         },
- *         // Tag stacks that don't have an owner tag yet
  *         {
  *             tags: [{
  *                 key: "owner",
@@ -98,7 +114,6 @@ import * as utilities from "./utilities";
  *             }],
  *             scopes: [pulumiservice.RbacStackScope.StackTagsUpdate],
  *         },
- *         // Delete stacks that match every tag condition
  *         {
  *             tags: [
  *                 {
@@ -113,13 +128,37 @@ import * as utilities from "./utilities";
  *             scopes: [pulumiservice.RbacStackScope.StackDelete],
  *         },
  *     ],
+ * });
+ * const platformRole = new pulumiservice.OrganizationRole("platformRole", {
+ *     organizationName: "my-org",
+ *     name: "Platform Engineers",
+ *     description: "Deploy platform stacks and clean up ephemeral ones.",
+ *     permissions: permissions.permissions,
+ * });
+ * ```
+ * ### Access to environments and cloud accounts
+ *
+ * Environment and cloud account rules take the same `all`, `id`, and `tags` selectors as stack rules. Each rule list accepts only the scopes for its own entity type.
+ *
+ * ```typescript
+ * import * as pulumi from "@pulumi/pulumi";
+ * import * as pulumiservice from "@pulumi/pulumiservice";
+ *
+ * const sharedEnvironment = pulumiservice.getEnvironmentOutput({
+ *     organizationName: "my-org",
+ *     projectName: "platform",
+ *     name: "shared",
+ * });
+ * const awsAccount = pulumiservice.getInsightsAccountOutput({
+ *     organizationName: "my-org",
+ *     accountName: "aws-production",
+ * });
+ * const permissions = pulumiservice.buildRolePermissionsOutput({
  *     environmentRules: [
- *         // Read every environment
  *         {
  *             all: true,
  *             scopes: [pulumiservice.RbacEnvironmentScope.EnvironmentRead],
  *         },
- *         // Open, update, and rotate one specific environment
  *         {
  *             id: sharedEnvironment.environmentId,
  *             scopes: [
@@ -128,27 +167,16 @@ import * as utilities from "./utilities";
  *                 pulumiservice.RbacEnvironmentScope.EnvironmentRotate,
  *             ],
  *         },
- *         // Open environments tagged team=platform
- *         {
- *             tags: [{
- *                 key: "team",
- *                 value: "platform",
- *             }],
- *             scopes: [pulumiservice.RbacEnvironmentScope.EnvironmentOpen],
- *         },
  *     ],
  *     accountRules: [
- *         // Read every cloud account
  *         {
  *             all: true,
  *             scopes: [pulumiservice.RbacAccountScope.InsightsAccountRead],
  *         },
- *         // Scan one specific account
  *         {
  *             id: awsAccount.insightsAccountId,
  *             scopes: [pulumiservice.RbacAccountScope.InsightsAccountScan],
  *         },
- *         // Update accounts tagged team=platform
  *         {
  *             tags: [{
  *                 key: "team",
@@ -158,13 +186,12 @@ import * as utilities from "./utilities";
  *         },
  *     ],
  * });
- * const platformRole = new pulumiservice.OrganizationRole("platformRole", {
- *     organizationName: organizationName,
- *     name: "Platform Engineers",
- *     description: "Read access across the organization, plus deploy access to platform stacks.",
- *     permissions: platformPermissions.permissions,
+ * const infraRole = new pulumiservice.OrganizationRole("infraRole", {
+ *     organizationName: "my-org",
+ *     name: "Infrastructure Operators",
+ *     description: "Read environments and cloud accounts, and operate the shared ones.",
+ *     permissions: permissions.permissions,
  * });
- *
  * ```
  *
  * ## Import

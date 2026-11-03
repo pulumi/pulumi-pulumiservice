@@ -18,26 +18,30 @@
 //
 // Each `<name>.yaml` in the source directory is a multi-document YAML file.
 // Every document is one example: a Pulumi YAML program (`variables`,
-// `resources`, `outputs`, ...) plus a `description` key that becomes the
-// example's heading. The command converts each program with `pulumi convert`
-// and writes `<name>.md` to the destination directory, with one fence per
-// language inside the docs `{{% examples %}}` shortcodes. SDK generation keeps
-// only the fence for each SDK's language.
+// `resources`, `outputs`, ...) plus a `description` key. The description's
+// first line becomes the example's heading and any further lines a paragraph
+// under it. The command converts each program with `pulumi convert` and writes
+// `<name>.md` to the destination directory, with one fence per language inside
+// the docs `{{% examples %}}` shortcodes. SDK generation keeps only the fence
+// for each SDK's language.
 //
 // `pulumi convert` loads the pulumiservice plugin to resolve types, so the
-// provider binary must be on PATH. `make generate_examples` arranges that.
+// provider binary must be on PATH. `make examples` arranges that.
 //
 // Usage: gen-examples <yaml source dir> <markdown destination dir>
 package main
 
 import (
 	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
+	"slices"
 	"strings"
 
 	"gopkg.in/yaml.v3"
@@ -67,6 +71,10 @@ func main() {
 }
 
 func run(srcDir, dstDir string) error {
+	schema, err := loadSchema()
+	if err != nil {
+		return err
+	}
 	paths, err := filepath.Glob(filepath.Join(srcDir, "*.yaml"))
 	if err != nil {
 		return err
@@ -75,7 +83,7 @@ func run(srcDir, dstDir string) error {
 		return fmt.Errorf("no .yaml files in %q", srcDir)
 	}
 	for _, path := range paths {
-		md, err := render(path)
+		md, err := render(path, schema)
 		if err != nil {
 			return fmt.Errorf("processing %q: %w", path, err)
 		}
@@ -90,7 +98,7 @@ func run(srcDir, dstDir string) error {
 }
 
 // render converts every example in one YAML file and returns the markdown.
-func render(path string) (string, error) {
+func render(path string, schema *schemaSpec) (string, error) {
 	//nolint:gosec // G703: path is built from build-time CLI arguments, not user input.
 	f, err := os.Open(filepath.Clean(path))
 	if err != nil {
@@ -112,7 +120,7 @@ func render(path string) (string, error) {
 		if err != nil {
 			return "", err
 		}
-		if err := writeExample(&b, description, program); err != nil {
+		if err := writeExample(&b, description, program, schema); err != nil {
 			return "", fmt.Errorf("example %q: %w", description, err)
 		}
 	}
@@ -142,8 +150,12 @@ func splitExample(doc *yaml.Node) (string, *yaml.Node, error) {
 	return description, program, nil
 }
 
-func writeExample(b *strings.Builder, description string, program *yaml.Node) error {
+func writeExample(b *strings.Builder, description string, program *yaml.Node, schema *schemaSpec) error {
 	programYAML, err := encodeYAML(program)
+	if err != nil {
+		return err
+	}
+	enums, err := schema.enumValues(program)
 	if err != nil {
 		return err
 	}
@@ -163,11 +175,20 @@ func writeExample(b *strings.Builder, description string, program *yaml.Node) er
 		return err
 	}
 
-	fmt.Fprintf(b, "\n{{%% example %%}}\n### %s\n", description)
+	heading, body, _ := strings.Cut(strings.TrimSpace(description), "\n")
+	fmt.Fprintf(b, "\n{{%% example %%}}\n### %s\n", heading)
+	if body = strings.TrimSpace(body); body != "" {
+		fmt.Fprintf(b, "\n%s\n", body)
+	}
 	for _, lang := range languages {
 		code, err := convert(src, filepath.Join(dir, lang.name), lang.name, lang.file)
 		if err != nil {
 			return err
+		}
+		if lang.name == "java" {
+			if code, err = fixJavaEnums(code, enums); err != nil {
+				return err
+			}
 		}
 		fmt.Fprintf(b, "\n```%s\n%s\n```\n", lang.name, strings.TrimSpace(code))
 	}
@@ -203,4 +224,213 @@ func encodeYAML(n *yaml.Node) (string, error) {
 		return "", err
 	}
 	return buf.String(), nil
+}
+
+// schemaSpec is the part of the provider schema needed to find the enum-typed
+// values in an example program.
+type schemaSpec struct {
+	Resources map[string]struct {
+		InputProperties map[string]typeSpec `json:"inputProperties"`
+	} `json:"resources"`
+	Functions map[string]struct {
+		Inputs struct {
+			Properties map[string]typeSpec `json:"properties"`
+		} `json:"inputs"`
+	} `json:"functions"`
+	Types map[string]struct {
+		Properties map[string]typeSpec `json:"properties"`
+		Enum       []struct {
+			Name  string `json:"name"`
+			Value any    `json:"value"`
+		} `json:"enum"`
+	} `json:"types"`
+}
+
+type typeSpec struct {
+	Ref                  string    `json:"$ref"`
+	Type                 string    `json:"type"`
+	Items                *typeSpec `json:"items"`
+	AdditionalProperties *typeSpec `json:"additionalProperties"`
+}
+
+// enumValue is an enum-typed value in an example program, with the Java enum
+// class and constant it stands for.
+type enumValue struct {
+	value, class, constant string
+}
+
+// loadSchema reads the schema from the provider binary on PATH rather than
+// schema.json, which may not have been regenerated since the provider changed.
+func loadSchema() (*schemaSpec, error) {
+	provider, err := exec.LookPath("pulumi-resource-pulumiservice")
+	if err != nil {
+		return nil, fmt.Errorf("the provider binary must be on PATH: %w", err)
+	}
+	var stderr bytes.Buffer
+	//nolint:gosec // provider is the binary found on PATH, not user input.
+	cmd := exec.Command("pulumi", "package", "get-schema", provider)
+	cmd.Stderr = &stderr
+	out, err := cmd.Output()
+	if err != nil {
+		return nil, fmt.Errorf("reading the provider schema: %w\n%s", err, stderr.String())
+	}
+	var s schemaSpec
+	if err := json.Unmarshal(out, &s); err != nil {
+		return nil, fmt.Errorf("parsing the provider schema: %w", err)
+	}
+	return &s, nil
+}
+
+// enumValues lists the enum-typed values passed to `fn::invoke` calls in
+// `variables` and to `resources`, in program order.
+func (s *schemaSpec) enumValues(program *yaml.Node) ([]enumValue, error) {
+	var out []enumValue
+	for i := 0; i+1 < len(program.Content); i += 2 {
+		section := program.Content[i+1]
+		switch program.Content[i].Value {
+		case "variables":
+			for j := 1; j < len(section.Content); j += 2 {
+				invoke := mapValue(section.Content[j], "fn::invoke")
+				if invoke == nil {
+					continue
+				}
+				fn, ok := s.Functions[schemaToken(mapValue(invoke, "function"))]
+				if !ok {
+					continue
+				}
+				if err := s.walkProperties(mapValue(invoke, "arguments"), fn.Inputs.Properties, &out); err != nil {
+					return nil, err
+				}
+			}
+		case "resources":
+			for j := 1; j < len(section.Content); j += 2 {
+				res, ok := s.Resources[schemaToken(mapValue(section.Content[j], "type"))]
+				if !ok {
+					continue
+				}
+				props := mapValue(section.Content[j], "properties")
+				if err := s.walkProperties(props, res.InputProperties, &out); err != nil {
+					return nil, err
+				}
+			}
+		}
+	}
+	return out, nil
+}
+
+func (s *schemaSpec) walkProperties(n *yaml.Node, props map[string]typeSpec, out *[]enumValue) error {
+	if n == nil || n.Kind != yaml.MappingNode {
+		return nil
+	}
+	for i := 0; i+1 < len(n.Content); i += 2 {
+		if spec, ok := props[n.Content[i].Value]; ok {
+			if err := s.walk(n.Content[i+1], spec, out); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+func (s *schemaSpec) walk(n *yaml.Node, spec typeSpec, out *[]enumValue) error {
+	switch {
+	case strings.HasPrefix(spec.Ref, "#/types/"):
+		token := strings.TrimPrefix(spec.Ref, "#/types/")
+		t := s.Types[token]
+		if len(t.Enum) == 0 {
+			return s.walkProperties(n, t.Properties, out)
+		}
+		if n.Kind != yaml.ScalarNode {
+			return nil
+		}
+		module, class, _ := strings.Cut(strings.TrimPrefix(token, "pulumiservice:"), ":")
+		if module != "index" {
+			return fmt.Errorf("enum %s: only index enums are supported", token)
+		}
+		for _, e := range t.Enum {
+			if fmt.Sprint(e.Value) == n.Value {
+				*out = append(*out, enumValue{value: n.Value, class: class, constant: e.Name})
+				return nil
+			}
+		}
+		return fmt.Errorf("%q is not a %s value", n.Value, token)
+	case spec.Type == "array" && spec.Items != nil && n.Kind == yaml.SequenceNode:
+		for _, item := range n.Content {
+			if err := s.walk(item, *spec.Items, out); err != nil {
+				return err
+			}
+		}
+	case spec.Type == "object" && spec.AdditionalProperties != nil && n.Kind == yaml.MappingNode:
+		for i := 1; i < len(n.Content); i += 2 {
+			if err := s.walk(n.Content[i], *spec.AdditionalProperties, out); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+// mapValue returns the value under key in a YAML mapping, or nil.
+func mapValue(n *yaml.Node, key string) *yaml.Node {
+	if n == nil || n.Kind != yaml.MappingNode {
+		return nil
+	}
+	for i := 0; i+1 < len(n.Content); i += 2 {
+		if n.Content[i].Value == key {
+			return n.Content[i+1]
+		}
+	}
+	return nil
+}
+
+// schemaToken expands a Pulumi YAML type token such as `pulumiservice:Team`,
+// which may omit the `index` module, to its schema form.
+func schemaToken(n *yaml.Node) string {
+	if n == nil {
+		return ""
+	}
+	if parts := strings.Split(n.Value, ":"); len(parts) == 2 {
+		return parts[0] + ":index:" + parts[1]
+	}
+	return n.Value
+}
+
+var javaStringLiteral = regexp.MustCompile(`"((?:[^"\\]|\\.)*)"`)
+
+// fixJavaEnums rewrites enum values in a converted Java program into enum
+// constants. `pulumi convert --language java` writes them as string literals,
+// which don't compile against the Java SDK. Literals are matched against enums
+// in program order, since the same string can belong to more than one enum
+// (`stack:read` is both an organization and a stack scope).
+func fixJavaEnums(code string, enums []enumValue) (string, error) {
+	if len(enums) == 0 {
+		return code, nil
+	}
+	next := 0
+	var classes []string
+	code = javaStringLiteral.ReplaceAllStringFunc(code, func(lit string) string {
+		if next == len(enums) || lit[1:len(lit)-1] != enums[next].value {
+			return lit
+		}
+		e := enums[next]
+		next++
+		if !slices.Contains(classes, e.class) {
+			classes = append(classes, e.class)
+		}
+		return e.class + "." + e.constant
+	})
+	if next != len(enums) {
+		return "", fmt.Errorf("java output: found %d of %d enum values; next missing is %q",
+			next, len(enums), enums[next].value)
+	}
+	firstImport := strings.Index(code, "\nimport ")
+	if firstImport < 0 {
+		return "", errors.New("java output has no imports")
+	}
+	slices.Sort(classes)
+	var imports strings.Builder
+	for _, c := range classes {
+		fmt.Fprintf(&imports, "import com.pulumi.pulumiservice.enums.%s;\n", c)
+	}
+	return code[:firstImport+1] + imports.String() + code[firstImport+1:], nil
 }

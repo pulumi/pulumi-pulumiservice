@@ -30,7 +30,7 @@ import (
 )
 
 // The example files are generated from the Pulumi YAML in examples/; edit
-// those and run `make generate_examples`.
+// those and run `make examples`.
 //
 //go:generate go run ../../tools/gen-examples examples .
 var (

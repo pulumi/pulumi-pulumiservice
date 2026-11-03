@@ -21,7 +21,7 @@ import (
 	"net/http"
 	"strings"
 
-	_ "embed" // for organizationRoleExampleDocs
+	_ "embed" // for the //go:embed example file below
 
 	"github.com/pulumi/pulumi-cloud-sdk/go/apitype"
 	p "github.com/pulumi/pulumi-go-provider"
@@ -38,12 +38,11 @@ const (
 	gcGlobal      = "global"
 )
 
-// organizationRoleExampleDocs is the Example Usage section of the
-// OrganizationRole docs, generated from docs/organization_role_example/ by
-// scripts/gen-organization-role-example-docs.sh.
+// Generated from examples/organization_role_examples.yaml; see the
+// //go:generate directive in org_access_token.go.
 //
-//go:embed docs/organization_role_example.md
-var organizationRoleExampleDocs string
+//go:embed organization_role_examples.md
+var organizationRoleExamples string
 
 type OrganizationRole struct{}
 
@@ -73,7 +72,7 @@ func (*OrganizationRole) Annotate(a infer.Annotator) {
 			"**Manage these roles in code, not in the Pulumi Cloud console.** In the console's role editor, "+
 			"every rule grants a permission set (the \"access level\"); it can't show scopes granted "+
 			"directly. Roles that grant scopes directly, as `buildRolePermissions` does, open read-only "+
-			"there.\n\n"+strings.TrimSpace(organizationRoleExampleDocs)+
+			"there.\n\n"+strings.TrimSpace(organizationRoleExamples)+
 			util.ImportDocs("pulumiservice:index:OrganizationRole", "{organization}/{roleId}",
 				"my-org/1e5b8d3a-6c42-4f90-b7a1-8d2c4e6f0b95",
 				util.ConsoleIDHint("role ID", "https://app.pulumi.com/my-org/settings/access-management/roles/"+
