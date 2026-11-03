@@ -6,7 +6,7 @@
     },
     "dependencies": {
         "@pulumi/pulumi": "3.273.0",
-        "@pulumi/pulumiservice": "1.6.0",
+        "@pulumi/pulumiservice": "1.7.0",
         "@pulumi/random": "4.21.6"
     }
 }

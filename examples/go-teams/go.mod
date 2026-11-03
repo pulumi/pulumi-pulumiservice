@@ -3,7 +3,7 @@ module github.com/pulumi/pulumi-pulumiservice/examples/go-teams
 go 1.26.6
 
 require (
-	github.com/pulumi/pulumi-pulumiservice/sdk v1.6.0
+	github.com/pulumi/pulumi-pulumiservice/sdk v1.7.0
 	github.com/pulumi/pulumi/sdk/v3 v3.272.0
 )
 
