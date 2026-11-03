@@ -178,7 +178,6 @@ func memberInfoFrom(m pulumiapi.Member) OrganizationMemberInfo {
 	if m.FGARole != nil {
 		name := m.FGARole.Name
 		info.RoleName = &name
-		// The service reports built-in roles by display name ("Builder"), the role slugs are lowercase.
 		if slug := strings.ToLower(name); slices.Contains(builtinOrgRoles, slug) {
 			info.Role = &slug
 			return info

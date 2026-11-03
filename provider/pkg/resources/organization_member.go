@@ -100,8 +100,6 @@ func (s *OrganizationMemberState) Annotate(a infer.Annotator) {
 
 const defaultOrgMemberRole = "member"
 
-// storedDefaultOrgMemberRoles are the roles of organizations that use stored default roles. The add-member
-// endpoint rejects them, so Create adds the user as a member and then patches the role.
 var storedDefaultOrgMemberRoles = []string{"reader", "builder", "maintainer"}
 
 var validOrgMemberRoles = append(

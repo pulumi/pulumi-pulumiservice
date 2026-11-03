@@ -75,8 +75,6 @@ type updateMemberRoleReq struct {
 	FGARoleID *string `json:"fgaRoleId,omitempty"`
 }
 
-// storedDefaultOrgRoles are the roles of organizations that moved off the
-// computed Member role. The member endpoints take them only as an fgaRoleId.
 var storedDefaultOrgRoles = []string{"reader", "builder", "maintainer"}
 
 func isStoredDefaultOrgRole(role string) bool {
