@@ -207,6 +207,13 @@ func (c *Client) ListOrgMembers(ctx context.Context, orgName string) (*Members, 
 		frontend = nil
 	}
 
+	frontendFGARoles := make(map[string]*FGARole, len(frontend))
+	for _, m := range frontend {
+		if m.HasFGARole() {
+			frontendFGARoles[memberKey(m)] = m.FGARole
+		}
+	}
+
 	seen := make(map[string]bool, len(backend))
 	out := make([]Member, 0, len(backend)+len(frontend))
 	add := func(m Member) {
@@ -225,6 +232,11 @@ func (c *Client) ListOrgMembers(ctx context.Context, orgName string) (*Members, 
 		out = append(out, m)
 	}
 	for _, m := range backend {
+		if !m.HasFGARole() {
+			if role, ok := frontendFGARoles[memberKey(m)]; ok {
+				m.FGARole = role
+			}
+		}
 		add(m)
 	}
 	for _, m := range frontend {

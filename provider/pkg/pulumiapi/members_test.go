@@ -178,6 +178,32 @@ func TestListOrgMembers(t *testing.T) {
 		assert.False(t, alice.KnownToPulumi,
 			"backend record must win on dedup conflict")
 	})
+
+	t.Run("Takes the fine-grained role from the roster that has it", func(t *testing.T) {
+		maintainer := &FGARole{ID: "role-1", Name: "Maintainer"}
+		backendBody := Members{Members: []Member{
+			{User: User{Name: aliceUser}, Role: memberRole, KnownToPulumi: true, FGARole: &FGARole{}},
+			{User: User{Name: bobUser}, Role: memberRole, FGARole: &FGARole{}},
+		}}
+		frontendBody := Members{Members: []Member{
+			{User: User{Name: aliceUser}, Role: memberRole, FGARole: maintainer},
+		}}
+		c := startTestServerMulti(t, func(r *http.Request) (int, any) {
+			if r.URL.Query().Get("type") == rosterBackend {
+				return 200, backendBody
+			}
+			return 200, frontendBody
+		})
+		got, err := c.ListOrgMembers(ctx, orgName)
+		require.NoError(t, err)
+		require.Len(t, got.Members, 2)
+
+		alice, bob := got.Members[0], got.Members[1]
+		assert.Equal(t, maintainer, alice.FGARole)
+		assert.True(t, alice.KnownToPulumi, "other fields stay as the backend reported them")
+		assert.False(t, bob.HasFGARole(), "no roster has a role for bob, so the legacy role applies")
+		assert.Equal(t, memberRole, bob.Role)
+	})
 }
 
 func TestDeleteMemberFromOrg(t *testing.T) {
@@ -366,6 +392,24 @@ func TestGetOrgMember(t *testing.T) {
 		if assert.NotNil(t, got) {
 			assert.Equal(t, memberRole, got.Role)
 		}
+	})
+
+	t.Run("takes the fine-grained role from the frontend roster", func(t *testing.T) {
+		maintainer := &FGARole{ID: "role-1", Name: "Maintainer"}
+		c := startTestServerMulti(t, func(r *http.Request) (int, any) {
+			if r.URL.Query().Get("type") == rosterBackend {
+				return 200, Members{Members: []Member{
+					{User: User{Name: bobUser, GithubLogin: bobUser}, Role: memberRole, FGARole: &FGARole{}},
+				}}
+			}
+			return 200, Members{Members: []Member{
+				{User: User{Name: bobUser, GithubLogin: bobUser}, Role: memberRole, FGARole: maintainer},
+			}}
+		})
+		got, err := c.GetOrgMember(ctx, orgName, bobUser)
+		require.NoError(t, err)
+		require.NotNil(t, got)
+		assert.Equal(t, maintainer, got.FGARole)
 	})
 
 	t.Run(notFoundError, func(t *testing.T) {
