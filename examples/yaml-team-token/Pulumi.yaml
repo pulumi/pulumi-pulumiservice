@@ -21,7 +21,6 @@ resources:
   token:
     type: pulumiservice:index:TeamAccessToken
     properties:
-      name: test-${rand.result}
       teamName: ${team.name}
       organizationName: service-provider-test-org
       description: "example team access token"

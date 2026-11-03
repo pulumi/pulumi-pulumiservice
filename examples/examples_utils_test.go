@@ -24,6 +24,15 @@ func getCwd(t *testing.T) string {
 	return cwd
 }
 
+const serializedTestsEnv = "PULUMI_TEST_SERIALIZED"
+
+func skipUnlessSerializedTests(t *testing.T) {
+	t.Helper()
+	if os.Getenv(serializedTestsEnv) == "" {
+		t.Skipf("runs in the serialized shared-org job; set %s to run it", serializedTestsEnv)
+	}
+}
+
 func generateRandomFiveDigits() string {
 	return fmt.Sprintf("%05d", rand.Intn(100000)) //nolint:gosec // For testing.
 }

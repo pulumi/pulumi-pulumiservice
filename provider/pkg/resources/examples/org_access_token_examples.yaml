@@ -11,7 +11,6 @@ resources:
     type: pulumiservice:OrgAccessToken
     properties:
       organizationName: my-org
-      name: ci-token
       description: Token for CI pipelines
       expires: "2027-06-30T17:00:00Z"
       roleId: ${ciDeployerRole.roleId}

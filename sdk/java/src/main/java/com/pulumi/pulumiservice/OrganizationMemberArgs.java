@@ -32,14 +32,14 @@ public final class OrganizationMemberArgs extends com.pulumi.resources.ResourceA
     }
 
     /**
-     * The built-in organization role. One of `member`, `admin`, `billing-manager`. Defaults to `member` on create. Ignored when `roleId` is set.
+     * The built-in organization role. One of `member`, `admin`, `billing-manager`, `reader`, `builder`, `maintainer`. `reader`, `builder` and `maintainer` exist only in organizations that use stored default roles. In those organizations `member` means the organization&#39;s default role: the member follows it if an administrator changes it. Defaults to `member` on create. Ignored when `roleId` is set.
      * 
      */
     @Import(name="role")
     private @Nullable Output<String> role;
 
     /**
-     * @return The built-in organization role. One of `member`, `admin`, `billing-manager`. Defaults to `member` on create. Ignored when `roleId` is set.
+     * @return The built-in organization role. One of `member`, `admin`, `billing-manager`, `reader`, `builder`, `maintainer`. `reader`, `builder` and `maintainer` exist only in organizations that use stored default roles. In those organizations `member` means the organization&#39;s default role: the member follows it if an administrator changes it. Defaults to `member` on create. Ignored when `roleId` is set.
      * 
      */
     public Optional<Output<String>> role() {
@@ -125,7 +125,7 @@ public final class OrganizationMemberArgs extends com.pulumi.resources.ResourceA
         }
 
         /**
-         * @param role The built-in organization role. One of `member`, `admin`, `billing-manager`. Defaults to `member` on create. Ignored when `roleId` is set.
+         * @param role The built-in organization role. One of `member`, `admin`, `billing-manager`, `reader`, `builder`, `maintainer`. `reader`, `builder` and `maintainer` exist only in organizations that use stored default roles. In those organizations `member` means the organization&#39;s default role: the member follows it if an administrator changes it. Defaults to `member` on create. Ignored when `roleId` is set.
          * 
          * @return builder
          * 
@@ -136,7 +136,7 @@ public final class OrganizationMemberArgs extends com.pulumi.resources.ResourceA
         }
 
         /**
-         * @param role The built-in organization role. One of `member`, `admin`, `billing-manager`. Defaults to `member` on create. Ignored when `roleId` is set.
+         * @param role The built-in organization role. One of `member`, `admin`, `billing-manager`, `reader`, `builder`, `maintainer`. `reader`, `builder` and `maintainer` exist only in organizations that use stored default roles. In those organizations `member` means the organization&#39;s default role: the member follows it if an administrator changes it. Defaults to `member` on create. Ignored when `roleId` is set.
          * 
          * @return builder
          * 

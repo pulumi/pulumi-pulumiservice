@@ -20,6 +20,9 @@ import (
 	"net/http"
 	"net/url"
 	"path"
+	"slices"
+
+	"github.com/pulumi/pulumi-cloud-sdk/go/apitype"
 )
 
 const (
@@ -56,6 +59,10 @@ type FGARole struct {
 	Name string `json:"name"`
 }
 
+func (m Member) HasFGARole() bool {
+	return m.FGARole != nil && (m.FGARole.ID != "" || m.FGARole.Name != "")
+}
+
 type User struct {
 	Name        string `json:"name"`
 	GithubLogin string `json:"githubLogin"`
@@ -72,12 +79,31 @@ type updateMemberRoleReq struct {
 	FGARoleID *string `json:"fgaRoleId,omitempty"`
 }
 
+var storedDefaultOrgRoles = []string{"reader", "builder", "maintainer"}
+
+func isStoredDefaultOrgRole(role string) bool {
+	return slices.Contains(storedDefaultOrgRoles, role)
+}
+
 func validBuiltinOrgRole(role string) bool {
 	switch role {
 	case adminRole, memberRole, "billing-manager":
 		return true
 	}
 	return false
+}
+
+func (c *Client) resolveStoredDefaultRoleID(ctx context.Context, orgName, role string) (string, error) {
+	roles, err := c.ListOrgRoles(ctx, orgName, apitype.PermissionDescriptorUXPurposeRole)
+	if err != nil {
+		return "", err
+	}
+	for _, r := range roles {
+		if r.DefaultIdentifier == role {
+			return r.ID, nil
+		}
+	}
+	return "", fmt.Errorf("role %q not found in organization %q", role, orgName)
 }
 
 func (c *Client) AddMemberToOrg(ctx context.Context, userName string, orgName string, role string) error {
@@ -104,13 +130,13 @@ func (c *Client) AddMemberToOrg(ctx context.Context, userName string, orgName st
 }
 
 // UpdateOrgMemberRole updates a member's role on the organization. Pass role
-// for a built-in role (member, admin, billing-manager); pass fgaRoleID to
-// assign a custom role (takes precedence). At least one must be non-empty.
+// for a built-in role (member, admin, billing-manager, reader, builder,
+// maintainer); pass fgaRoleID to assign a custom role (takes precedence). At
+// least one must be non-empty.
 //
-// The underlying member-PATCH endpoint rejects built-in role names in the
-// `role` field — it only accepts `fgaRoleId`. When called with a built-in
-// role name, this helper resolves the FGA ID for that built-in first and
-// sends the PATCH with `fgaRoleId` set.
+// Built-in roles are sent by name, not by ID: in organizations that store a
+// default role, "member" means the organization's default role, and only the
+// service can resolve that.
 func (c *Client) UpdateOrgMemberRole(
 	ctx context.Context,
 	orgName, userName, role string,
@@ -125,23 +151,23 @@ func (c *Client) UpdateOrgMemberRole(
 	if role == "" && (fgaRoleID == nil || *fgaRoleID == "") {
 		return errors.New("one of role or fgaRoleID must be set")
 	}
-	if role != "" && !validBuiltinOrgRole(role) {
-		return fmt.Errorf("role must be one of: admin, member, billing-manager")
+	if role != "" && !validBuiltinOrgRole(role) && !isStoredDefaultOrgRole(role) {
+		return fmt.Errorf("role must be one of: admin, member, billing-manager, reader, builder, maintainer")
 	}
 
-	// Translate built-in role names to their per-org FGA IDs. Custom roles
-	// (fgaRoleID already non-nil) pass through unchanged.
-	effectiveFGA := fgaRoleID
-	if effectiveFGA == nil || *effectiveFGA == "" {
-		id, err := c.ResolveBuiltInRoleID(ctx, orgName, role)
+	req := updateMemberRoleReq{Role: role}
+	switch {
+	case fgaRoleID != nil && *fgaRoleID != "":
+		req = updateMemberRoleReq{FGARoleID: fgaRoleID}
+	case isStoredDefaultOrgRole(role):
+		id, err := c.resolveStoredDefaultRoleID(ctx, orgName, role)
 		if err != nil {
-			return fmt.Errorf("failed to resolve built-in role %q: %w", role, err)
+			return fmt.Errorf("failed to resolve role: %w", err)
 		}
-		effectiveFGA = &id
+		req = updateMemberRoleReq{FGARoleID: &id}
 	}
 
 	apiPath := path.Join("orgs", orgName, "members", userName)
-	req := updateMemberRoleReq{FGARoleID: effectiveFGA}
 	if _, err := c.do(ctx, http.MethodPatch, apiPath, req, nil); err != nil {
 		return fmt.Errorf("failed to update org member role: %w", err)
 	}
@@ -181,6 +207,13 @@ func (c *Client) ListOrgMembers(ctx context.Context, orgName string) (*Members, 
 		frontend = nil
 	}
 
+	frontendFGARoles := make(map[string]*FGARole, len(frontend))
+	for _, m := range frontend {
+		if m.HasFGARole() {
+			frontendFGARoles[memberKey(m)] = m.FGARole
+		}
+	}
+
 	seen := make(map[string]bool, len(backend))
 	out := make([]Member, 0, len(backend)+len(frontend))
 	add := func(m Member) {
@@ -199,6 +232,11 @@ func (c *Client) ListOrgMembers(ctx context.Context, orgName string) (*Members, 
 		out = append(out, m)
 	}
 	for _, m := range backend {
+		if !m.HasFGARole() {
+			if role, ok := frontendFGARoles[memberKey(m)]; ok {
+				m.FGARole = role
+			}
+		}
 		add(m)
 	}
 	for _, m := range frontend {

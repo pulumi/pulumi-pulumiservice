@@ -65,7 +65,7 @@ To release a new version of the provider, follow steps below:
 
 The `auto-release` flow described under [Releasing the API Surface](#releasing-the-api-surface) works for any release, not only `pulumiservice:api:*` changes. Its `finalize` job marks the release as latest and rebuilds the registry docs, which a hand-pushed tag does not do.
 
-`main` requires a status check named `Sentinel`, written by the `sentinel` job at the end of `run-acceptance-tests.yml`. That workflow ignores PRs that change only `CHANGELOG.md`, so a changelog-only release PR shows `Sentinel` as expected and never reported. To get the check, comment `/run-acceptance-tests` on the PR or include a change to another file.
+`main` requires a status check named `Sentinel`, written by the `sentinel` job at the end of `run-acceptance-tests.yml`. That workflow ignores PRs that change only `CHANGELOG.md`, so a changelog-only release PR shows `Sentinel` as expected and never reported. To get the check, include a change to another file. Commenting `/run-acceptance-tests` runs the tests, but on a comment-triggered run the `sentinel` job writes `Sentinel` to the tip of `main` instead of the PR's commit, so the PR stays blocked.
 
 ## Releasing the API Surface
 

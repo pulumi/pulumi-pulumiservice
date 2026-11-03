@@ -147,7 +147,7 @@ func (*TeamEnvironmentPermission) Diff(
 		add(gcEnvironment)
 	}
 	if req.State.Permission != req.Inputs.Permission {
-		add("permission")
+		add(permissionProperty)
 	}
 	if normalizedDuration(req.State.MaxOpenDuration) != normalizedDuration(req.Inputs.MaxOpenDuration) {
 		add("maxOpenDuration")

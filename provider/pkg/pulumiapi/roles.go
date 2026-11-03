@@ -52,10 +52,7 @@ type RoleClient interface {
 		orgName string,
 		uxPurpose apitype.PermissionDescriptorUXPurpose,
 	) ([]apitype.PermissionDescriptorRecord, error)
-	ResolveBuiltInRoleID(
-		ctx context.Context,
-		orgName, builtInRole string,
-	) (string, error)
+	SetOrgDefaultRole(ctx context.Context, orgName, roleID string) error
 }
 
 // RoleScope is a single permission scope (e.g. "stack:read") plus its
@@ -218,30 +215,19 @@ func (c *Client) ListOrgRoles(
 	return resp.Roles, nil
 }
 
-// ResolveBuiltInRoleID returns the FGA role ID for a Pulumi Cloud built-in
-// role (admin, member, billing-manager). The member PATCH endpoint rejects
-// built-in role names in the `role` field — callers must translate to
-// `fgaRoleId` first. Each org has its own set of built-in role IDs.
-func (c *Client) ResolveBuiltInRoleID(ctx context.Context, orgName, builtInRole string) (string, error) {
-	roles, err := c.ListOrgRoles(ctx, orgName, apitype.PermissionDescriptorUXPurposeRole)
-	if err != nil {
-		return "", err
+// SetOrgDefaultRole makes the role the one that members without an explicit role follow. The service has no
+// call that clears the default, so an organization always has one.
+func (c *Client) SetOrgDefaultRole(ctx context.Context, orgName, roleID string) error {
+	if len(orgName) == 0 {
+		return errors.New("organization name must not be empty")
 	}
-	for _, r := range roles {
-		if r.DefaultIdentifier == builtInRole {
-			return r.ID, nil
-		}
+	if len(roleID) == 0 {
+		return errors.New("role id must not be empty")
 	}
-	// Orgs migrated to the Reader/Builder/Maintainer roles no longer list
-	// "member"; the org's default role is what a new member receives.
-	if builtInRole == memberRole {
-		for _, r := range roles {
-			if r.IsOrgDefault {
-				return r.ID, nil
-			}
-		}
+	if err := c.SDK.UpdateOrganizationDefaultRole(ctx, orgName, roleID); err != nil {
+		return fmt.Errorf("failed to set organization default role: %w", err)
 	}
-	return "", fmt.Errorf("built-in role %q not found in organization %q", builtInRole, orgName)
+	return nil
 }
 
 // DeleteRole deletes a custom role. When force is true the role is removed

@@ -761,7 +761,7 @@
       "properties": {
         "role": {
           "type": "string",
-          "description": "The member's built-in role (member, admin, billing-manager). Absent when a custom role is assigned — check `roleId` in that case."
+          "description": "The member's built-in role (member, admin, billing-manager, reader, builder, maintainer). Absent when a custom role is assigned — check `roleId` in that case."
         },
         "roleId": {
           "type": "string",
@@ -7241,7 +7241,7 @@
       ]
     },
     "pulumiservice:index:OrgAccessToken": {
-      "description": "Creates an organization access token in Pulumi Cloud. Organization tokens aren't tied to a user, so they suit CI/CD and other automation.\n\nThe provider must authenticate as a user, for example with a personal access token, to create or delete this resource. Pulumi Cloud rejects organization and team access tokens here, even Admin ones, with `403 Machine tokens are not allowed to perform this operation`, so that one machine token can't mint another. For automation, use the personal access token of a dedicated service-account user, or use `TeamAccessToken`, which has no such restriction.\n\n{{% examples %}}\n## Example Usage\n\n{{% example %}}\n### Token with an expiry and a custom role\n\n```typescript\nimport * as pulumi from \"@pulumi/pulumi\";\nimport * as pulumiservice from \"@pulumi/pulumiservice\";\n\nconst ciDeployerRole = pulumiservice.getOrganizationRoleOutput({\n    organizationName: \"my-org\",\n    name: \"CI Deployer\",\n});\nconst ciToken = new pulumiservice.OrgAccessToken(\"ciToken\", {\n    organizationName: \"my-org\",\n    name: \"ci-token\",\n    description: \"Token for CI pipelines\",\n    expires: \"2027-06-30T17:00:00Z\",\n    roleId: ciDeployerRole.roleId,\n});\nexport const ciTokenValue = ciToken.value;\n```\n\n```python\nimport pulumi\nimport pulumi_pulumiservice as pulumiservice\n\nci_deployer_role = pulumiservice.get_organization_role_output(organization_name=\"my-org\",\n    name=\"CI Deployer\")\nci_token = pulumiservice.OrgAccessToken(\"ciToken\",\n    organization_name=\"my-org\",\n    name=\"ci-token\",\n    description=\"Token for CI pipelines\",\n    expires=\"2027-06-30T17:00:00Z\",\n    role_id=ci_deployer_role.role_id)\npulumi.export(\"ciTokenValue\", ci_token.value)\n```\n\n```go\npackage main\n\nimport (\n\t\"github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice\"\n\t\"github.com/pulumi/pulumi/sdk/v3/go/pulumi\"\n)\n\nfunc main() {\n\tpulumi.Run(func(ctx *pulumi.Context) error {\n\t\tciDeployerRole := pulumiservice.GetOrganizationRoleOutput(ctx, pulumiservice.GetOrganizationRoleOutputArgs{\n\t\t\tOrganizationName: pulumi.String(\"my-org\"),\n\t\t\tName:             pulumi.String(\"CI Deployer\"),\n\t\t}, nil)\n\t\tciToken, err := pulumiservice.NewOrgAccessToken(ctx, \"ciToken\", &pulumiservice.OrgAccessTokenArgs{\n\t\t\tOrganizationName: pulumi.String(\"my-org\"),\n\t\t\tName:             pulumi.String(\"ci-token\"),\n\t\t\tDescription:      pulumi.String(\"Token for CI pipelines\"),\n\t\t\tExpires:          pulumi.String(\"2027-06-30T17:00:00Z\"),\n\t\t\tRoleId:           ciDeployerRole.RoleId(),\n\t\t})\n\t\tif err != nil {\n\t\t\treturn err\n\t\t}\n\t\tctx.Export(\"ciTokenValue\", ciToken.Value)\n\t\treturn nil\n\t})\n}\n```\n\n```csharp\nusing System.Collections.Generic;\nusing System.Linq;\nusing Pulumi;\nusing PulumiService = Pulumi.PulumiService;\n\nreturn await Deployment.RunAsync(() => \n{\n    var ciDeployerRole = PulumiService.GetOrganizationRole.Invoke(new()\n    {\n        OrganizationName = \"my-org\",\n        Name = \"CI Deployer\",\n    });\n\n    var ciToken = new PulumiService.OrgAccessToken(\"ciToken\", new()\n    {\n        OrganizationName = \"my-org\",\n        Name = \"ci-token\",\n        Description = \"Token for CI pipelines\",\n        Expires = \"2027-06-30T17:00:00Z\",\n        RoleId = ciDeployerRole.Apply(getOrganizationRoleResult => getOrganizationRoleResult.RoleId),\n    });\n\n    return new Dictionary<string, object?>\n    {\n        [\"ciTokenValue\"] = ciToken.Value,\n    };\n});\n```\n\n```java\npackage generated_program;\n\nimport com.pulumi.Context;\nimport com.pulumi.Pulumi;\nimport com.pulumi.core.Output;\nimport com.pulumi.pulumiservice.PulumiserviceFunctions;\nimport com.pulumi.pulumiservice.inputs.GetOrganizationRoleArgs;\nimport com.pulumi.pulumiservice.OrgAccessToken;\nimport com.pulumi.pulumiservice.OrgAccessTokenArgs;\nimport java.util.ArrayList;\nimport java.util.Arrays;\nimport java.util.Map;\nimport java.io.File;\nimport java.nio.file.Files;\nimport java.nio.file.Paths;\n\npublic class App {\n    public static void main(String[] args) {\n        Pulumi.run(App::stack);\n    }\n\n    public static void stack(Context ctx) {\n        final var ciDeployerRole = PulumiserviceFunctions.getOrganizationRole(GetOrganizationRoleArgs.builder()\n            .organizationName(\"my-org\")\n            .name(\"CI Deployer\")\n            .build());\n\n        var ciToken = new OrgAccessToken(\"ciToken\", OrgAccessTokenArgs.builder()\n            .organizationName(\"my-org\")\n            .name(\"ci-token\")\n            .description(\"Token for CI pipelines\")\n            .expires(\"2027-06-30T17:00:00Z\")\n            .roleId(ciDeployerRole.applyValue(_ciDeployerRole -> _ciDeployerRole.roleId()))\n            .build());\n\n        ctx.export(\"ciTokenValue\", ciToken.value());\n    }\n}\n```\n\n```yaml\nvariables:\n  ciDeployerRole:\n    fn::invoke:\n      function: pulumiservice:getOrganizationRole\n      arguments:\n        organizationName: my-org\n        name: CI Deployer\nresources:\n  ciToken:\n    type: pulumiservice:OrgAccessToken\n    properties:\n      organizationName: my-org\n      name: ci-token\n      description: Token for CI pipelines\n      expires: \"2027-06-30T17:00:00Z\"\n      roleId: ${ciDeployerRole.roleId}\noutputs:\n  ciTokenValue: ${ciToken.value}\n```\n{{% /example %}}\n{{% /examples %}}\n\n## Import\n\nThis resource can be imported using its `id`, which has the format `{organization}/{name}/{tokenId}`, e.g.,\n\n```sh\n $ pulumi import pulumiservice:index:OrgAccessToken my-org-access-token my-org/my-token/a81d4c3e-52f0-4b7a-b9e2-6d0f1c8e2a47\n```\n\nThe Pulumi Cloud console doesn't show the token ID. List it with the [Pulumi Cloud REST API](https://www.pulumi.com/docs/reference/cloud-rest-api/):\n\n```sh\ncurl -s -H \"Authorization: token $PULUMI_ACCESS_TOKEN\" \\\n  https://api.pulumi.com/api/orgs/my-org/tokens | jq '.tokens[] | {name, id}'\n```\n\nThe token's `value` can't be read back from Pulumi Cloud, so it's empty after import.\n",
+      "description": "Creates an organization access token in Pulumi Cloud. Organization tokens aren't tied to a user, so they suit CI/CD and other automation.\n\nThe provider must authenticate as a user, for example with a personal access token, to create or delete this resource. Pulumi Cloud rejects organization and team access tokens here, even Admin ones, with `403 Machine tokens are not allowed to perform this operation`, so that one machine token can't mint another. For automation, use the personal access token of a dedicated service-account user, or use `TeamAccessToken`, which has no such restriction.\n\n{{% examples %}}\n## Example Usage\n\n{{% example %}}\n### Token with an expiry and a custom role\n\n```typescript\nimport * as pulumi from \"@pulumi/pulumi\";\nimport * as pulumiservice from \"@pulumi/pulumiservice\";\n\nconst ciDeployerRole = pulumiservice.getOrganizationRoleOutput({\n    organizationName: \"my-org\",\n    name: \"CI Deployer\",\n});\nconst ciToken = new pulumiservice.OrgAccessToken(\"ciToken\", {\n    organizationName: \"my-org\",\n    description: \"Token for CI pipelines\",\n    expires: \"2027-06-30T17:00:00Z\",\n    roleId: ciDeployerRole.roleId,\n});\nexport const ciTokenValue = ciToken.value;\n```\n\n```python\nimport pulumi\nimport pulumi_pulumiservice as pulumiservice\n\nci_deployer_role = pulumiservice.get_organization_role_output(organization_name=\"my-org\",\n    name=\"CI Deployer\")\nci_token = pulumiservice.OrgAccessToken(\"ciToken\",\n    organization_name=\"my-org\",\n    description=\"Token for CI pipelines\",\n    expires=\"2027-06-30T17:00:00Z\",\n    role_id=ci_deployer_role.role_id)\npulumi.export(\"ciTokenValue\", ci_token.value)\n```\n\n```go\npackage main\n\nimport (\n\t\"github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice\"\n\t\"github.com/pulumi/pulumi/sdk/v3/go/pulumi\"\n)\n\nfunc main() {\n\tpulumi.Run(func(ctx *pulumi.Context) error {\n\t\tciDeployerRole := pulumiservice.GetOrganizationRoleOutput(ctx, pulumiservice.GetOrganizationRoleOutputArgs{\n\t\t\tOrganizationName: pulumi.String(\"my-org\"),\n\t\t\tName:             pulumi.String(\"CI Deployer\"),\n\t\t}, nil)\n\t\tciToken, err := pulumiservice.NewOrgAccessToken(ctx, \"ciToken\", &pulumiservice.OrgAccessTokenArgs{\n\t\t\tOrganizationName: pulumi.String(\"my-org\"),\n\t\t\tDescription:      pulumi.String(\"Token for CI pipelines\"),\n\t\t\tExpires:          pulumi.String(\"2027-06-30T17:00:00Z\"),\n\t\t\tRoleId:           ciDeployerRole.RoleId(),\n\t\t})\n\t\tif err != nil {\n\t\t\treturn err\n\t\t}\n\t\tctx.Export(\"ciTokenValue\", ciToken.Value)\n\t\treturn nil\n\t})\n}\n```\n\n```csharp\nusing System.Collections.Generic;\nusing System.Linq;\nusing Pulumi;\nusing PulumiService = Pulumi.PulumiService;\n\nreturn await Deployment.RunAsync(() => \n{\n    var ciDeployerRole = PulumiService.GetOrganizationRole.Invoke(new()\n    {\n        OrganizationName = \"my-org\",\n        Name = \"CI Deployer\",\n    });\n\n    var ciToken = new PulumiService.OrgAccessToken(\"ciToken\", new()\n    {\n        OrganizationName = \"my-org\",\n        Description = \"Token for CI pipelines\",\n        Expires = \"2027-06-30T17:00:00Z\",\n        RoleId = ciDeployerRole.Apply(getOrganizationRoleResult => getOrganizationRoleResult.RoleId),\n    });\n\n    return new Dictionary<string, object?>\n    {\n        [\"ciTokenValue\"] = ciToken.Value,\n    };\n});\n```\n\n```java\npackage generated_program;\n\nimport com.pulumi.Context;\nimport com.pulumi.Pulumi;\nimport com.pulumi.core.Output;\nimport com.pulumi.pulumiservice.PulumiserviceFunctions;\nimport com.pulumi.pulumiservice.inputs.GetOrganizationRoleArgs;\nimport com.pulumi.pulumiservice.OrgAccessToken;\nimport com.pulumi.pulumiservice.OrgAccessTokenArgs;\nimport java.util.ArrayList;\nimport java.util.Arrays;\nimport java.util.Map;\nimport java.io.File;\nimport java.nio.file.Files;\nimport java.nio.file.Paths;\n\npublic class App {\n    public static void main(String[] args) {\n        Pulumi.run(App::stack);\n    }\n\n    public static void stack(Context ctx) {\n        final var ciDeployerRole = PulumiserviceFunctions.getOrganizationRole(GetOrganizationRoleArgs.builder()\n            .organizationName(\"my-org\")\n            .name(\"CI Deployer\")\n            .build());\n\n        var ciToken = new OrgAccessToken(\"ciToken\", OrgAccessTokenArgs.builder()\n            .organizationName(\"my-org\")\n            .description(\"Token for CI pipelines\")\n            .expires(\"2027-06-30T17:00:00Z\")\n            .roleId(ciDeployerRole.applyValue(_ciDeployerRole -> _ciDeployerRole.roleId()))\n            .build());\n\n        ctx.export(\"ciTokenValue\", ciToken.value());\n    }\n}\n```\n\n```yaml\nvariables:\n  ciDeployerRole:\n    fn::invoke:\n      function: pulumiservice:getOrganizationRole\n      arguments:\n        organizationName: my-org\n        name: CI Deployer\nresources:\n  ciToken:\n    type: pulumiservice:OrgAccessToken\n    properties:\n      organizationName: my-org\n      description: Token for CI pipelines\n      expires: \"2027-06-30T17:00:00Z\"\n      roleId: ${ciDeployerRole.roleId}\noutputs:\n  ciTokenValue: ${ciToken.value}\n```\n{{% /example %}}\n{{% /examples %}}\n\n## Import\n\nThis resource can be imported using its `id`, which has the format `{organization}/{name}/{tokenId}`, e.g.,\n\n```sh\n $ pulumi import pulumiservice:index:OrgAccessToken my-org-access-token my-org/my-token/a81d4c3e-52f0-4b7a-b9e2-6d0f1c8e2a47\n```\n\nThe Pulumi Cloud console doesn't show the token ID. List it with the [Pulumi Cloud REST API](https://www.pulumi.com/docs/reference/cloud-rest-api/):\n\n```sh\ncurl -s -H \"Authorization: token $PULUMI_ACCESS_TOKEN\" \\\n  https://api.pulumi.com/api/orgs/my-org/tokens | jq '.tokens[] | {name, id}'\n```\n\nThe token's `value` can't be read back from Pulumi Cloud, so it's empty after import.\n",
       "properties": {
         "admin": {
           "type": "boolean",
@@ -7261,7 +7261,7 @@
         },
         "name": {
           "type": "string",
-          "description": "The name for the token.",
+          "description": "The name for the token, up to 40 characters. Organization and team tokens share one set of names per organization, and Pulumi Cloud never frees a deleted token's name, so the name must not have been used by any other token in the organization.\n\nIf omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). A replacement gets a new name. Removing `name` from an existing token keeps its current name until the next replacement.\n\nEvery input on this resource triggers a replacement, so when `name` is set explicitly, changing any other input fails with `409 Conflict: token name already exists`. Omit `name`, or change it along with the other input.",
           "replaceOnChanges": true
         },
         "organizationName": {
@@ -7305,7 +7305,7 @@
         },
         "name": {
           "type": "string",
-          "description": "The name for the token.",
+          "description": "The name for the token, up to 40 characters. Organization and team tokens share one set of names per organization, and Pulumi Cloud never frees a deleted token's name, so the name must not have been used by any other token in the organization.\n\nIf omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). A replacement gets a new name. Removing `name` from an existing token keeps its current name until the next replacement.\n\nEvery input on this resource triggers a replacement, so when `name` is set explicitly, changing any other input fails with `409 Conflict: token name already exists`. Omit `name`, or change it along with the other input.",
           "replaceOnChanges": true
         },
         "organizationName": {
@@ -7320,7 +7320,50 @@
         }
       },
       "requiredInputs": [
-        "name",
+        "organizationName"
+      ]
+    },
+    "pulumiservice:index:OrganizationDefaultRole": {
+      "description": "Sets the default role of a Pulumi Cloud organization: the role that members without an explicit role follow, and that new members receive. Set either `role`, for a built-in role, or `roleId`, for a custom role. An organization always has a default role and Pulumi Cloud has no call to clear it, so destroying this resource leaves the current default role in place. At most one `OrganizationDefaultRole` should manage an organization.\n\n## Import\n\nThis resource can be imported using its `id`, which has the format `{organization}`, e.g.,\n\n```sh\n $ pulumi import pulumiservice:index:OrganizationDefaultRole my-organization-default-role my-org\n```\n",
+      "properties": {
+        "organizationName": {
+          "type": "string",
+          "description": "The Pulumi Cloud organization name.",
+          "replaceOnChanges": true
+        },
+        "role": {
+          "type": "string",
+          "description": "The built-in role to use as the default. One of `reader`, `builder` or `maintainer`. Exactly one of `role` and `roleId` must be set."
+        },
+        "roleId": {
+          "type": "string",
+          "description": "The ID of a custom role to use as the default. Exactly one of `role` and `roleId` must be set."
+        },
+        "roleName": {
+          "type": "string",
+          "description": "The name of the current default role."
+        }
+      },
+      "required": [
+        "organizationName",
+        "roleName"
+      ],
+      "inputProperties": {
+        "organizationName": {
+          "type": "string",
+          "description": "The Pulumi Cloud organization name.",
+          "replaceOnChanges": true
+        },
+        "role": {
+          "type": "string",
+          "description": "The built-in role to use as the default. One of `reader`, `builder` or `maintainer`. Exactly one of `role` and `roleId` must be set."
+        },
+        "roleId": {
+          "type": "string",
+          "description": "The ID of a custom role to use as the default. Exactly one of `role` and `roleId` must be set."
+        }
+      },
+      "requiredInputs": [
         "organizationName"
       ]
     },
@@ -7346,7 +7389,7 @@
         },
         "role": {
           "type": "string",
-          "description": "The built-in organization role. One of `member`, `admin`, `billing-manager`. Defaults to `member` on create. Ignored when `roleId` is set."
+          "description": "The built-in organization role. One of `member`, `admin`, `billing-manager`, `reader`, `builder`, `maintainer`. `reader`, `builder` and `maintainer` exist only in organizations that use stored default roles. In those organizations `member` means the organization's default role: the member follows it if an administrator changes it. Defaults to `member` on create. Ignored when `roleId` is set."
         },
         "roleId": {
           "type": "string",
@@ -7378,7 +7421,7 @@
         },
         "role": {
           "type": "string",
-          "description": "The built-in organization role. One of `member`, `admin`, `billing-manager`. Defaults to `member` on create. Ignored when `roleId` is set."
+          "description": "The built-in organization role. One of `member`, `admin`, `billing-manager`, `reader`, `builder`, `maintainer`. `reader`, `builder` and `maintainer` exist only in organizations that use stored default roles. In those organizations `member` means the organization's default role: the member follows it if an administrator changes it. Defaults to `member` on create. Ignored when `roleId` is set."
         },
         "roleId": {
           "type": "string",
@@ -7393,6 +7436,91 @@
       "requiredInputs": [
         "organizationName",
         "username"
+      ]
+    },
+    "pulumiservice:index:OrganizationMemberEntityAccess": {
+      "description": "Grants one organization member a permission set on one stack, environment or Insights account, as in the entity access section of the Pulumi Cloud console. See the [entity access docs](https://www.pulumi.com/docs/administration/concepts/rbac/entities/). Each resource manages the grant of one member on one entity. Other grants of the member, and grants of other members on the same entity, are not touched, and destroying the resource removes only this grant. Set either `permission`, for a built-in permission set, or `permissionSetId`, for a custom one.\n\n## Import\n\nThis resource can be imported using its `id`, which has the format `{organization}/{username}/{entityType}/{entityName}`, e.g.,\n\n```sh\n $ pulumi import pulumiservice:index:OrganizationMemberEntityAccess my-organization-member-entity-access my-org/alice/stack/my-project/dev\n```\n\n`entityType` is `stack`, `environment` or `insightsAccount`. `entityName` is `{project}/{stack}`, `{project}/{environment}` or the account name.\n",
+      "properties": {
+        "entityId": {
+          "type": "string",
+          "description": "The ID of the entity Pulumi Cloud stores the grant against."
+        },
+        "entityName": {
+          "type": "string",
+          "description": "The name of the entity: `{project}/{stack}` for a stack, `{project}/{environment}` for an environment, or the account name for an Insights account.",
+          "replaceOnChanges": true
+        },
+        "entityType": {
+          "type": "string",
+          "description": "The kind of entity to grant access to. One of `stack`, `environment` or `insightsAccount`.",
+          "replaceOnChanges": true
+        },
+        "organizationName": {
+          "type": "string",
+          "description": "The Pulumi Cloud organization name.",
+          "replaceOnChanges": true
+        },
+        "permission": {
+          "type": "string",
+          "description": "The built-in permission set to grant, for example `stack-read`, `stack-write`, `stack-admin`, `environment-read`, `environment-open`, `environment-write`, `environment-admin`, `insights-account-read`, `insights-account-write` or `insights-account-admin`. Exactly one of `permission` and `permissionSetId` must be set."
+        },
+        "permissionSetId": {
+          "type": "string",
+          "description": "The ID of a custom permission set to grant. Exactly one of `permission` and `permissionSetId` must be set."
+        },
+        "permissionSetName": {
+          "type": "string",
+          "description": "The display name of the granted permission set."
+        },
+        "username": {
+          "type": "string",
+          "description": "The Pulumi Cloud username of the organization member.",
+          "replaceOnChanges": true
+        }
+      },
+      "required": [
+        "organizationName",
+        "username",
+        "entityType",
+        "entityName",
+        "entityId",
+        "permissionSetName"
+      ],
+      "inputProperties": {
+        "entityName": {
+          "type": "string",
+          "description": "The name of the entity: `{project}/{stack}` for a stack, `{project}/{environment}` for an environment, or the account name for an Insights account.",
+          "replaceOnChanges": true
+        },
+        "entityType": {
+          "type": "string",
+          "description": "The kind of entity to grant access to. One of `stack`, `environment` or `insightsAccount`.",
+          "replaceOnChanges": true
+        },
+        "organizationName": {
+          "type": "string",
+          "description": "The Pulumi Cloud organization name.",
+          "replaceOnChanges": true
+        },
+        "permission": {
+          "type": "string",
+          "description": "The built-in permission set to grant, for example `stack-read`, `stack-write`, `stack-admin`, `environment-read`, `environment-open`, `environment-write`, `environment-admin`, `insights-account-read`, `insights-account-write` or `insights-account-admin`. Exactly one of `permission` and `permissionSetId` must be set."
+        },
+        "permissionSetId": {
+          "type": "string",
+          "description": "The ID of a custom permission set to grant. Exactly one of `permission` and `permissionSetId` must be set."
+        },
+        "username": {
+          "type": "string",
+          "description": "The Pulumi Cloud username of the organization member.",
+          "replaceOnChanges": true
+        }
+      },
+      "requiredInputs": [
+        "organizationName",
+        "username",
+        "entityType",
+        "entityName"
       ]
     },
     "pulumiservice:index:OrganizationRole": {
@@ -7931,7 +8059,7 @@
         },
         "name": {
           "type": "string",
-          "description": "The name for the token. This must be unique among all organization and team tokens in the organization.",
+          "description": "The name for the token, up to 40 characters. Organization and team tokens share one set of names per organization, and Pulumi Cloud never frees a deleted token's name, so the name must not have been used by any other token in the organization.\n\nIf omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). A replacement gets a new name. Removing `name` from an existing token keeps its current name until the next replacement.\n\nEvery input on this resource triggers a replacement, so when `name` is set explicitly, changing any other input fails with `409 Conflict: token name already exists`. Omit `name`, or change it along with the other input.",
           "replaceOnChanges": true
         },
         "organizationName": {
@@ -7964,7 +8092,7 @@
         },
         "name": {
           "type": "string",
-          "description": "The name for the token. This must be unique among all organization and team tokens in the organization.",
+          "description": "The name for the token, up to 40 characters. Organization and team tokens share one set of names per organization, and Pulumi Cloud never frees a deleted token's name, so the name must not have been used by any other token in the organization.\n\nIf omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). A replacement gets a new name. Removing `name` from an existing token keeps its current name until the next replacement.\n\nEvery input on this resource triggers a replacement, so when `name` is set explicitly, changing any other input fails with `409 Conflict: token name already exists`. Omit `name`, or change it along with the other input.",
           "replaceOnChanges": true
         },
         "organizationName": {
@@ -7979,7 +8107,6 @@
         }
       },
       "requiredInputs": [
-        "name",
         "organizationName",
         "teamName"
       ]
@@ -8944,7 +9071,7 @@
       "outputs": {
         "properties": {
           "role": {
-            "description": "The member's built-in role (member, admin, billing-manager). Absent when a custom role is assigned — check `roleId` in that case.",
+            "description": "The member's built-in role (member, admin, billing-manager, reader, builder, maintainer). Absent when a custom role is assigned — check `roleId` in that case.",
             "type": "string"
           },
           "roleId": {
