@@ -356,6 +356,10 @@ func applyMemberRoleToState(
 	state *OrganizationMemberState,
 ) error {
 	if !member.HasFGARole() {
+		if member.FGARole != nil && member.Role == defaultOrgMemberRole {
+			state.RoleName = member.Role
+			return nil
+		}
 		name := member.Role
 		state.Role = &name
 		state.RoleId = nil
