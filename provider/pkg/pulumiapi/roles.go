@@ -52,6 +52,7 @@ type RoleClient interface {
 		orgName string,
 		uxPurpose apitype.PermissionDescriptorUXPurpose,
 	) ([]apitype.PermissionDescriptorRecord, error)
+	SetOrgDefaultRole(ctx context.Context, orgName, roleID string) error
 }
 
 // RoleScope is a single permission scope (e.g. "stack:read") plus its
@@ -212,6 +213,21 @@ func (c *Client) ListOrgRoles(
 		return nil, fmt.Errorf("failed to list organization roles: %w", err)
 	}
 	return resp.Roles, nil
+}
+
+// SetOrgDefaultRole makes the role the one that members without an explicit role follow. The service has no
+// call that clears the default, so an organization always has one.
+func (c *Client) SetOrgDefaultRole(ctx context.Context, orgName, roleID string) error {
+	if len(orgName) == 0 {
+		return errors.New("organization name must not be empty")
+	}
+	if len(roleID) == 0 {
+		return errors.New("role id must not be empty")
+	}
+	if err := c.SDK.UpdateOrganizationDefaultRole(ctx, orgName, roleID); err != nil {
+		return fmt.Errorf("failed to set organization default role: %w", err)
+	}
+	return nil
 }
 
 // DeleteRole deletes a custom role. When force is true the role is removed

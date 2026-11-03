@@ -21,6 +21,8 @@ const (
 	gcAlice     = "alice"
 	gcBob       = "bob"
 
+	gcBuilder    = "builder"
+	gcReader     = "reader"
 	gcBuilderCap = "Builder"
 	gcBuilderID  = "builder-role-id"
 )
@@ -225,6 +227,53 @@ func TestOrganizationMemberRead(t *testing.T) {
 		assert.Nil(t, resp.State.RoleId, "RoleId must be cleared in built-in branch")
 	})
 
+	t.Run("empty fgaRole object is treated as no FGARole", func(t *testing.T) {
+		mock := &orgMemberClientMock{
+			getFunc: func(_ context.Context, _, _ string) (*pulumiapi.Member, error) {
+				return &pulumiapi.Member{
+					Role:    gcAdmin,
+					User:    pulumiapi.User{GithubLogin: gcAlice},
+					FGARole: &pulumiapi.FGARole{},
+				}, nil
+			},
+		}
+		ctx := config.WithMockClient(context.Background(), mock)
+
+		r := &OrganizationMember{}
+		resp, err := r.Read(ctx, infer.ReadRequest[OrganizationMemberInput, OrganizationMemberState]{ID: gcAcmeAlice})
+		assert.NoError(t, err)
+		if assert.NotNil(t, resp.State.Role) {
+			assert.Equal(t, gcAdmin, *resp.State.Role)
+		}
+		assert.Equal(t, gcAdmin, resp.State.RoleName)
+		assert.Nil(t, resp.State.RoleId)
+	})
+
+	t.Run("empty fgaRole object on a member keeps the declared custom roleId", func(t *testing.T) {
+		mock := &orgMemberClientMock{
+			getFunc: func(_ context.Context, _, _ string) (*pulumiapi.Member, error) {
+				return &pulumiapi.Member{
+					Role:    defaultOrgMemberRole,
+					User:    pulumiapi.User{GithubLogin: gcAlice},
+					FGARole: &pulumiapi.FGARole{},
+				}, nil
+			},
+		}
+		ctx := config.WithMockClient(context.Background(), mock)
+		roleID := "custom-role-id"
+
+		r := &OrganizationMember{}
+		resp, err := r.Read(ctx, infer.ReadRequest[OrganizationMemberInput, OrganizationMemberState]{
+			ID:     gcAcmeAlice,
+			Inputs: OrganizationMemberInput{OrganizationMemberCore: OrganizationMemberCore{RoleId: &roleID}},
+		})
+		assert.NoError(t, err)
+		if assert.NotNil(t, resp.Inputs.RoleId) {
+			assert.Equal(t, roleID, *resp.Inputs.RoleId)
+		}
+		assert.Nil(t, resp.Inputs.Role)
+	})
+
 	migratedOrgRoles := func(
 		_ context.Context,
 		_ string,
@@ -239,7 +288,7 @@ func TestOrganizationMemberRead(t *testing.T) {
 			{
 				PermissionDescriptorBase: apitype.PermissionDescriptorBase{Name: gcBuilderCap},
 				ID:                       gcBuilderID,
-				DefaultIdentifier:        "builder",
+				DefaultIdentifier:        gcBuilder,
 				IsOrgDefault:             true,
 			},
 		}, nil
@@ -285,6 +334,50 @@ func TestOrganizationMemberRead(t *testing.T) {
 			assert.Equal(t, gcBuilderID, *resp.Inputs.RoleId)
 		}
 		assert.Nil(t, resp.Inputs.Role)
+	})
+
+	t.Run("member on a non-default built-in role reads as that role", func(t *testing.T) {
+		mock := &orgMemberClientMock{
+			getFunc: func(_ context.Context, _, _ string) (*pulumiapi.Member, error) {
+				return &pulumiapi.Member{
+					Role:    defaultOrgMemberRole,
+					User:    pulumiapi.User{GithubLogin: gcAlice},
+					FGARole: &pulumiapi.FGARole{ID: "maintainer-fga", Name: "Maintainer"},
+				}, nil
+			},
+			listRolesFunc: func(
+				_ context.Context,
+				_ string,
+				_ apitype.PermissionDescriptorUXPurpose,
+			) ([]apitype.PermissionDescriptorRecord, error) {
+				return []apitype.PermissionDescriptorRecord{
+					{
+						PermissionDescriptorBase: apitype.PermissionDescriptorBase{Name: "Maintainer"},
+						ID:                       "maintainer-id",
+						DefaultIdentifier:        "maintainer",
+					},
+					{
+						PermissionDescriptorBase: apitype.PermissionDescriptorBase{Name: gcBuilderCap},
+						ID:                       gcBuilderID,
+						DefaultIdentifier:        gcBuilder,
+						IsOrgDefault:             true,
+					},
+				}, nil
+			},
+		}
+		ctx := config.WithMockClient(context.Background(), mock)
+		declared := defaultOrgMemberRole
+
+		r := &OrganizationMember{}
+		resp, err := r.Read(ctx, infer.ReadRequest[OrganizationMemberInput, OrganizationMemberState]{
+			ID:     gcAcmeAlice,
+			Inputs: OrganizationMemberInput{OrganizationMemberCore: OrganizationMemberCore{Role: &declared}},
+		})
+		assert.NoError(t, err)
+		if assert.NotNil(t, resp.State.Role) {
+			assert.Equal(t, "maintainer", *resp.State.Role)
+		}
+		assert.Nil(t, resp.State.RoleId)
 	})
 
 	t.Run("bad id", func(t *testing.T) {
@@ -337,6 +430,53 @@ func TestOrganizationMemberCreate(t *testing.T) {
 		assert.Equal(t, gcAcmeAlice, resp.ID)
 		assert.True(t, added)
 		assert.False(t, updated, "no UpdateOrgMemberRole expected when only built-in role is set")
+	})
+
+	t.Run("reader is added as member, then patched to reader", func(t *testing.T) {
+		var addedAs, patchedTo string
+		mock := &orgMemberClientMock{
+			addFunc: func(_ context.Context, _, _, role string) error {
+				addedAs = role
+				return nil
+			},
+			updateFunc: func(_ context.Context, _, _, role string, _ *string) error {
+				patchedTo = role
+				return nil
+			},
+			getFunc: func(_ context.Context, _, _ string) (*pulumiapi.Member, error) {
+				return &pulumiapi.Member{
+					Role:    defaultOrgMemberRole,
+					User:    pulumiapi.User{GithubLogin: gcAlice},
+					FGARole: &pulumiapi.FGARole{ID: "reader-fga", Name: "Reader"},
+				}, nil
+			},
+			listRolesFunc: func(
+				_ context.Context,
+				_ string,
+				_ apitype.PermissionDescriptorUXPurpose,
+			) ([]apitype.PermissionDescriptorRecord, error) {
+				return []apitype.PermissionDescriptorRecord{{
+					PermissionDescriptorBase: apitype.PermissionDescriptorBase{Name: "Reader"},
+					ID:                       "reader-id",
+					DefaultIdentifier:        gcReader,
+				}}, nil
+			},
+		}
+		ctx := config.WithMockClient(context.Background(), mock)
+		role := gcReader
+
+		r := &OrganizationMember{}
+		resp, err := r.Create(ctx, infer.CreateRequest[OrganizationMemberInput]{
+			Inputs: OrganizationMemberInput{OrganizationMemberCore: OrganizationMemberCore{
+				OrganizationName: gcAcme, Username: gcAlice, Role: &role,
+			}},
+		})
+		assert.NoError(t, err)
+		assert.Equal(t, defaultOrgMemberRole, addedAs)
+		assert.Equal(t, gcReader, patchedTo)
+		if assert.NotNil(t, resp.Output.Role) {
+			assert.Equal(t, gcReader, *resp.Output.Role)
+		}
 	})
 
 	t.Run("custom role triggers follow-up update", func(t *testing.T) {
@@ -536,6 +676,21 @@ func TestOrganizationMemberReadPreservesAdopted(t *testing.T) {
 	assert.True(t, resp.State.Adopted, "Read must preserve Adopted from prior state")
 }
 
+func TestOrganizationMemberCheckAcceptsStoredDefaultRoles(t *testing.T) {
+	r := &OrganizationMember{}
+	for _, role := range []string{gcReader, gcBuilder, "maintainer"} {
+		resp, err := r.Check(context.Background(), infer.CheckRequest{
+			NewInputs: property.NewMap(map[string]property.Value{
+				gcOrganizationName: property.New(gcAcme),
+				gcUsername:         property.New(gcAlice),
+				roleProperty:       property.New(role),
+			}),
+		})
+		assert.NoError(t, err)
+		assert.Empty(t, resp.Failures, role)
+	}
+}
+
 func TestOrganizationMemberCheck(t *testing.T) {
 	r := &OrganizationMember{}
 	bad := "owner"
@@ -543,12 +698,12 @@ func TestOrganizationMemberCheck(t *testing.T) {
 	resp, err := r.Check(context.Background(), infer.CheckRequest{
 		NewInputs: property.NewMap(map[string]property.Value{
 			gcOrganizationName: property.New(gcAcme),
-			"username":         property.New(gcAlice),
-			"role":             property.New(bad),
+			gcUsername:         property.New(gcAlice),
+			roleProperty:       property.New(bad),
 		}),
 	})
 	assert.NoError(t, err)
 	if assert.Len(t, resp.Failures, 1) {
-		assert.Equal(t, "role", resp.Failures[0].Property)
+		assert.Equal(t, roleProperty, resp.Failures[0].Property)
 	}
 }
