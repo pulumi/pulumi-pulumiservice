@@ -682,7 +682,7 @@ func TestOrganizationMemberCheckAcceptsStoredDefaultRoles(t *testing.T) {
 		resp, err := r.Check(context.Background(), infer.CheckRequest{
 			NewInputs: property.NewMap(map[string]property.Value{
 				gcOrganizationName: property.New(gcAcme),
-				"username":         property.New(gcAlice),
+				gcUsername:         property.New(gcAlice),
 				roleProperty:       property.New(role),
 			}),
 		})
@@ -698,7 +698,7 @@ func TestOrganizationMemberCheck(t *testing.T) {
 	resp, err := r.Check(context.Background(), infer.CheckRequest{
 		NewInputs: property.NewMap(map[string]property.Value{
 			gcOrganizationName: property.New(gcAcme),
-			"username":         property.New(gcAlice),
+			gcUsername:         property.New(gcAlice),
 			roleProperty:       property.New(bad),
 		}),
 	})
