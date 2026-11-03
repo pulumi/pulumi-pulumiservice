@@ -37,8 +37,6 @@ const (
 	entityTypeInsightsAccount = "insightsAccount"
 )
 
-// permissionPrefixes ties each entity type to the built-in permission sets that apply to it, so a
-// mismatch fails at preview instead of at the service.
 var permissionPrefixes = map[string]string{
 	entityTypeStack:           "stack-",
 	entityTypeEnvironment:     "environment-",
@@ -344,8 +342,6 @@ func entityAccessID(in OrganizationMemberEntityAccessInput) string {
 	return strings.Join([]string{in.OrganizationName, in.Username, in.EntityType, in.EntityName}, "/")
 }
 
-// parseEntityAccessID splits on the first three slashes only, because the entity name of a stack or
-// environment contains one.
 func parseEntityAccessID(id string) (org, username, entityType, entityName string, err error) {
 	parts := strings.SplitN(id, "/", 4)
 	if len(parts) != 4 || slices.Contains(parts, "") {
@@ -376,8 +372,6 @@ func entityInstance(entityType, id string) (apitype.EntityInstance, error) {
 	}
 }
 
-// resolveAssignmentEntity turns an entity name into the ID the assignments API takes. It returns nil
-// when the entity does not exist.
 func resolveAssignmentEntity(
 	ctx context.Context,
 	client config.Client,
