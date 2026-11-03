@@ -109,7 +109,7 @@ func TestOrganizationMemberEntityAccessCheck(t *testing.T) {
 	check := func(entityType, entityName string, extra map[string]property.Value) []string {
 		props := map[string]property.Value{
 			gcOrganizationName: property.New(eaOrg),
-			"username":         property.New(eaUser),
+			gcUsername:         property.New(eaUser),
 			"entityType":       property.New(entityType),
 			"entityName":       property.New(entityName),
 		}

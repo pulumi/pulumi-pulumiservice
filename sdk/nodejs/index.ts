@@ -160,6 +160,11 @@ export type OrgAccessToken = import("./orgAccessToken").OrgAccessToken;
 export const OrgAccessToken: typeof import("./orgAccessToken").OrgAccessToken = null as any;
 utilities.lazyLoad(exports, ["OrgAccessToken"], () => require("./orgAccessToken"));
 
+export { OrganizationDefaultRoleArgs } from "./organizationDefaultRole";
+export type OrganizationDefaultRole = import("./organizationDefaultRole").OrganizationDefaultRole;
+export const OrganizationDefaultRole: typeof import("./organizationDefaultRole").OrganizationDefaultRole = null as any;
+utilities.lazyLoad(exports, ["OrganizationDefaultRole"], () => require("./organizationDefaultRole"));
+
 export { OrganizationMemberArgs } from "./organizationMember";
 export type OrganizationMember = import("./organizationMember").OrganizationMember;
 export const OrganizationMember: typeof import("./organizationMember").OrganizationMember = null as any;
@@ -288,6 +293,8 @@ const _module = {
                 return new OidcIssuer(name, <any>undefined, { urn })
             case "pulumiservice:index:OrgAccessToken":
                 return new OrgAccessToken(name, <any>undefined, { urn })
+            case "pulumiservice:index:OrganizationDefaultRole":
+                return new OrganizationDefaultRole(name, <any>undefined, { urn })
             case "pulumiservice:index:OrganizationMember":
                 return new OrganizationMember(name, <any>undefined, { urn })
             case "pulumiservice:index:OrganizationMemberEntityAccess":
