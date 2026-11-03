@@ -249,6 +249,31 @@ func TestOrganizationMemberRead(t *testing.T) {
 		assert.Nil(t, resp.State.RoleId)
 	})
 
+	t.Run("empty fgaRole object on a member keeps the declared custom roleId", func(t *testing.T) {
+		mock := &orgMemberClientMock{
+			getFunc: func(_ context.Context, _, _ string) (*pulumiapi.Member, error) {
+				return &pulumiapi.Member{
+					Role:    defaultOrgMemberRole,
+					User:    pulumiapi.User{GithubLogin: gcAlice},
+					FGARole: &pulumiapi.FGARole{},
+				}, nil
+			},
+		}
+		ctx := config.WithMockClient(context.Background(), mock)
+		roleID := "custom-role-id"
+
+		r := &OrganizationMember{}
+		resp, err := r.Read(ctx, infer.ReadRequest[OrganizationMemberInput, OrganizationMemberState]{
+			ID:     gcAcmeAlice,
+			Inputs: OrganizationMemberInput{OrganizationMemberCore: OrganizationMemberCore{RoleId: &roleID}},
+		})
+		assert.NoError(t, err)
+		if assert.NotNil(t, resp.Inputs.RoleId) {
+			assert.Equal(t, roleID, *resp.Inputs.RoleId)
+		}
+		assert.Nil(t, resp.Inputs.Role)
+	})
+
 	migratedOrgRoles := func(
 		_ context.Context,
 		_ string,
