@@ -71,8 +71,8 @@ func (m *OrganizationMemberInfo) Annotate(a infer.Annotator) {
 	a.Describe(&m.Username, "The member's Pulumi Cloud username.")
 	a.Describe(
 		&m.Role,
-		"The member's built-in role (member, admin, billing-manager). Absent when a custom role is assigned "+
-			"— check `roleId` in that case.",
+		"The member's built-in role (member, admin, billing-manager, reader, builder, maintainer). Absent "+
+			"when a custom role is assigned — check `roleId` in that case.",
 	)
 	a.Describe(&m.RoleId, "The custom role ID assigned to this member, if any.")
 	a.Describe(&m.RoleName, "The name of the currently assigned role (custom role name, or built-in role).")
@@ -168,7 +168,7 @@ func (GetOrganizationMemberFunction) Invoke(
 // resource; kept in sync so the data source and resource surface the same
 // shape for the same underlying member (built-in → role set, custom → roleId
 // set, never both).
-var builtinOrgRoles = []string{"member", "admin", "billing-manager"}
+var builtinOrgRoles = []string{"member", "admin", "billing-manager", "reader", "builder", "maintainer"}
 
 func memberInfoFrom(m pulumiapi.Member) OrganizationMemberInfo {
 	info := OrganizationMemberInfo{
@@ -178,8 +178,9 @@ func memberInfoFrom(m pulumiapi.Member) OrganizationMemberInfo {
 	if m.FGARole != nil {
 		name := m.FGARole.Name
 		info.RoleName = &name
-		if slices.Contains(builtinOrgRoles, m.FGARole.Name) {
-			info.Role = &name
+		// The service reports built-in roles by display name ("Builder"), the role slugs are lowercase.
+		if slug := strings.ToLower(name); slices.Contains(builtinOrgRoles, slug) {
+			info.Role = &slug
 			return info
 		}
 		id := m.FGARole.ID

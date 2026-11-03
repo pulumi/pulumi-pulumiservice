@@ -3722,7 +3722,7 @@ func (o OperationContextOptionsPtrOutput) SkipIntermediateDeployments() pulumi.B
 }
 
 type OrganizationMemberInfo struct {
-	// The member's built-in role (member, admin, billing-manager). Absent when a custom role is assigned — check `roleId` in that case.
+	// The member's built-in role (member, admin, billing-manager, reader, builder, maintainer). Absent when a custom role is assigned — check `roleId` in that case.
 	Role *string `pulumi:"role"`
 	// The custom role ID assigned to this member, if any.
 	RoleId *string `pulumi:"roleId"`
@@ -3748,7 +3748,7 @@ func (o OrganizationMemberInfoOutput) ToOrganizationMemberInfoOutputWithContext(
 	return o
 }
 
-// The member's built-in role (member, admin, billing-manager). Absent when a custom role is assigned — check `roleId` in that case.
+// The member's built-in role (member, admin, billing-manager, reader, builder, maintainer). Absent when a custom role is assigned — check `roleId` in that case.
 func (o OrganizationMemberInfoOutput) Role() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v OrganizationMemberInfo) *string { return v.Role }).(pulumi.StringPtrOutput)
 }

@@ -761,7 +761,7 @@
       "properties": {
         "role": {
           "type": "string",
-          "description": "The member's built-in role (member, admin, billing-manager). Absent when a custom role is assigned — check `roleId` in that case."
+          "description": "The member's built-in role (member, admin, billing-manager, reader, builder, maintainer). Absent when a custom role is assigned — check `roleId` in that case."
         },
         "roleId": {
           "type": "string",
@@ -7346,7 +7346,7 @@
         },
         "role": {
           "type": "string",
-          "description": "The built-in organization role. One of `member`, `admin`, `billing-manager`. Defaults to `member` on create. Ignored when `roleId` is set."
+          "description": "The built-in organization role. One of `member`, `admin`, `billing-manager`, `reader`, `builder`, `maintainer`. `reader`, `builder` and `maintainer` exist only in organizations that use stored default roles. In those organizations `member` means the organization's default role: the member follows it if an administrator changes it. Defaults to `member` on create. Ignored when `roleId` is set."
         },
         "roleId": {
           "type": "string",
@@ -7378,7 +7378,7 @@
         },
         "role": {
           "type": "string",
-          "description": "The built-in organization role. One of `member`, `admin`, `billing-manager`. Defaults to `member` on create. Ignored when `roleId` is set."
+          "description": "The built-in organization role. One of `member`, `admin`, `billing-manager`, `reader`, `builder`, `maintainer`. `reader`, `builder` and `maintainer` exist only in organizations that use stored default roles. In those organizations `member` means the organization's default role: the member follows it if an administrator changes it. Defaults to `member` on create. Ignored when `roleId` is set."
         },
         "roleId": {
           "type": "string",
@@ -8944,7 +8944,7 @@
       "outputs": {
         "properties": {
           "role": {
-            "description": "The member's built-in role (member, admin, billing-manager). Absent when a custom role is assigned — check `roleId` in that case.",
+            "description": "The member's built-in role (member, admin, billing-manager, reader, builder, maintainer). Absent when a custom role is assigned — check `roleId` in that case.",
             "type": "string"
           },
           "roleId": {

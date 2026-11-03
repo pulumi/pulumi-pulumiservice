@@ -1607,7 +1607,7 @@ class OrganizationMemberInfo(dict):
         """
         :param _builtins.str username: The member's Pulumi Cloud username.
         :param _builtins.bool virtual_admin: Whether this member is an admin in Pulumi Cloud without admin access on the backing identity provider.
-        :param _builtins.str role: The member's built-in role (member, admin, billing-manager). Absent when a custom role is assigned — check `roleId` in that case.
+        :param _builtins.str role: The member's built-in role (member, admin, billing-manager, reader, builder, maintainer). Absent when a custom role is assigned — check `roleId` in that case.
         :param _builtins.str role_id: The custom role ID assigned to this member, if any.
         :param _builtins.str role_name: The name of the currently assigned role (custom role name, or built-in role).
         """
@@ -1640,7 +1640,7 @@ class OrganizationMemberInfo(dict):
     @pulumi.getter
     def role(self) -> Optional[_builtins.str]:
         """
-        The member's built-in role (member, admin, billing-manager). Absent when a custom role is assigned — check `roleId` in that case.
+        The member's built-in role (member, admin, billing-manager, reader, builder, maintainer). Absent when a custom role is assigned — check `roleId` in that case.
         """
         return pulumi.get(self, "role")
 

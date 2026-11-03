@@ -86,14 +86,14 @@ public class OrganizationMember extends com.pulumi.resources.CustomResource {
         return this.organizationName;
     }
     /**
-     * The built-in organization role. One of `member`, `admin`, `billing-manager`. Defaults to `member` on create. Ignored when `roleId` is set.
+     * The built-in organization role. One of `member`, `admin`, `billing-manager`, `reader`, `builder`, `maintainer`. `reader`, `builder` and `maintainer` exist only in organizations that use stored default roles. In those organizations `member` means the organization&#39;s default role: the member follows it if an administrator changes it. Defaults to `member` on create. Ignored when `roleId` is set.
      * 
      */
     @Export(name="role", refs={String.class}, tree="[0]")
     private Output</* @Nullable */ String> role;
 
     /**
-     * @return The built-in organization role. One of `member`, `admin`, `billing-manager`. Defaults to `member` on create. Ignored when `roleId` is set.
+     * @return The built-in organization role. One of `member`, `admin`, `billing-manager`, `reader`, `builder`, `maintainer`. `reader`, `builder` and `maintainer` exist only in organizations that use stored default roles. In those organizations `member` means the organization&#39;s default role: the member follows it if an administrator changes it. Defaults to `member` on create. Ignored when `roleId` is set.
      * 
      */
     public Output<Optional<String>> role() {

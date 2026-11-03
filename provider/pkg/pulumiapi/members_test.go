@@ -1,11 +1,14 @@
 package pulumiapi
 
 import (
+	"io"
 	"net/http"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/pulumi/pulumi-cloud-sdk/go/apitype"
 )
 
 const (
@@ -219,6 +222,42 @@ func TestUpdateOrgMemberRole(t *testing.T) {
 		})
 	}
 
+	for _, role := range []string{"reader", "builder", "maintainer"} {
+		t.Run(role+" is resolved to its role ID, since the endpoint rejects it as a name", func(t *testing.T) {
+			roles := struct {
+				Roles []apitype.PermissionDescriptorRecord `json:"roles"`
+			}{Roles: []apitype.PermissionDescriptorRecord{
+				{ID: "other-id", DefaultIdentifier: "admin"},
+				{ID: role + "-id", DefaultIdentifier: role},
+			}}
+			var patchBody []byte
+			c := startTestServerMulti(t, func(r *http.Request) (int, any) {
+				switch {
+				case r.Method == http.MethodGet && r.URL.Path == orgRolesPath:
+					assert.Equal(t, "role", r.URL.Query().Get("uxPurpose"))
+					return 200, roles
+				case r.Method == http.MethodPatch && r.URL.Path == memberUserPath:
+					patchBody, _ = io.ReadAll(r.Body)
+					return 204, nil
+				default:
+					t.Fatalf("unexpected request: %s %s", r.Method, r.URL.Path)
+					return 500, nil
+				}
+			})
+			assert.NoError(t, c.UpdateOrgMemberRole(ctx, orgName, userName, role, nil))
+			assert.JSONEq(t, `{"fgaRoleId":"`+role+`-id"}`, string(patchBody))
+		})
+	}
+
+	t.Run("a role missing from the organization is an error", func(t *testing.T) {
+		c := startTestServerMulti(t, func(r *http.Request) (int, any) {
+			assert.Equal(t, http.MethodGet, r.Method)
+			return 200, map[string]any{"roles": []any{}}
+		})
+		err := c.UpdateOrgMemberRole(ctx, orgName, userName, "reader", nil)
+		assert.ErrorContains(t, err, `role "reader" not found in organization`)
+	})
+
 	t.Run("empty roleID sends the built-in role", func(t *testing.T) {
 		empty := ""
 		c := startTestServer(t, testServerConfig{
@@ -250,7 +289,7 @@ func TestUpdateOrgMemberRole(t *testing.T) {
 	t.Run("invalid built-in", func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{ResponseCode: 200})
 		err := c.UpdateOrgMemberRole(ctx, orgName, userName, "superadmin", nil)
-		assert.EqualError(t, err, "role must be one of: admin, member, billing-manager")
+		assert.EqualError(t, err, "role must be one of: admin, member, billing-manager, reader, builder, maintainer")
 	})
 }
 
