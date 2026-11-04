@@ -30,7 +30,7 @@ require (
 	github.com/go-git/gcfg/v2 v2.0.2 // indirect
 	github.com/go-git/go-billy/v6 v6.0.0-beta.1 // indirect
 	github.com/go-git/go-git/v6 v6.0.0-beta.1 // indirect
-	github.com/go-jose/go-jose/v4 v4.1.4 // indirect
+	github.com/go-jose/go-jose/v4 v4.1.6 // indirect
 	github.com/go-logr/logr v1.4.4 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/godbus/dbus/v5 v5.2.2 // indirect
@@ -52,7 +52,7 @@ require (
 	github.com/muesli/termenv v0.16.0 // indirect
 	github.com/pgavlin/fx v0.1.6 // indirect
 	github.com/pulumi/appdash v0.0.0-20231130102222-75f619a67231 // indirect
-	github.com/pulumi/pulumi-cloud-sdk/go v1.20261104.0 // indirect
+	github.com/pulumi/pulumi-cloud-sdk/go v1.20261104.1209 // indirect
 	github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e // indirect
 	github.com/zalando/go-keyring v0.2.8 // indirect
 	github.com/zclconf/go-cty v1.16.3 // indirect
