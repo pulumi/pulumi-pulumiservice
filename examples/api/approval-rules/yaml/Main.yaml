@@ -3,7 +3,7 @@ resources:
     type: pulumiservice:api:PolicyGroup
     properties:
       orgName: ${organizationName}
-      name: api-approvers
+      name: ${groupName}
       entityType: stacks
 outputs:
   policyGroupName: ${approvers.name}

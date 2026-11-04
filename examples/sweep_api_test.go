@@ -110,8 +110,9 @@ func (s *sweeper) shouldSweep(name string) bool {
 type apiTime struct{ time.Time }
 
 func (a *apiTime) UnmarshalJSON(b []byte) error {
+	a.Time = time.Time{}
 	var ms int64
-	if err := json.Unmarshal(b, &ms); err == nil {
+	if err := json.Unmarshal(b, &ms); err == nil && ms > 0 {
 		a.Time = time.UnixMilli(ms)
 		return nil
 	}
@@ -238,7 +239,7 @@ func (s *sweeper) sweepRoles() {
 			ModifiedAt apiTime `json:"modifiedAt"`
 		} `json:"roles"`
 	}
-	if err := s.get("/api/orgs/"+s.org+"/roles", &resp); err != nil {
+	if err := s.get("/api/orgs/"+s.org+"/roles?uxPurpose=role", &resp); err != nil {
 		s.t.Logf("sweep roles list: %v", err)
 		return
 	}
@@ -385,6 +386,15 @@ func TestSweepApiTime(t *testing.T) {
 		var got apiTime
 		if err := json.Unmarshal([]byte(in), &got); err != nil || !got.Equal(want) {
 			t.Errorf("apiTime(%s) = %v, %v; want %v", in, got.Time, err, want)
+		}
+	}
+
+	for _, in := range []string{`{}`, `{"created":null}`, `{"created":0}`, `{"created":"yesterday"}`} {
+		var resp struct {
+			Created apiTime `json:"created"`
+		}
+		if err := json.Unmarshal([]byte(in), &resp); err != nil || !resp.Created.IsZero() {
+			t.Errorf("apiTime from %s = %v, %v; want zero, so the resource is kept", in, resp.Created.Time, err)
 		}
 	}
 

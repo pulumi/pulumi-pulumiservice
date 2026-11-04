@@ -4,3 +4,6 @@ config:
   organizationName:
     type: string
     default: service-provider-test-org
+  groupName:
+    type: string
+    default: api-approvers
