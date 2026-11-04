@@ -8,8 +8,8 @@
 // non-idempotent endpoints, or shared singletons on the org).
 //
 // sweepOnce runs once per `go test` invocation, before TestApi starts,
-// and deletes any leftover resources matching the test-naming
-// conventions used by this suite.
+// and deletes leftover resources that match the test-naming conventions
+// used by this suite and are older than sweepMinAge.
 //
 // Set PULUMITEST_SKIP_SWEEP=1 to bypass.
 
@@ -49,16 +49,16 @@ func sweepApiTestState(t *testing.T) {
 			apiURL: strings.TrimRight(apiURL, "/"),
 			org:    ServiceProviderTestOrg,
 			http:   &http.Client{Timeout: 30 * time.Second},
+			now:    time.Now(),
 		}
+		// Webhooks, teams, policy groups and template sources aren't swept:
+		// their list responses carry no creation time, so a live resource
+		// from a concurrent run can't be told apart from a leaked one.
 		s.sweepOidcIssuers()
-		s.sweepOrgWebhooks()
-		s.sweepPolicyGroups()
 		s.sweepRoles()
-		s.sweepTeams()
 		s.sweepEnvironments()
 		s.sweepAgentPools()
 		s.sweepOrgTokens()
-		s.sweepTemplateCollections()
 	})
 }
 
@@ -68,17 +68,51 @@ type sweeper struct {
 	apiURL string
 	org    string
 	http   *http.Client
+	now    time.Time
 }
 
-// shouldSweep returns true if a resource name looks like a leftover
-// from the test suite. Test-suite naming conventions:
-//
-//   - suffix "-<5digits>" (random-suffix examples)
-//   - prefixes: "api-", "v1-" (transitional), "test-", "org-webhook-", "pulumiIssuer", etc.
+// sweepMinAge is how old a resource must be before the sweeper deletes it.
+// The acceptance tests in test.yml share this org and these name prefixes,
+// and they run at the same time as this suite on other PRs, so a younger
+// resource may still be in use. It exceeds the longest test timeout (2h).
+const sweepMinAge = 3 * time.Hour
+
+// sweepTime is a creation time as the list endpoints return it, which varies
+// by endpoint: RFC 3339, "2006-01-02 15:04:05.000" in UTC, or epoch
+// milliseconds. It is zero when the field is missing or unparseable.
+type sweepTime struct{ time.Time }
+
+func (st *sweepTime) UnmarshalJSON(b []byte) error {
+	st.Time = time.Time{}
+	var ms int64
+	if err := json.Unmarshal(b, &ms); err == nil && ms > 0 {
+		st.Time = time.UnixMilli(ms).UTC()
+		return nil
+	}
+	var s string
+	if json.Unmarshal(b, &s) != nil {
+		return nil
+	}
+	for _, layout := range []string{time.RFC3339Nano, "2006-01-02 15:04:05.999999999"} {
+		if t, err := time.Parse(layout, s); err == nil {
+			st.Time = t
+			return nil
+		}
+	}
+	return nil
+}
+
+// shouldSweep returns true if a resource looks like a leftover from the
+// test suite: its name follows a test-suite naming convention and it was
+// created at least sweepMinAge before now. A resource with no known
+// creation time is never swept.
 //
 // Conservative: only sweeps obvious test names so we don't nuke
 // human-created resources by accident.
-func (s *sweeper) shouldSweep(name string) bool {
+func shouldSweep(name string, created sweepTime, now time.Time) bool {
+	if created.IsZero() || now.Sub(created.Time) < sweepMinAge {
+		return false
+	}
 	for _, pre := range []string{
 		"api-", "v1-", "test-", "org-webhook-", "stack-webhook-",
 		"env-webhook-", "brand-new-api-", "brand-new-v1-", "example-policy-group",
@@ -124,8 +158,9 @@ func (s *sweeper) del(path string) error {
 func (s *sweeper) sweepOidcIssuers() {
 	var resp struct {
 		OidcIssuers []struct {
-			ID   string `json:"id"`
-			Name string `json:"name"`
+			ID      string    `json:"id"`
+			Name    string    `json:"name"`
+			Created sweepTime `json:"created"`
 		} `json:"oidcIssuers"`
 	}
 	if err := s.get("/api/orgs/"+s.org+"/oidc/issuers", &resp); err != nil {
@@ -133,7 +168,7 @@ func (s *sweeper) sweepOidcIssuers() {
 		return
 	}
 	for _, iss := range resp.OidcIssuers {
-		if !s.shouldSweep(iss.Name) {
+		if !shouldSweep(iss.Name, iss.Created, s.now) {
 			continue
 		}
 		if err := s.del("/api/orgs/" + s.org + "/oidc/issuers/" + iss.ID); err != nil {
@@ -144,61 +179,20 @@ func (s *sweeper) sweepOidcIssuers() {
 	}
 }
 
-func (s *sweeper) sweepOrgWebhooks() {
-	var resp []struct {
-		Name string `json:"name"`
-	}
-	if err := s.get("/api/orgs/"+s.org+"/hooks", &resp); err != nil {
-		s.t.Logf("sweep webhooks list: %v", err)
-		return
-	}
-	for _, h := range resp {
-		if !s.shouldSweep(h.Name) {
-			continue
-		}
-		if err := s.del("/api/orgs/" + s.org + "/hooks/" + h.Name); err != nil {
-			s.t.Logf("sweep webhook %s: %v", h.Name, err)
-			continue
-		}
-		s.t.Logf("sweep: deleted webhook %s", h.Name)
-	}
-}
-
-func (s *sweeper) sweepPolicyGroups() {
-	var resp struct {
-		PolicyGroups []struct {
-			Name string `json:"name"`
-		} `json:"policyGroups"`
-	}
-	if err := s.get("/api/orgs/"+s.org+"/policygroups", &resp); err != nil {
-		s.t.Logf("sweep policygroups list: %v", err)
-		return
-	}
-	for _, g := range resp.PolicyGroups {
-		if !s.shouldSweep(g.Name) {
-			continue
-		}
-		if err := s.del("/api/orgs/" + s.org + "/policygroups/" + g.Name); err != nil {
-			s.t.Logf("sweep policygroup %s: %v", g.Name, err)
-			continue
-		}
-		s.t.Logf("sweep: deleted policygroup %s", g.Name)
-	}
-}
-
 func (s *sweeper) sweepRoles() {
 	var resp struct {
 		Roles []struct {
-			ID   string `json:"id"`
-			Name string `json:"name"`
+			ID      string    `json:"id"`
+			Name    string    `json:"name"`
+			Created sweepTime `json:"created"`
 		} `json:"roles"`
 	}
-	if err := s.get("/api/orgs/"+s.org+"/roles", &resp); err != nil {
+	if err := s.get("/api/orgs/"+s.org+"/roles?uxPurpose=role", &resp); err != nil {
 		s.t.Logf("sweep roles list: %v", err)
 		return
 	}
 	for _, r := range resp.Roles {
-		if !s.shouldSweep(r.Name) {
+		if !shouldSweep(r.Name, r.Created, s.now) {
 			continue
 		}
 		if err := s.del("/api/orgs/" + s.org + "/roles/" + r.ID); err != nil {
@@ -209,33 +203,12 @@ func (s *sweeper) sweepRoles() {
 	}
 }
 
-func (s *sweeper) sweepTeams() {
-	var resp struct {
-		Teams []struct {
-			Name string `json:"name"`
-		} `json:"teams"`
-	}
-	if err := s.get("/api/orgs/"+s.org+"/teams", &resp); err != nil {
-		s.t.Logf("sweep teams list: %v", err)
-		return
-	}
-	for _, t := range resp.Teams {
-		if !s.shouldSweep(t.Name) {
-			continue
-		}
-		if err := s.del("/api/orgs/" + s.org + "/teams/" + t.Name); err != nil {
-			s.t.Logf("sweep team %s: %v", t.Name, err)
-			continue
-		}
-		s.t.Logf("sweep: deleted team %s", t.Name)
-	}
-}
-
 func (s *sweeper) sweepAgentPools() {
 	var resp struct {
 		AgentPools []struct {
-			ID   string `json:"id"`
-			Name string `json:"name"`
+			ID      string    `json:"id"`
+			Name    string    `json:"name"`
+			Created sweepTime `json:"created"`
 		} `json:"agentPools"`
 	}
 	if err := s.get("/api/orgs/"+s.org+"/agent-pools", &resp); err != nil {
@@ -243,7 +216,7 @@ func (s *sweeper) sweepAgentPools() {
 		return
 	}
 	for _, p := range resp.AgentPools {
-		if !s.shouldSweep(p.Name) {
+		if !shouldSweep(p.Name, p.Created, s.now) {
 			continue
 		}
 		if err := s.del("/api/orgs/" + s.org + "/agent-pools/" + p.ID); err != nil {
@@ -257,8 +230,9 @@ func (s *sweeper) sweepAgentPools() {
 func (s *sweeper) sweepOrgTokens() {
 	var resp struct {
 		Tokens []struct {
-			ID   string `json:"id"`
-			Name string `json:"name"`
+			ID      string    `json:"id"`
+			Name    string    `json:"name"`
+			Created sweepTime `json:"created"`
 		} `json:"tokens"`
 	}
 	if err := s.get("/api/orgs/"+s.org+"/tokens", &resp); err != nil {
@@ -266,7 +240,7 @@ func (s *sweeper) sweepOrgTokens() {
 		return
 	}
 	for _, tk := range resp.Tokens {
-		if !s.shouldSweep(tk.Name) {
+		if !shouldSweep(tk.Name, tk.Created, s.now) {
 			continue
 		}
 		if err := s.del("/api/orgs/" + s.org + "/tokens/" + tk.ID); err != nil {
@@ -277,36 +251,14 @@ func (s *sweeper) sweepOrgTokens() {
 	}
 }
 
-func (s *sweeper) sweepTemplateCollections() {
-	var resp struct {
-		Sources []struct {
-			ID   string `json:"id"`
-			Name string `json:"name"`
-		} `json:"sources"`
-	}
-	if err := s.get("/api/orgs/"+s.org+"/templates/sources", &resp); err != nil {
-		s.t.Logf("sweep template-collections list: %v", err)
-		return
-	}
-	for _, c := range resp.Sources {
-		if !s.shouldSweep(c.Name) {
-			continue
-		}
-		if err := s.del("/api/orgs/" + s.org + "/templates/sources/" + c.ID); err != nil {
-			s.t.Logf("sweep template-collection %s: %v", c.Name, err)
-			continue
-		}
-		s.t.Logf("sweep: deleted template-collection %s", c.Name)
-	}
-}
-
 func (s *sweeper) sweepEnvironments() {
 	// ESC environments are listed under a different path. Same name-based
 	// filter applies. Best-effort — projects with no envs return 404.
 	var resp struct {
 		Environments []struct {
-			Project string `json:"project"`
-			Name    string `json:"name"`
+			Project string    `json:"project"`
+			Name    string    `json:"name"`
+			Created sweepTime `json:"created"`
 		} `json:"environments"`
 	}
 	if err := s.get("/api/esc/environments/"+s.org, &resp); err != nil {
@@ -314,7 +266,7 @@ func (s *sweeper) sweepEnvironments() {
 		return
 	}
 	for _, e := range resp.Environments {
-		if !s.shouldSweep(e.Name) && !s.shouldSweep(e.Project) {
+		if !shouldSweep(e.Name, e.Created, s.now) && !shouldSweep(e.Project, e.Created, s.now) {
 			continue
 		}
 		path := "/api/esc/environments/" + s.org + "/" + e.Project + "/" + e.Name

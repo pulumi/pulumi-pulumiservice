@@ -9,11 +9,12 @@ public class App {
         Pulumi.run(ctx -> {
             var config = ctx.config();
             var organizationName = config.get("organizationName").orElse("service-provider-test-org");
+            var groupName = config.get("groupName").orElse("api-approvers");
 
             var approvers = new PolicyGroup("approvers",
                 PolicyGroupArgs.builder()
                     .orgName(organizationName)
-                    .name("api-approvers")
+                    .name(groupName)
                     .entityType("stacks")
                     .build());
 
