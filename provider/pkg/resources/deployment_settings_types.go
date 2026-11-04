@@ -333,7 +333,8 @@ func (o *AWSOIDCConfiguration) Annotate(a infer.Annotator) {
 }
 
 type GCPOIDCConfiguration struct {
-	ProjectID      string `pulumi:"projectId"`
+	ProjectID      string `pulumi:"projectId,optional"`
+	ProjectNumber  string `pulumi:"projectNumber,optional"`
 	Region         string `pulumi:"region,optional"`
 	WorkloadPoolID string `pulumi:"workloadPoolId"`
 	ProviderID     string `pulumi:"providerId"`
@@ -343,15 +344,47 @@ type GCPOIDCConfiguration struct {
 
 func (o *GCPOIDCConfiguration) Annotate(a infer.Annotator) {
 	a.Describe(o, "GCP configuration for Deployments OIDC. "+escRecommendation+" See "+cloudCredentialsGuide+".")
-	a.Describe(&o.ProjectID, "The GCP project number, a numeric value such as `123456789012`. This is not "+
-		"the project ID (such as `my-project`). To look up the number, run "+
-		"`gcloud projects describe <project-id> --format='value(projectNumber)'`.")
+	a.Describe(&o.ProjectNumber, gcpProjectNumberDescription)
+	a.Describe(&o.ProjectID, gcpProjectNumberDescription)
+	a.Deprecate(&o.ProjectID, "Use `projectNumber` instead. Despite its name, `projectId` takes the project "+
+		"number, not the project ID.")
 	a.Describe(&o.Region, "The region of the GCP project.")
 	a.Describe(&o.WorkloadPoolID, "The ID of the workload pool to use.")
 	a.Describe(&o.ProviderID, "The ID of the identity provider associated with the workload pool.")
 	a.Describe(&o.ServiceAccount, "The email address of the service account to use.")
 	a.Describe(&o.TokenLifetime, "The lifetime of the temporary credentials in “XhYmZs” format.")
 	a.SetToken("index", "GCPOIDCConfiguration")
+}
+
+const gcpProjectNumberDescription = "The GCP project number, a numeric value such as `123456789012`. This is " +
+	"not the project ID (such as `my-project`). To look up the number, run " +
+	"`gcloud projects describe <project-id> --format='value(projectNumber)'`."
+
+// projectNumber returns the value to send to Pulumi Cloud, which has a single
+// field for it. projectNumber wins because projectId is deprecated.
+func (o *GCPOIDCConfiguration) projectNumber() string {
+	if o.ProjectNumber != "" {
+		return o.ProjectNumber
+	}
+	return o.ProjectID
+}
+
+// matchProjectKey puts the project number under the key or keys that used set.
+// Pulumi Cloud returns it under one name, so without this a program using
+// projectNumber would see a diff after every create and refresh. With no used
+// configuration (import), it picks projectNumber.
+func (o *GCPOIDCConfiguration) matchProjectKey(used *GCPOIDCConfiguration) {
+	if o == nil {
+		return
+	}
+	number := o.projectNumber()
+	o.ProjectID, o.ProjectNumber = "", ""
+	if used != nil && used.ProjectID != "" {
+		o.ProjectID = number
+	}
+	if used == nil || used.ProjectNumber != "" || used.ProjectID == "" {
+		o.ProjectNumber = number
+	}
 }
 
 type AzureOIDCConfiguration struct {
@@ -584,7 +617,7 @@ func (oc *DeploymentSettingsOperationContext) toAPI(secretEnvVars map[string]boo
 		}
 		if gcp := oidc.GCP; gcp != nil {
 			out.OIDC.GCP = &pulumiapi.OperationContextGCPOIDCConfiguration{
-				ProjectID:      gcp.ProjectID,
+				ProjectID:      gcp.projectNumber(),
 				Region:         gcp.Region,
 				WorkloadPoolID: gcp.WorkloadPoolID,
 				ProviderID:     gcp.ProviderID,

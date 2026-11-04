@@ -17,6 +17,7 @@ package resources
 import (
 	"context"
 	"errors"
+	"fmt"
 	"path"
 	"strings"
 
@@ -94,7 +95,64 @@ func (*DeploymentSettings) Check(
 			oc.OIDC.AWS.Duration = *normalized
 		}
 	}
+	failures = append(failures, checkGCPProjectNumber(req.NewInputs)...)
 	return infer.CheckResponse[DeploymentSettingsInput]{Inputs: in, Failures: failures}, nil
+}
+
+// checkGCPProjectNumber rejects a GCP project ID passed where Pulumi Cloud
+// expects the project number. Pulumi Cloud doesn't check the value, so without
+// this the mistake only surfaces when a deployment fails to get credentials.
+// It reads the raw inputs because the typed inputs can't tell an unknown value,
+// which is fine during preview, from a missing one.
+func checkGCPProjectNumber(news property.Map) []p.CheckFailure {
+	gcp := news.Get(gcOperationContext)
+	for _, key := range []string{gcOIDC, gcGCP} {
+		if !gcp.IsMap() {
+			return nil
+		}
+		gcp = gcp.AsMap().Get(key)
+	}
+	if !gcp.IsMap() {
+		return nil
+	}
+	const prefix = "operationContext.oidc.gcp."
+	var failures []p.CheckFailure
+	set := false
+	for _, key := range []string{gcProjectNumber, gcProjectID} {
+		v := gcp.AsMap().Get(key)
+		if v.IsComputed() {
+			set = true
+			continue
+		}
+		if !v.IsString() || v.AsString() == "" {
+			continue
+		}
+		set = true
+		if value := v.AsString(); !isDigits(value) {
+			failures = append(failures, p.CheckFailure{
+				Property: prefix + key,
+				Reason: fmt.Sprintf("%q is not a GCP project number. %s takes the numeric project number, "+
+					"not the project ID. Look it up with "+
+					"`gcloud projects describe <project-id> --format='value(projectNumber)'`.", value, key),
+			})
+		}
+	}
+	if !set {
+		failures = append(failures, p.CheckFailure{
+			Property: prefix + gcProjectNumber,
+			Reason:   "missing required property 'projectNumber'",
+		})
+	}
+	return failures
+}
+
+func isDigits(s string) bool {
+	for _, r := range s {
+		if r < '0' || r > '9' {
+			return false
+		}
+	}
+	return s != ""
 }
 
 // restoreTrueDefaultFlags sets the flags whose schema default is true to the
@@ -200,7 +258,7 @@ func (*DeploymentSettings) Create(
 	if err != nil {
 		return infer.CreateResponse[DeploymentSettingsState]{}, err
 	}
-	state, err := deploymentSettingsState(input, response)
+	state, err := deploymentSettingsState(req.Inputs, input, response)
 	if err != nil {
 		return infer.CreateResponse[DeploymentSettingsState]{}, err
 	}
@@ -225,7 +283,7 @@ func (*DeploymentSettings) Update(
 	if err != nil {
 		return infer.UpdateResponse[DeploymentSettingsState]{}, err
 	}
-	state, err := deploymentSettingsState(input, response)
+	state, err := deploymentSettingsState(req.Inputs, input, response)
 	if err != nil {
 		return infer.UpdateResponse[DeploymentSettingsState]{}, err
 	}
@@ -235,10 +293,22 @@ func (*DeploymentSettings) Update(
 // deploymentSettingsState builds the state from the settings Pulumi Cloud
 // returned. Secret values in it are Pulumi Cloud's ciphertext.
 func deploymentSettingsState(
-	input PulumiServiceDeploymentSettingsInput, response *pulumiapi.DeploymentSettings,
+	inputs DeploymentSettingsInput, input PulumiServiceDeploymentSettingsInput, response *pulumiapi.DeploymentSettings,
 ) (DeploymentSettingsState, error) {
 	out := PulumiServiceDeploymentSettingsInput{DeploymentSettings: *response, Stack: input.Stack}
-	return fromPropertyMap[DeploymentSettingsState](out.ToPropertyMap(&input.DeploymentSettings, nil, false))
+	state, err := fromPropertyMap[DeploymentSettingsState](out.ToPropertyMap(&input.DeploymentSettings, nil, false))
+	if err != nil {
+		return state, err
+	}
+	gcpOIDC(state.OperationContext).matchProjectKey(gcpOIDC(inputs.OperationContext))
+	return state, nil
+}
+
+func gcpOIDC(oc *DeploymentSettingsOperationContext) *GCPOIDCConfiguration {
+	if oc == nil || oc.OIDC == nil {
+		return nil
+	}
+	return oc.OIDC.GCP
 }
 
 func (*DeploymentSettings) Read(
@@ -266,8 +336,14 @@ func (*DeploymentSettings) Read(
 	// ciphertext, so the plaintext of each secret comes from the old inputs.
 	// On import there's no state, and secrets get a placeholder.
 	var plaintext, ciphertext *pulumiapi.DeploymentSettings
+	var usedGCP *GCPOIDCConfiguration
 	props := resourceMap(raw.Properties)
 	if props[gcStack].HasValue() {
+		used, err := fromPropertyMap[DeploymentSettingsInput](resourceMap(raw.Inputs))
+		if err != nil {
+			return response{}, err
+		}
+		usedGCP = gcpOIDC(used.OperationContext)
 		oldInputs, err := decodeDeploymentSettingsInput(resourceMap(raw.Inputs))
 		if err != nil {
 			return response{}, err
@@ -289,6 +365,8 @@ func (*DeploymentSettings) Read(
 	if err != nil {
 		return response{}, err
 	}
+	gcpOIDC(state.OperationContext).matchProjectKey(usedGCP)
+	gcpOIDC(inputs.OperationContext).matchProjectKey(usedGCP)
 	return response{ID: req.ID, Inputs: inputs, State: state}, nil
 }
 

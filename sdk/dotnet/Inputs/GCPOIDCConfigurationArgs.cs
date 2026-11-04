@@ -18,8 +18,14 @@ namespace Pulumi.PulumiService.Inputs
         /// <summary>
         /// The GCP project number, a numeric value such as `123456789012`. This is not the project ID (such as `my-project`). To look up the number, run `gcloud projects describe &lt;project-id&gt; --format='value(projectNumber)'`.
         /// </summary>
-        [Input("projectId", required: true)]
-        public Input<string> ProjectId { get; set; } = null!;
+        [Input("projectId")]
+        public Input<string>? ProjectId { get; set; }
+
+        /// <summary>
+        /// The GCP project number, a numeric value such as `123456789012`. This is not the project ID (such as `my-project`). To look up the number, run `gcloud projects describe &lt;project-id&gt; --format='value(projectNumber)'`.
+        /// </summary>
+        [Input("projectNumber")]
+        public Input<string>? ProjectNumber { get; set; }
 
         /// <summary>
         /// The ID of the identity provider associated with the workload pool.

@@ -5,6 +5,7 @@
 ### Improvements
 
 - `name` on `OrgAccessToken` and `TeamAccessToken` is now optional. When it's omitted, Pulumi generates a name from the resource's logical name plus a random suffix, within Pulumi Cloud's 40-character limit for token names, or follows the stack's autonaming configuration. An update keeps the generated name, and a replacement gets a new one. [#1211](https://github.com/pulumi/pulumi-pulumiservice/issues/1211)
+- `DeploymentSettings` GCP OIDC has a new `projectNumber` property, which replaces `projectId`. `projectId` is deprecated: despite its name, it takes the project number, not the project ID. A value that isn't a number now fails at preview instead of when a deployment runs. In the Go SDK, `projectId` on outputs is now a `*string`. [#491](https://github.com/pulumi/pulumi-pulumiservice/issues/491)
 
 ### Bug Fixes
 

@@ -44,7 +44,7 @@ const settings = new service.DeploymentSettings("deployment_settings", {
                 sessionName: "my-session",
             },
             gcp: {
-                projectId: "my-project",
+                projectNumber: "123456789012",
                 region: "us-west1",
                 workloadPoolId: "my-workload-pool",
                 providerId: "my-provider",
