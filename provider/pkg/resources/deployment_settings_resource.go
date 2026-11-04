@@ -53,8 +53,8 @@ var (
 	_ infer.CustomDelete[DeploymentSettingsState]                            = &DeploymentSettings{}
 )
 
-// The example file is generated from the Pulumi YAML in examples/; edit
-// that and run `make generate_examples`.
+// Generated from examples/deployment_settings_examples.yaml; see the
+// //go:generate directive in org_access_token.go.
 //
 //go:embed deployment_settings_examples.md
 var deploymentSettingsExamples string
