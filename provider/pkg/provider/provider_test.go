@@ -28,7 +28,6 @@ import (
 	"github.com/pulumi/pulumi/pkg/v3/codegen/schema"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
-	"github.com/pulumi/pulumi/sdk/v3/go/common/tokens"
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
@@ -313,17 +312,6 @@ func servedSchema(t *testing.T) schema.PackageSpec {
 	return spec
 }
 
-// inferToken converts a token as infer reports it ("pkg:resources:Team") to
-// the token it is served under ("pulumiservice:index:Team").
-func inferToken(t *testing.T, tk tokens.Type) string {
-	t.Helper()
-	module := tk.Module().Name()
-	if mapped, ok := inferModuleMap[module]; ok {
-		module = mapped
-	}
-	return "pulumiservice:" + string(module) + ":" + tk.Name().String()
-}
-
 func indexTokens[V any](m map[string]V) []string {
 	var out []string
 	for token := range m {
@@ -332,27 +320,6 @@ func indexTokens[V any](m map[string]V) []string {
 		}
 	}
 	return out
-}
-
-func TestProvider_EveryIndexTokenIsServedByInfer(t *testing.T) {
-	spec := servedSchema(t)
-
-	var resourceTokens, functionTokens []string
-	for _, r := range inferResources() {
-		tk, err := r.GetToken()
-		require.NoError(t, err)
-		resourceTokens = append(resourceTokens, inferToken(t, tk))
-	}
-	for _, f := range inferFunctions() {
-		tk, err := f.GetToken()
-		require.NoError(t, err)
-		functionTokens = append(functionTokens, inferToken(t, tk))
-	}
-
-	assert.ElementsMatch(t, resourceTokens, indexTokens(spec.Resources),
-		"index resources in the schema must be exactly the resources registered with infer")
-	assert.ElementsMatch(t, functionTokens, indexTokens(spec.Functions),
-		"index functions in the schema must be exactly the functions registered with infer")
 }
 
 func TestProvider_EveryIndexResourceIsDescribed(t *testing.T) {

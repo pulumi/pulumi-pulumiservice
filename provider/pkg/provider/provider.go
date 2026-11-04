@@ -79,9 +79,62 @@ func MakeProvider(host *provider.HostClient, name, version string) (pulumirpc.Re
 		WithPublisher("Pulumi").
 		WithNamespace("pulumi").
 		WithWrapped(api).
-		WithResources(inferResources()...).
-		WithFunctions(inferFunctions()...).
-		WithModuleMap(inferModuleMap).
+		WithResources(
+			infer.Resource(&resources.AccessToken{}),
+			infer.Resource(&resources.DeploymentSettings{}),
+			infer.Resource(&resources.AgentPool{}),
+			infer.Resource(&resources.ApprovalRule{}),
+			infer.Resource(&resources.DeploymentSchedule{}),
+			infer.Resource(&resources.DriftSchedule{}),
+			infer.Resource(&resources.Environment{}),
+			infer.Resource(&resources.EnvironmentRotationSchedule{}),
+			infer.Resource(&resources.EnvironmentVersionTag{}),
+			infer.Resource(&resources.InsightsAccount{}),
+			infer.Resource(&resources.OidcIssuer{}),
+			infer.Resource(&resources.OrgAccessToken{}),
+			infer.Resource(&resources.OrganizationDefaultRole{}),
+			infer.Resource(&resources.OrganizationMember{}),
+			infer.Resource(&resources.OrganizationMemberEntityAccess{}),
+			infer.Resource(&resources.OrganizationRole{}),
+			infer.Resource(&resources.PolicyGroup{}),
+			infer.Resource(&resources.PolicyPack{}),
+			infer.Resource(&resources.Stack{}),
+			infer.Resource(&resources.StackTag{}),
+			infer.Resource(&resources.StackTags{}),
+			infer.Resource(&resources.TTLSchedule{}),
+			infer.Resource(&resources.Team{}),
+			infer.Resource(&resources.TeamAccessToken{}),
+			infer.Resource(&resources.TeamEnvironmentPermission{}),
+			infer.Resource(&resources.TeamRoleAssignment{}),
+			infer.Resource(&resources.TeamStackPermission{}),
+			infer.Resource(&resources.TemplateSource{}),
+			infer.Resource(&resources.Webhook{}),
+		).
+		WithFunctions(
+			infer.Function(&functions.BuildAccountMatchRuleFunction{}),
+			infer.Function(&functions.BuildAllowPermissionsFunction{}),
+			infer.Function(&functions.BuildEnvironmentScopedPermissionsFunction{}),
+			infer.Function(&functions.BuildInsightsAccountScopedPermissionsFunction{}),
+			infer.Function(&functions.BuildRolePermissionsFunction{}),
+			infer.Function(&functions.BuildStackMatchRuleFunction{}),
+			infer.Function(&functions.BuildStackScopedPermissionsFunction{}),
+			infer.Function(&functions.GetCurrentUserFunction{}),
+			infer.Function(&functions.GetEnvironmentFunction{}),
+			infer.Function(&functions.GetInsightsAccountFunction{}),
+			infer.Function(&functions.GetInsightsAccountsFunction{}),
+			infer.Function(&functions.GetOrganizationMemberFunction{}),
+			infer.Function(&functions.GetOrganizationMembersFunction{}),
+			infer.Function(&functions.GetOrganizationRoleFunction{}),
+			infer.Function(&functions.GetOrganizationRoleScopesFunction{}),
+			infer.Function(&functions.GetOrganizationRolesFunction{}),
+			infer.Function(&functions.GetPolicyPackFunction{}),
+			infer.Function(&functions.GetPolicyPacksFunction{}),
+			infer.Function(&functions.GetStackFunction{}),
+		).
+		WithModuleMap(map[tokens.ModuleName]tokens.ModuleName{
+			"resources": "index",
+			"functions": "index",
+		}).
 		WithConfig(infer.Config(&config.Config{})).
 		WithLanguageMap(map[string]any{
 			"csharp": map[string]any{
@@ -192,69 +245,4 @@ func withFunctionDeprecations(prov p.Provider, messages map[string]string) p.Pro
 		return resp, nil
 	}
 	return prov
-}
-
-// inferModuleMap puts the Go packages that hold the infer resources and
-// functions in the index module.
-var inferModuleMap = map[tokens.ModuleName]tokens.ModuleName{
-	"resources": "index",
-	"functions": "index",
-}
-
-func inferResources() []infer.InferredResource {
-	return []infer.InferredResource{
-		infer.Resource(&resources.AccessToken{}),
-		infer.Resource(&resources.DeploymentSettings{}),
-		infer.Resource(&resources.AgentPool{}),
-		infer.Resource(&resources.ApprovalRule{}),
-		infer.Resource(&resources.DeploymentSchedule{}),
-		infer.Resource(&resources.DriftSchedule{}),
-		infer.Resource(&resources.Environment{}),
-		infer.Resource(&resources.EnvironmentRotationSchedule{}),
-		infer.Resource(&resources.EnvironmentVersionTag{}),
-		infer.Resource(&resources.InsightsAccount{}),
-		infer.Resource(&resources.OidcIssuer{}),
-		infer.Resource(&resources.OrgAccessToken{}),
-		infer.Resource(&resources.OrganizationDefaultRole{}),
-		infer.Resource(&resources.OrganizationMember{}),
-		infer.Resource(&resources.OrganizationMemberEntityAccess{}),
-		infer.Resource(&resources.OrganizationRole{}),
-		infer.Resource(&resources.PolicyGroup{}),
-		infer.Resource(&resources.PolicyPack{}),
-		infer.Resource(&resources.Stack{}),
-		infer.Resource(&resources.StackTag{}),
-		infer.Resource(&resources.StackTags{}),
-		infer.Resource(&resources.TTLSchedule{}),
-		infer.Resource(&resources.Team{}),
-		infer.Resource(&resources.TeamAccessToken{}),
-		infer.Resource(&resources.TeamEnvironmentPermission{}),
-		infer.Resource(&resources.TeamRoleAssignment{}),
-		infer.Resource(&resources.TeamStackPermission{}),
-		infer.Resource(&resources.TemplateSource{}),
-		infer.Resource(&resources.Webhook{}),
-	}
-}
-
-func inferFunctions() []infer.InferredFunction {
-	return []infer.InferredFunction{
-		infer.Function(&functions.BuildAccountMatchRuleFunction{}),
-		infer.Function(&functions.BuildAllowPermissionsFunction{}),
-		infer.Function(&functions.BuildEnvironmentScopedPermissionsFunction{}),
-		infer.Function(&functions.BuildInsightsAccountScopedPermissionsFunction{}),
-		infer.Function(&functions.BuildRolePermissionsFunction{}),
-		infer.Function(&functions.BuildStackMatchRuleFunction{}),
-		infer.Function(&functions.BuildStackScopedPermissionsFunction{}),
-		infer.Function(&functions.GetCurrentUserFunction{}),
-		infer.Function(&functions.GetEnvironmentFunction{}),
-		infer.Function(&functions.GetInsightsAccountFunction{}),
-		infer.Function(&functions.GetInsightsAccountsFunction{}),
-		infer.Function(&functions.GetOrganizationMemberFunction{}),
-		infer.Function(&functions.GetOrganizationMembersFunction{}),
-		infer.Function(&functions.GetOrganizationRoleFunction{}),
-		infer.Function(&functions.GetOrganizationRoleScopesFunction{}),
-		infer.Function(&functions.GetOrganizationRolesFunction{}),
-		infer.Function(&functions.GetPolicyPackFunction{}),
-		infer.Function(&functions.GetPolicyPacksFunction{}),
-		infer.Function(&functions.GetStackFunction{}),
-	}
 }
