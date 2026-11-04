@@ -205,6 +205,10 @@ func (c *Client) DeletePolicyGroup(ctx context.Context, orgName, policyGroupName
 
 	_, err := c.do(ctx, http.MethodDelete, apiPath, nil, nil)
 	if err != nil {
+		// A group that's already gone has been deleted, so destroy can finish.
+		if GetErrorStatusCode(err) == http.StatusNotFound {
+			return nil
+		}
 		return fmt.Errorf("failed to delete policy group %q: %w", policyGroupName, err)
 	}
 
