@@ -45,6 +45,9 @@ import (
 	"strings"
 
 	"gopkg.in/yaml.v3"
+
+	"github.com/pulumi/pulumi/pkg/v3/codegen"
+	"github.com/pulumi/pulumi/pkg/v3/codegen/schema"
 )
 
 // languages lists the `pulumi convert` targets, in the order the fences are
@@ -71,7 +74,7 @@ func main() {
 }
 
 func run(srcDir, dstDir string) error {
-	schema, err := loadSchema()
+	pkg, err := loadSchema()
 	if err != nil {
 		return err
 	}
@@ -83,7 +86,7 @@ func run(srcDir, dstDir string) error {
 		return fmt.Errorf("no .yaml files in %q", srcDir)
 	}
 	for _, path := range paths {
-		md, err := render(path, schema)
+		md, err := render(path, pkg)
 		if err != nil {
 			return fmt.Errorf("processing %q: %w", path, err)
 		}
@@ -98,7 +101,7 @@ func run(srcDir, dstDir string) error {
 }
 
 // render converts every example in one YAML file and returns the markdown.
-func render(path string, schema *schemaSpec) (string, error) {
+func render(path string, pkg *schema.Package) (string, error) {
 	//nolint:gosec // G703: path is built from build-time CLI arguments, not user input.
 	f, err := os.Open(filepath.Clean(path))
 	if err != nil {
@@ -120,7 +123,7 @@ func render(path string, schema *schemaSpec) (string, error) {
 		if err != nil {
 			return "", err
 		}
-		if err := writeExample(&b, description, program, schema); err != nil {
+		if err := writeExample(&b, description, program, pkg); err != nil {
 			return "", fmt.Errorf("example %q: %w", description, err)
 		}
 	}
@@ -150,12 +153,12 @@ func splitExample(doc *yaml.Node) (string, *yaml.Node, error) {
 	return description, program, nil
 }
 
-func writeExample(b *strings.Builder, description string, program *yaml.Node, schema *schemaSpec) error {
+func writeExample(b *strings.Builder, description string, program *yaml.Node, pkg *schema.Package) error {
 	programYAML, err := encodeYAML(program)
 	if err != nil {
 		return err
 	}
-	enums, err := schema.enumValues(program)
+	enums, err := enumValues(pkg, program)
 	if err != nil {
 		return err
 	}
@@ -226,33 +229,6 @@ func encodeYAML(n *yaml.Node) (string, error) {
 	return buf.String(), nil
 }
 
-// schemaSpec is the part of the provider schema needed to find the enum-typed
-// values in an example program.
-type schemaSpec struct {
-	Resources map[string]struct {
-		InputProperties map[string]typeSpec `json:"inputProperties"`
-	} `json:"resources"`
-	Functions map[string]struct {
-		Inputs struct {
-			Properties map[string]typeSpec `json:"properties"`
-		} `json:"inputs"`
-	} `json:"functions"`
-	Types map[string]struct {
-		Properties map[string]typeSpec `json:"properties"`
-		Enum       []struct {
-			Name  string `json:"name"`
-			Value any    `json:"value"`
-		} `json:"enum"`
-	} `json:"types"`
-}
-
-type typeSpec struct {
-	Ref                  string    `json:"$ref"`
-	Type                 string    `json:"type"`
-	Items                *typeSpec `json:"items"`
-	AdditionalProperties *typeSpec `json:"additionalProperties"`
-}
-
 // enumValue is an enum-typed value in an example program, with the Java enum
 // class and constant it stands for.
 type enumValue struct {
@@ -261,7 +237,7 @@ type enumValue struct {
 
 // loadSchema reads the schema from the provider binary on PATH rather than
 // schema.json, which may not have been regenerated since the provider changed.
-func loadSchema() (*schemaSpec, error) {
+func loadSchema() (*schema.Package, error) {
 	provider, err := exec.LookPath("pulumi-resource-pulumiservice")
 	if err != nil {
 		return nil, fmt.Errorf("the provider binary must be on PATH: %w", err)
@@ -274,16 +250,20 @@ func loadSchema() (*schemaSpec, error) {
 	if err != nil {
 		return nil, fmt.Errorf("reading the provider schema: %w\n%s", err, stderr.String())
 	}
-	var s schemaSpec
-	if err := json.Unmarshal(out, &s); err != nil {
+	var spec schema.PackageSpec
+	if err := json.Unmarshal(out, &spec); err != nil {
 		return nil, fmt.Errorf("parsing the provider schema: %w", err)
 	}
-	return &s, nil
+	pkg, err := schema.ImportSpec(spec, nil, schema.NewNullLoader(), schema.ValidationOptions{})
+	if err != nil {
+		return nil, fmt.Errorf("binding the provider schema: %w", err)
+	}
+	return pkg, nil
 }
 
 // enumValues lists the enum-typed values passed to `fn::invoke` calls in
 // `variables` and to `resources`, in program order.
-func (s *schemaSpec) enumValues(program *yaml.Node) ([]enumValue, error) {
+func enumValues(pkg *schema.Package, program *yaml.Node) ([]enumValue, error) {
 	var out []enumValue
 	for i := 0; i+1 < len(program.Content); i += 2 {
 		section := program.Content[i+1]
@@ -294,22 +274,22 @@ func (s *schemaSpec) enumValues(program *yaml.Node) ([]enumValue, error) {
 				if invoke == nil {
 					continue
 				}
-				fn, ok := s.Functions[schemaToken(mapValue(invoke, "function"))]
-				if !ok {
+				fn, ok := pkg.GetFunction(schemaToken(mapValue(invoke, "function")))
+				if !ok || fn.Inputs == nil {
 					continue
 				}
-				if err := s.walkProperties(mapValue(invoke, "arguments"), fn.Inputs.Properties, &out); err != nil {
+				if err := walkProperties(mapValue(invoke, "arguments"), fn.Inputs.Properties, &out); err != nil {
 					return nil, err
 				}
 			}
 		case "resources":
 			for j := 1; j < len(section.Content); j += 2 {
-				res, ok := s.Resources[schemaToken(mapValue(section.Content[j], "type"))]
+				res, ok := pkg.GetResource(schemaToken(mapValue(section.Content[j], "type")))
 				if !ok {
 					continue
 				}
 				props := mapValue(section.Content[j], "properties")
-				if err := s.walkProperties(props, res.InputProperties, &out); err != nil {
+				if err := walkProperties(props, res.InputProperties, &out); err != nil {
 					return nil, err
 				}
 			}
@@ -318,51 +298,56 @@ func (s *schemaSpec) enumValues(program *yaml.Node) ([]enumValue, error) {
 	return out, nil
 }
 
-func (s *schemaSpec) walkProperties(n *yaml.Node, props map[string]typeSpec, out *[]enumValue) error {
+func walkProperties(n *yaml.Node, props []*schema.Property, out *[]enumValue) error {
 	if n == nil || n.Kind != yaml.MappingNode {
 		return nil
 	}
 	for i := 0; i+1 < len(n.Content); i += 2 {
-		if spec, ok := props[n.Content[i].Value]; ok {
-			if err := s.walk(n.Content[i+1], spec, out); err != nil {
-				return err
-			}
+		k := slices.IndexFunc(props, func(p *schema.Property) bool { return p.Name == n.Content[i].Value })
+		if k < 0 {
+			continue
+		}
+		if err := walk(n.Content[i+1], props[k].Type, out); err != nil {
+			return err
 		}
 	}
 	return nil
 }
 
-func (s *schemaSpec) walk(n *yaml.Node, spec typeSpec, out *[]enumValue) error {
-	switch {
-	case strings.HasPrefix(spec.Ref, "#/types/"):
-		token := strings.TrimPrefix(spec.Ref, "#/types/")
-		t := s.Types[token]
-		if len(t.Enum) == 0 {
-			return s.walkProperties(n, t.Properties, out)
-		}
+func walk(n *yaml.Node, t schema.Type, out *[]enumValue) error {
+	switch t := codegen.UnwrapType(t).(type) {
+	case *schema.EnumType:
 		if n.Kind != yaml.ScalarNode {
 			return nil
 		}
-		module, class, _ := strings.Cut(strings.TrimPrefix(token, "pulumiservice:"), ":")
+		module, class, _ := strings.Cut(strings.TrimPrefix(t.Token, "pulumiservice:"), ":")
 		if module != "index" {
-			return fmt.Errorf("enum %s: only index enums are supported", token)
+			return fmt.Errorf("enum %s: only index enums are supported", t.Token)
 		}
-		for _, e := range t.Enum {
+		for _, e := range t.Elements {
 			if fmt.Sprint(e.Value) == n.Value {
 				*out = append(*out, enumValue{value: n.Value, class: class, constant: e.Name})
 				return nil
 			}
 		}
-		return fmt.Errorf("%q is not a %s value", n.Value, token)
-	case spec.Type == "array" && spec.Items != nil && n.Kind == yaml.SequenceNode:
+		return fmt.Errorf("%q is not a %s value", n.Value, t.Token)
+	case *schema.ObjectType:
+		return walkProperties(n, t.Properties, out)
+	case *schema.ArrayType:
+		if n.Kind != yaml.SequenceNode {
+			return nil
+		}
 		for _, item := range n.Content {
-			if err := s.walk(item, *spec.Items, out); err != nil {
+			if err := walk(item, t.ElementType, out); err != nil {
 				return err
 			}
 		}
-	case spec.Type == "object" && spec.AdditionalProperties != nil && n.Kind == yaml.MappingNode:
+	case *schema.MapType:
+		if n.Kind != yaml.MappingNode {
+			return nil
+		}
 		for i := 1; i < len(n.Content); i += 2 {
-			if err := s.walk(n.Content[i], *spec.AdditionalProperties, out); err != nil {
+			if err := walk(n.Content[i], t.ElementType, out); err != nil {
 				return err
 			}
 		}
@@ -395,24 +380,36 @@ func schemaToken(n *yaml.Node) string {
 	return n.Value
 }
 
-var javaStringLiteral = regexp.MustCompile(`"((?:[^"\\]|\\.)*)"`)
+// javaEnumValue matches a string literal, or an enum constant that the Java
+// generator already wrote as a fully qualified reference.
+var javaEnumValue = regexp.MustCompile(`"((?:[^"\\]|\\.)*)"|com\.pulumi\.pulumiservice\.enums\.(\w+)\.(\w+)`)
 
 // fixJavaEnums rewrites enum values in a converted Java program into enum
-// constants. `pulumi convert --language java` writes them as string literals,
-// which don't compile against the Java SDK. Literals are matched against enums
-// in program order, since the same string can belong to more than one enum
-// (`stack:read` is both an organization and a stack scope).
+// constants. `pulumi convert --language java` writes enum values inside lists
+// as string literals, which don't compile against the Java SDK
+// (https://github.com/pulumi/pulumi-java/issues/2422). Remove this once the
+// Java language host bundled with the CLI includes the fix.
+//
+// Values are matched against enums in program order, since the same string can
+// belong to more than one enum (`stack:read` is both an organization and a
+// stack scope). Enums the generator already converted are shortened to match.
 func fixJavaEnums(code string, enums []enumValue) (string, error) {
 	if len(enums) == 0 {
 		return code, nil
 	}
 	next := 0
 	var classes []string
-	code = javaStringLiteral.ReplaceAllStringFunc(code, func(lit string) string {
-		if next == len(enums) || lit[1:len(lit)-1] != enums[next].value {
-			return lit
+	code = javaEnumValue.ReplaceAllStringFunc(code, func(match string) string {
+		if next == len(enums) {
+			return match
 		}
 		e := enums[next]
+		m := javaEnumValue.FindStringSubmatch(match)
+		literal := strings.HasPrefix(match, `"`) && m[1] == e.value
+		qualified := m[2] == e.class && m[3] == e.constant
+		if !literal && !qualified {
+			return match
+		}
 		next++
 		if !slices.Contains(classes, e.class) {
 			classes = append(classes, e.class)

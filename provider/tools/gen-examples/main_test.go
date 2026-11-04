@@ -21,21 +21,29 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"gopkg.in/yaml.v3"
+
+	"github.com/pulumi/pulumi/pkg/v3/codegen/schema"
 )
 
 const testSchema = `{
+  "name": "pulumiservice",
   "functions": {
     "pulumiservice:index:buildRolePermissions": {
       "inputs": {"properties": {
         "organizationScopes": {"type": "array", "items": {"$ref": "#/types/pulumiservice:index:RbacOrganizationScope"}},
         "stackRules": {"type": "array", "items": {"$ref": "#/types/pulumiservice:index:RoleStackRule"}}
-      }}
+      }},
+      "outputs": {"properties": {}}
     }
   },
   "types": {
-    "pulumiservice:index:RbacOrganizationScope": {"enum": [{"name": "StackRead", "value": "stack:read"}]},
-    "pulumiservice:index:RbacStackScope": {"enum": [{"name": "StackRead", "value": "stack:read"}]},
-    "pulumiservice:index:RoleStackRule": {"properties": {
+    "pulumiservice:index:RbacOrganizationScope": {
+      "type": "string", "enum": [{"name": "StackRead", "value": "stack:read"}]
+    },
+    "pulumiservice:index:RbacStackScope": {
+      "type": "string", "enum": [{"name": "StackRead", "value": "stack:read"}]
+    },
+    "pulumiservice:index:RoleStackRule": {"type": "object", "properties": {
       "scopes": {"type": "array", "items": {"$ref": "#/types/pulumiservice:index:RbacStackScope"}}
     }}
   }
@@ -59,12 +67,14 @@ var (
 
 func TestEnumValuesFollowProgramOrderAndSchemaTypes(t *testing.T) {
 	t.Parallel()
-	var schema schemaSpec
-	require.NoError(t, json.Unmarshal([]byte(testSchema), &schema))
+	var spec schema.PackageSpec
+	require.NoError(t, json.Unmarshal([]byte(testSchema), &spec))
+	pkg, err := schema.ImportSpec(spec, nil, schema.NewNullLoader(), schema.ValidationOptions{})
+	require.NoError(t, err)
 	var doc yaml.Node
 	require.NoError(t, yaml.Unmarshal([]byte(testProgram), &doc))
 
-	enums, err := schema.enumValues(doc.Content[0])
+	enums, err := enumValues(pkg, doc.Content[0])
 	require.NoError(t, err)
 	assert.Equal(t, []enumValue{orgStackRead, stackStackRead}, enums)
 }
@@ -84,6 +94,20 @@ func TestFixJavaEnums(t *testing.T) {
 			"import com.pulumi.pulumiservice.enums.RbacStackScope;\n"+
 			"import com.pulumi.Context;\n\n"+
 			`x.name("prod").organizationScopes(RbacOrganizationScope.StackRead).scopes(RbacStackScope.StackRead);`,
+			got)
+	})
+
+	t.Run("shortens enums the generator already qualified", func(t *testing.T) {
+		t.Parallel()
+		code := "package p;\n\nimport com.pulumi.Context;\n\n" +
+			`x.organizationScopes(com.pulumi.pulumiservice.enums.RbacOrganizationScope.StackRead).scopes("stack:read");`
+		got, err := fixJavaEnums(code, enums)
+		require.NoError(t, err)
+		assert.Equal(t, "package p;\n\n"+
+			"import com.pulumi.pulumiservice.enums.RbacOrganizationScope;\n"+
+			"import com.pulumi.pulumiservice.enums.RbacStackScope;\n"+
+			"import com.pulumi.Context;\n\n"+
+			`x.organizationScopes(RbacOrganizationScope.StackRead).scopes(RbacStackScope.StackRead);`,
 			got)
 	})
 
