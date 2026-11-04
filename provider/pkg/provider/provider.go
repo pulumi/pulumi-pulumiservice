@@ -23,7 +23,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	_ "embed" // For manualSchema.
+	_ "embed" // For the README.
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -59,25 +59,13 @@ const (
 //go:embed README.md
 var readme string
 
-type PulumiServiceResource interface {
-	Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error)
-	Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error)
-	Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error)
-	Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error)
-	Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error)
-	Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error)
-	Name() string
-}
-
 type pulumiserviceProvider struct {
 	pulumirpc.UnimplementedResourceProviderServer
 
-	host            *provider.HostClient
-	name            string
-	version         string
-	schema          string
-	pulumiResources []PulumiServiceResource
-	AccessToken     string
+	host    *provider.HostClient
+	name    string
+	version string
+	schema  string
 	// transportRef is the per-provider api transport, populated during
 	// Configure and consumed by the ctxmw.Wrap layer to attach this
 	// provider's transport to every CRUD context — keeps multi-provider
@@ -85,16 +73,11 @@ type pulumiserviceProvider struct {
 	transportRef *atomic.Value
 }
 
-// embed manual-schema.json directly into resource binary so that we can properly serve the schema
-// directly from the resource provider.
-//
-//go:embed manual-schema.json
-var manualSchema string
-
 // MakeProvider builds the unified Pulumi Cloud Provider. Three layers:
 //
-//  1. legacyRaw — the existing custom gRPC server (pulumiserviceProvider)
-//     handling resources defined in manual-schema.json.
+//  1. legacyRaw — the custom gRPC server (pulumiserviceProvider). It serves
+//     no resources; it handles configuration, including the transport the
+//     api resources use.
 //  2. dispatch.Wrap — overlays metadata-driven api resources from
 //     provider/pkg/cloud/metadata.json. Schema for these is spliced into
 //     GetSchema responses by withCloudApiSchema.
@@ -102,15 +85,14 @@ var manualSchema string
 //     (Team, OrganizationRole, etc.) at pulumiservice:index:* and stamps
 //     in package-level metadata (display name, language map, config schema).
 //
-// Existing user code keeps working unchanged: pulumiservice:index:* tokens
-// resolve through layers 1 and 3; the new api resources at
+// pulumiservice:index:* tokens resolve through layer 3; the api resources at
 // pulumiservice:api:* resolve through layer 2.
 func MakeProvider(host *provider.HostClient, name, version string) (pulumirpc.ResourceProviderServer, error) {
 	transportRef := &atomic.Value{}
 	legacyRaw := rpc.Provider(&pulumiserviceProvider{
 		host:         host,
 		name:         name,
-		schema:       mustSetSchemaVersion(manualSchema, version),
+		schema:       baseSchema(name, version),
 		version:      version,
 		transportRef: transportRef,
 	})
@@ -132,10 +114,17 @@ func MakeProvider(host *provider.HostClient, name, version string) (pulumirpc.Re
 
 	provider, err := infer.NewProviderBuilder().
 		WithDisplayName("Pulumi Cloud").
+		WithDescription("A native Pulumi package for creating and managing Pulumi Cloud constructs.").
+		WithHomepage("https://pulumi.com").
+		WithRepository("https://github.com/pulumi/pulumi-pulumiservice").
+		WithKeywords("pulumi", "kind/native", "category/infrastructure").
+		WithLicense("Apache-2.0").
+		WithPublisher("Pulumi").
 		WithNamespace("pulumi").
 		WithWrapped(composed).
 		WithResources(
 			infer.Resource(&resources.AccessToken{}),
+			infer.Resource(&resources.DeploymentSettings{}),
 			infer.Resource(&resources.AgentPool{}),
 			infer.Resource(&resources.ApprovalRule{}),
 			infer.Resource(&resources.DeploymentSchedule{}),
@@ -435,11 +424,6 @@ func (k *pulumiserviceProvider) Configure(
 	if err != nil {
 		return nil, err
 	}
-	client, err := pulumiapi.NewClient(&httpClient, *token, *url)
-	if err != nil {
-		return nil, err
-	}
-
 	transport := rest.Transport(&authedTransport{
 		baseURL: *url,
 		token:   *token,
@@ -456,12 +440,6 @@ func (k *pulumiserviceProvider) Configure(
 		return transport, nil
 	})
 
-	k.pulumiResources = []PulumiServiceResource{
-		&resources.PulumiServiceDeploymentSettingsResource{
-			Client: client,
-		},
-	}
-
 	return &pulumirpc.ConfigureResponse{
 		AcceptSecrets: true,
 	}, nil
@@ -476,61 +454,42 @@ func (k *pulumiserviceProvider) Invoke(
 	return nil, fmt.Errorf("unknown Invoke token '%s'", req.GetTok())
 }
 
-// Check validates that the given property bag is valid for a resource of the given type and returns
-// the inputs that should be passed to successive calls to Diff, Create, or Update for this
-// resource. As a rule, the provider inputs returned by a call to Check should preserve the original
-// representation of the properties as present in the program inputs. Though this rule is not
-// required for correctness, violations thereof can negatively impact the end-user experience, as
-// the provider inputs are using for detecting and rendering diffs.
+// The CRUD methods reject every resource type: all resources are served by
+// infer or by the api layer, which handle them before the request reaches this
+// server.
+
 func (k *pulumiserviceProvider) Check(
-	_ context.Context,
-	req *pulumirpc.CheckRequest,
+	_ context.Context, req *pulumirpc.CheckRequest,
 ) (*pulumirpc.CheckResponse, error) {
-	rn := getResourceNameFromRequest(req)
-	res := k.getPulumiServiceResource(rn)
-	return res.Check(req)
+	return nil, unknownResource(req.GetUrn())
 }
 
-// Diff checks what impacts a hypothetical update will have on the resource's properties.
 func (k *pulumiserviceProvider) Diff(_ context.Context, req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-	rn := getResourceNameFromRequest(req)
-	res := k.getPulumiServiceResource(rn)
-	return res.Diff(req)
+	return nil, unknownResource(req.GetUrn())
 }
 
-// Create allocates a new instance of the provided resource and returns its unique ID afterwards.
 func (k *pulumiserviceProvider) Create(
-	_ context.Context,
-	req *pulumirpc.CreateRequest,
+	_ context.Context, req *pulumirpc.CreateRequest,
 ) (*pulumirpc.CreateResponse, error) {
-	rn := getResourceNameFromRequest(req)
-	res := k.getPulumiServiceResource(rn)
-	return res.Create(req)
+	return nil, unknownResource(req.GetUrn())
 }
 
-// Read the current live state associated with a resource.
 func (k *pulumiserviceProvider) Read(_ context.Context, req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
-	rn := getResourceNameFromRequest(req)
-	res := k.getPulumiServiceResource(rn)
-	return res.Read(req)
+	return nil, unknownResource(req.GetUrn())
 }
 
-// Update updates an existing resource with new values.
 func (k *pulumiserviceProvider) Update(
-	_ context.Context,
-	req *pulumirpc.UpdateRequest,
+	_ context.Context, req *pulumirpc.UpdateRequest,
 ) (*pulumirpc.UpdateResponse, error) {
-	rn := getResourceNameFromRequest(req)
-	res := k.getPulumiServiceResource(rn)
-	return res.Update(req)
+	return nil, unknownResource(req.GetUrn())
 }
 
-// Delete tears down an existing resource with the given ID.  If it fails, the resource is assumed
-// to still exist.
 func (k *pulumiserviceProvider) Delete(_ context.Context, req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
-	rn := getResourceNameFromRequest(req)
-	res := k.getPulumiServiceResource(rn)
-	return res.Delete(req)
+	return nil, unknownResource(req.GetUrn())
+}
+
+func unknownResource(urn string) error {
+	return fmt.Errorf("unknown resource type '%s'", resource.URN(urn).Type())
 }
 
 // GetPluginInfo returns generic information about this plugin, like its version.
@@ -560,36 +519,12 @@ func (k *pulumiserviceProvider) Cancel(_ context.Context, _ *pbempty.Empty) (*pb
 	return &pbempty.Empty{}, nil
 }
 
-func (k *pulumiserviceProvider) getPulumiServiceResource(name string) PulumiServiceResource {
-	for _, r := range k.pulumiResources {
-		if r.Name() == name {
-			return r
-		}
-	}
-
-	return &PulumiServiceUnknownResource{}
-}
-
-func getResourceNameFromRequest(req ResourceBase) string {
-	urn := resource.URN(req.GetUrn())
-	return urn.Type().String()
-}
-
-// mustSetSchemaVersion deserializes schemaStr from json, sets Version field
-// then serializes back to json string
-func mustSetSchemaVersion(schemaStr string, version string) string {
-	var spec schema.PackageSpec
-	if err := json.Unmarshal([]byte(schemaStr), &spec); err != nil {
-		panic(fmt.Errorf("failed to parse schema: %w", err))
-	}
-	spec.Version = version
-	bytes, err := json.Marshal(spec)
+// baseSchema is the schema the raw gRPC server serves: only the package name
+// and version. infer and withCloudApiSchema add everything else.
+func baseSchema(name, version string) string {
+	bytes, err := json.Marshal(schema.PackageSpec{Name: name, Version: version})
 	if err != nil {
-		panic(fmt.Errorf("failed to serialize versioned schema: %w", err))
+		panic(fmt.Errorf("failed to serialize base schema: %w", err))
 	}
 	return string(bytes)
-}
-
-type ResourceBase interface {
-	GetUrn() string
 }

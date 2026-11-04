@@ -4,37 +4,44 @@ import (
 	"context"
 	"testing"
 
+	"github.com/blang/semver"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	p "github.com/pulumi/pulumi-go-provider"
+	"github.com/pulumi/pulumi-go-provider/infer"
+	"github.com/pulumi/pulumi-go-provider/integration"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
-	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
-	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
+	"github.com/pulumi/pulumi/sdk/v3/go/property"
 
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
-	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 )
 
 type getDeploymentSettingsFunc func() (*pulumiapi.DeploymentSettings, error)
 
 type DeploymentSettingsClientMock struct {
+	config.Client
 	getDeploymentSettingsFunc getDeploymentSettingsFunc
+	created, updated          []pulumiapi.DeploymentSettings
 }
 
 func (c *DeploymentSettingsClientMock) CreateDeploymentSettings(
 	_ context.Context,
 	_ pulumiapi.StackIdentifier,
-	_ pulumiapi.DeploymentSettings,
+	settings pulumiapi.DeploymentSettings,
 ) (*pulumiapi.DeploymentSettings, error) {
-	return nil, nil
+	c.created = append(c.created, settings)
+	return &settings, nil
 }
 
 func (c *DeploymentSettingsClientMock) UpdateDeploymentSettings(
 	_ context.Context,
 	_ pulumiapi.StackIdentifier,
-	_ pulumiapi.DeploymentSettings,
+	settings pulumiapi.DeploymentSettings,
 ) (*pulumiapi.DeploymentSettings, error) {
-	return nil, nil
+	c.updated = append(c.updated, settings)
+	return &settings, nil
 }
 
 func (c *DeploymentSettingsClientMock) GetDeploymentSettings(
@@ -55,34 +62,51 @@ func buildDeploymentSettingsClientMock(
 	getDeploymentSettingsFunc getDeploymentSettingsFunc,
 ) *DeploymentSettingsClientMock {
 	return &DeploymentSettingsClientMock{
-		getDeploymentSettingsFunc,
+		getDeploymentSettingsFunc: getDeploymentSettingsFunc,
 	}
+}
+
+var deploymentSettingsURN = resource.NewURN("test", "proj", "", DeploymentSettingsToken, "settings")
+
+func newDeploymentSettingsServer(t *testing.T, client *DeploymentSettingsClientMock) integration.Server {
+	t.Helper()
+	prov, err := infer.NewProviderBuilder().
+		WithResources(infer.Resource(&DeploymentSettings{})).
+		Build()
+	require.NoError(t, err)
+	server, err := integration.NewServer(config.WithMockClient(t.Context(), client),
+		"pulumiservice", semver.MustParse("0.0.0"), integration.WithProvider(prov))
+	require.NoError(t, err)
+	return server
+}
+
+// checkDeploymentSettings runs Check over props and returns the checked inputs.
+func checkDeploymentSettings(t *testing.T, props resource.PropertyMap) resource.PropertyMap {
+	t.Helper()
+	server := newDeploymentSettingsServer(t, &DeploymentSettingsClientMock{})
+	resp, err := server.Check(p.CheckRequest{
+		Urn:    deploymentSettingsURN,
+		Inputs: resource.FromResourcePropertyValue(resource.NewObjectProperty(props)).AsMap(),
+	})
+	require.NoError(t, err)
+	require.Empty(t, resp.Failures)
+	return resourceMap(resp.Inputs)
 }
 
 func TestDeploymentSettings(t *testing.T) {
 	t.Run("Read when the resource is not found", func(t *testing.T) {
-		mockedClient := buildDeploymentSettingsClientMock(
+		server := newDeploymentSettingsServer(t, buildDeploymentSettingsClientMock(
 			func() (*pulumiapi.DeploymentSettings, error) { return nil, nil },
-		)
+		))
 
-		provider := PulumiServiceDeploymentSettingsResource{
-			Client: mockedClient,
-		}
+		resp, err := server.Read(p.ReadRequest{ID: "abc/def/123", Urn: deploymentSettingsURN})
 
-		req := pulumirpc.ReadRequest{
-			Id:  "abc/def/123",
-			Urn: "urn:123",
-		}
-
-		resp, err := provider.Read(&req)
-
-		assert.NoError(t, err)
-		assert.Equal(t, resp.Id, "")
-		assert.Nil(t, resp.Properties)
+		require.NoError(t, err)
+		assert.Empty(t, resp.ID)
 	})
 
 	t.Run("Read when the resource is found", func(t *testing.T) {
-		mockedClient := buildDeploymentSettingsClientMock(
+		server := newDeploymentSettingsServer(t, buildDeploymentSettingsClientMock(
 			func() (*pulumiapi.DeploymentSettings, error) {
 				return &pulumiapi.DeploymentSettings{
 					Operation:     &pulumiapi.OperationContext{},
@@ -91,21 +115,12 @@ func TestDeploymentSettings(t *testing.T) {
 					Executor:      &pulumiapi.ExecutorContext{},
 				}, nil
 			},
-		)
+		))
 
-		provider := PulumiServiceDeploymentSettingsResource{
-			Client: mockedClient,
-		}
+		resp, err := server.Read(p.ReadRequest{ID: "abc/def/123", Urn: deploymentSettingsURN})
 
-		req := pulumirpc.ReadRequest{
-			Id:  "abc/def/123",
-			Urn: "urn:123",
-		}
-
-		resp, err := provider.Read(&req)
-
-		assert.NoError(t, err)
-		assert.Equal(t, resp.Id, "abc/def/123")
+		require.NoError(t, err)
+		assert.Equal(t, "abc/def/123", resp.ID)
 	})
 }
 
@@ -126,15 +141,7 @@ func checkGitAuth(t *testing.T, gitAuth resource.PropertyMap) resource.PropertyM
 		}),
 	}
 
-	news, err := plugin.MarshalProperties(propertyMap, util.StandardMarshal)
-	assert.NoError(t, err)
-
-	resp, err := (&PulumiServiceDeploymentSettingsResource{}).Check(&pulumirpc.CheckRequest{News: news})
-	assert.NoError(t, err)
-	assert.Empty(t, resp.Failures)
-
-	checked, err := plugin.UnmarshalProperties(resp.GetInputs(), util.KeepSecretsUnmarshal)
-	assert.NoError(t, err)
+	checked := checkDeploymentSettings(t, propertyMap)
 
 	sourceContext := checked[gcSourceContext]
 	assert.True(t, sourceContext.IsObject(), "sourceContext should be present")
@@ -152,6 +159,16 @@ func decodeSettings(t *testing.T, props resource.PropertyMap) PulumiServiceDeplo
 	decoded, err := decodeDeploymentSettingsInput(props)
 	require.NoError(t, err)
 	return decoded
+}
+
+func secretOrString(prop resource.PropertyValue) string {
+	if prop.IsSecret() {
+		return prop.SecretValue().Element.StringValue()
+	}
+	if prop.IsNull() {
+		return ""
+	}
+	return prop.StringValue()
 }
 
 // assertSecret asserts that prop is a secret wrapping the given plaintext.
@@ -241,15 +258,7 @@ func TestDeploymentSettingsCheckExecutorImageCredentialsSecret(t *testing.T) {
 			}),
 		}
 
-		news, err := plugin.MarshalProperties(propertyMap, util.StandardMarshal)
-		assert.NoError(t, err)
-
-		resp, err := (&PulumiServiceDeploymentSettingsResource{}).Check(&pulumirpc.CheckRequest{News: news})
-		assert.NoError(t, err)
-		assert.Empty(t, resp.Failures)
-
-		checked, err := plugin.UnmarshalProperties(resp.GetInputs(), util.KeepSecretsUnmarshal)
-		assert.NoError(t, err)
+		checked := checkDeploymentSettings(t, propertyMap)
 
 		executorContext := checked[gcExecutorContext]
 		assert.True(t, executorContext.IsObject(), "executorContext should be present")
@@ -351,7 +360,7 @@ func TestDeploymentSettingsBasicAuthRefresh(t *testing.T) {
 	assertSecret(t, inputs[gcPassword], "hunter2")
 
 	outputs := basicAuthPropertyMap(t, input.ToPropertyMap(&plaintextInputs, &priorState, false))
-	assert.Equal(t, testRedactedSecret, util.GetSecretOrStringValue(outputs[gcUsername]),
+	assert.Equal(t, testRedactedSecret, secretOrString(outputs[gcUsername]),
 		"outputs hold what the service returned, not the plaintext")
 }
 
@@ -374,15 +383,7 @@ func TestDeploymentSettingsCheckWithoutSourceContext(t *testing.T) {
 		gcStack:        resource.NewStringProperty("a-stack"),
 	}
 
-	news, err := plugin.MarshalProperties(propertyMap, util.StandardMarshal)
-	assert.NoError(t, err)
-
-	resp, err := (&PulumiServiceDeploymentSettingsResource{}).Check(&pulumirpc.CheckRequest{News: news})
-	assert.NoError(t, err)
-	assert.Empty(t, resp.Failures)
-
-	checked, err := plugin.UnmarshalProperties(resp.GetInputs(), util.KeepSecretsUnmarshal)
-	assert.NoError(t, err)
+	checked := checkDeploymentSettings(t, propertyMap)
 	assert.Equal(t, propertyMap, checked)
 }
 
@@ -490,11 +491,11 @@ func TestDeploymentSettingsExecutorImageCredentialsRefresh(t *testing.T) {
 	input := PulumiServiceDeploymentSettingsInput{DeploymentSettings: fromAPI}
 
 	inputs := credentialsPropertyMap(t, input.ToPropertyMap(&plaintextInputs, &priorState, true))
-	assert.Equal(t, testRegistryPassword, util.GetSecretOrStringValue(inputs["password"]),
+	assert.Equal(t, testRegistryPassword, secretOrString(inputs["password"]),
 		"refresh must preserve the plaintext password from prior inputs")
 
 	outputs := credentialsPropertyMap(t, input.ToPropertyMap(&plaintextInputs, &priorState, false))
-	assert.Equal(t, testRedactedSecret, util.GetSecretOrStringValue(outputs["password"]),
+	assert.Equal(t, testRedactedSecret, secretOrString(outputs["password"]),
 		"outputs hold what the service returned, not the plaintext")
 }
 
@@ -508,7 +509,7 @@ func TestDeploymentSettingsExecutorImageCredentialsRefreshWithoutPriorState(t *t
 	input := PulumiServiceDeploymentSettingsInput{DeploymentSettings: fromAPI}
 
 	inputs := credentialsPropertyMap(t, input.ToPropertyMap(&plaintextInputs, &priorState, true))
-	assert.Equal(t, "", util.GetSecretOrStringValue(inputs["password"]))
+	assert.Equal(t, "", secretOrString(inputs["password"]))
 }
 
 // Import has no inputs at all, so the password is replaced with the placeholder
@@ -518,8 +519,8 @@ func TestDeploymentSettingsExecutorImageCredentialsImport(t *testing.T) {
 	input := PulumiServiceDeploymentSettingsInput{DeploymentSettings: settings}
 
 	inputs := credentialsPropertyMap(t, input.ToPropertyMap(nil, nil, true))
-	assert.Equal(t, "<REPLACE WITH ACTUAL SECRET VALUE>", util.GetSecretOrStringValue(inputs["password"]))
-	assert.Equal(t, "registry-user", util.GetSecretOrStringValue(inputs["username"]))
+	assert.Equal(t, "<REPLACE WITH ACTUAL SECRET VALUE>", secretOrString(inputs["password"]))
+	assert.Equal(t, "registry-user", secretOrString(inputs["username"]))
 }
 
 func TestDeploymentSettingsVcsRoundtrip(t *testing.T) {
@@ -652,7 +653,7 @@ func TestDecodeDeploymentSettingsOperationContext(t *testing.T) {
 		secretKey: {Secret: true, Value: secretValue},
 	}
 	decode := func(t *testing.T, oc resource.PropertyValue) *pulumiapi.OperationContext {
-		return decodeSettings(t, resource.PropertyMap{"operationContext": oc}).Operation
+		return decodeSettings(t, resource.PropertyMap{gcOperationContext: oc}).Operation
 	}
 
 	t.Run("per-variable secrets", func(t *testing.T) {
@@ -706,4 +707,210 @@ func TestDecodeDeploymentSettingsInputWrongType(t *testing.T) {
 		}),
 	})
 	assert.Error(t, err)
+}
+
+const (
+	gcPublicVar  = "PUBLIC_VAR"
+	gcSecretVar  = "SECRET_VAR"
+	gcSettingsID = "an-org/a-project/a-stack"
+)
+
+func deploymentSettingsInputs(extra map[string]property.Value) property.Map {
+	m := map[string]property.Value{
+		gcOrganization: property.New("an-org"),
+		gcProject:      property.New("a-project"),
+		gcStack:        property.New("a-stack"),
+	}
+	for k, v := range extra {
+		m[k] = v
+	}
+	return property.NewMap(m)
+}
+
+func environmentVariables(vars map[string]property.Value) map[string]property.Value {
+	return map[string]property.Value{
+		gcOperationContext: property.New(map[string]property.Value{
+			gcEnvironmentVariables: property.New(vars),
+		}),
+	}
+}
+
+func TestDeploymentSettingsCreateSendsEnvironmentVariableSecrecy(t *testing.T) {
+	client := &DeploymentSettingsClientMock{}
+	server := newDeploymentSettingsServer(t, client)
+
+	resp, err := server.Create(p.CreateRequest{
+		Urn: deploymentSettingsURN,
+		Properties: deploymentSettingsInputs(environmentVariables(map[string]property.Value{
+			gcPublicVar: property.New("visible"),
+			gcSecretVar: property.New("hidden").WithSecret(true),
+		})),
+	})
+	require.NoError(t, err)
+	assert.Equal(t, gcSettingsID, resp.ID)
+
+	require.Len(t, client.created, 1)
+	assert.Equal(t, map[string]pulumiapi.SecretValue{
+		gcPublicVar: {Value: "visible"},
+		gcSecretVar: {Value: "hidden", Secret: true},
+	}, client.created[0].Operation.EnvironmentVariables)
+
+	vars := resp.Properties.Get(gcOperationContext).AsMap().Get(gcEnvironmentVariables).AsMap()
+	assert.False(t, vars.Get(gcPublicVar).Secret(), "PLAIN should stay public in the state")
+	assert.True(t, vars.Get(gcSecretVar).Secret(), "SECRET should stay secret in the state")
+}
+
+func TestDeploymentSettingsCreateSecretOperationContextMakesAllVariablesSecret(t *testing.T) {
+	client := &DeploymentSettingsClientMock{}
+	server := newDeploymentSettingsServer(t, client)
+
+	_, err := server.Create(p.CreateRequest{
+		Urn: deploymentSettingsURN,
+		Properties: deploymentSettingsInputs(map[string]property.Value{
+			gcOperationContext: property.New(map[string]property.Value{
+				gcEnvironmentVariables: property.New(map[string]property.Value{
+					"A": property.New("a"),
+				}),
+			}).WithSecret(true),
+		}),
+	})
+	require.NoError(t, err)
+
+	require.Len(t, client.created, 1)
+	assert.True(t, client.created[0].Operation.EnvironmentVariables["A"].Secret)
+}
+
+func TestDeploymentSettingsPreviewDoesNotCallPulumiCloud(t *testing.T) {
+	client := &DeploymentSettingsClientMock{}
+	server := newDeploymentSettingsServer(t, client)
+	inputs := deploymentSettingsInputs(nil)
+
+	_, err := server.Create(p.CreateRequest{Urn: deploymentSettingsURN, Properties: inputs, DryRun: true})
+	require.NoError(t, err)
+	_, err = server.Update(p.UpdateRequest{
+		ID: gcSettingsID, Urn: deploymentSettingsURN, State: inputs, Inputs: inputs, DryRun: true,
+	})
+	require.NoError(t, err)
+
+	assert.Empty(t, client.created)
+	assert.Empty(t, client.updated)
+}
+
+func TestDeploymentSettingsCheckDoesNotFillTrueDefaults(t *testing.T) {
+	for _, block := range []string{"github", gcVcs} {
+		t.Run(block+" flags left unset", func(t *testing.T) {
+			settings := map[string]property.Value{"repository": property.New("org/repo")}
+			if block == gcVcs {
+				settings["provider"] = property.New("github")
+			}
+			checked := checkDeploymentSettings(t, resourceMap(deploymentSettingsInputs(map[string]property.Value{
+				block: property.New(settings),
+			})))
+
+			got := checked[resource.PropertyKey(block)].ObjectValue()
+			assert.NotContains(t, got, resource.PropertyKey("deployCommits"))
+			assert.NotContains(t, got, resource.PropertyKey("previewPullRequests"))
+		})
+
+		t.Run(block+" flags set explicitly", func(t *testing.T) {
+			settings := map[string]property.Value{
+				"deployCommits":       property.New(true),
+				"previewPullRequests": property.New(false),
+			}
+			if block == gcVcs {
+				settings["provider"] = property.New("github")
+			}
+			checked := checkDeploymentSettings(t, resourceMap(deploymentSettingsInputs(map[string]property.Value{
+				block: property.New(settings),
+			})))
+
+			got := checked[resource.PropertyKey(block)].ObjectValue()
+			assert.Equal(t, resource.NewBoolProperty(true), got["deployCommits"])
+			assert.Equal(t, resource.NewBoolProperty(false), got["previewPullRequests"])
+		})
+	}
+}
+
+func TestDeploymentSettingsCheckNormalizesAWSDuration(t *testing.T) {
+	checked := checkDeploymentSettings(t, resourceMap(deploymentSettingsInputs(map[string]property.Value{
+		gcOperationContext: property.New(map[string]property.Value{
+			"oidc": property.New(map[string]property.Value{
+				gcAWS: property.New(map[string]property.Value{
+					"roleARN":     property.New("arn:aws:iam::123456789012:role/r"),
+					"sessionName": property.New("s"),
+					"duration":    property.New("90m"),
+				}),
+			}),
+		}),
+	})))
+
+	aws := checked[gcOperationContext].ObjectValue()["oidc"].ObjectValue()[gcAWS].ObjectValue()
+	assert.Equal(t, "1h30m0s", aws["duration"].StringValue())
+}
+
+func TestDeploymentSettingsDiff(t *testing.T) {
+	server := newDeploymentSettingsServer(t, &DeploymentSettingsClientMock{})
+	diff := func(t *testing.T, olds, news property.Map) p.DiffResponse {
+		t.Helper()
+		resp, err := server.Diff(p.DiffRequest{
+			ID: gcSettingsID, Urn: deploymentSettingsURN, State: olds, OldInputs: olds, Inputs: news,
+		})
+		require.NoError(t, err)
+		return resp
+	}
+	withVar := func(v property.Value) property.Map {
+		return deploymentSettingsInputs(environmentVariables(map[string]property.Value{"A": v}))
+	}
+
+	t.Run("no changes", func(t *testing.T) {
+		assert.False(t, diff(t, withVar(property.New("a")), withVar(property.New("a"))).HasChanges)
+	})
+
+	t.Run("making a value secret is not a change", func(t *testing.T) {
+		assert.False(t, diff(t, withVar(property.New("a")), withVar(property.New("a").WithSecret(true))).HasChanges)
+	})
+
+	t.Run("changed variable updates in place", func(t *testing.T) {
+		resp := diff(t, withVar(property.New("a")), withVar(property.New("b")))
+		assert.True(t, resp.HasChanges)
+		assert.Equal(t, p.Update, resp.DetailedDiff["operationContext.environmentVariables.A"].Kind)
+	})
+
+	t.Run("changed stack replaces, deleting first", func(t *testing.T) {
+		news := deploymentSettingsInputs(map[string]property.Value{gcStack: property.New("other-stack")})
+		resp := diff(t, deploymentSettingsInputs(nil), news)
+		assert.True(t, resp.HasChanges)
+		assert.True(t, resp.DeleteBeforeReplace)
+		assert.Equal(t, p.UpdateReplace, resp.DetailedDiff[gcStack].Kind)
+	})
+}
+
+func TestDeploymentSettingsRefreshKeepsSecretVariablesSecret(t *testing.T) {
+	server := newDeploymentSettingsServer(t, buildDeploymentSettingsClientMock(
+		func() (*pulumiapi.DeploymentSettings, error) {
+			return &pulumiapi.DeploymentSettings{Operation: &pulumiapi.OperationContext{
+				EnvironmentVariables: map[string]pulumiapi.SecretValue{
+					gcPublicVar: {Value: "visible"},
+					gcSecretVar: {Value: "ciphertext", Secret: true},
+				},
+			}}, nil
+		},
+	))
+	inputs := deploymentSettingsInputs(environmentVariables(map[string]property.Value{
+		gcPublicVar: property.New("visible"),
+		gcSecretVar: property.New("hidden").WithSecret(true),
+	}))
+	state := deploymentSettingsInputs(environmentVariables(map[string]property.Value{
+		gcPublicVar: property.New("visible"),
+		gcSecretVar: property.New("ciphertext").WithSecret(true),
+	}))
+
+	resp, err := server.Read(p.ReadRequest{
+		ID: gcSettingsID, Urn: deploymentSettingsURN, Properties: state, Inputs: inputs,
+	})
+	require.NoError(t, err)
+
+	vars := resp.Inputs.Get(gcOperationContext).AsMap().Get(gcEnvironmentVariables).AsMap()
+	assert.Equal(t, property.New("visible"), vars.Get(gcPublicVar))
+	assert.Equal(t, property.New("hidden").WithSecret(true), vars.Get(gcSecretVar))
 }
