@@ -101,6 +101,19 @@ class AgentPool(pulumi.CustomResource):
         """
         Agent Pool for customer managed deployments.
 
+        ## Import
+
+        This resource can be imported using its `id`, which has the format `{organization}/{name}/{agentPoolId}`, e.g.,
+
+        ```sh
+         $ pulumi import pulumiservice:index:AgentPool my-agent-pool my-org/my-pool/e4a1b7c2-9f30-4d58-b6e1-2a7c9d0f4e86
+        ```
+
+        The agent pool ID is the last segment of its page URL in the Pulumi Cloud console, for example `https://app.pulumi.com/my-org/settings/workflow-runner-pools/e4a1b7c2-9f30-4d58-b6e1-2a7c9d0f4e86`.
+
+        The pool's `tokenValue` can't be read back from Pulumi Cloud, so it's empty after import.
+
+
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] description: Description of the agent pool.
@@ -116,6 +129,19 @@ class AgentPool(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         Agent Pool for customer managed deployments.
+
+        ## Import
+
+        This resource can be imported using its `id`, which has the format `{organization}/{name}/{agentPoolId}`, e.g.,
+
+        ```sh
+         $ pulumi import pulumiservice:index:AgentPool my-agent-pool my-org/my-pool/e4a1b7c2-9f30-4d58-b6e1-2a7c9d0f4e86
+        ```
+
+        The agent pool ID is the last segment of its page URL in the Pulumi Cloud console, for example `https://app.pulumi.com/my-org/settings/workflow-runner-pools/e4a1b7c2-9f30-4d58-b6e1-2a7c9d0f4e86`.
+
+        The pool's `tokenValue` can't be read back from Pulumi Cloud, so it's empty after import.
+
 
         :param str resource_name: The name of the resource.
         :param AgentPoolArgs args: The arguments to use to populate this resource's properties.

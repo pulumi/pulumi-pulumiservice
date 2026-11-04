@@ -23,6 +23,7 @@ import (
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 )
 
 type TeamStackPermissionScope int
@@ -50,7 +51,9 @@ var (
 )
 
 func (*TeamStackPermission) Annotate(a infer.Annotator) {
-	a.Describe(&TeamStackPermission{}, "Grants a team permissions to the specified stack.")
+	a.Describe(&TeamStackPermission{}, "Grants a team permissions to the specified stack."+
+		util.ImportDocs("pulumiservice:index:TeamStackPermission", "{organization}/{project}/{stack}/{team}",
+			"my-org/my-project/my-stack/my-team"))
 	a.SetToken("index", "TeamStackPermission")
 }
 

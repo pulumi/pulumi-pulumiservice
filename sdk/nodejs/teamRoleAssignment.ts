@@ -6,6 +6,16 @@ import * as utilities from "./utilities";
 
 /**
  * Assigns a custom (fine-grained) role to a Pulumi Cloud team. The Pulumi Cloud API currently supports one role per team; creating a second assignment replaces the first. The team's organization must already have the custom-roles feature enabled.
+ *
+ * ## Import
+ *
+ * This resource can be imported using its `id`, which has the format `{organization}/{team}/{roleId}`, e.g.,
+ *
+ * ```sh
+ *  $ pulumi import pulumiservice:index:TeamRoleAssignment my-team-role-assignment my-org/my-team/1e5b8d3a-6c42-4f90-b7a1-8d2c4e6f0b95
+ * ```
+ *
+ * The role ID is the last segment of its page URL in the Pulumi Cloud console, for example `https://app.pulumi.com/my-org/settings/access-management/roles/details/1e5b8d3a-6c42-4f90-b7a1-8d2c4e6f0b95`.
  */
 export class TeamRoleAssignment extends pulumi.CustomResource {
     /**
@@ -18,6 +28,16 @@ export class TeamRoleAssignment extends pulumi.CustomResource {
      */
     public static get(name: string, id: pulumi.Input<pulumi.ID>, opts?: pulumi.CustomResourceOptions): TeamRoleAssignment {
         return new TeamRoleAssignment(name, undefined as any, { ...opts, id: id });
+    }
+
+    /**
+     * Check whether an existing TeamRoleAssignment resource with the given ID exists.
+     *
+     * @param id The _unique_ provider ID of the resource to check.
+     * @param opts Optional settings to control the behavior of the CustomResource.
+     */
+    public static exists(id: pulumi.Input<string>, opts?: pulumi.CustomResourceOptions): pulumi.Output<boolean> {
+        return pulumi.runtime.existsResource("pulumiservice:index:TeamRoleAssignment", id, {}, { ...opts }, undefined);
     }
 
     /** @internal */

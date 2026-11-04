@@ -13,6 +13,16 @@ import (
 )
 
 // Manages a user's membership in a Pulumi Cloud organization and their assigned role. The user must already have a Pulumi Cloud account before they can be added. Custom (fine-grained) roles are assigned by setting `roleId`; built-in roles are assigned by setting `role`. When both are set, `roleId` takes precedence.
+//
+// ## Import
+//
+// This resource can be imported using its `id`, which has the format `{organization}/{username}`, e.g.,
+//
+// ```sh
+//
+//	$ pulumi import pulumiservice:index:OrganizationMember my-organization-member my-org/my-user
+//
+// ```
 type OrganizationMember struct {
 	pulumi.CustomResourceState
 
@@ -24,7 +34,7 @@ type OrganizationMember struct {
 	Name pulumi.StringOutput `pulumi:"name"`
 	// The Pulumi Cloud organization name.
 	OrganizationName pulumi.StringOutput `pulumi:"organizationName"`
-	// The built-in organization role. One of `member`, `admin`, `billing-manager`. Defaults to `member` on create. Ignored when `roleId` is set.
+	// The built-in organization role. One of `member`, `admin`, `billing-manager`, `reader`, `builder`, `maintainer`. `reader`, `builder` and `maintainer` exist only in organizations that use stored default roles. In those organizations `member` means the organization's default role: the member follows it if an administrator changes it. Defaults to `member` on create. Ignored when `roleId` is set.
 	Role pulumi.StringPtrOutput `pulumi:"role"`
 	// The ID of a custom (fine-grained) organization role to assign. Takes precedence over `role`.
 	RoleId pulumi.StringPtrOutput `pulumi:"roleId"`
@@ -87,7 +97,7 @@ func (OrganizationMemberState) ElementType() reflect.Type {
 type organizationMemberArgs struct {
 	// The Pulumi Cloud organization name.
 	OrganizationName string `pulumi:"organizationName"`
-	// The built-in organization role. One of `member`, `admin`, `billing-manager`. Defaults to `member` on create. Ignored when `roleId` is set.
+	// The built-in organization role. One of `member`, `admin`, `billing-manager`, `reader`, `builder`, `maintainer`. `reader`, `builder` and `maintainer` exist only in organizations that use stored default roles. In those organizations `member` means the organization's default role: the member follows it if an administrator changes it. Defaults to `member` on create. Ignored when `roleId` is set.
 	Role *string `pulumi:"role"`
 	// The ID of a custom (fine-grained) organization role to assign. Takes precedence over `role`.
 	RoleId *string `pulumi:"roleId"`
@@ -99,7 +109,7 @@ type organizationMemberArgs struct {
 type OrganizationMemberArgs struct {
 	// The Pulumi Cloud organization name.
 	OrganizationName pulumi.StringInput
-	// The built-in organization role. One of `member`, `admin`, `billing-manager`. Defaults to `member` on create. Ignored when `roleId` is set.
+	// The built-in organization role. One of `member`, `admin`, `billing-manager`, `reader`, `builder`, `maintainer`. `reader`, `builder` and `maintainer` exist only in organizations that use stored default roles. In those organizations `member` means the organization's default role: the member follows it if an administrator changes it. Defaults to `member` on create. Ignored when `roleId` is set.
 	Role pulumi.StringPtrInput
 	// The ID of a custom (fine-grained) organization role to assign. Takes precedence over `role`.
 	RoleId pulumi.StringPtrInput
@@ -214,7 +224,7 @@ func (o OrganizationMemberOutput) OrganizationName() pulumi.StringOutput {
 	return o.ApplyT(func(v *OrganizationMember) pulumi.StringOutput { return v.OrganizationName }).(pulumi.StringOutput)
 }
 
-// The built-in organization role. One of `member`, `admin`, `billing-manager`. Defaults to `member` on create. Ignored when `roleId` is set.
+// The built-in organization role. One of `member`, `admin`, `billing-manager`, `reader`, `builder`, `maintainer`. `reader`, `builder` and `maintainer` exist only in organizations that use stored default roles. In those organizations `member` means the organization's default role: the member follows it if an administrator changes it. Defaults to `member` on create. Ignored when `roleId` is set.
 func (o OrganizationMemberOutput) Role() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *OrganizationMember) pulumi.StringPtrOutput { return v.Role }).(pulumi.StringPtrOutput)
 }

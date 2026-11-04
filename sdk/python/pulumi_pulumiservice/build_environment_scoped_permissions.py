@@ -21,6 +21,8 @@ __all__ = [
     'build_environment_scoped_permissions_output',
 ]
 
+warnings.warn("""Use `buildRolePermissions` instead, with an `environmentRules` entry that sets `id`. If a scope you need isn't in the enums yet, upgrade the provider.""", DeprecationWarning)
+
 @pulumi.output_type
 class BuildEnvironmentScopedPermissionsResult:
     def __init__(__self__, permissions=None):
@@ -50,11 +52,12 @@ def build_environment_scoped_permissions(environment_id: Optional[_builtins.str]
                                          permissions: Optional[Sequence[_builtins.str]] = None,
                                          opts: Optional[pulumi.InvokeOptions] = None) -> AwaitableBuildEnvironmentScopedPermissionsResult:
     """
-    Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named environment. Pair with `Environment.environmentId` (or the `getEnvironment` data source) to avoid hand-rolling the `PermissionDescriptorCondition` tree yourself. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls the output of each helper.
+    Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named environment. Pair with `Environment.environmentId` (or the `getEnvironment` data source) to avoid hand-rolling the `PermissionDescriptorCondition` tree yourself. The result is directly assignable to `OrganizationRole.permissions`. To combine it with other grants in a single role, pass it to `buildRolePermissions` in `additionalEntries`.
 
     :param _builtins.str environment_id: The target environment's UUID. Use the `environmentId` output of an `Environment` resource or the `getEnvironment` data source.
     :param Sequence[_builtins.str] permissions: The set of `environment:*` scopes to grant on the target environment (e.g. `environment:read`, `environment:open`, `environment:update`). Discover valid scope names via the `getOrganizationRoleScopes` data source.
     """
+    pulumi.log.warn("""build_environment_scoped_permissions is deprecated: Use `buildRolePermissions` instead, with an `environmentRules` entry that sets `id`. If a scope you need isn't in the enums yet, upgrade the provider.""")
     __args__ = dict()
     __args__['environmentId'] = environment_id
     __args__['permissions'] = permissions
@@ -67,11 +70,12 @@ def build_environment_scoped_permissions_output(environment_id: pulumi.Input[Opt
                                                 permissions: pulumi.Input[Optional[Sequence[_builtins.str]]] = None,
                                                 opts: Optional[Union[pulumi.InvokeOptions, pulumi.InvokeOutputOptions]] = None) -> pulumi.Output[BuildEnvironmentScopedPermissionsResult]:
     """
-    Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named environment. Pair with `Environment.environmentId` (or the `getEnvironment` data source) to avoid hand-rolling the `PermissionDescriptorCondition` tree yourself. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls the output of each helper.
+    Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named environment. Pair with `Environment.environmentId` (or the `getEnvironment` data source) to avoid hand-rolling the `PermissionDescriptorCondition` tree yourself. The result is directly assignable to `OrganizationRole.permissions`. To combine it with other grants in a single role, pass it to `buildRolePermissions` in `additionalEntries`.
 
     :param _builtins.str environment_id: The target environment's UUID. Use the `environmentId` output of an `Environment` resource or the `getEnvironment` data source.
     :param Sequence[_builtins.str] permissions: The set of `environment:*` scopes to grant on the target environment (e.g. `environment:read`, `environment:open`, `environment:update`). Discover valid scope names via the `getOrganizationRoleScopes` data source.
     """
+    pulumi.log.warn("""build_environment_scoped_permissions is deprecated: Use `buildRolePermissions` instead, with an `environmentRules` entry that sets `id`. If a scope you need isn't in the enums yet, upgrade the provider.""")
     __args__ = dict()
     __args__['environmentId'] = environment_id
     __args__['permissions'] = permissions

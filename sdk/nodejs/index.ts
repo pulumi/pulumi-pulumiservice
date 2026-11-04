@@ -40,6 +40,11 @@ export const buildInsightsAccountScopedPermissions: typeof import("./buildInsigh
 export const buildInsightsAccountScopedPermissionsOutput: typeof import("./buildInsightsAccountScopedPermissions").buildInsightsAccountScopedPermissionsOutput = null as any;
 utilities.lazyLoad(exports, ["buildInsightsAccountScopedPermissions","buildInsightsAccountScopedPermissionsOutput"], () => require("./buildInsightsAccountScopedPermissions"));
 
+export { BuildRolePermissionsArgs, BuildRolePermissionsResult, BuildRolePermissionsOutputArgs } from "./buildRolePermissions";
+export const buildRolePermissions: typeof import("./buildRolePermissions").buildRolePermissions = null as any;
+export const buildRolePermissionsOutput: typeof import("./buildRolePermissions").buildRolePermissionsOutput = null as any;
+utilities.lazyLoad(exports, ["buildRolePermissions","buildRolePermissionsOutput"], () => require("./buildRolePermissions"));
+
 export { BuildStackMatchRuleArgs, BuildStackMatchRuleResult, BuildStackMatchRuleOutputArgs } from "./buildStackMatchRule";
 export const buildStackMatchRule: typeof import("./buildStackMatchRule").buildStackMatchRule = null as any;
 export const buildStackMatchRuleOutput: typeof import("./buildStackMatchRule").buildStackMatchRuleOutput = null as any;
@@ -135,6 +140,11 @@ export const getPolicyPacks: typeof import("./getPolicyPacks").getPolicyPacks = 
 export const getPolicyPacksOutput: typeof import("./getPolicyPacks").getPolicyPacksOutput = null as any;
 utilities.lazyLoad(exports, ["getPolicyPacks","getPolicyPacksOutput"], () => require("./getPolicyPacks"));
 
+export { GetStackArgs, GetStackResult, GetStackOutputArgs } from "./getStack";
+export const getStack: typeof import("./getStack").getStack = null as any;
+export const getStackOutput: typeof import("./getStack").getStackOutput = null as any;
+utilities.lazyLoad(exports, ["getStack","getStackOutput"], () => require("./getStack"));
+
 export { InsightsAccountArgs } from "./insightsAccount";
 export type InsightsAccount = import("./insightsAccount").InsightsAccount;
 export const InsightsAccount: typeof import("./insightsAccount").InsightsAccount = null as any;
@@ -150,10 +160,20 @@ export type OrgAccessToken = import("./orgAccessToken").OrgAccessToken;
 export const OrgAccessToken: typeof import("./orgAccessToken").OrgAccessToken = null as any;
 utilities.lazyLoad(exports, ["OrgAccessToken"], () => require("./orgAccessToken"));
 
+export { OrganizationDefaultRoleArgs } from "./organizationDefaultRole";
+export type OrganizationDefaultRole = import("./organizationDefaultRole").OrganizationDefaultRole;
+export const OrganizationDefaultRole: typeof import("./organizationDefaultRole").OrganizationDefaultRole = null as any;
+utilities.lazyLoad(exports, ["OrganizationDefaultRole"], () => require("./organizationDefaultRole"));
+
 export { OrganizationMemberArgs } from "./organizationMember";
 export type OrganizationMember = import("./organizationMember").OrganizationMember;
 export const OrganizationMember: typeof import("./organizationMember").OrganizationMember = null as any;
 utilities.lazyLoad(exports, ["OrganizationMember"], () => require("./organizationMember"));
+
+export { OrganizationMemberEntityAccessArgs } from "./organizationMemberEntityAccess";
+export type OrganizationMemberEntityAccess = import("./organizationMemberEntityAccess").OrganizationMemberEntityAccess;
+export const OrganizationMemberEntityAccess: typeof import("./organizationMemberEntityAccess").OrganizationMemberEntityAccess = null as any;
+utilities.lazyLoad(exports, ["OrganizationMemberEntityAccess"], () => require("./organizationMemberEntityAccess"));
 
 export { OrganizationRoleArgs } from "./organizationRole";
 export type OrganizationRole = import("./organizationRole").OrganizationRole;
@@ -273,8 +293,12 @@ const _module = {
                 return new OidcIssuer(name, <any>undefined, { urn })
             case "pulumiservice:index:OrgAccessToken":
                 return new OrgAccessToken(name, <any>undefined, { urn })
+            case "pulumiservice:index:OrganizationDefaultRole":
+                return new OrganizationDefaultRole(name, <any>undefined, { urn })
             case "pulumiservice:index:OrganizationMember":
                 return new OrganizationMember(name, <any>undefined, { urn })
+            case "pulumiservice:index:OrganizationMemberEntityAccess":
+                return new OrganizationMemberEntityAccess(name, <any>undefined, { urn })
             case "pulumiservice:index:OrganizationRole":
                 return new OrganizationRole(name, <any>undefined, { urn })
             case "pulumiservice:index:PolicyGroup":

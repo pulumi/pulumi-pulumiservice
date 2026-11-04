@@ -6,6 +6,7 @@ import builtins as _builtins
 from .. import _utilities
 import typing
 # Export this package's modules as members:
+from .agent_automation_v2 import *
 from .audit_log_export_configuration import *
 from .default_organization import *
 from .gate import *

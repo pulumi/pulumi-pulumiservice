@@ -23,6 +23,7 @@ import (
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 )
 
 type InsightsAccount struct{}
@@ -35,7 +36,10 @@ var (
 )
 
 func (ia *InsightsAccount) Annotate(a infer.Annotator) {
-	a.Describe(ia, "Insights Account for cloud resource scanning and analysis across AWS, Azure, and GCP.")
+	a.Describe(ia, "Insights Account for cloud resource scanning and analysis across AWS, Azure, and GCP."+
+		util.ImportDocs("pulumiservice:index:InsightsAccount", "{organization}/{accountName}",
+			"my-org/my-account",
+			"`scanSchedule` isn't read back from Pulumi Cloud, so set it in your program after import."))
 }
 
 // CloudProvider enum for supported cloud providers
@@ -206,15 +210,15 @@ func (*InsightsAccount) Create(
 	}
 	if account == nil {
 		return infer.CreateResponse[InsightsAccountState]{
-				ID: accountID,
-				Output: InsightsAccountState{
-					InsightsAccountCore: req.Inputs.InsightsAccountCore,
-				},
-			}, infer.ResourceInitFailedError{
-				Reasons: []string{
-					fmt.Sprintf("insights account '%s' not found after creation", req.Inputs.AccountName),
-				},
-			}
+			ID: accountID,
+			Output: InsightsAccountState{
+				InsightsAccountCore: req.Inputs.InsightsAccountCore,
+			},
+		}, infer.ResourceInitFailedError{
+			Reasons: []string{
+				fmt.Sprintf("insights account '%s' not found after creation", req.Inputs.AccountName),
+			},
+		}
 	}
 
 	return infer.CreateResponse[InsightsAccountState]{
@@ -360,13 +364,13 @@ func (*InsightsAccount) Update(
 	}
 	if account == nil {
 		return infer.UpdateResponse[InsightsAccountState]{
-				Output: InsightsAccountState{
-					InsightsAccountCore: req.Inputs.InsightsAccountCore,
-					InsightsAccountID:   req.State.InsightsAccountID,
-				},
-			}, infer.ResourceInitFailedError{
-				Reasons: []string{fmt.Sprintf("insights account '%s' not found after update", req.State.AccountName)},
-			}
+			Output: InsightsAccountState{
+				InsightsAccountCore: req.Inputs.InsightsAccountCore,
+				InsightsAccountID:   req.State.InsightsAccountID,
+			},
+		}, infer.ResourceInitFailedError{
+			Reasons: []string{fmt.Sprintf("insights account '%s' not found after update", req.State.AccountName)},
+		}
 	}
 
 	return infer.UpdateResponse[InsightsAccountState]{

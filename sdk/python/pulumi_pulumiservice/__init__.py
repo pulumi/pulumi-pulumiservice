@@ -14,6 +14,7 @@ from .build_account_match_rule import *
 from .build_allow_permissions import *
 from .build_environment_scoped_permissions import *
 from .build_insights_account_scoped_permissions import *
+from .build_role_permissions import *
 from .build_stack_match_rule import *
 from .build_stack_scoped_permissions import *
 from .deployment_schedule import *
@@ -33,10 +34,13 @@ from .get_organization_role_scopes import *
 from .get_organization_roles import *
 from .get_policy_pack import *
 from .get_policy_packs import *
+from .get_stack import *
 from .insights_account import *
 from .oidc_issuer import *
 from .org_access_token import *
+from .organization_default_role import *
 from .organization_member import *
+from .organization_member_entity_access import *
 from .organization_role import *
 from .policy_group import *
 from .policy_pack import *
@@ -73,6 +77,7 @@ _utilities.register(
   "mod": "api",
   "fqn": "pulumi_pulumiservice.api",
   "classes": {
+   "pulumiservice:api:AgentAutomationV2": "AgentAutomationV2",
    "pulumiservice:api:AuditLogExportConfiguration": "AuditLogExportConfiguration",
    "pulumiservice:api:DefaultOrganization": "DefaultOrganization",
    "pulumiservice:api:Gate": "Gate",
@@ -90,6 +95,7 @@ _utilities.register(
   "mod": "api/agents",
   "fqn": "pulumi_pulumiservice.api.agents",
   "classes": {
+   "pulumiservice:api/agents:Definition": "Definition",
    "pulumiservice:api/agents:Pool": "Pool",
    "pulumiservice:api/agents:Task": "Task"
   }
@@ -215,7 +221,9 @@ _utilities.register(
    "pulumiservice:index:InsightsAccount": "InsightsAccount",
    "pulumiservice:index:OidcIssuer": "OidcIssuer",
    "pulumiservice:index:OrgAccessToken": "OrgAccessToken",
+   "pulumiservice:index:OrganizationDefaultRole": "OrganizationDefaultRole",
    "pulumiservice:index:OrganizationMember": "OrganizationMember",
+   "pulumiservice:index:OrganizationMemberEntityAccess": "OrganizationMemberEntityAccess",
    "pulumiservice:index:OrganizationRole": "OrganizationRole",
    "pulumiservice:index:PolicyGroup": "PolicyGroup",
    "pulumiservice:index:PolicyPack": "PolicyPack",

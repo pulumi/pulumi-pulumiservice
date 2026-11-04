@@ -23,6 +23,7 @@ import (
 	"github.com/pulumi/pulumi-go-provider/infer"
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 )
 
 type EnvironmentVersionTag struct{}
@@ -35,7 +36,11 @@ var (
 )
 
 func (*EnvironmentVersionTag) Annotate(a infer.Annotator) {
-	a.Describe(&EnvironmentVersionTag{}, "A tag on a specific revision of an environment.")
+	a.Describe(&EnvironmentVersionTag{}, "A tag on a specific revision of an environment."+
+		util.ImportDocs("pulumiservice:index:EnvironmentVersionTag",
+			"{organization}/{project}/{environment}/{tagName}", "my-org/my-project/my-environment/my-tag",
+			"The legacy format `{organization}/{environment}/{tagName}` is also accepted, and uses the "+
+				"`default` project."))
 	a.SetToken("index", "EnvironmentVersionTag")
 }
 

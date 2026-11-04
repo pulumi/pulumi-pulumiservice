@@ -18,6 +18,14 @@ import javax.annotation.Nullable;
 /**
  * Manages a user&#39;s membership in a Pulumi Cloud organization and their assigned role. The user must already have a Pulumi Cloud account before they can be added. Custom (fine-grained) roles are assigned by setting `roleId`; built-in roles are assigned by setting `role`. When both are set, `roleId` takes precedence.
  * 
+ * ## Import
+ * 
+ * This resource can be imported using its `id`, which has the format `{organization}/{username}`, e.g.,
+ * 
+ * ```sh
+ *  $ pulumi import pulumiservice:index:OrganizationMember my-organization-member my-org/my-user
+ * ```
+ * 
  */
 @ResourceType(type="pulumiservice:index:OrganizationMember")
 public class OrganizationMember extends com.pulumi.resources.CustomResource {
@@ -78,14 +86,14 @@ public class OrganizationMember extends com.pulumi.resources.CustomResource {
         return this.organizationName;
     }
     /**
-     * The built-in organization role. One of `member`, `admin`, `billing-manager`. Defaults to `member` on create. Ignored when `roleId` is set.
+     * The built-in organization role. One of `member`, `admin`, `billing-manager`, `reader`, `builder`, `maintainer`. `reader`, `builder` and `maintainer` exist only in organizations that use stored default roles. In those organizations `member` means the organization&#39;s default role: the member follows it if an administrator changes it. Defaults to `member` on create. Ignored when `roleId` is set.
      * 
      */
     @Export(name="role", refs={String.class}, tree="[0]")
     private Output</* @Nullable */ String> role;
 
     /**
-     * @return The built-in organization role. One of `member`, `admin`, `billing-manager`. Defaults to `member` on create. Ignored when `roleId` is set.
+     * @return The built-in organization role. One of `member`, `admin`, `billing-manager`, `reader`, `builder`, `maintainer`. `reader`, `builder` and `maintainer` exist only in organizations that use stored default roles. In those organizations `member` means the organization&#39;s default role: the member follows it if an administrator changes it. Defaults to `member` on create. Ignored when `roleId` is set.
      * 
      */
     public Output<Optional<String>> role() {

@@ -1,0 +1,40 @@
+# This example requires an organization with the Pulumi GitHub app
+# installed on the repository. It cannot run in CI automatically.
+#
+# To test manually:
+#   1. Set PULUMI_BACKEND_URL and PULUMI_ACCESS_TOKEN for your environment
+#   2. Set the organizationName and repository config values to an
+#      organization and repository the GitHub app can access
+#   3. Run: pulumi up, then pulumi refresh
+#   4. Check that the stack's deployment settings in Pulumi Cloud deploy
+#      on tags matching the filters
+name: yaml-deployment-settings-github-tags
+runtime: yaml
+description: Deployment settings that deploy on git tags
+config:
+  organizationName:
+    type: string
+    default: service-provider-test-org
+  repository:
+    type: string
+resources:
+  settings:
+    type: pulumiservice:DeploymentSettings
+    properties:
+      organization: ${organizationName}
+      project: ${pulumi.project}
+      stack: ${pulumi.stack}
+      sourceContext:
+        git:
+          branch: refs/heads/main
+      github:
+        repository: ${repository}
+        # Pulumi Cloud rejects deployCommits and deployTags together, and
+        # deployCommits defaults to true.
+        deployCommits: false
+        deployTags: true
+        tagFilters:
+          - "v*"
+          - "!*-rc*"
+outputs:
+  github: ${settings.github}

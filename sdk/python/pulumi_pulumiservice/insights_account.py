@@ -152,6 +152,17 @@ class InsightsAccount(pulumi.CustomResource):
         """
         Insights Account for cloud resource scanning and analysis across AWS, Azure, and GCP.
 
+        ## Import
+
+        This resource can be imported using its `id`, which has the format `{organization}/{accountName}`, e.g.,
+
+        ```sh
+         $ pulumi import pulumiservice:index:InsightsAccount my-insights-account my-org/my-account
+        ```
+
+        `scanSchedule` isn't read back from Pulumi Cloud, so set it in your program after import.
+
+
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] account_name: Name of the insights account.
@@ -170,6 +181,17 @@ class InsightsAccount(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         Insights Account for cloud resource scanning and analysis across AWS, Azure, and GCP.
+
+        ## Import
+
+        This resource can be imported using its `id`, which has the format `{organization}/{accountName}`, e.g.,
+
+        ```sh
+         $ pulumi import pulumiservice:index:InsightsAccount my-insights-account my-org/my-account
+        ```
+
+        `scanSchedule` isn't read back from Pulumi Cloud, so set it in your program after import.
+
 
         :param str resource_name: The name of the resource.
         :param InsightsAccountArgs args: The arguments to use to populate this resource's properties.

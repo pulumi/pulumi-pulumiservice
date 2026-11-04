@@ -25,6 +25,7 @@ import (
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 )
 
 const (
@@ -43,7 +44,10 @@ var (
 )
 
 func (*TemplateSource) Annotate(a infer.Annotator) {
-	a.Describe(&TemplateSource{}, "A source for Pulumi templates.")
+	a.Describe(&TemplateSource{}, "A source for Pulumi templates."+
+		util.ImportDocs("pulumiservice:index:TemplateSource", "{organization}/{templateSourceId}",
+			"my-org/6f0d3b9e-2a75-4c18-9e46-b3a8c1d7e520",
+			util.APIIDHint("template source ID", "/api/orgs/my-org/templates/sources", ".sources[] | {name, id}")))
 	a.SetToken("index", "TemplateSource")
 }
 

@@ -4,6 +4,7 @@
 package examples
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -27,6 +28,8 @@ import (
 	"github.com/pulumi/providertest/pulumitest/opttest"
 	"github.com/pulumi/pulumi-cloud-sdk/go/apitype"
 	"github.com/pulumi/pulumi/pkg/v3/testing/integration"
+	"github.com/pulumi/pulumi/sdk/v3/go/auto"
+	sdkapitype "github.com/pulumi/pulumi/sdk/v3/go/common/apitype"
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 )
@@ -222,8 +225,9 @@ func TestYamlDeploymentSettingsExample(t *testing.T) {
 		Dir:       path.Join(cwd, ".", "yaml-deployment-settings"),
 		StackName: "test-stack-" + digits,
 		Config: map[string]string{
-			"digits":        digits,
-			"imageUsername": "registry-user",
+			"digits":           digits,
+			"imageUsername":    "registry-user",
+			"organizationName": getOrgName(),
 		},
 		Secrets: map[string]string{
 			"imagePassword": "registry-password",
@@ -260,7 +264,8 @@ func TestYamlDeploymentSettingsNoSourceExample(t *testing.T) {
 		Dir:       path.Join(cwd, ".", "yaml-deployment-settings-no-source"),
 		StackName: "test-stack-" + digits,
 		Config: map[string]string{
-			"digits": digits,
+			"digits":           digits,
+			"organizationName": getOrgName(),
 		},
 		EditDirs: []integration.EditDir{
 			{
@@ -294,7 +299,8 @@ func TestYamlDeploymentSettingsCommitExample(t *testing.T) {
 		Dir:       path.Join(cwd, ".", "yaml-deployment-settings-commit"),
 		StackName: "test-stack-" + digits,
 		Config: map[string]string{
-			"digits": digits,
+			"digits":           digits,
+			"organizationName": getOrgName(),
 		},
 		EditDirs: []integration.EditDir{
 			{
@@ -306,6 +312,109 @@ func TestYamlDeploymentSettingsCommitExample(t *testing.T) {
 				ExpectNoChanges: true,
 			},
 		},
+	})
+}
+
+// deploymentSettingsBaselineVersion is the released provider whose state the
+// DeploymentSettings upgrade test reads.
+const deploymentSettingsBaselineVersion = "1.5.0"
+
+// TestYamlDeploymentSettingsUpgrade checks that a stack written by the released
+// provider previews with no changes under the current one, secrets included.
+// It guards the move of DeploymentSettings to infer (#1206).
+func TestYamlDeploymentSettingsUpgrade(t *testing.T) {
+	// Each example maps to a callback that sets the config it needs beyond
+	// organizationName and digits.
+	examples := map[string]func(ctx context.Context, t *testing.T, stack *auto.Stack){
+		"yaml-deployment-settings": func(ctx context.Context, t *testing.T, stack *auto.Stack) {
+			require.NoError(t, stack.SetAllConfig(ctx, auto.ConfigMap{
+				"imageUsername": {Value: "registry-user"},
+				"imagePassword": {Value: "registry-password", Secret: true},
+			}))
+		},
+		"yaml-deployment-settings-commit": func(context.Context, *testing.T, *auto.Stack) {},
+	}
+	for dir, configureExample := range examples {
+		t.Run(dir, func(t *testing.T) {
+			digits := generateRandomFiveDigits()
+			configure := func(test *pulumitest.PulumiTest) {
+				test.SetConfig(t, "organizationName", getOrgName())
+				test.SetConfig(t, "digits", digits)
+				configureExample(test.Context(), t, test.CurrentStack())
+			}
+
+			// The settings belong to this stack, so it must exist in Pulumi Cloud
+			// under the name the program gives it.
+			baseline := pulumitest.NewPulumiTest(t, filepath.Join(getCwd(t), dir),
+				opttest.DownloadProviderVersion("pulumiservice", deploymentSettingsBaselineVersion),
+				opttest.UseAmbientBackend(),
+				opttest.StackName("test-stack-"+digits),
+			)
+			configure(baseline)
+			baseline.Up(t)
+			state := baseline.ExportStack(t)
+
+			current := pulumitest.NewPulumiTest(t, filepath.Join(getCwd(t), dir),
+				inMemoryProvider(),
+				opttest.UseAmbientBackend(),
+				opttest.StackName(randomStackName()),
+			)
+			configure(current)
+			// Retarget the state at the current stack: its URNs, and the root
+			// stack resource's name, which ends in the stack name. The settings'
+			// own `stack` input still names the baseline stack, as it should.
+			from, to := baseline.CurrentStack().Name(), current.CurrentStack().Name()
+			for _, r := range [][2]string{
+				{"urn:pulumi:" + from + "::", "urn:pulumi:" + to + "::"},
+				{"-" + from + `"`, "-" + to + `"`},
+			} {
+				state.Deployment = bytes.ReplaceAll(state.Deployment, []byte(r[0]), []byte(r[1]))
+			}
+			current.ImportStack(t, state)
+			// The current stack now owns the settings and deletes them on cleanup.
+			// Empty the baseline stack so its cleanup doesn't delete them twice.
+			baseline.ImportStack(t, sdkapitype.UntypedDeployment{
+				Version:    3,
+				Deployment: json.RawMessage(`{}`),
+			})
+
+			assertpreview.HasNoChanges(t, current.Preview(t))
+		})
+	}
+}
+
+func TestYamlAccessTokenExample(t *testing.T) {
+	test := pulumitest.NewPulumiTest(t,
+		filepath.Join(getCwd(t), "yaml-access-tokens"),
+		inMemoryProvider(),
+		opttest.UseAmbientBackend(),
+		opttest.StackName(randomStackName()),
+	)
+	// Use a full date-time, not a bare date, so the test covers the time
+	// component surviving the round trip through the API.
+	expires := time.Now().UTC().AddDate(0, 0, 30).Truncate(time.Hour)
+	test.SetConfig(t, "expires", expires.Format(time.RFC3339))
+
+	runPulumiTestAfterUp(t, test, func(t *testing.T, test *pulumitest.PulumiTest) {
+		outputs, err := test.CurrentStack().Outputs(t.Context())
+		require.NoError(t, err)
+		tokenID, ok := outputs["expiringTokenId"].Value.(string)
+		require.True(t, ok, "expiringTokenId output must be a string")
+
+		// Read the token back from Pulumi Cloud, not from state, to prove the
+		// expiry was sent on create (#1215).
+		apiURL := os.Getenv("PULUMI_BACKEND_URL")
+		if apiURL == "" {
+			apiURL = "https://api.pulumi.com"
+		}
+		client, err := pulumiapi.NewClient(
+			&http.Client{Timeout: 60 * time.Second}, os.Getenv("PULUMI_ACCESS_TOKEN"), apiURL,
+		)
+		require.NoError(t, err)
+		token, err := client.GetAccessToken(t.Context(), tokenID)
+		require.NoError(t, err)
+		require.NotNil(t, token, "token %q not found", tokenID)
+		assert.Equal(t, expires.Unix(), token.Expires)
 	})
 }
 
@@ -322,6 +431,12 @@ func TestYamlOrgAccessTokenExample(t *testing.T) {
 	integration.ProgramTest(t, &integration.ProgramTestOptions{
 		Quick: true,
 		Dir:   path.Join(cwd, ".", "yaml-org-token"),
+		Config: map[string]string{
+			"organizationName": getOrgName(),
+			// Use a full date-time, not a bare date, so the test covers the
+			// time component surviving the round trip through the API.
+			"expires": time.Now().UTC().AddDate(0, 0, 30).Truncate(time.Hour).Format(time.RFC3339),
+		},
 	})
 }
 
@@ -453,6 +568,7 @@ func TestYamlAgentPoolsExample(t *testing.T) {
 }
 
 func TestYamlTemplateSourcesExample(t *testing.T) {
+	skipUnlessSerializedTests(t)
 	cwd := getCwd(t)
 	digits := generateRandomFiveDigits()
 	integration.ProgramTest(t, &integration.ProgramTestOptions{
@@ -466,11 +582,8 @@ func TestYamlTemplateSourcesExample(t *testing.T) {
 func TestYamlOidcIssuerExample(t *testing.T) {
 	cwd := getCwd(t)
 	integration.ProgramTest(t, &integration.ProgramTestOptions{
-		Dir: path.Join(cwd, ".", "yaml-oidc-issuer"),
-		Config: map[string]string{
-			"pulumiThumbprint": tlsThumbprint("api.pulumi.com"),
-			"githubThumbprint": tlsThumbprint("token.actions.githubusercontent.com"),
-		},
+		Dir:    path.Join(cwd, ".", "yaml-oidc-issuer"),
+		Config: oidcIssuerTestConfig(),
 	})
 }
 
@@ -535,7 +648,14 @@ func TestYamlPolicyPackExample(t *testing.T) {
 	)
 	test.SetConfig(t, "digits", generateRandomFiveDigits())
 	test.SetConfig(t, "organizationName", getOrgName())
-	runPulumiTest(t, test)
+	up := runPulumiTest(t, test)
+
+	// getPolicyPack reads the pack back from the real service, both by tag and
+	// as latest. Unit tests use a fake server, which once encoded routes the
+	// service doesn't have, so only a live read proves the lookup works (#1012).
+	assert.Equal(t, "1.0.0", up.Outputs["packByTagVersionTag"].Value)
+	assert.Len(t, up.Outputs["packByTagPolicies"].Value, 2)
+	assert.Equal(t, "1.0.0", up.Outputs["packLatestVersionTag"].Value)
 }
 
 func TestYamlPolicyGroupsAccountsExample(t *testing.T) {
@@ -646,7 +766,12 @@ func TestYamlDeploymentSettingsVcsExample(t *testing.T) {
 	t.Skip("requires an existing Azure DevOps integration; run manually against a configured environment")
 }
 
+func TestYamlDeploymentSettingsGitHubTagsExample(t *testing.T) {
+	t.Skip("requires an existing GitHub integration; run manually against a configured environment")
+}
+
 func TestYamlRbacExample(t *testing.T) {
+	skipUnlessSerializedTests(t)
 	// Requires the Custom Roles feature to be enabled on the test
 	// organization. If it isn't, CreateRole will return a feature-flag
 	// error and the test fails loudly — which is what we want to learn.
@@ -698,6 +823,28 @@ func TestYamlRbacExample(t *testing.T) {
 	if first, ok := up.Outputs["firstRoleName"]; ok {
 		assert.NotEmpty(t, first.Value, "expected getOrganizationRoles to return at least one role")
 	}
+	preview := test.Preview(t)
+	assertpreview.HasNoChanges(t, preview)
+	refresh := test.Refresh(t)
+	assertrefresh.HasNoChanges(t, refresh)
+	test.Destroy(t)
+}
+
+// TestYamlOrganizationRoleExample runs OrganizationRole end to end with the
+// RBAC helper functions.
+// Requires the Custom Roles feature on the test organization.
+func TestYamlOrganizationRoleExample(t *testing.T) {
+	test := pulumitest.NewPulumiTest(t,
+		filepath.Join(getCwd(t), "yaml-organization-role"),
+		inMemoryProvider(),
+		opttest.UseAmbientBackend(),
+		opttest.StackName(randomStackName()),
+	)
+	test.SetConfig(t, "digits", generateRandomFiveDigits())
+	test.SetConfig(t, "organizationName", getOrgName())
+
+	up := test.Up(t)
+	assert.NotEmpty(t, up.Outputs["platformRoleId"].Value)
 	preview := test.Preview(t)
 	assertpreview.HasNoChanges(t, preview)
 	refresh := test.Refresh(t)

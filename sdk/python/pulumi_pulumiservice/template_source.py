@@ -102,6 +102,22 @@ class TemplateSource(pulumi.CustomResource):
         """
         A source for Pulumi templates.
 
+        ## Import
+
+        This resource can be imported using its `id`, which has the format `{organization}/{templateSourceId}`, e.g.,
+
+        ```sh
+         $ pulumi import pulumiservice:index:TemplateSource my-template-source my-org/6f0d3b9e-2a75-4c18-9e46-b3a8c1d7e520
+        ```
+
+        The Pulumi Cloud console doesn't show the template source ID. List it with the [Pulumi Cloud REST API](https://www.pulumi.com/docs/reference/cloud-rest-api/):
+
+        ```sh
+        curl -s -H "Authorization: token $PULUMI_ACCESS_TOKEN" \\
+          https://api.pulumi.com/api/orgs/my-org/templates/sources | jq '.sources[] | {name, id}'
+        ```
+
+
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[Union['TemplateSourceDestinationArgs', 'TemplateSourceDestinationArgsDict', 'outputs.TemplateSourceDestination']] destination: The default destination for projects using templates from this source.
@@ -117,6 +133,22 @@ class TemplateSource(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         A source for Pulumi templates.
+
+        ## Import
+
+        This resource can be imported using its `id`, which has the format `{organization}/{templateSourceId}`, e.g.,
+
+        ```sh
+         $ pulumi import pulumiservice:index:TemplateSource my-template-source my-org/6f0d3b9e-2a75-4c18-9e46-b3a8c1d7e520
+        ```
+
+        The Pulumi Cloud console doesn't show the template source ID. List it with the [Pulumi Cloud REST API](https://www.pulumi.com/docs/reference/cloud-rest-api/):
+
+        ```sh
+        curl -s -H "Authorization: token $PULUMI_ACCESS_TOKEN" \\
+          https://api.pulumi.com/api/orgs/my-org/templates/sources | jq '.sources[] | {name, id}'
+        ```
+
 
         :param str resource_name: The name of the resource.
         :param TemplateSourceArgs args: The arguments to use to populate this resource's properties.

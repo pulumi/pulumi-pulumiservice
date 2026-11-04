@@ -10,7 +10,6 @@
 PROVIDER_SOURCES := $(shell find provider/cmd provider/pkg -name '*.go') \
                     provider/pkg/cloud/spec.json \
                     provider/pkg/cloud/metadata.json \
-                    provider/pkg/provider/manual-schema.json \
                     provider/pkg/provider/README.md \
                     go.mod go.sum
 

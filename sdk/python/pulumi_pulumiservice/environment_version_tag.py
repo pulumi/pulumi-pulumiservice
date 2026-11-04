@@ -118,6 +118,17 @@ class EnvironmentVersionTag(pulumi.CustomResource):
         """
         A tag on a specific revision of an environment.
 
+        ## Import
+
+        This resource can be imported using its `id`, which has the format `{organization}/{project}/{environment}/{tagName}`, e.g.,
+
+        ```sh
+         $ pulumi import pulumiservice:index:EnvironmentVersionTag my-environment-version-tag my-org/my-project/my-environment/my-tag
+        ```
+
+        The legacy format `{organization}/{environment}/{tagName}` is also accepted, and uses the `default` project.
+
+
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] environment: Environment name.
@@ -134,6 +145,17 @@ class EnvironmentVersionTag(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         A tag on a specific revision of an environment.
+
+        ## Import
+
+        This resource can be imported using its `id`, which has the format `{organization}/{project}/{environment}/{tagName}`, e.g.,
+
+        ```sh
+         $ pulumi import pulumiservice:index:EnvironmentVersionTag my-environment-version-tag my-org/my-project/my-environment/my-tag
+        ```
+
+        The legacy format `{organization}/{environment}/{tagName}` is also accepted, and uses the `default` project.
+
 
         :param str resource_name: The name of the resource.
         :param EnvironmentVersionTagArgs args: The arguments to use to populate this resource's properties.

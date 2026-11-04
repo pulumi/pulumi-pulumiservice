@@ -22,7 +22,7 @@ import (
 )
 
 type OrgAccessTokenClient interface {
-	CreateOrgAccessToken(ctx context.Context, name, orgName, description string, admin bool) (*AccessToken, error)
+	CreateOrgAccessToken(ctx context.Context, orgName string, req CreateOrgAccessTokenRequest) (*AccessToken, error)
 	DeleteOrgAccessToken(ctx context.Context, tokenID, orgName string) error
 	GetOrgAccessToken(ctx context.Context, tokenID, orgName string) (*AccessToken, error)
 }
@@ -32,33 +32,29 @@ type createOrgTokenResponse struct {
 	TokenValue string `json:"tokenValue"`
 }
 
-type createOrgTokenRequest struct {
-	Description string `json:"description"`
+type CreateOrgAccessTokenRequest struct {
 	Name        string `json:"name"`
+	Description string `json:"description"`
 	Admin       bool   `json:"admin"`
+	Expires     int64  `json:"expires,omitempty"`
+	RoleID      string `json:"roleID,omitempty"`
 }
 
 func (c *Client) CreateOrgAccessToken(
 	ctx context.Context,
-	name, orgName, description string,
-	admin bool,
+	orgName string,
+	createReq CreateOrgAccessTokenRequest,
 ) (*AccessToken, error) {
 
 	if len(orgName) == 0 {
 		return nil, errors.New("empty orgName")
 	}
 
-	if len(name) == 0 {
+	if len(createReq.Name) == 0 {
 		return nil, errors.New("empty name")
 	}
 
 	apiPath := path.Join("orgs", orgName, "tokens")
-
-	createReq := createOrgTokenRequest{
-		Name:        name,
-		Description: description,
-		Admin:       admin,
-	}
 
 	var createRes createOrgTokenResponse
 
@@ -111,12 +107,17 @@ func (c *Client) GetOrgAccessToken(ctx context.Context, tokenID, orgName string)
 	for i := 0; i < len(listRes.Tokens); i++ {
 		token := listRes.Tokens[i]
 		if token.ID == tokenID {
-			return &AccessToken{
+			accessToken := &AccessToken{
 				ID:          token.ID,
 				Name:        token.Name,
 				Description: token.Description,
 				Admin:       token.Admin,
-			}, nil
+				Expires:     token.Expires,
+			}
+			if token.Role != nil {
+				accessToken.RoleID = token.Role.ID
+			}
+			return accessToken, nil
 		}
 	}
 

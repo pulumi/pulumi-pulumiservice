@@ -33,7 +33,9 @@ func (t *Team) Annotate(a infer.Annotator) {
 	a.Describe(
 		t,
 		"The Pulumi Cloud offers role-based access control (RBAC) using teams. Teams allow organization admins "+
-			"to assign a set of stack permissions to a group of users.",
+			"to assign a set of stack permissions to a group of users."+
+			util.ImportDocs("pulumiservice:index:Team", "{organization}/{teamName}", "my-org/my-team",
+				"For GitHub teams, `githubTeamId` isn't read back, so set it in your program after import."),
 	)
 }
 

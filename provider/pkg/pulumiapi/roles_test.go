@@ -1,6 +1,7 @@
 package pulumiapi
 
 import (
+	"context"
 	"net/http"
 	"testing"
 
@@ -48,7 +49,7 @@ func TestCreateRole(t *testing.T) {
 		}
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPost,
-			ExpectedReqPath:   "/api/orgs/an-organization/roles",
+			ExpectedReqPath:   orgRolesPath,
 			ExpectedReqBody: apitype.PermissionDescriptorBase{
 				Name:         readOnlyRoleName,
 				Description:  readOnlyDescription,
@@ -207,5 +208,22 @@ func TestDeleteRole(t *testing.T) {
 			ResponseBody:      ErrorResponse{Message: notFoundError},
 		})
 		assert.NoError(t, c.DeleteRole(ctx, testRoleOrgName, testRoleID, false))
+	})
+}
+
+func TestSetOrgDefaultRole(t *testing.T) {
+	t.Run("patches the role's default route", func(t *testing.T) {
+		c := startTestServer(t, testServerConfig{
+			ExpectedReqMethod: http.MethodPatch,
+			ExpectedReqPath:   "/api/orgs/an-organization/roles/" + testRoleID + "/default",
+			ResponseCode:      204,
+		})
+		assert.NoError(t, c.SetOrgDefaultRole(context.Background(), testMemberOrgName, testRoleID))
+	})
+
+	t.Run("rejects empty arguments", func(t *testing.T) {
+		c := &Client{}
+		assert.Error(t, c.SetOrgDefaultRole(context.Background(), "", testRoleID))
+		assert.Error(t, c.SetOrgDefaultRole(context.Background(), testMemberOrgName, ""))
 	})
 }

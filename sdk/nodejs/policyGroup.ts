@@ -9,6 +9,14 @@ import * as utilities from "./utilities";
 
 /**
  * A Policy Group allows you to apply policy packs to a set of stacks in your organization.
+ *
+ * ## Import
+ *
+ * This resource can be imported using its `id`, which has the format `{organization}/{policyGroupName}`, e.g.,
+ *
+ * ```sh
+ *  $ pulumi import pulumiservice:index:PolicyGroup my-policy-group my-org/my-policy-group
+ * ```
  */
 export class PolicyGroup extends pulumi.CustomResource {
     /**
@@ -21,6 +29,16 @@ export class PolicyGroup extends pulumi.CustomResource {
      */
     public static get(name: string, id: pulumi.Input<pulumi.ID>, opts?: pulumi.CustomResourceOptions): PolicyGroup {
         return new PolicyGroup(name, undefined as any, { ...opts, id: id });
+    }
+
+    /**
+     * Check whether an existing PolicyGroup resource with the given ID exists.
+     *
+     * @param id The _unique_ provider ID of the resource to check.
+     * @param opts Optional settings to control the behavior of the CustomResource.
+     */
+    public static exists(id: pulumi.Input<string>, opts?: pulumi.CustomResourceOptions): pulumi.Output<boolean> {
+        return pulumi.runtime.existsResource("pulumiservice:index:PolicyGroup", id, {}, { ...opts }, undefined);
     }
 
     /** @internal */

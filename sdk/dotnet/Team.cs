@@ -11,6 +11,16 @@ namespace Pulumi.PulumiService
 {
     /// <summary>
     /// The Pulumi Cloud offers role-based access control (RBAC) using teams. Teams allow organization admins to assign a set of stack permissions to a group of users.
+    /// 
+    /// ## Import
+    /// 
+    /// This resource can be imported using its `id`, which has the format `{organization}/{teamName}`, e.g.,
+    /// 
+    /// ```sh
+    ///  $ pulumi import pulumiservice:index:Team my-team my-org/my-team
+    /// ```
+    /// 
+    /// For GitHub teams, `githubTeamId` isn't read back, so set it in your program after import.
     /// </summary>
     [PulumiServiceResourceType("pulumiservice:index:Team")]
     public partial class Team : global::Pulumi.CustomResource

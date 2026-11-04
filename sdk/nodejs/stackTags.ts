@@ -9,7 +9,15 @@ import * as utilities from "./utilities";
  *
  * Only tags declared in `tags` are managed; tags added out-of-band (CLI, pulumibot, a singular `StackTag` resource) are left alone. Tag values are immutable in Pulumi Cloud, so a value change is implemented as delete-and-recreate.
  *
- * Importing with ID `{organization}/{project}/{stack}/tags` adopts every tag currently on the stack; declare `tags` explicitly after import so subsequent updates match your intent. See the [registry docs](https://www.pulumi.com/registry/packages/pulumiservice/api-docs/stacktags/) for full usage and examples.
+ * ## Import
+ *
+ * This resource can be imported using its `id`, which has the format `{organization}/{project}/{stack}/tags`, e.g.,
+ *
+ * ```sh
+ *  $ pulumi import pulumiservice:index:StackTags my-stack-tags my-org/my-project/my-stack/tags
+ * ```
+ *
+ * The ID ends with the literal segment `tags`. Import adopts every tag currently on the stack; declare `tags` explicitly after import so subsequent updates match your intent.
  */
 export class StackTags extends pulumi.CustomResource {
     /**
@@ -22,6 +30,16 @@ export class StackTags extends pulumi.CustomResource {
      */
     public static get(name: string, id: pulumi.Input<pulumi.ID>, opts?: pulumi.CustomResourceOptions): StackTags {
         return new StackTags(name, undefined as any, { ...opts, id: id });
+    }
+
+    /**
+     * Check whether an existing StackTags resource with the given ID exists.
+     *
+     * @param id The _unique_ provider ID of the resource to check.
+     * @param opts Optional settings to control the behavior of the CustomResource.
+     */
+    public static exists(id: pulumi.Input<string>, opts?: pulumi.CustomResourceOptions): pulumi.Output<boolean> {
+        return pulumi.runtime.existsResource("pulumiservice:index:StackTags", id, {}, { ...opts }, undefined);
     }
 
     /** @internal */

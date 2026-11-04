@@ -13,7 +13,7 @@ import javax.annotation.Nullable;
 @CustomType
 public final class GCPOIDCConfiguration {
     /**
-     * @return The numerical ID of the GCP project.
+     * @return The GCP project number, a numeric value such as `123456789012`. This is not the project ID (such as `my-project`). To look up the number, run `gcloud projects describe &lt;project-id&gt; --format=&#39;value(projectNumber)&#39;`.
      * 
      */
     private String projectId;
@@ -45,7 +45,7 @@ public final class GCPOIDCConfiguration {
 
     private GCPOIDCConfiguration() {}
     /**
-     * @return The numerical ID of the GCP project.
+     * @return The GCP project number, a numeric value such as `123456789012`. This is not the project ID (such as `my-project`). To look up the number, run `gcloud projects describe &lt;project-id&gt; --format=&#39;value(projectNumber)&#39;`.
      * 
      */
     public String projectId() {

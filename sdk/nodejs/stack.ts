@@ -6,6 +6,14 @@ import * as utilities from "./utilities";
 
 /**
  * A stack is a collection of resources that share a common lifecycle. Stacks are uniquely identified by their name and the project they belong to.
+ *
+ * ## Import
+ *
+ * This resource can be imported using its `id`, which has the format `{organization}/{project}/{stack}`, e.g.,
+ *
+ * ```sh
+ *  $ pulumi import pulumiservice:index:Stack my-stack my-org/my-project/my-stack
+ * ```
  */
 export class Stack extends pulumi.CustomResource {
     /**
@@ -18,6 +26,16 @@ export class Stack extends pulumi.CustomResource {
      */
     public static get(name: string, id: pulumi.Input<pulumi.ID>, opts?: pulumi.CustomResourceOptions): Stack {
         return new Stack(name, undefined as any, { ...opts, id: id });
+    }
+
+    /**
+     * Check whether an existing Stack resource with the given ID exists.
+     *
+     * @param id The _unique_ provider ID of the resource to check.
+     * @param opts Optional settings to control the behavior of the CustomResource.
+     */
+    public static exists(id: pulumi.Input<string>, opts?: pulumi.CustomResourceOptions): pulumi.Output<boolean> {
+        return pulumi.runtime.existsResource("pulumiservice:index:Stack", id, {}, { ...opts }, undefined);
     }
 
     /** @internal */
@@ -35,7 +53,7 @@ export class Stack extends pulumi.CustomResource {
     }
 
     /**
-     * Optional. Flag indicating whether to delete the stack even if it still contains resources.
+     * Optional. Flag indicating whether to delete the stack even if it still contains resources. Defaults to `false`.
      */
     declare public readonly forceDestroy: pulumi.Output<boolean | undefined>;
     /**
@@ -93,7 +111,7 @@ export class Stack extends pulumi.CustomResource {
  */
 export interface StackArgs {
     /**
-     * Optional. Flag indicating whether to delete the stack even if it still contains resources.
+     * Optional. Flag indicating whether to delete the stack even if it still contains resources. Defaults to `false`.
      */
     forceDestroy?: pulumi.Input<boolean | undefined>;
     /**

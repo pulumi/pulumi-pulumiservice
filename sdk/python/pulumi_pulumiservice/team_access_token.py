@@ -19,35 +19,28 @@ __all__ = ['TeamAccessTokenArgs', 'TeamAccessToken']
 @pulumi.input_type
 class TeamAccessTokenArgs:
     def __init__(__self__, *,
-                 name: pulumi.Input[_builtins.str],
                  organization_name: pulumi.Input[_builtins.str],
                  team_name: pulumi.Input[_builtins.str],
-                 description: pulumi.Input[Optional[_builtins.str]] = None):
+                 description: pulumi.Input[Optional[_builtins.str]] = None,
+                 name: pulumi.Input[Optional[_builtins.str]] = None):
         """
         The set of arguments for constructing a TeamAccessToken resource.
 
-        :param pulumi.Input[_builtins.str] name: The name for the token. This must be unique among all organization and team tokens in the organization.
         :param pulumi.Input[_builtins.str] organization_name: The organization's name.
         :param pulumi.Input[_builtins.str] team_name: The team name.
         :param pulumi.Input[_builtins.str] description: A description of the token.
+        :param pulumi.Input[_builtins.str] name: The name for the token, up to 40 characters. Organization and team tokens share one set of names per organization, and Pulumi Cloud never frees a deleted token's name, so the name must not have been used by any other token in the organization.
+               
+               If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). A replacement gets a new name. Removing `name` from an existing token keeps its current name until the next replacement.
+               
+               Every input on this resource triggers a replacement, so when `name` is set explicitly, changing any other input fails with `409 Conflict: token name already exists`. Omit `name`, or change it along with the other input.
         """
-        pulumi.set(__self__, "name", name)
         pulumi.set(__self__, "organization_name", organization_name)
         pulumi.set(__self__, "team_name", team_name)
         if description is not None:
             pulumi.set(__self__, "description", description)
-
-    @_builtins.property
-    @pulumi.getter
-    def name(self) -> pulumi.Input[_builtins.str]:
-        """
-        The name for the token. This must be unique among all organization and team tokens in the organization.
-        """
-        return pulumi.get(self, "name")
-
-    @name.setter
-    def name(self, value: pulumi.Input[_builtins.str]):
-        pulumi.set(self, "name", value)
+        if name is not None:
+            pulumi.set(__self__, "name", name)
 
     @_builtins.property
     @pulumi.getter(name="organizationName")
@@ -85,6 +78,22 @@ class TeamAccessTokenArgs:
     def description(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "description", value)
 
+    @_builtins.property
+    @pulumi.getter
+    def name(self) -> pulumi.Input[Optional[_builtins.str]]:
+        """
+        The name for the token, up to 40 characters. Organization and team tokens share one set of names per organization, and Pulumi Cloud never frees a deleted token's name, so the name must not have been used by any other token in the organization.
+
+        If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). A replacement gets a new name. Removing `name` from an existing token keeps its current name until the next replacement.
+
+        Every input on this resource triggers a replacement, so when `name` is set explicitly, changing any other input fails with `409 Conflict: token name already exists`. Omit `name`, or change it along with the other input.
+        """
+        return pulumi.get(self, "name")
+
+    @name.setter
+    def name(self, value: pulumi.Input[Optional[_builtins.str]]):
+        pulumi.set(self, "name", value)
+
 
 @pulumi.type_token("pulumiservice:index:TeamAccessToken")
 class TeamAccessToken(pulumi.CustomResource):
@@ -102,10 +111,32 @@ class TeamAccessToken(pulumi.CustomResource):
 
         Unlike `OrgAccessToken`, a provider authenticated with an organization or team access token can create this resource.
 
+        ## Import
+
+        This resource can be imported using its `id`, which has the format `{organization}/{team}/{name}/{tokenId}`, e.g.,
+
+        ```sh
+         $ pulumi import pulumiservice:index:TeamAccessToken my-team-access-token my-org/my-team/my-token/5c7e0a92-1b3d-4f6e-8a24-9d1b7e3c0f58
+        ```
+
+        The Pulumi Cloud console doesn't show the token ID. List it with the [Pulumi Cloud REST API](https://www.pulumi.com/docs/reference/cloud-rest-api/):
+
+        ```sh
+        curl -s -H "Authorization: token $PULUMI_ACCESS_TOKEN" \\
+          https://api.pulumi.com/api/orgs/my-org/teams/my-team/tokens | jq '.tokens[] | {name, id}'
+        ```
+
+        The token's `value` can't be read back from Pulumi Cloud, so it's empty after import.
+
+
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] description: A description of the token.
-        :param pulumi.Input[_builtins.str] name: The name for the token. This must be unique among all organization and team tokens in the organization.
+        :param pulumi.Input[_builtins.str] name: The name for the token, up to 40 characters. Organization and team tokens share one set of names per organization, and Pulumi Cloud never frees a deleted token's name, so the name must not have been used by any other token in the organization.
+               
+               If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). A replacement gets a new name. Removing `name` from an existing token keeps its current name until the next replacement.
+               
+               Every input on this resource triggers a replacement, so when `name` is set explicitly, changing any other input fails with `409 Conflict: token name already exists`. Omit `name`, or change it along with the other input.
         :param pulumi.Input[_builtins.str] organization_name: The organization's name.
         :param pulumi.Input[_builtins.str] team_name: The team name.
         """
@@ -119,6 +150,24 @@ class TeamAccessToken(pulumi.CustomResource):
         Creates a team access token in Pulumi Cloud. The token isn't tied to a user, and it has the permissions granted to its team.
 
         Unlike `OrgAccessToken`, a provider authenticated with an organization or team access token can create this resource.
+
+        ## Import
+
+        This resource can be imported using its `id`, which has the format `{organization}/{team}/{name}/{tokenId}`, e.g.,
+
+        ```sh
+         $ pulumi import pulumiservice:index:TeamAccessToken my-team-access-token my-org/my-team/my-token/5c7e0a92-1b3d-4f6e-8a24-9d1b7e3c0f58
+        ```
+
+        The Pulumi Cloud console doesn't show the token ID. List it with the [Pulumi Cloud REST API](https://www.pulumi.com/docs/reference/cloud-rest-api/):
+
+        ```sh
+        curl -s -H "Authorization: token $PULUMI_ACCESS_TOKEN" \\
+          https://api.pulumi.com/api/orgs/my-org/teams/my-team/tokens | jq '.tokens[] | {name, id}'
+        ```
+
+        The token's `value` can't be read back from Pulumi Cloud, so it's empty after import.
+
 
         :param str resource_name: The name of the resource.
         :param TeamAccessTokenArgs args: The arguments to use to populate this resource's properties.
@@ -149,8 +198,6 @@ class TeamAccessToken(pulumi.CustomResource):
             __props__ = TeamAccessTokenArgs.__new__(TeamAccessTokenArgs)
 
             __props__.__dict__["description"] = description
-            if name is None and not opts.urn:
-                raise TypeError("Missing required property 'name'")
             __props__.__dict__["name"] = name
             if organization_name is None and not opts.urn:
                 raise TypeError("Missing required property 'organization_name'")
@@ -204,7 +251,11 @@ class TeamAccessToken(pulumi.CustomResource):
     @pulumi.getter
     def name(self) -> pulumi.Output[_builtins.str]:
         """
-        The name for the token. This must be unique among all organization and team tokens in the organization.
+        The name for the token, up to 40 characters. Organization and team tokens share one set of names per organization, and Pulumi Cloud never frees a deleted token's name, so the name must not have been used by any other token in the organization.
+
+        If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). A replacement gets a new name. Removing `name` from an existing token keeps its current name until the next replacement.
+
+        Every input on this resource triggers a replacement, so when `name` is set explicitly, changing any other input fails with `409 Conflict: token name already exists`. Omit `name`, or change it along with the other input.
         """
         return pulumi.get(self, "name")
 

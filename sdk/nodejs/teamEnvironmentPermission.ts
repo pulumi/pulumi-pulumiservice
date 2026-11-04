@@ -9,6 +9,16 @@ import * as utilities from "./utilities";
 
 /**
  * A permission for a team to use an environment.
+ *
+ * ## Import
+ *
+ * This resource can be imported using its `id`, which has the format `{organization}/{team}/{project}+{environment}`, e.g.,
+ *
+ * ```sh
+ *  $ pulumi import pulumiservice:index:TeamEnvironmentPermission my-team-environment-permission my-org/my-team/my-project+my-environment
+ * ```
+ *
+ * The project and environment are joined with `+`, not `/`. The legacy format `{organization}/{team}/{environment}` is also accepted, and uses the `default` project.
  */
 export class TeamEnvironmentPermission extends pulumi.CustomResource {
     /**
@@ -21,6 +31,16 @@ export class TeamEnvironmentPermission extends pulumi.CustomResource {
      */
     public static get(name: string, id: pulumi.Input<pulumi.ID>, opts?: pulumi.CustomResourceOptions): TeamEnvironmentPermission {
         return new TeamEnvironmentPermission(name, undefined as any, { ...opts, id: id });
+    }
+
+    /**
+     * Check whether an existing TeamEnvironmentPermission resource with the given ID exists.
+     *
+     * @param id The _unique_ provider ID of the resource to check.
+     * @param opts Optional settings to control the behavior of the CustomResource.
+     */
+    public static exists(id: pulumi.Input<string>, opts?: pulumi.CustomResourceOptions): pulumi.Output<boolean> {
+        return pulumi.runtime.existsResource("pulumiservice:index:TeamEnvironmentPermission", id, {}, { ...opts }, undefined);
     }
 
     /** @internal */

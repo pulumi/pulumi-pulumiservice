@@ -101,7 +101,15 @@ class StackTags(pulumi.CustomResource):
 
         Only tags declared in `tags` are managed; tags added out-of-band (CLI, pulumibot, a singular `StackTag` resource) are left alone. Tag values are immutable in Pulumi Cloud, so a value change is implemented as delete-and-recreate.
 
-        Importing with ID `{organization}/{project}/{stack}/tags` adopts every tag currently on the stack; declare `tags` explicitly after import so subsequent updates match your intent. See the [registry docs](https://www.pulumi.com/registry/packages/pulumiservice/api-docs/stacktags/) for full usage and examples.
+        ## Import
+
+        This resource can be imported using its `id`, which has the format `{organization}/{project}/{stack}/tags`, e.g.,
+
+        ```sh
+         $ pulumi import pulumiservice:index:StackTags my-stack-tags my-org/my-project/my-stack/tags
+        ```
+
+        The ID ends with the literal segment `tags`. Import adopts every tag currently on the stack; declare `tags` explicitly after import so subsequent updates match your intent.
 
 
         :param str resource_name: The name of the resource.
@@ -122,7 +130,15 @@ class StackTags(pulumi.CustomResource):
 
         Only tags declared in `tags` are managed; tags added out-of-band (CLI, pulumibot, a singular `StackTag` resource) are left alone. Tag values are immutable in Pulumi Cloud, so a value change is implemented as delete-and-recreate.
 
-        Importing with ID `{organization}/{project}/{stack}/tags` adopts every tag currently on the stack; declare `tags` explicitly after import so subsequent updates match your intent. See the [registry docs](https://www.pulumi.com/registry/packages/pulumiservice/api-docs/stacktags/) for full usage and examples.
+        ## Import
+
+        This resource can be imported using its `id`, which has the format `{organization}/{project}/{stack}/tags`, e.g.,
+
+        ```sh
+         $ pulumi import pulumiservice:index:StackTags my-stack-tags my-org/my-project/my-stack/tags
+        ```
+
+        The ID ends with the literal segment `tags`. Import adopts every tag currently on the stack; declare `tags` explicitly after import so subsequent updates match your intent.
 
 
         :param str resource_name: The name of the resource.

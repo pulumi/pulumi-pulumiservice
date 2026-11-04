@@ -6,6 +6,16 @@ import * as utilities from "./utilities";
 
 /**
  * An ESC Environment.
+ *
+ * ## Import
+ *
+ * This resource can be imported using its `id`, which has the format `{organization}/{project}/{environment}`, e.g.,
+ *
+ * ```sh
+ *  $ pulumi import pulumiservice:index:Environment my-environment my-org/my-project/my-environment
+ * ```
+ *
+ * The legacy format `{organization}/{environment}` is also accepted, and uses the `default` project.
  */
 export class Environment extends pulumi.CustomResource {
     /**
@@ -18,6 +28,16 @@ export class Environment extends pulumi.CustomResource {
      */
     public static get(name: string, id: pulumi.Input<pulumi.ID>, opts?: pulumi.CustomResourceOptions): Environment {
         return new Environment(name, undefined as any, { ...opts, id: id });
+    }
+
+    /**
+     * Check whether an existing Environment resource with the given ID exists.
+     *
+     * @param id The _unique_ provider ID of the resource to check.
+     * @param opts Optional settings to control the behavior of the CustomResource.
+     */
+    public static exists(id: pulumi.Input<string>, opts?: pulumi.CustomResourceOptions): pulumi.Output<boolean> {
+        return pulumi.runtime.existsResource("pulumiservice:index:Environment", id, {}, { ...opts }, undefined);
     }
 
     /** @internal */
@@ -35,7 +55,7 @@ export class Environment extends pulumi.CustomResource {
     }
 
     /**
-     * The environment's UUID. Use this as the `identity` value when pinning a custom RBAC role to this environment via a `PermissionLiteralExpressionEnvironment` in `OrganizationRole.permissions`, or pass it directly to the `buildEnvironmentScopedPermissions` helper.
+     * The environment's UUID. Use this as the `identity` value when pinning a custom RBAC role to this environment via a `PermissionLiteralExpressionEnvironment` in `OrganizationRole.permissions`, or pass it as the `id` of an `environmentRules` entry in `buildRolePermissions`.
      */
     declare public /*out*/ readonly environmentId: pulumi.Output<string | undefined>;
     /**

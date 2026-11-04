@@ -18,6 +18,8 @@ import (
 	"context"
 	"encoding/json"
 	"os"
+	"strings"
+	"sync/atomic"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -27,6 +29,8 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
+
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/functions"
 )
 
 func TestDiffConfig(t *testing.T) {
@@ -146,25 +150,26 @@ func TestConfigure_SetsAccessToken(t *testing.T) {
 	require.NoError(t, err)
 
 	// Configure the raw provider directly: MakeProvider wraps it, which
-	// hides the client field this test asserts on.
-	raw := &pulumiserviceProvider{}
+	// hides the transport this test asserts on.
+	raw := &pulumiserviceProvider{transportRef: &atomic.Value{}}
 	_, err = raw.Configure(ctx, &pulumirpc.ConfigureRequest{
 		Args: configArgs,
 	})
 	require.NoError(t, err)
 
-	assert.NotNil(t, raw.client, "client should be initialized after Configure")
+	transport, ok := raw.transportRef.Load().(*authedTransport)
+	require.True(t, ok, "Configure should store the API transport")
+	assert.Equal(t, "pul-test0token", transport.token)
 }
 
-// TestProvider_LayeredSchema verifies the unified provider serves three
+// TestProvider_LayeredSchema verifies the unified provider serves two
 // resource sources under one pulumiservice schema:
 //
-//  1. legacy raw gRPC server (manual-schema.json) — e.g. Stack
-//  2. modern infer (WithResources)              — e.g. Team
-//  3. metadata-driven api layer (rest.BuildSchema spliced via withCloudApiSchema)
+//  1. infer (WithResources) — e.g. Team
+//  2. metadata-driven api layer (rest.BuildSchema spliced via withCloudApiSchema)
 //     — e.g. OrganizationWebhook at pulumiservice:api:*
 //
-// All three share the pulumiservice package name; v0 surface is implicit
+// Both share the pulumiservice package name; v0 surface is implicit
 // at the package root (pulumiservice:index:*), api is an explicit module.
 // Existing user code using pulumiservice:index:* keeps working unchanged.
 func TestProvider_LayeredSchema(t *testing.T) {
@@ -184,7 +189,6 @@ func TestProvider_LayeredSchema(t *testing.T) {
 		token  string
 		source string
 	}{
-		{"pulumiservice:index:Stack", "v0: legacy raw (manual-schema.json)"},
 		{"pulumiservice:index:Team", "v0: modern infer (WithResources)"},
 		{"pulumiservice:api:OrganizationWebhook", "api: metadata-driven (withCloudApiSchema)"},
 	}
@@ -193,6 +197,51 @@ func TestProvider_LayeredSchema(t *testing.T) {
 		assert.Truef(t, ok, "missing %s — expected from %s", c.token, c.source)
 	}
 
+}
+
+// Every function in functions.DeprecatedFunctions must reach the schema
+// deprecated. The provider patches the messages in itself, so a misspelled
+// token would otherwise go unnoticed.
+func TestProvider_DeprecatedFunctions(t *testing.T) {
+	provider, err := MakeProvider(nil, "pulumiservice", "1.0.0")
+	require.NoError(t, err)
+
+	resp, err := provider.GetSchema(context.Background(), &pulumirpc.GetSchemaRequest{})
+	require.NoError(t, err)
+
+	var spec schema.PackageSpec
+	require.NoError(t, json.Unmarshal([]byte(resp.Schema), &spec))
+
+	require.NotEmpty(t, functions.DeprecatedFunctions)
+	for token, message := range functions.DeprecatedFunctions {
+		fn, ok := spec.Functions[token]
+		if assert.Truef(t, ok, "%s is not in the schema", token) {
+			assert.Equal(t, message, fn.DeprecationMessage, token)
+		}
+	}
+}
+
+// TestProvider_EveryResourceDocumentsImport keeps new index resources from shipping
+// without an Import section in their registry docs (#344). The registry docs
+// generator splits descriptions on exactly "\n\n## Import", so check for that.
+func TestProvider_EveryResourceDocumentsImport(t *testing.T) {
+	provider, err := MakeProvider(nil, "pulumiservice", "1.0.0")
+	require.NoError(t, err)
+
+	resp, err := provider.GetSchema(context.Background(), &pulumirpc.GetSchemaRequest{})
+	require.NoError(t, err)
+
+	var spec schema.PackageSpec
+	require.NoError(t, json.Unmarshal([]byte(resp.Schema), &spec))
+
+	for token, rs := range spec.Resources {
+		// pulumiservice:api:* resources are generated from the OpenAPI spec and
+		// don't document import yet.
+		if !strings.HasPrefix(token, "pulumiservice:index:") {
+			continue
+		}
+		assert.Contains(t, rs.Description, "\n\n## Import", "%s: description has no `## Import` section", token)
+	}
 }
 
 // getPolicyPacks' result must be a named type, not an inline object.
@@ -219,7 +268,7 @@ func TestProvider_PolicyPackSummaryIsANamedType(t *testing.T) {
 	require.NotNil(t, fn.ReturnType)
 	require.NotNil(t, fn.ReturnType.ObjectTypeSpec)
 
-	packs, ok := fn.ReturnType.ObjectTypeSpec.Properties[policyPacksKey]
+	packs, ok := fn.ReturnType.ObjectTypeSpec.Properties["policyPacks"]
 	require.True(t, ok, "policyPacks output should be present")
 	require.NotNil(t, packs.Items, "policyPacks items should survive schema generation")
 	assert.Equal(t, "#/types/pulumiservice:index:PolicyPackSummary", packs.Items.Ref)
@@ -227,20 +276,20 @@ func TestProvider_PolicyPackSummaryIsANamedType(t *testing.T) {
 	summary, ok := spec.Types["pulumiservice:index:PolicyPackSummary"]
 	require.True(t, ok, "PolicyPackSummary type should be present")
 
-	for _, field := range []string{nameKey, displayNameKey, versionsKey, versionTagsKey, sourceKey, publisherKey} {
+	for _, field := range []string{"name", "displayName", "versions", "versionTags", "source", "publisher"} {
 		_, ok := summary.Properties[field]
 		assert.Truef(t, ok, "PolicyPackSummary should declare %q", field)
 	}
 
 	// Optional so a degraded lookup is distinguishable from real data in typed SDKs.
-	assert.NotContains(t, summary.Required, sourceKey)
-	assert.NotContains(t, summary.Required, publisherKey)
+	assert.NotContains(t, summary.Required, "source")
+	assert.NotContains(t, summary.Required, "publisher")
 
 	single, ok := spec.Functions["pulumiservice:index:getPolicyPack"]
 	require.True(t, ok, "getPolicyPack should be present")
 	require.NotNil(t, single.ReturnType)
 	require.NotNil(t, single.ReturnType.ObjectTypeSpec)
-	for _, field := range []string{sourceKey, publisherKey} {
+	for _, field := range []string{"source", "publisher"} {
 		_, ok := single.ReturnType.ObjectTypeSpec.Properties[field]
 		assert.Truef(t, ok, "getPolicyPack should declare %q", field)
 		assert.NotContains(t, single.ReturnType.ObjectTypeSpec.Required, field)

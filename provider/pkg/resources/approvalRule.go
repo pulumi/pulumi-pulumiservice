@@ -24,6 +24,7 @@ import (
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 )
 
 type ApprovalRule struct{}
@@ -37,7 +38,13 @@ var (
 )
 
 func (*ApprovalRule) Annotate(a infer.Annotator) {
-	a.Describe(&ApprovalRule{}, "An approval rule for environment deployments.")
+	a.Describe(&ApprovalRule{}, "An approval rule for environment deployments."+
+		util.ImportDocs("pulumiservice:index:ApprovalRule",
+			"environment/{organization}/{project}/{environment}/{ruleId}",
+			"environment/my-org/my-project/my-environment/0b9e6f2d-4c81-4a37-9e5b-7f2d1a6c8e03",
+			"The ID starts with the literal segment `environment`.",
+			util.ConsoleIDHint("rule ID", "https://app.pulumi.com/my-org/esc/my-project/my-environment/"+
+				"change-requests/ruleset/0b9e6f2d-4c81-4a37-9e5b-7f2d1a6c8e03")))
 	a.SetToken("index", "ApprovalRule")
 }
 

@@ -10,6 +10,14 @@ config:
   maxExpiration:
     type: integer
     default: 3600
+  # Tests override the issuer URLs so that concurrent runs don't conflict;
+  # see oidcIssuerTestConfig in examples/examples_utils_test.go.
+  pulumiIssuerUrl:
+    type: string
+    default: https://api.pulumi.com/oidc
+  githubIssuerUrl:
+    type: string
+    default: https://token.actions.githubusercontent.com
   # Thumbprints must match the certificate the issuer currently serves, so
   # they have no static default. Compute one with:
   #   openssl s_client -connect <issuer-host>:443 </dev/null | openssl x509 -fingerprint -sha256 -noout

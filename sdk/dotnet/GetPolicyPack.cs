@@ -46,10 +46,10 @@ namespace Pulumi.PulumiService
         public string PolicyPackName { get; set; } = null!;
 
         /// <summary>
-        /// The version number of the policy pack. If not specified, returns the latest version.
+        /// The version tag of the policy pack, for example `1.4.1`, as shown in Pulumi Cloud. If not specified, returns the latest version.
         /// </summary>
-        [Input("version")]
-        public int? Version { get; set; }
+        [Input("versionTag")]
+        public string? VersionTag { get; set; }
 
         public GetPolicyPackArgs()
         {
@@ -72,10 +72,10 @@ namespace Pulumi.PulumiService
         public Input<string> PolicyPackName { get; set; } = null!;
 
         /// <summary>
-        /// The version number of the policy pack. If not specified, returns the latest version.
+        /// The version tag of the policy pack, for example `1.4.1`, as shown in Pulumi Cloud. If not specified, returns the latest version.
         /// </summary>
-        [Input("version")]
-        public Input<int>? Version { get; set; }
+        [Input("versionTag")]
+        public Input<string>? VersionTag { get; set; }
 
         public GetPolicyPackInvokeArgs()
         {
@@ -102,7 +102,7 @@ namespace Pulumi.PulumiService
         /// <summary>
         /// List of policies in this pack.
         /// </summary>
-        public readonly ImmutableArray<ImmutableDictionary<string, string>> Policies;
+        public readonly ImmutableArray<ImmutableDictionary<string, object>> Policies;
         /// <summary>
         /// The organization or user that published the policy pack. `pulumi` for Pulumi-published packs, otherwise the publishing organization's name. Omitted when the provider could not determine registry metadata for this pack.
         /// </summary>
@@ -128,7 +128,7 @@ namespace Pulumi.PulumiService
 
             string name,
 
-            ImmutableArray<ImmutableDictionary<string, string>> policies,
+            ImmutableArray<ImmutableDictionary<string, object>> policies,
 
             string? publisher,
 

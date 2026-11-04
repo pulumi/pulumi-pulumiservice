@@ -22,6 +22,16 @@ import javax.annotation.Nullable;
 /**
  * Insights Account for cloud resource scanning and analysis across AWS, Azure, and GCP.
  * 
+ * ## Import
+ * 
+ * This resource can be imported using its `id`, which has the format `{organization}/{accountName}`, e.g.,
+ * 
+ * ```sh
+ *  $ pulumi import pulumiservice:index:InsightsAccount my-insights-account my-org/my-account
+ * ```
+ * 
+ * `scanSchedule` isn&#39;t read back from Pulumi Cloud, so set it in your program after import.
+ * 
  */
 @ResourceType(type="pulumiservice:index:InsightsAccount")
 public class InsightsAccount extends com.pulumi.resources.CustomResource {

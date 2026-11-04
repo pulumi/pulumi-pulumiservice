@@ -116,6 +116,15 @@ class TeamStackPermission(pulumi.CustomResource):
         """
         Grants a team permissions to the specified stack.
 
+        ## Import
+
+        This resource can be imported using its `id`, which has the format `{organization}/{project}/{stack}/{team}`, e.g.,
+
+        ```sh
+         $ pulumi import pulumiservice:index:TeamStackPermission my-team-stack-permission my-org/my-project/my-stack/my-team
+        ```
+
+
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] organization: The organization or the personal account name of the stack.
@@ -132,6 +141,15 @@ class TeamStackPermission(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         Grants a team permissions to the specified stack.
+
+        ## Import
+
+        This resource can be imported using its `id`, which has the format `{organization}/{project}/{stack}/{team}`, e.g.,
+
+        ```sh
+         $ pulumi import pulumiservice:index:TeamStackPermission my-team-stack-permission my-org/my-project/my-stack/my-team
+        ```
+
 
         :param str resource_name: The name of the resource.
         :param TeamStackPermissionArgs args: The arguments to use to populate this resource's properties.

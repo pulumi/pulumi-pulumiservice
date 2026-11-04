@@ -11,6 +11,18 @@ namespace Pulumi.PulumiService
 {
     /// <summary>
     /// Agent Pool for customer managed deployments.
+    /// 
+    /// ## Import
+    /// 
+    /// This resource can be imported using its `id`, which has the format `{organization}/{name}/{agentPoolId}`, e.g.,
+    /// 
+    /// ```sh
+    ///  $ pulumi import pulumiservice:index:AgentPool my-agent-pool my-org/my-pool/e4a1b7c2-9f30-4d58-b6e1-2a7c9d0f4e86
+    /// ```
+    /// 
+    /// The agent pool ID is the last segment of its page URL in the Pulumi Cloud console, for example `https://app.pulumi.com/my-org/settings/workflow-runner-pools/e4a1b7c2-9f30-4d58-b6e1-2a7c9d0f4e86`.
+    /// 
+    /// The pool's `tokenValue` can't be read back from Pulumi Cloud, so it's empty after import.
     /// </summary>
     [PulumiServiceResourceType("pulumiservice:index:AgentPool")]
     public partial class AgentPool : global::Pulumi.CustomResource

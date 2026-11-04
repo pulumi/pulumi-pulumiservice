@@ -20,6 +20,7 @@ const (
 	rosterBackend  = "backend"
 	rosterFrontend = "frontend"
 	memberUserPath = "/api/orgs/an-organization/members/a-user"
+	orgRolesPath   = "/api/orgs/an-organization/roles"
 	membersPath    = "/api/orgs/an-organization/members"
 	bobUser        = "bob"
 	aliceUser      = "alice"
@@ -177,6 +178,32 @@ func TestListOrgMembers(t *testing.T) {
 		assert.False(t, alice.KnownToPulumi,
 			"backend record must win on dedup conflict")
 	})
+
+	t.Run("Takes the fine-grained role from the roster that has it", func(t *testing.T) {
+		maintainer := &FGARole{ID: "role-1", Name: "Maintainer"}
+		backendBody := Members{Members: []Member{
+			{User: User{Name: aliceUser}, Role: memberRole, KnownToPulumi: true, FGARole: &FGARole{}},
+			{User: User{Name: bobUser}, Role: memberRole, FGARole: &FGARole{}},
+		}}
+		frontendBody := Members{Members: []Member{
+			{User: User{Name: aliceUser}, Role: memberRole, FGARole: maintainer},
+		}}
+		c := startTestServerMulti(t, func(r *http.Request) (int, any) {
+			if r.URL.Query().Get("type") == rosterBackend {
+				return 200, backendBody
+			}
+			return 200, frontendBody
+		})
+		got, err := c.ListOrgMembers(ctx, orgName)
+		require.NoError(t, err)
+		require.Len(t, got.Members, 2)
+
+		alice, bob := got.Members[0], got.Members[1]
+		assert.Equal(t, maintainer, alice.FGARole)
+		assert.True(t, alice.KnownToPulumi, "other fields stay as the backend reported them")
+		assert.False(t, bob.HasFGARole(), "no roster has a role for bob, so the legacy role applies")
+		assert.Equal(t, memberRole, bob.Role)
+	})
 }
 
 func TestDeleteMemberFromOrg(t *testing.T) {
@@ -210,41 +237,63 @@ func TestUpdateOrgMemberRole(t *testing.T) {
 	orgName := testMemberOrgName
 	userName := testMemberUserName
 
-	t.Run("built-in role resolves to FGA ID before PATCH", func(t *testing.T) {
-		roles := struct {
-			Roles []apitype.PermissionDescriptorRecord `json:"roles"`
-		}{
-			Roles: []apitype.PermissionDescriptorRecord{
-				{
-					PermissionDescriptorBase: apitype.PermissionDescriptorBase{Name: "Admin"},
-					ID:                       "admin-fga-id",
-					DefaultIdentifier:        adminRole,
-				},
-				{
-					PermissionDescriptorBase: apitype.PermissionDescriptorBase{Name: "Member"},
-					ID:                       "member-fga-id",
-					DefaultIdentifier:        memberRole,
-				},
-			},
-		}
-		adminID := "admin-fga-id"
-		var patchBody []byte
-		c := startTestServerMulti(t, func(r *http.Request) (int, any) {
-			switch {
-			case r.Method == http.MethodGet && r.URL.Path == "/api/orgs/an-organization/roles":
-				assert.Equal(t, "role", r.URL.Query().Get("uxPurpose"))
-				return 200, roles
-			case r.Method == http.MethodPatch && r.URL.Path == memberUserPath:
-				patchBody, _ = io.ReadAll(r.Body)
-				return 204, nil
-			default:
-				t.Fatalf("unexpected request: %s %s", r.Method, r.URL.Path)
-				return 500, nil
-			}
+	for _, role := range []string{memberRole, adminRole, "billing-manager"} {
+		t.Run(role+" is sent by name so the service resolves it", func(t *testing.T) {
+			c := startTestServer(t, testServerConfig{
+				ExpectedReqMethod: http.MethodPatch,
+				ExpectedReqPath:   memberUserPath,
+				ExpectedReqBody:   updateMemberRoleReq{Role: role},
+				ResponseCode:      204,
+			})
+			assert.NoError(t, c.UpdateOrgMemberRole(ctx, orgName, userName, role, nil))
 		})
-		assert.NoError(t, c.UpdateOrgMemberRole(ctx, orgName, userName, adminRole, nil))
-		expected, _ := json.Marshal(updateMemberRoleReq{FGARoleID: &adminID})
-		assert.JSONEq(t, string(expected), string(patchBody))
+	}
+
+	for _, role := range []string{"reader", "builder", "maintainer"} {
+		t.Run(role+" is resolved to its role ID, since the endpoint rejects it as a name", func(t *testing.T) {
+			roles := struct {
+				Roles []apitype.PermissionDescriptorRecord `json:"roles"`
+			}{Roles: []apitype.PermissionDescriptorRecord{
+				{ID: "other-id", DefaultIdentifier: "admin"},
+				{ID: role + "-id", DefaultIdentifier: role},
+			}}
+			var patchBody []byte
+			c := startTestServerMulti(t, func(r *http.Request) (int, any) {
+				switch {
+				case r.Method == http.MethodGet && r.URL.Path == orgRolesPath:
+					assert.Equal(t, "role", r.URL.Query().Get("uxPurpose"))
+					return 200, roles
+				case r.Method == http.MethodPatch && r.URL.Path == memberUserPath:
+					patchBody, _ = io.ReadAll(r.Body)
+					return 204, nil
+				default:
+					t.Fatalf("unexpected request: %s %s", r.Method, r.URL.Path)
+					return 500, nil
+				}
+			})
+			assert.NoError(t, c.UpdateOrgMemberRole(ctx, orgName, userName, role, nil))
+			assert.JSONEq(t, `{"fgaRoleId":"`+role+`-id"}`, string(patchBody))
+		})
+	}
+
+	t.Run("a role missing from the organization is an error", func(t *testing.T) {
+		c := startTestServerMulti(t, func(r *http.Request) (int, any) {
+			assert.Equal(t, http.MethodGet, r.Method)
+			return 200, map[string]any{"roles": []any{}}
+		})
+		err := c.UpdateOrgMemberRole(ctx, orgName, userName, "reader", nil)
+		assert.ErrorContains(t, err, `role "reader" not found in organization`)
+	})
+
+	t.Run("empty roleID sends the built-in role", func(t *testing.T) {
+		empty := ""
+		c := startTestServer(t, testServerConfig{
+			ExpectedReqMethod: http.MethodPatch,
+			ExpectedReqPath:   memberUserPath,
+			ExpectedReqBody:   updateMemberRoleReq{Role: memberRole},
+			ResponseCode:      204,
+		})
+		assert.NoError(t, c.UpdateOrgMemberRole(ctx, orgName, userName, memberRole, &empty))
 	})
 
 	t.Run("custom role", func(t *testing.T) {
@@ -267,7 +316,7 @@ func TestUpdateOrgMemberRole(t *testing.T) {
 	t.Run("invalid built-in", func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{ResponseCode: 200})
 		err := c.UpdateOrgMemberRole(ctx, orgName, userName, "superadmin", nil)
-		assert.EqualError(t, err, "role must be one of: admin, member, billing-manager")
+		assert.EqualError(t, err, "role must be one of: admin, member, billing-manager, reader, builder, maintainer")
 	})
 }
 
@@ -345,6 +394,24 @@ func TestGetOrgMember(t *testing.T) {
 		}
 	})
 
+	t.Run("takes the fine-grained role from the frontend roster", func(t *testing.T) {
+		maintainer := &FGARole{ID: "role-1", Name: "Maintainer"}
+		c := startTestServerMulti(t, func(r *http.Request) (int, any) {
+			if r.URL.Query().Get("type") == rosterBackend {
+				return 200, Members{Members: []Member{
+					{User: User{Name: bobUser, GithubLogin: bobUser}, Role: memberRole, FGARole: &FGARole{}},
+				}}
+			}
+			return 200, Members{Members: []Member{
+				{User: User{Name: bobUser, GithubLogin: bobUser}, Role: memberRole, FGARole: maintainer},
+			}}
+		})
+		got, err := c.GetOrgMember(ctx, orgName, bobUser)
+		require.NoError(t, err)
+		require.NotNil(t, got)
+		assert.Equal(t, maintainer, got.FGARole)
+	})
+
 	t.Run(notFoundError, func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodGet,
@@ -356,4 +423,13 @@ func TestGetOrgMember(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Nil(t, got)
 	})
+}
+
+func TestBackendListingEmptyFGARoleObjectIsNotAFineGrainedRole(t *testing.T) {
+	var m Member
+	require.NoError(t, json.Unmarshal([]byte(`{"role":"admin","fgaRole":{}}`), &m))
+	assert.False(t, m.HasFGARole())
+
+	assert.False(t, Member{}.HasFGARole())
+	assert.True(t, Member{FGARole: &FGARole{ID: "id", Name: "Admin"}}.HasFGARole())
 }

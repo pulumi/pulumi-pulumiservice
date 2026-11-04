@@ -19,13 +19,17 @@ __all__ = ['AccessTokenArgs', 'AccessToken']
 @pulumi.input_type
 class AccessTokenArgs:
     def __init__(__self__, *,
-                 description: pulumi.Input[_builtins.str]):
+                 description: pulumi.Input[_builtins.str],
+                 expires: pulumi.Input[Optional[_builtins.str]] = None):
         """
         The set of arguments for constructing a AccessToken resource.
 
         :param pulumi.Input[_builtins.str] description: Description of the access token.
+        :param pulumi.Input[_builtins.str] expires: When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`. Omit it for a token that never expires. Pulumi Cloud rejects an expiry that is in the past or more than two years away.
         """
         pulumi.set(__self__, "description", description)
+        if expires is not None:
+            pulumi.set(__self__, "expires", expires)
 
     @_builtins.property
     @pulumi.getter
@@ -39,6 +43,18 @@ class AccessTokenArgs:
     def description(self, value: pulumi.Input[_builtins.str]):
         pulumi.set(self, "description", value)
 
+    @_builtins.property
+    @pulumi.getter
+    def expires(self) -> pulumi.Input[Optional[_builtins.str]]:
+        """
+        When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`. Omit it for a token that never expires. Pulumi Cloud rejects an expiry that is in the past or more than two years away.
+        """
+        return pulumi.get(self, "expires")
+
+    @expires.setter
+    def expires(self, value: pulumi.Input[Optional[_builtins.str]]):
+        pulumi.set(self, "expires", value)
+
 
 @pulumi.type_token("pulumiservice:index:AccessToken")
 class AccessToken(pulumi.CustomResource):
@@ -47,15 +63,35 @@ class AccessToken(pulumi.CustomResource):
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
                  description: pulumi.Input[Optional[_builtins.str]] = None,
+                 expires: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         """
         Creates a personal access token for the Pulumi Cloud user that the provider is authenticated as. The token acts with that user's permissions.
 
         To create a token that isn't tied to a user, use `OrgAccessToken` or `TeamAccessToken`.
 
+        ## Import
+
+        This resource can be imported using its `id`, which has the format `{tokenId}`, e.g.,
+
+        ```sh
+         $ pulumi import pulumiservice:index:AccessToken my-access-token 3f2b9c1e-7d4a-4e8b-9a61-0c5d2e8f7b13
+        ```
+
+        The Pulumi Cloud console doesn't show the token ID. List it with the [Pulumi Cloud REST API](https://www.pulumi.com/docs/reference/cloud-rest-api/):
+
+        ```sh
+        curl -s -H "Authorization: token $PULUMI_ACCESS_TOKEN" \\
+          https://api.pulumi.com/api/user/tokens | jq '.tokens[] | {name, id}'
+        ```
+
+        The token's `value` can't be read back from Pulumi Cloud, so it's empty after import.
+
+
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] description: Description of the access token.
+        :param pulumi.Input[_builtins.str] expires: When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`. Omit it for a token that never expires. Pulumi Cloud rejects an expiry that is in the past or more than two years away.
         """
         ...
     @overload
@@ -67,6 +103,24 @@ class AccessToken(pulumi.CustomResource):
         Creates a personal access token for the Pulumi Cloud user that the provider is authenticated as. The token acts with that user's permissions.
 
         To create a token that isn't tied to a user, use `OrgAccessToken` or `TeamAccessToken`.
+
+        ## Import
+
+        This resource can be imported using its `id`, which has the format `{tokenId}`, e.g.,
+
+        ```sh
+         $ pulumi import pulumiservice:index:AccessToken my-access-token 3f2b9c1e-7d4a-4e8b-9a61-0c5d2e8f7b13
+        ```
+
+        The Pulumi Cloud console doesn't show the token ID. List it with the [Pulumi Cloud REST API](https://www.pulumi.com/docs/reference/cloud-rest-api/):
+
+        ```sh
+        curl -s -H "Authorization: token $PULUMI_ACCESS_TOKEN" \\
+          https://api.pulumi.com/api/user/tokens | jq '.tokens[] | {name, id}'
+        ```
+
+        The token's `value` can't be read back from Pulumi Cloud, so it's empty after import.
+
 
         :param str resource_name: The name of the resource.
         :param AccessTokenArgs args: The arguments to use to populate this resource's properties.
@@ -84,6 +138,7 @@ class AccessToken(pulumi.CustomResource):
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
                  description: pulumi.Input[Optional[_builtins.str]] = None,
+                 expires: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
         if not isinstance(opts, pulumi.ResourceOptions):
@@ -96,10 +151,11 @@ class AccessToken(pulumi.CustomResource):
             if description is None and not opts.urn:
                 raise TypeError("Missing required property 'description'")
             __props__.__dict__["description"] = description
+            __props__.__dict__["expires"] = expires
             __props__.__dict__["value"] = None
         secret_opts = pulumi.ResourceOptions(additional_secret_outputs=["value"])
         opts = pulumi.ResourceOptions.merge(opts, secret_opts)
-        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["description"])
+        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["description", "expires"])
         opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(AccessToken, __self__).__init__(
             'pulumiservice:index:AccessToken',
@@ -124,6 +180,7 @@ class AccessToken(pulumi.CustomResource):
         __props__ = AccessTokenArgs.__new__(AccessTokenArgs)
 
         __props__.__dict__["description"] = None
+        __props__.__dict__["expires"] = None
         __props__.__dict__["value"] = None
         return AccessToken(resource_name, opts=opts, __props__=__props__)
 
@@ -134,6 +191,14 @@ class AccessToken(pulumi.CustomResource):
         Description of the access token.
         """
         return pulumi.get(self, "description")
+
+    @_builtins.property
+    @pulumi.getter
+    def expires(self) -> pulumi.Output[Optional[_builtins.str]]:
+        """
+        When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`. Omit it for a token that never expires. Pulumi Cloud rejects an expiry that is in the past or more than two years away.
+        """
+        return pulumi.get(self, "expires")
 
     @_builtins.property
     @pulumi.getter

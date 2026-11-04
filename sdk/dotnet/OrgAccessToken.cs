@@ -13,12 +13,61 @@ namespace Pulumi.PulumiService
     /// Creates an organization access token in Pulumi Cloud. Organization tokens aren't tied to a user, so they suit CI/CD and other automation.
     /// 
     /// The provider must authenticate as a user, for example with a personal access token, to create or delete this resource. Pulumi Cloud rejects organization and team access tokens here, even Admin ones, with `403 Machine tokens are not allowed to perform this operation`, so that one machine token can't mint another. For automation, use the personal access token of a dedicated service-account user, or use `TeamAccessToken`, which has no such restriction.
+    /// 
+    /// ## Example Usage
+    /// ### Token with an expiry and a custom role
+    /// 
+    /// ```csharp
+    /// using System.Collections.Generic;
+    /// using System.Linq;
+    /// using Pulumi;
+    /// using PulumiService = Pulumi.PulumiService;
+    /// 
+    /// return await Deployment.RunAsync(() =&gt; 
+    /// {
+    ///     var ciDeployerRole = PulumiService.GetOrganizationRole.Invoke(new()
+    ///     {
+    ///         OrganizationName = "my-org",
+    ///         Name = "CI Deployer",
+    ///     });
+    /// 
+    ///     var ciToken = new PulumiService.OrgAccessToken("ciToken", new()
+    ///     {
+    ///         OrganizationName = "my-org",
+    ///         Description = "Token for CI pipelines",
+    ///         Expires = "2027-06-30T17:00:00Z",
+    ///         RoleId = ciDeployerRole.Apply(getOrganizationRoleResult =&gt; getOrganizationRoleResult.RoleId),
+    ///     });
+    /// 
+    ///     return new Dictionary&lt;string, object?&gt;
+    ///     {
+    ///         ["ciTokenValue"] = ciToken.Value,
+    ///     };
+    /// });
+    /// ```
+    /// 
+    /// ## Import
+    /// 
+    /// This resource can be imported using its `id`, which has the format `{organization}/{name}/{tokenId}`, e.g.,
+    /// 
+    /// ```sh
+    ///  $ pulumi import pulumiservice:index:OrgAccessToken my-org-access-token my-org/my-token/a81d4c3e-52f0-4b7a-b9e2-6d0f1c8e2a47
+    /// ```
+    /// 
+    /// The Pulumi Cloud console doesn't show the token ID. List it with the [Pulumi Cloud REST API](https://www.pulumi.com/docs/reference/cloud-rest-api/):
+    /// 
+    /// ```sh
+    /// curl -s -H "Authorization: token $PULUMI_ACCESS_TOKEN" \
+    ///   https://api.pulumi.com/api/orgs/my-org/tokens | jq '.tokens[] | {name, id}'
+    /// ```
+    /// 
+    /// The token's `value` can't be read back from Pulumi Cloud, so it's empty after import.
     /// </summary>
     [PulumiServiceResourceType("pulumiservice:index:OrgAccessToken")]
     public partial class OrgAccessToken : global::Pulumi.CustomResource
     {
         /// <summary>
-        /// Whether the token has the Admin role. Defaults to `false`.
+        /// Whether the token has the Admin role. Defaults to `false`. Mutually exclusive with `roleId`: set `admin: true` or `roleId`, not both.
         /// </summary>
         [Output("admin")]
         public Output<bool> Admin { get; private set; } = null!;
@@ -30,7 +79,17 @@ namespace Pulumi.PulumiService
         public Output<string?> Description { get; private set; } = null!;
 
         /// <summary>
-        /// The name for the token.
+        /// When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`. Omit it for a token that never expires. Pulumi Cloud rejects an expiry that is in the past, more than two years away, or beyond the organization's maximum token lifetime.
+        /// </summary>
+        [Output("expires")]
+        public Output<string?> Expires { get; private set; } = null!;
+
+        /// <summary>
+        /// The name for the token, up to 40 characters. Organization and team tokens share one set of names per organization, and Pulumi Cloud never frees a deleted token's name, so the name must not have been used by any other token in the organization.
+        /// 
+        /// If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). A replacement gets a new name. Removing `name` from an existing token keeps its current name until the next replacement.
+        /// 
+        /// Every input on this resource triggers a replacement, so when `name` is set explicitly, changing any other input fails with `409 Conflict: token name already exists`. Omit `name`, or change it along with the other input.
         /// </summary>
         [Output("name")]
         public Output<string> Name { get; private set; } = null!;
@@ -40,6 +99,12 @@ namespace Pulumi.PulumiService
         /// </summary>
         [Output("organizationName")]
         public Output<string> OrganizationName { get; private set; } = null!;
+
+        /// <summary>
+        /// The ID of the role to assign to the token. Use `getOrganizationRole` to look up a role's ID by its name. Mutually exclusive with `admin: true`: set one or the other, not both. Pulumi Cloud accepts both, but some of its permission checks still treat such a token as an Admin whatever its role, so the provider rejects the combination. When neither is set, the token gets the Member role.
+        /// </summary>
+        [Output("roleId")]
+        public Output<string?> RoleId { get; private set; } = null!;
 
         /// <summary>
         /// The token's value.
@@ -78,8 +143,10 @@ namespace Pulumi.PulumiService
                 {
                     "admin",
                     "description",
+                    "expires",
                     "name",
                     "organizationName",
+                    "roleId",
                 },
             };
             var merged = CustomResourceOptions.Merge(defaultOptions, options);
@@ -104,7 +171,7 @@ namespace Pulumi.PulumiService
     public sealed class OrgAccessTokenArgs : global::Pulumi.ResourceArgs
     {
         /// <summary>
-        /// Whether the token has the Admin role. Defaults to `false`.
+        /// Whether the token has the Admin role. Defaults to `false`. Mutually exclusive with `roleId`: set `admin: true` or `roleId`, not both.
         /// </summary>
         [Input("admin")]
         public Input<bool>? Admin { get; set; }
@@ -116,16 +183,32 @@ namespace Pulumi.PulumiService
         public Input<string>? Description { get; set; }
 
         /// <summary>
-        /// The name for the token.
+        /// When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`. Omit it for a token that never expires. Pulumi Cloud rejects an expiry that is in the past, more than two years away, or beyond the organization's maximum token lifetime.
         /// </summary>
-        [Input("name", required: true)]
-        public Input<string> Name { get; set; } = null!;
+        [Input("expires")]
+        public Input<string>? Expires { get; set; }
+
+        /// <summary>
+        /// The name for the token, up to 40 characters. Organization and team tokens share one set of names per organization, and Pulumi Cloud never frees a deleted token's name, so the name must not have been used by any other token in the organization.
+        /// 
+        /// If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). A replacement gets a new name. Removing `name` from an existing token keeps its current name until the next replacement.
+        /// 
+        /// Every input on this resource triggers a replacement, so when `name` is set explicitly, changing any other input fails with `409 Conflict: token name already exists`. Omit `name`, or change it along with the other input.
+        /// </summary>
+        [Input("name")]
+        public Input<string>? Name { get; set; }
 
         /// <summary>
         /// The organization's name.
         /// </summary>
         [Input("organizationName", required: true)]
         public Input<string> OrganizationName { get; set; } = null!;
+
+        /// <summary>
+        /// The ID of the role to assign to the token. Use `getOrganizationRole` to look up a role's ID by its name. Mutually exclusive with `admin: true`: set one or the other, not both. Pulumi Cloud accepts both, but some of its permission checks still treat such a token as an Admin whatever its role, so the provider rejects the combination. When neither is set, the token gets the Member role.
+        /// </summary>
+        [Input("roleId")]
+        public Input<string>? RoleId { get; set; }
 
         public OrgAccessTokenArgs()
         {

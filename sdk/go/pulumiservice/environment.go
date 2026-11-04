@@ -13,10 +13,22 @@ import (
 )
 
 // An ESC Environment.
+//
+// ## Import
+//
+// This resource can be imported using its `id`, which has the format `{organization}/{project}/{environment}`, e.g.,
+//
+// ```sh
+//
+//	$ pulumi import pulumiservice:index:Environment my-environment my-org/my-project/my-environment
+//
+// ```
+//
+// The legacy format `{organization}/{environment}` is also accepted, and uses the `default` project.
 type Environment struct {
 	pulumi.CustomResourceState
 
-	// The environment's UUID. Use this as the `identity` value when pinning a custom RBAC role to this environment via a `PermissionLiteralExpressionEnvironment` in `OrganizationRole.permissions`, or pass it directly to the `buildEnvironmentScopedPermissions` helper.
+	// The environment's UUID. Use this as the `identity` value when pinning a custom RBAC role to this environment via a `PermissionLiteralExpressionEnvironment` in `OrganizationRole.permissions`, or pass it as the `id` of an `environmentRules` entry in `buildRolePermissions`.
 	EnvironmentId pulumi.StringPtrOutput `pulumi:"environmentId"`
 	// Environment name.
 	Name pulumi.StringOutput `pulumi:"name"`
@@ -198,7 +210,7 @@ func (o EnvironmentOutput) ToEnvironmentOutputWithContext(ctx context.Context) E
 	return o
 }
 
-// The environment's UUID. Use this as the `identity` value when pinning a custom RBAC role to this environment via a `PermissionLiteralExpressionEnvironment` in `OrganizationRole.permissions`, or pass it directly to the `buildEnvironmentScopedPermissions` helper.
+// The environment's UUID. Use this as the `identity` value when pinning a custom RBAC role to this environment via a `PermissionLiteralExpressionEnvironment` in `OrganizationRole.permissions`, or pass it as the `id` of an `environmentRules` entry in `buildRolePermissions`.
 func (o EnvironmentOutput) EnvironmentId() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *Environment) pulumi.StringPtrOutput { return v.EnvironmentId }).(pulumi.StringPtrOutput)
 }

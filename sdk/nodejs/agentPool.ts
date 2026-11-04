@@ -6,6 +6,18 @@ import * as utilities from "./utilities";
 
 /**
  * Agent Pool for customer managed deployments.
+ *
+ * ## Import
+ *
+ * This resource can be imported using its `id`, which has the format `{organization}/{name}/{agentPoolId}`, e.g.,
+ *
+ * ```sh
+ *  $ pulumi import pulumiservice:index:AgentPool my-agent-pool my-org/my-pool/e4a1b7c2-9f30-4d58-b6e1-2a7c9d0f4e86
+ * ```
+ *
+ * The agent pool ID is the last segment of its page URL in the Pulumi Cloud console, for example `https://app.pulumi.com/my-org/settings/workflow-runner-pools/e4a1b7c2-9f30-4d58-b6e1-2a7c9d0f4e86`.
+ *
+ * The pool's `tokenValue` can't be read back from Pulumi Cloud, so it's empty after import.
  */
 export class AgentPool extends pulumi.CustomResource {
     /**
@@ -18,6 +30,16 @@ export class AgentPool extends pulumi.CustomResource {
      */
     public static get(name: string, id: pulumi.Input<pulumi.ID>, opts?: pulumi.CustomResourceOptions): AgentPool {
         return new AgentPool(name, undefined as any, { ...opts, id: id });
+    }
+
+    /**
+     * Check whether an existing AgentPool resource with the given ID exists.
+     *
+     * @param id The _unique_ provider ID of the resource to check.
+     * @param opts Optional settings to control the behavior of the CustomResource.
+     */
+    public static exists(id: pulumi.Input<string>, opts?: pulumi.CustomResourceOptions): pulumi.Output<boolean> {
+        return pulumi.runtime.existsResource("pulumiservice:index:AgentPool", id, {}, { ...opts }, undefined);
     }
 
     /** @internal */

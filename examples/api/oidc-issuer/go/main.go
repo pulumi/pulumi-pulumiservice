@@ -21,6 +21,16 @@ func main() {
 		if err != nil {
 			maxExpiration = 3600
 		}
+		// Tests override the issuer URLs so that concurrent runs don't conflict;
+		// see oidcIssuerTestConfig in examples/examples_utils_test.go.
+		pulumiIssuerUrl := cfg.Get("pulumiIssuerUrl")
+		if pulumiIssuerUrl == "" {
+			pulumiIssuerUrl = "https://api.pulumi.com/oidc"
+		}
+		githubIssuerUrl := cfg.Get("githubIssuerUrl")
+		if githubIssuerUrl == "" {
+			githubIssuerUrl = "https://token.actions.githubusercontent.com"
+		}
 		// Thumbprints must match the certificate the issuer currently serves, so
 		// they have no static default. Compute one with:
 		//   openssl s_client -connect <issuer-host>:443 </dev/null | openssl x509 -fingerprint -sha256 -noout
@@ -30,7 +40,7 @@ func main() {
 		pulumiIssuer, err := auth.NewOidcIssuer(ctx, "pulumiIssuer", &auth.OidcIssuerArgs{
 			OrgName:     pulumi.String(organizationName),
 			Name:        pulumi.String("pulumi_issuer_" + issuerSuffix),
-			Url:         pulumi.String("https://api.pulumi.com/oidc"),
+			Url:         pulumi.String(pulumiIssuerUrl),
 			Thumbprints: pulumi.StringArray{pulumi.String(pulumiThumbprint)},
 		})
 		if err != nil {
@@ -40,7 +50,7 @@ func main() {
 		githubIssuer, err := auth.NewOidcIssuer(ctx, "githubIssuer", &auth.OidcIssuerArgs{
 			OrgName:       pulumi.String(organizationName),
 			Name:          pulumi.String("github_issuer_" + issuerSuffix),
-			Url:           pulumi.String("https://token.actions.githubusercontent.com"),
+			Url:           pulumi.String(githubIssuerUrl),
 			Thumbprints:   pulumi.StringArray{pulumi.String(githubThumbprint)},
 			MaxExpiration: pulumi.Int(maxExpiration),
 		})

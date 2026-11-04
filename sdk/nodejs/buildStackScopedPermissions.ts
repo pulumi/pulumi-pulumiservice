@@ -5,9 +5,11 @@ import * as pulumi from "@pulumi/pulumi";
 import * as utilities from "./utilities";
 
 /**
- * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named stack. The `stackId` is the stack's opaque Pulumi Cloud identifier — distinct from the `organization/project/stack` triple. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls the output of each helper.
+ * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named stack. The `stackId` is the stack's opaque Pulumi Cloud identifier — distinct from the `organization/project/stack` triple. The result is directly assignable to `OrganizationRole.permissions`. To combine it with other grants in a single role, pass it to `buildRolePermissions` in `additionalEntries`.
  */
+/** @deprecated Use `buildRolePermissions` instead, with a `stackRules` entry that sets `id`. If a scope you need isn't in the enums yet, upgrade the provider. */
 export function buildStackScopedPermissions(args: BuildStackScopedPermissionsArgs, opts?: pulumi.InvokeOptions): Promise<BuildStackScopedPermissionsResult> {
+    pulumi.log.warn("buildStackScopedPermissions is deprecated: Use `buildRolePermissions` instead, with a `stackRules` entry that sets `id`. If a scope you need isn't in the enums yet, upgrade the provider.")
     opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts || {});
     return pulumi.runtime.invoke("pulumiservice:index:buildStackScopedPermissions", {
         "permissions": args.permissions,
@@ -33,9 +35,11 @@ export interface BuildStackScopedPermissionsResult {
     readonly permissions: {[key: string]: any};
 }
 /**
- * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named stack. The `stackId` is the stack's opaque Pulumi Cloud identifier — distinct from the `organization/project/stack` triple. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls the output of each helper.
+ * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named stack. The `stackId` is the stack's opaque Pulumi Cloud identifier — distinct from the `organization/project/stack` triple. The result is directly assignable to `OrganizationRole.permissions`. To combine it with other grants in a single role, pass it to `buildRolePermissions` in `additionalEntries`.
  */
+/** @deprecated Use `buildRolePermissions` instead, with a `stackRules` entry that sets `id`. If a scope you need isn't in the enums yet, upgrade the provider. */
 export function buildStackScopedPermissionsOutput(args: BuildStackScopedPermissionsOutputArgs, opts?: pulumi.InvokeOutputOptions): pulumi.Output<BuildStackScopedPermissionsResult> {
+    pulumi.log.warn("buildStackScopedPermissions is deprecated: Use `buildRolePermissions` instead, with a `stackRules` entry that sets `id`. If a scope you need isn't in the enums yet, upgrade the provider.")
     opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts || {});
     return pulumi.runtime.invokeOutput("pulumiservice:index:buildStackScopedPermissions", {
         "permissions": args.permissions,

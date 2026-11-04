@@ -16,7 +16,7 @@ from .. import _utilities
 
 accessToken: Optional[str]
 """
-Access Token to authenticate with Pulumi Cloud.
+Access token to authenticate with Pulumi Cloud. Optional: if unset, the provider uses the `PULUMI_ACCESS_TOKEN` environment variable, then the access token of the account you're logged in to with `pulumi login`.
 """
 
 apiUrl: str

@@ -25,6 +25,7 @@ import (
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 )
 
 type PulumiOperation string
@@ -62,7 +63,12 @@ var (
 )
 
 func (*DeploymentSchedule) Annotate(a infer.Annotator) {
-	a.Describe(&DeploymentSchedule{}, "A scheduled recurring or single time run of a pulumi command.")
+	a.Describe(&DeploymentSchedule{}, "A scheduled recurring or single time run of a pulumi command."+
+		util.ImportDocs("pulumiservice:index:DeploymentSchedule",
+			"{organization}/{project}/{stack}/{scheduleId}",
+			"my-org/my-project/my-stack/7d3c5e1a-0f8b-4b26-a9d4-3e6f2b8c1a59",
+			util.APIIDHint("schedule ID", "/api/stacks/my-org/my-project/my-stack/deployments/schedules",
+				".schedules[]")))
 	a.SetToken("index", "DeploymentSchedule")
 }
 

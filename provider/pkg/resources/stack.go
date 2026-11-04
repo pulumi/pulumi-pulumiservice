@@ -24,6 +24,7 @@ import (
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 )
 
 type Stack struct{}
@@ -40,7 +41,9 @@ func (*Stack) Annotate(a infer.Annotator) {
 	a.Describe(
 		&Stack{},
 		"A stack is a collection of resources that share a common lifecycle. "+
-			"Stacks are uniquely identified by their name and the project they belong to.",
+			"Stacks are uniquely identified by their name and the project they belong to."+
+			util.ImportDocs("pulumiservice:index:Stack", "{organization}/{project}/{stack}",
+				"my-org/my-project/my-stack"),
 	)
 	a.SetToken("index", "Stack")
 }
@@ -61,7 +64,8 @@ func (i *StackInput) Annotate(a infer.Annotator) {
 	a.Describe(&i.StackName, "The name of the stack.")
 	a.Describe(
 		&i.ForceDestroy,
-		"Optional. Flag indicating whether to delete the stack even if it still contains resources.",
+		"Optional. Flag indicating whether to delete the stack even if it still contains resources. "+
+			"Defaults to `false`.",
 	)
 }
 

@@ -18,14 +18,14 @@ public final class StackArgs extends com.pulumi.resources.ResourceArgs {
     public static final StackArgs Empty = new StackArgs();
 
     /**
-     * Optional. Flag indicating whether to delete the stack even if it still contains resources.
+     * Optional. Flag indicating whether to delete the stack even if it still contains resources. Defaults to `false`.
      * 
      */
     @Import(name="forceDestroy")
     private @Nullable Output<Boolean> forceDestroy;
 
     /**
-     * @return Optional. Flag indicating whether to delete the stack even if it still contains resources.
+     * @return Optional. Flag indicating whether to delete the stack even if it still contains resources. Defaults to `false`.
      * 
      */
     public Optional<Output<Boolean>> forceDestroy() {
@@ -105,7 +105,7 @@ public final class StackArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param forceDestroy Optional. Flag indicating whether to delete the stack even if it still contains resources.
+         * @param forceDestroy Optional. Flag indicating whether to delete the stack even if it still contains resources. Defaults to `false`.
          * 
          * @return builder
          * 
@@ -116,7 +116,7 @@ public final class StackArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param forceDestroy Optional. Flag indicating whether to delete the stack even if it still contains resources.
+         * @param forceDestroy Optional. Flag indicating whether to delete the stack even if it still contains resources. Defaults to `false`.
          * 
          * @return builder
          * 

@@ -5,9 +5,11 @@ import * as pulumi from "@pulumi/pulumi";
 import * as utilities from "./utilities";
 
 /**
- * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named insights account. Pair with `InsightsAccount.insightsAccountId` (or the `getInsightsAccount` data source). The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls the output of each helper.
+ * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named insights account. Pair with `InsightsAccount.insightsAccountId` (or the `getInsightsAccount` data source). The result is directly assignable to `OrganizationRole.permissions`. To combine it with other grants in a single role, pass it to `buildRolePermissions` in `additionalEntries`.
  */
+/** @deprecated Use `buildRolePermissions` instead, with an `accountRules` entry that sets `id`. If a scope you need isn't in the enums yet, upgrade the provider. */
 export function buildInsightsAccountScopedPermissions(args: BuildInsightsAccountScopedPermissionsArgs, opts?: pulumi.InvokeOptions): Promise<BuildInsightsAccountScopedPermissionsResult> {
+    pulumi.log.warn("buildInsightsAccountScopedPermissions is deprecated: Use `buildRolePermissions` instead, with an `accountRules` entry that sets `id`. If a scope you need isn't in the enums yet, upgrade the provider.")
     opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts || {});
     return pulumi.runtime.invoke("pulumiservice:index:buildInsightsAccountScopedPermissions", {
         "insightsAccountId": args.insightsAccountId,
@@ -33,9 +35,11 @@ export interface BuildInsightsAccountScopedPermissionsResult {
     readonly permissions: {[key: string]: any};
 }
 /**
- * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named insights account. Pair with `InsightsAccount.insightsAccountId` (or the `getInsightsAccount` data source). The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls the output of each helper.
+ * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named insights account. Pair with `InsightsAccount.insightsAccountId` (or the `getInsightsAccount` data source). The result is directly assignable to `OrganizationRole.permissions`. To combine it with other grants in a single role, pass it to `buildRolePermissions` in `additionalEntries`.
  */
+/** @deprecated Use `buildRolePermissions` instead, with an `accountRules` entry that sets `id`. If a scope you need isn't in the enums yet, upgrade the provider. */
 export function buildInsightsAccountScopedPermissionsOutput(args: BuildInsightsAccountScopedPermissionsOutputArgs, opts?: pulumi.InvokeOutputOptions): pulumi.Output<BuildInsightsAccountScopedPermissionsResult> {
+    pulumi.log.warn("buildInsightsAccountScopedPermissions is deprecated: Use `buildRolePermissions` instead, with an `accountRules` entry that sets `id`. If a scope you need isn't in the enums yet, upgrade the provider.")
     opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts || {});
     return pulumi.runtime.invokeOutput("pulumiservice:index:buildInsightsAccountScopedPermissions", {
         "insightsAccountId": args.insightsAccountId,

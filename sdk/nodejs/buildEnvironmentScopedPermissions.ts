@@ -5,9 +5,11 @@ import * as pulumi from "@pulumi/pulumi";
 import * as utilities from "./utilities";
 
 /**
- * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named environment. Pair with `Environment.environmentId` (or the `getEnvironment` data source) to avoid hand-rolling the `PermissionDescriptorCondition` tree yourself. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls the output of each helper.
+ * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named environment. Pair with `Environment.environmentId` (or the `getEnvironment` data source) to avoid hand-rolling the `PermissionDescriptorCondition` tree yourself. The result is directly assignable to `OrganizationRole.permissions`. To combine it with other grants in a single role, pass it to `buildRolePermissions` in `additionalEntries`.
  */
+/** @deprecated Use `buildRolePermissions` instead, with an `environmentRules` entry that sets `id`. If a scope you need isn't in the enums yet, upgrade the provider. */
 export function buildEnvironmentScopedPermissions(args: BuildEnvironmentScopedPermissionsArgs, opts?: pulumi.InvokeOptions): Promise<BuildEnvironmentScopedPermissionsResult> {
+    pulumi.log.warn("buildEnvironmentScopedPermissions is deprecated: Use `buildRolePermissions` instead, with an `environmentRules` entry that sets `id`. If a scope you need isn't in the enums yet, upgrade the provider.")
     opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts || {});
     return pulumi.runtime.invoke("pulumiservice:index:buildEnvironmentScopedPermissions", {
         "environmentId": args.environmentId,
@@ -33,9 +35,11 @@ export interface BuildEnvironmentScopedPermissionsResult {
     readonly permissions: {[key: string]: any};
 }
 /**
- * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named environment. Pair with `Environment.environmentId` (or the `getEnvironment` data source) to avoid hand-rolling the `PermissionDescriptorCondition` tree yourself. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls the output of each helper.
+ * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named environment. Pair with `Environment.environmentId` (or the `getEnvironment` data source) to avoid hand-rolling the `PermissionDescriptorCondition` tree yourself. The result is directly assignable to `OrganizationRole.permissions`. To combine it with other grants in a single role, pass it to `buildRolePermissions` in `additionalEntries`.
  */
+/** @deprecated Use `buildRolePermissions` instead, with an `environmentRules` entry that sets `id`. If a scope you need isn't in the enums yet, upgrade the provider. */
 export function buildEnvironmentScopedPermissionsOutput(args: BuildEnvironmentScopedPermissionsOutputArgs, opts?: pulumi.InvokeOutputOptions): pulumi.Output<BuildEnvironmentScopedPermissionsResult> {
+    pulumi.log.warn("buildEnvironmentScopedPermissions is deprecated: Use `buildRolePermissions` instead, with an `environmentRules` entry that sets `id`. If a scope you need isn't in the enums yet, upgrade the provider.")
     opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts || {});
     return pulumi.runtime.invokeOutput("pulumiservice:index:buildEnvironmentScopedPermissions", {
         "environmentId": args.environmentId,

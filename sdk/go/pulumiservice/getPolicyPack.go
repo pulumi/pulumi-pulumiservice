@@ -27,8 +27,8 @@ type LookupPolicyPackArgs struct {
 	OrganizationName string `pulumi:"organizationName"`
 	// The name of the policy pack.
 	PolicyPackName string `pulumi:"policyPackName"`
-	// The version number of the policy pack. If not specified, returns the latest version.
-	Version *int `pulumi:"version"`
+	// The version tag of the policy pack, for example `1.4.1`, as shown in Pulumi Cloud. If not specified, returns the latest version.
+	VersionTag *string `pulumi:"versionTag"`
 }
 
 type LookupPolicyPackResult struct {
@@ -39,7 +39,7 @@ type LookupPolicyPackResult struct {
 	// The name of the policy pack.
 	Name string `pulumi:"name"`
 	// List of policies in this pack.
-	Policies []map[string]string `pulumi:"policies"`
+	Policies []map[string]interface{} `pulumi:"policies"`
 	// The organization or user that published the policy pack. `pulumi` for Pulumi-published packs, otherwise the publishing organization's name. Omitted when the provider could not determine registry metadata for this pack.
 	Publisher *string `pulumi:"publisher"`
 	// Where the policy pack is hosted in the Pulumi Registry: `pulumi` for packs published by Pulumi (for example `cis-aws`), `private` for packs published by an organization. Omitted when the provider could not determine registry metadata for this pack.
@@ -60,8 +60,8 @@ type LookupPolicyPackOutputArgs struct {
 	OrganizationName pulumi.StringInput `pulumi:"organizationName"`
 	// The name of the policy pack.
 	PolicyPackName pulumi.StringInput `pulumi:"policyPackName"`
-	// The version number of the policy pack. If not specified, returns the latest version.
-	Version pulumi.IntPtrInput `pulumi:"version"`
+	// The version tag of the policy pack, for example `1.4.1`, as shown in Pulumi Cloud. If not specified, returns the latest version.
+	VersionTag pulumi.StringPtrInput `pulumi:"versionTag"`
 }
 
 func (LookupPolicyPackOutputArgs) ElementType() reflect.Type {
@@ -98,8 +98,8 @@ func (o LookupPolicyPackResultOutput) Name() pulumi.StringOutput {
 }
 
 // List of policies in this pack.
-func (o LookupPolicyPackResultOutput) Policies() pulumi.StringMapArrayOutput {
-	return o.ApplyT(func(v LookupPolicyPackResult) []map[string]string { return v.Policies }).(pulumi.StringMapArrayOutput)
+func (o LookupPolicyPackResultOutput) Policies() pulumi.MapArrayOutput {
+	return o.ApplyT(func(v LookupPolicyPackResult) []map[string]interface{} { return v.Policies }).(pulumi.MapArrayOutput)
 }
 
 // The organization or user that published the policy pack. `pulumi` for Pulumi-published packs, otherwise the publishing organization's name. Omitted when the provider could not determine registry metadata for this pack.

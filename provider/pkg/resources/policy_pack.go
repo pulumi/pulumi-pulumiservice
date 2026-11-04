@@ -44,6 +44,7 @@ import (
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 )
 
 const (
@@ -64,7 +65,11 @@ var (
 
 func (*PolicyPack) Annotate(a infer.Annotator) {
 	a.Describe(&PolicyPack{}, "A Policy Pack published to Pulumi Cloud. The source directory is "+
-		"tarballed and uploaded on Create; changing source content publishes a new version (replace).")
+		"tarballed and uploaded on Create; changing source content publishes a new version (replace)."+
+		util.ImportDocs("pulumiservice:index:PolicyPack", "{organization}/{name}/{versionTag}",
+			"my-org/my-policy-pack/1.0.0",
+			"Only the organization, name, version tag and display name are read back. Set `sourcePath` "+
+				"in your program after import."))
 	a.SetToken("index", "PolicyPack")
 }
 
@@ -355,7 +360,7 @@ func introspectPolicyPack(ctx context.Context, sourcePath string) ([]PolicyPackP
 	defer func() { _ = pctx.Close() }()
 
 	analyzer, err := plugin.NewPolicyAnalyzer(
-		pctx.Host, pctx, tokens.QName("policypack"), absPath, nil, nil,
+		pctx.Host, pctx, tokens.QName("policypack"), absPath, nil,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("spawn policy analyzer for %s: %w", absPath, err)

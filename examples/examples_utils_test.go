@@ -24,6 +24,15 @@ func getCwd(t *testing.T) string {
 	return cwd
 }
 
+const serializedTestsEnv = "PULUMI_TEST_SERIALIZED"
+
+func skipUnlessSerializedTests(t *testing.T) {
+	t.Helper()
+	if os.Getenv(serializedTestsEnv) == "" {
+		t.Skipf("runs in the serialized shared-org job; set %s to run it", serializedTestsEnv)
+	}
+}
+
 func generateRandomFiveDigits() string {
 	return fmt.Sprintf("%05d", rand.Intn(100000)) //nolint:gosec // For testing.
 }
@@ -52,6 +61,26 @@ func tlsThumbprint(host string) string {
 	}
 	defer conn.Close()
 	return fmt.Sprintf("%x", sha256.Sum256(conn.ConnectionState().PeerCertificates[0].Raw))
+}
+
+// oidcIssuerTestConfig returns issuer URL and thumbprint config for the OIDC
+// issuer examples. Pulumi Cloud lets each issuer URL be registered only once
+// per org, so runs that overlapped, within a PR or across PRs, failed with
+// "issuer ... already registered" when they all used the examples' default
+// URLs. GitHub's issuer serves OIDC discovery under any path, so each call
+// returns its own https://token.actions.githubusercontent.com/<random> URLs,
+// for the Pulumi issuer as well as the GitHub one. The tests cover issuer
+// CRUD only, never token exchange, so which issuer the URL points at doesn't
+// matter.
+func oidcIssuerTestConfig() map[string]string {
+	base := "https://token.actions.githubusercontent.com/pulumiservice-test-" + uuid.NewString()[:8]
+	thumbprint := tlsThumbprint("token.actions.githubusercontent.com")
+	return map[string]string{
+		"pulumiIssuerUrl":  base + "-pulumi",
+		"pulumiThumbprint": thumbprint,
+		"githubIssuerUrl":  base + "-github",
+		"githubThumbprint": thumbprint,
+	}
 }
 
 // getOrgName returns the organization name from PULUMI_TEST_OWNER env var,

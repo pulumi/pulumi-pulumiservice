@@ -14,15 +14,106 @@ import (
 
 // Deployment settings configure Pulumi Deployments for a stack.
 //
-// ### Import
+// Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/) to choose between ESC and Deployments OIDC (`operationContext.oidc`).
 //
-// Deployment settings can be imported using the `id`, which for deployment settings is `{org}/{project}/{stack}` e.g.,
+// ## Example Usage
+// ### Deploy on every commit
+//
+// This runs `pulumi up` on each push to `main` that changes a file under `infra/`, and `pulumi preview` on pull requests. The organization must have the Pulumi GitHub app installed on the repository.
+//
+// ```go
+// package main
+//
+// import (
+//
+//	"github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice"
+//	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
+//
+// )
+//
+//	func main() {
+//		pulumi.Run(func(ctx *pulumi.Context) error {
+//			_, err := pulumiservice.NewDeploymentSettings(ctx, "settings", &pulumiservice.DeploymentSettingsArgs{
+//				Organization: pulumi.String("my-org"),
+//				Project:      pulumi.String("my-project"),
+//				Stack:        pulumi.String("dev"),
+//				SourceContext: &pulumiservice.DeploymentSettingsSourceContextArgs{
+//					Git: &pulumiservice.DeploymentSettingsGitSourceArgs{
+//						Branch: pulumi.String("refs/heads/main"),
+//					},
+//				},
+//				Github: &pulumiservice.DeploymentSettingsGithubArgs{
+//					Repository:          pulumi.String("my-org/my-repo"),
+//					DeployCommits:       pulumi.Bool(true),
+//					PreviewPullRequests: pulumi.Bool(true),
+//					Paths: pulumi.StringArray{
+//						pulumi.String("infra/**"),
+//					},
+//				},
+//			})
+//			if err != nil {
+//				return err
+//			}
+//			return nil
+//		})
+//	}
+//
+// ```
+// ### Deploy when a git tag is pushed
+//
+// This runs `pulumi up` when a tag matching `v*` is pushed, except release candidates such as `v1.2.0-rc1`. Pulumi Cloud rejects `deployCommits` and `deployTags` together, and `deployCommits` defaults to `true`, so set `deployCommits` to `false` when you enable `deployTags`. The organization must have the Pulumi GitHub app installed on the repository.
+//
+// ```go
+// package main
+//
+// import (
+//
+//	"github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice"
+//	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
+//
+// )
+//
+//	func main() {
+//		pulumi.Run(func(ctx *pulumi.Context) error {
+//			_, err := pulumiservice.NewDeploymentSettings(ctx, "settings", &pulumiservice.DeploymentSettingsArgs{
+//				Organization: pulumi.String("my-org"),
+//				Project:      pulumi.String("my-project"),
+//				Stack:        pulumi.String("production"),
+//				SourceContext: &pulumiservice.DeploymentSettingsSourceContextArgs{
+//					Git: &pulumiservice.DeploymentSettingsGitSourceArgs{
+//						Branch: pulumi.String("refs/heads/main"),
+//					},
+//				},
+//				Github: &pulumiservice.DeploymentSettingsGithubArgs{
+//					Repository:    pulumi.String("my-org/my-repo"),
+//					DeployCommits: pulumi.Bool(false),
+//					DeployTags:    pulumi.Bool(true),
+//					TagFilters: pulumi.StringArray{
+//						pulumi.String("v*"),
+//						pulumi.String("!*-rc*"),
+//					},
+//				},
+//			})
+//			if err != nil {
+//				return err
+//			}
+//			return nil
+//		})
+//	}
+//
+// ```
+//
+// ## Import
+//
+// This resource can be imported using its `id`, which has the format `{organization}/{project}/{stack}`, e.g.,
 //
 // ```sh
 //
-//	$ pulumi import pulumiservice:index:DeploymentSettings my_settings my-org/my-project/my-stack
+//	$ pulumi import pulumiservice:index:DeploymentSettings my-deployment-settings my-org/my-project/my-stack
 //
 // ```
+//
+// Secret values can't be read back from Pulumi Cloud, so import sets each one to the placeholder `<REPLACE WITH ACTUAL SECRET VALUE>`. Replace them with the real values in your program.
 type DeploymentSettings struct {
 	pulumi.CustomResourceState
 

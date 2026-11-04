@@ -6,6 +6,16 @@ import * as utilities from "./utilities";
 
 /**
  * A tag on a specific revision of an environment.
+ *
+ * ## Import
+ *
+ * This resource can be imported using its `id`, which has the format `{organization}/{project}/{environment}/{tagName}`, e.g.,
+ *
+ * ```sh
+ *  $ pulumi import pulumiservice:index:EnvironmentVersionTag my-environment-version-tag my-org/my-project/my-environment/my-tag
+ * ```
+ *
+ * The legacy format `{organization}/{environment}/{tagName}` is also accepted, and uses the `default` project.
  */
 export class EnvironmentVersionTag extends pulumi.CustomResource {
     /**
@@ -18,6 +28,16 @@ export class EnvironmentVersionTag extends pulumi.CustomResource {
      */
     public static get(name: string, id: pulumi.Input<pulumi.ID>, opts?: pulumi.CustomResourceOptions): EnvironmentVersionTag {
         return new EnvironmentVersionTag(name, undefined as any, { ...opts, id: id });
+    }
+
+    /**
+     * Check whether an existing EnvironmentVersionTag resource with the given ID exists.
+     *
+     * @param id The _unique_ provider ID of the resource to check.
+     * @param opts Optional settings to control the behavior of the CustomResource.
+     */
+    public static exists(id: pulumi.Input<string>, opts?: pulumi.CustomResourceOptions): pulumi.Output<boolean> {
+        return pulumi.runtime.existsResource("pulumiservice:index:EnvironmentVersionTag", id, {}, { ...opts }, undefined);
     }
 
     /** @internal */

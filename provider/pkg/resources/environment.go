@@ -30,6 +30,7 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/property"
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 )
 
 const (
@@ -52,7 +53,11 @@ var (
 )
 
 func (*Environment) Annotate(a infer.Annotator) {
-	a.Describe(&Environment{}, "An ESC Environment.")
+	a.Describe(&Environment{}, "An ESC Environment."+
+		util.ImportDocs("pulumiservice:index:Environment",
+			"{organization}/{project}/{environment}", "my-org/my-project/my-environment",
+			"The legacy format `{organization}/{environment}` is also accepted, and uses the "+
+				"`default` project."))
 	a.SetToken("index", "Environment")
 }
 
@@ -92,7 +97,7 @@ func (s *EnvironmentState) Annotate(a infer.Annotator) {
 	a.Describe(&s.EnvironmentID,
 		"The environment's UUID. Use this as the `identity` value when pinning a custom RBAC role to this "+
 			"environment via a `PermissionLiteralExpressionEnvironment` in `OrganizationRole.permissions`, or pass "+
-			"it directly to the `buildEnvironmentScopedPermissions` helper.")
+			"it as the `id` of an `environmentRules` entry in `buildRolePermissions`.")
 }
 
 func (*Environment) Check(

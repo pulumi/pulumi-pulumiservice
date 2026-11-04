@@ -50,7 +50,28 @@ resources:
         - name: ${pack.name}
           versionTag: ${pack.versionTag}
 
+variables:
+  # Read the published pack back by its version tag, the tag shown in Pulumi
+  # Cloud.
+  packByTag:
+    fn::invoke:
+      function: pulumiservice:getPolicyPack
+      arguments:
+        organizationName: ${organizationName}
+        policyPackName: ${pack.name}
+        versionTag: ${pack.versionTag}
+  # Omitting versionTag returns the latest version.
+  packLatest:
+    fn::invoke:
+      function: pulumiservice:getPolicyPack
+      arguments:
+        organizationName: ${organizationName}
+        policyPackName: ${pack.name}
+
 outputs:
   policyPackVersion: ${pack.version}
+  packByTagVersionTag: ${packByTag.versionTag}
+  packByTagPolicies: ${packByTag.policies}
+  packLatestVersionTag: ${packLatest.versionTag}
   policyPackHash: ${pack.contentHash}
   policyGroupName: ${group.name}

@@ -13,6 +13,10 @@ public class App {
             var organizationName = config.get("organizationName").orElse("service-provider-test-org");
             var issuerSuffix = config.get("issuerSuffix").orElse("dev");
             var maxExpiration = config.getInteger("maxExpiration").orElse(3600);
+            // Tests override the issuer URLs so that concurrent runs don't conflict;
+            // see oidcIssuerTestConfig in examples/examples_utils_test.go.
+            var pulumiIssuerUrl = config.get("pulumiIssuerUrl").orElse("https://api.pulumi.com/oidc");
+            var githubIssuerUrl = config.get("githubIssuerUrl").orElse("https://token.actions.githubusercontent.com");
             // Thumbprints must match the certificate the issuer currently serves, so
             // they have no static default. Compute one with:
             //   openssl s_client -connect <issuer-host>:443 </dev/null | openssl x509 -fingerprint -sha256 -noout
@@ -23,7 +27,7 @@ public class App {
                 OidcIssuerArgs.builder()
                     .orgName(organizationName)
                     .name("pulumi_issuer_" + issuerSuffix)
-                    .url("https://api.pulumi.com/oidc")
+                    .url(pulumiIssuerUrl)
                     .thumbprints(List.of(pulumiThumbprint))
                     .build());
 
@@ -31,7 +35,7 @@ public class App {
                 OidcIssuerArgs.builder()
                     .orgName(organizationName)
                     .name("github_issuer_" + issuerSuffix)
-                    .url("https://token.actions.githubusercontent.com")
+                    .url(githubIssuerUrl)
                     .thumbprints(List.of(githubThumbprint))
                     .maxExpiration(maxExpiration)
                     .build());

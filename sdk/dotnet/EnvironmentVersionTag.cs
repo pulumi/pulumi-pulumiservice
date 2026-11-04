@@ -11,6 +11,16 @@ namespace Pulumi.PulumiService
 {
     /// <summary>
     /// A tag on a specific revision of an environment.
+    /// 
+    /// ## Import
+    /// 
+    /// This resource can be imported using its `id`, which has the format `{organization}/{project}/{environment}/{tagName}`, e.g.,
+    /// 
+    /// ```sh
+    ///  $ pulumi import pulumiservice:index:EnvironmentVersionTag my-environment-version-tag my-org/my-project/my-environment/my-tag
+    /// ```
+    /// 
+    /// The legacy format `{organization}/{environment}/{tagName}` is also accepted, and uses the `default` project.
     /// </summary>
     [PulumiServiceResourceType("pulumiservice:index:EnvironmentVersionTag")]
     public partial class EnvironmentVersionTag : global::Pulumi.CustomResource

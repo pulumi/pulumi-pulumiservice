@@ -11,6 +11,16 @@ namespace Pulumi.PulumiService
 {
     /// <summary>
     /// A permission for a team to use an environment.
+    /// 
+    /// ## Import
+    /// 
+    /// This resource can be imported using its `id`, which has the format `{organization}/{team}/{project}+{environment}`, e.g.,
+    /// 
+    /// ```sh
+    ///  $ pulumi import pulumiservice:index:TeamEnvironmentPermission my-team-environment-permission my-org/my-team/my-project+my-environment
+    /// ```
+    /// 
+    /// The project and environment are joined with `+`, not `/`. The legacy format `{organization}/{team}/{environment}` is also accepted, and uses the `default` project.
     /// </summary>
     [PulumiServiceResourceType("pulumiservice:index:TeamEnvironmentPermission")]
     public partial class TeamEnvironmentPermission : global::Pulumi.CustomResource

@@ -14,10 +14,15 @@ import javax.annotation.Nullable;
 @CustomType
 public final class DeploymentSettingsGithub {
     /**
-     * @return Trigger a deployment running `pulumi up` on commit.
+     * @return Trigger a deployment running `pulumi up` on commit. Must be `false` when `deployTags` is `true`, because Pulumi Cloud rejects the two together.
      * 
      */
     private @Nullable Boolean deployCommits;
+    /**
+     * @return Trigger a deployment running `pulumi up` when a tag matching `tagFilters` is pushed. Can&#39;t be combined with `deployCommits`, which defaults to `true`, so set `deployCommits` to `false` when you enable this.
+     * 
+     */
+    private @Nullable Boolean deployTags;
     /**
      * @return The paths within the repo that deployments should be filtered to.
      * 
@@ -38,14 +43,26 @@ public final class DeploymentSettingsGithub {
      * 
      */
     private @Nullable String repository;
+    /**
+     * @return Glob patterns matching the tag names that trigger a deployment when `deployTags` is true. Prefix a pattern with `!` to exclude matching tags, for example `!*-rc*`. An empty list matches all tags.
+     * 
+     */
+    private @Nullable List<String> tagFilters;
 
     private DeploymentSettingsGithub() {}
     /**
-     * @return Trigger a deployment running `pulumi up` on commit.
+     * @return Trigger a deployment running `pulumi up` on commit. Must be `false` when `deployTags` is `true`, because Pulumi Cloud rejects the two together.
      * 
      */
     public Optional<Boolean> deployCommits() {
         return Optional.ofNullable(this.deployCommits);
+    }
+    /**
+     * @return Trigger a deployment running `pulumi up` when a tag matching `tagFilters` is pushed. Can&#39;t be combined with `deployCommits`, which defaults to `true`, so set `deployCommits` to `false` when you enable this.
+     * 
+     */
+    public Optional<Boolean> deployTags() {
+        return Optional.ofNullable(this.deployTags);
     }
     /**
      * @return The paths within the repo that deployments should be filtered to.
@@ -75,6 +92,13 @@ public final class DeploymentSettingsGithub {
     public Optional<String> repository() {
         return Optional.ofNullable(this.repository);
     }
+    /**
+     * @return Glob patterns matching the tag names that trigger a deployment when `deployTags` is true. Prefix a pattern with `!` to exclude matching tags, for example `!*-rc*`. An empty list matches all tags.
+     * 
+     */
+    public List<String> tagFilters() {
+        return this.tagFilters == null ? List.of() : this.tagFilters;
+    }
 
     public static Builder builder() {
         return new Builder();
@@ -86,24 +110,34 @@ public final class DeploymentSettingsGithub {
     @CustomType.Builder
     public static final class Builder {
         private @Nullable Boolean deployCommits;
+        private @Nullable Boolean deployTags;
         private @Nullable List<String> paths;
         private @Nullable Boolean previewPullRequests;
         private @Nullable Boolean pullRequestTemplate;
         private @Nullable String repository;
+        private @Nullable List<String> tagFilters;
         public Builder() {}
         public Builder(DeploymentSettingsGithub defaults) {
     	      Objects.requireNonNull(defaults);
     	      this.deployCommits = defaults.deployCommits;
+    	      this.deployTags = defaults.deployTags;
     	      this.paths = defaults.paths;
     	      this.previewPullRequests = defaults.previewPullRequests;
     	      this.pullRequestTemplate = defaults.pullRequestTemplate;
     	      this.repository = defaults.repository;
+    	      this.tagFilters = defaults.tagFilters;
         }
 
         @CustomType.Setter
         public Builder deployCommits(@Nullable Boolean deployCommits) {
 
             this.deployCommits = deployCommits;
+            return this;
+        }
+        @CustomType.Setter
+        public Builder deployTags(@Nullable Boolean deployTags) {
+
+            this.deployTags = deployTags;
             return this;
         }
         @CustomType.Setter
@@ -133,13 +167,24 @@ public final class DeploymentSettingsGithub {
             this.repository = repository;
             return this;
         }
+        @CustomType.Setter
+        public Builder tagFilters(@Nullable List<String> tagFilters) {
+
+            this.tagFilters = tagFilters;
+            return this;
+        }
+        public Builder tagFilters(String... tagFilters) {
+            return tagFilters(List.of(tagFilters));
+        }
         public DeploymentSettingsGithub build() {
             final var _resultValue = new DeploymentSettingsGithub();
             _resultValue.deployCommits = deployCommits;
+            _resultValue.deployTags = deployTags;
             _resultValue.paths = paths;
             _resultValue.previewPullRequests = previewPullRequests;
             _resultValue.pullRequestTemplate = pullRequestTemplate;
             _resultValue.repository = repository;
+            _resultValue.tagFilters = tagFilters;
             return _resultValue;
         }
     }

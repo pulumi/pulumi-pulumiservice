@@ -19,6 +19,23 @@ import javax.annotation.Nullable;
  * 
  * Unlike `OrgAccessToken`, a provider authenticated with an organization or team access token can create this resource.
  * 
+ * ## Import
+ * 
+ * This resource can be imported using its `id`, which has the format `{organization}/{team}/{name}/{tokenId}`, e.g.,
+ * 
+ * ```sh
+ *  $ pulumi import pulumiservice:index:TeamAccessToken my-team-access-token my-org/my-team/my-token/5c7e0a92-1b3d-4f6e-8a24-9d1b7e3c0f58
+ * ```
+ * 
+ * The Pulumi Cloud console doesn&#39;t show the token ID. List it with the [Pulumi Cloud REST API](https://www.pulumi.com/docs/reference/cloud-rest-api/):
+ * 
+ * ```sh
+ * curl -s -H &#34;Authorization: token $PULUMI_ACCESS_TOKEN&#34; &#92;
+ *   https://api.pulumi.com/api/orgs/my-org/teams/my-team/tokens | jq &#39;.tokens[] | {name, id}&#39;
+ * ```
+ * 
+ * The token&#39;s `value` can&#39;t be read back from Pulumi Cloud, so it&#39;s empty after import.
+ * 
  */
 @ResourceType(type="pulumiservice:index:TeamAccessToken")
 public class TeamAccessToken extends com.pulumi.resources.CustomResource {
@@ -37,14 +54,22 @@ public class TeamAccessToken extends com.pulumi.resources.CustomResource {
         return Codegen.optional(this.description);
     }
     /**
-     * The name for the token. This must be unique among all organization and team tokens in the organization.
+     * The name for the token, up to 40 characters. Organization and team tokens share one set of names per organization, and Pulumi Cloud never frees a deleted token&#39;s name, so the name must not have been used by any other token in the organization.
+     * 
+     * If omitted, Pulumi generates a name from the resource&#39;s logical name plus a random suffix, or follows the stack&#39;s [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). A replacement gets a new name. Removing `name` from an existing token keeps its current name until the next replacement.
+     * 
+     * Every input on this resource triggers a replacement, so when `name` is set explicitly, changing any other input fails with `409 Conflict: token name already exists`. Omit `name`, or change it along with the other input.
      * 
      */
     @Export(name="name", refs={String.class}, tree="[0]")
     private Output<String> name;
 
     /**
-     * @return The name for the token. This must be unique among all organization and team tokens in the organization.
+     * @return The name for the token, up to 40 characters. Organization and team tokens share one set of names per organization, and Pulumi Cloud never frees a deleted token&#39;s name, so the name must not have been used by any other token in the organization.
+     * 
+     * If omitted, Pulumi generates a name from the resource&#39;s logical name plus a random suffix, or follows the stack&#39;s [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). A replacement gets a new name. Removing `name` from an existing token keeps its current name until the next replacement.
+     * 
+     * Every input on this resource triggers a replacement, so when `name` is set explicitly, changing any other input fails with `409 Conflict: token name already exists`. Omit `name`, or change it along with the other input.
      * 
      */
     public Output<String> name() {

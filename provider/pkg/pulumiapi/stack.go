@@ -6,11 +6,14 @@ import (
 	"net/http"
 	"net/url"
 	"path"
+
+	"github.com/pulumi/pulumi-cloud-sdk/go/apitype"
 )
 
 type StackClient interface {
 	CreateStack(ctx context.Context, stack StackIdentifier) error
 	StackExists(ctx context.Context, stack StackIdentifier) (bool, error)
+	GetStack(ctx context.Context, stack StackIdentifier) (*apitype.AppStack, error)
 	DeleteStack(ctx context.Context, stack StackIdentifier, forceDestroy bool) error
 }
 
@@ -45,6 +48,22 @@ func (c *Client) StackExists(ctx context.Context, stackName StackIdentifier) (bo
 		return false, fmt.Errorf("failed to get stack: %w", err)
 	}
 	return true, nil
+}
+
+// GetStack returns the stack, including its unique ID (the identity RBAC
+// permission descriptors reference), or nil if the stack does not exist.
+func (c *Client) GetStack(ctx context.Context, stackName StackIdentifier) (*apitype.AppStack, error) {
+	if stackName.OrgName == "" || stackName.ProjectName == "" || stackName.StackName == "" {
+		return nil, fmt.Errorf("invalid stack identifier: %v", stackName)
+	}
+	s, err := c.SDK.GetStack(ctx, stackName.OrgName, stackName.ProjectName, stackName.StackName)
+	if err != nil {
+		if GetErrorStatusCode(err) == http.StatusNotFound {
+			return nil, nil
+		}
+		return nil, fmt.Errorf("failed to get stack: %w", err)
+	}
+	return s, nil
 }
 
 func (c *Client) DeleteStack(ctx context.Context, stackName StackIdentifier, forceDestroy bool) error {

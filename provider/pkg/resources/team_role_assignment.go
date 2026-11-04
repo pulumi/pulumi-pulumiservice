@@ -22,6 +22,7 @@ import (
 	"github.com/pulumi/pulumi-go-provider/infer"
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 )
 
 type TeamRoleAssignment struct{}
@@ -37,7 +38,11 @@ func (*TeamRoleAssignment) Annotate(a infer.Annotator) {
 		&TeamRoleAssignment{},
 		"Assigns a custom (fine-grained) role to a Pulumi Cloud team. The Pulumi Cloud API currently "+
 			"supports one role per team; creating a second assignment replaces the first. The team's "+
-			"organization must already have the custom-roles feature enabled.",
+			"organization must already have the custom-roles feature enabled."+
+			util.ImportDocs("pulumiservice:index:TeamRoleAssignment", "{organization}/{team}/{roleId}",
+				"my-org/my-team/1e5b8d3a-6c42-4f90-b7a1-8d2c4e6f0b95",
+				util.ConsoleIDHint("role ID", "https://app.pulumi.com/my-org/settings/access-management/roles/"+
+					"details/1e5b8d3a-6c42-4f90-b7a1-8d2c4e6f0b95")),
 	)
 }
 

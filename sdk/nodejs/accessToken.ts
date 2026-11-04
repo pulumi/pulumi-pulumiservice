@@ -8,6 +8,23 @@ import * as utilities from "./utilities";
  * Creates a personal access token for the Pulumi Cloud user that the provider is authenticated as. The token acts with that user's permissions.
  *
  * To create a token that isn't tied to a user, use `OrgAccessToken` or `TeamAccessToken`.
+ *
+ * ## Import
+ *
+ * This resource can be imported using its `id`, which has the format `{tokenId}`, e.g.,
+ *
+ * ```sh
+ *  $ pulumi import pulumiservice:index:AccessToken my-access-token 3f2b9c1e-7d4a-4e8b-9a61-0c5d2e8f7b13
+ * ```
+ *
+ * The Pulumi Cloud console doesn't show the token ID. List it with the [Pulumi Cloud REST API](https://www.pulumi.com/docs/reference/cloud-rest-api/):
+ *
+ * ```sh
+ * curl -s -H "Authorization: token $PULUMI_ACCESS_TOKEN" \
+ *   https://api.pulumi.com/api/user/tokens | jq '.tokens[] | {name, id}'
+ * ```
+ *
+ * The token's `value` can't be read back from Pulumi Cloud, so it's empty after import.
  */
 export class AccessToken extends pulumi.CustomResource {
     /**
@@ -20,6 +37,16 @@ export class AccessToken extends pulumi.CustomResource {
      */
     public static get(name: string, id: pulumi.Input<pulumi.ID>, opts?: pulumi.CustomResourceOptions): AccessToken {
         return new AccessToken(name, undefined as any, { ...opts, id: id });
+    }
+
+    /**
+     * Check whether an existing AccessToken resource with the given ID exists.
+     *
+     * @param id The _unique_ provider ID of the resource to check.
+     * @param opts Optional settings to control the behavior of the CustomResource.
+     */
+    public static exists(id: pulumi.Input<string>, opts?: pulumi.CustomResourceOptions): pulumi.Output<boolean> {
+        return pulumi.runtime.existsResource("pulumiservice:index:AccessToken", id, {}, { ...opts }, undefined);
     }
 
     /** @internal */
@@ -41,6 +68,10 @@ export class AccessToken extends pulumi.CustomResource {
      */
     declare public readonly description: pulumi.Output<string>;
     /**
+     * When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`. Omit it for a token that never expires. Pulumi Cloud rejects an expiry that is in the past or more than two years away.
+     */
+    declare public readonly expires: pulumi.Output<string | undefined>;
+    /**
      * The token's value.
      */
     declare public /*out*/ readonly value: pulumi.Output<string>;
@@ -60,15 +91,17 @@ export class AccessToken extends pulumi.CustomResource {
                 throw new Error("Missing required property 'description'");
             }
             resourceInputs["description"] = args?.description;
+            resourceInputs["expires"] = args?.expires;
             resourceInputs["value"] = undefined /*out*/;
         } else {
             resourceInputs["description"] = undefined /*out*/;
+            resourceInputs["expires"] = undefined /*out*/;
             resourceInputs["value"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
         const secretOpts = { additionalSecretOutputs: ["value"] };
         opts = pulumi.mergeOptions(opts, secretOpts);
-        const replaceOnChanges = { replaceOnChanges: ["description"] };
+        const replaceOnChanges = { replaceOnChanges: ["description", "expires"] };
         opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(AccessToken.__pulumiType, name, resourceInputs, opts);
     }
@@ -82,4 +115,8 @@ export interface AccessTokenArgs {
      * Description of the access token.
      */
     description: pulumi.Input<string>;
+    /**
+     * When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`. Omit it for a token that never expires. Pulumi Cloud rejects an expiry that is in the past or more than two years away.
+     */
+    expires?: pulumi.Input<string | undefined>;
 }

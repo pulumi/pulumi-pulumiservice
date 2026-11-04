@@ -19,14 +19,14 @@ public final class OrgAccessTokenArgs extends com.pulumi.resources.ResourceArgs 
     public static final OrgAccessTokenArgs Empty = new OrgAccessTokenArgs();
 
     /**
-     * Whether the token has the Admin role. Defaults to `false`.
+     * Whether the token has the Admin role. Defaults to `false`. Mutually exclusive with `roleId`: set `admin: true` or `roleId`, not both.
      * 
      */
     @Import(name="admin")
     private @Nullable Output<Boolean> admin;
 
     /**
-     * @return Whether the token has the Admin role. Defaults to `false`.
+     * @return Whether the token has the Admin role. Defaults to `false`. Mutually exclusive with `roleId`: set `admin: true` or `roleId`, not both.
      * 
      */
     public Optional<Output<Boolean>> admin() {
@@ -49,18 +49,41 @@ public final class OrgAccessTokenArgs extends com.pulumi.resources.ResourceArgs 
     }
 
     /**
-     * The name for the token.
+     * When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`. Omit it for a token that never expires. Pulumi Cloud rejects an expiry that is in the past, more than two years away, or beyond the organization&#39;s maximum token lifetime.
      * 
      */
-    @Import(name="name", required=true)
-    private Output<String> name;
+    @Import(name="expires")
+    private @Nullable Output<String> expires;
 
     /**
-     * @return The name for the token.
+     * @return When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`. Omit it for a token that never expires. Pulumi Cloud rejects an expiry that is in the past, more than two years away, or beyond the organization&#39;s maximum token lifetime.
      * 
      */
-    public Output<String> name() {
-        return this.name;
+    public Optional<Output<String>> expires() {
+        return Optional.ofNullable(this.expires);
+    }
+
+    /**
+     * The name for the token, up to 40 characters. Organization and team tokens share one set of names per organization, and Pulumi Cloud never frees a deleted token&#39;s name, so the name must not have been used by any other token in the organization.
+     * 
+     * If omitted, Pulumi generates a name from the resource&#39;s logical name plus a random suffix, or follows the stack&#39;s [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). A replacement gets a new name. Removing `name` from an existing token keeps its current name until the next replacement.
+     * 
+     * Every input on this resource triggers a replacement, so when `name` is set explicitly, changing any other input fails with `409 Conflict: token name already exists`. Omit `name`, or change it along with the other input.
+     * 
+     */
+    @Import(name="name")
+    private @Nullable Output<String> name;
+
+    /**
+     * @return The name for the token, up to 40 characters. Organization and team tokens share one set of names per organization, and Pulumi Cloud never frees a deleted token&#39;s name, so the name must not have been used by any other token in the organization.
+     * 
+     * If omitted, Pulumi generates a name from the resource&#39;s logical name plus a random suffix, or follows the stack&#39;s [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). A replacement gets a new name. Removing `name` from an existing token keeps its current name until the next replacement.
+     * 
+     * Every input on this resource triggers a replacement, so when `name` is set explicitly, changing any other input fails with `409 Conflict: token name already exists`. Omit `name`, or change it along with the other input.
+     * 
+     */
+    public Optional<Output<String>> name() {
+        return Optional.ofNullable(this.name);
     }
 
     /**
@@ -78,13 +101,30 @@ public final class OrgAccessTokenArgs extends com.pulumi.resources.ResourceArgs 
         return this.organizationName;
     }
 
+    /**
+     * The ID of the role to assign to the token. Use `getOrganizationRole` to look up a role&#39;s ID by its name. Mutually exclusive with `admin: true`: set one or the other, not both. Pulumi Cloud accepts both, but some of its permission checks still treat such a token as an Admin whatever its role, so the provider rejects the combination. When neither is set, the token gets the Member role.
+     * 
+     */
+    @Import(name="roleId")
+    private @Nullable Output<String> roleId;
+
+    /**
+     * @return The ID of the role to assign to the token. Use `getOrganizationRole` to look up a role&#39;s ID by its name. Mutually exclusive with `admin: true`: set one or the other, not both. Pulumi Cloud accepts both, but some of its permission checks still treat such a token as an Admin whatever its role, so the provider rejects the combination. When neither is set, the token gets the Member role.
+     * 
+     */
+    public Optional<Output<String>> roleId() {
+        return Optional.ofNullable(this.roleId);
+    }
+
     private OrgAccessTokenArgs() {}
 
     private OrgAccessTokenArgs(OrgAccessTokenArgs $) {
         this.admin = $.admin;
         this.description = $.description;
+        this.expires = $.expires;
         this.name = $.name;
         this.organizationName = $.organizationName;
+        this.roleId = $.roleId;
     }
 
     public static Builder builder() {
@@ -106,7 +146,7 @@ public final class OrgAccessTokenArgs extends com.pulumi.resources.ResourceArgs 
         }
 
         /**
-         * @param admin Whether the token has the Admin role. Defaults to `false`.
+         * @param admin Whether the token has the Admin role. Defaults to `false`. Mutually exclusive with `roleId`: set `admin: true` or `roleId`, not both.
          * 
          * @return builder
          * 
@@ -117,7 +157,7 @@ public final class OrgAccessTokenArgs extends com.pulumi.resources.ResourceArgs 
         }
 
         /**
-         * @param admin Whether the token has the Admin role. Defaults to `false`.
+         * @param admin Whether the token has the Admin role. Defaults to `false`. Mutually exclusive with `roleId`: set `admin: true` or `roleId`, not both.
          * 
          * @return builder
          * 
@@ -148,18 +188,47 @@ public final class OrgAccessTokenArgs extends com.pulumi.resources.ResourceArgs 
         }
 
         /**
-         * @param name The name for the token.
+         * @param expires When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`. Omit it for a token that never expires. Pulumi Cloud rejects an expiry that is in the past, more than two years away, or beyond the organization&#39;s maximum token lifetime.
          * 
          * @return builder
          * 
          */
-        public Builder name(Output<String> name) {
+        public Builder expires(@Nullable Output<String> expires) {
+            $.expires = expires;
+            return this;
+        }
+
+        /**
+         * @param expires When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`. Omit it for a token that never expires. Pulumi Cloud rejects an expiry that is in the past, more than two years away, or beyond the organization&#39;s maximum token lifetime.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder expires(String expires) {
+            return expires(Output.of(expires));
+        }
+
+        /**
+         * @param name The name for the token, up to 40 characters. Organization and team tokens share one set of names per organization, and Pulumi Cloud never frees a deleted token&#39;s name, so the name must not have been used by any other token in the organization.
+         * 
+         * If omitted, Pulumi generates a name from the resource&#39;s logical name plus a random suffix, or follows the stack&#39;s [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). A replacement gets a new name. Removing `name` from an existing token keeps its current name until the next replacement.
+         * 
+         * Every input on this resource triggers a replacement, so when `name` is set explicitly, changing any other input fails with `409 Conflict: token name already exists`. Omit `name`, or change it along with the other input.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder name(@Nullable Output<String> name) {
             $.name = name;
             return this;
         }
 
         /**
-         * @param name The name for the token.
+         * @param name The name for the token, up to 40 characters. Organization and team tokens share one set of names per organization, and Pulumi Cloud never frees a deleted token&#39;s name, so the name must not have been used by any other token in the organization.
+         * 
+         * If omitted, Pulumi generates a name from the resource&#39;s logical name plus a random suffix, or follows the stack&#39;s [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). A replacement gets a new name. Removing `name` from an existing token keeps its current name until the next replacement.
+         * 
+         * Every input on this resource triggers a replacement, so when `name` is set explicitly, changing any other input fails with `409 Conflict: token name already exists`. Omit `name`, or change it along with the other input.
          * 
          * @return builder
          * 
@@ -189,11 +258,29 @@ public final class OrgAccessTokenArgs extends com.pulumi.resources.ResourceArgs 
             return organizationName(Output.of(organizationName));
         }
 
+        /**
+         * @param roleId The ID of the role to assign to the token. Use `getOrganizationRole` to look up a role&#39;s ID by its name. Mutually exclusive with `admin: true`: set one or the other, not both. Pulumi Cloud accepts both, but some of its permission checks still treat such a token as an Admin whatever its role, so the provider rejects the combination. When neither is set, the token gets the Member role.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder roleId(@Nullable Output<String> roleId) {
+            $.roleId = roleId;
+            return this;
+        }
+
+        /**
+         * @param roleId The ID of the role to assign to the token. Use `getOrganizationRole` to look up a role&#39;s ID by its name. Mutually exclusive with `admin: true`: set one or the other, not both. Pulumi Cloud accepts both, but some of its permission checks still treat such a token as an Admin whatever its role, so the provider rejects the combination. When neither is set, the token gets the Member role.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder roleId(String roleId) {
+            return roleId(Output.of(roleId));
+        }
+
         public OrgAccessTokenArgs build() {
             $.admin = Codegen.booleanProp("admin").output().arg($.admin).def(false).getNullable();
-            if ($.name == null) {
-                throw new MissingRequiredPropertyException("OrgAccessTokenArgs", "name");
-            }
             if ($.organizationName == null) {
                 throw new MissingRequiredPropertyException("OrgAccessTokenArgs", "organizationName");
             }

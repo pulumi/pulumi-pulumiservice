@@ -28,7 +28,7 @@ class OrganizationMemberArgs:
 
         :param pulumi.Input[_builtins.str] organization_name: The Pulumi Cloud organization name.
         :param pulumi.Input[_builtins.str] username: The Pulumi Cloud username of the member.
-        :param pulumi.Input[_builtins.str] role: The built-in organization role. One of `member`, `admin`, `billing-manager`. Defaults to `member` on create. Ignored when `roleId` is set.
+        :param pulumi.Input[_builtins.str] role: The built-in organization role. One of `member`, `admin`, `billing-manager`, `reader`, `builder`, `maintainer`. `reader`, `builder` and `maintainer` exist only in organizations that use stored default roles. In those organizations `member` means the organization's default role: the member follows it if an administrator changes it. Defaults to `member` on create. Ignored when `roleId` is set.
         :param pulumi.Input[_builtins.str] role_id: The ID of a custom (fine-grained) organization role to assign. Takes precedence over `role`.
         """
         pulumi.set(__self__, "organization_name", organization_name)
@@ -66,7 +66,7 @@ class OrganizationMemberArgs:
     @pulumi.getter
     def role(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
-        The built-in organization role. One of `member`, `admin`, `billing-manager`. Defaults to `member` on create. Ignored when `roleId` is set.
+        The built-in organization role. One of `member`, `admin`, `billing-manager`, `reader`, `builder`, `maintainer`. `reader`, `builder` and `maintainer` exist only in organizations that use stored default roles. In those organizations `member` means the organization's default role: the member follows it if an administrator changes it. Defaults to `member` on create. Ignored when `roleId` is set.
         """
         return pulumi.get(self, "role")
 
@@ -101,10 +101,19 @@ class OrganizationMember(pulumi.CustomResource):
         """
         Manages a user's membership in a Pulumi Cloud organization and their assigned role. The user must already have a Pulumi Cloud account before they can be added. Custom (fine-grained) roles are assigned by setting `roleId`; built-in roles are assigned by setting `role`. When both are set, `roleId` takes precedence.
 
+        ## Import
+
+        This resource can be imported using its `id`, which has the format `{organization}/{username}`, e.g.,
+
+        ```sh
+         $ pulumi import pulumiservice:index:OrganizationMember my-organization-member my-org/my-user
+        ```
+
+
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] organization_name: The Pulumi Cloud organization name.
-        :param pulumi.Input[_builtins.str] role: The built-in organization role. One of `member`, `admin`, `billing-manager`. Defaults to `member` on create. Ignored when `roleId` is set.
+        :param pulumi.Input[_builtins.str] role: The built-in organization role. One of `member`, `admin`, `billing-manager`, `reader`, `builder`, `maintainer`. `reader`, `builder` and `maintainer` exist only in organizations that use stored default roles. In those organizations `member` means the organization's default role: the member follows it if an administrator changes it. Defaults to `member` on create. Ignored when `roleId` is set.
         :param pulumi.Input[_builtins.str] role_id: The ID of a custom (fine-grained) organization role to assign. Takes precedence over `role`.
         :param pulumi.Input[_builtins.str] username: The Pulumi Cloud username of the member.
         """
@@ -116,6 +125,15 @@ class OrganizationMember(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         Manages a user's membership in a Pulumi Cloud organization and their assigned role. The user must already have a Pulumi Cloud account before they can be added. Custom (fine-grained) roles are assigned by setting `roleId`; built-in roles are assigned by setting `role`. When both are set, `roleId` takes precedence.
+
+        ## Import
+
+        This resource can be imported using its `id`, which has the format `{organization}/{username}`, e.g.,
+
+        ```sh
+         $ pulumi import pulumiservice:index:OrganizationMember my-organization-member my-org/my-user
+        ```
+
 
         :param str resource_name: The name of the resource.
         :param OrganizationMemberArgs args: The arguments to use to populate this resource's properties.
@@ -227,7 +245,7 @@ class OrganizationMember(pulumi.CustomResource):
     @pulumi.getter
     def role(self) -> pulumi.Output[Optional[_builtins.str]]:
         """
-        The built-in organization role. One of `member`, `admin`, `billing-manager`. Defaults to `member` on create. Ignored when `roleId` is set.
+        The built-in organization role. One of `member`, `admin`, `billing-manager`, `reader`, `builder`, `maintainer`. `reader`, `builder` and `maintainer` exist only in organizations that use stored default roles. In those organizations `member` means the organization's default role: the member follows it if an administrator changes it. Defaults to `member` on create. Ignored when `roleId` is set.
         """
         return pulumi.get(self, "role")
 

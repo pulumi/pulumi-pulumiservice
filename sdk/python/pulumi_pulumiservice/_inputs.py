@@ -68,11 +68,22 @@ __all__ = [
     'PolicyPackComplianceFrameworkInputArgsDict',
     'PolicyPackPolicyInputArgs',
     'PolicyPackPolicyInputArgsDict',
+    'RoleAccountRule',
+    'RoleAccountRuleDict',
+    'RoleEnvironmentRule',
+    'RoleEnvironmentRuleDict',
+    'RoleStackRule',
+    'RoleStackRuleDict',
+    'TagCondition',
+    'TagConditionDict',
     'TemplateSourceDestinationArgs',
     'TemplateSourceDestinationArgsDict',
 ]
 
 class AWSOIDCConfigurationArgsDict(TypedDict):
+    """
+    AWS configuration for Deployments OIDC. Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
+    """
     role_arn: pulumi.Input[_builtins.str]
     """
     The ARN of the role to assume using the OIDC token.
@@ -98,6 +109,8 @@ class AWSOIDCConfigurationArgs:
                  duration: pulumi.Input[Optional[_builtins.str]] = None,
                  policy_arns: pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]] = None):
         """
+        AWS configuration for Deployments OIDC. Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
+
         :param pulumi.Input[_builtins.str] role_arn: The ARN of the role to assume using the OIDC token.
         :param pulumi.Input[_builtins.str] session_name: The name of the assume-role session.
         :param pulumi.Input[_builtins.str] duration: Duration of the assume-role session in “XhYmZs” format
@@ -411,6 +424,9 @@ class AuthPolicyDefinitionArgs:
 
 
 class AzureOIDCConfigurationArgsDict(TypedDict):
+    """
+    Azure configuration for Deployments OIDC. Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
+    """
     client_id: pulumi.Input[_builtins.str]
     """
     The client ID of the federated workload identity.
@@ -431,6 +447,8 @@ class AzureOIDCConfigurationArgs:
                  subscription_id: pulumi.Input[_builtins.str],
                  tenant_id: pulumi.Input[_builtins.str]):
         """
+        Azure configuration for Deployments OIDC. Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
+
         :param pulumi.Input[_builtins.str] client_id: The client ID of the federated workload identity.
         :param pulumi.Input[_builtins.str] subscription_id: The subscription ID of the federated workload identity.
         :param pulumi.Input[_builtins.str] tenant_id: The tenant ID of the federated workload identity.
@@ -896,7 +914,11 @@ class DeploymentSettingsGithubArgsDict(TypedDict):
     """
     deploy_commits: NotRequired[pulumi.Input[Optional[_builtins.bool]]]
     """
-    Trigger a deployment running `pulumi up` on commit.
+    Trigger a deployment running `pulumi up` on commit. Must be `false` when `deployTags` is `true`, because Pulumi Cloud rejects the two together.
+    """
+    deploy_tags: NotRequired[pulumi.Input[Optional[_builtins.bool]]]
+    """
+    Trigger a deployment running `pulumi up` when a tag matching `tagFilters` is pushed. Can't be combined with `deployCommits`, which defaults to `true`, so set `deployCommits` to `false` when you enable this.
     """
     paths: NotRequired[pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]]]
     """
@@ -914,28 +936,40 @@ class DeploymentSettingsGithubArgsDict(TypedDict):
     """
     The GitHub repository in the format org/repo.
     """
+    tag_filters: NotRequired[pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]]]
+    """
+    Glob patterns matching the tag names that trigger a deployment when `deployTags` is true. Prefix a pattern with `!` to exclude matching tags, for example `!*-rc*`. An empty list matches all tags.
+    """
 
 @pulumi.input_type
 class DeploymentSettingsGithubArgs:
     def __init__(__self__, *,
                  deploy_commits: pulumi.Input[Optional[_builtins.bool]] = None,
+                 deploy_tags: pulumi.Input[Optional[_builtins.bool]] = None,
                  paths: pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]] = None,
                  preview_pull_requests: pulumi.Input[Optional[_builtins.bool]] = None,
                  pull_request_template: pulumi.Input[Optional[_builtins.bool]] = None,
-                 repository: pulumi.Input[Optional[_builtins.str]] = None):
+                 repository: pulumi.Input[Optional[_builtins.str]] = None,
+                 tag_filters: pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]] = None):
         """
         GitHub settings for the deployment.
 
-        :param pulumi.Input[_builtins.bool] deploy_commits: Trigger a deployment running `pulumi up` on commit.
+        :param pulumi.Input[_builtins.bool] deploy_commits: Trigger a deployment running `pulumi up` on commit. Must be `false` when `deployTags` is `true`, because Pulumi Cloud rejects the two together.
+        :param pulumi.Input[_builtins.bool] deploy_tags: Trigger a deployment running `pulumi up` when a tag matching `tagFilters` is pushed. Can't be combined with `deployCommits`, which defaults to `true`, so set `deployCommits` to `false` when you enable this.
         :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] paths: The paths within the repo that deployments should be filtered to.
         :param pulumi.Input[_builtins.bool] preview_pull_requests: Trigger a deployment running `pulumi preview` when a PR is opened.
         :param pulumi.Input[_builtins.bool] pull_request_template: Use this stack as a template for pull request review stacks.
         :param pulumi.Input[_builtins.str] repository: The GitHub repository in the format org/repo.
+        :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] tag_filters: Glob patterns matching the tag names that trigger a deployment when `deployTags` is true. Prefix a pattern with `!` to exclude matching tags, for example `!*-rc*`. An empty list matches all tags.
         """
         if deploy_commits is None:
             deploy_commits = True
         if deploy_commits is not None:
             pulumi.set(__self__, "deploy_commits", deploy_commits)
+        if deploy_tags is None:
+            deploy_tags = False
+        if deploy_tags is not None:
+            pulumi.set(__self__, "deploy_tags", deploy_tags)
         if paths is not None:
             pulumi.set(__self__, "paths", paths)
         if preview_pull_requests is None:
@@ -948,18 +982,32 @@ class DeploymentSettingsGithubArgs:
             pulumi.set(__self__, "pull_request_template", pull_request_template)
         if repository is not None:
             pulumi.set(__self__, "repository", repository)
+        if tag_filters is not None:
+            pulumi.set(__self__, "tag_filters", tag_filters)
 
     @_builtins.property
     @pulumi.getter(name="deployCommits")
     def deploy_commits(self) -> pulumi.Input[Optional[_builtins.bool]]:
         """
-        Trigger a deployment running `pulumi up` on commit.
+        Trigger a deployment running `pulumi up` on commit. Must be `false` when `deployTags` is `true`, because Pulumi Cloud rejects the two together.
         """
         return pulumi.get(self, "deploy_commits")
 
     @deploy_commits.setter
     def deploy_commits(self, value: pulumi.Input[Optional[_builtins.bool]]):
         pulumi.set(self, "deploy_commits", value)
+
+    @_builtins.property
+    @pulumi.getter(name="deployTags")
+    def deploy_tags(self) -> pulumi.Input[Optional[_builtins.bool]]:
+        """
+        Trigger a deployment running `pulumi up` when a tag matching `tagFilters` is pushed. Can't be combined with `deployCommits`, which defaults to `true`, so set `deployCommits` to `false` when you enable this.
+        """
+        return pulumi.get(self, "deploy_tags")
+
+    @deploy_tags.setter
+    def deploy_tags(self, value: pulumi.Input[Optional[_builtins.bool]]):
+        pulumi.set(self, "deploy_tags", value)
 
     @_builtins.property
     @pulumi.getter
@@ -1009,6 +1057,18 @@ class DeploymentSettingsGithubArgs:
     def repository(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "repository", value)
 
+    @_builtins.property
+    @pulumi.getter(name="tagFilters")
+    def tag_filters(self) -> pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]]:
+        """
+        Glob patterns matching the tag names that trigger a deployment when `deployTags` is true. Prefix a pattern with `!` to exclude matching tags, for example `!*-rc*`. An empty list matches all tags.
+        """
+        return pulumi.get(self, "tag_filters")
+
+    @tag_filters.setter
+    def tag_filters(self, value: pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]]):
+        pulumi.set(self, "tag_filters", value)
+
 
 class DeploymentSettingsOperationContextArgsDict(TypedDict):
     """
@@ -1020,7 +1080,7 @@ class DeploymentSettingsOperationContextArgsDict(TypedDict):
     """
     oidc: NotRequired[pulumi.Input[Optional['OperationContextOIDCArgsDict']]]
     """
-    OIDC configuration to use during the deployment.
+    Deployments OIDC configuration for obtaining cloud credentials during the deployment. Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. Deployments OIDC still fits when a customer-managed runner can't reach Pulumi Cloud to use ESC, or when pre-run commands need credentials and aren't wrapped in `pulumi env run`. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
     """
     options: NotRequired[pulumi.Input[Optional['OperationContextOptionsArgsDict']]]
     """
@@ -1042,7 +1102,7 @@ class DeploymentSettingsOperationContextArgs:
         Settings related to the Pulumi operation environment during the deployment.
 
         :param pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]] environment_variables: Environment variables to set for the deployment.
-        :param pulumi.Input['OperationContextOIDCArgs'] oidc: OIDC configuration to use during the deployment.
+        :param pulumi.Input['OperationContextOIDCArgs'] oidc: Deployments OIDC configuration for obtaining cloud credentials during the deployment. Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. Deployments OIDC still fits when a customer-managed runner can't reach Pulumi Cloud to use ESC, or when pre-run commands need credentials and aren't wrapped in `pulumi env run`. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
         :param pulumi.Input['OperationContextOptionsArgs'] options: Options to override default behavior during the deployment.
         :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] pre_run_commands: Shell commands to run before the Pulumi operation executes.
         """
@@ -1071,7 +1131,7 @@ class DeploymentSettingsOperationContextArgs:
     @pulumi.getter
     def oidc(self) -> pulumi.Input[Optional['OperationContextOIDCArgs']]:
         """
-        OIDC configuration to use during the deployment.
+        Deployments OIDC configuration for obtaining cloud credentials during the deployment. Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. Deployments OIDC still fits when a customer-managed runner can't reach Pulumi Cloud to use ESC, or when pre-run commands need credentials and aren't wrapped in `pulumi env run`. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
         """
         return pulumi.get(self, "oidc")
 
@@ -1148,11 +1208,15 @@ class DeploymentSettingsVcsArgsDict(TypedDict):
     """
     deploy_commits: NotRequired[pulumi.Input[Optional[_builtins.bool]]]
     """
-    Trigger a deployment running `pulumi up` on commit.
+    Trigger a deployment running `pulumi up` on commit. Must be `false` when `deployTags` is `true`, because Pulumi Cloud rejects the two together.
     """
     deploy_pull_request: NotRequired[pulumi.Input[Optional[_builtins.int]]]
     """
     Deploy a specific pull request number.
+    """
+    deploy_tags: NotRequired[pulumi.Input[Optional[_builtins.bool]]]
+    """
+    Trigger a deployment running `pulumi up` when a tag matching `tagFilters` is pushed. Can't be combined with `deployCommits`, which defaults to `true`, so set `deployCommits` to `false` when you enable this.
     """
     installation_id: NotRequired[pulumi.Input[Optional[_builtins.str]]]
     """
@@ -1174,6 +1238,10 @@ class DeploymentSettingsVcsArgsDict(TypedDict):
     """
     The repository identifier (e.g., 'ProjectName/RepoName' for Azure DevOps, 'org/repo' for GitHub).
     """
+    tag_filters: NotRequired[pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]]]
+    """
+    Glob patterns matching the tag names that trigger a deployment when `deployTags` is true. Prefix a pattern with `!` to exclude matching tags, for example `!*-rc*`. An empty list matches all tags.
+    """
 
 @pulumi.input_type
 class DeploymentSettingsVcsArgs:
@@ -1181,22 +1249,26 @@ class DeploymentSettingsVcsArgs:
                  provider: pulumi.Input[_builtins.str],
                  deploy_commits: pulumi.Input[Optional[_builtins.bool]] = None,
                  deploy_pull_request: pulumi.Input[Optional[_builtins.int]] = None,
+                 deploy_tags: pulumi.Input[Optional[_builtins.bool]] = None,
                  installation_id: pulumi.Input[Optional[_builtins.str]] = None,
                  paths: pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]] = None,
                  preview_pull_requests: pulumi.Input[Optional[_builtins.bool]] = None,
                  pull_request_template: pulumi.Input[Optional[_builtins.bool]] = None,
-                 repository: pulumi.Input[Optional[_builtins.str]] = None):
+                 repository: pulumi.Input[Optional[_builtins.str]] = None,
+                 tag_filters: pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]] = None):
         """
         VCS settings for the deployment, supporting multiple VCS providers.
 
         :param pulumi.Input[_builtins.str] provider: The VCS provider type.
-        :param pulumi.Input[_builtins.bool] deploy_commits: Trigger a deployment running `pulumi up` on commit.
+        :param pulumi.Input[_builtins.bool] deploy_commits: Trigger a deployment running `pulumi up` on commit. Must be `false` when `deployTags` is `true`, because Pulumi Cloud rejects the two together.
         :param pulumi.Input[_builtins.int] deploy_pull_request: Deploy a specific pull request number.
+        :param pulumi.Input[_builtins.bool] deploy_tags: Trigger a deployment running `pulumi up` when a tag matching `tagFilters` is pushed. Can't be combined with `deployCommits`, which defaults to `true`, so set `deployCommits` to `false` when you enable this.
         :param pulumi.Input[_builtins.str] installation_id: The VCS integration installation ID. Use to disambiguate when an organization has multiple integrations of the same provider type (e.g., two GitHub Apps). If omitted, the API resolves the integration automatically from `provider` and `repository`.
         :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] paths: The paths within the repo that deployments should be filtered to.
         :param pulumi.Input[_builtins.bool] preview_pull_requests: Trigger a deployment running `pulumi preview` when a PR is opened.
         :param pulumi.Input[_builtins.bool] pull_request_template: Use this stack as a template for pull request review stacks.
         :param pulumi.Input[_builtins.str] repository: The repository identifier (e.g., 'ProjectName/RepoName' for Azure DevOps, 'org/repo' for GitHub).
+        :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] tag_filters: Glob patterns matching the tag names that trigger a deployment when `deployTags` is true. Prefix a pattern with `!` to exclude matching tags, for example `!*-rc*`. An empty list matches all tags.
         """
         pulumi.set(__self__, "provider", provider)
         if deploy_commits is None:
@@ -1205,6 +1277,10 @@ class DeploymentSettingsVcsArgs:
             pulumi.set(__self__, "deploy_commits", deploy_commits)
         if deploy_pull_request is not None:
             pulumi.set(__self__, "deploy_pull_request", deploy_pull_request)
+        if deploy_tags is None:
+            deploy_tags = False
+        if deploy_tags is not None:
+            pulumi.set(__self__, "deploy_tags", deploy_tags)
         if installation_id is not None:
             pulumi.set(__self__, "installation_id", installation_id)
         if paths is not None:
@@ -1219,6 +1295,8 @@ class DeploymentSettingsVcsArgs:
             pulumi.set(__self__, "pull_request_template", pull_request_template)
         if repository is not None:
             pulumi.set(__self__, "repository", repository)
+        if tag_filters is not None:
+            pulumi.set(__self__, "tag_filters", tag_filters)
 
     @_builtins.property
     @pulumi.getter
@@ -1236,7 +1314,7 @@ class DeploymentSettingsVcsArgs:
     @pulumi.getter(name="deployCommits")
     def deploy_commits(self) -> pulumi.Input[Optional[_builtins.bool]]:
         """
-        Trigger a deployment running `pulumi up` on commit.
+        Trigger a deployment running `pulumi up` on commit. Must be `false` when `deployTags` is `true`, because Pulumi Cloud rejects the two together.
         """
         return pulumi.get(self, "deploy_commits")
 
@@ -1255,6 +1333,18 @@ class DeploymentSettingsVcsArgs:
     @deploy_pull_request.setter
     def deploy_pull_request(self, value: pulumi.Input[Optional[_builtins.int]]):
         pulumi.set(self, "deploy_pull_request", value)
+
+    @_builtins.property
+    @pulumi.getter(name="deployTags")
+    def deploy_tags(self) -> pulumi.Input[Optional[_builtins.bool]]:
+        """
+        Trigger a deployment running `pulumi up` when a tag matching `tagFilters` is pushed. Can't be combined with `deployCommits`, which defaults to `true`, so set `deployCommits` to `false` when you enable this.
+        """
+        return pulumi.get(self, "deploy_tags")
+
+    @deploy_tags.setter
+    def deploy_tags(self, value: pulumi.Input[Optional[_builtins.bool]]):
+        pulumi.set(self, "deploy_tags", value)
 
     @_builtins.property
     @pulumi.getter(name="installationId")
@@ -1315,6 +1405,18 @@ class DeploymentSettingsVcsArgs:
     @repository.setter
     def repository(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "repository", value)
+
+    @_builtins.property
+    @pulumi.getter(name="tagFilters")
+    def tag_filters(self) -> pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]]:
+        """
+        Glob patterns matching the tag names that trigger a deployment when `deployTags` is true. Prefix a pattern with `!` to exclude matching tags, for example `!*-rc*`. An empty list matches all tags.
+        """
+        return pulumi.get(self, "tag_filters")
+
+    @tag_filters.setter
+    def tag_filters(self, value: pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]]):
+        pulumi.set(self, "tag_filters", value)
 
 
 class EligibleApproverArgsDict(TypedDict):
@@ -1453,9 +1555,12 @@ class EnvironmentIdentifierArgs:
 
 
 class GCPOIDCConfigurationArgsDict(TypedDict):
+    """
+    GCP configuration for Deployments OIDC. Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
+    """
     project_id: pulumi.Input[_builtins.str]
     """
-    The numerical ID of the GCP project.
+    The GCP project number, a numeric value such as `123456789012`. This is not the project ID (such as `my-project`). To look up the number, run `gcloud projects describe <project-id> --format='value(projectNumber)'`.
     """
     provider_id: pulumi.Input[_builtins.str]
     """
@@ -1488,7 +1593,9 @@ class GCPOIDCConfigurationArgs:
                  region: pulumi.Input[Optional[_builtins.str]] = None,
                  token_lifetime: pulumi.Input[Optional[_builtins.str]] = None):
         """
-        :param pulumi.Input[_builtins.str] project_id: The numerical ID of the GCP project.
+        GCP configuration for Deployments OIDC. Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
+
+        :param pulumi.Input[_builtins.str] project_id: The GCP project number, a numeric value such as `123456789012`. This is not the project ID (such as `my-project`). To look up the number, run `gcloud projects describe <project-id> --format='value(projectNumber)'`.
         :param pulumi.Input[_builtins.str] provider_id: The ID of the identity provider associated with the workload pool.
         :param pulumi.Input[_builtins.str] service_account: The email address of the service account to use.
         :param pulumi.Input[_builtins.str] workload_pool_id: The ID of the workload pool to use.
@@ -1508,7 +1615,7 @@ class GCPOIDCConfigurationArgs:
     @pulumi.getter(name="projectId")
     def project_id(self) -> pulumi.Input[_builtins.str]:
         """
-        The numerical ID of the GCP project.
+        The GCP project number, a numeric value such as `123456789012`. This is not the project ID (such as `my-project`). To look up the number, run `gcloud projects describe <project-id> --format='value(projectNumber)'`.
         """
         return pulumi.get(self, "project_id")
 
@@ -1578,6 +1685,16 @@ class GCPOIDCConfigurationArgs:
 
 
 class OperationContextOIDCArgsDict(TypedDict):
+    """
+    Deployments OIDC configuration for obtaining cloud credentials during a deployment.
+
+    Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. Deployments OIDC predates Pulumi ESC and still works, but for most users ESC is the better choice. Deployments OIDC is still a good fit when:
+
+    - A customer-managed runner can't reach Pulumi Cloud over the network to use ESC.
+    - Pre-run commands need credentials. An ESC environment applies only to the Pulumi operation itself, unless the command is wrapped in `pulumi env run`.
+
+    See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
+    """
     aws: NotRequired[pulumi.Input[Optional['AWSOIDCConfigurationArgsDict']]]
     """
     AWS-specific OIDC configuration.
@@ -1598,6 +1715,15 @@ class OperationContextOIDCArgs:
                  azure: pulumi.Input[Optional['AzureOIDCConfigurationArgs']] = None,
                  gcp: pulumi.Input[Optional['GCPOIDCConfigurationArgs']] = None):
         """
+        Deployments OIDC configuration for obtaining cloud credentials during a deployment.
+
+        Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. Deployments OIDC predates Pulumi ESC and still works, but for most users ESC is the better choice. Deployments OIDC is still a good fit when:
+
+        - A customer-managed runner can't reach Pulumi Cloud over the network to use ESC.
+        - Pre-run commands need credentials. An ESC environment applies only to the Pulumi operation itself, unless the command is wrapped in `pulumi env run`.
+
+        See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
+
         :param pulumi.Input['AWSOIDCConfigurationArgs'] aws: AWS-specific OIDC configuration.
         :param pulumi.Input['AzureOIDCConfigurationArgs'] azure: Azure-specific OIDC configuration.
         :param pulumi.Input['GCPOIDCConfigurationArgs'] gcp: GCP-specific OIDC configuration.
@@ -2269,6 +2395,341 @@ class PolicyPackPolicyInputArgs:
     @url.setter
     def url(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "url", value)
+
+
+class RoleAccountRuleDict(TypedDict):
+    all: NotRequired[_builtins.bool]
+    """
+    Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+    """
+    id: NotRequired[_builtins.str]
+    """
+    Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
+    """
+    scopes: NotRequired[Sequence['RbacAccountScope']]
+    """
+    Cloud account scopes to grant on the selected accounts.
+    """
+    tags: NotRequired[Sequence['TagConditionDict']]
+    """
+    Apply to entities whose tags match every condition.
+    """
+
+@pulumi.input_type
+class RoleAccountRule:
+    def __init__(__self__, *,
+                 all: Optional[_builtins.bool] = None,
+                 id: Optional[_builtins.str] = None,
+                 scopes: Optional[Sequence['RbacAccountScope']] = None,
+                 tags: Optional[Sequence['TagCondition']] = None):
+        """
+        :param _builtins.bool all: Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+        :param _builtins.str id: Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
+        :param Sequence['RbacAccountScope'] scopes: Cloud account scopes to grant on the selected accounts.
+        :param Sequence['TagCondition'] tags: Apply to entities whose tags match every condition.
+        """
+        if all is not None:
+            pulumi.set(__self__, "all", all)
+        if id is not None:
+            pulumi.set(__self__, "id", id)
+        if scopes is not None:
+            pulumi.set(__self__, "scopes", scopes)
+        if tags is not None:
+            pulumi.set(__self__, "tags", tags)
+
+    @_builtins.property
+    @pulumi.getter
+    def all(self) -> Optional[_builtins.bool]:
+        """
+        Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+        """
+        return pulumi.get(self, "all")
+
+    @all.setter
+    def all(self, value: Optional[_builtins.bool]):
+        pulumi.set(self, "all", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def id(self) -> Optional[_builtins.str]:
+        """
+        Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
+        """
+        return pulumi.get(self, "id")
+
+    @id.setter
+    def id(self, value: Optional[_builtins.str]):
+        pulumi.set(self, "id", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def scopes(self) -> Optional[Sequence['RbacAccountScope']]:
+        """
+        Cloud account scopes to grant on the selected accounts.
+        """
+        return pulumi.get(self, "scopes")
+
+    @scopes.setter
+    def scopes(self, value: Optional[Sequence['RbacAccountScope']]):
+        pulumi.set(self, "scopes", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def tags(self) -> Optional[Sequence['TagCondition']]:
+        """
+        Apply to entities whose tags match every condition.
+        """
+        return pulumi.get(self, "tags")
+
+    @tags.setter
+    def tags(self, value: Optional[Sequence['TagCondition']]):
+        pulumi.set(self, "tags", value)
+
+
+class RoleEnvironmentRuleDict(TypedDict):
+    all: NotRequired[_builtins.bool]
+    """
+    Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+    """
+    id: NotRequired[_builtins.str]
+    """
+    Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
+    """
+    scopes: NotRequired[Sequence['RbacEnvironmentScope']]
+    """
+    Environment scopes to grant on the selected environments.
+    """
+    tags: NotRequired[Sequence['TagConditionDict']]
+    """
+    Apply to entities whose tags match every condition.
+    """
+
+@pulumi.input_type
+class RoleEnvironmentRule:
+    def __init__(__self__, *,
+                 all: Optional[_builtins.bool] = None,
+                 id: Optional[_builtins.str] = None,
+                 scopes: Optional[Sequence['RbacEnvironmentScope']] = None,
+                 tags: Optional[Sequence['TagCondition']] = None):
+        """
+        :param _builtins.bool all: Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+        :param _builtins.str id: Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
+        :param Sequence['RbacEnvironmentScope'] scopes: Environment scopes to grant on the selected environments.
+        :param Sequence['TagCondition'] tags: Apply to entities whose tags match every condition.
+        """
+        if all is not None:
+            pulumi.set(__self__, "all", all)
+        if id is not None:
+            pulumi.set(__self__, "id", id)
+        if scopes is not None:
+            pulumi.set(__self__, "scopes", scopes)
+        if tags is not None:
+            pulumi.set(__self__, "tags", tags)
+
+    @_builtins.property
+    @pulumi.getter
+    def all(self) -> Optional[_builtins.bool]:
+        """
+        Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+        """
+        return pulumi.get(self, "all")
+
+    @all.setter
+    def all(self, value: Optional[_builtins.bool]):
+        pulumi.set(self, "all", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def id(self) -> Optional[_builtins.str]:
+        """
+        Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
+        """
+        return pulumi.get(self, "id")
+
+    @id.setter
+    def id(self, value: Optional[_builtins.str]):
+        pulumi.set(self, "id", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def scopes(self) -> Optional[Sequence['RbacEnvironmentScope']]:
+        """
+        Environment scopes to grant on the selected environments.
+        """
+        return pulumi.get(self, "scopes")
+
+    @scopes.setter
+    def scopes(self, value: Optional[Sequence['RbacEnvironmentScope']]):
+        pulumi.set(self, "scopes", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def tags(self) -> Optional[Sequence['TagCondition']]:
+        """
+        Apply to entities whose tags match every condition.
+        """
+        return pulumi.get(self, "tags")
+
+    @tags.setter
+    def tags(self, value: Optional[Sequence['TagCondition']]):
+        pulumi.set(self, "tags", value)
+
+
+class RoleStackRuleDict(TypedDict):
+    all: NotRequired[_builtins.bool]
+    """
+    Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+    """
+    id: NotRequired[_builtins.str]
+    """
+    Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
+    """
+    scopes: NotRequired[Sequence['RbacStackScope']]
+    """
+    Stack scopes to grant on the selected stacks.
+    """
+    tags: NotRequired[Sequence['TagConditionDict']]
+    """
+    Apply to entities whose tags match every condition.
+    """
+
+@pulumi.input_type
+class RoleStackRule:
+    def __init__(__self__, *,
+                 all: Optional[_builtins.bool] = None,
+                 id: Optional[_builtins.str] = None,
+                 scopes: Optional[Sequence['RbacStackScope']] = None,
+                 tags: Optional[Sequence['TagCondition']] = None):
+        """
+        :param _builtins.bool all: Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+        :param _builtins.str id: Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
+        :param Sequence['RbacStackScope'] scopes: Stack scopes to grant on the selected stacks.
+        :param Sequence['TagCondition'] tags: Apply to entities whose tags match every condition.
+        """
+        if all is not None:
+            pulumi.set(__self__, "all", all)
+        if id is not None:
+            pulumi.set(__self__, "id", id)
+        if scopes is not None:
+            pulumi.set(__self__, "scopes", scopes)
+        if tags is not None:
+            pulumi.set(__self__, "tags", tags)
+
+    @_builtins.property
+    @pulumi.getter
+    def all(self) -> Optional[_builtins.bool]:
+        """
+        Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
+        """
+        return pulumi.get(self, "all")
+
+    @all.setter
+    def all(self, value: Optional[_builtins.bool]):
+        pulumi.set(self, "all", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def id(self) -> Optional[_builtins.str]:
+        """
+        Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
+        """
+        return pulumi.get(self, "id")
+
+    @id.setter
+    def id(self, value: Optional[_builtins.str]):
+        pulumi.set(self, "id", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def scopes(self) -> Optional[Sequence['RbacStackScope']]:
+        """
+        Stack scopes to grant on the selected stacks.
+        """
+        return pulumi.get(self, "scopes")
+
+    @scopes.setter
+    def scopes(self, value: Optional[Sequence['RbacStackScope']]):
+        pulumi.set(self, "scopes", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def tags(self) -> Optional[Sequence['TagCondition']]:
+        """
+        Apply to entities whose tags match every condition.
+        """
+        return pulumi.get(self, "tags")
+
+    @tags.setter
+    def tags(self, value: Optional[Sequence['TagCondition']]):
+        pulumi.set(self, "tags", value)
+
+
+class TagConditionDict(TypedDict):
+    key: _builtins.str
+    """
+    The tag key.
+    """
+    operator: NotRequired['TagOperator']
+    """
+    How the tag is compared. Defaults to `equals`.
+    """
+    value: NotRequired[_builtins.str]
+    """
+    The tag value. Required with `equals` and `notEquals`, and not allowed with `exists` and `notExists`.
+    """
+
+@pulumi.input_type
+class TagCondition:
+    def __init__(__self__, *,
+                 key: _builtins.str,
+                 operator: Optional['TagOperator'] = None,
+                 value: Optional[_builtins.str] = None):
+        """
+        :param _builtins.str key: The tag key.
+        :param 'TagOperator' operator: How the tag is compared. Defaults to `equals`.
+        :param _builtins.str value: The tag value. Required with `equals` and `notEquals`, and not allowed with `exists` and `notExists`.
+        """
+        pulumi.set(__self__, "key", key)
+        if operator is not None:
+            pulumi.set(__self__, "operator", operator)
+        if value is not None:
+            pulumi.set(__self__, "value", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def key(self) -> _builtins.str:
+        """
+        The tag key.
+        """
+        return pulumi.get(self, "key")
+
+    @key.setter
+    def key(self, value: _builtins.str):
+        pulumi.set(self, "key", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def operator(self) -> Optional['TagOperator']:
+        """
+        How the tag is compared. Defaults to `equals`.
+        """
+        return pulumi.get(self, "operator")
+
+    @operator.setter
+    def operator(self, value: Optional['TagOperator']):
+        pulumi.set(self, "operator", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def value(self) -> Optional[_builtins.str]:
+        """
+        The tag value. Required with `equals` and `notEquals`, and not allowed with `exists` and `notExists`.
+        """
+        return pulumi.get(self, "value")
+
+    @value.setter
+    def value(self, value: Optional[_builtins.str]):
+        pulumi.set(self, "value", value)
 
 
 class TemplateSourceDestinationArgsDict(TypedDict):

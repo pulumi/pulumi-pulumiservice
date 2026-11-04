@@ -9,6 +9,21 @@ import * as utilities from "./utilities";
 
 /**
  * A scheduled recurring or single time run of a pulumi command.
+ *
+ * ## Import
+ *
+ * This resource can be imported using its `id`, which has the format `{organization}/{project}/{stack}/{scheduleId}`, e.g.,
+ *
+ * ```sh
+ *  $ pulumi import pulumiservice:index:DeploymentSchedule my-deployment-schedule my-org/my-project/my-stack/7d3c5e1a-0f8b-4b26-a9d4-3e6f2b8c1a59
+ * ```
+ *
+ * The Pulumi Cloud console doesn't show the schedule ID. List it with the [Pulumi Cloud REST API](https://www.pulumi.com/docs/reference/cloud-rest-api/):
+ *
+ * ```sh
+ * curl -s -H "Authorization: token $PULUMI_ACCESS_TOKEN" \
+ *   https://api.pulumi.com/api/stacks/my-org/my-project/my-stack/deployments/schedules | jq '.schedules[]'
+ * ```
  */
 export class DeploymentSchedule extends pulumi.CustomResource {
     /**
@@ -21,6 +36,16 @@ export class DeploymentSchedule extends pulumi.CustomResource {
      */
     public static get(name: string, id: pulumi.Input<pulumi.ID>, opts?: pulumi.CustomResourceOptions): DeploymentSchedule {
         return new DeploymentSchedule(name, undefined as any, { ...opts, id: id });
+    }
+
+    /**
+     * Check whether an existing DeploymentSchedule resource with the given ID exists.
+     *
+     * @param id The _unique_ provider ID of the resource to check.
+     * @param opts Optional settings to control the behavior of the CustomResource.
+     */
+    public static exists(id: pulumi.Input<string>, opts?: pulumi.CustomResourceOptions): pulumi.Output<boolean> {
+        return pulumi.runtime.existsResource("pulumiservice:index:DeploymentSchedule", id, {}, { ...opts }, undefined);
     }
 
     /** @internal */

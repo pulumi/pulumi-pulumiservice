@@ -9,6 +9,16 @@ import * as utilities from "./utilities";
 
 /**
  * A Policy Pack published to Pulumi Cloud. The source directory is tarballed and uploaded on Create; changing source content publishes a new version (replace).
+ *
+ * ## Import
+ *
+ * This resource can be imported using its `id`, which has the format `{organization}/{name}/{versionTag}`, e.g.,
+ *
+ * ```sh
+ *  $ pulumi import pulumiservice:index:PolicyPack my-policy-pack my-org/my-policy-pack/1.0.0
+ * ```
+ *
+ * Only the organization, name, version tag and display name are read back. Set `sourcePath` in your program after import.
  */
 export class PolicyPack extends pulumi.CustomResource {
     /**
@@ -21,6 +31,16 @@ export class PolicyPack extends pulumi.CustomResource {
      */
     public static get(name: string, id: pulumi.Input<pulumi.ID>, opts?: pulumi.CustomResourceOptions): PolicyPack {
         return new PolicyPack(name, undefined as any, { ...opts, id: id });
+    }
+
+    /**
+     * Check whether an existing PolicyPack resource with the given ID exists.
+     *
+     * @param id The _unique_ provider ID of the resource to check.
+     * @param opts Optional settings to control the behavior of the CustomResource.
+     */
+    public static exists(id: pulumi.Input<string>, opts?: pulumi.CustomResourceOptions): pulumi.Output<boolean> {
+        return pulumi.runtime.existsResource("pulumiservice:index:PolicyPack", id, {}, { ...opts }, undefined);
     }
 
     /** @internal */

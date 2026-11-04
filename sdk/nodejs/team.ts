@@ -6,6 +6,16 @@ import * as utilities from "./utilities";
 
 /**
  * The Pulumi Cloud offers role-based access control (RBAC) using teams. Teams allow organization admins to assign a set of stack permissions to a group of users.
+ *
+ * ## Import
+ *
+ * This resource can be imported using its `id`, which has the format `{organization}/{teamName}`, e.g.,
+ *
+ * ```sh
+ *  $ pulumi import pulumiservice:index:Team my-team my-org/my-team
+ * ```
+ *
+ * For GitHub teams, `githubTeamId` isn't read back, so set it in your program after import.
  */
 export class Team extends pulumi.CustomResource {
     /**
@@ -18,6 +28,16 @@ export class Team extends pulumi.CustomResource {
      */
     public static get(name: string, id: pulumi.Input<pulumi.ID>, opts?: pulumi.CustomResourceOptions): Team {
         return new Team(name, undefined as any, { ...opts, id: id });
+    }
+
+    /**
+     * Check whether an existing Team resource with the given ID exists.
+     *
+     * @param id The _unique_ provider ID of the resource to check.
+     * @param opts Optional settings to control the behavior of the CustomResource.
+     */
+    public static exists(id: pulumi.Input<string>, opts?: pulumi.CustomResourceOptions): pulumi.Output<boolean> {
+        return pulumi.runtime.existsResource("pulumiservice:index:Team", id, {}, { ...opts }, undefined);
     }
 
     /** @internal */

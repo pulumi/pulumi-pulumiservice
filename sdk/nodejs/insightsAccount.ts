@@ -9,6 +9,16 @@ import * as utilities from "./utilities";
 
 /**
  * Insights Account for cloud resource scanning and analysis across AWS, Azure, and GCP.
+ *
+ * ## Import
+ *
+ * This resource can be imported using its `id`, which has the format `{organization}/{accountName}`, e.g.,
+ *
+ * ```sh
+ *  $ pulumi import pulumiservice:index:InsightsAccount my-insights-account my-org/my-account
+ * ```
+ *
+ * `scanSchedule` isn't read back from Pulumi Cloud, so set it in your program after import.
  */
 export class InsightsAccount extends pulumi.CustomResource {
     /**
@@ -21,6 +31,16 @@ export class InsightsAccount extends pulumi.CustomResource {
      */
     public static get(name: string, id: pulumi.Input<pulumi.ID>, opts?: pulumi.CustomResourceOptions): InsightsAccount {
         return new InsightsAccount(name, undefined as any, { ...opts, id: id });
+    }
+
+    /**
+     * Check whether an existing InsightsAccount resource with the given ID exists.
+     *
+     * @param id The _unique_ provider ID of the resource to check.
+     * @param opts Optional settings to control the behavior of the CustomResource.
+     */
+    public static exists(id: pulumi.Input<string>, opts?: pulumi.CustomResourceOptions): pulumi.Output<boolean> {
+        return pulumi.runtime.existsResource("pulumiservice:index:InsightsAccount", id, {}, { ...opts }, undefined);
     }
 
     /** @internal */

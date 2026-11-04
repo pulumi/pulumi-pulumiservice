@@ -68,14 +68,14 @@ public final class WebhookArgs extends com.pulumi.resources.ResourceArgs {
     }
 
     /**
-     * Optional set of filters to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#filters) for more information.
+     * Optional set of filters to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/deployments/concepts/webhooks/#event-filtering) for more information.
      * 
      */
     @Import(name="filters")
     private @Nullable Output<List<WebhookFilters>> filters;
 
     /**
-     * @return Optional set of filters to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#filters) for more information.
+     * @return Optional set of filters to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/deployments/concepts/webhooks/#event-filtering) for more information.
      * 
      */
     public Optional<Output<List<WebhookFilters>>> filters() {
@@ -98,14 +98,14 @@ public final class WebhookArgs extends com.pulumi.resources.ResourceArgs {
     }
 
     /**
-     * Optional set of filter groups to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#groups) for more information.
+     * Optional set of filter groups to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/deployments/concepts/webhooks/#event-filtering) for more information.
      * 
      */
     @Import(name="groups")
     private @Nullable Output<List<WebhookGroup>> groups;
 
     /**
-     * @return Optional set of filter groups to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#groups) for more information.
+     * @return Optional set of filter groups to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/deployments/concepts/webhooks/#event-filtering) for more information.
      * 
      */
     public Optional<Output<List<WebhookGroup>>> groups() {
@@ -158,14 +158,14 @@ public final class WebhookArgs extends com.pulumi.resources.ResourceArgs {
     }
 
     /**
-     * Optional. secret used as the HMAC key. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#headers) for more information.
+     * Optional. secret used as the HMAC key. See [webhook docs](https://www.pulumi.com/docs/deployments/concepts/webhooks/#headers) for more information.
      * 
      */
     @Import(name="secret")
     private @Nullable Output<String> secret;
 
     /**
-     * @return Optional. secret used as the HMAC key. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#headers) for more information.
+     * @return Optional. secret used as the HMAC key. See [webhook docs](https://www.pulumi.com/docs/deployments/concepts/webhooks/#headers) for more information.
      * 
      */
     public Optional<Output<String>> secret() {
@@ -285,7 +285,7 @@ public final class WebhookArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param filters Optional set of filters to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#filters) for more information.
+         * @param filters Optional set of filters to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/deployments/concepts/webhooks/#event-filtering) for more information.
          * 
          * @return builder
          * 
@@ -296,7 +296,7 @@ public final class WebhookArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param filters Optional set of filters to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#filters) for more information.
+         * @param filters Optional set of filters to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/deployments/concepts/webhooks/#event-filtering) for more information.
          * 
          * @return builder
          * 
@@ -306,7 +306,7 @@ public final class WebhookArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param filters Optional set of filters to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#filters) for more information.
+         * @param filters Optional set of filters to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/deployments/concepts/webhooks/#event-filtering) for more information.
          * 
          * @return builder
          * 
@@ -337,7 +337,7 @@ public final class WebhookArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param groups Optional set of filter groups to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#groups) for more information.
+         * @param groups Optional set of filter groups to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/deployments/concepts/webhooks/#event-filtering) for more information.
          * 
          * @return builder
          * 
@@ -348,7 +348,7 @@ public final class WebhookArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param groups Optional set of filter groups to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#groups) for more information.
+         * @param groups Optional set of filter groups to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/deployments/concepts/webhooks/#event-filtering) for more information.
          * 
          * @return builder
          * 
@@ -358,7 +358,7 @@ public final class WebhookArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param groups Optional set of filter groups to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#groups) for more information.
+         * @param groups Optional set of filter groups to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/deployments/concepts/webhooks/#event-filtering) for more information.
          * 
          * @return builder
          * 
@@ -431,7 +431,7 @@ public final class WebhookArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param secret Optional. secret used as the HMAC key. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#headers) for more information.
+         * @param secret Optional. secret used as the HMAC key. See [webhook docs](https://www.pulumi.com/docs/deployments/concepts/webhooks/#headers) for more information.
          * 
          * @return builder
          * 
@@ -442,7 +442,7 @@ public final class WebhookArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param secret Optional. secret used as the HMAC key. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#headers) for more information.
+         * @param secret Optional. secret used as the HMAC key. See [webhook docs](https://www.pulumi.com/docs/deployments/concepts/webhooks/#headers) for more information.
          * 
          * @return builder
          * 

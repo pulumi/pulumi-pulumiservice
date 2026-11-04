@@ -10,6 +10,9 @@ using Pulumi.Serialization;
 namespace Pulumi.PulumiService.Inputs
 {
 
+    /// <summary>
+    /// Azure configuration for Deployments OIDC. Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
+    /// </summary>
     public sealed class AzureOIDCConfigurationArgs : global::Pulumi.ResourceArgs
     {
         /// <summary>

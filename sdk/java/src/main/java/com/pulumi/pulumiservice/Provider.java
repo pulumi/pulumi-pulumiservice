@@ -17,14 +17,14 @@ import javax.annotation.Nullable;
 @ResourceType(type="pulumi:providers:pulumiservice")
 public class Provider extends com.pulumi.resources.ProviderResource {
     /**
-     * Access Token to authenticate with Pulumi Cloud.
+     * Access token to authenticate with Pulumi Cloud. Optional: if unset, the provider uses the `PULUMI_ACCESS_TOKEN` environment variable, then the access token of the account you&#39;re logged in to with `pulumi login`.
      * 
      */
     @Export(name="accessToken", refs={String.class}, tree="[0]")
     private Output</* @Nullable */ String> accessToken;
 
     /**
-     * @return Access Token to authenticate with Pulumi Cloud.
+     * @return Access token to authenticate with Pulumi Cloud. Optional: if unset, the provider uses the `PULUMI_ACCESS_TOKEN` environment variable, then the access token of the account you&#39;re logged in to with `pulumi login`.
      * 
      */
     public Output<Optional<String>> accessToken() {

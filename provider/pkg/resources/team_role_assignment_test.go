@@ -44,11 +44,11 @@ func TestTeamRoleAssignmentCreate(t *testing.T) {
 			assigned = true
 			assert.Equal(t, gcAcme, org)
 			assert.Equal(t, gcDevops, team)
-			assert.Equal(t, gcRoleID, roleID)
+			assert.Equal(t, testRoleID, roleID)
 			return nil
 		},
 		get: func(_ context.Context, _, _, _ string) (*pulumiapi.TeamRoleRef, error) {
-			return &pulumiapi.TeamRoleRef{ID: gcRoleID, Name: "devops-role"}, nil
+			return &pulumiapi.TeamRoleRef{ID: testRoleID, Name: "devops-role"}, nil
 		},
 	}
 	ctx := config.WithMockClient(context.Background(), mock)
@@ -58,7 +58,7 @@ func TestTeamRoleAssignmentCreate(t *testing.T) {
 		Inputs: TeamRoleAssignmentInput{
 			OrganizationName: gcAcme,
 			TeamName:         gcDevops,
-			RoleId:           gcRoleID,
+			RoleId:           testRoleID,
 		},
 	})
 	assert.NoError(t, err)
@@ -71,7 +71,7 @@ func TestTeamRoleAssignmentRead(t *testing.T) {
 	t.Run("found", func(t *testing.T) {
 		mock := &teamRoleClientMock{
 			get: func(_ context.Context, _, _, _ string) (*pulumiapi.TeamRoleRef, error) {
-				return &pulumiapi.TeamRoleRef{ID: gcRoleID, Name: gcDevops}, nil
+				return &pulumiapi.TeamRoleRef{ID: testRoleID, Name: gcDevops}, nil
 			},
 		}
 		ctx := config.WithMockClient(context.Background(), mock)
@@ -81,7 +81,7 @@ func TestTeamRoleAssignmentRead(t *testing.T) {
 		})
 		assert.NoError(t, err)
 		assert.Equal(t, "acme/devops/role-123", resp.ID)
-		assert.Equal(t, gcRoleID, resp.State.RoleId)
+		assert.Equal(t, testRoleID, resp.State.RoleId)
 	})
 
 	t.Run("not found empties", func(t *testing.T) {
@@ -115,7 +115,7 @@ func TestTeamRoleAssignmentDelete(t *testing.T) {
 			removed = true
 			assert.Equal(t, gcAcme, org)
 			assert.Equal(t, gcDevops, team)
-			assert.Equal(t, gcRoleID, roleID)
+			assert.Equal(t, testRoleID, roleID)
 			return nil
 		},
 	}
@@ -126,7 +126,7 @@ func TestTeamRoleAssignmentDelete(t *testing.T) {
 			TeamRoleAssignmentInput: TeamRoleAssignmentInput{
 				OrganizationName: gcAcme,
 				TeamName:         gcDevops,
-				RoleId:           gcRoleID,
+				RoleId:           testRoleID,
 			},
 		},
 	})

@@ -33,6 +33,10 @@ const settings = new service.DeploymentSettings("deployment_settings", {
         options: {
             skipInstallDependencies: true,
         },
+        // Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments:
+        // https://www.pulumi.com/docs/deployments/guides/cloud-credentials/
+        // This block shows Deployments OIDC, which still fits some cases, such as customer-managed
+        // runners that can't reach Pulumi Cloud and pre-run commands that need credentials.
         oidc: {
             aws: {
                 roleARN: "arn:aws:iam::123456789012:role/MyRole",

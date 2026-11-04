@@ -28,7 +28,7 @@ namespace Pulumi.PulumiService.Inputs
         }
 
         /// <summary>
-        /// OIDC configuration to use during the deployment.
+        /// Deployments OIDC configuration for obtaining cloud credentials during the deployment. Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. Deployments OIDC still fits when a customer-managed runner can't reach Pulumi Cloud to use ESC, or when pre-run commands need credentials and aren't wrapped in `pulumi env run`. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
         /// </summary>
         [Input("oidc")]
         public Input<Inputs.OperationContextOIDCArgs>? Oidc { get; set; }

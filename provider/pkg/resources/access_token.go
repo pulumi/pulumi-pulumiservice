@@ -18,10 +18,12 @@ import (
 	"context"
 	"fmt"
 
+	p "github.com/pulumi/pulumi-go-provider"
 	"github.com/pulumi/pulumi-go-provider/infer"
 	"github.com/pulumi/pulumi/sdk/v3/go/property"
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 )
 
 const (
@@ -33,6 +35,7 @@ const (
 type AccessToken struct{}
 
 var (
+	_ infer.CustomCheck[AccessTokenInput]                    = &AccessToken{}
 	_ infer.CustomCreate[AccessTokenInput, AccessTokenState] = &AccessToken{}
 	_ infer.CustomDelete[AccessTokenState]                   = &AccessToken{}
 	_ infer.CustomRead[AccessTokenInput, AccessTokenState]   = &AccessToken{}
@@ -44,16 +47,27 @@ func (*AccessToken) Annotate(a infer.Annotator) {
 		&AccessToken{},
 		"Creates a personal access token for the Pulumi Cloud user that the provider is authenticated as. "+
 			"The token acts with that user's permissions.\n\n"+
-			"To create a token that isn't tied to a user, use `OrgAccessToken` or `TeamAccessToken`.",
+			"To create a token that isn't tied to a user, use `OrgAccessToken` or `TeamAccessToken`."+
+			util.ImportDocs("pulumiservice:index:AccessToken", "{tokenId}",
+				"3f2b9c1e-7d4a-4e8b-9a61-0c5d2e8f7b13",
+				util.APIIDHint("token ID", "/api/user/tokens", ".tokens[] | {name, id}"),
+				"The token's `value` can't be read back from Pulumi Cloud, so it's empty after import."),
 	)
 }
 
 type AccessTokenInput struct {
-	Description string `pulumi:"description" provider:"replaceOnChanges"`
+	Description string  `pulumi:"description"      provider:"replaceOnChanges"`
+	Expires     *string `pulumi:"expires,optional" provider:"replaceOnChanges"`
 }
 
 func (i *AccessTokenInput) Annotate(a infer.Annotator) {
 	a.Describe(&i.Description, "Description of the access token.")
+	a.Describe(
+		&i.Expires,
+		"When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`. Omit it for a "+
+			"token that never expires. Pulumi Cloud rejects an expiry that is in the past or more than two "+
+			"years away.",
+	)
 }
 
 type AccessTokenState struct {
@@ -74,7 +88,15 @@ func (*AccessToken) Create(
 			Output: AccessTokenState{AccessTokenInput: req.Inputs},
 		}, nil
 	}
-	token, err := config.GetClient(ctx).CreateAccessToken(ctx, req.Inputs.Description)
+	var expires int64
+	if req.Inputs.Expires != nil {
+		t, err := parseTokenExpiry(*req.Inputs.Expires)
+		if err != nil {
+			return infer.CreateResponse[AccessTokenState]{}, err
+		}
+		expires = t.Unix()
+	}
+	token, err := config.GetClient(ctx).CreateAccessToken(ctx, req.Inputs.Description, expires)
 	if err != nil {
 		return infer.CreateResponse[AccessTokenState]{}, fmt.Errorf(
 			"error creating access token %q: %w", req.Inputs.Description, err,
@@ -83,7 +105,7 @@ func (*AccessToken) Create(
 	return infer.CreateResponse[AccessTokenState]{
 		ID: token.ID,
 		Output: AccessTokenState{
-			AccessTokenInput: AccessTokenInput{Description: req.Inputs.Description},
+			AccessTokenInput: req.Inputs,
 			Value:            token.TokenValue,
 		},
 	}, nil
@@ -107,7 +129,10 @@ func (*AccessToken) Read(
 	if token == nil {
 		return infer.ReadResponse[AccessTokenInput, AccessTokenState]{}, nil
 	}
-	inputs := AccessTokenInput{Description: token.Description}
+	inputs := AccessTokenInput{
+		Description: token.Description,
+		Expires:     readTokenExpiry(token.Expires, req.State.Expires),
+	}
 	return infer.ReadResponse[AccessTokenInput, AccessTokenState]{
 		ID:     req.ID,
 		Inputs: inputs,
@@ -118,6 +143,22 @@ func (*AccessToken) Read(
 			Value: req.State.Value,
 		},
 	}, nil
+}
+
+func (*AccessToken) Check(
+	ctx context.Context,
+	req infer.CheckRequest,
+) (infer.CheckResponse[AccessTokenInput], error) {
+	in, failures, err := infer.DefaultCheck[AccessTokenInput](ctx, req.NewInputs)
+	if err != nil {
+		return infer.CheckResponse[AccessTokenInput]{}, err
+	}
+	if in.Expires != nil && !isUnknownInput(req.NewInputs, gcExpires) {
+		if _, err := parseTokenExpiry(*in.Expires); err != nil {
+			failures = append(failures, p.CheckFailure{Property: gcExpires, Reason: err.Error()})
+		}
+	}
+	return infer.CheckResponse[AccessTokenInput]{Inputs: in, Failures: failures}, nil
 }
 
 // StateMigrations strips the legacy "__inputs" outputs property that the

@@ -16,7 +16,7 @@ namespace Pulumi.PulumiService.Inputs
     public sealed class DeploymentSettingsVcsArgs : global::Pulumi.ResourceArgs
     {
         /// <summary>
-        /// Trigger a deployment running `pulumi up` on commit.
+        /// Trigger a deployment running `pulumi up` on commit. Must be `false` when `deployTags` is `true`, because Pulumi Cloud rejects the two together.
         /// </summary>
         [Input("deployCommits")]
         public Input<bool>? DeployCommits { get; set; }
@@ -26,6 +26,12 @@ namespace Pulumi.PulumiService.Inputs
         /// </summary>
         [Input("deployPullRequest")]
         public Input<int>? DeployPullRequest { get; set; }
+
+        /// <summary>
+        /// Trigger a deployment running `pulumi up` when a tag matching `tagFilters` is pushed. Can't be combined with `deployCommits`, which defaults to `true`, so set `deployCommits` to `false` when you enable this.
+        /// </summary>
+        [Input("deployTags")]
+        public Input<bool>? DeployTags { get; set; }
 
         /// <summary>
         /// The VCS integration installation ID. Use to disambiguate when an organization has multiple integrations of the same provider type (e.g., two GitHub Apps). If omitted, the API resolves the integration automatically from `provider` and `repository`.
@@ -69,9 +75,22 @@ namespace Pulumi.PulumiService.Inputs
         [Input("repository")]
         public Input<string>? Repository { get; set; }
 
+        [Input("tagFilters")]
+        private InputList<string>? _tagFilters;
+
+        /// <summary>
+        /// Glob patterns matching the tag names that trigger a deployment when `deployTags` is true. Prefix a pattern with `!` to exclude matching tags, for example `!*-rc*`. An empty list matches all tags.
+        /// </summary>
+        public InputList<string> TagFilters
+        {
+            get => _tagFilters ?? (_tagFilters = new InputList<string>());
+            set => _tagFilters = value;
+        }
+
         public DeploymentSettingsVcsArgs()
         {
             DeployCommits = true;
+            DeployTags = false;
             PreviewPullRequests = true;
             PullRequestTemplate = false;
         }

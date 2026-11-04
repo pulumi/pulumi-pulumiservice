@@ -51,6 +51,9 @@ __all__ = [
 
 @pulumi.output_type
 class AWSOIDCConfiguration(dict):
+    """
+    AWS configuration for Deployments OIDC. Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
+    """
     @staticmethod
     def __key_warning(key: str):
         suggest = None
@@ -78,6 +81,8 @@ class AWSOIDCConfiguration(dict):
                  duration: Optional[_builtins.str] = None,
                  policy_arns: Optional[Sequence[_builtins.str]] = None):
         """
+        AWS configuration for Deployments OIDC. Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
+
         :param _builtins.str role_arn: The ARN of the role to assume using the OIDC token.
         :param _builtins.str session_name: The name of the assume-role session.
         :param _builtins.str duration: Duration of the assume-role session in “XhYmZs” format
@@ -326,6 +331,9 @@ class AuthPolicyDefinition(dict):
 
 @pulumi.output_type
 class AzureOIDCConfiguration(dict):
+    """
+    Azure configuration for Deployments OIDC. Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
+    """
     @staticmethod
     def __key_warning(key: str):
         suggest = None
@@ -352,6 +360,8 @@ class AzureOIDCConfiguration(dict):
                  subscription_id: _builtins.str,
                  tenant_id: _builtins.str):
         """
+        Azure configuration for Deployments OIDC. Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
+
         :param _builtins.str client_id: The client ID of the federated workload identity.
         :param _builtins.str subscription_id: The subscription ID of the federated workload identity.
         :param _builtins.str tenant_id: The tenant ID of the federated workload identity.
@@ -741,10 +751,14 @@ class DeploymentSettingsGithub(dict):
         suggest = None
         if key == "deployCommits":
             suggest = "deploy_commits"
+        elif key == "deployTags":
+            suggest = "deploy_tags"
         elif key == "previewPullRequests":
             suggest = "preview_pull_requests"
         elif key == "pullRequestTemplate":
             suggest = "pull_request_template"
+        elif key == "tagFilters":
+            suggest = "tag_filters"
 
         if suggest:
             pulumi.log.warn(f"Key '{key}' not found in DeploymentSettingsGithub. Access the value via the '{suggest}' property getter instead.")
@@ -759,23 +773,31 @@ class DeploymentSettingsGithub(dict):
 
     def __init__(__self__, *,
                  deploy_commits: Optional[_builtins.bool] = None,
+                 deploy_tags: Optional[_builtins.bool] = None,
                  paths: Optional[Sequence[_builtins.str]] = None,
                  preview_pull_requests: Optional[_builtins.bool] = None,
                  pull_request_template: Optional[_builtins.bool] = None,
-                 repository: Optional[_builtins.str] = None):
+                 repository: Optional[_builtins.str] = None,
+                 tag_filters: Optional[Sequence[_builtins.str]] = None):
         """
         GitHub settings for the deployment.
 
-        :param _builtins.bool deploy_commits: Trigger a deployment running `pulumi up` on commit.
+        :param _builtins.bool deploy_commits: Trigger a deployment running `pulumi up` on commit. Must be `false` when `deployTags` is `true`, because Pulumi Cloud rejects the two together.
+        :param _builtins.bool deploy_tags: Trigger a deployment running `pulumi up` when a tag matching `tagFilters` is pushed. Can't be combined with `deployCommits`, which defaults to `true`, so set `deployCommits` to `false` when you enable this.
         :param Sequence[_builtins.str] paths: The paths within the repo that deployments should be filtered to.
         :param _builtins.bool preview_pull_requests: Trigger a deployment running `pulumi preview` when a PR is opened.
         :param _builtins.bool pull_request_template: Use this stack as a template for pull request review stacks.
         :param _builtins.str repository: The GitHub repository in the format org/repo.
+        :param Sequence[_builtins.str] tag_filters: Glob patterns matching the tag names that trigger a deployment when `deployTags` is true. Prefix a pattern with `!` to exclude matching tags, for example `!*-rc*`. An empty list matches all tags.
         """
         if deploy_commits is None:
             deploy_commits = True
         if deploy_commits is not None:
             pulumi.set(__self__, "deploy_commits", deploy_commits)
+        if deploy_tags is None:
+            deploy_tags = False
+        if deploy_tags is not None:
+            pulumi.set(__self__, "deploy_tags", deploy_tags)
         if paths is not None:
             pulumi.set(__self__, "paths", paths)
         if preview_pull_requests is None:
@@ -788,14 +810,24 @@ class DeploymentSettingsGithub(dict):
             pulumi.set(__self__, "pull_request_template", pull_request_template)
         if repository is not None:
             pulumi.set(__self__, "repository", repository)
+        if tag_filters is not None:
+            pulumi.set(__self__, "tag_filters", tag_filters)
 
     @_builtins.property
     @pulumi.getter(name="deployCommits")
     def deploy_commits(self) -> Optional[_builtins.bool]:
         """
-        Trigger a deployment running `pulumi up` on commit.
+        Trigger a deployment running `pulumi up` on commit. Must be `false` when `deployTags` is `true`, because Pulumi Cloud rejects the two together.
         """
         return pulumi.get(self, "deploy_commits")
+
+    @_builtins.property
+    @pulumi.getter(name="deployTags")
+    def deploy_tags(self) -> Optional[_builtins.bool]:
+        """
+        Trigger a deployment running `pulumi up` when a tag matching `tagFilters` is pushed. Can't be combined with `deployCommits`, which defaults to `true`, so set `deployCommits` to `false` when you enable this.
+        """
+        return pulumi.get(self, "deploy_tags")
 
     @_builtins.property
     @pulumi.getter
@@ -828,6 +860,14 @@ class DeploymentSettingsGithub(dict):
         The GitHub repository in the format org/repo.
         """
         return pulumi.get(self, "repository")
+
+    @_builtins.property
+    @pulumi.getter(name="tagFilters")
+    def tag_filters(self) -> Optional[Sequence[_builtins.str]]:
+        """
+        Glob patterns matching the tag names that trigger a deployment when `deployTags` is true. Prefix a pattern with `!` to exclude matching tags, for example `!*-rc*`. An empty list matches all tags.
+        """
+        return pulumi.get(self, "tag_filters")
 
 
 @pulumi.output_type
@@ -863,7 +903,7 @@ class DeploymentSettingsOperationContext(dict):
         Settings related to the Pulumi operation environment during the deployment.
 
         :param Mapping[str, _builtins.str] environment_variables: Environment variables to set for the deployment.
-        :param 'OperationContextOIDC' oidc: OIDC configuration to use during the deployment.
+        :param 'OperationContextOIDC' oidc: Deployments OIDC configuration for obtaining cloud credentials during the deployment. Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. Deployments OIDC still fits when a customer-managed runner can't reach Pulumi Cloud to use ESC, or when pre-run commands need credentials and aren't wrapped in `pulumi env run`. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
         :param 'OperationContextOptions' options: Options to override default behavior during the deployment.
         :param Sequence[_builtins.str] pre_run_commands: Shell commands to run before the Pulumi operation executes.
         """
@@ -888,7 +928,7 @@ class DeploymentSettingsOperationContext(dict):
     @pulumi.getter
     def oidc(self) -> Optional['outputs.OperationContextOIDC']:
         """
-        OIDC configuration to use during the deployment.
+        Deployments OIDC configuration for obtaining cloud credentials during the deployment. Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. Deployments OIDC still fits when a customer-managed runner can't reach Pulumi Cloud to use ESC, or when pre-run commands need credentials and aren't wrapped in `pulumi env run`. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
         """
         return pulumi.get(self, "oidc")
 
@@ -945,12 +985,16 @@ class DeploymentSettingsVcs(dict):
             suggest = "deploy_commits"
         elif key == "deployPullRequest":
             suggest = "deploy_pull_request"
+        elif key == "deployTags":
+            suggest = "deploy_tags"
         elif key == "installationId":
             suggest = "installation_id"
         elif key == "previewPullRequests":
             suggest = "preview_pull_requests"
         elif key == "pullRequestTemplate":
             suggest = "pull_request_template"
+        elif key == "tagFilters":
+            suggest = "tag_filters"
 
         if suggest:
             pulumi.log.warn(f"Key '{key}' not found in DeploymentSettingsVcs. Access the value via the '{suggest}' property getter instead.")
@@ -967,22 +1011,26 @@ class DeploymentSettingsVcs(dict):
                  provider: _builtins.str,
                  deploy_commits: Optional[_builtins.bool] = None,
                  deploy_pull_request: Optional[_builtins.int] = None,
+                 deploy_tags: Optional[_builtins.bool] = None,
                  installation_id: Optional[_builtins.str] = None,
                  paths: Optional[Sequence[_builtins.str]] = None,
                  preview_pull_requests: Optional[_builtins.bool] = None,
                  pull_request_template: Optional[_builtins.bool] = None,
-                 repository: Optional[_builtins.str] = None):
+                 repository: Optional[_builtins.str] = None,
+                 tag_filters: Optional[Sequence[_builtins.str]] = None):
         """
         VCS settings for the deployment, supporting multiple VCS providers.
 
         :param _builtins.str provider: The VCS provider type.
-        :param _builtins.bool deploy_commits: Trigger a deployment running `pulumi up` on commit.
+        :param _builtins.bool deploy_commits: Trigger a deployment running `pulumi up` on commit. Must be `false` when `deployTags` is `true`, because Pulumi Cloud rejects the two together.
         :param _builtins.int deploy_pull_request: Deploy a specific pull request number.
+        :param _builtins.bool deploy_tags: Trigger a deployment running `pulumi up` when a tag matching `tagFilters` is pushed. Can't be combined with `deployCommits`, which defaults to `true`, so set `deployCommits` to `false` when you enable this.
         :param _builtins.str installation_id: The VCS integration installation ID. Use to disambiguate when an organization has multiple integrations of the same provider type (e.g., two GitHub Apps). If omitted, the API resolves the integration automatically from `provider` and `repository`.
         :param Sequence[_builtins.str] paths: The paths within the repo that deployments should be filtered to.
         :param _builtins.bool preview_pull_requests: Trigger a deployment running `pulumi preview` when a PR is opened.
         :param _builtins.bool pull_request_template: Use this stack as a template for pull request review stacks.
         :param _builtins.str repository: The repository identifier (e.g., 'ProjectName/RepoName' for Azure DevOps, 'org/repo' for GitHub).
+        :param Sequence[_builtins.str] tag_filters: Glob patterns matching the tag names that trigger a deployment when `deployTags` is true. Prefix a pattern with `!` to exclude matching tags, for example `!*-rc*`. An empty list matches all tags.
         """
         pulumi.set(__self__, "provider", provider)
         if deploy_commits is None:
@@ -991,6 +1039,10 @@ class DeploymentSettingsVcs(dict):
             pulumi.set(__self__, "deploy_commits", deploy_commits)
         if deploy_pull_request is not None:
             pulumi.set(__self__, "deploy_pull_request", deploy_pull_request)
+        if deploy_tags is None:
+            deploy_tags = False
+        if deploy_tags is not None:
+            pulumi.set(__self__, "deploy_tags", deploy_tags)
         if installation_id is not None:
             pulumi.set(__self__, "installation_id", installation_id)
         if paths is not None:
@@ -1005,6 +1057,8 @@ class DeploymentSettingsVcs(dict):
             pulumi.set(__self__, "pull_request_template", pull_request_template)
         if repository is not None:
             pulumi.set(__self__, "repository", repository)
+        if tag_filters is not None:
+            pulumi.set(__self__, "tag_filters", tag_filters)
 
     @_builtins.property
     @pulumi.getter
@@ -1018,7 +1072,7 @@ class DeploymentSettingsVcs(dict):
     @pulumi.getter(name="deployCommits")
     def deploy_commits(self) -> Optional[_builtins.bool]:
         """
-        Trigger a deployment running `pulumi up` on commit.
+        Trigger a deployment running `pulumi up` on commit. Must be `false` when `deployTags` is `true`, because Pulumi Cloud rejects the two together.
         """
         return pulumi.get(self, "deploy_commits")
 
@@ -1029,6 +1083,14 @@ class DeploymentSettingsVcs(dict):
         Deploy a specific pull request number.
         """
         return pulumi.get(self, "deploy_pull_request")
+
+    @_builtins.property
+    @pulumi.getter(name="deployTags")
+    def deploy_tags(self) -> Optional[_builtins.bool]:
+        """
+        Trigger a deployment running `pulumi up` when a tag matching `tagFilters` is pushed. Can't be combined with `deployCommits`, which defaults to `true`, so set `deployCommits` to `false` when you enable this.
+        """
+        return pulumi.get(self, "deploy_tags")
 
     @_builtins.property
     @pulumi.getter(name="installationId")
@@ -1069,6 +1131,14 @@ class DeploymentSettingsVcs(dict):
         The repository identifier (e.g., 'ProjectName/RepoName' for Azure DevOps, 'org/repo' for GitHub).
         """
         return pulumi.get(self, "repository")
+
+    @_builtins.property
+    @pulumi.getter(name="tagFilters")
+    def tag_filters(self) -> Optional[Sequence[_builtins.str]]:
+        """
+        Glob patterns matching the tag names that trigger a deployment when `deployTags` is true. Prefix a pattern with `!` to exclude matching tags, for example `!*-rc*`. An empty list matches all tags.
+        """
+        return pulumi.get(self, "tag_filters")
 
 
 @pulumi.output_type
@@ -1175,6 +1245,9 @@ class EnvironmentIdentifier(dict):
 
 @pulumi.output_type
 class GCPOIDCConfiguration(dict):
+    """
+    GCP configuration for Deployments OIDC. Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
+    """
     @staticmethod
     def __key_warning(key: str):
         suggest = None
@@ -1208,7 +1281,9 @@ class GCPOIDCConfiguration(dict):
                  region: Optional[_builtins.str] = None,
                  token_lifetime: Optional[_builtins.str] = None):
         """
-        :param _builtins.str project_id: The numerical ID of the GCP project.
+        GCP configuration for Deployments OIDC. Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
+
+        :param _builtins.str project_id: The GCP project number, a numeric value such as `123456789012`. This is not the project ID (such as `my-project`). To look up the number, run `gcloud projects describe <project-id> --format='value(projectNumber)'`.
         :param _builtins.str provider_id: The ID of the identity provider associated with the workload pool.
         :param _builtins.str service_account: The email address of the service account to use.
         :param _builtins.str workload_pool_id: The ID of the workload pool to use.
@@ -1228,7 +1303,7 @@ class GCPOIDCConfiguration(dict):
     @pulumi.getter(name="projectId")
     def project_id(self) -> _builtins.str:
         """
-        The numerical ID of the GCP project.
+        The GCP project number, a numeric value such as `123456789012`. This is not the project ID (such as `my-project`). To look up the number, run `gcloud projects describe <project-id> --format='value(projectNumber)'`.
         """
         return pulumi.get(self, "project_id")
 
@@ -1385,11 +1460,30 @@ class InsightsAccountState(dict):
 
 @pulumi.output_type
 class OperationContextOIDC(dict):
+    """
+    Deployments OIDC configuration for obtaining cloud credentials during a deployment.
+
+    Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. Deployments OIDC predates Pulumi ESC and still works, but for most users ESC is the better choice. Deployments OIDC is still a good fit when:
+
+    - A customer-managed runner can't reach Pulumi Cloud over the network to use ESC.
+    - Pre-run commands need credentials. An ESC environment applies only to the Pulumi operation itself, unless the command is wrapped in `pulumi env run`.
+
+    See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
+    """
     def __init__(__self__, *,
                  aws: Optional['outputs.AWSOIDCConfiguration'] = None,
                  azure: Optional['outputs.AzureOIDCConfiguration'] = None,
                  gcp: Optional['outputs.GCPOIDCConfiguration'] = None):
         """
+        Deployments OIDC configuration for obtaining cloud credentials during a deployment.
+
+        Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. Deployments OIDC predates Pulumi ESC and still works, but for most users ESC is the better choice. Deployments OIDC is still a good fit when:
+
+        - A customer-managed runner can't reach Pulumi Cloud over the network to use ESC.
+        - Pre-run commands need credentials. An ESC environment applies only to the Pulumi operation itself, unless the command is wrapped in `pulumi env run`.
+
+        See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
+
         :param 'AWSOIDCConfiguration' aws: AWS-specific OIDC configuration.
         :param 'AzureOIDCConfiguration' azure: Azure-specific OIDC configuration.
         :param 'GCPOIDCConfiguration' gcp: GCP-specific OIDC configuration.
@@ -1513,7 +1607,7 @@ class OrganizationMemberInfo(dict):
         """
         :param _builtins.str username: The member's Pulumi Cloud username.
         :param _builtins.bool virtual_admin: Whether this member is an admin in Pulumi Cloud without admin access on the backing identity provider.
-        :param _builtins.str role: The member's built-in role (member, admin, billing-manager). Absent when a custom role is assigned — check `roleId` in that case.
+        :param _builtins.str role: The member's built-in role (member, admin, billing-manager, reader, builder, maintainer). Absent when a custom role is assigned — check `roleId` in that case.
         :param _builtins.str role_id: The custom role ID assigned to this member, if any.
         :param _builtins.str role_name: The name of the currently assigned role (custom role name, or built-in role).
         """
@@ -1546,7 +1640,7 @@ class OrganizationMemberInfo(dict):
     @pulumi.getter
     def role(self) -> Optional[_builtins.str]:
         """
-        The member's built-in role (member, admin, billing-manager). Absent when a custom role is assigned — check `roleId` in that case.
+        The member's built-in role (member, admin, billing-manager, reader, builder, maintainer). Absent when a custom role is assigned — check `roleId` in that case.
         """
         return pulumi.get(self, "role")
 

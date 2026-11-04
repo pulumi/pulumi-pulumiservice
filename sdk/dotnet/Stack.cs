@@ -11,12 +11,20 @@ namespace Pulumi.PulumiService
 {
     /// <summary>
     /// A stack is a collection of resources that share a common lifecycle. Stacks are uniquely identified by their name and the project they belong to.
+    /// 
+    /// ## Import
+    /// 
+    /// This resource can be imported using its `id`, which has the format `{organization}/{project}/{stack}`, e.g.,
+    /// 
+    /// ```sh
+    ///  $ pulumi import pulumiservice:index:Stack my-stack my-org/my-project/my-stack
+    /// ```
     /// </summary>
     [PulumiServiceResourceType("pulumiservice:index:Stack")]
     public partial class Stack : global::Pulumi.CustomResource
     {
         /// <summary>
-        /// Optional. Flag indicating whether to delete the stack even if it still contains resources.
+        /// Optional. Flag indicating whether to delete the stack even if it still contains resources. Defaults to `false`.
         /// </summary>
         [Output("forceDestroy")]
         public Output<bool?> ForceDestroy { get; private set; } = null!;
@@ -91,7 +99,7 @@ namespace Pulumi.PulumiService
     public sealed class StackArgs : global::Pulumi.ResourceArgs
     {
         /// <summary>
-        /// Optional. Flag indicating whether to delete the stack even if it still contains resources.
+        /// Optional. Flag indicating whether to delete the stack even if it still contains resources. Defaults to `false`.
         /// </summary>
         [Input("forceDestroy")]
         public Input<bool>? ForceDestroy { get; set; }

@@ -10,11 +10,14 @@ using Pulumi.Serialization;
 namespace Pulumi.PulumiService.Outputs
 {
 
+    /// <summary>
+    /// GCP configuration for Deployments OIDC. Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
+    /// </summary>
     [OutputType]
     public sealed class GCPOIDCConfiguration
     {
         /// <summary>
-        /// The numerical ID of the GCP project.
+        /// The GCP project number, a numeric value such as `123456789012`. This is not the project ID (such as `my-project`). To look up the number, run `gcloud projects describe &lt;project-id&gt; --format='value(projectNumber)'`.
         /// </summary>
         public readonly string ProjectId;
         /// <summary>

@@ -4,7 +4,7 @@ resources:
     properties:
       orgName: ${organizationName}
       name: pulumi_issuer_${issuerSuffix}
-      url: https://api.pulumi.com/oidc
+      url: ${pulumiIssuerUrl}
       thumbprints:
         - ${pulumiThumbprint}
   githubIssuer:
@@ -12,7 +12,7 @@ resources:
     properties:
       orgName: ${organizationName}
       name: github_issuer_${issuerSuffix}
-      url: https://token.actions.githubusercontent.com
+      url: ${githubIssuerUrl}
       thumbprints:
         - ${githubThumbprint}
       maxExpiration: ${maxExpiration}

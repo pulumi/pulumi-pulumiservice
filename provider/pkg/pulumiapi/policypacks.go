@@ -22,7 +22,6 @@ import (
 	"io"
 	"net/http"
 	"path"
-	"strconv"
 	"strings"
 	"time"
 
@@ -31,7 +30,7 @@ import (
 
 type PolicyPackClient interface {
 	ListPolicyPacks(ctx context.Context, orgName string) ([]PolicyPackWithVersions, error)
-	GetPolicyPack(ctx context.Context, orgName string, policyPackName string, version int) (*PolicyPackDetail, error)
+	GetPolicyPack(ctx context.Context, orgName string, policyPackName string, versionTag string) (*PolicyPackDetail, error)
 	GetLatestPolicyPack(ctx context.Context, orgName string, policyPackName string) (*PolicyPackDetail, error)
 	PublishPolicyPack(ctx context.Context, orgName string, req CreatePolicyPackRequest, archive io.Reader) (int, error)
 	DeletePolicyPack(ctx context.Context, orgName, policyPackName string) error
@@ -86,11 +85,14 @@ func (c *Client) ListPolicyPacks(ctx context.Context, orgName string) ([]PolicyP
 	return response.PolicyPacks, nil
 }
 
+// GetPolicyPack returns one version of a policy pack, or nil if it doesn't exist.
+// The API keys this route by version tag (for example `1.4.1`), not by the
+// numeric version.
 func (c *Client) GetPolicyPack(
 	ctx context.Context,
 	orgName string,
 	policyPackName string,
-	version int,
+	versionTag string,
 ) (*PolicyPackDetail, error) {
 	if len(orgName) == 0 {
 		return nil, errors.New("empty orgName")
@@ -100,7 +102,11 @@ func (c *Client) GetPolicyPack(
 		return nil, errors.New("empty policyPackName")
 	}
 
-	apiPath := path.Join("orgs", orgName, "policypacks", policyPackName, "versions", strconv.Itoa(version))
+	if len(versionTag) == 0 {
+		return nil, errors.New("empty versionTag")
+	}
+
+	apiPath := path.Join("orgs", orgName, "policypacks", policyPackName, "versions", versionTag)
 
 	var policyPack PolicyPackDetail
 	_, err := c.do(ctx, http.MethodGet, apiPath, nil, &policyPack)
@@ -115,6 +121,9 @@ func (c *Client) GetPolicyPack(
 	return &policyPack, nil
 }
 
+// GetLatestPolicyPack returns the newest version of a policy pack, or nil if it
+// doesn't exist. The API has no "latest" route, so this resolves the newest
+// version tag from the org's policy pack list and then fetches that tag.
 func (c *Client) GetLatestPolicyPack(
 	ctx context.Context,
 	orgName string,
@@ -128,19 +137,36 @@ func (c *Client) GetLatestPolicyPack(
 		return nil, errors.New("empty policyPackName")
 	}
 
-	apiPath := path.Join("orgs", orgName, "policypacks", policyPackName, "latest")
-
-	var policyPack PolicyPackDetail
-	_, err := c.do(ctx, http.MethodGet, apiPath, nil, &policyPack)
+	packs, err := c.ListPolicyPacks(ctx, orgName)
 	if err != nil {
-		statusCode := GetErrorStatusCode(err)
-		if statusCode == http.StatusNotFound {
-			return nil, nil
-		}
 		return nil, fmt.Errorf("failed to get latest policy pack: %w", err)
 	}
 
-	return &policyPack, nil
+	for _, pack := range packs {
+		if pack.Name != policyPackName {
+			continue
+		}
+		versionTag := latestVersionTag(pack)
+		if versionTag == "" {
+			return nil, nil
+		}
+		return c.GetPolicyPack(ctx, orgName, policyPackName, versionTag)
+	}
+
+	return nil, nil
+}
+
+// latestVersionTag returns the tag paired with the highest numeric version.
+// Versions and VersionTags are index-aligned. The API lists them newest first,
+// but picking the maximum doesn't depend on that.
+func latestVersionTag(pack PolicyPackWithVersions) string {
+	latest, tag := -1, ""
+	for i, v := range pack.Versions {
+		if i < len(pack.VersionTags) && v > latest {
+			latest, tag = v, pack.VersionTags[i]
+		}
+	}
+	return tag
 }
 
 func (c *Client) PublishPolicyPack(
