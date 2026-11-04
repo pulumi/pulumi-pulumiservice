@@ -7699,7 +7699,8 @@
       "description": "A Policy Pack published to Pulumi Cloud. The source directory is tarballed and uploaded on Create; changing source content publishes a new version (replace).\n\n## Import\n\nThis resource can be imported using its `id`, which has the format `{organization}/{name}/{versionTag}`, e.g.,\n\n```sh\n $ pulumi import pulumiservice:index:PolicyPack my-policy-pack my-org/my-policy-pack/1.0.0\n```\n\nOnly the organization, name, version tag and display name are read back. Set `sourcePath` in your program after import.\n",
       "properties": {
         "contentHash": {
-          "type": "string"
+          "type": "string",
+          "description": "Hash of the policy pack source directory. A change to the source replaces the policy pack, even when versionTag is unchanged."
         },
         "displayName": {
           "type": "string",
@@ -7725,7 +7726,8 @@
           "description": "Path to the directory containing the policy pack source. The directory is tarballed and uploaded."
         },
         "version": {
-          "type": "integer"
+          "type": "integer",
+          "description": "Version number Pulumi Cloud assigned when this version of the policy pack was published."
         },
         "versionTag": {
           "type": "string",

@@ -28,6 +28,7 @@ import (
 type PolicyPack struct {
 	pulumi.CustomResourceState
 
+	// Hash of the policy pack source directory. A change to the source replaces the policy pack, even when versionTag is unchanged.
 	ContentHash pulumi.StringOutput `pulumi:"contentHash"`
 	// Optional display name. Changing it requires a new versionTag (policy pack versions are immutable in Pulumi Cloud).
 	DisplayName pulumi.StringPtrOutput `pulumi:"displayName"`
@@ -39,7 +40,8 @@ type PolicyPack struct {
 	Policies PolicyPackPolicyInputArrayOutput `pulumi:"policies"`
 	// Path to the directory containing the policy pack source. The directory is tarballed and uploaded.
 	SourcePath pulumi.StringOutput `pulumi:"sourcePath"`
-	Version    pulumi.IntOutput    `pulumi:"version"`
+	// Version number Pulumi Cloud assigned when this version of the policy pack was published.
+	Version pulumi.IntOutput `pulumi:"version"`
 	// Semantic version tag (e.g. "1.0.0"). Versions are immutable; change to publish a new version.
 	VersionTag pulumi.StringOutput `pulumi:"versionTag"`
 }
@@ -213,6 +215,7 @@ func (o PolicyPackOutput) ToPolicyPackOutputWithContext(ctx context.Context) Pol
 	return o
 }
 
+// Hash of the policy pack source directory. A change to the source replaces the policy pack, even when versionTag is unchanged.
 func (o PolicyPackOutput) ContentHash() pulumi.StringOutput {
 	return o.ApplyT(func(v *PolicyPack) pulumi.StringOutput { return v.ContentHash }).(pulumi.StringOutput)
 }
@@ -242,6 +245,7 @@ func (o PolicyPackOutput) SourcePath() pulumi.StringOutput {
 	return o.ApplyT(func(v *PolicyPack) pulumi.StringOutput { return v.SourcePath }).(pulumi.StringOutput)
 }
 
+// Version number Pulumi Cloud assigned when this version of the policy pack was published.
 func (o PolicyPackOutput) Version() pulumi.IntOutput {
 	return o.ApplyT(func(v *PolicyPack) pulumi.IntOutput { return v.Version }).(pulumi.IntOutput)
 }
