@@ -200,14 +200,23 @@ the rest:
 1. Add a multi-document YAML file under the package's `examples/` directory
    (e.g. `provider/pkg/functions/examples/get_organization_role_examples.yaml`).
    Each document is one example: a Pulumi YAML program plus a `description`
-   key, which becomes the example's heading.
+   key. Its first line becomes the example's heading; any further lines
+   become a paragraph under it.
 2. Embed the generated `<name>.md` with `//go:embed` and append it to the
    type's `a.Describe(...)` text. See `provider/pkg/functions/org_roles.go`,
-   including its `//go:generate` line.
-3. Run `make generate_examples`. It builds the provider, puts it on PATH and
-   runs `provider/tools/gen-examples`, which converts each example with
-   `pulumi convert` into TypeScript, Python, Go, C# and Java.
+   including its `//go:generate` line. Each package needs only one
+   `//go:generate` line; it converts every YAML file in `examples/`.
+3. Run `make examples`. It builds the provider, puts it on PATH and runs
+   `provider/tools/gen-examples`, which converts each example with
+   `pulumi convert` into TypeScript, Python, Go, C# and Java. The target lives
+   in `.mk/examples.mk` because ci-mgmt regenerates the `Makefile` and drops
+   targets it doesn't own.
 4. Regenerate the schema and SDKs as above.
+
+`pulumi convert` drops YAML comments, so explain an example in its
+`description` rather than in comments; split an example that needs more
+explanation into several. It also writes Java enum values as strings, which
+`gen-examples` rewrites into enum constants using the provider schema.
 
 #### Schema JSON Syntax Guidelines
 

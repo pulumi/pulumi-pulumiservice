@@ -31,8 +31,8 @@ import (
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 )
 
-// The example file is generated from the Pulumi YAML in examples/; edit
-// that and run `make generate_examples`.
+// The example files in this package are generated from the Pulumi YAML in
+// examples/; edit those and run `make examples`.
 //
 //go:generate go run ../../tools/gen-examples examples .
 

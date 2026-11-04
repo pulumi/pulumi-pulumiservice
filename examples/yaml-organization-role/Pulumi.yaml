@@ -2,8 +2,8 @@ name: yaml-organization-role
 runtime: yaml
 description: >-
   End-to-end test of OrganizationRole built with the RBAC helper functions. The
-  OrganizationRole docs example (provider/pkg/resources/docs/organization_role_example)
-  covers the same features against existing entities.
+  OrganizationRole docs examples (provider/pkg/resources/examples/organization_role_examples.yaml)
+  cover the same features against existing entities.
 
 config:
   organizationName:

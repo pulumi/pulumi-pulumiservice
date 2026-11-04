@@ -1,0 +1,149 @@
+description: |
+  Organization-level scopes
+  Organization scopes apply across the whole organization rather than to a single stack, environment, or cloud account.
+variables:
+  permissions:
+    fn::invoke:
+      function: pulumiservice:buildRolePermissions
+      arguments:
+        organizationScopes:
+          - team:read
+          - stack:create
+resources:
+  teamReaderRole:
+    type: pulumiservice:OrganizationRole
+    properties:
+      organizationName: my-org
+      name: Team Readers
+      description: Read teams and create stacks.
+      permissions: ${permissions.permissions}
+---
+description: |
+  Access to every stack, or to one stack
+  A stack rule with `all: true` applies to every stack in the organization. A rule with `id` applies to a single stack, identified by the `stackId` that `getStack` returns.
+variables:
+  prodStack:
+    fn::invoke:
+      function: pulumiservice:getStack
+      arguments:
+        organizationName: my-org
+        projectName: networking
+        stackName: prod
+  permissions:
+    fn::invoke:
+      function: pulumiservice:buildRolePermissions
+      arguments:
+        stackRules:
+          - all: true
+            scopes:
+              - stack:read
+          - id: ${prodStack.stackId}
+            scopes:
+              - stack:write
+              - stack_deployment:create
+resources:
+  prodDeployerRole:
+    type: pulumiservice:OrganizationRole
+    properties:
+      organizationName: my-org
+      name: Prod Deployers
+      description: Read every stack and deploy networking/prod.
+      permissions: ${permissions.permissions}
+---
+description: |
+  Access to stacks by tag
+  A rule with `tags` applies to stacks whose tags match every condition in the list. A condition without an `operator` matches stacks where the tag equals `value`. `notEquals` also matches stacks that don't have the tag. `exists` and `notExists` check only whether the tag is set.
+variables:
+  permissions:
+    fn::invoke:
+      function: pulumiservice:buildRolePermissions
+      arguments:
+        stackRules:
+          - tags:
+              - key: team
+                value: platform
+            scopes:
+              - stack:write
+              - stack_deployment:create
+          - tags:
+              - key: env
+                value: prod
+                operator: notEquals
+            scopes:
+              - stack_deployment:create
+          - tags:
+              - key: cost-center
+                operator: exists
+            scopes:
+              - stack_deployment_settings:read
+          - tags:
+              - key: owner
+                operator: notExists
+            scopes:
+              - stack_tags:update
+          - tags:
+              - key: team
+                value: platform
+              - key: lifecycle
+                value: ephemeral
+            scopes:
+              - stack:delete
+resources:
+  platformRole:
+    type: pulumiservice:OrganizationRole
+    properties:
+      organizationName: my-org
+      name: Platform Engineers
+      description: Deploy platform stacks and clean up ephemeral ones.
+      permissions: ${permissions.permissions}
+---
+description: |
+  Access to environments and cloud accounts
+  Environment and cloud account rules take the same `all`, `id`, and `tags` selectors as stack rules. Each rule list accepts only the scopes for its own entity type.
+variables:
+  sharedEnvironment:
+    fn::invoke:
+      function: pulumiservice:getEnvironment
+      arguments:
+        organizationName: my-org
+        projectName: platform
+        name: shared
+  awsAccount:
+    fn::invoke:
+      function: pulumiservice:getInsightsAccount
+      arguments:
+        organizationName: my-org
+        accountName: aws-production
+  permissions:
+    fn::invoke:
+      function: pulumiservice:buildRolePermissions
+      arguments:
+        environmentRules:
+          - all: true
+            scopes:
+              - environment:read
+          - id: ${sharedEnvironment.environmentId}
+            scopes:
+              - environment:open
+              - environment:write
+              - environment:rotate
+        accountRules:
+          - all: true
+            scopes:
+              - insights_account:read
+          - id: ${awsAccount.insightsAccountId}
+            scopes:
+              - insights_account:scan
+          - tags:
+              - key: team
+                value: platform
+            scopes:
+              - insights_account:update
+resources:
+  infraRole:
+    type: pulumiservice:OrganizationRole
+    properties:
+      organizationName: my-org
+      name: Infrastructure Operators
+      description: Read environments and cloud accounts, and operate the shared ones.
+      permissions: ${permissions.permissions}
