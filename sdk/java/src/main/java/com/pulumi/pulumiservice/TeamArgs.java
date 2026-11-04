@@ -64,14 +64,14 @@ public final class TeamArgs extends com.pulumi.resources.ResourceArgs {
     }
 
     /**
-     * List of Pulumi Cloud usernames of team members.
+     * List of Pulumi Cloud usernames of team members. Pulumi Cloud adds the user who creates the team as a team admin, so include that user, usually the one whose access token runs `pulumi up`, or `pulumi refresh` reports them as a change.
      * 
      */
     @Import(name="members")
     private @Nullable Output<List<String>> members;
 
     /**
-     * @return List of Pulumi Cloud usernames of team members.
+     * @return List of Pulumi Cloud usernames of team members. Pulumi Cloud adds the user who creates the team as a team admin, so include that user, usually the one whose access token runs `pulumi up`, or `pulumi refresh` reports them as a change.
      * 
      */
     public Optional<Output<List<String>>> members() {
@@ -217,7 +217,7 @@ public final class TeamArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param members List of Pulumi Cloud usernames of team members.
+         * @param members List of Pulumi Cloud usernames of team members. Pulumi Cloud adds the user who creates the team as a team admin, so include that user, usually the one whose access token runs `pulumi up`, or `pulumi refresh` reports them as a change.
          * 
          * @return builder
          * 
@@ -228,7 +228,7 @@ public final class TeamArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param members List of Pulumi Cloud usernames of team members.
+         * @param members List of Pulumi Cloud usernames of team members. Pulumi Cloud adds the user who creates the team as a team admin, so include that user, usually the one whose access token runs `pulumi up`, or `pulumi refresh` reports them as a change.
          * 
          * @return builder
          * 
@@ -238,7 +238,7 @@ public final class TeamArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param members List of Pulumi Cloud usernames of team members.
+         * @param members List of Pulumi Cloud usernames of team members. Pulumi Cloud adds the user who creates the team as a team admin, so include that user, usually the one whose access token runs `pulumi up`, or `pulumi refresh` reports them as a change.
          * 
          * @return builder
          * 

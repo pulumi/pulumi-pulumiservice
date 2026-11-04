@@ -66,8 +66,14 @@ type TeamInput struct {
 	Members []string `pulumi:"members,optional"`
 }
 
+// teamMembersDescription is shared by the input and output so both document the same behavior.
+const teamMembersDescription = "List of Pulumi Cloud usernames of team members. " +
+	"Pulumi Cloud adds the user who creates the team as a team admin, so include that user, " +
+	"usually the one whose access token runs `pulumi up`, " +
+	"or `pulumi refresh` reports them as a change."
+
 func (t *TeamInput) Annotate(a infer.Annotator) {
-	a.Describe(&t.Members, "List of Pulumi Cloud usernames of team members.")
+	a.Describe(&t.Members, teamMembersDescription)
 }
 
 type TeamState struct {
@@ -76,7 +82,7 @@ type TeamState struct {
 }
 
 func (t *TeamState) Annotate(a infer.Annotator) {
-	a.Describe(&t.Members, "List of Pulumi Cloud usernames of team members.")
+	a.Describe(&t.Members, teamMembersDescription)
 }
 
 func (*Team) Create(ctx context.Context, req infer.CreateRequest[TeamInput]) (infer.CreateResponse[TeamState], error) {

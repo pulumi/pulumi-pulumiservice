@@ -34,7 +34,7 @@ class TeamArgs:
         :param pulumi.Input[_builtins.str] description: Optional. Team description.
         :param pulumi.Input[_builtins.str] display_name: Optional. Team display name.
         :param pulumi.Input[_builtins.float] github_team_id: The GitHub ID of the team to mirror. Must be in the same GitHub organization that the Pulumi org is backed by. Required for "github" teams.
-        :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] members: List of Pulumi Cloud usernames of team members.
+        :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] members: List of Pulumi Cloud usernames of team members. Pulumi Cloud adds the user who creates the team as a team admin, so include that user, usually the one whose access token runs `pulumi up`, or `pulumi refresh` reports them as a change.
         :param pulumi.Input[_builtins.str] name: The team's name. Required for "pulumi" teams.
         """
         pulumi.set(__self__, "organization_name", organization_name)
@@ -114,7 +114,7 @@ class TeamArgs:
     @pulumi.getter
     def members(self) -> pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]]:
         """
-        List of Pulumi Cloud usernames of team members.
+        List of Pulumi Cloud usernames of team members. Pulumi Cloud adds the user who creates the team as a team admin, so include that user, usually the one whose access token runs `pulumi up`, or `pulumi refresh` reports them as a change.
         """
         return pulumi.get(self, "members")
 
@@ -168,7 +168,7 @@ class Team(pulumi.CustomResource):
         :param pulumi.Input[_builtins.str] description: Optional. Team description.
         :param pulumi.Input[_builtins.str] display_name: Optional. Team display name.
         :param pulumi.Input[_builtins.float] github_team_id: The GitHub ID of the team to mirror. Must be in the same GitHub organization that the Pulumi org is backed by. Required for "github" teams.
-        :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] members: List of Pulumi Cloud usernames of team members.
+        :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] members: List of Pulumi Cloud usernames of team members. Pulumi Cloud adds the user who creates the team as a team admin, so include that user, usually the one whose access token runs `pulumi up`, or `pulumi refresh` reports them as a change.
         :param pulumi.Input[_builtins.str] name: The team's name. Required for "pulumi" teams.
         :param pulumi.Input[_builtins.str] organization_name: The name of the Pulumi organization the team belongs to.
         :param pulumi.Input[_builtins.str] team_type: The type of team. Must be either `pulumi` or `github`.
@@ -296,7 +296,7 @@ class Team(pulumi.CustomResource):
     @pulumi.getter
     def members(self) -> pulumi.Output[Sequence[_builtins.str]]:
         """
-        List of Pulumi Cloud usernames of team members.
+        List of Pulumi Cloud usernames of team members. Pulumi Cloud adds the user who creates the team as a team admin, so include that user, usually the one whose access token runs `pulumi up`, or `pulumi refresh` reports them as a change.
         """
         return pulumi.get(self, "members")
 

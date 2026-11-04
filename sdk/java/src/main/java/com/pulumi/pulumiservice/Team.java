@@ -74,14 +74,14 @@ public class Team extends com.pulumi.resources.CustomResource {
         return Codegen.optional(this.githubTeamId);
     }
     /**
-     * List of Pulumi Cloud usernames of team members.
+     * List of Pulumi Cloud usernames of team members. Pulumi Cloud adds the user who creates the team as a team admin, so include that user, usually the one whose access token runs `pulumi up`, or `pulumi refresh` reports them as a change.
      * 
      */
     @Export(name="members", refs={List.class,String.class}, tree="[0,1]")
     private Output<List<String>> members;
 
     /**
-     * @return List of Pulumi Cloud usernames of team members.
+     * @return List of Pulumi Cloud usernames of team members. Pulumi Cloud adds the user who creates the team as a team admin, so include that user, usually the one whose access token runs `pulumi up`, or `pulumi refresh` reports them as a change.
      * 
      */
     public Output<List<String>> members() {

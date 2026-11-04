@@ -67,7 +67,7 @@ export class Team extends pulumi.CustomResource {
      */
     declare public readonly githubTeamId: pulumi.Output<number | undefined>;
     /**
-     * List of Pulumi Cloud usernames of team members.
+     * List of Pulumi Cloud usernames of team members. Pulumi Cloud adds the user who creates the team as a team admin, so include that user, usually the one whose access token runs `pulumi up`, or `pulumi refresh` reports them as a change.
      */
     declare public readonly members: pulumi.Output<string[]>;
     /**
@@ -140,7 +140,7 @@ export interface TeamArgs {
      */
     githubTeamId?: pulumi.Input<number | undefined>;
     /**
-     * List of Pulumi Cloud usernames of team members.
+     * List of Pulumi Cloud usernames of team members. Pulumi Cloud adds the user who creates the team as a team admin, so include that user, usually the one whose access token runs `pulumi up`, or `pulumi refresh` reports them as a change.
      */
     members?: pulumi.Input<pulumi.Input<string>[] | undefined>;
     /**
