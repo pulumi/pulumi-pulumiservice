@@ -1,6 +1,10 @@
 name: yaml-team-stack-example
 runtime: yaml
 description: An example of using yaml to manage team stack permissions
+config:
+  organizationName:
+    type: string
+    default: service-provider-test-org
 resources:
   rand:
     type: random:RandomString
@@ -12,7 +16,7 @@ resources:
     type: pulumiservice:index:Team
     properties:
       name: yaml-team-${rand.result}
-      organizationName: service-provider-test-org
+      organizationName: ${organizationName}
       displayName: Team Stack Permission Example
       teamType: pulumi
       members:
@@ -28,3 +32,24 @@ resources:
       team: ${team.name}
       # edit access
       permission: 102
+  managedStackSuffix:
+    type: random:RandomPet
+    properties:
+      prefix: ${pulumi.stack}
+      separator: "-"
+  managedStack:
+    type: pulumiservice:Stack
+    properties:
+      organizationName: ${organizationName}
+      projectName: ${pulumi.project}
+      stackName: ${managedStackSuffix.id}
+  # grant admin access to a stack this program creates
+  managed-stack-permissions:
+    type: pulumiservice:index:TeamStackPermission
+    properties:
+      organization: ${team.organizationName}
+      project: ${managedStack.projectName}
+      stack: ${managedStack.stackName}
+      team: ${team.name}
+      # admin access
+      permission: 103
