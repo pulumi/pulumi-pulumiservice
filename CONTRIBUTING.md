@@ -90,7 +90,7 @@ A release is a PR that moves the unreleased changelog fragments under a version 
 
 For a prerelease, skip steps 1 and 2 and use a `Release-Version: vX.Y.Z-alpha.N` marker. The fragments stay unreleased until the next stable release. `prerelease.yml` publishes the packages but creates no GitHub release.
 
-Release from a PR rather than by pushing a tag or posting in #release-ops. Those skip the changelog checks and the `finalize` job, so the release isn't marked latest and the registry docs aren't rebuilt.
+Release from a PR rather than with `@release-bot` in #release-ops or by pushing a tag yourself. Those still publish the release, mark it latest and rebuild the registry docs, but nothing batches the changelog: `CHANGELOG.md` gets no section for the version, and its fragments land under the next release that is batched.
 
 `run-acceptance-tests.yml` skips PRs that change only `CHANGELOG.md`, and then the required `Sentinel` check never reports. A release PR also changes files under `.changes/`, so it isn't skipped. Commenting `/run-acceptance-tests` doesn't help on a skipped PR: a comment-triggered run writes `Sentinel` to the tip of `main` instead of the PR's commit.
 
