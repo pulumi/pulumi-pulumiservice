@@ -15,7 +15,6 @@
 package provider
 
 import (
-	"context"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -86,7 +85,7 @@ func TestDiffConfig(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ctx := context.Background()
+			ctx := t.Context()
 
 			// Create provider instance
 			provider, err := MakeProvider(nil, "pulumiservice", "1.0.0")
@@ -137,7 +136,7 @@ func TestConfigure_ApiResourcesUseConfiguredCredentials(t *testing.T) {
 	defer server.Close()
 
 	t.Setenv(config.EnvVarPulumiAccessToken, "")
-	ctx := context.Background()
+	ctx := t.Context()
 	provider, err := MakeProvider(nil, "pulumiservice", "1.0.0")
 	require.NoError(t, err)
 
@@ -179,7 +178,7 @@ func TestProvider_LayeredSchema(t *testing.T) {
 	provider, err := MakeProvider(nil, "pulumiservice", "1.0.0")
 	require.NoError(t, err)
 
-	resp, err := provider.GetSchema(context.Background(), &pulumirpc.GetSchemaRequest{})
+	resp, err := provider.GetSchema(t.Context(), &pulumirpc.GetSchemaRequest{})
 	require.NoError(t, err)
 	require.NotEmpty(t, resp.Schema)
 
@@ -209,7 +208,7 @@ func TestProvider_DeprecatedFunctions(t *testing.T) {
 	provider, err := MakeProvider(nil, "pulumiservice", "1.0.0")
 	require.NoError(t, err)
 
-	resp, err := provider.GetSchema(context.Background(), &pulumirpc.GetSchemaRequest{})
+	resp, err := provider.GetSchema(t.Context(), &pulumirpc.GetSchemaRequest{})
 	require.NoError(t, err)
 
 	var spec schema.PackageSpec
@@ -231,7 +230,7 @@ func TestProvider_EveryResourceDocumentsImport(t *testing.T) {
 	provider, err := MakeProvider(nil, "pulumiservice", "1.0.0")
 	require.NoError(t, err)
 
-	resp, err := provider.GetSchema(context.Background(), &pulumirpc.GetSchemaRequest{})
+	resp, err := provider.GetSchema(t.Context(), &pulumirpc.GetSchemaRequest{})
 	require.NoError(t, err)
 
 	var spec schema.PackageSpec
@@ -258,7 +257,7 @@ func TestProvider_PolicyPackSummaryIsANamedType(t *testing.T) {
 	provider, err := MakeProvider(nil, "pulumiservice", "1.0.0")
 	require.NoError(t, err)
 
-	resp, err := provider.GetSchema(context.Background(), &pulumirpc.GetSchemaRequest{})
+	resp, err := provider.GetSchema(t.Context(), &pulumirpc.GetSchemaRequest{})
 	require.NoError(t, err)
 
 	var spec schema.PackageSpec

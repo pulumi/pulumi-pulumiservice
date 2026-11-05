@@ -1,15 +1,12 @@
 package pulumiapi
 
 import (
-	"context"
 	"fmt"
 	"net/http"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
-
-var teamCtx = context.Background()
 
 const (
 	testTeamTokenTeamName = "aTeam"
@@ -26,7 +23,7 @@ func TestDeleteTeamAccessToken(t *testing.T) {
 			ExpectedReqPath:   "/api/orgs/anOrg/teams/aTeam/tokens/" + tokenID,
 			ResponseCode:      204,
 		})
-		assert.NoError(t, c.DeleteTeamAccessToken(teamCtx, tokenID, orgName, teamName))
+		assert.NoError(t, c.DeleteTeamAccessToken(t.Context(), tokenID, orgName, teamName))
 	})
 
 	t.Run("Error", func(t *testing.T) {
@@ -40,7 +37,7 @@ func TestDeleteTeamAccessToken(t *testing.T) {
 			},
 		})
 		assert.EqualError(t,
-			c.DeleteTeamAccessToken(teamCtx, tokenID, orgName, teamName),
+			c.DeleteTeamAccessToken(t.Context(), tokenID, orgName, teamName),
 			`failed to delete access token "abcdegh": 500 API error: token not found`,
 		)
 	})
@@ -67,7 +64,7 @@ func TestCreateTeamAccessToken(t *testing.T) {
 			ResponseCode:    201,
 			ResponseBody:    resp,
 		})
-		token, err := c.CreateTeamAccessToken(teamCtx, tokenName, orgName, teamName, desc)
+		token, err := c.CreateTeamAccessToken(t.Context(), tokenName, orgName, teamName, desc)
 		assert.NoError(t, err)
 		assert.Equal(t, &AccessToken{
 			ID:          resp.ID,
@@ -90,7 +87,7 @@ func TestCreateTeamAccessToken(t *testing.T) {
 				Message:    unauthorizedError,
 			},
 		})
-		token, err := c.CreateTeamAccessToken(teamCtx, tokenName, orgName, teamName, desc)
+		token, err := c.CreateTeamAccessToken(t.Context(), tokenName, orgName, teamName, desc)
 		assert.Nil(t, token, "token should be nil")
 		assert.EqualError(t,
 			err,
@@ -127,7 +124,7 @@ func TestGetTeamAccessToken(t *testing.T) {
 			ResponseCode:      200,
 			ResponseBody:      resp,
 		})
-		token, err := c.GetTeamAccessToken(ctx, id, org, team)
+		token, err := c.GetTeamAccessToken(t.Context(), id, org, team)
 		assert.NoError(t, err)
 		assert.Equal(t, &AccessToken{
 			ID:          id,
@@ -146,7 +143,7 @@ func TestGetTeamAccessToken(t *testing.T) {
 				Message:    unauthorizedError,
 			},
 		})
-		token, err := c.GetTeamAccessToken(ctx, id, org, team)
+		token, err := c.GetTeamAccessToken(t.Context(), id, org, team)
 		assert.Nil(t, token, "token should be nil")
 		assert.EqualError(t,
 			err,

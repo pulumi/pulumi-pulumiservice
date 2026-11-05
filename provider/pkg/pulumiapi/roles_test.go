@@ -1,7 +1,6 @@
 package pulumiapi
 
 import (
-	"context"
 	"net/http"
 	"testing"
 
@@ -61,7 +60,7 @@ func TestCreateRole(t *testing.T) {
 			ResponseBody: resp,
 		})
 
-		got, err := c.CreateRole(ctx, testRoleOrgName, apitype.PermissionDescriptorBase{
+		got, err := c.CreateRole(t.Context(), testRoleOrgName, apitype.PermissionDescriptorBase{
 			Name:         readOnlyRoleName,
 			Description:  readOnlyDescription,
 			ResourceType: globalScope,
@@ -77,7 +76,7 @@ func TestCreateRole(t *testing.T) {
 
 	t.Run("empty details rejected", func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{ResponseCode: 200})
-		_, err := c.CreateRole(ctx, testRoleOrgName, apitype.PermissionDescriptorBase{
+		_, err := c.CreateRole(t.Context(), testRoleOrgName, apitype.PermissionDescriptorBase{
 			Name:         "r",
 			ResourceType: globalScope,
 			UxPurpose:    apitype.PermissionDescriptorUXPurposeRole,
@@ -98,7 +97,7 @@ func TestGetRole(t *testing.T) {
 				Version:                  2,
 			},
 		})
-		got, err := c.GetRole(ctx, testRoleOrgName, testRoleID)
+		got, err := c.GetRole(t.Context(), testRoleOrgName, testRoleID)
 		assert.NoError(t, err)
 		if assert.NotNil(t, got) {
 			assert.Equal(t, int32(2), got.Version)
@@ -112,7 +111,7 @@ func TestGetRole(t *testing.T) {
 			ResponseCode:      404,
 			ResponseBody:      ErrorResponse{Message: notFoundError},
 		})
-		got, err := c.GetRole(ctx, testRoleOrgName, testRoleID)
+		got, err := c.GetRole(t.Context(), testRoleOrgName, testRoleID)
 		assert.NoError(t, err)
 		assert.Nil(t, got)
 	})
@@ -136,7 +135,7 @@ func TestUpdateRole(t *testing.T) {
 		},
 	})
 
-	got, err := c.UpdateRole(ctx, testRoleOrgName, testRoleID, req)
+	got, err := c.UpdateRole(t.Context(), testRoleOrgName, testRoleID, req)
 	assert.NoError(t, err)
 	if assert.NotNil(t, got) {
 		assert.Equal(t, int32(3), got.Version)
@@ -165,7 +164,7 @@ func TestListAvailableRoleScopes(t *testing.T) {
 			ResponseCode:      200,
 			ResponseBody:      wire,
 		})
-		got, err := c.ListAvailableRoleScopes(ctx, testRoleOrgName)
+		got, err := c.ListAvailableRoleScopes(t.Context(), testRoleOrgName)
 		assert.NoError(t, err)
 		if assert.Contains(t, got, stackKey) && assert.Len(t, got[stackKey], 1) {
 			group := got[stackKey][0]
@@ -184,7 +183,7 @@ func TestListAvailableRoleScopes(t *testing.T) {
 			ResponseCode:      401,
 			ResponseBody:      ErrorResponse{Message: unauthorizedError},
 		})
-		_, err := c.ListAvailableRoleScopes(ctx, testRoleOrgName)
+		_, err := c.ListAvailableRoleScopes(t.Context(), testRoleOrgName)
 		assert.ErrorContains(t, err, "failed to list available role scopes")
 	})
 }
@@ -197,7 +196,7 @@ func TestDeleteRole(t *testing.T) {
 			ExpectedQueryParams: map[string][]string{"force": {trueValue}},
 			ResponseCode:        204,
 		})
-		assert.NoError(t, c.DeleteRole(ctx, testRoleOrgName, testRoleID, true))
+		assert.NoError(t, c.DeleteRole(t.Context(), testRoleOrgName, testRoleID, true))
 	})
 
 	t.Run("not found swallowed", func(t *testing.T) {
@@ -207,7 +206,7 @@ func TestDeleteRole(t *testing.T) {
 			ResponseCode:      404,
 			ResponseBody:      ErrorResponse{Message: notFoundError},
 		})
-		assert.NoError(t, c.DeleteRole(ctx, testRoleOrgName, testRoleID, false))
+		assert.NoError(t, c.DeleteRole(t.Context(), testRoleOrgName, testRoleID, false))
 	})
 }
 
@@ -218,12 +217,12 @@ func TestSetOrgDefaultRole(t *testing.T) {
 			ExpectedReqPath:   "/api/orgs/an-organization/roles/" + testRoleID + "/default",
 			ResponseCode:      204,
 		})
-		assert.NoError(t, c.SetOrgDefaultRole(context.Background(), testMemberOrgName, testRoleID))
+		assert.NoError(t, c.SetOrgDefaultRole(t.Context(), testMemberOrgName, testRoleID))
 	})
 
 	t.Run("rejects empty arguments", func(t *testing.T) {
 		c := &Client{}
-		assert.Error(t, c.SetOrgDefaultRole(context.Background(), "", testRoleID))
-		assert.Error(t, c.SetOrgDefaultRole(context.Background(), testMemberOrgName, ""))
+		assert.Error(t, c.SetOrgDefaultRole(t.Context(), "", testRoleID))
+		assert.Error(t, c.SetOrgDefaultRole(t.Context(), testMemberOrgName, ""))
 	})
 }

@@ -50,7 +50,7 @@ func TestCreatePolicyGroup_HappyPath(t *testing.T) {
 		ResponseBody:      nil,
 	})
 
-	err := c.CreatePolicyGroup(ctx, orgName, policyGroupName, entityType, mode)
+	err := c.CreatePolicyGroup(t.Context(), orgName, policyGroupName, entityType, mode)
 	assert.NoError(t, err)
 }
 
@@ -75,7 +75,7 @@ func TestCreatePolicyGroup_AccountsPreventative(t *testing.T) {
 		ResponseBody:      nil,
 	})
 
-	err := c.CreatePolicyGroup(ctx, orgName, policyGroupName, entityType, mode)
+	err := c.CreatePolicyGroup(t.Context(), orgName, policyGroupName, entityType, mode)
 	assert.NoError(t, err)
 }
 
@@ -83,7 +83,7 @@ func TestCreatePolicyGroup_AccountsPreventative(t *testing.T) {
 func TestCreatePolicyGroup_EmptyOrgName(t *testing.T) {
 	c := &Client{}
 
-	err := c.CreatePolicyGroup(ctx, "", "policy-group", "stacks", "audit")
+	err := c.CreatePolicyGroup(t.Context(), "", "policy-group", "stacks", "audit")
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "orgName must not be empty")
 }
@@ -92,7 +92,7 @@ func TestCreatePolicyGroup_EmptyOrgName(t *testing.T) {
 func TestCreatePolicyGroup_EmptyPolicyGroupName(t *testing.T) {
 	c := &Client{}
 
-	err := c.CreatePolicyGroup(ctx, "test-org", "", "stacks", "audit")
+	err := c.CreatePolicyGroup(t.Context(), "test-org", "", "stacks", "audit")
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "policyGroupName must not be empty")
 }
@@ -101,7 +101,7 @@ func TestCreatePolicyGroup_EmptyPolicyGroupName(t *testing.T) {
 func TestCreatePolicyGroup_EmptyEntityType(t *testing.T) {
 	c := &Client{}
 
-	err := c.CreatePolicyGroup(ctx, "test-org", "policy-group", "", "audit")
+	err := c.CreatePolicyGroup(t.Context(), "test-org", "policy-group", "", "audit")
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "entityType must not be empty")
 }
@@ -110,7 +110,7 @@ func TestCreatePolicyGroup_EmptyEntityType(t *testing.T) {
 func TestCreatePolicyGroup_EmptyMode(t *testing.T) {
 	c := &Client{}
 
-	err := c.CreatePolicyGroup(ctx, "test-org", "policy-group", "stacks", "")
+	err := c.CreatePolicyGroup(t.Context(), "test-org", "policy-group", "stacks", "")
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "mode must not be empty")
 }
@@ -138,7 +138,7 @@ func TestCreatePolicyGroup_APIError(t *testing.T) {
 		},
 	})
 
-	err := c.CreatePolicyGroup(ctx, orgName, policyGroupName, entityType, mode)
+	err := c.CreatePolicyGroup(t.Context(), orgName, policyGroupName, entityType, mode)
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "failed to create policy group")
 	assert.Contains(t, err.Error(), "Invalid entity type")
@@ -167,7 +167,7 @@ func TestCreatePolicyGroup_Unauthorized(t *testing.T) {
 		},
 	})
 
-	err := c.CreatePolicyGroup(ctx, orgName, policyGroupName, entityType, mode)
+	err := c.CreatePolicyGroup(t.Context(), orgName, policyGroupName, entityType, mode)
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "failed to create policy group")
 	assert.Contains(t, err.Error(), unauthorizedError)
@@ -181,7 +181,7 @@ func TestBatchUpdatePolicyGroup(t *testing.T) {
 	t.Run("Empty OrgName", func(t *testing.T) {
 		c := &Client{}
 
-		err := c.BatchUpdatePolicyGroup(ctx, "", policyGroupName, []UpdatePolicyGroupRequest{})
+		err := c.BatchUpdatePolicyGroup(t.Context(), "", policyGroupName, []UpdatePolicyGroupRequest{})
 		require.Error(t, err)
 		assert.Contains(t, err.Error(), "orgName must not be empty")
 	})
@@ -189,7 +189,7 @@ func TestBatchUpdatePolicyGroup(t *testing.T) {
 	t.Run("Empty PolicyGroupName", func(t *testing.T) {
 		c := &Client{}
 
-		err := c.BatchUpdatePolicyGroup(ctx, orgName, "", []UpdatePolicyGroupRequest{})
+		err := c.BatchUpdatePolicyGroup(t.Context(), orgName, "", []UpdatePolicyGroupRequest{})
 		require.Error(t, err)
 		assert.Contains(t, err.Error(), "policyGroupName must not be empty")
 	})
@@ -198,7 +198,7 @@ func TestBatchUpdatePolicyGroup(t *testing.T) {
 		c := &Client{}
 
 		// Empty requests should return nil without making any API call
-		err := c.BatchUpdatePolicyGroup(ctx, orgName, policyGroupName, []UpdatePolicyGroupRequest{})
+		err := c.BatchUpdatePolicyGroup(t.Context(), orgName, policyGroupName, []UpdatePolicyGroupRequest{})
 		assert.NoError(t, err)
 	})
 
@@ -222,7 +222,7 @@ func TestBatchUpdatePolicyGroup(t *testing.T) {
 			ResponseCode:      200,
 		})
 
-		err := c.BatchUpdatePolicyGroup(ctx, orgName, policyGroupName, reqs)
+		err := c.BatchUpdatePolicyGroup(t.Context(), orgName, policyGroupName, reqs)
 		assert.NoError(t, err)
 	})
 
@@ -242,7 +242,7 @@ func TestBatchUpdatePolicyGroup(t *testing.T) {
 			},
 		})
 
-		err := c.BatchUpdatePolicyGroup(ctx, orgName, policyGroupName, reqs)
+		err := c.BatchUpdatePolicyGroup(t.Context(), orgName, policyGroupName, reqs)
 		require.Error(t, err)
 		assert.Contains(t, err.Error(), "failed to batch update policy group")
 		assert.Contains(t, err.Error(), "stack not found")
@@ -271,7 +271,7 @@ func TestGetPolicyGroup_IncludesEntityTypeAndMode(t *testing.T) {
 		ResponseBody:      expectedResponse,
 	})
 
-	result, err := c.GetPolicyGroup(ctx, orgName, policyGroupName)
+	result, err := c.GetPolicyGroup(t.Context(), orgName, policyGroupName)
 	require.NoError(t, err)
 	require.NotNil(t, result)
 	assert.Equal(t, "accounts", result.EntityType)

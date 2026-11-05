@@ -101,7 +101,7 @@ func TestOrganizationRoleCreate(t *testing.T) {
 			}, nil
 		},
 	}
-	ctx := config.WithMockClient(context.Background(), mock)
+	ctx := config.WithMockClient(t.Context(), mock)
 
 	r := &OrganizationRole{}
 	resp, err := r.Create(ctx, infer.CreateRequest[OrganizationRoleInput]{
@@ -123,7 +123,7 @@ func TestOrganizationRoleRead(t *testing.T) {
 		mock := &orgRoleClientMock{
 			get: func(_ context.Context, _, _ string) (*apitype.PermissionDescriptorRecord, error) { return nil, nil },
 		}
-		ctx := config.WithMockClient(context.Background(), mock)
+		ctx := config.WithMockClient(t.Context(), mock)
 		r := &OrganizationRole{}
 		resp, err := r.Read(ctx, infer.ReadRequest[OrganizationRoleInput, OrganizationRoleState]{
 			ID: "acme/role-123",
@@ -152,7 +152,7 @@ func TestOrganizationRoleRead(t *testing.T) {
 				}, nil
 			},
 		}
-		ctx := config.WithMockClient(context.Background(), mock)
+		ctx := config.WithMockClient(t.Context(), mock)
 		r := &OrganizationRole{}
 		resp, err := r.Read(ctx, infer.ReadRequest[OrganizationRoleInput, OrganizationRoleState]{
 			ID: "acme/role-123",
@@ -181,7 +181,7 @@ func TestOrganizationRoleRead(t *testing.T) {
 				}, nil
 			},
 		}
-		ctx := config.WithMockClient(context.Background(), mock)
+		ctx := config.WithMockClient(t.Context(), mock)
 		r := &OrganizationRole{}
 		_, err := r.Read(ctx, infer.ReadRequest[OrganizationRoleInput, OrganizationRoleState]{
 			ID: "acme/policy-123",
@@ -212,7 +212,7 @@ func TestOrganizationRoleDelete_InUseConflict(t *testing.T) {
 			}
 		},
 	}
-	ctx := config.WithMockClient(context.Background(), mock)
+	ctx := config.WithMockClient(t.Context(), mock)
 	r := &OrganizationRole{}
 	_, err := r.Delete(ctx, infer.DeleteRequest[OrganizationRoleState]{
 		State: OrganizationRoleState{
@@ -260,7 +260,7 @@ func TestOrganizationRoleDelete_EscalatesForceOnConflict(t *testing.T) {
 			return nil
 		},
 	}
-	ctx := config.WithMockClient(context.Background(), mock)
+	ctx := config.WithMockClient(t.Context(), mock)
 	r := &OrganizationRole{}
 	_, err := r.Delete(ctx, infer.DeleteRequest[OrganizationRoleState]{
 		State: OrganizationRoleState{
@@ -283,7 +283,7 @@ func TestOrganizationRoleDelete(t *testing.T) {
 			return nil
 		},
 	}
-	ctx := config.WithMockClient(context.Background(), mock)
+	ctx := config.WithMockClient(t.Context(), mock)
 	r := &OrganizationRole{}
 	_, err := r.Delete(ctx, infer.DeleteRequest[OrganizationRoleState]{
 		State: OrganizationRoleState{
@@ -321,7 +321,7 @@ func TestOrganizationRoleUpdateOmitsDescriptionWhenUnset(t *testing.T) {
 			}, nil
 		},
 	}
-	ctx := config.WithMockClient(context.Background(), mock)
+	ctx := config.WithMockClient(t.Context(), mock)
 	r := &OrganizationRole{}
 	_, err := r.Update(ctx, infer.UpdateRequest[OrganizationRoleInput, OrganizationRoleState]{
 		Inputs: OrganizationRoleInput{
@@ -345,7 +345,7 @@ func TestOrganizationRoleCheck(t *testing.T) {
 	r := &OrganizationRole{}
 
 	t.Run("rejects empty permissions", func(t *testing.T) {
-		resp, err := r.Check(context.Background(), infer.CheckRequest{
+		resp, err := r.Check(t.Context(), infer.CheckRequest{
 			NewInputs: property.NewMap(map[string]property.Value{
 				gcOrganizationName: property.New(gcAcme),
 				gcName:             property.New("r"),
@@ -366,7 +366,7 @@ func TestOrganizationRoleCheck(t *testing.T) {
 	// every fresh `pulumi preview`. The same emptiness checks belong in
 	// Create/Update, where Pulumi guarantees concrete values.
 	t.Run("tolerates computed permissions at preview", func(t *testing.T) {
-		resp, err := r.Check(context.Background(), infer.CheckRequest{
+		resp, err := r.Check(t.Context(), infer.CheckRequest{
 			NewInputs: property.NewMap(map[string]property.Value{
 				gcOrganizationName: property.New(gcAcme),
 				gcName:             property.New("r"),
@@ -381,7 +381,7 @@ func TestOrganizationRoleCheck(t *testing.T) {
 	})
 
 	t.Run("tolerates computed name at preview", func(t *testing.T) {
-		resp, err := r.Check(context.Background(), infer.CheckRequest{
+		resp, err := r.Check(t.Context(), infer.CheckRequest{
 			NewInputs: property.NewMap(map[string]property.Value{
 				gcOrganizationName: property.New(gcAcme),
 				gcName:             property.New(property.Computed),
@@ -404,7 +404,7 @@ func TestOrganizationRoleCheck(t *testing.T) {
 	// than blindly forwarded to the API. New variants Pulumi Cloud adds
 	// reach this provider through `apitype` regen.
 	t.Run("rejects unknown __type values", func(t *testing.T) {
-		resp, err := r.Check(context.Background(), infer.CheckRequest{
+		resp, err := r.Check(t.Context(), infer.CheckRequest{
 			NewInputs: property.NewMap(map[string]property.Value{
 				gcOrganizationName: property.New(gcAcme),
 				gcName:             property.New("r"),
@@ -428,7 +428,7 @@ func TestOrganizationRoleCheck(t *testing.T) {
 	// rejected at preview by the typed unmarshaller (`type '' not
 	// recognized`) rather than reaching the API.
 	t.Run("rejects descriptor missing __type", func(t *testing.T) {
-		resp, err := r.Check(context.Background(), infer.CheckRequest{
+		resp, err := r.Check(t.Context(), infer.CheckRequest{
 			NewInputs: property.NewMap(map[string]property.Value{
 				gcOrganizationName: property.New(gcAcme),
 				gcName:             property.New("r"),

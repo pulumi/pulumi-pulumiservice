@@ -51,7 +51,7 @@ func TestTeamRoleAssignmentCreate(t *testing.T) {
 			return &pulumiapi.TeamRoleRef{ID: testRoleID, Name: "devops-role"}, nil
 		},
 	}
-	ctx := config.WithMockClient(context.Background(), mock)
+	ctx := config.WithMockClient(t.Context(), mock)
 
 	r := &TeamRoleAssignment{}
 	resp, err := r.Create(ctx, infer.CreateRequest[TeamRoleAssignmentInput]{
@@ -74,7 +74,7 @@ func TestTeamRoleAssignmentRead(t *testing.T) {
 				return &pulumiapi.TeamRoleRef{ID: testRoleID, Name: gcDevops}, nil
 			},
 		}
-		ctx := config.WithMockClient(context.Background(), mock)
+		ctx := config.WithMockClient(t.Context(), mock)
 		r := &TeamRoleAssignment{}
 		resp, err := r.Read(ctx, infer.ReadRequest[TeamRoleAssignmentInput, TeamRoleAssignmentState]{
 			ID: "acme/devops/role-123",
@@ -90,7 +90,7 @@ func TestTeamRoleAssignmentRead(t *testing.T) {
 				return nil, nil
 			},
 		}
-		ctx := config.WithMockClient(context.Background(), mock)
+		ctx := config.WithMockClient(t.Context(), mock)
 		r := &TeamRoleAssignment{}
 		resp, err := r.Read(ctx, infer.ReadRequest[TeamRoleAssignmentInput, TeamRoleAssignmentState]{
 			ID: "acme/devops/role-123",
@@ -101,7 +101,7 @@ func TestTeamRoleAssignmentRead(t *testing.T) {
 
 	t.Run("bad id", func(t *testing.T) {
 		r := &TeamRoleAssignment{}
-		_, err := r.Read(context.Background(), infer.ReadRequest[TeamRoleAssignmentInput, TeamRoleAssignmentState]{
+		_, err := r.Read(t.Context(), infer.ReadRequest[TeamRoleAssignmentInput, TeamRoleAssignmentState]{
 			ID: "bad",
 		})
 		assert.ErrorContains(t, err, "organization/team/roleId")
@@ -119,7 +119,7 @@ func TestTeamRoleAssignmentDelete(t *testing.T) {
 			return nil
 		},
 	}
-	ctx := config.WithMockClient(context.Background(), mock)
+	ctx := config.WithMockClient(t.Context(), mock)
 	r := &TeamRoleAssignment{}
 	_, err := r.Delete(ctx, infer.DeleteRequest[TeamRoleAssignmentState]{
 		State: TeamRoleAssignmentState{

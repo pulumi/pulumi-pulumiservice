@@ -44,7 +44,7 @@ func TestGetDeploymentSettings(t *testing.T) {
 			ResponseBody: dsValue,
 		})
 
-		ds, err := c.GetDeploymentSettings(ctx, StackIdentifier{
+		ds, err := c.GetDeploymentSettings(t.Context(), StackIdentifier{
 			OrgName:     orgName,
 			ProjectName: projectName,
 			StackName:   stackName,
@@ -73,7 +73,7 @@ func TestGetDeploymentSettings(t *testing.T) {
 			},
 		})
 
-		ds, err := c.GetDeploymentSettings(ctx, StackIdentifier{
+		ds, err := c.GetDeploymentSettings(t.Context(), StackIdentifier{
 			OrgName:     orgName,
 			ProjectName: projectName,
 			StackName:   stackName,
@@ -115,7 +115,7 @@ func TestCreateDeploymentSettings(t *testing.T) {
 			ResponseBody:    dsValue,
 		})
 
-		response, err := c.CreateDeploymentSettings(ctx, StackIdentifier{
+		response, err := c.CreateDeploymentSettings(t.Context(), StackIdentifier{
 			OrgName:     orgName,
 			ProjectName: projectName,
 			StackName:   stackName,
@@ -171,7 +171,7 @@ func TestCreateDeploymentSettings(t *testing.T) {
 			ResponseBody:    dsValue,
 		})
 
-		_, err := c.CreateDeploymentSettings(ctx, StackIdentifier{
+		_, err := c.CreateDeploymentSettings(t.Context(), StackIdentifier{
 			OrgName:     orgName,
 			ProjectName: projectName,
 			StackName:   stackName,
@@ -203,7 +203,7 @@ func TestCreateDeploymentSettings(t *testing.T) {
 			ResponseBody:    dsValue,
 		})
 
-		_, err := c.CreateDeploymentSettings(ctx, StackIdentifier{
+		_, err := c.CreateDeploymentSettings(t.Context(), StackIdentifier{
 			OrgName:     orgName,
 			ProjectName: projectName,
 			StackName:   stackName,

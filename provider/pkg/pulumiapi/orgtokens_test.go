@@ -27,7 +27,7 @@ func TestDeleteOrgAccessToken(t *testing.T) {
 			ExpectedReqPath:   "/api/orgs/anOrg/tokens/" + tokenID,
 			ResponseCode:      204,
 		})
-		assert.NoError(t, c.DeleteOrgAccessToken(teamCtx, tokenID, orgName))
+		assert.NoError(t, c.DeleteOrgAccessToken(t.Context(), tokenID, orgName))
 	})
 
 	t.Run("Error", func(t *testing.T) {
@@ -41,7 +41,7 @@ func TestDeleteOrgAccessToken(t *testing.T) {
 			},
 		})
 		assert.EqualError(t,
-			c.DeleteOrgAccessToken(teamCtx, tokenID, orgName),
+			c.DeleteOrgAccessToken(t.Context(), tokenID, orgName),
 			fmt.Sprintf(`failed to delete access token "%s": 500 API error: token not found`, testOrgTokenID),
 		)
 	})
@@ -69,7 +69,7 @@ func TestCreateOrgAccessToken(t *testing.T) {
 			ResponseCode:      201,
 			ResponseBody:      resp,
 		})
-		token, err := c.CreateOrgAccessToken(teamCtx, orgName, req)
+		token, err := c.CreateOrgAccessToken(t.Context(), orgName, req)
 		assert.NoError(t, err)
 		assert.Equal(t, &AccessToken{
 			ID:          resp.ID,
@@ -95,7 +95,7 @@ func TestCreateOrgAccessToken(t *testing.T) {
 			ResponseCode:      201,
 			ResponseBody:      resp,
 		})
-		token, err := c.CreateOrgAccessToken(teamCtx, orgName, req)
+		token, err := c.CreateOrgAccessToken(t.Context(), orgName, req)
 		assert.NoError(t, err)
 		assert.Equal(t, &AccessToken{
 			ID:          resp.ID,
@@ -122,7 +122,7 @@ func TestCreateOrgAccessToken(t *testing.T) {
 			ResponseCode:      201,
 			ResponseBody:      resp,
 		})
-		token, err := c.CreateOrgAccessToken(teamCtx, orgName, req)
+		token, err := c.CreateOrgAccessToken(t.Context(), orgName, req)
 		assert.NoError(t, err)
 		assert.Equal(t, &AccessToken{
 			ID:          resp.ID,
@@ -146,7 +146,7 @@ func TestCreateOrgAccessToken(t *testing.T) {
 				Message:    unauthorizedError,
 			},
 		})
-		token, err := c.CreateOrgAccessToken(teamCtx, orgName, req)
+		token, err := c.CreateOrgAccessToken(t.Context(), orgName, req)
 		assert.Nil(t, token, "token should be nil")
 		assert.EqualError(t,
 			err,
@@ -184,7 +184,7 @@ func TestGetOrgAccessToken(t *testing.T) {
 			ResponseCode:      200,
 			ResponseBody:      resp,
 		})
-		token, err := c.GetOrgAccessToken(ctx, id, org)
+		token, err := c.GetOrgAccessToken(t.Context(), id, org)
 		assert.NoError(t, err)
 		assert.Equal(t, &AccessToken{
 			ID:          id,
@@ -205,7 +205,7 @@ func TestGetOrgAccessToken(t *testing.T) {
 				Message:    unauthorizedError,
 			},
 		})
-		token, err := c.GetOrgAccessToken(ctx, id, org)
+		token, err := c.GetOrgAccessToken(t.Context(), id, org)
 		assert.Nil(t, token, "token should be nil")
 		assert.EqualError(t,
 			err,

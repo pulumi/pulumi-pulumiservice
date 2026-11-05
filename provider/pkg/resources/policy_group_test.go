@@ -111,8 +111,9 @@ func returnPolicyGroup(pg *pulumiapi.PolicyGroup) func() (*pulumiapi.PolicyGroup
 	return func() (*pulumiapi.PolicyGroup, error) { return pg, nil }
 }
 
-func mockPolicyGroupCtx(client *PolicyGroupClientMock) context.Context {
-	return config.WithMockClient(context.Background(), client)
+func mockPolicyGroupCtx(t *testing.T, client *PolicyGroupClientMock) context.Context {
+	t.Helper()
+	return config.WithMockClient(t.Context(), client)
 }
 
 func newPolicyGroupServer(t *testing.T, client *PolicyGroupClientMock) integration.Server {
@@ -327,7 +328,7 @@ func TestPolicyGroupDiff(t *testing.T) {
 
 	diff := func(t *testing.T, state PolicyGroupState, inputs PolicyGroupInput) p.DiffResponse {
 		t.Helper()
-		resp, err := (&PolicyGroup{}).Diff(context.Background(),
+		resp, err := (&PolicyGroup{}).Diff(t.Context(),
 			infer.DiffRequest[PolicyGroupInput, PolicyGroupState]{ID: testPolicyGroupID, State: state, Inputs: inputs})
 		require.NoError(t, err)
 		return resp
@@ -556,7 +557,7 @@ func TestPolicyGroupRead(t *testing.T) {
 		t *testing.T, client *PolicyGroupClientMock, inputs PolicyGroupInput, state PolicyGroupState,
 	) infer.ReadResponse[PolicyGroupInput, PolicyGroupState] {
 		t.Helper()
-		resp, err := (&PolicyGroup{}).Read(mockPolicyGroupCtx(client),
+		resp, err := (&PolicyGroup{}).Read(mockPolicyGroupCtx(t, client),
 			infer.ReadRequest[PolicyGroupInput, PolicyGroupState]{ID: testPolicyGroupID, Inputs: inputs, State: state})
 		require.NoError(t, err)
 		return resp
@@ -605,13 +606,13 @@ func TestPolicyGroupRead(t *testing.T) {
 		client := &PolicyGroupClientMock{getPolicyGroupFunc: func() (*pulumiapi.PolicyGroup, error) {
 			return nil, errors.New("boom")
 		}}
-		_, err := (&PolicyGroup{}).Read(mockPolicyGroupCtx(client),
+		_, err := (&PolicyGroup{}).Read(mockPolicyGroupCtx(t, client),
 			infer.ReadRequest[PolicyGroupInput, PolicyGroupState]{ID: testPolicyGroupID})
 		assert.ErrorContains(t, err, "boom")
 	})
 
 	t.Run("rejects a malformed ID", func(t *testing.T) {
-		_, err := (&PolicyGroup{}).Read(mockPolicyGroupCtx(&PolicyGroupClientMock{}),
+		_, err := (&PolicyGroup{}).Read(mockPolicyGroupCtx(t, &PolicyGroupClientMock{}),
 			infer.ReadRequest[PolicyGroupInput, PolicyGroupState]{ID: "no-slash"})
 		assert.Error(t, err)
 	})
@@ -626,7 +627,7 @@ func TestPolicyGroupCreate(t *testing.T) {
 	create := func(
 		client *PolicyGroupClientMock, in PolicyGroupInput, dryRun bool,
 	) (infer.CreateResponse[PolicyGroupState], error) {
-		return (&PolicyGroup{}).Create(mockPolicyGroupCtx(client),
+		return (&PolicyGroup{}).Create(mockPolicyGroupCtx(t, client),
 			infer.CreateRequest[PolicyGroupInput]{Name: "testPolicyGroup", Inputs: in, DryRun: dryRun})
 	}
 
@@ -741,7 +742,7 @@ func TestPolicyGroupUpdate(t *testing.T) {
 	update := func(
 		client *PolicyGroupClientMock, state PolicyGroupState, in PolicyGroupInput,
 	) (infer.UpdateResponse[PolicyGroupState], error) {
-		return (&PolicyGroup{}).Update(mockPolicyGroupCtx(client),
+		return (&PolicyGroup{}).Update(mockPolicyGroupCtx(t, client),
 			infer.UpdateRequest[PolicyGroupInput, PolicyGroupState]{ID: testPolicyGroupID, State: state, Inputs: in})
 	}
 
@@ -826,7 +827,7 @@ func TestPolicyGroupUpdate(t *testing.T) {
 
 	t.Run("doesn't call the API on preview", func(t *testing.T) {
 		client := &PolicyGroupClientMock{}
-		resp, err := (&PolicyGroup{}).Update(mockPolicyGroupCtx(client),
+		resp, err := (&PolicyGroup{}).Update(mockPolicyGroupCtx(t, client),
 			infer.UpdateRequest[PolicyGroupInput, PolicyGroupState]{
 				ID: testPolicyGroupID, State: newPolicyGroup().state(),
 				Inputs: newPolicyGroup().withStacks(stack1).input(), DryRun: true,
@@ -899,7 +900,7 @@ func TestPolicyGroupDelete(t *testing.T) {
 			gotOrg, gotName = org, name
 			return nil
 		}}
-		_, err := (&PolicyGroup{}).Delete(mockPolicyGroupCtx(client),
+		_, err := (&PolicyGroup{}).Delete(mockPolicyGroupCtx(t, client),
 			infer.DeleteRequest[PolicyGroupState]{ID: testPolicyGroupID, State: newPolicyGroup().state()})
 		require.NoError(t, err)
 		assert.Equal(t, gcTestOrg, gotOrg)
@@ -910,7 +911,7 @@ func TestPolicyGroupDelete(t *testing.T) {
 		client := &PolicyGroupClientMock{deletePolicyGroupFunc: func(context.Context, string, string) error {
 			return errors.New("delete failed")
 		}}
-		_, err := (&PolicyGroup{}).Delete(mockPolicyGroupCtx(client),
+		_, err := (&PolicyGroup{}).Delete(mockPolicyGroupCtx(t, client),
 			infer.DeleteRequest[PolicyGroupState]{ID: testPolicyGroupID})
 		assert.ErrorContains(t, err, "delete failed")
 	})
