@@ -8,12 +8,9 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"os"
-	"path"
 	"path/filepath"
-	"strings"
 	"testing"
 	"time"
 
@@ -27,7 +24,6 @@ import (
 	"github.com/pulumi/providertest/pulumitest/assertrefresh"
 	"github.com/pulumi/providertest/pulumitest/opttest"
 	"github.com/pulumi/pulumi-cloud-sdk/go/apitype"
-	"github.com/pulumi/pulumi/pkg/v3/testing/integration"
 	"github.com/pulumi/pulumi/sdk/v3/go/auto"
 	sdkapitype "github.com/pulumi/pulumi/sdk/v3/go/common/apitype"
 
@@ -94,50 +90,31 @@ func TestYamlTeamsExample(t *testing.T) {
 		pulumiBot := "pulumi-bot"
 		providerUser := "service-provider-example-user"
 
-		notFoundDir := writeTeamProgram([]string{pulumiBot, "not-found-user"})
-		correctUpdateDir := writeTeamProgram([]string{pulumiBot, providerUser})
+		test := pulumitest.NewPulumiTest(t,
+			writeTeamProgram([]string{pulumiBot, "not-found-user"}),
+			inMemoryProvider(),
+			opttest.UseAmbientBackend(),
+			opttest.StackName(randomStackName()),
+		)
+		_, err := test.UpErr(t)
+		require.Error(t, err, "the first update should fail on the unknown member")
+		assert.Contains(t, err.Error(), "User 'not-found-user' not found")
 
-		first := &strings.Builder{}
-		firstOut := io.MultiWriter(os.Stdout, first)
-
-		second := &strings.Builder{}
-		secondOut := io.MultiWriter(os.Stdout, second)
-
-		integration.ProgramTest(t, &integration.ProgramTestOptions{
-			Quick:         true,
-			ExpectFailure: true,
-			SkipRefresh:   true,
-			Dir:           notFoundDir,
-			Stdout:        firstOut,
-			Stderr:        firstOut,
-			EditDirs: []integration.EditDir{
-				{
-					Dir: correctUpdateDir,
-					// Additive specifies that we're copying our directory on top of the previous one.
-					// This overwrites the previous Pulumi.yaml.
-					Additive: true,
-					Verbose:  true,
-					Stdout:   secondOut,
-					Stderr:   secondOut,
-					// explicitly do not expect a failure
-					ExpectFailure: false,
-				},
-			},
-		})
-
-		// ensure first run's output printed an error that user was not found
-		assert.Contains(t, first.String(), "User 'not-found-user' not found")
-
-		// ensure second run's output showed that members field was updated
-		assert.Contains(t, second.String(), "[diff: ~members]")
+		test.UpdateSource(t, writeTeamProgram([]string{pulumiBot, providerUser}))
+		second := test.Up(t)
+		assert.Contains(t, second.StdOut, "[diff: ~members]",
+			"the second update should update the partially created team, not create it again")
+		test.Destroy(t)
 	})
 
 	t.Run("Yaml Teams Example", func(t *testing.T) {
-		cwd, _ := os.Getwd()
-		integration.ProgramTest(t, &integration.ProgramTestOptions{
-			Quick: true,
-			Dir:   path.Join(cwd, ".", "yaml-teams"),
-		})
+		test := pulumitest.NewPulumiTest(t,
+			filepath.Join(getCwd(t), "yaml-teams"),
+			inMemoryProvider(),
+			opttest.UseAmbientBackend(),
+			opttest.StackName(randomStackName()),
+		)
+		runPulumiTest(t, test)
 	})
 
 }
@@ -147,30 +124,21 @@ func TestYamlStackTagsExample(t *testing.T) {
 	// yaml-stack-tags-example applies tags to it's own stack. To do this, we need to
 	// first create an empty stack, then add the stack tag.
 
-	tmpdir := writePulumiYaml(t, YamlProgram{
-		Name:        "yaml-stack-tags-example",
-		Runtime:     "yaml",
-		Description: "A minimal Pulumi YAML program",
-	})
+	test := pulumitest.NewPulumiTest(t,
+		writePulumiYaml(t, YamlProgram{
+			Name:        "yaml-stack-tags-example",
+			Runtime:     "yaml",
+			Description: "A minimal Pulumi YAML program",
+		}),
+		inMemoryProvider(),
+		opttest.UseAmbientBackend(),
+		opttest.StackName(randomStackName()),
+	)
+	test.SetConfig(t, "organizationName", getOrgName())
+	test.Up(t)
 
-	cwd, err := os.Getwd()
-	require.NoError(t, err)
-
-	integration.ProgramTest(t, &integration.ProgramTestOptions{
-		Quick:  true,
-		Dir:    tmpdir,
-		Config: map[string]string{"organizationName": getOrgName()},
-		EditDirs: []integration.EditDir{
-			{
-				Dir: path.Join(cwd, ".", "yaml-stack-tags"),
-			},
-			// Reapply the same thing again, except this time we expect there to be no changes
-			{
-				Dir:             path.Join(cwd, ".", "yaml-stack-tags"),
-				ExpectNoChanges: true,
-			},
-		},
-	})
+	test.UpdateSource(t, filepath.Join(getCwd(t), "yaml-stack-tags"))
+	runPulumiTest(t, test)
 }
 
 func TestYamlStackTagsPluralExample(t *testing.T) {
@@ -178,142 +146,96 @@ func TestYamlStackTagsPluralExample(t *testing.T) {
 	// yaml-stack-tags-plural-example applies multiple tags to it's own stack using the StackTags resource.
 	// To do this, we need to first create an empty stack, then add the tags.
 
-	tmpdir := writePulumiYaml(t, YamlProgram{
-		Name:        "yaml-stack-tags-plural-example",
-		Runtime:     "yaml",
-		Description: "Example using StackTags resource to manage multiple tags at once",
-	})
+	test := pulumitest.NewPulumiTest(t,
+		writePulumiYaml(t, YamlProgram{
+			Name:        "yaml-stack-tags-plural-example",
+			Runtime:     "yaml",
+			Description: "Example using StackTags resource to manage multiple tags at once",
+		}),
+		inMemoryProvider(),
+		opttest.UseAmbientBackend(),
+		opttest.StackName(randomStackName()),
+	)
+	test.SetConfig(t, "organization", getOrgName())
+	test.Up(t)
 
-	cwd, err := os.Getwd()
-	require.NoError(t, err)
-
-	integration.ProgramTest(t, &integration.ProgramTestOptions{
-		Quick: true,
-		Dir:   tmpdir,
-		Config: map[string]string{
-			"organization": getOrgName(),
-		},
-		EditDirs: []integration.EditDir{
-			{
-				Dir: path.Join(cwd, ".", "yaml-stack-tags-plural"),
-			},
-			// Reapply the same thing again, except this time we expect there to be no changes
-			{
-				Dir:             path.Join(cwd, ".", "yaml-stack-tags-plural"),
-				ExpectNoChanges: true,
-			},
-		},
-	})
+	test.UpdateSource(t, filepath.Join(getCwd(t), "yaml-stack-tags-plural"))
+	runPulumiTest(t, test)
 }
 
 func TestYamlDeploymentSettingsExample(t *testing.T) {
+	// The program names its own stack, so the settings must belong to a stack
+	// with that name.
+	digits := generateRandomFiveDigits()
+	test := pulumitest.NewPulumiTest(t,
+		filepath.Join(getCwd(t), "yaml-deployment-settings"),
+		inMemoryProvider(),
+		opttest.UseAmbientBackend(),
+		opttest.StackName("test-stack-"+digits),
+	)
+	test.SetConfig(t, "digits", digits)
+	test.SetConfig(t, "organizationName", getOrgName())
+	test.SetConfig(t, "imageUsername", "registry-user")
+	setSecretConfig(t, test, "imagePassword", "registry-password")
+	test.Up(t)
 
-	// Set up tmpdir with a Pulumi.yml with no resources
-	// mimicking the deletion of resource
-	newProgram := YamlProgram{
+	// Remove the settings from the program, then check that deleting them
+	// leaves nothing to change.
+	test.WritePulumiYaml(t, yamlProgramSource(t, YamlProgram{
 		Name:        "yaml-deployment-settings-example",
 		Runtime:     "yaml",
 		Description: "Deployment settings test",
-	}
-
-	tmpdir := writePulumiYaml(t, newProgram)
-
-	cwd, _ := os.Getwd()
-	digits := generateRandomFiveDigits()
-
-	integration.ProgramTest(t, &integration.ProgramTestOptions{
-		Quick:     true,
-		Dir:       path.Join(cwd, ".", "yaml-deployment-settings"),
-		StackName: "test-stack-" + digits,
-		Config: map[string]string{
-			"digits":           digits,
-			"imageUsername":    "registry-user",
-			"organizationName": getOrgName(),
-		},
-		Secrets: map[string]string{
-			"imagePassword": "registry-password",
-		},
-		EditDirs: []integration.EditDir{
-			{
-				Dir: tmpdir,
-			},
-			// Reapply the same thing again, except this time we expect there to be no changes
-			{
-				Dir:             tmpdir,
-				ExpectNoChanges: true,
-			},
-		},
-	})
+	}))
+	test.Up(t)
+	assertpreview.HasNoChanges(t, test.Preview(t))
 }
 
 func TestYamlDeploymentSettingsNoSourceExample(t *testing.T) {
-
-	// Set up tmpdir with a Pulumi.yml with no resources
-	// mimicking the deletion of resource
-	newProgram := YamlProgram{
-		Name:    "yaml-deployment-settings-example-no-source",
-		Runtime: "yaml",
-	}
-
-	tmpdir := writePulumiYaml(t, newProgram)
-
-	cwd, _ := os.Getwd()
+	// The program names its own stack, so the settings must belong to a stack
+	// with that name.
 	digits := generateRandomFiveDigits()
+	test := pulumitest.NewPulumiTest(t,
+		filepath.Join(getCwd(t), "yaml-deployment-settings-no-source"),
+		inMemoryProvider(),
+		opttest.UseAmbientBackend(),
+		opttest.StackName("test-stack-"+digits),
+	)
+	test.SetConfig(t, "digits", digits)
+	test.SetConfig(t, "organizationName", getOrgName())
+	test.Up(t)
 
-	integration.ProgramTest(t, &integration.ProgramTestOptions{
-		Quick:     true,
-		Dir:       path.Join(cwd, ".", "yaml-deployment-settings-no-source"),
-		StackName: "test-stack-" + digits,
-		Config: map[string]string{
-			"digits":           digits,
-			"organizationName": getOrgName(),
-		},
-		EditDirs: []integration.EditDir{
-			{
-				Dir: tmpdir,
-			},
-			// Reapply the same thing again, except this time we expect there to be no changes
-			{
-				Dir:             tmpdir,
-				ExpectNoChanges: true,
-			},
-		},
-	})
+	// Remove the settings from the program, then check that deleting them
+	// leaves nothing to change.
+	test.WritePulumiYaml(t, yamlProgramSource(t, YamlProgram{
+		Name:    "yaml-deployment-settings-example",
+		Runtime: "yaml",
+	}))
+	test.Up(t)
+	assertpreview.HasNoChanges(t, test.Preview(t))
 }
 
 func TestYamlDeploymentSettingsCommitExample(t *testing.T) {
+	// The program names its own stack, so the settings must belong to a stack
+	// with that name.
+	digits := generateRandomFiveDigits()
+	test := pulumitest.NewPulumiTest(t,
+		filepath.Join(getCwd(t), "yaml-deployment-settings-commit"),
+		inMemoryProvider(),
+		opttest.UseAmbientBackend(),
+		opttest.StackName("test-stack-"+digits),
+	)
+	test.SetConfig(t, "digits", digits)
+	test.SetConfig(t, "organizationName", getOrgName())
+	test.Up(t)
 
-	// Set up tmpdir with a Pulumi.yml with no resources
-	// mimicking the deletion of resource
-	newProgram := YamlProgram{
+	// Remove the settings from the program, then check that deleting them
+	// leaves nothing to change.
+	test.WritePulumiYaml(t, yamlProgramSource(t, YamlProgram{
 		Name:    "yaml-deployment-settings-commit-example",
 		Runtime: "yaml",
-	}
-
-	tmpdir := writePulumiYaml(t, newProgram)
-
-	cwd, _ := os.Getwd()
-	digits := generateRandomFiveDigits()
-
-	integration.ProgramTest(t, &integration.ProgramTestOptions{
-		Quick:     true,
-		Dir:       path.Join(cwd, ".", "yaml-deployment-settings-commit"),
-		StackName: "test-stack-" + digits,
-		Config: map[string]string{
-			"digits":           digits,
-			"organizationName": getOrgName(),
-		},
-		EditDirs: []integration.EditDir{
-			{
-				Dir: tmpdir,
-			},
-			// Reapply the same thing again, except this time we expect there to be no changes
-			{
-				Dir:             tmpdir,
-				ExpectNoChanges: true,
-			},
-		},
-	})
+	}))
+	test.Up(t)
+	assertpreview.HasNoChanges(t, test.Preview(t))
 }
 
 func TestYamlDeploymentSettingsOidcAuthExample(t *testing.T) {
@@ -440,25 +362,27 @@ func TestYamlAccessTokenExample(t *testing.T) {
 }
 
 func TestYamlTeamAccessTokenExample(t *testing.T) {
-	cwd, _ := os.Getwd()
-	integration.ProgramTest(t, &integration.ProgramTestOptions{
-		Quick: true,
-		Dir:   path.Join(cwd, ".", "yaml-team-token"),
-	})
+	test := pulumitest.NewPulumiTest(t,
+		filepath.Join(getCwd(t), "yaml-team-token"),
+		inMemoryProvider(),
+		opttest.UseAmbientBackend(),
+		opttest.StackName(randomStackName()),
+	)
+	runPulumiTest(t, test)
 }
 
 func TestYamlOrgAccessTokenExample(t *testing.T) {
-	cwd, _ := os.Getwd()
-	integration.ProgramTest(t, &integration.ProgramTestOptions{
-		Quick: true,
-		Dir:   path.Join(cwd, ".", "yaml-org-token"),
-		Config: map[string]string{
-			"organizationName": getOrgName(),
-			// Use a full date-time, not a bare date, so the test covers the
-			// time component surviving the round trip through the API.
-			"expires": time.Now().UTC().AddDate(0, 0, 30).Truncate(time.Hour).Format(time.RFC3339),
-		},
-	})
+	test := pulumitest.NewPulumiTest(t,
+		filepath.Join(getCwd(t), "yaml-org-token"),
+		inMemoryProvider(),
+		opttest.UseAmbientBackend(),
+		opttest.StackName(randomStackName()),
+	)
+	test.SetConfig(t, "organizationName", getOrgName())
+	// Use a full date-time, not a bare date, so the test covers the time
+	// component surviving the round trip through the API.
+	test.SetConfig(t, "expires", time.Now().UTC().AddDate(0, 0, 30).Truncate(time.Hour).Format(time.RFC3339))
+	runPulumiTest(t, test)
 }
 
 func TestYamlTeamStackPermissionsExample(t *testing.T) {
@@ -487,15 +411,17 @@ func TestYamlWebhookExample(t *testing.T) {
 func TestYamlSchedulesExample(t *testing.T) {
 
 	t.Run("Yaml Schedules Example", func(t *testing.T) {
-		cwd := getCwd(t)
+		// The program names its own stack, so the schedules must belong to a
+		// stack with that name.
 		digits := generateRandomFiveDigits()
-		integration.ProgramTest(t, &integration.ProgramTestOptions{
-			Dir:       path.Join(cwd, ".", "yaml-schedules"),
-			StackName: "test-stack-" + digits,
-			Config: map[string]string{
-				"digits": digits,
-			},
-		})
+		test := pulumitest.NewPulumiTest(t,
+			filepath.Join(getCwd(t), "yaml-schedules"),
+			inMemoryProvider(),
+			opttest.UseAmbientBackend(),
+			opttest.StackName("test-stack-"+digits),
+		)
+		test.SetConfig(t, "digits", digits)
+		runPulumiTest(t, test)
 	})
 
 	t.Run("Schedules are replaced on timestamp update", func(t *testing.T) {
@@ -544,33 +470,20 @@ func TestYamlSchedulesExample(t *testing.T) {
 		}
 
 		// create some initial one-time schedules
-		initialDir := writeScheduleProgram(time.Now().Add(1 * time.Hour))
+		test := pulumitest.NewPulumiTest(t,
+			writeScheduleProgram(time.Now().Add(1*time.Hour)),
+			inMemoryProvider(),
+			opttest.UseAmbientBackend(),
+			opttest.StackName(randomStackName()),
+		)
+		test.Up(t)
+
 		// and then reschedule them
-		rescheduleDir := writeScheduleProgram(time.Now().Add(2 * time.Hour))
-
-		update := &strings.Builder{}
-		updateOut := io.MultiWriter(os.Stdout, update)
-
-		integration.ProgramTest(t, &integration.ProgramTestOptions{
-			StackName:   "test-stack-" + generateRandomFiveDigits(),
-			Dir:         initialDir,
-			Quick:       true,
-			SkipRefresh: true,
-			EditDirs: []integration.EditDir{
-				{
-					Dir:             rescheduleDir,
-					Additive:        true,
-					Stdout:          updateOut,
-					Stderr:          updateOut,
-					Verbose:         true,
-					ExpectNoChanges: false,
-				},
-			},
-		})
-
-		// expect the update to cause schedule replacements
-		assert.Contains(t, update.String(), "deployment-schedule replaced")
-		assert.Contains(t, update.String(), "ttl-schedule replaced")
+		test.UpdateSource(t, writeScheduleProgram(time.Now().Add(2*time.Hour)))
+		update := test.Up(t)
+		assert.Contains(t, update.StdOut, "deployment-schedule replaced")
+		assert.Contains(t, update.StdOut, "ttl-schedule replaced")
+		test.Destroy(t)
 	})
 }
 
@@ -587,14 +500,14 @@ func TestYamlEnvironmentsExample(t *testing.T) {
 }
 
 func TestYamlAgentPoolsExample(t *testing.T) {
-	cwd := getCwd(t)
-	digits := generateRandomFiveDigits()
-	integration.ProgramTest(t, &integration.ProgramTestOptions{
-		Dir: path.Join(cwd, ".", "yaml-agent-pools"),
-		Config: map[string]string{
-			"digits": digits,
-		},
-	})
+	test := pulumitest.NewPulumiTest(t,
+		filepath.Join(getCwd(t), "yaml-agent-pools"),
+		inMemoryProvider(),
+		opttest.UseAmbientBackend(),
+		opttest.StackName(randomStackName()),
+	)
+	test.SetConfig(t, "digits", generateRandomFiveDigits())
+	runPulumiTest(t, test)
 }
 
 func TestYamlTemplateSourcesExample(t *testing.T) {
@@ -612,63 +525,67 @@ func TestYamlTemplateSourcesExample(t *testing.T) {
 }
 
 func TestYamlOidcIssuerExample(t *testing.T) {
-	cwd := getCwd(t)
-	integration.ProgramTest(t, &integration.ProgramTestOptions{
-		Dir:    path.Join(cwd, ".", "yaml-oidc-issuer"),
-		Config: oidcIssuerTestConfig(),
-	})
+	test := pulumitest.NewPulumiTest(t,
+		filepath.Join(getCwd(t), "yaml-oidc-issuer"),
+		inMemoryProvider(),
+		opttest.UseAmbientBackend(),
+		opttest.StackName(randomStackName()),
+	)
+	for k, v := range oidcIssuerTestConfig() {
+		test.SetConfig(t, k, v)
+	}
+	runPulumiTest(t, test)
 }
 
 func TestYamlPolicyGroupsExample(t *testing.T) {
-	cwd := getCwd(t)
-	digits := generateRandomFiveDigits()
-	integration.ProgramTest(t, &integration.ProgramTestOptions{
-		Dir: path.Join(cwd, ".", "yaml-policy-groups"),
-		Config: map[string]string{
-			"digits":           digits,
-			"organizationName": os.Getenv("PULUMI_TEST_OWNER"),
-		},
-		ExtraRuntimeValidation: func(t *testing.T, stack integration.RuntimeValidationStackInfo) {
-			// getPolicyPacks joins the org policy pack list against the registry
-			// to attach provenance. Unit tests cover the join in isolation; only
-			// a real org proves the registry actually returns entries for the
-			// packs the org can see, and that the join is pointed at a route
-			// that exists — a wrong path 404s, which the client reads as "no
-			// registry on this backend" and degrades to zero annotations.
-			packs, ok := stack.Outputs["policyPacks"].([]interface{})
-			if !ok {
-				t.Fatalf("expected policyPacks output to be a list, got %T", stack.Outputs["policyPacks"])
-			}
-			if len(packs) == 0 {
-				t.Skip("organization has no policy packs; nothing to assert provenance on")
-			}
-			// Annotation is per pack and best effort by design, so don't require
-			// every pack to carry it: the test org accumulates packs from other
-			// tests, and one absent from the registry shouldn't fail this. The
-			// regression being guarded is the join matching *nothing*, so assert
-			// that some pack resolved and that whatever did resolve is sane.
-			annotated := 0
-			for _, raw := range packs {
-				pack, ok := raw.(map[string]interface{})
-				if !ok {
-					t.Fatalf("expected each policy pack to be an object, got %T", raw)
-				}
-				if pack["publisher"] == nil && pack["source"] == nil {
-					continue
-				}
-				annotated++
-				name := pack["name"]
-				assert.NotEmptyf(t, pack["publisher"], "policy pack %v has no publisher", name)
-				// Don't assert a Pulumi-published pack exists — that depends on
-				// which packs the test org has added, and would be brittle.
-				assert.Containsf(t, []interface{}{"pulumi", "private"}, pack["source"],
-					"policy pack %v has unexpected source %v", name, pack["source"])
-			}
-			assert.Positivef(t, annotated,
-				"no policy pack carried registry provenance; the registry join matched "+
-					"nothing across %d packs", len(packs))
-		},
-	})
+	test := pulumitest.NewPulumiTest(t,
+		filepath.Join(getCwd(t), "yaml-policy-groups"),
+		inMemoryProvider(),
+		opttest.UseAmbientBackend(),
+		opttest.StackName(randomStackName()),
+	)
+	test.SetConfig(t, "digits", generateRandomFiveDigits())
+	test.SetConfig(t, "organizationName", getOrgName())
+	up := runPulumiTest(t, test)
+
+	// getPolicyPacks joins the org policy pack list against the registry
+	// to attach provenance. Unit tests cover the join in isolation; only
+	// a real org proves the registry actually returns entries for the
+	// packs the org can see, and that the join is pointed at a route
+	// that exists — a wrong path 404s, which the client reads as "no
+	// registry on this backend" and degrades to zero annotations.
+	packs, ok := up.Outputs["policyPacks"].Value.([]interface{})
+	if !ok {
+		t.Fatalf("expected policyPacks output to be a list, got %T", up.Outputs["policyPacks"].Value)
+	}
+	if len(packs) == 0 {
+		t.Skip("organization has no policy packs; nothing to assert provenance on")
+	}
+	// Annotation is per pack and best effort by design, so don't require
+	// every pack to carry it: the test org accumulates packs from other
+	// tests, and one absent from the registry shouldn't fail this. The
+	// regression being guarded is the join matching *nothing*, so assert
+	// that some pack resolved and that whatever did resolve is sane.
+	annotated := 0
+	for _, raw := range packs {
+		pack, ok := raw.(map[string]interface{})
+		if !ok {
+			t.Fatalf("expected each policy pack to be an object, got %T", raw)
+		}
+		if pack["publisher"] == nil && pack["source"] == nil {
+			continue
+		}
+		annotated++
+		name := pack["name"]
+		assert.NotEmptyf(t, pack["publisher"], "policy pack %v has no publisher", name)
+		// Don't assert a Pulumi-published pack exists — that depends on
+		// which packs the test org has added, and would be brittle.
+		assert.Containsf(t, []interface{}{"pulumi", "private"}, pack["source"],
+			"policy pack %v has unexpected source %v", name, pack["source"])
+	}
+	assert.Positivef(t, annotated,
+		"no policy pack carried registry provenance; the registry join matched "+
+			"nothing across %d packs", len(packs))
 }
 
 func TestYamlPolicyPackExample(t *testing.T) {
@@ -710,16 +627,16 @@ func TestYamlPolicyPackIntrospectExample(t *testing.T) {
 }
 
 func TestYamlPolicyGroupsAccountsExample(t *testing.T) {
-	cwd := getCwd(t)
-	digits := generateRandomFiveDigits()
-	integration.ProgramTest(t, &integration.ProgramTestOptions{
-		Dir: path.Join(cwd, ".", "yaml-policy-groups-accounts"),
-		Config: map[string]string{
-			"digits":           digits,
-			"organizationName": getOrgName(),
-			"roleArn":          getInsightsRoleArn(t),
-		},
-	})
+	test := pulumitest.NewPulumiTest(t,
+		filepath.Join(getCwd(t), "yaml-policy-groups-accounts"),
+		inMemoryProvider(),
+		opttest.UseAmbientBackend(),
+		opttest.StackName(randomStackName()),
+	)
+	test.SetConfig(t, "digits", generateRandomFiveDigits())
+	test.SetConfig(t, "organizationName", getOrgName())
+	test.SetConfig(t, "roleArn", getInsightsRoleArn(t))
+	runPulumiTest(t, test)
 }
 
 func TestYamlPolicyGroupMatchRulesExample(t *testing.T) {
@@ -775,29 +692,27 @@ func TestYamlPolicyGroupMatchRulesExample(t *testing.T) {
 }
 
 func TestYamlApprovalRuleExample(t *testing.T) {
-	cwd := getCwd(t)
-	digits := generateRandomFiveDigits()
-	integration.ProgramTest(t, &integration.ProgramTestOptions{
-		Quick: true,
-		Dir:   path.Join(cwd, ".", "yaml-approval-rules"),
-		Config: map[string]string{
-			"organizationName": getOrgName(),
-			"digits":           digits,
-		},
-	})
+	test := pulumitest.NewPulumiTest(t,
+		filepath.Join(getCwd(t), "yaml-approval-rules"),
+		inMemoryProvider(),
+		opttest.UseAmbientBackend(),
+		opttest.StackName(randomStackName()),
+	)
+	test.SetConfig(t, "organizationName", getOrgName())
+	test.SetConfig(t, "digits", generateRandomFiveDigits())
+	runPulumiTest(t, test)
 }
 
 func TestYamlStackExample(t *testing.T) {
-	cwd := getCwd(t)
-	digits := generateRandomFiveDigits()
-	integration.ProgramTest(t, &integration.ProgramTestOptions{
-		Quick: true,
-		Dir:   path.Join(cwd, ".", "yaml-stack"),
-		Config: map[string]string{
-			"organizationName": getOrgName(),
-			"digits":           digits,
-		},
-	})
+	test := pulumitest.NewPulumiTest(t,
+		filepath.Join(getCwd(t), "yaml-stack"),
+		inMemoryProvider(),
+		opttest.UseAmbientBackend(),
+		opttest.StackName(randomStackName()),
+	)
+	test.SetConfig(t, "organizationName", getOrgName())
+	test.SetConfig(t, "digits", generateRandomFiveDigits())
+	runPulumiTest(t, test)
 }
 
 func TestYamlInsightsAccountExample(t *testing.T) {
@@ -1121,13 +1036,17 @@ func TestYamlRbacComposeImport(t *testing.T) {
 
 func writePulumiYaml(t *testing.T, yamlContents interface{}) string {
 	tmpdir := t.TempDir()
-	b, err := yaml.Marshal(yamlContents)
-	if err != nil {
-		t.Fatal(err)
-	}
-	err = os.WriteFile(path.Join(tmpdir, "Pulumi.yaml"), b, 0600)
+	err := os.WriteFile(filepath.Join(tmpdir, "Pulumi.yaml"), []byte(yamlProgramSource(t, yamlContents)), 0600)
 	if err != nil {
 		t.Fatal(err)
 	}
 	return tmpdir
+}
+
+func yamlProgramSource(t *testing.T, yamlContents interface{}) string {
+	b, err := yaml.Marshal(yamlContents)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return string(b)
 }

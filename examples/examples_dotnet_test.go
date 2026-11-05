@@ -10,7 +10,7 @@ import (
 )
 
 func TestDotnetSmokeExample(t *testing.T) {
-	runSmokeTest(t, "cs",
+	runSmokeTest(t, "cs", nil,
 		// `pulumi install` runs before the reference below is added, so it
 		// can't resolve the local SDK. `pulumi up` builds the program instead.
 		opttest.SkipInstall(),

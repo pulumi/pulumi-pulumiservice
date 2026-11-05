@@ -1,6 +1,6 @@
 // Copyright 2026, Pulumi Corporation.
 
-//go:build go || dotnet || java || all
+//go:build nodejs || python || go || dotnet || java || all
 
 package examples
 
@@ -17,8 +17,14 @@ import (
 // runSmokeTest runs one of the <lang>-smoke programs. Each creates an
 // environment from a string asset, an org access token whose value is a secret
 // output, and reads the environment back with the getEnvironment invoke: the
-// shapes that each language SDK handles in its own code.
-func runSmokeTest(t *testing.T, lang string, opts ...opttest.Option) {
+// shapes that each language SDK handles in its own code. prepare, if not nil,
+// runs after the program is copied and installed and before `pulumi up`.
+func runSmokeTest(
+	t *testing.T,
+	lang string,
+	prepare func(t *testing.T, test *pulumitest.PulumiTest),
+	opts ...opttest.Option,
+) {
 	digits := generateRandomFiveDigits()
 	test := pulumitest.NewPulumiTest(t,
 		filepath.Join(getCwd(t), lang+"-smoke"),
@@ -30,6 +36,9 @@ func runSmokeTest(t *testing.T, lang string, opts ...opttest.Option) {
 	)
 	test.SetConfig(t, "organizationName", getOrgName())
 	test.SetConfig(t, "digits", digits)
+	if prepare != nil {
+		prepare(t, test)
+	}
 
 	up := runPulumiTest(t, test)
 

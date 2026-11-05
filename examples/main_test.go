@@ -59,8 +59,8 @@ func yarnInstall(t *testing.T, dir string) {
 	}
 }
 
-// runPulumiTest performs the same basic steps as
-// [github.com/pulumi/pulumi/pkg/v3/testing/integration.ProgramTest].
+// runPulumiTest runs `up`, checks that a preview and a refresh then find no
+// changes, and destroys the stack.
 func runPulumiTest(t *testing.T, test *pulumitest.PulumiTest) auto.UpResult {
 	return runPulumiTestAfterUp(t, test, nil)
 }
