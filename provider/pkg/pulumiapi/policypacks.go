@@ -58,12 +58,12 @@ type PolicyPackWithVersions struct {
 }
 
 type PolicyPackDetail struct {
-	Name        string                 `json:"name"`
-	DisplayName string                 `json:"displayName"`
-	Version     int                    `json:"version"`
-	VersionTag  string                 `json:"versionTag,omitempty"`
-	Config      map[string]interface{} `json:"config,omitempty"`
-	Policies    []apitype.Policy       `json:"policies,omitempty"`
+	Name        string           `json:"name"`
+	DisplayName string           `json:"displayName"`
+	Version     int              `json:"version"`
+	VersionTag  string           `json:"versionTag,omitempty"`
+	Config      map[string]any   `json:"config,omitempty"`
+	Policies    []apitype.Policy `json:"policies,omitempty"`
 }
 
 type listPolicyPacksResponse struct {

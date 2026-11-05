@@ -35,12 +35,10 @@ func (err *ErrorResponse) Error() string {
 // the legacy c.do() path and the generated SDK's `*apiclient.APIError` so
 // callers can switch on status uniformly during the SDK migration.
 func GetErrorStatusCode(err error) int {
-	var errResp *ErrorResponse
-	if errors.As(err, &errResp) {
+	if errResp, ok := errors.AsType[*ErrorResponse](err); ok {
 		return errResp.StatusCode
 	}
-	var apiErr *apiclient.APIError
-	if errors.As(err, &apiErr) {
+	if apiErr, ok := errors.AsType[*apiclient.APIError](err); ok {
 		return apiErr.HTTPStatusCode()
 	}
 	return 0

@@ -4,8 +4,13 @@ version: "2"
 linters:
   default: none
   enable:
+    - modernize
     - usetesting
   settings:
+    modernize:
+      disable:
+        # Switching omitempty to omitzero changes the JSON sent to the API.
+        - omitzero
     usetesting:
       # Off by default; t.Context() is cancelled when the test ends.
       context-background: true
