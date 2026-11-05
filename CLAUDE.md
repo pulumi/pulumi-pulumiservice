@@ -142,7 +142,7 @@ mise exec -- changie new --interactive=false \
 - `--custom Issue=<n>` adds the `[#n](...)` link. It takes an issue or PR
   number and is optional. Omit it when there's no issue. To cite several, put
   the extra links at the end of the body.
-- Humans can run `make changelog` for the interactive prompt instead.
+- Humans can run `changie new` for the interactive prompt.
 - Commit the fragment with the change. Check rendering with
   `mise exec -- changie batch v0.0.0 --dry-run`.
 
