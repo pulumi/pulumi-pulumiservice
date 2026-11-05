@@ -114,11 +114,11 @@ func (c *Client) GetTemplateSource(
 
 func (c *Client) DeleteTemplateSource(ctx context.Context, organizationName string, templateID string) error {
 	apiPath := path.Join("orgs", organizationName, "templates/sources", templateID)
-	response, err := c.do(ctx, http.MethodDelete, apiPath, nil, nil)
-	if response.StatusCode == 404 {
-		return nil
-	}
+	_, err := c.do(ctx, http.MethodDelete, apiPath, nil, nil)
 	if err != nil {
+		if GetErrorStatusCode(err) == http.StatusNotFound {
+			return nil
+		}
 		return fmt.Errorf(
 			"failed to delete template source in org %s with id %s due to error: %w",
 			organizationName,

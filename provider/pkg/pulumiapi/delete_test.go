@@ -5,9 +5,12 @@ package pulumiapi
 import (
 	"context"
 	"net/http"
+	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestDeleteTreatsNotFoundAsDeleted(t *testing.T) {
@@ -63,6 +66,9 @@ func TestDeleteTreatsNotFoundAsDeleted(t *testing.T) {
 		"DeleteWebhook": func(ctx context.Context, c *Client) error {
 			return c.DeleteWebhook(ctx, org, nil, nil, nil, "a-webhook")
 		},
+		"DeleteTemplateSource": func(ctx context.Context, c *Client) error {
+			return c.DeleteTemplateSource(ctx, org, "a-template-source")
+		},
 		"RemoveEnvironmentSettings": func(ctx context.Context, c *Client) error {
 			return c.RemoveEnvironmentSettings(ctx, TeamEnvironmentSettingsRequest{
 				Organization: org, Team: team, Environment: "an-env", Project: project,
@@ -99,6 +105,14 @@ func TestDeleteTreatsNotFoundAsDeleted(t *testing.T) {
 					}
 				})
 			}
+
+			t.Run("server unreachable", func(t *testing.T) {
+				server := httptest.NewServer(http.NotFoundHandler())
+				server.Close()
+				c, err := NewClient(&http.Client{Timeout: time.Second}, "abc123", server.URL)
+				require.NoError(t, err)
+				assert.Error(t, del(t.Context(), c), "a request with no response should fail the delete")
+			})
 		})
 	}
 }
