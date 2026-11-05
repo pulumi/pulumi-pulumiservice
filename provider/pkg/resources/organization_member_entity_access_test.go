@@ -116,7 +116,7 @@ func TestOrganizationMemberEntityAccessCheck(t *testing.T) {
 		for k, v := range extra {
 			props[k] = v
 		}
-		resp, err := (&OrganizationMemberEntityAccess{}).Check(context.Background(), infer.CheckRequest{
+		resp, err := (&OrganizationMemberEntityAccess{}).Check(t.Context(), infer.CheckRequest{
 			NewInputs: property.NewMap(props),
 		})
 		require.NoError(t, err)
@@ -148,7 +148,7 @@ func TestOrganizationMemberEntityAccessCheck(t *testing.T) {
 func TestOrganizationMemberEntityAccessCreate(t *testing.T) {
 	t.Run("resolves the stack and the built-in set to IDs", func(t *testing.T) {
 		mock := &entityAccessClientMock{stack: &apitype.AppStack{ID: eaStackID}, listing: stackListing()}
-		ctx := config.WithMockClient(context.Background(), mock)
+		ctx := config.WithMockClient(t.Context(), mock)
 
 		resp, err := (&OrganizationMemberEntityAccess{}).Create(ctx,
 			infer.CreateRequest[entityAccessInput]{Inputs: stackAccessInput("stack-write", "")})
@@ -172,7 +172,7 @@ func TestOrganizationMemberEntityAccessCreate(t *testing.T) {
 				permissionSet("acct-set-id", "Read", "insights-account-read"),
 			}},
 		}
-		ctx := config.WithMockClient(context.Background(), mock)
+		ctx := config.WithMockClient(t.Context(), mock)
 		r := &OrganizationMemberEntityAccess{}
 
 		_, err := r.Create(ctx, infer.CreateRequest[entityAccessInput]{Inputs: entityAccessInput{
@@ -194,7 +194,7 @@ func TestOrganizationMemberEntityAccessCreate(t *testing.T) {
 
 	t.Run("custom permission set ID", func(t *testing.T) {
 		mock := &entityAccessClientMock{stack: &apitype.AppStack{ID: eaStackID}, listing: stackListing()}
-		ctx := config.WithMockClient(context.Background(), mock)
+		ctx := config.WithMockClient(t.Context(), mock)
 		_, err := (&OrganizationMemberEntityAccess{}).Create(ctx,
 			infer.CreateRequest[entityAccessInput]{Inputs: stackAccessInput("", "custom-id")})
 		require.NoError(t, err)
@@ -203,7 +203,7 @@ func TestOrganizationMemberEntityAccessCreate(t *testing.T) {
 
 	t.Run("unknown permission and unknown set ID write nothing", func(t *testing.T) {
 		mock := &entityAccessClientMock{stack: &apitype.AppStack{ID: eaStackID}, listing: stackListing()}
-		ctx := config.WithMockClient(context.Background(), mock)
+		ctx := config.WithMockClient(t.Context(), mock)
 		r := &OrganizationMemberEntityAccess{}
 
 		_, err := r.Create(ctx, infer.CreateRequest[entityAccessInput]{Inputs: stackAccessInput("stack-admin", "")})
@@ -214,7 +214,7 @@ func TestOrganizationMemberEntityAccessCreate(t *testing.T) {
 	})
 
 	t.Run("missing stack is an error", func(t *testing.T) {
-		ctx := config.WithMockClient(context.Background(), &entityAccessClientMock{})
+		ctx := config.WithMockClient(t.Context(), &entityAccessClientMock{})
 		_, err := (&OrganizationMemberEntityAccess{}).Create(ctx,
 			infer.CreateRequest[entityAccessInput]{Inputs: stackAccessInput("stack-read", "")})
 		assert.ErrorContains(t, err, "not found")
@@ -222,7 +222,7 @@ func TestOrganizationMemberEntityAccessCreate(t *testing.T) {
 
 	t.Run("preview makes no call", func(t *testing.T) {
 		mock := &entityAccessClientMock{}
-		ctx := config.WithMockClient(context.Background(), mock)
+		ctx := config.WithMockClient(t.Context(), mock)
 		resp, err := (&OrganizationMemberEntityAccess{}).Create(ctx,
 			infer.CreateRequest[entityAccessInput]{DryRun: true, Inputs: stackAccessInput("stack-read", "")})
 		require.NoError(t, err)
@@ -233,7 +233,7 @@ func TestOrganizationMemberEntityAccessCreate(t *testing.T) {
 
 func TestOrganizationMemberEntityAccessUpdate(t *testing.T) {
 	mock := &entityAccessClientMock{stack: &apitype.AppStack{ID: eaStackID}, listing: stackListing()}
-	ctx := config.WithMockClient(context.Background(), mock)
+	ctx := config.WithMockClient(t.Context(), mock)
 	resp, err := (&OrganizationMemberEntityAccess{}).Update(ctx,
 		infer.UpdateRequest[entityAccessInput, entityAccessState]{
 			ID:     eaID,
@@ -250,7 +250,7 @@ func TestOrganizationMemberEntityAccessRead(t *testing.T) {
 	read := func(mock *entityAccessClientMock, inputs OrganizationMemberEntityAccessInput) (
 		infer.ReadResponse[entityAccessInput, entityAccessState], error,
 	) {
-		return (&OrganizationMemberEntityAccess{}).Read(config.WithMockClient(context.Background(), mock),
+		return (&OrganizationMemberEntityAccess{}).Read(config.WithMockClient(t.Context(), mock),
 			infer.ReadRequest[entityAccessInput, entityAccessState]{
 				ID: eaID, Inputs: inputs,
 			})
@@ -305,7 +305,7 @@ func TestOrganizationMemberEntityAccessRead(t *testing.T) {
 	})
 
 	t.Run("malformed import ID", func(t *testing.T) {
-		ctx := config.WithMockClient(context.Background(), &entityAccessClientMock{})
+		ctx := config.WithMockClient(t.Context(), &entityAccessClientMock{})
 		_, err := (&OrganizationMemberEntityAccess{}).Read(ctx,
 			infer.ReadRequest[entityAccessInput, entityAccessState]{ID: "my-org/alice"})
 		assert.ErrorContains(t, err, "invalid ID")
@@ -318,7 +318,7 @@ func TestOrganizationMemberEntityAccessDelete(t *testing.T) {
 		EntityId:                            eaStackID,
 	}
 	del := func(mock *entityAccessClientMock) error {
-		_, err := (&OrganizationMemberEntityAccess{}).Delete(config.WithMockClient(context.Background(), mock),
+		_, err := (&OrganizationMemberEntityAccess{}).Delete(config.WithMockClient(t.Context(), mock),
 			infer.DeleteRequest[entityAccessState]{State: state})
 		return err
 	}

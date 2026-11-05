@@ -19,7 +19,7 @@ func TestAssignRoleToTeam(t *testing.T) {
 		ExpectedReqPath:   "/api/orgs/an-organization/teams/a-team/roles/" + testRoleID,
 		ResponseCode:      204,
 	})
-	assert.NoError(t, c.AssignRoleToTeam(ctx, testTeamRolesOrg, testTeamRolesTeam, testRoleID))
+	assert.NoError(t, c.AssignRoleToTeam(t.Context(), testTeamRolesOrg, testTeamRolesTeam, testRoleID))
 }
 
 func TestRemoveRoleFromTeam(t *testing.T) {
@@ -29,7 +29,7 @@ func TestRemoveRoleFromTeam(t *testing.T) {
 			ExpectedReqPath:   "/api/orgs/an-organization/teams/a-team/roles/" + testRoleID,
 			ResponseCode:      204,
 		})
-		assert.NoError(t, c.RemoveRoleFromTeam(ctx, testTeamRolesOrg, testTeamRolesTeam, testRoleID))
+		assert.NoError(t, c.RemoveRoleFromTeam(t.Context(), testTeamRolesOrg, testTeamRolesTeam, testRoleID))
 	})
 
 	t.Run("not found swallowed", func(t *testing.T) {
@@ -39,7 +39,7 @@ func TestRemoveRoleFromTeam(t *testing.T) {
 			ResponseCode:      404,
 			ResponseBody:      ErrorResponse{Message: notFoundError},
 		})
-		assert.NoError(t, c.RemoveRoleFromTeam(ctx, testTeamRolesOrg, testTeamRolesTeam, testRoleID))
+		assert.NoError(t, c.RemoveRoleFromTeam(t.Context(), testTeamRolesOrg, testTeamRolesTeam, testRoleID))
 	})
 }
 
@@ -56,7 +56,7 @@ func TestListAndGetTeamRoles(t *testing.T) {
 			ResponseCode:      200,
 			ResponseBody:      roles,
 		})
-		got, err := c.ListTeamRoles(ctx, testTeamRolesOrg, testTeamRolesTeam)
+		got, err := c.ListTeamRoles(t.Context(), testTeamRolesOrg, testTeamRolesTeam)
 		assert.NoError(t, err)
 		assert.Len(t, got, 2)
 	})
@@ -68,7 +68,7 @@ func TestListAndGetTeamRoles(t *testing.T) {
 			ResponseCode:      200,
 			ResponseBody:      roles,
 		})
-		got, err := c.GetTeamRole(ctx, testTeamRolesOrg, testTeamRolesTeam, testRoleID)
+		got, err := c.GetTeamRole(t.Context(), testTeamRolesOrg, testTeamRolesTeam, testRoleID)
 		assert.NoError(t, err)
 		if assert.NotNil(t, got) {
 			assert.Equal(t, "devops", got.Name)
@@ -82,7 +82,7 @@ func TestListAndGetTeamRoles(t *testing.T) {
 			ResponseCode:      200,
 			ResponseBody:      listTeamRolesResponse{Roles: []TeamRoleRef{}},
 		})
-		got, err := c.GetTeamRole(ctx, testTeamRolesOrg, testTeamRolesTeam, testRoleID)
+		got, err := c.GetTeamRole(t.Context(), testTeamRolesOrg, testTeamRolesTeam, testRoleID)
 		assert.NoError(t, err)
 		assert.Nil(t, got)
 	})

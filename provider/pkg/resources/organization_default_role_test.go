@@ -53,7 +53,7 @@ func strPtr(s string) *string { return &s }
 
 func TestOrganizationDefaultRoleCheck(t *testing.T) {
 	check := func(props map[string]property.Value) []string {
-		resp, err := (&OrganizationDefaultRole{}).Check(context.Background(), infer.CheckRequest{
+		resp, err := (&OrganizationDefaultRole{}).Check(t.Context(), infer.CheckRequest{
 			NewInputs: property.NewMap(props),
 		})
 		require.NoError(t, err)
@@ -80,7 +80,7 @@ func TestOrganizationDefaultRoleCheck(t *testing.T) {
 func TestOrganizationDefaultRoleCreate(t *testing.T) {
 	t.Run("built-in role is resolved to its ID", func(t *testing.T) {
 		mock := &defaultRoleClientMock{roles: defaultRoleCatalogue("reader-id")}
-		ctx := config.WithMockClient(context.Background(), mock)
+		ctx := config.WithMockClient(t.Context(), mock)
 
 		resp, err := (&OrganizationDefaultRole{}).Create(ctx, infer.CreateRequest[OrganizationDefaultRoleInput]{
 			Inputs: OrganizationDefaultRoleInput{OrganizationName: gcAcme, Role: strPtr(gcBuilder)},
@@ -93,7 +93,7 @@ func TestOrganizationDefaultRoleCreate(t *testing.T) {
 
 	t.Run("custom role is set by ID", func(t *testing.T) {
 		mock := &defaultRoleClientMock{roles: defaultRoleCatalogue("reader-id")}
-		ctx := config.WithMockClient(context.Background(), mock)
+		ctx := config.WithMockClient(t.Context(), mock)
 
 		resp, err := (&OrganizationDefaultRole{}).Create(ctx, infer.CreateRequest[OrganizationDefaultRoleInput]{
 			Inputs: OrganizationDefaultRoleInput{OrganizationName: gcAcme, RoleId: strPtr("custom-id")},
@@ -105,7 +105,7 @@ func TestOrganizationDefaultRoleCreate(t *testing.T) {
 
 	t.Run("unknown role is an error and sets nothing", func(t *testing.T) {
 		mock := &defaultRoleClientMock{roles: defaultRoleCatalogue("reader-id")}
-		ctx := config.WithMockClient(context.Background(), mock)
+		ctx := config.WithMockClient(t.Context(), mock)
 
 		_, err := (&OrganizationDefaultRole{}).Create(ctx, infer.CreateRequest[OrganizationDefaultRoleInput]{
 			Inputs: OrganizationDefaultRoleInput{OrganizationName: gcAcme, Role: strPtr("maintainer")},
@@ -116,7 +116,7 @@ func TestOrganizationDefaultRoleCreate(t *testing.T) {
 
 	t.Run("preview does not call the service", func(t *testing.T) {
 		mock := &defaultRoleClientMock{}
-		ctx := config.WithMockClient(context.Background(), mock)
+		ctx := config.WithMockClient(t.Context(), mock)
 
 		_, err := (&OrganizationDefaultRole{}).Create(ctx, infer.CreateRequest[OrganizationDefaultRoleInput]{
 			Inputs: OrganizationDefaultRoleInput{OrganizationName: gcAcme, Role: strPtr(gcBuilder)},
@@ -130,7 +130,7 @@ func TestOrganizationDefaultRoleCreate(t *testing.T) {
 func TestOrganizationDefaultRoleRead(t *testing.T) {
 	read := func(t *testing.T, defaultID string, in OrganizationDefaultRoleInput) OrganizationDefaultRoleInput {
 		t.Helper()
-		ctx := config.WithMockClient(context.Background(), &defaultRoleClientMock{roles: defaultRoleCatalogue(defaultID)})
+		ctx := config.WithMockClient(t.Context(), &defaultRoleClientMock{roles: defaultRoleCatalogue(defaultID)})
 		resp, err := (&OrganizationDefaultRole{}).Read(ctx,
 			infer.ReadRequest[OrganizationDefaultRoleInput, OrganizationDefaultRoleState]{ID: gcAcme, Inputs: in})
 		require.NoError(t, err)
@@ -163,7 +163,7 @@ func TestOrganizationDefaultRoleRead(t *testing.T) {
 
 func TestOrganizationDefaultRoleDeleteLeavesDefaultInPlace(t *testing.T) {
 	mock := &defaultRoleClientMock{roles: defaultRoleCatalogue("builder-id")}
-	ctx := config.WithMockClient(context.Background(), mock)
+	ctx := config.WithMockClient(t.Context(), mock)
 
 	_, err := (&OrganizationDefaultRole{}).Delete(ctx, infer.DeleteRequest[OrganizationDefaultRoleState]{})
 	require.NoError(t, err)

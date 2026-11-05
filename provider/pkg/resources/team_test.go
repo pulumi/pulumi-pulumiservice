@@ -53,7 +53,7 @@ func TestTeam(t *testing.T) {
 			},
 		}
 
-		ctx := config.WithMockClient(context.Background(), mockedClient)
+		ctx := config.WithMockClient(t.Context(), mockedClient)
 
 		team := &Team{}
 		req := infer.ReadRequest[TeamInput, TeamState]{
@@ -98,7 +98,7 @@ func TestTeam(t *testing.T) {
 			},
 		}
 
-		ctx := config.WithMockClient(context.Background(), mockedClient)
+		ctx := config.WithMockClient(t.Context(), mockedClient)
 
 		team := &Team{}
 		req := infer.ReadRequest[TeamInput, TeamState]{
