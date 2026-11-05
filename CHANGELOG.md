@@ -8,6 +8,7 @@
 
 ### Bug Fixes
 
+- Destroying a resource that was already deleted outside Pulumi failed with `404 Not Found` for most resources, including `Stack`, `Team`, `Environment`, `Webhook`, the access token resources and the schedule resources. Destroy now treats the resource as deleted and succeeds. [#1350](https://github.com/pulumi/pulumi-pulumiservice/pull/1350)
 - Changing any input on an `OrgAccessToken` or `TeamAccessToken` replaces the token, and the replacement failed with `409 Conflict: token name already exists` because Pulumi Cloud doesn't let a new token reuse a deleted token's name. When `name` is omitted, the replacement now gets a new generated name and succeeds. This works for existing tokens too: removing `name` from the program keeps the current name until the next replacement. With an explicit `name`, change the name along with the other input. [#1211](https://github.com/pulumi/pulumi-pulumiservice/issues/1211), [#1216](https://github.com/pulumi/pulumi-pulumiservice/issues/1216)
 
 ## 1.7.0
