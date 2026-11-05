@@ -270,6 +270,9 @@ func (c *Client) DeleteTeam(ctx context.Context, orgName, teamName string) error
 
 	_, err := c.do(ctx, http.MethodDelete, apiPath, nil, nil)
 	if err != nil {
+		if GetErrorStatusCode(err) == http.StatusNotFound {
+			return nil
+		}
 		return fmt.Errorf("failed to delete team: %w", err)
 	}
 	return nil
@@ -371,6 +374,9 @@ func (c *Client) RemoveStackPermission(ctx context.Context, stack StackIdentifie
 
 	_, err := c.do(ctx, http.MethodPatch, apiPath, removeStackPermissionRequest, nil)
 	if err != nil {
+		if GetErrorStatusCode(err) == http.StatusNotFound {
+			return nil
+		}
 		return fmt.Errorf("failed to remove stack permission for team: %w", err)
 	}
 	return nil
@@ -458,6 +464,9 @@ func (c *Client) RemoveEnvironmentSettings(ctx context.Context, req TeamEnvironm
 
 	_, err := c.do(ctx, http.MethodPatch, apiPath, removeEnvironmentSettingsRequest, nil)
 	if err != nil {
+		if GetErrorStatusCode(err) == http.StatusNotFound {
+			return nil
+		}
 		return fmt.Errorf(
 			"failed to remove permissions for environment %s from team %s due to error: %w",
 			req.Environment,

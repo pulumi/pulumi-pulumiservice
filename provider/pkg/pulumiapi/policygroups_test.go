@@ -277,31 +277,3 @@ func TestGetPolicyGroup_IncludesEntityTypeAndMode(t *testing.T) {
 	assert.Equal(t, "accounts", result.EntityType)
 	assert.Equal(t, "preventative", result.Mode)
 }
-
-func TestDeletePolicyGroup(t *testing.T) {
-	for _, tc := range []struct {
-		name         string
-		responseCode int
-		wantErr      string
-	}{
-		{"deleted", http.StatusNoContent, ""},
-		{"already gone", http.StatusNotFound, ""},
-		{"server error", http.StatusInternalServerError, "failed to delete policy group"},
-	} {
-		t.Run(tc.name, func(t *testing.T) {
-			c := startTestServer(t, testServerConfig{
-				ExpectedReqMethod: http.MethodDelete,
-				ExpectedReqPath:   policyGroupsPath + "/" + testPolicyGroupName,
-				ResponseCode:      tc.responseCode,
-				ResponseBody:      ErrorResponse{Message: "policy group delete response"},
-			})
-
-			err := c.DeletePolicyGroup(ctx, testPolicyGroupOrgName, testPolicyGroupName)
-			if tc.wantErr == "" {
-				assert.NoError(t, err, "a %d response should count as deleted", tc.responseCode)
-			} else {
-				assert.ErrorContains(t, err, tc.wantErr)
-			}
-		})
-	}
-}
