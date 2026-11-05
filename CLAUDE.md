@@ -82,6 +82,7 @@ cd examples && go test -tags=all -v -count=1 -timeout 3h -parallel 4
 cd examples && go test -v -run TestYamlStackTagsPluralExample -tags yaml -timeout 10m
 ```
 
+- **Shared test org**: all CI suites on all PRs run concurrently against `service-provider-test-org` on staging, and the `api` suite starts with a sweeper (`examples/sweep_api_test.go`) that deletes leftover test resources. Give every resource in a new example a random suffix and avoid org-wide singletons. If you change what the sweeper deletes, update "Shared test org" in `CONTRIBUTING.md`. Locally, `go test -tags api` sweeps the org in `PULUMI_TEST_OWNER`; set `PULUMITEST_SKIP_SWEEP=1` to protect it.
 - Integration tests are located in `examples/` directory
 - Tests are tagged: use `-tags yaml`, `-tags nodejs`, `-tags python`, etc.
 - The `.env` file allows running integration tests locally against a custom organization

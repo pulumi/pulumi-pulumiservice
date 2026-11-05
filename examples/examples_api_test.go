@@ -139,7 +139,7 @@ var apiCases = []apiCase{
 	},
 	{
 		Name:    "approval-rules",
-		Config:  orgOnlyConfig,
+		Config:  approvalRulesConfig,
 		FullE2E: true,
 	},
 	{
@@ -799,6 +799,13 @@ func webhookConfig() map[string]string {
 		"organizationName": ServiceProviderTestOrg,
 		"secretValue":      "shhh-" + suffix,
 		"hookSuffix":       suffix,
+	}
+}
+
+func approvalRulesConfig() map[string]string {
+	return map[string]string{
+		"organizationName": ServiceProviderTestOrg,
+		"groupName":        "api-approvers-" + generateRandomFiveDigits(),
 	}
 }
 
