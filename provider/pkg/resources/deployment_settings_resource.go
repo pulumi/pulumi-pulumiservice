@@ -105,29 +105,27 @@ func (*DeploymentSettings) Check(
 // It reads the raw inputs because the typed inputs can't tell an unknown value,
 // which is fine during preview, from a missing one.
 func checkGCPProjectNumber(news property.Map) []p.CheckFailure {
-	gcp := news.Get(gcOperationContext)
-	for _, key := range []string{gcOIDC, gcGCP} {
-		if !gcp.IsMap() {
-			return nil
-		}
-		gcp = gcp.AsMap().Get(key)
-	}
-	if !gcp.IsMap() {
+	gcp, err := property.PathFromSegments(
+		property.NewSegment(gcOperationContext),
+		property.NewSegment(gcOIDC),
+		property.NewSegment(gcGCP),
+	).Get(property.New(news))
+	if err != nil || !gcp.IsMap() {
 		return nil
 	}
 	const prefix = "operationContext.oidc.gcp."
 	var failures []p.CheckFailure
-	set := false
+	var set []string
 	for _, key := range []string{gcProjectNumber, gcProjectID} {
 		v := gcp.AsMap().Get(key)
 		if v.IsComputed() {
-			set = true
+			set = append(set, key)
 			continue
 		}
 		if !v.IsString() || v.AsString() == "" {
 			continue
 		}
-		set = true
+		set = append(set, key)
 		if value := v.AsString(); !isDigits(value) {
 			failures = append(failures, p.CheckFailure{
 				Property: prefix + key,
@@ -137,10 +135,16 @@ func checkGCPProjectNumber(news property.Map) []p.CheckFailure {
 			})
 		}
 	}
-	if !set {
+	switch len(set) {
+	case 0:
 		failures = append(failures, p.CheckFailure{
 			Property: prefix + gcProjectNumber,
 			Reason:   "missing required property 'projectNumber'",
+		})
+	case 2:
+		failures = append(failures, p.CheckFailure{
+			Property: prefix + gcProjectID,
+			Reason:   "set only one of projectNumber and projectId. projectId is deprecated; use projectNumber.",
 		})
 	}
 	return failures
@@ -258,7 +262,7 @@ func (*DeploymentSettings) Create(
 	if err != nil {
 		return infer.CreateResponse[DeploymentSettingsState]{}, err
 	}
-	state, err := deploymentSettingsState(req.Inputs, input, response)
+	state, err := deploymentSettingsState(input, response)
 	if err != nil {
 		return infer.CreateResponse[DeploymentSettingsState]{}, err
 	}
@@ -283,7 +287,7 @@ func (*DeploymentSettings) Update(
 	if err != nil {
 		return infer.UpdateResponse[DeploymentSettingsState]{}, err
 	}
-	state, err := deploymentSettingsState(req.Inputs, input, response)
+	state, err := deploymentSettingsState(input, response)
 	if err != nil {
 		return infer.UpdateResponse[DeploymentSettingsState]{}, err
 	}
@@ -293,14 +297,14 @@ func (*DeploymentSettings) Update(
 // deploymentSettingsState builds the state from the settings Pulumi Cloud
 // returned. Secret values in it are Pulumi Cloud's ciphertext.
 func deploymentSettingsState(
-	inputs DeploymentSettingsInput, input PulumiServiceDeploymentSettingsInput, response *pulumiapi.DeploymentSettings,
+	input PulumiServiceDeploymentSettingsInput, response *pulumiapi.DeploymentSettings,
 ) (DeploymentSettingsState, error) {
 	out := PulumiServiceDeploymentSettingsInput{DeploymentSettings: *response, Stack: input.Stack}
 	state, err := fromPropertyMap[DeploymentSettingsState](out.ToPropertyMap(&input.DeploymentSettings, nil, false))
 	if err != nil {
 		return state, err
 	}
-	gcpOIDC(state.OperationContext).matchProjectKey(gcpOIDC(inputs.OperationContext))
+	gcpOIDC(state.OperationContext).setBothProjectKeys()
 	return state, nil
 }
 
@@ -365,7 +369,7 @@ func (*DeploymentSettings) Read(
 	if err != nil {
 		return response{}, err
 	}
-	gcpOIDC(state.OperationContext).matchProjectKey(usedGCP)
+	gcpOIDC(state.OperationContext).setBothProjectKeys()
 	gcpOIDC(inputs.OperationContext).matchProjectKey(usedGCP)
 	return response{ID: req.ID, Inputs: inputs, State: state}, nil
 }

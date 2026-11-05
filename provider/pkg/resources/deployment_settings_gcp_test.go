@@ -97,6 +97,15 @@ func TestDeploymentSettingsCheckGCPProjectNumber(t *testing.T) {
 			failContains: `"my-project" is not a GCP project number`,
 		},
 		{
+			name: "both keys set fails",
+			project: resource.PropertyMap{
+				gcProjectNumber: str(testGCPProjectNumber),
+				gcProjectID:     str(testGCPProjectNumber),
+			},
+			failOn:       "operationContext.oidc.gcp.projectId",
+			failContains: "set only one of projectNumber and projectId",
+		},
+		{
 			name:         "neither key set fails",
 			project:      resource.PropertyMap{},
 			failOn:       "operationContext.oidc.gcp.projectNumber",
@@ -130,10 +139,6 @@ func TestDeploymentSettingsGCPProjectNumberSentToPulumiCloud(t *testing.T) {
 	}{
 		{name: gcProjectNumber, project: resource.PropertyMap{gcProjectNumber: str(testGCPProjectNumber)}},
 		{name: gcProjectID, project: resource.PropertyMap{gcProjectID: str(testGCPProjectNumber)}},
-		{name: "projectNumber wins over projectId", project: resource.PropertyMap{
-			gcProjectNumber: str(testGCPProjectNumber),
-			gcProjectID:     str("999"),
-		}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -160,15 +165,8 @@ func TestDeploymentSettingsGCPProjectKeyKept(t *testing.T) {
 			project:  resource.PropertyMap{gcProjectID: str(testGCPProjectNumber)},
 			wantKeys: []resource.PropertyKey{gcProjectID},
 		},
-		{
-			name: "both",
-			project: resource.PropertyMap{
-				gcProjectNumber: str(testGCPProjectNumber),
-				gcProjectID:     str(testGCPProjectNumber),
-			},
-			wantKeys: []resource.PropertyKey{gcProjectID, gcProjectNumber},
-		},
 	}
+	bothKeys := []resource.PropertyKey{gcProjectID, gcProjectNumber}
 	assertKeys := func(t *testing.T, label string, gcp resource.PropertyMap, want []resource.PropertyKey) {
 		t.Helper()
 		for _, key := range []resource.PropertyKey{gcProjectID, gcProjectNumber} {
@@ -187,7 +185,7 @@ func TestDeploymentSettingsGCPProjectKeyKept(t *testing.T) {
 
 			created, err := server.Create(p.CreateRequest{Urn: deploymentSettingsURN, Properties: inputs})
 			require.NoError(t, err)
-			assertKeys(t, "create state", gcpProps(t, created.Properties), tt.wantKeys)
+			assertKeys(t, "create state", gcpProps(t, created.Properties), bothKeys)
 
 			client.getDeploymentSettingsFunc = func() (*pulumiapi.DeploymentSettings, error) {
 				return &client.created[0], nil
@@ -196,7 +194,7 @@ func TestDeploymentSettingsGCPProjectKeyKept(t *testing.T) {
 				ID: created.ID, Urn: deploymentSettingsURN, Properties: created.Properties, Inputs: inputs,
 			})
 			require.NoError(t, err)
-			assertKeys(t, "refresh state", gcpProps(t, read.Properties), tt.wantKeys)
+			assertKeys(t, "refresh state", gcpProps(t, read.Properties), bothKeys)
 			assertKeys(t, "refresh inputs", gcpProps(t, read.Inputs), tt.wantKeys)
 		})
 	}
@@ -214,5 +212,6 @@ func TestDeploymentSettingsGCPProjectKeyKept(t *testing.T) {
 		read, err := server.Read(p.ReadRequest{ID: "an-org/a-project/a-stack", Urn: deploymentSettingsURN})
 		require.NoError(t, err)
 		assertKeys(t, "import inputs", gcpProps(t, read.Inputs), []resource.PropertyKey{gcProjectNumber})
+		assertKeys(t, "import state", gcpProps(t, read.Properties), bothKeys)
 	})
 }

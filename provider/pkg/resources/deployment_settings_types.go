@@ -361,7 +361,7 @@ const gcpProjectNumberDescription = "The GCP project number, a numeric value suc
 	"`gcloud projects describe <project-id> --format='value(projectNumber)'`."
 
 // projectNumber returns the value to send to Pulumi Cloud, which has a single
-// field for it. projectNumber wins because projectId is deprecated.
+// field for it. Check rejects inputs that set both keys.
 func (o *GCPOIDCConfiguration) projectNumber() string {
 	if o.ProjectNumber != "" {
 		return o.ProjectNumber
@@ -369,9 +369,20 @@ func (o *GCPOIDCConfiguration) projectNumber() string {
 	return o.ProjectID
 }
 
-// matchProjectKey puts the project number under the key or keys that used set.
-// Pulumi Cloud returns it under one name, so without this a program using
-// projectNumber would see a diff after every create and refresh. With no used
+// setBothProjectKeys puts the project number under both keys in the state, so
+// a program can read either output and the state doesn't depend on which key
+// the inputs used.
+func (o *GCPOIDCConfiguration) setBothProjectKeys() {
+	if o == nil {
+		return
+	}
+	o.ProjectID = o.projectNumber()
+	o.ProjectNumber = o.ProjectID
+}
+
+// matchProjectKey puts the project number under the key that used set. Pulumi
+// Cloud returns it under one name, so without this a refresh of a program
+// using projectNumber would change its inputs and show a diff. With no used
 // configuration (import), it picks projectNumber.
 func (o *GCPOIDCConfiguration) matchProjectKey(used *GCPOIDCConfiguration) {
 	if o == nil {
@@ -381,8 +392,7 @@ func (o *GCPOIDCConfiguration) matchProjectKey(used *GCPOIDCConfiguration) {
 	o.ProjectID, o.ProjectNumber = "", ""
 	if used != nil && used.ProjectID != "" {
 		o.ProjectID = number
-	}
-	if used == nil || used.ProjectNumber != "" || used.ProjectID == "" {
+	} else {
 		o.ProjectNumber = number
 	}
 }
