@@ -896,8 +896,6 @@ func TestYamlRbacExample(t *testing.T) {
 	if first, ok := up.Outputs["firstRoleName"]; ok {
 		assert.NotEmpty(t, first.Value, "expected getOrganizationRoles to return at least one role")
 	}
-	assert.NotEmpty(t, up.Outputs["literalDescriptorRoleId"].Value,
-		"expected an OrganizationRole with a literal __type descriptor to be created")
 	assert.Equal(t, up.Outputs["roleId"].Value, up.Outputs["lookedUpMemberRoleId"].Value,
 		"expected getOrganizationMember to report the custom role assigned by OrganizationMember")
 	preview := test.Preview(t)

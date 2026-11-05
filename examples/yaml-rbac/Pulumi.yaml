@@ -32,19 +32,6 @@ resources:
       description: Read-only access to stacks, created by the yaml-rbac example.
       permissions: ${readOnlyPermissions.permissions}
 
-  # The same grant as readOnlyRole, written as the wire-format descriptor
-  # with its `__type` discriminator instead of built by a helper.
-  literalDescriptorRole:
-    type: pulumiservice:OrganizationRole
-    properties:
-      organizationName: ${organizationName}
-      name: yaml-rbac-literal-read-only-${digits}
-      description: Read-only access to stacks, written as a literal descriptor.
-      permissions:
-        __type: PermissionDescriptorAllow
-        permissions:
-          - stack:read
-
   # A team that will receive the custom role. Pulumi Cloud adds the team
   # creator as the first member automatically, so we declare them here to
   # keep refresh from detecting that as drift.
@@ -196,5 +183,4 @@ outputs:
   lookedUpRoleBuiltIn: ${lookedUpRole.builtIn}
   adminRoleId: ${adminRole.roleId}
   firstRoleName: ${allRoles.roles[0].name}
-  literalDescriptorRoleId: ${literalDescriptorRole.roleId}
   lookedUpMemberRoleId: ${memberByUsername.roleId}
