@@ -1,0 +1,9 @@
+name: go-smoke
+runtime: go
+description: Checks that the Go SDK handles an asset input, an invoke and a secret output.
+config:
+  organizationName:
+    type: string
+    default: service-provider-test-org
+  digits:
+    type: string
