@@ -4,16 +4,29 @@ package pulumiapi
 
 import (
 	"context"
+	"errors"
 	"net/http"
-	"net/http/httptest"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-func TestDeleteTreatsNotFoundAsDeleted(t *testing.T) {
+// failingTransport fails every request before a response arrives, the way a
+// network error or timeout does.
+type failingTransport struct{}
+
+func (failingTransport) RoundTrip(*http.Request) (*http.Response, error) {
+	return nil, errors.New("connection refused")
+}
+
+func newUnreachableClient(t *testing.T) *Client {
+	c, err := NewClient(&http.Client{Transport: failingTransport{}}, "abc123", "http://unreachable")
+	require.NoError(t, err)
+	return c
+}
+
+func TestDelete(t *testing.T) {
 	const (
 		org     = "an-org"
 		project = "a-project"
@@ -30,6 +43,9 @@ func TestDeleteTreatsNotFoundAsDeleted(t *testing.T) {
 		"DeleteAgentPool": func(ctx context.Context, c *Client) error {
 			return c.DeleteAgentPool(ctx, "a-pool", org, false)
 		},
+		"DeleteEnvironmentApprovalRule": func(ctx context.Context, c *Client) error {
+			return c.DeleteEnvironmentApprovalRule(ctx, org, "a-rule")
+		},
 		"DeleteDeploymentSettings": func(ctx context.Context, c *Client) error {
 			return c.DeleteDeploymentSettings(ctx, stack)
 		},
@@ -44,6 +60,9 @@ func TestDeleteTreatsNotFoundAsDeleted(t *testing.T) {
 		},
 		"DeleteOrgAccessToken": func(ctx context.Context, c *Client) error {
 			return c.DeleteOrgAccessToken(ctx, token, org)
+		},
+		"DeleteOidcIssuer": func(ctx context.Context, c *Client) error {
+			return c.DeleteOidcIssuer(ctx, org, "an-issuer")
 		},
 		"DeletePolicyGroup": func(ctx context.Context, c *Client) error {
 			return c.DeletePolicyGroup(ctx, org, "a-group")
@@ -107,11 +126,8 @@ func TestDeleteTreatsNotFoundAsDeleted(t *testing.T) {
 			}
 
 			t.Run("server unreachable", func(t *testing.T) {
-				server := httptest.NewServer(http.NotFoundHandler())
-				server.Close()
-				c, err := NewClient(&http.Client{Timeout: time.Second}, "abc123", server.URL)
-				require.NoError(t, err)
-				assert.Error(t, del(t.Context(), c), "a request with no response should fail the delete")
+				err := del(t.Context(), newUnreachableClient(t))
+				assert.Error(t, err, "a request with no response should fail the delete")
 			})
 		})
 	}
