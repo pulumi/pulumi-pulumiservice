@@ -40,11 +40,11 @@ type StackScheduleClient interface {
 
 type CreateDeploymentRequest struct {
 	PulumiOperation  string                   `json:"operation,omitempty"`
-	OperationContext ScheduleOperationContext `json:"operationContext,omitempty"`
+	OperationContext ScheduleOperationContext `json:"operationContext"`
 }
 
 type ScheduleOperationContext struct {
-	Options ScheduleOperationContextOptions `json:"options,omitempty"`
+	Options ScheduleOperationContextOptions `json:"options"`
 }
 
 type ScheduleOperationContextOptions struct {
@@ -53,13 +53,13 @@ type ScheduleOperationContextOptions struct {
 }
 
 type StackScheduleDefinition struct {
-	Request CreateDeploymentRequest `json:"request,omitempty"`
+	Request CreateDeploymentRequest `json:"request"`
 }
 
 type CreateDeploymentScheduleRequest struct {
 	ScheduleCron *string                 `json:"scheduleCron,omitempty"`
 	ScheduleOnce *time.Time              `json:"scheduleOnce,omitempty"`
-	Request      CreateDeploymentRequest `json:"request,omitempty"`
+	Request      CreateDeploymentRequest `json:"request"`
 }
 
 type CreateDriftScheduleRequest struct {
@@ -68,7 +68,7 @@ type CreateDriftScheduleRequest struct {
 }
 
 type CreateTTLScheduleRequest struct {
-	Timestamp          time.Time `json:"timestamp,omitempty"`
+	Timestamp          time.Time `json:"timestamp"`
 	DeleteAfterDestroy bool      `json:"deleteAfterDestroy,omitempty"`
 }
 
@@ -76,7 +76,7 @@ type StackScheduleResponse struct {
 	ID           string                  `json:"id,omitempty"`
 	ScheduleOnce *string                 `json:"scheduleOnce,omitempty"`
 	ScheduleCron *string                 `json:"scheduleCron,omitempty"`
-	Definition   StackScheduleDefinition `json:"definition,omitempty"`
+	Definition   StackScheduleDefinition `json:"definition"`
 }
 
 func (c *Client) CreateDeploymentSchedule(
