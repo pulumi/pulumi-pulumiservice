@@ -1,0 +1,59 @@
+name: yaml-deployment-settings-oidc-auth
+runtime: yaml
+description: Deployment settings with Deployments OIDC, SSH git auth, secret inputs and an agent pool.
+config:
+  organizationName:
+    type: string
+    default: service-provider-test-org
+  digits:
+    type: string
+  sshPassword:
+    type: string
+    secret: true
+  secretEnvVar:
+    type: string
+    secret: true
+resources:
+  agentPool:
+    type: pulumiservice:AgentPool
+    properties:
+      organizationName: ${organizationName}
+      name: test-oidc-auth-pool-${digits}
+  settings:
+    type: pulumiservice:DeploymentSettings
+    properties:
+      organization: ${organizationName}
+      project: ${pulumi.project}
+      stack: ${pulumi.stack}
+      agentPoolId: ${agentPool.agentPoolId}
+      operationContext:
+        environmentVariables:
+          PLAIN_VAR: plain-value
+          SECRET_VAR: ${secretEnvVar}
+        oidc:
+          aws:
+            roleARN: arn:aws:iam::123456789012:role/MyRole
+            duration: 1h
+            sessionName: my-session
+          gcp:
+            projectId: my-project
+            region: us-west1
+            workloadPoolId: my-workload-pool
+            providerId: my-provider
+            serviceAccount: my-service-account
+            tokenLifetime: 30s
+          azure:
+            tenantId: my-tenant-id
+            clientId: my-client-id
+            subscriptionId: my-subscription-id
+      sourceContext:
+        git:
+          repoUrl: https://github.com/pulumi/deploy-demos.git
+          branch: main
+          repoDir: pulumi-programs/simple-resource
+          gitAuth:
+            sshAuth:
+              sshPrivateKey: key
+              password: ${sshPassword}
+      cacheOptions:
+        enable: false

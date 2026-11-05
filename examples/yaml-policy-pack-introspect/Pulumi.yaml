@@ -1,0 +1,47 @@
+name: yaml-policy-pack-introspect-example
+runtime: yaml
+description: Publish a Policy Pack whose policies the provider reads from the pack itself.
+
+config:
+  organizationName:
+    type: string
+    default: service-provider-test-org
+  digits:
+    type: string
+  packName:
+    type: string
+    default: example-pack
+
+resources:
+  # Without `policies`, the provider runs the pack's policy analyzer against
+  # sourcePath to read its policies, so the pack's dependencies must be
+  # installed first.
+  pack:
+    type: pulumiservice:PolicyPack
+    properties:
+      organization: ${organizationName}
+      name: ${packName}
+      displayName: Example Pack
+      versionTag: 1.0.0
+      sourcePath: ${pulumi.cwd}/policy-pack
+
+  group:
+    type: pulumiservice:PolicyGroup
+    properties:
+      organizationName: ${organizationName}
+      name: example-group-${digits}
+      policyPacks:
+        - name: ${pack.name}
+          versionTag: ${pack.versionTag}
+
+variables:
+  packByTag:
+    fn::invoke:
+      function: pulumiservice:getPolicyPack
+      arguments:
+        organizationName: ${organizationName}
+        policyPackName: ${pack.name}
+        versionTag: ${pack.versionTag}
+
+outputs:
+  packByTagPolicies: ${packByTag.policies}
