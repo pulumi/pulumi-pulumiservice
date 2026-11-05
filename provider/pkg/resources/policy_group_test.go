@@ -17,6 +17,7 @@ package resources
 import (
 	"context"
 	"errors"
+	"maps"
 	"testing"
 
 	"github.com/blang/semver"
@@ -236,9 +237,7 @@ func policyGroupProps(extra map[string]property.Value) property.Map {
 		gcName:             property.New(gcTestPolicyGroup),
 		gcOrganizationName: property.New(gcTestOrg),
 	}
-	for k, v := range extra {
-		m[k] = v
-	}
+	maps.Copy(m, extra)
 	return property.NewMap(m)
 }
 

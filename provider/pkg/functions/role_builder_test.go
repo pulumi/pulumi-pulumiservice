@@ -31,8 +31,6 @@ const (
 	testUnknownOp  = "unknown operator"
 )
 
-func ptr[T any](v T) *T { return &v }
-
 func group(entries ...apitype.PermissionDescriptor) apitype.PermissionDescriptor {
 	return apitype.PermissionDescriptorGroupBuilder{Entries: entries}.Build()
 }
@@ -108,11 +106,11 @@ func TestBuildRolePermissions(t *testing.T) {
 			in: BuildRolePermissionsInput{
 				OrganizationScopes: []RbacOrganizationScope{RbacOrganizationScopeTeamRead},
 				StackRules: []RoleStackRule{{
-					RoleRuleSelector: RoleRuleSelector{All: ptr(true)},
+					RoleRuleSelector: RoleRuleSelector{All: new(true)},
 					Scopes:           []RbacStackScope{RbacStackScopeStackRead},
 				}},
 				EnvironmentRules: []RoleEnvironmentRule{{
-					RoleRuleSelector: RoleRuleSelector{All: ptr(true)},
+					RoleRuleSelector: RoleRuleSelector{All: new(true)},
 					Scopes: []RbacEnvironmentScope{
 						RbacEnvironmentScopeEnvironmentRead, RbacEnvironmentScopeEnvironmentRead,
 					},
@@ -124,7 +122,7 @@ func TestBuildRolePermissions(t *testing.T) {
 			name: "one stack by id",
 			in: BuildRolePermissionsInput{
 				StackRules: []RoleStackRule{{
-					RoleRuleSelector: RoleRuleSelector{Id: ptr("stack-1")},
+					RoleRuleSelector: RoleRuleSelector{Id: new("stack-1")},
 					Scopes:           []RbacStackScope{RbacStackScopeStackRead},
 				}},
 			},
@@ -140,7 +138,7 @@ func TestBuildRolePermissions(t *testing.T) {
 			name: "one cloud account by id",
 			in: BuildRolePermissionsInput{
 				AccountRules: []RoleAccountRule{{
-					RoleRuleSelector: RoleRuleSelector{Id: ptr(testAccountID)},
+					RoleRuleSelector: RoleRuleSelector{Id: new(testAccountID)},
 					Scopes:           []RbacAccountScope{RbacAccountScopeInsightsAccountRead},
 				}},
 			},
@@ -158,32 +156,32 @@ func TestBuildRolePermissions(t *testing.T) {
 				StackRules: []RoleStackRule{
 					{
 						RoleRuleSelector: RoleRuleSelector{Tags: []TagCondition{
-							{Key: testTagKeyTeam, Value: ptr("platform")},
+							{Key: testTagKeyTeam, Value: new("platform")},
 						}},
 						Scopes: []RbacStackScope{RbacStackScopeStackRead},
 					},
 					{
 						RoleRuleSelector: RoleRuleSelector{Tags: []TagCondition{
-							{Key: "env", Value: ptr("prod"), Operator: ptr(TagOperatorNotEquals)},
+							{Key: "env", Value: new("prod"), Operator: new(TagOperatorNotEquals)},
 						}},
 						Scopes: []RbacStackScope{RbacStackScopeStackRead},
 					},
 					{
 						RoleRuleSelector: RoleRuleSelector{Tags: []TagCondition{
-							{Key: testTagKeyCost, Operator: ptr(TagOperatorExists)},
+							{Key: testTagKeyCost, Operator: new(TagOperatorExists)},
 						}},
 						Scopes: []RbacStackScope{RbacStackScopeStackRead},
 					},
 					{
 						RoleRuleSelector: RoleRuleSelector{Tags: []TagCondition{
-							{Key: testTagKeyCost, Operator: ptr(TagOperatorNotExists)},
+							{Key: testTagKeyCost, Operator: new(TagOperatorNotExists)},
 						}},
 						Scopes: []RbacStackScope{RbacStackScopeStackRead},
 					},
 					{
 						RoleRuleSelector: RoleRuleSelector{Tags: []TagCondition{
-							{Key: testTagKeyTeam, Value: ptr("platform"), Operator: ptr(TagOperatorEquals)},
-							{Key: "env", Value: ptr("prod"), Operator: ptr(TagOperatorNotEquals)},
+							{Key: testTagKeyTeam, Value: new("platform"), Operator: new(TagOperatorEquals)},
+							{Key: "env", Value: new("prod"), Operator: new(TagOperatorNotEquals)},
 						}},
 						Scopes: []RbacStackScope{RbacStackScopeStackRead},
 					},
@@ -228,7 +226,7 @@ func TestBuildRolePermissions(t *testing.T) {
 func TestBuildRolePermissionsErrors(t *testing.T) {
 	t.Parallel()
 
-	all := RoleRuleSelector{All: ptr(true)}
+	all := RoleRuleSelector{All: new(true)}
 	tests := []struct {
 		name string
 		in   BuildRolePermissionsInput
@@ -243,13 +241,13 @@ func TestBuildRolePermissionsErrors(t *testing.T) {
 		}, "stackRules[0]: exactly one of `all`, `id`, or `tags`"},
 		{"all combined with id", BuildRolePermissionsInput{
 			StackRules: []RoleStackRule{{
-				RoleRuleSelector: RoleRuleSelector{All: ptr(true), Id: ptr("x")},
+				RoleRuleSelector: RoleRuleSelector{All: new(true), Id: new("x")},
 				Scopes:           []RbacStackScope{RbacStackScopeStackRead},
 			}},
 		}, "exactly one of `all`, `id`, or `tags`"},
 		{"id combined with tags", BuildRolePermissionsInput{
 			StackRules: []RoleStackRule{{
-				RoleRuleSelector: RoleRuleSelector{Id: ptr("x"), Tags: []TagCondition{{Key: "k", Value: ptr("v")}}},
+				RoleRuleSelector: RoleRuleSelector{Id: new("x"), Tags: []TagCondition{{Key: "k", Value: new("v")}}},
 				Scopes:           []RbacStackScope{RbacStackScopeStackRead},
 			}},
 		}, "exactly one of `all`, `id`, or `tags`"},
@@ -268,7 +266,7 @@ func TestBuildRolePermissionsErrors(t *testing.T) {
 		{"exists with a value", BuildRolePermissionsInput{
 			StackRules: []RoleStackRule{{
 				RoleRuleSelector: RoleRuleSelector{Tags: []TagCondition{{
-					Key: testTagKeyCost, Value: ptr("v"), Operator: ptr(TagOperatorExists),
+					Key: testTagKeyCost, Value: new("v"), Operator: new(TagOperatorExists),
 				}}},
 				Scopes: []RbacStackScope{RbacStackScopeStackRead},
 			}},
@@ -276,7 +274,7 @@ func TestBuildRolePermissionsErrors(t *testing.T) {
 		{testUnknownOp, BuildRolePermissionsInput{
 			StackRules: []RoleStackRule{{
 				RoleRuleSelector: RoleRuleSelector{Tags: []TagCondition{{
-					Key: "k", Value: ptr("v"), Operator: ptr(TagOperator("contains")),
+					Key: "k", Value: new("v"), Operator: new(TagOperator("contains")),
 				}}},
 				Scopes: []RbacStackScope{RbacStackScopeStackRead},
 			}},
@@ -292,7 +290,7 @@ func TestBuildRolePermissionsErrors(t *testing.T) {
 		}, "stackRules[0].scopes: `environment:read` is not a stack scope"},
 		{"stack scope in an environment rule", BuildRolePermissionsInput{
 			EnvironmentRules: []RoleEnvironmentRule{{
-				RoleRuleSelector: RoleRuleSelector{Id: ptr("env-1")},
+				RoleRuleSelector: RoleRuleSelector{Id: new("env-1")},
 				Scopes:           []RbacEnvironmentScope{RbacEnvironmentScope("stack:write")},
 			}},
 		}, "environmentRules[0].scopes: `stack:write` is not an environment scope"},

@@ -23,6 +23,7 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
+	"maps"
 	"os"
 	"path"
 	"path/filepath"
@@ -435,9 +436,7 @@ func normalizeConfigSchema(cs map[string]any) map[string]any {
 		return cs
 	}
 	out := make(map[string]any, len(cs)+1)
-	for k, v := range cs {
-		out[k] = v
-	}
+	maps.Copy(out, cs)
 	out[gcType] = gcObject
 	return out
 }

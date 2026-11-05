@@ -35,25 +35,25 @@ type InsightsAccountClient interface {
 }
 
 type InsightsAccount struct {
-	ID                   string                 `json:"id"`
-	Name                 string                 `json:"name"`
-	Provider             string                 `json:"provider"`
-	ProviderEnvRef       string                 `json:"providerEnvRef,omitempty"`
-	ScheduledScanEnabled bool                   `json:"scheduledScanEnabled"`
-	ProviderConfig       map[string]interface{} `json:"providerConfig,omitempty"`
+	ID                   string         `json:"id"`
+	Name                 string         `json:"name"`
+	Provider             string         `json:"provider"`
+	ProviderEnvRef       string         `json:"providerEnvRef,omitempty"`
+	ScheduledScanEnabled bool           `json:"scheduledScanEnabled"`
+	ProviderConfig       map[string]any `json:"providerConfig,omitempty"`
 }
 
 type CreateInsightsAccountRequest struct {
-	Provider       string                 `json:"provider"`
-	Environment    string                 `json:"environment"`
-	ScanSchedule   string                 `json:"scanSchedule,omitempty"`
-	ProviderConfig map[string]interface{} `json:"providerConfig,omitempty"`
+	Provider       string         `json:"provider"`
+	Environment    string         `json:"environment"`
+	ScanSchedule   string         `json:"scanSchedule,omitempty"`
+	ProviderConfig map[string]any `json:"providerConfig,omitempty"`
 }
 
 type UpdateInsightsAccountRequest struct {
-	Environment    string                 `json:"environment"`
-	ScanSchedule   string                 `json:"scanSchedule,omitempty"`
-	ProviderConfig map[string]interface{} `json:"providerConfig,omitempty"`
+	Environment    string         `json:"environment"`
+	ScanSchedule   string         `json:"scanSchedule,omitempty"`
+	ProviderConfig map[string]any `json:"providerConfig,omitempty"`
 }
 
 // WorkflowRun represents a workflow execution (scan) with status and timing information
