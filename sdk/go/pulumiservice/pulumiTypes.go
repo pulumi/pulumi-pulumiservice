@@ -5385,6 +5385,78 @@ func (o TagConditionArrayOutput) Index(i pulumi.IntInput) TagConditionOutput {
 	}).(TagConditionOutput)
 }
 
+type TeamInfo struct {
+	// The team's description.
+	Description string `pulumi:"description"`
+	// The team's display name.
+	DisplayName string `pulumi:"displayName"`
+	// Whether this is the Everyone team: every admin and member of the organization is in it, never billing managers. Pulumi manages it, so it can't be managed with the `Team` resource.
+	Everyone bool `pulumi:"everyone"`
+	// The team's name, used to grant to it.
+	Name string `pulumi:"name"`
+	// The type of team: `pulumi` or `github`.
+	Type string `pulumi:"type"`
+}
+
+type TeamInfoOutput struct{ *pulumi.OutputState }
+
+func (TeamInfoOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*TeamInfo)(nil)).Elem()
+}
+
+func (o TeamInfoOutput) ToTeamInfoOutput() TeamInfoOutput {
+	return o
+}
+
+func (o TeamInfoOutput) ToTeamInfoOutputWithContext(ctx context.Context) TeamInfoOutput {
+	return o
+}
+
+// The team's description.
+func (o TeamInfoOutput) Description() pulumi.StringOutput {
+	return o.ApplyT(func(v TeamInfo) string { return v.Description }).(pulumi.StringOutput)
+}
+
+// The team's display name.
+func (o TeamInfoOutput) DisplayName() pulumi.StringOutput {
+	return o.ApplyT(func(v TeamInfo) string { return v.DisplayName }).(pulumi.StringOutput)
+}
+
+// Whether this is the Everyone team: every admin and member of the organization is in it, never billing managers. Pulumi manages it, so it can't be managed with the `Team` resource.
+func (o TeamInfoOutput) Everyone() pulumi.BoolOutput {
+	return o.ApplyT(func(v TeamInfo) bool { return v.Everyone }).(pulumi.BoolOutput)
+}
+
+// The team's name, used to grant to it.
+func (o TeamInfoOutput) Name() pulumi.StringOutput {
+	return o.ApplyT(func(v TeamInfo) string { return v.Name }).(pulumi.StringOutput)
+}
+
+// The type of team: `pulumi` or `github`.
+func (o TeamInfoOutput) Type() pulumi.StringOutput {
+	return o.ApplyT(func(v TeamInfo) string { return v.Type }).(pulumi.StringOutput)
+}
+
+type TeamInfoArrayOutput struct{ *pulumi.OutputState }
+
+func (TeamInfoArrayOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]TeamInfo)(nil)).Elem()
+}
+
+func (o TeamInfoArrayOutput) ToTeamInfoArrayOutput() TeamInfoArrayOutput {
+	return o
+}
+
+func (o TeamInfoArrayOutput) ToTeamInfoArrayOutputWithContext(ctx context.Context) TeamInfoArrayOutput {
+	return o
+}
+
+func (o TeamInfoArrayOutput) Index(i pulumi.IntInput) TeamInfoOutput {
+	return pulumi.All(o, i).ApplyT(func(vs []interface{}) TeamInfo {
+		return vs[0].([]TeamInfo)[vs[1].(int)]
+	}).(TeamInfoOutput)
+}
+
 type TemplateSourceDestination struct {
 	// Destination URL that gets filled in on new project creation.
 	Url *string `pulumi:"url"`
@@ -5653,6 +5725,8 @@ func init() {
 	pulumi.RegisterOutputType(RoleStackRuleArrayOutput{})
 	pulumi.RegisterOutputType(TagConditionOutput{})
 	pulumi.RegisterOutputType(TagConditionArrayOutput{})
+	pulumi.RegisterOutputType(TeamInfoOutput{})
+	pulumi.RegisterOutputType(TeamInfoArrayOutput{})
 	pulumi.RegisterOutputType(TemplateSourceDestinationOutput{})
 	pulumi.RegisterOutputType(TemplateSourceDestinationPtrOutput{})
 }

@@ -46,6 +46,7 @@ __all__ = [
     'PolicyPackPolicyInput',
     'PolicyPackSummary',
     'RoleScopeInfo',
+    'TeamInfo',
     'TemplateSourceDestination',
 ]
 
@@ -2186,6 +2187,68 @@ class RoleScopeInfo(dict):
         The resource-type bucket the scope belongs to (e.g. `stack`, `team`).
         """
         return pulumi.get(self, "resource_type")
+
+
+@pulumi.output_type
+class TeamInfo(dict):
+    def __init__(__self__, *,
+                 description: _builtins.str,
+                 display_name: _builtins.str,
+                 everyone: _builtins.bool,
+                 name: _builtins.str,
+                 type: _builtins.str):
+        """
+        :param _builtins.str description: The team's description.
+        :param _builtins.str display_name: The team's display name.
+        :param _builtins.bool everyone: Whether this is the Everyone team: every admin and member of the organization is in it, never billing managers. Pulumi manages it, so it can't be managed with the `Team` resource.
+        :param _builtins.str name: The team's name, used to grant to it.
+        :param _builtins.str type: The type of team: `pulumi` or `github`.
+        """
+        pulumi.set(__self__, "description", description)
+        pulumi.set(__self__, "display_name", display_name)
+        pulumi.set(__self__, "everyone", everyone)
+        pulumi.set(__self__, "name", name)
+        pulumi.set(__self__, "type", type)
+
+    @_builtins.property
+    @pulumi.getter
+    def description(self) -> _builtins.str:
+        """
+        The team's description.
+        """
+        return pulumi.get(self, "description")
+
+    @_builtins.property
+    @pulumi.getter(name="displayName")
+    def display_name(self) -> _builtins.str:
+        """
+        The team's display name.
+        """
+        return pulumi.get(self, "display_name")
+
+    @_builtins.property
+    @pulumi.getter
+    def everyone(self) -> _builtins.bool:
+        """
+        Whether this is the Everyone team: every admin and member of the organization is in it, never billing managers. Pulumi manages it, so it can't be managed with the `Team` resource.
+        """
+        return pulumi.get(self, "everyone")
+
+    @_builtins.property
+    @pulumi.getter
+    def name(self) -> _builtins.str:
+        """
+        The team's name, used to grant to it.
+        """
+        return pulumi.get(self, "name")
+
+    @_builtins.property
+    @pulumi.getter
+    def type(self) -> _builtins.str:
+        """
+        The type of team: `pulumi` or `github`.
+        """
+        return pulumi.get(self, "type")
 
 
 @pulumi.output_type

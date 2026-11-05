@@ -4,6 +4,7 @@
 
 ### Improvements
 
+- Added the `getTeam` and `getTeams` functions, which look up the teams of an organization. They report `everyone` for the Everyone team, which every admin and member of an organization is in, never billing managers. Pulumi manages the Everyone team, so grant to it by name, `everyone`, with `TeamStackPermission` or `TeamEnvironmentPermission` instead of managing it with `Team`.
 - `name` on `OrgAccessToken` and `TeamAccessToken` is now optional. When it's omitted, Pulumi generates a name from the resource's logical name plus a random suffix, within Pulumi Cloud's 40-character limit for token names, or follows the stack's autonaming configuration. An update keeps the generated name, and a replacement gets a new one. [#1211](https://github.com/pulumi/pulumi-pulumiservice/issues/1211)
 
 ### Bug Fixes
