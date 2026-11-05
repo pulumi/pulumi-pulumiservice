@@ -305,7 +305,7 @@ type OrganizationRole struct {
 
 	// Human-readable description of what the role grants.
 	Description pulumi.StringPtrOutput `pulumi:"description"`
-	// The role's display name. Must be unique within the organization.
+	// The role's display name, up to 100 bytes. Must be unique within the organization. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
 	Name pulumi.StringOutput `pulumi:"name"`
 	// The Pulumi Cloud organization name.
 	OrganizationName pulumi.StringOutput `pulumi:"organizationName"`
@@ -337,9 +337,6 @@ func NewOrganizationRole(ctx *pulumi.Context,
 		return nil, errors.New("missing one or more required arguments")
 	}
 
-	if args.Name == nil {
-		return nil, errors.New("invalid value for required argument 'Name'")
-	}
 	if args.OrganizationName == nil {
 		return nil, errors.New("invalid value for required argument 'OrganizationName'")
 	}
@@ -385,8 +382,8 @@ func (OrganizationRoleState) ElementType() reflect.Type {
 type organizationRoleArgs struct {
 	// Human-readable description of what the role grants.
 	Description *string `pulumi:"description"`
-	// The role's display name. Must be unique within the organization.
-	Name string `pulumi:"name"`
+	// The role's display name, up to 100 bytes. Must be unique within the organization. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
+	Name *string `pulumi:"name"`
 	// The Pulumi Cloud organization name.
 	OrganizationName string `pulumi:"organizationName"`
 	// The role's permission descriptor tree.
@@ -410,8 +407,8 @@ type organizationRoleArgs struct {
 type OrganizationRoleArgs struct {
 	// Human-readable description of what the role grants.
 	Description pulumi.StringPtrInput
-	// The role's display name. Must be unique within the organization.
-	Name pulumi.StringInput
+	// The role's display name, up to 100 bytes. Must be unique within the organization. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
+	Name pulumi.StringPtrInput
 	// The Pulumi Cloud organization name.
 	OrganizationName pulumi.StringInput
 	// The role's permission descriptor tree.
@@ -523,7 +520,7 @@ func (o OrganizationRoleOutput) Description() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *OrganizationRole) pulumi.StringPtrOutput { return v.Description }).(pulumi.StringPtrOutput)
 }
 
-// The role's display name. Must be unique within the organization.
+// The role's display name, up to 100 bytes. Must be unique within the organization. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
 func (o OrganizationRoleOutput) Name() pulumi.StringOutput {
 	return o.ApplyT(func(v *OrganizationRole) pulumi.StringOutput { return v.Name }).(pulumi.StringOutput)
 }

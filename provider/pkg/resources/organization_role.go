@@ -90,7 +90,8 @@ type OrganizationRoleCore struct {
 
 func (c *OrganizationRoleCore) Annotate(a infer.Annotator) {
 	a.Describe(&c.OrganizationName, "The Pulumi Cloud organization name.")
-	a.Describe(&c.Name, "The role's display name. Must be unique within the organization.")
+	a.Describe(&c.Name, "The role's display name, up to 100 bytes. Must be unique within the organization. "+
+		autoNamedDescription)
 	a.Describe(&c.Description, "Human-readable description of what the role grants.")
 	a.Describe(
 		&c.ResourceType,
@@ -126,6 +127,14 @@ func (c *OrganizationRoleCore) Annotate(a infer.Annotator) {
 type OrganizationRoleInput struct {
 	OrganizationRoleCore
 }
+
+func (i *OrganizationRoleInput) AutoName(autoname infer.SetAutoName) {
+	autoname(&i.Name, suffixedAutoName(organizationRoleNameMaxLen, nil))
+}
+
+// organizationRoleNameMaxLen is the longest role name, in bytes, that Pulumi
+// Cloud accepts. The OpenAPI spec doesn't state the limit.
+const organizationRoleNameMaxLen = 100
 
 type OrganizationRoleState struct {
 	OrganizationRoleCore

@@ -19,36 +19,25 @@ __all__ = ['AgentPoolArgs', 'AgentPool']
 @pulumi.input_type
 class AgentPoolArgs:
     def __init__(__self__, *,
-                 name: pulumi.Input[_builtins.str],
                  organization_name: pulumi.Input[_builtins.str],
                  description: pulumi.Input[Optional[_builtins.str]] = None,
-                 force_destroy: pulumi.Input[Optional[_builtins.bool]] = None):
+                 force_destroy: pulumi.Input[Optional[_builtins.bool]] = None,
+                 name: pulumi.Input[Optional[_builtins.str]] = None):
         """
         The set of arguments for constructing a AgentPool resource.
 
-        :param pulumi.Input[_builtins.str] name: Name of the agent pool.
         :param pulumi.Input[_builtins.str] organization_name: The organization's name.
         :param pulumi.Input[_builtins.str] description: Description of the agent pool.
         :param pulumi.Input[_builtins.bool] force_destroy: Optional. Flag indicating whether to delete the agent pool even if stacks are configured to use it.
+        :param pulumi.Input[_builtins.str] name: Name of the agent pool, up to 100 characters. Only letters, digits, hyphens, underscores, spaces and periods are allowed. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). Characters that aren't allowed in the logical name are replaced with hyphens.
         """
-        pulumi.set(__self__, "name", name)
         pulumi.set(__self__, "organization_name", organization_name)
         if description is not None:
             pulumi.set(__self__, "description", description)
         if force_destroy is not None:
             pulumi.set(__self__, "force_destroy", force_destroy)
-
-    @_builtins.property
-    @pulumi.getter
-    def name(self) -> pulumi.Input[_builtins.str]:
-        """
-        Name of the agent pool.
-        """
-        return pulumi.get(self, "name")
-
-    @name.setter
-    def name(self, value: pulumi.Input[_builtins.str]):
-        pulumi.set(self, "name", value)
+        if name is not None:
+            pulumi.set(__self__, "name", name)
 
     @_builtins.property
     @pulumi.getter(name="organizationName")
@@ -86,6 +75,18 @@ class AgentPoolArgs:
     def force_destroy(self, value: pulumi.Input[Optional[_builtins.bool]]):
         pulumi.set(self, "force_destroy", value)
 
+    @_builtins.property
+    @pulumi.getter
+    def name(self) -> pulumi.Input[Optional[_builtins.str]]:
+        """
+        Name of the agent pool, up to 100 characters. Only letters, digits, hyphens, underscores, spaces and periods are allowed. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). Characters that aren't allowed in the logical name are replaced with hyphens.
+        """
+        return pulumi.get(self, "name")
+
+    @name.setter
+    def name(self, value: pulumi.Input[Optional[_builtins.str]]):
+        pulumi.set(self, "name", value)
+
 
 @pulumi.type_token("pulumiservice:index:AgentPool")
 class AgentPool(pulumi.CustomResource):
@@ -118,7 +119,7 @@ class AgentPool(pulumi.CustomResource):
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] description: Description of the agent pool.
         :param pulumi.Input[_builtins.bool] force_destroy: Optional. Flag indicating whether to delete the agent pool even if stacks are configured to use it.
-        :param pulumi.Input[_builtins.str] name: Name of the agent pool.
+        :param pulumi.Input[_builtins.str] name: Name of the agent pool, up to 100 characters. Only letters, digits, hyphens, underscores, spaces and periods are allowed. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). Characters that aren't allowed in the logical name are replaced with hyphens.
         :param pulumi.Input[_builtins.str] organization_name: The organization's name.
         """
         ...
@@ -173,8 +174,6 @@ class AgentPool(pulumi.CustomResource):
 
             __props__.__dict__["description"] = description
             __props__.__dict__["force_destroy"] = force_destroy
-            if name is None and not opts.urn:
-                raise TypeError("Missing required property 'name'")
             __props__.__dict__["name"] = name
             if organization_name is None and not opts.urn:
                 raise TypeError("Missing required property 'organization_name'")
@@ -243,7 +242,7 @@ class AgentPool(pulumi.CustomResource):
     @pulumi.getter
     def name(self) -> pulumi.Output[_builtins.str]:
         """
-        Name of the agent pool.
+        Name of the agent pool, up to 100 characters. Only letters, digits, hyphens, underscores, spaces and periods are allowed. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). Characters that aren't allowed in the logical name are replaced with hyphens.
         """
         return pulumi.get(self, "name")
 

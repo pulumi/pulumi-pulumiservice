@@ -588,12 +588,8 @@ func TestYamlEnvironmentsExample(t *testing.T) {
 
 func TestYamlAgentPoolsExample(t *testing.T) {
 	cwd := getCwd(t)
-	digits := generateRandomFiveDigits()
 	integration.ProgramTest(t, &integration.ProgramTestOptions{
 		Dir: path.Join(cwd, ".", "yaml-agent-pools"),
-		Config: map[string]string{
-			"digits": digits,
-		},
 	})
 }
 
