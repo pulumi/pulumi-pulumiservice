@@ -15,7 +15,6 @@
 package rest
 
 import (
-	"context"
 	"encoding/json"
 	"io"
 	"net/http"
@@ -101,9 +100,9 @@ func TestAttachmentCreate(t *testing.T) {
 			map[string]string{nameKey: devVal, routingProjectKey: myProjectVal},
 		)}
 	}}
-	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
+	ctx := WithTransport(t.Context(), mock)
 
-	resp, err := r.Create(t.Context(), p.CreateRequest{Properties: stackAttachmentInputs()})
+	resp, err := r.Create(ctx, p.CreateRequest{Properties: stackAttachmentInputs()})
 	if err != nil {
 		t.Fatalf("create: %v\n  calls: %v", err, mock.calls)
 	}
@@ -150,9 +149,9 @@ func TestAttachmentReadPresent(t *testing.T) {
 			map[string]string{nameKey: devVal, routingProjectKey: myProjectVal},
 		)},
 	}}
-	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
+	ctx := WithTransport(t.Context(), mock)
 
-	resp, err := r.Read(t.Context(), p.ReadRequest{
+	resp, err := r.Read(ctx, p.ReadRequest{
 		ID:         devProjectID,
 		Properties: stackAttachmentInputs(),
 	})
@@ -176,9 +175,9 @@ func TestAttachmentReadAbsent(t *testing.T) {
 			map[string]string{nameKey: "other", routingProjectKey: "p"},
 		)},
 	}}
-	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
+	ctx := WithTransport(t.Context(), mock)
 
-	resp, err := r.Read(t.Context(), p.ReadRequest{
+	resp, err := r.Read(ctx, p.ReadRequest{
 		ID:         devProjectID,
 		Properties: stackAttachmentInputs(),
 	})
@@ -196,9 +195,9 @@ func TestAttachmentReadParentGone(t *testing.T) {
 	mock := &mockTransport{responses: map[string]mockResponse{
 		"GET " + pgPath: {status: 404, body: `{"code":404,"message":"not found"}`},
 	}}
-	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
+	ctx := WithTransport(t.Context(), mock)
 
-	resp, err := r.Read(t.Context(), p.ReadRequest{
+	resp, err := r.Read(ctx, p.ReadRequest{
 		ID:         devProjectID,
 		Properties: stackAttachmentInputs(),
 	})
@@ -219,9 +218,9 @@ func TestAttachmentDelete(t *testing.T) {
 		body = string(b)
 		return mockResponse{status: 204}
 	}}
-	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
+	ctx := WithTransport(t.Context(), mock)
 
-	err := r.Delete(t.Context(), p.DeleteRequest{
+	err := r.Delete(ctx, p.DeleteRequest{
 		ID:         devProjectID,
 		Properties: stackAttachmentInputs(),
 	})
@@ -249,9 +248,9 @@ func TestAttachmentDeleteIdempotentOn404(t *testing.T) {
 	mock := &mockTransport{responses: map[string]mockResponse{
 		"PATCH " + pgPath: {status: 404, body: `{"code":404}`},
 	}}
-	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
+	ctx := WithTransport(t.Context(), mock)
 
-	err := r.Delete(t.Context(), p.DeleteRequest{
+	err := r.Delete(ctx, p.DeleteRequest{
 		ID:         devProjectID,
 		Properties: stackAttachmentInputs(),
 	})
@@ -314,7 +313,7 @@ func TestAttachmentReadMatchesSecretAndDependentInput(t *testing.T) {
 			map[string]string{nameKey: devVal, routingProjectKey: myProjectVal},
 		)},
 	}}
-	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
+	ctx := WithTransport(t.Context(), mock)
 
 	// Model a refresh: the secret/dependency-bearing values arrive in Inputs
 	// (old inputs from state), where they survive into the membership compare —
@@ -326,7 +325,7 @@ func TestAttachmentReadMatchesSecretAndDependentInput(t *testing.T) {
 		routingProjectKey: property.New(myProjectVal).
 			WithDependencies([]urn.URN{"urn:pulumi:dev::proj::pulumiservice:api/stacks:Stack::s"}),
 	})
-	resp, err := r.Read(t.Context(), p.ReadRequest{
+	resp, err := r.Read(ctx, p.ReadRequest{
 		ID:         devProjectID,
 		Inputs:     inputs,
 		Properties: inputs,
@@ -348,9 +347,9 @@ func TestAttachmentReadIgnoresExtraElementFields(t *testing.T) {
 			map[string]string{nameKey: devVal, routingProjectKey: myProjectVal, "serverOnly": "leak"},
 		)},
 	}}
-	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
+	ctx := WithTransport(t.Context(), mock)
 
-	resp, err := r.Read(t.Context(), p.ReadRequest{
+	resp, err := r.Read(ctx, p.ReadRequest{
 		ID:         devProjectID,
 		Properties: stackAttachmentInputs(),
 	})
@@ -446,9 +445,9 @@ func TestAccountAttachmentCreate(t *testing.T) {
 		}
 		return mockResponse{status: 200, body: groupWithAccounts(acct1Val, "acct-2")}
 	}}
-	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
+	ctx := WithTransport(t.Context(), mock)
 
-	resp, err := r.Create(t.Context(), p.CreateRequest{Properties: accountAttachmentInputs()})
+	resp, err := r.Create(ctx, p.CreateRequest{Properties: accountAttachmentInputs()})
 	if err != nil {
 		t.Fatalf("create: %v\n  calls: %v", err, mock.calls)
 	}
@@ -477,9 +476,9 @@ func TestAccountAttachmentReadAbsent(t *testing.T) {
 	mock := &mockTransport{responses: map[string]mockResponse{
 		"GET " + pgPath: {status: 200, body: groupWithAccounts("someone-else")},
 	}}
-	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
+	ctx := WithTransport(t.Context(), mock)
 
-	resp, err := r.Read(t.Context(), p.ReadRequest{ID: acct1ID, Properties: accountAttachmentInputs()})
+	resp, err := r.Read(ctx, p.ReadRequest{ID: acct1ID, Properties: accountAttachmentInputs()})
 	if err != nil {
 		t.Fatalf("read: %v", err)
 	}
@@ -494,9 +493,9 @@ func TestAccountAttachmentReadPresent(t *testing.T) {
 	mock := &mockTransport{responses: map[string]mockResponse{
 		"GET " + pgPath: {status: 200, body: groupWithAccounts(acct1Val)},
 	}}
-	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
+	ctx := WithTransport(t.Context(), mock)
 
-	resp, err := r.Read(t.Context(), p.ReadRequest{ID: acct1ID, Properties: accountAttachmentInputs()})
+	resp, err := r.Read(ctx, p.ReadRequest{ID: acct1ID, Properties: accountAttachmentInputs()})
 	if err != nil {
 		t.Fatalf("read: %v", err)
 	}
@@ -517,9 +516,9 @@ func TestAccountAttachmentDelete(t *testing.T) {
 		body = string(b)
 		return mockResponse{status: 204}
 	}}
-	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
+	ctx := WithTransport(t.Context(), mock)
 
-	if err := r.Delete(t.Context(), p.DeleteRequest{
+	if err := r.Delete(ctx, p.DeleteRequest{
 		ID:         acct1ID,
 		Properties: accountAttachmentInputs(),
 	}); err != nil {

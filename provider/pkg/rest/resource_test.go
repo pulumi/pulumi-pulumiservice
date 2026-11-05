@@ -332,12 +332,10 @@ func TestCreateSynthesizesID(t *testing.T) {
 			if tc.responseFn != nil {
 				mock.responseFn = tc.responseFn()
 			}
-			SetTransportResolver(func(_ context.Context) (Transport, error) {
-				return mock, nil
-			})
+			ctx := WithTransport(t.Context(), mock)
 
 			req := p.CreateRequest{Properties: propMap(tc.inputs)}
-			resp, err := r.Create(t.Context(), req)
+			resp, err := r.Create(ctx, req)
 			if err != nil {
 				t.Fatalf("create: %v\n  calls made: %v", err, mock.calls)
 			}
@@ -408,7 +406,7 @@ func TestCreateFusesYamlUpdateAfterJsonCreate(t *testing.T) {
 			return mockResponse{status: 200, body: ""}
 		},
 	}
-	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
+	ctx := WithTransport(t.Context(), mock)
 
 	yamlBody := "values:\n  bootstrap:\n    appVersion: 1.0.0\n"
 	// Secret-wrapped yaml mirrors what codegen sends for Secret fields.
@@ -419,7 +417,7 @@ func TestCreateFusesYamlUpdateAfterJsonCreate(t *testing.T) {
 		nameKey:   property.New("platform-bootstrap"),
 		"yaml":    yamlVal,
 	})
-	_, err := r.Create(t.Context(), p.CreateRequest{Properties: inputs})
+	_, err := r.Create(ctx, p.CreateRequest{Properties: inputs})
 	if err != nil {
 		t.Fatalf("create: %v\n  calls: %v", err, mock.calls)
 	}
@@ -478,9 +476,9 @@ func TestReadDecodesYamlResponseBody(t *testing.T) {
 			return mockResponse{status: 200, body: yamlBody}
 		},
 	}
-	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
+	ctx := WithTransport(t.Context(), mock)
 
-	resp, err := r.Read(t.Context(), p.ReadRequest{
+	resp, err := r.Read(ctx, p.ReadRequest{
 		ID:         "acme/default/platform-bootstrap",
 		Properties: property.NewMap(map[string]property.Value{}),
 	})
@@ -559,7 +557,7 @@ func TestReadRefreshProjectsRemoteDriftIntoInputs(t *testing.T) {
 			body:   `{"id":"thing-1","name":"n1","value":"remote","tags":["z","a"],"status":"ok"}`,
 		},
 	}}
-	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
+	ctx := WithTransport(t.Context(), mock)
 
 	oldInputs := property.NewMap(map[string]property.Value{
 		orgKey:      property.New(acmeVal),
@@ -570,7 +568,7 @@ func TestReadRefreshProjectsRemoteDriftIntoInputs(t *testing.T) {
 			property.New("a"), property.New("b"),
 		})),
 	})
-	resp, err := r.Read(t.Context(), p.ReadRequest{
+	resp, err := r.Read(ctx, p.ReadRequest{
 		ID:     "acme/thing-1",
 		Inputs: oldInputs,
 		Properties: propMap(map[string]any{
@@ -672,9 +670,9 @@ func TestRefreshChainSurfacesRoleDetailsDrift(t *testing.T) {
 						`"details":` + tc.details + `,"version":2,"orgId":"o1"}`,
 				},
 			}}
-			SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
+			ctx := WithTransport(t.Context(), mock)
 
-			readResp, err := r.Read(t.Context(), p.ReadRequest{
+			readResp, err := r.Read(ctx, p.ReadRequest{
 				ID:         "test-org/role-123",
 				Inputs:     oldInputs,
 				Properties: oldState,
@@ -685,7 +683,7 @@ func TestRefreshChainSurfacesRoleDetailsDrift(t *testing.T) {
 
 			// RefreshStep passes the freshly-read inputs as OldInputs and the
 			// pre-refresh inputs as Inputs, then inverts the result for display.
-			diffResp, err := r.Diff(t.Context(), p.DiffRequest{
+			diffResp, err := r.Diff(ctx, p.DiffRequest{
 				ID:        "test-org/role-123",
 				OldInputs: readResp.Inputs,
 				State:     readResp.Properties,
@@ -751,9 +749,9 @@ func TestRefreshChainIgnoresServerAddedStackTags(t *testing.T) {
 						`"tags":` + tc.tags + `}`,
 				},
 			}}
-			SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
+			ctx := WithTransport(t.Context(), mock)
 
-			readResp, err := r.Read(t.Context(), p.ReadRequest{
+			readResp, err := r.Read(ctx, p.ReadRequest{
 				ID:         "test-org/myproj/dev",
 				Inputs:     oldInputs,
 				Properties: oldInputs,
@@ -761,7 +759,7 @@ func TestRefreshChainIgnoresServerAddedStackTags(t *testing.T) {
 			if err != nil {
 				t.Fatalf("read: %v\n  calls: %v", err, mock.calls)
 			}
-			diffResp, err := r.Diff(t.Context(), p.DiffRequest{
+			diffResp, err := r.Diff(ctx, p.DiffRequest{
 				ID:        "test-org/myproj/dev",
 				OldInputs: readResp.Inputs,
 				State:     readResp.Properties,
@@ -811,7 +809,7 @@ func TestUpdateAliasesFlatNewFields(t *testing.T) {
 			return mockResponse{status: 500, body: unexpectedBody}
 		},
 	}
-	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
+	ctx := WithTransport(t.Context(), mock)
 
 	prior := propMap(map[string]any{
 		orgNameKey:     testOrgName,
@@ -825,7 +823,7 @@ func TestUpdateAliasesFlatNewFields(t *testing.T) {
 		"displayName":  "New Display",
 		descriptionKey: newDescVal,
 	})
-	resp, err := r.Update(t.Context(), p.UpdateRequest{
+	resp, err := r.Update(ctx, p.UpdateRequest{
 		ID:        testOrgInfraID,
 		OldInputs: prior,
 		State:     prior,
@@ -897,9 +895,9 @@ func TestCreateReadAfterCreateSourcesFromInputs(t *testing.T) {
 		postThingsAcme: {status: 200, body: `{"id":"thing-1"}`},
 		getThingPath:   {status: 200, body: `{"id":"thing-1","name":"foo","status":"ready"}`},
 	}}
-	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
+	ctx := WithTransport(t.Context(), mock)
 
-	resp, err := r.Create(t.Context(), p.CreateRequest{
+	resp, err := r.Create(ctx, p.CreateRequest{
 		Properties: propMap(map[string]any{orgKey: acmeVal, nameKey: fooVal}),
 	})
 	if err != nil {
@@ -966,9 +964,9 @@ func TestCreateReadsAfterCreate(t *testing.T) {
 		postThingsAcme: {status: 200, body: `{"id":"thing-1"}`},
 		getThingPath:   {status: 200, body: readBody},
 	}}
-	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
+	ctx := WithTransport(t.Context(), mock)
 
-	resp, err := r.Create(t.Context(), p.CreateRequest{
+	resp, err := r.Create(ctx, p.CreateRequest{
 		Properties: propMap(map[string]any{orgKey: acmeVal, nameKey: fooVal}),
 	})
 	if err != nil {
@@ -1012,9 +1010,9 @@ func TestCreateRequireImport_BlocksWhenExists(t *testing.T) {
 	mock := &mockTransport{responses: map[string]mockResponse{
 		getThingsAcme: {status: 200, body: `{"org":"acme","value":"existing"}`},
 	}}
-	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
+	ctx := WithTransport(t.Context(), mock)
 
-	_, err := r.Create(t.Context(), p.CreateRequest{
+	_, err := r.Create(ctx, p.CreateRequest{
 		Properties: propMap(map[string]any{orgKey: acmeVal, valueKey: newVal}),
 	})
 	if err == nil {
@@ -1053,9 +1051,9 @@ func TestCreateRequireImport_ProceedsOn404(t *testing.T) {
 		}
 		return mockResponse{status: 500, body: unexpectedBody}
 	}}
-	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
+	ctx := WithTransport(t.Context(), mock)
 
-	resp, err := r.Create(t.Context(), p.CreateRequest{
+	resp, err := r.Create(ctx, p.CreateRequest{
 		Properties: propMap(map[string]any{orgKey: acmeVal, valueKey: newVal}),
 	})
 	if err != nil {
@@ -1116,9 +1114,9 @@ func TestCreateRequireImport_ServerIDReadURL_MetadataError(t *testing.T) {
 		},
 	}
 	mock := &mockTransport{}
-	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
+	ctx := WithTransport(t.Context(), mock)
 
-	_, err = r.Create(t.Context(), p.CreateRequest{
+	_, err = r.Create(ctx, p.CreateRequest{
 		Properties: propMap(map[string]any{valueKey: newVal}),
 	})
 	if err == nil {
@@ -1150,9 +1148,9 @@ func TestCreateRequireImport_NoReadOp_OptsOut(t *testing.T) {
 	mock := &mockTransport{responses: map[string]mockResponse{
 		putThingsAcme: {status: 200, body: orgAcmeNewBody},
 	}}
-	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
+	ctx := WithTransport(t.Context(), mock)
 
-	_, err := r.Create(t.Context(), p.CreateRequest{
+	_, err := r.Create(ctx, p.CreateRequest{
 		Properties: propMap(map[string]any{orgKey: acmeVal, valueKey: newVal}),
 	})
 	if err != nil {
@@ -1213,15 +1211,13 @@ func TestCreateMissingPathParam(t *testing.T) {
 	mock := &mockTransport{responses: map[string]mockResponse{
 		"POST /api/orgs/test-org/teams/pulumi": {status: 200, body: `{}`},
 	}}
-	SetTransportResolver(func(_ context.Context) (Transport, error) {
-		return mock, nil
-	})
+	ctx := WithTransport(t.Context(), mock)
 
 	// Omit `name` — the body field that renames to teamName for the path.
 	req := p.CreateRequest{Properties: propMap(map[string]any{
 		orgNameKey: testOrgName,
 	})}
-	_, err := r.Create(t.Context(), req)
+	_, err := r.Create(ctx, req)
 	if err == nil {
 		t.Fatalf("expected error on missing path param, got nil")
 	}
@@ -1290,9 +1286,9 @@ func TestUpdateReadsAfterUpdate(t *testing.T) {
 		patchThingPath: {status: 200, body: patchBody},
 		getThingPath:   {status: 200, body: readBody},
 	}}
-	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
+	ctx := WithTransport(t.Context(), mock)
 
-	resp, err := r.Update(t.Context(), p.UpdateRequest{
+	resp, err := r.Update(ctx, p.UpdateRequest{
 		Inputs:    propMap(map[string]any{orgKey: acmeVal, nameKey: "foo-renamed", descriptionKey: rotatedVal}),
 		OldInputs: propMap(map[string]any{orgKey: acmeVal, nameKey: fooVal, descriptionKey: originalVal}),
 		State:     propMap(priorState),
@@ -1348,13 +1344,13 @@ func TestUpdateMergesPriorStateWithoutReadOp(t *testing.T) {
 	mock := &mockTransport{responses: map[string]mockResponse{
 		patchThingPath: {status: 200, body: `{"name":"foo","description":"rotated"}`},
 	}}
-	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
+	ctx := WithTransport(t.Context(), mock)
 
 	priorState := map[string]any{
 		"id": thing1ID, nameKey: fooVal, descriptionKey: originalVal,
 		createdKey: createdTimestamp,
 	}
-	resp, err := r.Update(t.Context(), p.UpdateRequest{
+	resp, err := r.Update(ctx, p.UpdateRequest{
 		Inputs:    propMap(map[string]any{orgKey: acmeVal, descriptionKey: rotatedVal}),
 		OldInputs: propMap(map[string]any{orgKey: acmeVal, descriptionKey: originalVal}),
 		State:     propMap(priorState),
@@ -1528,8 +1524,8 @@ func TestDeleteIsIdempotentOn404(t *testing.T) {
 		mock := &mockTransport{responses: map[string]mockResponse{
 			deleteThingsAcmeGone: {status: 204},
 		}}
-		SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
-		err := r.Delete(t.Context(), p.DeleteRequest{
+		ctx := WithTransport(t.Context(), mock)
+		err := r.Delete(ctx, p.DeleteRequest{
 			ID:         acmeGoneID,
 			Properties: propMap(map[string]any{orgKey: acmeVal, "id": goneVal}),
 		})
@@ -1542,8 +1538,8 @@ func TestDeleteIsIdempotentOn404(t *testing.T) {
 		mock := &mockTransport{responses: map[string]mockResponse{
 			deleteThingsAcmeGone: {status: 404, body: `{"code":404,"message":"not found"}`},
 		}}
-		SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
-		err := r.Delete(t.Context(), p.DeleteRequest{
+		ctx := WithTransport(t.Context(), mock)
+		err := r.Delete(ctx, p.DeleteRequest{
 			ID:         acmeGoneID,
 			Properties: propMap(map[string]any{orgKey: acmeVal, "id": goneVal}),
 		})
@@ -1556,8 +1552,8 @@ func TestDeleteIsIdempotentOn404(t *testing.T) {
 		mock := &mockTransport{responses: map[string]mockResponse{
 			deleteThingsAcmeGone: {status: 500, body: `oops`},
 		}}
-		SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
-		err := r.Delete(t.Context(), p.DeleteRequest{
+		ctx := WithTransport(t.Context(), mock)
+		err := r.Delete(ctx, p.DeleteRequest{
 			ID:         acmeGoneID,
 			Properties: propMap(map[string]any{orgKey: acmeVal, "id": goneVal}),
 		})
@@ -1645,9 +1641,9 @@ func TestUpdateUsesStateForPathParamsAndInputsForBody(t *testing.T) {
 		"PATCH /widgets/acme/real-7": {status: 200, body: `{"id":"real-7","name":"new-name"}`},
 		"GET /widgets/acme/real-7":   {status: 200, body: `{"id":"real-7","name":"new-name"}`},
 	}}
-	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
+	ctx := WithTransport(t.Context(), mock)
 
-	_, err = r.Update(t.Context(), p.UpdateRequest{
+	_, err = r.Update(ctx, p.UpdateRequest{
 		ID:        "acme/real-7",
 		Inputs:    inputs,
 		OldInputs: oldInputs,
@@ -1776,11 +1772,9 @@ func TestErrorURLIsPostTransportRewrite(t *testing.T) {
 	}
 	// Rewriting shim: mimics authedTransport.Do — overwrites scheme+host
 	// and returns a 500 so execAndDecode constructs an HTTPError.
-	SetTransportResolver(func(_ context.Context) (Transport, error) {
-		return rewriteTransport{scheme: "https", host: "api.real-backend.example"}, nil
-	})
+	ctx := WithTransport(t.Context(), rewriteTransport{scheme: "https", host: "api.real-backend.example"})
 
-	_, err = r.Create(t.Context(), p.CreateRequest{
+	_, err = r.Create(ctx, p.CreateRequest{
 		Properties: propMap(map[string]any{orgKey: acmeVal}),
 	})
 	if err == nil {
@@ -2093,11 +2087,11 @@ func TestUpdateSkipsAliasForReplaceTriggeringField(t *testing.T) {
 			return mockResponse{status: 500, body: unexpectedBody}
 		},
 	}
-	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
+	ctx := WithTransport(t.Context(), mock)
 
 	prior := propMap(map[string]any{orgNameKey: testOrgName, nameKey: pg1Val, agentPoolIDKey: poolAVal})
 	newInputs := propMap(map[string]any{orgNameKey: testOrgName, nameKey: pg1Val, agentPoolIDKey: poolBVal})
-	if _, err := r.Update(t.Context(), p.UpdateRequest{
+	if _, err := r.Update(ctx, p.UpdateRequest{
 		ID: testOrgPG1ID, OldInputs: prior, State: prior, Inputs: newInputs,
 	}); err != nil {
 		t.Fatalf("update: %v\n  calls: %v", err, mock.calls)
@@ -2133,7 +2127,7 @@ func TestUpdateExplicitWireNameWinsOverAlias(t *testing.T) {
 			return mockResponse{status: 500, body: unexpectedBody}
 		},
 	}
-	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
+	ctx := WithTransport(t.Context(), mock)
 
 	prior := propMap(map[string]any{
 		orgNameKey: testOrgName, nameKey: infraVal, descriptionKey: "old desc",
@@ -2143,7 +2137,7 @@ func TestUpdateExplicitWireNameWinsOverAlias(t *testing.T) {
 		descriptionKey:    newDescVal,
 		newDescriptionKey: "explicit desc",
 	})
-	if _, err := r.Update(t.Context(), p.UpdateRequest{
+	if _, err := r.Update(ctx, p.UpdateRequest{
 		ID: testOrgInfraID, OldInputs: prior, State: prior, Inputs: newInputs,
 	}); err != nil {
 		t.Fatalf("update: %v\n  calls: %v", err, mock.calls)
@@ -2164,14 +2158,12 @@ func TestReadKeepsResponseOnlyItemFieldsOutOfInputs(t *testing.T) {
 		t.Fatalf("api/services:Service resource not found")
 	}
 
-	SetTransportResolver(func(_ context.Context) (Transport, error) {
-		return &mockTransport{responseFn: func(_ *http.Request) mockResponse {
-			return mockResponse{status: 200, body: `{
-				"items":[{"name":"infra","type":"stack","created":"2026-05-05T00:00:00Z","cloudCount":3}],
-				"service":{"name":"svc-1"}
-			}`}
-		}}, nil
-	})
+	ctx := WithTransport(t.Context(), &mockTransport{responseFn: func(_ *http.Request) mockResponse {
+		return mockResponse{status: 200, body: `{
+			"items":[{"name":"infra","type":"stack","created":"2026-05-05T00:00:00Z","cloudCount":3}],
+			"service":{"name":"svc-1"}
+		}`}
+	}})
 
 	inputs := propMap(map[string]any{
 		orgNameKey:  testOrgName,
@@ -2180,7 +2172,7 @@ func TestReadKeepsResponseOnlyItemFieldsOutOfInputs(t *testing.T) {
 		nameKey:     "svc-1",
 		itemsKey:    []any{map[string]any{nameKey: infraVal, typeKey: stackVal}},
 	})
-	resp, err := r.Read(t.Context(), p.ReadRequest{
+	resp, err := r.Read(ctx, p.ReadRequest{
 		ID: "test-org/team/team-x/svc-1", Inputs: inputs, Properties: inputs,
 	})
 	if err != nil {
@@ -2194,7 +2186,7 @@ func TestReadKeepsResponseOnlyItemFieldsOutOfInputs(t *testing.T) {
 	}
 }
 
-func policyGroupPatchCapture(t *testing.T) (*Resource, *map[string]any) {
+func policyGroupPatchCapture(t *testing.T) (context.Context, *Resource, *map[string]any) {
 	t.Helper()
 	spec, meta := loadFixtures(t)
 	r, ok := Resources(spec, meta)["pulumiservice:api:PolicyGroup"]
@@ -2217,12 +2209,11 @@ func policyGroupPatchCapture(t *testing.T) (*Resource, *map[string]any) {
 			return mockResponse{status: 500, body: unexpectedBody}
 		},
 	}
-	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
-	return r, &patchBody
+	return WithTransport(t.Context(), mock), r, &patchBody
 }
 
 func TestUpdateSendsClearFieldWhenInputDropped(t *testing.T) {
-	r, patchBody := policyGroupPatchCapture(t)
+	ctx, r, patchBody := policyGroupPatchCapture(t)
 	stackRule := map[string]any{discriminatorKey: permExprEqualVal, tagKeyKey: envTagVal}
 	accountRule := map[string]any{discriminatorKey: permExprEqualVal, tagKeyKey: "team"}
 
@@ -2234,7 +2225,7 @@ func TestUpdateSendsClearFieldWhenInputDropped(t *testing.T) {
 		orgNameKey: testOrgName, nameKey: pg1Val, modeKey: auditVal,
 		"accountMatchRule": accountRule,
 	})
-	if _, err := r.Update(t.Context(), p.UpdateRequest{
+	if _, err := r.Update(ctx, p.UpdateRequest{
 		ID: testOrgPG1ID, OldInputs: prior, State: prior, Inputs: newInputs,
 	}); err != nil {
 		t.Fatalf("update: %v", err)
@@ -2251,14 +2242,14 @@ func TestUpdateSendsClearFieldWhenInputDropped(t *testing.T) {
 }
 
 func TestUpdateOmitsClearFieldWhenInputNeverSet(t *testing.T) {
-	r, patchBody := policyGroupPatchCapture(t)
+	ctx, r, patchBody := policyGroupPatchCapture(t)
 	prior := propMap(map[string]any{orgNameKey: testOrgName, nameKey: pg1Val, agentPoolIDKey: poolAVal})
 	state := propMap(map[string]any{
 		orgNameKey: testOrgName, nameKey: pg1Val, agentPoolIDKey: poolAVal,
 		stackMatchRuleKey: map[string]any{discriminatorKey: permExprEqualVal},
 	})
 	newInputs := propMap(map[string]any{orgNameKey: testOrgName, nameKey: pg1Val, agentPoolIDKey: poolBVal})
-	if _, err := r.Update(t.Context(), p.UpdateRequest{
+	if _, err := r.Update(ctx, p.UpdateRequest{
 		ID: testOrgPG1ID, OldInputs: prior, State: state, Inputs: newInputs,
 	}); err != nil {
 		t.Fatalf("update: %v", err)
@@ -2362,7 +2353,7 @@ func TestDiffSkipsMatchingForceNewInputAlongsideOtherChanges(t *testing.T) {
 }
 
 func TestUpdateClearFieldOverridesStateHeldRule(t *testing.T) {
-	r, patchBody := policyGroupPatchCapture(t)
+	ctx, r, patchBody := policyGroupPatchCapture(t)
 	prior := propMap(map[string]any{
 		orgNameKey: testOrgName, nameKey: pg1Val, modeKey: auditVal,
 		stackMatchRuleKey: map[string]any{discriminatorKey: permExprEqualVal, tagKeyKey: envTagVal},
@@ -2372,7 +2363,7 @@ func TestUpdateClearFieldOverridesStateHeldRule(t *testing.T) {
 		stackMatchRuleKey: map[string]any{discriminatorKey: permExprEqualVal, tagKeyKey: "region"},
 	})
 	newInputs := propMap(map[string]any{orgNameKey: testOrgName, nameKey: pg1Val, modeKey: auditVal})
-	if _, err := r.Update(t.Context(), p.UpdateRequest{
+	if _, err := r.Update(ctx, p.UpdateRequest{
 		ID: testOrgPG1ID, OldInputs: prior, State: state, Inputs: newInputs,
 	}); err != nil {
 		t.Fatalf("update: %v", err)
@@ -2386,7 +2377,7 @@ func TestUpdateClearFieldOverridesStateHeldRule(t *testing.T) {
 }
 
 func TestUpdateSendsClearFieldWhenInputSetToNull(t *testing.T) {
-	r, patchBody := policyGroupPatchCapture(t)
+	ctx, r, patchBody := policyGroupPatchCapture(t)
 	prior := propMap(map[string]any{
 		orgNameKey: testOrgName, nameKey: pg1Val, modeKey: auditVal,
 		stackMatchRuleKey: map[string]any{discriminatorKey: permExprEqualVal, tagKeyKey: envTagVal},
@@ -2397,7 +2388,7 @@ func TestUpdateSendsClearFieldWhenInputSetToNull(t *testing.T) {
 		modeKey:           property.New(auditVal),
 		stackMatchRuleKey: property.New(property.Null),
 	})
-	if _, err := r.Update(t.Context(), p.UpdateRequest{
+	if _, err := r.Update(ctx, p.UpdateRequest{
 		ID: testOrgPG1ID, OldInputs: prior, State: prior, Inputs: newInputs,
 	}); err != nil {
 		t.Fatalf("update: %v", err)

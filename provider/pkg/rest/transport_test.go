@@ -15,58 +15,24 @@
 package rest
 
 import (
-	"context"
 	"testing"
 )
 
-// TestWithTransport_BeatsGlobalResolver: a ctx-scoped transport wins over the
-// package-global resolver, so future test parallelism + multi-provider don't
-// race on the global.
-func TestWithTransport_BeatsGlobalResolver(t *testing.T) {
-	globalCalled := false
-	ctxOnly := &mockTransport{}
-	SetTransportResolver(func(_ context.Context) (Transport, error) {
-		globalCalled = true
-		return &mockTransport{}, nil
-	})
-	defer SetTransportResolver(nil)
-
-	ctx := WithTransport(t.Context(), ctxOnly)
-	got, err := resolveTransport(ctx)
+func TestResolveTransport_ReturnsContextTransport(t *testing.T) {
+	t.Parallel()
+	want := &mockTransport{}
+	got, err := resolveTransport(WithTransport(t.Context(), want))
 	if err != nil {
 		t.Fatalf("resolveTransport: %v", err)
 	}
-	if got != ctxOnly {
-		t.Errorf("resolveTransport returned %p; want ctx-scoped transport %p", got, ctxOnly)
-	}
-	if globalCalled {
-		t.Errorf("global resolver must not run when ctx has its own transport")
+	if got != want {
+		t.Errorf("resolveTransport returned %p; want %p", got, want)
 	}
 }
 
-// TestResolveTransport_FallsBackToGlobal: with no ctx-scoped transport, the
-// package-global resolver still runs (transitional compatibility).
-func TestResolveTransport_FallsBackToGlobal(t *testing.T) {
-	wanted := &mockTransport{}
-	SetTransportResolver(func(_ context.Context) (Transport, error) {
-		return wanted, nil
-	})
-	defer SetTransportResolver(nil)
-
-	got, err := resolveTransport(t.Context())
-	if err != nil {
-		t.Fatalf("resolveTransport: %v", err)
-	}
-	if got != wanted {
-		t.Errorf("global fallback returned %p; want %p", got, wanted)
-	}
-}
-
-// TestResolveTransport_NoTransportReturnsError: neither path set → clear error.
 func TestResolveTransport_NoTransportReturnsError(t *testing.T) {
-	SetTransportResolver(nil)
-	_, err := resolveTransport(t.Context())
-	if err == nil {
-		t.Fatalf("expected error with no transport configured")
+	t.Parallel()
+	if _, err := resolveTransport(t.Context()); err == nil {
+		t.Fatalf("expected error with no transport in context")
 	}
 }
