@@ -4,48 +4,16 @@
 package examples
 
 import (
-	"path/filepath"
 	"testing"
 
-	"github.com/pulumi/pulumi/pkg/v3/testing/integration"
+	"github.com/pulumi/providertest/pulumitest/opttest"
 )
 
-func TestGoTeamsExample(t *testing.T) {
-	testOpts := getGoBaseOptions(t).With(integration.ProgramTestOptions{
-		Verbose: true,
-		Dir:     filepath.Join(getCwd(t), "go-teams"),
-	})
-	integration.ProgramTest(t, &testOpts)
-}
-
-func TestGoEnvironmentsExample(t *testing.T) {
-	digits := generateRandomFiveDigits()
-	testOpts := getGoBaseOptions(t).With(integration.ProgramTestOptions{
-		Verbose: true,
-		Dir:     filepath.Join(getCwd(t), "go-environments"),
-		Config: map[string]string{
-			"digits": digits,
-		},
-	})
-	integration.ProgramTest(t, &testOpts)
-}
-
-func TestGoApprovalRulesExample(t *testing.T) {
-	digits := generateRandomFiveDigits()
-	testOpts := getGoBaseOptions(t).With(integration.ProgramTestOptions{
-		Verbose: true,
-		Dir:     filepath.Join(getCwd(t), "go-approval-rules"),
-		Config: map[string]string{
-			"digits": digits,
-		},
-	})
-	integration.ProgramTest(t, &testOpts)
-}
-
-func getGoBaseOptions(_ *testing.T) integration.ProgramTestOptions {
-	return integration.ProgramTestOptions{
-		Dependencies: []string{
-			"github.com/pulumi/pulumi-pulumiservice/sdk",
-		},
-	}
+func TestGoSmokeExample(t *testing.T) {
+	runSmokeTest(t, "go",
+		// `pulumi install` runs before the reference below is added, so it
+		// can't resolve the local SDK. `pulumi up` builds the program instead.
+		opttest.SkipInstall(),
+		opttest.GoModReplacement("github.com/pulumi/pulumi-pulumiservice/sdk", getCwd(t), "..", "sdk"),
+	)
 }
