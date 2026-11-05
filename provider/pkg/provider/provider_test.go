@@ -304,7 +304,7 @@ func servedSchema(t *testing.T) schema.PackageSpec {
 	provider, err := MakeProvider(nil, "pulumiservice", "1.0.0")
 	require.NoError(t, err)
 
-	resp, err := provider.GetSchema(context.Background(), &pulumirpc.GetSchemaRequest{})
+	resp, err := provider.GetSchema(t.Context(), &pulumirpc.GetSchemaRequest{})
 	require.NoError(t, err)
 
 	var spec schema.PackageSpec
