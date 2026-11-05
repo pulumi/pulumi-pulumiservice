@@ -74,7 +74,7 @@ type EligibleApprover struct {
 type EligibleApproverOutput struct {
 	EligibilityType ApprovalRuleEligibilityType `json:"eligibilityType"`
 	TeamName        string                      `json:"name,omitempty"`
-	User            UserInfo                    `json:"user,omitempty"`
+	User            UserInfo                    `json:"user"`
 	RbacPermission  string                      `json:"permission,omitempty"`
 }
 
