@@ -196,8 +196,7 @@ func MakeProvider(host *provider.HostClient, name, version string) (pulumirpc.Re
 	return p.RawServer(name, version, resources.WithEnvironmentCompat(provider))(host)
 }
 
-// cloudAPISchema returns the schema of the api resources. infer merges it
-// with the schema of the resources it serves.
+// cloudAPISchema returns the schema of the api resources.
 func cloudAPISchema(
 	spec *rest.Spec, metadata *rest.Metadata, pkg string,
 ) func(context.Context, p.GetSchemaRequest) (p.GetSchemaResponse, error) {

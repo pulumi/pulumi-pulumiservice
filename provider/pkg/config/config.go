@@ -166,9 +166,13 @@ func (c *Config) Configure(context.Context) error {
 	}
 	// pulumiapi.NewClient and the ESC client default an empty URL on their
 	// own; the transport needs the default spelled out.
-	baseURL := c.APIURL
-	if baseURL == "" {
-		baseURL = defaultAPIURL
+	rawBaseURL := c.APIURL
+	if rawBaseURL == "" {
+		rawBaseURL = defaultAPIURL
+	}
+	baseURL, err := url.Parse(rawBaseURL)
+	if err != nil {
+		return fmt.Errorf("parse API URL %q: %w", rawBaseURL, err)
 	}
 	c.transport = &authedTransport{
 		baseURL: baseURL,
@@ -185,20 +189,18 @@ func (c *Config) Configure(context.Context) error {
 }
 
 type authedTransport struct {
-	baseURL string
+	baseURL *url.URL
 	token   string
 	client  *http.Client
 }
 
 func (t *authedTransport) Do(_ context.Context, req *http.Request) (*http.Response, error) {
-	base, err := url.Parse(t.baseURL)
-	if err != nil {
-		return nil, fmt.Errorf("authedTransport: parse base URL %q: %w", t.baseURL, err)
-	}
-
-	req.URL.Scheme = base.Scheme
-	req.URL.Host = base.Host
-	req.Host = base.Host
+	req.URL.Scheme = t.baseURL.Scheme
+	req.URL.Host = t.baseURL.Host
+	// rest builds requests on a placeholder host, which http.NewRequest copies
+	// into req.Host. The client sends req.Host ahead of URL.Host, so it has to
+	// be rewritten too.
+	req.Host = t.baseURL.Host
 
 	req.Header.Set("Authorization", "token "+t.token)
 	// v0 (legacy) callers leave Accept unset and want the Pulumi-versioned

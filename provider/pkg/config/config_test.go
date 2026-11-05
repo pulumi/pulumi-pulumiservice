@@ -109,6 +109,6 @@ func TestConfigure_TransportDefaultsToPulumiCloudWhenAPIURLIsEmpty(t *testing.T)
 
 	transport, ok := c.transport.(*authedTransport)
 	require.True(t, ok, "Configure must build the api transport")
-	assert.Equal(t, defaultAPIURL, transport.baseURL)
+	assert.Equal(t, defaultAPIURL, transport.baseURL.String())
 	assert.Equal(t, "pul-test-token", transport.token)
 }
