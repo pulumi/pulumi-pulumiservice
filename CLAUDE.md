@@ -88,22 +88,16 @@ cd examples && go test -v -run TestYamlStackTagsPluralExample -tags yaml -timeou
 - The `.env` file allows running integration tests locally against a custom organization
 - Every new resource should have unit tests in `provider/pkg/` with `_test.go` suffix
 - Add example programs in `examples/` for each new resource (examples serve as integration tests)
-- Examples are organized by language: `ts-*`, `py-*`, `go-*`, `cs-*`, `java-*`, `yaml-*`
+- Examples are written in Pulumi YAML (`yaml-*`). Each other SDK language has one smoke program (`ts-smoke`, `py-smoke`, `go-smoke`, `cs-smoke`, `java-smoke`, run through `runSmokeTest` in `examples/examples_smoke_test.go`) that covers an asset input, an invoke and a secret output.
+- A new resource gets a YAML example. Add a non-YAML test only when the resource adds an input or output shape that the smoke programs don't cover.
 
-**IMPORTANT - Integration Test Framework**:
-- **Always use `pulumitest`** from `github.com/pulumi/providertest/pulumitest` for new integration tests
-- DO NOT use the legacy `integration.ProgramTest` from `github.com/pulumi/pulumi/pkg/v3/testing/integration`
-- The `pulumitest` framework provides better control, cleaner syntax, and is the preferred approach going forward
-- See `examples/examples_nodejs_test.go` for examples of properly structured `pulumitest` tests
-- Common pattern for `pulumitest` tests:
+**Integration Test Framework**:
+- Integration tests use `pulumitest` from `github.com/pulumi/providertest/pulumitest`
+- See `examples/examples_yaml_test.go` for examples of `pulumitest` tests
+- Common pattern for `pulumitest` tests. `newExampleTest` (in `examples/main_test.go`) runs the example against the in-memory provider on a randomly named stack; `newPulumiTest` does the same for a program outside `examples/`, such as one written by `writePulumiYaml`:
   ```go
-  test := pulumitest.NewPulumiTest(t,
-      filepath.Join(getCwd(t), "example-directory"),
-      inMemoryProvider(),
-      opttest.UseAmbientBackend(),
-      opttest.YarnLink("@pulumi/pulumiservice"),  // for Node.js tests
-  )
-  test.SetConfig(t, "key", "value")  // optional config
+  test := newExampleTest(t, "example-directory")
+  setConfig(t, test, map[string]string{"organizationName": getOrgName(), "digits": generateRandomFiveDigits()})
   runPulumiTest(t, test)  // runs up, preview, refresh, destroy
   ```
 
@@ -324,7 +318,7 @@ When investigating CI test failures:
 
 3. **Check for outdated test data**: Examples may contain hardcoded values like TLS certificate thumbprints that become stale when certificates are rotated
 
-4. **Look for related issues across examples**: If one language example fails, check all language examples (ts-, py-, go-, cs-, yaml-) for the same issue
+4. **Look for related issues across examples**: If one smoke program fails, check the other languages' smoke programs for the same issue
 
 ## Lessons Learned
 

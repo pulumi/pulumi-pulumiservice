@@ -1,10 +1,9 @@
-name: py-rbac
+name: py-smoke
 runtime:
   name: python
   options:
     virtualenv: venv
-description: Exercises the RBAC resources and data sources from Python.
-
+description: Checks that the Python SDK handles an asset input, an invoke and a secret output.
 config:
   organizationName:
     type: string
