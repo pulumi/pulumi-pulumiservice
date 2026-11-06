@@ -37,7 +37,7 @@ func TestCreateEnvironmentRotationSchedule(t *testing.T) {
 			ResponseBody:      testEnvResponse,
 		})
 		expectedScheduleID, err := c.CreateEnvironmentRotationSchedule(
-			ctx,
+			t.Context(),
 			testEnv,
 			createEnvironmentRotationScheduleReq,
 		)
@@ -56,7 +56,7 @@ func TestCreateEnvironmentRotationSchedule(t *testing.T) {
 			},
 		})
 		expectedScheduleID, err := c.CreateEnvironmentRotationSchedule(
-			ctx,
+			t.Context(),
 			testEnv,
 			createEnvironmentRotationScheduleReq,
 		)
@@ -79,7 +79,7 @@ func TestGetEnvironmentSchedule(t *testing.T) {
 			ResponseCode:      200,
 			ResponseBody:      testEnvResponse,
 		})
-		response, err := c.GetEnvironmentSchedule(ctx, testEnv, testScheduleID)
+		response, err := c.GetEnvironmentSchedule(t.Context(), testEnv, testScheduleID)
 		assert.NoError(t, err)
 		assert.Equal(t, testEnvResponse, *response)
 	})
@@ -93,7 +93,7 @@ func TestGetEnvironmentSchedule(t *testing.T) {
 				Message: unauthorizedError,
 			},
 		})
-		expectedScheduleID, err := c.GetEnvironmentSchedule(ctx, testEnv, testScheduleID)
+		expectedScheduleID, err := c.GetEnvironmentSchedule(t.Context(), testEnv, testScheduleID)
 		assert.Nil(t, expectedScheduleID, "scheduleId should be nil since error was returned")
 		assert.EqualError(
 			t,
@@ -112,7 +112,7 @@ func TestGetEnvironmentSchedule(t *testing.T) {
 				Message:    notFoundError,
 			},
 		})
-		expectedScheduleID, err := c.GetEnvironmentSchedule(ctx, testEnv, testScheduleID)
+		expectedScheduleID, err := c.GetEnvironmentSchedule(t.Context(), testEnv, testScheduleID)
 		assert.Nil(t, expectedScheduleID, "scheduleId should be nil since it was not found")
 		assert.NoError(t, err)
 	})
@@ -129,7 +129,7 @@ func TestUpdateEnvironmentRotationSchedule(t *testing.T) {
 			ResponseBody:      testResponse,
 		})
 		expectedScheduleID, err := c.UpdateEnvironmentRotationSchedule(
-			ctx,
+			t.Context(),
 			testEnv,
 			createEnvironmentRotationScheduleReq,
 			testScheduleID,
@@ -149,7 +149,7 @@ func TestUpdateEnvironmentRotationSchedule(t *testing.T) {
 			},
 		})
 		expectedScheduleID, err := c.UpdateEnvironmentRotationSchedule(
-			ctx,
+			t.Context(),
 			testEnv,
 			createEnvironmentRotationScheduleReq,
 			testScheduleID,
@@ -171,7 +171,7 @@ func TestDeleteEnvironmentSchedule(t *testing.T) {
 			ExpectedReqPath:   "/api/esc/environments/org/project/env/schedules/" + testScheduleID,
 			ResponseCode:      201,
 		})
-		err := c.DeleteEnvironmentSchedule(ctx, testEnv, testScheduleID)
+		err := c.DeleteEnvironmentSchedule(t.Context(), testEnv, testScheduleID)
 		assert.NoError(t, err)
 	})
 
@@ -184,7 +184,7 @@ func TestDeleteEnvironmentSchedule(t *testing.T) {
 				Message: unauthorizedError,
 			},
 		})
-		err := c.DeleteEnvironmentSchedule(ctx, testEnv, testScheduleID)
+		err := c.DeleteEnvironmentSchedule(t.Context(), testEnv, testScheduleID)
 		assert.EqualError(
 			t,
 			err,

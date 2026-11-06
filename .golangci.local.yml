@@ -1,0 +1,12 @@
+# Linters this repo runs on top of the ci-mgmt-generated .golangci.yml, which
+# would drop any additions on regeneration. Run by `make lint` via .mk/lint.mk.
+version: "2"
+linters:
+  default: none
+  enable:
+    - usetesting
+  settings:
+    usetesting:
+      # Off by default; t.Context() is cancelled when the test ends.
+      context-background: true
+      context-todo: true

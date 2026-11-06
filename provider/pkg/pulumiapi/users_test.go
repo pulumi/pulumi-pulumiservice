@@ -20,7 +20,7 @@ func TestGetCurrentUser(t *testing.T) {
 			AvatarURL:   "https://avatars.example.com/alice.png",
 		},
 	})
-	got, err := c.GetCurrentUser(ctx)
+	got, err := c.GetCurrentUser(t.Context())
 	assert.NoError(t, err)
 	if assert.NotNil(t, got) {
 		assert.Equal(t, aliceUser, got.GithubLogin)

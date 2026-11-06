@@ -202,7 +202,7 @@ func TestPolicyPack_Create_DryRun(t *testing.T) {
 			return 0, nil
 		},
 	}
-	ctx := config.WithMockClient(context.Background(), mock)
+	ctx := config.WithMockClient(t.Context(), mock)
 	resp, err := (&PolicyPack{}).Create(ctx, infer.CreateRequest[PolicyPackInput]{
 		DryRun: true,
 		Inputs: PolicyPackInput{
@@ -232,7 +232,7 @@ func TestPolicyPack_Create_HappyPath(t *testing.T) {
 			return 5, nil
 		},
 	}
-	ctx := config.WithMockClient(context.Background(), mock)
+	ctx := config.WithMockClient(t.Context(), mock)
 	resp, err := (&PolicyPack{}).Create(ctx, infer.CreateRequest[PolicyPackInput]{
 		Inputs: PolicyPackInput{
 			Organization: gcAcme,
@@ -266,7 +266,7 @@ func TestPolicyPack_Create_PublishError(t *testing.T) {
 			return 0, errors.New("boom")
 		},
 	}
-	ctx := config.WithMockClient(context.Background(), mock)
+	ctx := config.WithMockClient(t.Context(), mock)
 	_, err := (&PolicyPack{}).Create(ctx, infer.CreateRequest[PolicyPackInput]{
 		Inputs: PolicyPackInput{
 			Organization: gcAcme,
@@ -282,7 +282,7 @@ func TestPolicyPack_Create_PublishError(t *testing.T) {
 
 func TestPolicyPack_Create_TarballError(t *testing.T) {
 	mock := &PolicyPackClientMock{}
-	ctx := config.WithMockClient(context.Background(), mock)
+	ctx := config.WithMockClient(t.Context(), mock)
 	_, err := (&PolicyPack{}).Create(ctx, infer.CreateRequest[PolicyPackInput]{
 		Inputs: PolicyPackInput{
 			Organization: gcAcme,
@@ -311,7 +311,7 @@ func TestPolicyPack_Diff_NoChanges(t *testing.T) {
 		},
 		ContentHash: hash,
 	}
-	resp, err := (&PolicyPack{}).Diff(context.Background(), infer.DiffRequest[PolicyPackInput, PolicyPackState]{
+	resp, err := (&PolicyPack{}).Diff(t.Context(), infer.DiffRequest[PolicyPackInput, PolicyPackState]{
 		Inputs: state.PolicyPackInput,
 		State:  state,
 	})
@@ -331,7 +331,7 @@ func TestPolicyPack_Diff_ReplacesOnContentChange(t *testing.T) {
 		},
 		ContentHash: "not-the-current-hash",
 	}
-	resp, err := (&PolicyPack{}).Diff(context.Background(), infer.DiffRequest[PolicyPackInput, PolicyPackState]{
+	resp, err := (&PolicyPack{}).Diff(t.Context(), infer.DiffRequest[PolicyPackInput, PolicyPackState]{
 		Inputs: state.PolicyPackInput,
 		State:  state,
 	})
@@ -367,7 +367,7 @@ func TestPolicyPack_Diff_ReplacesOnIdentityChange(t *testing.T) {
 		t.Run(tc.field, func(t *testing.T) {
 			inputs := state.PolicyPackInput
 			tc.patch(&inputs)
-			resp, err := (&PolicyPack{}).Diff(context.Background(), infer.DiffRequest[PolicyPackInput, PolicyPackState]{
+			resp, err := (&PolicyPack{}).Diff(t.Context(), infer.DiffRequest[PolicyPackInput, PolicyPackState]{
 				Inputs: inputs,
 				State:  state,
 			})
@@ -390,7 +390,7 @@ func TestPolicyPack_Delete(t *testing.T) {
 				return nil
 			},
 		}
-		ctx := config.WithMockClient(context.Background(), mock)
+		ctx := config.WithMockClient(t.Context(), mock)
 		_, err := (&PolicyPack{}).Delete(ctx, infer.DeleteRequest[PolicyPackState]{
 			State: PolicyPackState{
 				PolicyPackInput: PolicyPackInput{Organization: gcAcme, Name: gcGuard, VersionTag: gcVersion100},
@@ -406,7 +406,7 @@ func TestPolicyPack_Delete(t *testing.T) {
 				return errors.New("upstream 500")
 			},
 		}
-		ctx := config.WithMockClient(context.Background(), mock)
+		ctx := config.WithMockClient(t.Context(), mock)
 		_, err := (&PolicyPack{}).Delete(ctx, infer.DeleteRequest[PolicyPackState]{
 			State: PolicyPackState{
 				PolicyPackInput: PolicyPackInput{Organization: gcAcme, Name: gcGuard, VersionTag: gcVersion100},
@@ -427,7 +427,7 @@ func TestPolicyPack_Read(t *testing.T) {
 				}, nil
 			},
 		}
-		ctx := config.WithMockClient(context.Background(), mock)
+		ctx := config.WithMockClient(t.Context(), mock)
 		existing := PolicyPackState{
 			PolicyPackInput: PolicyPackInput{SourcePath: "ignored"},
 			ContentHash:     "preserved-hash",
@@ -449,7 +449,7 @@ func TestPolicyPack_Read(t *testing.T) {
 				return []pulumiapi.PolicyPackWithVersions{{Name: gcOther}}, nil
 			},
 		}
-		ctx := config.WithMockClient(context.Background(), mock)
+		ctx := config.WithMockClient(t.Context(), mock)
 		resp, err := (&PolicyPack{}).Read(ctx, infer.ReadRequest[PolicyPackInput, PolicyPackState]{
 			ID: gcAcmeGuard100,
 		})
@@ -465,7 +465,7 @@ func TestPolicyPack_Read(t *testing.T) {
 				}, nil
 			},
 		}
-		ctx := config.WithMockClient(context.Background(), mock)
+		ctx := config.WithMockClient(t.Context(), mock)
 		resp, err := (&PolicyPack{}).Read(ctx, infer.ReadRequest[PolicyPackInput, PolicyPackState]{
 			ID: gcAcmeGuard100,
 		})
@@ -475,7 +475,7 @@ func TestPolicyPack_Read(t *testing.T) {
 
 	t.Run("malformed id rejected", func(t *testing.T) {
 		mock := &PolicyPackClientMock{}
-		ctx := config.WithMockClient(context.Background(), mock)
+		ctx := config.WithMockClient(t.Context(), mock)
 		_, err := (&PolicyPack{}).Read(ctx, infer.ReadRequest[PolicyPackInput, PolicyPackState]{
 			ID: "bogus",
 		})
@@ -489,7 +489,7 @@ func TestResolvePolicies_Inline(t *testing.T) {
 			{Name: gcNoSecrets, ConfigSchema: map[string]any{gcRequired: []string{"k"}}},
 		},
 	}
-	got, err := resolvePolicies(context.Background(), in)
+	got, err := resolvePolicies(t.Context(), in)
 	require.NoError(t, err)
 	require.Len(t, got, 1)
 	assert.Equal(t, gcObject, got[0].ConfigSchema[gcType])

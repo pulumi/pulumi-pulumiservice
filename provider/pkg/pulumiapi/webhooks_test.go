@@ -45,7 +45,7 @@ func TestCreateWebhook(t *testing.T) {
 			ResponseCode:      201,
 			ResponseBody:      webhook,
 		})
-		actualWebhook, err := c.CreateWebhook(ctx, createReq)
+		actualWebhook, err := c.CreateWebhook(t.Context(), createReq)
 		assert.NoError(t, err)
 		assert.Equal(t, webhook, *actualWebhook)
 	})
@@ -60,7 +60,7 @@ func TestCreateWebhook(t *testing.T) {
 				Message: unauthorizedError,
 			},
 		})
-		actualWebhook, err := c.CreateWebhook(ctx, createReq)
+		actualWebhook, err := c.CreateWebhook(t.Context(), createReq)
 		assert.Nil(t, actualWebhook, "webhook should be nil since error was returned")
 		assert.EqualError(t, err, "failed to create webhook: 401 API error: unauthorized")
 	})
@@ -87,7 +87,7 @@ func TestListWebhooks(t *testing.T) {
 			ResponseCode:      200,
 			ResponseBody:      webhooks,
 		})
-		actualWebhooks, err := c.ListWebhooks(ctx, orgName, nil, nil, nil)
+		actualWebhooks, err := c.ListWebhooks(t.Context(), orgName, nil, nil, nil)
 		assert.NoError(t, err)
 		assert.Equal(t, webhooks, actualWebhooks)
 	})
@@ -101,7 +101,7 @@ func TestListWebhooks(t *testing.T) {
 				Message: unauthorizedError,
 			},
 		})
-		actualWebhooks, err := c.ListWebhooks(ctx, orgName, nil, nil, nil)
+		actualWebhooks, err := c.ListWebhooks(t.Context(), orgName, nil, nil, nil)
 		assert.Nil(t, actualWebhooks, "webhooks should be nil since error was returned")
 		assert.EqualError(t, err, "failed to list webhooks: 401 API error: unauthorized")
 	})
@@ -127,7 +127,7 @@ func TestGetWebhook(t *testing.T) {
 			ResponseCode:      200,
 			ResponseBody:      webhook,
 		})
-		actualWebhook, err := c.GetWebhook(ctx, orgName, nil, nil, nil, webhookName)
+		actualWebhook, err := c.GetWebhook(t.Context(), orgName, nil, nil, nil, webhookName)
 		assert.NoError(t, err)
 		assert.Equal(t, webhook, *actualWebhook)
 	})
@@ -141,7 +141,7 @@ func TestGetWebhook(t *testing.T) {
 				Message: unauthorizedError,
 			},
 		})
-		actualWebhook, err := c.GetWebhook(ctx, orgName, nil, nil, nil, webhookName)
+		actualWebhook, err := c.GetWebhook(t.Context(), orgName, nil, nil, nil, webhookName)
 		assert.Nil(t, actualWebhook, "webhooks should be nil since error was returned")
 		assert.EqualError(t, err, "failed to get webhook: 401 API error: unauthorized")
 	})
@@ -156,7 +156,7 @@ func TestGetWebhook(t *testing.T) {
 				Message:    notFoundError,
 			},
 		})
-		actualWebhook, err := c.GetWebhook(ctx, orgName, nil, nil, nil, webhookName)
+		actualWebhook, err := c.GetWebhook(t.Context(), orgName, nil, nil, nil, webhookName)
 		assert.Nil(t, actualWebhook, "webhook should be nil since error was returned")
 		assert.Nil(t, err, "err should be nil since error was returned")
 	})
@@ -193,7 +193,7 @@ func TestUpdateWebhook(t *testing.T) {
 			ResponseCode:      201,
 			ResponseBody:      webhook,
 		})
-		response, err := c.UpdateWebhook(ctx, updateReq)
+		response, err := c.UpdateWebhook(t.Context(), updateReq)
 		assert.NoError(t, err)
 		assert.EqualValues(t, webhook, *response)
 	})
@@ -208,7 +208,7 @@ func TestUpdateWebhook(t *testing.T) {
 				Message: unauthorizedError,
 			},
 		})
-		_, err := c.UpdateWebhook(ctx, updateReq)
+		_, err := c.UpdateWebhook(t.Context(), updateReq)
 		assert.EqualError(t, err, "failed to update webhook: 401 API error: unauthorized")
 	})
 }
@@ -222,7 +222,7 @@ func TestDeleteWebhook(t *testing.T) {
 			ExpectedReqPath:   webhookPath,
 			ResponseCode:      201,
 		})
-		err := c.DeleteWebhook(ctx, orgName, nil, nil, nil, webhookName)
+		err := c.DeleteWebhook(t.Context(), orgName, nil, nil, nil, webhookName)
 		assert.NoError(t, err)
 	})
 
@@ -235,7 +235,7 @@ func TestDeleteWebhook(t *testing.T) {
 				Message: unauthorizedError,
 			},
 		})
-		err := c.DeleteWebhook(ctx, orgName, nil, nil, nil, webhookName)
+		err := c.DeleteWebhook(t.Context(), orgName, nil, nil, nil, webhookName)
 		assert.EqualError(t, err, "failed to delete webhook: 401 API error: unauthorized")
 	})
 }

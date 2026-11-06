@@ -104,7 +104,7 @@ func TestStackTagsCreate(t *testing.T) {
 				return nil
 			},
 		}
-		ctx := config.WithMockClient(context.Background(), mock)
+		ctx := config.WithMockClient(t.Context(), mock)
 
 		resp, err := (&StackTags{}).Create(ctx, infer.CreateRequest[StackTagsInput]{
 			Inputs: StackTagsInput{
@@ -130,7 +130,7 @@ func TestStackTagsCreate(t *testing.T) {
 				return nil
 			},
 		}
-		ctx := config.WithMockClient(context.Background(), mock)
+		ctx := config.WithMockClient(t.Context(), mock)
 
 		resp, err := (&StackTags{}).Create(ctx, infer.CreateRequest[StackTagsInput]{
 			DryRun: true,
@@ -160,7 +160,7 @@ func TestStackTagsCreate(t *testing.T) {
 				return nil
 			},
 		}
-		ctx := config.WithMockClient(context.Background(), mock)
+		ctx := config.WithMockClient(t.Context(), mock)
 
 		resp, err := (&StackTags{}).Create(ctx, infer.CreateRequest[StackTagsInput]{
 			Inputs: StackTagsInput{
@@ -214,7 +214,7 @@ func TestStackTagsUpdate(t *testing.T) {
 				return nil
 			},
 		}
-		ctx := config.WithMockClient(context.Background(), mock)
+		ctx := config.WithMockClient(t.Context(), mock)
 
 		resp, err := (&StackTags{}).Update(ctx, infer.UpdateRequest[StackTagsInput, StackTagsState]{
 			State:  oldState,
@@ -242,7 +242,7 @@ func TestStackTagsUpdate(t *testing.T) {
 				return nil
 			},
 		}
-		ctx := config.WithMockClient(context.Background(), mock)
+		ctx := config.WithMockClient(t.Context(), mock)
 
 		resp, err := (&StackTags{}).Update(ctx, infer.UpdateRequest[StackTagsInput, StackTagsState]{
 			DryRun: true,
@@ -266,7 +266,7 @@ func TestStackTagsUpdate(t *testing.T) {
 				return nil
 			},
 		}
-		ctx := config.WithMockClient(context.Background(), mock)
+		ctx := config.WithMockClient(t.Context(), mock)
 
 		resp, err := (&StackTags{}).Update(ctx, infer.UpdateRequest[StackTagsInput, StackTagsState]{
 			State:  oldState,
@@ -297,7 +297,7 @@ func TestStackTagsUpdate(t *testing.T) {
 				return nil
 			},
 		}
-		ctx := config.WithMockClient(context.Background(), mock)
+		ctx := config.WithMockClient(t.Context(), mock)
 
 		resp, err := (&StackTags{}).Update(ctx, infer.UpdateRequest[StackTagsInput, StackTagsState]{
 			State:  oldState,
@@ -326,7 +326,7 @@ func TestStackTagsDelete(t *testing.T) {
 				return nil
 			},
 		}
-		ctx := config.WithMockClient(context.Background(), mock)
+		ctx := config.WithMockClient(t.Context(), mock)
 
 		_, err := (&StackTags{}).Delete(ctx, infer.DeleteRequest[StackTagsState]{
 			State: StackTagsState{
@@ -346,7 +346,7 @@ func TestStackTagsDelete(t *testing.T) {
 				return errors.New("boom")
 			},
 		}
-		ctx := config.WithMockClient(context.Background(), mock)
+		ctx := config.WithMockClient(t.Context(), mock)
 
 		_, err := (&StackTags{}).Delete(ctx, infer.DeleteRequest[StackTagsState]{
 			State: StackTagsState{
@@ -367,7 +367,7 @@ func TestStackTagsRead(t *testing.T) {
 				return map[string]string{gcTag1: "v1", gcTag2: "v2", "extra": "x"}, nil
 			},
 		}
-		ctx := config.WithMockClient(context.Background(), mock)
+		ctx := config.WithMockClient(t.Context(), mock)
 
 		resp, err := (&StackTags{}).Read(ctx, infer.ReadRequest[StackTagsInput, StackTagsState]{
 			ID: gcOrgProjectStackTags,
@@ -398,7 +398,7 @@ func TestStackTagsRead(t *testing.T) {
 				return map[string]string{"a": "1", "b": "2"}, nil
 			},
 		}
-		ctx := config.WithMockClient(context.Background(), mock)
+		ctx := config.WithMockClient(t.Context(), mock)
 
 		resp, err := (&StackTags{}).Read(ctx, infer.ReadRequest[StackTagsInput, StackTagsState]{
 			ID: gcOrgProjectStackTags,
@@ -418,7 +418,7 @@ func TestStackTagsRead(t *testing.T) {
 	})
 
 	t.Run("invalid id returns error", func(t *testing.T) {
-		_, err := (&StackTags{}).Read(context.Background(),
+		_, err := (&StackTags{}).Read(t.Context(),
 			infer.ReadRequest[StackTagsInput, StackTagsState]{ID: "bogus"})
 		require.Error(t, err)
 	})

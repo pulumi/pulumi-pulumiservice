@@ -152,7 +152,7 @@ func TestInsightsAccount(t *testing.T) {
 			},
 		}
 
-		ctx := config.WithMockClient(context.Background(), mockedClient)
+		ctx := config.WithMockClient(t.Context(), mockedClient)
 
 		ia := &InsightsAccount{}
 		scanSchedule := ScanScheduleDaily
@@ -202,7 +202,7 @@ func TestInsightsAccount(t *testing.T) {
 			},
 		}
 
-		ctx := config.WithMockClient(context.Background(), mockedClient)
+		ctx := config.WithMockClient(t.Context(), mockedClient)
 
 		ia := &InsightsAccount{}
 		scanSchedule := ScanScheduleDaily
@@ -270,7 +270,7 @@ func TestInsightsAccount(t *testing.T) {
 			},
 		}
 
-		ctx := config.WithMockClient(context.Background(), mockedClient)
+		ctx := config.WithMockClient(t.Context(), mockedClient)
 
 		ia := &InsightsAccount{}
 		req := infer.ReadRequest[InsightsAccountInput, InsightsAccountState]{
@@ -308,7 +308,7 @@ func TestInsightsAccount(t *testing.T) {
 	t.Run("Create with DryRun", func(t *testing.T) {
 		t.Parallel()
 		mockedClient := &InsightsAccountClientMock{}
-		ctx := config.WithMockClient(context.Background(), mockedClient)
+		ctx := config.WithMockClient(t.Context(), mockedClient)
 
 		ia := &InsightsAccount{}
 		scanSchedule := ScanScheduleDaily
@@ -364,7 +364,7 @@ func TestInsightsAccount(t *testing.T) {
 				}, nil
 			},
 		}
-		ctx := config.WithMockClient(context.Background(), mockedClient)
+		ctx := config.WithMockClient(t.Context(), mockedClient)
 
 		ia := &InsightsAccount{}
 		scanSchedule := ScanScheduleDaily
@@ -415,7 +415,7 @@ func TestInsightsAccount(t *testing.T) {
 				}, nil
 			},
 		}
-		ctx := config.WithMockClient(context.Background(), mockedClient)
+		ctx := config.WithMockClient(t.Context(), mockedClient)
 
 		ia := &InsightsAccount{}
 		scanSchedule := ScanScheduleNone
@@ -448,7 +448,7 @@ func TestInsightsAccount(t *testing.T) {
 				return fmt.Errorf("API error: invalid environment reference")
 			},
 		}
-		ctx := config.WithMockClient(context.Background(), mockedClient)
+		ctx := config.WithMockClient(t.Context(), mockedClient)
 
 		ia := &InsightsAccount{}
 		req := infer.CreateRequest[InsightsAccountInput]{
@@ -483,7 +483,7 @@ func TestInsightsAccount(t *testing.T) {
 				return nil, fmt.Errorf("API error: internal server error")
 			},
 		}
-		ctx := config.WithMockClient(context.Background(), mockedClient)
+		ctx := config.WithMockClient(t.Context(), mockedClient)
 
 		ia := &InsightsAccount{}
 		req := infer.CreateRequest[InsightsAccountInput]{
@@ -521,7 +521,7 @@ func TestInsightsAccount(t *testing.T) {
 				return nil, nil // 404 - not found
 			},
 		}
-		ctx := config.WithMockClient(context.Background(), mockedClient)
+		ctx := config.WithMockClient(t.Context(), mockedClient)
 
 		ia := &InsightsAccount{}
 		req := infer.CreateRequest[InsightsAccountInput]{
@@ -550,7 +550,7 @@ func TestInsightsAccount(t *testing.T) {
 	t.Run("Update with DryRun", func(t *testing.T) {
 		t.Parallel()
 		mockedClient := &InsightsAccountClientMock{}
-		ctx := config.WithMockClient(context.Background(), mockedClient)
+		ctx := config.WithMockClient(t.Context(), mockedClient)
 
 		ia := &InsightsAccount{}
 		oldSchedule := ScanScheduleDaily
@@ -611,7 +611,7 @@ func TestInsightsAccount(t *testing.T) {
 				}, nil
 			},
 		}
-		ctx := config.WithMockClient(context.Background(), mockedClient)
+		ctx := config.WithMockClient(t.Context(), mockedClient)
 
 		ia := &InsightsAccount{}
 		oldSchedule := ScanScheduleDaily
@@ -657,7 +657,7 @@ func TestInsightsAccount(t *testing.T) {
 				return fmt.Errorf("API error: environment not found")
 			},
 		}
-		ctx := config.WithMockClient(context.Background(), mockedClient)
+		ctx := config.WithMockClient(t.Context(), mockedClient)
 
 		ia := &InsightsAccount{}
 		req := infer.UpdateRequest[InsightsAccountInput, InsightsAccountState]{
@@ -703,7 +703,7 @@ func TestInsightsAccount(t *testing.T) {
 				return nil, fmt.Errorf("API error: internal server error")
 			},
 		}
-		ctx := config.WithMockClient(context.Background(), mockedClient)
+		ctx := config.WithMockClient(t.Context(), mockedClient)
 
 		ia := &InsightsAccount{}
 		req := infer.UpdateRequest[InsightsAccountInput, InsightsAccountState]{
@@ -751,7 +751,7 @@ func TestInsightsAccount(t *testing.T) {
 				return nil, nil // 404 - not found
 			},
 		}
-		ctx := config.WithMockClient(context.Background(), mockedClient)
+		ctx := config.WithMockClient(t.Context(), mockedClient)
 
 		ia := &InsightsAccount{}
 		req := infer.UpdateRequest[InsightsAccountInput, InsightsAccountState]{
@@ -798,7 +798,7 @@ func TestInsightsAccount(t *testing.T) {
 				return nil
 			},
 		}
-		ctx := config.WithMockClient(context.Background(), mockedClient)
+		ctx := config.WithMockClient(t.Context(), mockedClient)
 
 		ia := &InsightsAccount{}
 		scanSchedule := ScanScheduleDaily
@@ -842,7 +842,7 @@ func TestInsightsAccount(t *testing.T) {
 			},
 		}
 
-		ctx := config.WithMockClient(context.Background(), mockedClient)
+		ctx := config.WithMockClient(t.Context(), mockedClient)
 
 		ia := &InsightsAccount{}
 		req := infer.ReadRequest[InsightsAccountInput, InsightsAccountState]{
@@ -891,7 +891,7 @@ func TestInsightsAccount(t *testing.T) {
 			},
 		}
 
-		ctx := config.WithMockClient(context.Background(), mockedClient)
+		ctx := config.WithMockClient(t.Context(), mockedClient)
 
 		ia := &InsightsAccount{}
 		req := infer.ReadRequest[InsightsAccountInput, InsightsAccountState]{
@@ -936,7 +936,7 @@ func TestInsightsAccount(t *testing.T) {
 				return nil
 			},
 		}
-		ctx := config.WithMockClient(context.Background(), mockedClient)
+		ctx := config.WithMockClient(t.Context(), mockedClient)
 
 		ia := &InsightsAccount{}
 		req := infer.CreateRequest[InsightsAccountInput]{
@@ -986,7 +986,7 @@ func TestInsightsAccount(t *testing.T) {
 				return nil
 			},
 		}
-		ctx := config.WithMockClient(context.Background(), mockedClient)
+		ctx := config.WithMockClient(t.Context(), mockedClient)
 
 		ia := &InsightsAccount{}
 		req := infer.CreateRequest[InsightsAccountInput]{
@@ -1022,7 +1022,7 @@ func TestInsightsAccount(t *testing.T) {
 				return fmt.Errorf("API error: failed to set tags")
 			},
 		}
-		ctx := config.WithMockClient(context.Background(), mockedClient)
+		ctx := config.WithMockClient(t.Context(), mockedClient)
 
 		ia := &InsightsAccount{}
 		req := infer.CreateRequest[InsightsAccountInput]{
@@ -1075,7 +1075,7 @@ func TestInsightsAccount(t *testing.T) {
 				return nil
 			},
 		}
-		ctx := config.WithMockClient(context.Background(), mockedClient)
+		ctx := config.WithMockClient(t.Context(), mockedClient)
 
 		ia := &InsightsAccount{}
 		req := infer.UpdateRequest[InsightsAccountInput, InsightsAccountState]{
@@ -1140,7 +1140,7 @@ func TestInsightsAccount(t *testing.T) {
 				return nil
 			},
 		}
-		ctx := config.WithMockClient(context.Background(), mockedClient)
+		ctx := config.WithMockClient(t.Context(), mockedClient)
 
 		ia := &InsightsAccount{}
 		req := infer.UpdateRequest[InsightsAccountInput, InsightsAccountState]{
@@ -1190,7 +1190,7 @@ func TestInsightsAccount(t *testing.T) {
 				return fmt.Errorf("API error: failed to set tags")
 			},
 		}
-		ctx := config.WithMockClient(context.Background(), mockedClient)
+		ctx := config.WithMockClient(t.Context(), mockedClient)
 
 		ia := &InsightsAccount{}
 		req := infer.UpdateRequest[InsightsAccountInput, InsightsAccountState]{

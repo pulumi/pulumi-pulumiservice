@@ -15,7 +15,6 @@
 package functions
 
 import (
-	"context"
 	"encoding/json"
 	"testing"
 
@@ -81,7 +80,7 @@ const consoleStackMatchRuleJSON = `{
 
 func TestBuildStackMatchRule(t *testing.T) {
 	t.Parallel()
-	resp, err := BuildStackMatchRuleFunction{}.Invoke(context.Background(), infer.FunctionRequest[BuildMatchRuleInput]{
+	resp, err := BuildStackMatchRuleFunction{}.Invoke(t.Context(), infer.FunctionRequest[BuildMatchRuleInput]{
 		Input: BuildMatchRuleInput{Rules: []PolicyGroupMatchRule{
 			{Conditions: []PolicyGroupTagCondition{
 				{Key: tagEnv, Value: value(tagProd)},
@@ -101,7 +100,7 @@ func TestBuildStackMatchRule(t *testing.T) {
 
 func TestBuildAccountMatchRule(t *testing.T) {
 	t.Parallel()
-	resp, err := BuildAccountMatchRuleFunction{}.Invoke(context.Background(), infer.FunctionRequest[BuildMatchRuleInput]{
+	resp, err := BuildAccountMatchRuleFunction{}.Invoke(t.Context(), infer.FunctionRequest[BuildMatchRuleInput]{
 		Input: BuildMatchRuleInput{Rules: []PolicyGroupMatchRule{
 			{Conditions: []PolicyGroupTagCondition{{Key: tagEnv, Operator: operator(PolicyGroupTagOperatorExists)}}},
 		}},
@@ -171,12 +170,12 @@ func TestBuildMatchRule_Errors(t *testing.T) {
 		req := infer.FunctionRequest[BuildMatchRuleInput]{Input: BuildMatchRuleInput{Rules: tc.rules}}
 		t.Run("stack/"+name, func(t *testing.T) {
 			t.Parallel()
-			_, err := BuildStackMatchRuleFunction{}.Invoke(context.Background(), req)
+			_, err := BuildStackMatchRuleFunction{}.Invoke(t.Context(), req)
 			assert.ErrorContains(t, err, tc.err)
 		})
 		t.Run("account/"+name, func(t *testing.T) {
 			t.Parallel()
-			_, err := BuildAccountMatchRuleFunction{}.Invoke(context.Background(), req)
+			_, err := BuildAccountMatchRuleFunction{}.Invoke(t.Context(), req)
 			assert.ErrorContains(t, err, tc.err)
 		})
 	}

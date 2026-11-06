@@ -41,7 +41,7 @@ func TestListTeams(t *testing.T) {
 			ResponseCode:      200,
 			ResponseBody:      teams,
 		})
-		teamsList, err := c.ListTeams(ctx, orgName)
+		teamsList, err := c.ListTeams(t.Context(), orgName)
 		assert.NoError(t, err)
 		assert.Equal(t, teams.Teams, teamsList)
 	})
@@ -54,7 +54,7 @@ func TestListTeams(t *testing.T) {
 				Message: unauthorizedError,
 			},
 		})
-		teamsList, err := c.ListTeams(ctx, orgName)
+		teamsList, err := c.ListTeams(t.Context(), orgName)
 		assert.Nil(t, teamsList, "if list teams has error, no teams object should be returned")
 		assert.EqualError(t, err, `failed to list teams for "an-organization": 401 API error: unauthorized`)
 	})
@@ -81,7 +81,7 @@ func TestGetTeam(t *testing.T) {
 			ResponseCode:      200,
 			ResponseBody:      team,
 		})
-		actualTeam, err := c.GetTeam(ctx, orgName, teamName)
+		actualTeam, err := c.GetTeam(t.Context(), orgName, teamName)
 		assert.NoError(t, err)
 		assert.Equal(t, &team, actualTeam)
 	})
@@ -94,7 +94,7 @@ func TestGetTeam(t *testing.T) {
 				Message: unauthorizedError,
 			},
 		})
-		team, err := c.GetTeam(ctx, orgName, teamName)
+		team, err := c.GetTeam(t.Context(), orgName, teamName)
 		assert.Nil(t, team, "team should be nil since error was returned")
 		assert.EqualError(t, err, "failed to get team: 401 API error: unauthorized")
 	})
@@ -109,7 +109,7 @@ func TestGetTeam(t *testing.T) {
 				Message:    notFoundError,
 			},
 		})
-		team, err := c.GetTeam(ctx, orgName, teamName)
+		team, err := c.GetTeam(t.Context(), orgName, teamName)
 		assert.Nil(t, team, "team should be nil since 404 was returned")
 		assert.Nil(t, err, "err should be nil since 404 was returned")
 	})
@@ -140,7 +140,7 @@ func TestCreateTeam(t *testing.T) {
 			ResponseBody: expected,
 			ResponseCode: 201,
 		})
-		actualTeam, err := c.CreateTeam(ctx, orgName, teamName, pulumiTeamType, displayName, description, 0)
+		actualTeam, err := c.CreateTeam(t.Context(), orgName, teamName, pulumiTeamType, displayName, description, 0)
 		assert.NoError(t, err)
 		assert.Equal(t, expected, *actualTeam)
 	})
@@ -162,7 +162,7 @@ func TestCreateTeam(t *testing.T) {
 			ResponseBody: expected,
 			ResponseCode: 201,
 		})
-		actualTeam, err := c.CreateTeam(ctx, orgName, "", githubTeamType, "", "", 1)
+		actualTeam, err := c.CreateTeam(t.Context(), orgName, "", githubTeamType, "", "", 1)
 		assert.NoError(t, err)
 		assert.Equal(t, expected, *actualTeam)
 	})
@@ -182,28 +182,28 @@ func TestCreateTeam(t *testing.T) {
 				Message: unauthorizedError,
 			},
 		})
-		team, err := c.CreateTeam(ctx, orgName, teamName, pulumiTeamType, displayName, description, 0)
+		team, err := c.CreateTeam(t.Context(), orgName, teamName, pulumiTeamType, displayName, description, 0)
 		assert.Nil(t, team, "team should be nil since error was returned")
 		assert.EqualError(t, err, "failed to create team: 401 API error: unauthorized")
 	})
 	t.Run("Error (github team missing ID)", func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{})
-		_, err := c.CreateTeam(ctx, orgName, "", githubTeamType, "", "", 0)
+		_, err := c.CreateTeam(t.Context(), orgName, "", githubTeamType, "", "", 0)
 		assert.EqualError(t, err, "github teams require a githubTeamId")
 	})
 	t.Run("Error (invalid team type)", func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{})
-		_, err := c.CreateTeam(ctx, orgName, "", "foo", "", "", 0)
+		_, err := c.CreateTeam(t.Context(), orgName, "", "foo", "", "", 0)
 		assert.EqualError(t, err, "teamtype must be one of [github pulumi], got \"foo\"")
 	})
 	t.Run("Error (invalid team name for pulumi team)", func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{})
-		_, err := c.CreateTeam(ctx, orgName, "", pulumiTeamType, "", "", 0)
+		_, err := c.CreateTeam(t.Context(), orgName, "", pulumiTeamType, "", "", 0)
 		assert.EqualError(t, err, "teamname must not be empty")
 	})
 	t.Run("Error (missing org name)", func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{})
-		_, err := c.CreateTeam(ctx, "", "", pulumiTeamType, "", "", 0)
+		_, err := c.CreateTeam(t.Context(), "", "", pulumiTeamType, "", "", 0)
 		assert.EqualError(t, err, "orgname must not be empty")
 	})
 }
@@ -222,7 +222,7 @@ func TestAddMemberToTeam(t *testing.T) {
 			},
 			ResponseCode: 204,
 		})
-		assert.NoError(t, c.AddMemberToTeam(ctx, orgName, teamName, userName))
+		assert.NoError(t, c.AddMemberToTeam(t.Context(), orgName, teamName, userName))
 	})
 
 	t.Run("Error", func(t *testing.T) {
@@ -239,7 +239,7 @@ func TestAddMemberToTeam(t *testing.T) {
 			},
 		})
 		assert.EqualError(t,
-			c.AddMemberToTeam(ctx, orgName, teamName, userName),
+			c.AddMemberToTeam(t.Context(), orgName, teamName, userName),
 			"failed to update team membership: 401 API error: unauthorized",
 		)
 	})
@@ -266,7 +266,7 @@ func TestAddStackPermission(t *testing.T) {
 			},
 			ResponseCode: 204,
 		})
-		assert.NoError(t, c.AddStackPermission(ctx, stack, teamName, permission))
+		assert.NoError(t, c.AddStackPermission(t.Context(), stack, teamName, permission))
 	})
 }
 
@@ -289,7 +289,7 @@ func TestRemoveStackPermission(t *testing.T) {
 			},
 			ResponseCode: 204,
 		})
-		assert.NoError(t, c.RemoveStackPermission(ctx, stack, teamName))
+		assert.NoError(t, c.RemoveStackPermission(t.Context(), stack, teamName))
 	})
 }
 
@@ -313,7 +313,7 @@ func TestAddEnvironmentPermission(t *testing.T) {
 			},
 			ResponseCode: 204,
 		})
-		assert.NoError(t, c.AddEnvironmentSettings(ctx, CreateTeamEnvironmentSettingsRequest{
+		assert.NoError(t, c.AddEnvironmentSettings(t.Context(), CreateTeamEnvironmentSettingsRequest{
 			TeamEnvironmentSettingsRequest: TeamEnvironmentSettingsRequest{
 				Organization: organization,
 				Project:      project,
@@ -354,7 +354,7 @@ func TestGetTeamEnvironmentSettings(t *testing.T) {
 			ResponseCode:      200,
 			ResponseBody:      team,
 		})
-		perm, _, err := c.GetTeamEnvironmentSettings(ctx, TeamEnvironmentSettingsRequest{
+		perm, _, err := c.GetTeamEnvironmentSettings(t.Context(), TeamEnvironmentSettingsRequest{
 			Organization: organization,
 			Team:         teamName,
 			Project:      "project-b",
@@ -372,7 +372,7 @@ func TestGetTeamEnvironmentSettings(t *testing.T) {
 			ResponseCode:      200,
 			ResponseBody:      team,
 		})
-		perm, _, err := c.GetTeamEnvironmentSettings(ctx, TeamEnvironmentSettingsRequest{
+		perm, _, err := c.GetTeamEnvironmentSettings(t.Context(), TeamEnvironmentSettingsRequest{
 			Organization: organization,
 			Team:         teamName,
 			Project:      "project-c",
@@ -400,7 +400,7 @@ func TestRemoveEnvironmentPermission(t *testing.T) {
 			},
 			ResponseCode: 204,
 		})
-		assert.NoError(t, c.RemoveEnvironmentSettings(ctx, TeamEnvironmentSettingsRequest{
+		assert.NoError(t, c.RemoveEnvironmentSettings(t.Context(), TeamEnvironmentSettingsRequest{
 			Organization: organization,
 			Team:         teamName,
 			Project:      project,
