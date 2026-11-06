@@ -17,6 +17,9 @@
 # Review the resulting diff: the enums are part of the provider's public
 # interface, so new or removed values are a deliberate change.
 #
+# .github/workflows/pulumiservice-update-rbac-scopes.yml runs this weekly and
+# after go.mod changes, and opens a PR when the enums change.
+#
 # Usage: PULUMI_ACCESS_TOKEN=... [PULUMI_ORG=...] scripts/gen-rbac-scopes.sh [--no-fetch] [--allow-removals]
 
 set -euo pipefail
