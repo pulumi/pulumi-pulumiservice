@@ -6478,7 +6478,7 @@
         },
         "name": {
           "type": "string",
-          "description": "Name of the agent pool."
+          "description": "Name of the agent pool, up to 100 characters. Only letters, digits, hyphens, underscores, spaces and periods are allowed. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). Characters that aren't allowed in the logical name are replaced with hyphens."
         },
         "organizationName": {
           "type": "string",
@@ -6508,7 +6508,7 @@
         },
         "name": {
           "type": "string",
-          "description": "Name of the agent pool."
+          "description": "Name of the agent pool, up to 100 characters. Only letters, digits, hyphens, underscores, spaces and periods are allowed. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). Characters that aren't allowed in the logical name are replaced with hyphens."
         },
         "organizationName": {
           "type": "string",
@@ -6517,8 +6517,7 @@
         }
       },
       "requiredInputs": [
-        "organizationName",
-        "name"
+        "organizationName"
       ]
     },
     "pulumiservice:index:ApprovalRule": {
@@ -6538,7 +6537,7 @@
         },
         "name": {
           "type": "string",
-          "description": "The name of the approval rule.",
+          "description": "The name of the approval rule, up to 255 bytes. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).",
           "replaceOnChanges": true
         },
         "targetActionTypes": {
@@ -6571,7 +6570,7 @@
         },
         "name": {
           "type": "string",
-          "description": "The name of the approval rule.",
+          "description": "The name of the approval rule, up to 255 bytes. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).",
           "replaceOnChanges": true
         },
         "targetActionTypes": {
@@ -6583,7 +6582,6 @@
         }
       },
       "requiredInputs": [
-        "name",
         "enabled",
         "targetActionTypes",
         "environmentIdentifier",
@@ -7166,7 +7164,7 @@
         },
         "name": {
           "type": "string",
-          "description": "Issuer name."
+          "description": "Issuer name, up to 255 characters. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming)."
         },
         "organization": {
           "type": "string",
@@ -7207,7 +7205,7 @@
         },
         "name": {
           "type": "string",
-          "description": "Issuer name."
+          "description": "Issuer name, up to 255 characters. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming)."
         },
         "organization": {
           "type": "string",
@@ -7236,7 +7234,6 @@
       },
       "requiredInputs": [
         "organization",
-        "name",
         "url"
       ]
     },
@@ -7532,7 +7529,7 @@
         },
         "name": {
           "type": "string",
-          "description": "The role's display name. Must be unique within the organization."
+          "description": "The role's display name, up to 100 bytes. Must be unique within the organization. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming)."
         },
         "organizationName": {
           "type": "string",
@@ -7573,7 +7570,7 @@
         },
         "name": {
           "type": "string",
-          "description": "The role's display name. Must be unique within the organization."
+          "description": "The role's display name, up to 100 bytes. Must be unique within the organization. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming)."
         },
         "organizationName": {
           "type": "string",
@@ -7594,7 +7591,6 @@
       },
       "requiredInputs": [
         "organizationName",
-        "name",
         "permissions"
       ]
     },
@@ -7987,7 +7983,7 @@
           "items": {
             "type": "string"
           },
-          "description": "List of Pulumi Cloud usernames of team members."
+          "description": "The Pulumi Cloud usernames of the team's members.\nPulumi Cloud adds the user who creates the team as a member, usually the owner of the access token that runs `pulumi up`.\nList that user here to keep them on the team: otherwise `pulumi refresh` shows them as a change, and the next update to `members` removes them."
         },
         "name": {
           "type": "string",
@@ -8028,7 +8024,7 @@
           "items": {
             "type": "string"
           },
-          "description": "List of Pulumi Cloud usernames of team members."
+          "description": "The Pulumi Cloud usernames of the team's members.\nPulumi Cloud adds the user who creates the team as a member, usually the owner of the access token that runs `pulumi up`.\nList that user here to keep them on the team: otherwise `pulumi refresh` shows them as a change, and the next update to `members` removes them."
         },
         "name": {
           "type": "string",
@@ -8453,7 +8449,7 @@
         },
         "displayName": {
           "type": "string",
-          "description": "The friendly name displayed in the Pulumi Cloud."
+          "description": "The friendly name displayed in the Pulumi Cloud, up to 100 bytes. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming)."
         },
         "environmentName": {
           "type": "string",
@@ -8523,7 +8519,7 @@
         },
         "displayName": {
           "type": "string",
-          "description": "The friendly name displayed in the Pulumi Cloud."
+          "description": "The friendly name displayed in the Pulumi Cloud, up to 100 bytes. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming)."
         },
         "environmentName": {
           "type": "string",
@@ -8576,7 +8572,6 @@
       },
       "requiredInputs": [
         "active",
-        "displayName",
         "payloadUrl",
         "organizationName"
       ]

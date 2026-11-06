@@ -44,7 +44,9 @@ namespace Pulumi.PulumiService
         public Output<double?> GithubTeamId { get; private set; } = null!;
 
         /// <summary>
-        /// List of Pulumi Cloud usernames of team members.
+        /// The Pulumi Cloud usernames of the team's members.
+        /// Pulumi Cloud adds the user who creates the team as a member, usually the owner of the access token that runs `pulumi up`.
+        /// List that user here to keep them on the team: otherwise `pulumi refresh` shows them as a change, and the next update to `members` removes them.
         /// </summary>
         [Output("members")]
         public Output<ImmutableArray<string>> Members { get; private set; } = null!;
@@ -140,7 +142,9 @@ namespace Pulumi.PulumiService
         private InputList<string>? _members;
 
         /// <summary>
-        /// List of Pulumi Cloud usernames of team members.
+        /// The Pulumi Cloud usernames of the team's members.
+        /// Pulumi Cloud adds the user who creates the team as a member, usually the owner of the access token that runs `pulumi up`.
+        /// List that user here to keep them on the team: otherwise `pulumi refresh` shows them as a change, and the next update to `members` removes them.
         /// </summary>
         public InputList<string> Members
         {

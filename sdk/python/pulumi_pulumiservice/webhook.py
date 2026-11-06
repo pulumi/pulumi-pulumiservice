@@ -21,9 +21,9 @@ __all__ = ['WebhookArgs', 'Webhook']
 class WebhookArgs:
     def __init__(__self__, *,
                  active: pulumi.Input[_builtins.bool],
-                 display_name: pulumi.Input[_builtins.str],
                  organization_name: pulumi.Input[_builtins.str],
                  payload_url: pulumi.Input[_builtins.str],
+                 display_name: pulumi.Input[Optional[_builtins.str]] = None,
                  environment_name: pulumi.Input[Optional[_builtins.str]] = None,
                  filters: pulumi.Input[Optional[Sequence[pulumi.Input['WebhookFilters']]]] = None,
                  format: pulumi.Input[Optional['WebhookFormat']] = None,
@@ -35,9 +35,9 @@ class WebhookArgs:
         The set of arguments for constructing a Webhook resource.
 
         :param pulumi.Input[_builtins.bool] active: Indicates whether this webhook is enabled or not.
-        :param pulumi.Input[_builtins.str] display_name: The friendly name displayed in the Pulumi Cloud.
         :param pulumi.Input[_builtins.str] organization_name: Name of the organization.
         :param pulumi.Input[_builtins.str] payload_url: URL to send request to.
+        :param pulumi.Input[_builtins.str] display_name: The friendly name displayed in the Pulumi Cloud, up to 100 bytes. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
         :param pulumi.Input[_builtins.str] environment_name: Name of the environment. Only specified if this is an environment webhook.
         :param pulumi.Input[Sequence[pulumi.Input['WebhookFilters']]] filters: Optional set of filters to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/deployments/concepts/webhooks/#event-filtering) for more information.
         :param pulumi.Input['WebhookFormat'] format: Format of the webhook payload. Can be either `raw`, `slack`, `ms_teams` or `pulumi_deployments`. Defaults to `raw`.
@@ -47,9 +47,10 @@ class WebhookArgs:
         :param pulumi.Input[_builtins.str] stack_name: Name of the stack. Only needed if this is a stack webhook.
         """
         pulumi.set(__self__, "active", active)
-        pulumi.set(__self__, "display_name", display_name)
         pulumi.set(__self__, "organization_name", organization_name)
         pulumi.set(__self__, "payload_url", payload_url)
+        if display_name is not None:
+            pulumi.set(__self__, "display_name", display_name)
         if environment_name is not None:
             pulumi.set(__self__, "environment_name", environment_name)
         if filters is not None:
@@ -80,18 +81,6 @@ class WebhookArgs:
         pulumi.set(self, "active", value)
 
     @_builtins.property
-    @pulumi.getter(name="displayName")
-    def display_name(self) -> pulumi.Input[_builtins.str]:
-        """
-        The friendly name displayed in the Pulumi Cloud.
-        """
-        return pulumi.get(self, "display_name")
-
-    @display_name.setter
-    def display_name(self, value: pulumi.Input[_builtins.str]):
-        pulumi.set(self, "display_name", value)
-
-    @_builtins.property
     @pulumi.getter(name="organizationName")
     def organization_name(self) -> pulumi.Input[_builtins.str]:
         """
@@ -114,6 +103,18 @@ class WebhookArgs:
     @payload_url.setter
     def payload_url(self, value: pulumi.Input[_builtins.str]):
         pulumi.set(self, "payload_url", value)
+
+    @_builtins.property
+    @pulumi.getter(name="displayName")
+    def display_name(self) -> pulumi.Input[Optional[_builtins.str]]:
+        """
+        The friendly name displayed in the Pulumi Cloud, up to 100 bytes. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
+        """
+        return pulumi.get(self, "display_name")
+
+    @display_name.setter
+    def display_name(self, value: pulumi.Input[Optional[_builtins.str]]):
+        pulumi.set(self, "display_name", value)
 
     @_builtins.property
     @pulumi.getter(name="environmentName")
@@ -245,7 +246,7 @@ class Webhook(pulumi.CustomResource):
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.bool] active: Indicates whether this webhook is enabled or not.
-        :param pulumi.Input[_builtins.str] display_name: The friendly name displayed in the Pulumi Cloud.
+        :param pulumi.Input[_builtins.str] display_name: The friendly name displayed in the Pulumi Cloud, up to 100 bytes. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
         :param pulumi.Input[_builtins.str] environment_name: Name of the environment. Only specified if this is an environment webhook.
         :param pulumi.Input[Sequence[pulumi.Input['WebhookFilters']]] filters: Optional set of filters to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/deployments/concepts/webhooks/#event-filtering) for more information.
         :param pulumi.Input['WebhookFormat'] format: Format of the webhook payload. Can be either `raw`, `slack`, `ms_teams` or `pulumi_deployments`. Defaults to `raw`.
@@ -324,8 +325,6 @@ class Webhook(pulumi.CustomResource):
             if active is None and not opts.urn:
                 raise TypeError("Missing required property 'active'")
             __props__.__dict__["active"] = active
-            if display_name is None and not opts.urn:
-                raise TypeError("Missing required property 'display_name'")
             __props__.__dict__["display_name"] = display_name
             __props__.__dict__["environment_name"] = environment_name
             __props__.__dict__["filters"] = filters
@@ -395,7 +394,7 @@ class Webhook(pulumi.CustomResource):
     @pulumi.getter(name="displayName")
     def display_name(self) -> pulumi.Output[_builtins.str]:
         """
-        The friendly name displayed in the Pulumi Cloud.
+        The friendly name displayed in the Pulumi Cloud, up to 100 bytes. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
         """
         return pulumi.get(self, "display_name")
 

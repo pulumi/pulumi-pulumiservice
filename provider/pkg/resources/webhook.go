@@ -346,7 +346,7 @@ type WebhookInput struct {
 
 func (i *WebhookInput) Annotate(a infer.Annotator) {
 	a.Describe(&i.Active, "Indicates whether this webhook is enabled or not.")
-	a.Describe(&i.DisplayName, "The friendly name displayed in the Pulumi Cloud.")
+	a.Describe(&i.DisplayName, "The friendly name displayed in the Pulumi Cloud, up to 100 bytes. "+autoNamedDescription)
 	a.Describe(&i.PayloadURL, "URL to send request to.")
 	a.Describe(
 		&i.Secret,
@@ -374,6 +374,14 @@ func (i *WebhookInput) Annotate(a infer.Annotator) {
 			"(https://www.pulumi.com/docs/deployments/concepts/webhooks/#event-filtering) for more information.",
 	)
 }
+
+func (i *WebhookInput) AutoName(autoname infer.SetAutoName) {
+	autoname(&i.DisplayName, suffixedAutoName(webhookDisplayNameMaxLen, nil))
+}
+
+// webhookDisplayNameMaxLen is the longest display name, in bytes, that Pulumi
+// Cloud accepts for a webhook. The OpenAPI spec doesn't state the limit.
+const webhookDisplayNameMaxLen = 100
 
 type WebhookState struct {
 	WebhookInput

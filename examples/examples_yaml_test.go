@@ -506,7 +506,6 @@ func TestYamlAgentPoolsExample(t *testing.T) {
 		opttest.UseAmbientBackend(),
 		opttest.StackName(randomStackName()),
 	)
-	test.SetConfig(t, "digits", generateRandomFiveDigits())
 	runPulumiTest(t, test)
 }
 
