@@ -49,9 +49,6 @@ func NewPolicyGroup(ctx *pulumi.Context,
 		return nil, errors.New("missing one or more required arguments")
 	}
 
-	if args.Name == nil {
-		return nil, errors.New("invalid value for required argument 'Name'")
-	}
 	if args.OrganizationName == nil {
 		return nil, errors.New("invalid value for required argument 'OrganizationName'")
 	}
@@ -100,8 +97,8 @@ type policyGroupArgs struct {
 	EntityType *string `pulumi:"entityType"`
 	// The mode for the policy group. Valid values are 'audit' (reports violations) or 'preventative' (blocks operations). Defaults to 'audit'.
 	Mode *string `pulumi:"mode"`
-	// The name of the policy group.
-	Name string `pulumi:"name"`
+	// The name of the policy group, up to 100 characters. Only letters, digits, hyphens, underscores, spaces and periods are allowed, and the name can't begin or end with a space. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). Characters that aren't allowed in the logical name are replaced with hyphens.
+	Name *string `pulumi:"name"`
 	// The name of the Pulumi organization the policy group belongs to.
 	OrganizationName string `pulumi:"organizationName"`
 	// List of policy packs applied to this policy group.
@@ -118,8 +115,8 @@ type PolicyGroupArgs struct {
 	EntityType pulumi.StringPtrInput
 	// The mode for the policy group. Valid values are 'audit' (reports violations) or 'preventative' (blocks operations). Defaults to 'audit'.
 	Mode pulumi.StringPtrInput
-	// The name of the policy group.
-	Name pulumi.StringInput
+	// The name of the policy group, up to 100 characters. Only letters, digits, hyphens, underscores, spaces and periods are allowed, and the name can't begin or end with a space. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). Characters that aren't allowed in the logical name are replaced with hyphens.
+	Name pulumi.StringPtrInput
 	// The name of the Pulumi organization the policy group belongs to.
 	OrganizationName pulumi.StringInput
 	// List of policy packs applied to this policy group.

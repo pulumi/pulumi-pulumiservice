@@ -42,6 +42,7 @@ func TestAutoName(t *testing.T) {
 			infer.Resource(&ApprovalRule{}),
 			infer.Resource(&OidcIssuer{}),
 			infer.Resource(&OrganizationRole{}),
+			infer.Resource(&PolicyGroup{}),
 		).
 		WithModuleMap(map[tokens.ModuleName]tokens.ModuleName{"resources": "index"}).
 		Build()
@@ -117,6 +118,12 @@ func TestAutoName(t *testing.T) {
 					"permissions": property.New(property.NewArray([]property.Value{str("stack:read")})),
 				})),
 			},
+		},
+		{
+			token:  "pulumiservice:index:PolicyGroup",
+			field:  gcName,
+			maxLen: policyGroupNameMaxLen,
+			inputs: map[string]property.Value{gcOrganizationName: str(gcMyOrg)},
 		},
 	} {
 		t.Run(string(tc.token), func(t *testing.T) {
@@ -215,5 +222,10 @@ func TestSuffixedAutoName(t *testing.T) {
 	t.Run("agent pool names replace disallowed characters with hyphens", func(t *testing.T) {
 		name := generate(t, suffixedAutoName(agentPoolNameMaxLen, agentPoolNameRune), "my/pool:é v1.2_x")
 		assert.Regexp(t, `^my-pool-- v1\.2_x-[0-9a-f]{8}$`, name)
+	})
+
+	t.Run("policy group names replace disallowed characters and drop leading spaces", func(t *testing.T) {
+		name := generate(t, policyGroupAutoName(), " my/group:é v1.2_x")
+		assert.Regexp(t, `^my-group-- v1\.2_x-[0-9a-f]{8}$`, name)
 	})
 }
