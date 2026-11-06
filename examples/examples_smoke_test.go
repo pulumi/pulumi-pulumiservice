@@ -5,7 +5,6 @@
 package examples
 
 import (
-	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -17,27 +16,24 @@ import (
 // runSmokeTest runs one of the <lang>-smoke programs. Each creates an
 // environment from a string asset, an org access token whose value is a secret
 // output, and reads the environment back with the getEnvironment invoke: the
-// shapes that each language SDK handles in its own code. prepare, if not nil,
-// runs after the program is copied and installed and before `pulumi up`.
-func runSmokeTest(
+// shapes that each language SDK handles in its own code.
+func runSmokeTest(t *testing.T, lang string, opts ...opttest.Option) {
+	runSmokeTestAfterInstall(t, lang, nil, opts...)
+}
+
+// runSmokeTestAfterInstall is runSmokeTest with a hook that runs after the
+// program is copied and installed and before `pulumi up`.
+func runSmokeTestAfterInstall(
 	t *testing.T,
 	lang string,
-	prepare func(t *testing.T, test *pulumitest.PulumiTest),
+	afterInstall func(t *testing.T, test *pulumitest.PulumiTest),
 	opts ...opttest.Option,
 ) {
 	digits := generateRandomFiveDigits()
-	test := pulumitest.NewPulumiTest(t,
-		filepath.Join(getCwd(t), lang+"-smoke"),
-		append([]opttest.Option{
-			inMemoryProvider(),
-			opttest.UseAmbientBackend(),
-			opttest.StackName(randomStackName()),
-		}, opts...)...,
-	)
-	test.SetConfig(t, "organizationName", getOrgName())
-	test.SetConfig(t, "digits", digits)
-	if prepare != nil {
-		prepare(t, test)
+	test := newExampleTest(t, lang+"-smoke", opts...)
+	setConfig(t, test, map[string]string{"organizationName": getOrgName(), "digits": digits})
+	if afterInstall != nil {
+		afterInstall(t, test)
 	}
 
 	up := runPulumiTest(t, test)

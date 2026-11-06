@@ -90,12 +90,7 @@ func TestYamlTeamsExample(t *testing.T) {
 		pulumiBot := "pulumi-bot"
 		providerUser := "service-provider-example-user"
 
-		test := pulumitest.NewPulumiTest(t,
-			writeTeamProgram([]string{pulumiBot, "not-found-user"}),
-			inMemoryProvider(),
-			opttest.UseAmbientBackend(),
-			opttest.StackName(randomStackName()),
-		)
+		test := newPulumiTest(t, writeTeamProgram([]string{pulumiBot, "not-found-user"}))
 		_, err := test.UpErr(t)
 		require.Error(t, err, "the first update should fail on the unknown member")
 		assert.Contains(t, err.Error(), "User 'not-found-user' not found")
@@ -108,12 +103,7 @@ func TestYamlTeamsExample(t *testing.T) {
 	})
 
 	t.Run("Yaml Teams Example", func(t *testing.T) {
-		test := pulumitest.NewPulumiTest(t,
-			filepath.Join(getCwd(t), "yaml-teams"),
-			inMemoryProvider(),
-			opttest.UseAmbientBackend(),
-			opttest.StackName(randomStackName()),
-		)
+		test := newExampleTest(t, "yaml-teams")
 		runPulumiTest(t, test)
 	})
 
@@ -124,16 +114,11 @@ func TestYamlStackTagsExample(t *testing.T) {
 	// yaml-stack-tags-example applies tags to it's own stack. To do this, we need to
 	// first create an empty stack, then add the stack tag.
 
-	test := pulumitest.NewPulumiTest(t,
-		writePulumiYaml(t, YamlProgram{
-			Name:        "yaml-stack-tags-example",
-			Runtime:     "yaml",
-			Description: "A minimal Pulumi YAML program",
-		}),
-		inMemoryProvider(),
-		opttest.UseAmbientBackend(),
-		opttest.StackName(randomStackName()),
-	)
+	test := newPulumiTest(t, writePulumiYaml(t, YamlProgram{
+		Name:        "yaml-stack-tags-example",
+		Runtime:     "yaml",
+		Description: "A minimal Pulumi YAML program",
+	}))
 	test.SetConfig(t, "organizationName", getOrgName())
 	test.Up(t)
 
@@ -146,16 +131,11 @@ func TestYamlStackTagsPluralExample(t *testing.T) {
 	// yaml-stack-tags-plural-example applies multiple tags to it's own stack using the StackTags resource.
 	// To do this, we need to first create an empty stack, then add the tags.
 
-	test := pulumitest.NewPulumiTest(t,
-		writePulumiYaml(t, YamlProgram{
-			Name:        "yaml-stack-tags-plural-example",
-			Runtime:     "yaml",
-			Description: "Example using StackTags resource to manage multiple tags at once",
-		}),
-		inMemoryProvider(),
-		opttest.UseAmbientBackend(),
-		opttest.StackName(randomStackName()),
-	)
+	test := newPulumiTest(t, writePulumiYaml(t, YamlProgram{
+		Name:        "yaml-stack-tags-plural-example",
+		Runtime:     "yaml",
+		Description: "Example using StackTags resource to manage multiple tags at once",
+	}))
 	test.SetConfig(t, "organization", getOrgName())
 	test.Up(t)
 
@@ -164,89 +144,54 @@ func TestYamlStackTagsPluralExample(t *testing.T) {
 }
 
 func TestYamlDeploymentSettingsExample(t *testing.T) {
-	// The program names its own stack, so the settings must belong to a stack
-	// with that name.
-	digits := generateRandomFiveDigits()
-	test := pulumitest.NewPulumiTest(t,
-		filepath.Join(getCwd(t), "yaml-deployment-settings"),
-		inMemoryProvider(),
-		opttest.UseAmbientBackend(),
-		opttest.StackName("test-stack-"+digits),
-	)
-	test.SetConfig(t, "digits", digits)
-	test.SetConfig(t, "organizationName", getOrgName())
+	test := newDeploymentSettingsTest(t, "yaml-deployment-settings")
 	test.SetConfig(t, "imageUsername", "registry-user")
 	setSecretConfig(t, test, "imagePassword", "registry-password")
-	test.Up(t)
-
-	// Remove the settings from the program, then check that deleting them
-	// leaves nothing to change.
-	test.WritePulumiYaml(t, yamlProgramSource(t, YamlProgram{
-		Name:        "yaml-deployment-settings-example",
-		Runtime:     "yaml",
-		Description: "Deployment settings test",
-	}))
-	test.Up(t)
-	assertpreview.HasNoChanges(t, test.Preview(t))
+	runDeploymentSettingsTest(t, test)
 }
 
 func TestYamlDeploymentSettingsNoSourceExample(t *testing.T) {
-	// The program names its own stack, so the settings must belong to a stack
-	// with that name.
-	digits := generateRandomFiveDigits()
-	test := pulumitest.NewPulumiTest(t,
-		filepath.Join(getCwd(t), "yaml-deployment-settings-no-source"),
-		inMemoryProvider(),
-		opttest.UseAmbientBackend(),
-		opttest.StackName("test-stack-"+digits),
-	)
-	test.SetConfig(t, "digits", digits)
-	test.SetConfig(t, "organizationName", getOrgName())
-	test.Up(t)
-
-	// Remove the settings from the program, then check that deleting them
-	// leaves nothing to change.
-	test.WritePulumiYaml(t, yamlProgramSource(t, YamlProgram{
-		Name:    "yaml-deployment-settings-example",
-		Runtime: "yaml",
-	}))
-	test.Up(t)
-	assertpreview.HasNoChanges(t, test.Preview(t))
+	runDeploymentSettingsTest(t, newDeploymentSettingsTest(t, "yaml-deployment-settings-no-source"))
 }
 
 func TestYamlDeploymentSettingsCommitExample(t *testing.T) {
-	// The program names its own stack, so the settings must belong to a stack
-	// with that name.
+	runDeploymentSettingsTest(t, newDeploymentSettingsTest(t, "yaml-deployment-settings-commit"))
+}
+
+// newDeploymentSettingsTest sets up a deployment-settings example. The example
+// names its own stack after the digits it is given, so the settings belong to
+// the test's stack only if the stack has that name.
+func newDeploymentSettingsTest(t *testing.T, dir string) *pulumitest.PulumiTest {
 	digits := generateRandomFiveDigits()
-	test := pulumitest.NewPulumiTest(t,
-		filepath.Join(getCwd(t), "yaml-deployment-settings-commit"),
-		inMemoryProvider(),
-		opttest.UseAmbientBackend(),
-		opttest.StackName("test-stack-"+digits),
-	)
-	test.SetConfig(t, "digits", digits)
-	test.SetConfig(t, "organizationName", getOrgName())
+	test := newExampleTest(t, dir, stackNamedByDigits(digits))
+	setConfig(t, test, map[string]string{"digits": digits, "organizationName": getOrgName()})
+	return test
+}
+
+// runDeploymentSettingsTest ups the example, then replaces the program with an
+// empty one and checks that deleting the settings leaves nothing to change. The
+// empty program takes the example's project name, because under any other name
+// the second `up` would target a different stack and delete nothing.
+func runDeploymentSettingsTest(t *testing.T, test *pulumitest.PulumiTest) {
 	test.Up(t)
 
-	// Remove the settings from the program, then check that deleting them
-	// leaves nothing to change.
 	test.WritePulumiYaml(t, yamlProgramSource(t, YamlProgram{
-		Name:    "yaml-deployment-settings-commit-example",
+		Name:    projectName(t, test.WorkingDir()),
 		Runtime: "yaml",
 	}))
 	test.Up(t)
 	assertpreview.HasNoChanges(t, test.Preview(t))
 }
 
+// stackNamedByDigits names the stack the way examples that refer to their own
+// stack expect: test-stack-<digits>.
+func stackNamedByDigits(digits string) opttest.Option {
+	return opttest.StackName("test-stack-" + digits)
+}
+
 func TestYamlDeploymentSettingsOidcAuthExample(t *testing.T) {
-	test := pulumitest.NewPulumiTest(t,
-		filepath.Join(getCwd(t), "yaml-deployment-settings-oidc-auth"),
-		inMemoryProvider(),
-		opttest.UseAmbientBackend(),
-		opttest.StackName(randomStackName()),
-	)
-	test.SetConfig(t, "digits", generateRandomFiveDigits())
-	test.SetConfig(t, "organizationName", getOrgName())
+	test := newExampleTest(t, "yaml-deployment-settings-oidc-auth")
+	setConfig(t, test, map[string]string{"digits": generateRandomFiveDigits(), "organizationName": getOrgName()})
 	setSecretConfig(t, test, "sshPassword", "my_password")
 	setSecretConfig(t, test, "secretEnvVar", "my_secret_value")
 
@@ -281,8 +226,7 @@ func TestYamlDeploymentSettingsUpgrade(t *testing.T) {
 		t.Run(dir, func(t *testing.T) {
 			digits := generateRandomFiveDigits()
 			configure := func(test *pulumitest.PulumiTest) {
-				test.SetConfig(t, "organizationName", getOrgName())
-				test.SetConfig(t, "digits", digits)
+				setConfig(t, test, map[string]string{"organizationName": getOrgName(), "digits": digits})
 				configureExample(test.Context(), t, test.CurrentStack())
 			}
 
@@ -291,17 +235,13 @@ func TestYamlDeploymentSettingsUpgrade(t *testing.T) {
 			baseline := pulumitest.NewPulumiTest(t, filepath.Join(getCwd(t), dir),
 				opttest.DownloadProviderVersion("pulumiservice", deploymentSettingsBaselineVersion),
 				opttest.UseAmbientBackend(),
-				opttest.StackName("test-stack-"+digits),
+				stackNamedByDigits(digits),
 			)
 			configure(baseline)
 			baseline.Up(t)
 			state := baseline.ExportStack(t)
 
-			current := pulumitest.NewPulumiTest(t, filepath.Join(getCwd(t), dir),
-				inMemoryProvider(),
-				opttest.UseAmbientBackend(),
-				opttest.StackName(randomStackName()),
-			)
+			current := newExampleTest(t, dir)
 			configure(current)
 			// Retarget the state at the current stack: its URNs, and the root
 			// stack resource's name, which ends in the stack name. The settings'
@@ -327,12 +267,7 @@ func TestYamlDeploymentSettingsUpgrade(t *testing.T) {
 }
 
 func TestYamlAccessTokenExample(t *testing.T) {
-	test := pulumitest.NewPulumiTest(t,
-		filepath.Join(getCwd(t), "yaml-access-tokens"),
-		inMemoryProvider(),
-		opttest.UseAmbientBackend(),
-		opttest.StackName(randomStackName()),
-	)
+	test := newExampleTest(t, "yaml-access-tokens")
 	// Use a full date-time, not a bare date, so the test covers the time
 	// component surviving the round trip through the API.
 	expires := time.Now().UTC().AddDate(0, 0, 30).Truncate(time.Hour)
@@ -362,22 +297,12 @@ func TestYamlAccessTokenExample(t *testing.T) {
 }
 
 func TestYamlTeamAccessTokenExample(t *testing.T) {
-	test := pulumitest.NewPulumiTest(t,
-		filepath.Join(getCwd(t), "yaml-team-token"),
-		inMemoryProvider(),
-		opttest.UseAmbientBackend(),
-		opttest.StackName(randomStackName()),
-	)
+	test := newExampleTest(t, "yaml-team-token")
 	runPulumiTest(t, test)
 }
 
 func TestYamlOrgAccessTokenExample(t *testing.T) {
-	test := pulumitest.NewPulumiTest(t,
-		filepath.Join(getCwd(t), "yaml-org-token"),
-		inMemoryProvider(),
-		opttest.UseAmbientBackend(),
-		opttest.StackName(randomStackName()),
-	)
+	test := newExampleTest(t, "yaml-org-token")
 	test.SetConfig(t, "organizationName", getOrgName())
 	// Use a full date-time, not a bare date, so the test covers the time
 	// component surviving the round trip through the API.
@@ -386,25 +311,14 @@ func TestYamlOrgAccessTokenExample(t *testing.T) {
 }
 
 func TestYamlTeamStackPermissionsExample(t *testing.T) {
-	test := pulumitest.NewPulumiTest(t,
-		filepath.Join(getCwd(t), "yaml-team-stack-permissions"),
-		inMemoryProvider(),
-		opttest.UseAmbientBackend(),
-		opttest.StackName(randomStackName()),
-	)
+	test := newExampleTest(t, "yaml-team-stack-permissions")
 	test.SetConfig(t, "organizationName", getOrgName())
 	runPulumiTest(t, test)
 }
 
 func TestYamlWebhookExample(t *testing.T) {
-	test := pulumitest.NewPulumiTest(t,
-		filepath.Join(getCwd(t), "yaml-webhooks"),
-		inMemoryProvider(),
-		opttest.UseAmbientBackend(),
-		opttest.StackName(randomStackName()),
-	)
-	test.SetConfig(t, "digits", generateRandomFiveDigits())
-	test.SetConfig(t, "organizationName", getOrgName())
+	test := newExampleTest(t, "yaml-webhooks")
+	setConfig(t, test, map[string]string{"digits": generateRandomFiveDigits(), "organizationName": getOrgName()})
 	runPulumiTest(t, test)
 }
 
@@ -414,12 +328,7 @@ func TestYamlSchedulesExample(t *testing.T) {
 		// The program names its own stack, so the schedules must belong to a
 		// stack with that name.
 		digits := generateRandomFiveDigits()
-		test := pulumitest.NewPulumiTest(t,
-			filepath.Join(getCwd(t), "yaml-schedules"),
-			inMemoryProvider(),
-			opttest.UseAmbientBackend(),
-			opttest.StackName("test-stack-"+digits),
-		)
+		test := newExampleTest(t, "yaml-schedules", stackNamedByDigits(digits))
 		test.SetConfig(t, "digits", digits)
 		runPulumiTest(t, test)
 	})
@@ -470,12 +379,7 @@ func TestYamlSchedulesExample(t *testing.T) {
 		}
 
 		// create some initial one-time schedules
-		test := pulumitest.NewPulumiTest(t,
-			writeScheduleProgram(time.Now().Add(1*time.Hour)),
-			inMemoryProvider(),
-			opttest.UseAmbientBackend(),
-			opttest.StackName(randomStackName()),
-		)
+		test := newPulumiTest(t, writeScheduleProgram(time.Now().Add(1*time.Hour)))
 		test.Up(t)
 
 		// and then reschedule them
@@ -488,63 +392,36 @@ func TestYamlSchedulesExample(t *testing.T) {
 }
 
 func TestYamlEnvironmentsExample(t *testing.T) {
-	test := pulumitest.NewPulumiTest(t,
-		filepath.Join(getCwd(t), "yaml-environments"),
-		inMemoryProvider(),
-		opttest.UseAmbientBackend(),
-		opttest.StackName(randomStackName()),
-	)
-	test.SetConfig(t, "digits", generateRandomFiveDigits())
-	test.SetConfig(t, "organizationName", getOrgName())
+	test := newExampleTest(t, "yaml-environments")
+	setConfig(t, test, map[string]string{"digits": generateRandomFiveDigits(), "organizationName": getOrgName()})
 	runPulumiTest(t, test)
 }
 
 func TestYamlAgentPoolsExample(t *testing.T) {
-	test := pulumitest.NewPulumiTest(t,
-		filepath.Join(getCwd(t), "yaml-agent-pools"),
-		inMemoryProvider(),
-		opttest.UseAmbientBackend(),
-		opttest.StackName(randomStackName()),
-	)
+	test := newExampleTest(t, "yaml-agent-pools")
 	runPulumiTest(t, test)
 }
 
 func TestYamlTemplateSourcesExample(t *testing.T) {
 	skipUnlessSerializedTests(t)
-	test := pulumitest.NewPulumiTest(t,
-		filepath.Join(getCwd(t), "yaml-template-sources"),
-		inMemoryProvider(),
-		opttest.UseAmbientBackend(),
-		opttest.StackName(randomStackName()),
-	)
-	test.SetConfig(t, "digits", generateRandomFiveDigits())
-	test.SetConfig(t, "organizationName", getOrgName())
-	test.SetConfig(t, "sourceURL", randomTemplateSourceURL())
+	test := newExampleTest(t, "yaml-template-sources")
+	setConfig(t, test, map[string]string{
+		"digits":           generateRandomFiveDigits(),
+		"organizationName": getOrgName(),
+		"sourceURL":        randomTemplateSourceURL(),
+	})
 	runPulumiTest(t, test)
 }
 
 func TestYamlOidcIssuerExample(t *testing.T) {
-	test := pulumitest.NewPulumiTest(t,
-		filepath.Join(getCwd(t), "yaml-oidc-issuer"),
-		inMemoryProvider(),
-		opttest.UseAmbientBackend(),
-		opttest.StackName(randomStackName()),
-	)
-	for k, v := range oidcIssuerTestConfig() {
-		test.SetConfig(t, k, v)
-	}
+	test := newExampleTest(t, "yaml-oidc-issuer")
+	setConfig(t, test, oidcIssuerTestConfig())
 	runPulumiTest(t, test)
 }
 
 func TestYamlPolicyGroupsExample(t *testing.T) {
-	test := pulumitest.NewPulumiTest(t,
-		filepath.Join(getCwd(t), "yaml-policy-groups"),
-		inMemoryProvider(),
-		opttest.UseAmbientBackend(),
-		opttest.StackName(randomStackName()),
-	)
-	test.SetConfig(t, "digits", generateRandomFiveDigits())
-	test.SetConfig(t, "organizationName", getOrgName())
+	test := newExampleTest(t, "yaml-policy-groups")
+	setConfig(t, test, map[string]string{"digits": generateRandomFiveDigits(), "organizationName": getOrgName()})
 	up := runPulumiTest(t, test)
 
 	// getPolicyPacks joins the org policy pack list against the registry
@@ -588,15 +465,12 @@ func TestYamlPolicyGroupsExample(t *testing.T) {
 }
 
 func TestYamlPolicyPackExample(t *testing.T) {
-	test := pulumitest.NewPulumiTest(t,
-		filepath.Join(getCwd(t), "yaml-policy-pack"),
-		inMemoryProvider(),
-		opttest.UseAmbientBackend(),
-		opttest.StackName(randomStackName()),
-	)
-	test.SetConfig(t, "digits", generateRandomFiveDigits())
-	test.SetConfig(t, "packName", uniquePolicyPackName())
-	test.SetConfig(t, "organizationName", getOrgName())
+	test := newExampleTest(t, "yaml-policy-pack")
+	setConfig(t, test, map[string]string{
+		"digits":           generateRandomFiveDigits(),
+		"packName":         uniquePolicyPackName(),
+		"organizationName": getOrgName(),
+	})
 	up := runPulumiTest(t, test)
 
 	// getPolicyPack reads the pack back from the real service, both by tag and
@@ -610,15 +484,12 @@ func TestYamlPolicyPackExample(t *testing.T) {
 func TestYamlPolicyPackIntrospectExample(t *testing.T) {
 	exampleDir := filepath.Join(getCwd(t), "yaml-policy-pack-introspect")
 	yarnInstall(t, filepath.Join(exampleDir, "policy-pack"))
-	test := pulumitest.NewPulumiTest(t,
-		exampleDir,
-		inMemoryProvider(),
-		opttest.UseAmbientBackend(),
-		opttest.StackName(randomStackName()),
-	)
-	test.SetConfig(t, "digits", generateRandomFiveDigits())
-	test.SetConfig(t, "packName", uniquePolicyPackName())
-	test.SetConfig(t, "organizationName", getOrgName())
+	test := newPulumiTest(t, exampleDir)
+	setConfig(t, test, map[string]string{
+		"digits":           generateRandomFiveDigits(),
+		"packName":         uniquePolicyPackName(),
+		"organizationName": getOrgName(),
+	})
 	up := runPulumiTest(t, test)
 
 	assert.Len(t, up.Outputs["packByTagPolicies"].Value, 2,
@@ -626,27 +497,18 @@ func TestYamlPolicyPackIntrospectExample(t *testing.T) {
 }
 
 func TestYamlPolicyGroupsAccountsExample(t *testing.T) {
-	test := pulumitest.NewPulumiTest(t,
-		filepath.Join(getCwd(t), "yaml-policy-groups-accounts"),
-		inMemoryProvider(),
-		opttest.UseAmbientBackend(),
-		opttest.StackName(randomStackName()),
-	)
-	test.SetConfig(t, "digits", generateRandomFiveDigits())
-	test.SetConfig(t, "organizationName", getOrgName())
-	test.SetConfig(t, "roleArn", getInsightsRoleArn(t))
+	test := newExampleTest(t, "yaml-policy-groups-accounts")
+	setConfig(t, test, map[string]string{
+		"digits":           generateRandomFiveDigits(),
+		"organizationName": getOrgName(),
+		"roleArn":          getInsightsRoleArn(t),
+	})
 	runPulumiTest(t, test)
 }
 
 func TestYamlPolicyGroupMatchRulesExample(t *testing.T) {
-	test := pulumitest.NewPulumiTest(t,
-		filepath.Join(getCwd(t), "yaml-policy-group-match-rules"),
-		inMemoryProvider(),
-		opttest.UseAmbientBackend(),
-		opttest.StackName(randomStackName()),
-	)
-	test.SetConfig(t, "organizationName", getOrgName())
-	test.SetConfig(t, "digits", generateRandomFiveDigits())
+	test := newExampleTest(t, "yaml-policy-group-match-rules")
+	setConfig(t, test, map[string]string{"organizationName": getOrgName(), "digits": generateRandomFiveDigits()})
 	up := runPulumiTest(t, test)
 
 	stackTag := func(key string) string {
@@ -691,40 +553,25 @@ func TestYamlPolicyGroupMatchRulesExample(t *testing.T) {
 }
 
 func TestYamlApprovalRuleExample(t *testing.T) {
-	test := pulumitest.NewPulumiTest(t,
-		filepath.Join(getCwd(t), "yaml-approval-rules"),
-		inMemoryProvider(),
-		opttest.UseAmbientBackend(),
-		opttest.StackName(randomStackName()),
-	)
-	test.SetConfig(t, "organizationName", getOrgName())
-	test.SetConfig(t, "digits", generateRandomFiveDigits())
+	test := newExampleTest(t, "yaml-approval-rules")
+	setConfig(t, test, map[string]string{"organizationName": getOrgName(), "digits": generateRandomFiveDigits()})
 	runPulumiTest(t, test)
 }
 
 func TestYamlStackExample(t *testing.T) {
-	test := pulumitest.NewPulumiTest(t,
-		filepath.Join(getCwd(t), "yaml-stack"),
-		inMemoryProvider(),
-		opttest.UseAmbientBackend(),
-		opttest.StackName(randomStackName()),
-	)
-	test.SetConfig(t, "organizationName", getOrgName())
-	test.SetConfig(t, "digits", generateRandomFiveDigits())
+	test := newExampleTest(t, "yaml-stack")
+	setConfig(t, test, map[string]string{"organizationName": getOrgName(), "digits": generateRandomFiveDigits()})
 	runPulumiTest(t, test)
 }
 
 func TestYamlInsightsAccountExample(t *testing.T) {
-	test := pulumitest.NewPulumiTest(t,
-		filepath.Join(getCwd(t), "yaml-insights-account"),
-		inMemoryProvider(),
-		opttest.UseAmbientBackend(),
-		opttest.StackName(randomStackName()),
-	)
+	test := newExampleTest(t, "yaml-insights-account")
 	digits := generateRandomFiveDigits()
-	test.SetConfig(t, "digits", digits)
-	test.SetConfig(t, "organizationName", getOrgName())
-	test.SetConfig(t, "roleArn", getInsightsRoleArn(t))
+	setConfig(t, test, map[string]string{
+		"digits":           digits,
+		"organizationName": getOrgName(),
+		"roleArn":          getInsightsRoleArn(t),
+	})
 	up := runPulumiTest(t, test)
 
 	accountName := "test-insights-account-" + digits
@@ -771,15 +618,12 @@ func TestYamlRbacExample(t *testing.T) {
 	// still gets the org back to a known state.
 	t.Cleanup(snapshotFixtureOrgMember(t, orgName, fixtureUser))
 
-	test := pulumitest.NewPulumiTest(t,
-		filepath.Join(getCwd(t), "yaml-rbac"),
-		inMemoryProvider(),
-		opttest.UseAmbientBackend(),
-		opttest.StackName(randomStackName()),
-	)
-	test.SetConfig(t, "digits", generateRandomFiveDigits())
-	test.SetConfig(t, "organizationName", orgName)
-	test.SetConfig(t, "adoptedUsername", fixtureUser)
+	test := newExampleTest(t, "yaml-rbac")
+	setConfig(t, test, map[string]string{
+		"digits":           generateRandomFiveDigits(),
+		"organizationName": orgName,
+		"adoptedUsername":  fixtureUser,
+	})
 
 	up := test.Up(t)
 	// Sanity-check adoption: OrganizationMember should have hit the 409
@@ -819,14 +663,8 @@ func TestYamlRbacExample(t *testing.T) {
 	test.Destroy(t)
 
 	t.Run("built-in member role", func(t *testing.T) {
-		test := pulumitest.NewPulumiTest(t,
-			filepath.Join(getCwd(t), "yaml-rbac-member-role"),
-			inMemoryProvider(),
-			opttest.UseAmbientBackend(),
-			opttest.StackName(randomStackName()),
-		)
-		test.SetConfig(t, "organizationName", orgName)
-		test.SetConfig(t, "adoptedUsername", fixtureUser)
+		test := newExampleTest(t, "yaml-rbac-member-role")
+		setConfig(t, test, map[string]string{"organizationName": orgName, "adoptedUsername": fixtureUser})
 		up := runPulumiTest(t, test)
 
 		assert.Equal(t, true, up.Outputs["memberAdopted"].Value,
@@ -841,14 +679,8 @@ func TestYamlRbacExample(t *testing.T) {
 // RBAC helper functions.
 // Requires the Custom Roles feature on the test organization.
 func TestYamlOrganizationRoleExample(t *testing.T) {
-	test := pulumitest.NewPulumiTest(t,
-		filepath.Join(getCwd(t), "yaml-organization-role"),
-		inMemoryProvider(),
-		opttest.UseAmbientBackend(),
-		opttest.StackName(randomStackName()),
-	)
-	test.SetConfig(t, "digits", generateRandomFiveDigits())
-	test.SetConfig(t, "organizationName", getOrgName())
+	test := newExampleTest(t, "yaml-organization-role")
+	setConfig(t, test, map[string]string{"digits": generateRandomFiveDigits(), "organizationName": getOrgName()})
 
 	up := test.Up(t)
 	assert.NotEmpty(t, up.Outputs["platformRoleId"].Value)
@@ -1040,6 +872,18 @@ func writePulumiYaml(t *testing.T, yamlContents interface{}) string {
 		t.Fatal(err)
 	}
 	return tmpdir
+}
+
+// projectName returns the project name in dir's Pulumi.yaml.
+func projectName(t *testing.T, dir string) string {
+	b, err := os.ReadFile(filepath.Join(dir, "Pulumi.yaml"))
+	require.NoError(t, err)
+	var project struct {
+		Name string `yaml:"name"`
+	}
+	require.NoError(t, yaml.Unmarshal(b, &project))
+	require.NotEmpty(t, project.Name, "%s/Pulumi.yaml has no name", dir)
+	return project.Name
 }
 
 func yamlProgramSource(t *testing.T, yamlContents interface{}) string {

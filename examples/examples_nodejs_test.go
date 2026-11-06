@@ -10,5 +10,5 @@ import (
 )
 
 func TestNodejsSmokeExample(t *testing.T) {
-	runSmokeTest(t, "ts", nil, opttest.YarnLink("@pulumi/pulumiservice"))
+	runSmokeTest(t, "ts", opttest.YarnLink("@pulumi/pulumiservice"))
 }

@@ -13,9 +13,9 @@ import (
 
 func TestPythonSmokeExample(t *testing.T) {
 	// opttest.PythonLink installs into the system interpreter, not the
-	// program's virtualenv, so install the local SDK into the virtualenv that
-	// `pulumi install` created.
-	runSmokeTest(t, "py", func(t *testing.T, test *pulumitest.PulumiTest) {
+	// program's virtualenv (https://github.com/pulumi/providertest/issues/184),
+	// so install the local SDK into the virtualenv that `pulumi install` created.
+	runSmokeTestAfterInstall(t, "py", func(t *testing.T, test *pulumitest.PulumiTest) {
 		sdk := filepath.Join(getCwd(t), "..", "sdk", "python", "bin")
 		python := filepath.Join(test.WorkingDir(), "venv", "bin", "python")
 		cmd := exec.Command(python, "-m", "pip", "install", "-e", sdk)

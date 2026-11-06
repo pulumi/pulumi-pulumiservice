@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -45,6 +46,28 @@ func inMemoryProvider() opttest.Option {
 		return psp.MakeProvider(nil, "pulumiservice", "1.0.0")
 	}
 	return opttest.AttachProviderServer("pulumiservice", provider)
+}
+
+// newPulumiTest runs the program in source against the in-memory provider on a
+// fresh, randomly named stack in the ambient backend.
+func newPulumiTest(t *testing.T, source string, opts ...opttest.Option) *pulumitest.PulumiTest {
+	return pulumitest.NewPulumiTest(t, source, append([]opttest.Option{
+		inMemoryProvider(),
+		opttest.UseAmbientBackend(),
+		opttest.StackName(randomStackName()),
+	}, opts...)...)
+}
+
+// newExampleTest is newPulumiTest for the example in dir under examples/.
+func newExampleTest(t *testing.T, dir string, opts ...opttest.Option) *pulumitest.PulumiTest {
+	return newPulumiTest(t, filepath.Join(getCwd(t), dir), opts...)
+}
+
+// setConfig sets each key in config to its value on the test's stack.
+func setConfig(t *testing.T, test *pulumitest.PulumiTest, config map[string]string) {
+	for k, v := range config {
+		test.SetConfig(t, k, v)
+	}
 }
 
 // yarnInstall runs `yarn install` in dir. The PolicyPack provider boots the

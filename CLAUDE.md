@@ -94,15 +94,10 @@ cd examples && go test -v -run TestYamlStackTagsPluralExample -tags yaml -timeou
 **Integration Test Framework**:
 - Integration tests use `pulumitest` from `github.com/pulumi/providertest/pulumitest`
 - See `examples/examples_yaml_test.go` for examples of `pulumitest` tests
-- Common pattern for `pulumitest` tests:
+- Common pattern for `pulumitest` tests. `newExampleTest` (in `examples/main_test.go`) runs the example against the in-memory provider on a randomly named stack; `newPulumiTest` does the same for a program outside `examples/`, such as one written by `writePulumiYaml`:
   ```go
-  test := pulumitest.NewPulumiTest(t,
-      filepath.Join(getCwd(t), "example-directory"),
-      inMemoryProvider(),
-      opttest.UseAmbientBackend(),
-      opttest.StackName(randomStackName()),
-  )
-  test.SetConfig(t, "key", "value")  // optional config
+  test := newExampleTest(t, "example-directory")
+  setConfig(t, test, map[string]string{"organizationName": getOrgName(), "digits": generateRandomFiveDigits()})
   runPulumiTest(t, test)  // runs up, preview, refresh, destroy
   ```
 
