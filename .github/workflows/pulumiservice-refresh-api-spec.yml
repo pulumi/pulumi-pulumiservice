@@ -167,7 +167,7 @@ jobs:
           ### Reviewer checklist
 
           - [ ] Decorate any newly-added empty entries in `provider/pkg/cloud/metadata.json` (`idFormat`, field renames, outputs, aliases)
-          - [ ] Add `CHANGELOG.md` entries under `## Unreleased` for new resources
+          - [ ] Add changelog fragments (`changie new`) for new resources, then run `changie batch ${VERSION} && changie merge` on this branch
           - [ ] Confirm `api-tests` check is green
           - [ ] Confirm the **Release-Version** line above matches the intended release version (edit before merge if needed)
 
