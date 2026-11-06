@@ -71,8 +71,10 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           cache: true
 
-      # The pulumi org has every RBAC feature enabled, so no feature-gated
-      # scopes are missing from its catalog.
+      # The enums ship in the public SDKs, so the catalog must come from an org
+      # with every generally available RBAC feature and no unreleased feature
+      # flags. An internal org like pulumi may have preview flags on, which
+      # would add scopes customers can't use yet.
       - name: Fetch the scope catalog and regenerate the enums
         env:
           PULUMI_ACCESS_TOKEN: ${{ steps.esc-auth.outputs.pulumi-access-token }}
