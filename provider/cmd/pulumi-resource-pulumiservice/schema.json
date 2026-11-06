@@ -7663,7 +7663,7 @@
         },
         "name": {
           "type": "string",
-          "description": "The name of the policy group.",
+          "description": "The name of the policy group, up to 100 characters. Only letters, digits, hyphens, underscores, spaces and periods are allowed, and the name can't begin or end with a space. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). Characters that aren't allowed in the logical name are replaced with hyphens.",
           "replaceOnChanges": true
         },
         "organizationName": {
@@ -7687,7 +7687,6 @@
         }
       },
       "requiredInputs": [
-        "name",
         "organizationName"
       ]
     },

@@ -143,7 +143,9 @@ type PolicyGroupInput struct {
 }
 
 func (i *PolicyGroupInput) Annotate(a infer.Annotator) {
-	a.Describe(&i.Name, "The name of the policy group.")
+	a.Describe(&i.Name, "The name of the policy group, up to 100 characters. Only letters, digits, hyphens, "+
+		"underscores, spaces and periods are allowed, and the name can't begin or end with a space. "+
+		autoNamedDescription+" Characters that aren't allowed in the logical name are replaced with hyphens.")
 	a.Describe(&i.OrganizationName, "The name of the Pulumi organization the policy group belongs to.")
 	a.Describe(&i.EntityType, policyGroupEntityTypeDescription)
 	a.SetDefault(&i.EntityType, gcStacks)
@@ -152,6 +154,37 @@ func (i *PolicyGroupInput) Annotate(a infer.Annotator) {
 	a.Describe(&i.Stacks, "List of stack references that belong to this policy group.")
 	a.Describe(&i.Accounts, "List of accounts that belong to this policy group.")
 	a.Describe(&i.PolicyPacks, "List of policy packs applied to this policy group.")
+}
+
+func (i *PolicyGroupInput) AutoName(autoname infer.SetAutoName) {
+	autoname(&i.Name, policyGroupAutoName())
+}
+
+// policyGroupReplacementName generates a fresh name for a policy group that is
+// about to be replaced. infer keeps an auto-named field's old value when old
+// inputs have it, so this field's name must not be one that inputs use.
+type policyGroupReplacementName struct {
+	Name string `pulumi:"replacementName"`
+}
+
+func (n *policyGroupReplacementName) AutoName(autoname infer.SetAutoName) {
+	autoname(&n.Name, policyGroupAutoName())
+}
+
+// policyGroupNameMaxLen is the longest policy group name that Pulumi Cloud
+// accepts. The OpenAPI spec states it only in the field's description.
+const policyGroupNameMaxLen = 100
+
+// policyGroupAutoName generates policy group names. Pulumi Cloud allows the
+// same characters as in agent pool names, and rejects a leading space.
+func policyGroupAutoName() infer.AutoNameConfig {
+	cfg := suffixedAutoName(policyGroupNameMaxLen, agentPoolNameRune)
+	generate := cfg.Generate
+	cfg.Generate = func(ctx context.Context, args infer.AutoNameGenerateArgs) (string, error) {
+		name, err := generate(ctx, args)
+		return strings.TrimLeft(name, " "), err
+	}
+	return cfg
 }
 
 // PolicyGroupState doesn't embed PolicyGroupInput: its policy packs carry the
@@ -205,7 +238,41 @@ func (*PolicyGroup) Check(
 			Reason:   "mode must be either 'audit' or 'preventative'",
 		})
 	}
+
+	// infer has kept the old name of an auto-named group. If this change
+	// replaces the group, name the replacement now, so that Diff sees a new
+	// name and the replacement is created before the old group is deleted.
+	if name, ok := news.GetOk(gcName); (!ok || name.IsNull()) && policyGroupReplaced(req.OldInputs, news, inputs) {
+		named, nameFailures, err := infer.DefaultCheck[policyGroupReplacementName](ctx, property.Map{})
+		if err != nil {
+			return infer.CheckResponse[PolicyGroupInput]{Inputs: inputs, Failures: failures}, err
+		}
+		for _, f := range nameFailures {
+			failures = append(failures, p.CheckFailure{Property: gcName, Reason: f.Reason})
+		}
+		if len(nameFailures) == 0 {
+			inputs.Name = named.Name
+		}
+	}
 	return infer.CheckResponse[PolicyGroupInput]{Inputs: inputs, Failures: failures}, nil
+}
+
+// policyGroupReplaced reports whether inputs change an input, other than
+// `name`, that replaces the group. Unknown values aren't treated as changes.
+func policyGroupReplaced(olds, news property.Map, inputs PolicyGroupInput) bool {
+	for key, value := range map[string]string{
+		gcOrganizationName: inputs.OrganizationName,
+		gcEntityType:       inputs.EntityType,
+		gcMode:             inputs.Mode,
+	} {
+		if v, ok := news.GetOk(key); ok && v.IsComputed() {
+			continue
+		}
+		if old, ok := olds.GetOk(key); ok && old.IsString() && old.AsString() != value {
+			return true
+		}
+	}
+	return false
 }
 
 // stripPolicyPackVersion removes `version` from each policy pack in inputs.
@@ -261,9 +328,12 @@ func (*PolicyGroup) Diff(
 	}
 
 	return infer.DiffResponse{
-		HasChanges:          len(diff) > 0,
-		DetailedDiff:        diff,
-		DeleteBeforeReplace: true,
+		HasChanges:   len(diff) > 0,
+		DetailedDiff: diff,
+		// Deleting first avoids a name conflict, but leaves the group's stacks
+		// and accounts without policy enforcement until the replacement exists.
+		// A replacement with a new name can't conflict, so it's created first.
+		DeleteBeforeReplace: req.State.Name == req.Inputs.Name,
 	}, nil
 }
 
