@@ -25,6 +25,9 @@ namespace Pulumi.PulumiService
     [PulumiServiceResourceType("pulumiservice:index:PolicyPack")]
     public partial class PolicyPack : global::Pulumi.CustomResource
     {
+        /// <summary>
+        /// Hash of the policy pack source directory. A change to the source replaces the policy pack, even when versionTag is unchanged.
+        /// </summary>
         [Output("contentHash")]
         public Output<string> ContentHash { get; private set; } = null!;
 
@@ -58,6 +61,9 @@ namespace Pulumi.PulumiService
         [Output("sourcePath")]
         public Output<string> SourcePath { get; private set; } = null!;
 
+        /// <summary>
+        /// Version number Pulumi Cloud assigned when this version of the policy pack was published.
+        /// </summary>
         [Output("version")]
         public Output<int> Version { get; private set; } = null!;
 

@@ -76,14 +76,14 @@ public class AgentPool extends com.pulumi.resources.CustomResource {
         return Codegen.optional(this.forceDestroy);
     }
     /**
-     * Name of the agent pool.
+     * Name of the agent pool, up to 100 characters. Only letters, digits, hyphens, underscores, spaces and periods are allowed. If omitted, Pulumi generates a name from the resource&#39;s logical name plus a random suffix, or follows the stack&#39;s [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). Characters that aren&#39;t allowed in the logical name are replaced with hyphens.
      * 
      */
     @Export(name="name", refs={String.class}, tree="[0]")
     private Output<String> name;
 
     /**
-     * @return Name of the agent pool.
+     * @return Name of the agent pool, up to 100 characters. Only letters, digits, hyphens, underscores, spaces and periods are allowed. If omitted, Pulumi generates a name from the resource&#39;s logical name plus a random suffix, or follows the stack&#39;s [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). Characters that aren&#39;t allowed in the logical name are replaced with hyphens.
      * 
      */
     public Output<String> name() {

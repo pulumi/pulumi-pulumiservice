@@ -1,12 +1,44 @@
 name: yaml-stack-tags-example
 runtime: yaml
 description: A minimal Pulumi YAML program
+config:
+  organizationName:
+    type: string
+    default: service-provider-test-org
 resources:
   testing-tag:
     type: pulumiservice:StackTag
     properties:
-      organization: service-provider-test-org
+      organization: ${organizationName}
       project: ${pulumi.project}
       stack: ${pulumi.stack}
       name: testing-tag
       value: bar
+  # Tags on a stack this program creates.
+  stackSuffix:
+    type: random:RandomPet
+    properties:
+      prefix: ${pulumi.stack}
+      separator: "-"
+  stack:
+    type: pulumiservice:Stack
+    properties:
+      organizationName: ${organizationName}
+      projectName: ${pulumi.project}
+      stackName: ${stackSuffix.id}
+  managed-stack-tag:
+    type: pulumiservice:StackTag
+    properties:
+      organization: ${stack.organizationName}
+      project: ${stack.projectName}
+      stack: ${stack.stackName}
+      name: test-tag
+      value: test-value
+  another-managed-stack-tag:
+    type: pulumiservice:StackTag
+    properties:
+      organization: ${stack.organizationName}
+      project: ${stack.projectName}
+      stack: ${stack.stackName}
+      name: another-tag
+      value: another-value

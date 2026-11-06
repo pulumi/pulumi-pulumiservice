@@ -57,6 +57,9 @@ export class PolicyPack extends pulumi.CustomResource {
         return obj['__pulumiType'] === PolicyPack.__pulumiType;
     }
 
+    /**
+     * Hash of the policy pack source directory. A change to the source replaces the policy pack, even when versionTag is unchanged.
+     */
     declare public /*out*/ readonly contentHash: pulumi.Output<string>;
     /**
      * Optional display name. Changing it requires a new versionTag (policy pack versions are immutable in Pulumi Cloud).
@@ -78,6 +81,9 @@ export class PolicyPack extends pulumi.CustomResource {
      * Path to the directory containing the policy pack source. The directory is tarballed and uploaded.
      */
     declare public readonly sourcePath: pulumi.Output<string>;
+    /**
+     * Version number Pulumi Cloud assigned when this version of the policy pack was published.
+     */
     declare public /*out*/ readonly version: pulumi.Output<number>;
     /**
      * Semantic version tag (e.g. "1.0.0"). Versions are immutable; change to publish a new version.

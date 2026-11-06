@@ -42,7 +42,7 @@ namespace Pulumi.PulumiService
         public Output<bool> Active { get; private set; } = null!;
 
         /// <summary>
-        /// The friendly name displayed in the Pulumi Cloud.
+        /// The friendly name displayed in the Pulumi Cloud, up to 100 bytes. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
         /// </summary>
         [Output("displayName")]
         public Output<string> DisplayName { get; private set; } = null!;
@@ -170,10 +170,10 @@ namespace Pulumi.PulumiService
         public Input<bool> Active { get; set; } = null!;
 
         /// <summary>
-        /// The friendly name displayed in the Pulumi Cloud.
+        /// The friendly name displayed in the Pulumi Cloud, up to 100 bytes. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
         /// </summary>
-        [Input("displayName", required: true)]
-        public Input<string> DisplayName { get; set; } = null!;
+        [Input("displayName")]
+        public Input<string>? DisplayName { get; set; }
 
         /// <summary>
         /// Name of the environment. Only specified if this is an environment webhook.

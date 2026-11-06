@@ -83,10 +83,11 @@ func (c *Client) DeleteOrgAccessToken(ctx context.Context, tokenID, orgName stri
 
 	apiPath := path.Join("orgs", orgName, "tokens", tokenID)
 
-	fmt.Println(apiPath)
-
 	_, err := c.do(ctx, http.MethodDelete, apiPath, nil, nil)
 	if err != nil {
+		if GetErrorStatusCode(err) == http.StatusNotFound {
+			return nil
+		}
 		return fmt.Errorf("failed to delete access token %q: %w", tokenID, err)
 	}
 

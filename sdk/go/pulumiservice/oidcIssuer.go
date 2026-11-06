@@ -37,7 +37,7 @@ type OidcIssuer struct {
 
 	// The maximum duration of the Pulumi access token working after an exchange, specified in seconds.
 	MaxExpirationSeconds pulumi.IntPtrOutput `pulumi:"maxExpirationSeconds"`
-	// Issuer name.
+	// Issuer name, up to 255 characters. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
 	Name pulumi.StringOutput `pulumi:"name"`
 	// Organization name.
 	Organization pulumi.StringOutput `pulumi:"organization"`
@@ -56,9 +56,6 @@ func NewOidcIssuer(ctx *pulumi.Context,
 		return nil, errors.New("missing one or more required arguments")
 	}
 
-	if args.Name == nil {
-		return nil, errors.New("invalid value for required argument 'Name'")
-	}
 	if args.Organization == nil {
 		return nil, errors.New("invalid value for required argument 'Organization'")
 	}
@@ -105,8 +102,8 @@ func (OidcIssuerState) ElementType() reflect.Type {
 type oidcIssuerArgs struct {
 	// The maximum duration of the Pulumi access token working after an exchange, specified in seconds.
 	MaxExpirationSeconds *int `pulumi:"maxExpirationSeconds"`
-	// Issuer name.
-	Name string `pulumi:"name"`
+	// Issuer name, up to 255 characters. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
+	Name *string `pulumi:"name"`
 	// Organization name.
 	Organization string `pulumi:"organization"`
 	// The auth policies for this Oidc Issuer.
@@ -121,8 +118,8 @@ type oidcIssuerArgs struct {
 type OidcIssuerArgs struct {
 	// The maximum duration of the Pulumi access token working after an exchange, specified in seconds.
 	MaxExpirationSeconds pulumi.IntPtrInput
-	// Issuer name.
-	Name pulumi.StringInput
+	// Issuer name, up to 255 characters. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
+	Name pulumi.StringPtrInput
 	// Organization name.
 	Organization pulumi.StringInput
 	// The auth policies for this Oidc Issuer.
@@ -225,7 +222,7 @@ func (o OidcIssuerOutput) MaxExpirationSeconds() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v *OidcIssuer) pulumi.IntPtrOutput { return v.MaxExpirationSeconds }).(pulumi.IntPtrOutput)
 }
 
-// Issuer name.
+// Issuer name, up to 255 characters. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
 func (o OidcIssuerOutput) Name() pulumi.StringOutput {
 	return o.ApplyT(func(v *OidcIssuer) pulumi.StringOutput { return v.Name }).(pulumi.StringOutput)
 }

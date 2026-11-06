@@ -1,0 +1,9 @@
+name: java-smoke
+runtime: java
+description: Checks that the Java SDK handles an asset input, an invoke and a secret output.
+config:
+  organizationName:
+    type: string
+    default: service-provider-test-org
+  digits:
+    type: string

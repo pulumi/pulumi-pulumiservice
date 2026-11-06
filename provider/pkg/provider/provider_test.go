@@ -17,9 +17,9 @@ package provider
 import (
 	"context"
 	"encoding/json"
-	"os"
+	"net/http"
+	"net/http/httptest"
 	"strings"
-	"sync/atomic"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -30,7 +30,13 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/functions"
+)
+
+const (
+	accessTokenKey = "accessToken"
+	apiURLKey      = "apiUrl"
 )
 
 func TestDiffConfig(t *testing.T) {
@@ -114,52 +120,49 @@ func TestDiffConfig(t *testing.T) {
 	}
 }
 
-func TestConfigure_SetsAccessToken(t *testing.T) {
+func TestConfigure_ApiResourcesUseConfiguredCredentials(t *testing.T) {
+	type seenRequest struct {
+		path, authorization, source string
+	}
+	seen := make(chan seenRequest, 1)
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		seen <- seenRequest{
+			path:          r.URL.Path,
+			authorization: r.Header.Get("Authorization"),
+			source:        r.Header.Get("X-Pulumi-Source"),
+		}
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"name":"my-hook"}`))
+	}))
+	defer server.Close()
+
+	t.Setenv(config.EnvVarPulumiAccessToken, "")
 	ctx := context.Background()
-
-	// Ensure PULUMI_ACCESS_TOKEN is not set from environment
-	oldToken := os.Getenv(EnvVarPulumiAccessToken)
-	err := os.Setenv(EnvVarPulumiAccessToken, "")
-	require.NoError(t, err)
-	defer func() {
-		err := os.Setenv(EnvVarPulumiAccessToken, oldToken)
-		assert.NoError(t, err)
-	}()
-
-	// Create provider instance
 	provider, err := MakeProvider(nil, "pulumiservice", "1.0.0")
 	require.NoError(t, err)
 
-	// Create config with accessToken
-	config := resource.PropertyMap{
-		accessTokenKey: resource.NewPropertyValue("pul-test0token"),
-	}
-	props, err := plugin.MarshalProperties(config, plugin.MarshalOptions{})
-	require.NoError(t, err)
-
-	// Call CheckConfig
-	_, err = provider.CheckConfig(ctx, &pulumirpc.CheckRequest{
-		News: props,
-	})
-	require.NoError(t, err)
-
-	// Build config args as the engine sends them: plain keys, secrets kept.
-	configArgs, err := plugin.MarshalProperties(resource.PropertyMap{
+	args, err := plugin.MarshalProperties(resource.PropertyMap{
 		accessTokenKey: resource.MakeSecret(resource.NewStringProperty("pul-test0token")),
+		apiURLKey:      resource.NewStringProperty(server.URL),
 	}, plugin.MarshalOptions{KeepSecrets: true})
 	require.NoError(t, err)
+	_, err = provider.Configure(ctx, &pulumirpc.ConfigureRequest{Args: args})
+	require.NoError(t, err)
 
-	// Configure the raw provider directly: MakeProvider wraps it, which
-	// hides the transport this test asserts on.
-	raw := &pulumiserviceProvider{transportRef: &atomic.Value{}}
-	_, err = raw.Configure(ctx, &pulumirpc.ConfigureRequest{
-		Args: configArgs,
+	_, err = provider.Read(ctx, &pulumirpc.ReadRequest{
+		Id:  "my-org/my-hook",
+		Urn: "urn:pulumi:stack::project::pulumiservice:api:OrganizationWebhook::hook",
 	})
 	require.NoError(t, err)
 
-	transport, ok := raw.transportRef.Load().(*authedTransport)
-	require.True(t, ok, "Configure should store the API transport")
-	assert.Equal(t, "pul-test0token", transport.token)
+	select {
+	case req := <-seen:
+		assert.Equal(t, "/api/orgs/my-org/hooks/my-hook", req.path)
+		assert.Equal(t, "token pul-test0token", req.authorization)
+		assert.Equal(t, "provider", req.source)
+	default:
+		t.Fatal("Read did not send a request to the configured apiUrl")
+	}
 }
 
 // TestProvider_LayeredSchema verifies the unified provider serves two
@@ -293,5 +296,43 @@ func TestProvider_PolicyPackSummaryIsANamedType(t *testing.T) {
 		_, ok := single.ReturnType.ObjectTypeSpec.Properties[field]
 		assert.Truef(t, ok, "getPolicyPack should declare %q", field)
 		assert.NotContains(t, single.ReturnType.ObjectTypeSpec.Required, field)
+	}
+}
+
+func servedSchema(t *testing.T) schema.PackageSpec {
+	t.Helper()
+	provider, err := MakeProvider(nil, "pulumiservice", "1.0.0")
+	require.NoError(t, err)
+
+	resp, err := provider.GetSchema(t.Context(), &pulumirpc.GetSchemaRequest{})
+	require.NoError(t, err)
+
+	var spec schema.PackageSpec
+	require.NoError(t, json.Unmarshal([]byte(resp.Schema), &spec))
+	return spec
+}
+
+func indexTokens[V any](m map[string]V) []string {
+	var out []string
+	for token := range m {
+		if strings.HasPrefix(token, "pulumiservice:index:") {
+			out = append(out, token)
+		}
+	}
+	return out
+}
+
+func TestProvider_EveryIndexResourceIsDescribed(t *testing.T) {
+	spec := servedSchema(t)
+
+	for _, token := range indexTokens(spec.Resources) {
+		rs := spec.Resources[token]
+		assert.NotEmpty(t, rs.Description, "%s has no description", token)
+		for name, prop := range rs.InputProperties {
+			assert.NotEmpty(t, prop.Description, "%s: input %q has no description", token, name)
+		}
+		for name, prop := range rs.Properties {
+			assert.NotEmpty(t, prop.Description, "%s: output %q has no description", token, name)
+		}
 	}
 }

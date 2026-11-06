@@ -78,6 +78,9 @@ func (c *Client) DeleteStack(ctx context.Context, stackName StackIdentifier, for
 		_, err = c.do(ctx, http.MethodDelete, apiPath, nil, nil)
 	}
 	if err != nil {
+		if GetErrorStatusCode(err) == http.StatusNotFound {
+			return nil
+		}
 		return fmt.Errorf("failed to delete stack: %w", err)
 	}
 

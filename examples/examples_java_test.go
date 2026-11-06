@@ -4,38 +4,18 @@
 package examples
 
 import (
-	"fmt"
-	"path/filepath"
 	"testing"
 
-	"github.com/pulumi/pulumi/pkg/v3/testing/integration"
+	"github.com/pulumi/providertest/pulumitest/opttest"
 )
 
-func TestJavaTeamsExamples(t *testing.T) {
-	test := getJavaBase(t, "java-teams", integration.ProgramTestOptions{})
-
-	integration.ProgramTest(t, &test)
-}
-
-func getJavaBase(
-	t *testing.T,
-	dir string,
-	testSpecificOptions integration.ProgramTestOptions,
-) integration.ProgramTestOptions {
-	repoRoot, err := filepath.Abs(filepath.Join("..", ".."))
-	if err != nil {
-		panic(err)
-	}
-	opts := integration.ProgramTestOptions{
-		Dir: filepath.Join(getCwd(t), dir),
-		Env: []string{fmt.Sprintf("PULUMI_REPO_ROOT=%s", repoRoot)},
-	}
-	opts = opts.With(getBaseOptions()).With(testSpecificOptions)
-	return opts
-}
-
-func getBaseOptions() integration.ProgramTestOptions {
-	return integration.ProgramTestOptions{
-		Dependencies: []string{"@pulumi/pulumi"},
-	}
+// The Java program resolves the pulumiservice SDK from the local Maven
+// repository, where `make install_java_sdk` publishes it.
+func TestJavaSmokeExample(t *testing.T) {
+	runSmokeTest(t, "java",
+		// `pulumi install` tries to download the provider plugin at the SDK's
+		// dev version, which isn't published. `pulumi up` builds the program
+		// instead, and uses the in-memory provider.
+		opttest.SkipInstall(),
+	)
 }

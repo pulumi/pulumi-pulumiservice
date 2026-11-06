@@ -36,7 +36,7 @@ type AgentPool struct {
 	Description pulumi.StringPtrOutput `pulumi:"description"`
 	// Optional. Flag indicating whether to delete the agent pool even if stacks are configured to use it.
 	ForceDestroy pulumi.BoolPtrOutput `pulumi:"forceDestroy"`
-	// Name of the agent pool.
+	// Name of the agent pool, up to 100 characters. Only letters, digits, hyphens, underscores, spaces and periods are allowed. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). Characters that aren't allowed in the logical name are replaced with hyphens.
 	Name pulumi.StringOutput `pulumi:"name"`
 	// The organization's name.
 	OrganizationName pulumi.StringOutput `pulumi:"organizationName"`
@@ -51,9 +51,6 @@ func NewAgentPool(ctx *pulumi.Context,
 		return nil, errors.New("missing one or more required arguments")
 	}
 
-	if args.Name == nil {
-		return nil, errors.New("invalid value for required argument 'Name'")
-	}
 	if args.OrganizationName == nil {
 		return nil, errors.New("invalid value for required argument 'OrganizationName'")
 	}
@@ -102,8 +99,8 @@ type agentPoolArgs struct {
 	Description *string `pulumi:"description"`
 	// Optional. Flag indicating whether to delete the agent pool even if stacks are configured to use it.
 	ForceDestroy *bool `pulumi:"forceDestroy"`
-	// Name of the agent pool.
-	Name string `pulumi:"name"`
+	// Name of the agent pool, up to 100 characters. Only letters, digits, hyphens, underscores, spaces and periods are allowed. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). Characters that aren't allowed in the logical name are replaced with hyphens.
+	Name *string `pulumi:"name"`
 	// The organization's name.
 	OrganizationName string `pulumi:"organizationName"`
 }
@@ -114,8 +111,8 @@ type AgentPoolArgs struct {
 	Description pulumi.StringPtrInput
 	// Optional. Flag indicating whether to delete the agent pool even if stacks are configured to use it.
 	ForceDestroy pulumi.BoolPtrInput
-	// Name of the agent pool.
-	Name pulumi.StringInput
+	// Name of the agent pool, up to 100 characters. Only letters, digits, hyphens, underscores, spaces and periods are allowed. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). Characters that aren't allowed in the logical name are replaced with hyphens.
+	Name pulumi.StringPtrInput
 	// The organization's name.
 	OrganizationName pulumi.StringInput
 }
@@ -222,7 +219,7 @@ func (o AgentPoolOutput) ForceDestroy() pulumi.BoolPtrOutput {
 	return o.ApplyT(func(v *AgentPool) pulumi.BoolPtrOutput { return v.ForceDestroy }).(pulumi.BoolPtrOutput)
 }
 
-// Name of the agent pool.
+// Name of the agent pool, up to 100 characters. Only letters, digits, hyphens, underscores, spaces and periods are allowed. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). Characters that aren't allowed in the logical name are replaced with hyphens.
 func (o AgentPoolOutput) Name() pulumi.StringOutput {
 	return o.ApplyT(func(v *AgentPool) pulumi.StringOutput { return v.Name }).(pulumi.StringOutput)
 }
