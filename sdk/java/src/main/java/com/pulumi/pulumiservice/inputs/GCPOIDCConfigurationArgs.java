@@ -23,16 +23,37 @@ public final class GCPOIDCConfigurationArgs extends com.pulumi.resources.Resourc
     /**
      * The GCP project number, a numeric value such as `123456789012`. This is not the project ID (such as `my-project`). To look up the number, run `gcloud projects describe &lt;project-id&gt; --format=&#39;value(projectNumber)&#39;`.
      * 
+     * @deprecated Use `projectNumber` instead. Despite its name, `projectId` takes the project number, not the project ID.
+     * 
      */
-    @Import(name="projectId", required=true)
-    private Output<String> projectId;
+    @Deprecated
+    @Import(name="projectId")
+    private @Nullable Output<String> projectId;
+
+    /**
+     * @return The GCP project number, a numeric value such as `123456789012`. This is not the project ID (such as `my-project`). To look up the number, run `gcloud projects describe &lt;project-id&gt; --format=&#39;value(projectNumber)&#39;`.
+     * 
+     * @deprecated Use `projectNumber` instead. Despite its name, `projectId` takes the project number, not the project ID.
+     * 
+     */
+    @Deprecated
+    public Optional<Output<String>> projectId() {
+        return Optional.ofNullable(this.projectId);
+    }
+
+    /**
+     * The GCP project number, a numeric value such as `123456789012`. This is not the project ID (such as `my-project`). To look up the number, run `gcloud projects describe &lt;project-id&gt; --format=&#39;value(projectNumber)&#39;`.
+     * 
+     */
+    @Import(name="projectNumber")
+    private @Nullable Output<String> projectNumber;
 
     /**
      * @return The GCP project number, a numeric value such as `123456789012`. This is not the project ID (such as `my-project`). To look up the number, run `gcloud projects describe &lt;project-id&gt; --format=&#39;value(projectNumber)&#39;`.
      * 
      */
-    public Output<String> projectId() {
-        return this.projectId;
+    public Optional<Output<String>> projectNumber() {
+        return Optional.ofNullable(this.projectNumber);
     }
 
     /**
@@ -114,6 +135,7 @@ public final class GCPOIDCConfigurationArgs extends com.pulumi.resources.Resourc
 
     private GCPOIDCConfigurationArgs(GCPOIDCConfigurationArgs $) {
         this.projectId = $.projectId;
+        this.projectNumber = $.projectNumber;
         this.providerId = $.providerId;
         this.region = $.region;
         this.serviceAccount = $.serviceAccount;
@@ -144,8 +166,11 @@ public final class GCPOIDCConfigurationArgs extends com.pulumi.resources.Resourc
          * 
          * @return builder
          * 
+         * @deprecated Use `projectNumber` instead. Despite its name, `projectId` takes the project number, not the project ID.
+         * 
          */
-        public Builder projectId(Output<String> projectId) {
+        @Deprecated
+        public Builder projectId(@Nullable Output<String> projectId) {
             $.projectId = projectId;
             return this;
         }
@@ -155,9 +180,33 @@ public final class GCPOIDCConfigurationArgs extends com.pulumi.resources.Resourc
          * 
          * @return builder
          * 
+         * @deprecated Use `projectNumber` instead. Despite its name, `projectId` takes the project number, not the project ID.
+         * 
          */
+        @Deprecated
         public Builder projectId(String projectId) {
             return projectId(Output.of(projectId));
+        }
+
+        /**
+         * @param projectNumber The GCP project number, a numeric value such as `123456789012`. This is not the project ID (such as `my-project`). To look up the number, run `gcloud projects describe &lt;project-id&gt; --format=&#39;value(projectNumber)&#39;`.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder projectNumber(@Nullable Output<String> projectNumber) {
+            $.projectNumber = projectNumber;
+            return this;
+        }
+
+        /**
+         * @param projectNumber The GCP project number, a numeric value such as `123456789012`. This is not the project ID (such as `my-project`). To look up the number, run `gcloud projects describe &lt;project-id&gt; --format=&#39;value(projectNumber)&#39;`.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder projectNumber(String projectNumber) {
+            return projectNumber(Output.of(projectNumber));
         }
 
         /**
@@ -266,9 +315,6 @@ public final class GCPOIDCConfigurationArgs extends com.pulumi.resources.Resourc
         }
 
         public GCPOIDCConfigurationArgs build() {
-            if ($.projectId == null) {
-                throw new MissingRequiredPropertyException("GCPOIDCConfigurationArgs", "projectId");
-            }
             if ($.providerId == null) {
                 throw new MissingRequiredPropertyException("GCPOIDCConfigurationArgs", "providerId");
             }

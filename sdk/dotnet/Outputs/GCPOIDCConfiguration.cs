@@ -19,7 +19,11 @@ namespace Pulumi.PulumiService.Outputs
         /// <summary>
         /// The GCP project number, a numeric value such as `123456789012`. This is not the project ID (such as `my-project`). To look up the number, run `gcloud projects describe &lt;project-id&gt; --format='value(projectNumber)'`.
         /// </summary>
-        public readonly string ProjectId;
+        public readonly string? ProjectId;
+        /// <summary>
+        /// The GCP project number, a numeric value such as `123456789012`. This is not the project ID (such as `my-project`). To look up the number, run `gcloud projects describe &lt;project-id&gt; --format='value(projectNumber)'`.
+        /// </summary>
+        public readonly string? ProjectNumber;
         /// <summary>
         /// The ID of the identity provider associated with the workload pool.
         /// </summary>
@@ -43,7 +47,9 @@ namespace Pulumi.PulumiService.Outputs
 
         [OutputConstructor]
         private GCPOIDCConfiguration(
-            string projectId,
+            string? projectId,
+
+            string? projectNumber,
 
             string providerId,
 
@@ -56,6 +62,7 @@ namespace Pulumi.PulumiService.Outputs
             string workloadPoolId)
         {
             ProjectId = projectId;
+            ProjectNumber = projectNumber;
             ProviderId = providerId;
             Region = region;
             ServiceAccount = serviceAccount;
