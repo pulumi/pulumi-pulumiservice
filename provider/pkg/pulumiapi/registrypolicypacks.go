@@ -116,7 +116,7 @@ func (c *Client) ListRegistryPolicyPacks(ctx context.Context, orgName string) ([
 	req := listRegistryPolicyPacksRequest{OrgLogin: orgName}
 
 	var response listRegistryPolicyPacksResponse
-	if _, err := c.do(ctx, http.MethodPost, apiPath, req, &response); err != nil {
+	if err := c.do(ctx, http.MethodPost, apiPath, req, &response); err != nil {
 		return nil, fmt.Errorf("failed to list registry policy packs for %q: %w", orgName, err)
 	}
 	return response.PolicyPacks, nil
@@ -152,9 +152,9 @@ func (c *Client) GetRegistryPolicyPack(
 	var response getRegistryPolicyPackResponse
 	var err error
 	if versionTag != "" {
-		_, err = c.doWithQuery(ctx, http.MethodGet, apiPath, url.Values{tagQueryParam: {versionTag}}, nil, &response)
+		err = c.doWithQuery(ctx, http.MethodGet, apiPath, url.Values{tagQueryParam: {versionTag}}, nil, &response)
 	} else {
-		_, err = c.do(ctx, http.MethodGet, apiPath, nil, &response)
+		err = c.do(ctx, http.MethodGet, apiPath, nil, &response)
 	}
 	if err != nil {
 		if GetErrorStatusCode(err) == http.StatusNotFound {

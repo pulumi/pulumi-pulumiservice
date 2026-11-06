@@ -200,7 +200,7 @@ func TestDeleteSchedule(t *testing.T) {
 		assert.EqualError(
 			t,
 			err,
-			"failed to delete stack schedule with scheduleId test-schedule-id : 401 API error: unauthorized",
+			"failed to delete stack schedule test-schedule-id: 401 API error: unauthorized",
 		)
 	})
 }

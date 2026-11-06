@@ -112,7 +112,7 @@ func (c *Client) CreateInsightsAccount(
 
 	apiPath := path.Join("preview", "insights", orgName, "accounts", accountName)
 
-	_, err := c.do(ctx, http.MethodPost, apiPath, req, nil)
+	err := c.do(ctx, http.MethodPost, apiPath, req, nil)
 	if err != nil {
 		return fmt.Errorf("failed to create insights account: %w", err)
 	}
@@ -132,7 +132,7 @@ func (c *Client) GetInsightsAccount(ctx context.Context, orgName, accountName st
 	apiPath := path.Join("preview", "insights", orgName, "accounts", accountName)
 
 	var account InsightsAccount
-	_, err := c.do(ctx, http.MethodGet, apiPath, nil, &account)
+	err := c.do(ctx, http.MethodGet, apiPath, nil, &account)
 	if err != nil {
 		statusCode := GetErrorStatusCode(err)
 		if statusCode == http.StatusNotFound {
@@ -157,7 +157,7 @@ func (c *Client) ListInsightsAccounts(ctx context.Context, orgName string) ([]In
 	apiPath := path.Join("preview", "insights", orgName, "accounts")
 
 	var response ListInsightsAccountsResponse
-	_, err := c.do(ctx, http.MethodGet, apiPath, nil, &response)
+	err := c.do(ctx, http.MethodGet, apiPath, nil, &response)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list insights accounts: %w", err)
 	}
@@ -180,7 +180,7 @@ func (c *Client) UpdateInsightsAccount(
 
 	apiPath := path.Join("preview", "insights", orgName, "accounts", accountName)
 
-	_, err := c.do(ctx, http.MethodPatch, apiPath, req, nil)
+	err := c.do(ctx, http.MethodPatch, apiPath, req, nil)
 	if err != nil {
 		return fmt.Errorf("failed to update insights account: %w", err)
 	}
@@ -199,15 +199,7 @@ func (c *Client) DeleteInsightsAccount(ctx context.Context, orgName, accountName
 
 	apiPath := path.Join("preview", "insights", orgName, "accounts", accountName)
 
-	_, err := c.do(ctx, http.MethodDelete, apiPath, nil, nil)
-	if err != nil {
-		if GetErrorStatusCode(err) == http.StatusNotFound {
-			return nil
-		}
-		return fmt.Errorf("failed to delete insights account %q: %w", accountName, err)
-	}
-
-	return nil
+	return c.deleteIgnoringNotFound(ctx, apiPath, nil, fmt.Sprintf("insights account %q", accountName))
 }
 
 // ScanOptions contains optional parameters for triggering a scan
@@ -244,27 +236,19 @@ func (c *Client) TriggerScan(ctx context.Context, orgName, accountName string) (
 	// Send empty ScanOptions (all fields are optional)
 	requestBody := ScanOptions{}
 
-	// The API may return either:
-	// - HTTP 200 with WorkflowRun JSON body
-	// - HTTP 204 No Content (scan queued but no details available yet)
-	// We need to handle both cases
-
 	var response TriggerScanResponse
-	httpResp, err := c.do(ctx, http.MethodPost, apiPath, requestBody, &response)
+	if err := c.do(ctx, http.MethodPost, apiPath, requestBody, &response); err != nil {
+		return nil, fmt.Errorf("failed to trigger scan for insights account %q: %w", accountName, err)
+	}
 
-	// Handle HTTP 204 No Content - scan triggered but no workflow run details returned yet
-	// The sendRequest will return an error when trying to unmarshal empty JSON for 204 responses
-	if httpResp != nil && httpResp.StatusCode == http.StatusNoContent {
-		// HTTP 204 - scan queued successfully but no details returned
+	// The API answers 204 No Content when it has queued the scan but has no
+	// workflow run to report yet, which leaves response empty.
+	if response == (TriggerScanResponse{}) {
 		return &TriggerScanResponse{
 			WorkflowRun: WorkflowRun{
 				Status: "queued",
 			},
 		}, nil
-	}
-
-	if err != nil {
-		return nil, fmt.Errorf("failed to trigger scan for insights account %q: %w", accountName, err)
 	}
 
 	return &response, nil
@@ -283,7 +267,7 @@ func (c *Client) GetScanStatus(ctx context.Context, orgName, accountName string)
 	apiPath := path.Join("preview", "insights", orgName, "accounts", accountName, "scan")
 
 	var status ScanStatusResponse
-	_, err := c.do(ctx, http.MethodGet, apiPath, nil, &status)
+	err := c.do(ctx, http.MethodGet, apiPath, nil, &status)
 	if err != nil {
 		statusCode := GetErrorStatusCode(err)
 		if statusCode == http.StatusNotFound {
@@ -309,7 +293,7 @@ func (c *Client) GetInsightsAccountTags(ctx context.Context, orgName, accountNam
 	apiPath := path.Join("preview", "insights", orgName, "accounts", accountName, "tags")
 
 	var response GetInsightsAccountTagsResponse
-	_, err := c.do(ctx, http.MethodGet, apiPath, nil, &response)
+	err := c.do(ctx, http.MethodGet, apiPath, nil, &response)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get tags for insights account %q: %w", accountName, err)
 	}
@@ -345,7 +329,7 @@ func (c *Client) SetInsightsAccountTags(
 		Tags: tags,
 	}
 
-	_, err := c.do(ctx, http.MethodPut, apiPath, req, nil)
+	err := c.do(ctx, http.MethodPut, apiPath, req, nil)
 	if err != nil {
 		return fmt.Errorf("failed to set tags for insights account %q: %w", accountName, err)
 	}

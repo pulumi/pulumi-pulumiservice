@@ -78,7 +78,7 @@ func (c *Client) ListPolicyPacks(ctx context.Context, orgName string) ([]PolicyP
 	apiPath := path.Join("orgs", orgName, "policypacks")
 
 	var response listPolicyPacksResponse
-	_, err := c.do(ctx, http.MethodGet, apiPath, nil, &response)
+	err := c.do(ctx, http.MethodGet, apiPath, nil, &response)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list policy packs for %q: %w", orgName, err)
 	}
@@ -109,7 +109,7 @@ func (c *Client) GetPolicyPack(
 	apiPath := path.Join("orgs", orgName, "policypacks", policyPackName, "versions", versionTag)
 
 	var policyPack PolicyPackDetail
-	_, err := c.do(ctx, http.MethodGet, apiPath, nil, &policyPack)
+	err := c.do(ctx, http.MethodGet, apiPath, nil, &policyPack)
 	if err != nil {
 		statusCode := GetErrorStatusCode(err)
 		if statusCode == http.StatusNotFound {
@@ -187,7 +187,7 @@ func (c *Client) PublishPolicyPack(
 
 	var resp CreatePolicyPackResponse
 	apiPath := path.Join("orgs", orgName, "policypacks")
-	if _, err = c.do(ctx, http.MethodPost, apiPath, req, &resp); err != nil {
+	if err = c.do(ctx, http.MethodPost, apiPath, req, &resp); err != nil {
 		return 0, fmt.Errorf("publish policy pack metadata: %w", err)
 	}
 
@@ -215,7 +215,7 @@ func (c *Client) PublishPolicyPack(
 	completePath := path.Join(
 		"orgs", orgName, "policypacks", req.Name, "versions", req.VersionTag, "complete",
 	)
-	if _, err = c.do(ctx, http.MethodPost, completePath, nil, nil); err != nil {
+	if err = c.do(ctx, http.MethodPost, completePath, nil, nil); err != nil {
 		return 0, fmt.Errorf("signal publish completion: %w", err)
 	}
 	return resp.Version, nil
@@ -289,13 +289,7 @@ func (c *Client) DeletePolicyPackVersion(ctx context.Context, orgName, policyPac
 		return errors.New("empty versionTag")
 	}
 	apiPath := path.Join("orgs", orgName, "policypacks", policyPackName, "versions", versionTag)
-	if _, err := c.do(ctx, http.MethodDelete, apiPath, nil, nil); err != nil {
-		if GetErrorStatusCode(err) == http.StatusNotFound {
-			return nil
-		}
-		return fmt.Errorf("delete policy pack version: %w", err)
-	}
-	return nil
+	return c.deleteIgnoringNotFound(ctx, apiPath, nil, "policy pack version")
 }
 
 func (c *Client) DeletePolicyPack(ctx context.Context, orgName, policyPackName string) error {
@@ -306,11 +300,5 @@ func (c *Client) DeletePolicyPack(ctx context.Context, orgName, policyPackName s
 		return errors.New("empty policy pack name")
 	}
 	apiPath := path.Join("orgs", orgName, "policypacks", policyPackName)
-	if _, err := c.do(ctx, http.MethodDelete, apiPath, nil, nil); err != nil {
-		if GetErrorStatusCode(err) == http.StatusNotFound {
-			return nil
-		}
-		return fmt.Errorf("delete policy pack: %w", err)
-	}
-	return nil
+	return c.deleteIgnoringNotFound(ctx, apiPath, nil, "policy pack")
 }

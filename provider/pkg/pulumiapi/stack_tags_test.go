@@ -87,7 +87,7 @@ func TestDeleteStackTags(t *testing.T) {
 		assert.EqualError(
 			t,
 			c.DeleteStackTag(ctx, stackName, tagName),
-			"failed to make request: 401 API error: unauthorized",
+			"failed to delete stack tag: 401 API error: unauthorized",
 		)
 	})
 }

@@ -78,7 +78,7 @@ func (c *Client) CreateAccessToken(ctx context.Context, description string, expi
 
 	var createRes createTokenResponse
 
-	_, err := c.do(ctx, http.MethodPost, apiPath, createReq, &createRes)
+	err := c.do(ctx, http.MethodPost, apiPath, createReq, &createRes)
 
 	if err != nil {
 		return nil, fmt.Errorf("failed to create access token: %w", err)
@@ -100,15 +100,7 @@ func (c *Client) DeleteAccessToken(ctx context.Context, tokenID string) error {
 
 	apiPath := path.Join("user", "tokens", tokenID)
 
-	_, err := c.do(ctx, http.MethodDelete, apiPath, nil, nil)
-	if err != nil {
-		if GetErrorStatusCode(err) == http.StatusNotFound {
-			return nil
-		}
-		return fmt.Errorf("failed to delete access token %q: %w", tokenID, err)
-	}
-
-	return nil
+	return c.deleteIgnoringNotFound(ctx, apiPath, nil, fmt.Sprintf("access token %q", tokenID))
 }
 
 func (c *Client) GetAccessToken(ctx context.Context, id string) (*AccessToken, error) {
@@ -116,7 +108,7 @@ func (c *Client) GetAccessToken(ctx context.Context, id string) (*AccessToken, e
 
 	var listRes listTokenResponse
 
-	_, err := c.do(ctx, http.MethodGet, apiPath, nil, &listRes)
+	err := c.do(ctx, http.MethodGet, apiPath, nil, &listRes)
 
 	if err != nil {
 		return nil, fmt.Errorf("failed to list access tokens: %w", err)

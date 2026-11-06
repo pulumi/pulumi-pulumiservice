@@ -148,7 +148,7 @@ func (c *Client) CreateEnvironmentApprovalRule(
 	apiPath := path.Join("change-gates", orgName)
 
 	var rule ApprovalRule
-	_, err := c.do(ctx, http.MethodPost, apiPath, req, &rule)
+	err := c.do(ctx, http.MethodPost, apiPath, req, &rule)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create approval rule: %w", err)
 	}
@@ -160,7 +160,7 @@ func (c *Client) GetEnvironmentApprovalRule(ctx context.Context, orgName string,
 	apiPath := path.Join("change-gates", orgName, ruleID)
 
 	var rule ApprovalRule
-	_, err := c.do(ctx, http.MethodGet, apiPath, nil, &rule)
+	err := c.do(ctx, http.MethodGet, apiPath, nil, &rule)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get approval rule: %w", err)
 	}
@@ -177,7 +177,7 @@ func (c *Client) UpdateEnvironmentApprovalRule(
 	apiPath := path.Join("change-gates", orgName, ruleID)
 
 	var rule ApprovalRule
-	_, err := c.do(ctx, http.MethodPut, apiPath, req, &rule)
+	err := c.do(ctx, http.MethodPut, apiPath, req, &rule)
 	if err != nil {
 		return nil, fmt.Errorf("failed to update approval rule: %w", err)
 	}
@@ -188,13 +188,5 @@ func (c *Client) UpdateEnvironmentApprovalRule(
 func (c *Client) DeleteEnvironmentApprovalRule(ctx context.Context, orgName string, ruleID string) error {
 	apiPath := path.Join("change-gates", orgName, ruleID)
 
-	_, err := c.do(ctx, http.MethodDelete, apiPath, nil, nil)
-	if err != nil {
-		if GetErrorStatusCode(err) == http.StatusNotFound {
-			return nil
-		}
-		return fmt.Errorf("failed to delete approval rule: %w", err)
-	}
-
-	return nil
+	return c.deleteIgnoringNotFound(ctx, apiPath, nil, "approval rule")
 }
