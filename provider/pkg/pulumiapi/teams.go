@@ -160,7 +160,7 @@ func (c *Client) ListTeams(ctx context.Context, orgName string) ([]Team, error) 
 	apiURL := path.Join("orgs", orgName, "teams")
 
 	var teamArray Teams
-	_, err := c.do(ctx, http.MethodGet, apiURL, nil, &teamArray)
+	err := c.do(ctx, http.MethodGet, apiURL, nil, &teamArray)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list teams for %q: %w", orgName, err)
 	}
@@ -179,7 +179,7 @@ func (c *Client) GetTeam(ctx context.Context, orgName string, teamName string) (
 	apiPath := path.Join("orgs", orgName, "teams", teamName)
 
 	var team Team
-	_, err := c.do(ctx, http.MethodGet, apiPath, nil, &team)
+	err := c.do(ctx, http.MethodGet, apiPath, nil, &team)
 	if err != nil {
 		statusCode := GetErrorStatusCode(err)
 		if statusCode == http.StatusNotFound {
@@ -226,7 +226,7 @@ func (c *Client) CreateTeam(
 	}
 
 	var team Team
-	_, err := c.do(ctx, http.MethodPost, apiPath, createReq, &team)
+	err := c.do(ctx, http.MethodPost, apiPath, createReq, &team)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create team: %w", err)
 	}
@@ -250,7 +250,7 @@ func (c *Client) UpdateTeam(ctx context.Context, orgName, teamName, displayName,
 		NewDescription: description,
 	}
 
-	_, err := c.do(ctx, "PATCH", apiPath, updateReq, nil)
+	err := c.do(ctx, "PATCH", apiPath, updateReq, nil)
 	if err != nil {
 		return fmt.Errorf("failed to update team: %w", err)
 	}
@@ -268,14 +268,7 @@ func (c *Client) DeleteTeam(ctx context.Context, orgName, teamName string) error
 
 	apiPath := path.Join("orgs", orgName, "teams", teamName)
 
-	_, err := c.do(ctx, http.MethodDelete, apiPath, nil, nil)
-	if err != nil {
-		if GetErrorStatusCode(err) == http.StatusNotFound {
-			return nil
-		}
-		return fmt.Errorf("failed to delete team: %w", err)
-	}
-	return nil
+	return c.deleteIgnoringNotFound(ctx, apiPath, nil, "team")
 }
 
 func (c *Client) updateTeamMembership(ctx context.Context, orgName, teamName, userName, addOrRemove string) error {
@@ -303,7 +296,7 @@ func (c *Client) updateTeamMembership(ctx context.Context, orgName, teamName, us
 		Member:       userName,
 	}
 
-	_, err := c.do(ctx, http.MethodPatch, apiPath, updateMembershipReq, nil)
+	err := c.do(ctx, http.MethodPatch, apiPath, updateMembershipReq, nil)
 	if err != nil {
 		return fmt.Errorf("failed to update team membership: %w", err)
 	}
@@ -350,7 +343,7 @@ func (c *Client) AddStackPermission(ctx context.Context, stack StackIdentifier, 
 		},
 	}
 
-	_, err := c.do(ctx, http.MethodPatch, apiPath, addStackPermissionRequest, nil)
+	err := c.do(ctx, http.MethodPatch, apiPath, addStackPermissionRequest, nil)
 	if err != nil {
 		return fmt.Errorf("failed to add stack permission for team: %w", err)
 	}
@@ -372,7 +365,7 @@ func (c *Client) RemoveStackPermission(ctx context.Context, stack StackIdentifie
 		RemoveStackPermission: RemoveStackPermission{ProjectName: stack.ProjectName, StackName: stack.StackName},
 	}
 
-	_, err := c.do(ctx, http.MethodPatch, apiPath, removeStackPermissionRequest, nil)
+	err := c.do(ctx, http.MethodPatch, apiPath, removeStackPermissionRequest, nil)
 	if err != nil {
 		if GetErrorStatusCode(err) == http.StatusNotFound {
 			return nil
@@ -394,7 +387,7 @@ func (c *Client) GetTeamStackPermission(ctx context.Context, stack StackIdentifi
 	apiPath := path.Join("orgs", stack.OrgName, "teams", teamName)
 
 	var team Team
-	_, err := c.do(ctx, http.MethodGet, apiPath, nil, &team)
+	err := c.do(ctx, http.MethodGet, apiPath, nil, &team)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get team: %w", err)
 	}
@@ -430,7 +423,7 @@ func (c *Client) AddEnvironmentSettings(ctx context.Context, req CreateTeamEnvir
 		},
 	}
 
-	_, err := c.do(ctx, http.MethodPatch, apiPath, addEnvironmentSettingsRequest, nil)
+	err := c.do(ctx, http.MethodPatch, apiPath, addEnvironmentSettingsRequest, nil)
 	if err != nil {
 		return fmt.Errorf(
 			"failed to add team settings for environment %s to team %s due to error: %w",
@@ -462,7 +455,7 @@ func (c *Client) RemoveEnvironmentSettings(ctx context.Context, req TeamEnvironm
 		},
 	}
 
-	_, err := c.do(ctx, http.MethodPatch, apiPath, removeEnvironmentSettingsRequest, nil)
+	err := c.do(ctx, http.MethodPatch, apiPath, removeEnvironmentSettingsRequest, nil)
 	if err != nil {
 		if GetErrorStatusCode(err) == http.StatusNotFound {
 			return nil
@@ -494,7 +487,7 @@ func (c *Client) GetTeamEnvironmentSettings(
 	apiPath := path.Join("orgs", req.Organization, "teams", req.Team)
 
 	var team Team
-	_, err := c.do(ctx, http.MethodGet, apiPath, nil, &team)
+	err := c.do(ctx, http.MethodGet, apiPath, nil, &team)
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to get team environment permission: %w", err)
 	}

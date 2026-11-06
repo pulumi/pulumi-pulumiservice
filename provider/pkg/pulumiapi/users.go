@@ -37,7 +37,7 @@ type CurrentUser struct {
 
 func (c *Client) GetCurrentUser(ctx context.Context) (*CurrentUser, error) {
 	var user CurrentUser
-	if _, err := c.do(ctx, http.MethodGet, "user", nil, &user); err != nil {
+	if err := c.do(ctx, http.MethodGet, "user", nil, &user); err != nil {
 		return nil, fmt.Errorf("failed to get current user: %w", err)
 	}
 	return &user, nil

@@ -59,7 +59,7 @@ func (c *Client) CreateTeamAccessToken(
 
 	var createRes createTeamTokenResponse
 
-	_, err := c.do(ctx, http.MethodPost, apiPath, createReq, &createRes)
+	err := c.do(ctx, http.MethodPost, apiPath, createReq, &createRes)
 
 	if err != nil {
 		return nil, fmt.Errorf("failed to create access token: %w", err)
@@ -88,15 +88,7 @@ func (c *Client) DeleteTeamAccessToken(ctx context.Context, tokenID, orgName, te
 
 	apiPath := path.Join("orgs", orgName, "teams", teamName, "tokens", tokenID)
 
-	_, err := c.do(ctx, http.MethodDelete, apiPath, nil, nil)
-	if err != nil {
-		if GetErrorStatusCode(err) == http.StatusNotFound {
-			return nil
-		}
-		return fmt.Errorf("failed to delete access token %q: %w", tokenID, err)
-	}
-
-	return nil
+	return c.deleteIgnoringNotFound(ctx, apiPath, nil, fmt.Sprintf("access token %q", tokenID))
 }
 
 func (c *Client) GetTeamAccessToken(ctx context.Context, tokenID, orgName, teamName string) (*AccessToken, error) {
@@ -104,7 +96,7 @@ func (c *Client) GetTeamAccessToken(ctx context.Context, tokenID, orgName, teamN
 
 	var listRes listTokenResponse
 
-	_, err := c.do(ctx, http.MethodGet, apiPath, nil, &listRes)
+	err := c.do(ctx, http.MethodGet, apiPath, nil, &listRes)
 
 	if err != nil {
 		return nil, fmt.Errorf("failed to list team access tokens: %w", err)
