@@ -98,3 +98,17 @@ func TestConfigure_EmptyInputsAndNoEnvVarsErrors(t *testing.T) {
 	}
 	assert.ErrorIs(t, err, ErrAccessTokenNotFound)
 }
+
+func TestConfigure_TransportDefaultsToPulumiCloudWhenAPIURLIsEmpty(t *testing.T) {
+	t.Setenv(EnvVarPulumiAccessToken, "pul-test-token")
+	t.Setenv(EnvVarPulumiBackendURL, "")
+	t.Setenv(EnvVarPulumiAPI, "")
+
+	c := &Config{}
+	require.NoError(t, c.Configure(context.Background()))
+
+	transport, ok := c.transport.(*authedTransport)
+	require.True(t, ok, "Configure must build the api transport")
+	assert.Equal(t, defaultAPIURL, transport.baseURL.String())
+	assert.Equal(t, "pul-test-token", transport.token)
+}

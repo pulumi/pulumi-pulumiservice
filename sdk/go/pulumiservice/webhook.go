@@ -40,7 +40,7 @@ type Webhook struct {
 
 	// Indicates whether this webhook is enabled or not.
 	Active pulumi.BoolOutput `pulumi:"active"`
-	// The friendly name displayed in the Pulumi Cloud.
+	// The friendly name displayed in the Pulumi Cloud, up to 100 bytes. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
 	DisplayName pulumi.StringOutput `pulumi:"displayName"`
 	// Name of the environment. Only specified if this is an environment webhook.
 	EnvironmentName pulumi.StringPtrOutput `pulumi:"environmentName"`
@@ -73,9 +73,6 @@ func NewWebhook(ctx *pulumi.Context,
 
 	if args.Active == nil {
 		return nil, errors.New("invalid value for required argument 'Active'")
-	}
-	if args.DisplayName == nil {
-		return nil, errors.New("invalid value for required argument 'DisplayName'")
 	}
 	if args.OrganizationName == nil {
 		return nil, errors.New("invalid value for required argument 'OrganizationName'")
@@ -135,8 +132,8 @@ func (WebhookState) ElementType() reflect.Type {
 type webhookArgs struct {
 	// Indicates whether this webhook is enabled or not.
 	Active bool `pulumi:"active"`
-	// The friendly name displayed in the Pulumi Cloud.
-	DisplayName string `pulumi:"displayName"`
+	// The friendly name displayed in the Pulumi Cloud, up to 100 bytes. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
+	DisplayName *string `pulumi:"displayName"`
 	// Name of the environment. Only specified if this is an environment webhook.
 	EnvironmentName *string `pulumi:"environmentName"`
 	// Optional set of filters to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/deployments/concepts/webhooks/#event-filtering) for more information.
@@ -161,8 +158,8 @@ type webhookArgs struct {
 type WebhookArgs struct {
 	// Indicates whether this webhook is enabled or not.
 	Active pulumi.BoolInput
-	// The friendly name displayed in the Pulumi Cloud.
-	DisplayName pulumi.StringInput
+	// The friendly name displayed in the Pulumi Cloud, up to 100 bytes. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
+	DisplayName pulumi.StringPtrInput
 	// Name of the environment. Only specified if this is an environment webhook.
 	EnvironmentName pulumi.StringPtrInput
 	// Optional set of filters to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/deployments/concepts/webhooks/#event-filtering) for more information.
@@ -275,7 +272,7 @@ func (o WebhookOutput) Active() pulumi.BoolOutput {
 	return o.ApplyT(func(v *Webhook) pulumi.BoolOutput { return v.Active }).(pulumi.BoolOutput)
 }
 
-// The friendly name displayed in the Pulumi Cloud.
+// The friendly name displayed in the Pulumi Cloud, up to 100 bytes. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
 func (o WebhookOutput) DisplayName() pulumi.StringOutput {
 	return o.ApplyT(func(v *Webhook) pulumi.StringOutput { return v.DisplayName }).(pulumi.StringOutput)
 }

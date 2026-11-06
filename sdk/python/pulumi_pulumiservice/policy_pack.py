@@ -256,6 +256,9 @@ class PolicyPack(pulumi.CustomResource):
     @_builtins.property
     @pulumi.getter(name="contentHash")
     def content_hash(self) -> pulumi.Output[_builtins.str]:
+        """
+        Hash of the policy pack source directory. A change to the source replaces the policy pack, even when versionTag is unchanged.
+        """
         return pulumi.get(self, "content_hash")
 
     @_builtins.property
@@ -301,6 +304,9 @@ class PolicyPack(pulumi.CustomResource):
     @_builtins.property
     @pulumi.getter
     def version(self) -> pulumi.Output[_builtins.int]:
+        """
+        Version number Pulumi Cloud assigned when this version of the policy pack was published.
+        """
         return pulumi.get(self, "version")
 
     @_builtins.property

@@ -157,8 +157,9 @@ func TestYamlStackTagsExample(t *testing.T) {
 	require.NoError(t, err)
 
 	integration.ProgramTest(t, &integration.ProgramTestOptions{
-		Quick: true,
-		Dir:   tmpdir,
+		Quick:  true,
+		Dir:    tmpdir,
+		Config: map[string]string{"organizationName": getOrgName()},
 		EditDirs: []integration.EditDir{
 			{
 				Dir: path.Join(cwd, ".", "yaml-stack-tags"),
@@ -315,6 +316,26 @@ func TestYamlDeploymentSettingsCommitExample(t *testing.T) {
 	})
 }
 
+func TestYamlDeploymentSettingsOidcAuthExample(t *testing.T) {
+	test := pulumitest.NewPulumiTest(t,
+		filepath.Join(getCwd(t), "yaml-deployment-settings-oidc-auth"),
+		inMemoryProvider(),
+		opttest.UseAmbientBackend(),
+		opttest.StackName(randomStackName()),
+	)
+	test.SetConfig(t, "digits", generateRandomFiveDigits())
+	test.SetConfig(t, "organizationName", getOrgName())
+	setSecretConfig(t, test, "sshPassword", "my_password")
+	setSecretConfig(t, test, "secretEnvVar", "my_secret_value")
+
+	runPulumiTestAfterUp(t, test, func(t *testing.T, test *pulumitest.PulumiTest) {
+		inputs := stateInputs(t, test, "pulumiservice:index:DeploymentSettings")
+		assertStateSecret(t, inputs, "sourceContext", "git", "gitAuth", "sshAuth", "sshPrivateKey")
+		assertStateSecret(t, inputs, "sourceContext", "git", "gitAuth", "sshAuth", "password")
+		assertStateSecret(t, inputs, "operationContext", "environmentVariables", "SECRET_VAR")
+	})
+}
+
 // deploymentSettingsBaselineVersion is the released provider whose state the
 // DeploymentSettings upgrade test reads.
 const deploymentSettingsBaselineVersion = "1.5.0"
@@ -441,18 +462,26 @@ func TestYamlOrgAccessTokenExample(t *testing.T) {
 }
 
 func TestYamlTeamStackPermissionsExample(t *testing.T) {
-	cwd, _ := os.Getwd()
-	integration.ProgramTest(t, &integration.ProgramTestOptions{
-		Quick: true,
-		Dir:   path.Join(cwd, ".", "yaml-team-stack-permissions"),
-	})
+	test := pulumitest.NewPulumiTest(t,
+		filepath.Join(getCwd(t), "yaml-team-stack-permissions"),
+		inMemoryProvider(),
+		opttest.UseAmbientBackend(),
+		opttest.StackName(randomStackName()),
+	)
+	test.SetConfig(t, "organizationName", getOrgName())
+	runPulumiTest(t, test)
 }
 
 func TestYamlWebhookExample(t *testing.T) {
-	cwd := getCwd(t)
-	integration.ProgramTest(t, &integration.ProgramTestOptions{
-		Dir: path.Join(cwd, ".", "yaml-webhooks"),
-	})
+	test := pulumitest.NewPulumiTest(t,
+		filepath.Join(getCwd(t), "yaml-webhooks"),
+		inMemoryProvider(),
+		opttest.UseAmbientBackend(),
+		opttest.StackName(randomStackName()),
+	)
+	test.SetConfig(t, "digits", generateRandomFiveDigits())
+	test.SetConfig(t, "organizationName", getOrgName())
+	runPulumiTest(t, test)
 }
 
 func TestYamlSchedulesExample(t *testing.T) {
@@ -546,37 +575,36 @@ func TestYamlSchedulesExample(t *testing.T) {
 }
 
 func TestYamlEnvironmentsExample(t *testing.T) {
-	cwd := getCwd(t)
-	digits := generateRandomFiveDigits()
-	integration.ProgramTest(t, &integration.ProgramTestOptions{
-		Dir: path.Join(cwd, ".", "yaml-environments"),
-		Config: map[string]string{
-			"digits": digits,
-		},
-	})
+	test := pulumitest.NewPulumiTest(t,
+		filepath.Join(getCwd(t), "yaml-environments"),
+		inMemoryProvider(),
+		opttest.UseAmbientBackend(),
+		opttest.StackName(randomStackName()),
+	)
+	test.SetConfig(t, "digits", generateRandomFiveDigits())
+	test.SetConfig(t, "organizationName", getOrgName())
+	runPulumiTest(t, test)
 }
 
 func TestYamlAgentPoolsExample(t *testing.T) {
 	cwd := getCwd(t)
-	digits := generateRandomFiveDigits()
 	integration.ProgramTest(t, &integration.ProgramTestOptions{
 		Dir: path.Join(cwd, ".", "yaml-agent-pools"),
-		Config: map[string]string{
-			"digits": digits,
-		},
 	})
 }
 
 func TestYamlTemplateSourcesExample(t *testing.T) {
 	skipUnlessSerializedTests(t)
-	cwd := getCwd(t)
-	digits := generateRandomFiveDigits()
-	integration.ProgramTest(t, &integration.ProgramTestOptions{
-		Dir: path.Join(cwd, ".", "yaml-template-sources"),
-		Config: map[string]string{
-			"digits": digits,
-		},
-	})
+	test := pulumitest.NewPulumiTest(t,
+		filepath.Join(getCwd(t), "yaml-template-sources"),
+		inMemoryProvider(),
+		opttest.UseAmbientBackend(),
+		opttest.StackName(randomStackName()),
+	)
+	test.SetConfig(t, "digits", generateRandomFiveDigits())
+	test.SetConfig(t, "organizationName", getOrgName())
+	test.SetConfig(t, "sourceURL", randomTemplateSourceURL())
+	runPulumiTest(t, test)
 }
 
 func TestYamlOidcIssuerExample(t *testing.T) {
@@ -647,6 +675,7 @@ func TestYamlPolicyPackExample(t *testing.T) {
 		opttest.StackName(randomStackName()),
 	)
 	test.SetConfig(t, "digits", generateRandomFiveDigits())
+	test.SetConfig(t, "packName", uniquePolicyPackName())
 	test.SetConfig(t, "organizationName", getOrgName())
 	up := runPulumiTest(t, test)
 
@@ -656,6 +685,24 @@ func TestYamlPolicyPackExample(t *testing.T) {
 	assert.Equal(t, "1.0.0", up.Outputs["packByTagVersionTag"].Value)
 	assert.Len(t, up.Outputs["packByTagPolicies"].Value, 2)
 	assert.Equal(t, "1.0.0", up.Outputs["packLatestVersionTag"].Value)
+}
+
+func TestYamlPolicyPackIntrospectExample(t *testing.T) {
+	exampleDir := filepath.Join(getCwd(t), "yaml-policy-pack-introspect")
+	yarnInstall(t, filepath.Join(exampleDir, "policy-pack"))
+	test := pulumitest.NewPulumiTest(t,
+		exampleDir,
+		inMemoryProvider(),
+		opttest.UseAmbientBackend(),
+		opttest.StackName(randomStackName()),
+	)
+	test.SetConfig(t, "digits", generateRandomFiveDigits())
+	test.SetConfig(t, "packName", uniquePolicyPackName())
+	test.SetConfig(t, "organizationName", getOrgName())
+	up := runPulumiTest(t, test)
+
+	assert.Len(t, up.Outputs["packByTagPolicies"].Value, 2,
+		"the published pack should carry both policies read from policy-pack/index.js")
 }
 
 func TestYamlPolicyGroupsAccountsExample(t *testing.T) {
@@ -756,10 +803,31 @@ func TestYamlInsightsAccountExample(t *testing.T) {
 		opttest.UseAmbientBackend(),
 		opttest.StackName(randomStackName()),
 	)
-	test.SetConfig(t, "digits", generateRandomFiveDigits())
+	digits := generateRandomFiveDigits()
+	test.SetConfig(t, "digits", digits)
 	test.SetConfig(t, "organizationName", getOrgName())
 	test.SetConfig(t, "roleArn", getInsightsRoleArn(t))
-	runPulumiTest(t, test)
+	up := runPulumiTest(t, test)
+
+	accountName := "test-insights-account-" + digits
+	assert.Equal(t, accountName, up.Outputs["accountName"].Value)
+	assert.Equal(t, accountName, up.Outputs["fetchedAccountName"].Value,
+		"getInsightsAccount should return the account by name")
+	assert.Equal(t, up.Outputs["insightsAccountId"].Value, up.Outputs["fetchedInsightsAccountId"].Value,
+		"getInsightsAccount should return the created account's ID")
+	assert.Equal(t, "aws", up.Outputs["fetchedProvider"].Value)
+	assert.Equal(t, "none", up.Outputs["fetchedScanSchedule"].Value)
+	assert.Equal(t, false, up.Outputs["fetchedScheduledScanEnabled"].Value)
+
+	accounts, ok := up.Outputs["allAccounts"].Value.([]interface{})
+	require.True(t, ok, "allAccounts should be a list, got %T", up.Outputs["allAccounts"].Value)
+	var names []interface{}
+	for _, a := range accounts {
+		if account, ok := a.(map[string]interface{}); ok {
+			names = append(names, account["accountName"])
+		}
+	}
+	assert.Contains(t, names, accountName, "getInsightsAccounts should list the created account")
 }
 
 func TestYamlDeploymentSettingsVcsExample(t *testing.T) {
@@ -793,6 +861,7 @@ func TestYamlRbacExample(t *testing.T) {
 	)
 	test.SetConfig(t, "digits", generateRandomFiveDigits())
 	test.SetConfig(t, "organizationName", orgName)
+	test.SetConfig(t, "adoptedUsername", fixtureUser)
 
 	up := test.Up(t)
 	// Sanity-check adoption: OrganizationMember should have hit the 409
@@ -823,11 +892,31 @@ func TestYamlRbacExample(t *testing.T) {
 	if first, ok := up.Outputs["firstRoleName"]; ok {
 		assert.NotEmpty(t, first.Value, "expected getOrganizationRoles to return at least one role")
 	}
+	assert.Equal(t, up.Outputs["roleId"].Value, up.Outputs["lookedUpMemberRoleId"].Value,
+		"expected getOrganizationMember to report the custom role assigned by OrganizationMember")
 	preview := test.Preview(t)
 	assertpreview.HasNoChanges(t, preview)
 	refresh := test.Refresh(t)
 	assertrefresh.HasNoChanges(t, refresh)
 	test.Destroy(t)
+
+	t.Run("built-in member role", func(t *testing.T) {
+		test := pulumitest.NewPulumiTest(t,
+			filepath.Join(getCwd(t), "yaml-rbac-member-role"),
+			inMemoryProvider(),
+			opttest.UseAmbientBackend(),
+			opttest.StackName(randomStackName()),
+		)
+		test.SetConfig(t, "organizationName", orgName)
+		test.SetConfig(t, "adoptedUsername", fixtureUser)
+		up := runPulumiTest(t, test)
+
+		assert.Equal(t, true, up.Outputs["memberAdopted"].Value,
+			"expected OrganizationMember to adopt the existing membership")
+		assert.Equal(t, "admin", up.Outputs["memberRole"].Value)
+		assert.Equal(t, "admin", up.Outputs["lookedUpMemberRole"].Value,
+			"expected getOrganizationMember to report the built-in role")
+	})
 }
 
 // TestYamlOrganizationRoleExample runs OrganizationRole end to end with the

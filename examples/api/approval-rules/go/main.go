@@ -13,10 +13,14 @@ func main() {
 		if organizationName == "" {
 			organizationName = "service-provider-test-org"
 		}
+		groupName := cfg.Get("groupName")
+		if groupName == "" {
+			groupName = "api-approvers"
+		}
 
 		approvers, err := api.NewPolicyGroup(ctx, "approvers", &api.PolicyGroupArgs{
 			OrgName:    pulumi.String(organizationName),
-			Name:       pulumi.String("api-approvers"),
+			Name:       pulumi.String(groupName),
 			EntityType: pulumi.String("stacks"),
 		})
 		if err != nil {
