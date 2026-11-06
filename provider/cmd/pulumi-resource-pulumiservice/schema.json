@@ -7987,7 +7987,7 @@
           "items": {
             "type": "string"
           },
-          "description": "List of Pulumi Cloud usernames of team members."
+          "description": "The Pulumi Cloud usernames of the team's members.\nPulumi Cloud adds the user who creates the team as a member, usually the owner of the access token that runs `pulumi up`.\nList that user here to keep them on the team: otherwise `pulumi refresh` shows them as a change, and the next update to `members` removes them."
         },
         "name": {
           "type": "string",
@@ -8028,7 +8028,7 @@
           "items": {
             "type": "string"
           },
-          "description": "List of Pulumi Cloud usernames of team members."
+          "description": "The Pulumi Cloud usernames of the team's members.\nPulumi Cloud adds the user who creates the team as a member, usually the owner of the access token that runs `pulumi up`.\nList that user here to keep them on the team: otherwise `pulumi refresh` shows them as a change, and the next update to `members` removes them."
         },
         "name": {
           "type": "string",
