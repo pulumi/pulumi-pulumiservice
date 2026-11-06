@@ -30,7 +30,7 @@ import javax.annotation.Nullable;
  * The Pulumi Cloud console doesn&#39;t show the issuer ID. List it with the [Pulumi Cloud REST API](https://www.pulumi.com/docs/reference/cloud-rest-api/):
  * 
  * ```sh
- * curl -s -H &#34;Authorization: token $PULUMI_ACCESS_TOKEN&#34; \
+ * curl -s -H &#34;Authorization: token $PULUMI_ACCESS_TOKEN&#34; &#92;
  *   https://api.pulumi.com/api/orgs/my-org/oidc/issuers | jq &#39;.oidcIssuers[] | {name, id}&#39;
  * ```
  * 
@@ -52,14 +52,14 @@ public class OidcIssuer extends com.pulumi.resources.CustomResource {
         return Codegen.optional(this.maxExpirationSeconds);
     }
     /**
-     * Issuer name.
+     * Issuer name, up to 255 characters. If omitted, Pulumi generates a name from the resource&#39;s logical name plus a random suffix, or follows the stack&#39;s [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
      * 
      */
     @Export(name="name", refs={String.class}, tree="[0]")
     private Output<String> name;
 
     /**
-     * @return Issuer name.
+     * @return Issuer name, up to 255 characters. If omitted, Pulumi generates a name from the resource&#39;s logical name plus a random suffix, or follows the stack&#39;s [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
      * 
      */
     public Output<String> name() {

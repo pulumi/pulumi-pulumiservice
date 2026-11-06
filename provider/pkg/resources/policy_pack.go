@@ -140,6 +140,12 @@ type PolicyPackState struct {
 	ContentHash string `pulumi:"contentHash"`
 }
 
+func (s *PolicyPackState) Annotate(a infer.Annotator) {
+	a.Describe(&s.Version, "Version number Pulumi Cloud assigned when this version of the policy pack was published.")
+	a.Describe(&s.ContentHash, "Hash of the policy pack source directory. "+
+		"A change to the source replaces the policy pack, even when versionTag is unchanged.")
+}
+
 // Mirrors the regex Pulumi Cloud enforces server-side; we validate up front so
 // bad tags surface as actionable errors rather than opaque 400s.
 var versionTagRegex = regexp.MustCompile(`^[a-zA-Z0-9-_.]{1,100}$`)
@@ -360,7 +366,7 @@ func introspectPolicyPack(ctx context.Context, sourcePath string) ([]PolicyPackP
 	defer func() { _ = pctx.Close() }()
 
 	analyzer, err := plugin.NewPolicyAnalyzer(
-		pctx.Host, pctx, tokens.QName("policypack"), absPath, nil, nil,
+		pctx.Host, pctx, tokens.QName("policypack"), absPath, nil,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("spawn policy analyzer for %s: %w", absPath, err)

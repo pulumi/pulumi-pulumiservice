@@ -60,12 +60,34 @@ type AgentPoolInput struct {
 
 func (i *AgentPoolInput) Annotate(a infer.Annotator) {
 	a.Describe(&i.OrganizationName, "The organization's name.")
-	a.Describe(&i.Name, "Name of the agent pool.")
+	a.Describe(&i.Name, "Name of the agent pool, up to 100 characters. Only letters, digits, hyphens, "+
+		"underscores, spaces and periods are allowed. "+autoNamedDescription+" Characters that aren't "+
+		"allowed in the logical name are replaced with hyphens.")
 	a.Describe(&i.Description, "Description of the agent pool.")
 	a.Describe(
 		&i.ForceDestroy,
 		"Optional. Flag indicating whether to delete the agent pool even if stacks are configured to use it.",
 	)
+}
+
+func (i *AgentPoolInput) AutoName(autoname infer.SetAutoName) {
+	autoname(&i.Name, suffixedAutoName(agentPoolNameMaxLen, agentPoolNameRune))
+}
+
+// agentPoolNameMaxLen is the longest agent pool name that Pulumi Cloud
+// accepts. The OpenAPI spec doesn't state the limit.
+const agentPoolNameMaxLen = 100
+
+// agentPoolNameRune replaces a rune that Pulumi Cloud rejects in agent pool
+// names with a hyphen. Pulumi Cloud allows only ASCII letters and digits,
+// hyphens, underscores, spaces and periods.
+func agentPoolNameRune(r rune) rune {
+	switch {
+	case r >= 'a' && r <= 'z', r >= 'A' && r <= 'Z', r >= '0' && r <= '9', strings.ContainsRune("-_ .", r):
+		return r
+	default:
+		return '-'
+	}
 }
 
 type AgentPoolState struct {

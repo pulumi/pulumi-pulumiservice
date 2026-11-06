@@ -43,6 +43,16 @@ export class Webhook extends pulumi.CustomResource {
         return new Webhook(name, undefined as any, { ...opts, id: id });
     }
 
+    /**
+     * Check whether an existing Webhook resource with the given ID exists.
+     *
+     * @param id The _unique_ provider ID of the resource to check.
+     * @param opts Optional settings to control the behavior of the CustomResource.
+     */
+    public static exists(id: pulumi.Input<string>, opts?: pulumi.CustomResourceOptions): pulumi.Output<boolean> {
+        return pulumi.runtime.existsResource("pulumiservice:index:Webhook", id, {}, { ...opts }, undefined);
+    }
+
     /** @internal */
     public static readonly __pulumiType = 'pulumiservice:index:Webhook';
 
@@ -62,7 +72,7 @@ export class Webhook extends pulumi.CustomResource {
      */
     declare public readonly active: pulumi.Output<boolean>;
     /**
-     * The friendly name displayed in the Pulumi Cloud.
+     * The friendly name displayed in the Pulumi Cloud, up to 100 bytes. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
      */
     declare public readonly displayName: pulumi.Output<string>;
     /**
@@ -120,9 +130,6 @@ export class Webhook extends pulumi.CustomResource {
             if (args?.active === undefined && !opts.urn) {
                 throw new Error("Missing required property 'active'");
             }
-            if (args?.displayName === undefined && !opts.urn) {
-                throw new Error("Missing required property 'displayName'");
-            }
             if (args?.organizationName === undefined && !opts.urn) {
                 throw new Error("Missing required property 'organizationName'");
             }
@@ -173,9 +180,9 @@ export interface WebhookArgs {
      */
     active: pulumi.Input<boolean>;
     /**
-     * The friendly name displayed in the Pulumi Cloud.
+     * The friendly name displayed in the Pulumi Cloud, up to 100 bytes. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
      */
-    displayName: pulumi.Input<string>;
+    displayName?: pulumi.Input<string | undefined>;
     /**
      * Name of the environment. Only specified if this is an environment webhook.
      */

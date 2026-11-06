@@ -1,0 +1,19 @@
+# AgentAutomationV2 creates a recurring Neo task. The task and trigger are
+# secret inputs because they can contain prompts or webhook credentials.
+resources:
+  dailySummary:
+    type: pulumiservice:api:AgentAutomationV2
+    properties:
+      orgName: ${organizationName}
+      kind: scheduled
+      name: daily-infrastructure-summary
+      scheduleCron: "0 9 * * *"
+      task:
+        message:
+          type: user_message
+          timestamp: "2026-01-01T00:00:00Z"
+          content: Summarize the infrastructure changes since yesterday.
+        source: schedule
+        permissionMode: read-only
+outputs:
+  automationId: ${dailySummary.automationID}

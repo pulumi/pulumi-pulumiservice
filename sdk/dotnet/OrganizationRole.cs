@@ -21,9 +21,9 @@ namespace Pulumi.PulumiService
     /// **Manage these roles in code, not in the Pulumi Cloud console.** In the console's role editor, every rule grants a permission set (the "access level"); it can't show scopes granted directly. Roles that grant scopes directly, as `buildRolePermissions` does, open read-only there.
     /// 
     /// ## Example Usage
-    /// ### A role with organization-level access and entity rules
+    /// ### Organization-level scopes
     /// 
-    /// The program looks up an existing stack, environment, and cloud account, then defines a role that grants scopes at the organization level and on each kind of entity.
+    /// Organization scopes apply across the whole organization rather than to a single stack, environment, or cloud account.
     /// 
     /// ```csharp
     /// using System.Collections.Generic;
@@ -33,38 +33,48 @@ namespace Pulumi.PulumiService
     /// 
     /// return await Deployment.RunAsync(() =&gt; 
     /// {
-    ///     var config = new Config();
-    ///     var organizationName = config.Get("organizationName") ?? "my-org";
-    ///     var prodStack = PulumiService.GetStack.Invoke(new()
-    ///     {
-    ///         OrganizationName = organizationName,
-    ///         ProjectName = "networking",
-    ///         StackName = "prod",
-    ///     });
-    /// 
-    ///     var sharedEnvironment = PulumiService.GetEnvironment.Invoke(new()
-    ///     {
-    ///         OrganizationName = organizationName,
-    ///         ProjectName = "platform",
-    ///         Name = "shared",
-    ///     });
-    /// 
-    ///     var awsAccount = PulumiService.GetInsightsAccount.Invoke(new()
-    ///     {
-    ///         OrganizationName = organizationName,
-    ///         AccountName = "aws-production",
-    ///     });
-    /// 
-    ///     var platformPermissions = PulumiService.BuildRolePermissions.Invoke(new()
+    ///     var permissions = PulumiService.BuildRolePermissions.Invoke(new()
     ///     {
     ///         OrganizationScopes = new[]
     ///         {
     ///             PulumiService.RbacOrganizationScope.TeamRead,
     ///             PulumiService.RbacOrganizationScope.StackCreate,
     ///         },
+    ///     });
+    /// 
+    ///     var teamReaderRole = new PulumiService.OrganizationRole("teamReaderRole", new()
+    ///     {
+    ///         OrganizationName = "my-org",
+    ///         Name = "Team Readers",
+    ///         Description = "Read teams and create stacks.",
+    ///         Permissions = permissions.Apply(buildRolePermissionsResult =&gt; buildRolePermissionsResult.Permissions),
+    ///     });
+    /// 
+    /// });
+    /// ```
+    /// ### Access to every stack, or to one stack
+    /// 
+    /// A stack rule with `all: true` applies to every stack in the organization. A rule with `id` applies to a single stack, identified by the `stackId` that `getStack` returns.
+    /// 
+    /// ```csharp
+    /// using System.Collections.Generic;
+    /// using System.Linq;
+    /// using Pulumi;
+    /// using PulumiService = Pulumi.PulumiService;
+    /// 
+    /// return await Deployment.RunAsync(() =&gt; 
+    /// {
+    ///     var prodStack = PulumiService.GetStack.Invoke(new()
+    ///     {
+    ///         OrganizationName = "my-org",
+    ///         ProjectName = "networking",
+    ///         StackName = "prod",
+    ///     });
+    /// 
+    ///     var permissions = PulumiService.BuildRolePermissions.Invoke(new()
+    ///     {
     ///         StackRules = new[]
     ///         {
-    ///             // Read every stack in the organization
     ///             new PulumiService.Inputs.RoleStackRuleInputArgs
     ///             {
     ///                 All = true,
@@ -73,7 +83,6 @@ namespace Pulumi.PulumiService
     ///                     PulumiService.RbacStackScope.StackRead,
     ///                 },
     ///             },
-    ///             // Deploy one specific stack
     ///             new PulumiService.Inputs.RoleStackRuleInputArgs
     ///             {
     ///                 Id = prodStack.Apply(getStackResult =&gt; getStackResult.StackId),
@@ -83,7 +92,35 @@ namespace Pulumi.PulumiService
     ///                     PulumiService.RbacStackScope.StackDeploymentCreate,
     ///                 },
     ///             },
-    ///             // Deploy stacks tagged team=platform (the operator defaults to equals)
+    ///         },
+    ///     });
+    /// 
+    ///     var prodDeployerRole = new PulumiService.OrganizationRole("prodDeployerRole", new()
+    ///     {
+    ///         OrganizationName = "my-org",
+    ///         Name = "Prod Deployers",
+    ///         Description = "Read every stack and deploy networking/prod.",
+    ///         Permissions = permissions.Apply(buildRolePermissionsResult =&gt; buildRolePermissionsResult.Permissions),
+    ///     });
+    /// 
+    /// });
+    /// ```
+    /// ### Access to stacks by tag
+    /// 
+    /// A rule with `tags` applies to stacks whose tags match every condition in the list. A condition without an `operator` matches stacks where the tag equals `value`. `notEquals` also matches stacks that don't have the tag. `exists` and `notExists` check only whether the tag is set.
+    /// 
+    /// ```csharp
+    /// using System.Collections.Generic;
+    /// using System.Linq;
+    /// using Pulumi;
+    /// using PulumiService = Pulumi.PulumiService;
+    /// 
+    /// return await Deployment.RunAsync(() =&gt; 
+    /// {
+    ///     var permissions = PulumiService.BuildRolePermissions.Invoke(new()
+    ///     {
+    ///         StackRules = new[]
+    ///         {
     ///             new PulumiService.Inputs.RoleStackRuleInputArgs
     ///             {
     ///                 Tags = new[]
@@ -100,7 +137,6 @@ namespace Pulumi.PulumiService
     ///                     PulumiService.RbacStackScope.StackDeploymentCreate,
     ///                 },
     ///             },
-    ///             // Deploy stacks whose env tag is anything but "prod"
     ///             new PulumiService.Inputs.RoleStackRuleInputArgs
     ///             {
     ///                 Tags = new[]
@@ -114,11 +150,9 @@ namespace Pulumi.PulumiService
     ///                 },
     ///                 Scopes = new[]
     ///                 {
-    ///                     PulumiService.RbacStackScope.StackWrite,
     ///                     PulumiService.RbacStackScope.StackDeploymentCreate,
     ///                 },
     ///             },
-    ///             // Read deployment settings on stacks that have a cost-center tag, whatever its value
     ///             new PulumiService.Inputs.RoleStackRuleInputArgs
     ///             {
     ///                 Tags = new[]
@@ -134,7 +168,6 @@ namespace Pulumi.PulumiService
     ///                     PulumiService.RbacStackScope.StackDeploymentSettingsRead,
     ///                 },
     ///             },
-    ///             // Tag stacks that don't have an owner tag yet
     ///             new PulumiService.Inputs.RoleStackRuleInputArgs
     ///             {
     ///                 Tags = new[]
@@ -150,7 +183,6 @@ namespace Pulumi.PulumiService
     ///                     PulumiService.RbacStackScope.StackTagsUpdate,
     ///                 },
     ///             },
-    ///             // Delete stacks that match every tag condition
     ///             new PulumiService.Inputs.RoleStackRuleInputArgs
     ///             {
     ///                 Tags = new[]
@@ -172,9 +204,47 @@ namespace Pulumi.PulumiService
     ///                 },
     ///             },
     ///         },
+    ///     });
+    /// 
+    ///     var platformRole = new PulumiService.OrganizationRole("platformRole", new()
+    ///     {
+    ///         OrganizationName = "my-org",
+    ///         Name = "Platform Engineers",
+    ///         Description = "Deploy platform stacks and clean up ephemeral ones.",
+    ///         Permissions = permissions.Apply(buildRolePermissionsResult =&gt; buildRolePermissionsResult.Permissions),
+    ///     });
+    /// 
+    /// });
+    /// ```
+    /// ### Access to environments and cloud accounts
+    /// 
+    /// Environment and cloud account rules take the same `all`, `id`, and `tags` selectors as stack rules. Each rule list accepts only the scopes for its own entity type.
+    /// 
+    /// ```csharp
+    /// using System.Collections.Generic;
+    /// using System.Linq;
+    /// using Pulumi;
+    /// using PulumiService = Pulumi.PulumiService;
+    /// 
+    /// return await Deployment.RunAsync(() =&gt; 
+    /// {
+    ///     var sharedEnvironment = PulumiService.GetEnvironment.Invoke(new()
+    ///     {
+    ///         OrganizationName = "my-org",
+    ///         ProjectName = "platform",
+    ///         Name = "shared",
+    ///     });
+    /// 
+    ///     var awsAccount = PulumiService.GetInsightsAccount.Invoke(new()
+    ///     {
+    ///         OrganizationName = "my-org",
+    ///         AccountName = "aws-production",
+    ///     });
+    /// 
+    ///     var permissions = PulumiService.BuildRolePermissions.Invoke(new()
+    ///     {
     ///         EnvironmentRules = new[]
     ///         {
-    ///             // Read every environment
     ///             new PulumiService.Inputs.RoleEnvironmentRuleInputArgs
     ///             {
     ///                 All = true,
@@ -183,7 +253,6 @@ namespace Pulumi.PulumiService
     ///                     PulumiService.RbacEnvironmentScope.EnvironmentRead,
     ///                 },
     ///             },
-    ///             // Open, update, and rotate one specific environment
     ///             new PulumiService.Inputs.RoleEnvironmentRuleInputArgs
     ///             {
     ///                 Id = sharedEnvironment.Apply(getEnvironmentResult =&gt; getEnvironmentResult.EnvironmentId),
@@ -194,26 +263,9 @@ namespace Pulumi.PulumiService
     ///                     PulumiService.RbacEnvironmentScope.EnvironmentRotate,
     ///                 },
     ///             },
-    ///             // Open environments tagged team=platform
-    ///             new PulumiService.Inputs.RoleEnvironmentRuleInputArgs
-    ///             {
-    ///                 Tags = new[]
-    ///                 {
-    ///                     new PulumiService.Inputs.TagConditionInputArgs
-    ///                     {
-    ///                         Key = "team",
-    ///                         Value = "platform",
-    ///                     },
-    ///                 },
-    ///                 Scopes = new[]
-    ///                 {
-    ///                     PulumiService.RbacEnvironmentScope.EnvironmentOpen,
-    ///                 },
-    ///             },
     ///         },
     ///         AccountRules = new[]
     ///         {
-    ///             // Read every cloud account
     ///             new PulumiService.Inputs.RoleAccountRuleInputArgs
     ///             {
     ///                 All = true,
@@ -222,7 +274,6 @@ namespace Pulumi.PulumiService
     ///                     PulumiService.RbacAccountScope.InsightsAccountRead,
     ///                 },
     ///             },
-    ///             // Scan one specific account
     ///             new PulumiService.Inputs.RoleAccountRuleInputArgs
     ///             {
     ///                 Id = awsAccount.Apply(getInsightsAccountResult =&gt; getInsightsAccountResult.InsightsAccountId),
@@ -231,7 +282,6 @@ namespace Pulumi.PulumiService
     ///                     PulumiService.RbacAccountScope.InsightsAccountScan,
     ///                 },
     ///             },
-    ///             // Update accounts tagged team=platform
     ///             new PulumiService.Inputs.RoleAccountRuleInputArgs
     ///             {
     ///                 Tags = new[]
@@ -250,17 +300,15 @@ namespace Pulumi.PulumiService
     ///         },
     ///     });
     /// 
-    ///     var platformRole = new PulumiService.OrganizationRole("platformRole", new()
+    ///     var infraRole = new PulumiService.OrganizationRole("infraRole", new()
     ///     {
-    ///         OrganizationName = organizationName,
-    ///         Name = "Platform Engineers",
-    ///         Description = "Read access across the organization, plus deploy access to platform stacks.",
-    ///         Permissions = platformPermissions.Apply(buildRolePermissionsResult =&gt; buildRolePermissionsResult.Permissions),
+    ///         OrganizationName = "my-org",
+    ///         Name = "Infrastructure Operators",
+    ///         Description = "Read environments and cloud accounts, and operate the shared ones.",
+    ///         Permissions = permissions.Apply(buildRolePermissionsResult =&gt; buildRolePermissionsResult.Permissions),
     ///     });
     /// 
     /// });
-    /// 
-    /// 
     /// ```
     /// 
     /// ## Import
@@ -283,7 +331,7 @@ namespace Pulumi.PulumiService
         public Output<string?> Description { get; private set; } = null!;
 
         /// <summary>
-        /// The role's display name. Must be unique within the organization.
+        /// The role's display name, up to 100 bytes. Must be unique within the organization. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
         /// </summary>
         [Output("name")]
         public Output<string> Name { get; private set; } = null!;
@@ -385,10 +433,10 @@ namespace Pulumi.PulumiService
         public Input<string>? Description { get; set; }
 
         /// <summary>
-        /// The role's display name. Must be unique within the organization.
+        /// The role's display name, up to 100 bytes. Must be unique within the organization. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
         /// </summary>
-        [Input("name", required: true)]
-        public Input<string> Name { get; set; } = null!;
+        [Input("name")]
+        public Input<string>? Name { get; set; }
 
         /// <summary>
         /// The Pulumi Cloud organization name.

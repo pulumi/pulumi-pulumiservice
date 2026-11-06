@@ -34,15 +34,15 @@ func TestDeleteOrgAccessToken(t *testing.T) {
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodDelete,
 			ExpectedReqPath:   "/api/orgs/anOrg/tokens/" + tokenID,
-			ResponseCode:      404,
+			ResponseCode:      500,
 			ResponseBody: ErrorResponse{
-				StatusCode: 404,
+				StatusCode: 500,
 				Message:    tokenNotFoundError,
 			},
 		})
 		assert.EqualError(t,
 			c.DeleteOrgAccessToken(teamCtx, tokenID, orgName),
-			fmt.Sprintf(`failed to delete access token "%s": 404 API error: token not found`, testOrgTokenID),
+			fmt.Sprintf(`failed to delete access token "%s": 500 API error: token not found`, testOrgTokenID),
 		)
 	})
 

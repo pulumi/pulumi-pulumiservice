@@ -58,6 +58,8 @@ type EscClientMock struct {
 	) ([]client.EnvironmentDiagnostic, int, error)
 	// calls records the mutating calls made, as "method org/project/env".
 	calls []string
+	// deleteErr is returned by DeleteEnvironment and DeleteEnvironmentRevisionTag.
+	deleteErr error
 }
 
 func (c *EscClientMock) GetEnvironment(
@@ -125,7 +127,7 @@ func (c *EscClientMock) CloneEnvironment(
 
 func (c *EscClientMock) DeleteEnvironment(_ context.Context, orgName, projectName, envName string) error {
 	c.calls = append(c.calls, "delete "+path.Join(orgName, projectName, envName))
-	return nil
+	return c.deleteErr
 }
 
 func (c *EscClientMock) EnvironmentExists(context.Context, string, string, string) (bool, error) {
@@ -370,7 +372,7 @@ func (c *EscClientMock) DeleteEnvironmentRevisionTag(
 	_ context.Context,
 	_, _, _, _ string,
 ) error {
-	return nil
+	return c.deleteErr
 }
 
 func (c *EscClientMock) RetractEnvironmentRevision(
@@ -902,6 +904,22 @@ func TestEnvironmentDelete(t *testing.T) {
 			assert.Equal(t, []string{"delete " + path.Join(gcOrg, project.AsString(), gcEnv)}, escClient.calls)
 		})
 	}
+
+	t.Run("already gone", func(t *testing.T) {
+		escClient := newEnvEscClientMock("", 0, nil)
+		escClient.deleteErr = &apitype.ErrorResponse{Code: http.StatusNotFound}
+		server := newEnvironmentServer(t, escClient)
+		err := server.Delete(p.DeleteRequest{ID: gcEnvProjID, Urn: envURN, Properties: legacyEnvState(gcEnvProj, gcEnvYaml)})
+		assert.NoError(t, err, "a 404 should count as deleted")
+	})
+
+	t.Run("server error", func(t *testing.T) {
+		escClient := newEnvEscClientMock("", 0, nil)
+		escClient.deleteErr = &apitype.ErrorResponse{Code: http.StatusInternalServerError}
+		server := newEnvironmentServer(t, escClient)
+		err := server.Delete(p.DeleteRequest{ID: gcEnvProjID, Urn: envURN, Properties: legacyEnvState(gcEnvProj, gcEnvYaml)})
+		assert.Error(t, err)
+	})
 }
 
 func TestEnvironmentRead(t *testing.T) {

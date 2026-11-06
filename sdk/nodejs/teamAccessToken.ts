@@ -39,6 +39,16 @@ export class TeamAccessToken extends pulumi.CustomResource {
         return new TeamAccessToken(name, undefined as any, { ...opts, id: id });
     }
 
+    /**
+     * Check whether an existing TeamAccessToken resource with the given ID exists.
+     *
+     * @param id The _unique_ provider ID of the resource to check.
+     * @param opts Optional settings to control the behavior of the CustomResource.
+     */
+    public static exists(id: pulumi.Input<string>, opts?: pulumi.CustomResourceOptions): pulumi.Output<boolean> {
+        return pulumi.runtime.existsResource("pulumiservice:index:TeamAccessToken", id, {}, { ...opts }, undefined);
+    }
+
     /** @internal */
     public static readonly __pulumiType = 'pulumiservice:index:TeamAccessToken';
 
@@ -58,7 +68,11 @@ export class TeamAccessToken extends pulumi.CustomResource {
      */
     declare public readonly description: pulumi.Output<string | undefined>;
     /**
-     * The name for the token. This must be unique among all organization and team tokens in the organization.
+     * The name for the token, up to 40 characters. Organization and team tokens share one set of names per organization, and Pulumi Cloud never frees a deleted token's name, so the name must not have been used by any other token in the organization.
+     *
+     * If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). A replacement gets a new name. Removing `name` from an existing token keeps its current name until the next replacement.
+     *
+     * Every input on this resource triggers a replacement, so when `name` is set explicitly, changing any other input fails with `409 Conflict: token name already exists`. Omit `name`, or change it along with the other input.
      */
     declare public readonly name: pulumi.Output<string>;
     /**
@@ -85,9 +99,6 @@ export class TeamAccessToken extends pulumi.CustomResource {
         let resourceInputs: pulumi.Inputs = {};
         opts = opts || {};
         if (!opts.id) {
-            if (args?.name === undefined && !opts.urn) {
-                throw new Error("Missing required property 'name'");
-            }
             if (args?.organizationName === undefined && !opts.urn) {
                 throw new Error("Missing required property 'organizationName'");
             }
@@ -124,9 +135,13 @@ export interface TeamAccessTokenArgs {
      */
     description?: pulumi.Input<string | undefined>;
     /**
-     * The name for the token. This must be unique among all organization and team tokens in the organization.
+     * The name for the token, up to 40 characters. Organization and team tokens share one set of names per organization, and Pulumi Cloud never frees a deleted token's name, so the name must not have been used by any other token in the organization.
+     *
+     * If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). A replacement gets a new name. Removing `name` from an existing token keeps its current name until the next replacement.
+     *
+     * Every input on this resource triggers a replacement, so when `name` is set explicitly, changing any other input fails with `409 Conflict: token name already exists`. Omit `name`, or change it along with the other input.
      */
-    name: pulumi.Input<string>;
+    name?: pulumi.Input<string | undefined>;
     /**
      * The organization's name.
      */

@@ -30,6 +30,16 @@ export class Team extends pulumi.CustomResource {
         return new Team(name, undefined as any, { ...opts, id: id });
     }
 
+    /**
+     * Check whether an existing Team resource with the given ID exists.
+     *
+     * @param id The _unique_ provider ID of the resource to check.
+     * @param opts Optional settings to control the behavior of the CustomResource.
+     */
+    public static exists(id: pulumi.Input<string>, opts?: pulumi.CustomResourceOptions): pulumi.Output<boolean> {
+        return pulumi.runtime.existsResource("pulumiservice:index:Team", id, {}, { ...opts }, undefined);
+    }
+
     /** @internal */
     public static readonly __pulumiType = 'pulumiservice:index:Team';
 
@@ -57,7 +67,9 @@ export class Team extends pulumi.CustomResource {
      */
     declare public readonly githubTeamId: pulumi.Output<number | undefined>;
     /**
-     * List of Pulumi Cloud usernames of team members.
+     * The Pulumi Cloud usernames of the team's members.
+     * Pulumi Cloud adds the user who creates the team as a member, usually the owner of the access token that runs `pulumi up`.
+     * List that user here to keep them on the team: otherwise `pulumi refresh` shows them as a change, and the next update to `members` removes them.
      */
     declare public readonly members: pulumi.Output<string[]>;
     /**
@@ -130,7 +142,9 @@ export interface TeamArgs {
      */
     githubTeamId?: pulumi.Input<number | undefined>;
     /**
-     * List of Pulumi Cloud usernames of team members.
+     * The Pulumi Cloud usernames of the team's members.
+     * Pulumi Cloud adds the user who creates the team as a member, usually the owner of the access token that runs `pulumi up`.
+     * List that user here to keep them on the team: otherwise `pulumi refresh` shows them as a change, and the next update to `members` removes them.
      */
     members?: pulumi.Input<pulumi.Input<string>[] | undefined>;
     /**

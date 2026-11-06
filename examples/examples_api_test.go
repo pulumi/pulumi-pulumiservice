@@ -68,6 +68,7 @@ type apiCase struct {
 	// PreviewOnlyAll forces preview-only on every lane (including yaml).
 	// Used when the api surface is partial or blocked at create time.
 	PreviewOnlyAll bool
+	OneAtATime     bool
 	// SkipReason, when non-empty, skips this example on every lane.
 	SkipReason string
 	// SkipLang skips specific language lanes for this example.
@@ -138,7 +139,7 @@ var apiCases = []apiCase{
 	},
 	{
 		Name:    "approval-rules",
-		Config:  orgOnlyConfig,
+		Config:  approvalRulesConfig,
 		FullE2E: true,
 	},
 	{
@@ -226,9 +227,10 @@ var apiCases = []apiCase{
 		FullE2E: true, // Stack + StackTag both have clean CRUD.
 	},
 	{
-		Name:    "template-sources",
-		Config:  templateSourcesConfig,
-		FullE2E: true,
+		Name:       "template-sources",
+		Config:     templateSourcesConfig,
+		FullE2E:    true,
+		OneAtATime: true,
 	},
 	{
 		Name:           "organization-members",
@@ -347,6 +349,9 @@ func TestApi(t *testing.T) {
 				t.Parallel()
 				if ex.SkipReason != "" {
 					t.Skip(ex.SkipReason)
+				}
+				if ex.OneAtATime && lang == "yaml" {
+					skipUnlessSerializedTests(t)
 				}
 				if reason := skipLangReason(t, lang); reason != "" {
 					t.Skip(reason)
@@ -794,6 +799,13 @@ func webhookConfig() map[string]string {
 		"organizationName": ServiceProviderTestOrg,
 		"secretValue":      "shhh-" + suffix,
 		"hookSuffix":       suffix,
+	}
+}
+
+func approvalRulesConfig() map[string]string {
+	return map[string]string{
+		"organizationName": ServiceProviderTestOrg,
+		"groupName":        "api-approvers-" + generateRandomFiveDigits(),
 	}
 }
 

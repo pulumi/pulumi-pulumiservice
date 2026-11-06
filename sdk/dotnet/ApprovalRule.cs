@@ -46,7 +46,7 @@ namespace Pulumi.PulumiService
         public Output<Outputs.EnvironmentIdentifier> EnvironmentIdentifier { get; private set; } = null!;
 
         /// <summary>
-        /// The name of the approval rule.
+        /// The name of the approval rule, up to 255 bytes. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
         /// </summary>
         [Output("name")]
         public Output<string> Name { get; private set; } = null!;
@@ -128,10 +128,10 @@ namespace Pulumi.PulumiService
         public Input<Inputs.EnvironmentIdentifierArgs> EnvironmentIdentifier { get; set; } = null!;
 
         /// <summary>
-        /// The name of the approval rule.
+        /// The name of the approval rule, up to 255 bytes. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
         /// </summary>
-        [Input("name", required: true)]
-        public Input<string> Name { get; set; } = null!;
+        [Input("name")]
+        public Input<string>? Name { get; set; }
 
         [Input("targetActionTypes", required: true)]
         private InputList<Pulumi.PulumiService.TargetActionType>? _targetActionTypes;

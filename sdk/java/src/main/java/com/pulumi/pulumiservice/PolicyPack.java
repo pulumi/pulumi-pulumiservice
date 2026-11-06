@@ -32,9 +32,17 @@ import javax.annotation.Nullable;
  */
 @ResourceType(type="pulumiservice:index:PolicyPack")
 public class PolicyPack extends com.pulumi.resources.CustomResource {
+    /**
+     * Hash of the policy pack source directory. A change to the source replaces the policy pack, even when versionTag is unchanged.
+     * 
+     */
     @Export(name="contentHash", refs={String.class}, tree="[0]")
     private Output<String> contentHash;
 
+    /**
+     * @return Hash of the policy pack source directory. A change to the source replaces the policy pack, even when versionTag is unchanged.
+     * 
+     */
     public Output<String> contentHash() {
         return this.contentHash;
     }
@@ -108,9 +116,17 @@ public class PolicyPack extends com.pulumi.resources.CustomResource {
     public Output<String> sourcePath() {
         return this.sourcePath;
     }
+    /**
+     * Version number Pulumi Cloud assigned when this version of the policy pack was published.
+     * 
+     */
     @Export(name="version", refs={Integer.class}, tree="[0]")
     private Output<Integer> version;
 
+    /**
+     * @return Version number Pulumi Cloud assigned when this version of the policy pack was published.
+     * 
+     */
     public Output<Integer> version() {
         return this.version;
     }

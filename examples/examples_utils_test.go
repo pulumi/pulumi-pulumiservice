@@ -12,6 +12,10 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/stretchr/testify/require"
+
+	"github.com/pulumi/providertest/pulumitest"
+	"github.com/pulumi/pulumi/sdk/v3/go/auto"
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 )
@@ -22,6 +26,15 @@ func getCwd(t *testing.T) string {
 		t.FailNow()
 	}
 	return cwd
+}
+
+const serializedTestsEnv = "PULUMI_TEST_SERIALIZED"
+
+func skipUnlessSerializedTests(t *testing.T) {
+	t.Helper()
+	if os.Getenv(serializedTestsEnv) == "" {
+		t.Skipf("runs in the serialized shared-org job; set %s to run it", serializedTestsEnv)
+	}
 }
 
 func generateRandomFiveDigits() string {
@@ -36,6 +49,14 @@ func generateRandomFiveDigits() string {
 // exists" on init.
 func randomStackName() string {
 	return "test-" + uuid.NewString()[:8]
+}
+
+// uniquePolicyPackName returns a policy pack name no earlier run has used.
+// Pulumi Cloud refuses to publish a name and version tag that was ever
+// published, even after the version is deleted, so a name from the five-digit
+// space eventually collides with a past run.
+func uniquePolicyPackName() string {
+	return "example-pack-" + uuid.NewString()
 }
 
 // tlsThumbprint returns the SHA256 fingerprint (hex) of the TLS certificate
@@ -175,4 +196,66 @@ func snapshotFixtureOrgMember(t *testing.T, orgName, userName string) func() {
 			t.Logf("restore fixture user role: %v", restoreErr)
 		}
 	}
+}
+
+// setSecretConfig sets an encrypted config value on the test's stack.
+// pulumitest's SetConfig only sets plaintext values, which a program that
+// declares the key as secret rejects.
+func setSecretConfig(t *testing.T, test *pulumitest.PulumiTest, key, value string) {
+	t.Helper()
+	err := test.CurrentStack().SetConfig(test.Context(), key, auto.ConfigValue{Value: value, Secret: true})
+	require.NoError(t, err, "setting secret config %q", key)
+}
+
+// templateSourceDirs are directories of github.com/pulumi/templates: the base
+// language templates and the architecture templates. Pulumi Cloud allows only
+// one template source per URL in an organization, so each run picks one at
+// random to avoid colliding with a concurrent run or with a source that an
+// earlier run left behind.
+var templateSourceDirs = []string{
+	"bun", "csharp", "fsharp", "go", "hcl", "java-gradle", "java-jbang", "java", "javascript",
+	"python", "typescript", "visualbasic", "yaml",
+	"container-aws-csharp", "container-aws-go", "container-aws-hcl", "container-aws-python",
+	"container-aws-typescript", "container-aws-yaml",
+	"container-azure-csharp", "container-azure-go", "container-azure-hcl", "container-azure-python",
+	"container-azure-typescript",
+	"container-gcp-csharp", "container-gcp-go", "container-gcp-hcl", "container-gcp-python",
+	"container-gcp-typescript",
+	"helm-kubernetes-csharp", "helm-kubernetes-go", "helm-kubernetes-hcl", "helm-kubernetes-python",
+	"helm-kubernetes-typescript", "helm-kubernetes-yaml",
+	"kubernetes-aws-csharp", "kubernetes-aws-go", "kubernetes-aws-hcl", "kubernetes-aws-python",
+	"kubernetes-aws-typescript", "kubernetes-aws-yaml",
+	"kubernetes-azure-csharp", "kubernetes-azure-go", "kubernetes-azure-hcl",
+	"kubernetes-azure-python", "kubernetes-azure-typescript", "kubernetes-azure-yaml",
+	"kubernetes-gcp-csharp", "kubernetes-gcp-go", "kubernetes-gcp-hcl", "kubernetes-gcp-python",
+	"kubernetes-gcp-typescript", "kubernetes-gcp-yaml",
+	"serverless-aws-csharp", "serverless-aws-go", "serverless-aws-hcl", "serverless-aws-python",
+	"serverless-aws-typescript", "serverless-aws-yaml",
+	"serverless-azure-csharp", "serverless-azure-go", "serverless-azure-hcl",
+	"serverless-azure-python", "serverless-azure-typescript", "serverless-azure-yaml",
+	"serverless-cloudflare-csharp", "serverless-cloudflare-go", "serverless-cloudflare-hcl",
+	"serverless-cloudflare-python", "serverless-cloudflare-typescript", "serverless-cloudflare-yaml",
+	"serverless-gcp-csharp", "serverless-gcp-go", "serverless-gcp-hcl", "serverless-gcp-python",
+	"serverless-gcp-typescript", "serverless-gcp-yaml",
+	"static-website-aws-bun", "static-website-aws-csharp", "static-website-aws-go",
+	"static-website-aws-hcl", "static-website-aws-python", "static-website-aws-typescript",
+	"static-website-aws-yaml",
+	"static-website-azure-csharp", "static-website-azure-go", "static-website-azure-hcl",
+	"static-website-azure-python", "static-website-azure-typescript", "static-website-azure-yaml",
+	"static-website-cloudflare-csharp", "static-website-cloudflare-go",
+	"static-website-cloudflare-hcl", "static-website-cloudflare-python",
+	"static-website-cloudflare-typescript", "static-website-cloudflare-yaml",
+	"static-website-gcp-csharp", "static-website-gcp-go", "static-website-gcp-hcl",
+	"static-website-gcp-python", "static-website-gcp-typescript", "static-website-gcp-yaml",
+	"vm-aws-csharp", "vm-aws-go", "vm-aws-hcl", "vm-aws-python", "vm-aws-typescript", "vm-aws-yaml",
+	"vm-azure-csharp", "vm-azure-go", "vm-azure-hcl", "vm-azure-python", "vm-azure-typescript",
+	"vm-azure-yaml",
+	"vm-gcp-csharp", "vm-gcp-go", "vm-gcp-hcl", "vm-gcp-python", "vm-gcp-typescript", "vm-gcp-yaml",
+	"webapp-kubernetes-csharp", "webapp-kubernetes-go", "webapp-kubernetes-hcl",
+	"webapp-kubernetes-python", "webapp-kubernetes-typescript", "webapp-kubernetes-yaml",
+}
+
+func randomTemplateSourceURL() string {
+	dir := templateSourceDirs[rand.Intn(len(templateSourceDirs))] //nolint:gosec // For testing.
+	return "https://github.com/pulumi/templates/" + dir
 }

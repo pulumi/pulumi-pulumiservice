@@ -66,8 +66,15 @@ type TeamInput struct {
 	Members []string `pulumi:"members,optional"`
 }
 
+// teamMembersDescription is shared by the input and output so both document the same behavior.
+const teamMembersDescription = "The Pulumi Cloud usernames of the team's members.\n" +
+	"Pulumi Cloud adds the user who creates the team as a member, " +
+	"usually the owner of the access token that runs `pulumi up`.\n" +
+	"List that user here to keep them on the team: otherwise `pulumi refresh` shows them as a change, " +
+	"and the next update to `members` removes them."
+
 func (t *TeamInput) Annotate(a infer.Annotator) {
-	a.Describe(&t.Members, "List of Pulumi Cloud usernames of team members.")
+	a.Describe(&t.Members, teamMembersDescription)
 }
 
 type TeamState struct {
@@ -76,7 +83,7 @@ type TeamState struct {
 }
 
 func (t *TeamState) Annotate(a infer.Annotator) {
-	a.Describe(&t.Members, "List of Pulumi Cloud usernames of team members.")
+	a.Describe(&t.Members, teamMembersDescription)
 }
 
 func (*Team) Create(ctx context.Context, req infer.CreateRequest[TeamInput]) (infer.CreateResponse[TeamState], error) {
@@ -144,6 +151,7 @@ func (*Team) Create(ctx context.Context, req infer.CreateRequest[TeamInput]) (in
 	}
 	// Sort the members so the order is deterministic
 	slices.Sort(members) //nolint:govet // inline analyzer limitation on generic slices.Sort; not a code defect.
+	warnUndeclaredMembers(ctx, util.OrZero(req.Inputs.Name), req.Inputs.Members, members)
 
 	return infer.CreateResponse[TeamState]{
 		ID: teamURN,
@@ -159,6 +167,22 @@ func (*Team) Create(ctx context.Context, req infer.CreateRequest[TeamInput]) (in
 			},
 		},
 	}, nil
+}
+
+// warnUndeclaredMembers warns about members Pulumi Cloud added to a new team that the program didn't declare,
+// which is the team's creator. Members is the full membership, so the next update that changes it removes them.
+func warnUndeclaredMembers(ctx context.Context, teamName string, declared, actual []string) {
+	for _, username := range actual {
+		if slices.Contains(declared, username) { //nolint:govet // inline analyzer limitation on generic slices.
+			continue
+		}
+		p.GetLogger(ctx).Warningf(
+			"Pulumi Cloud added %q to team %q because they created it. "+
+				"Add them to `members` to keep them on the team: otherwise `pulumi refresh` shows them as a change, "+
+				"and the next update to `members` removes them.",
+			username, teamName,
+		)
+	}
 }
 
 func (*Team) Check(ctx context.Context, req infer.CheckRequest) (infer.CheckResponse[TeamInput], error) {

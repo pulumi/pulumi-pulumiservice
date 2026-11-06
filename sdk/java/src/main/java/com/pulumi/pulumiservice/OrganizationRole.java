@@ -29,31 +29,20 @@ import javax.annotation.Nullable;
  * **Manage these roles in code, not in the Pulumi Cloud console.** In the console&#39;s role editor, every rule grants a permission set (the &#34;access level&#34;); it can&#39;t show scopes granted directly. Roles that grant scopes directly, as `buildRolePermissions` does, open read-only there.
  * 
  * ## Example Usage
- * ### A role with organization-level access and entity rules
+ * ### Organization-level scopes
  * 
- * The program looks up an existing stack, environment, and cloud account, then defines a role that grants scopes at the organization level and on each kind of entity.
+ * Organization scopes apply across the whole organization rather than to a single stack, environment, or cloud account.
  * 
  * <pre>
  * {@code
  * package generated_program;
  * 
+ * import com.pulumi.pulumiservice.enums.RbacOrganizationScope;
  * import com.pulumi.Context;
  * import com.pulumi.Pulumi;
  * import com.pulumi.core.Output;
- * import com.pulumi.pulumiservice.enums.RbacAccountScope;
- * import com.pulumi.pulumiservice.enums.RbacEnvironmentScope;
- * import com.pulumi.pulumiservice.enums.RbacOrganizationScope;
- * import com.pulumi.pulumiservice.enums.RbacStackScope;
- * import com.pulumi.pulumiservice.enums.TagOperator;
  * import com.pulumi.pulumiservice.PulumiserviceFunctions;
- * import com.pulumi.pulumiservice.inputs.GetStackArgs;
- * import com.pulumi.pulumiservice.inputs.GetEnvironmentArgs;
- * import com.pulumi.pulumiservice.inputs.GetInsightsAccountArgs;
  * import com.pulumi.pulumiservice.inputs.BuildRolePermissionsArgs;
- * import com.pulumi.pulumiservice.inputs.RoleStackRuleArgs;
- * import com.pulumi.pulumiservice.inputs.TagConditionArgs;
- * import com.pulumi.pulumiservice.inputs.RoleEnvironmentRuleArgs;
- * import com.pulumi.pulumiservice.inputs.RoleAccountRuleArgs;
  * import com.pulumi.pulumiservice.OrganizationRole;
  * import com.pulumi.pulumiservice.OrganizationRoleArgs;
  * import java.util.ArrayList;
@@ -69,43 +58,119 @@ import javax.annotation.Nullable;
  *     }
  * 
  *     public static void stack(Context ctx) {
- *         final var config = ctx.config();
- *         final var organizationName = config.get("organizationName").orElse("my-org");
+ *         final var permissions = PulumiserviceFunctions.buildRolePermissions(BuildRolePermissionsArgs.builder()
+ *             .organizationScopes(            
+ *                 RbacOrganizationScope.TeamRead,
+ *                 RbacOrganizationScope.StackCreate)
+ *             .build());
+ * 
+ *         var teamReaderRole = new OrganizationRole("teamReaderRole", OrganizationRoleArgs.builder()
+ *             .organizationName("my-org")
+ *             .name("Team Readers")
+ *             .description("Read teams and create stacks.")
+ *             .permissions(permissions.applyValue(_permissions -> _permissions.permissions()))
+ *             .build());
+ * 
+ *     }
+ * }
+ * }
+ * </pre>
+ * ### Access to every stack, or to one stack
+ * 
+ * A stack rule with `all: true` applies to every stack in the organization. A rule with `id` applies to a single stack, identified by the `stackId` that `getStack` returns.
+ * 
+ * <pre>
+ * {@code
+ * package generated_program;
+ * 
+ * import com.pulumi.pulumiservice.enums.RbacStackScope;
+ * import com.pulumi.Context;
+ * import com.pulumi.Pulumi;
+ * import com.pulumi.core.Output;
+ * import com.pulumi.pulumiservice.PulumiserviceFunctions;
+ * import com.pulumi.pulumiservice.inputs.GetStackArgs;
+ * import com.pulumi.pulumiservice.inputs.BuildRolePermissionsArgs;
+ * import com.pulumi.pulumiservice.inputs.RoleStackRuleArgs;
+ * import com.pulumi.pulumiservice.OrganizationRole;
+ * import com.pulumi.pulumiservice.OrganizationRoleArgs;
+ * import java.util.ArrayList;
+ * import java.util.Arrays;
+ * import java.util.Map;
+ * import java.io.File;
+ * import java.nio.file.Files;
+ * import java.nio.file.Paths;
+ * 
+ * public class App {
+ *     public static void main(String[] args) {
+ *         Pulumi.run(App::stack);
+ *     }
+ * 
+ *     public static void stack(Context ctx) {
  *         final var prodStack = PulumiserviceFunctions.getStack(GetStackArgs.builder()
- *             .organizationName(organizationName)
+ *             .organizationName("my-org")
  *             .projectName("networking")
  *             .stackName("prod")
  *             .build());
  * 
- *         final var sharedEnvironment = PulumiserviceFunctions.getEnvironment(GetEnvironmentArgs.builder()
- *             .organizationName(organizationName)
- *             .projectName("platform")
- *             .name("shared")
- *             .build());
- * 
- *         final var awsAccount = PulumiserviceFunctions.getInsightsAccount(GetInsightsAccountArgs.builder()
- *             .organizationName(organizationName)
- *             .accountName("aws-production")
- *             .build());
- * 
- *         final var platformPermissions = PulumiserviceFunctions.buildRolePermissions(BuildRolePermissionsArgs.builder()
- *             .organizationScopes(            
- *                 RbacOrganizationScope.TeamRead,
- *                 RbacOrganizationScope.StackCreate)
+ *         final var permissions = PulumiserviceFunctions.buildRolePermissions(BuildRolePermissionsArgs.builder()
  *             .stackRules(            
- *                 // Read every stack in the organization
  *                 RoleStackRuleArgs.builder()
  *                     .all(true)
  *                     .scopes(RbacStackScope.StackRead)
  *                     .build(),
- *                 // Deploy one specific stack
  *                 RoleStackRuleArgs.builder()
  *                     .id(prodStack.applyValue(_prodStack -> _prodStack.stackId()))
  *                     .scopes(                    
  *                         RbacStackScope.StackWrite,
  *                         RbacStackScope.StackDeploymentCreate)
- *                     .build(),
- *                 // Deploy stacks tagged team=platform (the operator defaults to equals)
+ *                     .build())
+ *             .build());
+ * 
+ *         var prodDeployerRole = new OrganizationRole("prodDeployerRole", OrganizationRoleArgs.builder()
+ *             .organizationName("my-org")
+ *             .name("Prod Deployers")
+ *             .description("Read every stack and deploy networking/prod.")
+ *             .permissions(permissions.applyValue(_permissions -> _permissions.permissions()))
+ *             .build());
+ * 
+ *     }
+ * }
+ * }
+ * </pre>
+ * ### Access to stacks by tag
+ * 
+ * A rule with `tags` applies to stacks whose tags match every condition in the list. A condition without an `operator` matches stacks where the tag equals `value`. `notEquals` also matches stacks that don&#39;t have the tag. `exists` and `notExists` check only whether the tag is set.
+ * 
+ * <pre>
+ * {@code
+ * package generated_program;
+ * 
+ * import com.pulumi.pulumiservice.enums.RbacStackScope;
+ * import com.pulumi.pulumiservice.enums.TagOperator;
+ * import com.pulumi.Context;
+ * import com.pulumi.Pulumi;
+ * import com.pulumi.core.Output;
+ * import com.pulumi.pulumiservice.PulumiserviceFunctions;
+ * import com.pulumi.pulumiservice.inputs.BuildRolePermissionsArgs;
+ * import com.pulumi.pulumiservice.inputs.RoleStackRuleArgs;
+ * import com.pulumi.pulumiservice.inputs.TagConditionArgs;
+ * import com.pulumi.pulumiservice.OrganizationRole;
+ * import com.pulumi.pulumiservice.OrganizationRoleArgs;
+ * import java.util.ArrayList;
+ * import java.util.Arrays;
+ * import java.util.Map;
+ * import java.io.File;
+ * import java.nio.file.Files;
+ * import java.nio.file.Paths;
+ * 
+ * public class App {
+ *     public static void main(String[] args) {
+ *         Pulumi.run(App::stack);
+ *     }
+ * 
+ *     public static void stack(Context ctx) {
+ *         final var permissions = PulumiserviceFunctions.buildRolePermissions(BuildRolePermissionsArgs.builder()
+ *             .stackRules(            
  *                 RoleStackRuleArgs.builder()
  *                     .tags(TagConditionArgs.builder()
  *                         .key("team")
@@ -115,18 +180,14 @@ import javax.annotation.Nullable;
  *                         RbacStackScope.StackWrite,
  *                         RbacStackScope.StackDeploymentCreate)
  *                     .build(),
- *                 // Deploy stacks whose env tag is anything but "prod"
  *                 RoleStackRuleArgs.builder()
  *                     .tags(TagConditionArgs.builder()
  *                         .key("env")
  *                         .value("prod")
  *                         .operator(TagOperator.NotEquals)
  *                         .build())
- *                     .scopes(                    
- *                         RbacStackScope.StackWrite,
- *                         RbacStackScope.StackDeploymentCreate)
+ *                     .scopes(RbacStackScope.StackDeploymentCreate)
  *                     .build(),
- *                 // Read deployment settings on stacks that have a cost-center tag, whatever its value
  *                 RoleStackRuleArgs.builder()
  *                     .tags(TagConditionArgs.builder()
  *                         .key("cost-center")
@@ -134,7 +195,6 @@ import javax.annotation.Nullable;
  *                         .build())
  *                     .scopes(RbacStackScope.StackDeploymentSettingsRead)
  *                     .build(),
- *                 // Tag stacks that don't have an owner tag yet
  *                 RoleStackRuleArgs.builder()
  *                     .tags(TagConditionArgs.builder()
  *                         .key("owner")
@@ -142,7 +202,6 @@ import javax.annotation.Nullable;
  *                         .build())
  *                     .scopes(RbacStackScope.StackTagsUpdate)
  *                     .build(),
- *                 // Delete stacks that match every tag condition
  *                 RoleStackRuleArgs.builder()
  *                     .tags(                    
  *                         TagConditionArgs.builder()
@@ -155,40 +214,87 @@ import javax.annotation.Nullable;
  *                             .build())
  *                     .scopes(RbacStackScope.StackDelete)
  *                     .build())
+ *             .build());
+ * 
+ *         var platformRole = new OrganizationRole("platformRole", OrganizationRoleArgs.builder()
+ *             .organizationName("my-org")
+ *             .name("Platform Engineers")
+ *             .description("Deploy platform stacks and clean up ephemeral ones.")
+ *             .permissions(permissions.applyValue(_permissions -> _permissions.permissions()))
+ *             .build());
+ * 
+ *     }
+ * }
+ * }
+ * </pre>
+ * ### Access to environments and cloud accounts
+ * 
+ * Environment and cloud account rules take the same `all`, `id`, and `tags` selectors as stack rules. Each rule list accepts only the scopes for its own entity type.
+ * 
+ * <pre>
+ * {@code
+ * package generated_program;
+ * 
+ * import com.pulumi.pulumiservice.enums.RbacAccountScope;
+ * import com.pulumi.pulumiservice.enums.RbacEnvironmentScope;
+ * import com.pulumi.Context;
+ * import com.pulumi.Pulumi;
+ * import com.pulumi.core.Output;
+ * import com.pulumi.pulumiservice.PulumiserviceFunctions;
+ * import com.pulumi.pulumiservice.inputs.GetEnvironmentArgs;
+ * import com.pulumi.pulumiservice.inputs.GetInsightsAccountArgs;
+ * import com.pulumi.pulumiservice.inputs.BuildRolePermissionsArgs;
+ * import com.pulumi.pulumiservice.inputs.RoleEnvironmentRuleArgs;
+ * import com.pulumi.pulumiservice.inputs.RoleAccountRuleArgs;
+ * import com.pulumi.pulumiservice.inputs.TagConditionArgs;
+ * import com.pulumi.pulumiservice.OrganizationRole;
+ * import com.pulumi.pulumiservice.OrganizationRoleArgs;
+ * import java.util.ArrayList;
+ * import java.util.Arrays;
+ * import java.util.Map;
+ * import java.io.File;
+ * import java.nio.file.Files;
+ * import java.nio.file.Paths;
+ * 
+ * public class App {
+ *     public static void main(String[] args) {
+ *         Pulumi.run(App::stack);
+ *     }
+ * 
+ *     public static void stack(Context ctx) {
+ *         final var sharedEnvironment = PulumiserviceFunctions.getEnvironment(GetEnvironmentArgs.builder()
+ *             .organizationName("my-org")
+ *             .projectName("platform")
+ *             .name("shared")
+ *             .build());
+ * 
+ *         final var awsAccount = PulumiserviceFunctions.getInsightsAccount(GetInsightsAccountArgs.builder()
+ *             .organizationName("my-org")
+ *             .accountName("aws-production")
+ *             .build());
+ * 
+ *         final var permissions = PulumiserviceFunctions.buildRolePermissions(BuildRolePermissionsArgs.builder()
  *             .environmentRules(            
- *                 // Read every environment
  *                 RoleEnvironmentRuleArgs.builder()
  *                     .all(true)
  *                     .scopes(RbacEnvironmentScope.EnvironmentRead)
  *                     .build(),
- *                 // Open, update, and rotate one specific environment
  *                 RoleEnvironmentRuleArgs.builder()
  *                     .id(sharedEnvironment.applyValue(_sharedEnvironment -> _sharedEnvironment.environmentId()))
  *                     .scopes(                    
  *                         RbacEnvironmentScope.EnvironmentOpen,
  *                         RbacEnvironmentScope.EnvironmentWrite,
  *                         RbacEnvironmentScope.EnvironmentRotate)
- *                     .build(),
- *                 // Open environments tagged team=platform
- *                 RoleEnvironmentRuleArgs.builder()
- *                     .tags(TagConditionArgs.builder()
- *                         .key("team")
- *                         .value("platform")
- *                         .build())
- *                     .scopes(RbacEnvironmentScope.EnvironmentOpen)
  *                     .build())
  *             .accountRules(            
- *                 // Read every cloud account
  *                 RoleAccountRuleArgs.builder()
  *                     .all(true)
  *                     .scopes(RbacAccountScope.InsightsAccountRead)
  *                     .build(),
- *                 // Scan one specific account
  *                 RoleAccountRuleArgs.builder()
  *                     .id(awsAccount.applyValue(_awsAccount -> _awsAccount.insightsAccountId()))
  *                     .scopes(RbacAccountScope.InsightsAccountScan)
  *                     .build(),
- *                 // Update accounts tagged team=platform
  *                 RoleAccountRuleArgs.builder()
  *                     .tags(TagConditionArgs.builder()
  *                         .key("team")
@@ -198,16 +304,15 @@ import javax.annotation.Nullable;
  *                     .build())
  *             .build());
  * 
- *         var platformRole = new OrganizationRole("platformRole", OrganizationRoleArgs.builder()
- *             .organizationName(organizationName)
- *             .name("Platform Engineers")
- *             .description("Read access across the organization, plus deploy access to platform stacks.")
- *             .permissions(platformPermissions.applyValue(_platformPermissions -> _platformPermissions.permissions()))
+ *         var infraRole = new OrganizationRole("infraRole", OrganizationRoleArgs.builder()
+ *             .organizationName("my-org")
+ *             .name("Infrastructure Operators")
+ *             .description("Read environments and cloud accounts, and operate the shared ones.")
+ *             .permissions(permissions.applyValue(_permissions -> _permissions.permissions()))
  *             .build());
  * 
  *     }
  * }
- * 
  * }
  * </pre>
  * 
@@ -239,14 +344,14 @@ public class OrganizationRole extends com.pulumi.resources.CustomResource {
         return Codegen.optional(this.description);
     }
     /**
-     * The role&#39;s display name. Must be unique within the organization.
+     * The role&#39;s display name, up to 100 bytes. Must be unique within the organization. If omitted, Pulumi generates a name from the resource&#39;s logical name plus a random suffix, or follows the stack&#39;s [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
      * 
      */
     @Export(name="name", refs={String.class}, tree="[0]")
     private Output<String> name;
 
     /**
-     * @return The role&#39;s display name. Must be unique within the organization.
+     * @return The role&#39;s display name, up to 100 bytes. Must be unique within the organization. If omitted, Pulumi generates a name from the resource&#39;s logical name plus a random suffix, or follows the stack&#39;s [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
      * 
      */
     public Output<String> name() {

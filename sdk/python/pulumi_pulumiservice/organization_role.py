@@ -19,15 +19,14 @@ __all__ = ['OrganizationRoleArgs', 'OrganizationRole']
 @pulumi.input_type
 class OrganizationRoleArgs:
     def __init__(__self__, *,
-                 name: pulumi.Input[_builtins.str],
                  organization_name: pulumi.Input[_builtins.str],
                  permissions: pulumi.Input[Mapping[str, Any]],
                  description: pulumi.Input[Optional[_builtins.str]] = None,
+                 name: pulumi.Input[Optional[_builtins.str]] = None,
                  resource_type: pulumi.Input[Optional[_builtins.str]] = None):
         """
         The set of arguments for constructing a OrganizationRole resource.
 
-        :param pulumi.Input[_builtins.str] name: The role's display name. Must be unique within the organization.
         :param pulumi.Input[_builtins.str] organization_name: The Pulumi Cloud organization name.
         :param pulumi.Input[Mapping[str, Any]] permissions: The role's permission descriptor tree.
                
@@ -42,27 +41,17 @@ class OrganizationRoleArgs:
                
                Note: the helpers' output requires pulumi 3.235.0 or later (pulumi/pulumi#22834). Earlier runtimes drop part of it at the SDK boundary; the Python SDK pins the minimum runtime version automatically.
         :param pulumi.Input[_builtins.str] description: Human-readable description of what the role grants.
+        :param pulumi.Input[_builtins.str] name: The role's display name, up to 100 bytes. Must be unique within the organization. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
         :param pulumi.Input[_builtins.str] resource_type: The resource type the role's permissions apply to. Defaults to `global` (the org-wide role that can be assigned to members and teams). Other valid values: `stack`, `environment`, `insights-account`.
         """
-        pulumi.set(__self__, "name", name)
         pulumi.set(__self__, "organization_name", organization_name)
         pulumi.set(__self__, "permissions", permissions)
         if description is not None:
             pulumi.set(__self__, "description", description)
+        if name is not None:
+            pulumi.set(__self__, "name", name)
         if resource_type is not None:
             pulumi.set(__self__, "resource_type", resource_type)
-
-    @_builtins.property
-    @pulumi.getter
-    def name(self) -> pulumi.Input[_builtins.str]:
-        """
-        The role's display name. Must be unique within the organization.
-        """
-        return pulumi.get(self, "name")
-
-    @name.setter
-    def name(self, value: pulumi.Input[_builtins.str]):
-        pulumi.set(self, "name", value)
 
     @_builtins.property
     @pulumi.getter(name="organizationName")
@@ -112,6 +101,18 @@ class OrganizationRoleArgs:
         pulumi.set(self, "description", value)
 
     @_builtins.property
+    @pulumi.getter
+    def name(self) -> pulumi.Input[Optional[_builtins.str]]:
+        """
+        The role's display name, up to 100 bytes. Must be unique within the organization. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
+        """
+        return pulumi.get(self, "name")
+
+    @name.setter
+    def name(self, value: pulumi.Input[Optional[_builtins.str]]):
+        pulumi.set(self, "name", value)
+
+    @_builtins.property
     @pulumi.getter(name="resourceType")
     def resource_type(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
@@ -148,105 +149,133 @@ class OrganizationRole(pulumi.CustomResource):
         **Manage these roles in code, not in the Pulumi Cloud console.** In the console's role editor, every rule grants a permission set (the "access level"); it can't show scopes granted directly. Roles that grant scopes directly, as `buildRolePermissions` does, open read-only there.
 
         ## Example Usage
-        ### A role with organization-level access and entity rules
+        ### Organization-level scopes
 
-        The program looks up an existing stack, environment, and cloud account, then defines a role that grants scopes at the organization level and on each kind of entity.
+        Organization scopes apply across the whole organization rather than to a single stack, environment, or cloud account.
 
         ```python
         import pulumi
         import pulumi_pulumiservice as pulumiservice
 
-        config = pulumi.Config()
-        organization_name = config.get("organizationName")
-        if organization_name is None:
-            organization_name = "my-org"
-        prod_stack = pulumiservice.get_stack_output(organization_name=organization_name,
+        permissions = pulumiservice.build_role_permissions_output(organization_scopes=[
+            pulumiservice.RbacOrganizationScope.TEAM_READ,
+            pulumiservice.RbacOrganizationScope.STACK_CREATE,
+        ])
+        team_reader_role = pulumiservice.OrganizationRole("teamReaderRole",
+            organization_name="my-org",
+            name="Team Readers",
+            description="Read teams and create stacks.",
+            permissions=permissions.permissions)
+        ```
+        ### Access to every stack, or to one stack
+
+        A stack rule with `all: true` applies to every stack in the organization. A rule with `id` applies to a single stack, identified by the `stackId` that `getStack` returns.
+
+        ```python
+        import pulumi
+        import pulumi_pulumiservice as pulumiservice
+
+        prod_stack = pulumiservice.get_stack_output(organization_name="my-org",
             project_name="networking",
             stack_name="prod")
-        shared_environment = pulumiservice.get_environment_output(organization_name=organization_name,
-            project_name="platform",
-            name="shared")
-        aws_account = pulumiservice.get_insights_account_output(organization_name=organization_name,
-            account_name="aws-production")
-        platform_permissions = pulumiservice.build_role_permissions_output(organization_scopes=[
-                pulumiservice.RbacOrganizationScope.TEAM_READ,
-                pulumiservice.RbacOrganizationScope.STACK_CREATE,
-            ],
-            stack_rules=[
-                # Read every stack in the organization
-                {
-                    "all": True,
-                    "scopes": [pulumiservice.RbacStackScope.STACK_READ],
-                },
-                # Deploy one specific stack
-                {
-                    "id": prod_stack.stack_id,
-                    "scopes": [
-                        pulumiservice.RbacStackScope.STACK_WRITE,
-                        pulumiservice.RbacStackScope.STACK_DEPLOYMENT_CREATE,
-                    ],
-                },
-                # Deploy stacks tagged team=platform (the operator defaults to equals)
-                {
-                    "tags": [{
+        permissions = pulumiservice.build_role_permissions_output(stack_rules=[
+            {
+                "all": True,
+                "scopes": [pulumiservice.RbacStackScope.STACK_READ],
+            },
+            {
+                "id": prod_stack.stack_id,
+                "scopes": [
+                    pulumiservice.RbacStackScope.STACK_WRITE,
+                    pulumiservice.RbacStackScope.STACK_DEPLOYMENT_CREATE,
+                ],
+            },
+        ])
+        prod_deployer_role = pulumiservice.OrganizationRole("prodDeployerRole",
+            organization_name="my-org",
+            name="Prod Deployers",
+            description="Read every stack and deploy networking/prod.",
+            permissions=permissions.permissions)
+        ```
+        ### Access to stacks by tag
+
+        A rule with `tags` applies to stacks whose tags match every condition in the list. A condition without an `operator` matches stacks where the tag equals `value`. `notEquals` also matches stacks that don't have the tag. `exists` and `notExists` check only whether the tag is set.
+
+        ```python
+        import pulumi
+        import pulumi_pulumiservice as pulumiservice
+
+        permissions = pulumiservice.build_role_permissions_output(stack_rules=[
+            {
+                "tags": [{
+                    "key": "team",
+                    "value": "platform",
+                }],
+                "scopes": [
+                    pulumiservice.RbacStackScope.STACK_WRITE,
+                    pulumiservice.RbacStackScope.STACK_DEPLOYMENT_CREATE,
+                ],
+            },
+            {
+                "tags": [{
+                    "key": "env",
+                    "value": "prod",
+                    "operator": pulumiservice.TagOperator.NOT_EQUALS,
+                }],
+                "scopes": [pulumiservice.RbacStackScope.STACK_DEPLOYMENT_CREATE],
+            },
+            {
+                "tags": [{
+                    "key": "cost-center",
+                    "operator": pulumiservice.TagOperator.EXISTS,
+                }],
+                "scopes": [pulumiservice.RbacStackScope.STACK_DEPLOYMENT_SETTINGS_READ],
+            },
+            {
+                "tags": [{
+                    "key": "owner",
+                    "operator": pulumiservice.TagOperator.NOT_EXISTS,
+                }],
+                "scopes": [pulumiservice.RbacStackScope.STACK_TAGS_UPDATE],
+            },
+            {
+                "tags": [
+                    {
                         "key": "team",
                         "value": "platform",
-                    }],
-                    "scopes": [
-                        pulumiservice.RbacStackScope.STACK_WRITE,
-                        pulumiservice.RbacStackScope.STACK_DEPLOYMENT_CREATE,
-                    ],
-                },
-                # Deploy stacks whose env tag is anything but "prod"
-                {
-                    "tags": [{
-                        "key": "env",
-                        "value": "prod",
-                        "operator": pulumiservice.TagOperator.NOT_EQUALS,
-                    }],
-                    "scopes": [
-                        pulumiservice.RbacStackScope.STACK_WRITE,
-                        pulumiservice.RbacStackScope.STACK_DEPLOYMENT_CREATE,
-                    ],
-                },
-                # Read deployment settings on stacks that have a cost-center tag, whatever its value
-                {
-                    "tags": [{
-                        "key": "cost-center",
-                        "operator": pulumiservice.TagOperator.EXISTS,
-                    }],
-                    "scopes": [pulumiservice.RbacStackScope.STACK_DEPLOYMENT_SETTINGS_READ],
-                },
-                # Tag stacks that don't have an owner tag yet
-                {
-                    "tags": [{
-                        "key": "owner",
-                        "operator": pulumiservice.TagOperator.NOT_EXISTS,
-                    }],
-                    "scopes": [pulumiservice.RbacStackScope.STACK_TAGS_UPDATE],
-                },
-                # Delete stacks that match every tag condition
-                {
-                    "tags": [
-                        {
-                            "key": "team",
-                            "value": "platform",
-                        },
-                        {
-                            "key": "lifecycle",
-                            "value": "ephemeral",
-                        },
-                    ],
-                    "scopes": [pulumiservice.RbacStackScope.STACK_DELETE],
-                },
-            ],
-            environment_rules=[
-                # Read every environment
+                    },
+                    {
+                        "key": "lifecycle",
+                        "value": "ephemeral",
+                    },
+                ],
+                "scopes": [pulumiservice.RbacStackScope.STACK_DELETE],
+            },
+        ])
+        platform_role = pulumiservice.OrganizationRole("platformRole",
+            organization_name="my-org",
+            name="Platform Engineers",
+            description="Deploy platform stacks and clean up ephemeral ones.",
+            permissions=permissions.permissions)
+        ```
+        ### Access to environments and cloud accounts
+
+        Environment and cloud account rules take the same `all`, `id`, and `tags` selectors as stack rules. Each rule list accepts only the scopes for its own entity type.
+
+        ```python
+        import pulumi
+        import pulumi_pulumiservice as pulumiservice
+
+        shared_environment = pulumiservice.get_environment_output(organization_name="my-org",
+            project_name="platform",
+            name="shared")
+        aws_account = pulumiservice.get_insights_account_output(organization_name="my-org",
+            account_name="aws-production")
+        permissions = pulumiservice.build_role_permissions_output(environment_rules=[
                 {
                     "all": True,
                     "scopes": [pulumiservice.RbacEnvironmentScope.ENVIRONMENT_READ],
                 },
-                # Open, update, and rotate one specific environment
                 {
                     "id": shared_environment.environment_id,
                     "scopes": [
@@ -255,27 +284,16 @@ class OrganizationRole(pulumi.CustomResource):
                         pulumiservice.RbacEnvironmentScope.ENVIRONMENT_ROTATE,
                     ],
                 },
-                # Open environments tagged team=platform
-                {
-                    "tags": [{
-                        "key": "team",
-                        "value": "platform",
-                    }],
-                    "scopes": [pulumiservice.RbacEnvironmentScope.ENVIRONMENT_OPEN],
-                },
             ],
             account_rules=[
-                # Read every cloud account
                 {
                     "all": True,
                     "scopes": [pulumiservice.RbacAccountScope.INSIGHTS_ACCOUNT_READ],
                 },
-                # Scan one specific account
                 {
                     "id": aws_account.insights_account_id,
                     "scopes": [pulumiservice.RbacAccountScope.INSIGHTS_ACCOUNT_SCAN],
                 },
-                # Update accounts tagged team=platform
                 {
                     "tags": [{
                         "key": "team",
@@ -284,12 +302,11 @@ class OrganizationRole(pulumi.CustomResource):
                     "scopes": [pulumiservice.RbacAccountScope.INSIGHTS_ACCOUNT_UPDATE],
                 },
             ])
-        platform_role = pulumiservice.OrganizationRole("platformRole",
-            organization_name=organization_name,
-            name="Platform Engineers",
-            description="Read access across the organization, plus deploy access to platform stacks.",
-            permissions=platform_permissions.permissions)
-
+        infra_role = pulumiservice.OrganizationRole("infraRole",
+            organization_name="my-org",
+            name="Infrastructure Operators",
+            description="Read environments and cloud accounts, and operate the shared ones.",
+            permissions=permissions.permissions)
         ```
 
         ## Import
@@ -306,7 +323,7 @@ class OrganizationRole(pulumi.CustomResource):
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] description: Human-readable description of what the role grants.
-        :param pulumi.Input[_builtins.str] name: The role's display name. Must be unique within the organization.
+        :param pulumi.Input[_builtins.str] name: The role's display name, up to 100 bytes. Must be unique within the organization. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
         :param pulumi.Input[_builtins.str] organization_name: The Pulumi Cloud organization name.
         :param pulumi.Input[Mapping[str, Any]] permissions: The role's permission descriptor tree.
                
@@ -340,105 +357,133 @@ class OrganizationRole(pulumi.CustomResource):
         **Manage these roles in code, not in the Pulumi Cloud console.** In the console's role editor, every rule grants a permission set (the "access level"); it can't show scopes granted directly. Roles that grant scopes directly, as `buildRolePermissions` does, open read-only there.
 
         ## Example Usage
-        ### A role with organization-level access and entity rules
+        ### Organization-level scopes
 
-        The program looks up an existing stack, environment, and cloud account, then defines a role that grants scopes at the organization level and on each kind of entity.
+        Organization scopes apply across the whole organization rather than to a single stack, environment, or cloud account.
 
         ```python
         import pulumi
         import pulumi_pulumiservice as pulumiservice
 
-        config = pulumi.Config()
-        organization_name = config.get("organizationName")
-        if organization_name is None:
-            organization_name = "my-org"
-        prod_stack = pulumiservice.get_stack_output(organization_name=organization_name,
+        permissions = pulumiservice.build_role_permissions_output(organization_scopes=[
+            pulumiservice.RbacOrganizationScope.TEAM_READ,
+            pulumiservice.RbacOrganizationScope.STACK_CREATE,
+        ])
+        team_reader_role = pulumiservice.OrganizationRole("teamReaderRole",
+            organization_name="my-org",
+            name="Team Readers",
+            description="Read teams and create stacks.",
+            permissions=permissions.permissions)
+        ```
+        ### Access to every stack, or to one stack
+
+        A stack rule with `all: true` applies to every stack in the organization. A rule with `id` applies to a single stack, identified by the `stackId` that `getStack` returns.
+
+        ```python
+        import pulumi
+        import pulumi_pulumiservice as pulumiservice
+
+        prod_stack = pulumiservice.get_stack_output(organization_name="my-org",
             project_name="networking",
             stack_name="prod")
-        shared_environment = pulumiservice.get_environment_output(organization_name=organization_name,
-            project_name="platform",
-            name="shared")
-        aws_account = pulumiservice.get_insights_account_output(organization_name=organization_name,
-            account_name="aws-production")
-        platform_permissions = pulumiservice.build_role_permissions_output(organization_scopes=[
-                pulumiservice.RbacOrganizationScope.TEAM_READ,
-                pulumiservice.RbacOrganizationScope.STACK_CREATE,
-            ],
-            stack_rules=[
-                # Read every stack in the organization
-                {
-                    "all": True,
-                    "scopes": [pulumiservice.RbacStackScope.STACK_READ],
-                },
-                # Deploy one specific stack
-                {
-                    "id": prod_stack.stack_id,
-                    "scopes": [
-                        pulumiservice.RbacStackScope.STACK_WRITE,
-                        pulumiservice.RbacStackScope.STACK_DEPLOYMENT_CREATE,
-                    ],
-                },
-                # Deploy stacks tagged team=platform (the operator defaults to equals)
-                {
-                    "tags": [{
+        permissions = pulumiservice.build_role_permissions_output(stack_rules=[
+            {
+                "all": True,
+                "scopes": [pulumiservice.RbacStackScope.STACK_READ],
+            },
+            {
+                "id": prod_stack.stack_id,
+                "scopes": [
+                    pulumiservice.RbacStackScope.STACK_WRITE,
+                    pulumiservice.RbacStackScope.STACK_DEPLOYMENT_CREATE,
+                ],
+            },
+        ])
+        prod_deployer_role = pulumiservice.OrganizationRole("prodDeployerRole",
+            organization_name="my-org",
+            name="Prod Deployers",
+            description="Read every stack and deploy networking/prod.",
+            permissions=permissions.permissions)
+        ```
+        ### Access to stacks by tag
+
+        A rule with `tags` applies to stacks whose tags match every condition in the list. A condition without an `operator` matches stacks where the tag equals `value`. `notEquals` also matches stacks that don't have the tag. `exists` and `notExists` check only whether the tag is set.
+
+        ```python
+        import pulumi
+        import pulumi_pulumiservice as pulumiservice
+
+        permissions = pulumiservice.build_role_permissions_output(stack_rules=[
+            {
+                "tags": [{
+                    "key": "team",
+                    "value": "platform",
+                }],
+                "scopes": [
+                    pulumiservice.RbacStackScope.STACK_WRITE,
+                    pulumiservice.RbacStackScope.STACK_DEPLOYMENT_CREATE,
+                ],
+            },
+            {
+                "tags": [{
+                    "key": "env",
+                    "value": "prod",
+                    "operator": pulumiservice.TagOperator.NOT_EQUALS,
+                }],
+                "scopes": [pulumiservice.RbacStackScope.STACK_DEPLOYMENT_CREATE],
+            },
+            {
+                "tags": [{
+                    "key": "cost-center",
+                    "operator": pulumiservice.TagOperator.EXISTS,
+                }],
+                "scopes": [pulumiservice.RbacStackScope.STACK_DEPLOYMENT_SETTINGS_READ],
+            },
+            {
+                "tags": [{
+                    "key": "owner",
+                    "operator": pulumiservice.TagOperator.NOT_EXISTS,
+                }],
+                "scopes": [pulumiservice.RbacStackScope.STACK_TAGS_UPDATE],
+            },
+            {
+                "tags": [
+                    {
                         "key": "team",
                         "value": "platform",
-                    }],
-                    "scopes": [
-                        pulumiservice.RbacStackScope.STACK_WRITE,
-                        pulumiservice.RbacStackScope.STACK_DEPLOYMENT_CREATE,
-                    ],
-                },
-                # Deploy stacks whose env tag is anything but "prod"
-                {
-                    "tags": [{
-                        "key": "env",
-                        "value": "prod",
-                        "operator": pulumiservice.TagOperator.NOT_EQUALS,
-                    }],
-                    "scopes": [
-                        pulumiservice.RbacStackScope.STACK_WRITE,
-                        pulumiservice.RbacStackScope.STACK_DEPLOYMENT_CREATE,
-                    ],
-                },
-                # Read deployment settings on stacks that have a cost-center tag, whatever its value
-                {
-                    "tags": [{
-                        "key": "cost-center",
-                        "operator": pulumiservice.TagOperator.EXISTS,
-                    }],
-                    "scopes": [pulumiservice.RbacStackScope.STACK_DEPLOYMENT_SETTINGS_READ],
-                },
-                # Tag stacks that don't have an owner tag yet
-                {
-                    "tags": [{
-                        "key": "owner",
-                        "operator": pulumiservice.TagOperator.NOT_EXISTS,
-                    }],
-                    "scopes": [pulumiservice.RbacStackScope.STACK_TAGS_UPDATE],
-                },
-                # Delete stacks that match every tag condition
-                {
-                    "tags": [
-                        {
-                            "key": "team",
-                            "value": "platform",
-                        },
-                        {
-                            "key": "lifecycle",
-                            "value": "ephemeral",
-                        },
-                    ],
-                    "scopes": [pulumiservice.RbacStackScope.STACK_DELETE],
-                },
-            ],
-            environment_rules=[
-                # Read every environment
+                    },
+                    {
+                        "key": "lifecycle",
+                        "value": "ephemeral",
+                    },
+                ],
+                "scopes": [pulumiservice.RbacStackScope.STACK_DELETE],
+            },
+        ])
+        platform_role = pulumiservice.OrganizationRole("platformRole",
+            organization_name="my-org",
+            name="Platform Engineers",
+            description="Deploy platform stacks and clean up ephemeral ones.",
+            permissions=permissions.permissions)
+        ```
+        ### Access to environments and cloud accounts
+
+        Environment and cloud account rules take the same `all`, `id`, and `tags` selectors as stack rules. Each rule list accepts only the scopes for its own entity type.
+
+        ```python
+        import pulumi
+        import pulumi_pulumiservice as pulumiservice
+
+        shared_environment = pulumiservice.get_environment_output(organization_name="my-org",
+            project_name="platform",
+            name="shared")
+        aws_account = pulumiservice.get_insights_account_output(organization_name="my-org",
+            account_name="aws-production")
+        permissions = pulumiservice.build_role_permissions_output(environment_rules=[
                 {
                     "all": True,
                     "scopes": [pulumiservice.RbacEnvironmentScope.ENVIRONMENT_READ],
                 },
-                # Open, update, and rotate one specific environment
                 {
                     "id": shared_environment.environment_id,
                     "scopes": [
@@ -447,27 +492,16 @@ class OrganizationRole(pulumi.CustomResource):
                         pulumiservice.RbacEnvironmentScope.ENVIRONMENT_ROTATE,
                     ],
                 },
-                # Open environments tagged team=platform
-                {
-                    "tags": [{
-                        "key": "team",
-                        "value": "platform",
-                    }],
-                    "scopes": [pulumiservice.RbacEnvironmentScope.ENVIRONMENT_OPEN],
-                },
             ],
             account_rules=[
-                # Read every cloud account
                 {
                     "all": True,
                     "scopes": [pulumiservice.RbacAccountScope.INSIGHTS_ACCOUNT_READ],
                 },
-                # Scan one specific account
                 {
                     "id": aws_account.insights_account_id,
                     "scopes": [pulumiservice.RbacAccountScope.INSIGHTS_ACCOUNT_SCAN],
                 },
-                # Update accounts tagged team=platform
                 {
                     "tags": [{
                         "key": "team",
@@ -476,12 +510,11 @@ class OrganizationRole(pulumi.CustomResource):
                     "scopes": [pulumiservice.RbacAccountScope.INSIGHTS_ACCOUNT_UPDATE],
                 },
             ])
-        platform_role = pulumiservice.OrganizationRole("platformRole",
-            organization_name=organization_name,
-            name="Platform Engineers",
-            description="Read access across the organization, plus deploy access to platform stacks.",
-            permissions=platform_permissions.permissions)
-
+        infra_role = pulumiservice.OrganizationRole("infraRole",
+            organization_name="my-org",
+            name="Infrastructure Operators",
+            description="Read environments and cloud accounts, and operate the shared ones.",
+            permissions=permissions.permissions)
         ```
 
         ## Import
@@ -525,8 +558,6 @@ class OrganizationRole(pulumi.CustomResource):
             __props__ = OrganizationRoleArgs.__new__(OrganizationRoleArgs)
 
             __props__.__dict__["description"] = description
-            if name is None and not opts.urn:
-                raise TypeError("Missing required property 'name'")
             __props__.__dict__["name"] = name
             if organization_name is None and not opts.urn:
                 raise TypeError("Missing required property 'organization_name'")
@@ -582,7 +613,7 @@ class OrganizationRole(pulumi.CustomResource):
     @pulumi.getter
     def name(self) -> pulumi.Output[_builtins.str]:
         """
-        The role's display name. Must be unique within the organization.
+        The role's display name, up to 100 bytes. Must be unique within the organization. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
         """
         return pulumi.get(self, "name")
 

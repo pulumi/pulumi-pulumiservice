@@ -61,13 +61,14 @@ type TeamAccessTokenInput struct {
 }
 
 func (i *TeamAccessTokenInput) Annotate(a infer.Annotator) {
-	a.Describe(
-		&i.Name,
-		"The name for the token. This must be unique among all organization and team tokens in the organization.",
-	)
+	a.Describe(&i.Name, tokenNameDescription)
 	a.Describe(&i.OrganizationName, "The organization's name.")
 	a.Describe(&i.TeamName, "The team name.")
 	a.Describe(&i.Description, "A description of the token.")
+}
+
+func (i *TeamAccessTokenInput) AutoName(autoname infer.SetAutoName) {
+	autoname(&i.Name, tokenAutoName)
 }
 
 type TeamAccessTokenState struct {

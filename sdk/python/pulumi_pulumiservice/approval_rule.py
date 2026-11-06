@@ -25,22 +25,23 @@ class ApprovalRuleArgs:
                  approval_rule_config: pulumi.Input['ApprovalRuleConfigArgs'],
                  enabled: pulumi.Input[_builtins.bool],
                  environment_identifier: pulumi.Input['EnvironmentIdentifierArgs'],
-                 name: pulumi.Input[_builtins.str],
-                 target_action_types: pulumi.Input[Sequence[pulumi.Input['TargetActionType']]]):
+                 target_action_types: pulumi.Input[Sequence[pulumi.Input['TargetActionType']]],
+                 name: pulumi.Input[Optional[_builtins.str]] = None):
         """
         The set of arguments for constructing a ApprovalRule resource.
 
         :param pulumi.Input['ApprovalRuleConfigArgs'] approval_rule_config: The approval rule configuration.
         :param pulumi.Input[_builtins.bool] enabled: Whether the approval rule is enabled.
         :param pulumi.Input['EnvironmentIdentifierArgs'] environment_identifier: The environment this rule applies to.
-        :param pulumi.Input[_builtins.str] name: The name of the approval rule.
         :param pulumi.Input[Sequence[pulumi.Input['TargetActionType']]] target_action_types: The type of action this rule applies to.
+        :param pulumi.Input[_builtins.str] name: The name of the approval rule, up to 255 bytes. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
         """
         pulumi.set(__self__, "approval_rule_config", approval_rule_config)
         pulumi.set(__self__, "enabled", enabled)
         pulumi.set(__self__, "environment_identifier", environment_identifier)
-        pulumi.set(__self__, "name", name)
         pulumi.set(__self__, "target_action_types", target_action_types)
+        if name is not None:
+            pulumi.set(__self__, "name", name)
 
     @_builtins.property
     @pulumi.getter(name="approvalRuleConfig")
@@ -79,18 +80,6 @@ class ApprovalRuleArgs:
         pulumi.set(self, "environment_identifier", value)
 
     @_builtins.property
-    @pulumi.getter
-    def name(self) -> pulumi.Input[_builtins.str]:
-        """
-        The name of the approval rule.
-        """
-        return pulumi.get(self, "name")
-
-    @name.setter
-    def name(self, value: pulumi.Input[_builtins.str]):
-        pulumi.set(self, "name", value)
-
-    @_builtins.property
     @pulumi.getter(name="targetActionTypes")
     def target_action_types(self) -> pulumi.Input[Sequence[pulumi.Input['TargetActionType']]]:
         """
@@ -101,6 +90,18 @@ class ApprovalRuleArgs:
     @target_action_types.setter
     def target_action_types(self, value: pulumi.Input[Sequence[pulumi.Input['TargetActionType']]]):
         pulumi.set(self, "target_action_types", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def name(self) -> pulumi.Input[Optional[_builtins.str]]:
+        """
+        The name of the approval rule, up to 255 bytes. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
+        """
+        return pulumi.get(self, "name")
+
+    @name.setter
+    def name(self, value: pulumi.Input[Optional[_builtins.str]]):
+        pulumi.set(self, "name", value)
 
 
 @pulumi.type_token("pulumiservice:index:ApprovalRule")
@@ -136,7 +137,7 @@ class ApprovalRule(pulumi.CustomResource):
         :param pulumi.Input[Union['ApprovalRuleConfigArgs', 'ApprovalRuleConfigArgsDict', 'outputs.ApprovalRuleConfig']] approval_rule_config: The approval rule configuration.
         :param pulumi.Input[_builtins.bool] enabled: Whether the approval rule is enabled.
         :param pulumi.Input[Union['EnvironmentIdentifierArgs', 'EnvironmentIdentifierArgsDict', 'outputs.EnvironmentIdentifier']] environment_identifier: The environment this rule applies to.
-        :param pulumi.Input[_builtins.str] name: The name of the approval rule.
+        :param pulumi.Input[_builtins.str] name: The name of the approval rule, up to 255 bytes. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
         :param pulumi.Input[Sequence[pulumi.Input['TargetActionType']]] target_action_types: The type of action this rule applies to.
         """
         ...
@@ -199,8 +200,6 @@ class ApprovalRule(pulumi.CustomResource):
             if environment_identifier is None and not opts.urn:
                 raise TypeError("Missing required property 'environment_identifier'")
             __props__.__dict__["environment_identifier"] = environment_identifier
-            if name is None and not opts.urn:
-                raise TypeError("Missing required property 'name'")
             __props__.__dict__["name"] = name
             if target_action_types is None and not opts.urn:
                 raise TypeError("Missing required property 'target_action_types'")
@@ -264,7 +263,7 @@ class ApprovalRule(pulumi.CustomResource):
     @pulumi.getter
     def name(self) -> pulumi.Output[_builtins.str]:
         """
-        The name of the approval rule.
+        The name of the approval rule, up to 255 bytes. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
         """
         return pulumi.get(self, "name")
 

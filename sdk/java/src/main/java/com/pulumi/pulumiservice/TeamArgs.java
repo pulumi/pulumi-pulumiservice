@@ -64,14 +64,18 @@ public final class TeamArgs extends com.pulumi.resources.ResourceArgs {
     }
 
     /**
-     * List of Pulumi Cloud usernames of team members.
+     * The Pulumi Cloud usernames of the team&#39;s members.
+     * Pulumi Cloud adds the user who creates the team as a member, usually the owner of the access token that runs `pulumi up`.
+     * List that user here to keep them on the team: otherwise `pulumi refresh` shows them as a change, and the next update to `members` removes them.
      * 
      */
     @Import(name="members")
     private @Nullable Output<List<String>> members;
 
     /**
-     * @return List of Pulumi Cloud usernames of team members.
+     * @return The Pulumi Cloud usernames of the team&#39;s members.
+     * Pulumi Cloud adds the user who creates the team as a member, usually the owner of the access token that runs `pulumi up`.
+     * List that user here to keep them on the team: otherwise `pulumi refresh` shows them as a change, and the next update to `members` removes them.
      * 
      */
     public Optional<Output<List<String>>> members() {
@@ -217,7 +221,9 @@ public final class TeamArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param members List of Pulumi Cloud usernames of team members.
+         * @param members The Pulumi Cloud usernames of the team&#39;s members.
+         * Pulumi Cloud adds the user who creates the team as a member, usually the owner of the access token that runs `pulumi up`.
+         * List that user here to keep them on the team: otherwise `pulumi refresh` shows them as a change, and the next update to `members` removes them.
          * 
          * @return builder
          * 
@@ -228,7 +234,9 @@ public final class TeamArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param members List of Pulumi Cloud usernames of team members.
+         * @param members The Pulumi Cloud usernames of the team&#39;s members.
+         * Pulumi Cloud adds the user who creates the team as a member, usually the owner of the access token that runs `pulumi up`.
+         * List that user here to keep them on the team: otherwise `pulumi refresh` shows them as a change, and the next update to `members` removes them.
          * 
          * @return builder
          * 
@@ -238,7 +246,9 @@ public final class TeamArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param members List of Pulumi Cloud usernames of team members.
+         * @param members The Pulumi Cloud usernames of the team&#39;s members.
+         * Pulumi Cloud adds the user who creates the team as a member, usually the owner of the access token that runs `pulumi up`.
+         * List that user here to keep them on the team: otherwise `pulumi refresh` shows them as a change, and the next update to `members` removes them.
          * 
          * @return builder
          * 

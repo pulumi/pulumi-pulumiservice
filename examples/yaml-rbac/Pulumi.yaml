@@ -152,6 +152,14 @@ variables:
       arguments:
         organizationName: ${organizationName}
         name: Admin
+  # Data source: look up one member by username. Its username comes from
+  # rbacMember so the lookup runs after the role is assigned.
+  memberByUsername:
+    fn::invoke:
+      function: pulumiservice:getOrganizationMember
+      arguments:
+        organizationName: ${organizationName}
+        username: ${rbacMember.username}
   # Data source: list every role in the organization, built-in and custom.
   allRoles:
     fn::invoke:
@@ -175,3 +183,4 @@ outputs:
   lookedUpRoleBuiltIn: ${lookedUpRole.builtIn}
   adminRoleId: ${adminRole.roleId}
   firstRoleName: ${allRoles.roles[0].name}
+  lookedUpMemberRoleId: ${memberByUsername.roleId}

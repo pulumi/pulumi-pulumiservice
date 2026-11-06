@@ -1,0 +1,12 @@
+name: py-smoke
+runtime:
+  name: python
+  options:
+    virtualenv: venv
+description: Checks that the Python SDK handles an asset input, an invoke and a secret output.
+config:
+  organizationName:
+    type: string
+    default: service-provider-test-org
+  digits:
+    type: string

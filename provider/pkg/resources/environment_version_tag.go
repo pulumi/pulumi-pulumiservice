@@ -20,6 +20,7 @@ import (
 	"path"
 	"strings"
 
+	esc_client "github.com/pulumi/esc/cmd/esc/cli/client"
 	"github.com/pulumi/pulumi-go-provider/infer"
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
@@ -135,7 +136,7 @@ func (*EnvironmentVersionTag) Delete(
 		req.State.Environment,
 		req.State.TagName,
 	)
-	if err != nil {
+	if err != nil && !esc_client.IsNotFound(err) {
 		return infer.DeleteResponse{}, fmt.Errorf(
 			"error deleting environment version tag %q: %w", req.State.TagName, err,
 		)

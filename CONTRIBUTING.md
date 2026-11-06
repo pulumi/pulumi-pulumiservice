@@ -34,7 +34,28 @@ Here's a quick list of helpful make commands:
 
 Ideally, every change should include unit tests, and every new resource a matching example in the `examples` folder.
 
+Write examples in Pulumi YAML (`examples/yaml-*`). Every SDK is generated from the same schema and wraps the same provider, so a resource tested in YAML doesn't need a copy in each language. Each other language has one smoke program (`examples/<lang>-smoke`) that creates an environment from a string asset, an org access token whose value is a secret output, and reads the environment back with an invoke. Add a non-YAML test only when a resource adds an input or output shape that those programs don't cover.
+
+Example tests use [`pulumitest`](https://github.com/pulumi/providertest/tree/main/pulumitest).
+
 You should also test changes manually using a Pulumi program that uses the updated SDKs. Here are some language-specific hints:
+
+### Shared test org
+
+Every CI test suite (`test`, the acceptance tests and the `api` tests), on every PR, creates real resources in one org: `service-provider-test-org` on `https://api.pulumi-staging.io`. Runs from different PRs overlap, so tests must not assume they have the org to themselves:
+
+- Give every resource a name with a random suffix (`generateRandomFiveDigits()` in `examples/examples_utils_test.go`), so concurrent runs and resources leaked by failed runs can't collide.
+- Avoid org-wide singletons. For example, an OIDC issuer URL can be registered only once per org, so two runs that both register `https://api.pulumi.com/oidc` conflict.
+
+The `api` test suite starts with a sweeper (`examples/sweep_api_test.go`) that deletes resources leaked by earlier runs. It deletes a resource only if all of these hold:
+
+- Its name, or for an environment its project, starts with one of the test prefixes in `shouldSweep`, such as `api-`, `test-` or `org-webhook-`.
+- It was last modified more than 3 hours ago (`sweepMinAge`), longer than any test run, so it can't belong to a run still in progress.
+- Its type's list endpoint returns a timestamp: OIDC issuers, roles, ESC environments, agent pools and organization tokens.
+
+Webhooks, teams, policy groups and template sources have no timestamp, so the sweeper deletes them only when `PULUMITEST_SWEEP_UNDATED=1` is set, regardless of age. Use it for manual cleanup only, when nothing else is running against the org. Set `PULUMITEST_SKIP_SWEEP=1` to skip the sweeper entirely.
+
+The sweeper targets `PULUMI_TEST_OWNER`. If you run `go test -tags api` locally against your own org, it deletes anything there whose name matches a test prefix, including resources you made by hand. Set `PULUMITEST_SKIP_SWEEP=1` if that org has anything you want to keep.
 
 ### .NET
 
@@ -65,7 +86,7 @@ To release a new version of the provider, follow steps below:
 
 The `auto-release` flow described under [Releasing the API Surface](#releasing-the-api-surface) works for any release, not only `pulumiservice:api:*` changes. Its `finalize` job marks the release as latest and rebuilds the registry docs, which a hand-pushed tag does not do.
 
-`main` requires a status check named `Sentinel`, written by the `sentinel` job at the end of `run-acceptance-tests.yml`. That workflow ignores PRs that change only `CHANGELOG.md`, so a changelog-only release PR shows `Sentinel` as expected and never reported. To get the check, comment `/run-acceptance-tests` on the PR or include a change to another file.
+`main` requires a status check named `Sentinel`, written by the `sentinel` job at the end of `run-acceptance-tests.yml`. That workflow ignores PRs that change only `CHANGELOG.md`, so a changelog-only release PR shows `Sentinel` as expected and never reported. To get the check, include a change to another file. Commenting `/run-acceptance-tests` runs the tests, but on a comment-triggered run the `sentinel` job writes `Sentinel` to the tip of `main` instead of the PR's commit, so the PR stays blocked.
 
 ## Releasing the API Surface
 

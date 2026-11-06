@@ -9,9 +9,9 @@ assigns the role to a team:
 - **`pulumiservice:getStack`** looks up a stack's unique ID.
 - **`pulumiservice:TeamRoleAssignment`** assigns the role to a team.
 
-The `OrganizationRole` docs example lives in
-`provider/pkg/resources/docs/organization_role_example`; it covers the same
-features against existing entities.
+The `OrganizationRole` docs examples live in
+`provider/pkg/resources/examples/organization_role_examples.yaml`; they cover
+the same features against existing entities.
 
 ## Prerequisites
 

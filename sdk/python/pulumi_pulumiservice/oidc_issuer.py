@@ -22,43 +22,32 @@ __all__ = ['OidcIssuerArgs', 'OidcIssuer']
 @pulumi.input_type
 class OidcIssuerArgs:
     def __init__(__self__, *,
-                 name: pulumi.Input[_builtins.str],
                  organization: pulumi.Input[_builtins.str],
                  url: pulumi.Input[_builtins.str],
                  max_expiration_seconds: pulumi.Input[Optional[_builtins.int]] = None,
+                 name: pulumi.Input[Optional[_builtins.str]] = None,
                  policies: pulumi.Input[Optional[Sequence[pulumi.Input['AuthPolicyDefinitionArgs']]]] = None,
                  thumbprints: pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]] = None):
         """
         The set of arguments for constructing a OidcIssuer resource.
 
-        :param pulumi.Input[_builtins.str] name: Issuer name.
         :param pulumi.Input[_builtins.str] organization: Organization name.
         :param pulumi.Input[_builtins.str] url: The OIDC issuer URL.
         :param pulumi.Input[_builtins.int] max_expiration_seconds: The maximum duration of the Pulumi access token working after an exchange, specified in seconds.
+        :param pulumi.Input[_builtins.str] name: Issuer name, up to 255 characters. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
         :param pulumi.Input[Sequence[pulumi.Input['AuthPolicyDefinitionArgs']]] policies: The auth policies for this Oidc Issuer.
         :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] thumbprints: The thumbprints of issuer's TLS certificates. By default, Pulumi will store the thumbprint of the certificate used to serve the OpenID configuration. If the provider uses multiple certificates to serve content, it is required to manually configure these.
         """
-        pulumi.set(__self__, "name", name)
         pulumi.set(__self__, "organization", organization)
         pulumi.set(__self__, "url", url)
         if max_expiration_seconds is not None:
             pulumi.set(__self__, "max_expiration_seconds", max_expiration_seconds)
+        if name is not None:
+            pulumi.set(__self__, "name", name)
         if policies is not None:
             pulumi.set(__self__, "policies", policies)
         if thumbprints is not None:
             pulumi.set(__self__, "thumbprints", thumbprints)
-
-    @_builtins.property
-    @pulumi.getter
-    def name(self) -> pulumi.Input[_builtins.str]:
-        """
-        Issuer name.
-        """
-        return pulumi.get(self, "name")
-
-    @name.setter
-    def name(self, value: pulumi.Input[_builtins.str]):
-        pulumi.set(self, "name", value)
 
     @_builtins.property
     @pulumi.getter
@@ -95,6 +84,18 @@ class OidcIssuerArgs:
     @max_expiration_seconds.setter
     def max_expiration_seconds(self, value: pulumi.Input[Optional[_builtins.int]]):
         pulumi.set(self, "max_expiration_seconds", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def name(self) -> pulumi.Input[Optional[_builtins.str]]:
+        """
+        Issuer name, up to 255 characters. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
+        """
+        return pulumi.get(self, "name")
+
+    @name.setter
+    def name(self, value: pulumi.Input[Optional[_builtins.str]]):
+        pulumi.set(self, "name", value)
 
     @_builtins.property
     @pulumi.getter
@@ -156,7 +157,7 @@ class OidcIssuer(pulumi.CustomResource):
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.int] max_expiration_seconds: The maximum duration of the Pulumi access token working after an exchange, specified in seconds.
-        :param pulumi.Input[_builtins.str] name: Issuer name.
+        :param pulumi.Input[_builtins.str] name: Issuer name, up to 255 characters. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
         :param pulumi.Input[_builtins.str] organization: Organization name.
         :param pulumi.Input[Sequence[pulumi.Input[Union['AuthPolicyDefinitionArgs', 'AuthPolicyDefinitionArgsDict', 'outputs.AuthPolicyDefinition']]]] policies: The auth policies for this Oidc Issuer.
         :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] thumbprints: The thumbprints of issuer's TLS certificates. By default, Pulumi will store the thumbprint of the certificate used to serve the OpenID configuration. If the provider uses multiple certificates to serve content, it is required to manually configure these.
@@ -218,8 +219,6 @@ class OidcIssuer(pulumi.CustomResource):
             __props__ = OidcIssuerArgs.__new__(OidcIssuerArgs)
 
             __props__.__dict__["max_expiration_seconds"] = max_expiration_seconds
-            if name is None and not opts.urn:
-                raise TypeError("Missing required property 'name'")
             __props__.__dict__["name"] = name
             if organization is None and not opts.urn:
                 raise TypeError("Missing required property 'organization'")
@@ -273,7 +272,7 @@ class OidcIssuer(pulumi.CustomResource):
     @pulumi.getter
     def name(self) -> pulumi.Output[_builtins.str]:
         """
-        Issuer name.
+        Issuer name, up to 255 characters. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
         """
         return pulumi.get(self, "name")
 

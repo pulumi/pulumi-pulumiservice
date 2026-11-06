@@ -14,7 +14,6 @@ const ciDeployerRole = pulumiservice.getOrganizationRoleOutput({
 });
 const ciToken = new pulumiservice.OrgAccessToken("ciToken", {
     organizationName: "my-org",
-    name: "ci-token",
     description: "Token for CI pipelines",
     expires: "2027-06-30T17:00:00Z",
     roleId: ciDeployerRole.roleId,
@@ -30,7 +29,6 @@ ci_deployer_role = pulumiservice.get_organization_role_output(organization_name=
     name="CI Deployer")
 ci_token = pulumiservice.OrgAccessToken("ciToken",
     organization_name="my-org",
-    name="ci-token",
     description="Token for CI pipelines",
     expires="2027-06-30T17:00:00Z",
     role_id=ci_deployer_role.role_id)
@@ -53,7 +51,6 @@ func main() {
 		}, nil)
 		ciToken, err := pulumiservice.NewOrgAccessToken(ctx, "ciToken", &pulumiservice.OrgAccessTokenArgs{
 			OrganizationName: pulumi.String("my-org"),
-			Name:             pulumi.String("ci-token"),
 			Description:      pulumi.String("Token for CI pipelines"),
 			Expires:          pulumi.String("2027-06-30T17:00:00Z"),
 			RoleId:           ciDeployerRole.RoleId(),
@@ -84,7 +81,6 @@ return await Deployment.RunAsync(() =>
     var ciToken = new PulumiService.OrgAccessToken("ciToken", new()
     {
         OrganizationName = "my-org",
-        Name = "ci-token",
         Description = "Token for CI pipelines",
         Expires = "2027-06-30T17:00:00Z",
         RoleId = ciDeployerRole.Apply(getOrganizationRoleResult => getOrganizationRoleResult.RoleId),
@@ -127,7 +123,6 @@ public class App {
 
         var ciToken = new OrgAccessToken("ciToken", OrgAccessTokenArgs.builder()
             .organizationName("my-org")
-            .name("ci-token")
             .description("Token for CI pipelines")
             .expires("2027-06-30T17:00:00Z")
             .roleId(ciDeployerRole.applyValue(_ciDeployerRole -> _ciDeployerRole.roleId()))
@@ -151,7 +146,6 @@ resources:
     type: pulumiservice:OrgAccessToken
     properties:
       organizationName: my-org
-      name: ci-token
       description: Token for CI pipelines
       expires: "2027-06-30T17:00:00Z"
       roleId: ${ciDeployerRole.roleId}

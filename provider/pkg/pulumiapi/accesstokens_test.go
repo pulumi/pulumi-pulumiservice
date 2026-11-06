@@ -17,6 +17,8 @@ const (
 	tokenNotFoundError   = "token not found"
 	userTokPath          = "/api/user/tokens"
 	otherValue           = "other"
+	// 2027-06-30T17:00:00Z
+	testTokenExpires int64 = 1814374800
 )
 
 func TestDeleteAccessToken(t *testing.T) {
@@ -34,15 +36,15 @@ func TestDeleteAccessToken(t *testing.T) {
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodDelete,
 			ExpectedReqPath:   "/api/user/tokens/" + tokenID,
-			ResponseCode:      404,
+			ResponseCode:      500,
 			ResponseBody: ErrorResponse{
-				StatusCode: 404,
+				StatusCode: 500,
 				Message:    tokenNotFoundError,
 			},
 		})
 		assert.EqualError(t,
 			c.DeleteAccessToken(ctx, tokenID),
-			`failed to delete access token "abcdegh": 404 API error: token not found`,
+			`failed to delete access token "abcdegh": 500 API error: token not found`,
 		)
 	})
 
@@ -64,12 +66,37 @@ func TestCreateAccessToken(t *testing.T) {
 			ResponseCode:    201,
 			ResponseBody:    resp,
 		})
-		token, err := c.CreateAccessToken(ctx, desc)
+		token, err := c.CreateAccessToken(ctx, desc, 0)
 		assert.NoError(t, err)
 		assert.Equal(t, &AccessToken{
 			ID:          resp.ID,
 			TokenValue:  resp.TokenValue,
 			Description: desc,
+		}, token)
+	})
+
+	t.Run("With expiry", func(t *testing.T) {
+		resp := createTokenResponse{
+			ID:         tokenIDKey,
+			TokenValue: secretKey,
+		}
+		c := startTestServer(t, testServerConfig{
+			ExpectedReqMethod: http.MethodPost,
+			ExpectedReqBody: createTokenRequest{
+				Description: desc,
+				Expires:     testTokenExpires,
+			},
+			ExpectedReqPath: userTokPath,
+			ResponseCode:    201,
+			ResponseBody:    resp,
+		})
+		token, err := c.CreateAccessToken(ctx, desc, testTokenExpires)
+		assert.NoError(t, err)
+		assert.Equal(t, &AccessToken{
+			ID:          resp.ID,
+			TokenValue:  resp.TokenValue,
+			Description: desc,
+			Expires:     testTokenExpires,
 		}, token)
 	})
 
@@ -86,7 +113,7 @@ func TestCreateAccessToken(t *testing.T) {
 				Message:    unauthorizedError,
 			},
 		})
-		token, err := c.CreateAccessToken(ctx, desc)
+		token, err := c.CreateAccessToken(ctx, desc, 0)
 		assert.Nil(t, token, "token should be nil")
 		assert.EqualError(t,
 			err,
@@ -106,6 +133,7 @@ func TestGetAccessToken(t *testing.T) {
 					ID:          id,
 					Description: desc,
 					LastUsed:    lastUsed,
+					Expires:     testTokenExpires,
 				},
 				{
 					ID:          otherValue,
@@ -126,6 +154,7 @@ func TestGetAccessToken(t *testing.T) {
 		assert.Equal(t, &AccessToken{
 			ID:          id,
 			Description: desc,
+			Expires:     testTokenExpires,
 		}, token)
 	})
 

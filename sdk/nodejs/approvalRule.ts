@@ -35,6 +35,16 @@ export class ApprovalRule extends pulumi.CustomResource {
         return new ApprovalRule(name, undefined as any, { ...opts, id: id });
     }
 
+    /**
+     * Check whether an existing ApprovalRule resource with the given ID exists.
+     *
+     * @param id The _unique_ provider ID of the resource to check.
+     * @param opts Optional settings to control the behavior of the CustomResource.
+     */
+    public static exists(id: pulumi.Input<string>, opts?: pulumi.CustomResourceOptions): pulumi.Output<boolean> {
+        return pulumi.runtime.existsResource("pulumiservice:index:ApprovalRule", id, {}, { ...opts }, undefined);
+    }
+
     /** @internal */
     public static readonly __pulumiType = 'pulumiservice:index:ApprovalRule';
 
@@ -62,7 +72,7 @@ export class ApprovalRule extends pulumi.CustomResource {
      */
     declare public readonly environmentIdentifier: pulumi.Output<outputs.EnvironmentIdentifier>;
     /**
-     * The name of the approval rule.
+     * The name of the approval rule, up to 255 bytes. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
      */
     declare public readonly name: pulumi.Output<string>;
     /**
@@ -89,9 +99,6 @@ export class ApprovalRule extends pulumi.CustomResource {
             }
             if (args?.environmentIdentifier === undefined && !opts.urn) {
                 throw new Error("Missing required property 'environmentIdentifier'");
-            }
-            if (args?.name === undefined && !opts.urn) {
-                throw new Error("Missing required property 'name'");
             }
             if (args?.targetActionTypes === undefined && !opts.urn) {
                 throw new Error("Missing required property 'targetActionTypes'");
@@ -132,9 +139,9 @@ export interface ApprovalRuleArgs {
      */
     environmentIdentifier: pulumi.Input<inputs.EnvironmentIdentifierArgs>;
     /**
-     * The name of the approval rule.
+     * The name of the approval rule, up to 255 bytes. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
      */
-    name: pulumi.Input<string>;
+    name?: pulumi.Input<string | undefined>;
     /**
      * The type of action this rule applies to.
      */

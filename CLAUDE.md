@@ -82,27 +82,22 @@ cd examples && go test -tags=all -v -count=1 -timeout 3h -parallel 4
 cd examples && go test -v -run TestYamlStackTagsPluralExample -tags yaml -timeout 10m
 ```
 
+- **Shared test org**: all CI suites on all PRs run concurrently against `service-provider-test-org` on staging, and the `api` suite starts with a sweeper (`examples/sweep_api_test.go`) that deletes leftover test resources. Give every resource in a new example a random suffix and avoid org-wide singletons. If you change what the sweeper deletes, update "Shared test org" in `CONTRIBUTING.md`. Locally, `go test -tags api` sweeps the org in `PULUMI_TEST_OWNER`; set `PULUMITEST_SKIP_SWEEP=1` to protect it.
 - Integration tests are located in `examples/` directory
 - Tests are tagged: use `-tags yaml`, `-tags nodejs`, `-tags python`, etc.
 - The `.env` file allows running integration tests locally against a custom organization
 - Every new resource should have unit tests in `provider/pkg/` with `_test.go` suffix
 - Add example programs in `examples/` for each new resource (examples serve as integration tests)
-- Examples are organized by language: `ts-*`, `py-*`, `go-*`, `cs-*`, `java-*`, `yaml-*`
+- Examples are written in Pulumi YAML (`yaml-*`). Each other SDK language has one smoke program (`ts-smoke`, `py-smoke`, `go-smoke`, `cs-smoke`, `java-smoke`, run through `runSmokeTest` in `examples/examples_smoke_test.go`) that covers an asset input, an invoke and a secret output.
+- A new resource gets a YAML example. Add a non-YAML test only when the resource adds an input or output shape that the smoke programs don't cover.
 
-**IMPORTANT - Integration Test Framework**:
-- **Always use `pulumitest`** from `github.com/pulumi/providertest/pulumitest` for new integration tests
-- DO NOT use the legacy `integration.ProgramTest` from `github.com/pulumi/pulumi/pkg/v3/testing/integration`
-- The `pulumitest` framework provides better control, cleaner syntax, and is the preferred approach going forward
-- See `examples/examples_nodejs_test.go` for examples of properly structured `pulumitest` tests
-- Common pattern for `pulumitest` tests:
+**Integration Test Framework**:
+- Integration tests use `pulumitest` from `github.com/pulumi/providertest/pulumitest`
+- See `examples/examples_yaml_test.go` for examples of `pulumitest` tests
+- Common pattern for `pulumitest` tests. `newExampleTest` (in `examples/main_test.go`) runs the example against the in-memory provider on a randomly named stack; `newPulumiTest` does the same for a program outside `examples/`, such as one written by `writePulumiYaml`:
   ```go
-  test := pulumitest.NewPulumiTest(t,
-      filepath.Join(getCwd(t), "example-directory"),
-      inMemoryProvider(),
-      opttest.UseAmbientBackend(),
-      opttest.YarnLink("@pulumi/pulumiservice"),  // for Node.js tests
-  )
-  test.SetConfig(t, "key", "value")  // optional config
+  test := newExampleTest(t, "example-directory")
+  setConfig(t, test, map[string]string{"organizationName": getOrgName(), "digits": generateRandomFiveDigits()})
   runPulumiTest(t, test)  // runs up, preview, refresh, destroy
   ```
 
@@ -150,7 +145,7 @@ it. Look for it in `gh pr checks <number>`.
 
 ### Schema Changes
 
-The provider schema is assembled from three sources in `MakeProvider`
+The provider schema is assembled from two sources in `MakeProvider`
 (`provider/pkg/provider/provider.go`). Find which one owns a resource before
 editing it:
 
@@ -160,18 +155,17 @@ editing it:
   each type's `Annotate(a infer.Annotator)` method (`a.Describe(...)`), and
   defaults are set with `a.SetDefault(...)`. Registered via
   `infer.Resource(...)` / `infer.Function(...)` in `provider.go`.
-- **Legacy resources in `provider/pkg/provider/manual-schema.json`**: currently
-  only `DeploymentSettings`, `Environment` and `PolicyGroup`, plus the shared
-  `types` they use. These are served by the custom gRPC server and implement
-  `PulumiServiceResource`.
 - **`pulumiservice:api:*` resources**: generated at runtime from the Pulumi
   Cloud OpenAPI spec plus `provider/pkg/cloud/metadata.json`.
+
+Package metadata (description, keywords, language settings) is set on the
+`infer.NewProviderBuilder()` call in `MakeProvider`.
 
 `provider/cmd/pulumi-resource-pulumiservice/schema.json` is **generated**. Never
 edit it by hand.
 
 After any schema-affecting change (an `Annotate` method, a Go input/state
-struct, or `manual-schema.json`):
+struct, or the package metadata):
 
 1. `make provider`: rebuild the provider binary
 2. `make schema`: regenerate `schema.json` from the binary
@@ -200,57 +194,27 @@ the rest:
 1. Add a multi-document YAML file under the package's `examples/` directory
    (e.g. `provider/pkg/functions/examples/get_organization_role_examples.yaml`).
    Each document is one example: a Pulumi YAML program plus a `description`
-   key, which becomes the example's heading.
+   key. Its first line becomes the example's heading; any further lines
+   become a paragraph under it.
 2. Embed the generated `<name>.md` with `//go:embed` and append it to the
    type's `a.Describe(...)` text. See `provider/pkg/functions/org_roles.go`,
-   including its `//go:generate` line.
-3. Run `make generate_examples`. It builds the provider, puts it on PATH and
-   runs `provider/tools/gen-examples`, which converts each example with
-   `pulumi convert` into TypeScript, Python, Go, C# and Java.
+   including its `//go:generate` line. Each package needs only one
+   `//go:generate` line; it converts every YAML file in `examples/`.
+3. Run `make examples`. It builds the provider, puts it on PATH and runs
+   `provider/tools/gen-examples`, which converts each example with
+   `pulumi convert` into TypeScript, Python, Go, C# and Java. The target lives
+   in `.mk/examples.mk` because ci-mgmt regenerates the `Makefile` and drops
+   targets it doesn't own.
 4. Regenerate the schema and SDKs as above.
 
-#### Schema JSON Syntax Guidelines
-
-These apply when editing `manual-schema.json`. The schema JSON must follow strict syntax rules. Common patterns:
-
-**Complex Nested Objects**:
-- ❌ **NEVER** define inline objects directly in array `items`:
-  ```json
-  "items": {
-    "type": "object",
-    "properties": { ... }
-  }
-  ```
-- ✅ **ALWAYS** define complex objects as separate types in the `types` section and reference them:
-  ```json
-  "items": {
-    "$ref": "#/types/pulumiservice:index:YourTypeName"
-  }
-  ```
-
-**Additional Properties**:
-- ❌ **NEVER** use boolean values: `"additionalProperties": true`
-- ✅ **ALWAYS** use type specifications:
-  ```json
-  "additionalProperties": {
-    "$ref": "pulumi.json#/Any"
-  }
-  ```
-  or
-  ```json
-  "additionalProperties": {
-    "type": "string"
-  }
-  ```
-
-**Type References**:
-- Use `"$ref": "#/types/pulumiservice:index:TypeName"` for custom types
-- Use `"$ref": "pulumi.json#/Any"` for generic object types
-- Custom types must be defined in the `types` section with full descriptions
+`pulumi convert` drops YAML comments, so explain an example in its
+`description` rather than in comments; split an example that needs more
+explanation into several. It also writes Java enum values as strings, which
+`gen-examples` rewrites into enum constants using the provider schema.
 
 ### Adding a New Resource
 
-New `index:` resources use `infer`. Don't add resources to `manual-schema.json`.
+New `index:` resources use `infer`.
 Use an existing `infer` resource such as
 `provider/pkg/resources/team_access_token.go` as a template.
 
@@ -285,21 +249,12 @@ Use an existing `infer` resource such as
 
 ### Resource Interface
 
-The legacy `manual-schema.json` resources implement the `PulumiServiceResource`
-interface (`provider/pkg/provider/provider.go`). `infer` resources don't; they
-implement `infer.CustomCreate`, `infer.CustomRead`, etc. instead:
-
-```go
-type PulumiServiceResource interface {
-    Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error)
-    Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error)
-    Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error)
-    Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error)
-    Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error)
-    Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error)
-    Name() string
-}
-```
+Resources implement `infer`'s interfaces (`infer.CustomCreate`,
+`infer.CustomRead`, `infer.CustomUpdate`, `infer.CustomDelete`, and optionally
+`infer.CustomCheck` and `infer.CustomDiff`). When a method needs information the
+typed values can't carry, such as which elements of a map are secret, read the
+untyped request with `infer.GetRawRequest` (see
+`provider/pkg/resources/deployment_settings_resource.go`).
 
 ### Resource Methods
 
@@ -363,7 +318,7 @@ When investigating CI test failures:
 
 3. **Check for outdated test data**: Examples may contain hardcoded values like TLS certificate thumbprints that become stale when certificates are rotated
 
-4. **Look for related issues across examples**: If one language example fails, check all language examples (ts-, py-, go-, cs-, yaml-) for the same issue
+4. **Look for related issues across examples**: If one smoke program fails, check the other languages' smoke programs for the same issue
 
 ## Lessons Learned
 

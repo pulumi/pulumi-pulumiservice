@@ -23,9 +23,9 @@ import (
 // **Manage these roles in code, not in the Pulumi Cloud console.** In the console's role editor, every rule grants a permission set (the "access level"); it can't show scopes granted directly. Roles that grant scopes directly, as `buildRolePermissions` does, open read-only there.
 //
 // ## Example Usage
-// ### A role with organization-level access and entity rules
+// ### Organization-level scopes
 //
-// The program looks up an existing stack, environment, and cloud account, then defines a role that grants scopes at the organization level and on each kind of entity.
+// Organization scopes apply across the whole organization rather than to a single stack, environment, or cloud account.
 //
 // ```go
 // package main
@@ -34,45 +34,60 @@ import (
 //
 //	"github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice"
 //	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
-//	"github.com/pulumi/pulumi/sdk/v3/go/pulumi/config"
 //
 // )
 //
 //	func main() {
 //		pulumi.Run(func(ctx *pulumi.Context) error {
-//			cfg := config.New(ctx, "")
-//			organizationName := "my-org"
-//			if param := cfg.Get("organizationName"); param != "" {
-//				organizationName = param
-//			}
-//			prodStack := pulumiservice.GetStackOutput(ctx, pulumiservice.GetStackOutputArgs{
-//				OrganizationName: pulumi.String(organizationName),
-//				ProjectName:      pulumi.String("networking"),
-//				StackName:        pulumi.String("prod"),
-//			}, nil)
-//			sharedEnvironment := pulumiservice.GetEnvironmentOutput(ctx, pulumiservice.GetEnvironmentOutputArgs{
-//				OrganizationName: pulumi.String(organizationName),
-//				ProjectName:      pulumi.String("platform"),
-//				Name:             pulumi.String("shared"),
-//			}, nil)
-//			awsAccount := pulumiservice.GetInsightsAccountOutput(ctx, pulumiservice.GetInsightsAccountOutputArgs{
-//				OrganizationName: pulumi.String(organizationName),
-//				AccountName:      pulumi.String("aws-production"),
-//			}, nil)
-//			platformPermissions := pulumiservice.BuildRolePermissionsOutput(ctx, pulumiservice.BuildRolePermissionsOutputArgs{
+//			permissions := pulumiservice.BuildRolePermissionsOutput(ctx, pulumiservice.BuildRolePermissionsOutputArgs{
 //				OrganizationScopes: pulumiservice.RbacOrganizationScopeArray{
 //					pulumiservice.RbacOrganizationScopeTeamRead,
 //					pulumiservice.RbacOrganizationScopeStackCreate,
 //				},
+//			}, nil)
+//			_, err := pulumiservice.NewOrganizationRole(ctx, "teamReaderRole", &pulumiservice.OrganizationRoleArgs{
+//				OrganizationName: pulumi.String("my-org"),
+//				Name:             pulumi.String("Team Readers"),
+//				Description:      pulumi.String("Read teams and create stacks."),
+//				Permissions:      permissions.Permissions(),
+//			})
+//			if err != nil {
+//				return err
+//			}
+//			return nil
+//		})
+//	}
+//
+// ```
+// ### Access to every stack, or to one stack
+//
+// A stack rule with `all: true` applies to every stack in the organization. A rule with `id` applies to a single stack, identified by the `stackId` that `getStack` returns.
+//
+// ```go
+// package main
+//
+// import (
+//
+//	"github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice"
+//	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
+//
+// )
+//
+//	func main() {
+//		pulumi.Run(func(ctx *pulumi.Context) error {
+//			prodStack := pulumiservice.GetStackOutput(ctx, pulumiservice.GetStackOutputArgs{
+//				OrganizationName: pulumi.String("my-org"),
+//				ProjectName:      pulumi.String("networking"),
+//				StackName:        pulumi.String("prod"),
+//			}, nil)
+//			permissions := pulumiservice.BuildRolePermissionsOutput(ctx, pulumiservice.BuildRolePermissionsOutputArgs{
 //				StackRules: pulumiservice.RoleStackRuleArray{
-//					// Read every stack in the organization
 //					&pulumiservice.RoleStackRuleArgs{
 //						All: pulumi.Bool(true),
 //						Scopes: pulumiservice.RbacStackScopeArray{
 //							pulumiservice.RbacStackScopeStackRead,
 //						},
 //					},
-//					// Deploy one specific stack
 //					&pulumiservice.RoleStackRuleArgs{
 //						Id: prodStack.StackId(),
 //						Scopes: pulumiservice.RbacStackScopeArray{
@@ -80,7 +95,40 @@ import (
 //							pulumiservice.RbacStackScopeStackDeploymentCreate,
 //						},
 //					},
-//					// Deploy stacks tagged team=platform (the operator defaults to equals)
+//				},
+//			}, nil)
+//			_, err := pulumiservice.NewOrganizationRole(ctx, "prodDeployerRole", &pulumiservice.OrganizationRoleArgs{
+//				OrganizationName: pulumi.String("my-org"),
+//				Name:             pulumi.String("Prod Deployers"),
+//				Description:      pulumi.String("Read every stack and deploy networking/prod."),
+//				Permissions:      permissions.Permissions(),
+//			})
+//			if err != nil {
+//				return err
+//			}
+//			return nil
+//		})
+//	}
+//
+// ```
+// ### Access to stacks by tag
+//
+// A rule with `tags` applies to stacks whose tags match every condition in the list. A condition without an `operator` matches stacks where the tag equals `value`. `notEquals` also matches stacks that don't have the tag. `exists` and `notExists` check only whether the tag is set.
+//
+// ```go
+// package main
+//
+// import (
+//
+//	"github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice"
+//	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
+//
+// )
+//
+//	func main() {
+//		pulumi.Run(func(ctx *pulumi.Context) error {
+//			permissions := pulumiservice.BuildRolePermissionsOutput(ctx, pulumiservice.BuildRolePermissionsOutputArgs{
+//				StackRules: pulumiservice.RoleStackRuleArray{
 //					&pulumiservice.RoleStackRuleArgs{
 //						Tags: pulumiservice.TagConditionArray{
 //							&pulumiservice.TagConditionArgs{
@@ -93,7 +141,6 @@ import (
 //							pulumiservice.RbacStackScopeStackDeploymentCreate,
 //						},
 //					},
-//					// Deploy stacks whose env tag is anything but "prod"
 //					&pulumiservice.RoleStackRuleArgs{
 //						Tags: pulumiservice.TagConditionArray{
 //							&pulumiservice.TagConditionArgs{
@@ -103,11 +150,9 @@ import (
 //							},
 //						},
 //						Scopes: pulumiservice.RbacStackScopeArray{
-//							pulumiservice.RbacStackScopeStackWrite,
 //							pulumiservice.RbacStackScopeStackDeploymentCreate,
 //						},
 //					},
-//					// Read deployment settings on stacks that have a cost-center tag, whatever its value
 //					&pulumiservice.RoleStackRuleArgs{
 //						Tags: pulumiservice.TagConditionArray{
 //							&pulumiservice.TagConditionArgs{
@@ -119,7 +164,6 @@ import (
 //							pulumiservice.RbacStackScopeStackDeploymentSettingsRead,
 //						},
 //					},
-//					// Tag stacks that don't have an owner tag yet
 //					&pulumiservice.RoleStackRuleArgs{
 //						Tags: pulumiservice.TagConditionArray{
 //							&pulumiservice.TagConditionArgs{
@@ -131,7 +175,6 @@ import (
 //							pulumiservice.RbacStackScopeStackTagsUpdate,
 //						},
 //					},
-//					// Delete stacks that match every tag condition
 //					&pulumiservice.RoleStackRuleArgs{
 //						Tags: pulumiservice.TagConditionArray{
 //							&pulumiservice.TagConditionArgs{
@@ -148,15 +191,54 @@ import (
 //						},
 //					},
 //				},
+//			}, nil)
+//			_, err := pulumiservice.NewOrganizationRole(ctx, "platformRole", &pulumiservice.OrganizationRoleArgs{
+//				OrganizationName: pulumi.String("my-org"),
+//				Name:             pulumi.String("Platform Engineers"),
+//				Description:      pulumi.String("Deploy platform stacks and clean up ephemeral ones."),
+//				Permissions:      permissions.Permissions(),
+//			})
+//			if err != nil {
+//				return err
+//			}
+//			return nil
+//		})
+//	}
+//
+// ```
+// ### Access to environments and cloud accounts
+//
+// Environment and cloud account rules take the same `all`, `id`, and `tags` selectors as stack rules. Each rule list accepts only the scopes for its own entity type.
+//
+// ```go
+// package main
+//
+// import (
+//
+//	"github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice"
+//	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
+//
+// )
+//
+//	func main() {
+//		pulumi.Run(func(ctx *pulumi.Context) error {
+//			sharedEnvironment := pulumiservice.GetEnvironmentOutput(ctx, pulumiservice.GetEnvironmentOutputArgs{
+//				OrganizationName: pulumi.String("my-org"),
+//				ProjectName:      pulumi.String("platform"),
+//				Name:             pulumi.String("shared"),
+//			}, nil)
+//			awsAccount := pulumiservice.GetInsightsAccountOutput(ctx, pulumiservice.GetInsightsAccountOutputArgs{
+//				OrganizationName: pulumi.String("my-org"),
+//				AccountName:      pulumi.String("aws-production"),
+//			}, nil)
+//			permissions := pulumiservice.BuildRolePermissionsOutput(ctx, pulumiservice.BuildRolePermissionsOutputArgs{
 //				EnvironmentRules: pulumiservice.RoleEnvironmentRuleArray{
-//					// Read every environment
 //					&pulumiservice.RoleEnvironmentRuleArgs{
 //						All: pulumi.Bool(true),
 //						Scopes: pulumiservice.RbacEnvironmentScopeArray{
 //							pulumiservice.RbacEnvironmentScopeEnvironmentRead,
 //						},
 //					},
-//					// Open, update, and rotate one specific environment
 //					&pulumiservice.RoleEnvironmentRuleArgs{
 //						Id: sharedEnvironment.EnvironmentId(),
 //						Scopes: pulumiservice.RbacEnvironmentScopeArray{
@@ -165,35 +247,20 @@ import (
 //							pulumiservice.RbacEnvironmentScopeEnvironmentRotate,
 //						},
 //					},
-//					// Open environments tagged team=platform
-//					&pulumiservice.RoleEnvironmentRuleArgs{
-//						Tags: pulumiservice.TagConditionArray{
-//							&pulumiservice.TagConditionArgs{
-//								Key:   pulumi.String("team"),
-//								Value: pulumi.String("platform"),
-//							},
-//						},
-//						Scopes: pulumiservice.RbacEnvironmentScopeArray{
-//							pulumiservice.RbacEnvironmentScopeEnvironmentOpen,
-//						},
-//					},
 //				},
 //				AccountRules: pulumiservice.RoleAccountRuleArray{
-//					// Read every cloud account
 //					&pulumiservice.RoleAccountRuleArgs{
 //						All: pulumi.Bool(true),
 //						Scopes: pulumiservice.RbacAccountScopeArray{
 //							pulumiservice.RbacAccountScopeInsightsAccountRead,
 //						},
 //					},
-//					// Scan one specific account
 //					&pulumiservice.RoleAccountRuleArgs{
 //						Id: awsAccount.InsightsAccountId(),
 //						Scopes: pulumiservice.RbacAccountScopeArray{
 //							pulumiservice.RbacAccountScopeInsightsAccountScan,
 //						},
 //					},
-//					// Update accounts tagged team=platform
 //					&pulumiservice.RoleAccountRuleArgs{
 //						Tags: pulumiservice.TagConditionArray{
 //							&pulumiservice.TagConditionArgs{
@@ -207,11 +274,11 @@ import (
 //					},
 //				},
 //			}, nil)
-//			_, err := pulumiservice.NewOrganizationRole(ctx, "platformRole", &pulumiservice.OrganizationRoleArgs{
-//				OrganizationName: pulumi.String(organizationName),
-//				Name:             pulumi.String("Platform Engineers"),
-//				Description:      pulumi.String("Read access across the organization, plus deploy access to platform stacks."),
-//				Permissions:      platformPermissions.Permissions(),
+//			_, err := pulumiservice.NewOrganizationRole(ctx, "infraRole", &pulumiservice.OrganizationRoleArgs{
+//				OrganizationName: pulumi.String("my-org"),
+//				Name:             pulumi.String("Infrastructure Operators"),
+//				Description:      pulumi.String("Read environments and cloud accounts, and operate the shared ones."),
+//				Permissions:      permissions.Permissions(),
 //			})
 //			if err != nil {
 //				return err
@@ -238,7 +305,7 @@ type OrganizationRole struct {
 
 	// Human-readable description of what the role grants.
 	Description pulumi.StringPtrOutput `pulumi:"description"`
-	// The role's display name. Must be unique within the organization.
+	// The role's display name, up to 100 bytes. Must be unique within the organization. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
 	Name pulumi.StringOutput `pulumi:"name"`
 	// The Pulumi Cloud organization name.
 	OrganizationName pulumi.StringOutput `pulumi:"organizationName"`
@@ -270,9 +337,6 @@ func NewOrganizationRole(ctx *pulumi.Context,
 		return nil, errors.New("missing one or more required arguments")
 	}
 
-	if args.Name == nil {
-		return nil, errors.New("invalid value for required argument 'Name'")
-	}
 	if args.OrganizationName == nil {
 		return nil, errors.New("invalid value for required argument 'OrganizationName'")
 	}
@@ -318,8 +382,8 @@ func (OrganizationRoleState) ElementType() reflect.Type {
 type organizationRoleArgs struct {
 	// Human-readable description of what the role grants.
 	Description *string `pulumi:"description"`
-	// The role's display name. Must be unique within the organization.
-	Name string `pulumi:"name"`
+	// The role's display name, up to 100 bytes. Must be unique within the organization. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
+	Name *string `pulumi:"name"`
 	// The Pulumi Cloud organization name.
 	OrganizationName string `pulumi:"organizationName"`
 	// The role's permission descriptor tree.
@@ -343,8 +407,8 @@ type organizationRoleArgs struct {
 type OrganizationRoleArgs struct {
 	// Human-readable description of what the role grants.
 	Description pulumi.StringPtrInput
-	// The role's display name. Must be unique within the organization.
-	Name pulumi.StringInput
+	// The role's display name, up to 100 bytes. Must be unique within the organization. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
+	Name pulumi.StringPtrInput
 	// The Pulumi Cloud organization name.
 	OrganizationName pulumi.StringInput
 	// The role's permission descriptor tree.
@@ -456,7 +520,7 @@ func (o OrganizationRoleOutput) Description() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *OrganizationRole) pulumi.StringPtrOutput { return v.Description }).(pulumi.StringPtrOutput)
 }
 
-// The role's display name. Must be unique within the organization.
+// The role's display name, up to 100 bytes. Must be unique within the organization. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
 func (o OrganizationRoleOutput) Name() pulumi.StringOutput {
 	return o.ApplyT(func(v *OrganizationRole) pulumi.StringOutput { return v.Name }).(pulumi.StringOutput)
 }

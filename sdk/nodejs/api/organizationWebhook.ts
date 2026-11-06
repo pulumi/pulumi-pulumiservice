@@ -26,6 +26,16 @@ export class OrganizationWebhook extends pulumi.CustomResource {
         return new OrganizationWebhook(name, undefined as any, { ...opts, id: id });
     }
 
+    /**
+     * Check whether an existing OrganizationWebhook resource with the given ID exists.
+     *
+     * @param id The _unique_ provider ID of the resource to check.
+     * @param opts Optional settings to control the behavior of the CustomResource.
+     */
+    public static exists(id: pulumi.Input<string>, opts?: pulumi.CustomResourceOptions): pulumi.Output<boolean> {
+        return pulumi.runtime.existsResource("pulumiservice:api:OrganizationWebhook", id, {}, { ...opts }, undefined);
+    }
+
     /** @internal */
     public static readonly __pulumiType = 'pulumiservice:api:OrganizationWebhook';
 

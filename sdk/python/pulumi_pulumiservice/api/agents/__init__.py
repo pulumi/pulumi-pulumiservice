@@ -6,5 +6,6 @@ import builtins as _builtins
 from ... import _utilities
 import typing
 # Export this package's modules as members:
+from .definition import *
 from .pool import *
 from .task import *

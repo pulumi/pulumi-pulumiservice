@@ -28,6 +28,7 @@ import javax.annotation.Nullable;
  * ### Deploy on every commit
  * 
  * This runs `pulumi up` on each push to `main` that changes a file under `infra/`, and `pulumi preview` on pull requests. The organization must have the Pulumi GitHub app installed on the repository.
+ * 
  * <pre>
  * {@code
  * package generated_program;
@@ -69,6 +70,7 @@ import javax.annotation.Nullable;
  *                 .paths("infra/**")
  *                 .build())
  *             .build());
+ * 
  *     }
  * }
  * }
@@ -76,6 +78,7 @@ import javax.annotation.Nullable;
  * ### Deploy when a git tag is pushed
  * 
  * This runs `pulumi up` when a tag matching `v*` is pushed, except release candidates such as `v1.2.0-rc1`. Pulumi Cloud rejects `deployCommits` and `deployTags` together, and `deployCommits` defaults to `true`, so set `deployCommits` to `false` when you enable `deployTags`. The organization must have the Pulumi GitHub app installed on the repository.
+ * 
  * <pre>
  * {@code
  * package generated_program;
@@ -114,11 +117,12 @@ import javax.annotation.Nullable;
  *                 .repository("my-org/my-repo")
  *                 .deployCommits(false)
  *                 .deployTags(true)
- *                 .tagFilters(
+ *                 .tagFilters(                
  *                     "v*",
  *                     "!*-rc*")
  *                 .build())
  *             .build());
+ * 
  *     }
  * }
  * }
@@ -182,11 +186,10 @@ public class DeploymentSettings extends com.pulumi.resources.CustomResource {
     /**
      * GitHub settings for the deployment.
      * 
-     * @deprecated
-     * Use the &#39;vcs&#39; property instead, which supports both GitHub and Azure DevOps.
+     * @deprecated Use the &#39;vcs&#39; property instead, which supports both GitHub and Azure DevOps.
      * 
      */
-    @Deprecated /* Use the 'vcs' property instead, which supports both GitHub and Azure DevOps. */
+    @Deprecated
     @Export(name="github", refs={DeploymentSettingsGithub.class}, tree="[0]")
     private Output</* @Nullable */ DeploymentSettingsGithub> github;
 
