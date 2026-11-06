@@ -59,14 +59,14 @@ public class Webhook extends com.pulumi.resources.CustomResource {
         return this.active;
     }
     /**
-     * The friendly name displayed in the Pulumi Cloud.
+     * The friendly name displayed in the Pulumi Cloud, up to 100 bytes. If omitted, Pulumi generates a name from the resource&#39;s logical name plus a random suffix, or follows the stack&#39;s [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
      * 
      */
     @Export(name="displayName", refs={String.class}, tree="[0]")
     private Output<String> displayName;
 
     /**
-     * @return The friendly name displayed in the Pulumi Cloud.
+     * @return The friendly name displayed in the Pulumi Cloud, up to 100 bytes. If omitted, Pulumi generates a name from the resource&#39;s logical name plus a random suffix, or follows the stack&#39;s [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
      * 
      */
     public Output<String> displayName() {

@@ -35,18 +35,18 @@ public final class OidcIssuerArgs extends com.pulumi.resources.ResourceArgs {
     }
 
     /**
-     * Issuer name.
+     * Issuer name, up to 255 characters. If omitted, Pulumi generates a name from the resource&#39;s logical name plus a random suffix, or follows the stack&#39;s [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
      * 
      */
-    @Import(name="name", required=true)
-    private Output<String> name;
+    @Import(name="name")
+    private @Nullable Output<String> name;
 
     /**
-     * @return Issuer name.
+     * @return Issuer name, up to 255 characters. If omitted, Pulumi generates a name from the resource&#39;s logical name plus a random suffix, or follows the stack&#39;s [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
      * 
      */
-    public Output<String> name() {
-        return this.name;
+    public Optional<Output<String>> name() {
+        return Optional.ofNullable(this.name);
     }
 
     /**
@@ -160,18 +160,18 @@ public final class OidcIssuerArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param name Issuer name.
+         * @param name Issuer name, up to 255 characters. If omitted, Pulumi generates a name from the resource&#39;s logical name plus a random suffix, or follows the stack&#39;s [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
          * 
          * @return builder
          * 
          */
-        public Builder name(Output<String> name) {
+        public Builder name(@Nullable Output<String> name) {
             $.name = name;
             return this;
         }
 
         /**
-         * @param name Issuer name.
+         * @param name Issuer name, up to 255 characters. If omitted, Pulumi generates a name from the resource&#39;s logical name plus a random suffix, or follows the stack&#39;s [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
          * 
          * @return builder
          * 
@@ -285,9 +285,6 @@ public final class OidcIssuerArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         public OidcIssuerArgs build() {
-            if ($.name == null) {
-                throw new MissingRequiredPropertyException("OidcIssuerArgs", "name");
-            }
             if ($.organization == null) {
                 throw new MissingRequiredPropertyException("OidcIssuerArgs", "organization");
             }

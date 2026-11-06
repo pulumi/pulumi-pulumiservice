@@ -34,18 +34,18 @@ public final class OrganizationRoleArgs extends com.pulumi.resources.ResourceArg
     }
 
     /**
-     * The role&#39;s display name. Must be unique within the organization.
+     * The role&#39;s display name, up to 100 bytes. Must be unique within the organization. If omitted, Pulumi generates a name from the resource&#39;s logical name plus a random suffix, or follows the stack&#39;s [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
      * 
      */
-    @Import(name="name", required=true)
-    private Output<String> name;
+    @Import(name="name")
+    private @Nullable Output<String> name;
 
     /**
-     * @return The role&#39;s display name. Must be unique within the organization.
+     * @return The role&#39;s display name, up to 100 bytes. Must be unique within the organization. If omitted, Pulumi generates a name from the resource&#39;s logical name plus a random suffix, or follows the stack&#39;s [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
      * 
      */
-    public Output<String> name() {
-        return this.name;
+    public Optional<Output<String>> name() {
+        return Optional.ofNullable(this.name);
     }
 
     /**
@@ -165,18 +165,18 @@ public final class OrganizationRoleArgs extends com.pulumi.resources.ResourceArg
         }
 
         /**
-         * @param name The role&#39;s display name. Must be unique within the organization.
+         * @param name The role&#39;s display name, up to 100 bytes. Must be unique within the organization. If omitted, Pulumi generates a name from the resource&#39;s logical name plus a random suffix, or follows the stack&#39;s [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
          * 
          * @return builder
          * 
          */
-        public Builder name(Output<String> name) {
+        public Builder name(@Nullable Output<String> name) {
             $.name = name;
             return this;
         }
 
         /**
-         * @param name The role&#39;s display name. Must be unique within the organization.
+         * @param name The role&#39;s display name, up to 100 bytes. Must be unique within the organization. If omitted, Pulumi generates a name from the resource&#39;s logical name plus a random suffix, or follows the stack&#39;s [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
          * 
          * @return builder
          * 
@@ -271,9 +271,6 @@ public final class OrganizationRoleArgs extends com.pulumi.resources.ResourceArg
         }
 
         public OrganizationRoleArgs build() {
-            if ($.name == null) {
-                throw new MissingRequiredPropertyException("OrganizationRoleArgs", "name");
-            }
             if ($.organizationName == null) {
                 throw new MissingRequiredPropertyException("OrganizationRoleArgs", "organizationName");
             }

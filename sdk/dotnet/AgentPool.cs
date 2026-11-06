@@ -46,7 +46,7 @@ namespace Pulumi.PulumiService
         public Output<bool?> ForceDestroy { get; private set; } = null!;
 
         /// <summary>
-        /// Name of the agent pool.
+        /// Name of the agent pool, up to 100 characters. Only letters, digits, hyphens, underscores, spaces and periods are allowed. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). Characters that aren't allowed in the logical name are replaced with hyphens.
         /// </summary>
         [Output("name")]
         public Output<string> Name { get; private set; } = null!;
@@ -129,10 +129,10 @@ namespace Pulumi.PulumiService
         public Input<bool>? ForceDestroy { get; set; }
 
         /// <summary>
-        /// Name of the agent pool.
+        /// Name of the agent pool, up to 100 characters. Only letters, digits, hyphens, underscores, spaces and periods are allowed. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). Characters that aren't allowed in the logical name are replaced with hyphens.
         /// </summary>
-        [Input("name", required: true)]
-        public Input<string> Name { get; set; } = null!;
+        [Input("name")]
+        public Input<string>? Name { get; set; }
 
         /// <summary>
         /// The organization's name.

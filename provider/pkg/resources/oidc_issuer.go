@@ -145,7 +145,7 @@ const (
 
 func (i *OidcIssuerInput) Annotate(a infer.Annotator) {
 	a.Describe(&i.Organization, "Organization name.")
-	a.Describe(&i.Name, "Issuer name.")
+	a.Describe(&i.Name, "Issuer name, up to 255 characters. "+autoNamedDescription)
 	a.Describe(&i.URL, "The OIDC issuer URL.")
 	a.Describe(
 		&i.MaxExpirationSeconds,
@@ -154,6 +154,15 @@ func (i *OidcIssuerInput) Annotate(a infer.Annotator) {
 	a.Describe(&i.Thumbprints, thumbprintsDescription)
 	a.Describe(&i.Policies, policiesDescription)
 }
+
+func (i *OidcIssuerInput) AutoName(autoname infer.SetAutoName) {
+	autoname(&i.Name, suffixedAutoName(oidcIssuerNameMaxLen, nil))
+}
+
+// oidcIssuerNameMaxLen is the longest OIDC issuer name, in characters, that
+// Pulumi Cloud accepts. Longer names fail with `500 Internal Server Error`. The
+// OpenAPI spec doesn't state the limit.
+const oidcIssuerNameMaxLen = 255
 
 type OidcIssuerState struct {
 	OidcIssuerInput
