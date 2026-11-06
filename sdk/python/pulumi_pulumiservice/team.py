@@ -37,7 +37,7 @@ class TeamArgs:
         :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] members: The Pulumi Cloud usernames of the team's members.
                Pulumi Cloud adds the user who creates the team as a member, usually the owner of the access token that runs `pulumi up`.
                List that user here to keep them on the team: otherwise `pulumi refresh` shows them as a change, and the next update to `members` removes them.
-        :param pulumi.Input[_builtins.str] name: The team's name. Required for "pulumi" teams.
+        :param pulumi.Input[_builtins.str] name: The team's name, up to 100 characters. Only letters, digits, hyphens, underscores and periods are allowed. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). Characters that aren't allowed in the logical name are replaced with hyphens. Only "pulumi" teams are auto-named.
         """
         pulumi.set(__self__, "organization_name", organization_name)
         pulumi.set(__self__, "team_type", team_type)
@@ -130,7 +130,7 @@ class TeamArgs:
     @pulumi.getter
     def name(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
-        The team's name. Required for "pulumi" teams.
+        The team's name, up to 100 characters. Only letters, digits, hyphens, underscores and periods are allowed. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). Characters that aren't allowed in the logical name are replaced with hyphens. Only "pulumi" teams are auto-named.
         """
         return pulumi.get(self, "name")
 
@@ -175,7 +175,7 @@ class Team(pulumi.CustomResource):
         :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] members: The Pulumi Cloud usernames of the team's members.
                Pulumi Cloud adds the user who creates the team as a member, usually the owner of the access token that runs `pulumi up`.
                List that user here to keep them on the team: otherwise `pulumi refresh` shows them as a change, and the next update to `members` removes them.
-        :param pulumi.Input[_builtins.str] name: The team's name. Required for "pulumi" teams.
+        :param pulumi.Input[_builtins.str] name: The team's name, up to 100 characters. Only letters, digits, hyphens, underscores and periods are allowed. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). Characters that aren't allowed in the logical name are replaced with hyphens. Only "pulumi" teams are auto-named.
         :param pulumi.Input[_builtins.str] organization_name: The name of the Pulumi organization the team belongs to.
         :param pulumi.Input[_builtins.str] team_type: The type of team. Must be either `pulumi` or `github`.
         """
@@ -312,7 +312,7 @@ class Team(pulumi.CustomResource):
     @pulumi.getter
     def name(self) -> pulumi.Output[Optional[_builtins.str]]:
         """
-        The team's name. Required for "pulumi" teams.
+        The team's name, up to 100 characters. Only letters, digits, hyphens, underscores and periods are allowed. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). Characters that aren't allowed in the logical name are replaced with hyphens. Only "pulumi" teams are auto-named.
         """
         return pulumi.get(self, "name")
 

@@ -83,14 +83,14 @@ public final class TeamArgs extends com.pulumi.resources.ResourceArgs {
     }
 
     /**
-     * The team&#39;s name. Required for &#34;pulumi&#34; teams.
+     * The team&#39;s name, up to 100 characters. Only letters, digits, hyphens, underscores and periods are allowed. If omitted, Pulumi generates a name from the resource&#39;s logical name plus a random suffix, or follows the stack&#39;s [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). Characters that aren&#39;t allowed in the logical name are replaced with hyphens. Only &#34;pulumi&#34; teams are auto-named.
      * 
      */
     @Import(name="name")
     private @Nullable Output<String> name;
 
     /**
-     * @return The team&#39;s name. Required for &#34;pulumi&#34; teams.
+     * @return The team&#39;s name, up to 100 characters. Only letters, digits, hyphens, underscores and periods are allowed. If omitted, Pulumi generates a name from the resource&#39;s logical name plus a random suffix, or follows the stack&#39;s [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). Characters that aren&#39;t allowed in the logical name are replaced with hyphens. Only &#34;pulumi&#34; teams are auto-named.
      * 
      */
     public Optional<Output<String>> name() {
@@ -258,7 +258,7 @@ public final class TeamArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param name The team&#39;s name. Required for &#34;pulumi&#34; teams.
+         * @param name The team&#39;s name, up to 100 characters. Only letters, digits, hyphens, underscores and periods are allowed. If omitted, Pulumi generates a name from the resource&#39;s logical name plus a random suffix, or follows the stack&#39;s [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). Characters that aren&#39;t allowed in the logical name are replaced with hyphens. Only &#34;pulumi&#34; teams are auto-named.
          * 
          * @return builder
          * 
@@ -269,7 +269,7 @@ public final class TeamArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param name The team&#39;s name. Required for &#34;pulumi&#34; teams.
+         * @param name The team&#39;s name, up to 100 characters. Only letters, digits, hyphens, underscores and periods are allowed. If omitted, Pulumi generates a name from the resource&#39;s logical name plus a random suffix, or follows the stack&#39;s [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). Characters that aren&#39;t allowed in the logical name are replaced with hyphens. Only &#34;pulumi&#34; teams are auto-named.
          * 
          * @return builder
          * 
