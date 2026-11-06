@@ -6,6 +6,7 @@
 
 - `name` on `OrgAccessToken` and `TeamAccessToken` is now optional. When it's omitted, Pulumi generates a name from the resource's logical name plus a random suffix, within Pulumi Cloud's 40-character limit for token names, or follows the stack's autonaming configuration. An update keeps the generated name, and a replacement gets a new one. [#1211](https://github.com/pulumi/pulumi-pulumiservice/issues/1211)
 - `displayName` on `Webhook` and `name` on `AgentPool`, `ApprovalRule`, `OidcIssuer` and `OrganizationRole` are now optional. When one is omitted, Pulumi generates it from the resource's logical name plus a random suffix, within Pulumi Cloud's length limit for that name, or follows the stack's autonaming configuration. For an `AgentPool`, characters that Pulumi Cloud doesn't allow in pool names become hyphens. [#1331](https://github.com/pulumi/pulumi-pulumiservice/issues/1331)
+- Creating a `Team` whose `members` leaves out the user creating it now warns that Pulumi Cloud added that user to the team, and that the next update to `members` removes them. [#1348](https://github.com/pulumi/pulumi-pulumiservice/pull/1348)
 
 ### Bug Fixes
 
