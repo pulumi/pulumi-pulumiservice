@@ -7,7 +7,7 @@ require (
 	github.com/pgavlin/fx/v2 v2.0.12
 	github.com/pulumi/esc v0.26.0
 	github.com/pulumi/providertest v0.7.0
-	github.com/pulumi/pulumi-cloud-sdk/go v1.20261105.0
+	github.com/pulumi/pulumi-cloud-sdk/go v1.20261106.0
 	github.com/pulumi/pulumi/pkg/v3 v3.273.0
 	github.com/pulumi/pulumi/sdk/v3 v3.273.0
 	github.com/stretchr/testify v1.12.1
@@ -85,7 +85,7 @@ require (
 	github.com/djherbis/times v1.5.0 // indirect
 	github.com/edsrzf/mmap-go v1.1.0 // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
-	github.com/go-jose/go-jose/v4 v4.1.6 // indirect
+	github.com/go-jose/go-jose/v4 v4.1.8 // indirect
 	github.com/go-logr/logr v1.4.4 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
