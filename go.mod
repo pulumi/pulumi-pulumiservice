@@ -8,8 +8,8 @@ require (
 	github.com/pulumi/esc v0.26.0
 	github.com/pulumi/providertest v0.7.0
 	github.com/pulumi/pulumi-cloud-sdk/go v1.20261106.0
-	github.com/pulumi/pulumi/pkg/v3 v3.273.0
-	github.com/pulumi/pulumi/sdk/v3 v3.273.0
+	github.com/pulumi/pulumi/pkg/v3 v3.274.1
+	github.com/pulumi/pulumi/sdk/v3 v3.274.1
 	github.com/stretchr/testify v1.12.1
 	golang.org/x/exp v0.0.0-20261014143641-f0251eb4aa3e
 	google.golang.org/protobuf v1.36.12
