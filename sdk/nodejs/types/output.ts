@@ -693,6 +693,29 @@ export interface RoleScopeInfo {
     resourceType: string;
 }
 
+export interface TeamInfo {
+    /**
+     * The team's description.
+     */
+    description: string;
+    /**
+     * The team's display name.
+     */
+    displayName: string;
+    /**
+     * Whether this is the Everyone team: every admin and member of the organization is in it, never billing managers. Pulumi manages it, so it can't be managed with the `Team` resource.
+     */
+    everyone: boolean;
+    /**
+     * The team's name, used to grant to it.
+     */
+    name: string;
+    /**
+     * The type of team: `pulumi` or `github`.
+     */
+    type: string;
+}
+
 export interface TemplateSourceDestination {
     /**
      * Destination URL that gets filled in on new project creation.
