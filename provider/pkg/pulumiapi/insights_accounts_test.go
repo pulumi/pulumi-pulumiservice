@@ -35,8 +35,8 @@ func TestCreateInsightsAccount(t *testing.T) {
 			Provider:     awsProvider,
 			Environment:  testEnvName,
 			ScanSchedule: "daily",
-			ProviderConfig: map[string]interface{}{
-				regionsKey: []interface{}{usWest2Region},
+			ProviderConfig: map[string]any{
+				regionsKey: []any{usWest2Region},
 			},
 		}
 
@@ -93,8 +93,8 @@ func TestListInsightsAccounts(t *testing.T) {
 					Provider:             awsProvider,
 					ProviderEnvRef:       testEnvName,
 					ScheduledScanEnabled: true,
-					ProviderConfig: map[string]interface{}{
-						regionsKey: []interface{}{usWest2Region, "us-east-1"},
+					ProviderConfig: map[string]any{
+						regionsKey: []any{usWest2Region, "us-east-1"},
 					},
 				},
 				{
@@ -148,8 +148,8 @@ func TestGetInsightsAccount(t *testing.T) {
 			Provider:             awsProvider,
 			ProviderEnvRef:       testEnvName,
 			ScheduledScanEnabled: true,
-			ProviderConfig: map[string]interface{}{
-				regionsKey: []interface{}{usWest2Region, "us-east-1"},
+			ProviderConfig: map[string]any{
+				regionsKey: []any{usWest2Region, "us-east-1"},
 			},
 		}
 
@@ -205,8 +205,8 @@ func TestUpdateInsightsAccount(t *testing.T) {
 		reqBody := UpdateInsightsAccountRequest{
 			Environment:  "updated-env",
 			ScanSchedule: "none",
-			ProviderConfig: map[string]interface{}{
-				regionsKey: []interface{}{"us-west-1"},
+			ProviderConfig: map[string]any{
+				regionsKey: []any{"us-west-1"},
 			},
 		}
 

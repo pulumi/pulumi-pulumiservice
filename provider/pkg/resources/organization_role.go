@@ -81,11 +81,11 @@ func (*OrganizationRole) Annotate(a infer.Annotator) {
 }
 
 type OrganizationRoleCore struct {
-	OrganizationName string                 `pulumi:"organizationName" provider:"replaceOnChanges"`
-	Name             string                 `pulumi:"name"`
-	Description      *string                `pulumi:"description,optional"`
-	ResourceType     *string                `pulumi:"resourceType,optional"`
-	Permissions      map[string]interface{} `pulumi:"permissions"`
+	OrganizationName string         `pulumi:"organizationName" provider:"replaceOnChanges"`
+	Name             string         `pulumi:"name"`
+	Description      *string        `pulumi:"description,optional"`
+	ResourceType     *string        `pulumi:"resourceType,optional"`
+	Permissions      map[string]any `pulumi:"permissions"`
 }
 
 func (c *OrganizationRoleCore) Annotate(a infer.Annotator) {
@@ -399,7 +399,7 @@ func orgRoleCoreFromAPI(
 			return OrganizationRoleCore{}, fmt.Errorf(
 				"marshalling role details for %q: %w", role.ID, err)
 		}
-		core.Permissions = map[string]interface{}{}
+		core.Permissions = map[string]any{}
 		if err := json.Unmarshal(raw, &core.Permissions); err != nil {
 			return OrganizationRoleCore{}, fmt.Errorf("parsing role details for %q: %w", role.ID, err)
 		}
@@ -429,7 +429,7 @@ func orgRoleStateFromAPI(
 // missing or unknown discriminators, so we don't structurally inspect
 // the map ourselves.
 func buildPermissionDescriptorForAPI(
-	permissions map[string]interface{},
+	permissions map[string]any,
 ) (apitype.PermissionDescriptor, error) {
 	raw, err := json.Marshal(permissions)
 	if err != nil {

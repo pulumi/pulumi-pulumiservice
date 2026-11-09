@@ -29,10 +29,6 @@ const (
 	tagProd = "prod"
 )
 
-func operator(o PolicyGroupTagOperator) *PolicyGroupTagOperator { return &o }
-
-func value(v string) *string { return &v }
-
 // The Pulumi Cloud console's encoding of the rules in TestBuildStackMatchRule.
 const consoleStackMatchRuleJSON = `{
   "__type": "PermissionExpressionOr",
@@ -83,12 +79,12 @@ func TestBuildStackMatchRule(t *testing.T) {
 	resp, err := BuildStackMatchRuleFunction{}.Invoke(t.Context(), infer.FunctionRequest[BuildMatchRuleInput]{
 		Input: BuildMatchRuleInput{Rules: []PolicyGroupMatchRule{
 			{Conditions: []PolicyGroupTagCondition{
-				{Key: tagEnv, Value: value(tagProd)},
-				{Key: "team", Operator: operator(PolicyGroupTagOperatorNotEquals), Value: value("legacy")},
+				{Key: tagEnv, Value: new(tagProd)},
+				{Key: "team", Operator: new(PolicyGroupTagOperatorNotEquals), Value: new("legacy")},
 			}},
 			{Conditions: []PolicyGroupTagCondition{
-				{Key: "cost-center", Operator: operator(PolicyGroupTagOperatorExists)},
-				{Key: "deprecated", Operator: operator(PolicyGroupTagOperatorNotExists)},
+				{Key: "cost-center", Operator: new(PolicyGroupTagOperatorExists)},
+				{Key: "deprecated", Operator: new(PolicyGroupTagOperatorNotExists)},
 			}},
 		}},
 	})
@@ -102,7 +98,7 @@ func TestBuildAccountMatchRule(t *testing.T) {
 	t.Parallel()
 	resp, err := BuildAccountMatchRuleFunction{}.Invoke(t.Context(), infer.FunctionRequest[BuildMatchRuleInput]{
 		Input: BuildMatchRuleInput{Rules: []PolicyGroupMatchRule{
-			{Conditions: []PolicyGroupTagCondition{{Key: tagEnv, Operator: operator(PolicyGroupTagOperatorExists)}}},
+			{Conditions: []PolicyGroupTagCondition{{Key: tagEnv, Operator: new(PolicyGroupTagOperatorExists)}}},
 		}},
 	})
 	require.NoError(t, err)
@@ -127,16 +123,16 @@ func TestBuildMatchRule_Errors(t *testing.T) {
 			"rules[0]: `conditions` must not be empty",
 		},
 		"empty key": {
-			[]PolicyGroupMatchRule{{Conditions: []PolicyGroupTagCondition{{Key: "", Value: value(tagProd)}}}},
+			[]PolicyGroupMatchRule{{Conditions: []PolicyGroupTagCondition{{Key: "", Value: new(tagProd)}}}},
 			"rules[0].conditions[0]: `key` must not be empty",
 		},
 		"key with a space": {
-			[]PolicyGroupMatchRule{{Conditions: []PolicyGroupTagCondition{{Key: "cost center", Value: value(tagProd)}}}},
+			[]PolicyGroupMatchRule{{Conditions: []PolicyGroupTagCondition{{Key: "cost center", Value: new(tagProd)}}}},
 			"`key` \"cost center\" may only contain",
 		},
 		"team-access key": {
 			[]PolicyGroupMatchRule{{Conditions: []PolicyGroupTagCondition{
-				{Key: "pulumi:team-access:ops", Operator: operator(PolicyGroupTagOperatorExists)},
+				{Key: "pulumi:team-access:ops", Operator: new(PolicyGroupTagOperatorExists)},
 			}}},
 			"can't use team-access tags",
 		},
@@ -145,24 +141,24 @@ func TestBuildMatchRule_Errors(t *testing.T) {
 			"`value` is required with the \"equals\" operator",
 		},
 		"equals with an empty value": {
-			[]PolicyGroupMatchRule{{Conditions: []PolicyGroupTagCondition{{Key: tagEnv, Value: value("")}}}},
+			[]PolicyGroupMatchRule{{Conditions: []PolicyGroupTagCondition{{Key: tagEnv, Value: new("")}}}},
 			"`value` is required with the \"equals\" operator",
 		},
 		"exists with a value": {
 			[]PolicyGroupMatchRule{{Conditions: []PolicyGroupTagCondition{
-				{Key: tagEnv, Operator: operator(PolicyGroupTagOperatorExists), Value: value(tagProd)},
+				{Key: tagEnv, Operator: new(PolicyGroupTagOperatorExists), Value: new(tagProd)},
 			}}},
 			"`value` can't be set with the \"exists\" operator",
 		},
 		"exists with an empty value": {
 			[]PolicyGroupMatchRule{{Conditions: []PolicyGroupTagCondition{
-				{Key: tagEnv, Operator: operator(PolicyGroupTagOperatorExists), Value: value("")},
+				{Key: tagEnv, Operator: new(PolicyGroupTagOperatorExists), Value: new("")},
 			}}},
 			"`value` can't be set with the \"exists\" operator",
 		},
 		"unknown operator": {
 			[]PolicyGroupMatchRule{{Conditions: []PolicyGroupTagCondition{
-				{Key: tagEnv, Operator: operator("contains"), Value: value(tagProd)},
+				{Key: tagEnv, Operator: new(PolicyGroupTagOperator("contains")), Value: new(tagProd)},
 			}}},
 			"unknown operator \"contains\"",
 		},
