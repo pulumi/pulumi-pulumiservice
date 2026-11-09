@@ -4,6 +4,7 @@ package resources
 
 import (
 	"context"
+	"maps"
 	"net/http"
 	"testing"
 
@@ -113,9 +114,7 @@ func TestOrganizationMemberEntityAccessCheck(t *testing.T) {
 			"entityType":       property.New(entityType),
 			"entityName":       property.New(entityName),
 		}
-		for k, v := range extra {
-			props[k] = v
-		}
+		maps.Copy(props, extra)
 		resp, err := (&OrganizationMemberEntityAccess{}).Check(t.Context(), infer.CheckRequest{
 			NewInputs: property.NewMap(props),
 		})
@@ -177,12 +176,12 @@ func TestOrganizationMemberEntityAccessCreate(t *testing.T) {
 
 		_, err := r.Create(ctx, infer.CreateRequest[entityAccessInput]{Inputs: entityAccessInput{
 			OrganizationName: eaOrg, Username: eaUser, EntityType: "environment", EntityName: "proj/env",
-			Permission: eaPtr("environment-read"),
+			Permission: new("environment-read"),
 		}})
 		require.NoError(t, err)
 		_, err = r.Create(ctx, infer.CreateRequest[entityAccessInput]{Inputs: entityAccessInput{
 			OrganizationName: eaOrg, Username: eaUser, EntityType: "insightsAccount", EntityName: "aws-prod",
-			Permission: eaPtr("insights-account-read"),
+			Permission: new("insights-account-read"),
 		}})
 		require.NoError(t, err)
 		require.Len(t, mock.updates, 2)
@@ -337,8 +336,6 @@ func TestOrganizationMemberEntityAccessDelete(t *testing.T) {
 		assert.NoError(t, del(mock))
 	})
 }
-
-func eaPtr(s string) *string { return &s }
 
 func contextKind(ctx apitype.PermissionContextExpression) string {
 	switch ctx.(type) {

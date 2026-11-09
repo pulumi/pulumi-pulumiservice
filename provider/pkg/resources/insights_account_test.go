@@ -195,7 +195,7 @@ func TestInsightsAccount(t *testing.T) {
 					Provider:             gcAWS,
 					ProviderEnvRef:       gcTestEnv,
 					ScheduledScanEnabled: true,
-					ProviderConfig: map[string]interface{}{
+					ProviderConfig: map[string]any{
 						"region": gcUSWest2,
 					},
 				}, nil
@@ -237,7 +237,7 @@ func TestInsightsAccount(t *testing.T) {
 			Provider:         CloudProviderAWS,
 			Environment:      gcTestEnv,
 			ScanSchedule:     ScanScheduleDaily,
-			ProviderConfig: map[string]interface{}{
+			ProviderConfig: map[string]any{
 				"region": gcUSWest2,
 			},
 			Tags: map[string]string{},
@@ -265,7 +265,7 @@ func TestInsightsAccount(t *testing.T) {
 					Provider:             gcAWS,
 					ProviderEnvRef:       gcTestEnv,
 					ScheduledScanEnabled: false,
-					ProviderConfig:       map[string]interface{}{}, // API returns empty map
+					ProviderConfig:       map[string]any{}, // API returns empty map
 				}, nil
 			},
 		}
@@ -321,7 +321,7 @@ func TestInsightsAccount(t *testing.T) {
 					Provider:         CloudProviderAWS,
 					Environment:      gcTestEnv,
 					ScanSchedule:     scanSchedule,
-					ProviderConfig: map[string]interface{}{
+					ProviderConfig: map[string]any{
 						gcRegions: []string{gcUSWest2},
 					},
 				},
@@ -358,8 +358,8 @@ func TestInsightsAccount(t *testing.T) {
 					Provider:             gcAWS,
 					ProviderEnvRef:       gcTestEnv,
 					ScheduledScanEnabled: true,
-					ProviderConfig: map[string]interface{}{
-						gcRegions: []interface{}{gcUSWest2},
+					ProviderConfig: map[string]any{
+						gcRegions: []any{gcUSWest2},
 					},
 				}, nil
 			},
@@ -377,7 +377,7 @@ func TestInsightsAccount(t *testing.T) {
 					Provider:         CloudProviderAWS,
 					Environment:      gcTestEnv,
 					ScanSchedule:     scanSchedule,
-					ProviderConfig: map[string]interface{}{
+					ProviderConfig: map[string]any{
 						gcRegions: []string{gcUSWest2},
 					},
 				},

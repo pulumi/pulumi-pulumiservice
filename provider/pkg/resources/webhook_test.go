@@ -25,8 +25,6 @@ const (
 	gcMyProject = "my-project"
 )
 
-func ptr[T any](v T) *T { return &v }
-
 func TestGenerateWebhookID(t *testing.T) {
 	t.Run("organization scope", func(t *testing.T) {
 		id := generateWebhookID(WebhookInput{OrganizationName: gcMyOrg}, "hook-1")
@@ -36,8 +34,8 @@ func TestGenerateWebhookID(t *testing.T) {
 	t.Run("stack scope", func(t *testing.T) {
 		id := generateWebhookID(WebhookInput{
 			OrganizationName: gcMyOrg,
-			ProjectName:      ptr(gcMyProject),
-			StackName:        ptr("my-stack"),
+			ProjectName:      new(gcMyProject),
+			StackName:        new("my-stack"),
 		}, "hook-2")
 		assert.Equal(t, "my-org/my-project/my-stack/hook-2", id)
 	})
@@ -45,8 +43,8 @@ func TestGenerateWebhookID(t *testing.T) {
 	t.Run("environment scope", func(t *testing.T) {
 		id := generateWebhookID(WebhookInput{
 			OrganizationName: gcMyOrg,
-			ProjectName:      ptr(gcMyProject),
-			EnvironmentName:  ptr("dev"),
+			ProjectName:      new(gcMyProject),
+			EnvironmentName:  new("dev"),
 		}, "hook-3")
 		assert.Equal(t, "my-org/environment/my-project/dev/hook-3", id)
 	})
@@ -67,8 +65,8 @@ func TestSplitWebhookID(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, &webhookID{
 			organizationName: gcMyOrg,
-			projectName:      ptr(gcMyProject),
-			stackName:        ptr("my-stack"),
+			projectName:      new(gcMyProject),
+			stackName:        new("my-stack"),
 			webhookName:      "hook-2",
 		}, got)
 	})
@@ -78,8 +76,8 @@ func TestSplitWebhookID(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, &webhookID{
 			organizationName: gcMyOrg,
-			projectName:      ptr(gcMyProject),
-			environmentName:  ptr("dev"),
+			projectName:      new(gcMyProject),
+			environmentName:  new("dev"),
 			webhookName:      "hook-3",
 		}, got)
 	})
@@ -97,8 +95,8 @@ func TestSplitWebhookID(t *testing.T) {
 		// All round-trip cases must produce the same scope-shape on parse.
 		cases := []WebhookInput{
 			{OrganizationName: gcOrg},
-			{OrganizationName: gcOrg, ProjectName: ptr("proj"), StackName: ptr("stk")},
-			{OrganizationName: gcOrg, ProjectName: ptr("proj"), EnvironmentName: ptr(gcEnv)},
+			{OrganizationName: gcOrg, ProjectName: new("proj"), StackName: new("stk")},
+			{OrganizationName: gcOrg, ProjectName: new("proj"), EnvironmentName: new(gcEnv)},
 		}
 		for _, in := range cases {
 			id := generateWebhookID(in, "hook")

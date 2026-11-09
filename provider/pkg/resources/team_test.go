@@ -62,14 +62,14 @@ func TestTeam(t *testing.T) {
 				TeamCore: TeamCore{
 					OrganizationName: gcABC,
 					Type:             teamTypePulumi,
-					Name:             ref("test"),
+					Name:             new("test"),
 				},
 			},
 			State: TeamState{
 				TeamCore: TeamCore{
 					OrganizationName: gcABC,
 					Type:             teamTypePulumi,
-					Name:             ref("test"),
+					Name:             new("test"),
 				},
 			},
 		}
@@ -107,14 +107,14 @@ func TestTeam(t *testing.T) {
 				TeamCore: TeamCore{
 					OrganizationName: gcABC,
 					Type:             teamTypePulumi,
-					Name:             ref("test"),
+					Name:             new("test"),
 				},
 			},
 			State: TeamState{
 				TeamCore: TeamCore{
 					OrganizationName: gcABC,
 					Type:             teamTypePulumi,
-					Name:             ref("test"),
+					Name:             new("test"),
 				},
 			},
 		}
@@ -127,9 +127,9 @@ func TestTeam(t *testing.T) {
 			TeamCore: TeamCore{
 				OrganizationName: gcABC,
 				Type:             teamTypePulumi,
-				Name:             ref("test"),
-				DisplayName:      ref("test team"),
-				Description:      ref("test team description"),
+				Name:             new("test"),
+				DisplayName:      new("test team"),
+				Description:      new("test team description"),
 			},
 			Members: []string{gcMember1, gcMember2},
 		}, resp.Inputs)
@@ -137,9 +137,9 @@ func TestTeam(t *testing.T) {
 			TeamCore: TeamCore{
 				OrganizationName: gcABC,
 				Type:             teamTypePulumi,
-				Name:             ref("test"),
-				DisplayName:      ref("test team"),
-				Description:      ref("test team description"),
+				Name:             new("test"),
+				DisplayName:      new("test team"),
+				Description:      new("test team description"),
 			},
 			Members: []string{gcMember1, gcMember2},
 		}, resp.State)
@@ -177,7 +177,7 @@ func TestTeamCreateWarnsAboutUndeclaredMembers(t *testing.T) {
 
 			_, err := (&Team{}).Create(ctx, infer.CreateRequest[TeamInput]{
 				Inputs: TeamInput{
-					TeamCore: TeamCore{OrganizationName: gcABC, Type: teamTypePulumi, Name: ref("test")},
+					TeamCore: TeamCore{OrganizationName: gcABC, Type: teamTypePulumi, Name: new("test")},
 					Members:  tc.declared,
 				},
 			})
@@ -193,5 +193,3 @@ func TestTeamCreateWarnsAboutUndeclaredMembers(t *testing.T) {
 		})
 	}
 }
-
-func ref[T any](v T) *T { return &v }

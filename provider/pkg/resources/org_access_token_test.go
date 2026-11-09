@@ -3,6 +3,7 @@ package resources
 import (
 	"context"
 	"fmt"
+	"maps"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -188,9 +189,7 @@ func TestOrgAccessTokenCheck(t *testing.T) {
 			gcName:             property.New("ci-token"),
 			gcOrganizationName: property.New(gcMyOrg),
 		}
-		for k, v := range extra {
-			m[k] = v
-		}
+		maps.Copy(m, extra)
 		return property.NewMap(m)
 	}
 	check := func(newInputs, oldInputs property.Map) []string {

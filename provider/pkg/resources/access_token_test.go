@@ -16,6 +16,7 @@ package resources
 
 import (
 	"context"
+	"maps"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -52,9 +53,7 @@ func (c *accessTokenClientMock) GetAccessToken(ctx context.Context, id string) (
 func TestAccessTokenCheck(t *testing.T) {
 	check := func(extra map[string]property.Value) []string {
 		m := map[string]property.Value{gcDescription: property.New(testAccessTokenDesc)}
-		for k, v := range extra {
-			m[k] = v
-		}
+		maps.Copy(m, extra)
 		resp, err := (&AccessToken{}).Check(t.Context(), infer.CheckRequest{
 			NewInputs: property.NewMap(m),
 		})

@@ -37,7 +37,7 @@ const (
 // `__`-prefixed keys as of pulumi/pulumi#22834).
 func assertScopedConditionShape(
 	t *testing.T,
-	got map[string]interface{},
+	got map[string]any,
 	expectedExpressionType string,
 	expectedLiteralType string,
 	expectedIdentity string,
@@ -48,24 +48,24 @@ func assertScopedConditionShape(
 	assert.Equal(t, "PermissionDescriptorCondition", got["__type"],
 		"top-level __type must be PermissionDescriptorCondition")
 
-	cond, ok := got["condition"].(map[string]interface{})
+	cond, ok := got["condition"].(map[string]any)
 	require.True(t, ok, "condition must be a map; got %T", got["condition"])
 	assert.Equal(t, "PermissionExpressionEqual", cond["__type"])
 
-	left, ok := cond["left"].(map[string]interface{})
+	left, ok := cond["left"].(map[string]any)
 	require.True(t, ok, "condition.left must be a map; got %T", cond["left"])
 	assert.Equal(t, expectedExpressionType, left["__type"])
 
-	right, ok := cond["right"].(map[string]interface{})
+	right, ok := cond["right"].(map[string]any)
 	require.True(t, ok, "condition.right must be a map; got %T", cond["right"])
 	assert.Equal(t, expectedLiteralType, right["__type"])
 	assert.Equal(t, expectedIdentity, right["identity"])
 
-	sub, ok := got["subNode"].(map[string]interface{})
+	sub, ok := got["subNode"].(map[string]any)
 	require.True(t, ok, "subNode must be a map; got %T", got["subNode"])
 	assert.Equal(t, "PermissionDescriptorAllow", sub["__type"])
 
-	rawPerms, ok := sub["permissions"].([]interface{})
+	rawPerms, ok := sub["permissions"].([]any)
 	require.True(t, ok, "subNode.permissions must be a list; got %T", sub["permissions"])
 	gotPerms := make([]string, len(rawPerms))
 	for i, p := range rawPerms {
@@ -91,9 +91,9 @@ func TestBuildAllowPermissions(t *testing.T) {
 		got := resp.Output.Permissions
 		assert.Equal(t, "PermissionDescriptorAllow", got["__type"])
 		// Permissions list passes through verbatim.
-		perms, ok := got["permissions"].([]interface{})
+		perms, ok := got["permissions"].([]any)
 		require.True(t, ok)
-		assert.Equal(t, []interface{}{permStackRead, permEnvironmentOpen}, perms)
+		assert.Equal(t, []any{permStackRead, permEnvironmentOpen}, perms)
 	})
 
 	t.Run("rejects empty permissions", func(t *testing.T) {

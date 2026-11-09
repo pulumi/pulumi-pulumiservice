@@ -66,9 +66,9 @@ func mustParseDescriptor(t *testing.T, wireJSON string) apitype.PermissionDescri
 	return d
 }
 
-var testPermissions = map[string]interface{}{
+var testPermissions = map[string]any{
 	gcTypeMeta:    "PermissionDescriptorAllow",
-	gcPermissions: []interface{}{"stack:read"},
+	gcPermissions: []any{"stack:read"},
 }
 
 func TestOrganizationRoleCreate(t *testing.T) {
@@ -88,7 +88,7 @@ func TestOrganizationRoleCreate(t *testing.T) {
 			// share this discriminator now).
 			raw, err := json.Marshal(req.Details)
 			require.NoError(t, err)
-			var parsed map[string]interface{}
+			var parsed map[string]any
 			require.NoError(t, json.Unmarshal(raw, &parsed))
 			assert.Equal(t, "PermissionDescriptorAllow", parsed[gcTypeMeta])
 			return &apitype.PermissionDescriptorRecord{
