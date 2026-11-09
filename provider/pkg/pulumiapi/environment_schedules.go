@@ -39,7 +39,7 @@ type EnvironmentIdentifier struct {
 type CreateEnvironmentRotationScheduleRequest struct {
 	ScheduleCron          *string                                        `json:"scheduleCron,omitempty"`
 	ScheduleOnce          *time.Time                                     `json:"scheduleOnce,omitempty"`
-	SecretRotationRequest CreateEnvironmentSecretRotationScheduleRequest `json:"secretRotationRequest,omitempty"`
+	SecretRotationRequest CreateEnvironmentSecretRotationScheduleRequest `json:"secretRotationRequest"`
 }
 
 type CreateEnvironmentSecretRotationScheduleRequest struct {
@@ -50,7 +50,7 @@ type EnvironmentScheduleResponse struct {
 	ID           string                        `json:"id,omitempty"`
 	ScheduleOnce *string                       `json:"scheduleOnce,omitempty"`
 	ScheduleCron *string                       `json:"scheduleCron,omitempty"`
-	Definition   EnvironmentScheduleDefinition `json:"definition,omitempty"`
+	Definition   EnvironmentScheduleDefinition `json:"definition"`
 }
 
 type EnvironmentScheduleDefinition struct {
