@@ -159,8 +159,9 @@ under the exceptions above, add the label when you open it:
 PR. This check is a commit status, not an Actions job, so `gh run` doesn't show
 it. Look for it in `gh pr checks <number>`.
 
-Only a release PR moves fragments into `CHANGELOG.md`, with
-`changie batch vX.Y.Z && changie merge`. See
+Only a release moves fragments into `CHANGELOG.md`: a release PR runs
+`changie batch vX.Y.Z && changie merge` itself, and for a tag pushed any other
+way `pulumiservice-release-notes.yml` opens a PR that does it. See
 [Releasing](CONTRIBUTING.md#releasing).
 
 ### Schema Changes

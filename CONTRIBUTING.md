@@ -94,7 +94,7 @@ A release is a PR that moves the unreleased changelog fragments under a version 
 
 For a prerelease, skip steps 1 and 2 and use a `Release-Version: vX.Y.Z-alpha.N` marker. The fragments stay unreleased until the next stable release. `prerelease.yml` publishes the packages but creates no GitHub release.
 
-Release from a PR rather than with `@release-bot` in #release-ops or by pushing a tag yourself. Those still publish the release, mark it latest and rebuild the registry docs, but nothing batches the changelog: `CHANGELOG.md` gets no section for the version, and its fragments land under the next release that is batched.
+A release with `@release-bot` in #release-ops, or a tag you push yourself, also publishes the release, marks it latest and rebuilds the registry docs. Its changelog isn't batched before the tag, so `pulumiservice-release-notes.yml` batches the fragments in the tagged commit, adds them to the release body, and opens a `Batch the changelog for vX.Y.Z` PR that applies them to `main`. Approve that PR if it's waiting for a review; it merges itself once its checks pass. A release PR lets you review the notes before the release instead of after.
 
 `run-acceptance-tests.yml` skips PRs that change only `CHANGELOG.md`, and then the required `Sentinel` check never reports. A release PR also changes files under `.changes/`, so it isn't skipped. Commenting `/run-acceptance-tests` doesn't help on a skipped PR: a comment-triggered run writes `Sentinel` to the tip of `main` instead of the PR's commit.
 
