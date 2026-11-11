@@ -16,6 +16,14 @@ const (
 	gcAWS          = "aws"
 )
 
+// Property names along the path to the GCP OIDC project number.
+const (
+	gcOIDC          = "oidc"
+	gcGCP           = "gcp"
+	gcProjectID     = "projectId"
+	gcProjectNumber = "projectNumber"
+)
+
 // Property names along the paths to the nested credentials.
 const (
 	gcSourceContext   = "sourceContext"

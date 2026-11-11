@@ -627,6 +627,11 @@
       "properties": {
         "projectId": {
           "type": "string",
+          "description": "The GCP project number, a numeric value such as `123456789012`. This is not the project ID (such as `my-project`). To look up the number, run `gcloud projects describe <project-id> --format='value(projectNumber)'`.",
+          "deprecationMessage": "Use `projectNumber` instead. Despite its name, `projectId` takes the project number, not the project ID."
+        },
+        "projectNumber": {
+          "type": "string",
           "description": "The GCP project number, a numeric value such as `123456789012`. This is not the project ID (such as `my-project`). To look up the number, run `gcloud projects describe <project-id> --format='value(projectNumber)'`."
         },
         "providerId": {
@@ -652,7 +657,6 @@
       },
       "type": "object",
       "required": [
-        "projectId",
         "workloadPoolId",
         "providerId",
         "serviceAccount"

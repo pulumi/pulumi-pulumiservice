@@ -1,11 +1,10 @@
 // Copyright 2026, Pulumi Corporation.
 
-//go:build go || dotnet || java || all
+//go:build nodejs || python || go || dotnet || java || all
 
 package examples
 
 import (
-	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -19,17 +18,23 @@ import (
 // output, and reads the environment back with the getEnvironment invoke: the
 // shapes that each language SDK handles in its own code.
 func runSmokeTest(t *testing.T, lang string, opts ...opttest.Option) {
+	runSmokeTestAfterInstall(t, lang, nil, opts...)
+}
+
+// runSmokeTestAfterInstall is runSmokeTest with a hook that runs after the
+// program is copied and installed and before `pulumi up`.
+func runSmokeTestAfterInstall(
+	t *testing.T,
+	lang string,
+	afterInstall func(t *testing.T, test *pulumitest.PulumiTest),
+	opts ...opttest.Option,
+) {
 	digits := generateRandomFiveDigits()
-	test := pulumitest.NewPulumiTest(t,
-		filepath.Join(getCwd(t), lang+"-smoke"),
-		append([]opttest.Option{
-			inMemoryProvider(),
-			opttest.UseAmbientBackend(),
-			opttest.StackName(randomStackName()),
-		}, opts...)...,
-	)
-	test.SetConfig(t, "organizationName", getOrgName())
-	test.SetConfig(t, "digits", digits)
+	test := newExampleTest(t, lang+"-smoke", opts...)
+	setConfig(t, test, map[string]string{"organizationName": getOrgName(), "digits": digits})
+	if afterInstall != nil {
+		afterInstall(t, test)
+	}
 
 	up := runPulumiTest(t, test)
 

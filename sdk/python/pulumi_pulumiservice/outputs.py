@@ -1251,14 +1251,16 @@ class GCPOIDCConfiguration(dict):
     @staticmethod
     def __key_warning(key: str):
         suggest = None
-        if key == "projectId":
-            suggest = "project_id"
-        elif key == "providerId":
+        if key == "providerId":
             suggest = "provider_id"
         elif key == "serviceAccount":
             suggest = "service_account"
         elif key == "workloadPoolId":
             suggest = "workload_pool_id"
+        elif key == "projectId":
+            suggest = "project_id"
+        elif key == "projectNumber":
+            suggest = "project_number"
         elif key == "tokenLifetime":
             suggest = "token_lifetime"
 
@@ -1274,38 +1276,35 @@ class GCPOIDCConfiguration(dict):
         return super().get(key, default)
 
     def __init__(__self__, *,
-                 project_id: _builtins.str,
                  provider_id: _builtins.str,
                  service_account: _builtins.str,
                  workload_pool_id: _builtins.str,
+                 project_id: Optional[_builtins.str] = None,
+                 project_number: Optional[_builtins.str] = None,
                  region: Optional[_builtins.str] = None,
                  token_lifetime: Optional[_builtins.str] = None):
         """
         GCP configuration for Deployments OIDC. Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
 
-        :param _builtins.str project_id: The GCP project number, a numeric value such as `123456789012`. This is not the project ID (such as `my-project`). To look up the number, run `gcloud projects describe <project-id> --format='value(projectNumber)'`.
         :param _builtins.str provider_id: The ID of the identity provider associated with the workload pool.
         :param _builtins.str service_account: The email address of the service account to use.
         :param _builtins.str workload_pool_id: The ID of the workload pool to use.
+        :param _builtins.str project_id: The GCP project number, a numeric value such as `123456789012`. This is not the project ID (such as `my-project`). To look up the number, run `gcloud projects describe <project-id> --format='value(projectNumber)'`.
+        :param _builtins.str project_number: The GCP project number, a numeric value such as `123456789012`. This is not the project ID (such as `my-project`). To look up the number, run `gcloud projects describe <project-id> --format='value(projectNumber)'`.
         :param _builtins.str region: The region of the GCP project.
         :param _builtins.str token_lifetime: The lifetime of the temporary credentials in “XhYmZs” format.
         """
-        pulumi.set(__self__, "project_id", project_id)
         pulumi.set(__self__, "provider_id", provider_id)
         pulumi.set(__self__, "service_account", service_account)
         pulumi.set(__self__, "workload_pool_id", workload_pool_id)
+        if project_id is not None:
+            pulumi.set(__self__, "project_id", project_id)
+        if project_number is not None:
+            pulumi.set(__self__, "project_number", project_number)
         if region is not None:
             pulumi.set(__self__, "region", region)
         if token_lifetime is not None:
             pulumi.set(__self__, "token_lifetime", token_lifetime)
-
-    @_builtins.property
-    @pulumi.getter(name="projectId")
-    def project_id(self) -> _builtins.str:
-        """
-        The GCP project number, a numeric value such as `123456789012`. This is not the project ID (such as `my-project`). To look up the number, run `gcloud projects describe <project-id> --format='value(projectNumber)'`.
-        """
-        return pulumi.get(self, "project_id")
 
     @_builtins.property
     @pulumi.getter(name="providerId")
@@ -1330,6 +1329,23 @@ class GCPOIDCConfiguration(dict):
         The ID of the workload pool to use.
         """
         return pulumi.get(self, "workload_pool_id")
+
+    @_builtins.property
+    @pulumi.getter(name="projectId")
+    @_utilities.deprecated("""Use `projectNumber` instead. Despite its name, `projectId` takes the project number, not the project ID.""")
+    def project_id(self) -> Optional[_builtins.str]:
+        """
+        The GCP project number, a numeric value such as `123456789012`. This is not the project ID (such as `my-project`). To look up the number, run `gcloud projects describe <project-id> --format='value(projectNumber)'`.
+        """
+        return pulumi.get(self, "project_id")
+
+    @_builtins.property
+    @pulumi.getter(name="projectNumber")
+    def project_number(self) -> Optional[_builtins.str]:
+        """
+        The GCP project number, a numeric value such as `123456789012`. This is not the project ID (such as `my-project`). To look up the number, run `gcloud projects describe <project-id> --format='value(projectNumber)'`.
+        """
+        return pulumi.get(self, "project_number")
 
     @_builtins.property
     @pulumi.getter

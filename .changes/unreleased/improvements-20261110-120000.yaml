@@ -1,0 +1,3 @@
+kind: improvements
+body: '`DeploymentSettings` GCP OIDC has a new `projectNumber` property, which replaces `projectId`. `projectId` is deprecated: despite its name, it takes the project number, not the project ID. A value that isn''t a number now fails at preview instead of when a deployment runs. In the Go SDK, `projectId` on outputs is now a `*string`. [#491](https://github.com/pulumi/pulumi-pulumiservice/issues/491)'
+time: 2026-11-10T12:00:00.000000-05:00
