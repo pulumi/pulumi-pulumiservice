@@ -73,7 +73,7 @@ export class Team extends pulumi.CustomResource {
      */
     declare public readonly members: pulumi.Output<string[]>;
     /**
-     * The team's name. Required for "pulumi" teams.
+     * The team's name, up to 100 characters. Only letters, digits, hyphens, underscores and periods are allowed. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). Characters that aren't allowed in the logical name are replaced with hyphens. Only "pulumi" teams are auto-named.
      */
     declare public readonly name: pulumi.Output<string | undefined>;
     /**
@@ -148,7 +148,7 @@ export interface TeamArgs {
      */
     members?: pulumi.Input<pulumi.Input<string>[] | undefined>;
     /**
-     * The team's name. Required for "pulumi" teams.
+     * The team's name, up to 100 characters. Only letters, digits, hyphens, underscores and periods are allowed. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). Characters that aren't allowed in the logical name are replaced with hyphens. Only "pulumi" teams are auto-named.
      */
     name?: pulumi.Input<string | undefined>;
     /**

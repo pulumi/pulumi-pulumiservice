@@ -52,7 +52,7 @@ namespace Pulumi.PulumiService
         public Output<ImmutableArray<string>> Members { get; private set; } = null!;
 
         /// <summary>
-        /// The team's name. Required for "pulumi" teams.
+        /// The team's name, up to 100 characters. Only letters, digits, hyphens, underscores and periods are allowed. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). Characters that aren't allowed in the logical name are replaced with hyphens. Only "pulumi" teams are auto-named.
         /// </summary>
         [Output("name")]
         public Output<string?> Name { get; private set; } = null!;
@@ -153,7 +153,7 @@ namespace Pulumi.PulumiService
         }
 
         /// <summary>
-        /// The team's name. Required for "pulumi" teams.
+        /// The team's name, up to 100 characters. Only letters, digits, hyphens, underscores and periods are allowed. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). Characters that aren't allowed in the logical name are replaced with hyphens. Only "pulumi" teams are auto-named.
         /// </summary>
         [Input("name")]
         public Input<string>? Name { get; set; }
