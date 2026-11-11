@@ -1,0 +1,3 @@
+kind: improvements
+body: '`displayName` on `Webhook` and `name` on `AgentPool`, `ApprovalRule`, `OidcIssuer` and `OrganizationRole` are now optional. When one is omitted, Pulumi generates it from the resource''s logical name plus a random suffix, within Pulumi Cloud''s length limit for that name, or follows the stack''s autonaming configuration. For an `AgentPool`, characters that Pulumi Cloud doesn''t allow in pool names become hyphens. [#1331](https://github.com/pulumi/pulumi-pulumiservice/issues/1331)'
+time: 2026-11-06T12:00:00.000000-05:00

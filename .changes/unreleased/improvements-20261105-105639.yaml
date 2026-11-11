@@ -1,0 +1,5 @@
+kind: improvements
+body: '`name` on `OrgAccessToken` and `TeamAccessToken` is now optional. When it''s omitted, Pulumi generates a name from the resource''s logical name plus a random suffix, within Pulumi Cloud''s 40-character limit for token names, or follows the stack''s autonaming configuration. An update keeps the generated name, and a replacement gets a new one.'
+time: 2026-11-05T10:56:39.03043-05:00
+custom:
+    Issue: "1211"

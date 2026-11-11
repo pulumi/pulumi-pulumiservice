@@ -1,0 +1,3 @@
+kind: bug-fixes
+body: 'Destroying a `TemplateSource`, `ApprovalRule` or `OidcIssuer`, or refreshing an `OidcIssuer`, crashed the provider when the request got no response from Pulumi Cloud, such as on a network error or timeout. These operations now report the error. [#1362](https://github.com/pulumi/pulumi-pulumiservice/pull/1362)'
+time: 2026-11-06T12:00:02.000000-05:00

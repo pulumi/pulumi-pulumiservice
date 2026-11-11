@@ -1,0 +1,3 @@
+kind: bug-fixes
+body: 'Destroying a resource that was already deleted outside Pulumi failed with `404 Not Found` for most resources, including `Stack`, `Team`, `Environment`, `Webhook`, the access token resources and the schedule resources. Destroy now treats the resource as deleted and succeeds. [#1350](https://github.com/pulumi/pulumi-pulumiservice/pull/1350)'
+time: 2026-11-06T12:00:04.000000-05:00
