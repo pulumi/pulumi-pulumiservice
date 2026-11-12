@@ -421,7 +421,7 @@ func TestYamlOidcIssuerExample(t *testing.T) {
 
 func TestYamlPolicyGroupsExample(t *testing.T) {
 	test := newExampleTest(t, "yaml-policy-groups")
-	setConfig(t, test, map[string]string{"digits": generateRandomFiveDigits(), "organizationName": getOrgName()})
+	setConfig(t, test, map[string]string{"organizationName": getOrgName()})
 	up := runPulumiTest(t, test)
 
 	// getPolicyPacks joins the org policy pack list against the registry
