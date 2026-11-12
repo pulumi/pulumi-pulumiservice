@@ -35,6 +35,8 @@ from .get_organization_roles import *
 from .get_policy_pack import *
 from .get_policy_packs import *
 from .get_stack import *
+from .get_team import *
+from .get_teams import *
 from .insights_account import *
 from .oidc_issuer import *
 from .org_access_token import *

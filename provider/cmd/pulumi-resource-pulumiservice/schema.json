@@ -2227,6 +2227,38 @@
         }
       ]
     },
+    "pulumiservice:index:TeamInfo": {
+      "properties": {
+        "description": {
+          "type": "string",
+          "description": "The team's description."
+        },
+        "displayName": {
+          "type": "string",
+          "description": "The team's display name."
+        },
+        "everyone": {
+          "type": "boolean",
+          "description": "Whether this is the Everyone team: every admin and member of the organization is in it, never billing managers. Pulumi manages it, so it can't be managed with the `Team` resource."
+        },
+        "name": {
+          "type": "string",
+          "description": "The team's name, used to grant to it."
+        },
+        "type": {
+          "type": "string",
+          "description": "The type of team: `pulumi` or `github`."
+        }
+      },
+      "type": "object",
+      "required": [
+        "name",
+        "displayName",
+        "description",
+        "type",
+        "everyone"
+      ]
+    },
     "pulumiservice:index:TeamStackPermissionScope": {
       "type": "integer",
       "enum": [
@@ -7967,7 +7999,7 @@
       ]
     },
     "pulumiservice:index:Team": {
-      "description": "The Pulumi Cloud offers role-based access control (RBAC) using teams. Teams allow organization admins to assign a set of stack permissions to a group of users.\n\n## Import\n\nThis resource can be imported using its `id`, which has the format `{organization}/{teamName}`, e.g.,\n\n```sh\n $ pulumi import pulumiservice:index:Team my-team my-org/my-team\n```\n\nFor GitHub teams, `githubTeamId` isn't read back, so set it in your program after import.\n",
+      "description": "The Pulumi Cloud offers role-based access control (RBAC) using teams. Teams allow organization admins to assign a set of stack permissions to a group of users. Every organization also has an Everyone team that every admin and member is in, never billing managers. Pulumi manages it, so it can't be managed with this resource: grant to it by name, `everyone`, with `TeamStackPermission` or `TeamEnvironmentPermission`, and look it up with `getTeam` or `getTeams`.\n\n## Import\n\nThis resource can be imported using its `id`, which has the format `{organization}/{teamName}`, e.g.,\n\n```sh\n $ pulumi import pulumiservice:index:Team my-team my-org/my-team\n```\n\nFor GitHub teams, `githubTeamId` isn't read back, so set it in your program after import.\n",
       "properties": {
         "description": {
           "type": "string",
@@ -9393,6 +9425,95 @@
           "stackName",
           "stackId",
           "tags"
+        ],
+        "type": "object"
+      }
+    },
+    "pulumiservice:index:getTeam": {
+      "description": "Looks up a team of a Pulumi Cloud organization by name, for example the Everyone team, `everyone`. Returns an error when the team is not found.",
+      "inputs": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The team's name."
+          },
+          "organizationName": {
+            "type": "string",
+            "description": "The name of the Pulumi organization."
+          }
+        },
+        "type": "object",
+        "required": [
+          "organizationName",
+          "name"
+        ]
+      },
+      "outputs": {
+        "properties": {
+          "description": {
+            "description": "The team's description.",
+            "type": "string"
+          },
+          "displayName": {
+            "description": "The team's display name.",
+            "type": "string"
+          },
+          "everyone": {
+            "description": "Whether this is the Everyone team: every admin and member of the organization is in it, never billing managers. Pulumi manages it, so it can't be managed with the `Team` resource.",
+            "type": "boolean"
+          },
+          "members": {
+            "description": "Pulumi Cloud usernames of the team's members.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "name": {
+            "description": "The team's name, used to grant to it.",
+            "type": "string"
+          },
+          "type": {
+            "description": "The type of team: `pulumi` or `github`.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "displayName",
+          "description",
+          "type",
+          "everyone",
+          "members"
+        ],
+        "type": "object"
+      }
+    },
+    "pulumiservice:index:getTeams": {
+      "description": "Lists the teams of a Pulumi Cloud organization, including the Everyone team.",
+      "inputs": {
+        "properties": {
+          "organizationName": {
+            "type": "string",
+            "description": "The name of the Pulumi organization."
+          }
+        },
+        "type": "object",
+        "required": [
+          "organizationName"
+        ]
+      },
+      "outputs": {
+        "properties": {
+          "teams": {
+            "items": {
+              "$ref": "#/types/pulumiservice:index:TeamInfo"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "teams"
         ],
         "type": "object"
       }
