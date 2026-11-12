@@ -627,6 +627,11 @@
       "properties": {
         "projectId": {
           "type": "string",
+          "description": "The GCP project number, a numeric value such as `123456789012`. This is not the project ID (such as `my-project`). To look up the number, run `gcloud projects describe <project-id> --format='value(projectNumber)'`.",
+          "deprecationMessage": "Use `projectNumber` instead. Despite its name, `projectId` takes the project number, not the project ID."
+        },
+        "projectNumber": {
+          "type": "string",
           "description": "The GCP project number, a numeric value such as `123456789012`. This is not the project ID (such as `my-project`). To look up the number, run `gcloud projects describe <project-id> --format='value(projectNumber)'`."
         },
         "providerId": {
@@ -652,7 +657,6 @@
       },
       "type": "object",
       "required": [
-        "projectId",
         "workloadPoolId",
         "providerId",
         "serviceAccount"
@@ -7986,7 +7990,7 @@
         },
         "name": {
           "type": "string",
-          "description": "The team's name. Required for \"pulumi\" teams.",
+          "description": "The team's name, up to 100 characters. Only letters, digits, hyphens, underscores and periods are allowed. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). Characters that aren't allowed in the logical name are replaced with hyphens. Only \"pulumi\" teams are auto-named.",
           "replaceOnChanges": true
         },
         "organizationName": {
@@ -8027,7 +8031,7 @@
         },
         "name": {
           "type": "string",
-          "description": "The team's name. Required for \"pulumi\" teams.",
+          "description": "The team's name, up to 100 characters. Only letters, digits, hyphens, underscores and periods are allowed. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). Characters that aren't allowed in the logical name are replaced with hyphens. Only \"pulumi\" teams are auto-named.",
           "replaceOnChanges": true
         },
         "organizationName": {

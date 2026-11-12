@@ -36,7 +36,7 @@ resources:
             duration: 1h
             sessionName: my-session
           gcp:
-            projectId: my-project
+            projectNumber: "123456789012"
             region: us-west1
             workloadPoolId: my-workload-pool
             providerId: my-provider

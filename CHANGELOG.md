@@ -5,8 +5,10 @@
 ### Improvements
 
 - `name` on `OrgAccessToken` and `TeamAccessToken` is now optional. When it's omitted, Pulumi generates a name from the resource's logical name plus a random suffix, within Pulumi Cloud's 40-character limit for token names, or follows the stack's autonaming configuration. An update keeps the generated name, and a replacement gets a new one. [#1211](https://github.com/pulumi/pulumi-pulumiservice/issues/1211)
+- `DeploymentSettings` GCP OIDC has a new `projectNumber` property, which replaces `projectId`. `projectId` is deprecated: despite its name, it takes the project number, not the project ID. A value that isn't a number now fails at preview instead of when a deployment runs. In the Go SDK, `projectId` on outputs is now a `*string`. [#491](https://github.com/pulumi/pulumi-pulumiservice/issues/491)
 - `displayName` on `Webhook` and `name` on `AgentPool`, `ApprovalRule`, `OidcIssuer` and `OrganizationRole` are now optional. When one is omitted, Pulumi generates it from the resource's logical name plus a random suffix, within Pulumi Cloud's length limit for that name, or follows the stack's autonaming configuration. For an `AgentPool`, characters that Pulumi Cloud doesn't allow in pool names become hyphens. [#1331](https://github.com/pulumi/pulumi-pulumiservice/issues/1331)
 - `name` on `PolicyGroup` is now optional. When it's omitted, Pulumi generates it from the resource's logical name plus a random suffix, within Pulumi Cloud's 100-character limit, or follows the stack's autonaming configuration. Characters that Pulumi Cloud doesn't allow in policy group names become hyphens. [#1333](https://github.com/pulumi/pulumi-pulumiservice/issues/1333)
+- `name` on a `Team` with `teamType: pulumi` is no longer required. When it's omitted, Pulumi generates it from the resource's logical name plus a random suffix, within Pulumi Cloud's 100-character limit, or follows the stack's autonaming configuration. Characters that Pulumi Cloud doesn't allow in team names, including spaces, become hyphens. `github` teams are unchanged. [#1332](https://github.com/pulumi/pulumi-pulumiservice/issues/1332)
 - Creating a `Team` whose `members` leaves out the user creating it now warns that Pulumi Cloud added that user to the team, and that the next update to `members` removes them. [#1348](https://github.com/pulumi/pulumi-pulumiservice/pull/1348)
 
 ### Bug Fixes
@@ -16,6 +18,7 @@
 - Destroying an `OrgAccessToken` no longer prints the token's API path to the provider's output. [#1362](https://github.com/pulumi/pulumi-pulumiservice/pull/1362)
 - Destroying a resource that was already deleted outside Pulumi failed with `404 Not Found` for most resources, including `Stack`, `Team`, `Environment`, `Webhook`, the access token resources and the schedule resources. Destroy now treats the resource as deleted and succeeds. [#1350](https://github.com/pulumi/pulumi-pulumiservice/pull/1350)
 - Changing any input on an `OrgAccessToken` or `TeamAccessToken` replaces the token, and the replacement failed with `409 Conflict: token name already exists` because Pulumi Cloud doesn't let a new token reuse a deleted token's name. When `name` is omitted, the replacement now gets a new generated name and succeeds. This works for existing tokens too: removing `name` from the program keeps the current name until the next replacement. With an explicit `name`, change the name along with the other input. [#1211](https://github.com/pulumi/pulumi-pulumiservice/issues/1211), [#1216](https://github.com/pulumi/pulumi-pulumiservice/issues/1216)
+- Updated the Go toolchain used to build the provider to 1.26.10, picking up the latest Go standard library security fixes [#1285](https://github.com/pulumi/pulumi-pulumiservice/issues/1285)
 
 ## 1.7.0
 

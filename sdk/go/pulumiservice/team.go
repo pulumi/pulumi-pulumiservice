@@ -38,7 +38,7 @@ type Team struct {
 	// Pulumi Cloud adds the user who creates the team as a member, usually the owner of the access token that runs `pulumi up`.
 	// List that user here to keep them on the team: otherwise `pulumi refresh` shows them as a change, and the next update to `members` removes them.
 	Members pulumi.StringArrayOutput `pulumi:"members"`
-	// The team's name. Required for "pulumi" teams.
+	// The team's name, up to 100 characters. Only letters, digits, hyphens, underscores and periods are allowed. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). Characters that aren't allowed in the logical name are replaced with hyphens. Only "pulumi" teams are auto-named.
 	Name pulumi.StringPtrOutput `pulumi:"name"`
 	// The name of the Pulumi organization the team belongs to.
 	OrganizationName pulumi.StringOutput `pulumi:"organizationName"`
@@ -108,7 +108,7 @@ type teamArgs struct {
 	// Pulumi Cloud adds the user who creates the team as a member, usually the owner of the access token that runs `pulumi up`.
 	// List that user here to keep them on the team: otherwise `pulumi refresh` shows them as a change, and the next update to `members` removes them.
 	Members []string `pulumi:"members"`
-	// The team's name. Required for "pulumi" teams.
+	// The team's name, up to 100 characters. Only letters, digits, hyphens, underscores and periods are allowed. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). Characters that aren't allowed in the logical name are replaced with hyphens. Only "pulumi" teams are auto-named.
 	Name *string `pulumi:"name"`
 	// The name of the Pulumi organization the team belongs to.
 	OrganizationName string `pulumi:"organizationName"`
@@ -128,7 +128,7 @@ type TeamArgs struct {
 	// Pulumi Cloud adds the user who creates the team as a member, usually the owner of the access token that runs `pulumi up`.
 	// List that user here to keep them on the team: otherwise `pulumi refresh` shows them as a change, and the next update to `members` removes them.
 	Members pulumi.StringArrayInput
-	// The team's name. Required for "pulumi" teams.
+	// The team's name, up to 100 characters. Only letters, digits, hyphens, underscores and periods are allowed. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). Characters that aren't allowed in the logical name are replaced with hyphens. Only "pulumi" teams are auto-named.
 	Name pulumi.StringPtrInput
 	// The name of the Pulumi organization the team belongs to.
 	OrganizationName pulumi.StringInput
@@ -245,7 +245,7 @@ func (o TeamOutput) Members() pulumi.StringArrayOutput {
 	return o.ApplyT(func(v *Team) pulumi.StringArrayOutput { return v.Members }).(pulumi.StringArrayOutput)
 }
 
-// The team's name. Required for "pulumi" teams.
+// The team's name, up to 100 characters. Only letters, digits, hyphens, underscores and periods are allowed. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). Characters that aren't allowed in the logical name are replaced with hyphens. Only "pulumi" teams are auto-named.
 func (o TeamOutput) Name() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *Team) pulumi.StringPtrOutput { return v.Name }).(pulumi.StringPtrOutput)
 }

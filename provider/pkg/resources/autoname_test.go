@@ -43,6 +43,7 @@ func TestAutoName(t *testing.T) {
 			infer.Resource(&OidcIssuer{}),
 			infer.Resource(&OrganizationRole{}),
 			infer.Resource(&PolicyGroup{}),
+			infer.Resource(&Team{}),
 		).
 		WithModuleMap(map[tokens.ModuleName]tokens.ModuleName{"resources": "index"}).
 		Build()
@@ -55,10 +56,11 @@ func TestAutoName(t *testing.T) {
 	str := property.New[string]
 
 	for _, tc := range []struct {
-		token  tokens.Type
-		field  string
-		maxLen int
-		inputs map[string]property.Value
+		token          tokens.Type
+		field          string
+		maxLen         int
+		inputs         map[string]property.Value
+		optionalOutput bool
 	}{
 		{
 			token:  "pulumiservice:index:Webhook",
@@ -125,6 +127,13 @@ func TestAutoName(t *testing.T) {
 			maxLen: policyGroupNameMaxLen,
 			inputs: map[string]property.Value{gcOrganizationName: str(gcMyOrg)},
 		},
+		{
+			token:          "pulumiservice:index:Team",
+			field:          gcName,
+			maxLen:         teamNameMaxLen,
+			inputs:         map[string]property.Value{gcOrganizationName: str(gcMyOrg), "teamType": str(teamTypePulumi)},
+			optionalOutput: true,
+		},
 	} {
 		t.Run(string(tc.token), func(t *testing.T) {
 			t.Parallel()
@@ -181,7 +190,7 @@ func TestAutoName(t *testing.T) {
 				assert.Equal(t, "dev-ciThing", name)
 			})
 
-			t.Run("name is an optional input and a required output", func(t *testing.T) {
+			t.Run("name is an optional input", func(t *testing.T) {
 				resp, err := server.GetSchema(p.GetSchemaRequest{})
 				require.NoError(t, err)
 				var spec struct {
@@ -194,10 +203,58 @@ func TestAutoName(t *testing.T) {
 				res, ok := spec.Resources[string(tc.token)]
 				require.True(t, ok, "resource missing from schema")
 				assert.NotContains(t, res.RequiredInputs, tc.field)
-				assert.Contains(t, res.Required, tc.field)
+				if tc.optionalOutput {
+					assert.NotContains(t, res.Required, tc.field, "output should stay optional")
+				} else {
+					assert.Contains(t, res.Required, tc.field, "output should be required")
+				}
 			})
 		})
 	}
+
+	t.Run("pulumiservice:index:Team by teamType", func(t *testing.T) {
+		t.Parallel()
+		check := func(t *testing.T, req p.CheckRequest) p.CheckResponse {
+			t.Helper()
+			req.Urn = urn.New("dev", "demo", "", "pulumiservice:index:Team", "my team")
+			req.RandomSeed = seed
+			resp, err := server.Check(req)
+			require.NoError(t, err)
+			return resp
+		}
+		inputs := func(teamType string) property.Map {
+			return property.NewMap(map[string]property.Value{
+				gcOrganizationName: str(gcMyOrg),
+				"teamType":         str(teamType),
+			})
+		}
+
+		t.Run("pulumi team without a name gets one that is also its display name", func(t *testing.T) {
+			resp := check(t, p.CheckRequest{Inputs: inputs(teamTypePulumi)})
+			require.Empty(t, resp.Failures)
+			name := resp.Inputs.Get(gcName).AsString()
+			assert.Regexp(t, `^my-team-[0-9a-f]{8}$`, name)
+			assert.Equal(t, name, resp.Inputs.Get(gcDisplayName).AsString())
+		})
+
+		t.Run("github team without a name is not given one", func(t *testing.T) {
+			resp := check(t, p.CheckRequest{
+				Inputs: inputs(teamTypeGitHub).Set("githubTeamId", property.New(1234.0)),
+			})
+			require.Empty(t, resp.Failures)
+			_, ok := resp.Inputs.GetOk(gcName)
+			assert.False(t, ok, "github team should have no name, got %v", resp.Inputs.Get(gcName))
+		})
+
+		t.Run("pulumi team without a name fails when autonaming is disabled", func(t *testing.T) {
+			resp := check(t, p.CheckRequest{
+				Inputs:     inputs(teamTypePulumi),
+				Autonaming: &p.AutonamingOptions{Mode: p.AutonamingDisable},
+			})
+			require.Len(t, resp.Failures, 1)
+			assert.Equal(t, gcName, resp.Failures[0].Property)
+		})
+	})
 }
 
 func TestSuffixedAutoName(t *testing.T) {
@@ -227,5 +284,10 @@ func TestSuffixedAutoName(t *testing.T) {
 	t.Run("policy group names replace disallowed characters and drop leading spaces", func(t *testing.T) {
 		name := generate(t, policyGroupAutoName(), " my/group:é v1.2_x")
 		assert.Regexp(t, `^my-group-- v1\.2_x-[0-9a-f]{8}$`, name)
+	})
+
+	t.Run("team names replace disallowed characters, including spaces, with hyphens", func(t *testing.T) {
+		name := generate(t, suffixedAutoName(teamNameMaxLen, teamNameRune), "my/team:é v1.2_x")
+		assert.Regexp(t, `^my-team---v1\.2_x-[0-9a-f]{8}$`, name)
 	})
 }
