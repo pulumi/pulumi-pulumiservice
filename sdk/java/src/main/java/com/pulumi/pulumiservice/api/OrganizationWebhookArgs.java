@@ -109,14 +109,14 @@ public final class OrganizationWebhookArgs extends com.pulumi.resources.Resource
     }
 
     /**
-     * The unique identifier name for the webhook within its scope. Optional on creation; if omitted, the service generates a short random name. Always populated in responses.
+     * The unique identifier name for the webhook within its scope. Optional on creation; if omitted, the service generates a short random name. Always populated in responses. Up to 32 characters of letters, numbers, hyphens, underscores, and periods. On update, the name comes from the URL and this field is ignored.
      * 
      */
     @Import(name="name")
     private @Nullable Output<String> name;
 
     /**
-     * @return The unique identifier name for the webhook within its scope. Optional on creation; if omitted, the service generates a short random name. Always populated in responses.
+     * @return The unique identifier name for the webhook within its scope. Optional on creation; if omitted, the service generates a short random name. Always populated in responses. Up to 32 characters of letters, numbers, hyphens, underscores, and periods. On update, the name comes from the URL and this field is ignored.
      * 
      */
     public Optional<Output<String>> name() {
@@ -380,7 +380,7 @@ public final class OrganizationWebhookArgs extends com.pulumi.resources.Resource
         }
 
         /**
-         * @param name The unique identifier name for the webhook within its scope. Optional on creation; if omitted, the service generates a short random name. Always populated in responses.
+         * @param name The unique identifier name for the webhook within its scope. Optional on creation; if omitted, the service generates a short random name. Always populated in responses. Up to 32 characters of letters, numbers, hyphens, underscores, and periods. On update, the name comes from the URL and this field is ignored.
          * 
          * @return builder
          * 
@@ -391,7 +391,7 @@ public final class OrganizationWebhookArgs extends com.pulumi.resources.Resource
         }
 
         /**
-         * @param name The unique identifier name for the webhook within its scope. Optional on creation; if omitted, the service generates a short random name. Always populated in responses.
+         * @param name The unique identifier name for the webhook within its scope. Optional on creation; if omitted, the service generates a short random name. Always populated in responses. Up to 32 characters of letters, numbers, hyphens, underscores, and periods. On update, the name comes from the URL and this field is ignored.
          * 
          * @return builder
          * 

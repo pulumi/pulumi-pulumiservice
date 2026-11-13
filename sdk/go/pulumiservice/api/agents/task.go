@@ -113,7 +113,7 @@ func (TaskState) ElementType() reflect.Type {
 }
 
 type taskArgs struct {
-	// Optional Custom Agent definition id to run this task as. When set, the task's role, permission mode, and enabled integrations are taken from the named agent definition instead of from this request, and the task is attributed to that agent. The agent's instructions and approval mode are not copied at creation: they are read from the definition on every turn, so editing the agent applies to the next turn of every run. A preview capability, gated per organization.
+	// Optional Custom Agent definition id to run this task as. When set, the task's role and enabled integrations are taken from the named agent definition instead of from this request, and the task is attributed to that agent. The agent's instructions and approval mode are not copied at creation: they are read from the definition on every turn, so editing the agent applies to the next turn of every run. A preview capability, gated per organization.
 	AgentDefinitionId *string `pulumi:"agentDefinitionId"`
 	// Optional approval mode override for this task. If omitted, org default is used.
 	ApprovalMode *string `pulumi:"approvalMode"`
@@ -141,7 +141,7 @@ type taskArgs struct {
 
 // The set of arguments for constructing a Task resource.
 type TaskArgs struct {
-	// Optional Custom Agent definition id to run this task as. When set, the task's role, permission mode, and enabled integrations are taken from the named agent definition instead of from this request, and the task is attributed to that agent. The agent's instructions and approval mode are not copied at creation: they are read from the definition on every turn, so editing the agent applies to the next turn of every run. A preview capability, gated per organization.
+	// Optional Custom Agent definition id to run this task as. When set, the task's role and enabled integrations are taken from the named agent definition instead of from this request, and the task is attributed to that agent. The agent's instructions and approval mode are not copied at creation: they are read from the definition on every turn, so editing the agent applies to the next turn of every run. A preview capability, gated per organization.
 	AgentDefinitionId pulumi.StringPtrInput
 	// Optional approval mode override for this task. If omitted, org default is used.
 	ApprovalMode pulumi.StringPtrInput

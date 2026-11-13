@@ -35,6 +35,8 @@ func (m *module) Construct(ctx *pulumi.Context, name, typ, urn string) (r pulumi
 		r = &GitHubIntegration{}
 	case "pulumiservice:api/integrations:GitLabIntegration":
 		r = &GitLabIntegration{}
+	case "pulumiservice:api/integrations:OriginIntegration":
+		r = &OriginIntegration{}
 	default:
 		return nil, fmt.Errorf("unknown resource type: %s", typ)
 	}

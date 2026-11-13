@@ -88,7 +88,7 @@ type serviceArgs struct {
 	Description string `pulumi:"description"`
 	// an optional list of items to add during service creation
 	Items []interface{} `pulumi:"items"`
-	// the name of the service
+	// The name of the service. Between 1 and 80 characters.
 	Name string `pulumi:"name"`
 	// The organization name
 	OrgName string `pulumi:"orgName"`
@@ -106,7 +106,7 @@ type ServiceArgs struct {
 	Description pulumi.StringInput
 	// an optional list of items to add during service creation
 	Items pulumi.ArrayInput
-	// the name of the service
+	// The name of the service. Between 1 and 80 characters.
 	Name pulumi.StringInput
 	// The organization name
 	OrgName pulumi.StringInput

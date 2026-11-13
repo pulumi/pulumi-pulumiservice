@@ -154,7 +154,8 @@ _utilities.register(
    "pulumiservice:api/integrations:CustomVCSRepository": "CustomVCSRepository",
    "pulumiservice:api/integrations:GitHubEnterpriseIntegration": "GitHubEnterpriseIntegration",
    "pulumiservice:api/integrations:GitHubIntegration": "GitHubIntegration",
-   "pulumiservice:api/integrations:GitLabIntegration": "GitLabIntegration"
+   "pulumiservice:api/integrations:GitLabIntegration": "GitLabIntegration",
+   "pulumiservice:api/integrations:OriginIntegration": "OriginIntegration"
   }
  },
  {
@@ -163,6 +164,15 @@ _utilities.register(
   "fqn": "pulumi_pulumiservice.api.neo",
   "classes": {
    "pulumiservice:api/neo:UsageCap": "UsageCap"
+  }
+ },
+ {
+  "pkg": "pulumiservice",
+  "mod": "api/policy",
+  "fqn": "pulumi_pulumiservice.api.policy",
+  "classes": {
+   "pulumiservice:api/policy:Exception": "Exception",
+   "pulumiservice:api/policy:Finding": "Finding"
   }
  },
  {

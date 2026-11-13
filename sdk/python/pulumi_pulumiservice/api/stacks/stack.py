@@ -23,6 +23,7 @@ class StackArgs:
                  project_name: pulumi.Input[_builtins.str],
                  stack_name: pulumi.Input[_builtins.str],
                  config: Optional[Any] = None,
+                 create_managed_environment: pulumi.Input[Optional[_builtins.bool]] = None,
                  state: Optional[Any] = None,
                  tags: pulumi.Input[Optional[Mapping[str, Any]]] = None,
                  teams: pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]] = None):
@@ -33,6 +34,7 @@ class StackArgs:
         :param pulumi.Input[_builtins.str] project_name: The project name
         :param pulumi.Input[_builtins.str] stack_name: The name of the stack being created.
         :param Any config: The configuration for the new stack.
+        :param pulumi.Input[_builtins.bool] create_managed_environment: Whether the service should create an ESC environment that the stack manages.
         :param Any state: An optional state to initialize the stack with.
         :param pulumi.Input[Mapping[str, Any]] tags: An optional set of tags to apply to the stack.
         :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] teams: An optional set of teams to assign to the stack.
@@ -42,6 +44,8 @@ class StackArgs:
         pulumi.set(__self__, "stack_name", stack_name)
         if config is not None:
             pulumi.set(__self__, "config", config)
+        if create_managed_environment is not None:
+            pulumi.set(__self__, "create_managed_environment", create_managed_environment)
         if state is not None:
             pulumi.set(__self__, "state", state)
         if tags is not None:
@@ -98,6 +102,18 @@ class StackArgs:
         pulumi.set(self, "config", value)
 
     @_builtins.property
+    @pulumi.getter(name="createManagedEnvironment")
+    def create_managed_environment(self) -> pulumi.Input[Optional[_builtins.bool]]:
+        """
+        Whether the service should create an ESC environment that the stack manages.
+        """
+        return pulumi.get(self, "create_managed_environment")
+
+    @create_managed_environment.setter
+    def create_managed_environment(self, value: pulumi.Input[Optional[_builtins.bool]]):
+        pulumi.set(self, "create_managed_environment", value)
+
+    @_builtins.property
     @pulumi.getter
     def state(self) -> Optional[Any]:
         """
@@ -141,6 +157,7 @@ class Stack(pulumi.CustomResource):
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
                  config: Optional[Any] = None,
+                 create_managed_environment: pulumi.Input[Optional[_builtins.bool]] = None,
                  org_name: pulumi.Input[Optional[_builtins.str]] = None,
                  project_name: pulumi.Input[Optional[_builtins.str]] = None,
                  stack_name: pulumi.Input[Optional[_builtins.str]] = None,
@@ -160,6 +177,7 @@ class Stack(pulumi.CustomResource):
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param Any config: The configuration for the new stack.
+        :param pulumi.Input[_builtins.bool] create_managed_environment: Whether the service should create an ESC environment that the stack manages.
         :param pulumi.Input[_builtins.str] org_name: The organization name
         :param pulumi.Input[_builtins.str] project_name: The project name
         :param pulumi.Input[_builtins.str] stack_name: The name of the stack being created.
@@ -198,6 +216,7 @@ class Stack(pulumi.CustomResource):
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
                  config: Optional[Any] = None,
+                 create_managed_environment: pulumi.Input[Optional[_builtins.bool]] = None,
                  org_name: pulumi.Input[Optional[_builtins.str]] = None,
                  project_name: pulumi.Input[Optional[_builtins.str]] = None,
                  stack_name: pulumi.Input[Optional[_builtins.str]] = None,
@@ -214,6 +233,7 @@ class Stack(pulumi.CustomResource):
             __props__ = StackArgs.__new__(StackArgs)
 
             __props__.__dict__["config"] = config
+            __props__.__dict__["create_managed_environment"] = create_managed_environment
             if org_name is None and not opts.urn:
                 raise TypeError("Missing required property 'org_name'")
             __props__.__dict__["org_name"] = org_name
@@ -228,6 +248,7 @@ class Stack(pulumi.CustomResource):
             __props__.__dict__["teams"] = teams
             __props__.__dict__["active_update"] = None
             __props__.__dict__["current_operation"] = None
+            __props__.__dict__["managed_environment"] = None
             __props__.__dict__["version"] = None
         super(Stack, __self__).__init__(
             'pulumiservice:api/stacks:Stack',
@@ -254,6 +275,7 @@ class Stack(pulumi.CustomResource):
         __props__.__dict__["active_update"] = None
         __props__.__dict__["config"] = None
         __props__.__dict__["current_operation"] = None
+        __props__.__dict__["managed_environment"] = None
         __props__.__dict__["org_name"] = None
         __props__.__dict__["project_name"] = None
         __props__.__dict__["stack_name"] = None
@@ -285,6 +307,14 @@ class Stack(pulumi.CustomResource):
         Information about a live operation currently running for the stack, its kind, the author who initiated it, and its start time. Null when no operation is in flight.
         """
         return pulumi.get(self, "current_operation")
+
+    @_builtins.property
+    @pulumi.getter(name="managedEnvironment")
+    def managed_environment(self) -> pulumi.Output[Optional[_builtins.str]]:
+        """
+        The ESC environment this stack manages, which holds the stack's configuration, as <project>/<name>. Read-only; omitted when the stack does not manage an environment. The name stays set after the environment is deleted. Returned to anyone who can read the stack, whether or not they can read the environment.
+        """
+        return pulumi.get(self, "managed_environment")
 
     @_builtins.property
     @pulumi.getter(name="orgName")

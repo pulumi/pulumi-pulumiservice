@@ -31,7 +31,7 @@ class ServiceArgs:
 
         :param pulumi.Input[_builtins.str] description: an optional description of the service
         :param pulumi.Input[Sequence[Any]] items: an optional list of items to add during service creation
-        :param pulumi.Input[_builtins.str] name: the name of the service
+        :param pulumi.Input[_builtins.str] name: The name of the service. Between 1 and 80 characters.
         :param pulumi.Input[_builtins.str] org_name: The organization name
         :param pulumi.Input[_builtins.str] owner_name: the service owner name
         :param pulumi.Input[_builtins.str] owner_type: the service owner type
@@ -73,7 +73,7 @@ class ServiceArgs:
     @pulumi.getter
     def name(self) -> pulumi.Input[_builtins.str]:
         """
-        the name of the service
+        The name of the service. Between 1 and 80 characters.
         """
         return pulumi.get(self, "name")
 
@@ -151,7 +151,7 @@ class Service(pulumi.CustomResource):
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] description: an optional description of the service
         :param pulumi.Input[Sequence[Any]] items: an optional list of items to add during service creation
-        :param pulumi.Input[_builtins.str] name: the name of the service
+        :param pulumi.Input[_builtins.str] name: The name of the service. Between 1 and 80 characters.
         :param pulumi.Input[_builtins.str] org_name: The organization name
         :param pulumi.Input[_builtins.str] owner_name: the service owner name
         :param pulumi.Input[_builtins.str] owner_type: the service owner type

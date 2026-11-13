@@ -32,7 +32,7 @@ class OrgTokenArgs:
         :param pulumi.Input[_builtins.bool] admin: Whether the entity has admin privileges
         :param pulumi.Input[_builtins.str] description: The description
         :param pulumi.Input[_builtins.int] expires: The expiration time
-        :param pulumi.Input[_builtins.str] name: The name
+        :param pulumi.Input[_builtins.str] name: The display name of the token. Must be between 1 and 40 characters.
         :param pulumi.Input[_builtins.str] org_name: The organization name
         :param pulumi.Input[_builtins.str] reason: Audit log reason for creating this token
         :param pulumi.Input[_builtins.str] role_id: The role identifier
@@ -87,7 +87,7 @@ class OrgTokenArgs:
     @pulumi.getter
     def name(self) -> pulumi.Input[_builtins.str]:
         """
-        The name
+        The display name of the token. Must be between 1 and 40 characters.
         """
         return pulumi.get(self, "name")
 
@@ -160,7 +160,7 @@ class OrgToken(pulumi.CustomResource):
         :param pulumi.Input[_builtins.bool] admin: Whether the entity has admin privileges
         :param pulumi.Input[_builtins.str] description: The description
         :param pulumi.Input[_builtins.int] expires: The expiration time
-        :param pulumi.Input[_builtins.str] name: The name
+        :param pulumi.Input[_builtins.str] name: The display name of the token. Must be between 1 and 40 characters.
         :param pulumi.Input[_builtins.str] org_name: The organization name
         :param pulumi.Input[_builtins.str] reason: Audit log reason for creating this token
         :param pulumi.Input[_builtins.str] role_id: The role identifier

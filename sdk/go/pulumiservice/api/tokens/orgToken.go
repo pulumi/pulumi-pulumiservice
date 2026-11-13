@@ -93,7 +93,7 @@ type orgTokenArgs struct {
 	Description string `pulumi:"description"`
 	// The expiration time
 	Expires int `pulumi:"expires"`
-	// The name
+	// The display name of the token. Must be between 1 and 40 characters.
 	Name string `pulumi:"name"`
 	// The organization name
 	OrgName string `pulumi:"orgName"`
@@ -111,7 +111,7 @@ type OrgTokenArgs struct {
 	Description pulumi.StringInput
 	// The expiration time
 	Expires pulumi.IntInput
-	// The name
+	// The display name of the token. Must be between 1 and 40 characters.
 	Name pulumi.StringInput
 	// The organization name
 	OrgName pulumi.StringInput

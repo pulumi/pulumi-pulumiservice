@@ -40,6 +40,11 @@ export type GitLabIntegration = import("./gitLabIntegration").GitLabIntegration;
 export const GitLabIntegration: typeof import("./gitLabIntegration").GitLabIntegration = null as any;
 utilities.lazyLoad(exports, ["GitLabIntegration"], () => require("./gitLabIntegration"));
 
+export { OriginIntegrationArgs } from "./originIntegration";
+export type OriginIntegration = import("./originIntegration").OriginIntegration;
+export const OriginIntegration: typeof import("./originIntegration").OriginIntegration = null as any;
+utilities.lazyLoad(exports, ["OriginIntegration"], () => require("./originIntegration"));
+
 
 const _module = {
     version: utilities.getVersion(),
@@ -59,6 +64,8 @@ const _module = {
                 return new GitHubIntegration(name, <any>undefined, { urn })
             case "pulumiservice:api/integrations:GitLabIntegration":
                 return new GitLabIntegration(name, <any>undefined, { urn })
+            case "pulumiservice:api/integrations:OriginIntegration":
+                return new OriginIntegration(name, <any>undefined, { urn })
             default:
                 throw new Error(`unknown resource type ${type}`);
         }

@@ -10,6 +10,8 @@ import java.lang.Boolean;
 import java.lang.Object;
 import java.lang.String;
 import java.util.Objects;
+import java.util.Optional;
+import javax.annotation.Nullable;
 
 
 public final class AuditLogExportConfigurationArgs extends com.pulumi.resources.ResourceArgs {
@@ -29,6 +31,21 @@ public final class AuditLogExportConfigurationArgs extends com.pulumi.resources.
      */
     public Output<Boolean> newEnabled() {
         return this.newEnabled;
+    }
+
+    /**
+     * The new S3-compatible configuration for audit log export. Mutually exclusive with newS3Configuration.
+     * 
+     */
+    @Import(name="newS3CompatibleConfiguration")
+    private @Nullable Output<Object> newS3CompatibleConfiguration;
+
+    /**
+     * @return The new S3-compatible configuration for audit log export. Mutually exclusive with newS3Configuration.
+     * 
+     */
+    public Optional<Output<Object>> newS3CompatibleConfiguration() {
+        return Optional.ofNullable(this.newS3CompatibleConfiguration);
     }
 
     /**
@@ -65,6 +82,7 @@ public final class AuditLogExportConfigurationArgs extends com.pulumi.resources.
 
     private AuditLogExportConfigurationArgs(AuditLogExportConfigurationArgs $) {
         this.newEnabled = $.newEnabled;
+        this.newS3CompatibleConfiguration = $.newS3CompatibleConfiguration;
         this.newS3Configuration = $.newS3Configuration;
         this.orgName = $.orgName;
     }
@@ -106,6 +124,27 @@ public final class AuditLogExportConfigurationArgs extends com.pulumi.resources.
          */
         public Builder newEnabled(Boolean newEnabled) {
             return newEnabled(Output.of(newEnabled));
+        }
+
+        /**
+         * @param newS3CompatibleConfiguration The new S3-compatible configuration for audit log export. Mutually exclusive with newS3Configuration.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder newS3CompatibleConfiguration(@Nullable Output<Object> newS3CompatibleConfiguration) {
+            $.newS3CompatibleConfiguration = newS3CompatibleConfiguration;
+            return this;
+        }
+
+        /**
+         * @param newS3CompatibleConfiguration The new S3-compatible configuration for audit log export. Mutually exclusive with newS3Configuration.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder newS3CompatibleConfiguration(Object newS3CompatibleConfiguration) {
+            return newS3CompatibleConfiguration(Output.of(newS3CompatibleConfiguration));
         }
 
         /**

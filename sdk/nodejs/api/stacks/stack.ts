@@ -64,6 +64,10 @@ export class Stack extends pulumi.CustomResource {
      */
     declare public /*out*/ readonly currentOperation: pulumi.Output<any | undefined>;
     /**
+     * The ESC environment this stack manages, which holds the stack's configuration, as <project>/<name>. Read-only; omitted when the stack does not manage an environment. The name stays set after the environment is deleted. Returned to anyone who can read the stack, whether or not they can read the environment.
+     */
+    declare public /*out*/ readonly managedEnvironment: pulumi.Output<string | undefined>;
+    /**
      * The organization name
      */
     declare public readonly orgName: pulumi.Output<string>;
@@ -105,6 +109,7 @@ export class Stack extends pulumi.CustomResource {
                 throw new Error("Missing required property 'stackName'");
             }
             resourceInputs["config"] = args?.config;
+            resourceInputs["createManagedEnvironment"] = args?.createManagedEnvironment;
             resourceInputs["orgName"] = args?.orgName;
             resourceInputs["projectName"] = args?.projectName;
             resourceInputs["stackName"] = args?.stackName;
@@ -113,11 +118,13 @@ export class Stack extends pulumi.CustomResource {
             resourceInputs["teams"] = args?.teams;
             resourceInputs["activeUpdate"] = undefined /*out*/;
             resourceInputs["currentOperation"] = undefined /*out*/;
+            resourceInputs["managedEnvironment"] = undefined /*out*/;
             resourceInputs["version"] = undefined /*out*/;
         } else {
             resourceInputs["activeUpdate"] = undefined /*out*/;
             resourceInputs["config"] = undefined /*out*/;
             resourceInputs["currentOperation"] = undefined /*out*/;
+            resourceInputs["managedEnvironment"] = undefined /*out*/;
             resourceInputs["orgName"] = undefined /*out*/;
             resourceInputs["projectName"] = undefined /*out*/;
             resourceInputs["stackName"] = undefined /*out*/;
@@ -137,6 +144,10 @@ export interface StackArgs {
      * The configuration for the new stack.
      */
     config?: any | undefined;
+    /**
+     * Whether the service should create an ESC environment that the stack manages.
+     */
+    createManagedEnvironment?: pulumi.Input<boolean | undefined>;
     /**
      * The organization name
      */

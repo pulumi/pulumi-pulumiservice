@@ -79,6 +79,20 @@ public class Role extends com.pulumi.resources.CustomResource {
         return Codegen.optional(this.details);
     }
     /**
+     * Whether this role is the organization&#39;s Member (legacy) role, a copy of what members could do before the organization moved to built-in roles.
+     * 
+     */
+    @Export(name="isCompatibilityRole", refs={Boolean.class}, tree="[0]")
+    private Output</* @Nullable */ Boolean> isCompatibilityRole;
+
+    /**
+     * @return Whether this role is the organization&#39;s Member (legacy) role, a copy of what members could do before the organization moved to built-in roles.
+     * 
+     */
+    public Output<Optional<Boolean>> isCompatibilityRole() {
+        return Codegen.optional(this.isCompatibilityRole);
+    }
+    /**
      * Whether this role is the organization default.
      * 
      */

@@ -20,7 +20,9 @@ type AuditLogExportConfiguration struct {
 	Enabled pulumi.BoolOutput `pulumi:"enabled"`
 	// The result of the last audit log export attempt.
 	LastResult pulumi.AnyOutput `pulumi:"lastResult"`
-	// The S3 configuration for exporting audit logs.
+	// The S3-compatible configuration for exporting audit logs. Set when audit logs export to an S3-compatible service.
+	S3CompatibleConfig pulumi.AnyOutput `pulumi:"s3CompatibleConfig"`
+	// The S3 configuration for exporting audit logs. Set when audit logs export to Amazon S3.
 	S3Config pulumi.AnyOutput `pulumi:"s3Config"`
 }
 
@@ -75,6 +77,8 @@ func (AuditLogExportConfigurationState) ElementType() reflect.Type {
 type auditLogExportConfigurationArgs struct {
 	// Whether the audit log export is enabled.
 	NewEnabled bool `pulumi:"newEnabled"`
+	// The new S3-compatible configuration for audit log export. Mutually exclusive with newS3Configuration.
+	NewS3CompatibleConfiguration interface{} `pulumi:"newS3CompatibleConfiguration"`
 	// The new S3 configuration for audit log export.
 	NewS3Configuration interface{} `pulumi:"newS3Configuration"`
 	// The organization name
@@ -85,6 +89,8 @@ type auditLogExportConfigurationArgs struct {
 type AuditLogExportConfigurationArgs struct {
 	// Whether the audit log export is enabled.
 	NewEnabled pulumi.BoolInput
+	// The new S3-compatible configuration for audit log export. Mutually exclusive with newS3Configuration.
+	NewS3CompatibleConfiguration pulumi.Input
 	// The new S3 configuration for audit log export.
 	NewS3Configuration pulumi.Input
 	// The organization name
@@ -188,7 +194,12 @@ func (o AuditLogExportConfigurationOutput) LastResult() pulumi.AnyOutput {
 	return o.ApplyT(func(v *AuditLogExportConfiguration) pulumi.AnyOutput { return v.LastResult }).(pulumi.AnyOutput)
 }
 
-// The S3 configuration for exporting audit logs.
+// The S3-compatible configuration for exporting audit logs. Set when audit logs export to an S3-compatible service.
+func (o AuditLogExportConfigurationOutput) S3CompatibleConfig() pulumi.AnyOutput {
+	return o.ApplyT(func(v *AuditLogExportConfiguration) pulumi.AnyOutput { return v.S3CompatibleConfig }).(pulumi.AnyOutput)
+}
+
+// The S3 configuration for exporting audit logs. Set when audit logs export to Amazon S3.
 func (o AuditLogExportConfigurationOutput) S3Config() pulumi.AnyOutput {
 	return o.ApplyT(func(v *AuditLogExportConfiguration) pulumi.AnyOutput { return v.S3Config }).(pulumi.AnyOutput)
 }

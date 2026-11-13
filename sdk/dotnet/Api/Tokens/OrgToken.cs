@@ -101,7 +101,7 @@ namespace Pulumi.PulumiService.Api.Tokens
         public Input<int> Expires { get; set; } = null!;
 
         /// <summary>
-        /// The name
+        /// The display name of the token. Must be between 1 and 40 characters.
         /// </summary>
         [Input("name", required: true)]
         public Input<string> Name { get; set; } = null!;

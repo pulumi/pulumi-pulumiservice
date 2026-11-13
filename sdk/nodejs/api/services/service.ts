@@ -116,7 +116,7 @@ export interface ServiceArgs {
      */
     items: pulumi.Input<any[]>;
     /**
-     * the name of the service
+     * The name of the service. Between 1 and 80 characters.
      */
     name: pulumi.Input<string>;
     /**

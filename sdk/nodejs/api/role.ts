@@ -61,6 +61,10 @@ export class Role extends pulumi.CustomResource {
      */
     declare public readonly details: pulumi.Output<any | undefined>;
     /**
+     * Whether this role is the organization's Member (legacy) role, a copy of what members could do before the organization moved to built-in roles.
+     */
+    declare public /*out*/ readonly isCompatibilityRole: pulumi.Output<boolean | undefined>;
+    /**
      * Whether this role is the organization default.
      */
     declare public /*out*/ readonly isOrgDefault: pulumi.Output<boolean>;
@@ -117,6 +121,7 @@ export class Role extends pulumi.CustomResource {
             resourceInputs["uxPurpose"] = args?.uxPurpose;
             resourceInputs["created"] = undefined /*out*/;
             resourceInputs["defaultIdentifier"] = undefined /*out*/;
+            resourceInputs["isCompatibilityRole"] = undefined /*out*/;
             resourceInputs["isOrgDefault"] = undefined /*out*/;
             resourceInputs["modified"] = undefined /*out*/;
             resourceInputs["orgId"] = undefined /*out*/;
@@ -126,6 +131,7 @@ export class Role extends pulumi.CustomResource {
             resourceInputs["defaultIdentifier"] = undefined /*out*/;
             resourceInputs["description"] = undefined /*out*/;
             resourceInputs["details"] = undefined /*out*/;
+            resourceInputs["isCompatibilityRole"] = undefined /*out*/;
             resourceInputs["isOrgDefault"] = undefined /*out*/;
             resourceInputs["modified"] = undefined /*out*/;
             resourceInputs["name"] = undefined /*out*/;

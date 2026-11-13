@@ -41,6 +41,12 @@ namespace Pulumi.PulumiService.Api.Stacks
         public Output<object?> CurrentOperation { get; private set; } = null!;
 
         /// <summary>
+        /// The ESC environment this stack manages, which holds the stack's configuration, as &lt;project&gt;/&lt;name&gt;. Read-only; omitted when the stack does not manage an environment. The name stays set after the environment is deleted. Returned to anyone who can read the stack, whether or not they can read the environment.
+        /// </summary>
+        [Output("managedEnvironment")]
+        public Output<string?> ManagedEnvironment { get; private set; } = null!;
+
+        /// <summary>
         /// The organization name
         /// </summary>
         [Output("orgName")]
@@ -120,6 +126,12 @@ namespace Pulumi.PulumiService.Api.Stacks
         /// </summary>
         [Input("config")]
         public Input<object>? Config { get; set; }
+
+        /// <summary>
+        /// Whether the service should create an ESC environment that the stack manages.
+        /// </summary>
+        [Input("createManagedEnvironment")]
+        public Input<bool>? CreateManagedEnvironment { get; set; }
 
         /// <summary>
         /// The organization name
