@@ -54,6 +54,20 @@ public class TeamAccessToken extends com.pulumi.resources.CustomResource {
         return Codegen.optional(this.description);
     }
     /**
+     * When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`. Omit it for a token that never expires. Pulumi Cloud rejects an expiry that is in the past, more than two years away, or beyond the organization&#39;s maximum token lifetime.
+     * 
+     */
+    @Export(name="expires", refs={String.class}, tree="[0]")
+    private Output</* @Nullable */ String> expires;
+
+    /**
+     * @return When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`. Omit it for a token that never expires. Pulumi Cloud rejects an expiry that is in the past, more than two years away, or beyond the organization&#39;s maximum token lifetime.
+     * 
+     */
+    public Output<Optional<String>> expires() {
+        return Codegen.optional(this.expires);
+    }
+    /**
      * The name for the token, up to 40 characters. Organization and team tokens share one set of names per organization, and Pulumi Cloud never frees a deleted token&#39;s name, so the name must not have been used by any other token in the organization.
      * 
      * If omitted, Pulumi generates a name from the resource&#39;s logical name plus a random suffix, or follows the stack&#39;s [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). A replacement gets a new name. Removing `name` from an existing token keeps its current name until the next replacement.
@@ -162,6 +176,7 @@ public class TeamAccessToken extends com.pulumi.resources.CustomResource {
             ))
             .replaceOnChanges(List.of(
                 "description",
+                "expires",
                 "name",
                 "organizationName",
                 "teamName"

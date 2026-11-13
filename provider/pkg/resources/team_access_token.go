@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"strings"
 
+	p "github.com/pulumi/pulumi-go-provider"
 	"github.com/pulumi/pulumi-go-provider/infer"
 	"github.com/pulumi/pulumi/sdk/v3/go/property"
 
@@ -33,6 +34,7 @@ const (
 type TeamAccessToken struct{}
 
 var (
+	_ infer.CustomCheck[TeamAccessTokenInput]                        = &TeamAccessToken{}
 	_ infer.CustomCreate[TeamAccessTokenInput, TeamAccessTokenState] = &TeamAccessToken{}
 	_ infer.CustomDelete[TeamAccessTokenState]                       = &TeamAccessToken{}
 	_ infer.CustomRead[TeamAccessTokenInput, TeamAccessTokenState]   = &TeamAccessToken{}
@@ -58,6 +60,7 @@ type TeamAccessTokenInput struct {
 	OrganizationName string  `pulumi:"organizationName" provider:"replaceOnChanges"`
 	TeamName         string  `pulumi:"teamName"         provider:"replaceOnChanges"`
 	Description      *string `pulumi:"description,optional" provider:"replaceOnChanges"`
+	Expires          *string `pulumi:"expires,optional"     provider:"replaceOnChanges"`
 }
 
 func (i *TeamAccessTokenInput) Annotate(a infer.Annotator) {
@@ -65,6 +68,12 @@ func (i *TeamAccessTokenInput) Annotate(a infer.Annotator) {
 	a.Describe(&i.OrganizationName, "The organization's name.")
 	a.Describe(&i.TeamName, "The team name.")
 	a.Describe(&i.Description, "A description of the token.")
+	a.Describe(
+		&i.Expires,
+		"When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`. Omit it for a "+
+			"token that never expires. Pulumi Cloud rejects an expiry that is in the past, more than two "+
+			"years away, or beyond the organization's maximum token lifetime.",
+	)
 }
 
 func (i *TeamAccessTokenInput) AutoName(autoname infer.SetAutoName) {
@@ -93,8 +102,16 @@ func (*TeamAccessToken) Create(
 	if req.Inputs.Description != nil {
 		desc = *req.Inputs.Description
 	}
+	var expires int64
+	if req.Inputs.Expires != nil {
+		t, err := parseTokenExpiry(*req.Inputs.Expires)
+		if err != nil {
+			return infer.CreateResponse[TeamAccessTokenState]{}, err
+		}
+		expires = t.Unix()
+	}
 	token, err := config.GetClient(ctx).CreateTeamAccessToken(
-		ctx, req.Inputs.Name, req.Inputs.OrganizationName, req.Inputs.TeamName, desc,
+		ctx, req.Inputs.Name, req.Inputs.OrganizationName, req.Inputs.TeamName, desc, expires,
 	)
 	if err != nil {
 		return infer.CreateResponse[TeamAccessTokenState]{}, fmt.Errorf(
@@ -143,6 +160,7 @@ func (*TeamAccessToken) Read(
 		OrganizationName: orgName,
 		TeamName:         teamName,
 		Description:      stringPtrIfNonEmpty(token.Description),
+		Expires:          readTokenExpiry(token.Expires, req.State.Expires),
 	}
 	return infer.ReadResponse[TeamAccessTokenInput, TeamAccessTokenState]{
 		ID:     req.ID,
@@ -154,6 +172,22 @@ func (*TeamAccessToken) Read(
 			Value: req.State.Value,
 		},
 	}, nil
+}
+
+func (*TeamAccessToken) Check(
+	ctx context.Context,
+	req infer.CheckRequest,
+) (infer.CheckResponse[TeamAccessTokenInput], error) {
+	in, failures, err := infer.DefaultCheck[TeamAccessTokenInput](ctx, req.NewInputs)
+	if err != nil {
+		return infer.CheckResponse[TeamAccessTokenInput]{}, err
+	}
+	if in.Expires != nil && !isUnknownInput(req.NewInputs, gcExpires) {
+		if _, err := parseTokenExpiry(*in.Expires); err != nil {
+			failures = append(failures, p.CheckFailure{Property: gcExpires, Reason: err.Error()})
+		}
+	}
+	return infer.CheckResponse[TeamAccessTokenInput]{Inputs: in, Failures: failures}, nil
 }
 
 // StateMigrations strips the legacy "__inputs" outputs property that the
