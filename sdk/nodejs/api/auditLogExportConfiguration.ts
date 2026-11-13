@@ -53,9 +53,13 @@ export class AuditLogExportConfiguration extends pulumi.CustomResource {
      */
     declare public /*out*/ readonly lastResult: pulumi.Output<any>;
     /**
-     * The S3 configuration for exporting audit logs.
+     * The S3-compatible configuration for exporting audit logs. Set when audit logs export to an S3-compatible service.
      */
-    declare public /*out*/ readonly s3Config: pulumi.Output<any>;
+    declare public /*out*/ readonly s3CompatibleConfig: pulumi.Output<any | undefined>;
+    /**
+     * The S3 configuration for exporting audit logs. Set when audit logs export to Amazon S3.
+     */
+    declare public /*out*/ readonly s3Config: pulumi.Output<any | undefined>;
 
     /**
      * Create a AuditLogExportConfiguration resource with the given unique name, arguments, and options.
@@ -78,14 +82,17 @@ export class AuditLogExportConfiguration extends pulumi.CustomResource {
                 throw new Error("Missing required property 'orgName'");
             }
             resourceInputs["newEnabled"] = args?.newEnabled;
+            resourceInputs["newS3CompatibleConfiguration"] = args?.newS3CompatibleConfiguration;
             resourceInputs["newS3Configuration"] = args?.newS3Configuration;
             resourceInputs["orgName"] = args?.orgName;
             resourceInputs["enabled"] = undefined /*out*/;
             resourceInputs["lastResult"] = undefined /*out*/;
+            resourceInputs["s3CompatibleConfig"] = undefined /*out*/;
             resourceInputs["s3Config"] = undefined /*out*/;
         } else {
             resourceInputs["enabled"] = undefined /*out*/;
             resourceInputs["lastResult"] = undefined /*out*/;
+            resourceInputs["s3CompatibleConfig"] = undefined /*out*/;
             resourceInputs["s3Config"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
@@ -101,6 +108,10 @@ export interface AuditLogExportConfigurationArgs {
      * Whether the audit log export is enabled.
      */
     newEnabled: pulumi.Input<boolean>;
+    /**
+     * The new S3-compatible configuration for audit log export. Mutually exclusive with newS3Configuration.
+     */
+    newS3CompatibleConfiguration?: any | undefined;
     /**
      * The new S3 configuration for audit log export.
      */

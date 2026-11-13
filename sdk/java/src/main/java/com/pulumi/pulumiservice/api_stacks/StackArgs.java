@@ -6,6 +6,7 @@ package com.pulumi.pulumiservice.api_stacks;
 import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
 import com.pulumi.exceptions.MissingRequiredPropertyException;
+import java.lang.Boolean;
 import java.lang.Object;
 import java.lang.String;
 import java.util.List;
@@ -32,6 +33,21 @@ public final class StackArgs extends com.pulumi.resources.ResourceArgs {
      */
     public Optional<Output<Object>> config() {
         return Optional.ofNullable(this.config);
+    }
+
+    /**
+     * Whether the service should create an ESC environment that the stack manages.
+     * 
+     */
+    @Import(name="createManagedEnvironment")
+    private @Nullable Output<Boolean> createManagedEnvironment;
+
+    /**
+     * @return Whether the service should create an ESC environment that the stack manages.
+     * 
+     */
+    public Optional<Output<Boolean>> createManagedEnvironment() {
+        return Optional.ofNullable(this.createManagedEnvironment);
     }
 
     /**
@@ -128,6 +144,7 @@ public final class StackArgs extends com.pulumi.resources.ResourceArgs {
 
     private StackArgs(StackArgs $) {
         this.config = $.config;
+        this.createManagedEnvironment = $.createManagedEnvironment;
         this.orgName = $.orgName;
         this.projectName = $.projectName;
         this.stackName = $.stackName;
@@ -173,6 +190,27 @@ public final class StackArgs extends com.pulumi.resources.ResourceArgs {
          */
         public Builder config(Object config) {
             return config(Output.of(config));
+        }
+
+        /**
+         * @param createManagedEnvironment Whether the service should create an ESC environment that the stack manages.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder createManagedEnvironment(@Nullable Output<Boolean> createManagedEnvironment) {
+            $.createManagedEnvironment = createManagedEnvironment;
+            return this;
+        }
+
+        /**
+         * @param createManagedEnvironment Whether the service should create an ESC environment that the stack manages.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder createManagedEnvironment(Boolean createManagedEnvironment) {
+            return createManagedEnvironment(Output.of(createManagedEnvironment));
         }
 
         /**

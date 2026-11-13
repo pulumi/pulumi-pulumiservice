@@ -28,10 +28,16 @@ namespace Pulumi.PulumiService.Api
         public Output<object> LastResult { get; private set; } = null!;
 
         /// <summary>
-        /// The S3 configuration for exporting audit logs.
+        /// The S3-compatible configuration for exporting audit logs. Set when audit logs export to an S3-compatible service.
+        /// </summary>
+        [Output("s3CompatibleConfig")]
+        public Output<object?> S3CompatibleConfig { get; private set; } = null!;
+
+        /// <summary>
+        /// The S3 configuration for exporting audit logs. Set when audit logs export to Amazon S3.
         /// </summary>
         [Output("s3Config")]
-        public Output<object> S3Config { get; private set; } = null!;
+        public Output<object?> S3Config { get; private set; } = null!;
 
 
         /// <summary>
@@ -83,6 +89,12 @@ namespace Pulumi.PulumiService.Api
         /// </summary>
         [Input("newEnabled", required: true)]
         public Input<bool> NewEnabled { get; set; } = null!;
+
+        /// <summary>
+        /// The new S3-compatible configuration for audit log export. Mutually exclusive with newS3Configuration.
+        /// </summary>
+        [Input("newS3CompatibleConfiguration")]
+        public Input<object>? NewS3CompatibleConfiguration { get; set; }
 
         /// <summary>
         /// The new S3 configuration for audit log export.

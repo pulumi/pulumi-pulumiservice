@@ -21,17 +21,21 @@ class AuditLogExportConfigurationArgs:
     def __init__(__self__, *,
                  new_enabled: pulumi.Input[_builtins.bool],
                  new_s3_configuration: Any,
-                 org_name: pulumi.Input[_builtins.str]):
+                 org_name: pulumi.Input[_builtins.str],
+                 new_s3_compatible_configuration: Optional[Any] = None):
         """
         The set of arguments for constructing a AuditLogExportConfiguration resource.
 
         :param pulumi.Input[_builtins.bool] new_enabled: Whether the audit log export is enabled.
         :param Any new_s3_configuration: The new S3 configuration for audit log export.
         :param pulumi.Input[_builtins.str] org_name: The organization name
+        :param Any new_s3_compatible_configuration: The new S3-compatible configuration for audit log export. Mutually exclusive with newS3Configuration.
         """
         pulumi.set(__self__, "new_enabled", new_enabled)
         pulumi.set(__self__, "new_s3_configuration", new_s3_configuration)
         pulumi.set(__self__, "org_name", org_name)
+        if new_s3_compatible_configuration is not None:
+            pulumi.set(__self__, "new_s3_compatible_configuration", new_s3_compatible_configuration)
 
     @_builtins.property
     @pulumi.getter(name="newEnabled")
@@ -69,6 +73,18 @@ class AuditLogExportConfigurationArgs:
     def org_name(self, value: pulumi.Input[_builtins.str]):
         pulumi.set(self, "org_name", value)
 
+    @_builtins.property
+    @pulumi.getter(name="newS3CompatibleConfiguration")
+    def new_s3_compatible_configuration(self) -> Optional[Any]:
+        """
+        The new S3-compatible configuration for audit log export. Mutually exclusive with newS3Configuration.
+        """
+        return pulumi.get(self, "new_s3_compatible_configuration")
+
+    @new_s3_compatible_configuration.setter
+    def new_s3_compatible_configuration(self, value: Optional[Any]):
+        pulumi.set(self, "new_s3_compatible_configuration", value)
+
 
 @pulumi.type_token("pulumiservice:api:AuditLogExportConfiguration")
 class AuditLogExportConfiguration(pulumi.CustomResource):
@@ -77,6 +93,7 @@ class AuditLogExportConfiguration(pulumi.CustomResource):
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
                  new_enabled: pulumi.Input[Optional[_builtins.bool]] = None,
+                 new_s3_compatible_configuration: Optional[Any] = None,
                  new_s3_configuration: Optional[Any] = None,
                  org_name: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
@@ -86,6 +103,7 @@ class AuditLogExportConfiguration(pulumi.CustomResource):
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.bool] new_enabled: Whether the audit log export is enabled.
+        :param Any new_s3_compatible_configuration: The new S3-compatible configuration for audit log export. Mutually exclusive with newS3Configuration.
         :param Any new_s3_configuration: The new S3 configuration for audit log export.
         :param pulumi.Input[_builtins.str] org_name: The organization name
         """
@@ -114,6 +132,7 @@ class AuditLogExportConfiguration(pulumi.CustomResource):
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
                  new_enabled: pulumi.Input[Optional[_builtins.bool]] = None,
+                 new_s3_compatible_configuration: Optional[Any] = None,
                  new_s3_configuration: Optional[Any] = None,
                  org_name: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
@@ -128,6 +147,7 @@ class AuditLogExportConfiguration(pulumi.CustomResource):
             if new_enabled is None and not opts.urn:
                 raise TypeError("Missing required property 'new_enabled'")
             __props__.__dict__["new_enabled"] = new_enabled
+            __props__.__dict__["new_s3_compatible_configuration"] = new_s3_compatible_configuration
             if new_s3_configuration is None and not opts.urn:
                 raise TypeError("Missing required property 'new_s3_configuration'")
             __props__.__dict__["new_s3_configuration"] = new_s3_configuration
@@ -136,6 +156,7 @@ class AuditLogExportConfiguration(pulumi.CustomResource):
             __props__.__dict__["org_name"] = org_name
             __props__.__dict__["enabled"] = None
             __props__.__dict__["last_result"] = None
+            __props__.__dict__["s3_compatible_config"] = None
             __props__.__dict__["s3_config"] = None
         super(AuditLogExportConfiguration, __self__).__init__(
             'pulumiservice:api:AuditLogExportConfiguration',
@@ -161,6 +182,7 @@ class AuditLogExportConfiguration(pulumi.CustomResource):
 
         __props__.__dict__["enabled"] = None
         __props__.__dict__["last_result"] = None
+        __props__.__dict__["s3_compatible_config"] = None
         __props__.__dict__["s3_config"] = None
         return AuditLogExportConfiguration(resource_name, opts=opts, __props__=__props__)
 
@@ -181,10 +203,18 @@ class AuditLogExportConfiguration(pulumi.CustomResource):
         return pulumi.get(self, "last_result")
 
     @_builtins.property
-    @pulumi.getter(name="s3Config")
-    def s3_config(self) -> pulumi.Output[Any]:
+    @pulumi.getter(name="s3CompatibleConfig")
+    def s3_compatible_config(self) -> pulumi.Output[Optional[Any]]:
         """
-        The S3 configuration for exporting audit logs.
+        The S3-compatible configuration for exporting audit logs. Set when audit logs export to an S3-compatible service.
+        """
+        return pulumi.get(self, "s3_compatible_config")
+
+    @_builtins.property
+    @pulumi.getter(name="s3Config")
+    def s3_config(self) -> pulumi.Output[Optional[Any]]:
+        """
+        The S3 configuration for exporting audit logs. Set when audit logs export to Amazon S3.
         """
         return pulumi.get(self, "s3_config")
 

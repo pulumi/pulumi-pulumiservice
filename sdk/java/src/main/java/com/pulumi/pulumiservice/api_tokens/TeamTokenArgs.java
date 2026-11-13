@@ -48,14 +48,14 @@ public final class TeamTokenArgs extends com.pulumi.resources.ResourceArgs {
     }
 
     /**
-     * The name
+     * The display name of the token. Must be between 1 and 40 characters.
      * 
      */
     @Import(name="name", required=true)
     private Output<String> name;
 
     /**
-     * @return The name
+     * @return The display name of the token. Must be between 1 and 40 characters.
      * 
      */
     public Output<String> name() {
@@ -179,7 +179,7 @@ public final class TeamTokenArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param name The name
+         * @param name The display name of the token. Must be between 1 and 40 characters.
          * 
          * @return builder
          * 
@@ -190,7 +190,7 @@ public final class TeamTokenArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param name The name
+         * @param name The display name of the token. Must be between 1 and 40 characters.
          * 
          * @return builder
          * 

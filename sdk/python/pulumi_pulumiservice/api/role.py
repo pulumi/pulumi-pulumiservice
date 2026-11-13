@@ -234,6 +234,7 @@ class Role(pulumi.CustomResource):
             __props__.__dict__["ux_purpose"] = ux_purpose
             __props__.__dict__["created"] = None
             __props__.__dict__["default_identifier"] = None
+            __props__.__dict__["is_compatibility_role"] = None
             __props__.__dict__["is_org_default"] = None
             __props__.__dict__["modified"] = None
             __props__.__dict__["org_id"] = None
@@ -264,6 +265,7 @@ class Role(pulumi.CustomResource):
         __props__.__dict__["default_identifier"] = None
         __props__.__dict__["description"] = None
         __props__.__dict__["details"] = None
+        __props__.__dict__["is_compatibility_role"] = None
         __props__.__dict__["is_org_default"] = None
         __props__.__dict__["modified"] = None
         __props__.__dict__["name"] = None
@@ -305,6 +307,14 @@ class Role(pulumi.CustomResource):
         The detailed permission descriptor tree.
         """
         return pulumi.get(self, "details")
+
+    @_builtins.property
+    @pulumi.getter(name="isCompatibilityRole")
+    def is_compatibility_role(self) -> pulumi.Output[Optional[_builtins.bool]]:
+        """
+        Whether this role is the organization's Member (legacy) role, a copy of what members could do before the organization moved to built-in roles.
+        """
+        return pulumi.get(self, "is_compatibility_role")
 
     @_builtins.property
     @pulumi.getter(name="isOrgDefault")

@@ -2828,7 +2828,7 @@
       "inputProperties": {
         "agentDefinitionId": {
           "type": "string",
-          "description": "Optional Custom Agent definition id to run this task as. When set, the task's role, permission mode, and enabled integrations are taken from the named agent definition instead of from this request, and the task is attributed to that agent. The agent's instructions and approval mode are not copied at creation: they are read from the definition on every turn, so editing the agent applies to the next turn of every run. A preview capability, gated per organization."
+          "description": "Optional Custom Agent definition id to run this task as. When set, the task's role and enabled integrations are taken from the named agent definition instead of from this request, and the task is attributed to that agent. The agent's instructions and approval mode are not copied at creation: they are read from the definition on every turn, so editing the agent applies to the next turn of every run. A preview capability, gated per organization."
         },
         "approvalMode": {
           "type": "string",
@@ -3802,7 +3802,7 @@
         },
         "name": {
           "type": "string",
-          "description": "The unique identifier name for the webhook within its scope. Optional on creation; if omitted, the service generates a short random name. Always populated in responses."
+          "description": "The unique identifier name for the webhook within its scope. Optional on creation; if omitted, the service generates a short random name. Always populated in responses. Up to 32 characters of letters, numbers, hyphens, underscores, and periods. On update, the name comes from the URL and this field is ignored."
         },
         "organizationName": {
           "type": "string",
@@ -3875,7 +3875,7 @@
         },
         "name": {
           "type": "string",
-          "description": "The unique identifier name for the webhook within its scope. Optional on creation; if omitted, the service generates a short random name. Always populated in responses.",
+          "description": "The unique identifier name for the webhook within its scope. Optional on creation; if omitted, the service generates a short random name. Always populated in responses. Up to 32 characters of letters, numbers, hyphens, underscores, and periods. On update, the name comes from the URL and this field is ignored.",
           "replaceOnChanges": true,
           "willReplaceOnChanges": true
         },
@@ -4729,6 +4729,40 @@
         "orgName"
       ]
     },
+    "pulumiservice:api/integrations:OriginIntegration": {
+      "description": "Updates the pull request reporting preferences of an Origin integration owned by this organization.",
+      "type": "object",
+      "inputProperties": {
+        "disableDetailedDiff": {
+          "type": "boolean",
+          "description": "Hide property-level changes in pull request comments."
+        },
+        "disableDraftPRComments": {
+          "type": "boolean",
+          "description": "Disable comments on draft pull requests."
+        },
+        "disablePRComments": {
+          "type": "boolean",
+          "description": "Disable comments with Pulumi preview and update results."
+        },
+        "integrationId": {
+          "type": "string",
+          "description": "The Pulumi integration identifier",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The Pulumi organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        }
+      },
+      "requiredInputs": [
+        "integrationId",
+        "orgName"
+      ]
+    },
     "pulumiservice:api/neo:UsageCap": {
       "description": "Creates or replaces the monthly Neo usage cap for an organization. The cap must be at least $10/month. To remove the cap, call DeleteNeoUsageCap.",
       "properties": {
@@ -4769,6 +4803,157 @@
       },
       "requiredInputs": [
         "capCents",
+        "orgName"
+      ]
+    },
+    "pulumiservice:api/policy:Exception": {
+      "description": "Creates an active policy exception and returns it with its ID (`EXC-<n>`). Returns 400 when the request breaks a field's limits or the policy pack isn't in one of the organization's policy groups, 403 when the organization has disabled policy exceptions, and 409 when it requires approval to create them.",
+      "properties": {
+        "changeRequestId": {
+          "type": "string",
+          "description": "The change request that approved the exception, if creating it required approval."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "When the exception was created."
+        },
+        "createdBy": {
+          "$ref": "pulumi.json#/Any",
+          "description": "The user who created the exception, if the user still exists."
+        },
+        "exceptionId": {
+          "type": "string",
+          "description": "The exception ID, unique within the organization, for example `EXC-42`."
+        },
+        "expiresAt": {
+          "type": "string",
+          "description": "When the exception expires, after which it's removed. Null if it never expires."
+        },
+        "match": {
+          "type": "array",
+          "items": {
+            "$ref": "pulumi.json#/Any"
+          },
+          "description": "The exception's entries."
+        },
+        "policyPack": {
+          "type": "string",
+          "description": "The name of the policy pack the exception applies to."
+        },
+        "reason": {
+          "type": "string",
+          "description": "The justification for the exception."
+        },
+        "removedAt": {
+          "type": "string",
+          "description": "When the exception was removed. Null while it is active."
+        },
+        "removedBy": {
+          "$ref": "pulumi.json#/Any",
+          "description": "The user who removed the exception, if the user still exists."
+        },
+        "status": {
+          "type": "string",
+          "description": "The exception's lifecycle status."
+        }
+      },
+      "type": "object",
+      "required": [
+        "createdAt",
+        "exceptionId",
+        "match",
+        "policyPack",
+        "reason",
+        "status"
+      ],
+      "inputProperties": {
+        "exceptionId": {
+          "type": "string",
+          "description": "The exception ID, for example `EXC-42`",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "expiresInSeconds": {
+          "type": "integer",
+          "description": "Seconds until the exception expires, counted from when it's created: a whole number of hours, between 1 hour and 3650 days. Omit for an exception that never expires."
+        },
+        "match": {
+          "type": "array",
+          "items": {
+            "$ref": "pulumi.json#/Any"
+          },
+          "description": "The exception's entries: between 1 and 100."
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "policyPack": {
+          "type": "string",
+          "description": "The name of the policy pack the exception applies to."
+        },
+        "reason": {
+          "type": "string",
+          "description": "The justification for the exception: up to 2048 characters, not blank."
+        }
+      },
+      "requiredInputs": [
+        "match",
+        "orgName",
+        "policyPack",
+        "reason"
+      ]
+    },
+    "pulumiservice:api/policy:Finding": {
+      "description": "Updates a policy Finding's triage status and other mutable fields. All body fields are optional — only provide the fields you want to update.\n\n- `status`: `open`, `in_progress`, or `ignored` (`fixed` and `by_design` cannot be set manually)\n- `priority`: `p0`, `p1`, `p2`, `p3`, or `p4`\n- `assignedTo`: username to assign the Finding to, or `null` to unassign",
+      "properties": {
+        "policy": {
+          "$ref": "pulumi.json#/Any",
+          "description": "The policy definition that caused this issue. May be null if the policy has been deleted or is unavailable."
+        },
+        "policyIssue": {
+          "$ref": "pulumi.json#/Any",
+          "description": "The policy issue details"
+        },
+        "policyPack": {
+          "$ref": "pulumi.json#/Any",
+          "description": "The registry policy pack metadata. May be null if the policy pack is unavailable."
+        }
+      },
+      "type": "object",
+      "required": [
+        "policyIssue"
+      ],
+      "inputProperties": {
+        "assignedTo": {
+          "type": "string",
+          "description": "The user to assign the policy issue to."
+        },
+        "findingId": {
+          "type": "string",
+          "description": "The Finding identifier",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "priority": {
+          "type": "string",
+          "description": "The new priority for the policy issue."
+        },
+        "status": {
+          "type": "string",
+          "description": "The new status for the policy issue. Valid values: open, in_progress, ignored. Note: fixed and by_design cannot be set manually."
+        }
+      },
+      "requiredInputs": [
+        "findingId",
         "orgName"
       ]
     },
@@ -4876,7 +5061,7 @@
         },
         "name": {
           "type": "string",
-          "description": "the name of the service",
+          "description": "The name of the service. Between 1 and 80 characters.",
           "replaceOnChanges": true,
           "willReplaceOnChanges": true
         },
@@ -5000,6 +5185,10 @@
           "$ref": "pulumi.json#/Any",
           "description": "Information about a live operation currently running for the stack, its kind, the author who initiated it, and its start time. Null when no operation is in flight."
         },
+        "managedEnvironment": {
+          "type": "string",
+          "description": "The ESC environment this stack manages, which holds the stack's configuration, as <project>/<name>. Read-only; omitted when the stack does not manage an environment. The name stays set after the environment is deleted. Returned to anyone who can read the stack, whether or not they can read the environment."
+        },
         "orgName": {
           "type": "string",
           "description": "The organization name"
@@ -5036,6 +5225,10 @@
         "config": {
           "$ref": "pulumi.json#/Any",
           "description": "The configuration for the new stack."
+        },
+        "createManagedEnvironment": {
+          "type": "boolean",
+          "description": "Whether the service should create an ESC environment that the stack manages."
         },
         "orgName": {
           "type": "string",
@@ -5159,7 +5352,7 @@
         },
         "name": {
           "type": "string",
-          "description": "The unique identifier name for the webhook within its scope. Optional on creation; if omitted, the service generates a short random name. Always populated in responses."
+          "description": "The unique identifier name for the webhook within its scope. Optional on creation; if omitted, the service generates a short random name. Always populated in responses. Up to 32 characters of letters, numbers, hyphens, underscores, and periods. On update, the name comes from the URL and this field is ignored."
         },
         "organizationName": {
           "type": "string",
@@ -5230,7 +5423,7 @@
         },
         "name": {
           "type": "string",
-          "description": "The unique identifier name for the webhook within its scope. Optional on creation; if omitted, the service generates a short random name. Always populated in responses.",
+          "description": "The unique identifier name for the webhook within its scope. Optional on creation; if omitted, the service generates a short random name. Always populated in responses. Up to 32 characters of letters, numbers, hyphens, underscores, and periods. On update, the name comes from the URL and this field is ignored.",
           "replaceOnChanges": true,
           "willReplaceOnChanges": true
         },
@@ -5432,7 +5625,7 @@
         },
         "name": {
           "type": "string",
-          "description": "The name"
+          "description": "The display name of the token. Must be between 1 and 40 characters."
         },
         "orgName": {
           "type": "string",
@@ -5527,7 +5720,7 @@
         },
         "name": {
           "type": "string",
-          "description": "The name"
+          "description": "The display name of the token. Must be between 1 and 40 characters."
         },
         "orgName": {
           "type": "string",
@@ -5685,21 +5878,28 @@
           "$ref": "pulumi.json#/Any",
           "description": "The result of the last audit log export attempt."
         },
+        "s3CompatibleConfig": {
+          "$ref": "pulumi.json#/Any",
+          "description": "The S3-compatible configuration for exporting audit logs. Set when audit logs export to an S3-compatible service."
+        },
         "s3Config": {
           "$ref": "pulumi.json#/Any",
-          "description": "The S3 configuration for exporting audit logs."
+          "description": "The S3 configuration for exporting audit logs. Set when audit logs export to Amazon S3."
         }
       },
       "type": "object",
       "required": [
         "enabled",
-        "lastResult",
-        "s3Config"
+        "lastResult"
       ],
       "inputProperties": {
         "newEnabled": {
           "type": "boolean",
           "description": "Whether the audit log export is enabled."
+        },
+        "newS3CompatibleConfiguration": {
+          "$ref": "pulumi.json#/Any",
+          "description": "The new S3-compatible configuration for audit log export. Mutually exclusive with newS3Configuration."
         },
         "newS3Configuration": {
           "$ref": "pulumi.json#/Any",
@@ -5900,6 +6100,10 @@
           "$ref": "pulumi.json#/Any",
           "description": "The role currently assigned to this member — either a built-in role (member, admin, billingManager) or a custom role. Falls back to the organization's default role if no role is assigned directly."
         },
+        "followsDefaultRole": {
+          "type": "boolean",
+          "description": "FollowsDefaultRole is true when the member has no role of their own and gets the\norganization's default role. A member assigned the default role directly is false."
+        },
         "knownToPulumi": {
           "type": "boolean",
           "description": "KnownToPulumi returns if the organization member has a Pulumi account."
@@ -5950,7 +6154,7 @@
         },
         "role": {
           "type": "string",
-          "description": "The built-in role assigned to the new member. Must be `member`, `admin`, or `billingManager`."
+          "description": "The built-in role assigned to the new member. Must be `member`, `admin`, `billing-manager`, `reader`, `builder` or `maintainer`. In an organization with a default role, `member` puts the new member on the default role, and the member follows it when an admin changes it. `reader`, `builder` and `maintainer` assign the Reader, Builder or Maintainer role to the new member explicitly, so the member keeps it when the default role changes; they are available only in organizations with a default role."
         },
         "userLogin": {
           "type": "string",
@@ -6005,7 +6209,7 @@
         },
         "name": {
           "type": "string",
-          "description": "The unique identifier name for the webhook within its scope. Optional on creation; if omitted, the service generates a short random name. Always populated in responses."
+          "description": "The unique identifier name for the webhook within its scope. Optional on creation; if omitted, the service generates a short random name. Always populated in responses. Up to 32 characters of letters, numbers, hyphens, underscores, and periods. On update, the name comes from the URL and this field is ignored."
         },
         "organizationName": {
           "type": "string",
@@ -6076,7 +6280,7 @@
         },
         "name": {
           "type": "string",
-          "description": "The unique identifier name for the webhook within its scope. Optional on creation; if omitted, the service generates a short random name. Always populated in responses.",
+          "description": "The unique identifier name for the webhook within its scope. Optional on creation; if omitted, the service generates a short random name. Always populated in responses. Up to 32 characters of letters, numbers, hyphens, underscores, and periods. On update, the name comes from the URL and this field is ignored.",
           "replaceOnChanges": true,
           "willReplaceOnChanges": true
         },
@@ -6339,6 +6543,10 @@
         "details": {
           "$ref": "pulumi.json#/Any",
           "description": "The detailed permission descriptor tree."
+        },
+        "isCompatibilityRole": {
+          "type": "boolean",
+          "description": "Whether this role is the organization's Member (legacy) role, a copy of what members could do before the organization moved to built-in roles."
         },
         "isOrgDefault": {
           "type": "boolean",

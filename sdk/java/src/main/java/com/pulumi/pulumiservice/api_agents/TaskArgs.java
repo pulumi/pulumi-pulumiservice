@@ -20,14 +20,14 @@ public final class TaskArgs extends com.pulumi.resources.ResourceArgs {
     public static final TaskArgs Empty = new TaskArgs();
 
     /**
-     * Optional Custom Agent definition id to run this task as. When set, the task&#39;s role, permission mode, and enabled integrations are taken from the named agent definition instead of from this request, and the task is attributed to that agent. The agent&#39;s instructions and approval mode are not copied at creation: they are read from the definition on every turn, so editing the agent applies to the next turn of every run. A preview capability, gated per organization.
+     * Optional Custom Agent definition id to run this task as. When set, the task&#39;s role and enabled integrations are taken from the named agent definition instead of from this request, and the task is attributed to that agent. The agent&#39;s instructions and approval mode are not copied at creation: they are read from the definition on every turn, so editing the agent applies to the next turn of every run. A preview capability, gated per organization.
      * 
      */
     @Import(name="agentDefinitionId")
     private @Nullable Output<String> agentDefinitionId;
 
     /**
-     * @return Optional Custom Agent definition id to run this task as. When set, the task&#39;s role, permission mode, and enabled integrations are taken from the named agent definition instead of from this request, and the task is attributed to that agent. The agent&#39;s instructions and approval mode are not copied at creation: they are read from the definition on every turn, so editing the agent applies to the next turn of every run. A preview capability, gated per organization.
+     * @return Optional Custom Agent definition id to run this task as. When set, the task&#39;s role and enabled integrations are taken from the named agent definition instead of from this request, and the task is attributed to that agent. The agent&#39;s instructions and approval mode are not copied at creation: they are read from the definition on every turn, so editing the agent applies to the next turn of every run. A preview capability, gated per organization.
      * 
      */
     public Optional<Output<String>> agentDefinitionId() {
@@ -235,7 +235,7 @@ public final class TaskArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param agentDefinitionId Optional Custom Agent definition id to run this task as. When set, the task&#39;s role, permission mode, and enabled integrations are taken from the named agent definition instead of from this request, and the task is attributed to that agent. The agent&#39;s instructions and approval mode are not copied at creation: they are read from the definition on every turn, so editing the agent applies to the next turn of every run. A preview capability, gated per organization.
+         * @param agentDefinitionId Optional Custom Agent definition id to run this task as. When set, the task&#39;s role and enabled integrations are taken from the named agent definition instead of from this request, and the task is attributed to that agent. The agent&#39;s instructions and approval mode are not copied at creation: they are read from the definition on every turn, so editing the agent applies to the next turn of every run. A preview capability, gated per organization.
          * 
          * @return builder
          * 
@@ -246,7 +246,7 @@ public final class TaskArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param agentDefinitionId Optional Custom Agent definition id to run this task as. When set, the task&#39;s role, permission mode, and enabled integrations are taken from the named agent definition instead of from this request, and the task is attributed to that agent. The agent&#39;s instructions and approval mode are not copied at creation: they are read from the definition on every turn, so editing the agent applies to the next turn of every run. A preview capability, gated per organization.
+         * @param agentDefinitionId Optional Custom Agent definition id to run this task as. When set, the task&#39;s role and enabled integrations are taken from the named agent definition instead of from this request, and the task is attributed to that agent. The agent&#39;s instructions and approval mode are not copied at creation: they are read from the definition on every turn, so editing the agent applies to the next turn of every run. A preview capability, gated per organization.
          * 
          * @return builder
          * 

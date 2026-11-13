@@ -11,6 +11,7 @@ import com.pulumi.pulumiservice.Utilities;
 import com.pulumi.pulumiservice.api.AuditLogExportConfigurationArgs;
 import java.lang.Boolean;
 import java.lang.Object;
+import java.util.Optional;
 import javax.annotation.Nullable;
 
 /**
@@ -48,18 +49,32 @@ public class AuditLogExportConfiguration extends com.pulumi.resources.CustomReso
         return this.lastResult;
     }
     /**
-     * The S3 configuration for exporting audit logs.
+     * The S3-compatible configuration for exporting audit logs. Set when audit logs export to an S3-compatible service.
+     * 
+     */
+    @Export(name="s3CompatibleConfig", refs={Object.class}, tree="[0]")
+    private Output</* @Nullable */ Object> s3CompatibleConfig;
+
+    /**
+     * @return The S3-compatible configuration for exporting audit logs. Set when audit logs export to an S3-compatible service.
+     * 
+     */
+    public Output<Optional<Object>> s3CompatibleConfig() {
+        return Codegen.optional(this.s3CompatibleConfig);
+    }
+    /**
+     * The S3 configuration for exporting audit logs. Set when audit logs export to Amazon S3.
      * 
      */
     @Export(name="s3Config", refs={Object.class}, tree="[0]")
-    private Output<Object> s3Config;
+    private Output</* @Nullable */ Object> s3Config;
 
     /**
-     * @return The S3 configuration for exporting audit logs.
+     * @return The S3 configuration for exporting audit logs. Set when audit logs export to Amazon S3.
      * 
      */
-    public Output<Object> s3Config() {
-        return this.s3Config;
+    public Output<Optional<Object>> s3Config() {
+        return Codegen.optional(this.s3Config);
     }
 
     /**
