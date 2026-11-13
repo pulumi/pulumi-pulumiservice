@@ -52,7 +52,7 @@ func (c *Client) AssignRoleToTeam(ctx context.Context, orgName, teamName, roleID
 	}
 
 	apiPath := path.Join("orgs", orgName, "teams", teamName, "roles", roleID)
-	if _, err := c.do(ctx, http.MethodPost, apiPath, nil, nil); err != nil {
+	if err := c.do(ctx, http.MethodPost, apiPath, nil, nil); err != nil {
 		return fmt.Errorf("failed to assign role to team: %w", err)
 	}
 	return nil
@@ -70,13 +70,7 @@ func (c *Client) RemoveRoleFromTeam(ctx context.Context, orgName, teamName, role
 	}
 
 	apiPath := path.Join("orgs", orgName, "teams", teamName, "roles", roleID)
-	if _, err := c.do(ctx, http.MethodDelete, apiPath, nil, nil); err != nil {
-		if GetErrorStatusCode(err) == http.StatusNotFound {
-			return nil
-		}
-		return fmt.Errorf("failed to remove role from team: %w", err)
-	}
-	return nil
+	return c.deleteIgnoringNotFound(ctx, apiPath, nil, "role from team")
 }
 
 func (c *Client) ListTeamRoles(ctx context.Context, orgName, teamName string) ([]TeamRoleRef, error) {
@@ -89,7 +83,7 @@ func (c *Client) ListTeamRoles(ctx context.Context, orgName, teamName string) ([
 
 	apiPath := path.Join("orgs", orgName, "teams", teamName, "roles")
 	var resp listTeamRolesResponse
-	if _, err := c.do(ctx, http.MethodGet, apiPath, nil, &resp); err != nil {
+	if err := c.do(ctx, http.MethodGet, apiPath, nil, &resp); err != nil {
 		if GetErrorStatusCode(err) == http.StatusNotFound {
 			return nil, nil
 		}

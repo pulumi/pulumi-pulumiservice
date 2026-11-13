@@ -69,7 +69,7 @@ func (c *Client) CreateAgentPool(ctx context.Context, orgName, name, description
 
 	var createRes createAgentPoolResponse
 
-	_, err := c.do(ctx, http.MethodPost, apiPath, createReq, &createRes)
+	err := c.do(ctx, http.MethodPost, apiPath, createReq, &createRes)
 
 	if err != nil {
 		return nil, fmt.Errorf("failed to create agent pool: %w", err)
@@ -104,7 +104,7 @@ func (c *Client) UpdateAgentPool(ctx context.Context, agentPoolID, orgName, name
 		Description: description,
 	}
 
-	_, err := c.do(ctx, http.MethodPatch, apiPath, updateReq, nil)
+	err := c.do(ctx, http.MethodPatch, apiPath, updateReq, nil)
 	if err != nil {
 		return fmt.Errorf("failed to update agent pool: %w", err)
 	}
@@ -122,27 +122,18 @@ func (c *Client) DeleteAgentPool(ctx context.Context, agentPoolID, orgName strin
 
 	apiPath := path.Join("orgs", orgName, "agent-pools", agentPoolID)
 
-	var err error
+	var query url.Values
 	if forceDestroy {
-		_, err = c.doWithQuery(ctx, http.MethodDelete, apiPath, url.Values{"force": []string{trueValue}}, nil, nil)
-	} else {
-		_, err = c.do(ctx, http.MethodDelete, apiPath, nil, nil)
+		query = url.Values{"force": []string{trueValue}}
 	}
-	if err != nil {
-		if GetErrorStatusCode(err) == http.StatusNotFound {
-			return nil
-		}
-		return fmt.Errorf("failed to delete agent pool %q: %w", agentPoolID, err)
-	}
-
-	return nil
+	return c.deleteIgnoringNotFound(ctx, apiPath, query, fmt.Sprintf("agent pool %q", agentPoolID))
 }
 
 func (c *Client) GetAgentPool(ctx context.Context, agentPoolID, orgName string) (*AgentPool, error) {
 	apiPath := path.Join("orgs", orgName, "agent-pools", agentPoolID)
 
 	var pool AgentPool
-	_, err := c.do(ctx, http.MethodGet, apiPath, nil, &pool)
+	err := c.do(ctx, http.MethodGet, apiPath, nil, &pool)
 	if err != nil {
 		statusCode := GetErrorStatusCode(err)
 		if statusCode == http.StatusNotFound {

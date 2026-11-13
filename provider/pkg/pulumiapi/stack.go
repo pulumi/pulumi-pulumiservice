@@ -23,7 +23,7 @@ type CreateStackRequest struct {
 
 func (c *Client) CreateStack(ctx context.Context, stack StackIdentifier) error {
 	apiPath := path.Join("stacks", stack.OrgName, stack.ProjectName)
-	_, err := c.do(ctx, http.MethodPost, apiPath, CreateStackRequest{
+	err := c.do(ctx, http.MethodPost, apiPath, CreateStackRequest{
 		StackName: stack.StackName,
 	}, nil)
 	if err != nil {
@@ -38,7 +38,7 @@ func (c *Client) StackExists(ctx context.Context, stackName StackIdentifier) (bo
 	}
 	apiPath := path.Join("stacks", stackName.OrgName, stackName.ProjectName, stackName.StackName)
 	var s stack
-	_, err := c.do(ctx, http.MethodGet, apiPath, nil, &s)
+	err := c.do(ctx, http.MethodGet, apiPath, nil, &s)
 	if err != nil {
 		statusCode := GetErrorStatusCode(err)
 		if statusCode == http.StatusNotFound {
@@ -71,18 +71,9 @@ func (c *Client) DeleteStack(ctx context.Context, stackName StackIdentifier, for
 		"stacks", stackName.OrgName, stackName.ProjectName, stackName.StackName,
 	)
 
-	var err error
+	var query url.Values
 	if forceDestroy {
-		_, err = c.doWithQuery(ctx, http.MethodDelete, apiPath, url.Values{"forceDestroy": []string{trueValue}}, nil, nil)
-	} else {
-		_, err = c.do(ctx, http.MethodDelete, apiPath, nil, nil)
+		query = url.Values{"forceDestroy": []string{trueValue}}
 	}
-	if err != nil {
-		if GetErrorStatusCode(err) == http.StatusNotFound {
-			return nil
-		}
-		return fmt.Errorf("failed to delete stack: %w", err)
-	}
-
-	return nil
+	return c.deleteIgnoringNotFound(ctx, apiPath, query, "stack")
 }

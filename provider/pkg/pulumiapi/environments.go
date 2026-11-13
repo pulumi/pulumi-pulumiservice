@@ -61,7 +61,7 @@ func (c *Client) GetEnvironmentMetadata(
 
 	apiPath := path.Join("esc", "environments", orgName, projectName, envName, "metadata")
 	var meta EnvironmentMetadata
-	if _, err := c.do(ctx, http.MethodGet, apiPath, nil, &meta); err != nil {
+	if err := c.do(ctx, http.MethodGet, apiPath, nil, &meta); err != nil {
 		if GetErrorStatusCode(err) == http.StatusNotFound {
 			return nil, nil
 		}

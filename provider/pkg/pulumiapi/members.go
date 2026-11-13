@@ -122,7 +122,7 @@ func (c *Client) AddMemberToOrg(ctx context.Context, userName string, orgName st
 	req := addMemberToOrgReq{
 		Role: role,
 	}
-	_, err := c.do(ctx, http.MethodPost, apiPath, req, nil)
+	err := c.do(ctx, http.MethodPost, apiPath, req, nil)
 	if err != nil {
 		return fmt.Errorf("failed to add member to org: %w", err)
 	}
@@ -168,7 +168,7 @@ func (c *Client) UpdateOrgMemberRole(
 	}
 
 	apiPath := path.Join("orgs", orgName, "members", userName)
-	if _, err := c.do(ctx, http.MethodPatch, apiPath, req, nil); err != nil {
+	if err := c.do(ctx, http.MethodPatch, apiPath, req, nil); err != nil {
 		return fmt.Errorf("failed to update org member role: %w", err)
 	}
 	return nil
@@ -268,7 +268,7 @@ func (c *Client) listOrgMembersByType(
 			q.Set("continuationToken", token)
 		}
 		var page Members
-		if _, err := c.doWithQuery(ctx, http.MethodGet, apiPath, q, nil, &page); err != nil {
+		if err := c.doWithQuery(ctx, http.MethodGet, apiPath, q, nil, &page); err != nil {
 			return nil, err
 		}
 		all = append(all, page.Members...)
@@ -306,13 +306,5 @@ func (c *Client) DeleteMemberFromOrg(ctx context.Context, orgName string, userNa
 
 	apiPath := path.Join("orgs", orgName, "members", userName)
 
-	_, err := c.do(ctx, http.MethodDelete, apiPath, nil, nil)
-
-	if err != nil {
-		if GetErrorStatusCode(err) == http.StatusNotFound {
-			return nil
-		}
-		return fmt.Errorf("failed to delete member from org: %w", err)
-	}
-	return nil
+	return c.deleteIgnoringNotFound(ctx, apiPath, nil, "member from org")
 }

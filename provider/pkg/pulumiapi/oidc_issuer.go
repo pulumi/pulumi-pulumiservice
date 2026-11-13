@@ -82,7 +82,7 @@ func (c *Client) RegisterOidcIssuer(
 ) (*OidcIssuerRegistrationResponse, error) {
 	apiPath := path.Join("orgs", organization, "oidc", "issuers")
 	var response = &OidcIssuerRegistrationResponse{}
-	_, err := c.do(ctx, http.MethodPost, apiPath, request, response)
+	err := c.do(ctx, http.MethodPost, apiPath, request, response)
 	if err != nil {
 		return nil, fmt.Errorf("failed to register oidc issuer '%s': %w", request.Name, err)
 	}
@@ -97,7 +97,7 @@ func (c *Client) UpdateOidcIssuer(
 ) (*OidcIssuerRegistrationResponse, error) {
 	apiPath := path.Join("orgs", organization, "oidc", "issuers", issuerID)
 	var response = &OidcIssuerRegistrationResponse{}
-	_, err := c.do(ctx, http.MethodPatch, apiPath, request, response)
+	err := c.do(ctx, http.MethodPatch, apiPath, request, response)
 	if err != nil {
 		return nil, fmt.Errorf("failed to update oidc issuer with id '%s': %w", issuerID, err)
 	}
@@ -111,7 +111,7 @@ func (c *Client) GetOidcIssuer(
 ) (*OidcIssuerRegistrationResponse, error) {
 	apiPath := path.Join("orgs", organization, "oidc", "issuers", issuerID)
 	var response = &OidcIssuerRegistrationResponse{}
-	_, err := c.do(ctx, http.MethodGet, apiPath, nil, response)
+	err := c.do(ctx, http.MethodGet, apiPath, nil, response)
 	if err != nil {
 		if GetErrorStatusCode(err) == http.StatusNotFound {
 			return nil, nil
@@ -123,20 +123,13 @@ func (c *Client) GetOidcIssuer(
 
 func (c *Client) DeleteOidcIssuer(ctx context.Context, organization string, issuerID string) error {
 	apiPath := path.Join("orgs", organization, "oidc", "issuers", issuerID)
-	_, err := c.do(ctx, http.MethodDelete, apiPath, nil, nil)
-	if err != nil {
-		if GetErrorStatusCode(err) == http.StatusNotFound {
-			return nil
-		}
-		return fmt.Errorf("failed to delete oidc issuer with id '%s': %w", issuerID, err)
-	}
-	return nil
+	return c.deleteIgnoringNotFound(ctx, apiPath, nil, fmt.Sprintf("oidc issuer %q", issuerID))
 }
 
 func (c *Client) GetAuthPolicies(ctx context.Context, organization string, issuerID string) (*AuthPolicy, error) {
 	apiPath := path.Join("orgs", organization, "auth", "policies", "oidcissuers", issuerID)
 	var response = &AuthPolicy{}
-	_, err := c.do(ctx, http.MethodGet, apiPath, nil, response)
+	err := c.do(ctx, http.MethodGet, apiPath, nil, response)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get auth policies with issuer id '%s': %w", issuerID, err)
 	}
@@ -151,7 +144,7 @@ func (c *Client) UpdateAuthPolicies(
 ) (*AuthPolicy, error) {
 	apiPath := path.Join("orgs", organization, "auth", "policies", policyID)
 	var response = &AuthPolicy{}
-	_, err := c.do(ctx, http.MethodPatch, apiPath, request, response)
+	err := c.do(ctx, http.MethodPatch, apiPath, request, response)
 	if err != nil {
 		return nil, fmt.Errorf("failed to update auth policies with policy id '%s': %w", policyID, err)
 	}
