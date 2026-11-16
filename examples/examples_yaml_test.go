@@ -298,6 +298,7 @@ func TestYamlAccessTokenExample(t *testing.T) {
 
 func TestYamlTeamAccessTokenExample(t *testing.T) {
 	test := newExampleTest(t, "yaml-team-token")
+	test.SetConfig(t, "expires", time.Now().UTC().AddDate(0, 0, 30).Truncate(time.Hour).Format(time.RFC3339))
 	runPulumiTest(t, test)
 }
 

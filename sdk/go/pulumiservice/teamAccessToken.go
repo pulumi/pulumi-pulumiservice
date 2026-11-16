@@ -41,6 +41,8 @@ type TeamAccessToken struct {
 
 	// A description of the token.
 	Description pulumi.StringPtrOutput `pulumi:"description"`
+	// When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`. Omit it for a token that never expires. Pulumi Cloud rejects an expiry that is in the past, more than two years away, or beyond the organization's maximum token lifetime.
+	Expires pulumi.StringPtrOutput `pulumi:"expires"`
 	// The name for the token, up to 40 characters. Organization and team tokens share one set of names per organization, and Pulumi Cloud never frees a deleted token's name, so the name must not have been used by any other token in the organization.
 	//
 	// If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). A replacement gets a new name. Removing `name` from an existing token keeps its current name until the next replacement.
@@ -74,6 +76,7 @@ func NewTeamAccessToken(ctx *pulumi.Context,
 	opts = append(opts, secrets)
 	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
 		"description",
+		"expires",
 		"name",
 		"organizationName",
 		"teamName",
@@ -114,6 +117,8 @@ func (TeamAccessTokenState) ElementType() reflect.Type {
 type teamAccessTokenArgs struct {
 	// A description of the token.
 	Description *string `pulumi:"description"`
+	// When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`. Omit it for a token that never expires. Pulumi Cloud rejects an expiry that is in the past, more than two years away, or beyond the organization's maximum token lifetime.
+	Expires *string `pulumi:"expires"`
 	// The name for the token, up to 40 characters. Organization and team tokens share one set of names per organization, and Pulumi Cloud never frees a deleted token's name, so the name must not have been used by any other token in the organization.
 	//
 	// If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). A replacement gets a new name. Removing `name` from an existing token keeps its current name until the next replacement.
@@ -130,6 +135,8 @@ type teamAccessTokenArgs struct {
 type TeamAccessTokenArgs struct {
 	// A description of the token.
 	Description pulumi.StringPtrInput
+	// When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`. Omit it for a token that never expires. Pulumi Cloud rejects an expiry that is in the past, more than two years away, or beyond the organization's maximum token lifetime.
+	Expires pulumi.StringPtrInput
 	// The name for the token, up to 40 characters. Organization and team tokens share one set of names per organization, and Pulumi Cloud never frees a deleted token's name, so the name must not have been used by any other token in the organization.
 	//
 	// If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). A replacement gets a new name. Removing `name` from an existing token keeps its current name until the next replacement.
@@ -232,6 +239,11 @@ func (o TeamAccessTokenOutput) ToTeamAccessTokenOutputWithContext(ctx context.Co
 // A description of the token.
 func (o TeamAccessTokenOutput) Description() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *TeamAccessToken) pulumi.StringPtrOutput { return v.Description }).(pulumi.StringPtrOutput)
+}
+
+// When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`. Omit it for a token that never expires. Pulumi Cloud rejects an expiry that is in the past, more than two years away, or beyond the organization's maximum token lifetime.
+func (o TeamAccessTokenOutput) Expires() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *TeamAccessToken) pulumi.StringPtrOutput { return v.Expires }).(pulumi.StringPtrOutput)
 }
 
 // The name for the token, up to 40 characters. Organization and team tokens share one set of names per organization, and Pulumi Cloud never frees a deleted token's name, so the name must not have been used by any other token in the organization.
