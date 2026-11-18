@@ -15,13 +15,151 @@
 package resources
 
 import (
+	"context"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/pulumi/pulumi-go-provider/infer"
+
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 )
+
+const (
+	testOidcIssuerID   = "issuer-123"
+	testOidcIssuerName = "test-issuer"
+	testOidcIssuerURL  = "https://example.com"
+	testAuthPolicyID   = "policy-1"
+	testPolicyRoleID   = "role-456"
+)
+
+type oidcIssuerClientMock struct {
+	config.Client
+	register func(
+		ctx context.Context, org string, req pulumiapi.OidcIssuerRegistrationRequest,
+	) (*pulumiapi.OidcIssuerRegistrationResponse, error)
+	update func(
+		ctx context.Context, org, issuerID string, req pulumiapi.OidcIssuerUpdateRequest,
+	) (*pulumiapi.OidcIssuerRegistrationResponse, error)
+	getPolicies    func(ctx context.Context, org, issuerID string) (*pulumiapi.AuthPolicy, error)
+	updatePolicies func(
+		ctx context.Context, org, policyID string, req pulumiapi.AuthPolicyUpdateRequest,
+	) (*pulumiapi.AuthPolicy, error)
+}
+
+func (c *oidcIssuerClientMock) RegisterOidcIssuer(
+	ctx context.Context, org string, req pulumiapi.OidcIssuerRegistrationRequest,
+) (*pulumiapi.OidcIssuerRegistrationResponse, error) {
+	return c.register(ctx, org, req)
+}
+
+func (c *oidcIssuerClientMock) UpdateOidcIssuer(
+	ctx context.Context, org, issuerID string, req pulumiapi.OidcIssuerUpdateRequest,
+) (*pulumiapi.OidcIssuerRegistrationResponse, error) {
+	return c.update(ctx, org, issuerID, req)
+}
+
+func (c *oidcIssuerClientMock) GetAuthPolicies(
+	ctx context.Context, org, issuerID string,
+) (*pulumiapi.AuthPolicy, error) {
+	return c.getPolicies(ctx, org, issuerID)
+}
+
+func (c *oidcIssuerClientMock) UpdateAuthPolicies(
+	ctx context.Context, org, policyID string, req pulumiapi.AuthPolicyUpdateRequest,
+) (*pulumiapi.AuthPolicy, error) {
+	return c.updatePolicies(ctx, org, policyID, req)
+}
+
+// newOidcIssuerClientMock returns a client whose auth policy calls behave like
+// Pulumi Cloud: the update response leaves out roleID, the read returns it.
+func newOidcIssuerClientMock(t *testing.T) *oidcIssuerClientMock {
+	t.Helper()
+	stored := &pulumiapi.AuthPolicy{ID: testAuthPolicyID}
+	return &oidcIssuerClientMock{
+		getPolicies: func(_ context.Context, org, issuerID string) (*pulumiapi.AuthPolicy, error) {
+			assert.Equal(t, gcMyOrg, org)
+			assert.Equal(t, testOidcIssuerID, issuerID)
+			return stored, nil
+		},
+		updatePolicies: func(
+			_ context.Context, org, policyID string, req pulumiapi.AuthPolicyUpdateRequest,
+		) (*pulumiapi.AuthPolicy, error) {
+			assert.Equal(t, gcMyOrg, org)
+			assert.Equal(t, testAuthPolicyID, policyID)
+			stored = &pulumiapi.AuthPolicy{ID: testAuthPolicyID, Version: stored.Version + 1}
+			response := &pulumiapi.AuthPolicy{ID: testAuthPolicyID, Version: stored.Version}
+			for i := range req.Definition {
+				stored.Definition = append(stored.Definition, &req.Definition[i])
+				withoutRole := req.Definition[i]
+				withoutRole.RoleID = nil
+				response.Definition = append(response.Definition, &withoutRole)
+			}
+			return response, nil
+		},
+	}
+}
+
+func testRolePolicies() []AuthPolicyDefinition {
+	roleID := testPolicyRoleID
+	return []AuthPolicyDefinition{{
+		Decision:  AuthPolicyDecisionAllow,
+		TokenType: AuthPolicyTokenTypeOrganization,
+		RoleID:    &roleID,
+		Rules:     map[string]string{"repository": "my-org/repo"},
+	}}
+}
+
+func TestOidcIssuerCreateKeepsPolicyRoleID(t *testing.T) {
+	mock := newOidcIssuerClientMock(t)
+	mock.register = func(
+		_ context.Context, org string, req pulumiapi.OidcIssuerRegistrationRequest,
+	) (*pulumiapi.OidcIssuerRegistrationResponse, error) {
+		assert.Equal(t, gcMyOrg, org)
+		return &pulumiapi.OidcIssuerRegistrationResponse{ID: testOidcIssuerID, Name: req.Name, URL: req.URL}, nil
+	}
+	ctx := config.WithMockClient(context.Background(), mock)
+
+	policies := testRolePolicies()
+	resp, err := (&OidcIssuer{}).Create(ctx, infer.CreateRequest[OidcIssuerInput]{
+		Inputs: OidcIssuerInput{
+			Organization: gcMyOrg,
+			Name:         testOidcIssuerName,
+			URL:          testOidcIssuerURL,
+			Policies:     policies,
+		},
+	})
+	require.NoError(t, err)
+	assert.Equal(t, oidcIssuerID(gcMyOrg, testOidcIssuerID), resp.ID)
+	assert.Equal(t, policies, resp.Output.Policies)
+}
+
+func TestOidcIssuerUpdateKeepsPolicyRoleID(t *testing.T) {
+	mock := newOidcIssuerClientMock(t)
+	mock.update = func(
+		_ context.Context, org, issuerID string, req pulumiapi.OidcIssuerUpdateRequest,
+	) (*pulumiapi.OidcIssuerRegistrationResponse, error) {
+		assert.Equal(t, gcMyOrg, org)
+		assert.Equal(t, testOidcIssuerID, issuerID)
+		return &pulumiapi.OidcIssuerRegistrationResponse{ID: issuerID, Name: *req.Name, URL: testOidcIssuerURL}, nil
+	}
+	ctx := config.WithMockClient(context.Background(), mock)
+
+	policies := testRolePolicies()
+	resp, err := (&OidcIssuer{}).Update(ctx, infer.UpdateRequest[OidcIssuerInput, OidcIssuerState]{
+		ID: oidcIssuerID(gcMyOrg, testOidcIssuerID),
+		Inputs: OidcIssuerInput{
+			Organization: gcMyOrg,
+			Name:         testOidcIssuerName,
+			URL:          testOidcIssuerURL,
+			Policies:     policies,
+		},
+	})
+	require.NoError(t, err)
+	assert.Equal(t, policies, resp.Output.Policies)
+}
 
 func TestOidcIssuerID(t *testing.T) {
 	assert.Equal(t, "my-org/issuer-123", oidcIssuerID(gcMyOrg, "issuer-123"))

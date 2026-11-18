@@ -219,15 +219,14 @@ func (*OidcIssuer) Create(
 	}
 
 	if len(req.Inputs.Policies) > 0 {
-		request := policiesToAPIRequest(req.Inputs.Policies)
-		authPolicy, err = client.UpdateAuthPolicies(ctx, req.Inputs.Organization, authPolicy.ID, request)
+		authPolicy, err = setAuthPolicies(
+			ctx, client, req.Inputs.Organization, registerResponse.ID, authPolicy.ID, req.Inputs.Policies,
+		)
 		if err != nil {
 			// Best-effort cleanup to avoid leaving the issuer in limbo when
 			// the user-supplied policies are rejected by the API.
 			_ = client.DeleteOidcIssuer(ctx, req.Inputs.Organization, registerResponse.ID)
-			return infer.CreateResponse[OidcIssuerState]{}, fmt.Errorf(
-				"error updating auth policies for oidc issuer %q: %w", registerResponse.ID, err,
-			)
+			return infer.CreateResponse[OidcIssuerState]{}, err
 		}
 	}
 
@@ -271,12 +270,11 @@ func (*OidcIssuer) Update(
 	}
 
 	if len(req.Inputs.Policies) > 0 {
-		request := policiesToAPIRequest(req.Inputs.Policies)
-		authPolicy, err = client.UpdateAuthPolicies(ctx, req.Inputs.Organization, authPolicy.ID, request)
+		authPolicy, err = setAuthPolicies(
+			ctx, client, req.Inputs.Organization, issuerID, authPolicy.ID, req.Inputs.Policies,
+		)
 		if err != nil {
-			return infer.UpdateResponse[OidcIssuerState]{}, fmt.Errorf(
-				"error updating auth policies for oidc issuer %q: %w", issuerID, err,
-			)
+			return infer.UpdateResponse[OidcIssuerState]{}, err
 		}
 	}
 
@@ -348,6 +346,25 @@ func oidcIssuerStateFromAPI(
 		input.Policies = apiPoliciesToInputs(authPolicy.Definition)
 	}
 	return newOidcIssuerState(input)
+}
+
+// setAuthPolicies replaces the issuer's auth policies and reads them back,
+// because the update response leaves out each policy's roleID.
+func setAuthPolicies(
+	ctx context.Context,
+	client config.Client,
+	organization, issuerID, policyID string,
+	policies []AuthPolicyDefinition,
+) (*pulumiapi.AuthPolicy, error) {
+	_, err := client.UpdateAuthPolicies(ctx, organization, policyID, policiesToAPIRequest(policies))
+	if err != nil {
+		return nil, fmt.Errorf("error updating auth policies for oidc issuer %q: %w", issuerID, err)
+	}
+	authPolicy, err := client.GetAuthPolicies(ctx, organization, issuerID)
+	if err != nil {
+		return nil, fmt.Errorf("error retrieving auth policies for oidc issuer %q: %w", issuerID, err)
+	}
+	return authPolicy, nil
 }
 
 func (i *OidcIssuerInput) toCreateRequest() pulumiapi.OidcIssuerRegistrationRequest {
