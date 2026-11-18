@@ -26,9 +26,11 @@ class DefinitionArgs:
                  definition_id: pulumi.Input[Optional[_builtins.str]] = None,
                  display_name: pulumi.Input[Optional[_builtins.str]] = None,
                  enabled_integrations: pulumi.Input[Optional[Sequence[Any]]] = None,
+                 model_provider: pulumi.Input[Optional[_builtins.str]] = None,
                  name: pulumi.Input[Optional[_builtins.str]] = None,
                  permission_mode: pulumi.Input[Optional[_builtins.str]] = None,
                  purpose: pulumi.Input[Optional[_builtins.str]] = None,
+                 reasoning_effort: pulumi.Input[Optional[_builtins.str]] = None,
                  role_id: pulumi.Input[Optional[_builtins.str]] = None):
         """
         The set of arguments for constructing a Definition resource.
@@ -40,9 +42,11 @@ class DefinitionArgs:
         :param pulumi.Input[_builtins.str] definition_id: The agent definition identifier
         :param pulumi.Input[_builtins.str] display_name: The human-readable label shown wherever the agent is displayed. Required unless name is supplied, in which case the name is used as the label too.
         :param pulumi.Input[Sequence[Any]] enabled_integrations: The integrations to enable for the agent's tasks, by id. Omitted or null inherits all organization integrations; an empty list enables none.
+        :param pulumi.Input[_builtins.str] model_provider: The model provider the agent's tasks run on: a provider name, or 'pulumi' for Pulumi's built-in models. On creation, omitted, null, or empty uses the organization's default provider; on update, omitted or null keeps the stored provider and empty returns to that default.
         :param pulumi.Input[_builtins.str] name: The agent's name: lower-case letters, digits and hyphens, at most 64 characters, unique within the organization. Optional -- when omitted it is derived from displayName, so a form that asks for one name still works. A name already taken by another agent is rejected with a 409 rather than silently suffixed. Supplying a different name on an update renames the agent, which is safe because every internal reference is by id.
         :param pulumi.Input[_builtins.str] permission_mode: Deprecated. Custom Agent authority is controlled by roleId and this field is ignored.
         :param pulumi.Input[_builtins.str] purpose: A one-line description of what this agent is for, shown under its name in the roster.
+        :param pulumi.Input[_builtins.str] reasoning_effort: Effort the agent's models reason or think at: 'low', 'medium', or 'high', for this agent only. On an 'openai-responses' provider it overrides the provider's reasoning effort; on an 'anthropic-messages' provider it sets the thinking effort of models that support adaptive thinking. With no provider it applies to whichever of these the organization's default is. Refused for 'pulumi' and a named 'openai-chat' provider, and ignored on a run whose provider cannot reason. On creation, omitted, null, or empty uses the provider's; on update, omitted or null keeps the stored effort and empty returns to the provider's.
         :param pulumi.Input[_builtins.str] role_id: The RBAC role id the agent's tasks assume. With Agents-as-Team-Members enabled, creation with omitted/null or empty uses the feature's read-only default; on update, omitted/null preserves the existing role and empty selects that default. A role that does not exist in the organization is rejected with a 404.
         """
         pulumi.set(__self__, "org_name", org_name)
@@ -58,12 +62,16 @@ class DefinitionArgs:
             pulumi.set(__self__, "display_name", display_name)
         if enabled_integrations is not None:
             pulumi.set(__self__, "enabled_integrations", enabled_integrations)
+        if model_provider is not None:
+            pulumi.set(__self__, "model_provider", model_provider)
         if name is not None:
             pulumi.set(__self__, "name", name)
         if permission_mode is not None:
             pulumi.set(__self__, "permission_mode", permission_mode)
         if purpose is not None:
             pulumi.set(__self__, "purpose", purpose)
+        if reasoning_effort is not None:
+            pulumi.set(__self__, "reasoning_effort", reasoning_effort)
         if role_id is not None:
             pulumi.set(__self__, "role_id", role_id)
 
@@ -152,6 +160,18 @@ class DefinitionArgs:
         pulumi.set(self, "enabled_integrations", value)
 
     @_builtins.property
+    @pulumi.getter(name="modelProvider")
+    def model_provider(self) -> pulumi.Input[Optional[_builtins.str]]:
+        """
+        The model provider the agent's tasks run on: a provider name, or 'pulumi' for Pulumi's built-in models. On creation, omitted, null, or empty uses the organization's default provider; on update, omitted or null keeps the stored provider and empty returns to that default.
+        """
+        return pulumi.get(self, "model_provider")
+
+    @model_provider.setter
+    def model_provider(self, value: pulumi.Input[Optional[_builtins.str]]):
+        pulumi.set(self, "model_provider", value)
+
+    @_builtins.property
     @pulumi.getter
     def name(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
@@ -188,6 +208,18 @@ class DefinitionArgs:
         pulumi.set(self, "purpose", value)
 
     @_builtins.property
+    @pulumi.getter(name="reasoningEffort")
+    def reasoning_effort(self) -> pulumi.Input[Optional[_builtins.str]]:
+        """
+        Effort the agent's models reason or think at: 'low', 'medium', or 'high', for this agent only. On an 'openai-responses' provider it overrides the provider's reasoning effort; on an 'anthropic-messages' provider it sets the thinking effort of models that support adaptive thinking. With no provider it applies to whichever of these the organization's default is. Refused for 'pulumi' and a named 'openai-chat' provider, and ignored on a run whose provider cannot reason. On creation, omitted, null, or empty uses the provider's; on update, omitted or null keeps the stored effort and empty returns to the provider's.
+        """
+        return pulumi.get(self, "reasoning_effort")
+
+    @reasoning_effort.setter
+    def reasoning_effort(self, value: pulumi.Input[Optional[_builtins.str]]):
+        pulumi.set(self, "reasoning_effort", value)
+
+    @_builtins.property
     @pulumi.getter(name="roleId")
     def role_id(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
@@ -212,10 +244,12 @@ class Definition(pulumi.CustomResource):
                  definition_id: pulumi.Input[Optional[_builtins.str]] = None,
                  display_name: pulumi.Input[Optional[_builtins.str]] = None,
                  enabled_integrations: pulumi.Input[Optional[Sequence[Any]]] = None,
+                 model_provider: pulumi.Input[Optional[_builtins.str]] = None,
                  name: pulumi.Input[Optional[_builtins.str]] = None,
                  org_name: pulumi.Input[Optional[_builtins.str]] = None,
                  permission_mode: pulumi.Input[Optional[_builtins.str]] = None,
                  purpose: pulumi.Input[Optional[_builtins.str]] = None,
+                 reasoning_effort: pulumi.Input[Optional[_builtins.str]] = None,
                  role_id: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         """
@@ -229,10 +263,12 @@ class Definition(pulumi.CustomResource):
         :param pulumi.Input[_builtins.str] definition_id: The agent definition identifier
         :param pulumi.Input[_builtins.str] display_name: The human-readable label shown wherever the agent is displayed. Required unless name is supplied, in which case the name is used as the label too.
         :param pulumi.Input[Sequence[Any]] enabled_integrations: The integrations to enable for the agent's tasks, by id. Omitted or null inherits all organization integrations; an empty list enables none.
+        :param pulumi.Input[_builtins.str] model_provider: The model provider the agent's tasks run on: a provider name, or 'pulumi' for Pulumi's built-in models. On creation, omitted, null, or empty uses the organization's default provider; on update, omitted or null keeps the stored provider and empty returns to that default.
         :param pulumi.Input[_builtins.str] name: The agent's name: lower-case letters, digits and hyphens, at most 64 characters, unique within the organization. Optional -- when omitted it is derived from displayName, so a form that asks for one name still works. A name already taken by another agent is rejected with a 409 rather than silently suffixed. Supplying a different name on an update renames the agent, which is safe because every internal reference is by id.
         :param pulumi.Input[_builtins.str] org_name: The organization name
         :param pulumi.Input[_builtins.str] permission_mode: Deprecated. Custom Agent authority is controlled by roleId and this field is ignored.
         :param pulumi.Input[_builtins.str] purpose: A one-line description of what this agent is for, shown under its name in the roster.
+        :param pulumi.Input[_builtins.str] reasoning_effort: Effort the agent's models reason or think at: 'low', 'medium', or 'high', for this agent only. On an 'openai-responses' provider it overrides the provider's reasoning effort; on an 'anthropic-messages' provider it sets the thinking effort of models that support adaptive thinking. With no provider it applies to whichever of these the organization's default is. Refused for 'pulumi' and a named 'openai-chat' provider, and ignored on a run whose provider cannot reason. On creation, omitted, null, or empty uses the provider's; on update, omitted or null keeps the stored effort and empty returns to the provider's.
         :param pulumi.Input[_builtins.str] role_id: The RBAC role id the agent's tasks assume. With Agents-as-Team-Members enabled, creation with omitted/null or empty uses the feature's read-only default; on update, omitted/null preserves the existing role and empty selects that default. A role that does not exist in the organization is rejected with a 404.
         """
         ...
@@ -265,10 +301,12 @@ class Definition(pulumi.CustomResource):
                  definition_id: pulumi.Input[Optional[_builtins.str]] = None,
                  display_name: pulumi.Input[Optional[_builtins.str]] = None,
                  enabled_integrations: pulumi.Input[Optional[Sequence[Any]]] = None,
+                 model_provider: pulumi.Input[Optional[_builtins.str]] = None,
                  name: pulumi.Input[Optional[_builtins.str]] = None,
                  org_name: pulumi.Input[Optional[_builtins.str]] = None,
                  permission_mode: pulumi.Input[Optional[_builtins.str]] = None,
                  purpose: pulumi.Input[Optional[_builtins.str]] = None,
+                 reasoning_effort: pulumi.Input[Optional[_builtins.str]] = None,
                  role_id: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
@@ -285,12 +323,14 @@ class Definition(pulumi.CustomResource):
             __props__.__dict__["definition_id"] = definition_id
             __props__.__dict__["display_name"] = display_name
             __props__.__dict__["enabled_integrations"] = enabled_integrations
+            __props__.__dict__["model_provider"] = model_provider
             __props__.__dict__["name"] = name
             if org_name is None and not opts.urn:
                 raise TypeError("Missing required property 'org_name'")
             __props__.__dict__["org_name"] = org_name
             __props__.__dict__["permission_mode"] = permission_mode
             __props__.__dict__["purpose"] = purpose
+            __props__.__dict__["reasoning_effort"] = reasoning_effort
             __props__.__dict__["role_id"] = role_id
             __props__.__dict__["paused_at"] = None
             __props__.__dict__["paused_by"] = None
@@ -324,12 +364,14 @@ class Definition(pulumi.CustomResource):
         __props__.__dict__["definition_id"] = None
         __props__.__dict__["display_name"] = None
         __props__.__dict__["enabled_integrations"] = None
+        __props__.__dict__["model_provider"] = None
         __props__.__dict__["name"] = None
         __props__.__dict__["paused_at"] = None
         __props__.__dict__["paused_by"] = None
         __props__.__dict__["paused_reason"] = None
         __props__.__dict__["permission_mode"] = None
         __props__.__dict__["purpose"] = None
+        __props__.__dict__["reasoning_effort"] = None
         __props__.__dict__["role_id"] = None
         __props__.__dict__["task_counts"] = None
         return Definition(resource_name, opts=opts, __props__=__props__)
@@ -383,6 +425,14 @@ class Definition(pulumi.CustomResource):
         return pulumi.get(self, "enabled_integrations")
 
     @_builtins.property
+    @pulumi.getter(name="modelProvider")
+    def model_provider(self) -> pulumi.Output[Optional[_builtins.str]]:
+        """
+        The model provider the agent's tasks run on: a provider name, or 'pulumi' for Pulumi's built-in models. Omitted or null uses the organization's default provider.
+        """
+        return pulumi.get(self, "model_provider")
+
+    @_builtins.property
     @pulumi.getter
     def name(self) -> pulumi.Output[_builtins.str]:
         """
@@ -429,6 +479,14 @@ class Definition(pulumi.CustomResource):
         A one-line description of what this agent is for, shown under its name in the roster.
         """
         return pulumi.get(self, "purpose")
+
+    @_builtins.property
+    @pulumi.getter(name="reasoningEffort")
+    def reasoning_effort(self) -> pulumi.Output[Optional[_builtins.str]]:
+        """
+        Effort the agent's models reason or think at: 'low', 'medium', or 'high', for this agent only. On an 'openai-responses' provider it overrides the provider's reasoning effort; on an 'anthropic-messages' provider it sets the thinking effort of models that support adaptive thinking. With no provider it applies to whichever of these the organization's default is. Refused for 'pulumi' and a named 'openai-chat' provider, and ignored on a run whose provider cannot reason. Omitted or null uses the provider's.
+        """
+        return pulumi.get(self, "reasoning_effort")
 
     @_builtins.property
     @pulumi.getter(name="roleId")

@@ -109,6 +109,21 @@ public final class DefinitionArgs extends com.pulumi.resources.ResourceArgs {
     }
 
     /**
+     * The model provider the agent&#39;s tasks run on: a provider name, or &#39;pulumi&#39; for Pulumi&#39;s built-in models. On creation, omitted, null, or empty uses the organization&#39;s default provider; on update, omitted or null keeps the stored provider and empty returns to that default.
+     * 
+     */
+    @Import(name="modelProvider")
+    private @Nullable Output<String> modelProvider;
+
+    /**
+     * @return The model provider the agent&#39;s tasks run on: a provider name, or &#39;pulumi&#39; for Pulumi&#39;s built-in models. On creation, omitted, null, or empty uses the organization&#39;s default provider; on update, omitted or null keeps the stored provider and empty returns to that default.
+     * 
+     */
+    public Optional<Output<String>> modelProvider() {
+        return Optional.ofNullable(this.modelProvider);
+    }
+
+    /**
      * The agent&#39;s name: lower-case letters, digits and hyphens, at most 64 characters, unique within the organization. Optional -- when omitted it is derived from displayName, so a form that asks for one name still works. A name already taken by another agent is rejected with a 409 rather than silently suffixed. Supplying a different name on an update renames the agent, which is safe because every internal reference is by id.
      * 
      */
@@ -169,6 +184,21 @@ public final class DefinitionArgs extends com.pulumi.resources.ResourceArgs {
     }
 
     /**
+     * Effort the agent&#39;s models reason or think at: &#39;low&#39;, &#39;medium&#39;, or &#39;high&#39;, for this agent only. On an &#39;openai-responses&#39; provider it overrides the provider&#39;s reasoning effort; on an &#39;anthropic-messages&#39; provider it sets the thinking effort of models that support adaptive thinking. With no provider it applies to whichever of these the organization&#39;s default is. Refused for &#39;pulumi&#39; and a named &#39;openai-chat&#39; provider, and ignored on a run whose provider cannot reason. On creation, omitted, null, or empty uses the provider&#39;s; on update, omitted or null keeps the stored effort and empty returns to the provider&#39;s.
+     * 
+     */
+    @Import(name="reasoningEffort")
+    private @Nullable Output<String> reasoningEffort;
+
+    /**
+     * @return Effort the agent&#39;s models reason or think at: &#39;low&#39;, &#39;medium&#39;, or &#39;high&#39;, for this agent only. On an &#39;openai-responses&#39; provider it overrides the provider&#39;s reasoning effort; on an &#39;anthropic-messages&#39; provider it sets the thinking effort of models that support adaptive thinking. With no provider it applies to whichever of these the organization&#39;s default is. Refused for &#39;pulumi&#39; and a named &#39;openai-chat&#39; provider, and ignored on a run whose provider cannot reason. On creation, omitted, null, or empty uses the provider&#39;s; on update, omitted or null keeps the stored effort and empty returns to the provider&#39;s.
+     * 
+     */
+    public Optional<Output<String>> reasoningEffort() {
+        return Optional.ofNullable(this.reasoningEffort);
+    }
+
+    /**
      * The RBAC role id the agent&#39;s tasks assume. With Agents-as-Team-Members enabled, creation with omitted/null or empty uses the feature&#39;s read-only default; on update, omitted/null preserves the existing role and empty selects that default. A role that does not exist in the organization is rejected with a 404.
      * 
      */
@@ -192,10 +222,12 @@ public final class DefinitionArgs extends com.pulumi.resources.ResourceArgs {
         this.definitionID = $.definitionID;
         this.displayName = $.displayName;
         this.enabledIntegrations = $.enabledIntegrations;
+        this.modelProvider = $.modelProvider;
         this.name = $.name;
         this.orgName = $.orgName;
         this.permissionMode = $.permissionMode;
         this.purpose = $.purpose;
+        this.reasoningEffort = $.reasoningEffort;
         this.roleId = $.roleId;
     }
 
@@ -354,6 +386,27 @@ public final class DefinitionArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
+         * @param modelProvider The model provider the agent&#39;s tasks run on: a provider name, or &#39;pulumi&#39; for Pulumi&#39;s built-in models. On creation, omitted, null, or empty uses the organization&#39;s default provider; on update, omitted or null keeps the stored provider and empty returns to that default.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder modelProvider(@Nullable Output<String> modelProvider) {
+            $.modelProvider = modelProvider;
+            return this;
+        }
+
+        /**
+         * @param modelProvider The model provider the agent&#39;s tasks run on: a provider name, or &#39;pulumi&#39; for Pulumi&#39;s built-in models. On creation, omitted, null, or empty uses the organization&#39;s default provider; on update, omitted or null keeps the stored provider and empty returns to that default.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder modelProvider(String modelProvider) {
+            return modelProvider(Output.of(modelProvider));
+        }
+
+        /**
          * @param name The agent&#39;s name: lower-case letters, digits and hyphens, at most 64 characters, unique within the organization. Optional -- when omitted it is derived from displayName, so a form that asks for one name still works. A name already taken by another agent is rejected with a 409 rather than silently suffixed. Supplying a different name on an update renames the agent, which is safe because every internal reference is by id.
          * 
          * @return builder
@@ -435,6 +488,27 @@ public final class DefinitionArgs extends com.pulumi.resources.ResourceArgs {
          */
         public Builder purpose(String purpose) {
             return purpose(Output.of(purpose));
+        }
+
+        /**
+         * @param reasoningEffort Effort the agent&#39;s models reason or think at: &#39;low&#39;, &#39;medium&#39;, or &#39;high&#39;, for this agent only. On an &#39;openai-responses&#39; provider it overrides the provider&#39;s reasoning effort; on an &#39;anthropic-messages&#39; provider it sets the thinking effort of models that support adaptive thinking. With no provider it applies to whichever of these the organization&#39;s default is. Refused for &#39;pulumi&#39; and a named &#39;openai-chat&#39; provider, and ignored on a run whose provider cannot reason. On creation, omitted, null, or empty uses the provider&#39;s; on update, omitted or null keeps the stored effort and empty returns to the provider&#39;s.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder reasoningEffort(@Nullable Output<String> reasoningEffort) {
+            $.reasoningEffort = reasoningEffort;
+            return this;
+        }
+
+        /**
+         * @param reasoningEffort Effort the agent&#39;s models reason or think at: &#39;low&#39;, &#39;medium&#39;, or &#39;high&#39;, for this agent only. On an &#39;openai-responses&#39; provider it overrides the provider&#39;s reasoning effort; on an &#39;anthropic-messages&#39; provider it sets the thinking effort of models that support adaptive thinking. With no provider it applies to whichever of these the organization&#39;s default is. Refused for &#39;pulumi&#39; and a named &#39;openai-chat&#39; provider, and ignored on a run whose provider cannot reason. On creation, omitted, null, or empty uses the provider&#39;s; on update, omitted or null keeps the stored effort and empty returns to the provider&#39;s.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder reasoningEffort(String reasoningEffort) {
+            return reasoningEffort(Output.of(reasoningEffort));
         }
 
         /**

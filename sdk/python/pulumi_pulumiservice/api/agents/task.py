@@ -35,7 +35,7 @@ class TaskArgs:
         The set of arguments for constructing a Task resource.
 
         :param pulumi.Input[_builtins.str] org_name: The organization name
-        :param pulumi.Input[_builtins.str] agent_definition_id: Optional Custom Agent definition id to run this task as. When set, the task's role, permission mode, and enabled integrations are taken from the named agent definition instead of from this request, and the task is attributed to that agent. The agent's instructions and approval mode are not copied at creation: they are read from the definition on every turn, so editing the agent applies to the next turn of every run. A preview capability, gated per organization.
+        :param pulumi.Input[_builtins.str] agent_definition_id: Optional Custom Agent definition id to run this task as. When set, the task's role and enabled integrations are taken from the named agent definition instead of from this request, and the task is attributed to that agent. The agent's instructions and approval mode are not copied at creation: they are read from the definition on every turn, so editing the agent applies to the next turn of every run. A preview capability, gated per organization.
         :param pulumi.Input[_builtins.str] approval_mode: Optional approval mode override for this task. If omitted, org default is used.
         :param pulumi.Input[Sequence[Any]] cli_integrations: Optional filter for CLI integrations to enable for this task. Semantics: omitted/null → enable all CLI integrations connected for the org; empty list → explicit opt-out (no CLI integrations for this task); populated list → whitelist by (catalogId, name) of the configured instances to enable. Entries with missing or unknown catalogId, missing name, or referencing a (catalogId, name) pair that is not connected for the organization are rejected with a 400 response. catalogId matching is case-insensitive.
         :param pulumi.Input[Sequence[Any]] enabled_integrations: Optional list of integrations to enable for this task. Semantics: omitted/null → inherit all org-enabled integrations; empty list → explicit opt-out (no integration credentials for this task); populated list → whitelist of specific integrations by ID. Modeled as an object array rather than a bare string array so multi-instance support (instance_name, scope, etc.) can be added later without a wire break.
@@ -87,7 +87,7 @@ class TaskArgs:
     @pulumi.getter(name="agentDefinitionId")
     def agent_definition_id(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
-        Optional Custom Agent definition id to run this task as. When set, the task's role, permission mode, and enabled integrations are taken from the named agent definition instead of from this request, and the task is attributed to that agent. The agent's instructions and approval mode are not copied at creation: they are read from the definition on every turn, so editing the agent applies to the next turn of every run. A preview capability, gated per organization.
+        Optional Custom Agent definition id to run this task as. When set, the task's role and enabled integrations are taken from the named agent definition instead of from this request, and the task is attributed to that agent. The agent's instructions and approval mode are not copied at creation: they are read from the definition on every turn, so editing the agent applies to the next turn of every run. A preview capability, gated per organization.
         """
         return pulumi.get(self, "agent_definition_id")
 
@@ -240,7 +240,7 @@ class Task(pulumi.CustomResource):
 
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
-        :param pulumi.Input[_builtins.str] agent_definition_id: Optional Custom Agent definition id to run this task as. When set, the task's role, permission mode, and enabled integrations are taken from the named agent definition instead of from this request, and the task is attributed to that agent. The agent's instructions and approval mode are not copied at creation: they are read from the definition on every turn, so editing the agent applies to the next turn of every run. A preview capability, gated per organization.
+        :param pulumi.Input[_builtins.str] agent_definition_id: Optional Custom Agent definition id to run this task as. When set, the task's role and enabled integrations are taken from the named agent definition instead of from this request, and the task is attributed to that agent. The agent's instructions and approval mode are not copied at creation: they are read from the definition on every turn, so editing the agent applies to the next turn of every run. A preview capability, gated per organization.
         :param pulumi.Input[_builtins.str] approval_mode: Optional approval mode override for this task. If omitted, org default is used.
         :param pulumi.Input[Sequence[Any]] cli_integrations: Optional filter for CLI integrations to enable for this task. Semantics: omitted/null → enable all CLI integrations connected for the org; empty list → explicit opt-out (no CLI integrations for this task); populated list → whitelist by (catalogId, name) of the configured instances to enable. Entries with missing or unknown catalogId, missing name, or referencing a (catalogId, name) pair that is not connected for the organization are rejected with a 400 response. catalogId matching is case-insensitive.
         :param pulumi.Input[Sequence[Any]] enabled_integrations: Optional list of integrations to enable for this task. Semantics: omitted/null → inherit all org-enabled integrations; empty list → explicit opt-out (no integration credentials for this task); populated list → whitelist of specific integrations by ID. Modeled as an object array rather than a bare string array so multi-instance support (instance_name, scope, etc.) can be added later without a wire break.
@@ -312,6 +312,7 @@ class Task(pulumi.CustomResource):
             __props__.__dict__["source"] = source
             __props__.__dict__["task_id"] = task_id
             __props__.__dict__["tool_execution_mode"] = tool_execution_mode
+            __props__.__dict__["archived_at"] = None
             __props__.__dict__["async_trigger_type"] = None
             __props__.__dict__["context_compaction_threshold_percent"] = None
             __props__.__dict__["context_used_tokens"] = None
@@ -319,8 +320,11 @@ class Task(pulumi.CustomResource):
             __props__.__dict__["created_at"] = None
             __props__.__dict__["created_by"] = None
             __props__.__dict__["entities"] = None
+            __props__.__dict__["interaction_mode"] = None
             __props__.__dict__["is_shared"] = None
             __props__.__dict__["last_heartbeat"] = None
+            __props__.__dict__["model"] = None
+            __props__.__dict__["model_provider"] = None
             __props__.__dict__["name"] = None
             __props__.__dict__["pending_input_count"] = None
             __props__.__dict__["role_name"] = None
@@ -355,6 +359,7 @@ class Task(pulumi.CustomResource):
 
         __props__.__dict__["agent_definition_id"] = None
         __props__.__dict__["approval_mode"] = None
+        __props__.__dict__["archived_at"] = None
         __props__.__dict__["async_trigger_type"] = None
         __props__.__dict__["context_compaction_threshold_percent"] = None
         __props__.__dict__["context_used_tokens"] = None
@@ -362,8 +367,11 @@ class Task(pulumi.CustomResource):
         __props__.__dict__["created_at"] = None
         __props__.__dict__["created_by"] = None
         __props__.__dict__["entities"] = None
+        __props__.__dict__["interaction_mode"] = None
         __props__.__dict__["is_shared"] = None
         __props__.__dict__["last_heartbeat"] = None
+        __props__.__dict__["model"] = None
+        __props__.__dict__["model_provider"] = None
         __props__.__dict__["name"] = None
         __props__.__dict__["pending_input_count"] = None
         __props__.__dict__["permission_mode"] = None
@@ -396,6 +404,14 @@ class Task(pulumi.CustomResource):
         Approval mode for this task. Valid values: 'manual', 'auto', 'balanced'.
         """
         return pulumi.get(self, "approval_mode")
+
+    @_builtins.property
+    @pulumi.getter(name="archivedAt")
+    def archived_at(self) -> pulumi.Output[Optional[_builtins.str]]:
+        """
+        When the task was archived. Null while the task remains active.
+        """
+        return pulumi.get(self, "archived_at")
 
     @_builtins.property
     @pulumi.getter(name="asyncTriggerType")
@@ -454,6 +470,14 @@ class Task(pulumi.CustomResource):
         return pulumi.get(self, "entities")
 
     @_builtins.property
+    @pulumi.getter(name="interactionMode")
+    def interaction_mode(self) -> pulumi.Output[Optional[_builtins.str]]:
+        """
+        Whether the task accepts user interaction. Read-only tasks do not accept follow-up input.
+        """
+        return pulumi.get(self, "interaction_mode")
+
+    @_builtins.property
     @pulumi.getter(name="isShared")
     def is_shared(self) -> pulumi.Output[_builtins.bool]:
         """
@@ -468,6 +492,22 @@ class Task(pulumi.CustomResource):
         When the task runtime last reported a heartbeat. Null if the runtime has never checked in.
         """
         return pulumi.get(self, "last_heartbeat")
+
+    @_builtins.property
+    @pulumi.getter
+    def model(self) -> pulumi.Output[Optional[_builtins.str]]:
+        """
+        The model the task's main loop last ran on, as its provider reported it. Null until the task has used a model.
+        """
+        return pulumi.get(self, "model")
+
+    @_builtins.property
+    @pulumi.getter(name="modelProvider")
+    def model_provider(self) -> pulumi.Output[Optional[_builtins.str]]:
+        """
+        The model provider the task's turns run on, pinned at its first turn: 'pulumi' for Pulumi's built-in models, or the name of one of the organization's model providers. Null until the first turn.
+        """
+        return pulumi.get(self, "model_provider")
 
     @_builtins.property
     @pulumi.getter

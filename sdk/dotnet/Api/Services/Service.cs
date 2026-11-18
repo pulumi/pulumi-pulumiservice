@@ -92,7 +92,7 @@ namespace Pulumi.PulumiService.Api.Services
         }
 
         /// <summary>
-        /// the name of the service
+        /// The name of the service. Between 1 and 80 characters.
         /// </summary>
         [Input("name", required: true)]
         public Input<string> Name { get; set; } = null!;
