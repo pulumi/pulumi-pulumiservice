@@ -393,6 +393,16 @@
       },
       "token": "pulumiservice:api:OrganizationWebhook"
     },
+    "pulumiservice:api:OriginIntegration": {
+      "idFormat": "{orgName}/{integrationId}",
+      "operations": {
+        "create": "UpdateOriginIntegration",
+        "delete": "DeleteOriginIntegration",
+        "update": "UpdateOriginIntegration"
+      },
+      "requireImport": true,
+      "token": "pulumiservice:api/integrations:OriginIntegration"
+    },
     "pulumiservice:api:PersonalToken": {
       "fields": {
         "tokenValue": {
@@ -408,6 +418,28 @@
         "tokenId": "id"
       },
       "token": "pulumiservice:api/tokens:PersonalToken"
+    },
+    "pulumiservice:api:PolicyException": {
+      "idFormat": "{orgName}/{exceptionId}",
+      "operations": {
+        "create": "CreatePolicyException",
+        "delete": "RemovePolicyException",
+        "read": "GetPolicyException"
+      },
+      "renames": {
+        "exceptionId": "id"
+      },
+      "token": "pulumiservice:api/policy:Exception"
+    },
+    "pulumiservice:api:PolicyFinding": {
+      "idFormat": "{orgName}/{findingId}",
+      "operations": {
+        "create": "UpdatePolicyFinding",
+        "read": "GetPolicyFinding",
+        "update": "UpdatePolicyFinding"
+      },
+      "requireImport": true,
+      "token": "pulumiservice:api/policy:Finding"
     },
     "pulumiservice:api:PolicyGroup": {
       "deleteBeforeReplace": true,

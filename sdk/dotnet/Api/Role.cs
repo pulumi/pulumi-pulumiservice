@@ -40,6 +40,12 @@ namespace Pulumi.PulumiService.Api
         public Output<object?> Details { get; private set; } = null!;
 
         /// <summary>
+        /// Whether this role is the organization's Member (legacy) role, a copy of what members could do before the organization moved to built-in roles.
+        /// </summary>
+        [Output("isCompatibilityRole")]
+        public Output<bool?> IsCompatibilityRole { get; private set; } = null!;
+
+        /// <summary>
         /// Whether this role is the organization default.
         /// </summary>
         [Output("isOrgDefault")]

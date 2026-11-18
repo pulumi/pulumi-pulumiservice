@@ -20,6 +20,12 @@ import (
 var resourceExampleWaivers = map[string]string{
 	"pulumiservice:api/esc:OpenEnvironmentRequest": "Function-shaped resource: create/read/update only, no delete. " +
 		"Models an internal ESC env-editing session, not a user-managed IaC resource.",
+	"pulumiservice:api/integrations:OriginIntegration": "Manages the settings of an Origin integration " +
+		"that already exists, so it has to be imported. The test org has no Origin integration to import.",
+	"pulumiservice:api/policy:Exception": "Pulumi Cloud only creates an exception for a policy pack in one " +
+		"of the organization's policy groups. No example provisions such a pack yet.",
+	"pulumiservice:api/policy:Finding": "Manages a finding that a policy evaluation created, so it has to " +
+		"be imported. The test org has no stable finding to import.",
 }
 
 // TestEveryApiResourceHasExample asserts that every api token declared in

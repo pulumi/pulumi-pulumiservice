@@ -69,6 +69,7 @@ import * as esc from "./esc";
 import * as insights from "./insights";
 import * as integrations from "./integrations";
 import * as neo from "./neo";
+import * as policy from "./policy";
 import * as services from "./services";
 import * as stacks from "./stacks";
 import * as teams from "./teams";
@@ -82,6 +83,7 @@ export {
     insights,
     integrations,
     neo,
+    policy,
     services,
     stacks,
     teams,

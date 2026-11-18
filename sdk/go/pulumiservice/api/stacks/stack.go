@@ -29,6 +29,8 @@ type Stack struct {
 	Config pulumi.AnyOutput `pulumi:"config"`
 	// Information about a live operation currently running for the stack, its kind, the author who initiated it, and its start time. Null when no operation is in flight.
 	CurrentOperation pulumi.AnyOutput `pulumi:"currentOperation"`
+	// The ESC environment this stack manages, which holds the stack's configuration, as <project>/<name>. Read-only; omitted when the stack does not manage an environment. The name stays set after the environment is deleted. Returned to anyone who can read the stack, whether or not they can read the environment.
+	ManagedEnvironment pulumi.StringPtrOutput `pulumi:"managedEnvironment"`
 	// The organization name
 	OrgName pulumi.StringOutput `pulumi:"orgName"`
 	// The project name
@@ -92,6 +94,8 @@ func (StackState) ElementType() reflect.Type {
 type stackArgs struct {
 	// The configuration for the new stack.
 	Config interface{} `pulumi:"config"`
+	// Whether the service should create an ESC environment that the stack manages.
+	CreateManagedEnvironment *bool `pulumi:"createManagedEnvironment"`
 	// The organization name
 	OrgName string `pulumi:"orgName"`
 	// The project name
@@ -110,6 +114,8 @@ type stackArgs struct {
 type StackArgs struct {
 	// The configuration for the new stack.
 	Config pulumi.Input
+	// Whether the service should create an ESC environment that the stack manages.
+	CreateManagedEnvironment pulumi.BoolPtrInput
 	// The organization name
 	OrgName pulumi.StringInput
 	// The project name
@@ -225,6 +231,11 @@ func (o StackOutput) Config() pulumi.AnyOutput {
 // Information about a live operation currently running for the stack, its kind, the author who initiated it, and its start time. Null when no operation is in flight.
 func (o StackOutput) CurrentOperation() pulumi.AnyOutput {
 	return o.ApplyT(func(v *Stack) pulumi.AnyOutput { return v.CurrentOperation }).(pulumi.AnyOutput)
+}
+
+// The ESC environment this stack manages, which holds the stack's configuration, as <project>/<name>. Read-only; omitted when the stack does not manage an environment. The name stays set after the environment is deleted. Returned to anyone who can read the stack, whether or not they can read the environment.
+func (o StackOutput) ManagedEnvironment() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *Stack) pulumi.StringPtrOutput { return v.ManagedEnvironment }).(pulumi.StringPtrOutput)
 }
 
 // The organization name

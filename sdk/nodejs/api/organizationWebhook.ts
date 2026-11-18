@@ -80,7 +80,7 @@ export class OrganizationWebhook extends pulumi.CustomResource {
      */
     declare public /*out*/ readonly hasSecret: pulumi.Output<boolean>;
     /**
-     * The unique identifier name for the webhook within its scope. Optional on creation; if omitted, the service generates a short random name. Always populated in responses.
+     * The unique identifier name for the webhook within its scope. Optional on creation; if omitted, the service generates a short random name. Always populated in responses. Up to 32 characters of letters, numbers, hyphens, underscores, and periods. On update, the name comes from the URL and this field is ignored.
      */
     declare public readonly name: pulumi.Output<string | undefined>;
     /**
@@ -198,7 +198,7 @@ export interface OrganizationWebhookArgs {
      */
     groups?: pulumi.Input<pulumi.Input<string>[] | undefined>;
     /**
-     * The unique identifier name for the webhook within its scope. Optional on creation; if omitted, the service generates a short random name. Always populated in responses.
+     * The unique identifier name for the webhook within its scope. Optional on creation; if omitted, the service generates a short random name. Always populated in responses. Up to 32 characters of letters, numbers, hyphens, underscores, and periods. On update, the name comes from the URL and this field is ignored.
      */
     name?: pulumi.Input<string | undefined>;
     /**
