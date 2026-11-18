@@ -47,6 +47,10 @@ import com.pulumi.pulumiservice.inputs.GetPolicyPacksArgs;
 import com.pulumi.pulumiservice.inputs.GetPolicyPacksPlainArgs;
 import com.pulumi.pulumiservice.inputs.GetStackArgs;
 import com.pulumi.pulumiservice.inputs.GetStackPlainArgs;
+import com.pulumi.pulumiservice.inputs.GetTeamArgs;
+import com.pulumi.pulumiservice.inputs.GetTeamPlainArgs;
+import com.pulumi.pulumiservice.inputs.GetTeamsArgs;
+import com.pulumi.pulumiservice.inputs.GetTeamsPlainArgs;
 import com.pulumi.pulumiservice.outputs.BuildAccountMatchRuleResult;
 import com.pulumi.pulumiservice.outputs.BuildAllowPermissionsResult;
 import com.pulumi.pulumiservice.outputs.BuildEnvironmentScopedPermissionsResult;
@@ -66,6 +70,8 @@ import com.pulumi.pulumiservice.outputs.GetOrganizationRolesResult;
 import com.pulumi.pulumiservice.outputs.GetPolicyPackResult;
 import com.pulumi.pulumiservice.outputs.GetPolicyPacksResult;
 import com.pulumi.pulumiservice.outputs.GetStackResult;
+import com.pulumi.pulumiservice.outputs.GetTeamResult;
+import com.pulumi.pulumiservice.outputs.GetTeamsResult;
 import java.util.concurrent.CompletableFuture;
 
 public final class PulumiserviceFunctions {
@@ -1381,5 +1387,75 @@ public final class PulumiserviceFunctions {
      */
     public static CompletableFuture<GetStackResult> getStackPlain(GetStackPlainArgs args, InvokeOptions options) {
         return Deployment.getInstance().invokeAsync("pulumiservice:index:getStack", TypeShape.of(GetStackResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Looks up a team of a Pulumi Cloud organization by name, for example the Everyone team, `everyone`. Returns an error when the team is not found.
+     * 
+     */
+    public static Output<GetTeamResult> getTeam(GetTeamArgs args) {
+        return getTeam(args, InvokeOptions.Empty);
+    }
+    /**
+     * Looks up a team of a Pulumi Cloud organization by name, for example the Everyone team, `everyone`. Returns an error when the team is not found.
+     * 
+     */
+    public static CompletableFuture<GetTeamResult> getTeamPlain(GetTeamPlainArgs args) {
+        return getTeamPlain(args, InvokeOptions.Empty);
+    }
+    /**
+     * Looks up a team of a Pulumi Cloud organization by name, for example the Everyone team, `everyone`. Returns an error when the team is not found.
+     * 
+     */
+    public static Output<GetTeamResult> getTeam(GetTeamArgs args, InvokeOptions options) {
+        return Deployment.getInstance().invoke("pulumiservice:index:getTeam", TypeShape.of(GetTeamResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Looks up a team of a Pulumi Cloud organization by name, for example the Everyone team, `everyone`. Returns an error when the team is not found.
+     * 
+     */
+    public static Output<GetTeamResult> getTeam(GetTeamArgs args, InvokeOutputOptions options) {
+        return Deployment.getInstance().invoke("pulumiservice:index:getTeam", TypeShape.of(GetTeamResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Looks up a team of a Pulumi Cloud organization by name, for example the Everyone team, `everyone`. Returns an error when the team is not found.
+     * 
+     */
+    public static CompletableFuture<GetTeamResult> getTeamPlain(GetTeamPlainArgs args, InvokeOptions options) {
+        return Deployment.getInstance().invokeAsync("pulumiservice:index:getTeam", TypeShape.of(GetTeamResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Lists the teams of a Pulumi Cloud organization, including the Everyone team.
+     * 
+     */
+    public static Output<GetTeamsResult> getTeams(GetTeamsArgs args) {
+        return getTeams(args, InvokeOptions.Empty);
+    }
+    /**
+     * Lists the teams of a Pulumi Cloud organization, including the Everyone team.
+     * 
+     */
+    public static CompletableFuture<GetTeamsResult> getTeamsPlain(GetTeamsPlainArgs args) {
+        return getTeamsPlain(args, InvokeOptions.Empty);
+    }
+    /**
+     * Lists the teams of a Pulumi Cloud organization, including the Everyone team.
+     * 
+     */
+    public static Output<GetTeamsResult> getTeams(GetTeamsArgs args, InvokeOptions options) {
+        return Deployment.getInstance().invoke("pulumiservice:index:getTeams", TypeShape.of(GetTeamsResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Lists the teams of a Pulumi Cloud organization, including the Everyone team.
+     * 
+     */
+    public static Output<GetTeamsResult> getTeams(GetTeamsArgs args, InvokeOutputOptions options) {
+        return Deployment.getInstance().invoke("pulumiservice:index:getTeams", TypeShape.of(GetTeamsResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Lists the teams of a Pulumi Cloud organization, including the Everyone team.
+     * 
+     */
+    public static CompletableFuture<GetTeamsResult> getTeamsPlain(GetTeamsPlainArgs args, InvokeOptions options) {
+        return Deployment.getInstance().invokeAsync("pulumiservice:index:getTeams", TypeShape.of(GetTeamsResult.class), args, Utilities.withVersion(options));
     }
 }

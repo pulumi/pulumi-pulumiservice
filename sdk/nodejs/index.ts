@@ -145,6 +145,16 @@ export const getStack: typeof import("./getStack").getStack = null as any;
 export const getStackOutput: typeof import("./getStack").getStackOutput = null as any;
 utilities.lazyLoad(exports, ["getStack","getStackOutput"], () => require("./getStack"));
 
+export { GetTeamArgs, GetTeamResult, GetTeamOutputArgs } from "./getTeam";
+export const getTeam: typeof import("./getTeam").getTeam = null as any;
+export const getTeamOutput: typeof import("./getTeam").getTeamOutput = null as any;
+utilities.lazyLoad(exports, ["getTeam","getTeamOutput"], () => require("./getTeam"));
+
+export { GetTeamsArgs, GetTeamsResult, GetTeamsOutputArgs } from "./getTeams";
+export const getTeams: typeof import("./getTeams").getTeams = null as any;
+export const getTeamsOutput: typeof import("./getTeams").getTeamsOutput = null as any;
+utilities.lazyLoad(exports, ["getTeams","getTeamsOutput"], () => require("./getTeams"));
+
 export { InsightsAccountArgs } from "./insightsAccount";
 export type InsightsAccount = import("./insightsAccount").InsightsAccount;
 export const InsightsAccount: typeof import("./insightsAccount").InsightsAccount = null as any;

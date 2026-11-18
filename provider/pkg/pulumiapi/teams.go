@@ -59,6 +59,7 @@ type Team struct {
 	Members      []TeamMember
 	Stacks       []TeamStackPermission
 	Environments []TeamEnvironmentSettings
+	Everyone     bool `json:"everyone"`
 }
 
 type TeamMember struct {
