@@ -67,7 +67,7 @@ namespace Pulumi.PulumiService.Api.Stacks
         public Output<bool> HasSecret { get; private set; } = null!;
 
         /// <summary>
-        /// The unique identifier name for the webhook within its scope. Optional on creation; if omitted, the service generates a short random name. Always populated in responses.
+        /// The unique identifier name for the webhook within its scope. Optional on creation; if omitted, the service generates a short random name. Always populated in responses. Up to 32 characters of letters, numbers, hyphens, underscores, and periods. On update, the name comes from the URL and this field is ignored.
         /// </summary>
         [Output("name")]
         public Output<string?> Name { get; private set; } = null!;
@@ -209,7 +209,7 @@ namespace Pulumi.PulumiService.Api.Stacks
         }
 
         /// <summary>
-        /// The unique identifier name for the webhook within its scope. Optional on creation; if omitted, the service generates a short random name. Always populated in responses.
+        /// The unique identifier name for the webhook within its scope. Optional on creation; if omitted, the service generates a short random name. Always populated in responses. Up to 32 characters of letters, numbers, hyphens, underscores, and periods. On update, the name comes from the URL and this field is ignored.
         /// </summary>
         [Input("name")]
         public Input<string>? Name { get; set; }

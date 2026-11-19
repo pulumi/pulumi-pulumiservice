@@ -41,6 +41,13 @@ namespace Pulumi.PulumiService.Api.Teams
         public Output<ImmutableArray<object>> Environments { get; private set; } = null!;
 
         /// <summary>
+        /// Whether this is the Everyone team: every admin and member of the organization is in it, but
+        /// no billing manager. Pulumi manages it, so its name, description, members and roles cannot change.
+        /// </summary>
+        [Output("everyone")]
+        public Output<bool?> Everyone { get; private set; } = null!;
+
+        /// <summary>
         /// The kind of team (e.g., pulumi or GitHub-backed).
         /// </summary>
         [Output("kind")]

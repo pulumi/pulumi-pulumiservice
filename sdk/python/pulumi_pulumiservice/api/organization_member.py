@@ -26,7 +26,7 @@ class OrganizationMemberArgs:
         The set of arguments for constructing a OrganizationMember resource.
 
         :param pulumi.Input[_builtins.str] org_name: The organization name
-        :param pulumi.Input[_builtins.str] role: The built-in role assigned to the new member. Must be `member`, `admin`, or `billingManager`.
+        :param pulumi.Input[_builtins.str] role: The built-in role assigned to the new member. Must be `member`, `admin`, `billing-manager`, `reader`, `builder` or `maintainer`. In an organization with a default role, `member` puts the new member on the default role, and the member follows it when an admin changes it. `reader`, `builder` and `maintainer` assign the Reader, Builder or Maintainer role to the new member explicitly, so the member keeps it when the default role changes; they are available only in organizations with a default role.
         :param pulumi.Input[_builtins.str] user_login: The user login name
         """
         pulumi.set(__self__, "org_name", org_name)
@@ -49,7 +49,7 @@ class OrganizationMemberArgs:
     @pulumi.getter
     def role(self) -> pulumi.Input[_builtins.str]:
         """
-        The built-in role assigned to the new member. Must be `member`, `admin`, or `billingManager`.
+        The built-in role assigned to the new member. Must be `member`, `admin`, `billing-manager`, `reader`, `builder` or `maintainer`. In an organization with a default role, `member` puts the new member on the default role, and the member follows it when an admin changes it. `reader`, `builder` and `maintainer` assign the Reader, Builder or Maintainer role to the new member explicitly, so the member keeps it when the default role changes; they are available only in organizations with a default role.
         """
         return pulumi.get(self, "role")
 
@@ -90,7 +90,7 @@ class OrganizationMember(pulumi.CustomResource):
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] org_name: The organization name
-        :param pulumi.Input[_builtins.str] role: The built-in role assigned to the new member. Must be `member`, `admin`, or `billingManager`.
+        :param pulumi.Input[_builtins.str] role: The built-in role assigned to the new member. Must be `member`, `admin`, `billing-manager`, `reader`, `builder` or `maintainer`. In an organization with a default role, `member` puts the new member on the default role, and the member follows it when an admin changes it. `reader`, `builder` and `maintainer` assign the Reader, Builder or Maintainer role to the new member explicitly, so the member keeps it when the default role changes; they are available only in organizations with a default role.
         :param pulumi.Input[_builtins.str] user_login: The user login name
         """
         ...
@@ -144,6 +144,7 @@ class OrganizationMember(pulumi.CustomResource):
             __props__.__dict__["user_login"] = user_login
             __props__.__dict__["created"] = None
             __props__.__dict__["fga_role"] = None
+            __props__.__dict__["follows_default_role"] = None
             __props__.__dict__["known_to_pulumi"] = None
             __props__.__dict__["links"] = None
             __props__.__dict__["suspended"] = None
@@ -174,6 +175,7 @@ class OrganizationMember(pulumi.CustomResource):
 
         __props__.__dict__["created"] = None
         __props__.__dict__["fga_role"] = None
+        __props__.__dict__["follows_default_role"] = None
         __props__.__dict__["known_to_pulumi"] = None
         __props__.__dict__["links"] = None
         __props__.__dict__["role"] = None
@@ -198,6 +200,15 @@ class OrganizationMember(pulumi.CustomResource):
         The role currently assigned to this member — either a built-in role (member, admin, billingManager) or a custom role. Falls back to the organization's default role if no role is assigned directly.
         """
         return pulumi.get(self, "fga_role")
+
+    @_builtins.property
+    @pulumi.getter(name="followsDefaultRole")
+    def follows_default_role(self) -> pulumi.Output[Optional[_builtins.bool]]:
+        """
+        FollowsDefaultRole is true when the member has no role of their own and gets the
+        organization's default role. A member assigned the default role directly is false.
+        """
+        return pulumi.get(self, "follows_default_role")
 
     @_builtins.property
     @pulumi.getter(name="knownToPulumi")

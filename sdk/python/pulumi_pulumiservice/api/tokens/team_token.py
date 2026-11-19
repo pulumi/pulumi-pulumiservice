@@ -30,7 +30,7 @@ class TeamTokenArgs:
 
         :param pulumi.Input[_builtins.str] description: The description
         :param pulumi.Input[_builtins.int] expires: The expiration time
-        :param pulumi.Input[_builtins.str] name: The name
+        :param pulumi.Input[_builtins.str] name: The display name of the token. Must be between 1 and 40 characters.
         :param pulumi.Input[_builtins.str] org_name: The organization name
         :param pulumi.Input[_builtins.str] team_name: The team name
         :param pulumi.Input[_builtins.str] reason: Audit log reason for creating this token
@@ -71,7 +71,7 @@ class TeamTokenArgs:
     @pulumi.getter
     def name(self) -> pulumi.Input[_builtins.str]:
         """
-        The name
+        The display name of the token. Must be between 1 and 40 characters.
         """
         return pulumi.get(self, "name")
 
@@ -140,7 +140,7 @@ class TeamToken(pulumi.CustomResource):
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] description: The description
         :param pulumi.Input[_builtins.int] expires: The expiration time
-        :param pulumi.Input[_builtins.str] name: The name
+        :param pulumi.Input[_builtins.str] name: The display name of the token. Must be between 1 and 40 characters.
         :param pulumi.Input[_builtins.str] org_name: The organization name
         :param pulumi.Input[_builtins.str] reason: Audit log reason for creating this token
         :param pulumi.Input[_builtins.str] team_name: The team name

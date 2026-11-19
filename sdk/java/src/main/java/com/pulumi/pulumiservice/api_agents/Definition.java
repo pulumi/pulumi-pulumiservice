@@ -106,6 +106,20 @@ public class Definition extends com.pulumi.resources.CustomResource {
         return Codegen.optional(this.enabledIntegrations);
     }
     /**
+     * The model provider the agent&#39;s tasks run on: a provider name, or &#39;pulumi&#39; for Pulumi&#39;s built-in models. Omitted or null uses the organization&#39;s default provider.
+     * 
+     */
+    @Export(name="modelProvider", refs={String.class}, tree="[0]")
+    private Output</* @Nullable */ String> modelProvider;
+
+    /**
+     * @return The model provider the agent&#39;s tasks run on: a provider name, or &#39;pulumi&#39; for Pulumi&#39;s built-in models. Omitted or null uses the organization&#39;s default provider.
+     * 
+     */
+    public Output<Optional<String>> modelProvider() {
+        return Codegen.optional(this.modelProvider);
+    }
+    /**
      * The agent&#39;s name: lower-case letters, digits and hyphens, unique within the organization. This is the stable handle a person writes down -- in an automation, in a CLI invocation -- and it may be changed, because everything that references an agent internally references it by id.
      * 
      */
@@ -188,6 +202,20 @@ public class Definition extends com.pulumi.resources.CustomResource {
      */
     public Output<Optional<String>> purpose() {
         return Codegen.optional(this.purpose);
+    }
+    /**
+     * Effort the agent&#39;s models reason or think at: &#39;low&#39;, &#39;medium&#39;, or &#39;high&#39;, for this agent only. On an &#39;openai-responses&#39; provider it overrides the provider&#39;s reasoning effort; on an &#39;anthropic-messages&#39; provider it sets the thinking effort of models that support adaptive thinking. With no provider it applies to whichever of these the organization&#39;s default is. Refused for &#39;pulumi&#39; and a named &#39;openai-chat&#39; provider, and ignored on a run whose provider cannot reason. Omitted or null uses the provider&#39;s.
+     * 
+     */
+    @Export(name="reasoningEffort", refs={String.class}, tree="[0]")
+    private Output</* @Nullable */ String> reasoningEffort;
+
+    /**
+     * @return Effort the agent&#39;s models reason or think at: &#39;low&#39;, &#39;medium&#39;, or &#39;high&#39;, for this agent only. On an &#39;openai-responses&#39; provider it overrides the provider&#39;s reasoning effort; on an &#39;anthropic-messages&#39; provider it sets the thinking effort of models that support adaptive thinking. With no provider it applies to whichever of these the organization&#39;s default is. Refused for &#39;pulumi&#39; and a named &#39;openai-chat&#39; provider, and ignored on a run whose provider cannot reason. Omitted or null uses the provider&#39;s.
+     * 
+     */
+    public Output<Optional<String>> reasoningEffort() {
+        return Codegen.optional(this.reasoningEffort);
     }
     /**
      * The RBAC role id the agent&#39;s tasks assume, identified by role id. Null means no assumed role: tasks run with the invoking user&#39;s own permissions.

@@ -22,7 +22,11 @@ import (
 )
 
 type TeamAccessTokenClient interface {
-	CreateTeamAccessToken(ctx context.Context, name, orgName, teamName, description string) (*AccessToken, error)
+	// CreateTeamAccessToken creates a team access token. expires is Unix epoch
+	// seconds; 0 means the token never expires.
+	CreateTeamAccessToken(
+		ctx context.Context, name, orgName, teamName, description string, expires int64,
+	) (*AccessToken, error)
 	DeleteTeamAccessToken(ctx context.Context, tokenID, orgName, teamName string) error
 	GetTeamAccessToken(ctx context.Context, tokenID, orgName, teamName string) (*AccessToken, error)
 }
@@ -35,11 +39,13 @@ type createTeamTokenResponse struct {
 type createTeamTokenRequest struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`
+	Expires     int64  `json:"expires,omitempty"`
 }
 
 func (c *Client) CreateTeamAccessToken(
 	ctx context.Context,
 	name, orgName, teamName, description string,
+	expires int64,
 ) (*AccessToken, error) {
 
 	if len(orgName) == 0 {
@@ -55,6 +61,7 @@ func (c *Client) CreateTeamAccessToken(
 	createReq := createTeamTokenRequest{
 		Name:        name,
 		Description: description,
+		Expires:     expires,
 	}
 
 	var createRes createTeamTokenResponse
@@ -116,6 +123,7 @@ func (c *Client) GetTeamAccessToken(ctx context.Context, tokenID, orgName, teamN
 			return &AccessToken{
 				ID:          token.ID,
 				Description: token.Description,
+				Expires:     token.Expires,
 			}, nil
 		}
 	}

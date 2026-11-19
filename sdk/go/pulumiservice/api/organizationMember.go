@@ -24,6 +24,9 @@ type OrganizationMember struct {
 	Created pulumi.StringOutput `pulumi:"created"`
 	// The role currently assigned to this member — either a built-in role (member, admin, billingManager) or a custom role. Falls back to the organization's default role if no role is assigned directly.
 	FgaRole pulumi.AnyOutput `pulumi:"fgaRole"`
+	// FollowsDefaultRole is true when the member has no role of their own and gets the
+	// organization's default role. A member assigned the default role directly is false.
+	FollowsDefaultRole pulumi.BoolPtrOutput `pulumi:"followsDefaultRole"`
 	// KnownToPulumi returns if the organization member has a Pulumi account.
 	KnownToPulumi pulumi.BoolOutput `pulumi:"knownToPulumi"`
 	// Links to the member in the Pulumi Console
@@ -94,7 +97,7 @@ func (OrganizationMemberState) ElementType() reflect.Type {
 type organizationMemberArgs struct {
 	// The organization name
 	OrgName string `pulumi:"orgName"`
-	// The built-in role assigned to the new member. Must be `member`, `admin`, or `billingManager`.
+	// The built-in role assigned to the new member. Must be `member`, `admin`, `billing-manager`, `reader`, `builder` or `maintainer`. In an organization with a default role, `member` puts the new member on the default role, and the member follows it when an admin changes it. `reader`, `builder` and `maintainer` assign the Reader, Builder or Maintainer role to the new member explicitly, so the member keeps it when the default role changes; they are available only in organizations with a default role.
 	Role string `pulumi:"role"`
 	// The user login name
 	UserLogin string `pulumi:"userLogin"`
@@ -104,7 +107,7 @@ type organizationMemberArgs struct {
 type OrganizationMemberArgs struct {
 	// The organization name
 	OrgName pulumi.StringInput
-	// The built-in role assigned to the new member. Must be `member`, `admin`, or `billingManager`.
+	// The built-in role assigned to the new member. Must be `member`, `admin`, `billing-manager`, `reader`, `builder` or `maintainer`. In an organization with a default role, `member` puts the new member on the default role, and the member follows it when an admin changes it. `reader`, `builder` and `maintainer` assign the Reader, Builder or Maintainer role to the new member explicitly, so the member keeps it when the default role changes; they are available only in organizations with a default role.
 	Role pulumi.StringInput
 	// The user login name
 	UserLogin pulumi.StringInput
@@ -205,6 +208,12 @@ func (o OrganizationMemberOutput) Created() pulumi.StringOutput {
 // The role currently assigned to this member — either a built-in role (member, admin, billingManager) or a custom role. Falls back to the organization's default role if no role is assigned directly.
 func (o OrganizationMemberOutput) FgaRole() pulumi.AnyOutput {
 	return o.ApplyT(func(v *OrganizationMember) pulumi.AnyOutput { return v.FgaRole }).(pulumi.AnyOutput)
+}
+
+// FollowsDefaultRole is true when the member has no role of their own and gets the
+// organization's default role. A member assigned the default role directly is false.
+func (o OrganizationMemberOutput) FollowsDefaultRole() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v *OrganizationMember) pulumi.BoolPtrOutput { return v.FollowsDefaultRole }).(pulumi.BoolPtrOutput)
 }
 
 // KnownToPulumi returns if the organization member has a Pulumi account.

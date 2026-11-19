@@ -2,8 +2,6 @@ name: yaml-policy-groups
 description: Example demonstrating PolicyGroup resource and policy pack data sources
 runtime: yaml
 config:
-  digits:
-    type: string
   organizationName:
     type: string
     default: service-provider-test-org
@@ -36,10 +34,9 @@ variables:
   #       versionTag: "1.0.0"
 
 resources:
-  testPolicyGroup:
+  test-policy-group:
     type: pulumiservice:PolicyGroup
     properties:
-      name: test-policy-group-${digits}
       organizationName: ${organizationName}
       entityType: stacks
       mode: audit
@@ -62,7 +59,7 @@ resources:
 
 outputs:
   # Export the policy group name and the list of available policy packs
-  policyGroupName: ${testPolicyGroup.name}
+  policyGroupName: ${test-policy-group.name}
   # Exported so the integration test can assert every pack carries its registry
   # provenance — the one thing unit tests can't verify against the real API.
   policyPacks: ${policyPacks}

@@ -28,6 +28,12 @@ namespace Pulumi.PulumiService.Api.Agents
         public Output<string> ApprovalMode { get; private set; } = null!;
 
         /// <summary>
+        /// When the task was archived. Null while the task remains active.
+        /// </summary>
+        [Output("archivedAt")]
+        public Output<string?> ArchivedAt { get; private set; } = null!;
+
+        /// <summary>
         /// The async trigger source for this task. Null for sync tasks.
         /// </summary>
         [Output("asyncTriggerType")]
@@ -70,6 +76,12 @@ namespace Pulumi.PulumiService.Api.Agents
         public Output<ImmutableArray<object>> Entities { get; private set; } = null!;
 
         /// <summary>
+        /// Whether the task accepts user interaction. Read-only tasks do not accept follow-up input.
+        /// </summary>
+        [Output("interactionMode")]
+        public Output<string?> InteractionMode { get; private set; } = null!;
+
+        /// <summary>
         /// Whether this task is shared with other org members.
         /// </summary>
         [Output("isShared")]
@@ -80,6 +92,18 @@ namespace Pulumi.PulumiService.Api.Agents
         /// </summary>
         [Output("lastHeartbeat")]
         public Output<string?> LastHeartbeat { get; private set; } = null!;
+
+        /// <summary>
+        /// The model the task's main loop last ran on, as its provider reported it. Null until the task has used a model.
+        /// </summary>
+        [Output("model")]
+        public Output<string?> Model { get; private set; } = null!;
+
+        /// <summary>
+        /// The model provider the task's turns run on, pinned at its first turn: 'pulumi' for Pulumi's built-in models, or the name of one of the organization's model providers. Null until the first turn.
+        /// </summary>
+        [Output("modelProvider")]
+        public Output<string?> ModelProvider { get; private set; } = null!;
 
         /// <summary>
         /// Display name for the task, typically auto-generated from the initial user message.
@@ -217,7 +241,7 @@ namespace Pulumi.PulumiService.Api.Agents
     public sealed class TaskArgs : global::Pulumi.ResourceArgs
     {
         /// <summary>
-        /// Optional Custom Agent definition id to run this task as. When set, the task's role, permission mode, and enabled integrations are taken from the named agent definition instead of from this request, and the task is attributed to that agent. The agent's instructions and approval mode are not copied at creation: they are read from the definition on every turn, so editing the agent applies to the next turn of every run. A preview capability, gated per organization.
+        /// Optional Custom Agent definition id to run this task as. When set, the task's role and enabled integrations are taken from the named agent definition instead of from this request, and the task is attributed to that agent. The agent's instructions and approval mode are not copied at creation: they are read from the definition on every turn, so editing the agent applies to the next turn of every run. A preview capability, gated per organization.
         /// </summary>
         [Input("agentDefinitionId")]
         public Input<string>? AgentDefinitionId { get; set; }

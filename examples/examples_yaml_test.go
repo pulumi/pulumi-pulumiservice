@@ -298,6 +298,7 @@ func TestYamlAccessTokenExample(t *testing.T) {
 
 func TestYamlTeamAccessTokenExample(t *testing.T) {
 	test := newExampleTest(t, "yaml-team-token")
+	test.SetConfig(t, "expires", time.Now().UTC().AddDate(0, 0, 30).Truncate(time.Hour).Format(time.RFC3339))
 	runPulumiTest(t, test)
 }
 
@@ -421,7 +422,7 @@ func TestYamlOidcIssuerExample(t *testing.T) {
 
 func TestYamlPolicyGroupsExample(t *testing.T) {
 	test := newExampleTest(t, "yaml-policy-groups")
-	setConfig(t, test, map[string]string{"digits": generateRandomFiveDigits(), "organizationName": getOrgName()})
+	setConfig(t, test, map[string]string{"organizationName": getOrgName()})
 	up := runPulumiTest(t, test)
 
 	// getPolicyPacks joins the org policy pack list against the registry

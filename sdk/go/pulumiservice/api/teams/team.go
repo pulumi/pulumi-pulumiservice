@@ -25,6 +25,9 @@ type Team struct {
 	DisplayName pulumi.StringOutput `pulumi:"displayName"`
 	// The list of environment settings for the team.
 	Environments pulumi.ArrayOutput `pulumi:"environments"`
+	// Whether this is the Everyone team: every admin and member of the organization is in it, but
+	// no billing manager. Pulumi manages it, so its name, description, members and roles cannot change.
+	Everyone pulumi.BoolPtrOutput `pulumi:"everyone"`
 	// The kind of team (e.g., pulumi or GitHub-backed).
 	Kind pulumi.StringOutput `pulumi:"kind"`
 	// ListMembersError is the error message if an error was encountered whilst trying to
@@ -223,6 +226,12 @@ func (o TeamOutput) DisplayName() pulumi.StringOutput {
 // The list of environment settings for the team.
 func (o TeamOutput) Environments() pulumi.ArrayOutput {
 	return o.ApplyT(func(v *Team) pulumi.ArrayOutput { return v.Environments }).(pulumi.ArrayOutput)
+}
+
+// Whether this is the Everyone team: every admin and member of the organization is in it, but
+// no billing manager. Pulumi manages it, so its name, description, members and roles cannot change.
+func (o TeamOutput) Everyone() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v *Team) pulumi.BoolPtrOutput { return v.Everyone }).(pulumi.BoolPtrOutput)
 }
 
 // The kind of team (e.g., pulumi or GitHub-backed).

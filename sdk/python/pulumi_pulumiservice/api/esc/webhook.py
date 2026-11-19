@@ -43,7 +43,7 @@ class WebhookArgs:
         :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] filters: Specific event types this webhook subscribes to. If empty, all events are delivered.
         :param pulumi.Input[_builtins.str] format: The format of the webhook payload (e.g., 'raw', 'slack', 'ms_teams').
         :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] groups: Event groups this webhook subscribes to (e.g., 'stacks', 'deployments').
-        :param pulumi.Input[_builtins.str] name: The unique identifier name for the webhook within its scope. Optional on creation; if omitted, the service generates a short random name. Always populated in responses.
+        :param pulumi.Input[_builtins.str] name: The unique identifier name for the webhook within its scope. Optional on creation; if omitted, the service generates a short random name. Always populated in responses. Up to 32 characters of letters, numbers, hyphens, underscores, and periods. On update, the name comes from the URL and this field is ignored.
         :param pulumi.Input[_builtins.str] secret: Secret will be omitted when returned from the service.
         :param pulumi.Input[_builtins.str] stack_name: The stack name. Set when the webhook is scoped to a specific stack.
         """
@@ -178,7 +178,7 @@ class WebhookArgs:
     @pulumi.getter
     def name(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
-        The unique identifier name for the webhook within its scope. Optional on creation; if omitted, the service generates a short random name. Always populated in responses.
+        The unique identifier name for the webhook within its scope. Optional on creation; if omitted, the service generates a short random name. Always populated in responses. Up to 32 characters of letters, numbers, hyphens, underscores, and periods. On update, the name comes from the URL and this field is ignored.
         """
         return pulumi.get(self, "name")
 
@@ -241,7 +241,7 @@ class Webhook(pulumi.CustomResource):
         :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] filters: Specific event types this webhook subscribes to. If empty, all events are delivered.
         :param pulumi.Input[_builtins.str] format: The format of the webhook payload (e.g., 'raw', 'slack', 'ms_teams').
         :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] groups: Event groups this webhook subscribes to (e.g., 'stacks', 'deployments').
-        :param pulumi.Input[_builtins.str] name: The unique identifier name for the webhook within its scope. Optional on creation; if omitted, the service generates a short random name. Always populated in responses.
+        :param pulumi.Input[_builtins.str] name: The unique identifier name for the webhook within its scope. Optional on creation; if omitted, the service generates a short random name. Always populated in responses. Up to 32 characters of letters, numbers, hyphens, underscores, and periods. On update, the name comes from the URL and this field is ignored.
         :param pulumi.Input[_builtins.str] organization_name: The organization that owns this webhook.
         :param pulumi.Input[_builtins.str] payload_url: The URL to which webhook payloads are delivered.
         :param pulumi.Input[_builtins.str] project_name: The project name. Set when the webhook is scoped to a specific stack.
@@ -420,7 +420,7 @@ class Webhook(pulumi.CustomResource):
     @pulumi.getter
     def name(self) -> pulumi.Output[Optional[_builtins.str]]:
         """
-        The unique identifier name for the webhook within its scope. Optional on creation; if omitted, the service generates a short random name. Always populated in responses.
+        The unique identifier name for the webhook within its scope. Optional on creation; if omitted, the service generates a short random name. Always populated in responses. Up to 32 characters of letters, numbers, hyphens, underscores, and periods. On update, the name comes from the URL and this field is ignored.
         """
         return pulumi.get(self, "name")
 

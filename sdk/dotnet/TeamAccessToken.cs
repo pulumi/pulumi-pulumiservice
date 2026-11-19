@@ -41,6 +41,12 @@ namespace Pulumi.PulumiService
         public Output<string?> Description { get; private set; } = null!;
 
         /// <summary>
+        /// When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`. Omit it for a token that never expires. Pulumi Cloud rejects an expiry that is in the past, more than two years away, or beyond the organization's maximum token lifetime.
+        /// </summary>
+        [Output("expires")]
+        public Output<string?> Expires { get; private set; } = null!;
+
+        /// <summary>
         /// The name for the token, up to 40 characters. Organization and team tokens share one set of names per organization, and Pulumi Cloud never frees a deleted token's name, so the name must not have been used by any other token in the organization.
         /// 
         /// If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). A replacement gets a new name. Removing `name` from an existing token keeps its current name until the next replacement.
@@ -98,6 +104,7 @@ namespace Pulumi.PulumiService
                 ReplaceOnChanges =
                 {
                     "description",
+                    "expires",
                     "name",
                     "organizationName",
                     "teamName",
@@ -129,6 +136,12 @@ namespace Pulumi.PulumiService
         /// </summary>
         [Input("description")]
         public Input<string>? Description { get; set; }
+
+        /// <summary>
+        /// When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`. Omit it for a token that never expires. Pulumi Cloud rejects an expiry that is in the past, more than two years away, or beyond the organization's maximum token lifetime.
+        /// </summary>
+        [Input("expires")]
+        public Input<string>? Expires { get; set; }
 
         /// <summary>
         /// The name for the token, up to 40 characters. Organization and team tokens share one set of names per organization, and Pulumi Cloud never frees a deleted token's name, so the name must not have been used by any other token in the organization.

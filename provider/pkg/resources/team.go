@@ -9,6 +9,7 @@ import (
 
 	p "github.com/pulumi/pulumi-go-provider"
 	"github.com/pulumi/pulumi-go-provider/infer"
+	"github.com/pulumi/pulumi/sdk/v3/go/property"
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
@@ -51,7 +52,9 @@ type TeamCore struct {
 func (t *TeamCore) Annotate(a infer.Annotator) {
 	a.Describe(&t.Description, "Optional. Team description.")
 	a.Describe(&t.DisplayName, "Optional. Team display name.")
-	a.Describe(&t.Name, "The team's name. Required for \"pulumi\" teams.")
+	a.Describe(&t.Name, "The team's name, up to 100 characters. Only letters, digits, hyphens, underscores "+
+		"and periods are allowed. "+autoNamedDescription+" Characters that aren't allowed in the logical name "+
+		"are replaced with hyphens. Only \"pulumi\" teams are auto-named.")
 	a.Describe(&t.OrganizationName, "The name of the Pulumi organization the team belongs to.")
 	a.Describe(&t.Type, "The type of team. Must be either `pulumi` or `github`.")
 	a.Describe(
@@ -205,10 +208,14 @@ func (*Team) Check(ctx context.Context, req infer.CheckRequest) (infer.CheckResp
 	}
 
 	if i.Type == teamTypePulumi && i.Name == nil {
-		checkFailures = append(checkFailures, p.CheckFailure{
-			Reason:   "teams with teamType 'pulumi' require a name",
-			Property: gcName,
-		})
+		named, nameFailures, err := infer.DefaultCheck[pulumiTeamName](ctx, property.Map{})
+		if err != nil {
+			return infer.CheckResponse[TeamInput]{}, err
+		}
+		checkFailures = append(checkFailures, nameFailures...)
+		if len(nameFailures) == 0 {
+			i.Name = &named.Name
+		}
 	}
 
 	if i.DisplayName == nil {
@@ -223,6 +230,33 @@ func (*Team) Check(ctx context.Context, req infer.CheckRequest) (infer.CheckResp
 		Inputs:   i,
 		Failures: checkFailures,
 	}, nil
+}
+
+// pulumiTeamName auto-names the name of a "pulumi" team. TeamInput can't
+// implement infer.AutoNamed itself, because "github" teams are identified by
+// githubTeamId and must not be given a name.
+type pulumiTeamName struct {
+	Name string `pulumi:"name"`
+}
+
+func (n *pulumiTeamName) AutoName(autoname infer.SetAutoName) {
+	autoname(&n.Name, suffixedAutoName(teamNameMaxLen, teamNameRune))
+}
+
+// teamNameMaxLen is the longest team name that Pulumi Cloud accepts. The
+// OpenAPI spec doesn't state the limit.
+const teamNameMaxLen = 100
+
+// teamNameRune replaces a rune that Pulumi Cloud rejects in team names with a
+// hyphen. Pulumi Cloud allows only ASCII letters and digits, hyphens,
+// underscores and periods.
+func teamNameRune(r rune) rune {
+	switch {
+	case r >= 'a' && r <= 'z', r >= 'A' && r <= 'Z', r >= '0' && r <= '9', strings.ContainsRune("-_.", r):
+		return r
+	default:
+		return '-'
+	}
 }
 
 func (*Team) Delete(ctx context.Context, req infer.DeleteRequest[TeamState]) (infer.DeleteResponse, error) {
