@@ -15,7 +15,6 @@
 package functions
 
 import (
-	"context"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -38,7 +37,7 @@ const (
 // `__`-prefixed keys as of pulumi/pulumi#22834).
 func assertScopedConditionShape(
 	t *testing.T,
-	got map[string]interface{},
+	got map[string]any,
 	expectedExpressionType string,
 	expectedLiteralType string,
 	expectedIdentity string,
@@ -49,24 +48,24 @@ func assertScopedConditionShape(
 	assert.Equal(t, "PermissionDescriptorCondition", got["__type"],
 		"top-level __type must be PermissionDescriptorCondition")
 
-	cond, ok := got["condition"].(map[string]interface{})
+	cond, ok := got["condition"].(map[string]any)
 	require.True(t, ok, "condition must be a map; got %T", got["condition"])
 	assert.Equal(t, "PermissionExpressionEqual", cond["__type"])
 
-	left, ok := cond["left"].(map[string]interface{})
+	left, ok := cond["left"].(map[string]any)
 	require.True(t, ok, "condition.left must be a map; got %T", cond["left"])
 	assert.Equal(t, expectedExpressionType, left["__type"])
 
-	right, ok := cond["right"].(map[string]interface{})
+	right, ok := cond["right"].(map[string]any)
 	require.True(t, ok, "condition.right must be a map; got %T", cond["right"])
 	assert.Equal(t, expectedLiteralType, right["__type"])
 	assert.Equal(t, expectedIdentity, right["identity"])
 
-	sub, ok := got["subNode"].(map[string]interface{})
+	sub, ok := got["subNode"].(map[string]any)
 	require.True(t, ok, "subNode must be a map; got %T", got["subNode"])
 	assert.Equal(t, "PermissionDescriptorAllow", sub["__type"])
 
-	rawPerms, ok := sub["permissions"].([]interface{})
+	rawPerms, ok := sub["permissions"].([]any)
 	require.True(t, ok, "subNode.permissions must be a list; got %T", sub["permissions"])
 	gotPerms := make([]string, len(rawPerms))
 	for i, p := range rawPerms {
@@ -81,7 +80,7 @@ func TestBuildAllowPermissions(t *testing.T) {
 	t.Run("happy path", func(t *testing.T) {
 		t.Parallel()
 		resp, err := BuildAllowPermissionsFunction{}.Invoke(
-			context.Background(),
+			t.Context(),
 			infer.FunctionRequest[BuildAllowPermissionsInput]{
 				Input: BuildAllowPermissionsInput{
 					Permissions: []string{permStackRead, permEnvironmentOpen},
@@ -92,15 +91,15 @@ func TestBuildAllowPermissions(t *testing.T) {
 		got := resp.Output.Permissions
 		assert.Equal(t, "PermissionDescriptorAllow", got["__type"])
 		// Permissions list passes through verbatim.
-		perms, ok := got["permissions"].([]interface{})
+		perms, ok := got["permissions"].([]any)
 		require.True(t, ok)
-		assert.Equal(t, []interface{}{permStackRead, permEnvironmentOpen}, perms)
+		assert.Equal(t, []any{permStackRead, permEnvironmentOpen}, perms)
 	})
 
 	t.Run("rejects empty permissions", func(t *testing.T) {
 		t.Parallel()
 		_, err := BuildAllowPermissionsFunction{}.Invoke(
-			context.Background(),
+			t.Context(),
 			infer.FunctionRequest[BuildAllowPermissionsInput]{
 				Input: BuildAllowPermissionsInput{},
 			},
@@ -115,7 +114,7 @@ func TestBuildEnvironmentScopedPermissions(t *testing.T) {
 	t.Run("happy path", func(t *testing.T) {
 		t.Parallel()
 		resp, err := BuildEnvironmentScopedPermissionsFunction{}.Invoke(
-			context.Background(),
+			t.Context(),
 			infer.FunctionRequest[BuildEnvironmentScopedPermissionsInput]{
 				Input: BuildEnvironmentScopedPermissionsInput{
 					EnvironmentID: "env-uuid-1",
@@ -136,7 +135,7 @@ func TestBuildEnvironmentScopedPermissions(t *testing.T) {
 	t.Run("rejects empty environmentId", func(t *testing.T) {
 		t.Parallel()
 		_, err := BuildEnvironmentScopedPermissionsFunction{}.Invoke(
-			context.Background(),
+			t.Context(),
 			infer.FunctionRequest[BuildEnvironmentScopedPermissionsInput]{
 				Input: BuildEnvironmentScopedPermissionsInput{
 					Permissions: []string{permEnvironmentRead},
@@ -149,7 +148,7 @@ func TestBuildEnvironmentScopedPermissions(t *testing.T) {
 	t.Run("rejects empty permissions", func(t *testing.T) {
 		t.Parallel()
 		_, err := BuildEnvironmentScopedPermissionsFunction{}.Invoke(
-			context.Background(),
+			t.Context(),
 			infer.FunctionRequest[BuildEnvironmentScopedPermissionsInput]{
 				Input: BuildEnvironmentScopedPermissionsInput{
 					EnvironmentID: "env-uuid-1",
@@ -166,7 +165,7 @@ func TestBuildStackScopedPermissions(t *testing.T) {
 	t.Run("happy path", func(t *testing.T) {
 		t.Parallel()
 		resp, err := BuildStackScopedPermissionsFunction{}.Invoke(
-			context.Background(),
+			t.Context(),
 			infer.FunctionRequest[BuildStackScopedPermissionsInput]{
 				Input: BuildStackScopedPermissionsInput{
 					StackID:     "stack-id-1",
@@ -187,7 +186,7 @@ func TestBuildStackScopedPermissions(t *testing.T) {
 	t.Run("rejects empty stackId", func(t *testing.T) {
 		t.Parallel()
 		_, err := BuildStackScopedPermissionsFunction{}.Invoke(
-			context.Background(),
+			t.Context(),
 			infer.FunctionRequest[BuildStackScopedPermissionsInput]{
 				Input: BuildStackScopedPermissionsInput{
 					Permissions: []string{permStackRead},
@@ -200,7 +199,7 @@ func TestBuildStackScopedPermissions(t *testing.T) {
 	t.Run("rejects empty permissions", func(t *testing.T) {
 		t.Parallel()
 		_, err := BuildStackScopedPermissionsFunction{}.Invoke(
-			context.Background(),
+			t.Context(),
 			infer.FunctionRequest[BuildStackScopedPermissionsInput]{
 				Input: BuildStackScopedPermissionsInput{
 					StackID: "stack-id-1",
@@ -217,7 +216,7 @@ func TestBuildInsightsAccountScopedPermissions(t *testing.T) {
 	t.Run("happy path", func(t *testing.T) {
 		t.Parallel()
 		resp, err := BuildInsightsAccountScopedPermissionsFunction{}.Invoke(
-			context.Background(),
+			t.Context(),
 			infer.FunctionRequest[BuildInsightsAccountScopedPermissionsInput]{
 				Input: BuildInsightsAccountScopedPermissionsInput{
 					InsightsAccountID: testAccountID,
@@ -238,7 +237,7 @@ func TestBuildInsightsAccountScopedPermissions(t *testing.T) {
 	t.Run("rejects empty insightsAccountId", func(t *testing.T) {
 		t.Parallel()
 		_, err := BuildInsightsAccountScopedPermissionsFunction{}.Invoke(
-			context.Background(),
+			t.Context(),
 			infer.FunctionRequest[BuildInsightsAccountScopedPermissionsInput]{
 				Input: BuildInsightsAccountScopedPermissionsInput{
 					Permissions: []string{permInsightsAccountRead},
@@ -251,7 +250,7 @@ func TestBuildInsightsAccountScopedPermissions(t *testing.T) {
 	t.Run("rejects empty permissions", func(t *testing.T) {
 		t.Parallel()
 		_, err := BuildInsightsAccountScopedPermissionsFunction{}.Invoke(
-			context.Background(),
+			t.Context(),
 			infer.FunctionRequest[BuildInsightsAccountScopedPermissionsInput]{
 				Input: BuildInsightsAccountScopedPermissionsInput{
 					InsightsAccountID: testAccountID,

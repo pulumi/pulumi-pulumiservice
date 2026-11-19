@@ -236,6 +236,9 @@ func (i EnvironmentRotationScheduleInput) toAPI() (
 	}
 	scheduleReq := pulumiapi.CreateEnvironmentRotationScheduleRequest{
 		ScheduleCron: i.ScheduleCron,
+		// The API rejects a schedule without a secret rotation request. Leaving
+		// its environmentPath blank rotates every rotated secret in the environment.
+		SecretRotationRequest: pulumiapi.CreateEnvironmentSecretRotationScheduleRequest{},
 	}
 	if i.Timestamp != nil && *i.Timestamp != "" {
 		ts, err := time.Parse(time.RFC3339, *i.Timestamp)

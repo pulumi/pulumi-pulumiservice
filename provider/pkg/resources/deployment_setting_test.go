@@ -2,6 +2,7 @@ package resources
 
 import (
 	"context"
+	"maps"
 	"testing"
 
 	"github.com/blang/semver"
@@ -721,9 +722,7 @@ func deploymentSettingsInputs(extra map[string]property.Value) property.Map {
 		gcProject:      property.New("a-project"),
 		gcStack:        property.New("a-stack"),
 	}
-	for k, v := range extra {
-		m[k] = v
-	}
+	maps.Copy(m, extra)
 	return property.NewMap(m)
 }
 

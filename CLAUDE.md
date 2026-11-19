@@ -331,6 +331,22 @@ cd examples && golangci-lint run --timeout 10m --build-tags all
 
 Without the build tags, golangci-lint may report false positives about unused functions that are actually used in files with specific build tags.
 
+## Go Style
+
+`make lint` doesn't catch these, so check for them yourself in `provider/`:
+
+- In tests, use `t.Context()`, not `context.Background()` or `context.TODO()`.
+  It's cancelled when the test ends.
+  Don't hold a context in a package-level variable.
+- Write `any`, not `interface{}`.
+- Take a pointer to a value with `new(v)` (Go 1.26), e.g. `new("prod")` or `new(TagOperatorExists)`.
+  Don't add `ptr`/`strPtr` helpers.
+- Use `maps.Copy` and `slices.Contains` instead of hand-written loops.
+- Use `errors.AsType[*T](err)` instead of declaring a variable for `errors.As`.
+- Don't switch `omitempty` to `omitzero` in `pulumiapi` structs.
+  It changes the JSON sent to the API, and some endpoints reject a request without an empty nested object, such as `secretRotationRequest` on environment rotation schedules.
+  Don't put `omitempty` on struct-valued fields either; `encoding/json` ignores it there.
+
 ## Debugging CI Failures
 
 When investigating CI test failures:

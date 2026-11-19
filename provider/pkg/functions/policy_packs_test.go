@@ -16,6 +16,7 @@ package functions
 
 import (
 	"encoding/json"
+	"maps"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -327,9 +328,7 @@ func singlePolicyPackHandler(t *testing.T, registryCode int, detail map[string]a
 			body := map[string]any{
 				ppKeyName: ppAlpha, ppKeyDisplayName: ppAlphaDisplayName, ppKeyVersion: version, ppKeyVersionTag: tag,
 			}
-			for k, v := range detail {
-				body[k] = v
-			}
+			maps.Copy(body, detail)
 			writeJSON(t, w, http.StatusOK, body)
 		case r.URL.Path == ppOrgRegistryPath:
 			// The resolved tag must be forwarded (#1196). Omitting it makes the

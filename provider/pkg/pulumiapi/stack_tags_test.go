@@ -37,7 +37,7 @@ func TestCreateStackTags(t *testing.T) {
 			ExpectedReqBody: tag,
 			ResponseCode:    http.StatusNoContent,
 		})
-		assert.NoError(t, c.CreateStackTag(ctx, stackName, tag))
+		assert.NoError(t, c.CreateStackTag(t.Context(), stackName, tag))
 	})
 
 	t.Run("Error", func(t *testing.T) {
@@ -54,7 +54,7 @@ func TestCreateStackTags(t *testing.T) {
 				Message: unauthorizedError,
 			},
 		})
-		err := c.CreateStackTag(ctx, stackName, tag)
+		err := c.CreateStackTag(t.Context(), stackName, tag)
 		assert.EqualError(t, err, "failed to create tag (tagName=tagValue): 401 API error: unauthorized")
 	})
 }
@@ -72,7 +72,7 @@ func TestDeleteStackTags(t *testing.T) {
 			ExpectedReqPath:   "/api/stacks/organization/project/stack/tags/tagName",
 			ResponseCode:      204,
 		})
-		assert.NoError(t, c.DeleteStackTag(ctx, stackName, tagName))
+		assert.NoError(t, c.DeleteStackTag(t.Context(), stackName, tagName))
 	})
 
 	t.Run("Error", func(t *testing.T) {
@@ -86,7 +86,7 @@ func TestDeleteStackTags(t *testing.T) {
 		})
 		assert.EqualError(
 			t,
-			c.DeleteStackTag(ctx, stackName, tagName),
+			c.DeleteStackTag(t.Context(), stackName, tagName),
 			"failed to make request: 401 API error: unauthorized",
 		)
 	})

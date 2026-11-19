@@ -1937,7 +1937,7 @@ type moduleAssignment struct {
 
 func routePrefix(path string) string {
 	var parts []string
-	for _, seg := range strings.Split(strings.Trim(path, "/"), "/") {
+	for seg := range strings.SplitSeq(strings.Trim(path, "/"), "/") {
 		if seg == "" || strings.HasPrefix(seg, "{") {
 			continue
 		}

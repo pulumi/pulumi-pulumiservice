@@ -107,7 +107,7 @@ func TestOrganizationMemberRead(t *testing.T) {
 		mock := &orgMemberClientMock{
 			getFunc: func(_ context.Context, _, _ string) (*pulumiapi.Member, error) { return nil, nil },
 		}
-		ctx := config.WithMockClient(context.Background(), mock)
+		ctx := config.WithMockClient(t.Context(), mock)
 
 		r := &OrganizationMember{}
 		resp, err := r.Read(ctx, infer.ReadRequest[OrganizationMemberInput, OrganizationMemberState]{
@@ -137,7 +137,7 @@ func TestOrganizationMemberRead(t *testing.T) {
 			},
 			listRolesFunc: stubBuiltinRoles,
 		}
-		ctx := config.WithMockClient(context.Background(), mock)
+		ctx := config.WithMockClient(t.Context(), mock)
 
 		r := &OrganizationMember{}
 		resp, err := r.Read(ctx, infer.ReadRequest[OrganizationMemberInput, OrganizationMemberState]{
@@ -183,7 +183,7 @@ func TestOrganizationMemberRead(t *testing.T) {
 				}, builtinRoles...), nil
 			},
 		}
-		ctx := config.WithMockClient(context.Background(), mock)
+		ctx := config.WithMockClient(t.Context(), mock)
 
 		r := &OrganizationMember{}
 		resp, err := r.Read(ctx, infer.ReadRequest[OrganizationMemberInput, OrganizationMemberState]{
@@ -213,7 +213,7 @@ func TestOrganizationMemberRead(t *testing.T) {
 				}, nil
 			},
 		}
-		ctx := config.WithMockClient(context.Background(), mock)
+		ctx := config.WithMockClient(t.Context(), mock)
 		priorRoleID := "stale-role-id"
 
 		r := &OrganizationMember{}
@@ -238,7 +238,7 @@ func TestOrganizationMemberRead(t *testing.T) {
 				}, nil
 			},
 		}
-		ctx := config.WithMockClient(context.Background(), mock)
+		ctx := config.WithMockClient(t.Context(), mock)
 
 		r := &OrganizationMember{}
 		resp, err := r.Read(ctx, infer.ReadRequest[OrganizationMemberInput, OrganizationMemberState]{ID: gcAcmeAlice})
@@ -260,7 +260,7 @@ func TestOrganizationMemberRead(t *testing.T) {
 				}, nil
 			},
 		}
-		ctx := config.WithMockClient(context.Background(), mock)
+		ctx := config.WithMockClient(t.Context(), mock)
 		roleID := "custom-role-id"
 
 		r := &OrganizationMember{}
@@ -304,7 +304,7 @@ func TestOrganizationMemberRead(t *testing.T) {
 
 	t.Run("member on the org default role keeps role member", func(t *testing.T) {
 		mock := &orgMemberClientMock{getFunc: builderMember, listRolesFunc: migratedOrgRoles}
-		ctx := config.WithMockClient(context.Background(), mock)
+		ctx := config.WithMockClient(t.Context(), mock)
 		member := defaultOrgMemberRole
 
 		r := &OrganizationMember{}
@@ -322,7 +322,7 @@ func TestOrganizationMemberRead(t *testing.T) {
 
 	t.Run("roleId pointing at the org default role stays a roleId", func(t *testing.T) {
 		mock := &orgMemberClientMock{getFunc: builderMember, listRolesFunc: migratedOrgRoles}
-		ctx := config.WithMockClient(context.Background(), mock)
+		ctx := config.WithMockClient(t.Context(), mock)
 		roleID := gcBuilderID
 
 		r := &OrganizationMember{}
@@ -366,7 +366,7 @@ func TestOrganizationMemberRead(t *testing.T) {
 				}, nil
 			},
 		}
-		ctx := config.WithMockClient(context.Background(), mock)
+		ctx := config.WithMockClient(t.Context(), mock)
 		declared := defaultOrgMemberRole
 
 		r := &OrganizationMember{}
@@ -383,7 +383,7 @@ func TestOrganizationMemberRead(t *testing.T) {
 
 	t.Run("bad id", func(t *testing.T) {
 		r := &OrganizationMember{}
-		_, err := r.Read(context.Background(), infer.ReadRequest[OrganizationMemberInput, OrganizationMemberState]{
+		_, err := r.Read(t.Context(), infer.ReadRequest[OrganizationMemberInput, OrganizationMemberState]{
 			ID: "no-slash",
 		})
 		assert.ErrorContains(t, err, "must be in the format")
@@ -414,7 +414,7 @@ func TestOrganizationMemberCreate(t *testing.T) {
 			},
 			listRolesFunc: stubBuiltinRoles,
 		}
-		ctx := config.WithMockClient(context.Background(), mock)
+		ctx := config.WithMockClient(t.Context(), mock)
 		role := testAdminRole
 
 		r := &OrganizationMember{}
@@ -463,7 +463,7 @@ func TestOrganizationMemberCreate(t *testing.T) {
 				}}, nil
 			},
 		}
-		ctx := config.WithMockClient(context.Background(), mock)
+		ctx := config.WithMockClient(t.Context(), mock)
 		role := gcReader
 
 		r := &OrganizationMember{}
@@ -503,7 +503,7 @@ func TestOrganizationMemberCreate(t *testing.T) {
 			},
 			listRolesFunc: stubBuiltinRoles,
 		}
-		ctx := config.WithMockClient(context.Background(), mock)
+		ctx := config.WithMockClient(t.Context(), mock)
 		roleID := "role-xyz"
 
 		r := &OrganizationMember{}
@@ -540,7 +540,7 @@ func TestOrganizationMemberDelete(t *testing.T) {
 				return nil
 			},
 		}
-		ctx := config.WithMockClient(context.Background(), mock)
+		ctx := config.WithMockClient(t.Context(), mock)
 		r := &OrganizationMember{}
 		_, err := r.Delete(ctx, infer.DeleteRequest[OrganizationMemberState]{
 			State: OrganizationMemberState{
@@ -562,7 +562,7 @@ func TestOrganizationMemberDelete(t *testing.T) {
 				return &pulumiapi.ErrorResponse{StatusCode: http.StatusNotFound}
 			},
 		}
-		ctx := config.WithMockClient(context.Background(), mock)
+		ctx := config.WithMockClient(t.Context(), mock)
 		_, err := (&OrganizationMember{}).Delete(ctx, infer.DeleteRequest[OrganizationMemberState]{
 			State: OrganizationMemberState{
 				OrganizationMemberCore: OrganizationMemberCore{OrganizationName: gcAcme, Username: gcAlice},
@@ -580,7 +580,7 @@ func TestOrganizationMemberDelete(t *testing.T) {
 				return nil
 			},
 		}
-		ctx := config.WithMockClient(context.Background(), mock)
+		ctx := config.WithMockClient(t.Context(), mock)
 		r := &OrganizationMember{}
 		_, err := r.Delete(ctx, infer.DeleteRequest[OrganizationMemberState]{
 			State: OrganizationMemberState{
@@ -600,7 +600,7 @@ func TestOrganizationMemberUpdateDryRunPreservesAdopted(t *testing.T) {
 	// Regression: Update's DryRun branch returned OrganizationMemberState{}
 	// with Adopted defaulting to false. `pulumi preview` on an adopted
 	// member then showed a spurious `adopted: true → false` diff.
-	ctx := config.WithMockClient(context.Background(), &orgMemberClientMock{})
+	ctx := config.WithMockClient(t.Context(), &orgMemberClientMock{})
 	role := testAdminRole
 
 	r := &OrganizationMember{}
@@ -640,7 +640,7 @@ func TestOrganizationMemberUpdatePreservesAdopted(t *testing.T) {
 			}, nil
 		},
 	}
-	ctx := config.WithMockClient(context.Background(), mock)
+	ctx := config.WithMockClient(t.Context(), mock)
 	role := testAdminRole
 
 	r := &OrganizationMember{}
@@ -676,7 +676,7 @@ func TestOrganizationMemberReadPreservesAdopted(t *testing.T) {
 			}, nil
 		},
 	}
-	ctx := config.WithMockClient(context.Background(), mock)
+	ctx := config.WithMockClient(t.Context(), mock)
 
 	r := &OrganizationMember{}
 	resp, err := r.Read(ctx, infer.ReadRequest[OrganizationMemberInput, OrganizationMemberState]{
@@ -696,7 +696,7 @@ func TestOrganizationMemberReadPreservesAdopted(t *testing.T) {
 func TestOrganizationMemberCheckAcceptsStoredDefaultRoles(t *testing.T) {
 	r := &OrganizationMember{}
 	for _, role := range []string{gcReader, gcBuilder, "maintainer"} {
-		resp, err := r.Check(context.Background(), infer.CheckRequest{
+		resp, err := r.Check(t.Context(), infer.CheckRequest{
 			NewInputs: property.NewMap(map[string]property.Value{
 				gcOrganizationName: property.New(gcAcme),
 				gcUsername:         property.New(gcAlice),
@@ -712,7 +712,7 @@ func TestOrganizationMemberCheck(t *testing.T) {
 	r := &OrganizationMember{}
 	bad := "owner"
 
-	resp, err := r.Check(context.Background(), infer.CheckRequest{
+	resp, err := r.Check(t.Context(), infer.CheckRequest{
 		NewInputs: property.NewMap(map[string]property.Value{
 			gcOrganizationName: property.New(gcAcme),
 			gcUsername:         property.New(gcAlice),

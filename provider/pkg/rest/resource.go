@@ -420,8 +420,7 @@ func (r *Resource) checkAlreadyExists(ctx context.Context, inputs property.Map) 
 	// Read URL needs a path param we can't supply pre-create (typically a
 	// server-generated ID). The probe can't run, so surface a metadata-error
 	// message instead of the generic "requireImport probe" wrap.
-	var mpErr *MissingPathParamError
-	if errors.As(err, &mpErr) {
+	if mpErr, ok := errors.AsType[*MissingPathParamError](err); ok {
 		token := r.meta.Token
 		if token == "" {
 			token = "this resource"
@@ -518,10 +517,7 @@ func (r *Resource) parseIDIntoInputs(id string, inputs property.Map) property.Ma
 	if matches == nil {
 		return inputs
 	}
-	out := map[string]property.Value{}
-	for k, v := range inputs.AllStable {
-		out[k] = v
-	}
+	out := maps.Collect(inputs.AllStable)
 	for i, name := range names {
 		if i+1 >= len(matches) {
 			break
@@ -693,10 +689,7 @@ func (r *Resource) fetchState(ctx context.Context, source, prior property.Map) (
 // preserveEmitOnCreate copies EmitOnCreate fields from oldState into
 // newState when missing. Token values are the canonical case.
 func (r *Resource) preserveEmitOnCreate(newState, oldState property.Map) property.Map {
-	out := map[string]property.Value{}
-	for k, v := range newState.AllStable {
-		out[k] = v
-	}
+	out := maps.Collect(newState.AllStable)
 	for name, fm := range r.meta.Fields {
 		if len(fm.EmitOnCreateKeys) > 0 {
 			if v, ok := out[name]; ok {
@@ -726,10 +719,7 @@ func preserveObjectKeys(v, prior property.Value, keys []string) property.Value {
 	}
 	obj := v.AsMap()
 	priorObj := prior.AsMap()
-	merged := map[string]property.Value{}
-	for k, kv := range obj.AllStable {
-		merged[k] = kv
-	}
+	merged := maps.Collect(obj.AllStable)
 	changed := false
 	for _, k := range keys {
 		if _, has := merged[k]; has {
@@ -881,13 +871,11 @@ func (r *Resource) Delete(ctx context.Context, req p.DeleteRequest) error {
 }
 
 // mergeMaps unions every key. Earlier maps take precedence on conflict.
-func mergeMaps(maps ...property.Map) property.Map {
+func mergeMaps(ms ...property.Map) property.Map {
 	out := map[string]property.Value{}
 	// Walk in reverse so earlier maps overwrite later ones.
-	for i := len(maps) - 1; i >= 0; i-- {
-		for k, v := range maps[i].AllStable {
-			out[k] = v
-		}
+	for _, m := range slices.Backward(ms) {
+		maps.Insert(out, m.AllStable)
 	}
 	return property.NewMap(out)
 }

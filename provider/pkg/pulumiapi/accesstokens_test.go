@@ -1,14 +1,11 @@
 package pulumiapi
 
 import (
-	"context"
 	"net/http"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
-
-var ctx = context.Background()
 
 const (
 	testTokenID          = "abcdegh"
@@ -29,7 +26,7 @@ func TestDeleteAccessToken(t *testing.T) {
 			ExpectedReqPath:   "/api/user/tokens/" + tokenID,
 			ResponseCode:      204,
 		})
-		assert.NoError(t, c.DeleteAccessToken(ctx, tokenID))
+		assert.NoError(t, c.DeleteAccessToken(t.Context(), tokenID))
 	})
 
 	t.Run("Error", func(t *testing.T) {
@@ -43,7 +40,7 @@ func TestDeleteAccessToken(t *testing.T) {
 			},
 		})
 		assert.EqualError(t,
-			c.DeleteAccessToken(ctx, tokenID),
+			c.DeleteAccessToken(t.Context(), tokenID),
 			`failed to delete access token "abcdegh": 500 API error: token not found`,
 		)
 	})
@@ -66,7 +63,7 @@ func TestCreateAccessToken(t *testing.T) {
 			ResponseCode:    201,
 			ResponseBody:    resp,
 		})
-		token, err := c.CreateAccessToken(ctx, desc, 0)
+		token, err := c.CreateAccessToken(t.Context(), desc, 0)
 		assert.NoError(t, err)
 		assert.Equal(t, &AccessToken{
 			ID:          resp.ID,
@@ -90,7 +87,7 @@ func TestCreateAccessToken(t *testing.T) {
 			ResponseCode:    201,
 			ResponseBody:    resp,
 		})
-		token, err := c.CreateAccessToken(ctx, desc, testTokenExpires)
+		token, err := c.CreateAccessToken(t.Context(), desc, testTokenExpires)
 		assert.NoError(t, err)
 		assert.Equal(t, &AccessToken{
 			ID:          resp.ID,
@@ -113,7 +110,7 @@ func TestCreateAccessToken(t *testing.T) {
 				Message:    unauthorizedError,
 			},
 		})
-		token, err := c.CreateAccessToken(ctx, desc, 0)
+		token, err := c.CreateAccessToken(t.Context(), desc, 0)
 		assert.Nil(t, token, "token should be nil")
 		assert.EqualError(t,
 			err,
@@ -149,7 +146,7 @@ func TestGetAccessToken(t *testing.T) {
 			ResponseCode:      200,
 			ResponseBody:      resp,
 		})
-		token, err := c.GetAccessToken(ctx, id)
+		token, err := c.GetAccessToken(t.Context(), id)
 		assert.NoError(t, err)
 		assert.Equal(t, &AccessToken{
 			ID:          id,
@@ -169,7 +166,7 @@ func TestGetAccessToken(t *testing.T) {
 				Message:    unauthorizedError,
 			},
 		})
-		token, err := c.GetAccessToken(ctx, id)
+		token, err := c.GetAccessToken(t.Context(), id)
 		assert.Nil(t, token, "token should be nil")
 		assert.EqualError(t,
 			err,

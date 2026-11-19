@@ -17,6 +17,7 @@ package rest
 import (
 	"encoding/json"
 	"fmt"
+	"maps"
 	"net/http"
 	"sort"
 	"strings"
@@ -137,9 +138,7 @@ func (s *Spec) Op(id string) (*Operation, bool) {
 // AllOps returns a defensive copy of the operationId → Operation map.
 func (s *Spec) AllOps() map[string]*Operation {
 	out := make(map[string]*Operation, len(s.ops))
-	for id, op := range s.ops {
-		out[id] = op
-	}
+	maps.Copy(out, s.ops)
 	return out
 }
 

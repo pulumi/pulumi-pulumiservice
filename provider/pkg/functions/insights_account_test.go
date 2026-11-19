@@ -65,8 +65,8 @@ func TestGetInsightsAccountFunction(t *testing.T) {
 			Provider:             string(resources.CloudProviderAWS),
 			ProviderEnvRef:       "test-env",
 			ScheduledScanEnabled: true,
-			ProviderConfig: map[string]interface{}{
-				"regions": []interface{}{"us-west-2"},
+			ProviderConfig: map[string]any{
+				"regions": []any{"us-west-2"},
 			},
 		}
 		mockedClient := &insightsAccountClientMock{
@@ -192,8 +192,8 @@ func TestGetInsightsAccountsFunction(t *testing.T) {
 			Provider:             string(resources.CloudProviderAWS),
 			ProviderEnvRef:       "aws-env",
 			ScheduledScanEnabled: true,
-			ProviderConfig: map[string]interface{}{
-				"regions": []interface{}{"us-west-2", "us-east-1"},
+			ProviderConfig: map[string]any{
+				"regions": []any{"us-west-2", "us-east-1"},
 			},
 		}
 		gcpAccount := pulumiapi.InsightsAccount{
