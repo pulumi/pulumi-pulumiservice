@@ -292,7 +292,7 @@ resources:
     properties:
       orgName: ${organizationName}
       teamName: ${platformTeam.name}
-      roleID: ${stackReadonlyRole.id}
+      roleID: ${stackReadonlyRole.roleID}
 
 outputs:
   platformTeamName: ${platformTeam.name}
