@@ -301,8 +301,11 @@ The `pulumiapi` package provides HTTP client wrappers for the Pulumi Cloud REST 
 
 Pulumi employees release by merging a release PR: it batches the changelog and
 carries the `auto-release` label and a `Release-Version:` marker. GitHub Actions
-then tags, publishes, and adds the changelog to the GitHub release. The steps
-are in [Releasing](CONTRIBUTING.md#releasing).
+then tags, publishes, and adds the changelog to the GitHub release. A release
+with `@release-bot` or a hand-pushed tag skips the batching, so
+`pulumiservice-release-notes.yml` batches the changelog after the release and
+opens a PR that applies it to `main`. The steps are in
+[Releasing](CONTRIBUTING.md#releasing).
 
 ## Configuration
 

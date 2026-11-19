@@ -31,6 +31,7 @@ on:
 
 permissions:
   contents: write
+  issues: write
   id-token: write # For ESC secrets.
 
 concurrency:
@@ -69,7 +70,20 @@ jobs:
             echo "notes=$NOTES" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          FRAGMENTS=$(find .changes/unreleased -name '*.yaml' | sort)
+          # A fragment that was already in the previous stable tag shipped in
+          # that release. It's still here when that release was also tagged
+          # without batching and its batch PR hasn't merged yet.
+          PREV=$(git describe --tags --abbrev=0 --match 'v[0-9]*' --exclude '*-*' "$VERSION^" 2>/dev/null || true)
+          FRAGMENTS=""
+          while IFS= read -r f; do
+            if [[ -n "$PREV" ]] && git cat-file -e "$PREV:$f" 2>/dev/null; then
+              echo "::notice::Skipping $f, which shipped in $PREV."
+              rm "$f"
+            else
+              FRAGMENTS+="$f"$'\n'
+            fi
+          done < <(find .changes/unreleased -name '*.yaml' | sort)
+          FRAGMENTS=${FRAGMENTS%$'\n'}
           if [[ -z "$FRAGMENTS" ]]; then
             echo "::notice::$VERSION has no changelog fragments; leaving the changelog and the release body as they are."
             exit 0
@@ -156,3 +170,18 @@ jobs:
               --body "$VERSION was tagged without batching its changelog. This moves the fragments that were in the tagged commit under a $VERSION heading and regenerates \`CHANGELOG.md\`. Fragments merged after the tag stay unreleased."
           fi
           gh pr merge "$BRANCH" --auto --squash
+
+      # Without this, a failed run goes unnoticed and the changelog falls
+      # behind the releases.
+      - name: Open an issue if the changelog wasn't updated
+        if: failure()
+        run: |
+          set -euo pipefail
+          TITLE="Changelog not updated for $VERSION"
+          if [[ -n "$(gh issue list --repo "$GITHUB_REPOSITORY" --state open --search "\"$TITLE\" in:title" --json number -q '.[].number')" ]]; then
+            exit 0
+          fi
+          RUN_URL="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+          gh issue create --repo "$GITHUB_REPOSITORY" --title "$TITLE" --body "The release-notes workflow failed for $VERSION: $RUN_URL
+
+          Fix the cause and re-run the workflow with \`$VERSION\` as its input. It's safe to re-run: it skips the steps that already finished."
