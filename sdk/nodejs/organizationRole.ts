@@ -246,7 +246,7 @@ export class OrganizationRole extends pulumi.CustomResource {
      */
     declare public readonly description: pulumi.Output<string | undefined>;
     /**
-     * The role's display name. Must be unique within the organization.
+     * The role's display name, up to 100 bytes. Must be unique within the organization. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
      */
     declare public readonly name: pulumi.Output<string>;
     /**
@@ -292,9 +292,6 @@ export class OrganizationRole extends pulumi.CustomResource {
         let resourceInputs: pulumi.Inputs = {};
         opts = opts || {};
         if (!opts.id) {
-            if (args?.name === undefined && !opts.urn) {
-                throw new Error("Missing required property 'name'");
-            }
             if (args?.organizationName === undefined && !opts.urn) {
                 throw new Error("Missing required property 'organizationName'");
             }
@@ -333,9 +330,9 @@ export interface OrganizationRoleArgs {
      */
     description?: pulumi.Input<string | undefined>;
     /**
-     * The role's display name. Must be unique within the organization.
+     * The role's display name, up to 100 bytes. Must be unique within the organization. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
      */
-    name: pulumi.Input<string>;
+    name?: pulumi.Input<string | undefined>;
     /**
      * The Pulumi Cloud organization name.
      */

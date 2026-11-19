@@ -77,6 +77,9 @@ func (c *Client) DeleteStackTag(ctx context.Context, stackName StackIdentifier, 
 	)
 	_, err := c.do(ctx, http.MethodDelete, apiPath, nil, nil)
 	if err != nil {
+		if GetErrorStatusCode(err) == http.StatusNotFound {
+			return nil
+		}
 		return fmt.Errorf("failed to make request: %w", err)
 	}
 	return nil

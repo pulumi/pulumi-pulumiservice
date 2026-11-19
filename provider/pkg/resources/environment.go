@@ -244,6 +244,9 @@ func (*Environment) Delete(
 ) (infer.DeleteResponse, error) {
 	err := config.GetEscClient(ctx).DeleteEnvironment(
 		ctx, req.State.Organization, projectOrDefault(req.State.Project), req.State.Name)
+	if esc_client.IsNotFound(err) {
+		return infer.DeleteResponse{}, nil
+	}
 	return infer.DeleteResponse{}, err
 }
 

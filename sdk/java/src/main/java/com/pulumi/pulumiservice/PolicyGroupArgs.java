@@ -66,18 +66,18 @@ public final class PolicyGroupArgs extends com.pulumi.resources.ResourceArgs {
     }
 
     /**
-     * The name of the policy group.
+     * The name of the policy group, up to 100 characters. Only letters, digits, hyphens, underscores, spaces and periods are allowed, and the name can&#39;t begin or end with a space. If omitted, Pulumi generates a name from the resource&#39;s logical name plus a random suffix, or follows the stack&#39;s [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). Characters that aren&#39;t allowed in the logical name are replaced with hyphens.
      * 
      */
-    @Import(name="name", required=true)
-    private Output<String> name;
+    @Import(name="name")
+    private @Nullable Output<String> name;
 
     /**
-     * @return The name of the policy group.
+     * @return The name of the policy group, up to 100 characters. Only letters, digits, hyphens, underscores, spaces and periods are allowed, and the name can&#39;t begin or end with a space. If omitted, Pulumi generates a name from the resource&#39;s logical name plus a random suffix, or follows the stack&#39;s [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). Characters that aren&#39;t allowed in the logical name are replaced with hyphens.
      * 
      */
-    public Output<String> name() {
-        return this.name;
+    public Optional<Output<String>> name() {
+        return Optional.ofNullable(this.name);
     }
 
     /**
@@ -229,18 +229,18 @@ public final class PolicyGroupArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param name The name of the policy group.
+         * @param name The name of the policy group, up to 100 characters. Only letters, digits, hyphens, underscores, spaces and periods are allowed, and the name can&#39;t begin or end with a space. If omitted, Pulumi generates a name from the resource&#39;s logical name plus a random suffix, or follows the stack&#39;s [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). Characters that aren&#39;t allowed in the logical name are replaced with hyphens.
          * 
          * @return builder
          * 
          */
-        public Builder name(Output<String> name) {
+        public Builder name(@Nullable Output<String> name) {
             $.name = name;
             return this;
         }
 
         /**
-         * @param name The name of the policy group.
+         * @param name The name of the policy group, up to 100 characters. Only letters, digits, hyphens, underscores, spaces and periods are allowed, and the name can&#39;t begin or end with a space. If omitted, Pulumi generates a name from the resource&#39;s logical name plus a random suffix, or follows the stack&#39;s [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). Characters that aren&#39;t allowed in the logical name are replaced with hyphens.
          * 
          * @return builder
          * 
@@ -335,9 +335,6 @@ public final class PolicyGroupArgs extends com.pulumi.resources.ResourceArgs {
         public PolicyGroupArgs build() {
             $.entityType = Codegen.stringProp("entityType").output().arg($.entityType).def("stacks").getNullable();
             $.mode = Codegen.stringProp("mode").output().arg($.mode).def("audit").getNullable();
-            if ($.name == null) {
-                throw new MissingRequiredPropertyException("PolicyGroupArgs", "name");
-            }
             if ($.organizationName == null) {
                 throw new MissingRequiredPropertyException("PolicyGroupArgs", "organizationName");
             }

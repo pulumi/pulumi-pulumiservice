@@ -1,0 +1,34 @@
+name: yaml-rbac-member-role
+runtime: yaml
+description: Adopts an existing organization member and gives them a built-in role.
+
+config:
+  organizationName:
+    type: string
+    default: service-provider-test-org
+  # An existing member of the organization. The default is the fixture user
+  # of the CI test org.
+  adoptedUsername:
+    type: string
+    default: service-provider-example-user
+
+resources:
+  member:
+    type: pulumiservice:OrganizationMember
+    properties:
+      organizationName: ${organizationName}
+      username: ${adoptedUsername}
+      role: admin
+
+variables:
+  memberByUsername:
+    fn::invoke:
+      function: pulumiservice:getOrganizationMember
+      arguments:
+        organizationName: ${organizationName}
+        username: ${member.username}
+
+outputs:
+  memberAdopted: ${member.adopted}
+  memberRole: ${member.role}
+  lookedUpMemberRole: ${memberByUsername.role}

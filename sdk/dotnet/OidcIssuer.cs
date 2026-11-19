@@ -37,7 +37,7 @@ namespace Pulumi.PulumiService
         public Output<int?> MaxExpirationSeconds { get; private set; } = null!;
 
         /// <summary>
-        /// Issuer name.
+        /// Issuer name, up to 255 characters. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
         /// </summary>
         [Output("name")]
         public Output<string> Name { get; private set; } = null!;
@@ -123,10 +123,10 @@ namespace Pulumi.PulumiService
         public Input<int>? MaxExpirationSeconds { get; set; }
 
         /// <summary>
-        /// Issuer name.
+        /// Issuer name, up to 255 characters. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
         /// </summary>
-        [Input("name", required: true)]
-        public Input<string> Name { get; set; } = null!;
+        [Input("name")]
+        public Input<string>? Name { get; set; }
 
         /// <summary>
         /// Organization name.

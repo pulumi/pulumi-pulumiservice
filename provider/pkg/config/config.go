@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"net/url"
 	"os"
 	"runtime"
 	"time"
@@ -15,6 +16,7 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/common/workspace"
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/rest"
 )
 
 const (
@@ -24,6 +26,8 @@ const (
 	// flows (e.g. `pl login devstack`). We honor it as a fallback so a token
 	// scoped to a non-prod backend doesn't silently route to api.pulumi.com.
 	EnvVarPulumiAPI = "PULUMI_API"
+
+	defaultAPIURL = "https://api.pulumi.com"
 )
 
 func GetClient(ctx context.Context) Client {
@@ -41,6 +45,12 @@ func GetEscClient(ctx context.Context) esc_client.Client {
 		return v.(esc_client.Client)
 	}
 	return infer.GetConfig[Config](ctx).escClient
+}
+
+// GetTransport returns the transport the api resources send requests through,
+// or nil before Configure has run.
+func GetTransport(ctx context.Context) rest.Transport {
+	return infer.GetConfig[Config](ctx).transport
 }
 
 type (
@@ -103,6 +113,7 @@ type Config struct {
 
 	client    *pulumiapi.Client
 	escClient esc_client.Client
+	transport rest.Transport
 }
 
 func (c *Config) Annotate(a infer.Annotator) {
@@ -145,12 +156,28 @@ func (c *Config) Configure(context.Context) error {
 		c.APIURL = os.Getenv(EnvVarPulumiAPI)
 	}
 
-	var err error
-	c.client, err = pulumiapi.NewClient(&http.Client{
+	httpClient := &http.Client{
 		Timeout: 60 * time.Second,
-	}, c.AccessToken, c.APIURL)
+	}
+	var err error
+	c.client, err = pulumiapi.NewClient(httpClient, c.AccessToken, c.APIURL)
 	if err != nil {
 		return err
+	}
+	// pulumiapi.NewClient and the ESC client default an empty URL on their
+	// own; the transport needs the default spelled out.
+	rawBaseURL := c.APIURL
+	if rawBaseURL == "" {
+		rawBaseURL = defaultAPIURL
+	}
+	baseURL, err := url.Parse(rawBaseURL)
+	if err != nil {
+		return fmt.Errorf("parse API URL %q: %w", rawBaseURL, err)
+	}
+	c.transport = &authedTransport{
+		baseURL: baseURL,
+		token:   c.AccessToken,
+		client:  httpClient,
 	}
 	c.escClient = esc_client.New(
 		fmt.Sprintf("provider-pulumiservice/1 (%s; %s)", version.Version, runtime.GOOS),
@@ -159,6 +186,34 @@ func (c *Config) Configure(context.Context) error {
 		false,
 	)
 	return nil
+}
+
+type authedTransport struct {
+	baseURL *url.URL
+	token   string
+	client  *http.Client
+}
+
+func (t *authedTransport) Do(_ context.Context, req *http.Request) (*http.Response, error) {
+	req.URL.Scheme = t.baseURL.Scheme
+	req.URL.Host = t.baseURL.Host
+	// rest builds requests on a placeholder host, which http.NewRequest copies
+	// into req.Host. The client sends req.Host ahead of URL.Host, so it has to
+	// be rewritten too.
+	req.Host = t.baseURL.Host
+
+	req.Header.Set("Authorization", "token "+t.token)
+	// v0 (legacy) callers leave Accept unset and want the Pulumi-versioned
+	// media type; api (rest.Resource) sets Accept: application/json explicitly
+	// because its OpenAPI-described endpoints return standard JSON.
+	if req.Header.Get("Accept") == "" {
+		req.Header.Set("Accept", pulumiapi.AcceptMediaType)
+	}
+	req.Header.Set("X-Pulumi-Source", "provider")
+
+	// Request host is pinned to the operator-configured Pulumi API base URL
+	// (authedTransport.baseURL), not attacker-controlled per-request input.
+	return t.client.Do(req) //nolint:gosec // G704: host pinned to configured API base URL, not request input
 }
 
 func (*Config) Diff(_ context.Context, req infer.DiffRequest[*Config, *Config]) (infer.DiffResponse, error) {

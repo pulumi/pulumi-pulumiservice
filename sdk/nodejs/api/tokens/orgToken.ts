@@ -122,7 +122,7 @@ export interface OrgTokenArgs {
      */
     expires: pulumi.Input<number>;
     /**
-     * The name
+     * The display name of the token. Must be between 1 and 40 characters.
      */
     name: pulumi.Input<string>;
     /**

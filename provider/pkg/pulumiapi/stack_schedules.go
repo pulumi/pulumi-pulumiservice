@@ -266,6 +266,9 @@ func (c *Client) DeleteStackSchedule(ctx context.Context, stack StackIdentifier,
 	)
 	_, err := c.do(ctx, http.MethodDelete, apiPath, nil, nil)
 	if err != nil {
+		if GetErrorStatusCode(err) == http.StatusNotFound {
+			return nil
+		}
 		return fmt.Errorf("failed to delete stack schedule with scheduleId %s : %w", scheduleID, err)
 	}
 	return nil

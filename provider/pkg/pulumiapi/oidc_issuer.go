@@ -111,9 +111,9 @@ func (c *Client) GetOidcIssuer(
 ) (*OidcIssuerRegistrationResponse, error) {
 	apiPath := path.Join("orgs", organization, "oidc", "issuers", issuerID)
 	var response = &OidcIssuerRegistrationResponse{}
-	result, err := c.do(ctx, http.MethodGet, apiPath, nil, response)
+	_, err := c.do(ctx, http.MethodGet, apiPath, nil, response)
 	if err != nil {
-		if result.StatusCode == 404 {
+		if GetErrorStatusCode(err) == http.StatusNotFound {
 			return nil, nil
 		}
 		return nil, fmt.Errorf("failed to get oidc issuer with id '%s': %w", issuerID, err)
@@ -123,9 +123,9 @@ func (c *Client) GetOidcIssuer(
 
 func (c *Client) DeleteOidcIssuer(ctx context.Context, organization string, issuerID string) error {
 	apiPath := path.Join("orgs", organization, "oidc", "issuers", issuerID)
-	result, err := c.do(ctx, http.MethodDelete, apiPath, nil, nil)
+	_, err := c.do(ctx, http.MethodDelete, apiPath, nil, nil)
 	if err != nil {
-		if result.StatusCode == 404 {
+		if GetErrorStatusCode(err) == http.StatusNotFound {
 			return nil
 		}
 		return fmt.Errorf("failed to delete oidc issuer with id '%s': %w", issuerID, err)

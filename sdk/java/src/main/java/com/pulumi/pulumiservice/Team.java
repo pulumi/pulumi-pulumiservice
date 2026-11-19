@@ -74,28 +74,32 @@ public class Team extends com.pulumi.resources.CustomResource {
         return Codegen.optional(this.githubTeamId);
     }
     /**
-     * List of Pulumi Cloud usernames of team members.
+     * The Pulumi Cloud usernames of the team&#39;s members.
+     * Pulumi Cloud adds the user who creates the team as a member, usually the owner of the access token that runs `pulumi up`.
+     * List that user here to keep them on the team: otherwise `pulumi refresh` shows them as a change, and the next update to `members` removes them.
      * 
      */
     @Export(name="members", refs={List.class,String.class}, tree="[0,1]")
     private Output<List<String>> members;
 
     /**
-     * @return List of Pulumi Cloud usernames of team members.
+     * @return The Pulumi Cloud usernames of the team&#39;s members.
+     * Pulumi Cloud adds the user who creates the team as a member, usually the owner of the access token that runs `pulumi up`.
+     * List that user here to keep them on the team: otherwise `pulumi refresh` shows them as a change, and the next update to `members` removes them.
      * 
      */
     public Output<List<String>> members() {
         return this.members;
     }
     /**
-     * The team&#39;s name. Required for &#34;pulumi&#34; teams.
+     * The team&#39;s name, up to 100 characters. Only letters, digits, hyphens, underscores and periods are allowed. If omitted, Pulumi generates a name from the resource&#39;s logical name plus a random suffix, or follows the stack&#39;s [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). Characters that aren&#39;t allowed in the logical name are replaced with hyphens. Only &#34;pulumi&#34; teams are auto-named.
      * 
      */
     @Export(name="name", refs={String.class}, tree="[0]")
     private Output</* @Nullable */ String> name;
 
     /**
-     * @return The team&#39;s name. Required for &#34;pulumi&#34; teams.
+     * @return The team&#39;s name, up to 100 characters. Only letters, digits, hyphens, underscores and periods are allowed. If omitted, Pulumi generates a name from the resource&#39;s logical name plus a random suffix, or follows the stack&#39;s [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). Characters that aren&#39;t allowed in the logical name are replaced with hyphens. Only &#34;pulumi&#34; teams are auto-named.
      * 
      */
     public Output<Optional<String>> name() {

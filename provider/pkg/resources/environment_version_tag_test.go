@@ -15,10 +15,16 @@
 package resources
 
 import (
+	"net/http"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/pulumi/pulumi-go-provider/infer"
+	"github.com/pulumi/pulumi/sdk/v3/go/common/apitype"
+
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 )
 
 func TestEnvironmentVersionTagID(t *testing.T) {
@@ -58,4 +64,30 @@ func TestSplitEnvironmentVersionTagID(t *testing.T) {
 		_, _, _, _, err := splitEnvironmentVersionTagID("a/b/c/d/e")
 		require.Error(t, err)
 	})
+}
+
+func TestEnvironmentVersionTagDelete(t *testing.T) {
+	for _, tc := range []struct {
+		name      string
+		deleteErr error
+		wantErr   bool
+	}{
+		{"deleted", nil, false},
+		{"already gone", &apitype.ErrorResponse{Code: http.StatusNotFound}, false},
+		{"server error", &apitype.ErrorResponse{Code: http.StatusInternalServerError}, true},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			ctx := config.WithMockEscClient(t.Context(), &EscClientMock{deleteErr: tc.deleteErr})
+			_, err := (&EnvironmentVersionTag{}).Delete(ctx, infer.DeleteRequest[EnvironmentVersionTagState]{
+				State: EnvironmentVersionTagState{EnvironmentVersionTagInput{
+					Organization: gcMyOrg, Project: "tag-proj", Environment: "tag-env", TagName: "tag-name",
+				}},
+			})
+			if tc.wantErr {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+			}
+		})
+	}
 }

@@ -34,9 +34,11 @@ type Team struct {
 	DisplayName pulumi.StringPtrOutput `pulumi:"displayName"`
 	// The GitHub ID of the team to mirror. Must be in the same GitHub organization that the Pulumi org is backed by. Required for "github" teams.
 	GithubTeamId pulumi.Float64PtrOutput `pulumi:"githubTeamId"`
-	// List of Pulumi Cloud usernames of team members.
+	// The Pulumi Cloud usernames of the team's members.
+	// Pulumi Cloud adds the user who creates the team as a member, usually the owner of the access token that runs `pulumi up`.
+	// List that user here to keep them on the team: otherwise `pulumi refresh` shows them as a change, and the next update to `members` removes them.
 	Members pulumi.StringArrayOutput `pulumi:"members"`
-	// The team's name. Required for "pulumi" teams.
+	// The team's name, up to 100 characters. Only letters, digits, hyphens, underscores and periods are allowed. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). Characters that aren't allowed in the logical name are replaced with hyphens. Only "pulumi" teams are auto-named.
 	Name pulumi.StringPtrOutput `pulumi:"name"`
 	// The name of the Pulumi organization the team belongs to.
 	OrganizationName pulumi.StringOutput `pulumi:"organizationName"`
@@ -102,9 +104,11 @@ type teamArgs struct {
 	DisplayName *string `pulumi:"displayName"`
 	// The GitHub ID of the team to mirror. Must be in the same GitHub organization that the Pulumi org is backed by. Required for "github" teams.
 	GithubTeamId *float64 `pulumi:"githubTeamId"`
-	// List of Pulumi Cloud usernames of team members.
+	// The Pulumi Cloud usernames of the team's members.
+	// Pulumi Cloud adds the user who creates the team as a member, usually the owner of the access token that runs `pulumi up`.
+	// List that user here to keep them on the team: otherwise `pulumi refresh` shows them as a change, and the next update to `members` removes them.
 	Members []string `pulumi:"members"`
-	// The team's name. Required for "pulumi" teams.
+	// The team's name, up to 100 characters. Only letters, digits, hyphens, underscores and periods are allowed. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). Characters that aren't allowed in the logical name are replaced with hyphens. Only "pulumi" teams are auto-named.
 	Name *string `pulumi:"name"`
 	// The name of the Pulumi organization the team belongs to.
 	OrganizationName string `pulumi:"organizationName"`
@@ -120,9 +124,11 @@ type TeamArgs struct {
 	DisplayName pulumi.StringPtrInput
 	// The GitHub ID of the team to mirror. Must be in the same GitHub organization that the Pulumi org is backed by. Required for "github" teams.
 	GithubTeamId pulumi.Float64PtrInput
-	// List of Pulumi Cloud usernames of team members.
+	// The Pulumi Cloud usernames of the team's members.
+	// Pulumi Cloud adds the user who creates the team as a member, usually the owner of the access token that runs `pulumi up`.
+	// List that user here to keep them on the team: otherwise `pulumi refresh` shows them as a change, and the next update to `members` removes them.
 	Members pulumi.StringArrayInput
-	// The team's name. Required for "pulumi" teams.
+	// The team's name, up to 100 characters. Only letters, digits, hyphens, underscores and periods are allowed. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). Characters that aren't allowed in the logical name are replaced with hyphens. Only "pulumi" teams are auto-named.
 	Name pulumi.StringPtrInput
 	// The name of the Pulumi organization the team belongs to.
 	OrganizationName pulumi.StringInput
@@ -232,12 +238,14 @@ func (o TeamOutput) GithubTeamId() pulumi.Float64PtrOutput {
 	return o.ApplyT(func(v *Team) pulumi.Float64PtrOutput { return v.GithubTeamId }).(pulumi.Float64PtrOutput)
 }
 
-// List of Pulumi Cloud usernames of team members.
+// The Pulumi Cloud usernames of the team's members.
+// Pulumi Cloud adds the user who creates the team as a member, usually the owner of the access token that runs `pulumi up`.
+// List that user here to keep them on the team: otherwise `pulumi refresh` shows them as a change, and the next update to `members` removes them.
 func (o TeamOutput) Members() pulumi.StringArrayOutput {
 	return o.ApplyT(func(v *Team) pulumi.StringArrayOutput { return v.Members }).(pulumi.StringArrayOutput)
 }
 
-// The team's name. Required for "pulumi" teams.
+// The team's name, up to 100 characters. Only letters, digits, hyphens, underscores and periods are allowed. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). Characters that aren't allowed in the logical name are replaced with hyphens. Only "pulumi" teams are auto-named.
 func (o TeamOutput) Name() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *Team) pulumi.StringPtrOutput { return v.Name }).(pulumi.StringPtrOutput)
 }

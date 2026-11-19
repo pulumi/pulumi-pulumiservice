@@ -1,3 +1,0 @@
-name: cs-schedules
-runtime: dotnet
-description: A minimal C# Pulumi Schedules Example

@@ -52,14 +52,14 @@ public class OidcIssuer extends com.pulumi.resources.CustomResource {
         return Codegen.optional(this.maxExpirationSeconds);
     }
     /**
-     * Issuer name.
+     * Issuer name, up to 255 characters. If omitted, Pulumi generates a name from the resource&#39;s logical name plus a random suffix, or follows the stack&#39;s [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
      * 
      */
     @Export(name="name", refs={String.class}, tree="[0]")
     private Output<String> name;
 
     /**
-     * @return Issuer name.
+     * @return Issuer name, up to 255 characters. If omitted, Pulumi generates a name from the resource&#39;s logical name plus a random suffix, or follows the stack&#39;s [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
      * 
      */
     public Output<String> name() {

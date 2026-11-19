@@ -38,18 +38,18 @@ public final class WebhookArgs extends com.pulumi.resources.ResourceArgs {
     }
 
     /**
-     * The friendly name displayed in the Pulumi Cloud.
+     * The friendly name displayed in the Pulumi Cloud, up to 100 bytes. If omitted, Pulumi generates a name from the resource&#39;s logical name plus a random suffix, or follows the stack&#39;s [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
      * 
      */
-    @Import(name="displayName", required=true)
-    private Output<String> displayName;
+    @Import(name="displayName")
+    private @Nullable Output<String> displayName;
 
     /**
-     * @return The friendly name displayed in the Pulumi Cloud.
+     * @return The friendly name displayed in the Pulumi Cloud, up to 100 bytes. If omitted, Pulumi generates a name from the resource&#39;s logical name plus a random suffix, or follows the stack&#39;s [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
      * 
      */
-    public Output<String> displayName() {
-        return this.displayName;
+    public Optional<Output<String>> displayName() {
+        return Optional.ofNullable(this.displayName);
     }
 
     /**
@@ -243,18 +243,18 @@ public final class WebhookArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param displayName The friendly name displayed in the Pulumi Cloud.
+         * @param displayName The friendly name displayed in the Pulumi Cloud, up to 100 bytes. If omitted, Pulumi generates a name from the resource&#39;s logical name plus a random suffix, or follows the stack&#39;s [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
          * 
          * @return builder
          * 
          */
-        public Builder displayName(Output<String> displayName) {
+        public Builder displayName(@Nullable Output<String> displayName) {
             $.displayName = displayName;
             return this;
         }
 
         /**
-         * @param displayName The friendly name displayed in the Pulumi Cloud.
+         * @param displayName The friendly name displayed in the Pulumi Cloud, up to 100 bytes. If omitted, Pulumi generates a name from the resource&#39;s logical name plus a random suffix, or follows the stack&#39;s [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
          * 
          * @return builder
          * 
@@ -475,9 +475,6 @@ public final class WebhookArgs extends com.pulumi.resources.ResourceArgs {
         public WebhookArgs build() {
             if ($.active == null) {
                 throw new MissingRequiredPropertyException("WebhookArgs", "active");
-            }
-            if ($.displayName == null) {
-                throw new MissingRequiredPropertyException("WebhookArgs", "displayName");
             }
             $.format = Codegen.objectProp("format", WebhookFormat.class).output().arg($.format).def(WebhookFormat.Raw).getNullable();
             if ($.organizationName == null) {

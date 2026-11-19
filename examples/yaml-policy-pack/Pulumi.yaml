@@ -8,6 +8,9 @@ config:
     default: service-provider-test-org
   digits:
     type: string
+  packName:
+    type: string
+    default: example-pack
   versionTag:
     type: string
     default: "1.0.0"
@@ -17,7 +20,7 @@ resources:
     type: pulumiservice:PolicyPack
     properties:
       organization: ${organizationName}
-      name: example-pack-${digits}
+      name: ${packName}
       displayName: Example Pack
       versionTag: ${versionTag}
       # sourcePath must be absolute; ${pulumi.cwd} resolves to the program directory.

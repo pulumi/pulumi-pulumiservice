@@ -344,14 +344,14 @@ public class OrganizationRole extends com.pulumi.resources.CustomResource {
         return Codegen.optional(this.description);
     }
     /**
-     * The role&#39;s display name. Must be unique within the organization.
+     * The role&#39;s display name, up to 100 bytes. Must be unique within the organization. If omitted, Pulumi generates a name from the resource&#39;s logical name plus a random suffix, or follows the stack&#39;s [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
      * 
      */
     @Export(name="name", refs={String.class}, tree="[0]")
     private Output<String> name;
 
     /**
-     * @return The role&#39;s display name. Must be unique within the organization.
+     * @return The role&#39;s display name, up to 100 bytes. Must be unique within the organization. If omitted, Pulumi generates a name from the resource&#39;s logical name plus a random suffix, or follows the stack&#39;s [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
      * 
      */
     public Output<String> name() {

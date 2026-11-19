@@ -30,15 +30,15 @@ func TestDeleteAgentPool(t *testing.T) {
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodDelete,
 			ExpectedReqPath:   "/api/orgs/" + testOrgName + "/agent-pools/" + agentPoolID,
-			ResponseCode:      404,
+			ResponseCode:      500,
 			ResponseBody: ErrorResponse{
-				StatusCode: 404,
+				StatusCode: 500,
 				Message:    "agent pool not found",
 			},
 		})
 		assert.EqualError(t,
 			c.DeleteAgentPool(teamCtx, agentPoolID, orgName, false),
-			fmt.Sprintf(`failed to delete agent pool "%s": 404 API error: agent pool not found`, testAgentPoolID),
+			fmt.Sprintf(`failed to delete agent pool "%s": 500 API error: agent pool not found`, testAgentPoolID),
 		)
 	})
 

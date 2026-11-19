@@ -2,14 +2,92 @@ name: yaml-webhooks
 runtime: yaml
 description: A minimal example of provisioning webhooks via Pulumi YAML
 
+config:
+  organizationName:
+    type: string
+    default: service-provider-test-org
+  digits:
+    type: string
+
 resources:
+  # Organization webhook subscribed to all events.
   webhook:
-    type: pulumiservice:index:Webhook
+    type: pulumiservice:Webhook
     properties:
       active: true
       displayName: yaml-webhook
-      organizationName: service-provider-test-org
+      organizationName: ${organizationName}
       payloadUrl: "https://google.com"
+      secret: super-secret
+
+  # Organization webhook subscribed to the environments and stacks groups only.
+  groupsWebhook:
+    type: pulumiservice:Webhook
+    properties:
+      active: true
+      displayName: yaml-webhook-groups
+      organizationName: ${organizationName}
+      payloadUrl: "https://google.com"
+      groups:
+        - environments
+        - stacks
+      secret: super-secret
+
+  stackSuffix:
+    type: random:RandomPet
+    properties:
+      prefix: ${pulumi.stack}
+      separator: "-"
+  stack:
+    type: pulumiservice:Stack
+    properties:
+      organizationName: ${organizationName}
+      projectName: ${pulumi.project}
+      stackName: ${stackSuffix.id}
+
+  # Stack webhook that posts Slack-formatted messages for a group and
+  # specific events.
+  stackWebhook:
+    type: pulumiservice:Webhook
+    properties:
+      active: true
+      displayName: yaml-stack-webhook
+      organizationName: ${organizationName}
+      projectName: ${stack.projectName}
+      stackName: ${stack.stackName}
+      payloadUrl: "https://hooks.slack.com/blahblah"
+      format: slack
+      groups:
+        - stacks
+      filters:
+        - deployment_started
+        - deployment_succeeded
+      secret: super-secret
+
+  environment:
+    type: pulumiservice:Environment
+    properties:
+      organization: ${organizationName}
+      project: test-project
+      name: testing-environment-yaml-webhooks-${digits}
+      yaml:
+        fn::stringAsset: |-
+          values:
+            myNumber: 1
+
+  # Environment webhook subscribed to specific events only.
+  environmentWebhook:
+    type: pulumiservice:Webhook
+    properties:
+      active: true
+      displayName: yaml-env-webhook
+      organizationName: ${organizationName}
+      projectName: ${environment.project}
+      environmentName: ${environment.name}
+      payloadUrl: "https://example.com"
+      filters:
+        - environment_revision_created
+        - imported_environment_changed
       secret: super-secret
 
 outputs:

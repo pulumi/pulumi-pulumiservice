@@ -21,25 +21,24 @@ __all__ = ['PolicyGroupArgs', 'PolicyGroup']
 @pulumi.input_type
 class PolicyGroupArgs:
     def __init__(__self__, *,
-                 name: pulumi.Input[_builtins.str],
                  organization_name: pulumi.Input[_builtins.str],
                  accounts: pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]] = None,
                  entity_type: pulumi.Input[Optional[_builtins.str]] = None,
                  mode: pulumi.Input[Optional[_builtins.str]] = None,
+                 name: pulumi.Input[Optional[_builtins.str]] = None,
                  policy_packs: pulumi.Input[Optional[Sequence[pulumi.Input['PolicyGroupPolicyPackReferenceInputArgs']]]] = None,
                  stacks: pulumi.Input[Optional[Sequence[pulumi.Input['PolicyGroupStackReferenceArgs']]]] = None):
         """
         The set of arguments for constructing a PolicyGroup resource.
 
-        :param pulumi.Input[_builtins.str] name: The name of the policy group.
         :param pulumi.Input[_builtins.str] organization_name: The name of the Pulumi organization the policy group belongs to.
         :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] accounts: List of accounts that belong to this policy group.
         :param pulumi.Input[_builtins.str] entity_type: The entity type for the policy group. Valid values are 'stacks' or 'accounts'. Defaults to 'stacks'.
         :param pulumi.Input[_builtins.str] mode: The mode for the policy group. Valid values are 'audit' (reports violations) or 'preventative' (blocks operations). Defaults to 'audit'.
+        :param pulumi.Input[_builtins.str] name: The name of the policy group, up to 100 characters. Only letters, digits, hyphens, underscores, spaces and periods are allowed, and the name can't begin or end with a space. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). Characters that aren't allowed in the logical name are replaced with hyphens.
         :param pulumi.Input[Sequence[pulumi.Input['PolicyGroupPolicyPackReferenceInputArgs']]] policy_packs: List of policy packs applied to this policy group.
         :param pulumi.Input[Sequence[pulumi.Input['PolicyGroupStackReferenceArgs']]] stacks: List of stack references that belong to this policy group.
         """
-        pulumi.set(__self__, "name", name)
         pulumi.set(__self__, "organization_name", organization_name)
         if accounts is not None:
             pulumi.set(__self__, "accounts", accounts)
@@ -51,22 +50,12 @@ class PolicyGroupArgs:
             mode = 'audit'
         if mode is not None:
             pulumi.set(__self__, "mode", mode)
+        if name is not None:
+            pulumi.set(__self__, "name", name)
         if policy_packs is not None:
             pulumi.set(__self__, "policy_packs", policy_packs)
         if stacks is not None:
             pulumi.set(__self__, "stacks", stacks)
-
-    @_builtins.property
-    @pulumi.getter
-    def name(self) -> pulumi.Input[_builtins.str]:
-        """
-        The name of the policy group.
-        """
-        return pulumi.get(self, "name")
-
-    @name.setter
-    def name(self, value: pulumi.Input[_builtins.str]):
-        pulumi.set(self, "name", value)
 
     @_builtins.property
     @pulumi.getter(name="organizationName")
@@ -115,6 +104,18 @@ class PolicyGroupArgs:
     @mode.setter
     def mode(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "mode", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def name(self) -> pulumi.Input[Optional[_builtins.str]]:
+        """
+        The name of the policy group, up to 100 characters. Only letters, digits, hyphens, underscores, spaces and periods are allowed, and the name can't begin or end with a space. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). Characters that aren't allowed in the logical name are replaced with hyphens.
+        """
+        return pulumi.get(self, "name")
+
+    @name.setter
+    def name(self, value: pulumi.Input[Optional[_builtins.str]]):
+        pulumi.set(self, "name", value)
 
     @_builtins.property
     @pulumi.getter(name="policyPacks")
@@ -172,7 +173,7 @@ class PolicyGroup(pulumi.CustomResource):
         :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] accounts: List of accounts that belong to this policy group.
         :param pulumi.Input[_builtins.str] entity_type: The entity type for the policy group. Valid values are 'stacks' or 'accounts'. Defaults to 'stacks'.
         :param pulumi.Input[_builtins.str] mode: The mode for the policy group. Valid values are 'audit' (reports violations) or 'preventative' (blocks operations). Defaults to 'audit'.
-        :param pulumi.Input[_builtins.str] name: The name of the policy group.
+        :param pulumi.Input[_builtins.str] name: The name of the policy group, up to 100 characters. Only letters, digits, hyphens, underscores, spaces and periods are allowed, and the name can't begin or end with a space. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). Characters that aren't allowed in the logical name are replaced with hyphens.
         :param pulumi.Input[_builtins.str] organization_name: The name of the Pulumi organization the policy group belongs to.
         :param pulumi.Input[Sequence[pulumi.Input[Union['PolicyGroupPolicyPackReferenceInputArgs', 'PolicyGroupPolicyPackReferenceInputArgsDict']]]] policy_packs: List of policy packs applied to this policy group.
         :param pulumi.Input[Sequence[pulumi.Input[Union['PolicyGroupStackReferenceArgs', 'PolicyGroupStackReferenceArgsDict', 'outputs.PolicyGroupStackReference']]]] stacks: List of stack references that belong to this policy group.
@@ -233,8 +234,6 @@ class PolicyGroup(pulumi.CustomResource):
             if mode is None:
                 mode = 'audit'
             __props__.__dict__["mode"] = mode
-            if name is None and not opts.urn:
-                raise TypeError("Missing required property 'name'")
             __props__.__dict__["name"] = name
             if organization_name is None and not opts.urn:
                 raise TypeError("Missing required property 'organization_name'")

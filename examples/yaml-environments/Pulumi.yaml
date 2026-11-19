@@ -1,11 +1,17 @@
 name: yaml-environments-example
 runtime: yaml
 description: A minimal Pulumi YAML program
+config:
+  organizationName:
+    type: string
+    default: service-provider-test-org
+  digits:
+    type: string
 resources:
   testing-environment:
     type: pulumiservice:Environment
     properties:
-      organization: service-provider-test-org
+      organization: ${organizationName}
       project: my-project
       name: testing-environment-yaml-${digits}
       yaml:
@@ -49,4 +55,29 @@ resources:
       environment: ${testing-environment.name}
       project: ${testing-environment.project}
       permission: "admin"
+  fileAssetEnvironment:
+    type: pulumiservice:Environment
+    properties:
+      organization: ${organizationName}
+      project: my-project
+      name: testing-environment-yaml-file-asset-${digits}
+      yaml:
+        fn::fileAsset: ${pulumi.cwd}/env.yaml
+  openTeam:
+    type: pulumiservice:Team
+    properties:
+      name: brand-new-yaml-open-team-${digits}
+      organizationName: ${organizationName}
+      teamType: pulumi
+      members:
+        - pulumi-bot
+  teamEnvOpenPermission:
+    type: pulumiservice:TeamEnvironmentPermission
+    properties:
+      organization: ${organizationName}
+      team: ${openTeam.name}
+      environment: ${testing-environment.name}
+      project: ${testing-environment.project}
+      permission: open
+      maxOpenDuration: 15m
 

@@ -4,67 +4,16 @@
 package examples
 
 import (
-	"path"
 	"testing"
 
-	"github.com/pulumi/pulumi/pkg/v3/testing/integration"
+	"github.com/pulumi/providertest/pulumitest/opttest"
 )
 
-func TestDotnetTeamsExamples(t *testing.T) {
-	integration.ProgramTest(t, &integration.ProgramTestOptions{
-		Dir: path.Join(getCwd(t), "cs-teams"),
-		Dependencies: []string{
-			"Pulumi.PulumiService",
-		},
-	})
-}
-
-func TestDotnetSchedulesExamples(t *testing.T) {
-	digits := generateRandomFiveDigits()
-	integration.ProgramTest(t, &integration.ProgramTestOptions{
-		Dir:       path.Join(getCwd(t), "cs-schedules"),
-		StackName: "test-stack-" + digits,
-		Config: map[string]string{
-			"digits": digits,
-		},
-		Dependencies: []string{
-			"Pulumi.PulumiService",
-		},
-	})
-}
-
-func TestDotnetEnvironmentsExamples(t *testing.T) {
-	digits := generateRandomFiveDigits()
-	integration.ProgramTest(t, &integration.ProgramTestOptions{
-		Dir: path.Join(getCwd(t), "cs-environments"),
-		Config: map[string]string{
-			"digits": digits,
-		},
-		Dependencies: []string{
-			"Pulumi.PulumiService",
-		},
-	})
-}
-
-func TestDotnetOidcIssuerExamples(t *testing.T) {
-	integration.ProgramTest(t, &integration.ProgramTestOptions{
-		Dir:    path.Join(getCwd(t), "cs-oidc-issuer"),
-		Config: oidcIssuerTestConfig(),
-		Dependencies: []string{
-			"Pulumi.PulumiService",
-		},
-	})
-}
-
-func TestDotnetApprovalRulesExamples(t *testing.T) {
-	digits := generateRandomFiveDigits()
-	integration.ProgramTest(t, &integration.ProgramTestOptions{
-		Dir: path.Join(getCwd(t), "cs-approval-rules"),
-		Config: map[string]string{
-			"digits": digits,
-		},
-		Dependencies: []string{
-			"Pulumi.PulumiService",
-		},
-	})
+func TestDotnetSmokeExample(t *testing.T) {
+	runSmokeTest(t, "cs",
+		// `pulumi install` runs before the reference below is added, so it
+		// can't resolve the local SDK. `pulumi up` builds the program instead.
+		opttest.SkipInstall(),
+		opttest.DotNetReference("Pulumi.PulumiService", getCwd(t), "..", "sdk", "dotnet"),
+	)
 }

@@ -48,7 +48,28 @@ resources:
         environment: testing
         team: platform
 
+variables:
+  # Both invokes take their arguments from the resource's outputs so they
+  # run after the account exists.
+  fetchedAccount:
+    fn::invoke:
+      function: pulumiservice:getInsightsAccount
+      arguments:
+        organizationName: ${insights-account.organizationName}
+        accountName: ${insights-account.accountName}
+  allAccounts:
+    fn::invoke:
+      function: pulumiservice:getInsightsAccounts
+      arguments:
+        organizationName: ${insights-account.organizationName}
+
 outputs:
   insightsAccountId: ${insights-account.insightsAccountId}
   accountName: ${insights-account.accountName}
   scheduledScanEnabled: ${insights-account.scheduledScanEnabled}
+  fetchedAccountName: ${fetchedAccount.accountName}
+  fetchedInsightsAccountId: ${fetchedAccount.insightsAccountId}
+  fetchedProvider: ${fetchedAccount.provider}
+  fetchedScanSchedule: ${fetchedAccount.scanSchedule}
+  fetchedScheduledScanEnabled: ${fetchedAccount.scheduledScanEnabled}
+  allAccounts: ${allAccounts.accounts}

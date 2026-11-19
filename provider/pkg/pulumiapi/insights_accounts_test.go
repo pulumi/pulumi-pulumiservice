@@ -261,9 +261,9 @@ func TestDeleteInsightsAccount(t *testing.T) {
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodDelete,
 			ExpectedReqPath:   fmt.Sprintf("/api/preview/insights/%s/accounts/%s", orgName, accountName),
-			ResponseCode:      404,
+			ResponseCode:      500,
 			ResponseBody: ErrorResponse{
-				StatusCode: 404,
+				StatusCode: 500,
 				Message:    "insights account not found",
 			},
 		})
@@ -272,7 +272,7 @@ func TestDeleteInsightsAccount(t *testing.T) {
 		assert.EqualError(
 			t,
 			err,
-			fmt.Sprintf(`failed to delete insights account "%s": 404 API error: insights account not found`,
+			fmt.Sprintf(`failed to delete insights account "%s": 500 API error: insights account not found`,
 				testInsightsAccountName),
 		)
 	})

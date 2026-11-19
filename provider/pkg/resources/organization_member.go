@@ -265,13 +265,17 @@ func (*OrganizationMember) Delete(
 ) (infer.DeleteResponse, error) {
 	client := config.GetClient(ctx)
 	if req.State.Adopted {
-		return infer.DeleteResponse{}, client.UpdateOrgMemberRole(
+		err := client.UpdateOrgMemberRole(
 			ctx,
 			req.State.OrganizationName,
 			req.State.Username,
 			defaultOrgMemberRole,
 			nil,
 		)
+		if pulumiapi.GetErrorStatusCode(err) == http.StatusNotFound {
+			return infer.DeleteResponse{}, nil
+		}
+		return infer.DeleteResponse{}, err
 	}
 	return infer.DeleteResponse{}, client.DeleteMemberFromOrg(
 		ctx,

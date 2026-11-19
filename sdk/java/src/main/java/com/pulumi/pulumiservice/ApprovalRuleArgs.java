@@ -13,6 +13,8 @@ import java.lang.Boolean;
 import java.lang.String;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import javax.annotation.Nullable;
 
 
 public final class ApprovalRuleArgs extends com.pulumi.resources.ResourceArgs {
@@ -65,18 +67,18 @@ public final class ApprovalRuleArgs extends com.pulumi.resources.ResourceArgs {
     }
 
     /**
-     * The name of the approval rule.
+     * The name of the approval rule, up to 255 bytes. If omitted, Pulumi generates a name from the resource&#39;s logical name plus a random suffix, or follows the stack&#39;s [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
      * 
      */
-    @Import(name="name", required=true)
-    private Output<String> name;
+    @Import(name="name")
+    private @Nullable Output<String> name;
 
     /**
-     * @return The name of the approval rule.
+     * @return The name of the approval rule, up to 255 bytes. If omitted, Pulumi generates a name from the resource&#39;s logical name plus a random suffix, or follows the stack&#39;s [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
      * 
      */
-    public Output<String> name() {
-        return this.name;
+    public Optional<Output<String>> name() {
+        return Optional.ofNullable(this.name);
     }
 
     /**
@@ -186,18 +188,18 @@ public final class ApprovalRuleArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param name The name of the approval rule.
+         * @param name The name of the approval rule, up to 255 bytes. If omitted, Pulumi generates a name from the resource&#39;s logical name plus a random suffix, or follows the stack&#39;s [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
          * 
          * @return builder
          * 
          */
-        public Builder name(Output<String> name) {
+        public Builder name(@Nullable Output<String> name) {
             $.name = name;
             return this;
         }
 
         /**
-         * @param name The name of the approval rule.
+         * @param name The name of the approval rule, up to 255 bytes. If omitted, Pulumi generates a name from the resource&#39;s logical name plus a random suffix, or follows the stack&#39;s [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
          * 
          * @return builder
          * 
@@ -246,9 +248,6 @@ public final class ApprovalRuleArgs extends com.pulumi.resources.ResourceArgs {
             }
             if ($.environmentIdentifier == null) {
                 throw new MissingRequiredPropertyException("ApprovalRuleArgs", "environmentIdentifier");
-            }
-            if ($.name == null) {
-                throw new MissingRequiredPropertyException("ApprovalRuleArgs", "name");
             }
             if ($.targetActionTypes == null) {
                 throw new MissingRequiredPropertyException("ApprovalRuleArgs", "targetActionTypes");

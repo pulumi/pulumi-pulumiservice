@@ -36,7 +36,7 @@ type ApprovalRule struct {
 	Enabled pulumi.BoolOutput `pulumi:"enabled"`
 	// The environment this rule applies to.
 	EnvironmentIdentifier EnvironmentIdentifierOutput `pulumi:"environmentIdentifier"`
-	// The name of the approval rule.
+	// The name of the approval rule, up to 255 bytes. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
 	Name pulumi.StringOutput `pulumi:"name"`
 	// The type of action this rule applies to.
 	TargetActionTypes TargetActionTypeArrayOutput `pulumi:"targetActionTypes"`
@@ -57,9 +57,6 @@ func NewApprovalRule(ctx *pulumi.Context,
 	}
 	if args.EnvironmentIdentifier == nil {
 		return nil, errors.New("invalid value for required argument 'EnvironmentIdentifier'")
-	}
-	if args.Name == nil {
-		return nil, errors.New("invalid value for required argument 'Name'")
 	}
 	if args.TargetActionTypes == nil {
 		return nil, errors.New("invalid value for required argument 'TargetActionTypes'")
@@ -110,8 +107,8 @@ type approvalRuleArgs struct {
 	Enabled bool `pulumi:"enabled"`
 	// The environment this rule applies to.
 	EnvironmentIdentifier EnvironmentIdentifier `pulumi:"environmentIdentifier"`
-	// The name of the approval rule.
-	Name string `pulumi:"name"`
+	// The name of the approval rule, up to 255 bytes. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
+	Name *string `pulumi:"name"`
 	// The type of action this rule applies to.
 	TargetActionTypes []TargetActionType `pulumi:"targetActionTypes"`
 }
@@ -124,8 +121,8 @@ type ApprovalRuleArgs struct {
 	Enabled pulumi.BoolInput
 	// The environment this rule applies to.
 	EnvironmentIdentifier EnvironmentIdentifierInput
-	// The name of the approval rule.
-	Name pulumi.StringInput
+	// The name of the approval rule, up to 255 bytes. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
+	Name pulumi.StringPtrInput
 	// The type of action this rule applies to.
 	TargetActionTypes TargetActionTypeArrayInput
 }
@@ -232,7 +229,7 @@ func (o ApprovalRuleOutput) EnvironmentIdentifier() EnvironmentIdentifierOutput 
 	return o.ApplyT(func(v *ApprovalRule) EnvironmentIdentifierOutput { return v.EnvironmentIdentifier }).(EnvironmentIdentifierOutput)
 }
 
-// The name of the approval rule.
+// The name of the approval rule, up to 255 bytes. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
 func (o ApprovalRuleOutput) Name() pulumi.StringOutput {
 	return o.ApplyT(func(v *ApprovalRule) pulumi.StringOutput { return v.Name }).(pulumi.StringOutput)
 }

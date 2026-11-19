@@ -34,6 +34,10 @@ Here's a quick list of helpful make commands:
 
 Ideally, every change should include unit tests, and every new resource a matching example in the `examples` folder.
 
+Write examples in Pulumi YAML (`examples/yaml-*`). Every SDK is generated from the same schema and wraps the same provider, so a resource tested in YAML doesn't need a copy in each language. Each other language has one smoke program (`examples/<lang>-smoke`) that creates an environment from a string asset, an org access token whose value is a secret output, and reads the environment back with an invoke. Add a non-YAML test only when a resource adds an input or output shape that those programs don't cover.
+
+Example tests use [`pulumitest`](https://github.com/pulumi/providertest/tree/main/pulumitest).
+
 You should also test changes manually using a Pulumi program that uses the updated SDKs. Here are some language-specific hints:
 
 ### Shared test org

@@ -141,12 +141,20 @@ type ApprovalRuleInput struct {
 }
 
 func (i *ApprovalRuleInput) Annotate(a infer.Annotator) {
-	a.Describe(&i.Name, "The name of the approval rule.")
+	a.Describe(&i.Name, "The name of the approval rule, up to 255 bytes. "+autoNamedDescription)
 	a.Describe(&i.Enabled, "Whether the approval rule is enabled.")
 	a.Describe(&i.TargetActionTypes, "The type of action this rule applies to.")
 	a.Describe(&i.EnvironmentIdentifier, "The environment this rule applies to.")
 	a.Describe(&i.ApprovalRuleConfig, "The approval rule configuration.")
 }
+
+func (i *ApprovalRuleInput) AutoName(autoname infer.SetAutoName) {
+	autoname(&i.Name, suffixedAutoName(approvalRuleNameMaxLen, nil))
+}
+
+// approvalRuleNameMaxLen is the longest approval rule name, in bytes, that
+// Pulumi Cloud accepts. The OpenAPI spec doesn't state the limit.
+const approvalRuleNameMaxLen = 255
 
 type ApprovalRuleState struct {
 	ApprovalRuleInput

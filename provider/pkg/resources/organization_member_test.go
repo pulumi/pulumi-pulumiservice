@@ -2,6 +2,7 @@ package resources
 
 import (
 	"context"
+	"net/http"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -553,6 +554,22 @@ func TestOrganizationMemberDelete(t *testing.T) {
 		assert.NoError(t, err)
 		assert.True(t, updated, "expected UpdateOrgMemberRole to un-assign the custom role")
 		assert.False(t, deleted, "must not remove an adopted member from the org")
+	})
+
+	t.Run("adopted: member already removed from the org", func(t *testing.T) {
+		mock := &orgMemberClientMock{
+			updateFunc: func(context.Context, string, string, string, *string) error {
+				return &pulumiapi.ErrorResponse{StatusCode: http.StatusNotFound}
+			},
+		}
+		ctx := config.WithMockClient(context.Background(), mock)
+		_, err := (&OrganizationMember{}).Delete(ctx, infer.DeleteRequest[OrganizationMemberState]{
+			State: OrganizationMemberState{
+				OrganizationMemberCore: OrganizationMemberCore{OrganizationName: gcAcme, Username: gcAlice},
+				Adopted:                true,
+			},
+		})
+		assert.NoError(t, err, "a 404 should count as deleted")
 	})
 
 	t.Run("owned: removes the user", func(t *testing.T) {

@@ -130,6 +130,9 @@ func (c *Client) DeleteDeploymentSettings(ctx context.Context, stack StackIdenti
 	)
 	_, err := c.do(ctx, http.MethodDelete, apiPath, nil, nil)
 	if err != nil {
+		if GetErrorStatusCode(err) == http.StatusNotFound {
+			return nil
+		}
 		return fmt.Errorf("failed to delete deployment settings for stack (%s): %w", stack.String(), err)
 	}
 	return nil

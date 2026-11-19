@@ -188,9 +188,9 @@ func (c *Client) UpdateEnvironmentApprovalRule(
 func (c *Client) DeleteEnvironmentApprovalRule(ctx context.Context, orgName string, ruleID string) error {
 	apiPath := path.Join("change-gates", orgName, ruleID)
 
-	result, err := c.do(ctx, http.MethodDelete, apiPath, nil, nil)
+	_, err := c.do(ctx, http.MethodDelete, apiPath, nil, nil)
 	if err != nil {
-		if result.StatusCode == 404 {
+		if GetErrorStatusCode(err) == http.StatusNotFound {
 			return nil
 		}
 		return fmt.Errorf("failed to delete approval rule: %w", err)

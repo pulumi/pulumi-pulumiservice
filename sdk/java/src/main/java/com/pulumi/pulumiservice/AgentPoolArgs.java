@@ -48,18 +48,18 @@ public final class AgentPoolArgs extends com.pulumi.resources.ResourceArgs {
     }
 
     /**
-     * Name of the agent pool.
+     * Name of the agent pool, up to 100 characters. Only letters, digits, hyphens, underscores, spaces and periods are allowed. If omitted, Pulumi generates a name from the resource&#39;s logical name plus a random suffix, or follows the stack&#39;s [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). Characters that aren&#39;t allowed in the logical name are replaced with hyphens.
      * 
      */
-    @Import(name="name", required=true)
-    private Output<String> name;
+    @Import(name="name")
+    private @Nullable Output<String> name;
 
     /**
-     * @return Name of the agent pool.
+     * @return Name of the agent pool, up to 100 characters. Only letters, digits, hyphens, underscores, spaces and periods are allowed. If omitted, Pulumi generates a name from the resource&#39;s logical name plus a random suffix, or follows the stack&#39;s [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). Characters that aren&#39;t allowed in the logical name are replaced with hyphens.
      * 
      */
-    public Output<String> name() {
-        return this.name;
+    public Optional<Output<String>> name() {
+        return Optional.ofNullable(this.name);
     }
 
     /**
@@ -147,18 +147,18 @@ public final class AgentPoolArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param name Name of the agent pool.
+         * @param name Name of the agent pool, up to 100 characters. Only letters, digits, hyphens, underscores, spaces and periods are allowed. If omitted, Pulumi generates a name from the resource&#39;s logical name plus a random suffix, or follows the stack&#39;s [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). Characters that aren&#39;t allowed in the logical name are replaced with hyphens.
          * 
          * @return builder
          * 
          */
-        public Builder name(Output<String> name) {
+        public Builder name(@Nullable Output<String> name) {
             $.name = name;
             return this;
         }
 
         /**
-         * @param name Name of the agent pool.
+         * @param name Name of the agent pool, up to 100 characters. Only letters, digits, hyphens, underscores, spaces and periods are allowed. If omitted, Pulumi generates a name from the resource&#39;s logical name plus a random suffix, or follows the stack&#39;s [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). Characters that aren&#39;t allowed in the logical name are replaced with hyphens.
          * 
          * @return builder
          * 
@@ -189,9 +189,6 @@ public final class AgentPoolArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         public AgentPoolArgs build() {
-            if ($.name == null) {
-                throw new MissingRequiredPropertyException("AgentPoolArgs", "name");
-            }
             if ($.organizationName == null) {
                 throw new MissingRequiredPropertyException("AgentPoolArgs", "organizationName");
             }

@@ -201,6 +201,9 @@ func (c *Client) DeleteInsightsAccount(ctx context.Context, orgName, accountName
 
 	_, err := c.do(ctx, http.MethodDelete, apiPath, nil, nil)
 	if err != nil {
+		if GetErrorStatusCode(err) == http.StatusNotFound {
+			return nil
+		}
 		return fmt.Errorf("failed to delete insights account %q: %w", accountName, err)
 	}
 

@@ -52,6 +52,12 @@ namespace Pulumi.PulumiService.Api.Agents
         public Output<ImmutableArray<object>> EnabledIntegrations { get; private set; } = null!;
 
         /// <summary>
+        /// The model provider the agent's tasks run on: a provider name, or 'pulumi' for Pulumi's built-in models. Omitted or null uses the organization's default provider.
+        /// </summary>
+        [Output("modelProvider")]
+        public Output<string?> ModelProvider { get; private set; } = null!;
+
+        /// <summary>
         /// The agent's name: lower-case letters, digits and hyphens, unique within the organization. This is the stable handle a person writes down -- in an automation, in a CLI invocation -- and it may be changed, because everything that references an agent internally references it by id.
         /// </summary>
         [Output("name")]
@@ -86,6 +92,12 @@ namespace Pulumi.PulumiService.Api.Agents
         /// </summary>
         [Output("purpose")]
         public Output<string?> Purpose { get; private set; } = null!;
+
+        /// <summary>
+        /// Effort the agent's models reason or think at: 'low', 'medium', or 'high', for this agent only. On an 'openai-responses' provider it overrides the provider's reasoning effort; on an 'anthropic-messages' provider it sets the thinking effort of models that support adaptive thinking. With no provider it applies to whichever of these the organization's default is. Refused for 'pulumi' and a named 'openai-chat' provider, and ignored on a run whose provider cannot reason. Omitted or null uses the provider's.
+        /// </summary>
+        [Output("reasoningEffort")]
+        public Output<string?> ReasoningEffort { get; private set; } = null!;
 
         /// <summary>
         /// The RBAC role id the agent's tasks assume, identified by role id. Null means no assumed role: tasks run with the invoking user's own permissions.
@@ -187,6 +199,12 @@ namespace Pulumi.PulumiService.Api.Agents
         }
 
         /// <summary>
+        /// The model provider the agent's tasks run on: a provider name, or 'pulumi' for Pulumi's built-in models. On creation, omitted, null, or empty uses the organization's default provider; on update, omitted or null keeps the stored provider and empty returns to that default.
+        /// </summary>
+        [Input("modelProvider")]
+        public Input<string>? ModelProvider { get; set; }
+
+        /// <summary>
         /// The agent's name: lower-case letters, digits and hyphens, at most 64 characters, unique within the organization. Optional -- when omitted it is derived from displayName, so a form that asks for one name still works. A name already taken by another agent is rejected with a 409 rather than silently suffixed. Supplying a different name on an update renames the agent, which is safe because every internal reference is by id.
         /// </summary>
         [Input("name")]
@@ -209,6 +227,12 @@ namespace Pulumi.PulumiService.Api.Agents
         /// </summary>
         [Input("purpose")]
         public Input<string>? Purpose { get; set; }
+
+        /// <summary>
+        /// Effort the agent's models reason or think at: 'low', 'medium', or 'high', for this agent only. On an 'openai-responses' provider it overrides the provider's reasoning effort; on an 'anthropic-messages' provider it sets the thinking effort of models that support adaptive thinking. With no provider it applies to whichever of these the organization's default is. Refused for 'pulumi' and a named 'openai-chat' provider, and ignored on a run whose provider cannot reason. On creation, omitted, null, or empty uses the provider's; on update, omitted or null keeps the stored effort and empty returns to the provider's.
+        /// </summary>
+        [Input("reasoningEffort")]
+        public Input<string>? ReasoningEffort { get; set; }
 
         /// <summary>
         /// The RBAC role id the agent's tasks assume. With Agents-as-Team-Members enabled, creation with omitted/null or empty uses the feature's read-only default; on update, omitted/null preserves the existing role and empty selects that default. A role that does not exist in the organization is rejected with a 404.

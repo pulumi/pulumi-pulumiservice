@@ -67,7 +67,7 @@ export class OidcIssuer extends pulumi.CustomResource {
      */
     declare public readonly maxExpirationSeconds: pulumi.Output<number | undefined>;
     /**
-     * Issuer name.
+     * Issuer name, up to 255 characters. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
      */
     declare public readonly name: pulumi.Output<string>;
     /**
@@ -98,9 +98,6 @@ export class OidcIssuer extends pulumi.CustomResource {
         let resourceInputs: pulumi.Inputs = {};
         opts = opts || {};
         if (!opts.id) {
-            if (args?.name === undefined && !opts.urn) {
-                throw new Error("Missing required property 'name'");
-            }
             if (args?.organization === undefined && !opts.urn) {
                 throw new Error("Missing required property 'organization'");
             }
@@ -137,9 +134,9 @@ export interface OidcIssuerArgs {
      */
     maxExpirationSeconds?: pulumi.Input<number | undefined>;
     /**
-     * Issuer name.
+     * Issuer name, up to 255 characters. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
      */
-    name: pulumi.Input<string>;
+    name?: pulumi.Input<string | undefined>;
     /**
      * Organization name.
      */

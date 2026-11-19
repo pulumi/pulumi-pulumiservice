@@ -19,15 +19,14 @@ __all__ = ['OrganizationRoleArgs', 'OrganizationRole']
 @pulumi.input_type
 class OrganizationRoleArgs:
     def __init__(__self__, *,
-                 name: pulumi.Input[_builtins.str],
                  organization_name: pulumi.Input[_builtins.str],
                  permissions: pulumi.Input[Mapping[str, Any]],
                  description: pulumi.Input[Optional[_builtins.str]] = None,
+                 name: pulumi.Input[Optional[_builtins.str]] = None,
                  resource_type: pulumi.Input[Optional[_builtins.str]] = None):
         """
         The set of arguments for constructing a OrganizationRole resource.
 
-        :param pulumi.Input[_builtins.str] name: The role's display name. Must be unique within the organization.
         :param pulumi.Input[_builtins.str] organization_name: The Pulumi Cloud organization name.
         :param pulumi.Input[Mapping[str, Any]] permissions: The role's permission descriptor tree.
                
@@ -42,27 +41,17 @@ class OrganizationRoleArgs:
                
                Note: the helpers' output requires pulumi 3.235.0 or later (pulumi/pulumi#22834). Earlier runtimes drop part of it at the SDK boundary; the Python SDK pins the minimum runtime version automatically.
         :param pulumi.Input[_builtins.str] description: Human-readable description of what the role grants.
+        :param pulumi.Input[_builtins.str] name: The role's display name, up to 100 bytes. Must be unique within the organization. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
         :param pulumi.Input[_builtins.str] resource_type: The resource type the role's permissions apply to. Defaults to `global` (the org-wide role that can be assigned to members and teams). Other valid values: `stack`, `environment`, `insights-account`.
         """
-        pulumi.set(__self__, "name", name)
         pulumi.set(__self__, "organization_name", organization_name)
         pulumi.set(__self__, "permissions", permissions)
         if description is not None:
             pulumi.set(__self__, "description", description)
+        if name is not None:
+            pulumi.set(__self__, "name", name)
         if resource_type is not None:
             pulumi.set(__self__, "resource_type", resource_type)
-
-    @_builtins.property
-    @pulumi.getter
-    def name(self) -> pulumi.Input[_builtins.str]:
-        """
-        The role's display name. Must be unique within the organization.
-        """
-        return pulumi.get(self, "name")
-
-    @name.setter
-    def name(self, value: pulumi.Input[_builtins.str]):
-        pulumi.set(self, "name", value)
 
     @_builtins.property
     @pulumi.getter(name="organizationName")
@@ -110,6 +99,18 @@ class OrganizationRoleArgs:
     @description.setter
     def description(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "description", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def name(self) -> pulumi.Input[Optional[_builtins.str]]:
+        """
+        The role's display name, up to 100 bytes. Must be unique within the organization. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
+        """
+        return pulumi.get(self, "name")
+
+    @name.setter
+    def name(self, value: pulumi.Input[Optional[_builtins.str]]):
+        pulumi.set(self, "name", value)
 
     @_builtins.property
     @pulumi.getter(name="resourceType")
@@ -322,7 +323,7 @@ class OrganizationRole(pulumi.CustomResource):
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] description: Human-readable description of what the role grants.
-        :param pulumi.Input[_builtins.str] name: The role's display name. Must be unique within the organization.
+        :param pulumi.Input[_builtins.str] name: The role's display name, up to 100 bytes. Must be unique within the organization. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
         :param pulumi.Input[_builtins.str] organization_name: The Pulumi Cloud organization name.
         :param pulumi.Input[Mapping[str, Any]] permissions: The role's permission descriptor tree.
                
@@ -557,8 +558,6 @@ class OrganizationRole(pulumi.CustomResource):
             __props__ = OrganizationRoleArgs.__new__(OrganizationRoleArgs)
 
             __props__.__dict__["description"] = description
-            if name is None and not opts.urn:
-                raise TypeError("Missing required property 'name'")
             __props__.__dict__["name"] = name
             if organization_name is None and not opts.urn:
                 raise TypeError("Missing required property 'organization_name'")
@@ -614,7 +613,7 @@ class OrganizationRole(pulumi.CustomResource):
     @pulumi.getter
     def name(self) -> pulumi.Output[_builtins.str]:
         """
-        The role's display name. Must be unique within the organization.
+        The role's display name, up to 100 bytes. Must be unique within the organization. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
         """
         return pulumi.get(self, "name")
 

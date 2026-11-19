@@ -627,6 +627,11 @@
       "properties": {
         "projectId": {
           "type": "string",
+          "description": "The GCP project number, a numeric value such as `123456789012`. This is not the project ID (such as `my-project`). To look up the number, run `gcloud projects describe <project-id> --format='value(projectNumber)'`.",
+          "deprecationMessage": "Use `projectNumber` instead. Despite its name, `projectId` takes the project number, not the project ID."
+        },
+        "projectNumber": {
+          "type": "string",
           "description": "The GCP project number, a numeric value such as `123456789012`. This is not the project ID (such as `my-project`). To look up the number, run `gcloud projects describe <project-id> --format='value(projectNumber)'`."
         },
         "providerId": {
@@ -652,7 +657,6 @@
       },
       "type": "object",
       "required": [
-        "projectId",
         "workloadPoolId",
         "providerId",
         "serviceAccount"
@@ -2533,6 +2537,10 @@
           },
           "description": "The integrations enabled for the agent's tasks, by id. Omitted or null inherits all organization integrations; an empty list enables none."
         },
+        "modelProvider": {
+          "type": "string",
+          "description": "The model provider the agent's tasks run on: a provider name, or 'pulumi' for Pulumi's built-in models. Omitted or null uses the organization's default provider."
+        },
         "name": {
           "type": "string",
           "description": "The agent's name: lower-case letters, digits and hyphens, unique within the organization. This is the stable handle a person writes down -- in an automation, in a CLI invocation -- and it may be changed, because everything that references an agent internally references it by id."
@@ -2556,6 +2564,10 @@
         "purpose": {
           "type": "string",
           "description": "A one-line description of what this agent is for, shown under its name in the roster."
+        },
+        "reasoningEffort": {
+          "type": "string",
+          "description": "Effort the agent's models reason or think at: 'low', 'medium', or 'high', for this agent only. On an 'openai-responses' provider it overrides the provider's reasoning effort; on an 'anthropic-messages' provider it sets the thinking effort of models that support adaptive thinking. With no provider it applies to whichever of these the organization's default is. Refused for 'pulumi' and a named 'openai-chat' provider, and ignored on a run whose provider cannot reason. Omitted or null uses the provider's."
         },
         "roleId": {
           "type": "string",
@@ -2602,6 +2614,10 @@
           },
           "description": "The integrations to enable for the agent's tasks, by id. Omitted or null inherits all organization integrations; an empty list enables none."
         },
+        "modelProvider": {
+          "type": "string",
+          "description": "The model provider the agent's tasks run on: a provider name, or 'pulumi' for Pulumi's built-in models. On creation, omitted, null, or empty uses the organization's default provider; on update, omitted or null keeps the stored provider and empty returns to that default."
+        },
         "name": {
           "type": "string",
           "description": "The agent's name: lower-case letters, digits and hyphens, at most 64 characters, unique within the organization. Optional -- when omitted it is derived from displayName, so a form that asks for one name still works. A name already taken by another agent is rejected with a 409 rather than silently suffixed. Supplying a different name on an update renames the agent, which is safe because every internal reference is by id."
@@ -2619,6 +2635,10 @@
         "purpose": {
           "type": "string",
           "description": "A one-line description of what this agent is for, shown under its name in the roster."
+        },
+        "reasoningEffort": {
+          "type": "string",
+          "description": "Effort the agent's models reason or think at: 'low', 'medium', or 'high', for this agent only. On an 'openai-responses' provider it overrides the provider's reasoning effort; on an 'anthropic-messages' provider it sets the thinking effort of models that support adaptive thinking. With no provider it applies to whichever of these the organization's default is. Refused for 'pulumi' and a named 'openai-chat' provider, and ignored on a run whose provider cannot reason. On creation, omitted, null, or empty uses the provider's; on update, omitted or null keeps the stored effort and empty returns to the provider's."
         },
         "roleId": {
           "type": "string",
@@ -2708,6 +2728,10 @@
           "type": "string",
           "description": "Approval mode for this task. Valid values: 'manual', 'auto', 'balanced'."
         },
+        "archivedAt": {
+          "type": "string",
+          "description": "When the task was archived. Null while the task remains active."
+        },
         "asyncTriggerType": {
           "type": "string",
           "description": "The async trigger source for this task. Null for sync tasks."
@@ -2739,6 +2763,10 @@
           },
           "description": "Pulumi entities (stacks, projects, etc.) that provide context for the agent."
         },
+        "interactionMode": {
+          "type": "string",
+          "description": "Whether the task accepts user interaction. Read-only tasks do not accept follow-up input."
+        },
         "isShared": {
           "type": "boolean",
           "description": "Whether this task is shared with other org members."
@@ -2746,6 +2774,14 @@
         "lastHeartbeat": {
           "type": "string",
           "description": "When the task runtime last reported a heartbeat. Null if the runtime has never checked in."
+        },
+        "model": {
+          "type": "string",
+          "description": "The model the task's main loop last ran on, as its provider reported it. Null until the task has used a model."
+        },
+        "modelProvider": {
+          "type": "string",
+          "description": "The model provider the task's turns run on, pinned at its first turn: 'pulumi' for Pulumi's built-in models, or the name of one of the organization's model providers. Null until the first turn."
         },
         "name": {
           "type": "string",
@@ -2824,7 +2860,7 @@
       "inputProperties": {
         "agentDefinitionId": {
           "type": "string",
-          "description": "Optional Custom Agent definition id to run this task as. When set, the task's role, permission mode, and enabled integrations are taken from the named agent definition instead of from this request, and the task is attributed to that agent. The agent's instructions and approval mode are not copied at creation: they are read from the definition on every turn, so editing the agent applies to the next turn of every run. A preview capability, gated per organization."
+          "description": "Optional Custom Agent definition id to run this task as. When set, the task's role and enabled integrations are taken from the named agent definition instead of from this request, and the task is attributed to that agent. The agent's instructions and approval mode are not copied at creation: they are read from the definition on every turn, so editing the agent applies to the next turn of every run. A preview capability, gated per organization."
         },
         "approvalMode": {
           "type": "string",
@@ -3798,7 +3834,7 @@
         },
         "name": {
           "type": "string",
-          "description": "The unique identifier name for the webhook within its scope. Optional on creation; if omitted, the service generates a short random name. Always populated in responses."
+          "description": "The unique identifier name for the webhook within its scope. Optional on creation; if omitted, the service generates a short random name. Always populated in responses. Up to 32 characters of letters, numbers, hyphens, underscores, and periods. On update, the name comes from the URL and this field is ignored."
         },
         "organizationName": {
           "type": "string",
@@ -3871,7 +3907,7 @@
         },
         "name": {
           "type": "string",
-          "description": "The unique identifier name for the webhook within its scope. Optional on creation; if omitted, the service generates a short random name. Always populated in responses.",
+          "description": "The unique identifier name for the webhook within its scope. Optional on creation; if omitted, the service generates a short random name. Always populated in responses. Up to 32 characters of letters, numbers, hyphens, underscores, and periods. On update, the name comes from the URL and this field is ignored.",
           "replaceOnChanges": true,
           "willReplaceOnChanges": true
         },
@@ -4872,7 +4908,7 @@
         },
         "name": {
           "type": "string",
-          "description": "the name of the service",
+          "description": "The name of the service. Between 1 and 80 characters.",
           "replaceOnChanges": true,
           "willReplaceOnChanges": true
         },
@@ -4996,6 +5032,10 @@
           "$ref": "pulumi.json#/Any",
           "description": "Information about a live operation currently running for the stack, its kind, the author who initiated it, and its start time. Null when no operation is in flight."
         },
+        "managedEnvironment": {
+          "type": "string",
+          "description": "The ESC environment this stack manages, which holds the stack's configuration, as <project>/<name>. Read-only; omitted when the stack does not manage an environment. The name stays set after the environment is deleted. Returned to anyone who can read the stack, whether or not they can read the environment."
+        },
         "orgName": {
           "type": "string",
           "description": "The organization name"
@@ -5032,6 +5072,10 @@
         "config": {
           "$ref": "pulumi.json#/Any",
           "description": "The configuration for the new stack."
+        },
+        "createManagedEnvironment": {
+          "type": "boolean",
+          "description": "Whether the service should create an ESC environment that the stack manages."
         },
         "orgName": {
           "type": "string",
@@ -5155,7 +5199,7 @@
         },
         "name": {
           "type": "string",
-          "description": "The unique identifier name for the webhook within its scope. Optional on creation; if omitted, the service generates a short random name. Always populated in responses."
+          "description": "The unique identifier name for the webhook within its scope. Optional on creation; if omitted, the service generates a short random name. Always populated in responses. Up to 32 characters of letters, numbers, hyphens, underscores, and periods. On update, the name comes from the URL and this field is ignored."
         },
         "organizationName": {
           "type": "string",
@@ -5226,7 +5270,7 @@
         },
         "name": {
           "type": "string",
-          "description": "The unique identifier name for the webhook within its scope. Optional on creation; if omitted, the service generates a short random name. Always populated in responses.",
+          "description": "The unique identifier name for the webhook within its scope. Optional on creation; if omitted, the service generates a short random name. Always populated in responses. Up to 32 characters of letters, numbers, hyphens, underscores, and periods. On update, the name comes from the URL and this field is ignored.",
           "replaceOnChanges": true,
           "willReplaceOnChanges": true
         },
@@ -5320,6 +5364,10 @@
             "$ref": "pulumi.json#/Any"
           },
           "description": "The list of environment settings for the team."
+        },
+        "everyone": {
+          "type": "boolean",
+          "description": "Whether this is the Everyone team: every admin and member of the organization is in it, but\nno billing manager. Pulumi manages it, so its name, description, members and roles cannot change."
         },
         "kind": {
           "type": "string",
@@ -5428,7 +5476,7 @@
         },
         "name": {
           "type": "string",
-          "description": "The name"
+          "description": "The display name of the token. Must be between 1 and 40 characters."
         },
         "orgName": {
           "type": "string",
@@ -5523,7 +5571,7 @@
         },
         "name": {
           "type": "string",
-          "description": "The name"
+          "description": "The display name of the token. Must be between 1 and 40 characters."
         },
         "orgName": {
           "type": "string",
@@ -5681,21 +5729,28 @@
           "$ref": "pulumi.json#/Any",
           "description": "The result of the last audit log export attempt."
         },
+        "s3CompatibleConfig": {
+          "$ref": "pulumi.json#/Any",
+          "description": "The S3-compatible configuration for exporting audit logs. Set when audit logs export to an S3-compatible service."
+        },
         "s3Config": {
           "$ref": "pulumi.json#/Any",
-          "description": "The S3 configuration for exporting audit logs."
+          "description": "The S3 configuration for exporting audit logs. Set when audit logs export to Amazon S3."
         }
       },
       "type": "object",
       "required": [
         "enabled",
-        "lastResult",
-        "s3Config"
+        "lastResult"
       ],
       "inputProperties": {
         "newEnabled": {
           "type": "boolean",
           "description": "Whether the audit log export is enabled."
+        },
+        "newS3CompatibleConfiguration": {
+          "$ref": "pulumi.json#/Any",
+          "description": "The new S3-compatible configuration for audit log export. Mutually exclusive with newS3Configuration."
         },
         "newS3Configuration": {
           "$ref": "pulumi.json#/Any",
@@ -5896,6 +5951,10 @@
           "$ref": "pulumi.json#/Any",
           "description": "The role currently assigned to this member — either a built-in role (member, admin, billingManager) or a custom role. Falls back to the organization's default role if no role is assigned directly."
         },
+        "followsDefaultRole": {
+          "type": "boolean",
+          "description": "FollowsDefaultRole is true when the member has no role of their own and gets the\norganization's default role. A member assigned the default role directly is false."
+        },
         "knownToPulumi": {
           "type": "boolean",
           "description": "KnownToPulumi returns if the organization member has a Pulumi account."
@@ -5946,7 +6005,7 @@
         },
         "role": {
           "type": "string",
-          "description": "The built-in role assigned to the new member. Must be `member`, `admin`, or `billingManager`."
+          "description": "The built-in role assigned to the new member. Must be `member`, `admin`, `billing-manager`, `reader`, `builder` or `maintainer`. In an organization with a default role, `member` puts the new member on the default role, and the member follows it when an admin changes it. `reader`, `builder` and `maintainer` assign the Reader, Builder or Maintainer role to the new member explicitly, so the member keeps it when the default role changes; they are available only in organizations with a default role."
         },
         "userLogin": {
           "type": "string",
@@ -6001,7 +6060,7 @@
         },
         "name": {
           "type": "string",
-          "description": "The unique identifier name for the webhook within its scope. Optional on creation; if omitted, the service generates a short random name. Always populated in responses."
+          "description": "The unique identifier name for the webhook within its scope. Optional on creation; if omitted, the service generates a short random name. Always populated in responses. Up to 32 characters of letters, numbers, hyphens, underscores, and periods. On update, the name comes from the URL and this field is ignored."
         },
         "organizationName": {
           "type": "string",
@@ -6072,7 +6131,7 @@
         },
         "name": {
           "type": "string",
-          "description": "The unique identifier name for the webhook within its scope. Optional on creation; if omitted, the service generates a short random name. Always populated in responses.",
+          "description": "The unique identifier name for the webhook within its scope. Optional on creation; if omitted, the service generates a short random name. Always populated in responses. Up to 32 characters of letters, numbers, hyphens, underscores, and periods. On update, the name comes from the URL and this field is ignored.",
           "replaceOnChanges": true,
           "willReplaceOnChanges": true
         },
@@ -6336,6 +6395,10 @@
           "$ref": "pulumi.json#/Any",
           "description": "The detailed permission descriptor tree."
         },
+        "isCompatibilityRole": {
+          "type": "boolean",
+          "description": "Whether this role is the organization's Member (legacy) role, a copy of what members could do before the organization moved to built-in roles."
+        },
         "isOrgDefault": {
           "type": "boolean",
           "description": "Whether this role is the organization default."
@@ -6478,7 +6541,7 @@
         },
         "name": {
           "type": "string",
-          "description": "Name of the agent pool."
+          "description": "Name of the agent pool, up to 100 characters. Only letters, digits, hyphens, underscores, spaces and periods are allowed. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). Characters that aren't allowed in the logical name are replaced with hyphens."
         },
         "organizationName": {
           "type": "string",
@@ -6508,7 +6571,7 @@
         },
         "name": {
           "type": "string",
-          "description": "Name of the agent pool."
+          "description": "Name of the agent pool, up to 100 characters. Only letters, digits, hyphens, underscores, spaces and periods are allowed. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). Characters that aren't allowed in the logical name are replaced with hyphens."
         },
         "organizationName": {
           "type": "string",
@@ -6517,8 +6580,7 @@
         }
       },
       "requiredInputs": [
-        "organizationName",
-        "name"
+        "organizationName"
       ]
     },
     "pulumiservice:index:ApprovalRule": {
@@ -6538,7 +6600,7 @@
         },
         "name": {
           "type": "string",
-          "description": "The name of the approval rule.",
+          "description": "The name of the approval rule, up to 255 bytes. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).",
           "replaceOnChanges": true
         },
         "targetActionTypes": {
@@ -6571,7 +6633,7 @@
         },
         "name": {
           "type": "string",
-          "description": "The name of the approval rule.",
+          "description": "The name of the approval rule, up to 255 bytes. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).",
           "replaceOnChanges": true
         },
         "targetActionTypes": {
@@ -6583,7 +6645,6 @@
         }
       },
       "requiredInputs": [
-        "name",
         "enabled",
         "targetActionTypes",
         "environmentIdentifier",
@@ -7166,7 +7227,7 @@
         },
         "name": {
           "type": "string",
-          "description": "Issuer name."
+          "description": "Issuer name, up to 255 characters. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming)."
         },
         "organization": {
           "type": "string",
@@ -7207,7 +7268,7 @@
         },
         "name": {
           "type": "string",
-          "description": "Issuer name."
+          "description": "Issuer name, up to 255 characters. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming)."
         },
         "organization": {
           "type": "string",
@@ -7236,7 +7297,6 @@
       },
       "requiredInputs": [
         "organization",
-        "name",
         "url"
       ]
     },
@@ -7532,7 +7592,7 @@
         },
         "name": {
           "type": "string",
-          "description": "The role's display name. Must be unique within the organization."
+          "description": "The role's display name, up to 100 bytes. Must be unique within the organization. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming)."
         },
         "organizationName": {
           "type": "string",
@@ -7573,7 +7633,7 @@
         },
         "name": {
           "type": "string",
-          "description": "The role's display name. Must be unique within the organization."
+          "description": "The role's display name, up to 100 bytes. Must be unique within the organization. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming)."
         },
         "organizationName": {
           "type": "string",
@@ -7594,7 +7654,6 @@
       },
       "requiredInputs": [
         "organizationName",
-        "name",
         "permissions"
       ]
     },
@@ -7667,7 +7726,7 @@
         },
         "name": {
           "type": "string",
-          "description": "The name of the policy group.",
+          "description": "The name of the policy group, up to 100 characters. Only letters, digits, hyphens, underscores, spaces and periods are allowed, and the name can't begin or end with a space. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). Characters that aren't allowed in the logical name are replaced with hyphens.",
           "replaceOnChanges": true
         },
         "organizationName": {
@@ -7691,7 +7750,6 @@
         }
       },
       "requiredInputs": [
-        "name",
         "organizationName"
       ]
     },
@@ -7699,7 +7757,8 @@
       "description": "A Policy Pack published to Pulumi Cloud. The source directory is tarballed and uploaded on Create; changing source content publishes a new version (replace).\n\n## Import\n\nThis resource can be imported using its `id`, which has the format `{organization}/{name}/{versionTag}`, e.g.,\n\n```sh\n $ pulumi import pulumiservice:index:PolicyPack my-policy-pack my-org/my-policy-pack/1.0.0\n```\n\nOnly the organization, name, version tag and display name are read back. Set `sourcePath` in your program after import.\n",
       "properties": {
         "contentHash": {
-          "type": "string"
+          "type": "string",
+          "description": "Hash of the policy pack source directory. A change to the source replaces the policy pack, even when versionTag is unchanged."
         },
         "displayName": {
           "type": "string",
@@ -7725,7 +7784,8 @@
           "description": "Path to the directory containing the policy pack source. The directory is tarballed and uploaded."
         },
         "version": {
-          "type": "integer"
+          "type": "integer",
+          "description": "Version number Pulumi Cloud assigned when this version of the policy pack was published."
         },
         "versionTag": {
           "type": "string",
@@ -7985,11 +8045,11 @@
           "items": {
             "type": "string"
           },
-          "description": "List of Pulumi Cloud usernames of team members."
+          "description": "The Pulumi Cloud usernames of the team's members.\nPulumi Cloud adds the user who creates the team as a member, usually the owner of the access token that runs `pulumi up`.\nList that user here to keep them on the team: otherwise `pulumi refresh` shows them as a change, and the next update to `members` removes them."
         },
         "name": {
           "type": "string",
-          "description": "The team's name. Required for \"pulumi\" teams.",
+          "description": "The team's name, up to 100 characters. Only letters, digits, hyphens, underscores and periods are allowed. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). Characters that aren't allowed in the logical name are replaced with hyphens. Only \"pulumi\" teams are auto-named.",
           "replaceOnChanges": true
         },
         "organizationName": {
@@ -8026,11 +8086,11 @@
           "items": {
             "type": "string"
           },
-          "description": "List of Pulumi Cloud usernames of team members."
+          "description": "The Pulumi Cloud usernames of the team's members.\nPulumi Cloud adds the user who creates the team as a member, usually the owner of the access token that runs `pulumi up`.\nList that user here to keep them on the team: otherwise `pulumi refresh` shows them as a change, and the next update to `members` removes them."
         },
         "name": {
           "type": "string",
-          "description": "The team's name. Required for \"pulumi\" teams.",
+          "description": "The team's name, up to 100 characters. Only letters, digits, hyphens, underscores and periods are allowed. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). Characters that aren't allowed in the logical name are replaced with hyphens. Only \"pulumi\" teams are auto-named.",
           "replaceOnChanges": true
         },
         "organizationName": {
@@ -8055,6 +8115,11 @@
         "description": {
           "type": "string",
           "description": "A description of the token.",
+          "replaceOnChanges": true
+        },
+        "expires": {
+          "type": "string",
+          "description": "When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`. Omit it for a token that never expires. Pulumi Cloud rejects an expiry that is in the past, more than two years away, or beyond the organization's maximum token lifetime.",
           "replaceOnChanges": true
         },
         "name": {
@@ -8088,6 +8153,11 @@
         "description": {
           "type": "string",
           "description": "A description of the token.",
+          "replaceOnChanges": true
+        },
+        "expires": {
+          "type": "string",
+          "description": "When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`. Omit it for a token that never expires. Pulumi Cloud rejects an expiry that is in the past, more than two years away, or beyond the organization's maximum token lifetime.",
           "replaceOnChanges": true
         },
         "name": {
@@ -8451,7 +8521,7 @@
         },
         "displayName": {
           "type": "string",
-          "description": "The friendly name displayed in the Pulumi Cloud."
+          "description": "The friendly name displayed in the Pulumi Cloud, up to 100 bytes. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming)."
         },
         "environmentName": {
           "type": "string",
@@ -8521,7 +8591,7 @@
         },
         "displayName": {
           "type": "string",
-          "description": "The friendly name displayed in the Pulumi Cloud."
+          "description": "The friendly name displayed in the Pulumi Cloud, up to 100 bytes. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming)."
         },
         "environmentName": {
           "type": "string",
@@ -8574,7 +8644,6 @@
       },
       "requiredInputs": [
         "active",
-        "displayName",
         "payloadUrl",
         "organizationName"
       ]

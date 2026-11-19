@@ -67,11 +67,13 @@ export class Team extends pulumi.CustomResource {
      */
     declare public readonly githubTeamId: pulumi.Output<number | undefined>;
     /**
-     * List of Pulumi Cloud usernames of team members.
+     * The Pulumi Cloud usernames of the team's members.
+     * Pulumi Cloud adds the user who creates the team as a member, usually the owner of the access token that runs `pulumi up`.
+     * List that user here to keep them on the team: otherwise `pulumi refresh` shows them as a change, and the next update to `members` removes them.
      */
     declare public readonly members: pulumi.Output<string[]>;
     /**
-     * The team's name. Required for "pulumi" teams.
+     * The team's name, up to 100 characters. Only letters, digits, hyphens, underscores and periods are allowed. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). Characters that aren't allowed in the logical name are replaced with hyphens. Only "pulumi" teams are auto-named.
      */
     declare public readonly name: pulumi.Output<string | undefined>;
     /**
@@ -140,11 +142,13 @@ export interface TeamArgs {
      */
     githubTeamId?: pulumi.Input<number | undefined>;
     /**
-     * List of Pulumi Cloud usernames of team members.
+     * The Pulumi Cloud usernames of the team's members.
+     * Pulumi Cloud adds the user who creates the team as a member, usually the owner of the access token that runs `pulumi up`.
+     * List that user here to keep them on the team: otherwise `pulumi refresh` shows them as a change, and the next update to `members` removes them.
      */
     members?: pulumi.Input<pulumi.Input<string>[] | undefined>;
     /**
-     * The team's name. Required for "pulumi" teams.
+     * The team's name, up to 100 characters. Only letters, digits, hyphens, underscores and periods are allowed. If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). Characters that aren't allowed in the logical name are replaced with hyphens. Only "pulumi" teams are auto-named.
      */
     name?: pulumi.Input<string | undefined>;
     /**

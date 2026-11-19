@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -47,6 +48,28 @@ func inMemoryProvider() opttest.Option {
 	return opttest.AttachProviderServer("pulumiservice", provider)
 }
 
+// newPulumiTest runs the program in source against the in-memory provider on a
+// fresh, randomly named stack in the ambient backend.
+func newPulumiTest(t *testing.T, source string, opts ...opttest.Option) *pulumitest.PulumiTest {
+	return pulumitest.NewPulumiTest(t, source, append([]opttest.Option{
+		inMemoryProvider(),
+		opttest.UseAmbientBackend(),
+		opttest.StackName(randomStackName()),
+	}, opts...)...)
+}
+
+// newExampleTest is newPulumiTest for the example in dir under examples/.
+func newExampleTest(t *testing.T, dir string, opts ...opttest.Option) *pulumitest.PulumiTest {
+	return newPulumiTest(t, filepath.Join(getCwd(t), dir), opts...)
+}
+
+// setConfig sets each key in config to its value on the test's stack.
+func setConfig(t *testing.T, test *pulumitest.PulumiTest, config map[string]string) {
+	for k, v := range config {
+		test.SetConfig(t, k, v)
+	}
+}
+
 // yarnInstall runs `yarn install` in dir. The PolicyPack provider boots the
 // pack's language analyzer to introspect policies, which needs the pack's
 // runtime deps installed (same prerequisite as `pulumi policy publish`).
@@ -59,8 +82,8 @@ func yarnInstall(t *testing.T, dir string) {
 	}
 }
 
-// runPulumiTest performs the same basic steps as
-// [github.com/pulumi/pulumi/pkg/v3/testing/integration.ProgramTest].
+// runPulumiTest runs `up`, checks that a preview and a refresh then find no
+// changes, and destroys the stack.
 func runPulumiTest(t *testing.T, test *pulumitest.PulumiTest) auto.UpResult {
 	return runPulumiTestAfterUp(t, test, nil)
 }

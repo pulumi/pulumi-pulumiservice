@@ -28,6 +28,8 @@ type Definition struct {
 	DisplayName pulumi.StringOutput `pulumi:"displayName"`
 	// The integrations enabled for the agent's tasks, by id. Omitted or null inherits all organization integrations; an empty list enables none.
 	EnabledIntegrations pulumi.ArrayOutput `pulumi:"enabledIntegrations"`
+	// The model provider the agent's tasks run on: a provider name, or 'pulumi' for Pulumi's built-in models. Omitted or null uses the organization's default provider.
+	ModelProvider pulumi.StringPtrOutput `pulumi:"modelProvider"`
 	// The agent's name: lower-case letters, digits and hyphens, unique within the organization. This is the stable handle a person writes down -- in an automation, in a CLI invocation -- and it may be changed, because everything that references an agent internally references it by id.
 	Name pulumi.StringOutput `pulumi:"name"`
 	// When the agent was paused, or null if it is not paused. A paused agent starts no new runs from any source -- console, schedule, or trigger -- until it is resumed; runs already in flight continue.
@@ -40,6 +42,8 @@ type Definition struct {
 	PermissionMode pulumi.StringPtrOutput `pulumi:"permissionMode"`
 	// A one-line description of what this agent is for, shown under its name in the roster.
 	Purpose pulumi.StringPtrOutput `pulumi:"purpose"`
+	// Effort the agent's models reason or think at: 'low', 'medium', or 'high', for this agent only. On an 'openai-responses' provider it overrides the provider's reasoning effort; on an 'anthropic-messages' provider it sets the thinking effort of models that support adaptive thinking. With no provider it applies to whichever of these the organization's default is. Refused for 'pulumi' and a named 'openai-chat' provider, and ignored on a run whose provider cannot reason. Omitted or null uses the provider's.
+	ReasoningEffort pulumi.StringPtrOutput `pulumi:"reasoningEffort"`
 	// The RBAC role id the agent's tasks assume, identified by role id. Null means no assumed role: tasks run with the invoking user's own permissions.
 	RoleId pulumi.StringPtrOutput `pulumi:"roleId"`
 	// Run counts for this agent, shown on its roster card.
@@ -101,6 +105,8 @@ type definitionArgs struct {
 	DisplayName *string `pulumi:"displayName"`
 	// The integrations to enable for the agent's tasks, by id. Omitted or null inherits all organization integrations; an empty list enables none.
 	EnabledIntegrations []interface{} `pulumi:"enabledIntegrations"`
+	// The model provider the agent's tasks run on: a provider name, or 'pulumi' for Pulumi's built-in models. On creation, omitted, null, or empty uses the organization's default provider; on update, omitted or null keeps the stored provider and empty returns to that default.
+	ModelProvider *string `pulumi:"modelProvider"`
 	// The agent's name: lower-case letters, digits and hyphens, at most 64 characters, unique within the organization. Optional -- when omitted it is derived from displayName, so a form that asks for one name still works. A name already taken by another agent is rejected with a 409 rather than silently suffixed. Supplying a different name on an update renames the agent, which is safe because every internal reference is by id.
 	Name *string `pulumi:"name"`
 	// The organization name
@@ -109,6 +115,8 @@ type definitionArgs struct {
 	PermissionMode *string `pulumi:"permissionMode"`
 	// A one-line description of what this agent is for, shown under its name in the roster.
 	Purpose *string `pulumi:"purpose"`
+	// Effort the agent's models reason or think at: 'low', 'medium', or 'high', for this agent only. On an 'openai-responses' provider it overrides the provider's reasoning effort; on an 'anthropic-messages' provider it sets the thinking effort of models that support adaptive thinking. With no provider it applies to whichever of these the organization's default is. Refused for 'pulumi' and a named 'openai-chat' provider, and ignored on a run whose provider cannot reason. On creation, omitted, null, or empty uses the provider's; on update, omitted or null keeps the stored effort and empty returns to the provider's.
+	ReasoningEffort *string `pulumi:"reasoningEffort"`
 	// The RBAC role id the agent's tasks assume. With Agents-as-Team-Members enabled, creation with omitted/null or empty uses the feature's read-only default; on update, omitted/null preserves the existing role and empty selects that default. A role that does not exist in the organization is rejected with a 404.
 	RoleId *string `pulumi:"roleId"`
 }
@@ -127,6 +135,8 @@ type DefinitionArgs struct {
 	DisplayName pulumi.StringPtrInput
 	// The integrations to enable for the agent's tasks, by id. Omitted or null inherits all organization integrations; an empty list enables none.
 	EnabledIntegrations pulumi.ArrayInput
+	// The model provider the agent's tasks run on: a provider name, or 'pulumi' for Pulumi's built-in models. On creation, omitted, null, or empty uses the organization's default provider; on update, omitted or null keeps the stored provider and empty returns to that default.
+	ModelProvider pulumi.StringPtrInput
 	// The agent's name: lower-case letters, digits and hyphens, at most 64 characters, unique within the organization. Optional -- when omitted it is derived from displayName, so a form that asks for one name still works. A name already taken by another agent is rejected with a 409 rather than silently suffixed. Supplying a different name on an update renames the agent, which is safe because every internal reference is by id.
 	Name pulumi.StringPtrInput
 	// The organization name
@@ -135,6 +145,8 @@ type DefinitionArgs struct {
 	PermissionMode pulumi.StringPtrInput
 	// A one-line description of what this agent is for, shown under its name in the roster.
 	Purpose pulumi.StringPtrInput
+	// Effort the agent's models reason or think at: 'low', 'medium', or 'high', for this agent only. On an 'openai-responses' provider it overrides the provider's reasoning effort; on an 'anthropic-messages' provider it sets the thinking effort of models that support adaptive thinking. With no provider it applies to whichever of these the organization's default is. Refused for 'pulumi' and a named 'openai-chat' provider, and ignored on a run whose provider cannot reason. On creation, omitted, null, or empty uses the provider's; on update, omitted or null keeps the stored effort and empty returns to the provider's.
+	ReasoningEffort pulumi.StringPtrInput
 	// The RBAC role id the agent's tasks assume. With Agents-as-Team-Members enabled, creation with omitted/null or empty uses the feature's read-only default; on update, omitted/null preserves the existing role and empty selects that default. A role that does not exist in the organization is rejected with a 404.
 	RoleId pulumi.StringPtrInput
 }
@@ -256,6 +268,11 @@ func (o DefinitionOutput) EnabledIntegrations() pulumi.ArrayOutput {
 	return o.ApplyT(func(v *Definition) pulumi.ArrayOutput { return v.EnabledIntegrations }).(pulumi.ArrayOutput)
 }
 
+// The model provider the agent's tasks run on: a provider name, or 'pulumi' for Pulumi's built-in models. Omitted or null uses the organization's default provider.
+func (o DefinitionOutput) ModelProvider() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *Definition) pulumi.StringPtrOutput { return v.ModelProvider }).(pulumi.StringPtrOutput)
+}
+
 // The agent's name: lower-case letters, digits and hyphens, unique within the organization. This is the stable handle a person writes down -- in an automation, in a CLI invocation -- and it may be changed, because everything that references an agent internally references it by id.
 func (o DefinitionOutput) Name() pulumi.StringOutput {
 	return o.ApplyT(func(v *Definition) pulumi.StringOutput { return v.Name }).(pulumi.StringOutput)
@@ -284,6 +301,11 @@ func (o DefinitionOutput) PermissionMode() pulumi.StringPtrOutput {
 // A one-line description of what this agent is for, shown under its name in the roster.
 func (o DefinitionOutput) Purpose() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *Definition) pulumi.StringPtrOutput { return v.Purpose }).(pulumi.StringPtrOutput)
+}
+
+// Effort the agent's models reason or think at: 'low', 'medium', or 'high', for this agent only. On an 'openai-responses' provider it overrides the provider's reasoning effort; on an 'anthropic-messages' provider it sets the thinking effort of models that support adaptive thinking. With no provider it applies to whichever of these the organization's default is. Refused for 'pulumi' and a named 'openai-chat' provider, and ignored on a run whose provider cannot reason. Omitted or null uses the provider's.
+func (o DefinitionOutput) ReasoningEffort() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *Definition) pulumi.StringPtrOutput { return v.ReasoningEffort }).(pulumi.StringPtrOutput)
 }
 
 // The RBAC role id the agent's tasks assume, identified by role id. Null means no assumed role: tasks run with the invoking user's own permissions.

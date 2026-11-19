@@ -36,15 +36,15 @@ func TestDeleteAccessToken(t *testing.T) {
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodDelete,
 			ExpectedReqPath:   "/api/user/tokens/" + tokenID,
-			ResponseCode:      404,
+			ResponseCode:      500,
 			ResponseBody: ErrorResponse{
-				StatusCode: 404,
+				StatusCode: 500,
 				Message:    tokenNotFoundError,
 			},
 		})
 		assert.EqualError(t,
 			c.DeleteAccessToken(ctx, tokenID),
-			`failed to delete access token "abcdegh": 404 API error: token not found`,
+			`failed to delete access token "abcdegh": 500 API error: token not found`,
 		)
 	})
 

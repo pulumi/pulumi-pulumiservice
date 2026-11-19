@@ -64,14 +64,18 @@ public final class TeamArgs extends com.pulumi.resources.ResourceArgs {
     }
 
     /**
-     * List of Pulumi Cloud usernames of team members.
+     * The Pulumi Cloud usernames of the team&#39;s members.
+     * Pulumi Cloud adds the user who creates the team as a member, usually the owner of the access token that runs `pulumi up`.
+     * List that user here to keep them on the team: otherwise `pulumi refresh` shows them as a change, and the next update to `members` removes them.
      * 
      */
     @Import(name="members")
     private @Nullable Output<List<String>> members;
 
     /**
-     * @return List of Pulumi Cloud usernames of team members.
+     * @return The Pulumi Cloud usernames of the team&#39;s members.
+     * Pulumi Cloud adds the user who creates the team as a member, usually the owner of the access token that runs `pulumi up`.
+     * List that user here to keep them on the team: otherwise `pulumi refresh` shows them as a change, and the next update to `members` removes them.
      * 
      */
     public Optional<Output<List<String>>> members() {
@@ -79,14 +83,14 @@ public final class TeamArgs extends com.pulumi.resources.ResourceArgs {
     }
 
     /**
-     * The team&#39;s name. Required for &#34;pulumi&#34; teams.
+     * The team&#39;s name, up to 100 characters. Only letters, digits, hyphens, underscores and periods are allowed. If omitted, Pulumi generates a name from the resource&#39;s logical name plus a random suffix, or follows the stack&#39;s [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). Characters that aren&#39;t allowed in the logical name are replaced with hyphens. Only &#34;pulumi&#34; teams are auto-named.
      * 
      */
     @Import(name="name")
     private @Nullable Output<String> name;
 
     /**
-     * @return The team&#39;s name. Required for &#34;pulumi&#34; teams.
+     * @return The team&#39;s name, up to 100 characters. Only letters, digits, hyphens, underscores and periods are allowed. If omitted, Pulumi generates a name from the resource&#39;s logical name plus a random suffix, or follows the stack&#39;s [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). Characters that aren&#39;t allowed in the logical name are replaced with hyphens. Only &#34;pulumi&#34; teams are auto-named.
      * 
      */
     public Optional<Output<String>> name() {
@@ -217,7 +221,9 @@ public final class TeamArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param members List of Pulumi Cloud usernames of team members.
+         * @param members The Pulumi Cloud usernames of the team&#39;s members.
+         * Pulumi Cloud adds the user who creates the team as a member, usually the owner of the access token that runs `pulumi up`.
+         * List that user here to keep them on the team: otherwise `pulumi refresh` shows them as a change, and the next update to `members` removes them.
          * 
          * @return builder
          * 
@@ -228,7 +234,9 @@ public final class TeamArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param members List of Pulumi Cloud usernames of team members.
+         * @param members The Pulumi Cloud usernames of the team&#39;s members.
+         * Pulumi Cloud adds the user who creates the team as a member, usually the owner of the access token that runs `pulumi up`.
+         * List that user here to keep them on the team: otherwise `pulumi refresh` shows them as a change, and the next update to `members` removes them.
          * 
          * @return builder
          * 
@@ -238,7 +246,9 @@ public final class TeamArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param members List of Pulumi Cloud usernames of team members.
+         * @param members The Pulumi Cloud usernames of the team&#39;s members.
+         * Pulumi Cloud adds the user who creates the team as a member, usually the owner of the access token that runs `pulumi up`.
+         * List that user here to keep them on the team: otherwise `pulumi refresh` shows them as a change, and the next update to `members` removes them.
          * 
          * @return builder
          * 
@@ -248,7 +258,7 @@ public final class TeamArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param name The team&#39;s name. Required for &#34;pulumi&#34; teams.
+         * @param name The team&#39;s name, up to 100 characters. Only letters, digits, hyphens, underscores and periods are allowed. If omitted, Pulumi generates a name from the resource&#39;s logical name plus a random suffix, or follows the stack&#39;s [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). Characters that aren&#39;t allowed in the logical name are replaced with hyphens. Only &#34;pulumi&#34; teams are auto-named.
          * 
          * @return builder
          * 
@@ -259,7 +269,7 @@ public final class TeamArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param name The team&#39;s name. Required for &#34;pulumi&#34; teams.
+         * @param name The team&#39;s name, up to 100 characters. Only letters, digits, hyphens, underscores and periods are allowed. If omitted, Pulumi generates a name from the resource&#39;s logical name plus a random suffix, or follows the stack&#39;s [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). Characters that aren&#39;t allowed in the logical name are replaced with hyphens. Only &#34;pulumi&#34; teams are auto-named.
          * 
          * @return builder
          * 
