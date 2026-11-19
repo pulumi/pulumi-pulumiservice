@@ -208,7 +208,7 @@ new ps.api.PolicyGroup("starterPolicyGroup", {
 new ps.api.teams.Role("platformTeamRole", {
     orgName: organizationName,
     teamName: platformTeam.name,
-    roleID: stackReadonlyRole.id,
+    roleID: stackReadonlyRole.roleID,
 });
 
 export const platformTeamName = platformTeam.name;
