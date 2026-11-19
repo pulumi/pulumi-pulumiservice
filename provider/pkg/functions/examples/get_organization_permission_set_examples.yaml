@@ -1,0 +1,20 @@
+description: Grant a built-in organization-level permission set
+variables:
+  readOnly:
+    fn::invoke:
+      function: pulumiservice:getOrganizationPermissionSet
+      arguments:
+        organizationName: my-org
+        builtIn: org-settings-read-only
+  permissions:
+    fn::invoke:
+      function: pulumiservice:buildRolePermissions
+      arguments:
+        organizationPermissionSetScopes: ${readOnly.scopes}
+resources:
+  readOnlyRole:
+    type: pulumiservice:OrganizationRole
+    properties:
+      organizationName: my-org
+      name: Org Readers
+      permissions: ${permissions.permissions}

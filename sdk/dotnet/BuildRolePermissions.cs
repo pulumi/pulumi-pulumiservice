@@ -12,19 +12,19 @@ namespace Pulumi.PulumiService
     public static class BuildRolePermissions
     {
         /// <summary>
-        /// Builds a complete `OrganizationRole.permissions` descriptor from organization-level access and rules for stacks, environments, and cloud accounts (Discovery; `InsightsAccount` in the API and this provider), the same model as the role editor in the Pulumi Cloud console. Each rule grants scopes on every entity of its type, on one specific entity, or on entities matching tag conditions. Each rule list accepts only scopes for its own entity type. The result is directly assignable to `OrganizationRole.permissions`.
+        /// Builds a complete `OrganizationRole.permissions` descriptor from organization-level access and rules for stacks, environments, and cloud accounts (Discovery; `InsightsAccount` in the API and this provider), the same model as the role editor in the Pulumi Cloud console. Each rule grants scopes on every entity of its type, on one specific entity, or on entities matching tag conditions. A rule grants scopes, a permission set's scopes from the matching lookup (such as `getStackPermissionSet`), or both. Each rule list accepts only scopes for its own entity type. The result is directly assignable to `OrganizationRole.permissions`.
         /// </summary>
         public static Task<BuildRolePermissionsResult> InvokeAsync(BuildRolePermissionsArgs? args = null, InvokeOptions? options = null)
             => global::Pulumi.Deployment.Instance.InvokeAsync<BuildRolePermissionsResult>("pulumiservice:index:buildRolePermissions", args ?? new BuildRolePermissionsArgs(), options.WithDefaults());
 
         /// <summary>
-        /// Builds a complete `OrganizationRole.permissions` descriptor from organization-level access and rules for stacks, environments, and cloud accounts (Discovery; `InsightsAccount` in the API and this provider), the same model as the role editor in the Pulumi Cloud console. Each rule grants scopes on every entity of its type, on one specific entity, or on entities matching tag conditions. Each rule list accepts only scopes for its own entity type. The result is directly assignable to `OrganizationRole.permissions`.
+        /// Builds a complete `OrganizationRole.permissions` descriptor from organization-level access and rules for stacks, environments, and cloud accounts (Discovery; `InsightsAccount` in the API and this provider), the same model as the role editor in the Pulumi Cloud console. Each rule grants scopes on every entity of its type, on one specific entity, or on entities matching tag conditions. A rule grants scopes, a permission set's scopes from the matching lookup (such as `getStackPermissionSet`), or both. Each rule list accepts only scopes for its own entity type. The result is directly assignable to `OrganizationRole.permissions`.
         /// </summary>
         public static Output<BuildRolePermissionsResult> Invoke(BuildRolePermissionsInvokeArgs? args = null, InvokeOptions? options = null)
             => global::Pulumi.Deployment.Instance.Invoke<BuildRolePermissionsResult>("pulumiservice:index:buildRolePermissions", args ?? new BuildRolePermissionsInvokeArgs(), options.WithDefaults());
 
         /// <summary>
-        /// Builds a complete `OrganizationRole.permissions` descriptor from organization-level access and rules for stacks, environments, and cloud accounts (Discovery; `InsightsAccount` in the API and this provider), the same model as the role editor in the Pulumi Cloud console. Each rule grants scopes on every entity of its type, on one specific entity, or on entities matching tag conditions. Each rule list accepts only scopes for its own entity type. The result is directly assignable to `OrganizationRole.permissions`.
+        /// Builds a complete `OrganizationRole.permissions` descriptor from organization-level access and rules for stacks, environments, and cloud accounts (Discovery; `InsightsAccount` in the API and this provider), the same model as the role editor in the Pulumi Cloud console. Each rule grants scopes on every entity of its type, on one specific entity, or on entities matching tag conditions. A rule grants scopes, a permission set's scopes from the matching lookup (such as `getStackPermissionSet`), or both. Each rule list accepts only scopes for its own entity type. The result is directly assignable to `OrganizationRole.permissions`.
         /// </summary>
         public static Output<BuildRolePermissionsResult> Invoke(BuildRolePermissionsInvokeArgs args, InvokeOutputOptions options)
             => global::Pulumi.Deployment.Instance.Invoke<BuildRolePermissionsResult>("pulumiservice:index:buildRolePermissions", args ?? new BuildRolePermissionsInvokeArgs(), options.WithDefaults());
@@ -67,6 +67,18 @@ namespace Pulumi.PulumiService
         {
             get => _environmentRules ?? (_environmentRules = new List<Inputs.RoleEnvironmentRule>());
             set => _environmentRules = value;
+        }
+
+        [Input("organizationPermissionSetScopes")]
+        private List<string>? _organizationPermissionSetScopes;
+
+        /// <summary>
+        /// The scopes of an organization-level permission set to grant: the `scopes` output of `getOrganizationPermissionSet`. The role gets a copy of the set's scopes, not a link to the set.
+        /// </summary>
+        public List<string> OrganizationPermissionSetScopes
+        {
+            get => _organizationPermissionSetScopes ?? (_organizationPermissionSetScopes = new List<string>());
+            set => _organizationPermissionSetScopes = value;
         }
 
         [Input("organizationScopes")]
@@ -135,6 +147,18 @@ namespace Pulumi.PulumiService
         {
             get => _environmentRules ?? (_environmentRules = new InputList<Inputs.RoleEnvironmentRuleArgs>());
             set => _environmentRules = value;
+        }
+
+        [Input("organizationPermissionSetScopes")]
+        private InputList<string>? _organizationPermissionSetScopes;
+
+        /// <summary>
+        /// The scopes of an organization-level permission set to grant: the `scopes` output of `getOrganizationPermissionSet`. The role gets a copy of the set's scopes, not a link to the set.
+        /// </summary>
+        public InputList<string> OrganizationPermissionSetScopes
+        {
+            get => _organizationPermissionSetScopes ?? (_organizationPermissionSetScopes = new InputList<string>());
+            set => _organizationPermissionSetScopes = value;
         }
 
         [Input("organizationScopes")]

@@ -85,6 +85,11 @@ export type EnvironmentVersionTag = import("./environmentVersionTag").Environmen
 export const EnvironmentVersionTag: typeof import("./environmentVersionTag").EnvironmentVersionTag = null as any;
 utilities.lazyLoad(exports, ["EnvironmentVersionTag"], () => require("./environmentVersionTag"));
 
+export { GetAccountPermissionSetArgs, GetAccountPermissionSetResult, GetAccountPermissionSetOutputArgs } from "./getAccountPermissionSet";
+export const getAccountPermissionSet: typeof import("./getAccountPermissionSet").getAccountPermissionSet = null as any;
+export const getAccountPermissionSetOutput: typeof import("./getAccountPermissionSet").getAccountPermissionSetOutput = null as any;
+utilities.lazyLoad(exports, ["getAccountPermissionSet","getAccountPermissionSetOutput"], () => require("./getAccountPermissionSet"));
+
 export { GetCurrentUserArgs, GetCurrentUserResult } from "./getCurrentUser";
 export const getCurrentUser: typeof import("./getCurrentUser").getCurrentUser = null as any;
 export const getCurrentUserOutput: typeof import("./getCurrentUser").getCurrentUserOutput = null as any;
@@ -94,6 +99,11 @@ export { GetEnvironmentArgs, GetEnvironmentResult, GetEnvironmentOutputArgs } fr
 export const getEnvironment: typeof import("./getEnvironment").getEnvironment = null as any;
 export const getEnvironmentOutput: typeof import("./getEnvironment").getEnvironmentOutput = null as any;
 utilities.lazyLoad(exports, ["getEnvironment","getEnvironmentOutput"], () => require("./getEnvironment"));
+
+export { GetEnvironmentPermissionSetArgs, GetEnvironmentPermissionSetResult, GetEnvironmentPermissionSetOutputArgs } from "./getEnvironmentPermissionSet";
+export const getEnvironmentPermissionSet: typeof import("./getEnvironmentPermissionSet").getEnvironmentPermissionSet = null as any;
+export const getEnvironmentPermissionSetOutput: typeof import("./getEnvironmentPermissionSet").getEnvironmentPermissionSetOutput = null as any;
+utilities.lazyLoad(exports, ["getEnvironmentPermissionSet","getEnvironmentPermissionSetOutput"], () => require("./getEnvironmentPermissionSet"));
 
 export { GetInsightsAccountArgs, GetInsightsAccountResult, GetInsightsAccountOutputArgs } from "./getInsightsAccount";
 export const getInsightsAccount: typeof import("./getInsightsAccount").getInsightsAccount = null as any;
@@ -114,6 +124,11 @@ export { GetOrganizationMembersArgs, GetOrganizationMembersResult, GetOrganizati
 export const getOrganizationMembers: typeof import("./getOrganizationMembers").getOrganizationMembers = null as any;
 export const getOrganizationMembersOutput: typeof import("./getOrganizationMembers").getOrganizationMembersOutput = null as any;
 utilities.lazyLoad(exports, ["getOrganizationMembers","getOrganizationMembersOutput"], () => require("./getOrganizationMembers"));
+
+export { GetOrganizationPermissionSetArgs, GetOrganizationPermissionSetResult, GetOrganizationPermissionSetOutputArgs } from "./getOrganizationPermissionSet";
+export const getOrganizationPermissionSet: typeof import("./getOrganizationPermissionSet").getOrganizationPermissionSet = null as any;
+export const getOrganizationPermissionSetOutput: typeof import("./getOrganizationPermissionSet").getOrganizationPermissionSetOutput = null as any;
+utilities.lazyLoad(exports, ["getOrganizationPermissionSet","getOrganizationPermissionSetOutput"], () => require("./getOrganizationPermissionSet"));
 
 export { GetOrganizationRoleArgs, GetOrganizationRoleResult, GetOrganizationRoleOutputArgs } from "./getOrganizationRole";
 export const getOrganizationRole: typeof import("./getOrganizationRole").getOrganizationRole = null as any;
@@ -144,6 +159,11 @@ export { GetStackArgs, GetStackResult, GetStackOutputArgs } from "./getStack";
 export const getStack: typeof import("./getStack").getStack = null as any;
 export const getStackOutput: typeof import("./getStack").getStackOutput = null as any;
 utilities.lazyLoad(exports, ["getStack","getStackOutput"], () => require("./getStack"));
+
+export { GetStackPermissionSetArgs, GetStackPermissionSetResult, GetStackPermissionSetOutputArgs } from "./getStackPermissionSet";
+export const getStackPermissionSet: typeof import("./getStackPermissionSet").getStackPermissionSet = null as any;
+export const getStackPermissionSetOutput: typeof import("./getStackPermissionSet").getStackPermissionSetOutput = null as any;
+utilities.lazyLoad(exports, ["getStackPermissionSet","getStackPermissionSetOutput"], () => require("./getStackPermissionSet"));
 
 export { InsightsAccountArgs } from "./insightsAccount";
 export type InsightsAccount = import("./insightsAccount").InsightsAccount;

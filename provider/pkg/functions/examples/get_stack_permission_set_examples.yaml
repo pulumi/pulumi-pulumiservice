@@ -1,0 +1,49 @@
+description: |
+  Grant a built-in stack permission set
+  Built-in permission sets, such as Stack Write, are the access levels every organization has. Pass the set's `scopes` to a stack rule's `permissionSetScopes`.
+variables:
+  stackWrite:
+    fn::invoke:
+      function: pulumiservice:getStackPermissionSet
+      arguments:
+        organizationName: my-org
+        builtIn: stack-write
+  permissions:
+    fn::invoke:
+      function: pulumiservice:buildRolePermissions
+      arguments:
+        stackRules:
+          - all: true
+            permissionSetScopes: ${stackWrite.scopes}
+resources:
+  stackWriterRole:
+    type: pulumiservice:OrganizationRole
+    properties:
+      organizationName: my-org
+      name: Stack Writers
+      permissions: ${permissions.permissions}
+---
+description: |
+  Grant a custom stack permission set
+  A custom permission set is looked up by the name shown in the Pulumi Cloud console.
+variables:
+  deployers:
+    fn::invoke:
+      function: pulumiservice:getStackPermissionSet
+      arguments:
+        organizationName: my-org
+        name: Deployers
+  permissions:
+    fn::invoke:
+      function: pulumiservice:buildRolePermissions
+      arguments:
+        stackRules:
+          - all: true
+            permissionSetScopes: ${deployers.scopes}
+resources:
+  deployerRole:
+    type: pulumiservice:OrganizationRole
+    properties:
+      organizationName: my-org
+      name: Deployers
+      permissions: ${permissions.permissions}

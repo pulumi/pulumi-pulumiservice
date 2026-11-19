@@ -310,6 +310,122 @@ namespace Pulumi.PulumiService
     /// 
     /// });
     /// ```
+    /// ### Grant permission sets
+    /// 
+    /// A rule's `permissionSetScopes` grants a permission set, built-in or custom, like an access level in the Pulumi Cloud console. Look the set up with the function for the rule's entity type, here `getStackPermissionSet`, and pass its `scopes`. A rule can combine a permission set with `scopes`. The role gets a copy of the set's scopes, so if the set changes in Pulumi Cloud, the next `pulumi up` updates the role.
+    /// 
+    /// ```csharp
+    /// using System.Collections.Generic;
+    /// using System.Linq;
+    /// using Pulumi;
+    /// using PulumiService = Pulumi.PulumiService;
+    /// 
+    /// return await Deployment.RunAsync(() =&gt; 
+    /// {
+    ///     var stackWrite = PulumiService.GetStackPermissionSet.Invoke(new()
+    ///     {
+    ///         OrganizationName = "my-org",
+    ///         BuiltIn = PulumiService.BuiltInStackPermissionSet.Write,
+    ///     });
+    /// 
+    ///     var deployers = PulumiService.GetStackPermissionSet.Invoke(new()
+    ///     {
+    ///         OrganizationName = "my-org",
+    ///         Name = "Deployers",
+    ///     });
+    /// 
+    ///     var prodStack = PulumiService.GetStack.Invoke(new()
+    ///     {
+    ///         OrganizationName = "my-org",
+    ///         ProjectName = "networking",
+    ///         StackName = "prod",
+    ///     });
+    /// 
+    ///     var permissions = PulumiService.BuildRolePermissions.Invoke(new()
+    ///     {
+    ///         StackRules = new[]
+    ///         {
+    ///             new PulumiService.Inputs.RoleStackRuleInputArgs
+    ///             {
+    ///                 All = true,
+    ///                 PermissionSetScopes = deployers.Apply(getStackPermissionSetResult =&gt; getStackPermissionSetResult.Scopes),
+    ///             },
+    ///             new PulumiService.Inputs.RoleStackRuleInputArgs
+    ///             {
+    ///                 Id = prodStack.Apply(getStackResult =&gt; getStackResult.StackId),
+    ///                 PermissionSetScopes = stackWrite.Apply(getStackPermissionSetResult =&gt; getStackPermissionSetResult.Scopes),
+    ///                 Scopes = new[]
+    ///                 {
+    ///                     PulumiService.RbacStackScope.StackDeploymentCreate,
+    ///                 },
+    ///             },
+    ///         },
+    ///     });
+    /// 
+    ///     var prodDeployerRole = new PulumiService.OrganizationRole("prodDeployerRole", new()
+    ///     {
+    ///         OrganizationName = "my-org",
+    ///         Name = "Prod Deployers",
+    ///         Description = "Deploy every stack; full write on networking/prod.",
+    ///         Permissions = permissions.Apply(buildRolePermissionsResult =&gt; buildRolePermissionsResult.Permissions),
+    ///     });
+    /// 
+    /// });
+    /// ```
+    /// ### Grant environment and organization-level permission sets
+    /// 
+    /// Each entity type has its own lookup: `getEnvironmentPermissionSet` for `environmentRules`, `getAccountPermissionSet` for `accountRules`, and `getOrganizationPermissionSet` for `organizationPermissionSetScopes`.
+    /// 
+    /// ```csharp
+    /// using System.Collections.Generic;
+    /// using System.Linq;
+    /// using Pulumi;
+    /// using PulumiService = Pulumi.PulumiService;
+    /// 
+    /// return await Deployment.RunAsync(() =&gt; 
+    /// {
+    ///     var readOnly = PulumiService.GetOrganizationPermissionSet.Invoke(new()
+    ///     {
+    ///         OrganizationName = "my-org",
+    ///         BuiltIn = PulumiService.BuiltInOrganizationPermissionSet.ReadOnly,
+    ///     });
+    /// 
+    ///     var environmentOpen = PulumiService.GetEnvironmentPermissionSet.Invoke(new()
+    ///     {
+    ///         OrganizationName = "my-org",
+    ///         BuiltIn = PulumiService.BuiltInEnvironmentPermissionSet.Open,
+    ///     });
+    /// 
+    ///     var permissions = PulumiService.BuildRolePermissions.Invoke(new()
+    ///     {
+    ///         OrganizationPermissionSetScopes = readOnly.Apply(getOrganizationPermissionSetResult =&gt; getOrganizationPermissionSetResult.Scopes),
+    ///         EnvironmentRules = new[]
+    ///         {
+    ///             new PulumiService.Inputs.RoleEnvironmentRuleInputArgs
+    ///             {
+    ///                 Tags = new[]
+    ///                 {
+    ///                     new PulumiService.Inputs.TagConditionInputArgs
+    ///                     {
+    ///                         Key = "team",
+    ///                         Value = "platform",
+    ///                     },
+    ///                 },
+    ///                 PermissionSetScopes = environmentOpen.Apply(getEnvironmentPermissionSetResult =&gt; getEnvironmentPermissionSetResult.Scopes),
+    ///             },
+    ///         },
+    ///     });
+    /// 
+    ///     var platformViewerRole = new PulumiService.OrganizationRole("platformViewerRole", new()
+    ///     {
+    ///         OrganizationName = "my-org",
+    ///         Name = "Platform Viewers",
+    ///         Description = "View the organization and open platform environments.",
+    ///         Permissions = permissions.Apply(buildRolePermissionsResult =&gt; buildRolePermissionsResult.Permissions),
+    ///     });
+    /// 
+    /// });
+    /// ```
     /// 
     /// ## Import
     /// 

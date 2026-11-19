@@ -1,0 +1,22 @@
+description: Grant a built-in cloud account permission set
+variables:
+  accountRead:
+    fn::invoke:
+      function: pulumiservice:getAccountPermissionSet
+      arguments:
+        organizationName: my-org
+        builtIn: insights-account-read
+  permissions:
+    fn::invoke:
+      function: pulumiservice:buildRolePermissions
+      arguments:
+        accountRules:
+          - all: true
+            permissionSetScopes: ${accountRead.scopes}
+resources:
+  accountReaderRole:
+    type: pulumiservice:OrganizationRole
+    properties:
+      organizationName: my-org
+      name: Account Readers
+      permissions: ${permissions.permissions}

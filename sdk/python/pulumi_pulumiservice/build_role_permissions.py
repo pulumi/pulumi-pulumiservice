@@ -51,15 +51,17 @@ class AwaitableBuildRolePermissionsResult(BuildRolePermissionsResult):
 def build_role_permissions(account_rules: Optional[Sequence[Union['RoleAccountRule', 'RoleAccountRuleDict']]] = None,
                            additional_entries: Optional[Sequence[Mapping[str, Any]]] = None,
                            environment_rules: Optional[Sequence[Union['RoleEnvironmentRule', 'RoleEnvironmentRuleDict']]] = None,
+                           organization_permission_set_scopes: Optional[Sequence[_builtins.str]] = None,
                            organization_scopes: Optional[Sequence['RbacOrganizationScope']] = None,
                            stack_rules: Optional[Sequence[Union['RoleStackRule', 'RoleStackRuleDict']]] = None,
                            opts: Optional[pulumi.InvokeOptions] = None) -> AwaitableBuildRolePermissionsResult:
     """
-    Builds a complete `OrganizationRole.permissions` descriptor from organization-level access and rules for stacks, environments, and cloud accounts (Discovery; `InsightsAccount` in the API and this provider), the same model as the role editor in the Pulumi Cloud console. Each rule grants scopes on every entity of its type, on one specific entity, or on entities matching tag conditions. Each rule list accepts only scopes for its own entity type. The result is directly assignable to `OrganizationRole.permissions`.
+    Builds a complete `OrganizationRole.permissions` descriptor from organization-level access and rules for stacks, environments, and cloud accounts (Discovery; `InsightsAccount` in the API and this provider), the same model as the role editor in the Pulumi Cloud console. Each rule grants scopes on every entity of its type, on one specific entity, or on entities matching tag conditions. A rule grants scopes, a permission set's scopes from the matching lookup (such as `getStackPermissionSet`), or both. Each rule list accepts only scopes for its own entity type. The result is directly assignable to `OrganizationRole.permissions`.
 
     :param Sequence[Union['RoleAccountRule', 'RoleAccountRuleDict']] account_rules: Grants on cloud accounts (`InsightsAccount`).
     :param Sequence[Mapping[str, Any]] additional_entries: Output of the other permission helpers to include in the role.
     :param Sequence[Union['RoleEnvironmentRule', 'RoleEnvironmentRuleDict']] environment_rules: Grants on ESC environments.
+    :param Sequence[_builtins.str] organization_permission_set_scopes: The scopes of an organization-level permission set to grant: the `scopes` output of `getOrganizationPermissionSet`. The role gets a copy of the set's scopes, not a link to the set.
     :param Sequence['RbacOrganizationScope'] organization_scopes: Organization-level scopes to grant (e.g. `team:read`).
     :param Sequence[Union['RoleStackRule', 'RoleStackRuleDict']] stack_rules: Grants on stacks.
     """
@@ -67,6 +69,7 @@ def build_role_permissions(account_rules: Optional[Sequence[Union['RoleAccountRu
     __args__['accountRules'] = account_rules
     __args__['additionalEntries'] = additional_entries
     __args__['environmentRules'] = environment_rules
+    __args__['organizationPermissionSetScopes'] = organization_permission_set_scopes
     __args__['organizationScopes'] = organization_scopes
     __args__['stackRules'] = stack_rules
     opts = pulumi.InvokeOptions.merge(_utilities.get_invoke_opts_defaults(), opts)
@@ -77,15 +80,17 @@ def build_role_permissions(account_rules: Optional[Sequence[Union['RoleAccountRu
 def build_role_permissions_output(account_rules: pulumi.Input[Optional[Optional[Sequence[Union['RoleAccountRule', 'RoleAccountRuleDict']]]]] = None,
                                   additional_entries: pulumi.Input[Optional[Optional[Sequence[Mapping[str, Any]]]]] = None,
                                   environment_rules: pulumi.Input[Optional[Optional[Sequence[Union['RoleEnvironmentRule', 'RoleEnvironmentRuleDict']]]]] = None,
+                                  organization_permission_set_scopes: pulumi.Input[Optional[Optional[Sequence[_builtins.str]]]] = None,
                                   organization_scopes: pulumi.Input[Optional[Optional[Sequence['RbacOrganizationScope']]]] = None,
                                   stack_rules: pulumi.Input[Optional[Optional[Sequence[Union['RoleStackRule', 'RoleStackRuleDict']]]]] = None,
                                   opts: Optional[Union[pulumi.InvokeOptions, pulumi.InvokeOutputOptions]] = None) -> pulumi.Output[BuildRolePermissionsResult]:
     """
-    Builds a complete `OrganizationRole.permissions` descriptor from organization-level access and rules for stacks, environments, and cloud accounts (Discovery; `InsightsAccount` in the API and this provider), the same model as the role editor in the Pulumi Cloud console. Each rule grants scopes on every entity of its type, on one specific entity, or on entities matching tag conditions. Each rule list accepts only scopes for its own entity type. The result is directly assignable to `OrganizationRole.permissions`.
+    Builds a complete `OrganizationRole.permissions` descriptor from organization-level access and rules for stacks, environments, and cloud accounts (Discovery; `InsightsAccount` in the API and this provider), the same model as the role editor in the Pulumi Cloud console. Each rule grants scopes on every entity of its type, on one specific entity, or on entities matching tag conditions. A rule grants scopes, a permission set's scopes from the matching lookup (such as `getStackPermissionSet`), or both. Each rule list accepts only scopes for its own entity type. The result is directly assignable to `OrganizationRole.permissions`.
 
     :param Sequence[Union['RoleAccountRule', 'RoleAccountRuleDict']] account_rules: Grants on cloud accounts (`InsightsAccount`).
     :param Sequence[Mapping[str, Any]] additional_entries: Output of the other permission helpers to include in the role.
     :param Sequence[Union['RoleEnvironmentRule', 'RoleEnvironmentRuleDict']] environment_rules: Grants on ESC environments.
+    :param Sequence[_builtins.str] organization_permission_set_scopes: The scopes of an organization-level permission set to grant: the `scopes` output of `getOrganizationPermissionSet`. The role gets a copy of the set's scopes, not a link to the set.
     :param Sequence['RbacOrganizationScope'] organization_scopes: Organization-level scopes to grant (e.g. `team:read`).
     :param Sequence[Union['RoleStackRule', 'RoleStackRuleDict']] stack_rules: Grants on stacks.
     """
@@ -93,6 +98,7 @@ def build_role_permissions_output(account_rules: pulumi.Input[Optional[Optional[
     __args__['accountRules'] = account_rules
     __args__['additionalEntries'] = additional_entries
     __args__['environmentRules'] = environment_rules
+    __args__['organizationPermissionSetScopes'] = organization_permission_set_scopes
     __args__['organizationScopes'] = organization_scopes
     __args__['stackRules'] = stack_rules
     opts = pulumi.InvokeOutputOptions.merge(_utilities.get_invoke_opts_defaults(), opts)

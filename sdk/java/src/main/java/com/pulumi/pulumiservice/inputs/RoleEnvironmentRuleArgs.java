@@ -50,6 +50,21 @@ public final class RoleEnvironmentRuleArgs extends com.pulumi.resources.Resource
     }
 
     /**
+     * The scopes of a environment permission set to grant on the selected environments: the `scopes` output of `getEnvironmentPermissionSet`. The role gets a copy of the set&#39;s scopes, not a link to the set.
+     * 
+     */
+    @Import(name="permissionSetScopes")
+    private @Nullable Output<List<String>> permissionSetScopes;
+
+    /**
+     * @return The scopes of a environment permission set to grant on the selected environments: the `scopes` output of `getEnvironmentPermissionSet`. The role gets a copy of the set&#39;s scopes, not a link to the set.
+     * 
+     */
+    public Optional<Output<List<String>>> permissionSetScopes() {
+        return Optional.ofNullable(this.permissionSetScopes);
+    }
+
+    /**
      * Environment scopes to grant on the selected environments.
      * 
      */
@@ -84,6 +99,7 @@ public final class RoleEnvironmentRuleArgs extends com.pulumi.resources.Resource
     private RoleEnvironmentRuleArgs(RoleEnvironmentRuleArgs $) {
         this.all = $.all;
         this.id = $.id;
+        this.permissionSetScopes = $.permissionSetScopes;
         this.scopes = $.scopes;
         this.tags = $.tags;
     }
@@ -146,6 +162,37 @@ public final class RoleEnvironmentRuleArgs extends com.pulumi.resources.Resource
          */
         public Builder id(String id) {
             return id(Output.of(id));
+        }
+
+        /**
+         * @param permissionSetScopes The scopes of a environment permission set to grant on the selected environments: the `scopes` output of `getEnvironmentPermissionSet`. The role gets a copy of the set&#39;s scopes, not a link to the set.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder permissionSetScopes(@Nullable Output<List<String>> permissionSetScopes) {
+            $.permissionSetScopes = permissionSetScopes;
+            return this;
+        }
+
+        /**
+         * @param permissionSetScopes The scopes of a environment permission set to grant on the selected environments: the `scopes` output of `getEnvironmentPermissionSet`. The role gets a copy of the set&#39;s scopes, not a link to the set.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder permissionSetScopes(List<String> permissionSetScopes) {
+            return permissionSetScopes(Output.of(permissionSetScopes));
+        }
+
+        /**
+         * @param permissionSetScopes The scopes of a environment permission set to grant on the selected environments: the `scopes` output of `getEnvironmentPermissionSet`. The role gets a copy of the set&#39;s scopes, not a link to the set.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder permissionSetScopes(String... permissionSetScopes) {
+            return permissionSetScopes(List.of(permissionSetScopes));
         }
 
         /**

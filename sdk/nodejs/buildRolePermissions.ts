@@ -8,7 +8,7 @@ import * as enums from "./types/enums";
 import * as utilities from "./utilities";
 
 /**
- * Builds a complete `OrganizationRole.permissions` descriptor from organization-level access and rules for stacks, environments, and cloud accounts (Discovery; `InsightsAccount` in the API and this provider), the same model as the role editor in the Pulumi Cloud console. Each rule grants scopes on every entity of its type, on one specific entity, or on entities matching tag conditions. Each rule list accepts only scopes for its own entity type. The result is directly assignable to `OrganizationRole.permissions`.
+ * Builds a complete `OrganizationRole.permissions` descriptor from organization-level access and rules for stacks, environments, and cloud accounts (Discovery; `InsightsAccount` in the API and this provider), the same model as the role editor in the Pulumi Cloud console. Each rule grants scopes on every entity of its type, on one specific entity, or on entities matching tag conditions. A rule grants scopes, a permission set's scopes from the matching lookup (such as `getStackPermissionSet`), or both. Each rule list accepts only scopes for its own entity type. The result is directly assignable to `OrganizationRole.permissions`.
  */
 export function buildRolePermissions(args?: BuildRolePermissionsArgs, opts?: pulumi.InvokeOptions): Promise<BuildRolePermissionsResult> {
     args = args || {};
@@ -17,6 +17,7 @@ export function buildRolePermissions(args?: BuildRolePermissionsArgs, opts?: pul
         "accountRules": args.accountRules,
         "additionalEntries": args.additionalEntries,
         "environmentRules": args.environmentRules,
+        "organizationPermissionSetScopes": args.organizationPermissionSetScopes,
         "organizationScopes": args.organizationScopes,
         "stackRules": args.stackRules,
     }, opts);
@@ -36,6 +37,10 @@ export interface BuildRolePermissionsArgs {
      */
     environmentRules?: inputs.RoleEnvironmentRule[];
     /**
+     * The scopes of an organization-level permission set to grant: the `scopes` output of `getOrganizationPermissionSet`. The role gets a copy of the set's scopes, not a link to the set.
+     */
+    organizationPermissionSetScopes?: string[];
+    /**
      * Organization-level scopes to grant (e.g. `team:read`).
      */
     organizationScopes?: enums.RbacOrganizationScope[];
@@ -52,7 +57,7 @@ export interface BuildRolePermissionsResult {
     readonly permissions: {[key: string]: any};
 }
 /**
- * Builds a complete `OrganizationRole.permissions` descriptor from organization-level access and rules for stacks, environments, and cloud accounts (Discovery; `InsightsAccount` in the API and this provider), the same model as the role editor in the Pulumi Cloud console. Each rule grants scopes on every entity of its type, on one specific entity, or on entities matching tag conditions. Each rule list accepts only scopes for its own entity type. The result is directly assignable to `OrganizationRole.permissions`.
+ * Builds a complete `OrganizationRole.permissions` descriptor from organization-level access and rules for stacks, environments, and cloud accounts (Discovery; `InsightsAccount` in the API and this provider), the same model as the role editor in the Pulumi Cloud console. Each rule grants scopes on every entity of its type, on one specific entity, or on entities matching tag conditions. A rule grants scopes, a permission set's scopes from the matching lookup (such as `getStackPermissionSet`), or both. Each rule list accepts only scopes for its own entity type. The result is directly assignable to `OrganizationRole.permissions`.
  */
 export function buildRolePermissionsOutput(args?: BuildRolePermissionsOutputArgs, opts?: pulumi.InvokeOutputOptions): pulumi.Output<BuildRolePermissionsResult> {
     args = args || {};
@@ -61,6 +66,7 @@ export function buildRolePermissionsOutput(args?: BuildRolePermissionsOutputArgs
         "accountRules": args.accountRules,
         "additionalEntries": args.additionalEntries,
         "environmentRules": args.environmentRules,
+        "organizationPermissionSetScopes": args.organizationPermissionSetScopes,
         "organizationScopes": args.organizationScopes,
         "stackRules": args.stackRules,
     }, opts);
@@ -79,6 +85,10 @@ export interface BuildRolePermissionsOutputArgs {
      * Grants on ESC environments.
      */
     environmentRules?: pulumi.Input<pulumi.Input<inputs.RoleEnvironmentRuleArgs>[] | undefined>;
+    /**
+     * The scopes of an organization-level permission set to grant: the `scopes` output of `getOrganizationPermissionSet`. The role gets a copy of the set's scopes, not a link to the set.
+     */
+    organizationPermissionSetScopes?: pulumi.Input<pulumi.Input<string>[] | undefined>;
     /**
      * Organization-level scopes to grant (e.g. `team:read`).
      */

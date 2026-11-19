@@ -49,6 +49,21 @@ public final class RoleAccountRule extends com.pulumi.resources.InvokeArgs {
     }
 
     /**
+     * The scopes of a cloud account permission set to grant on the selected accounts: the `scopes` output of `getAccountPermissionSet`. The role gets a copy of the set&#39;s scopes, not a link to the set.
+     * 
+     */
+    @Import(name="permissionSetScopes")
+    private @Nullable List<String> permissionSetScopes;
+
+    /**
+     * @return The scopes of a cloud account permission set to grant on the selected accounts: the `scopes` output of `getAccountPermissionSet`. The role gets a copy of the set&#39;s scopes, not a link to the set.
+     * 
+     */
+    public Optional<List<String>> permissionSetScopes() {
+        return Optional.ofNullable(this.permissionSetScopes);
+    }
+
+    /**
      * Cloud account scopes to grant on the selected accounts.
      * 
      */
@@ -83,6 +98,7 @@ public final class RoleAccountRule extends com.pulumi.resources.InvokeArgs {
     private RoleAccountRule(RoleAccountRule $) {
         this.all = $.all;
         this.id = $.id;
+        this.permissionSetScopes = $.permissionSetScopes;
         this.scopes = $.scopes;
         this.tags = $.tags;
     }
@@ -125,6 +141,27 @@ public final class RoleAccountRule extends com.pulumi.resources.InvokeArgs {
         public Builder id(@Nullable String id) {
             $.id = id;
             return this;
+        }
+
+        /**
+         * @param permissionSetScopes The scopes of a cloud account permission set to grant on the selected accounts: the `scopes` output of `getAccountPermissionSet`. The role gets a copy of the set&#39;s scopes, not a link to the set.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder permissionSetScopes(@Nullable List<String> permissionSetScopes) {
+            $.permissionSetScopes = permissionSetScopes;
+            return this;
+        }
+
+        /**
+         * @param permissionSetScopes The scopes of a cloud account permission set to grant on the selected accounts: the `scopes` output of `getAccountPermissionSet`. The role gets a copy of the set&#39;s scopes, not a link to the set.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder permissionSetScopes(String... permissionSetScopes) {
+            return permissionSetScopes(List.of(permissionSetScopes));
         }
 
         /**

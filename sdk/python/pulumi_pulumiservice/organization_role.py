@@ -308,6 +308,64 @@ class OrganizationRole(pulumi.CustomResource):
             description="Read environments and cloud accounts, and operate the shared ones.",
             permissions=permissions.permissions)
         ```
+        ### Grant permission sets
+
+        A rule's `permissionSetScopes` grants a permission set, built-in or custom, like an access level in the Pulumi Cloud console. Look the set up with the function for the rule's entity type, here `getStackPermissionSet`, and pass its `scopes`. A rule can combine a permission set with `scopes`. The role gets a copy of the set's scopes, so if the set changes in Pulumi Cloud, the next `pulumi up` updates the role.
+
+        ```python
+        import pulumi
+        import pulumi_pulumiservice as pulumiservice
+
+        stack_write = pulumiservice.get_stack_permission_set_output(organization_name="my-org",
+            built_in=pulumiservice.BuiltInStackPermissionSet.WRITE)
+        deployers = pulumiservice.get_stack_permission_set_output(organization_name="my-org",
+            name="Deployers")
+        prod_stack = pulumiservice.get_stack_output(organization_name="my-org",
+            project_name="networking",
+            stack_name="prod")
+        permissions = pulumiservice.build_role_permissions_output(stack_rules=[
+            {
+                "all": True,
+                "permission_set_scopes": deployers.scopes,
+            },
+            {
+                "id": prod_stack.stack_id,
+                "permission_set_scopes": stack_write.scopes,
+                "scopes": [pulumiservice.RbacStackScope.STACK_DEPLOYMENT_CREATE],
+            },
+        ])
+        prod_deployer_role = pulumiservice.OrganizationRole("prodDeployerRole",
+            organization_name="my-org",
+            name="Prod Deployers",
+            description="Deploy every stack; full write on networking/prod.",
+            permissions=permissions.permissions)
+        ```
+        ### Grant environment and organization-level permission sets
+
+        Each entity type has its own lookup: `getEnvironmentPermissionSet` for `environmentRules`, `getAccountPermissionSet` for `accountRules`, and `getOrganizationPermissionSet` for `organizationPermissionSetScopes`.
+
+        ```python
+        import pulumi
+        import pulumi_pulumiservice as pulumiservice
+
+        read_only = pulumiservice.get_organization_permission_set_output(organization_name="my-org",
+            built_in=pulumiservice.BuiltInOrganizationPermissionSet.READ_ONLY)
+        environment_open = pulumiservice.get_environment_permission_set_output(organization_name="my-org",
+            built_in=pulumiservice.BuiltInEnvironmentPermissionSet.OPEN)
+        permissions = pulumiservice.build_role_permissions_output(organization_permission_set_scopes=read_only.scopes,
+            environment_rules=[{
+                "tags": [{
+                    "key": "team",
+                    "value": "platform",
+                }],
+                "permission_set_scopes": environment_open.scopes,
+            }])
+        platform_viewer_role = pulumiservice.OrganizationRole("platformViewerRole",
+            organization_name="my-org",
+            name="Platform Viewers",
+            description="View the organization and open platform environments.",
+            permissions=permissions.permissions)
+        ```
 
         ## Import
 
@@ -514,6 +572,64 @@ class OrganizationRole(pulumi.CustomResource):
             organization_name="my-org",
             name="Infrastructure Operators",
             description="Read environments and cloud accounts, and operate the shared ones.",
+            permissions=permissions.permissions)
+        ```
+        ### Grant permission sets
+
+        A rule's `permissionSetScopes` grants a permission set, built-in or custom, like an access level in the Pulumi Cloud console. Look the set up with the function for the rule's entity type, here `getStackPermissionSet`, and pass its `scopes`. A rule can combine a permission set with `scopes`. The role gets a copy of the set's scopes, so if the set changes in Pulumi Cloud, the next `pulumi up` updates the role.
+
+        ```python
+        import pulumi
+        import pulumi_pulumiservice as pulumiservice
+
+        stack_write = pulumiservice.get_stack_permission_set_output(organization_name="my-org",
+            built_in=pulumiservice.BuiltInStackPermissionSet.WRITE)
+        deployers = pulumiservice.get_stack_permission_set_output(organization_name="my-org",
+            name="Deployers")
+        prod_stack = pulumiservice.get_stack_output(organization_name="my-org",
+            project_name="networking",
+            stack_name="prod")
+        permissions = pulumiservice.build_role_permissions_output(stack_rules=[
+            {
+                "all": True,
+                "permission_set_scopes": deployers.scopes,
+            },
+            {
+                "id": prod_stack.stack_id,
+                "permission_set_scopes": stack_write.scopes,
+                "scopes": [pulumiservice.RbacStackScope.STACK_DEPLOYMENT_CREATE],
+            },
+        ])
+        prod_deployer_role = pulumiservice.OrganizationRole("prodDeployerRole",
+            organization_name="my-org",
+            name="Prod Deployers",
+            description="Deploy every stack; full write on networking/prod.",
+            permissions=permissions.permissions)
+        ```
+        ### Grant environment and organization-level permission sets
+
+        Each entity type has its own lookup: `getEnvironmentPermissionSet` for `environmentRules`, `getAccountPermissionSet` for `accountRules`, and `getOrganizationPermissionSet` for `organizationPermissionSetScopes`.
+
+        ```python
+        import pulumi
+        import pulumi_pulumiservice as pulumiservice
+
+        read_only = pulumiservice.get_organization_permission_set_output(organization_name="my-org",
+            built_in=pulumiservice.BuiltInOrganizationPermissionSet.READ_ONLY)
+        environment_open = pulumiservice.get_environment_permission_set_output(organization_name="my-org",
+            built_in=pulumiservice.BuiltInEnvironmentPermissionSet.OPEN)
+        permissions = pulumiservice.build_role_permissions_output(organization_permission_set_scopes=read_only.scopes,
+            environment_rules=[{
+                "tags": [{
+                    "key": "team",
+                    "value": "platform",
+                }],
+                "permission_set_scopes": environment_open.scopes,
+            }])
+        platform_viewer_role = pulumiservice.OrganizationRole("platformViewerRole",
+            organization_name="my-org",
+            name="Platform Viewers",
+            description="View the organization and open platform environments.",
             permissions=permissions.permissions)
         ```
 

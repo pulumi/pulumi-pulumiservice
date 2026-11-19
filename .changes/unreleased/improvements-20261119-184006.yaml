@@ -1,0 +1,5 @@
+kind: improvements
+body: Added permission sets to `buildRolePermissions`. Look up a built-in or custom permission set with `getStackPermissionSet`, `getEnvironmentPermissionSet`, `getAccountPermissionSet` or `getOrganizationPermissionSet`, and grant it by passing its `scopes` to a rule's new `permissionSetScopes` input (or `organizationPermissionSetScopes` for organization-level sets). Built-in sets are named by the new `BuiltInStackPermissionSet`, `BuiltInEnvironmentPermissionSet`, `BuiltInAccountPermissionSet` and `BuiltInOrganizationPermissionSet` enums. The role gets a copy of the set's scopes, so it follows changes to the set on the next `pulumi up`.
+time: 2026-11-19T18:40:06.737612-05:00
+custom:
+    Issue: "1243"

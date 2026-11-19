@@ -118,6 +118,162 @@ namespace Pulumi.PulumiService
     }
 
     [EnumType]
+    public readonly struct BuiltInAccountPermissionSet : IEquatable<BuiltInAccountPermissionSet>
+    {
+        private readonly string _value;
+
+        private BuiltInAccountPermissionSet(string value)
+        {
+            _value = value ?? throw new ArgumentNullException(nameof(value));
+        }
+
+        /// <summary>
+        /// Account Admin: Admin access to insights accounts.
+        /// </summary>
+        public static BuiltInAccountPermissionSet Admin { get; } = new BuiltInAccountPermissionSet("insights-account-admin");
+        /// <summary>
+        /// Account Read: Read access to insights accounts.
+        /// </summary>
+        public static BuiltInAccountPermissionSet Read { get; } = new BuiltInAccountPermissionSet("insights-account-read");
+        /// <summary>
+        /// Account Write: Read/write access to insights accounts.
+        /// </summary>
+        public static BuiltInAccountPermissionSet Write { get; } = new BuiltInAccountPermissionSet("insights-account-write");
+
+        public static bool operator ==(BuiltInAccountPermissionSet left, BuiltInAccountPermissionSet right) => left.Equals(right);
+        public static bool operator !=(BuiltInAccountPermissionSet left, BuiltInAccountPermissionSet right) => !left.Equals(right);
+
+        public static explicit operator string(BuiltInAccountPermissionSet value) => value._value;
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public override bool Equals(object? obj) => obj is BuiltInAccountPermissionSet other && Equals(other);
+        public bool Equals(BuiltInAccountPermissionSet other) => string.Equals(_value, other._value, StringComparison.Ordinal);
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public override int GetHashCode() => _value?.GetHashCode() ?? 0;
+
+        public override string ToString() => _value;
+    }
+
+    [EnumType]
+    public readonly struct BuiltInEnvironmentPermissionSet : IEquatable<BuiltInEnvironmentPermissionSet>
+    {
+        private readonly string _value;
+
+        private BuiltInEnvironmentPermissionSet(string value)
+        {
+            _value = value ?? throw new ArgumentNullException(nameof(value));
+        }
+
+        /// <summary>
+        /// Environment Admin: Admin access to environments.
+        /// </summary>
+        public static BuiltInEnvironmentPermissionSet Admin { get; } = new BuiltInEnvironmentPermissionSet("environment-admin");
+        /// <summary>
+        /// Environment Open: Read/open access to environments.
+        /// </summary>
+        public static BuiltInEnvironmentPermissionSet Open { get; } = new BuiltInEnvironmentPermissionSet("environment-open");
+        /// <summary>
+        /// Environment Read: Read access to environments.
+        /// </summary>
+        public static BuiltInEnvironmentPermissionSet Read { get; } = new BuiltInEnvironmentPermissionSet("environment-read");
+        /// <summary>
+        /// Environment Write: Read/open/write access to environments.
+        /// </summary>
+        public static BuiltInEnvironmentPermissionSet Write { get; } = new BuiltInEnvironmentPermissionSet("environment-write");
+
+        public static bool operator ==(BuiltInEnvironmentPermissionSet left, BuiltInEnvironmentPermissionSet right) => left.Equals(right);
+        public static bool operator !=(BuiltInEnvironmentPermissionSet left, BuiltInEnvironmentPermissionSet right) => !left.Equals(right);
+
+        public static explicit operator string(BuiltInEnvironmentPermissionSet value) => value._value;
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public override bool Equals(object? obj) => obj is BuiltInEnvironmentPermissionSet other && Equals(other);
+        public bool Equals(BuiltInEnvironmentPermissionSet other) => string.Equals(_value, other._value, StringComparison.Ordinal);
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public override int GetHashCode() => _value?.GetHashCode() ?? 0;
+
+        public override string ToString() => _value;
+    }
+
+    [EnumType]
+    public readonly struct BuiltInOrganizationPermissionSet : IEquatable<BuiltInOrganizationPermissionSet>
+    {
+        private readonly string _value;
+
+        private BuiltInOrganizationPermissionSet(string value)
+        {
+            _value = value ?? throw new ArgumentNullException(nameof(value));
+        }
+
+        /// <summary>
+        /// Organization Settings Billing: Billing access.
+        /// </summary>
+        public static BuiltInOrganizationPermissionSet Billing { get; } = new BuiltInOrganizationPermissionSet("org-settings-billing");
+        /// <summary>
+        /// Read Only: View-only org access: usage, members, stacks, environments, teams, Insights accounts; read deployments, integrations, services, templates, and resources. No create/update/delete.
+        /// </summary>
+        public static BuiltInOrganizationPermissionSet ReadOnly { get; } = new BuiltInOrganizationPermissionSet("org-settings-read-only");
+        /// <summary>
+        /// Standard: View org usage and members; list stacks, environments, teams, and Insights accounts; use deployments, integrations, services, and resources; create resources (stacks, environments, teams, Insights accounts). Excludes billing and member or org admin settings.
+        /// </summary>
+        public static BuiltInOrganizationPermissionSet Standard { get; } = new BuiltInOrganizationPermissionSet("org-settings-standard");
+
+        public static bool operator ==(BuiltInOrganizationPermissionSet left, BuiltInOrganizationPermissionSet right) => left.Equals(right);
+        public static bool operator !=(BuiltInOrganizationPermissionSet left, BuiltInOrganizationPermissionSet right) => !left.Equals(right);
+
+        public static explicit operator string(BuiltInOrganizationPermissionSet value) => value._value;
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public override bool Equals(object? obj) => obj is BuiltInOrganizationPermissionSet other && Equals(other);
+        public bool Equals(BuiltInOrganizationPermissionSet other) => string.Equals(_value, other._value, StringComparison.Ordinal);
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public override int GetHashCode() => _value?.GetHashCode() ?? 0;
+
+        public override string ToString() => _value;
+    }
+
+    [EnumType]
+    public readonly struct BuiltInStackPermissionSet : IEquatable<BuiltInStackPermissionSet>
+    {
+        private readonly string _value;
+
+        private BuiltInStackPermissionSet(string value)
+        {
+            _value = value ?? throw new ArgumentNullException(nameof(value));
+        }
+
+        /// <summary>
+        /// Stack Admin: Admin access to stacks, including deployment settings.
+        /// </summary>
+        public static BuiltInStackPermissionSet Admin { get; } = new BuiltInStackPermissionSet("stack-admin");
+        /// <summary>
+        /// Stack Read: Read access to stacks, including deployment settings.
+        /// </summary>
+        public static BuiltInStackPermissionSet Read { get; } = new BuiltInStackPermissionSet("stack-read");
+        /// <summary>
+        /// Stack Write: Read/write access to stacks, including deployment settings.
+        /// </summary>
+        public static BuiltInStackPermissionSet Write { get; } = new BuiltInStackPermissionSet("stack-write");
+
+        public static bool operator ==(BuiltInStackPermissionSet left, BuiltInStackPermissionSet right) => left.Equals(right);
+        public static bool operator !=(BuiltInStackPermissionSet left, BuiltInStackPermissionSet right) => !left.Equals(right);
+
+        public static explicit operator string(BuiltInStackPermissionSet value) => value._value;
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public override bool Equals(object? obj) => obj is BuiltInStackPermissionSet other && Equals(other);
+        public bool Equals(BuiltInStackPermissionSet other) => string.Equals(_value, other._value, StringComparison.Ordinal);
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public override int GetHashCode() => _value?.GetHashCode() ?? 0;
+
+        public override string ToString() => _value;
+    }
+
+    [EnumType]
     public readonly struct CloudProvider : IEquatable<CloudProvider>
     {
         private readonly string _value;
