@@ -1,9 +1,0 @@
-description: List all roles
-variables:
-  allRoles:
-    fn::invoke:
-      function: pulumiservice:getOrganizationRoles
-      arguments:
-        organizationName: my-org
-outputs:
-  roles: ${allRoles.roles}
