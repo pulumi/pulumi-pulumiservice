@@ -173,7 +173,7 @@ func TestTeamCreateWarnsAboutUndeclaredMembers(t *testing.T) {
 				}
 				return &pulumiapi.Team{Name: teamName, Type: teamTypePulumi, Members: members}, nil
 			}
-			ctx := config.WithMockClient(context.Background(), client)
+			ctx := config.WithMockClient(t.Context(), client)
 
 			_, err := (&Team{}).Create(ctx, infer.CreateRequest[TeamInput]{
 				Inputs: TeamInput{

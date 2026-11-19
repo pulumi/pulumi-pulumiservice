@@ -87,7 +87,7 @@ func TestCreateTeamAccessToken(t *testing.T) {
 			ResponseCode:    201,
 			ResponseBody:    createTokenResponse{ID: tokenIDKey, TokenValue: secretKey},
 		})
-		_, err := c.CreateTeamAccessToken(teamCtx, tokenName, orgName, teamName, desc, expires)
+		_, err := c.CreateTeamAccessToken(t.Context(), tokenName, orgName, teamName, desc, expires)
 		assert.NoError(t, err)
 	})
 
