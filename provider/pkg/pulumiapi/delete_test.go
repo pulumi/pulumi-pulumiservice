@@ -67,6 +67,12 @@ func TestDelete(t *testing.T) {
 		"DeletePolicyGroup": func(ctx context.Context, c *Client) error {
 			return c.DeletePolicyGroup(ctx, org, "a-group")
 		},
+		"DeletePolicyPack": func(ctx context.Context, c *Client) error {
+			return c.DeletePolicyPack(ctx, org, "a-policy-pack")
+		},
+		"DeletePolicyPackVersion": func(ctx context.Context, c *Client) error {
+			return c.DeletePolicyPackVersion(ctx, org, "a-policy-pack", "1.0.0")
+		},
 		"DeleteStack": func(ctx context.Context, c *Client) error {
 			return c.DeleteStack(ctx, stack, false)
 		},
@@ -92,6 +98,9 @@ func TestDelete(t *testing.T) {
 			return c.RemoveEnvironmentSettings(ctx, TeamEnvironmentSettingsRequest{
 				Organization: org, Team: team, Environment: "an-env", Project: project,
 			})
+		},
+		"RemoveRoleFromTeam": func(ctx context.Context, c *Client) error {
+			return c.RemoveRoleFromTeam(ctx, org, team, "a-role")
 		},
 		"RemoveStackPermission": func(ctx context.Context, c *Client) error {
 			return c.RemoveStackPermission(ctx, stack, team)

@@ -72,7 +72,7 @@ func (c *Client) CreateEnvironmentRotationSchedule(
 		"schedules",
 	)
 	var scheduleResponse EnvironmentScheduleResponse
-	_, err := c.do(ctx, http.MethodPost, apiPath, scheduleReq, &scheduleResponse)
+	err := c.do(ctx, http.MethodPost, apiPath, scheduleReq, &scheduleResponse)
 	if err != nil {
 		var cronString string
 		if scheduleReq.ScheduleCron != nil {
@@ -101,7 +101,7 @@ func (c *Client) GetEnvironmentSchedule(
 		scheduleID,
 	)
 	var scheduleResponse EnvironmentScheduleResponse
-	_, err := c.do(ctx, http.MethodGet, apiPath, nil, &scheduleResponse)
+	err := c.do(ctx, http.MethodGet, apiPath, nil, &scheduleResponse)
 	if err != nil {
 		if GetErrorStatusCode(err) == http.StatusNotFound {
 			return nil, nil
@@ -127,7 +127,7 @@ func (c *Client) UpdateEnvironmentRotationSchedule(
 		scheduleID,
 	)
 	var scheduleResponse EnvironmentScheduleResponse
-	_, err := c.do(ctx, http.MethodPost, apiPath, scheduleReq, &scheduleResponse)
+	err := c.do(ctx, http.MethodPost, apiPath, scheduleReq, &scheduleResponse)
 	if err != nil {
 		var cronString string
 		if scheduleReq.ScheduleCron != nil {
@@ -155,12 +155,5 @@ func (c *Client) DeleteEnvironmentSchedule(
 		"schedules",
 		scheduleID,
 	)
-	_, err := c.do(ctx, http.MethodDelete, apiPath, nil, nil)
-	if err != nil {
-		if GetErrorStatusCode(err) == http.StatusNotFound {
-			return nil
-		}
-		return fmt.Errorf("failed to delete environment schedule with scheduleId %s : %w", scheduleID, err)
-	}
-	return nil
+	return c.deleteIgnoringNotFound(ctx, apiPath, nil, "environment schedule "+scheduleID)
 }

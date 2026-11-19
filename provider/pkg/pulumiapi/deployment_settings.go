@@ -86,7 +86,7 @@ func (c *Client) CreateDeploymentSettings(
 ) (*DeploymentSettings, error) {
 	apiPath := path.Join("stacks", stack.OrgName, stack.ProjectName, stack.StackName, "deployments", "settings")
 	var resultDS = &DeploymentSettings{}
-	_, err := c.do(ctx, http.MethodPut, apiPath, ds, resultDS)
+	err := c.do(ctx, http.MethodPut, apiPath, ds, resultDS)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create deployment settings for stack (%s): %w", stack.String(), err)
 	}
@@ -100,7 +100,7 @@ func (c *Client) UpdateDeploymentSettings(
 ) (*DeploymentSettings, error) {
 	apiPath := path.Join("stacks", stack.OrgName, stack.ProjectName, stack.StackName, "deployments", "settings")
 	var resultDS = &DeploymentSettings{}
-	_, err := c.do(ctx, http.MethodPut, apiPath, ds, resultDS)
+	err := c.do(ctx, http.MethodPut, apiPath, ds, resultDS)
 	if err != nil {
 		return nil, fmt.Errorf("failed to update deployment settings for stack (%s): %w", stack.String(), err)
 	}
@@ -112,7 +112,7 @@ func (c *Client) GetDeploymentSettings(ctx context.Context, stack StackIdentifie
 		"stacks", stack.OrgName, stack.ProjectName, stack.StackName, "deployments", "settings",
 	)
 	var ds DeploymentSettings
-	_, err := c.do(ctx, http.MethodGet, apiPath, nil, &ds)
+	err := c.do(ctx, http.MethodGet, apiPath, nil, &ds)
 	if err != nil {
 		statusCode := GetErrorStatusCode(err)
 		if statusCode == http.StatusNotFound {
@@ -128,12 +128,5 @@ func (c *Client) DeleteDeploymentSettings(ctx context.Context, stack StackIdenti
 	apiPath := path.Join(
 		"stacks", stack.OrgName, stack.ProjectName, stack.StackName, "deployments", "settings",
 	)
-	_, err := c.do(ctx, http.MethodDelete, apiPath, nil, nil)
-	if err != nil {
-		if GetErrorStatusCode(err) == http.StatusNotFound {
-			return nil
-		}
-		return fmt.Errorf("failed to delete deployment settings for stack (%s): %w", stack.String(), err)
-	}
-	return nil
+	return c.deleteIgnoringNotFound(ctx, apiPath, nil, "deployment settings for stack "+stack.String())
 }

@@ -49,7 +49,7 @@ type stack struct {
 
 func (c *Client) CreateStackTag(ctx context.Context, stack StackIdentifier, tag StackTag) error {
 	apiPath := path.Join("stacks", stack.OrgName, stack.ProjectName, stack.StackName, "tags")
-	_, err := c.do(ctx, http.MethodPost, apiPath, tag, nil)
+	err := c.do(ctx, http.MethodPost, apiPath, tag, nil)
 	if err != nil {
 		return fmt.Errorf("failed to create tag (%s=%s): %w", tag.Name, tag.Value, err)
 	}
@@ -75,21 +75,14 @@ func (c *Client) DeleteStackTag(ctx context.Context, stackName StackIdentifier, 
 	apiPath := path.Join(
 		"stacks", stackName.OrgName, stackName.ProjectName, stackName.StackName, "tags", tagName,
 	)
-	_, err := c.do(ctx, http.MethodDelete, apiPath, nil, nil)
-	if err != nil {
-		if GetErrorStatusCode(err) == http.StatusNotFound {
-			return nil
-		}
-		return fmt.Errorf("failed to make request: %w", err)
-	}
-	return nil
+	return c.deleteIgnoringNotFound(ctx, apiPath, nil, "stack tag")
 }
 
 // GetStackTags retrieves all tags for a stack
 func (c *Client) GetStackTags(ctx context.Context, stackName StackIdentifier) (map[string]string, error) {
 	apiPath := path.Join("stacks", stackName.OrgName, stackName.ProjectName, stackName.StackName)
 	var s stack
-	_, err := c.do(ctx, http.MethodGet, apiPath, nil, &s)
+	err := c.do(ctx, http.MethodGet, apiPath, nil, &s)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get stack tags: %w", err)
 	}

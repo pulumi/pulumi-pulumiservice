@@ -171,7 +171,7 @@ func (c *Client) ListAvailableRoleScopes(
 
 	apiPath := path.Join("orgs", orgName, "roles", "scopes")
 	raw := map[string][]rbacScopeGroup{}
-	if _, err := c.do(ctx, http.MethodGet, apiPath, nil, &raw); err != nil {
+	if err := c.do(ctx, http.MethodGet, apiPath, nil, &raw); err != nil {
 		return nil, fmt.Errorf("failed to list available role scopes: %w", err)
 	}
 

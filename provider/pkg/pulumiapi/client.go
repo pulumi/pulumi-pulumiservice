@@ -117,10 +117,10 @@ func (c *Client) createRequest(
 
 // sendRequest executes req and unmarshals response json into resBody
 // returns attempts to unmarshal response into ErrorResponse if statusCode not 2XX
-func (c *Client) sendRequest(req *http.Request, resBody interface{}) (*http.Response, error) {
+func (c *Client) sendRequest(req *http.Request, resBody interface{}) error {
 	res, err := c.httpClient.Do(req)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create request: %w", err)
+		return fmt.Errorf("failed to create request: %w", err)
 	}
 	defer func() {
 		err = res.Body.Close()
@@ -130,7 +130,7 @@ func (c *Client) sendRequest(req *http.Request, resBody interface{}) (*http.Resp
 	}()
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read response body: %w", err)
+		return fmt.Errorf("failed to read response body: %w", err)
 	}
 	if !ok(res.StatusCode) {
 		// if we didn't get an 2XX status code, unmarshal the response as an ErrorResponse
@@ -144,7 +144,7 @@ func (c *Client) sendRequest(req *http.Request, resBody interface{}) (*http.Resp
 		if errRes.StatusCode == 0 {
 			errRes.StatusCode = res.StatusCode
 		}
-		return res, &errRes
+		return &errRes
 	}
 	// Only unmarshal response body if:
 	// 1. resBody is not nil (caller wants the response)
@@ -152,26 +152,35 @@ func (c *Client) sendRequest(req *http.Request, resBody interface{}) (*http.Resp
 	if resBody != nil && len(body) > 0 {
 		err = json.Unmarshal(body, resBody)
 		if err != nil {
-			return res, fmt.Errorf("failed to parse response body: %w", err)
+			return fmt.Errorf("failed to parse response body: %w", err)
 		}
 	}
-	return res, nil
+	return nil
 }
 
 // do execute an http request to the pulumi service at the configured url
 // Marshals reqBody and resBody to/from JSON. Applies appropriate headers as well
-// Returns http.Response, but Body will be closed
 func (c *Client) do(
 	ctx context.Context,
 	method, path string,
 	reqBody interface{},
 	resBody interface{},
-) (*http.Response, error) {
+) error {
 	req, err := c.createRequest(ctx, method, &url.URL{Path: path}, reqBody)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	return c.sendRequest(req, resBody)
+}
+
+// deleteIgnoringNotFound sends a DELETE and treats a 404 as success, so
+// deleting a resource that is already gone doesn't fail.
+func (c *Client) deleteIgnoringNotFound(ctx context.Context, apiPath string, query url.Values, what string) error {
+	err := c.doWithQuery(ctx, http.MethodDelete, apiPath, query, nil, nil)
+	if err != nil && GetErrorStatusCode(err) != http.StatusNotFound {
+		return fmt.Errorf("failed to delete %s: %w", what, err)
+	}
+	return nil
 }
 
 func (c *Client) doWithQuery(
@@ -180,12 +189,12 @@ func (c *Client) doWithQuery(
 	query url.Values,
 	reqBody interface{},
 	resBody interface{},
-) (*http.Response, error) {
+) error {
 	reqURL := &url.URL{Path: path}
 	reqURL.RawQuery = query.Encode()
 	req, err := c.createRequest(ctx, method, reqURL, reqBody)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	return c.sendRequest(req, resBody)
 }
