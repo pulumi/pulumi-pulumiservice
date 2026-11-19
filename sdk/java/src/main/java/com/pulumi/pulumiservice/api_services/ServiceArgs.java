@@ -47,14 +47,14 @@ public final class ServiceArgs extends com.pulumi.resources.ResourceArgs {
     }
 
     /**
-     * the name of the service
+     * The name of the service. Between 1 and 80 characters.
      * 
      */
     @Import(name="name", required=true)
     private Output<String> name;
 
     /**
-     * @return the name of the service
+     * @return The name of the service. Between 1 and 80 characters.
      * 
      */
     public Output<String> name() {
@@ -204,7 +204,7 @@ public final class ServiceArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param name the name of the service
+         * @param name The name of the service. Between 1 and 80 characters.
          * 
          * @return builder
          * 
@@ -215,7 +215,7 @@ public final class ServiceArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param name the name of the service
+         * @param name The name of the service. Between 1 and 80 characters.
          * 
          * @return builder
          * 

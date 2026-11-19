@@ -57,6 +57,11 @@ export class OrganizationMember extends pulumi.CustomResource {
      */
     declare public /*out*/ readonly fgaRole: pulumi.Output<any>;
     /**
+     * FollowsDefaultRole is true when the member has no role of their own and gets the
+     * organization's default role. A member assigned the default role directly is false.
+     */
+    declare public /*out*/ readonly followsDefaultRole: pulumi.Output<boolean | undefined>;
+    /**
      * KnownToPulumi returns if the organization member has a Pulumi account.
      */
     declare public /*out*/ readonly knownToPulumi: pulumi.Output<boolean>;
@@ -113,6 +118,7 @@ export class OrganizationMember extends pulumi.CustomResource {
             resourceInputs["userLogin"] = args?.userLogin;
             resourceInputs["created"] = undefined /*out*/;
             resourceInputs["fgaRole"] = undefined /*out*/;
+            resourceInputs["followsDefaultRole"] = undefined /*out*/;
             resourceInputs["knownToPulumi"] = undefined /*out*/;
             resourceInputs["links"] = undefined /*out*/;
             resourceInputs["suspended"] = undefined /*out*/;
@@ -122,6 +128,7 @@ export class OrganizationMember extends pulumi.CustomResource {
         } else {
             resourceInputs["created"] = undefined /*out*/;
             resourceInputs["fgaRole"] = undefined /*out*/;
+            resourceInputs["followsDefaultRole"] = undefined /*out*/;
             resourceInputs["knownToPulumi"] = undefined /*out*/;
             resourceInputs["links"] = undefined /*out*/;
             resourceInputs["role"] = undefined /*out*/;
@@ -144,7 +151,7 @@ export interface OrganizationMemberArgs {
      */
     orgName: pulumi.Input<string>;
     /**
-     * The built-in role assigned to the new member. Must be `member`, `admin`, or `billingManager`.
+     * The built-in role assigned to the new member. Must be `member`, `admin`, `billing-manager`, `reader`, `builder` or `maintainer`. In an organization with a default role, `member` puts the new member on the default role, and the member follows it when an admin changes it. `reader`, `builder` and `maintainer` assign the Reader, Builder or Maintainer role to the new member explicitly, so the member keeps it when the default role changes; they are available only in organizations with a default role.
      */
     role: pulumi.Input<string>;
     /**

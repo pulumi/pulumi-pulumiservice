@@ -52,6 +52,20 @@ public class Task extends com.pulumi.resources.CustomResource {
         return this.approvalMode;
     }
     /**
+     * When the task was archived. Null while the task remains active.
+     * 
+     */
+    @Export(name="archivedAt", refs={String.class}, tree="[0]")
+    private Output</* @Nullable */ String> archivedAt;
+
+    /**
+     * @return When the task was archived. Null while the task remains active.
+     * 
+     */
+    public Output<Optional<String>> archivedAt() {
+        return Codegen.optional(this.archivedAt);
+    }
+    /**
      * The async trigger source for this task. Null for sync tasks.
      * 
      */
@@ -150,6 +164,20 @@ public class Task extends com.pulumi.resources.CustomResource {
         return this.entities;
     }
     /**
+     * Whether the task accepts user interaction. Read-only tasks do not accept follow-up input.
+     * 
+     */
+    @Export(name="interactionMode", refs={String.class}, tree="[0]")
+    private Output</* @Nullable */ String> interactionMode;
+
+    /**
+     * @return Whether the task accepts user interaction. Read-only tasks do not accept follow-up input.
+     * 
+     */
+    public Output<Optional<String>> interactionMode() {
+        return Codegen.optional(this.interactionMode);
+    }
+    /**
      * Whether this task is shared with other org members.
      * 
      */
@@ -176,6 +204,34 @@ public class Task extends com.pulumi.resources.CustomResource {
      */
     public Output<Optional<String>> lastHeartbeat() {
         return Codegen.optional(this.lastHeartbeat);
+    }
+    /**
+     * The model the task&#39;s main loop last ran on, as its provider reported it. Null until the task has used a model.
+     * 
+     */
+    @Export(name="model", refs={String.class}, tree="[0]")
+    private Output</* @Nullable */ String> model;
+
+    /**
+     * @return The model the task&#39;s main loop last ran on, as its provider reported it. Null until the task has used a model.
+     * 
+     */
+    public Output<Optional<String>> model() {
+        return Codegen.optional(this.model);
+    }
+    /**
+     * The model provider the task&#39;s turns run on, pinned at its first turn: &#39;pulumi&#39; for Pulumi&#39;s built-in models, or the name of one of the organization&#39;s model providers. Null until the first turn.
+     * 
+     */
+    @Export(name="modelProvider", refs={String.class}, tree="[0]")
+    private Output</* @Nullable */ String> modelProvider;
+
+    /**
+     * @return The model provider the task&#39;s turns run on, pinned at its first turn: &#39;pulumi&#39; for Pulumi&#39;s built-in models, or the name of one of the organization&#39;s model providers. Null until the first turn.
+     * 
+     */
+    public Output<Optional<String>> modelProvider() {
+        return Codegen.optional(this.modelProvider);
     }
     /**
      * Display name for the task, typically auto-generated from the initial user message.

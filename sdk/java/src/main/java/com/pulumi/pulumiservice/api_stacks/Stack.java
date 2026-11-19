@@ -73,6 +73,20 @@ public class Stack extends com.pulumi.resources.CustomResource {
         return Codegen.optional(this.currentOperation);
     }
     /**
+     * The ESC environment this stack manages, which holds the stack&#39;s configuration, as &lt;project&gt;/&lt;name&gt;. Read-only; omitted when the stack does not manage an environment. The name stays set after the environment is deleted. Returned to anyone who can read the stack, whether or not they can read the environment.
+     * 
+     */
+    @Export(name="managedEnvironment", refs={String.class}, tree="[0]")
+    private Output</* @Nullable */ String> managedEnvironment;
+
+    /**
+     * @return The ESC environment this stack manages, which holds the stack&#39;s configuration, as &lt;project&gt;/&lt;name&gt;. Read-only; omitted when the stack does not manage an environment. The name stays set after the environment is deleted. Returned to anyone who can read the stack, whether or not they can read the environment.
+     * 
+     */
+    public Output<Optional<String>> managedEnvironment() {
+        return Codegen.optional(this.managedEnvironment);
+    }
+    /**
      * The organization name
      * 
      */

@@ -24,6 +24,8 @@ type Role struct {
 	Description pulumi.StringPtrOutput `pulumi:"description"`
 	// The detailed permission descriptor tree.
 	Details pulumi.AnyOutput `pulumi:"details"`
+	// Whether this role is the organization's Member (legacy) role, a copy of what members could do before the organization moved to built-in roles.
+	IsCompatibilityRole pulumi.BoolPtrOutput `pulumi:"isCompatibilityRole"`
 	// Whether this role is the organization default.
 	IsOrgDefault pulumi.BoolOutput `pulumi:"isOrgDefault"`
 	// When the role was last modified.
@@ -228,6 +230,11 @@ func (o RoleOutput) Description() pulumi.StringPtrOutput {
 // The detailed permission descriptor tree.
 func (o RoleOutput) Details() pulumi.AnyOutput {
 	return o.ApplyT(func(v *Role) pulumi.AnyOutput { return v.Details }).(pulumi.AnyOutput)
+}
+
+// Whether this role is the organization's Member (legacy) role, a copy of what members could do before the organization moved to built-in roles.
+func (o RoleOutput) IsCompatibilityRole() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v *Role) pulumi.BoolPtrOutput { return v.IsCompatibilityRole }).(pulumi.BoolPtrOutput)
 }
 
 // Whether this role is the organization default.

@@ -159,6 +159,7 @@ class Team(pulumi.CustomResource):
             __props__.__dict__["org_name"] = org_name
             __props__.__dict__["accounts"] = None
             __props__.__dict__["environments"] = None
+            __props__.__dict__["everyone"] = None
             __props__.__dict__["kind"] = None
             __props__.__dict__["list_members_error"] = None
             __props__.__dict__["members"] = None
@@ -191,6 +192,7 @@ class Team(pulumi.CustomResource):
         __props__.__dict__["description"] = None
         __props__.__dict__["display_name"] = None
         __props__.__dict__["environments"] = None
+        __props__.__dict__["everyone"] = None
         __props__.__dict__["kind"] = None
         __props__.__dict__["list_members_error"] = None
         __props__.__dict__["members"] = None
@@ -231,6 +233,15 @@ class Team(pulumi.CustomResource):
         The list of environment settings for the team.
         """
         return pulumi.get(self, "environments")
+
+    @_builtins.property
+    @pulumi.getter
+    def everyone(self) -> pulumi.Output[Optional[_builtins.bool]]:
+        """
+        Whether this is the Everyone team: every admin and member of the organization is in it, but
+        no billing manager. Pulumi manages it, so its name, description, members and roles cannot change.
+        """
+        return pulumi.get(self, "everyone")
 
     @_builtins.property
     @pulumi.getter
