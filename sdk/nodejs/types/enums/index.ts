@@ -49,6 +49,78 @@ export const AuthPolicyTokenType = {
 
 export type AuthPolicyTokenType = (typeof AuthPolicyTokenType)[keyof typeof AuthPolicyTokenType];
 
+export const BuiltInAccountPermissionSet = {
+    /**
+     * Account Admin: Admin access to insights accounts.
+     */
+    Admin: "insights-account-admin",
+    /**
+     * Account Read: Read access to insights accounts.
+     */
+    Read: "insights-account-read",
+    /**
+     * Account Write: Read/write access to insights accounts.
+     */
+    Write: "insights-account-write",
+} as const;
+
+export type BuiltInAccountPermissionSet = (typeof BuiltInAccountPermissionSet)[keyof typeof BuiltInAccountPermissionSet];
+
+export const BuiltInEnvironmentPermissionSet = {
+    /**
+     * Environment Admin: Admin access to environments.
+     */
+    Admin: "environment-admin",
+    /**
+     * Environment Open: Read/open access to environments.
+     */
+    Open: "environment-open",
+    /**
+     * Environment Read: Read access to environments.
+     */
+    Read: "environment-read",
+    /**
+     * Environment Write: Read/open/write access to environments.
+     */
+    Write: "environment-write",
+} as const;
+
+export type BuiltInEnvironmentPermissionSet = (typeof BuiltInEnvironmentPermissionSet)[keyof typeof BuiltInEnvironmentPermissionSet];
+
+export const BuiltInOrganizationPermissionSet = {
+    /**
+     * Organization Settings Billing: Billing access.
+     */
+    Billing: "org-settings-billing",
+    /**
+     * Read Only: View-only org access: usage, members, stacks, environments, teams, Insights accounts; read deployments, integrations, services, templates, and resources. No create/update/delete.
+     */
+    ReadOnly: "org-settings-read-only",
+    /**
+     * Standard: View org usage and members; list stacks, environments, teams, and Insights accounts; use deployments, integrations, services, and resources; create resources (stacks, environments, teams, Insights accounts). Excludes billing and member or org admin settings.
+     */
+    Standard: "org-settings-standard",
+} as const;
+
+export type BuiltInOrganizationPermissionSet = (typeof BuiltInOrganizationPermissionSet)[keyof typeof BuiltInOrganizationPermissionSet];
+
+export const BuiltInStackPermissionSet = {
+    /**
+     * Stack Admin: Admin access to stacks, including deployment settings.
+     */
+    Admin: "stack-admin",
+    /**
+     * Stack Read: Read access to stacks, including deployment settings.
+     */
+    Read: "stack-read",
+    /**
+     * Stack Write: Read/write access to stacks, including deployment settings.
+     */
+    Write: "stack-write",
+} as const;
+
+export type BuiltInStackPermissionSet = (typeof BuiltInStackPermissionSet)[keyof typeof BuiltInStackPermissionSet];
+
 export const CloudProvider = {
     /**
      * Amazon Web Services

@@ -11,7 +11,7 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
-// Builds a complete `OrganizationRole.permissions` descriptor from organization-level access and rules for stacks, environments, and cloud accounts (Discovery; `InsightsAccount` in the API and this provider), the same model as the role editor in the Pulumi Cloud console. Each rule grants scopes on every entity of its type, on one specific entity, or on entities matching tag conditions. Each rule list accepts only scopes for its own entity type. The result is directly assignable to `OrganizationRole.permissions`.
+// Builds a complete `OrganizationRole.permissions` descriptor from organization-level access and rules for stacks, environments, and cloud accounts (Discovery; `InsightsAccount` in the API and this provider), the same model as the role editor in the Pulumi Cloud console. Each rule grants scopes on every entity of its type, on one specific entity, or on entities matching tag conditions. A rule grants scopes, a permission set's scopes from the matching lookup (such as `getStackPermissionSet`), or both. Each rule list accepts only scopes for its own entity type. The result is directly assignable to `OrganizationRole.permissions`.
 func BuildRolePermissions(ctx *pulumi.Context, args *BuildRolePermissionsArgs, opts ...pulumi.InvokeOption) (*BuildRolePermissionsResult, error) {
 	opts = internal.PkgInvokeDefaultOpts(opts)
 	var rv BuildRolePermissionsResult
@@ -29,6 +29,8 @@ type BuildRolePermissionsArgs struct {
 	AdditionalEntries []map[string]interface{} `pulumi:"additionalEntries"`
 	// Grants on ESC environments.
 	EnvironmentRules []RoleEnvironmentRule `pulumi:"environmentRules"`
+	// The scopes of an organization-level permission set to grant: the `scopes` output of `getOrganizationPermissionSet`. The role gets a copy of the set's scopes, not a link to the set.
+	OrganizationPermissionSetScopes []string `pulumi:"organizationPermissionSetScopes"`
 	// Organization-level scopes to grant (e.g. `team:read`).
 	OrganizationScopes []RbacOrganizationScope `pulumi:"organizationScopes"`
 	// Grants on stacks.
@@ -52,6 +54,8 @@ type BuildRolePermissionsOutputArgs struct {
 	AdditionalEntries pulumi.MapArrayInput `pulumi:"additionalEntries"`
 	// Grants on ESC environments.
 	EnvironmentRules RoleEnvironmentRuleArrayInput `pulumi:"environmentRules"`
+	// The scopes of an organization-level permission set to grant: the `scopes` output of `getOrganizationPermissionSet`. The role gets a copy of the set's scopes, not a link to the set.
+	OrganizationPermissionSetScopes pulumi.StringArrayInput `pulumi:"organizationPermissionSetScopes"`
 	// Organization-level scopes to grant (e.g. `team:read`).
 	OrganizationScopes RbacOrganizationScopeArrayInput `pulumi:"organizationScopes"`
 	// Grants on stacks.

@@ -1266,4 +1266,549 @@ resources:
       permissions: ${permissions.permissions}
 ```
 {{% /example %}}
+
+{{% example %}}
+### Grant permission sets
+
+A rule's `permissionSetScopes` grants a permission set, built-in or custom, like an access level in the Pulumi Cloud console. Look the set up with the function for the rule's entity type, here `getStackPermissionSet`, and pass its `scopes`. A rule can combine a permission set with `scopes`. The role gets a copy of the set's scopes, so if the set changes in Pulumi Cloud, the next `pulumi up` updates the role.
+
+```typescript
+import * as pulumi from "@pulumi/pulumi";
+import * as pulumiservice from "@pulumi/pulumiservice";
+
+const stackWrite = pulumiservice.getStackPermissionSetOutput({
+    organizationName: "my-org",
+    builtIn: pulumiservice.BuiltInStackPermissionSet.Write,
+});
+const deployers = pulumiservice.getStackPermissionSetOutput({
+    organizationName: "my-org",
+    name: "Deployers",
+});
+const prodStack = pulumiservice.getStackOutput({
+    organizationName: "my-org",
+    projectName: "networking",
+    stackName: "prod",
+});
+const permissions = pulumiservice.buildRolePermissionsOutput({
+    stackRules: [
+        {
+            all: true,
+            permissionSetScopes: deployers.scopes,
+        },
+        {
+            id: prodStack.stackId,
+            permissionSetScopes: stackWrite.scopes,
+            scopes: [pulumiservice.RbacStackScope.StackDeploymentCreate],
+        },
+    ],
+});
+const prodDeployerRole = new pulumiservice.OrganizationRole("prodDeployerRole", {
+    organizationName: "my-org",
+    name: "Prod Deployers",
+    description: "Deploy every stack; full write on networking/prod.",
+    permissions: permissions.permissions,
+});
+```
+
+```python
+import pulumi
+import pulumi_pulumiservice as pulumiservice
+
+stack_write = pulumiservice.get_stack_permission_set_output(organization_name="my-org",
+    built_in=pulumiservice.BuiltInStackPermissionSet.WRITE)
+deployers = pulumiservice.get_stack_permission_set_output(organization_name="my-org",
+    name="Deployers")
+prod_stack = pulumiservice.get_stack_output(organization_name="my-org",
+    project_name="networking",
+    stack_name="prod")
+permissions = pulumiservice.build_role_permissions_output(stack_rules=[
+    {
+        "all": True,
+        "permission_set_scopes": deployers.scopes,
+    },
+    {
+        "id": prod_stack.stack_id,
+        "permission_set_scopes": stack_write.scopes,
+        "scopes": [pulumiservice.RbacStackScope.STACK_DEPLOYMENT_CREATE],
+    },
+])
+prod_deployer_role = pulumiservice.OrganizationRole("prodDeployerRole",
+    organization_name="my-org",
+    name="Prod Deployers",
+    description="Deploy every stack; full write on networking/prod.",
+    permissions=permissions.permissions)
+```
+
+```go
+package main
+
+import (
+	"github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice"
+	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
+)
+
+func main() {
+	pulumi.Run(func(ctx *pulumi.Context) error {
+		stackWrite := pulumiservice.GetStackPermissionSetOutput(ctx, pulumiservice.GetStackPermissionSetOutputArgs{
+			OrganizationName: pulumi.String("my-org"),
+			BuiltIn:          pulumiservice.BuiltInStackPermissionSetWrite,
+		}, nil)
+		deployers := pulumiservice.GetStackPermissionSetOutput(ctx, pulumiservice.GetStackPermissionSetOutputArgs{
+			OrganizationName: pulumi.String("my-org"),
+			Name:             pulumi.String("Deployers"),
+		}, nil)
+		prodStack := pulumiservice.GetStackOutput(ctx, pulumiservice.GetStackOutputArgs{
+			OrganizationName: pulumi.String("my-org"),
+			ProjectName:      pulumi.String("networking"),
+			StackName:        pulumi.String("prod"),
+		}, nil)
+		permissions := pulumiservice.BuildRolePermissionsOutput(ctx, pulumiservice.BuildRolePermissionsOutputArgs{
+			StackRules: pulumiservice.RoleStackRuleArray{
+				&pulumiservice.RoleStackRuleArgs{
+					All:                 pulumi.Bool(true),
+					PermissionSetScopes: deployers.Scopes(),
+				},
+				&pulumiservice.RoleStackRuleArgs{
+					Id:                  prodStack.StackId(),
+					PermissionSetScopes: stackWrite.Scopes(),
+					Scopes: pulumiservice.RbacStackScopeArray{
+						pulumiservice.RbacStackScopeStackDeploymentCreate,
+					},
+				},
+			},
+		}, nil)
+		_, err := pulumiservice.NewOrganizationRole(ctx, "prodDeployerRole", &pulumiservice.OrganizationRoleArgs{
+			OrganizationName: pulumi.String("my-org"),
+			Name:             pulumi.String("Prod Deployers"),
+			Description:      pulumi.String("Deploy every stack; full write on networking/prod."),
+			Permissions:      permissions.Permissions(),
+		})
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+}
+```
+
+```csharp
+using System.Collections.Generic;
+using System.Linq;
+using Pulumi;
+using PulumiService = Pulumi.PulumiService;
+
+return await Deployment.RunAsync(() => 
+{
+    var stackWrite = PulumiService.GetStackPermissionSet.Invoke(new()
+    {
+        OrganizationName = "my-org",
+        BuiltIn = PulumiService.BuiltInStackPermissionSet.Write,
+    });
+
+    var deployers = PulumiService.GetStackPermissionSet.Invoke(new()
+    {
+        OrganizationName = "my-org",
+        Name = "Deployers",
+    });
+
+    var prodStack = PulumiService.GetStack.Invoke(new()
+    {
+        OrganizationName = "my-org",
+        ProjectName = "networking",
+        StackName = "prod",
+    });
+
+    var permissions = PulumiService.BuildRolePermissions.Invoke(new()
+    {
+        StackRules = new[]
+        {
+            new PulumiService.Inputs.RoleStackRuleInputArgs
+            {
+                All = true,
+                PermissionSetScopes = deployers.Apply(getStackPermissionSetResult => getStackPermissionSetResult.Scopes),
+            },
+            new PulumiService.Inputs.RoleStackRuleInputArgs
+            {
+                Id = prodStack.Apply(getStackResult => getStackResult.StackId),
+                PermissionSetScopes = stackWrite.Apply(getStackPermissionSetResult => getStackPermissionSetResult.Scopes),
+                Scopes = new[]
+                {
+                    PulumiService.RbacStackScope.StackDeploymentCreate,
+                },
+            },
+        },
+    });
+
+    var prodDeployerRole = new PulumiService.OrganizationRole("prodDeployerRole", new()
+    {
+        OrganizationName = "my-org",
+        Name = "Prod Deployers",
+        Description = "Deploy every stack; full write on networking/prod.",
+        Permissions = permissions.Apply(buildRolePermissionsResult => buildRolePermissionsResult.Permissions),
+    });
+
+});
+```
+
+```java
+package generated_program;
+
+import com.pulumi.pulumiservice.enums.BuiltInStackPermissionSet;
+import com.pulumi.pulumiservice.enums.RbacStackScope;
+import com.pulumi.Context;
+import com.pulumi.Pulumi;
+import com.pulumi.core.Output;
+import com.pulumi.pulumiservice.PulumiserviceFunctions;
+import com.pulumi.pulumiservice.inputs.GetStackPermissionSetArgs;
+import com.pulumi.pulumiservice.inputs.GetStackArgs;
+import com.pulumi.pulumiservice.inputs.BuildRolePermissionsArgs;
+import com.pulumi.pulumiservice.inputs.RoleStackRuleArgs;
+import com.pulumi.pulumiservice.OrganizationRole;
+import com.pulumi.pulumiservice.OrganizationRoleArgs;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Map;
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
+public class App {
+    public static void main(String[] args) {
+        Pulumi.run(App::stack);
+    }
+
+    public static void stack(Context ctx) {
+        final var stackWrite = PulumiserviceFunctions.getStackPermissionSet(GetStackPermissionSetArgs.builder()
+            .organizationName("my-org")
+            .builtIn(BuiltInStackPermissionSet.Write)
+            .build());
+
+        final var deployers = PulumiserviceFunctions.getStackPermissionSet(GetStackPermissionSetArgs.builder()
+            .organizationName("my-org")
+            .name("Deployers")
+            .build());
+
+        final var prodStack = PulumiserviceFunctions.getStack(GetStackArgs.builder()
+            .organizationName("my-org")
+            .projectName("networking")
+            .stackName("prod")
+            .build());
+
+        final var permissions = PulumiserviceFunctions.buildRolePermissions(BuildRolePermissionsArgs.builder()
+            .stackRules(            
+                RoleStackRuleArgs.builder()
+                    .all(true)
+                    .permissionSetScopes(deployers.applyValue(_deployers -> _deployers.scopes()))
+                    .build(),
+                RoleStackRuleArgs.builder()
+                    .id(prodStack.applyValue(_prodStack -> _prodStack.stackId()))
+                    .permissionSetScopes(stackWrite.applyValue(_stackWrite -> _stackWrite.scopes()))
+                    .scopes(RbacStackScope.StackDeploymentCreate)
+                    .build())
+            .build());
+
+        var prodDeployerRole = new OrganizationRole("prodDeployerRole", OrganizationRoleArgs.builder()
+            .organizationName("my-org")
+            .name("Prod Deployers")
+            .description("Deploy every stack; full write on networking/prod.")
+            .permissions(permissions.applyValue(_permissions -> _permissions.permissions()))
+            .build());
+
+    }
+}
+```
+
+```yaml
+variables:
+  stackWrite:
+    fn::invoke:
+      function: pulumiservice:getStackPermissionSet
+      arguments:
+        organizationName: my-org
+        builtIn: stack-write
+  deployers:
+    fn::invoke:
+      function: pulumiservice:getStackPermissionSet
+      arguments:
+        organizationName: my-org
+        name: Deployers
+  prodStack:
+    fn::invoke:
+      function: pulumiservice:getStack
+      arguments:
+        organizationName: my-org
+        projectName: networking
+        stackName: prod
+  permissions:
+    fn::invoke:
+      function: pulumiservice:buildRolePermissions
+      arguments:
+        stackRules:
+          - all: true
+            permissionSetScopes: ${deployers.scopes}
+          - id: ${prodStack.stackId}
+            permissionSetScopes: ${stackWrite.scopes}
+            scopes:
+              - stack_deployment:create
+resources:
+  prodDeployerRole:
+    type: pulumiservice:OrganizationRole
+    properties:
+      organizationName: my-org
+      name: Prod Deployers
+      description: Deploy every stack; full write on networking/prod.
+      permissions: ${permissions.permissions}
+```
+{{% /example %}}
+
+{{% example %}}
+### Grant environment and organization-level permission sets
+
+Each entity type has its own lookup: `getEnvironmentPermissionSet` for `environmentRules`, `getAccountPermissionSet` for `accountRules`, and `getOrganizationPermissionSet` for `organizationPermissionSetScopes`.
+
+```typescript
+import * as pulumi from "@pulumi/pulumi";
+import * as pulumiservice from "@pulumi/pulumiservice";
+
+const readOnly = pulumiservice.getOrganizationPermissionSetOutput({
+    organizationName: "my-org",
+    builtIn: pulumiservice.BuiltInOrganizationPermissionSet.ReadOnly,
+});
+const environmentOpen = pulumiservice.getEnvironmentPermissionSetOutput({
+    organizationName: "my-org",
+    builtIn: pulumiservice.BuiltInEnvironmentPermissionSet.Open,
+});
+const permissions = pulumiservice.buildRolePermissionsOutput({
+    organizationPermissionSetScopes: readOnly.scopes,
+    environmentRules: [{
+        tags: [{
+            key: "team",
+            value: "platform",
+        }],
+        permissionSetScopes: environmentOpen.scopes,
+    }],
+});
+const platformViewerRole = new pulumiservice.OrganizationRole("platformViewerRole", {
+    organizationName: "my-org",
+    name: "Platform Viewers",
+    description: "View the organization and open platform environments.",
+    permissions: permissions.permissions,
+});
+```
+
+```python
+import pulumi
+import pulumi_pulumiservice as pulumiservice
+
+read_only = pulumiservice.get_organization_permission_set_output(organization_name="my-org",
+    built_in=pulumiservice.BuiltInOrganizationPermissionSet.READ_ONLY)
+environment_open = pulumiservice.get_environment_permission_set_output(organization_name="my-org",
+    built_in=pulumiservice.BuiltInEnvironmentPermissionSet.OPEN)
+permissions = pulumiservice.build_role_permissions_output(organization_permission_set_scopes=read_only.scopes,
+    environment_rules=[{
+        "tags": [{
+            "key": "team",
+            "value": "platform",
+        }],
+        "permission_set_scopes": environment_open.scopes,
+    }])
+platform_viewer_role = pulumiservice.OrganizationRole("platformViewerRole",
+    organization_name="my-org",
+    name="Platform Viewers",
+    description="View the organization and open platform environments.",
+    permissions=permissions.permissions)
+```
+
+```go
+package main
+
+import (
+	"github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice"
+	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
+)
+
+func main() {
+	pulumi.Run(func(ctx *pulumi.Context) error {
+		readOnly := pulumiservice.GetOrganizationPermissionSetOutput(ctx, pulumiservice.GetOrganizationPermissionSetOutputArgs{
+			OrganizationName: pulumi.String("my-org"),
+			BuiltIn:          pulumiservice.BuiltInOrganizationPermissionSetReadOnly,
+		}, nil)
+		environmentOpen := pulumiservice.GetEnvironmentPermissionSetOutput(ctx, pulumiservice.GetEnvironmentPermissionSetOutputArgs{
+			OrganizationName: pulumi.String("my-org"),
+			BuiltIn:          pulumiservice.BuiltInEnvironmentPermissionSetOpen,
+		}, nil)
+		permissions := pulumiservice.BuildRolePermissionsOutput(ctx, pulumiservice.BuildRolePermissionsOutputArgs{
+			OrganizationPermissionSetScopes: readOnly.Scopes(),
+			EnvironmentRules: pulumiservice.RoleEnvironmentRuleArray{
+				&pulumiservice.RoleEnvironmentRuleArgs{
+					Tags: pulumiservice.TagConditionArray{
+						&pulumiservice.TagConditionArgs{
+							Key:   pulumi.String("team"),
+							Value: pulumi.String("platform"),
+						},
+					},
+					PermissionSetScopes: environmentOpen.Scopes(),
+				},
+			},
+		}, nil)
+		_, err := pulumiservice.NewOrganizationRole(ctx, "platformViewerRole", &pulumiservice.OrganizationRoleArgs{
+			OrganizationName: pulumi.String("my-org"),
+			Name:             pulumi.String("Platform Viewers"),
+			Description:      pulumi.String("View the organization and open platform environments."),
+			Permissions:      permissions.Permissions(),
+		})
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+}
+```
+
+```csharp
+using System.Collections.Generic;
+using System.Linq;
+using Pulumi;
+using PulumiService = Pulumi.PulumiService;
+
+return await Deployment.RunAsync(() => 
+{
+    var readOnly = PulumiService.GetOrganizationPermissionSet.Invoke(new()
+    {
+        OrganizationName = "my-org",
+        BuiltIn = PulumiService.BuiltInOrganizationPermissionSet.ReadOnly,
+    });
+
+    var environmentOpen = PulumiService.GetEnvironmentPermissionSet.Invoke(new()
+    {
+        OrganizationName = "my-org",
+        BuiltIn = PulumiService.BuiltInEnvironmentPermissionSet.Open,
+    });
+
+    var permissions = PulumiService.BuildRolePermissions.Invoke(new()
+    {
+        OrganizationPermissionSetScopes = readOnly.Apply(getOrganizationPermissionSetResult => getOrganizationPermissionSetResult.Scopes),
+        EnvironmentRules = new[]
+        {
+            new PulumiService.Inputs.RoleEnvironmentRuleInputArgs
+            {
+                Tags = new[]
+                {
+                    new PulumiService.Inputs.TagConditionInputArgs
+                    {
+                        Key = "team",
+                        Value = "platform",
+                    },
+                },
+                PermissionSetScopes = environmentOpen.Apply(getEnvironmentPermissionSetResult => getEnvironmentPermissionSetResult.Scopes),
+            },
+        },
+    });
+
+    var platformViewerRole = new PulumiService.OrganizationRole("platformViewerRole", new()
+    {
+        OrganizationName = "my-org",
+        Name = "Platform Viewers",
+        Description = "View the organization and open platform environments.",
+        Permissions = permissions.Apply(buildRolePermissionsResult => buildRolePermissionsResult.Permissions),
+    });
+
+});
+```
+
+```java
+package generated_program;
+
+import com.pulumi.pulumiservice.enums.BuiltInEnvironmentPermissionSet;
+import com.pulumi.pulumiservice.enums.BuiltInOrganizationPermissionSet;
+import com.pulumi.Context;
+import com.pulumi.Pulumi;
+import com.pulumi.core.Output;
+import com.pulumi.pulumiservice.PulumiserviceFunctions;
+import com.pulumi.pulumiservice.inputs.GetOrganizationPermissionSetArgs;
+import com.pulumi.pulumiservice.inputs.GetEnvironmentPermissionSetArgs;
+import com.pulumi.pulumiservice.inputs.BuildRolePermissionsArgs;
+import com.pulumi.pulumiservice.inputs.RoleEnvironmentRuleArgs;
+import com.pulumi.pulumiservice.inputs.TagConditionArgs;
+import com.pulumi.pulumiservice.OrganizationRole;
+import com.pulumi.pulumiservice.OrganizationRoleArgs;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Map;
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
+public class App {
+    public static void main(String[] args) {
+        Pulumi.run(App::stack);
+    }
+
+    public static void stack(Context ctx) {
+        final var readOnly = PulumiserviceFunctions.getOrganizationPermissionSet(GetOrganizationPermissionSetArgs.builder()
+            .organizationName("my-org")
+            .builtIn(BuiltInOrganizationPermissionSet.ReadOnly)
+            .build());
+
+        final var environmentOpen = PulumiserviceFunctions.getEnvironmentPermissionSet(GetEnvironmentPermissionSetArgs.builder()
+            .organizationName("my-org")
+            .builtIn(BuiltInEnvironmentPermissionSet.Open)
+            .build());
+
+        final var permissions = PulumiserviceFunctions.buildRolePermissions(BuildRolePermissionsArgs.builder()
+            .organizationPermissionSetScopes(readOnly.applyValue(_readOnly -> _readOnly.scopes()))
+            .environmentRules(RoleEnvironmentRuleArgs.builder()
+                .tags(TagConditionArgs.builder()
+                    .key("team")
+                    .value("platform")
+                    .build())
+                .permissionSetScopes(environmentOpen.applyValue(_environmentOpen -> _environmentOpen.scopes()))
+                .build())
+            .build());
+
+        var platformViewerRole = new OrganizationRole("platformViewerRole", OrganizationRoleArgs.builder()
+            .organizationName("my-org")
+            .name("Platform Viewers")
+            .description("View the organization and open platform environments.")
+            .permissions(permissions.applyValue(_permissions -> _permissions.permissions()))
+            .build());
+
+    }
+}
+```
+
+```yaml
+variables:
+  readOnly:
+    fn::invoke:
+      function: pulumiservice:getOrganizationPermissionSet
+      arguments:
+        organizationName: my-org
+        builtIn: org-settings-read-only
+  environmentOpen:
+    fn::invoke:
+      function: pulumiservice:getEnvironmentPermissionSet
+      arguments:
+        organizationName: my-org
+        builtIn: environment-open
+  permissions:
+    fn::invoke:
+      function: pulumiservice:buildRolePermissions
+      arguments:
+        organizationPermissionSetScopes: ${readOnly.scopes}
+        environmentRules:
+          - tags:
+              - key: team
+                value: platform
+            permissionSetScopes: ${environmentOpen.scopes}
+resources:
+  platformViewerRole:
+    type: pulumiservice:OrganizationRole
+    properties:
+      organizationName: my-org
+      name: Platform Viewers
+      description: View the organization and open platform environments.
+      permissions: ${permissions.permissions}
+```
+{{% /example %}}
 {{% /examples %}}

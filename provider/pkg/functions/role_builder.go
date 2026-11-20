@@ -33,7 +33,8 @@ package functions
 // "All" rules are encoded without a condition, so they rely on every scope in
 // them belonging to the rule's entity type: a stack scope in an
 // unconditional grant applies to every stack. The per-type rule lists and
-// scope enums below guarantee that.
+// scope enums below guarantee that for scopes, and Pulumi Cloud guarantees it
+// for the scopes of a permission set of the rule's entity type.
 
 import (
 	"context"
@@ -47,10 +48,14 @@ import (
 
 // Entity types, as Pulumi Cloud names them in the scope catalog.
 const (
+	entityTypeOrganization    = "global"
 	entityTypeStack           = "stack"
 	entityTypeEnvironment     = "environment"
 	entityTypeInsightsAccount = "insights-account"
 )
+
+const permissionSetScopesDoc = "The scopes of a %s permission set to grant on the selected %s: the `scopes` " +
+	"output of `%s`. The role gets a copy of the set's scopes, not a link to the set."
 
 // RoleRuleSelector chooses which entities a rule applies to.
 type RoleRuleSelector struct {
@@ -69,39 +74,49 @@ func (s *RoleRuleSelector) Annotate(a infer.Annotator) {
 
 type RoleStackRule struct {
 	RoleRuleSelector
-	Scopes []RbacStackScope `pulumi:"scopes,optional"`
+	Scopes              []RbacStackScope `pulumi:"scopes,optional"`
+	PermissionSetScopes []string         `pulumi:"permissionSetScopes,optional"`
 }
 
 func (r *RoleStackRule) Annotate(a infer.Annotator) {
+	a.Describe(&r.PermissionSetScopes,
+		fmt.Sprintf(permissionSetScopesDoc, "stack", "stacks", "getStackPermissionSet"))
 	a.Describe(&r.Scopes, "Stack scopes to grant on the selected stacks.")
 }
 
 type RoleEnvironmentRule struct {
 	RoleRuleSelector
-	Scopes []RbacEnvironmentScope `pulumi:"scopes,optional"`
+	Scopes              []RbacEnvironmentScope `pulumi:"scopes,optional"`
+	PermissionSetScopes []string               `pulumi:"permissionSetScopes,optional"`
 }
 
 func (r *RoleEnvironmentRule) Annotate(a infer.Annotator) {
+	a.Describe(&r.PermissionSetScopes,
+		fmt.Sprintf(permissionSetScopesDoc, "environment", "environments", "getEnvironmentPermissionSet"))
 	a.Describe(&r.Scopes, "Environment scopes to grant on the selected environments.")
 }
 
 type RoleAccountRule struct {
 	RoleRuleSelector
-	Scopes []RbacAccountScope `pulumi:"scopes,optional"`
+	Scopes              []RbacAccountScope `pulumi:"scopes,optional"`
+	PermissionSetScopes []string           `pulumi:"permissionSetScopes,optional"`
 }
 
 func (r *RoleAccountRule) Annotate(a infer.Annotator) {
+	a.Describe(&r.PermissionSetScopes,
+		fmt.Sprintf(permissionSetScopesDoc, "cloud account", "accounts", "getAccountPermissionSet"))
 	a.Describe(&r.Scopes, "Cloud account scopes to grant on the selected accounts.")
 }
 
 type BuildRolePermissionsFunction struct{}
 
 type BuildRolePermissionsInput struct {
-	OrganizationScopes []RbacOrganizationScope `pulumi:"organizationScopes,optional"`
-	StackRules         []RoleStackRule         `pulumi:"stackRules,optional"`
-	EnvironmentRules   []RoleEnvironmentRule   `pulumi:"environmentRules,optional"`
-	AccountRules       []RoleAccountRule       `pulumi:"accountRules,optional"`
-	AdditionalEntries  []map[string]any        `pulumi:"additionalEntries,optional"`
+	OrganizationScopes              []RbacOrganizationScope `pulumi:"organizationScopes,optional"`
+	OrganizationPermissionSetScopes []string                `pulumi:"organizationPermissionSetScopes,optional"`
+	StackRules                      []RoleStackRule         `pulumi:"stackRules,optional"`
+	EnvironmentRules                []RoleEnvironmentRule   `pulumi:"environmentRules,optional"`
+	AccountRules                    []RoleAccountRule       `pulumi:"accountRules,optional"`
+	AdditionalEntries               []map[string]any        `pulumi:"additionalEntries,optional"`
 }
 
 type BuildRolePermissionsOutput struct {
@@ -115,14 +130,18 @@ func (BuildRolePermissionsFunction) Annotate(a infer.Annotator) {
 			"rules for stacks, environments, and cloud accounts (Discovery; `InsightsAccount` in the API and this "+
 			"provider), the same model as the role editor in the "+
 			"Pulumi Cloud console. Each rule grants scopes on every entity of its type, on one specific entity, "+
-			"or on entities matching tag conditions. Each rule list accepts only scopes for its own entity "+
-			"type. The result is directly assignable to `OrganizationRole.permissions`.",
+			"or on entities matching tag conditions. A rule grants scopes, a permission set's scopes "+
+			"from the matching lookup (such as `getStackPermissionSet`), or both. Each rule list accepts only "+
+			"scopes for its own entity type. The result is directly assignable to `OrganizationRole.permissions`.",
 	)
 	a.SetToken("index", "buildRolePermissions")
 }
 
 func (i *BuildRolePermissionsInput) Annotate(a infer.Annotator) {
 	a.Describe(&i.OrganizationScopes, "Organization-level scopes to grant (e.g. `team:read`).")
+	a.Describe(&i.OrganizationPermissionSetScopes, "The scopes of an organization-level permission set to "+
+		"grant: the `scopes` output of `getOrganizationPermissionSet`. The role gets a copy of the set's scopes, "+
+		"not a link to the set.")
 	a.Describe(&i.StackRules, "Grants on stacks.")
 	a.Describe(&i.EnvironmentRules, "Grants on ESC environments.")
 	a.Describe(&i.AccountRules, "Grants on cloud accounts (`InsightsAccount`).")
@@ -161,10 +180,10 @@ type rule struct {
 }
 
 func buildRoleDescriptor(in BuildRolePermissionsInput) (apitype.PermissionDescriptor, error) {
-	if len(in.OrganizationScopes) == 0 && len(in.StackRules) == 0 && len(in.EnvironmentRules) == 0 &&
-		len(in.AccountRules) == 0 && len(in.AdditionalEntries) == 0 {
-		return nil, errors.New("at least one of `organizationScopes`, `stackRules`, `environmentRules`, " +
-			"`accountRules`, or `additionalEntries` must be set")
+	if len(in.OrganizationScopes) == 0 && len(in.OrganizationPermissionSetScopes) == 0 && len(in.StackRules) == 0 &&
+		len(in.EnvironmentRules) == 0 && len(in.AccountRules) == 0 && len(in.AdditionalEntries) == 0 {
+		return nil, errors.New("at least one of `organizationScopes`, `organizationPermissionSetScopes`, " +
+			"`stackRules`, `environmentRules`, `accountRules`, or `additionalEntries` must be set")
 	}
 
 	rules, err := collectRules(in)
@@ -176,10 +195,15 @@ func buildRoleDescriptor(in BuildRolePermissionsInput) (apitype.PermissionDescri
 	if err != nil {
 		return nil, fmt.Errorf("organizationScopes: %w", err)
 	}
+	orgSetScopes, err := checkSetScopes(in.OrganizationPermissionSetScopes, entityTypeOrganization)
+	if err != nil {
+		return nil, fmt.Errorf("organizationPermissionSetScopes: %w", err)
+	}
+	unconditionalScopes = append(unconditionalScopes, orgSetScopes...)
 	var conditional []apitype.PermissionDescriptor
 	for _, r := range rules {
 		if len(r.scopes) == 0 {
-			return nil, fmt.Errorf("%s: `scopes` must not be empty", r.path)
+			return nil, fmt.Errorf("%s: at least one of `scopes` or `permissionSetScopes` must be set", r.path)
 		}
 		if r.sel.All != nil && *r.sel.All {
 			if r.sel.Id != nil || len(r.sel.Tags) > 0 {
@@ -222,7 +246,7 @@ func buildRoleDescriptor(in BuildRolePermissionsInput) (apitype.PermissionDescri
 }
 
 // collectRules flattens the three rule lists, checking each rule's scopes
-// against its entity type's enum.
+// against its entity type's enum and adding its permission set's scopes.
 func collectRules(in BuildRolePermissionsInput) ([]rule, error) {
 	var rules []rule
 	for i, r := range in.StackRules {
@@ -230,6 +254,11 @@ func collectRules(in BuildRolePermissionsInput) ([]rule, error) {
 		if err != nil {
 			return nil, fmt.Errorf("stackRules[%d].scopes: %w", i, err)
 		}
+		setScopes, err := checkSetScopes(r.PermissionSetScopes, entityTypeStack)
+		if err != nil {
+			return nil, fmt.Errorf("stackRules[%d].permissionSetScopes: %w", i, err)
+		}
+		scopes = append(scopes, setScopes...)
 		rules = append(rules, rule{fmt.Sprintf("stackRules[%d]", i), entityTypeStack,
 			r.RoleRuleSelector, scopes})
 	}
@@ -238,6 +267,11 @@ func collectRules(in BuildRolePermissionsInput) ([]rule, error) {
 		if err != nil {
 			return nil, fmt.Errorf("environmentRules[%d].scopes: %w", i, err)
 		}
+		setScopes, err := checkSetScopes(r.PermissionSetScopes, entityTypeEnvironment)
+		if err != nil {
+			return nil, fmt.Errorf("environmentRules[%d].permissionSetScopes: %w", i, err)
+		}
+		scopes = append(scopes, setScopes...)
 		rules = append(rules, rule{fmt.Sprintf("environmentRules[%d]", i), entityTypeEnvironment,
 			r.RoleRuleSelector, scopes})
 	}
@@ -246,10 +280,78 @@ func collectRules(in BuildRolePermissionsInput) ([]rule, error) {
 		if err != nil {
 			return nil, fmt.Errorf("accountRules[%d].scopes: %w", i, err)
 		}
+		setScopes, err := checkSetScopes(r.PermissionSetScopes, entityTypeInsightsAccount)
+		if err != nil {
+			return nil, fmt.Errorf("accountRules[%d].permissionSetScopes: %w", i, err)
+		}
+		scopes = append(scopes, setScopes...)
 		rules = append(rules, rule{fmt.Sprintf("accountRules[%d]", i), entityTypeInsightsAccount,
 			r.RoleRuleSelector, scopes})
 	}
 	return rules, nil
+}
+
+// entityScopeTypes maps each scope in the entity types' scope enums to its
+// entity type.
+var entityScopeTypes = func() map[string]string {
+	out := map[string]string{}
+	for _, v := range rbacStackScopeValues {
+		out[string(v.Value)] = entityTypeStack
+	}
+	for _, v := range rbacEnvironmentScopeValues {
+		out[string(v.Value)] = entityTypeEnvironment
+	}
+	for _, v := range rbacAccountScopeValues {
+		out[string(v.Value)] = entityTypeInsightsAccount
+	}
+	return out
+}()
+
+// checkSetScopes checks a permission set's scopes for a rule of entityType.
+//
+// They aren't checked against the entity type's enum, because Pulumi Cloud
+// puts scopes in built-in sets that its scope catalog doesn't list for the
+// set's entity type, such as `stack_annotations:update` and
+// `policy_results:update` in Stack Write. Instead, a scope the catalog lists
+// under a different entity type is rejected: it means the set was looked up
+// for another rule list, and in an `all` rule it would apply to every entity
+// of that other type. Scopes must still be ones the Pulumi Cloud SDK knows,
+// which the lookups guarantee.
+func checkSetScopes(scopes []string, entityType string) ([]string, error) {
+	for _, s := range scopes {
+		if !apitype.RbacPermission(s).IsValid() {
+			return nil, fmt.Errorf("%q is not a valid permission scope; pass the `scopes` output of a "+
+				"permission set lookup", s)
+		}
+		if other, ok := entityScopeTypes[s]; ok && other != entityType {
+			return nil, fmt.Errorf("`%s` is %s scope; each rule list accepts only permission sets for its "+
+				"own entity type, so look this set up with %s and use it there",
+				s, entityArticle(other), entityLookup(other))
+		}
+	}
+	return scopes, nil
+}
+
+func entityArticle(entityType string) string {
+	switch entityType {
+	case entityTypeEnvironment:
+		return "an environment"
+	case entityTypeInsightsAccount:
+		return "a cloud account"
+	default:
+		return "a stack"
+	}
+}
+
+func entityLookup(entityType string) string {
+	switch entityType {
+	case entityTypeEnvironment:
+		return "`getEnvironmentPermissionSet`"
+	case entityTypeInsightsAccount:
+		return "`getAccountPermissionSet`"
+	default:
+		return "`getStackPermissionSet`"
+	}
 }
 
 // entityContext returns the expression that refers to the entity being

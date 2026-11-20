@@ -24,6 +24,18 @@ namespace Pulumi.PulumiService.Inputs
         [Input("id")]
         public string? Id { get; set; }
 
+        [Input("permissionSetScopes")]
+        private List<string>? _permissionSetScopes;
+
+        /// <summary>
+        /// The scopes of a cloud account permission set to grant on the selected accounts: the `scopes` output of `getAccountPermissionSet`. The role gets a copy of the set's scopes, not a link to the set.
+        /// </summary>
+        public List<string> PermissionSetScopes
+        {
+            get => _permissionSetScopes ?? (_permissionSetScopes = new List<string>());
+            set => _permissionSetScopes = value;
+        }
+
         [Input("scopes")]
         private List<Pulumi.PulumiService.RbacAccountScope>? _scopes;
 

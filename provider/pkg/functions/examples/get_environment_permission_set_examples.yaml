@@ -1,0 +1,22 @@
+description: Grant a built-in environment permission set
+variables:
+  environmentOpen:
+    fn::invoke:
+      function: pulumiservice:getEnvironmentPermissionSet
+      arguments:
+        organizationName: my-org
+        builtIn: environment-open
+  permissions:
+    fn::invoke:
+      function: pulumiservice:buildRolePermissions
+      arguments:
+        environmentRules:
+          - all: true
+            permissionSetScopes: ${environmentOpen.scopes}
+resources:
+  environmentOpenerRole:
+    type: pulumiservice:OrganizationRole
+    properties:
+      organizationName: my-org
+      name: Environment Openers
+      permissions: ${permissions.permissions}

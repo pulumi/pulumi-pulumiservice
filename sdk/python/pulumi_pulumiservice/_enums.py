@@ -10,6 +10,10 @@ __all__ = [
     'AuthPolicyDecision',
     'AuthPolicyPermissionLevel',
     'AuthPolicyTokenType',
+    'BuiltInAccountPermissionSet',
+    'BuiltInEnvironmentPermissionSet',
+    'BuiltInOrganizationPermissionSet',
+    'BuiltInStackPermissionSet',
     'CloudProvider',
     'EnvironmentPermission',
     'PolicyGroupTagOperator',
@@ -70,6 +74,74 @@ class AuthPolicyTokenType(_builtins.str, Enum):
     RUNNER = "runner"
     """
     Deployment Runner Pulumi token. Requires runnerID field to be filled.
+    """
+
+
+@pulumi.type_token("pulumiservice:index:BuiltInAccountPermissionSet")
+class BuiltInAccountPermissionSet(_builtins.str, Enum):
+    ADMIN = "insights-account-admin"
+    """
+    Account Admin: Admin access to insights accounts.
+    """
+    READ = "insights-account-read"
+    """
+    Account Read: Read access to insights accounts.
+    """
+    WRITE = "insights-account-write"
+    """
+    Account Write: Read/write access to insights accounts.
+    """
+
+
+@pulumi.type_token("pulumiservice:index:BuiltInEnvironmentPermissionSet")
+class BuiltInEnvironmentPermissionSet(_builtins.str, Enum):
+    ADMIN = "environment-admin"
+    """
+    Environment Admin: Admin access to environments.
+    """
+    OPEN = "environment-open"
+    """
+    Environment Open: Read/open access to environments.
+    """
+    READ = "environment-read"
+    """
+    Environment Read: Read access to environments.
+    """
+    WRITE = "environment-write"
+    """
+    Environment Write: Read/open/write access to environments.
+    """
+
+
+@pulumi.type_token("pulumiservice:index:BuiltInOrganizationPermissionSet")
+class BuiltInOrganizationPermissionSet(_builtins.str, Enum):
+    BILLING = "org-settings-billing"
+    """
+    Organization Settings Billing: Billing access.
+    """
+    READ_ONLY = "org-settings-read-only"
+    """
+    Read Only: View-only org access: usage, members, stacks, environments, teams, Insights accounts; read deployments, integrations, services, templates, and resources. No create/update/delete.
+    """
+    STANDARD = "org-settings-standard"
+    """
+    Standard: View org usage and members; list stacks, environments, teams, and Insights accounts; use deployments, integrations, services, and resources; create resources (stacks, environments, teams, Insights accounts). Excludes billing and member or org admin settings.
+    """
+
+
+@pulumi.type_token("pulumiservice:index:BuiltInStackPermissionSet")
+class BuiltInStackPermissionSet(_builtins.str, Enum):
+    ADMIN = "stack-admin"
+    """
+    Stack Admin: Admin access to stacks, including deployment settings.
+    """
+    READ = "stack-read"
+    """
+    Stack Read: Read access to stacks, including deployment settings.
+    """
+    WRITE = "stack-write"
+    """
+    Stack Write: Read/write access to stacks, including deployment settings.
     """
 
 

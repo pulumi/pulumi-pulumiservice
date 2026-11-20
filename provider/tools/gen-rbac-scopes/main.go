@@ -14,8 +14,9 @@
 
 // Command gen-rbac-scopes turns the Pulumi Cloud RBAC scope catalog (the
 // normalized response of GET /api/orgs/{org}/roles/scopes) into the
-// provider's per-entity-type scope enums. Run it through
-// scripts/gen-rbac-scopes.sh.
+// provider's per-entity-type scope enums, and the organization's built-in
+// permission sets (from GET /api/orgs/{org}/roles?uxPurpose=set) into the
+// BuiltInPermissionSet enum. Run it through scripts/gen-rbac-scopes.sh.
 package main
 
 import (
@@ -53,7 +54,26 @@ type scopeCatalog map[string][]struct {
 	} `json:"scopes"`
 }
 
-// scope is one enum member.
+// permissionSetCatalog is the normalized list of built-in permission sets.
+type permissionSetCatalog []struct {
+	DefaultIdentifier string `json:"defaultIdentifier"`
+	Name              string `json:"name"`
+	Description       string `json:"description"`
+	ResourceType      string `json:"resourceType"`
+}
+
+// permissionSetEnums maps each entity type to the Go enum generated for its
+// built-in permission sets, and the identifier prefix that the enum's member
+// names drop (`stack-write` becomes BuiltInStackPermissionSetWrite). A set of
+// another entity type, or an identifier without the prefix, fails generation.
+var permissionSetEnums = map[string]struct{ Enum, Prefix string }{
+	"global":           {"BuiltInOrganizationPermissionSet", "org-settings-"},
+	"stack":            {"BuiltInStackPermissionSet", "stack-"},
+	"environment":      {"BuiltInEnvironmentPermissionSet", "environment-"},
+	"insights-account": {"BuiltInAccountPermissionSet", "insights-account-"},
+}
+
+// scope is one enum member: a scope, or a built-in permission set.
 type scope struct {
 	Value       string
 	Name        string
@@ -63,11 +83,14 @@ type scope struct {
 func main() {
 	in := flag.String("catalog", "rbac-scopes.json", "Normalized /roles/scopes response")
 	out := flag.String("out", "zz_generated_rbac_scopes.go", "Go file to write")
+	setsIn := flag.String("permission-sets", "rbac-permission-sets.json", "Normalized built-in permission sets")
+	setsOut := flag.String("permission-sets-out", "zz_generated_permission_sets.go", "Go file to write")
 	allowRemovals := flag.Bool("allow-removals", false,
 		"Allow dropping values the current enums have. Removing an enum member breaks SDK users.")
 	flag.Parse()
 
 	generate(*out, scopeEnums(*in), *allowRemovals)
+	generate(*setsOut, permissionSets(*setsIn), *allowRemovals)
 }
 
 // generate writes the enums to out, failing if that would drop a value the
@@ -113,6 +136,46 @@ func scopeEnums(in string) map[string][]scope {
 		if len(enums[typ]) == 0 {
 			fail("catalog has no scopes for entity type %q", bucket)
 		}
+	}
+	return enums
+}
+
+// permissionSets reads the built-in permission sets into one enum per entity
+// type, each sorted by identifier. Each member's description leads with the
+// set's name, as the Pulumi Cloud console shows it. Unlike scopes, sets aren't
+// filtered by the Pulumi Cloud SDK: the provider matches set identifiers as
+// plain strings and never parses them with the SDK.
+func permissionSets(in string) map[string][]scope {
+	raw, err := os.ReadFile(in)
+	if err != nil {
+		fail("read permission sets: %v", err)
+	}
+	var catalog permissionSetCatalog
+	if err := json.Unmarshal(raw, &catalog); err != nil {
+		fail("parse permission sets: %v", err)
+	}
+	enums := map[string][]scope{}
+	for _, s := range catalog {
+		e, ok := permissionSetEnums[s.ResourceType]
+		if !ok {
+			fail("permission set %q has unknown entity type %q; add it to permissionSetEnums",
+				s.DefaultIdentifier, s.ResourceType)
+		}
+		member, ok := strings.CutPrefix(s.DefaultIdentifier, e.Prefix)
+		if !ok {
+			fail("permission set %q doesn't start with %q; update permissionSetEnums", s.DefaultIdentifier, e.Prefix)
+		}
+		enums[e.Enum] = append(enums[e.Enum], scope{
+			Value:       s.DefaultIdentifier,
+			Name:        pascal(member),
+			Description: fmt.Sprintf("%s: %s", s.Name, s.Description),
+		})
+	}
+	for typ, e := range permissionSetEnums {
+		if len(enums[e.Enum]) == 0 {
+			fail("%s has no built-in permission sets for entity type %q", in, typ)
+		}
+		sort.Slice(enums[e.Enum], func(i, j int) bool { return enums[e.Enum][i].Value < enums[e.Enum][j].Value })
 	}
 	return enums
 }
