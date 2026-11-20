@@ -139,8 +139,6 @@ export class GitLabIntegration extends pulumi.CustomResource {
             resourceInputs["valid"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
-        const secretOpts = { additionalSecretOutputs: ["groupAccessTokenExpiration"] };
-        opts = pulumi.mergeOptions(opts, secretOpts);
         super(GitLabIntegration.__pulumiType, name, resourceInputs, opts);
     }
 }

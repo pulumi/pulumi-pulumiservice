@@ -207,7 +207,7 @@ class ScheduledDeployment(pulumi.CustomResource):
             if project_name is None and not opts.urn:
                 raise TypeError("Missing required property 'project_name'")
             __props__.__dict__["project_name"] = project_name
-            __props__.__dict__["request"] = request
+            __props__.__dict__["request"] = None if request is None else pulumi.Output.secret(request)
             __props__.__dict__["schedule_cron"] = schedule_cron
             __props__.__dict__["schedule_id"] = schedule_id
             __props__.__dict__["schedule_once"] = schedule_once
@@ -222,6 +222,8 @@ class ScheduledDeployment(pulumi.CustomResource):
             __props__.__dict__["next_execution"] = None
             __props__.__dict__["org_id"] = None
             __props__.__dict__["paused"] = None
+        secret_opts = pulumi.ResourceOptions(additional_secret_outputs=["definition"])
+        opts = pulumi.ResourceOptions.merge(opts, secret_opts)
         super(ScheduledDeployment, __self__).__init__(
             'pulumiservice:api/deployments:ScheduledDeployment',
             resource_name,

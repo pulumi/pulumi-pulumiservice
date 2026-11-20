@@ -335,7 +335,7 @@ class Webhook(pulumi.CustomResource):
             __props__.__dict__["stack_name"] = stack_name
             __props__.__dict__["has_secret"] = None
             __props__.__dict__["secret_ciphertext"] = None
-        secret_opts = pulumi.ResourceOptions(additional_secret_outputs=["hasSecret", "secret", "secretCiphertext"])
+        secret_opts = pulumi.ResourceOptions(additional_secret_outputs=["secret", "secretCiphertext"])
         opts = pulumi.ResourceOptions.merge(opts, secret_opts)
         super(Webhook, __self__).__init__(
             'pulumiservice:api/stacks:Webhook',

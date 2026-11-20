@@ -111,7 +111,7 @@ export class ScheduledDeployment extends pulumi.CustomResource {
             }
             resourceInputs["orgName"] = args?.orgName;
             resourceInputs["projectName"] = args?.projectName;
-            resourceInputs["request"] = args?.request;
+            resourceInputs["request"] = args?.request ? pulumi.secret(args.request) : undefined;
             resourceInputs["scheduleCron"] = args?.scheduleCron;
             resourceInputs["scheduleID"] = args?.scheduleID;
             resourceInputs["scheduleOnce"] = args?.scheduleOnce;
@@ -138,6 +138,8 @@ export class ScheduledDeployment extends pulumi.CustomResource {
             resourceInputs["scheduleOnce"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
+        const secretOpts = { additionalSecretOutputs: ["definition"] };
+        opts = pulumi.mergeOptions(opts, secretOpts);
         super(ScheduledDeployment.__pulumiType, name, resourceInputs, opts);
     }
 }

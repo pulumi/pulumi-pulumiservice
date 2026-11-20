@@ -279,16 +279,16 @@ class Settings(pulumi.CustomResource):
 
             __props__.__dict__["agent_pool_id"] = agent_pool_id
             __props__.__dict__["cache_options"] = cache_options
-            __props__.__dict__["executor_context"] = executor_context
+            __props__.__dict__["executor_context"] = None if executor_context is None else pulumi.Output.secret(executor_context)
             __props__.__dict__["git_hub"] = git_hub
-            __props__.__dict__["operation_context"] = operation_context
+            __props__.__dict__["operation_context"] = None if operation_context is None else pulumi.Output.secret(operation_context)
             if org_name is None and not opts.urn:
                 raise TypeError("Missing required property 'org_name'")
             __props__.__dict__["org_name"] = org_name
             if project_name is None and not opts.urn:
                 raise TypeError("Missing required property 'project_name'")
             __props__.__dict__["project_name"] = project_name
-            __props__.__dict__["source_context"] = source_context
+            __props__.__dict__["source_context"] = None if source_context is None else pulumi.Output.secret(source_context)
             if stack_name is None and not opts.urn:
                 raise TypeError("Missing required property 'stack_name'")
             __props__.__dict__["stack_name"] = stack_name
@@ -296,6 +296,8 @@ class Settings(pulumi.CustomResource):
             __props__.__dict__["vcs"] = vcs
             __props__.__dict__["source"] = None
             __props__.__dict__["version"] = None
+        secret_opts = pulumi.ResourceOptions(additional_secret_outputs=["executorContext", "operationContext", "sourceContext"])
+        opts = pulumi.ResourceOptions.merge(opts, secret_opts)
         super(Settings, __self__).__init__(
             'pulumiservice:api/deployments:Settings',
             resource_name,

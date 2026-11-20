@@ -3149,7 +3149,8 @@
           "additionalProperties": {
             "$ref": "pulumi.json#/Any"
           },
-          "description": "The action definition, which varies based on the action kind."
+          "description": "The action definition, which varies based on the action kind.",
+          "secret": true
         },
         "kind": {
           "type": "string",
@@ -3215,7 +3216,8 @@
         },
         "request": {
           "$ref": "pulumi.json#/Any",
-          "description": "Deployment request payload to execute when the schedule fires. This has the same shape and semantics as CreateDeploymentRequest used for immediate deployments."
+          "description": "Deployment request payload to execute when the schedule fires. This has the same shape and semantics as CreateDeploymentRequest used for immediate deployments.",
+          "secret": true
         },
         "scheduleCron": {
           "type": "string",
@@ -3257,7 +3259,8 @@
         },
         "executorContext": {
           "$ref": "pulumi.json#/Any",
-          "description": "The executor context defining the execution environment."
+          "description": "The executor context defining the execution environment.",
+          "secret": true
         },
         "gitHub": {
           "$ref": "pulumi.json#/Any",
@@ -3265,7 +3268,8 @@
         },
         "operationContext": {
           "$ref": "pulumi.json#/Any",
-          "description": "The operation context defining pre-run and post-run commands and environment variables."
+          "description": "The operation context defining pre-run and post-run commands and environment variables.",
+          "secret": true
         },
         "source": {
           "type": "string",
@@ -3273,7 +3277,8 @@
         },
         "sourceContext": {
           "$ref": "pulumi.json#/Any",
-          "description": "The source context defining where the source code is located."
+          "description": "The source context defining where the source code is located.",
+          "secret": true
         },
         "tag": {
           "type": "string",
@@ -3300,7 +3305,8 @@
         },
         "executorContext": {
           "$ref": "pulumi.json#/Any",
-          "description": "The executor context defining the execution environment."
+          "description": "The executor context defining the execution environment.",
+          "secret": true
         },
         "gitHub": {
           "$ref": "pulumi.json#/Any",
@@ -3308,7 +3314,8 @@
         },
         "operationContext": {
           "$ref": "pulumi.json#/Any",
-          "description": "The operation context defining pre-run and post-run commands and environment variables."
+          "description": "The operation context defining pre-run and post-run commands and environment variables.",
+          "secret": true
         },
         "orgName": {
           "type": "string",
@@ -3324,7 +3331,8 @@
         },
         "sourceContext": {
           "$ref": "pulumi.json#/Any",
-          "description": "The source context defining where the source code is located."
+          "description": "The source context defining where the source code is located.",
+          "secret": true
         },
         "stackName": {
           "type": "string",
@@ -3536,8 +3544,7 @@
         },
         "secretRotationRequest": {
           "$ref": "pulumi.json#/Any",
-          "description": "The secret rotation request",
-          "secret": true
+          "description": "The secret rotation request"
         }
       },
       "requiredInputs": [
@@ -3829,8 +3836,7 @@
         },
         "hasSecret": {
           "type": "boolean",
-          "description": "HasSecret is true if the webhook has a secret. This is used to determine whether\nto show that there is a secret in the UI.",
-          "secret": true
+          "description": "HasSecret is true if the webhook has a secret. This is used to determine whether\nto show that there is a secret in the UI."
         },
         "name": {
           "type": "string",
@@ -4701,8 +4707,7 @@
         },
         "groupAccessTokenExpiration": {
           "type": "string",
-          "description": "The expiration date of the group access token, if one is being used for authentication.",
-          "secret": true
+          "description": "The expiration date of the group access token, if one is being used for authentication."
         },
         "groupName": {
           "type": "string",
@@ -5194,8 +5199,7 @@
         },
         "hasSecret": {
           "type": "boolean",
-          "description": "HasSecret is true if the webhook has a secret. This is used to determine whether\nto show that there is a secret in the UI.",
-          "secret": true
+          "description": "HasSecret is true if the webhook has a secret. This is used to determine whether\nto show that there is a secret in the UI."
         },
         "name": {
           "type": "string",
@@ -5731,7 +5735,8 @@
         },
         "s3CompatibleConfig": {
           "$ref": "pulumi.json#/Any",
-          "description": "The S3-compatible configuration for exporting audit logs. Set when audit logs export to an S3-compatible service."
+          "description": "The S3-compatible configuration for exporting audit logs. Set when audit logs export to an S3-compatible service.",
+          "secret": true
         },
         "s3Config": {
           "$ref": "pulumi.json#/Any",
@@ -5750,7 +5755,8 @@
         },
         "newS3CompatibleConfiguration": {
           "$ref": "pulumi.json#/Any",
-          "description": "The new S3-compatible configuration for audit log export. Mutually exclusive with newS3Configuration."
+          "description": "The new S3-compatible configuration for audit log export. Mutually exclusive with newS3Configuration.",
+          "secret": true
         },
         "newS3Configuration": {
           "$ref": "pulumi.json#/Any",
@@ -6055,8 +6061,7 @@
         },
         "hasSecret": {
           "type": "boolean",
-          "description": "HasSecret is true if the webhook has a secret. This is used to determine whether\nto show that there is a secret in the UI.",
-          "secret": true
+          "description": "HasSecret is true if the webhook has a secret. This is used to determine whether\nto show that there is a secret in the UI."
         },
         "name": {
           "type": "string",

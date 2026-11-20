@@ -77,7 +77,6 @@ func NewWebhook(ctx *pulumi.Context,
 		args.Secret = pulumi.ToSecret(args.Secret).(pulumi.StringPtrInput)
 	}
 	secrets := pulumi.AdditionalSecretOutputs([]string{
-		"hasSecret",
 		"secret",
 		"secretCiphertext",
 	})

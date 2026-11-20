@@ -1,0 +1,5 @@
+kind: bug-fixes
+body: 'Marked properties that carry credentials as secret: the S3-compatible configuration on `api.AuditLogExportConfiguration`, the source, executor and operation contexts on `api.deployments.Settings`, and the request and definition on `api.deployments.ScheduledDeployment`.'
+time: 2026-11-20T16:36:56.388647-05:00
+custom:
+    Issue: "1446"

@@ -132,7 +132,6 @@ namespace Pulumi.PulumiService.Api
                 Version = Utilities.Version,
                 AdditionalSecretOutputs =
                 {
-                    "hasSecret",
                     "secret",
                     "secretCiphertext",
                 },
