@@ -1,0 +1,59 @@
+name: yaml-service-principals-example
+runtime: yaml
+description: A service principal with a role, entity access and an access token
+config:
+  organizationName:
+    type: string
+    default: service-provider-test-org
+  digits:
+    type: string
+  # When the token expires, as an RFC 3339 date-time. Pulumi Cloud rejects
+  # expiries in the past or more than two years out, so the test passes a date
+  # relative to the current time.
+  expires:
+    type: string
+variables:
+  readerRole:
+    fn::invoke:
+      function: pulumiservice:getOrganizationRole
+      arguments:
+        organizationName: ${organizationName}
+        name: Reader
+resources:
+  deployer:
+    type: pulumiservice:ServicePrincipal
+    properties:
+      organizationName: ${organizationName}
+      name: test-sp-deployer-${digits}
+      roleIds:
+        - ${readerRole.roleId}
+  deployerToken:
+    type: pulumiservice:ServicePrincipalAccessToken
+    properties:
+      organizationName: ${organizationName}
+      servicePrincipalLogin: ${deployer.login}
+      description: Token for CI pipelines
+      expires: ${expires}
+  environment:
+    type: pulumiservice:Environment
+    properties:
+      organization: ${organizationName}
+      project: test-sp-project-${digits}
+      name: deploy-config
+      yaml:
+        fn::stringAsset: |-
+          values:
+            region: us-west-2
+  # A service principal is an organization member, so entity access targets it
+  # by its login.
+  deployerEnvironmentAccess:
+    type: pulumiservice:OrganizationMemberEntityAccess
+    properties:
+      organizationName: ${organizationName}
+      username: ${deployer.login}
+      entityType: environment
+      entityName: ${environment.project}/${environment.name}
+      permission: environment-open
+outputs:
+  deployerLogin: ${deployer.login}
+  deployerToken: ${deployerToken.value}

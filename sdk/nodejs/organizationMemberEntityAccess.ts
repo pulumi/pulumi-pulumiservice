@@ -83,7 +83,7 @@ export class OrganizationMemberEntityAccess extends pulumi.CustomResource {
      */
     declare public /*out*/ readonly permissionSetName: pulumi.Output<string>;
     /**
-     * The Pulumi Cloud username of the organization member.
+     * The Pulumi Cloud username of the organization member. For a service principal, use its login, the `login` output of a `ServicePrincipal` resource.
      */
     declare public readonly username: pulumi.Output<string>;
 
@@ -160,7 +160,7 @@ export interface OrganizationMemberEntityAccessArgs {
      */
     permissionSetId?: pulumi.Input<string | undefined>;
     /**
-     * The Pulumi Cloud username of the organization member.
+     * The Pulumi Cloud username of the organization member. For a service principal, use its login, the `login` output of a `ServicePrincipal` resource.
      */
     username: pulumi.Input<string>;
 }

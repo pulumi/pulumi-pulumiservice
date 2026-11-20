@@ -91,7 +91,11 @@ type OrganizationMemberEntityAccessInput struct {
 
 func (i *OrganizationMemberEntityAccessInput) Annotate(a infer.Annotator) {
 	a.Describe(&i.OrganizationName, "The Pulumi Cloud organization name.")
-	a.Describe(&i.Username, "The Pulumi Cloud username of the organization member.")
+	a.Describe(
+		&i.Username,
+		"The Pulumi Cloud username of the organization member. For a service principal, use its login, the "+
+			"`login` output of a `ServicePrincipal` resource.",
+	)
 	a.Describe(&i.EntityType, "The kind of entity to grant access to. One of `stack`, `environment` or `insightsAccount`.")
 	a.Describe(
 		&i.EntityName,

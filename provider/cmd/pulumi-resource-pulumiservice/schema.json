@@ -7534,7 +7534,7 @@
         },
         "username": {
           "type": "string",
-          "description": "The Pulumi Cloud username of the organization member.",
+          "description": "The Pulumi Cloud username of the organization member. For a service principal, use its login, the `login` output of a `ServicePrincipal` resource.",
           "replaceOnChanges": true
         }
       },
@@ -7572,7 +7572,7 @@
         },
         "username": {
           "type": "string",
-          "description": "The Pulumi Cloud username of the organization member.",
+          "description": "The Pulumi Cloud username of the organization member. For a service principal, use its login, the `login` output of a `ServicePrincipal` resource.",
           "replaceOnChanges": true
         }
       },
@@ -7834,6 +7834,129 @@
         "name",
         "versionTag",
         "sourcePath"
+      ]
+    },
+    "pulumiservice:index:ServicePrincipal": {
+      "description": "Creates a service principal in a Pulumi Cloud organization. A service principal is a named, non-human member of the organization for automation to authenticate as. It has no access of its own: its access comes from the organization-wide roles in `roleIds` and from entity access granted with `OrganizationMemberEntityAccess`, and it never receives the organization's default role. Create tokens that authenticate as it with `ServicePrincipalAccessToken`.\n\nRenaming the service principal or changing its roles updates it in place. Destroying it also deletes its access tokens.\n\n## Import\n\nThis resource can be imported using its `id`, which has the format `{organization}/{login}`, e.g.,\n\n```sh\n $ pulumi import pulumiservice:index:ServicePrincipal my-service-principal my-org/service-principal:d333a711-4aa0-402f-be6d-72af9665fc37\n```\n\nThe Pulumi Cloud console doesn't show the service principal's login. List it with the [Pulumi Cloud REST API](https://www.pulumi.com/docs/reference/cloud-rest-api/):\n\n```sh\ncurl -s -H \"Authorization: token $PULUMI_ACCESS_TOKEN\" \\\n  https://api.pulumi.com/api/orgs/my-org/members?type=service-principal | jq '.members[] | {name: .user.name, login: .user.githubLogin}'\n```\n",
+      "properties": {
+        "login": {
+          "type": "string",
+          "description": "The service principal's login, such as `service-principal:d333a711-4aa0-402f-be6d-72af9665fc37`. It doesn't change when the service principal is renamed. Pass it to `ServicePrincipalAccessToken.servicePrincipalLogin`, or as the `username` of `OrganizationMemberEntityAccess`."
+        },
+        "name": {
+          "type": "string",
+          "description": "The service principal's display name, unique among the organization's service principals. Up to 64 characters: letters, digits, spaces, hyphens, underscores and periods. Changing it renames the service principal in place.\n\nIf omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming)."
+        },
+        "organizationName": {
+          "type": "string",
+          "description": "The organization's name.",
+          "replaceOnChanges": true
+        },
+        "roleIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The IDs of the organization-wide roles the service principal holds. Use `getOrganizationRole` to look up a role's ID by its name. Organizations with custom roles can assign any number of custom roles and the built-in Admin, Maintainer, Builder and Reader roles. Without custom roles, a service principal holds at most one of the Reader, Maintainer and Admin roles. Omit it, or leave it empty, for a service principal whose only access is its entity access."
+        }
+      },
+      "required": [
+        "organizationName",
+        "name",
+        "login"
+      ],
+      "inputProperties": {
+        "name": {
+          "type": "string",
+          "description": "The service principal's display name, unique among the organization's service principals. Up to 64 characters: letters, digits, spaces, hyphens, underscores and periods. Changing it renames the service principal in place.\n\nIf omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming)."
+        },
+        "organizationName": {
+          "type": "string",
+          "description": "The organization's name.",
+          "replaceOnChanges": true
+        },
+        "roleIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The IDs of the organization-wide roles the service principal holds. Use `getOrganizationRole` to look up a role's ID by its name. Organizations with custom roles can assign any number of custom roles and the built-in Admin, Maintainer, Builder and Reader roles. Without custom roles, a service principal holds at most one of the Reader, Maintainer and Admin roles. Omit it, or leave it empty, for a service principal whose only access is its entity access."
+        }
+      },
+      "requiredInputs": [
+        "organizationName"
+      ]
+    },
+    "pulumiservice:index:ServicePrincipalAccessToken": {
+      "description": "Creates an access token that authenticates as a service principal. Requests made with the token have the service principal's roles and entity access, and the token isn't tied to a user. It can replace an `OrgAccessToken`: give a `ServicePrincipal` the roles the automation needs, then create a token for it.\n\nThe provider's credentials need permission to create organization tokens. Pulumi Cloud refuses delegated credentials, such as tokens minted by OIDC token exchange, here.\n\n## Import\n\nThis resource can be imported using its `id`, which has the format `{organization}/{login}/{tokenId}`, e.g.,\n\n```sh\n $ pulumi import pulumiservice:index:ServicePrincipalAccessToken my-service-principal-access-token my-org/service-principal:d333a711-4aa0-402f-be6d-72af9665fc37/a81d4c3e-52f0-4b7a-b9e2-6d0f1c8e2a47\n```\n\nThe Pulumi Cloud console doesn't show the token ID. List it with the [Pulumi Cloud REST API](https://www.pulumi.com/docs/reference/cloud-rest-api/):\n\n```sh\ncurl -s -H \"Authorization: token $PULUMI_ACCESS_TOKEN\" \\\n  https://api.pulumi.com/api/orgs/my-org/service-principals/{login}/tokens | jq '.tokens[] | {name, id}'\n```\n\nThe token's `value` can't be read back from Pulumi Cloud, so it's empty after import.\n",
+      "properties": {
+        "description": {
+          "type": "string",
+          "description": "A description of the token.",
+          "replaceOnChanges": true
+        },
+        "expires": {
+          "type": "string",
+          "description": "When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`. Omit it for a token that never expires. Pulumi Cloud rejects an expiry that is in the past, more than two years away, or beyond the organization's maximum token lifetime.",
+          "replaceOnChanges": true
+        },
+        "name": {
+          "type": "string",
+          "description": "The name for the token, up to 40 characters. It must be unique among the service principal's tokens, and Pulumi Cloud never frees a deleted token's name.\n\nIf omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). A replacement gets a new name.\n\nEvery input on this resource triggers a replacement, so when `name` is set explicitly, changing any other input fails with `409 Conflict: token name already exists`. Omit `name`, or change it along with the other input.",
+          "replaceOnChanges": true
+        },
+        "organizationName": {
+          "type": "string",
+          "description": "The organization's name.",
+          "replaceOnChanges": true
+        },
+        "servicePrincipalLogin": {
+          "type": "string",
+          "description": "The login of the service principal the token authenticates as: the `login` output of a `ServicePrincipal` resource.",
+          "replaceOnChanges": true
+        },
+        "value": {
+          "type": "string",
+          "description": "The token's value.",
+          "secret": true
+        }
+      },
+      "required": [
+        "name",
+        "organizationName",
+        "servicePrincipalLogin",
+        "value"
+      ],
+      "inputProperties": {
+        "description": {
+          "type": "string",
+          "description": "A description of the token.",
+          "replaceOnChanges": true
+        },
+        "expires": {
+          "type": "string",
+          "description": "When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`. Omit it for a token that never expires. Pulumi Cloud rejects an expiry that is in the past, more than two years away, or beyond the organization's maximum token lifetime.",
+          "replaceOnChanges": true
+        },
+        "name": {
+          "type": "string",
+          "description": "The name for the token, up to 40 characters. It must be unique among the service principal's tokens, and Pulumi Cloud never frees a deleted token's name.\n\nIf omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). A replacement gets a new name.\n\nEvery input on this resource triggers a replacement, so when `name` is set explicitly, changing any other input fails with `409 Conflict: token name already exists`. Omit `name`, or change it along with the other input.",
+          "replaceOnChanges": true
+        },
+        "organizationName": {
+          "type": "string",
+          "description": "The organization's name.",
+          "replaceOnChanges": true
+        },
+        "servicePrincipalLogin": {
+          "type": "string",
+          "description": "The login of the service principal the token authenticates as: the `login` output of a `ServicePrincipal` resource.",
+          "replaceOnChanges": true
+        }
+      },
+      "requiredInputs": [
+        "organizationName",
+        "servicePrincipalLogin"
       ]
     },
     "pulumiservice:index:Stack": {

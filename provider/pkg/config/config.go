@@ -96,6 +96,7 @@ type Client interface {
 	pulumiapi.PolicyPackClient
 	pulumiapi.RegistryPolicyPackClient
 	pulumiapi.RoleClient
+	pulumiapi.ServicePrincipalClient
 	pulumiapi.StackClient
 	pulumiapi.StackScheduleClient
 	pulumiapi.StackTagClient

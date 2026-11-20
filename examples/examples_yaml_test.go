@@ -311,6 +311,20 @@ func TestYamlOrgAccessTokenExample(t *testing.T) {
 	runPulumiTest(t, test)
 }
 
+func TestYamlServicePrincipalsExample(t *testing.T) {
+	if os.Getenv("PULUMITEST_SERVICE_PRINCIPALS") == "" {
+		t.Skip("requires the service principal API to be available to the test organization; " +
+			"set PULUMITEST_SERVICE_PRINCIPALS=1 to run it")
+	}
+	test := newExampleTest(t, "yaml-service-principals")
+	setConfig(t, test, map[string]string{
+		"organizationName": getOrgName(),
+		"digits":           generateRandomFiveDigits(),
+		"expires":          time.Now().UTC().AddDate(0, 0, 30).Truncate(time.Hour).Format(time.RFC3339),
+	})
+	runPulumiTest(t, test)
+}
+
 func TestYamlTeamStackPermissionsExample(t *testing.T) {
 	test := newExampleTest(t, "yaml-team-stack-permissions")
 	test.SetConfig(t, "organizationName", getOrgName())

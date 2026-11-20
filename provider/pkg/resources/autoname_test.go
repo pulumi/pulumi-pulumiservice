@@ -43,6 +43,7 @@ func TestAutoName(t *testing.T) {
 			infer.Resource(&OidcIssuer{}),
 			infer.Resource(&OrganizationRole{}),
 			infer.Resource(&PolicyGroup{}),
+			infer.Resource(&ServicePrincipal{}),
 			infer.Resource(&Team{}),
 		).
 		WithModuleMap(map[tokens.ModuleName]tokens.ModuleName{"resources": "index"}).
@@ -125,6 +126,12 @@ func TestAutoName(t *testing.T) {
 			token:  "pulumiservice:index:PolicyGroup",
 			field:  gcName,
 			maxLen: policyGroupNameMaxLen,
+			inputs: map[string]property.Value{gcOrganizationName: str(gcMyOrg)},
+		},
+		{
+			token:  "pulumiservice:index:ServicePrincipal",
+			field:  gcName,
+			maxLen: servicePrincipalNameMaxLen,
 			inputs: map[string]property.Value{gcOrganizationName: str(gcMyOrg)},
 		},
 		{

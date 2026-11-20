@@ -1,0 +1,3 @@
+kind: improvements
+body: Added the `ServicePrincipal` and `ServicePrincipalAccessToken` resources for managing service principals, their roles and their access tokens. A service principal can also be granted entity access with `OrganizationMemberEntityAccess`, using its `login` as the username
+time: 2026-11-20T09:14:30.255782+01:00
