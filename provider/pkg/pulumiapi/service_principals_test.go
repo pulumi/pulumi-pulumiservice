@@ -32,44 +32,54 @@ const (
 	testSPName    = "ci-deployer"
 	testSPTokenID = "tok-123"
 	testSPPath    = "/api/orgs/an-org/service-principals/service-principal:d333a711"
+	testSPCreate  = "/api/orgs/an-org/service-principals/create"
+	testSPRoleA   = "sp-role-a"
+	testSPRoleB   = "sp-role-b"
+	testSPDesc    = "for CI"
+	testSPFailure = "internal failure"
 )
 
-func spRolesResponse(ids ...string) map[string]any {
-	roles := make([]map[string]any, 0, len(ids))
+func spRolesResponse(ids ...string) servicePrincipalRolesResponse {
+	res := servicePrincipalRolesResponse{Roles: []servicePrincipalRole{}}
 	for _, id := range ids {
-		roles = append(roles, map[string]any{"id": id, "name": "role " + id})
+		res.Roles = append(res.Roles, servicePrincipalRole{ID: id})
 	}
-	return map[string]any{"roles": roles}
+	return res
+}
+
+func spMember(name, login string) servicePrincipalMember {
+	return servicePrincipalMember{User: User{Name: name, GithubLogin: login}}
+}
+
+func spMembers(logins ...string) Members {
+	var page Members
+	for _, l := range logins {
+		page.Members = append(page.Members, Member{User: User{Name: "name of " + l, GithubLogin: l}})
+	}
+	return page
 }
 
 func TestCreateServicePrincipal(t *testing.T) {
 	t.Run("sends name and roles, returns the login", func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPost,
-			ExpectedReqPath:   "/api/orgs/an-org/service-principals/create",
-			ExpectedReqBody:   map[string]any{"name": testSPName, "roleIds": []string{"role-1"}},
+			ExpectedReqPath:   testSPCreate,
+			ExpectedReqBody:   createServicePrincipalRequest{Name: testSPName, RoleIDs: []string{testSPRoleA}},
 			ResponseCode:      http.StatusCreated,
-			ResponseBody: map[string]any{
-				"role": "member",
-				"user": map[string]any{
-					"name":                 testSPName,
-					"githubLogin":          testSPLogin,
-					"servicePrincipalKind": "user-defined",
-				},
-			},
+			ResponseBody:      spMember(testSPName, testSPLogin),
 		})
-		sp, err := c.CreateServicePrincipal(t.Context(), testSPOrg, testSPName, []string{"role-1"})
+		sp, err := c.CreateServicePrincipal(t.Context(), testSPOrg, testSPName, []string{testSPRoleA})
 		require.NoError(t, err)
-		assert.Equal(t, &ServicePrincipal{Login: testSPLogin, Name: testSPName, RoleIDs: []string{"role-1"}}, sp)
+		assert.Equal(t, &ServicePrincipal{Login: testSPLogin, Name: testSPName, RoleIDs: []string{testSPRoleA}}, sp)
 	})
 
 	t.Run("omits roles when there are none", func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPost,
-			ExpectedReqPath:   "/api/orgs/an-org/service-principals/create",
-			ExpectedReqBody:   map[string]any{"name": testSPName},
+			ExpectedReqPath:   testSPCreate,
+			ExpectedReqBody:   createServicePrincipalRequest{Name: testSPName},
 			ResponseCode:      http.StatusCreated,
-			ResponseBody:      map[string]any{"user": map[string]any{"name": testSPName, "githubLogin": testSPLogin}},
+			ResponseBody:      spMember(testSPName, testSPLogin),
 		})
 		sp, err := c.CreateServicePrincipal(t.Context(), testSPOrg, testSPName, nil)
 		require.NoError(t, err)
@@ -80,7 +90,7 @@ func TestCreateServicePrincipal(t *testing.T) {
 		msg := "without custom roles, a service principal holds at most one of the Reader, Maintainer or Admin roles"
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPost,
-			ExpectedReqPath:   "/api/orgs/an-org/service-principals/create",
+			ExpectedReqPath:   testSPCreate,
 			ResponseCode:      http.StatusBadRequest,
 			ResponseBody:      ErrorResponse{StatusCode: http.StatusBadRequest, Message: msg},
 		})
@@ -99,13 +109,7 @@ func TestCreateServicePrincipal(t *testing.T) {
 }
 
 func TestGetServicePrincipal(t *testing.T) {
-	members := func(logins ...string) map[string]any {
-		var ms []map[string]any
-		for _, l := range logins {
-			ms = append(ms, map[string]any{"user": map[string]any{"name": "name of " + l, "githubLogin": l}})
-		}
-		return map[string]any{"members": ms}
-	}
+	members := spMembers
 
 	t.Run("reads the name from the member list and the roles", func(t *testing.T) {
 		c := startTestServerMulti(t, func(r *http.Request) (int, any) {
@@ -114,7 +118,7 @@ func TestGetServicePrincipal(t *testing.T) {
 				assert.Equal(t, "service-principal", r.URL.Query().Get("type"))
 				return http.StatusOK, members("service-principal:other", testSPLogin)
 			case r.Method == http.MethodGet && r.URL.Path == testSPPath+"/roles":
-				return http.StatusOK, spRolesResponse("role-1", "role-2")
+				return http.StatusOK, spRolesResponse(testSPRoleA, testSPRoleB)
 			}
 			t.Errorf("unexpected request %s %s", r.Method, r.URL.Path)
 			return http.StatusInternalServerError, nil
@@ -124,7 +128,7 @@ func TestGetServicePrincipal(t *testing.T) {
 		assert.Equal(t, &ServicePrincipal{
 			Login:   testSPLogin,
 			Name:    "name of " + testSPLogin,
-			RoleIDs: []string{"role-1", "role-2"},
+			RoleIDs: []string{testSPRoleA, testSPRoleB},
 		}, sp)
 	})
 
@@ -135,7 +139,7 @@ func TestGetServicePrincipal(t *testing.T) {
 			}
 			if r.URL.Query().Get("continuationToken") == "" {
 				page := members("service-principal:other")
-				page["continuationToken"] = "next"
+				page.ContinuationToken = new("next")
 				return http.StatusOK, page
 			}
 			return http.StatusOK, members(testSPLogin)
@@ -159,7 +163,7 @@ func TestGetServicePrincipal(t *testing.T) {
 	t.Run("roles not found", func(t *testing.T) {
 		c := startTestServerMulti(t, func(r *http.Request) (int, any) {
 			if r.URL.Path == testSPPath+"/roles" {
-				return http.StatusNotFound, ErrorResponse{StatusCode: http.StatusNotFound, Message: "not found"}
+				return http.StatusNotFound, ErrorResponse{StatusCode: http.StatusNotFound, Message: notFoundError}
 			}
 			return http.StatusOK, members(testSPLogin)
 		})
@@ -173,7 +177,7 @@ func TestRenameServicePrincipal(t *testing.T) {
 	c := startTestServer(t, testServerConfig{
 		ExpectedReqMethod: http.MethodPatch,
 		ExpectedReqPath:   "/api/orgs/an-org/members/" + testSPLogin,
-		ExpectedReqBody:   map[string]any{"name": "new-name"},
+		ExpectedReqBody:   renameServicePrincipalRequest{Name: "new-name"},
 		ResponseCode:      http.StatusNoContent,
 	})
 	require.NoError(t, c.RenameServicePrincipal(t.Context(), testSPOrg, testSPLogin, "new-name"))
@@ -185,13 +189,13 @@ func TestUpdateServicePrincipalRoles(t *testing.T) {
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPut,
 			ExpectedReqPath:   testSPPath + "/roles",
-			ExpectedReqBody:   map[string]any{"roleIds": []string{"role-1"}},
+			ExpectedReqBody:   servicePrincipalRolesRequest{RoleIDs: []string{testSPRoleA}},
 			ResponseCode:      http.StatusOK,
-			ResponseBody:      spRolesResponse("role-1"),
+			ResponseBody:      spRolesResponse(testSPRoleA),
 		})
-		ids, err := c.UpdateServicePrincipalRoles(t.Context(), testSPOrg, testSPLogin, []string{"role-1"})
+		ids, err := c.UpdateServicePrincipalRoles(t.Context(), testSPOrg, testSPLogin, []string{testSPRoleA})
 		require.NoError(t, err)
-		assert.Equal(t, []string{"role-1"}, ids)
+		assert.Equal(t, []string{testSPRoleA}, ids)
 	})
 
 	t.Run("no roles sends an empty list", func(t *testing.T) {
@@ -218,16 +222,16 @@ func TestCreateServicePrincipalToken(t *testing.T) {
 			require.NoError(t, err)
 			assert.JSONEq(t,
 				`{"name":"ci","description":"for CI","expires":"2027-06-30T17:00:00Z"}`, string(body))
-			return http.StatusOK, createTokenResponse{ID: testSPTokenID, TokenValue: "secret"}
+			return http.StatusOK, createTokenResponse{ID: testSPTokenID, TokenValue: secretKey}
 		})
 		token, err := c.CreateServicePrincipalToken(t.Context(), testSPOrg, testSPLogin,
-			CreateServicePrincipalTokenRequest{Name: "ci", Description: "for CI", Expires: &expires})
+			CreateServicePrincipalTokenRequest{Name: "ci", Description: testSPDesc, Expires: &expires})
 		require.NoError(t, err)
 		assert.Equal(t, &AccessToken{
 			ID:          testSPTokenID,
 			Name:        "ci",
-			TokenValue:  "secret",
-			Description: "for CI",
+			TokenValue:  secretKey,
+			Description: testSPDesc,
 			Expires:     expires.Unix(),
 		}, token)
 	})
@@ -238,7 +242,7 @@ func TestCreateServicePrincipalToken(t *testing.T) {
 			require.NoError(t, json.NewDecoder(r.Body).Decode(&body))
 			assert.NotContains(t, body, "expires")
 			assert.Contains(t, body, "description")
-			return http.StatusOK, createTokenResponse{ID: testSPTokenID, TokenValue: "secret"}
+			return http.StatusOK, createTokenResponse{ID: testSPTokenID, TokenValue: secretKey}
 		})
 		_, err := c.CreateServicePrincipalToken(t.Context(), testSPOrg, testSPLogin,
 			CreateServicePrincipalTokenRequest{Name: "ci"})
@@ -280,10 +284,9 @@ func TestGetServicePrincipalToken(t *testing.T) {
 	t.Run("follows the continuation token", func(t *testing.T) {
 		c := startTestServerMulti(t, func(r *http.Request) (int, any) {
 			if r.URL.Query().Get("continuationToken") == "" {
-				return http.StatusOK, map[string]any{
-					"tokens":            []accessTokenResponse{token("other")},
-					"continuationToken": "next",
-				}
+				page := listTokensPage{ContinuationToken: new("next")}
+				page.Tokens = []accessTokenResponse{token("other")}
+				return http.StatusOK, page
 			}
 			assert.Equal(t, "next", r.URL.Query().Get("continuationToken"))
 			return http.StatusOK, listTokenResponse{Tokens: []accessTokenResponse{token(testSPTokenID)}}
@@ -305,7 +308,7 @@ func TestGetServicePrincipalToken(t *testing.T) {
 
 	t.Run("service principal not found", func(t *testing.T) {
 		c := startTestServerMulti(t, func(*http.Request) (int, any) {
-			return http.StatusNotFound, ErrorResponse{StatusCode: http.StatusNotFound, Message: "not found"}
+			return http.StatusNotFound, ErrorResponse{StatusCode: http.StatusNotFound, Message: notFoundError}
 		})
 		got, err := c.GetServicePrincipalToken(t.Context(), testSPOrg, testSPLogin, testSPTokenID)
 		require.NoError(t, err)
@@ -314,7 +317,7 @@ func TestGetServicePrincipalToken(t *testing.T) {
 
 	t.Run("server error", func(t *testing.T) {
 		c := startTestServerMulti(t, func(*http.Request) (int, any) {
-			return http.StatusInternalServerError, ErrorResponse{StatusCode: 500, Message: "boom"}
+			return http.StatusInternalServerError, ErrorResponse{StatusCode: 500, Message: testSPFailure}
 		})
 		_, err := c.GetServicePrincipalToken(t.Context(), testSPOrg, testSPLogin, testSPTokenID)
 		assert.Error(t, err)

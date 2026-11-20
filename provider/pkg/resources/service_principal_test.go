@@ -31,6 +31,9 @@ import (
 const (
 	testServicePrincipalLogin = "service-principal:d333a711-4aa0-402f-be6d-72af9665fc37"
 	testServicePrincipalName  = "ci-deployer"
+	testSPRoleA               = "sp-role-a"
+	testSPRoleB               = "sp-role-b"
+	testSPRoleC               = "sp-role-c"
 )
 
 var testServicePrincipalID = servicePrincipalID(gcMyOrg, testServicePrincipalLogin)
@@ -76,7 +79,7 @@ func TestServicePrincipalCreate(t *testing.T) {
 			create: func(orgName, name string, roleIDs []string) (*pulumiapi.ServicePrincipal, error) {
 				assert.Equal(t, gcMyOrg, orgName)
 				assert.Equal(t, testServicePrincipalName, name)
-				assert.Equal(t, []string{"role-1"}, roleIDs)
+				assert.Equal(t, []string{testSPRoleA}, roleIDs)
 				return &pulumiapi.ServicePrincipal{Login: testServicePrincipalLogin, Name: name, RoleIDs: roleIDs}, nil
 			},
 		}
@@ -84,7 +87,7 @@ func TestServicePrincipalCreate(t *testing.T) {
 		in := ServicePrincipalInput{
 			OrganizationName: gcMyOrg,
 			Name:             testServicePrincipalName,
-			RoleIDs:          []string{"role-1"},
+			RoleIDs:          []string{testSPRoleA},
 		}
 		resp, err := (&ServicePrincipal{}).Create(ctx, infer.CreateRequest[ServicePrincipalInput]{Inputs: in})
 		require.NoError(t, err)
@@ -121,7 +124,7 @@ func TestServicePrincipalUpdate(t *testing.T) {
 		ServicePrincipalInput: ServicePrincipalInput{
 			OrganizationName: gcMyOrg,
 			Name:             testServicePrincipalName,
-			RoleIDs:          []string{"role-1", "role-2"},
+			RoleIDs:          []string{testSPRoleA, testSPRoleB},
 		},
 		Login: testServicePrincipalLogin,
 	}
@@ -164,11 +167,11 @@ func TestServicePrincipalUpdate(t *testing.T) {
 
 	t.Run("roles only", func(t *testing.T) {
 		in := state.ServicePrincipalInput
-		in.RoleIDs = []string{"role-3"}
+		in.RoleIDs = []string{testSPRoleC}
 		renamed, roles := run(t, in)
 		assert.Nil(t, renamed, "name must not be rewritten")
 		require.NotNil(t, roles)
-		assert.Equal(t, []string{"role-3"}, *roles)
+		assert.Equal(t, []string{testSPRoleC}, *roles)
 	})
 
 	t.Run("removing every role", func(t *testing.T) {
@@ -181,7 +184,7 @@ func TestServicePrincipalUpdate(t *testing.T) {
 
 	t.Run("reordered roles make no call", func(t *testing.T) {
 		in := state.ServicePrincipalInput
-		in.RoleIDs = []string{"role-2", "role-1"}
+		in.RoleIDs = []string{testSPRoleB, testSPRoleA}
 		renamed, roles := run(t, in)
 		assert.Nil(t, renamed)
 		assert.Nil(t, roles)
@@ -227,12 +230,12 @@ func TestServicePrincipalRead(t *testing.T) {
 		resp := read(t, &pulumiapi.ServicePrincipal{
 			Login:   testServicePrincipalLogin,
 			Name:    testServicePrincipalName,
-			RoleIDs: []string{"role-1"},
+			RoleIDs: []string{testSPRoleA},
 		}, ServicePrincipalState{})
 		want := ServicePrincipalInput{
 			OrganizationName: gcMyOrg,
 			Name:             testServicePrincipalName,
-			RoleIDs:          []string{"role-1"},
+			RoleIDs:          []string{testSPRoleA},
 		}
 		assert.Equal(t, testServicePrincipalID, resp.ID)
 		assert.Equal(t, want, resp.Inputs)
@@ -243,22 +246,22 @@ func TestServicePrincipalRead(t *testing.T) {
 		resp := read(t, &pulumiapi.ServicePrincipal{
 			Login:   testServicePrincipalLogin,
 			Name:    testServicePrincipalName,
-			RoleIDs: []string{"role-1", "role-2"},
-		}, ServicePrincipalState{ServicePrincipalInput: ServicePrincipalInput{RoleIDs: []string{"role-2", "role-1"}}})
-		assert.Equal(t, []string{"role-2", "role-1"}, resp.Inputs.RoleIDs)
+			RoleIDs: []string{testSPRoleA, testSPRoleB},
+		}, ServicePrincipalState{ServicePrincipalInput: ServicePrincipalInput{RoleIDs: []string{testSPRoleB, testSPRoleA}}})
+		assert.Equal(t, []string{testSPRoleB, testSPRoleA}, resp.Inputs.RoleIDs)
 	})
 
 	t.Run("reports drift in roles and name", func(t *testing.T) {
 		resp := read(t, &pulumiapi.ServicePrincipal{
 			Login:   testServicePrincipalLogin,
 			Name:    "renamed-in-console",
-			RoleIDs: []string{"role-3"},
+			RoleIDs: []string{testSPRoleC},
 		}, ServicePrincipalState{ServicePrincipalInput: ServicePrincipalInput{
 			Name:    testServicePrincipalName,
-			RoleIDs: []string{"role-1"},
+			RoleIDs: []string{testSPRoleA},
 		}})
 		assert.Equal(t, "renamed-in-console", resp.Inputs.Name)
-		assert.Equal(t, []string{"role-3"}, resp.Inputs.RoleIDs)
+		assert.Equal(t, []string{testSPRoleC}, resp.Inputs.RoleIDs)
 	})
 
 	t.Run("no roles", func(t *testing.T) {

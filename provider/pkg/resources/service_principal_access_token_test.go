@@ -30,11 +30,12 @@ import (
 )
 
 const (
-	testSPTokenID   = "a81d4c3e-52f0-4b7a-b9e2-6d0f1c8e2a47"
+	testSPTokID     = "a81d4c3e-52f0-4b7a-b9e2-6d0f1c8e2a47"
 	testSPTokenName = "ci-token"
+	testSPTokDesc   = "for CI"
 )
 
-var testSPTokenResourceID = spTokenID(gcMyOrg, testServicePrincipalLogin, testSPTokenID)
+var testSPTokenResourceID = spTokenID(gcMyOrg, testServicePrincipalLogin, testSPTokID)
 
 type spTokenClientMock struct {
 	config.Client
@@ -94,11 +95,11 @@ func TestServicePrincipalAccessTokenCreate(t *testing.T) {
 				assert.Equal(t, gcMyOrg, orgName)
 				assert.Equal(t, testServicePrincipalLogin, login)
 				got = req
-				return &pulumiapi.AccessToken{ID: testSPTokenID, TokenValue: gcTokSecretValue}, nil
+				return &pulumiapi.AccessToken{ID: testSPTokID, TokenValue: gcTokSecretValue}, nil
 			},
 		}
 		ctx := config.WithMockClient(t.Context(), mock)
-		desc := "for CI"
+		desc := testSPTokDesc
 		expires := testExpiryWithOffset
 		in := ServicePrincipalAccessTokenInput{
 			Name:                  testSPTokenName,
@@ -125,7 +126,7 @@ func TestServicePrincipalAccessTokenCreate(t *testing.T) {
 			create: func(_, _ string, req pulumiapi.CreateServicePrincipalTokenRequest) (*pulumiapi.AccessToken, error) {
 				assert.Nil(t, req.Expires)
 				assert.Empty(t, req.Description)
-				return &pulumiapi.AccessToken{ID: testSPTokenID, TokenValue: gcTokSecretValue}, nil
+				return &pulumiapi.AccessToken{ID: testSPTokID, TokenValue: gcTokSecretValue}, nil
 			},
 		}
 		ctx := config.WithMockClient(t.Context(), mock)
@@ -159,7 +160,7 @@ func TestServicePrincipalAccessTokenRead(t *testing.T) {
 			get: func(orgName, login, tokenID string) (*pulumiapi.AccessToken, error) {
 				assert.Equal(t, gcMyOrg, orgName)
 				assert.Equal(t, testServicePrincipalLogin, login)
-				assert.Equal(t, testSPTokenID, tokenID)
+				assert.Equal(t, testSPTokID, tokenID)
 				return token, nil
 			},
 		}
@@ -174,12 +175,12 @@ func TestServicePrincipalAccessTokenRead(t *testing.T) {
 
 	t.Run("import", func(t *testing.T) {
 		resp := read(t, &pulumiapi.AccessToken{
-			ID:          testSPTokenID,
+			ID:          testSPTokID,
 			Name:        testSPTokenName,
-			Description: "for CI",
+			Description: testSPTokDesc,
 			Expires:     testExpiryEpoch,
 		}, spTokenState{})
-		desc := "for CI"
+		desc := testSPTokDesc
 		expires := "2027-06-30T17:00:00Z"
 		want := ServicePrincipalAccessTokenInput{
 			Name:                  testSPTokenName,
@@ -196,7 +197,7 @@ func TestServicePrincipalAccessTokenRead(t *testing.T) {
 	t.Run("refresh keeps the value and the expiry's spelling", func(t *testing.T) {
 		expires := testExpiryWithOffset
 		resp := read(t, &pulumiapi.AccessToken{
-			ID:      testSPTokenID,
+			ID:      testSPTokID,
 			Name:    testSPTokenName,
 			Expires: testExpiryEpoch,
 		}, spTokenState{
@@ -228,13 +229,13 @@ func TestServicePrincipalAccessTokenDelete(t *testing.T) {
 	ctx := config.WithMockClient(t.Context(), mock)
 	_, err := (&ServicePrincipalAccessToken{}).Delete(ctx, infer.DeleteRequest[spTokenState]{ID: testSPTokenResourceID})
 	require.NoError(t, err)
-	assert.Equal(t, testSPTokenID, deleted)
+	assert.Equal(t, testSPTokID, deleted)
 }
 
 func TestSplitSPTokenID(t *testing.T) {
 	org, login, tokenID, err := splitSPTokenID(testSPTokenResourceID)
 	require.NoError(t, err)
-	assert.Equal(t, []string{gcMyOrg, testServicePrincipalLogin, testSPTokenID}, []string{org, login, tokenID})
+	assert.Equal(t, []string{gcMyOrg, testServicePrincipalLogin, testSPTokID}, []string{org, login, tokenID})
 
 	for _, id := range []string{"", "my-org/login", "my-org//tok", "my-org/login/tok/extra"} {
 		_, _, _, err := splitSPTokenID(id)

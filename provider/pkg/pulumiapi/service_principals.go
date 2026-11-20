@@ -71,10 +71,12 @@ type servicePrincipalRolesRequest struct {
 	RoleIDs []string `json:"roleIds"`
 }
 
+type servicePrincipalRole struct {
+	ID string `json:"id"`
+}
+
 type servicePrincipalRolesResponse struct {
-	Roles []struct {
-		ID string `json:"id"`
-	} `json:"roles"`
+	Roles []servicePrincipalRole `json:"roles"`
 }
 
 // CreateServicePrincipalTokenRequest is the body of a request to create a
@@ -83,6 +85,11 @@ type CreateServicePrincipalTokenRequest struct {
 	Name        string     `json:"name"`
 	Description string     `json:"description"`
 	Expires     *time.Time `json:"expires,omitempty"`
+}
+
+type listTokensPage struct {
+	listTokenResponse
+	ContinuationToken *string `json:"continuationToken,omitempty"`
 }
 
 func servicePrincipalPath(orgName, login string, rest ...string) string {
@@ -268,10 +275,7 @@ func (c *Client) GetServicePrincipalToken(
 		if continuation != "" {
 			q.Set("continuationToken", continuation)
 		}
-		var page struct {
-			listTokenResponse
-			ContinuationToken *string `json:"continuationToken,omitempty"`
-		}
+		var page listTokensPage
 		if _, err := c.doWithQuery(ctx, http.MethodGet, apiPath, q, nil, &page); err != nil {
 			if GetErrorStatusCode(err) == http.StatusNotFound {
 				return nil, nil
