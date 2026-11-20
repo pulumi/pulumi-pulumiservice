@@ -90,27 +90,11 @@ representation lives in the language files directly.
 
 ## Coverage
 
-| Example | Resources | Mode |
-|---|---|---|
-| webhooks            | 2 × OrganizationWebhook | full E2E |
-| oidc-issuer         | 2 × OidcIssuer | preview-only — RegisterOidcIssuer is non-idempotent |
-| policy-groups       | 1 × PolicyGroup | preview-only — BatchUpdatePolicyGroup requires the group to exist first |
-| policy-packs        | 1 × PolicyPack | preview-only — Create returns an upload URL we don't POST against |
-| environments        | 1 × Environment_esc + 2 × RevisionTag_esc | preview-only — CreateEnvironment returns empty 200 (no /id) |
-| approval-rules      | 1 × PolicyGroup | preview-only — same as policy-groups |
-| rbac                | 1 × Role + 1 × Team | preview-only |
-| schedules           | 1 × ScheduledDeployment + 1 × EnvironmentSchedule | preview-only — depends on DeploymentSettings idField |
-| stack               | 1 × Stack | preview-only — CreateStack response is `{messages}`-only |
-| deployment-settings | 1 × DeploymentSettings | preview-only — singleton, no /id in response |
-| teams               | 1 × Team | full E2E (CreatePulumiTeam + DeleteTeam) |
-
-The "preview-only" examples still:
-- type-check the program in every language,
-- resolve `pulumiservice:api:*` tokens against the in-process provider,
-- exercise the api Check + Diff path,
-
-…they just stop short of calling Create against the live API because
-the create surface for those resources is incomplete in api metadata.
+`apiCases` in `examples/examples_api_test.go` sets how each example runs.
+A `FullE2E` example's yaml program runs create, refresh and destroy against Pulumi Cloud.
+Every other lane runs a preview, which type-checks the program and exercises the provider's Check and Diff.
+Comments on the `PreviewOnlyAll` entries explain why they stop at preview.
+To see which api resources only run a preview, run `go test ./pkg/cloud -run TestEveryApiResourceHasExample -v` in `provider/`.
 
 ## Run
 
