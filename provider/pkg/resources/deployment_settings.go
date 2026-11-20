@@ -40,6 +40,7 @@ const (
 	gcOperationContext     = "operationContext"
 	gcEnvironmentVariables = "environmentVariables"
 	gcVcs                  = "vcs"
+	gcGitHub               = "github"
 )
 
 type PulumiServiceDeploymentSettingsInput struct {
