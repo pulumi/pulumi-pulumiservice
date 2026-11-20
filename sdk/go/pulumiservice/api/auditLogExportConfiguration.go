@@ -42,6 +42,13 @@ func NewAuditLogExportConfiguration(ctx *pulumi.Context,
 	if args.OrgName == nil {
 		return nil, errors.New("invalid value for required argument 'OrgName'")
 	}
+	if args.NewS3CompatibleConfiguration != nil {
+		args.NewS3CompatibleConfiguration = pulumi.ToSecret(args.NewS3CompatibleConfiguration).(pulumi.Input)
+	}
+	secrets := pulumi.AdditionalSecretOutputs([]string{
+		"s3CompatibleConfig",
+	})
+	opts = append(opts, secrets)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource AuditLogExportConfiguration
 	err := ctx.RegisterResource("pulumiservice:api:AuditLogExportConfiguration", name, args, &resource, opts...)

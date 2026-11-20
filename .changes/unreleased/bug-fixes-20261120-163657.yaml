@@ -1,0 +1,5 @@
+kind: bug-fixes
+body: Stopped marking `hasSecret` on webhooks, `secretRotationRequest` on `api.esc.EnvironmentSchedule` and `groupAccessTokenExpiration` on `api.integrations.GitLabIntegration` as secret, so their values show in previews.
+time: 2026-11-20T16:36:57.461485-05:00
+custom:
+    Issue: "1446"

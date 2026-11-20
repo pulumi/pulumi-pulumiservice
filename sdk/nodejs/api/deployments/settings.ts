@@ -107,12 +107,12 @@ export class Settings extends pulumi.CustomResource {
             }
             resourceInputs["agentPoolID"] = args?.agentPoolID;
             resourceInputs["cacheOptions"] = args?.cacheOptions;
-            resourceInputs["executorContext"] = args?.executorContext;
+            resourceInputs["executorContext"] = args?.executorContext ? pulumi.secret(args.executorContext) : undefined;
             resourceInputs["gitHub"] = args?.gitHub;
-            resourceInputs["operationContext"] = args?.operationContext;
+            resourceInputs["operationContext"] = args?.operationContext ? pulumi.secret(args.operationContext) : undefined;
             resourceInputs["orgName"] = args?.orgName;
             resourceInputs["projectName"] = args?.projectName;
-            resourceInputs["sourceContext"] = args?.sourceContext;
+            resourceInputs["sourceContext"] = args?.sourceContext ? pulumi.secret(args.sourceContext) : undefined;
             resourceInputs["stackName"] = args?.stackName;
             resourceInputs["tag"] = args?.tag;
             resourceInputs["vcs"] = args?.vcs;
@@ -131,6 +131,8 @@ export class Settings extends pulumi.CustomResource {
             resourceInputs["version"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
+        const secretOpts = { additionalSecretOutputs: ["executorContext", "operationContext", "sourceContext"] };
+        opts = pulumi.mergeOptions(opts, secretOpts);
         super(Settings.__pulumiType, name, resourceInputs, opts);
     }
 }

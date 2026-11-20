@@ -268,7 +268,7 @@ func TestCreateSynthesizesID(t *testing.T) {
 		{ //nolint:gosec // G101: test fixture, not a real credential.
 			// AuditLogExportConfiguration: requireImport singleton, same
 			// staging pattern as DefaultOrganization.
-			token: "pulumiservice:api:AuditLogExportConfiguration",
+			token: auditLogExportType,
 			responseFn: func() func(req *http.Request) mockResponse {
 				written := false
 				return func(req *http.Request) mockResponse {

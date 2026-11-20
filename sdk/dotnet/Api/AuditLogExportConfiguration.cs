@@ -62,6 +62,10 @@ namespace Pulumi.PulumiService.Api
             var defaultOptions = new CustomResourceOptions
             {
                 Version = Utilities.Version,
+                AdditionalSecretOutputs =
+                {
+                    "s3CompatibleConfig",
+                },
             };
             var merged = CustomResourceOptions.Merge(defaultOptions, options);
             // Override the ID if one was specified for consistency with other language SDKs.
@@ -90,11 +94,21 @@ namespace Pulumi.PulumiService.Api
         [Input("newEnabled", required: true)]
         public Input<bool> NewEnabled { get; set; } = null!;
 
+        [Input("newS3CompatibleConfiguration")]
+        private Input<object>? _newS3CompatibleConfiguration;
+
         /// <summary>
         /// The new S3-compatible configuration for audit log export. Mutually exclusive with newS3Configuration.
         /// </summary>
-        [Input("newS3CompatibleConfiguration")]
-        public Input<object>? NewS3CompatibleConfiguration { get; set; }
+        public Input<object>? NewS3CompatibleConfiguration
+        {
+            get => _newS3CompatibleConfiguration;
+            set
+            {
+                var emptySecret = Output.CreateSecret(0);
+                _newS3CompatibleConfiguration = Output.Tuple<Input<object>?, int>(value, emptySecret).Apply(t => t.Item1);
+            }
+        }
 
         /// <summary>
         /// The new S3 configuration for audit log export.

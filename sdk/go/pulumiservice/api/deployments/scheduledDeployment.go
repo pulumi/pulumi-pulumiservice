@@ -56,6 +56,13 @@ func NewScheduledDeployment(ctx *pulumi.Context,
 	if args.StackName == nil {
 		return nil, errors.New("invalid value for required argument 'StackName'")
 	}
+	if args.Request != nil {
+		args.Request = pulumi.ToSecret(args.Request).(pulumi.Input)
+	}
+	secrets := pulumi.AdditionalSecretOutputs([]string{
+		"definition",
+	})
+	opts = append(opts, secrets)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource ScheduledDeployment
 	err := ctx.RegisterResource("pulumiservice:api/deployments:ScheduledDeployment", name, args, &resource, opts...)

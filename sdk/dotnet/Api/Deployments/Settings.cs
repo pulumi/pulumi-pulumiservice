@@ -98,6 +98,12 @@ namespace Pulumi.PulumiService.Api.Deployments
             var defaultOptions = new CustomResourceOptions
             {
                 Version = Utilities.Version,
+                AdditionalSecretOutputs =
+                {
+                    "executorContext",
+                    "operationContext",
+                    "sourceContext",
+                },
             };
             var merged = CustomResourceOptions.Merge(defaultOptions, options);
             // Override the ID if one was specified for consistency with other language SDKs.
@@ -132,11 +138,21 @@ namespace Pulumi.PulumiService.Api.Deployments
         [Input("cacheOptions")]
         public Input<object>? CacheOptions { get; set; }
 
+        [Input("executorContext")]
+        private Input<object>? _executorContext;
+
         /// <summary>
         /// The executor context defining the execution environment.
         /// </summary>
-        [Input("executorContext")]
-        public Input<object>? ExecutorContext { get; set; }
+        public Input<object>? ExecutorContext
+        {
+            get => _executorContext;
+            set
+            {
+                var emptySecret = Output.CreateSecret(0);
+                _executorContext = Output.Tuple<Input<object>?, int>(value, emptySecret).Apply(t => t.Item1);
+            }
+        }
 
         /// <summary>
         /// GitHub-specific deployment settings
@@ -144,11 +160,21 @@ namespace Pulumi.PulumiService.Api.Deployments
         [Input("gitHub")]
         public Input<object>? GitHub { get; set; }
 
+        [Input("operationContext")]
+        private Input<object>? _operationContext;
+
         /// <summary>
         /// The operation context defining pre-run and post-run commands and environment variables.
         /// </summary>
-        [Input("operationContext")]
-        public Input<object>? OperationContext { get; set; }
+        public Input<object>? OperationContext
+        {
+            get => _operationContext;
+            set
+            {
+                var emptySecret = Output.CreateSecret(0);
+                _operationContext = Output.Tuple<Input<object>?, int>(value, emptySecret).Apply(t => t.Item1);
+            }
+        }
 
         /// <summary>
         /// The organization name
@@ -162,11 +188,21 @@ namespace Pulumi.PulumiService.Api.Deployments
         [Input("projectName", required: true)]
         public Input<string> ProjectName { get; set; } = null!;
 
+        [Input("sourceContext")]
+        private Input<object>? _sourceContext;
+
         /// <summary>
         /// The source context defining where the source code is located.
         /// </summary>
-        [Input("sourceContext")]
-        public Input<object>? SourceContext { get; set; }
+        public Input<object>? SourceContext
+        {
+            get => _sourceContext;
+            set
+            {
+                var emptySecret = Output.CreateSecret(0);
+                _sourceContext = Output.Tuple<Input<object>?, int>(value, emptySecret).Apply(t => t.Item1);
+            }
+        }
 
         /// <summary>
         /// The stack name

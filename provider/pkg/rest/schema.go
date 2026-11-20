@@ -728,9 +728,22 @@ func applyFieldMeta(ps *schema.PropertySpec, fm FieldMeta, isPathParam bool) {
 	}
 }
 
+// notSecret lists field names that match looksSecret's substrings but carry
+// no sensitive value. Marking them secret would only hide them in previews.
+var notSecret = map[string]bool{
+	"hasSecret":                  true, // whether a webhook has a secret
+	"secretRotationRequest":      true, // the path of the secret to rotate
+	"groupAccessTokenExpiration": true, // a date
+}
+
 // looksSecret heuristically flags sensitive field names. The OpenAPI spec
-// has no x-secret extension we can rely on, so this fills the gap.
+// has no x-secret extension we can rely on, so this fills the gap. It only
+// sees top-level names, so a credential nested in an object needs a
+// `"secret": true` field override in metadata.json.
 func looksSecret(name string) bool {
+	if notSecret[name] {
+		return false
+	}
 	lower := strings.ToLower(name)
 	for _, sub := range []string{"secret", "tokenvalue", "password", "apikey", "accesstoken", "ciphertext"} {
 		if strings.Contains(lower, sub) {
