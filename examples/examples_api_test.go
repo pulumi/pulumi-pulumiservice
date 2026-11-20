@@ -287,7 +287,7 @@ var apiCases = []apiCase{
 	{
 		Name:           "platform-bootstrap",
 		Config:         platformBootstrapConfig,
-		PreviewOnlyAll: true,
+		PreviewOnlyAll: true, // OrgTemplateCollection has no read operation, and DefaultOrganization changes the caller's default org.
 	},
 	{
 		Name:    "esc-webhook",
