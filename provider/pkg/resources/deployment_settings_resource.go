@@ -300,12 +300,30 @@ func deploymentSettingsState(
 	input PulumiServiceDeploymentSettingsInput, response *pulumiapi.DeploymentSettings,
 ) (DeploymentSettingsState, error) {
 	out := PulumiServiceDeploymentSettingsInput{DeploymentSettings: *response, Stack: input.Stack}
+	dropMirroredGitHubBlock(&out.DeploymentSettings, &input.DeploymentSettings)
 	state, err := fromPropertyMap[DeploymentSettingsState](out.ToPropertyMap(&input.DeploymentSettings, nil, false))
 	if err != nil {
 		return state, err
 	}
 	gcpOIDC(state.OperationContext).setBothProjectKeys()
 	return state, nil
+}
+
+// dropMirroredGitHubBlock removes from settings the GitHub block that the
+// program didn't set. Pulumi Cloud copies GitHub settings between the github
+// and vcs blocks and returns both, so keeping the copy would show it as drift.
+func dropMirroredGitHubBlock(settings, configured *pulumiapi.DeploymentSettings) {
+	setGitHub, setVcs := configured.GitHub != nil, configured.Vcs != nil
+	if setGitHub && !setVcs && settings.Vcs != nil {
+		if provider, _ := settings.Vcs.GetDiscriminatorValue(); provider == vcsProviderGitHub {
+			settings.Vcs = nil
+		}
+	}
+	if setVcs && !setGitHub {
+		if provider, _ := configured.Vcs.GetDiscriminatorValue(); provider == vcsProviderGitHub {
+			settings.GitHub = nil
+		}
+	}
 }
 
 func gcpOIDC(oc *DeploymentSettingsOperationContext) *GCPOIDCConfiguration {
@@ -361,6 +379,9 @@ func (*DeploymentSettings) Read(
 	}
 
 	current := PulumiServiceDeploymentSettingsInput{Stack: stack, DeploymentSettings: *settings}
+	if plaintext != nil {
+		dropMirroredGitHubBlock(&current.DeploymentSettings, plaintext)
+	}
 	state, err := fromPropertyMap[DeploymentSettingsState](current.ToPropertyMap(plaintext, ciphertext, false))
 	if err != nil {
 		return response{}, err
@@ -368,6 +389,11 @@ func (*DeploymentSettings) Read(
 	inputs, err := fromPropertyMap[DeploymentSettingsInput](current.ToPropertyMap(plaintext, ciphertext, true))
 	if err != nil {
 		return response{}, err
+	}
+	if plaintext != nil && inputs.Vcs != nil && (plaintext.Vcs == nil || plaintext.Vcs.InstallationID() == "") {
+		// Pulumi Cloud fills in the installation ID when the program leaves it
+		// out. Keeping it in the inputs would make the next preview remove it.
+		inputs.Vcs.InstallationID = ""
 	}
 	gcpOIDC(state.OperationContext).setBothProjectKeys()
 	gcpOIDC(inputs.OperationContext).matchProjectKey(usedGCP)

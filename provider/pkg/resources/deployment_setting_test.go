@@ -24,7 +24,10 @@ type getDeploymentSettingsFunc func() (*pulumiapi.DeploymentSettings, error)
 type DeploymentSettingsClientMock struct {
 	config.Client
 	getDeploymentSettingsFunc getDeploymentSettingsFunc
-	created, updated          []pulumiapi.DeploymentSettings
+	// respond, when set, turns the settings sent on create or update into the
+	// settings Pulumi Cloud returns. Otherwise they're returned unchanged.
+	respond          func(pulumiapi.DeploymentSettings) pulumiapi.DeploymentSettings
+	created, updated []pulumiapi.DeploymentSettings
 }
 
 func (c *DeploymentSettingsClientMock) CreateDeploymentSettings(
@@ -33,6 +36,9 @@ func (c *DeploymentSettingsClientMock) CreateDeploymentSettings(
 	settings pulumiapi.DeploymentSettings,
 ) (*pulumiapi.DeploymentSettings, error) {
 	c.created = append(c.created, settings)
+	if c.respond != nil {
+		settings = c.respond(settings)
+	}
 	return &settings, nil
 }
 
@@ -42,6 +48,9 @@ func (c *DeploymentSettingsClientMock) UpdateDeploymentSettings(
 	settings pulumiapi.DeploymentSettings,
 ) (*pulumiapi.DeploymentSettings, error) {
 	c.updated = append(c.updated, settings)
+	if c.respond != nil {
+		settings = c.respond(settings)
+	}
 	return &settings, nil
 }
 
@@ -714,6 +723,8 @@ const (
 	gcPublicVar  = "PUBLIC_VAR"
 	gcSecretVar  = "SECRET_VAR"
 	gcSettingsID = "an-org/a-project/a-stack"
+	gcRepository = "repository"
+	gcGitHub     = "github"
 )
 
 func deploymentSettingsInputs(extra map[string]property.Value) property.Map {
@@ -912,4 +923,75 @@ func TestDeploymentSettingsRefreshKeepsSecretVariablesSecret(t *testing.T) {
 	vars := resp.Inputs.Get(gcOperationContext).AsMap().Get(gcEnvironmentVariables).AsMap()
 	assert.Equal(t, property.New("visible"), vars.Get(gcPublicVar))
 	assert.Equal(t, property.New("hidden").WithSecret(true), vars.Get(gcSecretVar))
+}
+
+func TestDeploymentSettingsRefreshIgnoresMirroredGitHubBlock(t *testing.T) {
+	for _, block := range []string{gcGitHub, gcVcs} {
+		t.Run("program sets "+block, func(t *testing.T) {
+			client := &DeploymentSettingsClientMock{respond: mirrorGitHubSettings}
+			client.getDeploymentSettingsFunc = func() (*pulumiapi.DeploymentSettings, error) {
+				settings := mirrorGitHubSettings(client.created[0])
+				return &settings, nil
+			}
+			server := newDeploymentSettingsServer(t, client)
+
+			settings := map[string]property.Value{gcRepository: property.New("org/repo")}
+			if block == gcVcs {
+				settings["provider"] = property.New(vcsProviderGitHub)
+			}
+			checked, err := server.Check(p.CheckRequest{
+				Urn:    deploymentSettingsURN,
+				Inputs: deploymentSettingsInputs(map[string]property.Value{block: property.New(settings)}),
+			})
+			require.NoError(t, err)
+			require.Empty(t, checked.Failures)
+
+			created, err := server.Create(p.CreateRequest{Urn: deploymentSettingsURN, Properties: checked.Inputs})
+			require.NoError(t, err)
+			assert.True(t, created.Properties.Get(otherGitHubBlock(block)).IsNull(), "create stored the mirrored block")
+
+			read, err := server.Read(p.ReadRequest{
+				ID: created.ID, Urn: deploymentSettingsURN, Properties: created.Properties, Inputs: checked.Inputs,
+			})
+			require.NoError(t, err)
+			assert.Equal(t, created.Properties, read.Properties, "refresh changed the state")
+
+			diff, err := server.Diff(p.DiffRequest{
+				ID: created.ID, Urn: deploymentSettingsURN,
+				State: read.Properties, OldInputs: read.Inputs, Inputs: checked.Inputs,
+			})
+			require.NoError(t, err)
+			assert.False(t, diff.HasChanges, "preview after refresh proposes an update: %v", diff.DetailedDiff)
+		})
+	}
+}
+
+func otherGitHubBlock(block string) string {
+	if block == gcVcs {
+		return gcGitHub
+	}
+	return gcVcs
+}
+
+// mirrorGitHubSettings returns settings the way Pulumi Cloud does: GitHub
+// settings in both the github and vcs blocks, with the installation ID filled in.
+func mirrorGitHubSettings(settings pulumiapi.DeploymentSettings) pulumiapi.DeploymentSettings {
+	gh := settings.GitHub
+	if gh == nil {
+		gh = &pulumiapi.DeploymentSettingsGitHub{
+			Repository:          settings.Vcs.Repository(),
+			DeployCommits:       settings.Vcs.DeployCommits(),
+			PreviewPullRequests: settings.Vcs.PreviewPullRequests(),
+		}
+	}
+	settings.GitHub = gh
+	settings.Vcs = pulumiapi.DeploymentSettingsVCSGitHubBuilder{
+		DeploymentSettingsVCSBuilder: pulumiapi.DeploymentSettingsVCSBuilder{
+			Repository:          gh.Repository,
+			InstallationID:      "123",
+			DeployCommits:       gh.DeployCommits,
+			PreviewPullRequests: gh.PreviewPullRequests,
+		},
+	}.Build()
+	return settings
 }

@@ -42,6 +42,9 @@ const (
 	gcVcs                  = "vcs"
 )
 
+// vcsProviderGitHub is the vcs block's provider for GitHub.
+const vcsProviderGitHub = "github"
+
 type PulumiServiceDeploymentSettingsInput struct {
 	pulumiapi.DeploymentSettings
 	Stack pulumiapi.StackIdentifier
