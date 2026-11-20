@@ -553,7 +553,7 @@ func (v *DeploymentSettingsVcs) toAPI() pulumiapi.DeploymentSettingsVCS {
 		return pulumiapi.DeploymentSettingsVCSBitbucketBuilder{DeploymentSettingsVCSBuilder: base}.Build()
 	case "custom":
 		return pulumiapi.DeploymentSettingsVCSCustomBuilder{DeploymentSettingsVCSBuilder: base}.Build()
-	case "github":
+	case vcsProviderGitHub:
 		return pulumiapi.DeploymentSettingsVCSGitHubBuilder{DeploymentSettingsVCSBuilder: base}.Build()
 	case "gitlab":
 		return pulumiapi.DeploymentSettingsVCSGitLabBuilder{DeploymentSettingsVCSBuilder: base}.Build()
