@@ -5,10 +5,11 @@
 # Pulumi Cloud's RBAC scope catalog.
 #
 # By default it fetches the catalog from the API and stores it, normalized, in
-# provider/pkg/cloud/rbac-scopes.json. The endpoint is org-scoped, but every
-# org gets the same catalog back; use one with all RBAC features enabled so no
-# feature-gated scopes are missing. Pass --no-fetch to regenerate from the
-# stored file only.
+# provider/pkg/cloud/rbac-scopes.json. The endpoint is org-scoped, and the enums
+# ship in the public SDKs, so fetch from an org with every generally available
+# RBAC feature and no unreleased feature flags: missing features drop scopes
+# customers can use, and preview flags add scopes they can't. Pass --no-fetch to
+# regenerate from the stored file only.
 #
 # Generation fails if the API drops a value the enums already have, because
 # removing an enum member breaks SDK users. Pass --allow-removals when that is
@@ -16,6 +17,9 @@
 #
 # Review the resulting diff: the enums are part of the provider's public
 # interface, so new or removed values are a deliberate change.
+#
+# .github/workflows/pulumiservice-update-rbac-scopes.yml runs this weekly and
+# after go.mod changes, and opens a PR when the enums change.
 #
 # Usage: PULUMI_ACCESS_TOKEN=... [PULUMI_ORG=...] scripts/gen-rbac-scopes.sh [--no-fetch] [--allow-removals]
 
