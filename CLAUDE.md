@@ -89,6 +89,7 @@ cd examples && go test -v -run TestYamlStackTagsPluralExample -tags yaml -timeou
 - Every new resource should have unit tests in `provider/pkg/` with `_test.go` suffix
 - Add example programs in `examples/` for each new resource (examples serve as integration tests)
 - Examples are written in Pulumi YAML (`yaml-*`). Each other SDK language has one smoke program (`ts-smoke`, `py-smoke`, `go-smoke`, `cs-smoke`, `java-smoke`, run through `runSmokeTest` in `examples/examples_smoke_test.go`) that covers an asset input, an invoke and a secret output.
+- `api` examples live in `examples/api/<name>/<language>/`. Only `yaml/` is required, and every example directory must be registered in `apiCases`. See `examples/api/README.md`.
 - A new resource gets a YAML example. Add a non-YAML test only when the resource adds an input or output shape that the smoke programs don't cover.
 
 **Integration Test Framework**:

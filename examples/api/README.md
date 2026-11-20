@@ -74,6 +74,11 @@ examples/api/<name>/
   java/        Pulumi.yaml + pom.xml + src/main/java/...
 ```
 
+Only `yaml/` is required: `TestEveryApiResourceHasExample` checks every api resource against it.
+The other languages are optional.
+`TestApi` runs each language whose directory exists and skips the rest.
+Register every example directory in `apiCases` in `examples/examples_api_test.go`.
+
 Each language directory is hand-maintained — there is no PCL source nor
 code-generation step. We tried PCL with `pulumi convert` first; it
 mishandles multi-module schemas (the `api` module under the `pulumiservice`
