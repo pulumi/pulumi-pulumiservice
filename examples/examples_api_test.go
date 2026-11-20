@@ -322,6 +322,35 @@ var apiCases = []apiCase{
 		PreviewOnlyAll: true, // services:Item attaches stacks to a Service; the referenced stacks aren't provisioned in this example.
 		SkipLang:       yamlOnlyLangs("service-items example is yaml-only"),
 	},
+	{
+		Name:           "agent-automations",
+		Config:         orgOnlyConfig,
+		PreviewOnlyAll: true, // A real Up schedules a recurring Neo task in the shared test org.
+		SkipLang:       yamlOnlyLangs("agent-automations example is yaml-only"),
+	},
+	{
+		Name:           "agent-definitions",
+		Config:         orgOnlyConfig,
+		PreviewOnlyAll: true, // The role and agent names are fixed, so concurrent runs in the shared test org would collide.
+		SkipLang:       yamlOnlyLangs("agent-definitions example is yaml-only"),
+	},
+	{
+		Name:           "neo-usage-caps",
+		Config:         orgOnlyConfig,
+		PreviewOnlyAll: true, // UsageCap is an org-wide singleton that must be imported, not created.
+		SkipLang:       yamlOnlyLangs("neo-usage-caps example is yaml-only"),
+	},
+	{
+		Name:           "service-catalog-demo",
+		Config:         serviceCatalogDemoConfig,
+		PreviewOnlyAll: true, // The service example already runs Service; this checks the demo still resolves.
+		SkipLang: map[string]string{
+			"python": "service-catalog-demo has no python program",
+			"go":     "service-catalog-demo has no go program",
+			"csharp": "service-catalog-demo has no csharp program",
+			"java":   "service-catalog-demo has no java program",
+		},
+	},
 }
 
 // yamlOnlyLangs returns a SkipLang map that skips every non-yaml lane with
@@ -955,6 +984,13 @@ func serviceCatalogConfig() map[string]string {
 	return map[string]string{
 		"organizationName": ServiceProviderTestOrg,
 		"serviceSuffix":    generateRandomFiveDigits(),
+	}
+}
+
+func serviceCatalogDemoConfig() map[string]string {
+	return map[string]string{
+		"organizationName": ServiceProviderTestOrg,
+		"nameSuffix":       generateRandomFiveDigits(),
 	}
 }
 

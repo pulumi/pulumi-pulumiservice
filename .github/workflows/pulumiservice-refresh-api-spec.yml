@@ -27,6 +27,7 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  id-token: write # For ESC secrets.
 
 concurrency:
   group: refresh-api-spec
@@ -63,12 +64,31 @@ jobs:
             exit 1
           fi
 
+      - env:
+          ESC_ACTION_ENVIRONMENT: github-secrets/${{ github.repository_owner }}-${{ github.event.repository.name }}
+          ESC_ACTION_EXPORT_ENVIRONMENT_VARIABLES: "false"
+          ESC_ACTION_OIDC_AUTH: "true"
+          ESC_ACTION_OIDC_ORGANIZATION: pulumi
+          ESC_ACTION_OIDC_REQUESTED_TOKEN_TYPE: urn:pulumi:token-type:access_token:organization
+        id: esc-secrets
+        name: Fetch secrets from ESC
+        uses: pulumi/esc-action@9eb774255b1a4afb7855678ae8d4a77359da0d9b
+
+      # Pushes and PRs made with GITHUB_TOKEN don't trigger other workflows,
+      # so CI wouldn't run on the refresh PR. Ones made with an App token do.
+      - uses: actions/create-github-app-token@1b10c78c7865c340bc4f6099eb2f838309f1e8c3 # v3.1.1
+        id: app-auth
+        with:
+          app-id: ${{ steps.esc-secrets.outputs.PULUMI_PROVIDER_AUTOMATION_APP_ID }}
+          private-key: ${{ steps.esc-secrets.outputs.PULUMI_PROVIDER_AUTOMATION_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+
       - name: Checkout main
         uses: actions/checkout@v4
         with:
           ref: main
           fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ steps.app-auth.outputs.token }}
 
       - name: Install mise
         uses: jdx/mise-action@590bfd78fa3e93efd2e7ea21d65d397118ac1430
@@ -123,6 +143,12 @@ jobs:
           BEFORE=$(jq -r "$TOKENS" /tmp/metadata.before.json | sort)
           AFTER=$(jq -r "$TOKENS" provider/pkg/cloud/metadata.json | sort)
           NEW=$(comm -13 <(echo "$BEFORE") <(echo "$AFTER") || true)
+          echo "$NEW" | sed '/^$/d' > "$RUNNER_TEMP/new-tokens.txt"
+          if [[ -s "$RUNNER_TEMP/new-tokens.txt" ]]; then
+            echo "any=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "any=false" >> "$GITHUB_OUTPUT"
+          fi
           {
             echo "tokens<<DELIM"
             if [[ -z "$NEW" ]]; then
@@ -134,6 +160,26 @@ jobs:
             fi
             echo "DELIM"
           } >> "$GITHUB_OUTPUT"
+
+      - name: Add changelog fragments for new api tokens
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          set -euo pipefail
+          while IFS= read -r tok; do
+            changie new --interactive=false --kind improvements \
+              --body "Added the \`$tok\` resource."
+          done < "$RUNNER_TEMP/new-tokens.txt"
+
+      # A stable release PR batches the changelog itself, which
+      # pulumiservice-changelog.yml checks. Prereleases don't batch.
+      - name: Batch changelog for release
+        if: steps.diff.outputs.changed == 'true' && inputs.version != '' && inputs.prerelease == false
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          set -euo pipefail
+          changie batch "$VERSION" --allow-no-changes
+          changie merge
 
       - name: Commit + force-push refresh branch
         if: steps.diff.outputs.changed == 'true'
@@ -161,6 +207,7 @@ jobs:
         env:
           VERSION: ${{ inputs.version }}
           NEW_TOKENS: ${{ steps.new_tokens.outputs.tokens }}
+          ANY_NEW: ${{ steps.new_tokens.outputs.any }}
         run: |
           set -euo pipefail
           if [[ -n "$VERSION" ]]; then
@@ -172,7 +219,18 @@ jobs:
             RELEASE_NOTE="No release is tagged when this PR merges. These changes ship with the next release."
             RELEASE_CHECK=""
           fi
-          export RELEASE_NOTE RELEASE_CHECK
+          if [[ "$ANY_NEW" == "true" ]]; then
+            CHECKLIST="- [ ] For each new token, add a YAML example under \`examples/api/<name>/yaml/\` and register it in \`apiCases\` in \`examples/examples_api_test.go\`, or add a waiver with a reason to \`resourceExampleWaivers\` in \`provider/pkg/cloud/example_coverage_test.go\`. \`TestEveryApiResourceHasExample\` fails until you do.
+          - [ ] Decorate the new entries in \`provider/pkg/cloud/metadata.json\` where needed (\`idFormat\`, field renames, outputs, aliases).
+          - [ ] Reword the generated changelog fragments in \`.changes/\` if \`Added the <token> resource.\` doesn't say enough."
+          else
+            CHECKLIST="No \`api\` resources are new. Merge once CI passes."
+          fi
+          if [[ -n "$RELEASE_CHECK" ]]; then
+            CHECKLIST="${CHECKLIST}
+          ${RELEASE_CHECK}"
+          fi
+          export RELEASE_NOTE CHECKLIST
           cat > /tmp/pr-body.tmpl <<'EOF'
           Automated refresh of the embedded Pulumi Cloud OpenAPI spec and regeneration of all language SDKs.
 
@@ -184,19 +242,16 @@ jobs:
 
           ### Reviewer checklist
 
-          - [ ] Decorate any newly-added empty entries in `provider/pkg/cloud/metadata.json` (`idFormat`, field renames, outputs, aliases)
-          - [ ] Add changelog fragments (`changie new`) for new resources, then run `changie batch ${VERSION} && changie merge` on this branch
-          - [ ] Confirm `api-tests` check is green
-          ${RELEASE_CHECK}
+          ${CHECKLIST}
 
           > Re-running `refresh-api-spec` force-pushes this branch. Save any manual edits before triggering again.
           EOF
-          envsubst '$RELEASE_NOTE $RELEASE_CHECK $NEW_TOKENS' < /tmp/pr-body.tmpl > /tmp/pr-body.md
+          envsubst '$RELEASE_NOTE $CHECKLIST $NEW_TOKENS' < /tmp/pr-body.tmpl > /tmp/pr-body.md
 
       - name: Open or update PR
         if: steps.diff.outputs.changed == 'true'
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ steps.app-auth.outputs.token }}
           VERSION: ${{ inputs.version }}
         run: |
           set -euo pipefail
@@ -209,6 +264,14 @@ jobs:
             # A label left by an earlier run with a version would still tag a release on merge.
             LABEL_FLAGS=(--remove-label auto-release)
             CREATE_LABEL_FLAGS=()
+          fi
+          # The `Update Changelog` check passes only when a PR adds a fragment
+          # or carries this label.
+          if [[ -n "$(git diff --name-only --diff-filter=A origin/main HEAD -- .changes/unreleased)" ]]; then
+            LABEL_FLAGS+=(--remove-label impact/no-changelog-required)
+          else
+            LABEL_FLAGS+=(--add-label impact/no-changelog-required)
+            CREATE_LABEL_FLAGS+=(--label impact/no-changelog-required)
           fi
           EXISTING=$(gh pr list --head auto/refresh-api-spec --state open --json number --jq '.[0].number // empty')
           if [[ -n "$EXISTING" ]]; then

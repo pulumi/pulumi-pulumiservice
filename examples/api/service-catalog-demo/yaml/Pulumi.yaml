@@ -1,11 +1,8 @@
 name: pulumicloud-api-service-catalog-demo
 runtime: yaml
 description: |
-  Service Catalog api demo — provisions an owner team, three placeholder
-  stacks, and three catalog entries (checkout-api, search-frontend,
-  notification-worker) wired together with realistic owner / tier /
-  oncall metadata. The catalog is a api-only resource surface; no api
-  pulumiservice resource models org-wide service catalog entries.
+  Service Catalog api demo: an owner team, three placeholder stacks, and
+  three catalog entries with owner, tier and on-call metadata.
 config:
   organizationName:
     type: string
