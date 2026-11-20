@@ -31,7 +31,7 @@ class OrganizationMemberEntityAccessArgs:
         :param pulumi.Input[_builtins.str] entity_name: The name of the entity: `{project}/{stack}` for a stack, `{project}/{environment}` for an environment, or the account name for an Insights account.
         :param pulumi.Input[_builtins.str] entity_type: The kind of entity to grant access to. One of `stack`, `environment` or `insightsAccount`.
         :param pulumi.Input[_builtins.str] organization_name: The Pulumi Cloud organization name.
-        :param pulumi.Input[_builtins.str] username: The Pulumi Cloud username of the organization member.
+        :param pulumi.Input[_builtins.str] username: The Pulumi Cloud username of the organization member. For a service principal, use its login, the `login` output of a `ServicePrincipal` resource.
         :param pulumi.Input[_builtins.str] permission: The built-in permission set to grant, for example `stack-read`, `stack-write`, `stack-admin`, `environment-read`, `environment-open`, `environment-write`, `environment-admin`, `insights-account-read`, `insights-account-write` or `insights-account-admin`. Exactly one of `permission` and `permissionSetId` must be set.
         :param pulumi.Input[_builtins.str] permission_set_id: The ID of a custom permission set to grant. Exactly one of `permission` and `permissionSetId` must be set.
         """
@@ -84,7 +84,7 @@ class OrganizationMemberEntityAccessArgs:
     @pulumi.getter
     def username(self) -> pulumi.Input[_builtins.str]:
         """
-        The Pulumi Cloud username of the organization member.
+        The Pulumi Cloud username of the organization member. For a service principal, use its login, the `login` output of a `ServicePrincipal` resource.
         """
         return pulumi.get(self, "username")
 
@@ -151,7 +151,7 @@ class OrganizationMemberEntityAccess(pulumi.CustomResource):
         :param pulumi.Input[_builtins.str] organization_name: The Pulumi Cloud organization name.
         :param pulumi.Input[_builtins.str] permission: The built-in permission set to grant, for example `stack-read`, `stack-write`, `stack-admin`, `environment-read`, `environment-open`, `environment-write`, `environment-admin`, `insights-account-read`, `insights-account-write` or `insights-account-admin`. Exactly one of `permission` and `permissionSetId` must be set.
         :param pulumi.Input[_builtins.str] permission_set_id: The ID of a custom permission set to grant. Exactly one of `permission` and `permissionSetId` must be set.
-        :param pulumi.Input[_builtins.str] username: The Pulumi Cloud username of the organization member.
+        :param pulumi.Input[_builtins.str] username: The Pulumi Cloud username of the organization member. For a service principal, use its login, the `login` output of a `ServicePrincipal` resource.
         """
         ...
     @overload
@@ -313,7 +313,7 @@ class OrganizationMemberEntityAccess(pulumi.CustomResource):
     @pulumi.getter
     def username(self) -> pulumi.Output[_builtins.str]:
         """
-        The Pulumi Cloud username of the organization member.
+        The Pulumi Cloud username of the organization member. For a service principal, use its login, the `login` output of a `ServicePrincipal` resource.
         """
         return pulumi.get(self, "username")
 

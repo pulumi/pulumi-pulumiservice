@@ -42,7 +42,7 @@ type OrganizationMemberEntityAccess struct {
 	PermissionSetId pulumi.StringPtrOutput `pulumi:"permissionSetId"`
 	// The display name of the granted permission set.
 	PermissionSetName pulumi.StringOutput `pulumi:"permissionSetName"`
-	// The Pulumi Cloud username of the organization member.
+	// The Pulumi Cloud username of the organization member. For a service principal, use its login, the `login` output of a `ServicePrincipal` resource.
 	Username pulumi.StringOutput `pulumi:"username"`
 }
 
@@ -115,7 +115,7 @@ type organizationMemberEntityAccessArgs struct {
 	Permission *string `pulumi:"permission"`
 	// The ID of a custom permission set to grant. Exactly one of `permission` and `permissionSetId` must be set.
 	PermissionSetId *string `pulumi:"permissionSetId"`
-	// The Pulumi Cloud username of the organization member.
+	// The Pulumi Cloud username of the organization member. For a service principal, use its login, the `login` output of a `ServicePrincipal` resource.
 	Username string `pulumi:"username"`
 }
 
@@ -131,7 +131,7 @@ type OrganizationMemberEntityAccessArgs struct {
 	Permission pulumi.StringPtrInput
 	// The ID of a custom permission set to grant. Exactly one of `permission` and `permissionSetId` must be set.
 	PermissionSetId pulumi.StringPtrInput
-	// The Pulumi Cloud username of the organization member.
+	// The Pulumi Cloud username of the organization member. For a service principal, use its login, the `login` output of a `ServicePrincipal` resource.
 	Username pulumi.StringInput
 }
 
@@ -257,7 +257,7 @@ func (o OrganizationMemberEntityAccessOutput) PermissionSetName() pulumi.StringO
 	return o.ApplyT(func(v *OrganizationMemberEntityAccess) pulumi.StringOutput { return v.PermissionSetName }).(pulumi.StringOutput)
 }
 
-// The Pulumi Cloud username of the organization member.
+// The Pulumi Cloud username of the organization member. For a service principal, use its login, the `login` output of a `ServicePrincipal` resource.
 func (o OrganizationMemberEntityAccessOutput) Username() pulumi.StringOutput {
 	return o.ApplyT(func(v *OrganizationMemberEntityAccess) pulumi.StringOutput { return v.Username }).(pulumi.StringOutput)
 }

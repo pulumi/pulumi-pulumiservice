@@ -35,7 +35,11 @@ func TestTokenAutoName(t *testing.T) {
 	t.Parallel()
 
 	prov, err := infer.NewProviderBuilder().
-		WithResources(infer.Resource(&OrgAccessToken{}), infer.Resource(&TeamAccessToken{})).
+		WithResources(
+			infer.Resource(&OrgAccessToken{}),
+			infer.Resource(&TeamAccessToken{}),
+			infer.Resource(&ServicePrincipalAccessToken{}),
+		).
 		WithModuleMap(map[tokens.ModuleName]tokens.ModuleName{"resources": "index"}).
 		Build()
 	require.NoError(t, err)
@@ -58,6 +62,13 @@ func TestTokenAutoName(t *testing.T) {
 			inputs: property.NewMap(map[string]property.Value{
 				gcOrganizationName: property.New(gcMyOrg),
 				gcTeamName:         property.New("my-team"),
+			}),
+		},
+		{
+			token: "pulumiservice:index:ServicePrincipalAccessToken",
+			inputs: property.NewMap(map[string]property.Value{
+				gcOrganizationName:      property.New(gcMyOrg),
+				"servicePrincipalLogin": property.New(testServicePrincipalLogin),
 			}),
 		},
 	} {

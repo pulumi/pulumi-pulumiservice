@@ -120,6 +120,8 @@
         "policyGroup.ts",
         "policyPack.ts",
         "provider.ts",
+        "servicePrincipal.ts",
+        "servicePrincipalAccessToken.ts",
         "stack.ts",
         "stackTag.ts",
         "stackTags.ts",

@@ -67,6 +67,12 @@ func TestDelete(t *testing.T) {
 		"DeletePolicyGroup": func(ctx context.Context, c *Client) error {
 			return c.DeletePolicyGroup(ctx, org, "a-group")
 		},
+		"DeleteServicePrincipal": func(ctx context.Context, c *Client) error {
+			return c.DeleteServicePrincipal(ctx, org, "service-principal:an-id")
+		},
+		"DeleteServicePrincipalToken": func(ctx context.Context, c *Client) error {
+			return c.DeleteServicePrincipalToken(ctx, org, "service-principal:an-id", token)
+		},
 		"DeleteStack": func(ctx context.Context, c *Client) error {
 			return c.DeleteStack(ctx, stack, false)
 		},
