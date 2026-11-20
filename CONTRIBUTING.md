@@ -100,7 +100,7 @@ A release with `@release-bot` in #release-ops, or a tag you push yourself, also 
 
 ### API surface releases
 
-`pulumiservice:api:*` resources are generated from the Pulumi Cloud OpenAPI spec. Running the [`refresh-api-spec`](./.github/workflows/pulumiservice-refresh-api-spec.yml) workflow with a version opens a PR that regenerates them, already labeled `auto-release` with the `Release-Version:` marker. Before merging it, add fragments for the user-visible changes on its branch, then do step 2 of [Releasing](#releasing) for that version. Re-running the workflow force-pushes the branch, so do this after the last run.
+`pulumiservice:api:*` resources are generated from the Pulumi Cloud OpenAPI spec. The [`refresh-api-spec`](./.github/workflows/pulumiservice-refresh-api-spec.yml) workflow opens a PR that regenerates them and adds a changelog fragment for each new resource. When no resource is new, the PR needs no manual steps. Run with a version, the PR is labeled `auto-release` with the `Release-Version:` marker, and for a stable version the workflow also batches the changelog. To change the release notes, edit `.changes/<version>.md` on its branch and run `changie merge`. Re-running the workflow force-pushes the branch, so make edits after the last run.
 
 ## Getting Help
 
