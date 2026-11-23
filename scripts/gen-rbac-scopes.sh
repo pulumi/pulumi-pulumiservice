@@ -58,13 +58,15 @@ if $fetch; then
   get roles/scopes \
     | jq --sort-keys 'map_values(sort_by(.name) | map(.scopes |= sort_by(.name)))' >"$tmp"
   mv "$tmp" "$catalog"
-  # Built-in sets are the ones with a defaultIdentifier; custom sets are
-  # per-org and have none.
+  # Keep only the built-in sets (custom sets have no defaultIdentifier) and the
+  # fields the generator reads, so the stored file changes only when the enums
+  # would. Edits to the org's custom sets or timestamps would otherwise make the
+  # refresh workflow open a PR with no enum changes.
   get 'roles?uxPurpose=set' \
-    | jq --sort-keys '[.roles[]
+    | jq --sort-keys '{roles: [.roles[]
         | select((.defaultIdentifier // "") != "")
         | {defaultIdentifier, name, description, resourceType}]
-      | sort_by(.defaultIdentifier)' >"$tmp"
+      | sort_by(.defaultIdentifier)}' >"$tmp"
   mv "$tmp" "$permission_sets"
 fi
 

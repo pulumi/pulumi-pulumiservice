@@ -54,14 +54,6 @@ type scopeCatalog map[string][]struct {
 	} `json:"scopes"`
 }
 
-// permissionSetCatalog is the normalized list of built-in permission sets.
-type permissionSetCatalog []struct {
-	DefaultIdentifier string `json:"defaultIdentifier"`
-	Name              string `json:"name"`
-	Description       string `json:"description"`
-	ResourceType      string `json:"resourceType"`
-}
-
 // permissionSetEnums maps each entity type to the Go enum generated for its
 // built-in permission sets, and the identifier prefix that the enum's member
 // names drop (`stack-write` becomes BuiltInStackPermissionSetWrite). A set of
@@ -142,20 +134,24 @@ func scopeEnums(in string) map[string][]scope {
 
 // permissionSets reads the built-in permission sets into one enum per entity
 // type, each sorted by identifier. Each member's description leads with the
-// set's name, as the Pulumi Cloud console shows it. Unlike scopes, sets aren't
-// filtered by the Pulumi Cloud SDK: the provider matches set identifiers as
-// plain strings and never parses them with the SDK.
+// set's name, as the Pulumi Cloud console shows it. Unlike scopes, set
+// identifiers aren't checked against the Pulumi Cloud SDK's enum: the provider
+// matches them as plain strings.
 func permissionSets(in string) map[string][]scope {
 	raw, err := os.ReadFile(in)
 	if err != nil {
 		fail("read permission sets: %v", err)
 	}
-	var catalog permissionSetCatalog
-	if err := json.Unmarshal(raw, &catalog); err != nil {
+	var resp apitype.ListRolesResponse
+	if err := json.Unmarshal(raw, &resp); err != nil {
 		fail("parse permission sets: %v", err)
 	}
 	enums := map[string][]scope{}
-	for _, s := range catalog {
+	for _, s := range resp.Roles {
+		// Custom sets are per-org and have no identifier.
+		if s.DefaultIdentifier == "" {
+			continue
+		}
 		e, ok := permissionSetEnums[s.ResourceType]
 		if !ok {
 			fail("permission set %q has unknown entity type %q; add it to permissionSetEnums",
