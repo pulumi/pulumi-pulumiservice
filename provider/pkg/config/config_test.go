@@ -15,7 +15,6 @@
 package config
 
 import (
-	"context"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -31,7 +30,7 @@ func TestConfigure_FallsBackToEnvVarsWhenInputsAreEmpty(t *testing.T) {
 	t.Setenv(EnvVarPulumiBackendURL, "https://test-backend.example/")
 
 	c := &Config{} // Empty inputs — what `pulumi import` persists.
-	require.NoError(t, c.Configure(context.Background()))
+	require.NoError(t, c.Configure(t.Context()))
 
 	assert.Equal(t, "pul-test-token", c.AccessToken,
 		"AccessToken must fall back to PULUMI_ACCESS_TOKEN when input is empty")
@@ -50,7 +49,7 @@ func TestConfigure_ExplicitConfigBeatsEnvVar(t *testing.T) {
 		AccessToken: "pul-explicit-token",
 		APIURL:      "https://explicit-backend.example/",
 	}
-	require.NoError(t, c.Configure(context.Background()))
+	require.NoError(t, c.Configure(t.Context()))
 
 	assert.Equal(t, "pul-explicit-token", c.AccessToken,
 		"explicit AccessToken must not be overridden by env var fallback")
@@ -67,7 +66,7 @@ func TestConfigure_FallsBackToPulumiAPIWhenBackendURLUnset(t *testing.T) {
 	t.Setenv(EnvVarPulumiAPI, "https://api.devstack.example/")
 
 	c := &Config{}
-	require.NoError(t, c.Configure(context.Background()))
+	require.NoError(t, c.Configure(t.Context()))
 
 	assert.Equal(t, "https://api.devstack.example/", c.APIURL,
 		"APIURL must fall back to PULUMI_API when PULUMI_BACKEND_URL is unset")
@@ -80,7 +79,7 @@ func TestConfigure_BackendURLBeatsPulumiAPI(t *testing.T) {
 	t.Setenv(EnvVarPulumiAPI, "https://api.example/")
 
 	c := &Config{}
-	require.NoError(t, c.Configure(context.Background()))
+	require.NoError(t, c.Configure(t.Context()))
 
 	assert.Equal(t, "https://backend.example/", c.APIURL,
 		"PULUMI_BACKEND_URL must win over PULUMI_API when both are set")
@@ -92,7 +91,7 @@ func TestConfigure_EmptyInputsAndNoEnvVarsErrors(t *testing.T) {
 	t.Setenv(EnvVarPulumiAccessToken, "")
 	t.Setenv(EnvVarPulumiBackendURL, "")
 	c := &Config{}
-	err := c.Configure(context.Background())
+	err := c.Configure(t.Context())
 	if err == nil {
 		t.Skipf("workspace.GetStoredCredentials returned a token; skipping. AccessToken=%q", c.AccessToken)
 	}
@@ -105,7 +104,7 @@ func TestConfigure_TransportDefaultsToPulumiCloudWhenAPIURLIsEmpty(t *testing.T)
 	t.Setenv(EnvVarPulumiAPI, "")
 
 	c := &Config{}
-	require.NoError(t, c.Configure(context.Background()))
+	require.NoError(t, c.Configure(t.Context()))
 
 	transport, ok := c.transport.(*authedTransport)
 	require.True(t, ok, "Configure must build the api transport")

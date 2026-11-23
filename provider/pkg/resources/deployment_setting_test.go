@@ -2,6 +2,7 @@ package resources
 
 import (
 	"context"
+	"maps"
 	"testing"
 
 	"github.com/blang/semver"
@@ -620,7 +621,7 @@ func TestDecodeDeploymentSettingsOperationContext(t *testing.T) {
 				"deleteAfterDestroy":          resource.NewBoolProperty(true),
 				"shell":                       resource.NewStringProperty("/bin/bash"),
 			}),
-			"oidc": resource.NewObjectProperty(resource.PropertyMap{
+			gcOIDC: resource.NewObjectProperty(resource.PropertyMap{
 				"aws": resource.NewObjectProperty(resource.PropertyMap{
 					"roleARN":     resource.NewStringProperty("arn:aws:iam::123456789012:role/deploy"),
 					"sessionName": resource.NewStringProperty("deploy"),
@@ -629,8 +630,8 @@ func TestDecodeDeploymentSettingsOperationContext(t *testing.T) {
 						resource.NewStringProperty("arn:aws:iam::aws:policy/ReadOnlyAccess"),
 					}),
 				}),
-				"gcp": resource.NewObjectProperty(resource.PropertyMap{
-					"projectId":      resource.NewStringProperty("123456789"),
+				gcGCP: resource.NewObjectProperty(resource.PropertyMap{
+					gcProjectID:      resource.NewStringProperty("123456789"),
 					"workloadPoolId": resource.NewStringProperty("pool"),
 					"providerId":     resource.NewStringProperty("oidc-provider"),
 					"serviceAccount": resource.NewStringProperty("deploy@example.iam.gserviceaccount.com"),
@@ -721,9 +722,7 @@ func deploymentSettingsInputs(extra map[string]property.Value) property.Map {
 		gcProject:      property.New("a-project"),
 		gcStack:        property.New("a-stack"),
 	}
-	for k, v := range extra {
-		m[k] = v
-	}
+	maps.Copy(m, extra)
 	return property.NewMap(m)
 }
 
@@ -834,7 +833,7 @@ func TestDeploymentSettingsCheckDoesNotFillTrueDefaults(t *testing.T) {
 func TestDeploymentSettingsCheckNormalizesAWSDuration(t *testing.T) {
 	checked := checkDeploymentSettings(t, resourceMap(deploymentSettingsInputs(map[string]property.Value{
 		gcOperationContext: property.New(map[string]property.Value{
-			"oidc": property.New(map[string]property.Value{
+			gcOIDC: property.New(map[string]property.Value{
 				gcAWS: property.New(map[string]property.Value{
 					"roleARN":     property.New("arn:aws:iam::123456789012:role/r"),
 					"sessionName": property.New("s"),
@@ -844,7 +843,7 @@ func TestDeploymentSettingsCheckNormalizesAWSDuration(t *testing.T) {
 		}),
 	})))
 
-	aws := checked[gcOperationContext].ObjectValue()["oidc"].ObjectValue()[gcAWS].ObjectValue()
+	aws := checked[gcOperationContext].ObjectValue()[gcOIDC].ObjectValue()[gcAWS].ObjectValue()
 	assert.Equal(t, "1h30m0s", aws["duration"].StringValue())
 }
 

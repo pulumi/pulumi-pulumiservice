@@ -55,6 +55,22 @@ public class OrganizationMember extends com.pulumi.resources.CustomResource {
         return this.fgaRole;
     }
     /**
+     * FollowsDefaultRole is true when the member has no role of their own and gets the
+     * organization&#39;s default role. A member assigned the default role directly is false.
+     * 
+     */
+    @Export(name="followsDefaultRole", refs={Boolean.class}, tree="[0]")
+    private Output</* @Nullable */ Boolean> followsDefaultRole;
+
+    /**
+     * @return FollowsDefaultRole is true when the member has no role of their own and gets the
+     * organization&#39;s default role. A member assigned the default role directly is false.
+     * 
+     */
+    public Output<Optional<Boolean>> followsDefaultRole() {
+        return Codegen.optional(this.followsDefaultRole);
+    }
+    /**
      * KnownToPulumi returns if the organization member has a Pulumi account.
      * 
      */

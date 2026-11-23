@@ -389,8 +389,14 @@ export interface EnvironmentIdentifierArgs {
 export interface GCPOIDCConfigurationArgs {
     /**
      * The GCP project number, a numeric value such as `123456789012`. This is not the project ID (such as `my-project`). To look up the number, run `gcloud projects describe <project-id> --format='value(projectNumber)'`.
+     *
+     * @deprecated Use `projectNumber` instead. Despite its name, `projectId` takes the project number, not the project ID.
      */
-    projectId: pulumi.Input<string>;
+    projectId?: pulumi.Input<string | undefined>;
+    /**
+     * The GCP project number, a numeric value such as `123456789012`. This is not the project ID (such as `my-project`). To look up the number, run `gcloud projects describe <project-id> --format='value(projectNumber)'`.
+     */
+    projectNumber?: pulumi.Input<string | undefined>;
     /**
      * The ID of the identity provider associated with the workload pool.
      */

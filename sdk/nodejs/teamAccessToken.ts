@@ -68,6 +68,10 @@ export class TeamAccessToken extends pulumi.CustomResource {
      */
     declare public readonly description: pulumi.Output<string | undefined>;
     /**
+     * When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`. Omit it for a token that never expires. Pulumi Cloud rejects an expiry that is in the past, more than two years away, or beyond the organization's maximum token lifetime.
+     */
+    declare public readonly expires: pulumi.Output<string | undefined>;
+    /**
      * The name for the token, up to 40 characters. Organization and team tokens share one set of names per organization, and Pulumi Cloud never frees a deleted token's name, so the name must not have been used by any other token in the organization.
      *
      * If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming). A replacement gets a new name. Removing `name` from an existing token keeps its current name until the next replacement.
@@ -106,12 +110,14 @@ export class TeamAccessToken extends pulumi.CustomResource {
                 throw new Error("Missing required property 'teamName'");
             }
             resourceInputs["description"] = args?.description;
+            resourceInputs["expires"] = args?.expires;
             resourceInputs["name"] = args?.name;
             resourceInputs["organizationName"] = args?.organizationName;
             resourceInputs["teamName"] = args?.teamName;
             resourceInputs["value"] = undefined /*out*/;
         } else {
             resourceInputs["description"] = undefined /*out*/;
+            resourceInputs["expires"] = undefined /*out*/;
             resourceInputs["name"] = undefined /*out*/;
             resourceInputs["organizationName"] = undefined /*out*/;
             resourceInputs["teamName"] = undefined /*out*/;
@@ -120,7 +126,7 @@ export class TeamAccessToken extends pulumi.CustomResource {
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
         const secretOpts = { additionalSecretOutputs: ["value"] };
         opts = pulumi.mergeOptions(opts, secretOpts);
-        const replaceOnChanges = { replaceOnChanges: ["description", "name", "organizationName", "teamName"] };
+        const replaceOnChanges = { replaceOnChanges: ["description", "expires", "name", "organizationName", "teamName"] };
         opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(TeamAccessToken.__pulumiType, name, resourceInputs, opts);
     }
@@ -134,6 +140,10 @@ export interface TeamAccessTokenArgs {
      * A description of the token.
      */
     description?: pulumi.Input<string | undefined>;
+    /**
+     * When the token expires, as an RFC 3339 date-time such as `2027-06-30T17:00:00Z`. Omit it for a token that never expires. Pulumi Cloud rejects an expiry that is in the past, more than two years away, or beyond the organization's maximum token lifetime.
+     */
+    expires?: pulumi.Input<string | undefined>;
     /**
      * The name for the token, up to 40 characters. Organization and team tokens share one set of names per organization, and Pulumi Cloud never frees a deleted token's name, so the name must not have been used by any other token in the organization.
      *

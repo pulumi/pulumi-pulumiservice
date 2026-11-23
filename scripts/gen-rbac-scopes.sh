@@ -12,7 +12,7 @@
 #
 # Generation fails if the API drops a value the enums already have, because
 # removing an enum member breaks SDK users. Pass --allow-removals when that is
-# intended (and note it in the CHANGELOG as a breaking change).
+# intended (and add a `breaking-changes` changelog fragment).
 #
 # Review the resulting diff: the enums are part of the provider's public
 # interface, so new or removed values are a deliberate change.

@@ -1,0 +1,32 @@
+changesDir: .changes
+unreleasedDir: unreleased
+headerPath: header.tpl.md
+changelogPath: CHANGELOG.md
+versionExt: md
+# CHANGELOG.md headings have no "v", while tags and .changes/ files do.
+versionFormat: '## {{.VersionNoPrefix}}'
+kindFormat: '### {{.Kind}}'
+kinds:
+  - label: Breaking Changes
+    key: breaking-changes
+    # Breaking changes ship in minor releases: a major version would also need
+    # a new Go module path and `major-version` in .ci-mgmt.yaml.
+    auto: minor
+  - label: Improvements
+    key: improvements
+    auto: minor
+  - label: Bug Fixes
+    key: bug-fixes
+    auto: patch
+changeFormat: '- {{.Body}}{{if .Custom.Issue}} [#{{.Custom.Issue}}](https://github.com/pulumi/pulumi-pulumiservice/issues/{{.Custom.Issue}}){{end}}'
+custom:
+  - key: Issue
+    label: GitHub issue or PR number (optional)
+    type: int
+    optional: true
+newlines:
+  afterKind: 1
+  beforeKind: 1
+  endOfVersion: 1
+  beforeChangelogVersion: 1
+envPrefix: CHANGIE_

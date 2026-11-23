@@ -15,8 +15,16 @@ public final class GCPOIDCConfiguration {
     /**
      * @return The GCP project number, a numeric value such as `123456789012`. This is not the project ID (such as `my-project`). To look up the number, run `gcloud projects describe &lt;project-id&gt; --format=&#39;value(projectNumber)&#39;`.
      * 
+     * @deprecated Use `projectNumber` instead. Despite its name, `projectId` takes the project number, not the project ID.
+     * 
      */
-    private String projectId;
+    @Deprecated
+    private @Nullable String projectId;
+    /**
+     * @return The GCP project number, a numeric value such as `123456789012`. This is not the project ID (such as `my-project`). To look up the number, run `gcloud projects describe &lt;project-id&gt; --format=&#39;value(projectNumber)&#39;`.
+     * 
+     */
+    private @Nullable String projectNumber;
     /**
      * @return The ID of the identity provider associated with the workload pool.
      * 
@@ -47,9 +55,19 @@ public final class GCPOIDCConfiguration {
     /**
      * @return The GCP project number, a numeric value such as `123456789012`. This is not the project ID (such as `my-project`). To look up the number, run `gcloud projects describe &lt;project-id&gt; --format=&#39;value(projectNumber)&#39;`.
      * 
+     * @deprecated Use `projectNumber` instead. Despite its name, `projectId` takes the project number, not the project ID.
+     * 
      */
-    public String projectId() {
-        return this.projectId;
+    @Deprecated
+    public Optional<String> projectId() {
+        return Optional.ofNullable(this.projectId);
+    }
+    /**
+     * @return The GCP project number, a numeric value such as `123456789012`. This is not the project ID (such as `my-project`). To look up the number, run `gcloud projects describe &lt;project-id&gt; --format=&#39;value(projectNumber)&#39;`.
+     * 
+     */
+    public Optional<String> projectNumber() {
+        return Optional.ofNullable(this.projectNumber);
     }
     /**
      * @return The ID of the identity provider associated with the workload pool.
@@ -96,7 +114,8 @@ public final class GCPOIDCConfiguration {
     }
     @CustomType.Builder
     public static final class Builder {
-        private String projectId;
+        private @Nullable String projectId;
+        private @Nullable String projectNumber;
         private String providerId;
         private @Nullable String region;
         private String serviceAccount;
@@ -106,6 +125,7 @@ public final class GCPOIDCConfiguration {
         public Builder(GCPOIDCConfiguration defaults) {
     	      Objects.requireNonNull(defaults);
     	      this.projectId = defaults.projectId;
+    	      this.projectNumber = defaults.projectNumber;
     	      this.providerId = defaults.providerId;
     	      this.region = defaults.region;
     	      this.serviceAccount = defaults.serviceAccount;
@@ -114,11 +134,15 @@ public final class GCPOIDCConfiguration {
         }
 
         @CustomType.Setter
-        public Builder projectId(String projectId) {
-            if (projectId == null) {
-              throw new MissingRequiredPropertyException("GCPOIDCConfiguration", "projectId");
-            }
+        public Builder projectId(@Nullable String projectId) {
+
             this.projectId = projectId;
+            return this;
+        }
+        @CustomType.Setter
+        public Builder projectNumber(@Nullable String projectNumber) {
+
+            this.projectNumber = projectNumber;
             return this;
         }
         @CustomType.Setter
@@ -160,6 +184,7 @@ public final class GCPOIDCConfiguration {
         public GCPOIDCConfiguration build() {
             final var _resultValue = new GCPOIDCConfiguration();
             _resultValue.projectId = projectId;
+            _resultValue.projectNumber = projectNumber;
             _resultValue.providerId = providerId;
             _resultValue.region = region;
             _resultValue.serviceAccount = serviceAccount;

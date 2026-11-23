@@ -20,6 +20,8 @@ type Task struct {
 	AgentDefinitionId pulumi.StringPtrOutput `pulumi:"agentDefinitionId"`
 	// Approval mode for this task. Valid values: 'manual', 'auto', 'balanced'.
 	ApprovalMode pulumi.StringOutput `pulumi:"approvalMode"`
+	// When the task was archived. Null while the task remains active.
+	ArchivedAt pulumi.StringPtrOutput `pulumi:"archivedAt"`
 	// The async trigger source for this task. Null for sync tasks.
 	AsyncTriggerType pulumi.StringPtrOutput `pulumi:"asyncTriggerType"`
 	// Percentage of the context window (1-100) at which the agent triggers conversation compaction. Populated alongside contextWindowTokens when token usage data is available; omitted otherwise.
@@ -34,10 +36,16 @@ type Task struct {
 	CreatedBy pulumi.AnyOutput `pulumi:"createdBy"`
 	// Pulumi entities (stacks, projects, etc.) that provide context for the agent.
 	Entities pulumi.ArrayOutput `pulumi:"entities"`
+	// Whether the task accepts user interaction. Read-only tasks do not accept follow-up input.
+	InteractionMode pulumi.StringPtrOutput `pulumi:"interactionMode"`
 	// Whether this task is shared with other org members.
 	IsShared pulumi.BoolOutput `pulumi:"isShared"`
 	// When the task runtime last reported a heartbeat. Null if the runtime has never checked in.
 	LastHeartbeat pulumi.StringPtrOutput `pulumi:"lastHeartbeat"`
+	// The model the task's main loop last ran on, as its provider reported it. Null until the task has used a model.
+	Model pulumi.StringPtrOutput `pulumi:"model"`
+	// The model provider the task's turns run on, pinned at its first turn: 'pulumi' for Pulumi's built-in models, or the name of one of the organization's model providers. Null until the first turn.
+	ModelProvider pulumi.StringPtrOutput `pulumi:"modelProvider"`
 	// Display name for the task, typically auto-generated from the initial user message.
 	Name pulumi.StringOutput `pulumi:"name"`
 	// The number of pending inputs waiting behind this task. Present for tasks that can receive asynchronous inputs.
@@ -113,7 +121,7 @@ func (TaskState) ElementType() reflect.Type {
 }
 
 type taskArgs struct {
-	// Optional Custom Agent definition id to run this task as. When set, the task's role, permission mode, and enabled integrations are taken from the named agent definition instead of from this request, and the task is attributed to that agent. The agent's instructions and approval mode are not copied at creation: they are read from the definition on every turn, so editing the agent applies to the next turn of every run. A preview capability, gated per organization.
+	// Optional Custom Agent definition id to run this task as. When set, the task's role and enabled integrations are taken from the named agent definition instead of from this request, and the task is attributed to that agent. The agent's instructions and approval mode are not copied at creation: they are read from the definition on every turn, so editing the agent applies to the next turn of every run. A preview capability, gated per organization.
 	AgentDefinitionId *string `pulumi:"agentDefinitionId"`
 	// Optional approval mode override for this task. If omitted, org default is used.
 	ApprovalMode *string `pulumi:"approvalMode"`
@@ -141,7 +149,7 @@ type taskArgs struct {
 
 // The set of arguments for constructing a Task resource.
 type TaskArgs struct {
-	// Optional Custom Agent definition id to run this task as. When set, the task's role, permission mode, and enabled integrations are taken from the named agent definition instead of from this request, and the task is attributed to that agent. The agent's instructions and approval mode are not copied at creation: they are read from the definition on every turn, so editing the agent applies to the next turn of every run. A preview capability, gated per organization.
+	// Optional Custom Agent definition id to run this task as. When set, the task's role and enabled integrations are taken from the named agent definition instead of from this request, and the task is attributed to that agent. The agent's instructions and approval mode are not copied at creation: they are read from the definition on every turn, so editing the agent applies to the next turn of every run. A preview capability, gated per organization.
 	AgentDefinitionId pulumi.StringPtrInput
 	// Optional approval mode override for this task. If omitted, org default is used.
 	ApprovalMode pulumi.StringPtrInput
@@ -264,6 +272,11 @@ func (o TaskOutput) ApprovalMode() pulumi.StringOutput {
 	return o.ApplyT(func(v *Task) pulumi.StringOutput { return v.ApprovalMode }).(pulumi.StringOutput)
 }
 
+// When the task was archived. Null while the task remains active.
+func (o TaskOutput) ArchivedAt() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *Task) pulumi.StringPtrOutput { return v.ArchivedAt }).(pulumi.StringPtrOutput)
+}
+
 // The async trigger source for this task. Null for sync tasks.
 func (o TaskOutput) AsyncTriggerType() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *Task) pulumi.StringPtrOutput { return v.AsyncTriggerType }).(pulumi.StringPtrOutput)
@@ -299,6 +312,11 @@ func (o TaskOutput) Entities() pulumi.ArrayOutput {
 	return o.ApplyT(func(v *Task) pulumi.ArrayOutput { return v.Entities }).(pulumi.ArrayOutput)
 }
 
+// Whether the task accepts user interaction. Read-only tasks do not accept follow-up input.
+func (o TaskOutput) InteractionMode() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *Task) pulumi.StringPtrOutput { return v.InteractionMode }).(pulumi.StringPtrOutput)
+}
+
 // Whether this task is shared with other org members.
 func (o TaskOutput) IsShared() pulumi.BoolOutput {
 	return o.ApplyT(func(v *Task) pulumi.BoolOutput { return v.IsShared }).(pulumi.BoolOutput)
@@ -307,6 +325,16 @@ func (o TaskOutput) IsShared() pulumi.BoolOutput {
 // When the task runtime last reported a heartbeat. Null if the runtime has never checked in.
 func (o TaskOutput) LastHeartbeat() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *Task) pulumi.StringPtrOutput { return v.LastHeartbeat }).(pulumi.StringPtrOutput)
+}
+
+// The model the task's main loop last ran on, as its provider reported it. Null until the task has used a model.
+func (o TaskOutput) Model() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *Task) pulumi.StringPtrOutput { return v.Model }).(pulumi.StringPtrOutput)
+}
+
+// The model provider the task's turns run on, pinned at its first turn: 'pulumi' for Pulumi's built-in models, or the name of one of the organization's model providers. Null until the first turn.
+func (o TaskOutput) ModelProvider() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *Task) pulumi.StringPtrOutput { return v.ModelProvider }).(pulumi.StringPtrOutput)
 }
 
 // Display name for the task, typically auto-generated from the initial user message.

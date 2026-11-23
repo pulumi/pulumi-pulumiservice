@@ -17,6 +17,7 @@ package resources
 import (
 	"context"
 	"errors"
+	"maps"
 	"testing"
 
 	"github.com/blang/semver"
@@ -111,8 +112,9 @@ func returnPolicyGroup(pg *pulumiapi.PolicyGroup) func() (*pulumiapi.PolicyGroup
 	return func() (*pulumiapi.PolicyGroup, error) { return pg, nil }
 }
 
-func mockPolicyGroupCtx(client *PolicyGroupClientMock) context.Context {
-	return config.WithMockClient(context.Background(), client)
+func mockPolicyGroupCtx(t *testing.T, client *PolicyGroupClientMock) context.Context {
+	t.Helper()
+	return config.WithMockClient(t.Context(), client)
 }
 
 func newPolicyGroupServer(t *testing.T, client *PolicyGroupClientMock) integration.Server {
@@ -235,9 +237,7 @@ func policyGroupProps(extra map[string]property.Value) property.Map {
 		gcName:             property.New(gcTestPolicyGroup),
 		gcOrganizationName: property.New(gcTestOrg),
 	}
-	for k, v := range extra {
-		m[k] = v
-	}
+	maps.Copy(m, extra)
 	return property.NewMap(m)
 }
 
@@ -308,13 +308,84 @@ func TestPolicyGroupCheck(t *testing.T) {
 		assert.Empty(t, resp.Failures)
 	})
 
-	t.Run("requires name and organizationName", func(t *testing.T) {
+	t.Run("requires organizationName", func(t *testing.T) {
 		resp := check(t, property.NewMap(nil))
 		props := make([]string, 0, len(resp.Failures))
 		for _, f := range resp.Failures {
 			props = append(props, f.Property)
 		}
-		assert.ElementsMatch(t, []string{gcName, gcOrganizationName}, props)
+		assert.ElementsMatch(t, []string{gcOrganizationName}, props)
+	})
+}
+
+func TestPolicyGroupAutoNameReplacement(t *testing.T) {
+	t.Parallel()
+	server := newPolicyGroupServer(t, &PolicyGroupClientMock{})
+	seed := []byte("policy-group-seed")
+	const oldName = "testPolicyGroup-1a2b3c4d"
+	olds := policyGroupProps(map[string]property.Value{
+		gcName:       property.New(oldName),
+		gcEntityType: property.New(gcStacks),
+		gcMode:       property.New(gcAudit),
+	})
+	unnamed := func(extra map[string]property.Value) property.Map {
+		return policyGroupProps(extra).Delete(gcName)
+	}
+	check := func(t *testing.T, state, inputs property.Map) property.Map {
+		t.Helper()
+		resp, err := server.Check(p.CheckRequest{Urn: policyGroupURN, State: state, Inputs: inputs, RandomSeed: seed})
+		require.NoError(t, err)
+		require.Empty(t, resp.Failures)
+		return resp.Inputs
+	}
+	replacementName := check(t, property.Map{}, unnamed(map[string]property.Value{gcMode: property.New(gcPreventative)})).
+		Get(gcName).AsString()
+
+	t.Run("update that doesn't replace keeps the old name", func(t *testing.T) {
+		inputs := check(t, olds, unnamed(map[string]property.Value{
+			gcStacks: property.New([]property.Value{}),
+		}))
+		assert.Equal(t, oldName, inputs.Get(gcName).AsString())
+	})
+
+	t.Run("unknown replacing input keeps the old name", func(t *testing.T) {
+		inputs := check(t, olds, unnamed(map[string]property.Value{gcMode: property.New(property.Computed)}))
+		assert.Equal(t, oldName, inputs.Get(gcName).AsString())
+	})
+
+	t.Run("explicit name is kept when the group is replaced", func(t *testing.T) {
+		inputs := check(t, olds, policyGroupProps(map[string]property.Value{gcMode: property.New(gcPreventative)}))
+		assert.Equal(t, gcTestPolicyGroup, inputs.Get(gcName).AsString())
+	})
+
+	for key, value := range map[string]string{
+		gcOrganizationName: gcOther,
+		gcEntityType:       gcAccounts,
+		gcMode:             gcPreventative,
+	} {
+		t.Run(key+" change names the replacement and creates it first", func(t *testing.T) {
+			inputs := check(t, olds, unnamed(map[string]property.Value{key: property.New(value)}))
+			name := inputs.Get(gcName).AsString()
+			assert.NotEqual(t, oldName, name)
+			if key == gcMode {
+				assert.Equal(t, replacementName, name, "name should match the engine's check without old inputs")
+			}
+
+			resp, err := server.Diff(p.DiffRequest{
+				ID: testPolicyGroupID, Urn: policyGroupURN, State: olds, Inputs: inputs,
+			})
+			require.NoError(t, err)
+			assert.Equal(t, p.UpdateReplace, resp.DetailedDiff[key].Kind)
+			assert.False(t, resp.DeleteBeforeReplace)
+		})
+	}
+
+	t.Run("replacement that keeps an explicit name deletes first", func(t *testing.T) {
+		state := olds.Set(gcName, property.New(gcTestPolicyGroup))
+		inputs := check(t, state, policyGroupProps(map[string]property.Value{gcMode: property.New(gcPreventative)}))
+		resp, err := server.Diff(p.DiffRequest{ID: testPolicyGroupID, Urn: policyGroupURN, State: state, Inputs: inputs})
+		require.NoError(t, err)
+		assert.True(t, resp.DeleteBeforeReplace)
 	})
 }
 
@@ -327,7 +398,7 @@ func TestPolicyGroupDiff(t *testing.T) {
 
 	diff := func(t *testing.T, state PolicyGroupState, inputs PolicyGroupInput) p.DiffResponse {
 		t.Helper()
-		resp, err := (&PolicyGroup{}).Diff(context.Background(),
+		resp, err := (&PolicyGroup{}).Diff(t.Context(),
 			infer.DiffRequest[PolicyGroupInput, PolicyGroupState]{ID: testPolicyGroupID, State: state, Inputs: inputs})
 		require.NoError(t, err)
 		return resp
@@ -375,7 +446,8 @@ func TestPolicyGroupDiff(t *testing.T) {
 			resp := diff(t, newPolicyGroup().state(), in)
 			assert.True(t, resp.HasChanges)
 			assert.Equal(t, map[string]p.PropertyDiff{field: {Kind: p.UpdateReplace, InputDiff: true}}, resp.DetailedDiff)
-			assert.True(t, resp.DeleteBeforeReplace)
+			assert.Equal(t, field != gcName, resp.DeleteBeforeReplace,
+				"only a replacement that keeps the name should delete first")
 		})
 	}
 
@@ -556,7 +628,7 @@ func TestPolicyGroupRead(t *testing.T) {
 		t *testing.T, client *PolicyGroupClientMock, inputs PolicyGroupInput, state PolicyGroupState,
 	) infer.ReadResponse[PolicyGroupInput, PolicyGroupState] {
 		t.Helper()
-		resp, err := (&PolicyGroup{}).Read(mockPolicyGroupCtx(client),
+		resp, err := (&PolicyGroup{}).Read(mockPolicyGroupCtx(t, client),
 			infer.ReadRequest[PolicyGroupInput, PolicyGroupState]{ID: testPolicyGroupID, Inputs: inputs, State: state})
 		require.NoError(t, err)
 		return resp
@@ -605,13 +677,13 @@ func TestPolicyGroupRead(t *testing.T) {
 		client := &PolicyGroupClientMock{getPolicyGroupFunc: func() (*pulumiapi.PolicyGroup, error) {
 			return nil, errors.New("boom")
 		}}
-		_, err := (&PolicyGroup{}).Read(mockPolicyGroupCtx(client),
+		_, err := (&PolicyGroup{}).Read(mockPolicyGroupCtx(t, client),
 			infer.ReadRequest[PolicyGroupInput, PolicyGroupState]{ID: testPolicyGroupID})
 		assert.ErrorContains(t, err, "boom")
 	})
 
 	t.Run("rejects a malformed ID", func(t *testing.T) {
-		_, err := (&PolicyGroup{}).Read(mockPolicyGroupCtx(&PolicyGroupClientMock{}),
+		_, err := (&PolicyGroup{}).Read(mockPolicyGroupCtx(t, &PolicyGroupClientMock{}),
 			infer.ReadRequest[PolicyGroupInput, PolicyGroupState]{ID: "no-slash"})
 		assert.Error(t, err)
 	})
@@ -626,7 +698,7 @@ func TestPolicyGroupCreate(t *testing.T) {
 	create := func(
 		client *PolicyGroupClientMock, in PolicyGroupInput, dryRun bool,
 	) (infer.CreateResponse[PolicyGroupState], error) {
-		return (&PolicyGroup{}).Create(mockPolicyGroupCtx(client),
+		return (&PolicyGroup{}).Create(mockPolicyGroupCtx(t, client),
 			infer.CreateRequest[PolicyGroupInput]{Name: "testPolicyGroup", Inputs: in, DryRun: dryRun})
 	}
 
@@ -741,7 +813,7 @@ func TestPolicyGroupUpdate(t *testing.T) {
 	update := func(
 		client *PolicyGroupClientMock, state PolicyGroupState, in PolicyGroupInput,
 	) (infer.UpdateResponse[PolicyGroupState], error) {
-		return (&PolicyGroup{}).Update(mockPolicyGroupCtx(client),
+		return (&PolicyGroup{}).Update(mockPolicyGroupCtx(t, client),
 			infer.UpdateRequest[PolicyGroupInput, PolicyGroupState]{ID: testPolicyGroupID, State: state, Inputs: in})
 	}
 
@@ -826,7 +898,7 @@ func TestPolicyGroupUpdate(t *testing.T) {
 
 	t.Run("doesn't call the API on preview", func(t *testing.T) {
 		client := &PolicyGroupClientMock{}
-		resp, err := (&PolicyGroup{}).Update(mockPolicyGroupCtx(client),
+		resp, err := (&PolicyGroup{}).Update(mockPolicyGroupCtx(t, client),
 			infer.UpdateRequest[PolicyGroupInput, PolicyGroupState]{
 				ID: testPolicyGroupID, State: newPolicyGroup().state(),
 				Inputs: newPolicyGroup().withStacks(stack1).input(), DryRun: true,
@@ -899,7 +971,7 @@ func TestPolicyGroupDelete(t *testing.T) {
 			gotOrg, gotName = org, name
 			return nil
 		}}
-		_, err := (&PolicyGroup{}).Delete(mockPolicyGroupCtx(client),
+		_, err := (&PolicyGroup{}).Delete(mockPolicyGroupCtx(t, client),
 			infer.DeleteRequest[PolicyGroupState]{ID: testPolicyGroupID, State: newPolicyGroup().state()})
 		require.NoError(t, err)
 		assert.Equal(t, gcTestOrg, gotOrg)
@@ -910,7 +982,7 @@ func TestPolicyGroupDelete(t *testing.T) {
 		client := &PolicyGroupClientMock{deletePolicyGroupFunc: func(context.Context, string, string) error {
 			return errors.New("delete failed")
 		}}
-		_, err := (&PolicyGroup{}).Delete(mockPolicyGroupCtx(client),
+		_, err := (&PolicyGroup{}).Delete(mockPolicyGroupCtx(t, client),
 			infer.DeleteRequest[PolicyGroupState]{ID: testPolicyGroupID})
 		assert.ErrorContains(t, err, "delete failed")
 	})

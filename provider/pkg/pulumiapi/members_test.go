@@ -39,7 +39,7 @@ func TestAddMemberToOrg(t *testing.T) {
 			},
 			ResponseCode: 201,
 		})
-		err := c.AddMemberToOrg(ctx, userName, orgName, role)
+		err := c.AddMemberToOrg(t.Context(), userName, orgName, role)
 		assert.NoError(t, err)
 	})
 
@@ -55,7 +55,7 @@ func TestAddMemberToOrg(t *testing.T) {
 				Message: unauthorizedError,
 			},
 		})
-		err := c.AddMemberToOrg(ctx, userName, orgName, role)
+		err := c.AddMemberToOrg(t.Context(), userName, orgName, role)
 		assert.EqualError(t, err, "failed to add member to org: 401 API error: unauthorized")
 	})
 }
@@ -73,7 +73,7 @@ func TestListOrgMembers(t *testing.T) {
 			assert.Equal(t, membersPath, r.URL.Path)
 			return 200, body
 		})
-		got, err := c.ListOrgMembers(ctx, orgName)
+		got, err := c.ListOrgMembers(t.Context(), orgName)
 		assert.NoError(t, err)
 		if assert.NotNil(t, got) {
 			assert.Len(t, got.Members, 1)
@@ -88,7 +88,7 @@ func TestListOrgMembers(t *testing.T) {
 			ResponseCode:      401,
 			ResponseBody:      ErrorResponse{Message: unauthorizedError},
 		})
-		got, err := c.ListOrgMembers(ctx, orgName)
+		got, err := c.ListOrgMembers(t.Context(), orgName)
 		assert.Nil(t, got, "members should be null since backend error was returned")
 		assert.EqualError(t, err, "failed to list organization members: 401 API error: unauthorized")
 	})
@@ -108,7 +108,7 @@ func TestListOrgMembers(t *testing.T) {
 				return 500, nil
 			}
 		})
-		got, err := c.ListOrgMembers(ctx, orgName)
+		got, err := c.ListOrgMembers(t.Context(), orgName)
 		assert.NoError(t, err)
 		if assert.NotNil(t, got) {
 			assert.Len(t, got.Members, 1, "backend result must be returned despite frontend failure")
@@ -135,7 +135,7 @@ func TestListOrgMembers(t *testing.T) {
 			t.Fatalf("unexpected type=%q", r.URL.Query().Get("type"))
 			return 500, nil
 		})
-		got, err := c.ListOrgMembers(ctx, orgName)
+		got, err := c.ListOrgMembers(t.Context(), orgName)
 		assert.NoError(t, err)
 		require.NotNil(t, got)
 		assert.Len(t, got.Members, 1, "synthetic org-as-user entry must be dropped")
@@ -163,7 +163,7 @@ func TestListOrgMembers(t *testing.T) {
 			t.Fatalf("unexpected type=%q", r.URL.Query().Get("type"))
 			return 500, nil
 		})
-		got, err := c.ListOrgMembers(ctx, orgName)
+		got, err := c.ListOrgMembers(t.Context(), orgName)
 		assert.NoError(t, err)
 		require.NotNil(t, got)
 		assert.Len(t, got.Members, 3, "alice + bob + carol after dedup")
@@ -194,7 +194,7 @@ func TestListOrgMembers(t *testing.T) {
 			}
 			return 200, frontendBody
 		})
-		got, err := c.ListOrgMembers(ctx, orgName)
+		got, err := c.ListOrgMembers(t.Context(), orgName)
 		require.NoError(t, err)
 		require.Len(t, got.Members, 2)
 
@@ -215,7 +215,7 @@ func TestDeleteMemberFromOrg(t *testing.T) {
 			ExpectedReqPath:   memberUserPath,
 			ResponseCode:      201,
 		})
-		err := c.DeleteMemberFromOrg(ctx, orgName, userName)
+		err := c.DeleteMemberFromOrg(t.Context(), orgName, userName)
 		assert.NoError(t, err)
 	})
 
@@ -228,7 +228,7 @@ func TestDeleteMemberFromOrg(t *testing.T) {
 				Message: unauthorizedError,
 			},
 		})
-		err := c.DeleteMemberFromOrg(ctx, orgName, userName)
+		err := c.DeleteMemberFromOrg(t.Context(), orgName, userName)
 		assert.EqualError(t, err, "failed to delete member from org: 401 API error: unauthorized")
 	})
 }
@@ -245,7 +245,7 @@ func TestUpdateOrgMemberRole(t *testing.T) {
 				ExpectedReqBody:   updateMemberRoleReq{Role: role},
 				ResponseCode:      204,
 			})
-			assert.NoError(t, c.UpdateOrgMemberRole(ctx, orgName, userName, role, nil))
+			assert.NoError(t, c.UpdateOrgMemberRole(t.Context(), orgName, userName, role, nil))
 		})
 	}
 
@@ -271,7 +271,7 @@ func TestUpdateOrgMemberRole(t *testing.T) {
 					return 500, nil
 				}
 			})
-			assert.NoError(t, c.UpdateOrgMemberRole(ctx, orgName, userName, role, nil))
+			assert.NoError(t, c.UpdateOrgMemberRole(t.Context(), orgName, userName, role, nil))
 			assert.JSONEq(t, `{"fgaRoleId":"`+role+`-id"}`, string(patchBody))
 		})
 	}
@@ -281,7 +281,7 @@ func TestUpdateOrgMemberRole(t *testing.T) {
 			assert.Equal(t, http.MethodGet, r.Method)
 			return 200, map[string]any{"roles": []any{}}
 		})
-		err := c.UpdateOrgMemberRole(ctx, orgName, userName, "reader", nil)
+		err := c.UpdateOrgMemberRole(t.Context(), orgName, userName, "reader", nil)
 		assert.ErrorContains(t, err, `role "reader" not found in organization`)
 	})
 
@@ -293,7 +293,7 @@ func TestUpdateOrgMemberRole(t *testing.T) {
 			ExpectedReqBody:   updateMemberRoleReq{Role: memberRole},
 			ResponseCode:      204,
 		})
-		assert.NoError(t, c.UpdateOrgMemberRole(ctx, orgName, userName, memberRole, &empty))
+		assert.NoError(t, c.UpdateOrgMemberRole(t.Context(), orgName, userName, memberRole, &empty))
 	})
 
 	t.Run("custom role", func(t *testing.T) {
@@ -304,18 +304,18 @@ func TestUpdateOrgMemberRole(t *testing.T) {
 			ExpectedReqBody:   updateMemberRoleReq{FGARoleID: &roleID},
 			ResponseCode:      204,
 		})
-		assert.NoError(t, c.UpdateOrgMemberRole(ctx, orgName, userName, "", &roleID))
+		assert.NoError(t, c.UpdateOrgMemberRole(t.Context(), orgName, userName, "", &roleID))
 	})
 
 	t.Run("neither role nor roleID", func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{ResponseCode: 200})
-		err := c.UpdateOrgMemberRole(ctx, orgName, userName, "", nil)
+		err := c.UpdateOrgMemberRole(t.Context(), orgName, userName, "", nil)
 		assert.EqualError(t, err, "one of role or fgaRoleID must be set")
 	})
 
 	t.Run("invalid built-in", func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{ResponseCode: 200})
-		err := c.UpdateOrgMemberRole(ctx, orgName, userName, "superadmin", nil)
+		err := c.UpdateOrgMemberRole(t.Context(), orgName, userName, "superadmin", nil)
 		assert.EqualError(t, err, "role must be one of: admin, member, billing-manager, reader, builder, maintainer")
 	})
 }
@@ -363,7 +363,7 @@ func TestListOrgMembersPagination(t *testing.T) {
 		return 500, nil
 	})
 
-	got, err := c.ListOrgMembers(ctx, orgName)
+	got, err := c.ListOrgMembers(t.Context(), orgName)
 	assert.NoError(t, err)
 	if assert.NotNil(t, got) {
 		assert.Len(t, got.Members, 3)
@@ -387,7 +387,7 @@ func TestGetOrgMember(t *testing.T) {
 			ResponseCode:      200,
 			ResponseBody:      members,
 		})
-		got, err := c.GetOrgMember(ctx, orgName, bobUser)
+		got, err := c.GetOrgMember(t.Context(), orgName, bobUser)
 		assert.NoError(t, err)
 		if assert.NotNil(t, got) {
 			assert.Equal(t, memberRole, got.Role)
@@ -406,7 +406,7 @@ func TestGetOrgMember(t *testing.T) {
 				{User: User{Name: bobUser, GithubLogin: bobUser}, Role: memberRole, FGARole: maintainer},
 			}}
 		})
-		got, err := c.GetOrgMember(ctx, orgName, bobUser)
+		got, err := c.GetOrgMember(t.Context(), orgName, bobUser)
 		require.NoError(t, err)
 		require.NotNil(t, got)
 		assert.Equal(t, maintainer, got.FGARole)
@@ -419,7 +419,7 @@ func TestGetOrgMember(t *testing.T) {
 			ResponseCode:      200,
 			ResponseBody:      members,
 		})
-		got, err := c.GetOrgMember(ctx, orgName, "nobody")
+		got, err := c.GetOrgMember(t.Context(), orgName, "nobody")
 		assert.NoError(t, err)
 		assert.Nil(t, got)
 	})

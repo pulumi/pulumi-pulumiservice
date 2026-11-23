@@ -89,7 +89,7 @@ func (c *Client) createRequest(
 	ctx context.Context,
 	method string,
 	url *url.URL,
-	reqBody interface{},
+	reqBody any,
 ) (*http.Request, error) {
 	var reqBodyReader io.Reader
 	if reqBody != nil {
@@ -117,7 +117,7 @@ func (c *Client) createRequest(
 
 // sendRequest executes req and unmarshals response json into resBody
 // returns attempts to unmarshal response into ErrorResponse if statusCode not 2XX
-func (c *Client) sendRequest(req *http.Request, resBody interface{}) error {
+func (c *Client) sendRequest(req *http.Request, resBody any) error {
 	res, err := c.httpClient.Do(req)
 	if err != nil {
 		return fmt.Errorf("failed to create request: %w", err)
@@ -163,8 +163,8 @@ func (c *Client) sendRequest(req *http.Request, resBody interface{}) error {
 func (c *Client) do(
 	ctx context.Context,
 	method, path string,
-	reqBody interface{},
-	resBody interface{},
+	reqBody any,
+	resBody any,
 ) error {
 	req, err := c.createRequest(ctx, method, &url.URL{Path: path}, reqBody)
 	if err != nil {
@@ -187,8 +187,8 @@ func (c *Client) doWithQuery(
 	ctx context.Context,
 	method, path string,
 	query url.Values,
-	reqBody interface{},
-	resBody interface{},
+	reqBody any,
+	resBody any,
 ) error {
 	reqURL := &url.URL{Path: path}
 	reqURL.RawQuery = query.Encode()

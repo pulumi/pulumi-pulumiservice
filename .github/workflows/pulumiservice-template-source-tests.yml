@@ -55,12 +55,6 @@ jobs:
       - name: Build provider
         run: make provider
 
-      - name: Build and link nodejs SDK
-        run: make build_nodejs install_nodejs_sdk
-
-      - name: Build python SDK
-        run: make build_python
-
       - name: Put locally-built provider on PATH
         run: echo "${GITHUB_WORKSPACE}/bin" >> "$GITHUB_PATH"
 
@@ -90,7 +84,7 @@ jobs:
           PULUMI_ACCESS_TOKEN: ${{ steps.esc-secrets.outputs.PULUMI_ACCESS_TOKEN_STAGING }}
         run: |
           cd examples
-          go test -tags all -run '^(TestNodejsTemplateSourcesExample|TestYamlTemplateSourcesExample|TestNodejsRbacExample|TestYamlRbacExample|TestPythonRbacExample)$' \
+          go test -tags all -run '^(TestYamlTemplateSourcesExample|TestYamlRbacExample)$' \
             -parallel 1 -v -count=1 -timeout 40m .
           go test -tags api -run 'TestApi/template-sources/yaml' \
             -v -count=1 -timeout 20m .

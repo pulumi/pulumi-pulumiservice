@@ -71,8 +71,6 @@ type apiCase struct {
 	OneAtATime     bool
 	// SkipReason, when non-empty, skips this example on every lane.
 	SkipReason string
-	// SkipLang skips specific language lanes for this example.
-	SkipLang map[string]string
 	// Dir overrides the example directory under examples/api/. Defaults to
 	// Name when empty. Useful for running multiple tests against the same
 	// example (e.g. one for in-place update, another for replace).
@@ -115,7 +113,6 @@ var apiCases = []apiCase{
 		Name:           "policy-group-account-attachment",
 		Config:         policyGroupAccountAttachmentConfig,
 		PreviewOnlyAll: true, // Insights account creation needs real cloud creds in the ESC env.
-		SkipLang:       yamlOnlyLangs("policy-group-account-attachment example is yaml-only"),
 	},
 	{
 		Name:    "environments",
@@ -290,7 +287,7 @@ var apiCases = []apiCase{
 	{
 		Name:           "platform-bootstrap",
 		Config:         platformBootstrapConfig,
-		PreviewOnlyAll: true,
+		PreviewOnlyAll: true, // OrgTemplateCollection has no read operation, and DefaultOrganization changes the caller's default org.
 	},
 	{
 		Name:    "esc-webhook",
@@ -302,39 +299,42 @@ var apiCases = []apiCase{
 			suffix := generateRandomFiveDigits()
 			return map[string]string{"payloadUrl": "https://example.invalid/hook-rotated/" + suffix}
 		},
-		SkipLang: yamlOnlyLangs("esc-webhook example is yaml-only"),
 	},
 	{
 		Name:           "esc-environment-schedule",
 		Config:         escEnvironmentScheduleConfig,
 		PreviewOnlyAll: true, // Cloud API requires `secretRotationRequest` even for cron-only schedules; modeling that body shape end-to-end is out of scope for this example. Mirrors the equivalent comment in the existing schedules/yaml composite.
-		SkipLang:       yamlOnlyLangs("esc-environment-schedule example is yaml-only"),
 	},
 	{
 		Name:           "esc-revision-tag",
 		Config:         escRevisionTagConfig,
 		PreviewOnlyAll: true, // Tagging a specific revision needs a definition pushed to the env (revision 1+); a freshly-created api Environment has no revisions, so a real Up would 404.
-		SkipLang:       yamlOnlyLangs("esc-revision-tag example is yaml-only"),
 	},
 	{
 		Name:           "service-items",
 		Config:         serviceItemsConfig,
 		PreviewOnlyAll: true, // services:Item attaches stacks to a Service; the referenced stacks aren't provisioned in this example.
-		SkipLang:       yamlOnlyLangs("service-items example is yaml-only"),
 	},
-}
-
-// yamlOnlyLangs returns a SkipLang map that skips every non-yaml lane with
-// the same reason. Used by examples whose only-yaml programs validate the
-// type-token plumbing but aren't reproduced in TS/Python/Go/.NET/Java.
-func yamlOnlyLangs(reason string) map[string]string {
-	return map[string]string{
-		"typescript": reason,
-		"python":     reason,
-		"go":         reason,
-		"csharp":     reason,
-		"java":       reason,
-	}
+	{
+		Name:           "agent-automations",
+		Config:         orgOnlyConfig,
+		PreviewOnlyAll: true, // A real Up schedules a recurring Neo task in the shared test org.
+	},
+	{
+		Name:           "agent-definitions",
+		Config:         orgOnlyConfig,
+		PreviewOnlyAll: true, // The role and agent names are fixed, so concurrent runs in the shared test org would collide.
+	},
+	{
+		Name:           "neo-usage-caps",
+		Config:         orgOnlyConfig,
+		PreviewOnlyAll: true, // UsageCap is an org-wide singleton that must be imported, not created.
+	},
+	{
+		Name:           "service-catalog-demo",
+		Config:         serviceCatalogDemoConfig,
+		PreviewOnlyAll: true, // The service example already runs Service; this checks the demo still resolves.
+	},
 }
 
 var apiLanguages = []string{"yaml", "typescript", "python", "go", "csharp", "java"}
@@ -356,9 +356,6 @@ func TestApi(t *testing.T) {
 				if reason := skipLangReason(t, lang); reason != "" {
 					t.Skip(reason)
 				}
-				if reason, ok := ex.SkipLang[lang]; ok {
-					t.Skip(reason)
-				}
 				runApiCase(t, ex, lang)
 			})
 		}
@@ -375,6 +372,9 @@ func runApiCase(t *testing.T, ex apiCase, lang string) {
 	}
 	src := filepath.Join(getCwd(t), "api", dir, lang)
 	if _, err := os.Stat(src); err != nil {
+		if lang != "yaml" && os.IsNotExist(err) {
+			t.Skipf("%s has no %s program", ex.Name, lang)
+		}
 		t.Fatalf("%s example missing for %s: %v", lang, ex.Name, err)
 	}
 
@@ -955,6 +955,13 @@ func serviceCatalogConfig() map[string]string {
 	return map[string]string{
 		"organizationName": ServiceProviderTestOrg,
 		"serviceSuffix":    generateRandomFiveDigits(),
+	}
+}
+
+func serviceCatalogDemoConfig() map[string]string {
+	return map[string]string{
+		"organizationName": ServiceProviderTestOrg,
+		"nameSuffix":       generateRandomFiveDigits(),
 	}
 }
 

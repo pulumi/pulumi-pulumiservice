@@ -1,0 +1,9 @@
+name: ts-smoke
+runtime: nodejs
+description: Checks that the Node.js SDK handles an asset input, an invoke and a secret output.
+config:
+  organizationName:
+    type: string
+    default: service-provider-test-org
+  digits:
+    type: string

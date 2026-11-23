@@ -55,11 +55,11 @@ type StackReference struct {
 }
 
 type PolicyPackMetadata struct {
-	Name        string                 `json:"name"`
-	DisplayName string                 `json:"displayName"`
-	Version     int                    `json:"version"`
-	VersionTag  string                 `json:"versionTag"`
-	Config      map[string]interface{} `json:"config,omitempty"`
+	Name        string         `json:"name"`
+	DisplayName string         `json:"displayName"`
+	Version     int            `json:"version"`
+	VersionTag  string         `json:"versionTag"`
+	Config      map[string]any `json:"config,omitempty"`
 }
 
 type listPolicyGroupsResponse struct {

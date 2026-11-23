@@ -62,6 +62,11 @@ export class Team extends pulumi.CustomResource {
      */
     declare public /*out*/ readonly environments: pulumi.Output<any[] | undefined>;
     /**
+     * Whether this is the Everyone team: every admin and member of the organization is in it, but
+     * no billing manager. Pulumi manages it, so its name, description, members and roles cannot change.
+     */
+    declare public /*out*/ readonly everyone: pulumi.Output<boolean | undefined>;
+    /**
      * The kind of team (e.g., pulumi or GitHub-backed).
      */
     declare public /*out*/ readonly kind: pulumi.Output<string>;
@@ -122,6 +127,7 @@ export class Team extends pulumi.CustomResource {
             resourceInputs["orgName"] = args?.orgName;
             resourceInputs["accounts"] = undefined /*out*/;
             resourceInputs["environments"] = undefined /*out*/;
+            resourceInputs["everyone"] = undefined /*out*/;
             resourceInputs["kind"] = undefined /*out*/;
             resourceInputs["listMembersError"] = undefined /*out*/;
             resourceInputs["members"] = undefined /*out*/;
@@ -133,6 +139,7 @@ export class Team extends pulumi.CustomResource {
             resourceInputs["description"] = undefined /*out*/;
             resourceInputs["displayName"] = undefined /*out*/;
             resourceInputs["environments"] = undefined /*out*/;
+            resourceInputs["everyone"] = undefined /*out*/;
             resourceInputs["kind"] = undefined /*out*/;
             resourceInputs["listMembersError"] = undefined /*out*/;
             resourceInputs["members"] = undefined /*out*/;

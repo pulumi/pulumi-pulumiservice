@@ -118,6 +118,6 @@ resources:
 
 outputs:
   ownerTeamName: ${ownerTeam.name}
-  checkoutServiceName: ${checkoutService.name}
-  searchServiceName: ${searchService.name}
-  notificationServiceName: ${notificationService.name}
+  checkoutServiceName: checkout-api-${nameSuffix}
+  searchServiceName: search-frontend-${nameSuffix}
+  notificationServiceName: notification-worker-${nameSuffix}

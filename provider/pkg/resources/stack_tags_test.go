@@ -56,7 +56,7 @@ func TestStackTag(t *testing.T) {
 			},
 		}
 
-		ctx := config.WithMockClient(context.Background(), mockedClient)
+		ctx := config.WithMockClient(t.Context(), mockedClient)
 
 		st := &StackTag{}
 		req := infer.ReadRequest[StackTagInput, StackTagState]{
@@ -93,7 +93,7 @@ func TestStackTag(t *testing.T) {
 			},
 		}
 
-		ctx := config.WithMockClient(context.Background(), mockedClient)
+		ctx := config.WithMockClient(t.Context(), mockedClient)
 
 		st := &StackTag{}
 		req := infer.ReadRequest[StackTagInput, StackTagState]{

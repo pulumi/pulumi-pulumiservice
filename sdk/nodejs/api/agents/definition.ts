@@ -69,6 +69,10 @@ export class Definition extends pulumi.CustomResource {
      */
     declare public readonly enabledIntegrations: pulumi.Output<any[] | undefined>;
     /**
+     * The model provider the agent's tasks run on: a provider name, or 'pulumi' for Pulumi's built-in models. Omitted or null uses the organization's default provider.
+     */
+    declare public readonly modelProvider: pulumi.Output<string | undefined>;
+    /**
      * The agent's name: lower-case letters, digits and hyphens, unique within the organization. This is the stable handle a person writes down -- in an automation, in a CLI invocation -- and it may be changed, because everything that references an agent internally references it by id.
      */
     declare public readonly name: pulumi.Output<string>;
@@ -92,6 +96,10 @@ export class Definition extends pulumi.CustomResource {
      * A one-line description of what this agent is for, shown under its name in the roster.
      */
     declare public readonly purpose: pulumi.Output<string | undefined>;
+    /**
+     * Effort the agent's models reason or think at: 'low', 'medium', or 'high', for this agent only. On an 'openai-responses' provider it overrides the provider's reasoning effort; on an 'anthropic-messages' provider it sets the thinking effort of models that support adaptive thinking. With no provider it applies to whichever of these the organization's default is. Refused for 'pulumi' and a named 'openai-chat' provider, and ignored on a run whose provider cannot reason. Omitted or null uses the provider's.
+     */
+    declare public readonly reasoningEffort: pulumi.Output<string | undefined>;
     /**
      * The RBAC role id the agent's tasks assume, identified by role id. Null means no assumed role: tasks run with the invoking user's own permissions.
      */
@@ -121,10 +129,12 @@ export class Definition extends pulumi.CustomResource {
             resourceInputs["definitionID"] = args?.definitionID;
             resourceInputs["displayName"] = args?.displayName;
             resourceInputs["enabledIntegrations"] = args?.enabledIntegrations;
+            resourceInputs["modelProvider"] = args?.modelProvider;
             resourceInputs["name"] = args?.name;
             resourceInputs["orgName"] = args?.orgName;
             resourceInputs["permissionMode"] = args?.permissionMode;
             resourceInputs["purpose"] = args?.purpose;
+            resourceInputs["reasoningEffort"] = args?.reasoningEffort;
             resourceInputs["roleId"] = args?.roleId;
             resourceInputs["pausedAt"] = undefined /*out*/;
             resourceInputs["pausedBy"] = undefined /*out*/;
@@ -137,12 +147,14 @@ export class Definition extends pulumi.CustomResource {
             resourceInputs["definitionID"] = undefined /*out*/;
             resourceInputs["displayName"] = undefined /*out*/;
             resourceInputs["enabledIntegrations"] = undefined /*out*/;
+            resourceInputs["modelProvider"] = undefined /*out*/;
             resourceInputs["name"] = undefined /*out*/;
             resourceInputs["pausedAt"] = undefined /*out*/;
             resourceInputs["pausedBy"] = undefined /*out*/;
             resourceInputs["pausedReason"] = undefined /*out*/;
             resourceInputs["permissionMode"] = undefined /*out*/;
             resourceInputs["purpose"] = undefined /*out*/;
+            resourceInputs["reasoningEffort"] = undefined /*out*/;
             resourceInputs["roleId"] = undefined /*out*/;
             resourceInputs["taskCounts"] = undefined /*out*/;
         }
@@ -180,6 +192,10 @@ export interface DefinitionArgs {
      */
     enabledIntegrations?: pulumi.Input<any[] | undefined>;
     /**
+     * The model provider the agent's tasks run on: a provider name, or 'pulumi' for Pulumi's built-in models. On creation, omitted, null, or empty uses the organization's default provider; on update, omitted or null keeps the stored provider and empty returns to that default.
+     */
+    modelProvider?: pulumi.Input<string | undefined>;
+    /**
      * The agent's name: lower-case letters, digits and hyphens, at most 64 characters, unique within the organization. Optional -- when omitted it is derived from displayName, so a form that asks for one name still works. A name already taken by another agent is rejected with a 409 rather than silently suffixed. Supplying a different name on an update renames the agent, which is safe because every internal reference is by id.
      */
     name?: pulumi.Input<string | undefined>;
@@ -195,6 +211,10 @@ export interface DefinitionArgs {
      * A one-line description of what this agent is for, shown under its name in the roster.
      */
     purpose?: pulumi.Input<string | undefined>;
+    /**
+     * Effort the agent's models reason or think at: 'low', 'medium', or 'high', for this agent only. On an 'openai-responses' provider it overrides the provider's reasoning effort; on an 'anthropic-messages' provider it sets the thinking effort of models that support adaptive thinking. With no provider it applies to whichever of these the organization's default is. Refused for 'pulumi' and a named 'openai-chat' provider, and ignored on a run whose provider cannot reason. On creation, omitted, null, or empty uses the provider's; on update, omitted or null keeps the stored effort and empty returns to the provider's.
+     */
+    reasoningEffort?: pulumi.Input<string | undefined>;
     /**
      * The RBAC role id the agent's tasks assume. With Agents-as-Team-Members enabled, creation with omitted/null or empty uses the feature's read-only default; on update, omitted/null preserves the existing role and empty selects that default. A role that does not exist in the organization is rejected with a 404.
      */

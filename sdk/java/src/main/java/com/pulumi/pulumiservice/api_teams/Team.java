@@ -9,6 +9,7 @@ import com.pulumi.core.annotations.ResourceType;
 import com.pulumi.core.internal.Codegen;
 import com.pulumi.pulumiservice.Utilities;
 import com.pulumi.pulumiservice.api_teams.TeamArgs;
+import java.lang.Boolean;
 import java.lang.Object;
 import java.lang.String;
 import java.util.List;
@@ -77,6 +78,22 @@ public class Team extends com.pulumi.resources.CustomResource {
      */
     public Output<Optional<List<Object>>> environments() {
         return Codegen.optional(this.environments);
+    }
+    /**
+     * Whether this is the Everyone team: every admin and member of the organization is in it, but
+     * no billing manager. Pulumi manages it, so its name, description, members and roles cannot change.
+     * 
+     */
+    @Export(name="everyone", refs={Boolean.class}, tree="[0]")
+    private Output</* @Nullable */ Boolean> everyone;
+
+    /**
+     * @return Whether this is the Everyone team: every admin and member of the organization is in it, but
+     * no billing manager. Pulumi manages it, so its name, description, members and roles cannot change.
+     * 
+     */
+    public Output<Optional<Boolean>> everyone() {
+        return Codegen.optional(this.everyone);
     }
     /**
      * The kind of team (e.g., pulumi or GitHub-backed).

@@ -53,6 +53,10 @@ export class Task extends pulumi.CustomResource {
      */
     declare public readonly approvalMode: pulumi.Output<string>;
     /**
+     * When the task was archived. Null while the task remains active.
+     */
+    declare public /*out*/ readonly archivedAt: pulumi.Output<string | undefined>;
+    /**
      * The async trigger source for this task. Null for sync tasks.
      */
     declare public /*out*/ readonly asyncTriggerType: pulumi.Output<string | undefined>;
@@ -81,6 +85,10 @@ export class Task extends pulumi.CustomResource {
      */
     declare public /*out*/ readonly entities: pulumi.Output<any[]>;
     /**
+     * Whether the task accepts user interaction. Read-only tasks do not accept follow-up input.
+     */
+    declare public /*out*/ readonly interactionMode: pulumi.Output<string | undefined>;
+    /**
      * Whether this task is shared with other org members.
      */
     declare public /*out*/ readonly isShared: pulumi.Output<boolean>;
@@ -88,6 +96,14 @@ export class Task extends pulumi.CustomResource {
      * When the task runtime last reported a heartbeat. Null if the runtime has never checked in.
      */
     declare public /*out*/ readonly lastHeartbeat: pulumi.Output<string | undefined>;
+    /**
+     * The model the task's main loop last ran on, as its provider reported it. Null until the task has used a model.
+     */
+    declare public /*out*/ readonly model: pulumi.Output<string | undefined>;
+    /**
+     * The model provider the task's turns run on, pinned at its first turn: 'pulumi' for Pulumi's built-in models, or the name of one of the organization's model providers. Null until the first turn.
+     */
+    declare public /*out*/ readonly modelProvider: pulumi.Output<string | undefined>;
     /**
      * Display name for the task, typically auto-generated from the initial user message.
      */
@@ -175,6 +191,7 @@ export class Task extends pulumi.CustomResource {
             resourceInputs["source"] = args?.source;
             resourceInputs["taskID"] = args?.taskID;
             resourceInputs["toolExecutionMode"] = args?.toolExecutionMode;
+            resourceInputs["archivedAt"] = undefined /*out*/;
             resourceInputs["asyncTriggerType"] = undefined /*out*/;
             resourceInputs["contextCompactionThresholdPercent"] = undefined /*out*/;
             resourceInputs["contextUsedTokens"] = undefined /*out*/;
@@ -182,8 +199,11 @@ export class Task extends pulumi.CustomResource {
             resourceInputs["createdAt"] = undefined /*out*/;
             resourceInputs["createdBy"] = undefined /*out*/;
             resourceInputs["entities"] = undefined /*out*/;
+            resourceInputs["interactionMode"] = undefined /*out*/;
             resourceInputs["isShared"] = undefined /*out*/;
             resourceInputs["lastHeartbeat"] = undefined /*out*/;
+            resourceInputs["model"] = undefined /*out*/;
+            resourceInputs["modelProvider"] = undefined /*out*/;
             resourceInputs["name"] = undefined /*out*/;
             resourceInputs["pendingInputCount"] = undefined /*out*/;
             resourceInputs["roleName"] = undefined /*out*/;
@@ -197,6 +217,7 @@ export class Task extends pulumi.CustomResource {
         } else {
             resourceInputs["agentDefinitionId"] = undefined /*out*/;
             resourceInputs["approvalMode"] = undefined /*out*/;
+            resourceInputs["archivedAt"] = undefined /*out*/;
             resourceInputs["asyncTriggerType"] = undefined /*out*/;
             resourceInputs["contextCompactionThresholdPercent"] = undefined /*out*/;
             resourceInputs["contextUsedTokens"] = undefined /*out*/;
@@ -204,8 +225,11 @@ export class Task extends pulumi.CustomResource {
             resourceInputs["createdAt"] = undefined /*out*/;
             resourceInputs["createdBy"] = undefined /*out*/;
             resourceInputs["entities"] = undefined /*out*/;
+            resourceInputs["interactionMode"] = undefined /*out*/;
             resourceInputs["isShared"] = undefined /*out*/;
             resourceInputs["lastHeartbeat"] = undefined /*out*/;
+            resourceInputs["model"] = undefined /*out*/;
+            resourceInputs["modelProvider"] = undefined /*out*/;
             resourceInputs["name"] = undefined /*out*/;
             resourceInputs["pendingInputCount"] = undefined /*out*/;
             resourceInputs["permissionMode"] = undefined /*out*/;
@@ -232,7 +256,7 @@ export class Task extends pulumi.CustomResource {
  */
 export interface TaskArgs {
     /**
-     * Optional Custom Agent definition id to run this task as. When set, the task's role, permission mode, and enabled integrations are taken from the named agent definition instead of from this request, and the task is attributed to that agent. The agent's instructions and approval mode are not copied at creation: they are read from the definition on every turn, so editing the agent applies to the next turn of every run. A preview capability, gated per organization.
+     * Optional Custom Agent definition id to run this task as. When set, the task's role and enabled integrations are taken from the named agent definition instead of from this request, and the task is attributed to that agent. The agent's instructions and approval mode are not copied at creation: they are read from the definition on every turn, so editing the agent applies to the next turn of every run. A preview capability, gated per organization.
      */
     agentDefinitionId?: pulumi.Input<string | undefined>;
     /**

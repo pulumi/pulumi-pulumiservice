@@ -56,7 +56,7 @@ func TestCreateDeploymentSchedule(t *testing.T) {
 			ResponseCode:      201,
 			ResponseBody:      testResponse,
 		})
-		expectedScheduleID, err := c.CreateDeploymentSchedule(ctx, testStack, createDeploymentScheduleReq)
+		expectedScheduleID, err := c.CreateDeploymentSchedule(t.Context(), testStack, createDeploymentScheduleReq)
 		assert.NoError(t, err)
 		assert.Equal(t, testScheduleID, *expectedScheduleID)
 	})
@@ -71,7 +71,7 @@ func TestCreateDeploymentSchedule(t *testing.T) {
 				Message: unauthorizedError,
 			},
 		})
-		expectedScheduleID, err := c.CreateDeploymentSchedule(ctx, testStack, createDeploymentScheduleReq)
+		expectedScheduleID, err := c.CreateDeploymentSchedule(t.Context(), testStack, createDeploymentScheduleReq)
 		assert.Nil(t, expectedScheduleID, "deployment schedule should be nil since error was returned")
 		assert.EqualError(
 			t,
@@ -91,7 +91,7 @@ func TestGetDeploymentSchedule(t *testing.T) {
 			ResponseCode:      200,
 			ResponseBody:      testResponse,
 		})
-		response, err := c.GetStackSchedule(ctx, testStack, testScheduleID)
+		response, err := c.GetStackSchedule(t.Context(), testStack, testScheduleID)
 		assert.NoError(t, err)
 		assert.Equal(t, testResponse, *response)
 	})
@@ -105,7 +105,7 @@ func TestGetDeploymentSchedule(t *testing.T) {
 				Message: unauthorizedError,
 			},
 		})
-		expectedScheduleID, err := c.GetStackSchedule(ctx, testStack, testScheduleID)
+		expectedScheduleID, err := c.GetStackSchedule(t.Context(), testStack, testScheduleID)
 		assert.Nil(t, expectedScheduleID, "scheduleId should be nil since error was returned")
 		assert.EqualError(
 			t,
@@ -124,7 +124,7 @@ func TestGetDeploymentSchedule(t *testing.T) {
 				Message:    notFoundError,
 			},
 		})
-		expectedScheduleID, err := c.GetStackSchedule(ctx, testStack, testScheduleID)
+		expectedScheduleID, err := c.GetStackSchedule(t.Context(), testStack, testScheduleID)
 		assert.Nil(t, expectedScheduleID, "scheduleId should be nil since it was not found")
 		assert.NoError(t, err)
 	})
@@ -141,7 +141,7 @@ func TestUpdateDeploymentSchedule(t *testing.T) {
 			ResponseBody:      testResponse,
 		})
 		expectedScheduleID, err := c.UpdateDeploymentSchedule(
-			ctx,
+			t.Context(),
 			testStack,
 			createDeploymentScheduleReq,
 			testScheduleID,
@@ -161,7 +161,7 @@ func TestUpdateDeploymentSchedule(t *testing.T) {
 			},
 		})
 		expectedScheduleID, err := c.UpdateDeploymentSchedule(
-			ctx,
+			t.Context(),
 			testStack,
 			createDeploymentScheduleReq,
 			testScheduleID,
@@ -183,7 +183,7 @@ func TestDeleteSchedule(t *testing.T) {
 			ExpectedReqPath:   "/api/stacks/org/project/stack/deployments/schedules/" + testScheduleID,
 			ResponseCode:      201,
 		})
-		err := c.DeleteStackSchedule(ctx, testStack, testScheduleID)
+		err := c.DeleteStackSchedule(t.Context(), testStack, testScheduleID)
 		assert.NoError(t, err)
 	})
 
@@ -196,7 +196,7 @@ func TestDeleteSchedule(t *testing.T) {
 				Message: unauthorizedError,
 			},
 		})
-		err := c.DeleteStackSchedule(ctx, testStack, testScheduleID)
+		err := c.DeleteStackSchedule(t.Context(), testStack, testScheduleID)
 		assert.EqualError(
 			t,
 			err,
@@ -215,7 +215,7 @@ func TestCreateDriftSchedule(t *testing.T) {
 			ResponseCode:      201,
 			ResponseBody:      testResponse,
 		})
-		expectedScheduleID, err := c.CreateDriftSchedule(ctx, testStack, createDriftScheduleReq)
+		expectedScheduleID, err := c.CreateDriftSchedule(t.Context(), testStack, createDriftScheduleReq)
 		assert.NoError(t, err)
 		assert.Equal(t, testScheduleID, *expectedScheduleID)
 	})
@@ -230,7 +230,7 @@ func TestCreateDriftSchedule(t *testing.T) {
 				Message: unauthorizedError,
 			},
 		})
-		expectedScheduleID, err := c.CreateDriftSchedule(ctx, testStack, createDriftScheduleReq)
+		expectedScheduleID, err := c.CreateDriftSchedule(t.Context(), testStack, createDriftScheduleReq)
 		assert.Nil(t, expectedScheduleID, "drift schedule should be nil since error was returned")
 		assert.EqualError(
 			t,
@@ -250,7 +250,7 @@ func TestUpdateDriftSchedule(t *testing.T) {
 			ResponseCode:      201,
 			ResponseBody:      testResponse,
 		})
-		expectedScheduleID, err := c.UpdateDriftSchedule(ctx, testStack, createDriftScheduleReq, testScheduleID)
+		expectedScheduleID, err := c.UpdateDriftSchedule(t.Context(), testStack, createDriftScheduleReq, testScheduleID)
 		assert.NoError(t, err)
 		assert.Equal(t, testScheduleID, *expectedScheduleID)
 	})
@@ -265,7 +265,7 @@ func TestUpdateDriftSchedule(t *testing.T) {
 				Message: unauthorizedError,
 			},
 		})
-		expectedScheduleID, err := c.UpdateDriftSchedule(ctx, testStack, createDriftScheduleReq, testScheduleID)
+		expectedScheduleID, err := c.UpdateDriftSchedule(t.Context(), testStack, createDriftScheduleReq, testScheduleID)
 		assert.Nil(t, expectedScheduleID, "scheduleId should be nil since error was returned")
 		assert.EqualError(
 			t,
@@ -286,7 +286,7 @@ func TestCreateTTLSchedule(t *testing.T) {
 			ResponseCode:      201,
 			ResponseBody:      testResponse,
 		})
-		expectedScheduleID, err := c.CreateTTLSchedule(ctx, testStack, createTTLScheduleReq)
+		expectedScheduleID, err := c.CreateTTLSchedule(t.Context(), testStack, createTTLScheduleReq)
 		assert.NoError(t, err)
 		assert.Equal(t, testScheduleID, *expectedScheduleID)
 	})
@@ -301,7 +301,7 @@ func TestCreateTTLSchedule(t *testing.T) {
 				Message: unauthorizedError,
 			},
 		})
-		expectedScheduleID, err := c.CreateTTLSchedule(ctx, testStack, createTTLScheduleReq)
+		expectedScheduleID, err := c.CreateTTLSchedule(t.Context(), testStack, createTTLScheduleReq)
 		assert.Nil(t, expectedScheduleID, "ttl schedule should be nil since error was returned")
 		assert.EqualError(
 			t,
@@ -322,7 +322,7 @@ func TestUpdateTTLSchedule(t *testing.T) {
 			ResponseCode:      201,
 			ResponseBody:      testResponse,
 		})
-		expectedScheduleID, err := c.UpdateTTLSchedule(ctx, testStack, createTTLScheduleReq, testScheduleID)
+		expectedScheduleID, err := c.UpdateTTLSchedule(t.Context(), testStack, createTTLScheduleReq, testScheduleID)
 		assert.NoError(t, err)
 		assert.Equal(t, testScheduleID, *expectedScheduleID)
 	})
@@ -337,7 +337,7 @@ func TestUpdateTTLSchedule(t *testing.T) {
 				Message: unauthorizedError,
 			},
 		})
-		expectedScheduleID, err := c.UpdateTTLSchedule(ctx, testStack, createTTLScheduleReq, testScheduleID)
+		expectedScheduleID, err := c.UpdateTTLSchedule(t.Context(), testStack, createTTLScheduleReq, testScheduleID)
 		assert.Nil(t, expectedScheduleID, "scheduleId should be nil since error was returned")
 		assert.EqualError(
 			t,

@@ -50,14 +50,14 @@ func TestListRegistryPolicyPacks(t *testing.T) {
 			ResponseCode:      http.StatusOK,
 			ResponseBody:      listRegistryPolicyPacksResponse{PolicyPacks: want},
 		})
-		got, err := c.ListRegistryPolicyPacks(ctx, testOrgName)
+		got, err := c.ListRegistryPolicyPacks(t.Context(), testOrgName)
 		require.NoError(t, err)
 		assert.Equal(t, want, got)
 	})
 
 	t.Run("empty org rejected", func(t *testing.T) {
 		c := &Client{}
-		_, err := c.ListRegistryPolicyPacks(ctx, "")
+		_, err := c.ListRegistryPolicyPacks(t.Context(), "")
 		assert.EqualError(t, err, "empty orgName")
 	})
 
@@ -68,7 +68,7 @@ func TestListRegistryPolicyPacks(t *testing.T) {
 			ResponseCode:      http.StatusInternalServerError,
 			ResponseBody:      ErrorResponse{StatusCode: 500, Message: "boom"},
 		})
-		_, err := c.ListRegistryPolicyPacks(ctx, testOrgName)
+		_, err := c.ListRegistryPolicyPacks(t.Context(), testOrgName)
 		assert.ErrorContains(t, err, "failed to list registry policy packs")
 	})
 }
@@ -84,7 +84,7 @@ func TestGetRegistryPolicyPack(t *testing.T) {
 			ResponseCode:      http.StatusOK,
 			ResponseBody:      getRegistryPolicyPackResponse{PolicyPack: *want},
 		})
-		got, err := c.GetRegistryPolicyPack(ctx, testOrgName, alphaPolicyPack, "")
+		got, err := c.GetRegistryPolicyPack(t.Context(), testOrgName, alphaPolicyPack, "")
 		require.NoError(t, err)
 		assert.Equal(t, want, got)
 	})
@@ -99,7 +99,7 @@ func TestGetRegistryPolicyPack(t *testing.T) {
 				PolicyPack: RegistryPolicyPack{Name: alphaPolicyPack},
 			},
 		})
-		_, err := c.GetRegistryPolicyPack(ctx, testOrgName, alphaPolicyPack, "latest")
+		_, err := c.GetRegistryPolicyPack(t.Context(), testOrgName, alphaPolicyPack, "latest")
 		require.NoError(t, err)
 	})
 
@@ -110,16 +110,16 @@ func TestGetRegistryPolicyPack(t *testing.T) {
 			ResponseCode:      http.StatusNotFound,
 			ResponseBody:      ErrorResponse{StatusCode: 404, Message: notFoundError},
 		})
-		got, err := c.GetRegistryPolicyPack(ctx, testOrgName, "missing", "")
+		got, err := c.GetRegistryPolicyPack(t.Context(), testOrgName, "missing", "")
 		require.NoError(t, err)
 		assert.Nil(t, got)
 	})
 
 	t.Run("input validation", func(t *testing.T) {
 		c := &Client{}
-		_, err := c.GetRegistryPolicyPack(ctx, "", alphaPolicyPack, "")
+		_, err := c.GetRegistryPolicyPack(t.Context(), "", alphaPolicyPack, "")
 		assert.EqualError(t, err, "empty orgName")
-		_, err = c.GetRegistryPolicyPack(ctx, testOrgName, "", "")
+		_, err = c.GetRegistryPolicyPack(t.Context(), testOrgName, "", "")
 		assert.EqualError(t, err, "empty policyPackName")
 	})
 }
@@ -210,7 +210,7 @@ func TestListPolicyPacksWithRegistryMetadata(t *testing.T) {
 			{Name: alphaPolicyPack, Source: sourcePrivate, Publisher: testOrgName},
 		}, nil)
 
-		got, degraded, err := c.ListPolicyPacksWithRegistryMetadata(ctx, testOrgName)
+		got, degraded, err := c.ListPolicyPacksWithRegistryMetadata(t.Context(), testOrgName)
 		require.NoError(t, err)
 		assert.False(t, degraded)
 		require.Len(t, got, 2)
@@ -231,7 +231,7 @@ func TestListPolicyPacksWithRegistryMetadata(t *testing.T) {
 			{Name: cisAwsPolicyPack, Source: sourcePulumi, Publisher: sourcePulumi},
 		}, nil)
 
-		got, degraded, err := c.ListPolicyPacksWithRegistryMetadata(ctx, testOrgName)
+		got, degraded, err := c.ListPolicyPacksWithRegistryMetadata(t.Context(), testOrgName)
 		require.NoError(t, err)
 		assert.False(t, degraded)
 		require.Len(t, got, 2)
@@ -247,7 +247,7 @@ func TestListPolicyPacksWithRegistryMetadata(t *testing.T) {
 			{Name: "not-in-org", Source: sourcePulumi, Publisher: sourcePulumi},
 		}, nil)
 
-		got, _, err := c.ListPolicyPacksWithRegistryMetadata(ctx, testOrgName)
+		got, _, err := c.ListPolicyPacksWithRegistryMetadata(t.Context(), testOrgName)
 		require.NoError(t, err)
 		assert.Len(t, got, len(orgPacks))
 	})
@@ -258,7 +258,7 @@ func TestListPolicyPacksWithRegistryMetadata(t *testing.T) {
 			{Name: alphaPolicyPack, Source: sourcePrivate, Publisher: testOrgName},
 		}, nil)
 
-		got, _, err := c.ListPolicyPacksWithRegistryMetadata(ctx, testOrgName)
+		got, _, err := c.ListPolicyPacksWithRegistryMetadata(t.Context(), testOrgName)
 		require.NoError(t, err)
 		require.Len(t, got, 2)
 		assert.Empty(t, got[1].Source)
@@ -270,7 +270,7 @@ func TestListPolicyPacksWithRegistryMetadata(t *testing.T) {
 	t.Run("registry 404 degrades instead of failing", func(t *testing.T) {
 		c := registryJoinServer(t, orgPacks, http.StatusNotFound, nil, nil)
 
-		got, degraded, err := c.ListPolicyPacksWithRegistryMetadata(ctx, testOrgName)
+		got, degraded, err := c.ListPolicyPacksWithRegistryMetadata(t.Context(), testOrgName)
 		require.NoError(t, err)
 		assert.True(t, degraded)
 		require.Len(t, got, 2)
@@ -281,7 +281,7 @@ func TestListPolicyPacksWithRegistryMetadata(t *testing.T) {
 	t.Run("registry 405 degrades instead of failing", func(t *testing.T) {
 		c := registryJoinServer(t, orgPacks, http.StatusMethodNotAllowed, nil, nil)
 
-		got, degraded, err := c.ListPolicyPacksWithRegistryMetadata(ctx, testOrgName)
+		got, degraded, err := c.ListPolicyPacksWithRegistryMetadata(t.Context(), testOrgName)
 		require.NoError(t, err)
 		assert.True(t, degraded)
 		assert.Len(t, got, 2)
@@ -292,14 +292,14 @@ func TestListPolicyPacksWithRegistryMetadata(t *testing.T) {
 	t.Run("registry 403 fails the call", func(t *testing.T) {
 		c := registryJoinServer(t, orgPacks, http.StatusForbidden, nil, nil)
 
-		_, _, err := c.ListPolicyPacksWithRegistryMetadata(ctx, testOrgName)
+		_, _, err := c.ListPolicyPacksWithRegistryMetadata(t.Context(), testOrgName)
 		assert.ErrorContains(t, err, "registry policy packs")
 	})
 
 	t.Run("registry 500 fails the call", func(t *testing.T) {
 		c := registryJoinServer(t, orgPacks, http.StatusInternalServerError, nil, nil)
 
-		_, _, err := c.ListPolicyPacksWithRegistryMetadata(ctx, testOrgName)
+		_, _, err := c.ListPolicyPacksWithRegistryMetadata(t.Context(), testOrgName)
 		assert.ErrorContains(t, err, "registry policy packs")
 	})
 
@@ -312,14 +312,14 @@ func TestListPolicyPacksWithRegistryMetadata(t *testing.T) {
 			return http.StatusInternalServerError, ErrorResponse{StatusCode: 500, Message: "boom"}
 		})
 
-		_, _, err := c.ListPolicyPacksWithRegistryMetadata(ctx, testOrgName)
+		_, _, err := c.ListPolicyPacksWithRegistryMetadata(t.Context(), testOrgName)
 		assert.ErrorContains(t, err, "failed to list policy packs")
 		assert.False(t, registryHit, "registry should not be queried when the org list fails")
 	})
 
 	t.Run("empty org rejected", func(t *testing.T) {
 		c := &Client{}
-		_, _, err := c.ListPolicyPacksWithRegistryMetadata(ctx, "")
+		_, _, err := c.ListPolicyPacksWithRegistryMetadata(t.Context(), "")
 		assert.EqualError(t, err, "empty orgName")
 	})
 }

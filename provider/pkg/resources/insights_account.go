@@ -83,13 +83,13 @@ func (ScanSchedule) Values() []infer.EnumValue[ScanSchedule] {
 
 // InsightsAccountCore contains the core fields for an insights account
 type InsightsAccountCore struct {
-	OrganizationName string                 `pulumi:"organizationName"        provider:"replaceOnChanges"`
-	AccountName      string                 `pulumi:"accountName"             provider:"replaceOnChanges"`
-	Provider         CloudProvider          `pulumi:"provider"                provider:"replaceOnChanges"`
-	Environment      string                 `pulumi:"environment"`
-	ScanSchedule     ScanSchedule           `pulumi:"scanSchedule"`
-	ProviderConfig   map[string]interface{} `pulumi:"providerConfig,optional"`
-	Tags             map[string]string      `pulumi:"tags,optional"`
+	OrganizationName string            `pulumi:"organizationName"        provider:"replaceOnChanges"`
+	AccountName      string            `pulumi:"accountName"             provider:"replaceOnChanges"`
+	Provider         CloudProvider     `pulumi:"provider"                provider:"replaceOnChanges"`
+	Environment      string            `pulumi:"environment"`
+	ScanSchedule     ScanSchedule      `pulumi:"scanSchedule"`
+	ProviderConfig   map[string]any    `pulumi:"providerConfig,optional"`
+	Tags             map[string]string `pulumi:"tags,optional"`
 }
 
 func (c *InsightsAccountCore) Annotate(a infer.Annotator) {
@@ -323,7 +323,7 @@ func (*InsightsAccount) Update(
 	// If provider config is default (empty or single region for AWS), pass
 	// config with empty regions to ensure API updates correctly
 	if isDefaultProviderConfig(req.Inputs.Provider, providerConfig) {
-		providerConfig = map[string]interface{}{gcRegions: []string{}}
+		providerConfig = map[string]any{gcRegions: []string{}}
 	}
 
 	updateReq := pulumiapi.UpdateInsightsAccountRequest{
@@ -382,13 +382,13 @@ func (*InsightsAccount) Update(
 	}, nil
 }
 
-func isDefaultProviderConfig(provider CloudProvider, config map[string]interface{}) bool {
+func isDefaultProviderConfig(provider CloudProvider, config map[string]any) bool {
 	if len(config) == 0 {
 		return true
 	}
 	if provider == CloudProviderAWS {
 		if regions, ok := config[gcRegions]; ok {
-			if regionsSlice, ok := regions.([]interface{}); ok {
+			if regionsSlice, ok := regions.([]any); ok {
 				return len(regionsSlice) == 0
 			}
 		}

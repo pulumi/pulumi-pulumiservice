@@ -2984,7 +2984,11 @@ func (o EnvironmentIdentifierOutput) Project() pulumi.StringOutput {
 // GCP configuration for Deployments OIDC. Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
 type GCPOIDCConfiguration struct {
 	// The GCP project number, a numeric value such as `123456789012`. This is not the project ID (such as `my-project`). To look up the number, run `gcloud projects describe <project-id> --format='value(projectNumber)'`.
-	ProjectId string `pulumi:"projectId"`
+	//
+	// Deprecated: Use `projectNumber` instead. Despite its name, `projectId` takes the project number, not the project ID.
+	ProjectId *string `pulumi:"projectId"`
+	// The GCP project number, a numeric value such as `123456789012`. This is not the project ID (such as `my-project`). To look up the number, run `gcloud projects describe <project-id> --format='value(projectNumber)'`.
+	ProjectNumber *string `pulumi:"projectNumber"`
 	// The ID of the identity provider associated with the workload pool.
 	ProviderId string `pulumi:"providerId"`
 	// The region of the GCP project.
@@ -3011,7 +3015,11 @@ type GCPOIDCConfigurationInput interface {
 // GCP configuration for Deployments OIDC. Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
 type GCPOIDCConfigurationArgs struct {
 	// The GCP project number, a numeric value such as `123456789012`. This is not the project ID (such as `my-project`). To look up the number, run `gcloud projects describe <project-id> --format='value(projectNumber)'`.
-	ProjectId pulumi.StringInput `pulumi:"projectId"`
+	//
+	// Deprecated: Use `projectNumber` instead. Despite its name, `projectId` takes the project number, not the project ID.
+	ProjectId pulumi.StringPtrInput `pulumi:"projectId"`
+	// The GCP project number, a numeric value such as `123456789012`. This is not the project ID (such as `my-project`). To look up the number, run `gcloud projects describe <project-id> --format='value(projectNumber)'`.
+	ProjectNumber pulumi.StringPtrInput `pulumi:"projectNumber"`
 	// The ID of the identity provider associated with the workload pool.
 	ProviderId pulumi.StringInput `pulumi:"providerId"`
 	// The region of the GCP project.
@@ -3103,8 +3111,15 @@ func (o GCPOIDCConfigurationOutput) ToGCPOIDCConfigurationPtrOutputWithContext(c
 }
 
 // The GCP project number, a numeric value such as `123456789012`. This is not the project ID (such as `my-project`). To look up the number, run `gcloud projects describe <project-id> --format='value(projectNumber)'`.
-func (o GCPOIDCConfigurationOutput) ProjectId() pulumi.StringOutput {
-	return o.ApplyT(func(v GCPOIDCConfiguration) string { return v.ProjectId }).(pulumi.StringOutput)
+//
+// Deprecated: Use `projectNumber` instead. Despite its name, `projectId` takes the project number, not the project ID.
+func (o GCPOIDCConfigurationOutput) ProjectId() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v GCPOIDCConfiguration) *string { return v.ProjectId }).(pulumi.StringPtrOutput)
+}
+
+// The GCP project number, a numeric value such as `123456789012`. This is not the project ID (such as `my-project`). To look up the number, run `gcloud projects describe <project-id> --format='value(projectNumber)'`.
+func (o GCPOIDCConfigurationOutput) ProjectNumber() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v GCPOIDCConfiguration) *string { return v.ProjectNumber }).(pulumi.StringPtrOutput)
 }
 
 // The ID of the identity provider associated with the workload pool.
@@ -3157,12 +3172,24 @@ func (o GCPOIDCConfigurationPtrOutput) Elem() GCPOIDCConfigurationOutput {
 }
 
 // The GCP project number, a numeric value such as `123456789012`. This is not the project ID (such as `my-project`). To look up the number, run `gcloud projects describe <project-id> --format='value(projectNumber)'`.
+//
+// Deprecated: Use `projectNumber` instead. Despite its name, `projectId` takes the project number, not the project ID.
 func (o GCPOIDCConfigurationPtrOutput) ProjectId() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *GCPOIDCConfiguration) *string {
 		if v == nil {
 			return nil
 		}
-		return &v.ProjectId
+		return v.ProjectId
+	}).(pulumi.StringPtrOutput)
+}
+
+// The GCP project number, a numeric value such as `123456789012`. This is not the project ID (such as `my-project`). To look up the number, run `gcloud projects describe <project-id> --format='value(projectNumber)'`.
+func (o GCPOIDCConfigurationPtrOutput) ProjectNumber() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *GCPOIDCConfiguration) *string {
+		if v == nil {
+			return nil
+		}
+		return v.ProjectNumber
 	}).(pulumi.StringPtrOutput)
 }
 
