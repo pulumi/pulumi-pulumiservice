@@ -147,7 +147,7 @@ class AuditLogExportConfiguration(pulumi.CustomResource):
             if new_enabled is None and not opts.urn:
                 raise TypeError("Missing required property 'new_enabled'")
             __props__.__dict__["new_enabled"] = new_enabled
-            __props__.__dict__["new_s3_compatible_configuration"] = new_s3_compatible_configuration
+            __props__.__dict__["new_s3_compatible_configuration"] = None if new_s3_compatible_configuration is None else pulumi.Output.secret(new_s3_compatible_configuration)
             if new_s3_configuration is None and not opts.urn:
                 raise TypeError("Missing required property 'new_s3_configuration'")
             __props__.__dict__["new_s3_configuration"] = new_s3_configuration
@@ -158,6 +158,8 @@ class AuditLogExportConfiguration(pulumi.CustomResource):
             __props__.__dict__["last_result"] = None
             __props__.__dict__["s3_compatible_config"] = None
             __props__.__dict__["s3_config"] = None
+        secret_opts = pulumi.ResourceOptions(additional_secret_outputs=["s3CompatibleConfig"])
+        opts = pulumi.ResourceOptions.merge(opts, secret_opts)
         super(AuditLogExportConfiguration, __self__).__init__(
             'pulumiservice:api:AuditLogExportConfiguration',
             resource_name,

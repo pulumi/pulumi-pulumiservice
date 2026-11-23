@@ -11,6 +11,7 @@ import com.pulumi.pulumiservice.Utilities;
 import com.pulumi.pulumiservice.api.AuditLogExportConfigurationArgs;
 import java.lang.Boolean;
 import java.lang.Object;
+import java.util.List;
 import java.util.Optional;
 import javax.annotation.Nullable;
 
@@ -116,6 +117,9 @@ public class AuditLogExportConfiguration extends com.pulumi.resources.CustomReso
     private static com.pulumi.resources.CustomResourceOptions makeResourceOptions(@Nullable com.pulumi.resources.CustomResourceOptions options, @Nullable Output<java.lang.String> id) {
         var defaultOptions = com.pulumi.resources.CustomResourceOptions.builder()
             .version(Utilities.getVersion())
+            .additionalSecretOutputs(List.of(
+                "s3CompatibleConfig"
+            ))
             .build();
         return com.pulumi.resources.CustomResourceOptions.merge(defaultOptions, options, id);
     }

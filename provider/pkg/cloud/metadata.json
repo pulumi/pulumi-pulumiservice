@@ -87,6 +87,14 @@
       "token": "pulumiservice:api/agents:Pool"
     },
     "pulumiservice:api:AuditLogExportConfiguration": {
+      "fields": {
+        "newS3CompatibleConfiguration": {
+          "secret": true
+        },
+        "s3CompatibleConfig": {
+          "secret": true
+        }
+      },
       "idFormat": "{orgName}",
       "operations": {
         "create": "UpdateAuditLogExportConfiguration",
@@ -167,6 +175,17 @@
     },
     "pulumiservice:api:DeploymentSettings": {
       "deleteBeforeReplace": true,
+      "fields": {
+        "executorContext": {
+          "secret": true
+        },
+        "operationContext": {
+          "secret": true
+        },
+        "sourceContext": {
+          "secret": true
+        }
+      },
       "idFormat": "{orgName}/{projectName}/{stackName}",
       "operations": {
         "create": "PatchDeploymentSettings",
@@ -508,6 +527,14 @@
     },
     "pulumiservice:api:ScheduledDeployment": {
       "deleteBeforeReplace": true,
+      "fields": {
+        "definition": {
+          "secret": true
+        },
+        "request": {
+          "secret": true
+        }
+      },
       "idFormat": "{orgName}/{projectName}/{stackName}/{scheduleID}",
       "operations": {
         "create": "CreateScheduledDeployment",

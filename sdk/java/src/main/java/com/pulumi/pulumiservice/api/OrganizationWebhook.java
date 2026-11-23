@@ -268,7 +268,6 @@ public class OrganizationWebhook extends com.pulumi.resources.CustomResource {
         var defaultOptions = com.pulumi.resources.CustomResourceOptions.builder()
             .version(Utilities.getVersion())
             .additionalSecretOutputs(List.of(
-                "hasSecret",
                 "secret",
                 "secretCiphertext"
             ))

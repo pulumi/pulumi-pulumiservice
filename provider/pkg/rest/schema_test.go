@@ -23,10 +23,13 @@ import (
 )
 
 const (
-	tokenValueKey    = "tokenValue"
-	outputVal        = "output"
-	triggerKey       = "trigger"
-	webhookSecretKey = "webhookSecret"
+	tokenValueKey          = "tokenValue"
+	outputVal              = "output"
+	inputVal               = "input"
+	auditLogExportType     = "pulumiservice:api:AuditLogExportConfiguration"
+	deploymentSettingsType = "pulumiservice:api:DeploymentSettings"
+	triggerKey             = "trigger"
+	webhookSecretKey       = "webhookSecret"
 )
 
 // TestBuildSchemaSucceeds catches drift between metadata and spec.json.
@@ -107,8 +110,9 @@ func TestIDIsSkippedFromOutputs(t *testing.T) {
 	}
 }
 
-// TestSecretFieldsAreMarkedSecret pins the looksSecret heuristic against
-// representative resources, on both outputs and inputs.
+// TestSecretFieldsAreMarkedSecret pins the looksSecret heuristic and the
+// metadata.json secret overrides against representative resources, on both
+// outputs and inputs.
 func TestSecretFieldsAreMarkedSecret(t *testing.T) {
 	spec, meta := loadFixtures(t)
 	pkg, err := BuildSchema(spec, meta, "pulumiservice")
@@ -123,7 +127,17 @@ func TestSecretFieldsAreMarkedSecret(t *testing.T) {
 		{"pulumiservice:api:OrgToken", tokenValueKey, outputVal},
 		{"pulumiservice:api:TeamToken", tokenValueKey, outputVal},
 		{"pulumiservice:api:PersonalToken", tokenValueKey, outputVal},
-		{"pulumiservice:api:OrganizationWebhook", "secret", "input"},
+		{"pulumiservice:api:OrganizationWebhook", "secret", inputVal},
+		{auditLogExportType, "newS3CompatibleConfiguration", inputVal},
+		{auditLogExportType, "s3CompatibleConfig", outputVal},
+		{deploymentSettingsType, "sourceContext", inputVal},
+		{deploymentSettingsType, "sourceContext", outputVal},
+		{deploymentSettingsType, "executorContext", inputVal},
+		{deploymentSettingsType, "executorContext", outputVal},
+		{deploymentSettingsType, "operationContext", inputVal},
+		{deploymentSettingsType, "operationContext", outputVal},
+		{"pulumiservice:api:ScheduledDeployment", "request", inputVal},
+		{"pulumiservice:api:ScheduledDeployment", "definition", outputVal},
 	}
 	for _, tc := range cases {
 		rm := meta.Resources[tc.token]
@@ -137,7 +151,7 @@ func TestSecretFieldsAreMarkedSecret(t *testing.T) {
 			continue
 		}
 		props := rs.Properties
-		if tc.surface == "input" {
+		if tc.surface == inputVal {
 			props = rs.InputProperties
 		}
 		ps, ok := props[tc.field]
@@ -146,7 +160,7 @@ func TestSecretFieldsAreMarkedSecret(t *testing.T) {
 			continue
 		}
 		if !ps.Secret {
-			t.Errorf("%s.%s (%s): Secret = false (expected true via looksSecret heuristic)", tc.token, tc.field, tc.surface)
+			t.Errorf("%s.%s (%s): Secret = false, want true", tc.token, tc.field, tc.surface)
 		}
 	}
 }
@@ -322,15 +336,18 @@ func TestAutoNameNotRequired(t *testing.T) {
 // TestLooksSecret pins the substring set the heuristic recognizes.
 func TestLooksSecret(t *testing.T) {
 	cases := map[string]bool{
-		tokenValueKey:      true,
-		webhookSecretKey:   true,
-		passwordKey:        true,
-		"apiKey":           true,
-		"accessToken":      true,
-		"secretCiphertext": true,
-		nameKey:            false,
-		descriptionKey:     false,
-		orgNameKey:         false,
+		tokenValueKey:                true,
+		webhookSecretKey:             true,
+		passwordKey:                  true,
+		"apiKey":                     true,
+		"accessToken":                true,
+		"secretCiphertext":           true,
+		"hasSecret":                  false,
+		"secretRotationRequest":      false,
+		"groupAccessTokenExpiration": false,
+		nameKey:                      false,
+		descriptionKey:               false,
+		orgNameKey:                   false,
 	}
 	for name, want := range cases {
 		if got := looksSecret(name); got != want {

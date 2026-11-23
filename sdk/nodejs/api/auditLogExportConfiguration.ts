@@ -82,7 +82,7 @@ export class AuditLogExportConfiguration extends pulumi.CustomResource {
                 throw new Error("Missing required property 'orgName'");
             }
             resourceInputs["newEnabled"] = args?.newEnabled;
-            resourceInputs["newS3CompatibleConfiguration"] = args?.newS3CompatibleConfiguration;
+            resourceInputs["newS3CompatibleConfiguration"] = args?.newS3CompatibleConfiguration ? pulumi.secret(args.newS3CompatibleConfiguration) : undefined;
             resourceInputs["newS3Configuration"] = args?.newS3Configuration;
             resourceInputs["orgName"] = args?.orgName;
             resourceInputs["enabled"] = undefined /*out*/;
@@ -96,6 +96,8 @@ export class AuditLogExportConfiguration extends pulumi.CustomResource {
             resourceInputs["s3Config"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
+        const secretOpts = { additionalSecretOutputs: ["s3CompatibleConfig"] };
+        opts = pulumi.mergeOptions(opts, secretOpts);
         super(AuditLogExportConfiguration.__pulumiType, name, resourceInputs, opts);
     }
 }

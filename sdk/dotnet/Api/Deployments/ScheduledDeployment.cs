@@ -104,6 +104,10 @@ namespace Pulumi.PulumiService.Api.Deployments
             var defaultOptions = new CustomResourceOptions
             {
                 Version = Utilities.Version,
+                AdditionalSecretOutputs =
+                {
+                    "definition",
+                },
             };
             var merged = CustomResourceOptions.Merge(defaultOptions, options);
             // Override the ID if one was specified for consistency with other language SDKs.
@@ -138,11 +142,21 @@ namespace Pulumi.PulumiService.Api.Deployments
         [Input("projectName", required: true)]
         public Input<string> ProjectName { get; set; } = null!;
 
+        [Input("request")]
+        private Input<object>? _request;
+
         /// <summary>
         /// Deployment request payload to execute when the schedule fires. This has the same shape and semantics as CreateDeploymentRequest used for immediate deployments.
         /// </summary>
-        [Input("request")]
-        public Input<object>? Request { get; set; }
+        public Input<object>? Request
+        {
+            get => _request;
+            set
+            {
+                var emptySecret = Output.CreateSecret(0);
+                _request = Output.Tuple<Input<object>?, int>(value, emptySecret).Apply(t => t.Item1);
+            }
+        }
 
         /// <summary>
         /// Cron expression defining a recurring schedule for this deployment. When set, scheduleOnce must be null. Uses standard 5-field cron syntax (MIN HOUR DOM MON DOW) and is evaluated in UTC.

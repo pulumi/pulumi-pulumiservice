@@ -134,7 +134,6 @@ namespace Pulumi.PulumiService.Api.Stacks
                 Version = Utilities.Version,
                 AdditionalSecretOutputs =
                 {
-                    "hasSecret",
                     "secret",
                     "secretCiphertext",
                 },

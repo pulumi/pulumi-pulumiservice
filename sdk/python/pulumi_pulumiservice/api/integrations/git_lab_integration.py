@@ -182,8 +182,6 @@ class GitLabIntegration(pulumi.CustomResource):
             __props__.__dict__["group_path"] = None
             __props__.__dict__["installed"] = None
             __props__.__dict__["valid"] = None
-        secret_opts = pulumi.ResourceOptions(additional_secret_outputs=["groupAccessTokenExpiration"])
-        opts = pulumi.ResourceOptions.merge(opts, secret_opts)
         super(GitLabIntegration, __self__).__init__(
             'pulumiservice:api/integrations:GitLabIntegration',
             resource_name,

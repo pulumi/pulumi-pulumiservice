@@ -55,10 +55,6 @@ func NewGitLabIntegration(ctx *pulumi.Context,
 	if args.OrgName == nil {
 		return nil, errors.New("invalid value for required argument 'OrgName'")
 	}
-	secrets := pulumi.AdditionalSecretOutputs([]string{
-		"groupAccessTokenExpiration",
-	})
-	opts = append(opts, secrets)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource GitLabIntegration
 	err := ctx.RegisterResource("pulumiservice:api/integrations:GitLabIntegration", name, args, &resource, opts...)

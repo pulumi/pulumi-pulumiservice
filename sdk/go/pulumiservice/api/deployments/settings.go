@@ -54,6 +54,21 @@ func NewSettings(ctx *pulumi.Context,
 	if args.StackName == nil {
 		return nil, errors.New("invalid value for required argument 'StackName'")
 	}
+	if args.ExecutorContext != nil {
+		args.ExecutorContext = pulumi.ToSecret(args.ExecutorContext).(pulumi.Input)
+	}
+	if args.OperationContext != nil {
+		args.OperationContext = pulumi.ToSecret(args.OperationContext).(pulumi.Input)
+	}
+	if args.SourceContext != nil {
+		args.SourceContext = pulumi.ToSecret(args.SourceContext).(pulumi.Input)
+	}
+	secrets := pulumi.AdditionalSecretOutputs([]string{
+		"executorContext",
+		"operationContext",
+		"sourceContext",
+	})
+	opts = append(opts, secrets)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource Settings
 	err := ctx.RegisterResource("pulumiservice:api/deployments:Settings", name, args, &resource, opts...)
