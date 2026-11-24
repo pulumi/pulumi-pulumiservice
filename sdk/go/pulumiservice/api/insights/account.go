@@ -30,9 +30,6 @@ type Account struct {
 	// Reference to an ESC environment containing provider credentials,
 	// in the format 'project/environment' with an optional @version suffix.
 	ProviderEnvRef pulumi.StringPtrOutput `pulumi:"providerEnvRef"`
-	// Deprecated: no longer populated. Omitted from responses, and ignored if sent.
-	// The provider version used for discovery is now recorded per resource.
-	ProviderVersion pulumi.StringPtrOutput `pulumi:"providerVersion"`
 	// Status of the last discovery scan for this account.
 	ScanStatus pulumi.AnyOutput `pulumi:"scanStatus"`
 	// If true, the account is scheduled for recurring discovery.
@@ -250,12 +247,6 @@ func (o AccountOutput) ProviderConfig() pulumi.MapOutput {
 // in the format 'project/environment' with an optional @version suffix.
 func (o AccountOutput) ProviderEnvRef() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *Account) pulumi.StringPtrOutput { return v.ProviderEnvRef }).(pulumi.StringPtrOutput)
-}
-
-// Deprecated: no longer populated. Omitted from responses, and ignored if sent.
-// The provider version used for discovery is now recorded per resource.
-func (o AccountOutput) ProviderVersion() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *Account) pulumi.StringPtrOutput { return v.ProviderVersion }).(pulumi.StringPtrOutput)
 }
 
 // Status of the last discovery scan for this account.

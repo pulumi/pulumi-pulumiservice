@@ -1,5 +1,0 @@
-kind: bug-fixes
-body: Fixed `DeploymentSettings` with a `github` or `vcs` block reporting changes on every refresh, because Pulumi Cloud returns GitHub settings in both blocks
-time: 2026-11-20T15:43:03.643035-05:00
-custom:
-    Issue: "1201"

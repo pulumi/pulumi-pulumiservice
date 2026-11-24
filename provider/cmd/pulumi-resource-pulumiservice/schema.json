@@ -3982,10 +3982,6 @@
           "type": "string",
           "description": "Reference to an ESC environment containing provider credentials,\nin the format 'project/environment' with an optional @version suffix."
         },
-        "providerVersion": {
-          "type": "string",
-          "description": "Deprecated: no longer populated. Omitted from responses, and ignored if sent.\nThe provider version used for discovery is now recorded per resource."
-        },
         "scanStatus": {
           "$ref": "pulumi.json#/Any",
           "description": "Status of the last discovery scan for this account."

@@ -3390,7 +3390,8 @@
               "neo-cli-mode",
               "begin-update",
               "stack-outputs",
-              "coherence-windows"
+              "coherence-windows",
+              "email-delivery"
             ],
             "type": "string",
             "x-order": 1,
@@ -3408,7 +3409,8 @@
                 "Advertises that the service supports Neo CLI mode. The configuration object carries `minCliVersion`, the minimum `pulumi` CLI semver required to start a Neo CLI session.",
                 "Indicates that the service supports the combined begin-update endpoint.",
                 "Indicates that the service supports /api/stacks/{org}/{project}/{stack}/outputs.",
-                "Indicates that the service supports stack update coherence windows."
+                "Indicates that the service supports stack update coherence windows.",
+                "Indicates that the service can send email, such as organization invitations."
               ],
               "enumFieldNames": [
                 "DeltaCheckpointUploads",
@@ -3422,7 +3424,8 @@
                 "NeoCLIMode",
                 "BeginUpdate",
                 "StackOutputs",
-                "CoherenceWindows"
+                "CoherenceWindows",
+                "EmailDelivery"
               ],
               "enumNoValidation": true,
               "enumTypeName": "AppAPICapability"
@@ -13024,7 +13027,7 @@
         "description": "CreateOrganizationInviteRequest is for sending out invites to join a Pulumi organization.",
         "properties": {
           "email": {
-            "description": "The email address. Required for email-based invites, omitted when creating shareable invite links.",
+            "description": "The email address of the person invited. Required: an invite without an email is deprecated. It is refused when the service can send email, and from 2027-02-22 in every case.",
             "type": "string",
             "x-order": 1
           },
@@ -13660,6 +13663,2933 @@
           "projectName",
           "stackName",
           "version"
+        ],
+        "type": "object"
+      },
+      "DeliveryAction": {
+        "description": "Whether an action is available to the caller, and why not if it is not.",
+        "properties": {
+          "allowed": {
+            "description": "Whether the caller can do the action now.",
+            "type": "boolean",
+            "x-order": 1
+          },
+          "reason": {
+            "description": "Why the caller cannot do the action. Not set when it is allowed.",
+            "type": "string",
+            "x-order": 2
+          }
+        },
+        "required": [
+          "allowed"
+        ],
+        "type": "object"
+      },
+      "DeliveryActionResult": {
+        "description": "The result of an action that starts or continues a Delivery run.",
+        "properties": {
+          "runNumber": {
+            "description": "The number of the run that the action started or continued.",
+            "format": "int64",
+            "type": "integer",
+            "x-order": 1
+          }
+        },
+        "required": [
+          "runNumber"
+        ],
+        "type": "object"
+      },
+      "DeliveryApproval": {
+        "description": "A row of the list of approvals.",
+        "properties": {
+          "actor": {
+            "description": "The login of the user who started the run.",
+            "type": "string",
+            "x-order": 10
+          },
+          "approvals": {
+            "description": "The number of approvals that count now.",
+            "format": "int64",
+            "type": "integer",
+            "x-order": 14
+          },
+          "changeRequestStatus": {
+            "description": "The status of the change request of the approval.",
+            "type": "string",
+            "x-order": 11
+          },
+          "conditionId": {
+            "description": "The ID of the condition.",
+            "type": "string",
+            "x-order": 5
+          },
+          "conditionName": {
+            "description": "The name of the condition.",
+            "type": "string",
+            "x-order": 6
+          },
+          "conditionState": {
+            "description": "The state of the condition: `pending`, `satisfied` or `rejected`.",
+            "enum": [
+              "pending",
+              "satisfied",
+              "rejected"
+            ],
+            "type": "string",
+            "x-order": 12,
+            "x-pulumi-model-property": {
+              "enumComments": "The state of a gate condition.",
+              "enumFieldComments": [
+                "The condition waits.",
+                "The condition is satisfied.",
+                "The condition is rejected."
+              ],
+              "enumNoValidation": true,
+              "enumTypeName": "DeliveryGateConditionState"
+            }
+          },
+          "gateId": {
+            "description": "The ID of the gate.",
+            "type": "string",
+            "x-order": 4
+          },
+          "project": {
+            "description": "The project name of the pipeline stack.",
+            "type": "string",
+            "x-order": 1
+          },
+          "releaseNumber": {
+            "description": "The number of the release.",
+            "format": "int64",
+            "type": "integer",
+            "x-order": 8
+          },
+          "requestedAt": {
+            "description": "When the approval was requested.",
+            "format": "date-time",
+            "type": "string",
+            "x-order": 9
+          },
+          "requiredApprovals": {
+            "description": "The number of approvals that are needed.",
+            "format": "int64",
+            "type": "integer",
+            "x-order": 13
+          },
+          "runNumber": {
+            "description": "The number of the run.",
+            "format": "int64",
+            "type": "integer",
+            "x-order": 3
+          },
+          "stack": {
+            "description": "The stack name of the pipeline stack.",
+            "type": "string",
+            "x-order": 2
+          },
+          "stageName": {
+            "description": "The name of the stage.",
+            "type": "string",
+            "x-order": 7
+          }
+        },
+        "required": [
+          "conditionId",
+          "conditionName",
+          "gateId",
+          "project",
+          "requestedAt",
+          "runNumber",
+          "stack"
+        ],
+        "type": "object"
+      },
+      "DeliveryApprovalList": {
+        "description": "A page of approvals.",
+        "properties": {
+          "approvals": {
+            "description": "The approvals of the page, newest first.",
+            "items": {
+              "$ref": "#/components/schemas/DeliveryApproval"
+            },
+            "type": "array",
+            "x-order": 1
+          },
+          "continuationToken": {
+            "description": "The token of the next page. Not set on the last page.",
+            "type": "string",
+            "x-order": 2
+          }
+        },
+        "type": "object"
+      },
+      "DeliveryAttempt": {
+        "description": "One attempt to run a member.",
+        "properties": {
+          "createdAt": {
+            "description": "When the attempt was created.",
+            "format": "date-time",
+            "type": "string",
+            "x-order": 7
+          },
+          "failureReason": {
+            "description": "Why the attempt failed.",
+            "type": "string",
+            "x-order": 6
+          },
+          "finishedAt": {
+            "description": "When the attempt ended.",
+            "format": "date-time",
+            "type": "string",
+            "x-order": 9
+          },
+          "number": {
+            "description": "The number of the attempt.",
+            "format": "int64",
+            "type": "integer",
+            "x-order": 1
+          },
+          "startedAt": {
+            "description": "When the attempt started.",
+            "format": "date-time",
+            "type": "string",
+            "x-order": 8
+          },
+          "status": {
+            "description": "The status of the attempt.",
+            "enum": [
+              "queued",
+              "running",
+              "succeeded",
+              "failed",
+              "canceled"
+            ],
+            "type": "string",
+            "x-order": 2,
+            "x-pulumi-model-property": {
+              "enumComments": "The status of an attempt to run a member.",
+              "enumFieldComments": [
+                "The attempt is waiting to start.",
+                "The attempt is running.",
+                "The attempt succeeded.",
+                "The attempt failed.",
+                "The attempt was canceled."
+              ],
+              "enumNoValidation": true,
+              "enumTypeName": "DeliveryAttemptStatus"
+            }
+          },
+          "updateId": {
+            "description": "The ID of the update of the target stack.",
+            "type": "string",
+            "x-order": 3
+          },
+          "updateKind": {
+            "description": "The kind of that update. Not set when no update is bound.",
+            "enum": [
+              "update",
+              "preview",
+              "refresh",
+              "rename",
+              "destroy",
+              "import",
+              "resource-import",
+              "Pupdate",
+              "Prefresh",
+              "Pdestroy",
+              "Pimport",
+              "Prename"
+            ],
+            "type": "string",
+            "x-order": 5,
+            "x-pulumi-model-property": {
+              "enumComments": "UpdateKind is an enum for the type of update performed.\nShould generally mirror backend.UpdateKind, but we clone it in this package to add\nflexibility in case there is a breaking change in the backend-type.",
+              "enumFieldComments": [
+                "A Pulumi program update.",
+                "A preview of an update, without impacting resources.",
+                "A refresh operation.",
+                "A rename of the stack or project name.",
+                "An update which removes all resources.",
+                "An update that entails importing a raw checkpoint file.",
+                "An update that entails importing one or more resources.",
+                "A preview of an update operation.",
+                "A preview of a refresh operation.",
+                "A preview of a destroy operation.",
+                "A preview of an import operation.",
+                "A preview of a rename operation."
+              ],
+              "enumFieldNames": [
+                "Update",
+                "Preview",
+                "Refresh",
+                "Rename",
+                "Destroy",
+                "Import",
+                "ResourceImport",
+                "PreviewUpdate",
+                "PreviewRefresh",
+                "PreviewDestroy",
+                "PreviewImport",
+                "PreviewRename"
+              ],
+              "enumNoValidation": true,
+              "enumTypeName": "AppUpdateKind"
+            }
+          },
+          "updateVersion": {
+            "description": "The version of that update on the target stack, for the link to the update. Not set when no update is bound.",
+            "format": "int64",
+            "type": "integer",
+            "x-order": 4
+          }
+        },
+        "required": [
+          "createdAt",
+          "number",
+          "status"
+        ],
+        "type": "object"
+      },
+      "DeliveryChangeEntry": {
+        "description": "The changes of one member for an approval.",
+        "properties": {
+          "configChanged": {
+            "description": "The number of config keys that differ from the last deployment of the stage.",
+            "format": "int64",
+            "type": "integer",
+            "x-order": 9
+          },
+          "countsApproximate": {
+            "description": "Whether the counts may include reads of other stacks, because the preview was too large to tell them apart.",
+            "type": "boolean",
+            "x-order": 8
+          },
+          "kind": {
+            "description": "The kind of the entry.",
+            "enum": [
+              "stack",
+              "job"
+            ],
+            "type": "string",
+            "x-order": 3,
+            "x-pulumi-model-property": {
+              "enumComments": "The kind of a member in the changes of an approval.",
+              "enumFieldComments": [
+                "A stack member.",
+                "A job member."
+              ],
+              "enumNoValidation": true,
+              "enumTypeName": "DeliveryChangeEntryKind"
+            }
+          },
+          "memberId": {
+            "description": "The ID of the member.",
+            "type": "string",
+            "x-order": 1
+          },
+          "memberName": {
+            "description": "The name of the member.",
+            "type": "string",
+            "x-order": 2
+          },
+          "reason": {
+            "description": "Why the preview failed or is not available. Free-form text.",
+            "type": "string",
+            "x-order": 6
+          },
+          "state": {
+            "description": "The state of the preview.",
+            "enum": [
+              "pending",
+              "running",
+              "done",
+              "failed",
+              "not_previewable",
+              "canceled",
+              "not_previewed"
+            ],
+            "type": "string",
+            "x-order": 5,
+            "x-pulumi-model-property": {
+              "enumComments": "The state of the preview of a member at a gate.",
+              "enumFieldComments": [
+                "The preview waits to start.",
+                "The preview is running.",
+                "The preview finished.",
+                "The preview failed.",
+                "The member cannot be previewed.",
+                "The preview was canceled.",
+                "The member has no preview."
+              ],
+              "enumFieldNames": [
+                "Pending",
+                "Running",
+                "Done",
+                "Failed",
+                "NotPreviewable",
+                "Canceled",
+                "NotPreviewed"
+              ],
+              "enumNoValidation": true,
+              "enumTypeName": "DeliveryPreviewState"
+            }
+          },
+          "summary": {
+            "additionalProperties": {
+              "format": "int64",
+              "type": "integer"
+            },
+            "description": "The number of resources for each operation of a preview that is done.",
+            "type": "object",
+            "x-order": 7
+          },
+          "targetStack": {
+            "description": "The target stack of a `stack` entry.",
+            "type": "string",
+            "x-order": 4
+          }
+        },
+        "required": [
+          "configChanged",
+          "countsApproximate",
+          "kind",
+          "memberId",
+          "memberName",
+          "state"
+        ],
+        "type": "object"
+      },
+      "DeliveryChangeSummary": {
+        "description": "The summary of the stage previews of an approval.",
+        "properties": {
+          "entries": {
+            "description": "One entry for each member of the stage, at most 1000.",
+            "items": {
+              "$ref": "#/components/schemas/DeliveryChangeEntry"
+            },
+            "type": "array",
+            "x-order": 4
+          },
+          "stacksNotAvailable": {
+            "description": "The number of stacks whose preview is not available. They are not counted as unchanged.",
+            "format": "int64",
+            "type": "integer",
+            "x-order": 2
+          },
+          "stacksPreviewed": {
+            "description": "The number of stacks with a preview that is done.",
+            "format": "int64",
+            "type": "integer",
+            "x-order": 1
+          },
+          "stacksWithChanges": {
+            "description": "The number of previewed stacks that have changes.",
+            "format": "int64",
+            "type": "integer",
+            "x-order": 3
+          }
+        },
+        "required": [
+          "stacksNotAvailable",
+          "stacksPreviewed",
+          "stacksWithChanges"
+        ],
+        "type": "object"
+      },
+      "DeliveryCommit": {
+        "description": "A commit that Delivery recorded for a source.",
+        "properties": {
+          "authorLogin": {
+            "description": "The login of the commit author on the forge, if known.",
+            "type": "string",
+            "x-order": 3
+          },
+          "authorName": {
+            "description": "The name of the commit author, if known.",
+            "type": "string",
+            "x-order": 2
+          },
+          "commit": {
+            "description": "The commit SHA.",
+            "type": "string",
+            "x-order": 1
+          },
+          "message": {
+            "description": "The first line of the commit message, if known.",
+            "type": "string",
+            "x-order": 4
+          }
+        },
+        "required": [
+          "commit"
+        ],
+        "type": "object"
+      },
+      "DeliveryCondition": {
+        "description": "A condition of a gate.",
+        "properties": {
+          "actor": {
+            "description": "The login of the user who satisfied or rejected the condition.",
+            "type": "string",
+            "x-order": 6
+          },
+          "actorKind": {
+            "description": "Who satisfied or rejected the condition.",
+            "enum": [
+              "user",
+              "webhook",
+              "system",
+              "trigger"
+            ],
+            "type": "string",
+            "x-order": 5,
+            "x-pulumi-model-property": {
+              "enumComments": "Who acted: a person, a webhook, a trigger or the system.",
+              "enumFieldComments": [
+                "A person.",
+                "A webhook.",
+                "The system.",
+                "A trigger."
+              ],
+              "enumNoValidation": true,
+              "enumTypeName": "DeliveryActorKind"
+            }
+          },
+          "approvals": {
+            "description": "The number of approvals that count now.",
+            "format": "int64",
+            "type": "integer",
+            "x-order": 14
+          },
+          "canContinue": {
+            "$ref": "#/components/schemas/DeliveryAction",
+            "description": "Whether the caller can continue a manual condition.",
+            "x-order": 8
+          },
+          "canReview": {
+            "$ref": "#/components/schemas/DeliveryAction",
+            "description": "Whether the caller can approve or reject an approval condition. Only an eligible approver of its change request can.",
+            "x-order": 9
+          },
+          "changeRequestId": {
+            "description": "The ID of the change request of an approval.",
+            "type": "string",
+            "x-order": 11
+          },
+          "changeRequestStatus": {
+            "description": "The status of the change request of an approval: `draft`, `pending`, `ready`, `applied` or `closed`.",
+            "type": "string",
+            "x-order": 12
+          },
+          "comment": {
+            "description": "The comment of the person who continued a manual condition.",
+            "type": "string",
+            "x-order": 10
+          },
+          "description": {
+            "description": "What the condition is for, as the pipeline program describes it.",
+            "type": "string",
+            "x-order": 7
+          },
+          "details": {
+            "additionalProperties": {
+              "type": "object"
+            },
+            "description": "Facts about the condition. For an approval, the message that says why it cannot get its change request. For a decision, the outcome and answers of its last evaluation, or the message of its last failure and the time of the next attempt.",
+            "type": "object",
+            "x-order": 16
+          },
+          "eligibleApprovers": {
+            "description": "The names of the users and teams that can approve. Empty means anyone with the pipeline:approve permission on the pipeline stack.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "x-order": 15
+          },
+          "id": {
+            "description": "The ID of the condition.",
+            "type": "string",
+            "x-order": 1
+          },
+          "kind": {
+            "description": "The kind of the condition: `approval`, `decision`, or `manual`.",
+            "enum": [
+              "approval",
+              "decision",
+              "manual"
+            ],
+            "type": "string",
+            "x-order": 3,
+            "x-pulumi-model-property": {
+              "enumComments": "The kind of a gate condition.",
+              "enumFieldComments": [
+                "The condition needs approvals.",
+                "The condition evaluates a deployment decision.",
+                "The condition needs a person to continue it."
+              ],
+              "enumNoValidation": true,
+              "enumTypeName": "DeliveryGateConditionKind"
+            }
+          },
+          "name": {
+            "description": "The name of the condition.",
+            "type": "string",
+            "x-order": 2
+          },
+          "requiredApprovals": {
+            "description": "The number of approvals that an approval condition needs.",
+            "format": "int64",
+            "type": "integer",
+            "x-order": 13
+          },
+          "state": {
+            "description": "The state of the condition: `pending`, `satisfied` or `rejected`.",
+            "enum": [
+              "pending",
+              "satisfied",
+              "rejected"
+            ],
+            "type": "string",
+            "x-order": 4,
+            "x-pulumi-model-property": {
+              "enumComments": "The state of a gate condition.",
+              "enumFieldComments": [
+                "The condition waits.",
+                "The condition is satisfied.",
+                "The condition is rejected."
+              ],
+              "enumNoValidation": true,
+              "enumTypeName": "DeliveryGateConditionState"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "name",
+          "state"
+        ],
+        "type": "object"
+      },
+      "DeliveryConditionChip": {
+        "description": "The state of one condition of a gate, for the stage list.",
+        "properties": {
+          "approvals": {
+            "description": "The number of approvals given.",
+            "format": "int64",
+            "type": "integer",
+            "x-order": 7
+          },
+          "canContinue": {
+            "$ref": "#/components/schemas/DeliveryAction",
+            "description": "Whether the caller can continue a manual condition.",
+            "x-order": 6
+          },
+          "description": {
+            "description": "What the condition is for, as the pipeline program describes it.",
+            "type": "string",
+            "x-order": 5
+          },
+          "id": {
+            "description": "The ID of the condition.",
+            "type": "string",
+            "x-order": 1
+          },
+          "kind": {
+            "description": "The kind of the condition: `approval`, `decision`, or `manual`.",
+            "enum": [
+              "approval",
+              "decision",
+              "manual"
+            ],
+            "type": "string",
+            "x-order": 3,
+            "x-pulumi-model-property": {
+              "enumComments": "The kind of a gate condition.",
+              "enumFieldComments": [
+                "The condition needs approvals.",
+                "The condition evaluates a deployment decision.",
+                "The condition needs a person to continue it."
+              ],
+              "enumNoValidation": true,
+              "enumTypeName": "DeliveryGateConditionKind"
+            }
+          },
+          "name": {
+            "description": "The name of the condition.",
+            "type": "string",
+            "x-order": 2
+          },
+          "requiredApprovals": {
+            "description": "The number of approvals required.",
+            "format": "int64",
+            "type": "integer",
+            "x-order": 8
+          },
+          "state": {
+            "description": "The state of the condition.",
+            "enum": [
+              "pending",
+              "satisfied",
+              "rejected"
+            ],
+            "type": "string",
+            "x-order": 4,
+            "x-pulumi-model-property": {
+              "enumComments": "The state of a gate condition.",
+              "enumFieldComments": [
+                "The condition waits.",
+                "The condition is satisfied.",
+                "The condition is rejected."
+              ],
+              "enumNoValidation": true,
+              "enumTypeName": "DeliveryGateConditionState"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "name",
+          "state"
+        ],
+        "type": "object"
+      },
+      "DeliveryDeployment": {
+        "description": "Where a release is deployed.",
+        "properties": {
+          "deployed": {
+            "description": "Whether the release is the deployed release of the stage.",
+            "type": "boolean",
+            "x-order": 2
+          },
+          "runNumber": {
+            "description": "The number of the run that deployed it.",
+            "format": "int64",
+            "type": "integer",
+            "x-order": 3
+          },
+          "stageName": {
+            "description": "The name of the stage.",
+            "type": "string",
+            "x-order": 1
+          }
+        },
+        "required": [
+          "deployed",
+          "stageName"
+        ],
+        "type": "object"
+      },
+      "DeliveryDispatchRequest": {
+        "description": "A request to start a Delivery run, at the head of the program branch or at a chosen ref.",
+        "properties": {
+          "key": {
+            "description": "A key that prevents duplicate dispatches. A second dispatch with the same key, the same `ref` and the same `sources` returns the run of the first. A dispatch with a different `ref` or different `sources` is a new dispatch. The key has at most 128 printable ASCII characters.",
+            "type": "string",
+            "x-order": 1
+          },
+          "ref": {
+            "description": "A branch name, a tag name or a full commit SHA of the program repository. The run uses the program code at that commit and the active definition of the pipeline. Empty means the head of the program branch.",
+            "type": "string",
+            "x-order": 2
+          },
+          "sources": {
+            "description": "Release sources to pin. A source that is not pinned gets its latest value.",
+            "items": {
+              "$ref": "#/components/schemas/DeliveryDispatchSource"
+            },
+            "type": "array",
+            "x-order": 3
+          }
+        },
+        "type": "object"
+      },
+      "DeliveryDispatchResponse": {
+        "description": "The run that a dispatch started or found.",
+        "properties": {
+          "runNumber": {
+            "description": "The number of the run.",
+            "format": "int64",
+            "type": "integer",
+            "x-order": 1
+          }
+        },
+        "required": [
+          "runNumber"
+        ],
+        "type": "object"
+      },
+      "DeliveryDispatchSource": {
+        "description": "A release source of a pipeline and the value to pin it to.",
+        "properties": {
+          "name": {
+            "description": "The name of the source resource in the pipeline definition. Only a GitHub, GitLab, Bitbucket or Azure DevOps source can be pinned. A source of another kind, an unknown name, a name that appears twice or an empty value returns a 400 error.",
+            "type": "string",
+            "x-order": 1
+          },
+          "value": {
+            "description": "The branch name, tag name or full commit SHA to pin the source to.",
+            "type": "string",
+            "x-order": 2
+          }
+        },
+        "required": [
+          "name",
+          "value"
+        ],
+        "type": "object"
+      },
+      "DeliveryEdge": {
+        "description": "An edge of the graph of a run.",
+        "properties": {
+          "from": {
+            "description": "The start of the edge: a stage name or a member ID.",
+            "type": "string",
+            "x-order": 1
+          },
+          "kind": {
+            "description": "The kind of the edge: `stage` or `member`.",
+            "enum": [
+              "stage",
+              "member"
+            ],
+            "type": "string",
+            "x-order": 3,
+            "x-pulumi-model-property": {
+              "enumComments": "The kind of an edge in the graph of a Delivery pipeline.",
+              "enumFieldComments": [
+                "An edge between two stages.",
+                "An edge between two members."
+              ],
+              "enumNoValidation": true,
+              "enumTypeName": "DeliveryEdgeKind"
+            }
+          },
+          "to": {
+            "description": "The end of the edge: a stage name or a member ID.",
+            "type": "string",
+            "x-order": 2
+          }
+        },
+        "required": [
+          "from",
+          "kind",
+          "to"
+        ],
+        "type": "object"
+      },
+      "DeliveryGate": {
+        "description": "A gate of a stage of a run, in one round.",
+        "properties": {
+          "closeReason": {
+            "description": "Why a closed gate closed.",
+            "enum": [
+              "canceled",
+              "failed",
+              "superseded",
+              "ended",
+              "stage_converged"
+            ],
+            "type": "string",
+            "x-order": 10,
+            "x-pulumi-model-property": {
+              "enumComments": "Why a Delivery gate closed.",
+              "enumFieldComments": [
+                "The run was canceled.",
+                "The run failed.",
+                "A newer release superseded the run.",
+                "The run ended.",
+                "The stage converged."
+              ],
+              "enumFieldNames": [
+                "Canceled",
+                "Failed",
+                "Superseded",
+                "Ended",
+                "StageConverged"
+              ],
+              "enumNoValidation": true,
+              "enumTypeName": "DeliveryGateCloseReason"
+            }
+          },
+          "closedAt": {
+            "description": "When the gate closed.",
+            "format": "date-time",
+            "type": "string",
+            "x-order": 9
+          },
+          "closedBy": {
+            "description": "The login of the user who closed the gate, for example by canceling the run.",
+            "type": "string",
+            "x-order": 12
+          },
+          "closedByKind": {
+            "description": "Who closed the gate: a user, or the system for a supersede, a failure or the end of the run.",
+            "enum": [
+              "user",
+              "webhook",
+              "system",
+              "trigger"
+            ],
+            "type": "string",
+            "x-order": 11,
+            "x-pulumi-model-property": {
+              "enumComments": "Who acted: a person, a webhook, a trigger or the system.",
+              "enumFieldComments": [
+                "A person.",
+                "A webhook.",
+                "The system.",
+                "A trigger."
+              ],
+              "enumNoValidation": true,
+              "enumTypeName": "DeliveryActorKind"
+            }
+          },
+          "conditions": {
+            "description": "The conditions of the gate.",
+            "items": {
+              "$ref": "#/components/schemas/DeliveryCondition"
+            },
+            "type": "array",
+            "x-order": 5
+          },
+          "createdAt": {
+            "description": "When the gate opened.",
+            "format": "date-time",
+            "type": "string",
+            "x-order": 7
+          },
+          "id": {
+            "description": "The ID of the gate.",
+            "type": "string",
+            "x-order": 1
+          },
+          "passedAt": {
+            "description": "When the gate passed.",
+            "format": "date-time",
+            "type": "string",
+            "x-order": 8
+          },
+          "round": {
+            "description": "The round of the gate. A retry opens a new round.",
+            "format": "int64",
+            "type": "integer",
+            "x-order": 3
+          },
+          "rule": {
+            "$ref": "#/components/schemas/DeliveryRuleNode",
+            "description": "The rule of the gate with its satisfaction.",
+            "x-order": 6
+          },
+          "stageName": {
+            "description": "The name of the stage of the gate.",
+            "type": "string",
+            "x-order": 2
+          },
+          "status": {
+            "description": "The status of the gate.",
+            "enum": [
+              "open",
+              "passed",
+              "closed"
+            ],
+            "type": "string",
+            "x-order": 4,
+            "x-pulumi-model-property": {
+              "enumComments": "The status of a gate.",
+              "enumFieldComments": [
+                "The gate waits for its conditions.",
+                "The conditions of the gate are met.",
+                "The gate closed without passing, or after it passed."
+              ],
+              "enumNoValidation": true,
+              "enumTypeName": "DeliveryGateStatus"
+            }
+          }
+        },
+        "required": [
+          "createdAt",
+          "id",
+          "round",
+          "status"
+        ],
+        "type": "object"
+      },
+      "DeliveryGateActionRequest": {
+        "description": "A request to continue a manual condition of a gate of a Delivery run.",
+        "properties": {
+          "comment": {
+            "description": "An optional comment. It is shown with the person who continued the gate. Leading and trailing white space is removed, and the comment has at most 4096 bytes.",
+            "type": "string",
+            "x-order": 2
+          },
+          "condition": {
+            "description": "The name or the ID of the manual condition of the gate. It is necessary when the gate has more than one manual condition.",
+            "type": "string",
+            "x-order": 1
+          }
+        },
+        "type": "object"
+      },
+      "DeliveryGateActionResponse": {
+        "description": "The state of a gate of a Delivery run after an action on it.",
+        "properties": {
+          "status": {
+            "description": "The status of the gate after the action.",
+            "enum": [
+              "open",
+              "passed",
+              "closed"
+            ],
+            "type": "string",
+            "x-order": 1,
+            "x-pulumi-model-property": {
+              "enumComments": "The status of a gate.",
+              "enumFieldComments": [
+                "The gate waits for its conditions.",
+                "The conditions of the gate are met.",
+                "The gate closed without passing, or after it passed."
+              ],
+              "enumNoValidation": true,
+              "enumTypeName": "DeliveryGateStatus"
+            }
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "type": "object"
+      },
+      "DeliveryGateDetail": {
+        "description": "The page of one gate.",
+        "properties": {
+          "changes": {
+            "$ref": "#/components/schemas/DeliveryChangeSummary",
+            "description": "The summary of the stage previews for the gate. It is set for a gate of a stage.",
+            "x-order": 6
+          },
+          "gate": {
+            "$ref": "#/components/schemas/DeliveryGate",
+            "description": "The gate with its conditions.",
+            "x-order": 1
+          },
+          "releaseNumber": {
+            "description": "The number of the release.",
+            "format": "int64",
+            "type": "integer",
+            "x-order": 3
+          },
+          "runNumber": {
+            "description": "The number of the run.",
+            "format": "int64",
+            "type": "integer",
+            "x-order": 2
+          },
+          "stageName": {
+            "description": "The name of the stage.",
+            "type": "string",
+            "x-order": 4
+          },
+          "title": {
+            "description": "The title for the approval, for example `Approve release 25 (run 41) into prod`.",
+            "type": "string",
+            "x-order": 5
+          }
+        },
+        "required": [
+          "gate",
+          "runNumber",
+          "title"
+        ],
+        "type": "object"
+      },
+      "DeliveryLocalUpdate": {
+        "description": "The update of the pipeline stack that drives a local run.",
+        "properties": {
+          "project": {
+            "description": "The project name of the pipeline stack.",
+            "type": "string",
+            "x-order": 1
+          },
+          "stack": {
+            "description": "The name of the pipeline stack.",
+            "type": "string",
+            "x-order": 2
+          },
+          "version": {
+            "description": "The version of the update on the pipeline stack.",
+            "format": "int64",
+            "type": "integer",
+            "x-order": 3
+          }
+        },
+        "required": [
+          "project",
+          "stack",
+          "version"
+        ],
+        "type": "object"
+      },
+      "DeliveryMember": {
+        "description": "A member of a Delivery run: a job, an artifact or one stack of a group of stacks.",
+        "properties": {
+          "agentTaskId": {
+            "description": "The Neo task that an Agent member started.",
+            "type": "string",
+            "x-order": 8
+          },
+          "currentAttempt": {
+            "$ref": "#/components/schemas/DeliveryAttempt",
+            "description": "The current attempt of the member.",
+            "x-order": 9
+          },
+          "dependsOn": {
+            "description": "The IDs of the members that this member waits for.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "x-order": 11
+          },
+          "failureReason": {
+            "description": "Why the member failed. Free-form text.",
+            "type": "string",
+            "x-order": 7
+          },
+          "group": {
+            "$ref": "#/components/schemas/DeliveryMemberGroup",
+            "description": "The group of stacks of the member.",
+            "x-order": 10
+          },
+          "id": {
+            "description": "The ID of the member.",
+            "type": "string",
+            "x-order": 1
+          },
+          "name": {
+            "description": "The name of the member: the component and, for a group of stacks, the entry.",
+            "type": "string",
+            "x-order": 2
+          },
+          "stageName": {
+            "description": "The name of the stage of the member.",
+            "type": "string",
+            "x-order": 4
+          },
+          "status": {
+            "$ref": "#/components/schemas/DeliveryStatus",
+            "description": "The structured status of the member, with the reason it waits.",
+            "x-order": 6
+          },
+          "targetStack": {
+            "$ref": "#/components/schemas/DeliveryStackRef",
+            "description": "The stack that a member of `Stacks` updates.",
+            "x-order": 5
+          },
+          "type": {
+            "description": "The type of the member.",
+            "enum": [
+              "job",
+              "stacks",
+              "artifact",
+              "agent"
+            ],
+            "type": "string",
+            "x-order": 3,
+            "x-pulumi-model-property": {
+              "enumComments": "The type of a member of a Delivery run.",
+              "enumFieldComments": [
+                "A job.",
+                "A group of stacks.",
+                "An artifact.",
+                "A structured Neo agent invocation."
+              ],
+              "enumNoValidation": true,
+              "enumTypeName": "DeliveryMemberType"
+            }
+          },
+          "unchangedSinceRelease": {
+            "description": "The release that last ran the member, for a member whose status is unchanged in a local run. Not set when unknown.",
+            "format": "int64",
+            "type": "integer",
+            "x-order": 12
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "status",
+          "type"
+        ],
+        "type": "object"
+      },
+      "DeliveryMemberGroup": {
+        "description": "The group of stacks that a member belongs to.",
+        "properties": {
+          "round": {
+            "description": "The round of the group.",
+            "format": "int64",
+            "type": "integer",
+            "x-order": 1
+          },
+          "status": {
+            "description": "The status of the group.",
+            "enum": [
+              "open",
+              "failing",
+              "closed"
+            ],
+            "type": "string",
+            "x-order": 2,
+            "x-pulumi-model-property": {
+              "enumComments": "The status of a group of stacks.",
+              "enumFieldComments": [
+                "The group is open.",
+                "The group failed and its running updates are ending.",
+                "The group is closed."
+              ],
+              "enumNoValidation": true,
+              "enumTypeName": "DeliveryMemberGroupStatus"
+            }
+          }
+        },
+        "required": [
+          "round",
+          "status"
+        ],
+        "type": "object"
+      },
+      "DeliveryPass": {
+        "description": "One pass of a Delivery run: one execution of the program of the run.",
+        "properties": {
+          "createdAt": {
+            "description": "When the pass was queued.",
+            "format": "date-time",
+            "type": "string",
+            "x-order": 6
+          },
+          "failureReason": {
+            "description": "Why the pass failed. Free-form text.",
+            "type": "string",
+            "x-order": 5
+          },
+          "finishedAt": {
+            "description": "When the pass ended.",
+            "format": "date-time",
+            "type": "string",
+            "x-order": 8
+          },
+          "number": {
+            "description": "The number of the pass in the run.",
+            "format": "int64",
+            "type": "integer",
+            "x-order": 1
+          },
+          "outcome": {
+            "description": "The outcome of a finished pass.",
+            "enum": [
+              "awaiting",
+              "completed",
+              "failed",
+              "canceled"
+            ],
+            "type": "string",
+            "x-order": 3,
+            "x-pulumi-model-property": {
+              "enumComments": "How a finished Delivery pass ended.",
+              "enumFieldComments": [
+                "The pass ended with members still waiting for something.",
+                "The pass completed.",
+                "The pass failed.",
+                "The pass was canceled."
+              ],
+              "enumNoValidation": true,
+              "enumTypeName": "DeliveryPassOutcome"
+            }
+          },
+          "startedAt": {
+            "description": "When the pass started.",
+            "format": "date-time",
+            "type": "string",
+            "x-order": 7
+          },
+          "status": {
+            "description": "The status of the pass.",
+            "enum": [
+              "queued",
+              "running",
+              "finished"
+            ],
+            "type": "string",
+            "x-order": 2,
+            "x-pulumi-model-property": {
+              "enumComments": "The status of a Delivery pass.",
+              "enumFieldComments": [
+                "The pass is waiting to start.",
+                "The pass is running.",
+                "The pass ended; its outcome says how."
+              ],
+              "enumNoValidation": true,
+              "enumTypeName": "DeliveryPassStatus"
+            }
+          },
+          "updateId": {
+            "description": "The ID of the update of the run stack that the pass made.",
+            "type": "string",
+            "x-order": 4
+          }
+        },
+        "required": [
+          "createdAt",
+          "number",
+          "status"
+        ],
+        "type": "object"
+      },
+      "DeliveryProgram": {
+        "description": "The shell of a Delivery program.",
+        "properties": {
+          "dispatch": {
+            "$ref": "#/components/schemas/DeliveryAction",
+            "description": "Whether the caller can dispatch a run.",
+            "x-order": 14
+          },
+          "kind": {
+            "description": "The kind of the program: `pipeline`.",
+            "enum": [
+              "pipeline"
+            ],
+            "type": "string",
+            "x-order": 4,
+            "x-pulumi-model-property": {
+              "enumComments": "The kind of a Delivery program. More kinds can be added.",
+              "enumFieldComments": [
+                "A pipeline."
+              ],
+              "enumNoValidation": true,
+              "enumTypeName": "DeliveryProgramKind"
+            }
+          },
+          "lastFailedRegistration": {
+            "$ref": "#/components/schemas/DeliveryRegistrationInfo",
+            "description": "The latest failed registration, if it is newer than the active one.",
+            "x-order": 8
+          },
+          "latestRegistration": {
+            "$ref": "#/components/schemas/DeliveryRegistrationEntry",
+            "description": "The newest attempt to register the pipeline, whether it is queued, running, failed or done.",
+            "x-order": 9
+          },
+          "org": {
+            "description": "The organization name.",
+            "type": "string",
+            "x-order": 1
+          },
+          "project": {
+            "description": "The project name.",
+            "type": "string",
+            "x-order": 2
+          },
+          "registered": {
+            "description": "Whether the program has an active registration. A stack with only a failed registration has none.",
+            "type": "boolean",
+            "x-order": 5
+          },
+          "registering": {
+            "description": "Whether the first registration is still finishing. The program is not registered yet, and `registration` is the pending registration.",
+            "type": "boolean",
+            "x-order": 6
+          },
+          "registration": {
+            "$ref": "#/components/schemas/DeliveryRegistrationInfo",
+            "description": "The active registration, or the pending one while `registering` is true.",
+            "x-order": 7
+          },
+          "runsInProgress": {
+            "description": "The newest runs in progress, at most 20.",
+            "items": {
+              "$ref": "#/components/schemas/DeliveryRunSummary"
+            },
+            "type": "array",
+            "x-order": 11
+          },
+          "runsInProgressCount": {
+            "description": "The number of runs in progress.",
+            "format": "int64",
+            "type": "integer",
+            "x-order": 12
+          },
+          "stack": {
+            "description": "The stack name.",
+            "type": "string",
+            "x-order": 3
+          },
+          "stages": {
+            "description": "The stages in the order of the stage graph.",
+            "items": {
+              "$ref": "#/components/schemas/DeliveryStageSummary"
+            },
+            "type": "array",
+            "x-order": 10
+          },
+          "summary": {
+            "$ref": "#/components/schemas/DeliverySummary",
+            "description": "Summary facts about the pipeline.",
+            "x-order": 13
+          }
+        },
+        "required": [
+          "dispatch",
+          "kind",
+          "org",
+          "project",
+          "registered",
+          "registering",
+          "registration",
+          "runsInProgressCount",
+          "stack",
+          "summary"
+        ],
+        "type": "object"
+      },
+      "DeliveryProgramList": {
+        "description": "A page of Delivery programs.",
+        "properties": {
+          "continuationToken": {
+            "description": "The token of the next page. Not set on the last page.",
+            "type": "string",
+            "x-order": 2
+          },
+          "programs": {
+            "description": "The programs of the page, in stack order.",
+            "items": {
+              "$ref": "#/components/schemas/DeliveryProgramRow"
+            },
+            "type": "array",
+            "x-order": 1
+          }
+        },
+        "type": "object"
+      },
+      "DeliveryProgramRow": {
+        "description": "A row of the list of programs.",
+        "properties": {
+          "lastRun": {
+            "$ref": "#/components/schemas/DeliveryRunSummary",
+            "description": "The latest run, without its stage entries.",
+            "x-order": 4
+          },
+          "pendingApprovals": {
+            "description": "The number of approvals that wait now.",
+            "format": "int64",
+            "type": "integer",
+            "x-order": 6
+          },
+          "project": {
+            "description": "The project name.",
+            "type": "string",
+            "x-order": 1
+          },
+          "registered": {
+            "description": "Whether the program has an active registration. A stack with local runs only has none.",
+            "type": "boolean",
+            "x-order": 3
+          },
+          "stack": {
+            "description": "The stack name.",
+            "type": "string",
+            "x-order": 2
+          },
+          "stages": {
+            "description": "The stages in order.",
+            "items": {
+              "$ref": "#/components/schemas/DeliveryProgramRowStage"
+            },
+            "type": "array",
+            "x-order": 5
+          }
+        },
+        "required": [
+          "pendingApprovals",
+          "project",
+          "registered",
+          "stack"
+        ],
+        "type": "object"
+      },
+      "DeliveryProgramRowStage": {
+        "description": "The state of a stage in the list of programs.",
+        "properties": {
+          "deployedReleaseNumber": {
+            "description": "The release deployed at the stage.",
+            "format": "int64",
+            "type": "integer",
+            "x-order": 3
+          },
+          "name": {
+            "description": "The name of the stage.",
+            "type": "string",
+            "x-order": 1
+          },
+          "status": {
+            "$ref": "#/components/schemas/DeliveryStatus",
+            "description": "The status of the stage in the latest run.",
+            "x-order": 2
+          }
+        },
+        "required": [
+          "name",
+          "status"
+        ],
+        "type": "object"
+      },
+      "DeliveryRegistrationEntry": {
+        "description": "An attempt to register a pipeline: a pulumi up of the pipeline stack, or a registration that a push to the repository queued.",
+        "properties": {
+          "active": {
+            "description": "Whether this is the active registration of the pipeline.",
+            "type": "boolean",
+            "x-order": 9
+          },
+          "branch": {
+            "description": "The tracked branch, if known. Only a registration that a push queued records it.",
+            "type": "string",
+            "x-order": 5
+          },
+          "commit": {
+            "description": "The commit of the attempt, if known.",
+            "type": "string",
+            "x-order": 3
+          },
+          "created": {
+            "description": "When the attempt was created.",
+            "format": "date-time",
+            "type": "string",
+            "x-order": 13
+          },
+          "dirty": {
+            "description": "Whether the checkout of a user registration had uncommitted changes, or did not say. Not set for a push or while the update runs.",
+            "type": "boolean",
+            "x-order": 4
+          },
+          "finished": {
+            "description": "When the attempt finished. Not set while it is in progress.",
+            "format": "date-time",
+            "type": "string",
+            "x-order": 14
+          },
+          "id": {
+            "description": "The ID of the entry: the ID of the update, or the ID of the queued registration when it has no update.",
+            "type": "string",
+            "x-order": 1
+          },
+          "message": {
+            "description": "Why the attempt failed, if it did.",
+            "type": "string",
+            "x-order": 8
+          },
+          "programSource": {
+            "$ref": "#/components/schemas/DeliverySourceRef",
+            "description": "Where the commit of a push lives: the kind and repository of the source that the queued registration recorded, and the branch. Not set for a registration by a person.",
+            "x-order": 6
+          },
+          "requestedBy": {
+            "description": "The login of the user who ran the update, for a user registration.",
+            "type": "string",
+            "x-order": 12
+          },
+          "source": {
+            "description": "Who started the attempt.",
+            "enum": [
+              "user",
+              "push"
+            ],
+            "type": "string",
+            "x-order": 2,
+            "x-pulumi-model-property": {
+              "enumComments": "Who started a registration.",
+              "enumFieldComments": [
+                "A person or CI ran pulumi up of the pipeline stack.",
+                "A push to the tracked branch queued a registration."
+              ],
+              "enumNoValidation": true,
+              "enumTypeName": "DeliveryRegistrationSource"
+            }
+          },
+          "state": {
+            "description": "The state of the attempt.",
+            "enum": [
+              "queued",
+              "running",
+              "succeeded",
+              "failed",
+              "canceled"
+            ],
+            "type": "string",
+            "x-order": 7,
+            "x-pulumi-model-property": {
+              "enumComments": "The state of a registration attempt.",
+              "enumFieldComments": [
+                "The registration that a push queued waits to start.",
+                "The attempt is in progress.",
+                "The attempt succeeded.",
+                "The attempt failed.",
+                "The attempt was canceled."
+              ],
+              "enumNoValidation": true,
+              "enumTypeName": "DeliveryRegistrationState"
+            }
+          },
+          "updateVersion": {
+            "description": "The version of the update of the pipeline stack, if the attempt has an update.",
+            "format": "int64",
+            "type": "integer",
+            "x-order": 10
+          },
+          "workItemId": {
+            "description": "The ID of the registration that the push queued. Set for a push.",
+            "type": "string",
+            "x-order": 11
+          }
+        },
+        "required": [
+          "active",
+          "created",
+          "id",
+          "source",
+          "state"
+        ],
+        "type": "object"
+      },
+      "DeliveryRegistrationInfo": {
+        "description": "A registration of a Delivery program.",
+        "properties": {
+          "actor": {
+            "description": "Who registered the program.",
+            "type": "string",
+            "x-order": 6
+          },
+          "actorKind": {
+            "description": "The kind of the actor.",
+            "enum": [
+              "user",
+              "webhook",
+              "system",
+              "trigger"
+            ],
+            "type": "string",
+            "x-order": 7,
+            "x-pulumi-model-property": {
+              "enumComments": "Who acted: a person, a webhook, a trigger or the system.",
+              "enumFieldComments": [
+                "A person.",
+                "A webhook.",
+                "The system.",
+                "A trigger."
+              ],
+              "enumNoValidation": true,
+              "enumTypeName": "DeliveryActorKind"
+            }
+          },
+          "createdAt": {
+            "description": "When the registration was made.",
+            "format": "date-time",
+            "type": "string",
+            "x-order": 8
+          },
+          "id": {
+            "description": "The ID of the registration. A new active registration has a new ID, so a changed ID means that the pipeline definition can have changed.",
+            "type": "string",
+            "x-order": 1
+          },
+          "programCommit": {
+            "description": "The commit of the registered program.",
+            "type": "string",
+            "x-order": 5
+          },
+          "reason": {
+            "description": "Why a registration failed.",
+            "type": "string",
+            "x-order": 4
+          },
+          "registered": {
+            "description": "Whether a registration is active.",
+            "type": "boolean",
+            "x-order": 2
+          },
+          "status": {
+            "description": "The status of the registration.",
+            "enum": [
+              "pending",
+              "succeeded",
+              "failed",
+              "local"
+            ],
+            "type": "string",
+            "x-order": 3,
+            "x-pulumi-model-property": {
+              "enumComments": "The status of a registration.",
+              "enumFieldComments": [
+                "The registration is not finished.",
+                "The registration succeeded.",
+                "The registration failed.",
+                "The declarations belong to a local run and not to a registration."
+              ],
+              "enumNoValidation": true,
+              "enumTypeName": "DeliveryRegistrationStatus"
+            }
+          },
+          "warnings": {
+            "description": "The warnings of the registration.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "x-order": 9
+          }
+        },
+        "required": [
+          "registered"
+        ],
+        "type": "object"
+      },
+      "DeliveryRelease": {
+        "description": "A release of a Delivery pipeline.",
+        "properties": {
+          "createdAt": {
+            "description": "When the release was created.",
+            "format": "date-time",
+            "type": "string",
+            "x-order": 6
+          },
+          "deployments": {
+            "description": "The stages where the release is deployed.",
+            "items": {
+              "$ref": "#/components/schemas/DeliveryDeployment"
+            },
+            "type": "array",
+            "x-order": 7
+          },
+          "local": {
+            "description": "Whether the release is a local release, started with `pulumi up`. Set only when it is.",
+            "type": "boolean",
+            "x-order": 8
+          },
+          "number": {
+            "description": "The number of the release.",
+            "format": "int64",
+            "type": "integer",
+            "x-order": 1
+          },
+          "originRunNumber": {
+            "description": "The number of the run that created the release.",
+            "format": "int64",
+            "type": "integer",
+            "x-order": 4
+          },
+          "programCommit": {
+            "$ref": "#/components/schemas/DeliveryCommit",
+            "description": "The commit of the program of the release.",
+            "x-order": 5
+          },
+          "ready": {
+            "description": "Whether the release is ready. A release is ready when its first pass has finished.",
+            "type": "boolean",
+            "x-order": 3
+          },
+          "status": {
+            "$ref": "#/components/schemas/DeliveryStatus",
+            "description": "The structured status of the originating run of the release.",
+            "x-order": 2
+          }
+        },
+        "required": [
+          "createdAt",
+          "number",
+          "originRunNumber",
+          "ready",
+          "status"
+        ],
+        "type": "object"
+      },
+      "DeliveryReleaseDetail": {
+        "description": "The page of one release.",
+        "properties": {
+          "artifacts": {
+            "description": "The artifacts of the release, grouped by run.",
+            "items": {
+              "$ref": "#/components/schemas/DeliveryRunArtifacts"
+            },
+            "type": "array",
+            "x-order": 4
+          },
+          "previousReleaseNumber": {
+            "description": "The number of the previous release.",
+            "format": "int64",
+            "type": "integer",
+            "x-order": 2
+          },
+          "release": {
+            "$ref": "#/components/schemas/DeliveryRelease",
+            "description": "The facts of the release.",
+            "x-order": 1
+          },
+          "rollout": {
+            "description": "The rollout by stage and run.",
+            "items": {
+              "$ref": "#/components/schemas/DeliveryRollout"
+            },
+            "type": "array",
+            "x-order": 5
+          },
+          "runsTruncated": {
+            "description": "Whether the release has more runs than the artifacts and the rollout cover. The runs route lists them all.",
+            "type": "boolean",
+            "x-order": 6
+          },
+          "sources": {
+            "description": "The recorded sources of the release.",
+            "items": {
+              "$ref": "#/components/schemas/DeliveryReleaseSource"
+            },
+            "type": "array",
+            "x-order": 3
+          }
+        },
+        "required": [
+          "release",
+          "runsTruncated"
+        ],
+        "type": "object"
+      },
+      "DeliveryReleaseList": {
+        "description": "A page of releases.",
+        "properties": {
+          "continuationToken": {
+            "description": "The token of the next page. Not set on the last page.",
+            "type": "string",
+            "x-order": 2
+          },
+          "releases": {
+            "description": "The releases of the page, newest first.",
+            "items": {
+              "$ref": "#/components/schemas/DeliveryRelease"
+            },
+            "type": "array",
+            "x-order": 1
+          }
+        },
+        "type": "object"
+      },
+      "DeliveryReleaseSource": {
+        "description": "A source value of a release.",
+        "properties": {
+          "branch": {
+            "description": "The branch.",
+            "type": "string"
+          },
+          "changed": {
+            "description": "Whether the value changed since the previous release.",
+            "type": "boolean",
+            "x-order": 2
+          },
+          "commit": {
+            "$ref": "#/components/schemas/DeliveryCommit",
+            "description": "The recorded commit of a version control source.",
+            "x-order": 1
+          },
+          "kind": {
+            "description": "The kind of the source: a repository kind, or `pipeline` for an upstream pipeline. More kinds can be added.",
+            "enum": [
+              "github",
+              "gitlab",
+              "bitbucket",
+              "azure_devops",
+              "entire",
+              "custom",
+              "pipeline"
+            ],
+            "type": "string",
+            "x-pulumi-model-property": {
+              "enumComments": "The kind of a source of a Delivery pipeline. More kinds can be added.",
+              "enumFieldComments": [
+                "A GitHub repository.",
+                "A GitLab repository.",
+                "A Bitbucket repository.",
+                "An Azure DevOps repository.",
+                "An Entire repository.",
+                "A custom source.",
+                "An upstream pipeline."
+              ],
+              "enumFieldNames": [
+                "GitHub",
+                "GitLab",
+                "Bitbucket",
+                "AzureDevOps",
+                "Entire",
+                "Custom",
+                "Pipeline"
+              ],
+              "enumNoValidation": true,
+              "enumTypeName": "DeliverySourceKind"
+            }
+          },
+          "name": {
+            "description": "The name of the source in the pipeline program, which a run pins it by.",
+            "type": "string"
+          },
+          "repository": {
+            "description": "The repository.",
+            "type": "string"
+          },
+          "upstreamProgram": {
+            "description": "The upstream program of a `pipeline` source, as `organization/project/stack`. The upstream pipeline is always in the organization of the program.",
+            "type": "string"
+          },
+          "upstreamRelease": {
+            "description": "The release of the upstream pipeline.",
+            "format": "int64",
+            "type": "integer",
+            "x-order": 3
+          },
+          "upstreamStage": {
+            "description": "The upstream stage.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "changed",
+          "kind"
+        ],
+        "type": "object"
+      },
+      "DeliveryRollout": {
+        "description": "The rollout of a release at a stage.",
+        "properties": {
+          "convergedAt": {
+            "description": "When the stage converged.",
+            "format": "date-time",
+            "type": "string",
+            "x-order": 4
+          },
+          "runNumber": {
+            "description": "The number of the run.",
+            "format": "int64",
+            "type": "integer",
+            "x-order": 2
+          },
+          "stageName": {
+            "description": "The name of the stage.",
+            "type": "string",
+            "x-order": 1
+          },
+          "status": {
+            "$ref": "#/components/schemas/DeliveryStatus",
+            "description": "The structured status of the stage in the run.",
+            "x-order": 3
+          }
+        },
+        "required": [
+          "runNumber",
+          "stageName",
+          "status"
+        ],
+        "type": "object"
+      },
+      "DeliveryRuleNode": {
+        "description": "A node of the rule of a gate, with its satisfaction computed by the service.",
+        "properties": {
+          "children": {
+            "description": "The children of an `all` or `any` node.",
+            "items": {
+              "$ref": "#/components/schemas/DeliveryRuleNode"
+            },
+            "type": "array",
+            "x-order": 4
+          },
+          "kind": {
+            "description": "The kind of the node.",
+            "enum": [
+              "all",
+              "any",
+              "approval",
+              "decision",
+              "manual"
+            ],
+            "type": "string",
+            "x-order": 1,
+            "x-pulumi-model-property": {
+              "enumComments": "The kind of a node of the rule of a gate.",
+              "enumFieldComments": [
+                "All the children must be satisfied.",
+                "At least one child must be satisfied.",
+                "The node needs approvals.",
+                "The node evaluates a deployment decision.",
+                "The node needs a person to continue it."
+              ],
+              "enumNoValidation": true,
+              "enumTypeName": "DeliveryRuleNodeKind"
+            }
+          },
+          "name": {
+            "description": "The name of the condition. Set for a condition, not for `all` and `any`.",
+            "type": "string",
+            "x-order": 2
+          },
+          "satisfied": {
+            "description": "Whether the node is satisfied.",
+            "type": "boolean",
+            "x-order": 3
+          }
+        },
+        "required": [
+          "kind",
+          "satisfied"
+        ],
+        "type": "object"
+      },
+      "DeliveryRun": {
+        "description": "The page of one Delivery run.",
+        "properties": {
+          "actions": {
+            "$ref": "#/components/schemas/DeliveryRunActions",
+            "description": "The actions available to the caller.",
+            "x-order": 13
+          },
+          "artifacts": {
+            "$ref": "#/components/schemas/DeliveryRunArtifacts",
+            "description": "The artifacts that the run recorded.",
+            "x-order": 12
+          },
+          "canceledAt": {
+            "description": "When the run was canceled.",
+            "format": "date-time",
+            "type": "string",
+            "x-order": 4
+          },
+          "canceledBy": {
+            "description": "The login of the user who canceled the run.",
+            "type": "string",
+            "x-order": 3
+          },
+          "currentPass": {
+            "$ref": "#/components/schemas/DeliveryPass",
+            "description": "The latest pass of the run.",
+            "x-order": 8
+          },
+          "edges": {
+            "description": "The edges between the stages and between the members.",
+            "items": {
+              "$ref": "#/components/schemas/DeliveryEdge"
+            },
+            "type": "array",
+            "x-order": 11
+          },
+          "failureReason": {
+            "description": "Why the run failed.",
+            "type": "string",
+            "x-order": 2
+          },
+          "localUpdate": {
+            "$ref": "#/components/schemas/DeliveryLocalUpdate",
+            "description": "The update of the pipeline stack that drove the run. Set only for a local run, which has no run stack.",
+            "x-order": 6
+          },
+          "members": {
+            "description": "The members of the run.",
+            "items": {
+              "$ref": "#/components/schemas/DeliveryMember"
+            },
+            "type": "array",
+            "x-order": 10
+          },
+          "passCount": {
+            "description": "The number of passes of the run.",
+            "format": "int64",
+            "type": "integer",
+            "x-order": 7
+          },
+          "runStack": {
+            "$ref": "#/components/schemas/DeliveryStackRef",
+            "description": "The stack that the program of the run runs on.",
+            "x-order": 5
+          },
+          "stages": {
+            "description": "The stages of the run.",
+            "items": {
+              "$ref": "#/components/schemas/DeliveryRunStage"
+            },
+            "type": "array",
+            "x-order": 9
+          },
+          "summary": {
+            "$ref": "#/components/schemas/DeliveryRunSummary",
+            "description": "The facts of the run.",
+            "x-order": 1
+          }
+        },
+        "required": [
+          "actions",
+          "passCount",
+          "summary"
+        ],
+        "type": "object"
+      },
+      "DeliveryRunActions": {
+        "description": "The actions on a run that are available to the caller.",
+        "properties": {
+          "cancel": {
+            "$ref": "#/components/schemas/DeliveryAction",
+            "description": "Whether the caller can cancel the run.",
+            "x-order": 2
+          },
+          "retry": {
+            "$ref": "#/components/schemas/DeliveryAction",
+            "description": "Whether the caller can retry the run.",
+            "x-order": 1
+          }
+        },
+        "required": [
+          "cancel",
+          "retry"
+        ],
+        "type": "object"
+      },
+      "DeliveryRunArtifacts": {
+        "description": "The artifacts that a run recorded.",
+        "properties": {
+          "artifacts": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/DeliveryValue"
+            },
+            "description": "The artifacts by name.",
+            "type": "object",
+            "x-order": 2
+          },
+          "runNumber": {
+            "description": "The number of the run.",
+            "format": "int64",
+            "type": "integer",
+            "x-order": 1
+          }
+        },
+        "required": [
+          "runNumber"
+        ],
+        "type": "object"
+      },
+      "DeliveryRunList": {
+        "description": "A page of runs.",
+        "properties": {
+          "continuationToken": {
+            "description": "The token of the next page. Not set on the last page.",
+            "type": "string",
+            "x-order": 2
+          },
+          "runs": {
+            "description": "The runs of the page, newest first.",
+            "items": {
+              "$ref": "#/components/schemas/DeliveryRunSummary"
+            },
+            "type": "array",
+            "x-order": 1
+          }
+        },
+        "type": "object"
+      },
+      "DeliveryRunStage": {
+        "description": "A stage of a run.",
+        "properties": {
+          "admittedAt": {
+            "description": "When the stage got its lock.",
+            "format": "date-time",
+            "type": "string",
+            "x-order": 5
+          },
+          "convergedAt": {
+            "description": "When the stage converged.",
+            "format": "date-time",
+            "type": "string",
+            "x-order": 6
+          },
+          "from": {
+            "description": "The names of the stages that must converge first.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "x-order": 3
+          },
+          "gate": {
+            "$ref": "#/components/schemas/DeliveryGate",
+            "description": "The latest gate of the stage.",
+            "x-order": 7
+          },
+          "name": {
+            "description": "The name of the stage.",
+            "type": "string",
+            "x-order": 1
+          },
+          "status": {
+            "$ref": "#/components/schemas/DeliveryStatus",
+            "description": "The structured status of the stage in the run.",
+            "x-order": 2
+          },
+          "when": {
+            "description": "The kinds and names of the conditions that the run declared for the stage, as kind:name.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "x-order": 4
+          }
+        },
+        "required": [
+          "name",
+          "status"
+        ],
+        "type": "object"
+      },
+      "DeliveryRunStageSummary": {
+        "description": "A stage of a run, as the summary of the run shows it.",
+        "properties": {
+          "admittedAt": {
+            "description": "When the stage got its lock.",
+            "format": "date-time",
+            "type": "string",
+            "x-order": 4
+          },
+          "convergedAt": {
+            "description": "When the stage converged.",
+            "format": "date-time",
+            "type": "string",
+            "x-order": 5
+          },
+          "from": {
+            "description": "The names of the stages that must converge first.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "x-order": 3
+          },
+          "name": {
+            "description": "The name of the stage.",
+            "type": "string",
+            "x-order": 1
+          },
+          "status": {
+            "$ref": "#/components/schemas/DeliveryStatus",
+            "description": "The structured status of the stage in the run.",
+            "x-order": 2
+          }
+        },
+        "required": [
+          "name",
+          "status"
+        ],
+        "type": "object"
+      },
+      "DeliveryRunSummary": {
+        "description": "A row of the runs table of a Delivery program.",
+        "properties": {
+          "actor": {
+            "description": "The login of the user who started the run, if a user did.",
+            "type": "string",
+            "x-order": 6
+          },
+          "actorKind": {
+            "description": "Who started the run: `user`, `webhook`, `trigger` or `system`.",
+            "enum": [
+              "user",
+              "webhook",
+              "system",
+              "trigger"
+            ],
+            "type": "string",
+            "x-order": 5,
+            "x-pulumi-model-property": {
+              "enumComments": "Who acted: a person, a webhook, a trigger or the system.",
+              "enumFieldComments": [
+                "A person.",
+                "A webhook.",
+                "The system.",
+                "A trigger."
+              ],
+              "enumNoValidation": true,
+              "enumTypeName": "DeliveryActorKind"
+            }
+          },
+          "createdAt": {
+            "description": "When the run was created.",
+            "format": "date-time",
+            "type": "string",
+            "x-order": 13
+          },
+          "finishedAt": {
+            "description": "When the run ended.",
+            "format": "date-time",
+            "type": "string",
+            "x-order": 14
+          },
+          "kind": {
+            "description": "The kind of the run.",
+            "enum": [
+              "normal",
+              "rollback",
+              "redeploy",
+              "force_promote"
+            ],
+            "type": "string",
+            "x-order": 2,
+            "x-pulumi-model-property": {
+              "enumComments": "The kind of a run.",
+              "enumFieldComments": [
+                "A run that a trigger started.",
+                "A run that an operator started to return a stage to an earlier release.",
+                "A run that an operator started to deploy a stage again.",
+                "A run that an operator started to promote a release past its gates."
+              ],
+              "enumFieldNames": [
+                "Normal",
+                "Rollback",
+                "Redeploy",
+                "ForcePromote"
+              ],
+              "enumNoValidation": true,
+              "enumTypeName": "DeliveryRunKind"
+            }
+          },
+          "local": {
+            "description": "Whether the run is a local run, started with `pulumi up`. Set only when it is.",
+            "type": "boolean",
+            "x-order": 15
+          },
+          "number": {
+            "description": "The number of the run.",
+            "format": "int64",
+            "type": "integer",
+            "x-order": 1
+          },
+          "originRunNumber": {
+            "description": "The number of the run that an operator run repeats.",
+            "format": "int64",
+            "type": "integer",
+            "x-order": 11
+          },
+          "programCommit": {
+            "$ref": "#/components/schemas/DeliveryCommit",
+            "description": "The commit of the program that the run executes.",
+            "x-order": 9
+          },
+          "programRef": {
+            "description": "The ref (branch, tag or commit SHA) that a person started the run at. Absent for a run at the head of the program branch.",
+            "type": "string",
+            "x-order": 10
+          },
+          "releaseNumber": {
+            "description": "The number of the release of the run.",
+            "format": "int64",
+            "type": "integer",
+            "x-order": 8
+          },
+          "stages": {
+            "description": "One entry for each stage of the run, in the order of the stages.",
+            "items": {
+              "$ref": "#/components/schemas/DeliveryRunStageSummary"
+            },
+            "type": "array",
+            "x-order": 12
+          },
+          "status": {
+            "$ref": "#/components/schemas/DeliveryStatus",
+            "description": "The structured status of the run.",
+            "x-order": 3
+          },
+          "targetStage": {
+            "description": "The stage that an operator run deploys.",
+            "type": "string",
+            "x-order": 7
+          },
+          "triggerKind": {
+            "description": "What started the run.",
+            "enum": [
+              "registration",
+              "push",
+              "dispatch",
+              "operator",
+              "stage_converged",
+              "local"
+            ],
+            "type": "string",
+            "x-order": 4,
+            "x-pulumi-model-property": {
+              "enumComments": "What started a run.",
+              "enumFieldComments": [
+                "A registration of the program.",
+                "A push of a source.",
+                "A dispatch by a user.",
+                "An operator action on a stage.",
+                "A stage of another pipeline that converged.",
+                "A local `pulumi up` of the pipeline stack."
+              ],
+              "enumFieldNames": [
+                "Registration",
+                "Push",
+                "Dispatch",
+                "Operator",
+                "StageConverged",
+                "Local"
+              ],
+              "enumNoValidation": true,
+              "enumTypeName": "DeliveryTriggerKind"
+            }
+          }
+        },
+        "required": [
+          "actorKind",
+          "createdAt",
+          "kind",
+          "number",
+          "status",
+          "triggerKind"
+        ],
+        "type": "object"
+      },
+      "DeliverySourceRef": {
+        "description": "A source of a program, a trigger or a release.",
+        "properties": {
+          "branch": {
+            "description": "The branch.",
+            "type": "string",
+            "x-order": 4
+          },
+          "kind": {
+            "description": "The kind of the source: a repository kind, or `pipeline` for an upstream pipeline. More kinds can be added.",
+            "enum": [
+              "github",
+              "gitlab",
+              "bitbucket",
+              "azure_devops",
+              "entire",
+              "custom",
+              "pipeline"
+            ],
+            "type": "string",
+            "x-order": 1,
+            "x-pulumi-model-property": {
+              "enumComments": "The kind of a source of a Delivery pipeline. More kinds can be added.",
+              "enumFieldComments": [
+                "A GitHub repository.",
+                "A GitLab repository.",
+                "A Bitbucket repository.",
+                "An Azure DevOps repository.",
+                "An Entire repository.",
+                "A custom source.",
+                "An upstream pipeline."
+              ],
+              "enumFieldNames": [
+                "GitHub",
+                "GitLab",
+                "Bitbucket",
+                "AzureDevOps",
+                "Entire",
+                "Custom",
+                "Pipeline"
+              ],
+              "enumNoValidation": true,
+              "enumTypeName": "DeliverySourceKind"
+            }
+          },
+          "name": {
+            "description": "The name of the source in the pipeline program, which a run pins it by.",
+            "type": "string",
+            "x-order": 2
+          },
+          "repository": {
+            "description": "The repository.",
+            "type": "string",
+            "x-order": 3
+          },
+          "upstreamProgram": {
+            "description": "The upstream program of a `pipeline` source, as `organization/project/stack`. The upstream pipeline is always in the organization of the program.",
+            "type": "string",
+            "x-order": 5
+          },
+          "upstreamStage": {
+            "description": "The upstream stage.",
+            "type": "string",
+            "x-order": 6
+          }
+        },
+        "required": [
+          "kind"
+        ],
+        "type": "object"
+      },
+      "DeliveryStackRef": {
+        "description": "A stack that a Delivery item refers to.",
+        "properties": {
+          "exists": {
+            "description": "Whether the stack still exists. A run stack is deleted with its pipeline.",
+            "type": "boolean",
+            "x-order": 3
+          },
+          "project": {
+            "description": "The project name of the stack.",
+            "type": "string",
+            "x-order": 1
+          },
+          "stack": {
+            "description": "The name of the stack.",
+            "type": "string",
+            "x-order": 2
+          }
+        },
+        "required": [
+          "exists",
+          "project",
+          "stack"
+        ],
+        "type": "object"
+      },
+      "DeliveryStageActionRequest": {
+        "description": "A request to roll back a stage of a Delivery pipeline to a release, or to promote a release to it.",
+        "properties": {
+          "releaseNumber": {
+            "description": "The number of the release.",
+            "format": "int64",
+            "type": "integer",
+            "x-order": 1
+          }
+        },
+        "required": [
+          "releaseNumber"
+        ],
+        "type": "object"
+      },
+      "DeliveryStageGate": {
+        "description": "The newest open gate of a stage over all runs in progress.",
+        "properties": {
+          "conditions": {
+            "description": "The conditions of the gate, at most 50.",
+            "items": {
+              "$ref": "#/components/schemas/DeliveryConditionChip"
+            },
+            "type": "array",
+            "x-order": 5
+          },
+          "gateId": {
+            "description": "The ID of the gate.",
+            "type": "string",
+            "x-order": 3
+          },
+          "releaseNumber": {
+            "description": "The number of the release of the run.",
+            "format": "int64",
+            "type": "integer",
+            "x-order": 2
+          },
+          "runNumber": {
+            "description": "The number of the run of the gate.",
+            "format": "int64",
+            "type": "integer",
+            "x-order": 1
+          },
+          "status": {
+            "$ref": "#/components/schemas/DeliveryStatus",
+            "description": "The status of the gate.",
+            "x-order": 4
+          }
+        },
+        "required": [
+          "gateId",
+          "runNumber",
+          "status"
+        ],
+        "type": "object"
+      },
+      "DeliveryStageMember": {
+        "description": "A member of a stage in the active registration, with its current status.",
+        "properties": {
+          "dependsOn": {
+            "description": "The IDs of the members that this member depends on.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "x-order": 4
+          },
+          "id": {
+            "description": "The ID of the member.",
+            "type": "string",
+            "x-order": 1
+          },
+          "name": {
+            "description": "The name of the member.",
+            "type": "string",
+            "x-order": 2
+          },
+          "status": {
+            "$ref": "#/components/schemas/DeliveryStatus",
+            "description": "The status of the member in the run that holds the lock of the stage, or else in the run that deployed the stage.",
+            "x-order": 5
+          },
+          "type": {
+            "description": "The type of the member.",
+            "enum": [
+              "job",
+              "stacks",
+              "artifact",
+              "agent"
+            ],
+            "type": "string",
+            "x-order": 3,
+            "x-pulumi-model-property": {
+              "enumComments": "The type of a member of a Delivery run.",
+              "enumFieldComments": [
+                "A job.",
+                "A group of stacks.",
+                "An artifact.",
+                "A structured Neo agent invocation."
+              ],
+              "enumNoValidation": true,
+              "enumTypeName": "DeliveryMemberType"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "type"
+        ],
+        "type": "object"
+      },
+      "DeliveryStageRun": {
+        "description": "A run that deployed a stage or holds its lock.",
+        "properties": {
+          "convergedAt": {
+            "description": "When the run converged the stage. Not set for a run that holds the lock.",
+            "format": "date-time",
+            "type": "string",
+            "x-order": 3
+          },
+          "local": {
+            "description": "Whether the run is a local run, started with `pulumi up`. Set only when it is.",
+            "type": "boolean",
+            "x-order": 5
+          },
+          "releaseNumber": {
+            "description": "The number of the release of the run.",
+            "format": "int64",
+            "type": "integer",
+            "x-order": 2
+          },
+          "runNumber": {
+            "description": "The number of the run.",
+            "format": "int64",
+            "type": "integer",
+            "x-order": 1
+          },
+          "status": {
+            "$ref": "#/components/schemas/DeliveryStatus",
+            "description": "The status of the stage in the run. Set for the run that holds the lock.",
+            "x-order": 4
+          }
+        },
+        "required": [
+          "runNumber"
+        ],
+        "type": "object"
+      },
+      "DeliveryStageSummary": {
+        "description": "A stage of a pipeline in the active registration, with its live state.",
+        "properties": {
+          "deployed": {
+            "$ref": "#/components/schemas/DeliveryStageRun",
+            "description": "The run that deployed the current release of the stage.",
+            "x-order": 8
+          },
+          "deployedReleaseNumber": {
+            "description": "The release deployed at the stage.",
+            "format": "int64",
+            "type": "integer",
+            "x-order": 4
+          },
+          "deployedRunNumber": {
+            "description": "The run that deployed it.",
+            "format": "int64",
+            "type": "integer",
+            "x-order": 5
+          },
+          "from": {
+            "description": "The names of the stages that must converge first.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "lastCloudDeployed": {
+            "$ref": "#/components/schemas/DeliveryStageRun",
+            "description": "The last cloud release that converged the stage. Downstream pipelines read this one. It differs from `deployed` while a local release is deployed.",
+            "x-order": 9
+          },
+          "lastRun": {
+            "$ref": "#/components/schemas/DeliveryStageRun",
+            "description": "The run that last held the stage, with the status of the stage in it. It is the lock holder while a run holds the stage. Absent when no run has held the stage since the service started to record it.",
+            "x-order": 11
+          },
+          "lockHolder": {
+            "$ref": "#/components/schemas/DeliveryStageRun",
+            "description": "The run that holds the lock of the stage, with the status of the stage in it. A normal run and an operator run can hold it.",
+            "x-order": 10
+          },
+          "lockRunNumber": {
+            "description": "The run that holds the lock of the stage.",
+            "format": "int64",
+            "type": "integer",
+            "x-order": 6
+          },
+          "members": {
+            "description": "The members of the stage in the active registration, at most 1000.",
+            "items": {
+              "$ref": "#/components/schemas/DeliveryStageMember"
+            },
+            "type": "array",
+            "x-order": 13
+          },
+          "name": {
+            "description": "The name of the stage.",
+            "type": "string"
+          },
+          "openGate": {
+            "$ref": "#/components/schemas/DeliveryStageGate",
+            "description": "The newest open gate of the stage over all runs in progress.",
+            "x-order": 12
+          },
+          "paused": {
+            "description": "Whether the stage is paused.",
+            "type": "boolean",
+            "x-order": 1
+          },
+          "pausedAt": {
+            "description": "When the stage was paused.",
+            "format": "date-time",
+            "type": "string",
+            "x-order": 3
+          },
+          "pausedBy": {
+            "description": "Who paused the stage.",
+            "type": "string",
+            "x-order": 2
+          },
+          "queueLength": {
+            "description": "The number of runs that wait for the stage. List them with the runs route, its `stage` filter and `queued` set to true.",
+            "format": "int64",
+            "type": "integer",
+            "x-order": 7
+          },
+          "when": {
+            "description": "The kinds and names of the conditions of the stage.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "name",
+          "paused",
+          "queueLength"
+        ],
+        "type": "object"
+      },
+      "DeliveryStatus": {
+        "description": "The structured status of a Delivery run, stage, member, gate or release.",
+        "properties": {
+          "reason": {
+            "description": "The reason in text for people, for example why an item failed.",
+            "type": "string",
+            "x-order": 5
+          },
+          "releaseNumber": {
+            "description": "The number of the release that the status refers to, for example the release that superseded a run.",
+            "format": "int64",
+            "type": "integer",
+            "x-order": 4
+          },
+          "stageName": {
+            "description": "The name of the stage that the status refers to, for example the stage at which a run waits, failed or was superseded.",
+            "type": "string",
+            "x-order": 3
+          },
+          "status": {
+            "description": "The status.",
+            "enum": [
+              "in_progress",
+              "waiting",
+              "running",
+              "pending",
+              "blocked",
+              "succeeded",
+              "failed",
+              "canceled",
+              "superseded",
+              "skipped",
+              "closed",
+              "unchanged"
+            ],
+            "type": "string",
+            "x-order": 1,
+            "x-pulumi-model-property": {
+              "enumComments": "The status of a Delivery item.",
+              "enumFieldComments": [
+                "Part of the item is running.",
+                "The item waits for something; its wait kind says what.",
+                "The item is running.",
+                "The item has not started.",
+                "The item cannot go on.",
+                "The item succeeded.",
+                "The item failed.",
+                "The item was canceled.",
+                "A newer release replaced the item.",
+                "The item was skipped.",
+                "The item is closed.",
+                "The item was not run because its inputs did not change."
+              ],
+              "enumFieldNames": [
+                "InProgress",
+                "Waiting",
+                "Running",
+                "Pending",
+                "Blocked",
+                "Succeeded",
+                "Failed",
+                "Canceled",
+                "Superseded",
+                "Skipped",
+                "Closed",
+                "Unchanged"
+              ],
+              "enumNoValidation": true,
+              "enumTypeName": "DeliveryStatusKind"
+            }
+          },
+          "waitKind": {
+            "description": "What a waiting item waits for. A pending approval is a wait, not a failure.",
+            "enum": [
+              "approval",
+              "decision",
+              "manual",
+              "queue",
+              "stage",
+              "dependency",
+              "target",
+              "inputs",
+              "scope",
+              "pass_retry",
+              "paused"
+            ],
+            "type": "string",
+            "x-order": 2,
+            "x-pulumi-model-property": {
+              "enumComments": "What a waiting Delivery item waits for.",
+              "enumFieldComments": [
+                "An approval.",
+                "A decision evaluation.",
+                "A person to continue it.",
+                "A place in the queue.",
+                "An earlier stage.",
+                "A member it depends on.",
+                "The target stack to be free.",
+                "Its inputs.",
+                "Its scope.",
+                "A retry of the pass.",
+                "A paused stage to resume."
+              ],
+              "enumFieldNames": [
+                "Approval",
+                "Decision",
+                "Manual",
+                "Queue",
+                "Stage",
+                "Dependency",
+                "Target",
+                "Inputs",
+                "Scope",
+                "PassRetry",
+                "Paused"
+              ],
+              "enumNoValidation": true,
+              "enumTypeName": "DeliveryWaitKind"
+            }
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "type": "object"
+      },
+      "DeliverySummary": {
+        "description": "Summary facts about a pipeline.",
+        "properties": {
+          "approvalCount": {
+            "description": "The number of approvals that wait now.",
+            "format": "int64",
+            "type": "integer",
+            "x-order": 3
+          },
+          "lastFinishedRun": {
+            "$ref": "#/components/schemas/DeliveryRunSummary",
+            "description": "The latest run that ended.",
+            "x-order": 1
+          },
+          "newestApprovalConditionId": {
+            "description": "The condition of the newest waiting approval.",
+            "type": "string",
+            "x-order": 6
+          },
+          "newestApprovalGateId": {
+            "description": "The gate of the newest waiting approval.",
+            "type": "string",
+            "x-order": 5
+          },
+          "newestApprovalRunNumber": {
+            "description": "The run of the newest waiting approval.",
+            "format": "int64",
+            "type": "integer",
+            "x-order": 4
+          },
+          "newestRelease": {
+            "$ref": "#/components/schemas/DeliveryRelease",
+            "description": "The newest release.",
+            "x-order": 2
+          }
+        },
+        "required": [
+          "approvalCount"
+        ],
+        "type": "object"
+      },
+      "DeliveryValue": {
+        "description": "A value that Delivery recorded. A secret value is never returned.",
+        "properties": {
+          "secret": {
+            "description": "Whether the value is a secret. A secret value has no `value`.",
+            "type": "boolean",
+            "x-order": 1
+          },
+          "value": {
+            "description": "The value, as JSON. Not set for a secret.",
+            "type": "object",
+            "x-order": 2
+          }
+        },
+        "required": [
+          "secret"
         ],
         "type": "object"
       },
@@ -19798,7 +22728,7 @@
           "agentPoolID": {
             "description": "The ID of the agent pool to run account discovery workflows.\nIf not specified, discovery will use the default agent pool.",
             "type": "string",
-            "x-order": 8
+            "x-order": 7
           },
           "id": {
             "description": "ID of the account.",
@@ -19823,28 +22753,22 @@
           "providerConfig": {
             "description": "Provider-specific configuration for the account.",
             "type": "object",
-            "x-order": 9
+            "x-order": 8
           },
           "providerEnvRef": {
             "description": "Reference to an ESC environment containing provider credentials,\nin the format 'project/environment' with an optional @version suffix.",
-            "type": "string",
-            "x-order": 6
-          },
-          "providerVersion": {
-            "deprecated": true,
-            "description": "Deprecated: no longer populated. Omitted from responses, and ignored if sent.\nThe provider version used for discovery is now recorded per resource.",
             "type": "string",
             "x-order": 5
           },
           "scanStatus": {
             "$ref": "#/components/schemas/ScanStatus",
             "description": "Status of the last discovery scan for this account.",
-            "x-order": 10
+            "x-order": 9
           },
           "scheduledScanEnabled": {
             "description": "If true, the account is scheduled for recurring discovery.",
             "type": "boolean",
-            "x-order": 7
+            "x-order": 6
           }
         },
         "required": [
@@ -21551,6 +24475,11 @@
       "ListOrganizationInvitesResponse": {
         "description": "ListOrganizationInvitesResponse describes all pending invites for an organization.",
         "properties": {
+          "emailRequired": {
+            "description": "Whether an invite must name the email address of the person invited. True when email delivery is configured.",
+            "type": "boolean",
+            "x-order": 2
+          },
           "invites": {
             "description": "The list of pending organization invites",
             "items": {
@@ -21561,6 +24490,7 @@
           }
         },
         "required": [
+          "emailRequired",
           "invites"
         ],
         "type": "object"
@@ -23980,7 +26910,7 @@
             "x-order": 42
           },
           "policyPostureReportEnabled": {
-            "description": "Whether the monthly Infrastructure Posture report is available to the organization.",
+            "description": "Whether the monthly Infrastructure posture report is available to the organization.",
             "type": "boolean",
             "x-order": 97
           },
@@ -36281,6 +39211,9 @@
               }
             },
             "description": "OK"
+          },
+          "403": {
+            "description": "Neo is disabled for the organization, or the caller lacks the agent_task:create permission in it"
           }
         },
         "summary": "CopilotSkill",
@@ -48517,7 +51450,7 @@
     },
     "/api/orgs/{orgName}/invites/link": {
       "post": {
-        "description": "Generates a new invite URL to join an organization, intended to be shared via copy/paste. Does not send out an email and does not require an email address in the request. Anyone with a Pulumi account who knows the resulting URL can accept the invitation, so share the link only with the intended recipient.",
+        "description": "Generates a new invite URL to join an organization, intended to be shared via copy/paste. Does not send out an email. The request names the email address of the person invited, and only that person can accept the invitation. Requests without an email are deprecated: they are refused when the service can send email, and from 2027-02-22 in every case.",
         "operationId": "CreateOrgInviteLink",
         "parameters": [
           {
@@ -49845,7 +52778,7 @@
         }
       },
       "post": {
-        "description": "Creates an active policy exception and returns it with its ID (`EXC-<n>`). Returns 400 when the request breaks a field's limits or the policy pack isn't in one of the organization's policy groups, 403 when the organization has disabled policy exceptions, and 409 when it requires approval to create them.",
+        "description": "Creates an active policy exception and returns it with its ID (`EXC-<n>`). Returns 400 when the request breaks a field's limits or the policy pack isn't in one of the organization's policy groups, 403 when the organization has disabled policy exceptions, and 409 when it requires approval to create them (`requires approval`), or when an active exception has the same policy pack, reason and match entries, whatever its expiry (`already excepted by EXC-<n>`).",
         "operationId": "CreatePolicyException",
         "parameters": [
           {
@@ -49889,7 +52822,7 @@
             "description": "Organization not found"
           },
           "409": {
-            "description": "Creating policy exceptions requires approval"
+            "description": "Creating policy exceptions requires approval, or an active exception matches the request"
           }
         },
         "summary": "CreatePolicyException",
@@ -56522,6 +59455,237 @@
         }
       }
     },
+    "/api/preview/delivery/{orgName}/approvals": {
+      "get": {
+        "description": "Lists the approvals of Delivery gates in the organization for the pipelines that the caller can read, newest request first, then by condition ID. The `status` filter keeps the pending approvals, the closed ones or all of them. An approval is pending when its gate is open and it has no change request yet or its change request is in draft, pending or ready status. Every other approval is closed, including approvals of gates that have ended. Results are paginated with `continuationToken` and `maxResults`; the response carries a `continuationToken` when more results follow. `maxResults` defaults to 50, and a value below 1 or above 100 returns a 400 error. An invalid continuation token returns a 400 error.",
+        "operationId": "ListDeliveryApprovals",
+        "parameters": [
+          {
+            "description": "The organization name",
+            "in": "path",
+            "name": "orgName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Continuation token from a previous page",
+            "in": "query",
+            "name": "continuationToken",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The number of results per page. The default is 50. A value below 1 or above 100 returns a 400 error.",
+            "in": "query",
+            "name": "maxResults",
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Only approvals of the pipeline with this project name. Use it with `stack`.",
+            "in": "query",
+            "name": "project",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Only approvals of the pipeline with this stack name. Use it with `project`.",
+            "in": "query",
+            "name": "stack",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "`pending`, `closed` or `all`. The default is `pending`. Any other value that is not empty returns a 400 error.",
+            "in": "query",
+            "name": "status",
+            "schema": {
+              "enum": [
+                "pending",
+                "closed",
+                "all"
+              ],
+              "type": "string",
+              "x-pulumi-model-property": {
+                "enumComments": "The filter on the status of the approvals in a list of Delivery approvals.",
+                "enumFieldComments": [
+                  "Approvals of an open gate whose change request is not finished.",
+                  "All other approvals.",
+                  "All approvals."
+                ],
+                "enumNoValidation": true,
+                "enumTypeName": "DeliveryApprovalStatusFilter"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeliveryApprovalList"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "description": "A parameter is not valid"
+          }
+        },
+        "summary": "ListDeliveryApprovals",
+        "tags": [
+          "Delivery"
+        ],
+        "x-pulumi-route-property": {
+          "Visibility": "Preview"
+        }
+      }
+    },
+    "/api/preview/delivery/{orgName}/programs": {
+      "get": {
+        "description": "Lists the Delivery programs of the organization that the caller can read, in the order of the accessible stacks. Results are paginated with `continuationToken` and `maxResults`; the response carries a `continuationToken` when more results follow. `maxResults` defaults to 50, and a value below 1 or above 100 returns a 400 error. An invalid continuation token returns a 400 error.",
+        "operationId": "ListDeliveryPrograms",
+        "parameters": [
+          {
+            "description": "The organization name",
+            "in": "path",
+            "name": "orgName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Continuation token from a previous page",
+            "in": "query",
+            "name": "continuationToken",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Only programs of this kind. The only kind is `pipeline`. Any other value that is not empty returns a 400 error.",
+            "in": "query",
+            "name": "kind",
+            "schema": {
+              "enum": [
+                "pipeline"
+              ],
+              "type": "string",
+              "x-pulumi-model-property": {
+                "enumComments": "The kind of a Delivery program. More kinds can be added.",
+                "enumFieldComments": [
+                  "A pipeline."
+                ],
+                "enumNoValidation": true,
+                "enumTypeName": "DeliveryProgramKind"
+              }
+            }
+          },
+          {
+            "description": "The number of results per page. The default is 50. A value below 1 or above 100 returns a 400 error.",
+            "in": "query",
+            "name": "maxResults",
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Only programs whose project or stack name contains this text",
+            "in": "query",
+            "name": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Only programs whose latest run has this status: `in_progress`, `succeeded`, `failed`, `canceled` or `superseded`. Any other value that is not empty returns a 400 error.",
+            "in": "query",
+            "name": "status",
+            "schema": {
+              "enum": [
+                "in_progress",
+                "succeeded",
+                "failed",
+                "canceled",
+                "superseded"
+              ],
+              "type": "string",
+              "x-pulumi-model-property": {
+                "enumComments": "The status of a run.",
+                "enumFieldComments": [
+                  "The run is in progress.",
+                  "The run succeeded.",
+                  "The run failed.",
+                  "The run was canceled.",
+                  "A newer run replaced the run."
+                ],
+                "enumFieldNames": [
+                  "InProgress",
+                  "Succeeded",
+                  "Failed",
+                  "Canceled",
+                  "Superseded"
+                ],
+                "enumNoValidation": true,
+                "enumTypeName": "DeliveryRunStatus"
+              }
+            }
+          },
+          {
+            "description": "Only programs that have a run in progress that waits for this kind of condition. The only kind is `approval`. Any other value that is not empty returns a 400 error.",
+            "in": "query",
+            "name": "waitKind",
+            "schema": {
+              "enum": [
+                "approval"
+              ],
+              "type": "string",
+              "x-pulumi-model-property": {
+                "enumComments": "The filter on what a run in progress waits for, in a list of Delivery programs. More kinds can be added.",
+                "enumFieldComments": [
+                  "Programs that have a run in progress that waits for an approval."
+                ],
+                "enumNoValidation": true,
+                "enumTypeName": "DeliveryWaitKindFilter"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeliveryProgramList"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "description": "A parameter is not valid"
+          }
+        },
+        "summary": "ListDeliveryPrograms",
+        "tags": [
+          "Delivery"
+        ],
+        "x-pulumi-route-property": {
+          "Visibility": "Preview"
+        }
+      }
+    },
     "/api/preview/environments": {
       "get": {
         "deprecated": true,
@@ -61537,6 +64701,9 @@
           "204": {
             "description": "No Content"
           },
+          "403": {
+            "description": "Missing update permission on the Insights account"
+          },
           "404": {
             "description": "Discovered stack or annotation not found"
           }
@@ -61598,6 +64765,9 @@
           },
           "400": {
             "description": "Invalid request"
+          },
+          "403": {
+            "description": "Missing update permission on the Insights account"
           },
           "404": {
             "description": "Discovered stack not found"
@@ -61750,6 +64920,9 @@
           },
           "400": {
             "description": "Invalid request"
+          },
+          "403": {
+            "description": "Forbidden. The caller lacks permission to manage the organization's billing."
           }
         },
         "summary": "AcceptInsightsBilling",
@@ -61783,6 +64956,9 @@
           },
           "400": {
             "description": "Invalid request"
+          },
+          "403": {
+            "description": "Forbidden. The caller lacks permission to manage the organization's billing."
           }
         },
         "summary": "TerminateInsightsTrial",
@@ -62753,6 +65929,1175 @@
         "x-pulumi-route-property": {
           "Deprecated": true,
           "SupersededBy": "PostPublishTemplateVersionComplete",
+          "Visibility": "Preview"
+        }
+      }
+    },
+    "/api/preview/stacks/{orgName}/{projectName}/{stackName}/delivery/dispatch": {
+      "post": {
+        "description": "Starts a Delivery run of the pipeline on the stack at the head of the program branch, or at the ref of the request. Sources that the request does not pin get their latest value. An optional key prevents duplicate dispatches. A credential needs the pipeline:dispatch permission on the pipeline stack. A request that sets a ref or sources also needs the stack:write permission on that stack. Returns a 400 error if the key, the ref or a source is not valid, or if a pinned source is not a GitHub, GitLab, Bitbucket or Azure DevOps source of the pipeline, a 403 error if the organization cannot use Delivery, a 404 error if the stack is not a pipeline, and a 409 error if the pipeline has no active registration, cannot run, or changed while the run started.",
+        "operationId": "DispatchDeliveryRun",
+        "parameters": [
+          {
+            "description": "The organization name",
+            "in": "path",
+            "name": "orgName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The project name",
+            "in": "path",
+            "name": "projectName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The stack name",
+            "in": "path",
+            "name": "stackName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeliveryDispatchRequest"
+              }
+            }
+          },
+          "x-originalParamName": "body"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeliveryDispatchResponse"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "description": "The key, the ref or a source is not valid, or a pinned source is not a GitHub, GitLab, Bitbucket or Azure DevOps source of the pipeline, is pinned twice or has an empty value"
+          },
+          "403": {
+            "description": "Delivery is not enabled, or the credential has no pipeline:dispatch permission on the stack, or has no stack:write permission on it for a request that sets a ref or sources"
+          },
+          "404": {
+            "description": "The stack is not a Delivery pipeline"
+          },
+          "409": {
+            "description": "The pipeline has no active registration, cannot run, or changed while the run started"
+          },
+          "503": {
+            "description": "The forge could not be read"
+          }
+        },
+        "summary": "DispatchDeliveryRun",
+        "tags": [
+          "Delivery"
+        ],
+        "x-pulumi-route-property": {
+          "Visibility": "Preview"
+        }
+      }
+    },
+    "/api/preview/stacks/{orgName}/{projectName}/{stackName}/delivery/program": {
+      "get": {
+        "description": "Returns the shell of a Delivery program: a projection of the active registration with live state. Each stage of the active registration carries the run that deployed its current release (`deployed`), the run that holds its lock (`lockHolder`), its newest open gate (`openGate`), its queue length and its members with their status. Stages and members that are not in the active registration do not appear; their history is in the run routes. The active registration has at most 1000 stages and 1000 members. The response also holds the runs in progress (at most 20, with a count) and a summary of the pipeline. A stack with a failed first registration and no program answers 200 with `registered` set to false.",
+        "operationId": "GetDeliveryProgram",
+        "parameters": [
+          {
+            "description": "The organization name",
+            "in": "path",
+            "name": "orgName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The project name",
+            "in": "path",
+            "name": "projectName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The stack name",
+            "in": "path",
+            "name": "stackName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeliveryProgram"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "The stack is not a Delivery program, or has no such item"
+          }
+        },
+        "summary": "GetDeliveryProgram",
+        "tags": [
+          "Delivery"
+        ],
+        "x-pulumi-route-property": {
+          "Visibility": "Preview"
+        }
+      }
+    },
+    "/api/preview/stacks/{orgName}/{projectName}/{stackName}/delivery/releases": {
+      "get": {
+        "description": "Lists the releases of a Delivery program, ordered by release number, newest first. With `ready` set to true, only ready releases are listed. With `rollbackStage` set to the name of a stage, only the releases that the rollback of that stage accepts are listed: releases that converged the stage and are older than the release deployed at it; they are all ready, so `rollbackStage` cannot combine with `ready`. Results are paginated with `continuationToken` and `maxResults`; the response carries a `continuationToken` when more results follow. `maxResults` defaults to 50, and a value below 1 or above 100 returns a 400 error. An invalid continuation token returns a 400 error.",
+        "operationId": "ListDeliveryReleases",
+        "parameters": [
+          {
+            "description": "The organization name",
+            "in": "path",
+            "name": "orgName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The project name",
+            "in": "path",
+            "name": "projectName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The stack name",
+            "in": "path",
+            "name": "stackName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Continuation token from a previous page",
+            "in": "query",
+            "name": "continuationToken",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The number of results per page. The default is 50. A value below 1 or above 100 returns a 400 error.",
+            "in": "query",
+            "name": "maxResults",
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "When true, only ready releases",
+            "in": "query",
+            "name": "ready",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "description": "Only the releases that the rollback of this stage accepts",
+            "in": "query",
+            "name": "rollbackStage",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeliveryReleaseList"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "description": "A parameter is not valid"
+          },
+          "404": {
+            "description": "The stack is not a Delivery program, or has no such item"
+          }
+        },
+        "summary": "ListDeliveryReleases",
+        "tags": [
+          "Delivery"
+        ],
+        "x-pulumi-route-property": {
+          "Visibility": "Preview"
+        }
+      }
+    },
+    "/api/preview/stacks/{orgName}/{projectName}/{stackName}/delivery/releases/{releaseNumber}": {
+      "get": {
+        "description": "Returns a release: its sources, the previous release, its artifacts grouped by run and its rollout by stage. The rollout lists at most 50 runs. List the runs of a release with the `release` filter of the runs route.",
+        "operationId": "GetDeliveryRelease",
+        "parameters": [
+          {
+            "description": "The organization name",
+            "in": "path",
+            "name": "orgName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The project name",
+            "in": "path",
+            "name": "projectName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The stack name",
+            "in": "path",
+            "name": "stackName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The number of the release",
+            "in": "path",
+            "name": "releaseNumber",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeliveryReleaseDetail"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "The stack is not a Delivery program, or has no such item"
+          }
+        },
+        "summary": "GetDeliveryRelease",
+        "tags": [
+          "Delivery"
+        ],
+        "x-pulumi-route-property": {
+          "Visibility": "Preview"
+        }
+      }
+    },
+    "/api/preview/stacks/{orgName}/{projectName}/{stackName}/delivery/runs": {
+      "get": {
+        "description": "Lists the runs of a Delivery program, ordered by run number, newest first. The filters `stage`, `status` and `release` combine. With `queued` set to true, the route lists instead the runs that wait for admission to the stage in `stage`, in the order the service admits them: operator runs by queue time, then run number, ascending; then normal runs by release number, then run number, descending. `queued` requires `stage` and returns a 400 error without it, and it cannot combine with `release` or `status`. The queue is a live view: an admission removes the first run and the others move up, so read it again from the first page after a change. Results are paginated with `continuationToken` and `maxResults`; the response carries a `continuationToken` when more results follow. `maxResults` defaults to 50, and a value below 1 or above 100 returns a 400 error. An invalid continuation token returns a 400 error.",
+        "operationId": "ListDeliveryRuns",
+        "parameters": [
+          {
+            "description": "The organization name",
+            "in": "path",
+            "name": "orgName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The project name",
+            "in": "path",
+            "name": "projectName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The stack name",
+            "in": "path",
+            "name": "stackName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Continuation token from a previous page",
+            "in": "query",
+            "name": "continuationToken",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The number of results per page. The default is 50. A value below 1 or above 100 returns a 400 error.",
+            "in": "query",
+            "name": "maxResults",
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "When true, list the runs that wait for admission to the stage in `stage`, in admission order. It requires `stage`.",
+            "in": "query",
+            "name": "queued",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "description": "Only runs of the release with this number",
+            "in": "query",
+            "name": "release",
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Only runs that reached this stage: they wait at it, hold its lock or converged it",
+            "in": "query",
+            "name": "stage",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Only runs with this status: `in_progress`, `succeeded`, `failed`, `canceled` or `superseded`. Any other value that is not empty returns a 400 error.",
+            "in": "query",
+            "name": "status",
+            "schema": {
+              "enum": [
+                "in_progress",
+                "succeeded",
+                "failed",
+                "canceled",
+                "superseded"
+              ],
+              "type": "string",
+              "x-pulumi-model-property": {
+                "enumComments": "The status of a run.",
+                "enumFieldComments": [
+                  "The run is in progress.",
+                  "The run succeeded.",
+                  "The run failed.",
+                  "The run was canceled.",
+                  "A newer run replaced the run."
+                ],
+                "enumFieldNames": [
+                  "InProgress",
+                  "Succeeded",
+                  "Failed",
+                  "Canceled",
+                  "Superseded"
+                ],
+                "enumNoValidation": true,
+                "enumTypeName": "DeliveryRunStatus"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeliveryRunList"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "description": "A parameter is not valid"
+          },
+          "404": {
+            "description": "The stack is not a Delivery program, or has no such item"
+          }
+        },
+        "summary": "ListDeliveryRuns",
+        "tags": [
+          "Delivery"
+        ],
+        "x-pulumi-route-property": {
+          "Visibility": "Preview"
+        }
+      }
+    },
+    "/api/preview/stacks/{orgName}/{projectName}/{stackName}/delivery/runs/{runNumber}": {
+      "get": {
+        "description": "Returns the page of a run: its facts, stages, members, graph edges and the actions available to the caller. Nested lists are bounded.",
+        "operationId": "GetDeliveryRunDetail",
+        "parameters": [
+          {
+            "description": "The organization name",
+            "in": "path",
+            "name": "orgName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The project name",
+            "in": "path",
+            "name": "projectName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The stack name",
+            "in": "path",
+            "name": "stackName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The number of the run",
+            "in": "path",
+            "name": "runNumber",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeliveryRun"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "The stack is not a Delivery program, or has no such item"
+          }
+        },
+        "summary": "GetDeliveryRunDetail",
+        "tags": [
+          "Delivery"
+        ],
+        "x-pulumi-route-property": {
+          "Visibility": "Preview"
+        }
+      }
+    },
+    "/api/preview/stacks/{orgName}/{projectName}/{stackName}/delivery/runs/{runNumber}/cancel": {
+      "post": {
+        "description": "Cancels a Delivery run of the pipeline on the stack. Work that the run started stops, and the run never shows as failed. Canceling a run that is already canceled succeeds and changes nothing. The tokens that Delivery creates for a run cannot cancel. Returns a 404 error if the stack is not a pipeline or has no such run, and a 409 error if the run is a local run or already ended in another status.",
+        "operationId": "CancelDeliveryRun",
+        "parameters": [
+          {
+            "description": "The organization name",
+            "in": "path",
+            "name": "orgName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The project name",
+            "in": "path",
+            "name": "projectName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The stack name",
+            "in": "path",
+            "name": "stackName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The number of the run",
+            "in": "path",
+            "name": "runNumber",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "403": {
+            "description": "The credential cannot cancel a run"
+          },
+          "404": {
+            "description": "The stack is not a Delivery pipeline or has no such run"
+          },
+          "409": {
+            "description": "The run is a local run, or it already ended in another status"
+          }
+        },
+        "summary": "CancelDeliveryRun",
+        "tags": [
+          "Delivery"
+        ],
+        "x-pulumi-route-property": {
+          "Visibility": "Preview"
+        }
+      }
+    },
+    "/api/preview/stacks/{orgName}/{projectName}/{stackName}/delivery/runs/{runNumber}/gates/{gateID}": {
+      "get": {
+        "description": "Returns a gate: its title, its conditions, the rule with its satisfaction and, for each approval, the status of its change request, the approvals it needs and the approvals that count. The `changes` field summarizes the previews of the stage: the counts, and one entry for each member with the state of its preview and the number of changed config keys. A gate has at most 50 conditions, and the summary has one entry for each member of the stage, at most 1000.",
+        "operationId": "GetDeliveryGate",
+        "parameters": [
+          {
+            "description": "The organization name",
+            "in": "path",
+            "name": "orgName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The project name",
+            "in": "path",
+            "name": "projectName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The stack name",
+            "in": "path",
+            "name": "stackName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The number of the run",
+            "in": "path",
+            "name": "runNumber",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "The identifier of the gate",
+            "in": "path",
+            "name": "gateID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeliveryGateDetail"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "The stack is not a Delivery program, or has no such item"
+          }
+        },
+        "summary": "GetDeliveryGate",
+        "tags": [
+          "Delivery"
+        ],
+        "x-pulumi-route-property": {
+          "Visibility": "Preview"
+        }
+      }
+    },
+    "/api/preview/stacks/{orgName}/{projectName}/{stackName}/delivery/runs/{runNumber}/gates/{gateID}/continue": {
+      "post": {
+        "description": "Continues the manual condition of a gate of a Delivery run, with an optional comment. Any credential with the pipeline:approve permission on the pipeline stack can continue a gate, except the tokens that Delivery creates for a run. The body names the condition (by name or ID) when the gate has more than one manual condition. Returns a 400 error if the comment is longer than 4096 bytes after trimming, a 404 error if the stack is not a pipeline, has no such run or gate, or the gate has no manual condition with the name in the request, and a 409 error if the gate is not open.",
+        "operationId": "ContinueDeliveryGate",
+        "parameters": [
+          {
+            "description": "The organization name",
+            "in": "path",
+            "name": "orgName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The project name",
+            "in": "path",
+            "name": "projectName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The stack name",
+            "in": "path",
+            "name": "stackName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The number of the run",
+            "in": "path",
+            "name": "runNumber",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "The identifier of the gate",
+            "in": "path",
+            "name": "gateID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeliveryGateActionRequest"
+              }
+            }
+          },
+          "x-originalParamName": "body"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeliveryGateActionResponse"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "description": "The gate has no manual condition, or more than one and the request does not name one, or the comment is longer than 4096 bytes after trimming"
+          },
+          "403": {
+            "description": "The credential has no pipeline:approve permission on the stack, or is a token that Delivery created for a run"
+          },
+          "404": {
+            "description": "The stack is not a Delivery pipeline, or has no such run or gate, or the gate has no manual condition with the name in the request"
+          },
+          "409": {
+            "description": "The gate is not open"
+          }
+        },
+        "summary": "ContinueDeliveryGate",
+        "tags": [
+          "Delivery"
+        ],
+        "x-pulumi-route-property": {
+          "Visibility": "Preview"
+        }
+      }
+    },
+    "/api/preview/stacks/{orgName}/{projectName}/{stackName}/delivery/runs/{runNumber}/retry": {
+      "post": {
+        "description": "Retries a failed Delivery run of the pipeline on the stack. The run continues on its own stack with the same values: members that failed start again, and members that succeeded keep their results. The tokens that Delivery creates for a run cannot retry. Returns a 404 error if the stack is not a pipeline or has no such run, and a 409 error if the run is a local run, did not fail or its stack is gone, if the pipeline is being deleted, if the run reached its limit of passes, or if a stage moved on: a newer release was deployed to a stage where the run failed or waits for that stage (use rollback to deploy the release of the run again), or the run is a rollback, redeploy or promote run and something was deployed to its stage after it started (start the stage action again).",
+        "operationId": "RetryDeliveryRun",
+        "parameters": [
+          {
+            "description": "The organization name",
+            "in": "path",
+            "name": "orgName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The project name",
+            "in": "path",
+            "name": "projectName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The stack name",
+            "in": "path",
+            "name": "stackName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The number of the run",
+            "in": "path",
+            "name": "runNumber",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeliveryActionResult"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "403": {
+            "description": "The credential cannot retry a run"
+          },
+          "404": {
+            "description": "The stack is not a Delivery pipeline or has no such run"
+          },
+          "409": {
+            "description": "The run is a local run, did not fail or has no stack; the pipeline is being deleted; the run reached its limit of passes; a newer release was deployed to a stage where the run failed or waits for that stage (use rollback); or the run is a rollback, redeploy or promote run and something was deployed to its stage after it started"
+          }
+        },
+        "summary": "RetryDeliveryRun",
+        "tags": [
+          "Delivery"
+        ],
+        "x-pulumi-route-property": {
+          "Visibility": "Preview"
+        }
+      }
+    },
+    "/api/preview/stacks/{orgName}/{projectName}/{stackName}/delivery/stages/{stageName}/pause": {
+      "post": {
+        "description": "Pauses a stage of a Delivery pipeline. A run that holds the stage keeps it. Normal runs wait for the stage until it is resumed. The tokens that Delivery creates for a run cannot pause.",
+        "operationId": "PauseDeliveryStage",
+        "parameters": [
+          {
+            "description": "The organization name",
+            "in": "path",
+            "name": "orgName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The project name",
+            "in": "path",
+            "name": "projectName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The stack name",
+            "in": "path",
+            "name": "stackName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The name of the stage",
+            "in": "path",
+            "name": "stageName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "403": {
+            "description": "The credential cannot act on a stage"
+          },
+          "404": {
+            "description": "The stack is not a Delivery pipeline, or has no such stage"
+          }
+        },
+        "summary": "PauseDeliveryStage",
+        "tags": [
+          "Delivery"
+        ],
+        "x-pulumi-route-property": {
+          "Visibility": "Preview"
+        }
+      }
+    },
+    "/api/preview/stacks/{orgName}/{projectName}/{stackName}/delivery/stages/{stageName}/promote": {
+      "post": {
+        "description": "Deploys any ready release to a stage of a Delivery pipeline (force-promote). The new run skips the gate of the stage. The tokens that Delivery creates for a run cannot promote.",
+        "operationId": "PromoteDeliveryStage",
+        "parameters": [
+          {
+            "description": "The organization name",
+            "in": "path",
+            "name": "orgName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The project name",
+            "in": "path",
+            "name": "projectName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The stack name",
+            "in": "path",
+            "name": "stackName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The name of the stage",
+            "in": "path",
+            "name": "stageName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeliveryStageActionRequest"
+              }
+            }
+          },
+          "x-originalParamName": "body"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeliveryActionResult"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "403": {
+            "description": "The credential cannot act on a stage, or Delivery is not enabled for the organization"
+          },
+          "404": {
+            "description": "The stack is not a Delivery pipeline, or has no such stage or release"
+          },
+          "409": {
+            "description": "The release is a local release, is not ready yet, has no such stage, or did not converge, in its own run, a stage that the stage depends on; the pipeline is being deleted or has no service principal to run as; or a stack with the name of the new run stack already exists"
+          }
+        },
+        "summary": "PromoteDeliveryStage",
+        "tags": [
+          "Delivery"
+        ],
+        "x-pulumi-route-property": {
+          "Visibility": "Preview"
+        }
+      }
+    },
+    "/api/preview/stacks/{orgName}/{projectName}/{stackName}/delivery/stages/{stageName}/redeploy": {
+      "post": {
+        "description": "Deploys the release that a stage of a Delivery pipeline has again. The new run skips the gate of the stage. The tokens that Delivery creates for a run cannot redeploy.",
+        "operationId": "RedeployDeliveryStage",
+        "parameters": [
+          {
+            "description": "The organization name",
+            "in": "path",
+            "name": "orgName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The project name",
+            "in": "path",
+            "name": "projectName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The stack name",
+            "in": "path",
+            "name": "stackName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The name of the stage",
+            "in": "path",
+            "name": "stageName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeliveryActionResult"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "403": {
+            "description": "The credential cannot act on a stage, or Delivery is not enabled for the organization"
+          },
+          "404": {
+            "description": "The stack is not a Delivery pipeline, or has no such stage or release"
+          },
+          "409": {
+            "description": "Nothing was deployed to the stage yet, or the deployed release came from a local update, is not ready yet, or cannot be deployed again; the pipeline is being deleted or has no service principal to run as; or a stack with the name of the new run stack already exists"
+          }
+        },
+        "summary": "RedeployDeliveryStage",
+        "tags": [
+          "Delivery"
+        ],
+        "x-pulumi-route-property": {
+          "Visibility": "Preview"
+        }
+      }
+    },
+    "/api/preview/stacks/{orgName}/{projectName}/{stackName}/delivery/stages/{stageName}/resume": {
+      "post": {
+        "description": "Resumes a paused stage of a Delivery pipeline. The tokens that Delivery creates for a run cannot resume.",
+        "operationId": "ResumeDeliveryStage",
+        "parameters": [
+          {
+            "description": "The organization name",
+            "in": "path",
+            "name": "orgName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The project name",
+            "in": "path",
+            "name": "projectName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The stack name",
+            "in": "path",
+            "name": "stackName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The name of the stage",
+            "in": "path",
+            "name": "stageName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "403": {
+            "description": "The credential cannot act on a stage"
+          },
+          "404": {
+            "description": "The stack is not a Delivery pipeline, or has no such stage"
+          }
+        },
+        "summary": "ResumeDeliveryStage",
+        "tags": [
+          "Delivery"
+        ],
+        "x-pulumi-route-property": {
+          "Visibility": "Preview"
+        }
+      }
+    },
+    "/api/preview/stacks/{orgName}/{projectName}/{stackName}/delivery/stages/{stageName}/rollback": {
+      "post": {
+        "description": "Rolls a stage of a Delivery pipeline back to an earlier release that was ready and converged the stage before. The rollback pauses the stage, so a newer release that waits does not deploy over it. The stage stays paused after the rollback run ends, also when it fails or is cancelled. Resume the stage to admit runs again. The new run skips the gate of the stage. The tokens that Delivery creates for a run cannot roll back.",
+        "operationId": "RollbackDeliveryStage",
+        "parameters": [
+          {
+            "description": "The organization name",
+            "in": "path",
+            "name": "orgName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The project name",
+            "in": "path",
+            "name": "projectName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The stack name",
+            "in": "path",
+            "name": "stackName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The name of the stage",
+            "in": "path",
+            "name": "stageName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeliveryStageActionRequest"
+              }
+            }
+          },
+          "x-originalParamName": "body"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeliveryActionResult"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "403": {
+            "description": "The credential cannot act on a stage, or Delivery is not enabled for the organization"
+          },
+          "404": {
+            "description": "The stack is not a Delivery pipeline, or has no such stage or release"
+          },
+          "409": {
+            "description": "Nothing was deployed to the stage yet; the release number is missing or less than 1, or the release is not lower than the release deployed to the stage, is a local release, is not ready yet, or never converged the stage; the pipeline is being deleted or has no service principal to run as; or a stack with the name of the new run stack already exists"
+          }
+        },
+        "summary": "RollbackDeliveryStage",
+        "tags": [
+          "Delivery"
+        ],
+        "x-pulumi-route-property": {
           "Visibility": "Preview"
         }
       }
@@ -75956,6 +80301,9 @@
     },
     {
       "name": "DataExport"
+    },
+    {
+      "name": "Delivery"
     },
     {
       "name": "DeploymentRunners"

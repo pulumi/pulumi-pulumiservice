@@ -244,7 +244,6 @@ class Account(pulumi.CustomResource):
             __props__.__dict__["name"] = None
             __props__.__dict__["owned_by"] = None
             __props__.__dict__["provider_env_ref"] = None
-            __props__.__dict__["provider_version"] = None
             __props__.__dict__["scan_status"] = None
             __props__.__dict__["scheduled_scan_enabled"] = None
         super(Account, __self__).__init__(
@@ -275,7 +274,6 @@ class Account(pulumi.CustomResource):
         __props__.__dict__["provider"] = None
         __props__.__dict__["provider_config"] = None
         __props__.__dict__["provider_env_ref"] = None
-        __props__.__dict__["provider_version"] = None
         __props__.__dict__["scan_status"] = None
         __props__.__dict__["scheduled_scan_enabled"] = None
         return Account(resource_name, opts=opts, __props__=__props__)
@@ -329,15 +327,6 @@ class Account(pulumi.CustomResource):
         in the format 'project/environment' with an optional @version suffix.
         """
         return pulumi.get(self, "provider_env_ref")
-
-    @_builtins.property
-    @pulumi.getter(name="providerVersion")
-    def provider_version(self) -> pulumi.Output[Optional[_builtins.str]]:
-        """
-        Deprecated: no longer populated. Omitted from responses, and ignored if sent.
-        The provider version used for discovery is now recorded per resource.
-        """
-        return pulumi.get(self, "provider_version")
 
     @_builtins.property
     @pulumi.getter(name="scanStatus")

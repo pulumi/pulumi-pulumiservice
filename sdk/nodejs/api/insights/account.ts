@@ -71,11 +71,6 @@ export class Account extends pulumi.CustomResource {
      */
     declare public /*out*/ readonly providerEnvRef: pulumi.Output<string | undefined>;
     /**
-     * Deprecated: no longer populated. Omitted from responses, and ignored if sent.
-     * The provider version used for discovery is now recorded per resource.
-     */
-    declare public /*out*/ readonly providerVersion: pulumi.Output<string | undefined>;
-    /**
      * Status of the last discovery scan for this account.
      */
     declare public /*out*/ readonly scanStatus: pulumi.Output<any | undefined>;
@@ -118,7 +113,6 @@ export class Account extends pulumi.CustomResource {
             resourceInputs["name"] = undefined /*out*/;
             resourceInputs["ownedBy"] = undefined /*out*/;
             resourceInputs["providerEnvRef"] = undefined /*out*/;
-            resourceInputs["providerVersion"] = undefined /*out*/;
             resourceInputs["scanStatus"] = undefined /*out*/;
             resourceInputs["scheduledScanEnabled"] = undefined /*out*/;
         } else {
@@ -128,7 +122,6 @@ export class Account extends pulumi.CustomResource {
             resourceInputs["provider"] = undefined /*out*/;
             resourceInputs["providerConfig"] = undefined /*out*/;
             resourceInputs["providerEnvRef"] = undefined /*out*/;
-            resourceInputs["providerVersion"] = undefined /*out*/;
             resourceInputs["scanStatus"] = undefined /*out*/;
             resourceInputs["scheduledScanEnabled"] = undefined /*out*/;
         }
