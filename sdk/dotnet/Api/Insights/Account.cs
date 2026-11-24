@@ -54,13 +54,6 @@ namespace Pulumi.PulumiService.Api.Insights
         public Output<string?> ProviderEnvRef { get; private set; } = null!;
 
         /// <summary>
-        /// Deprecated: no longer populated. Omitted from responses, and ignored if sent.
-        /// The provider version used for discovery is now recorded per resource.
-        /// </summary>
-        [Output("providerVersion")]
-        public Output<string?> ProviderVersion { get; private set; } = null!;
-
-        /// <summary>
         /// Status of the last discovery scan for this account.
         /// </summary>
         [Output("scanStatus")]

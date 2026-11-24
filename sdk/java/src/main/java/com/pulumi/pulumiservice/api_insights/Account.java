@@ -111,22 +111,6 @@ public class Account extends com.pulumi.resources.CustomResource {
         return Codegen.optional(this.providerEnvRef);
     }
     /**
-     * Deprecated: no longer populated. Omitted from responses, and ignored if sent.
-     * The provider version used for discovery is now recorded per resource.
-     * 
-     */
-    @Export(name="providerVersion", refs={String.class}, tree="[0]")
-    private Output</* @Nullable */ String> providerVersion;
-
-    /**
-     * @return Deprecated: no longer populated. Omitted from responses, and ignored if sent.
-     * The provider version used for discovery is now recorded per resource.
-     * 
-     */
-    public Output<Optional<String>> providerVersion() {
-        return Codegen.optional(this.providerVersion);
-    }
-    /**
      * Status of the last discovery scan for this account.
      * 
      */
