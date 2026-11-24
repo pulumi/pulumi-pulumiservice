@@ -91,7 +91,7 @@ func (c *Client) CreateWebhook(ctx context.Context, req WebhookRequest) (*Webhoo
 	apiPath := constructAPIPath(req.OrganizationName, req.ProjectName, req.StackName, req.EnvironmentName)
 
 	var webhook Webhook
-	_, err := c.do(ctx, http.MethodPost, apiPath, req, &webhook)
+	err := c.do(ctx, http.MethodPost, apiPath, req, &webhook)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create webhook: %w", err)
 	}
@@ -110,7 +110,7 @@ func (c *Client) ListWebhooks(
 	apiPath := constructAPIPath(orgName, projectName, stackName, environmentName)
 
 	var webhooks []Webhook
-	_, err := c.do(ctx, http.MethodGet, apiPath, nil, &webhooks)
+	err := c.do(ctx, http.MethodGet, apiPath, nil, &webhooks)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list webhooks: %w", err)
 	}
@@ -131,7 +131,7 @@ func (c *Client) GetWebhook(ctx context.Context,
 	apiPath := constructAPIPath(orgName, projectName, stackName, environmentName) + "/" + webhookName
 
 	var webhook Webhook
-	_, err := c.do(ctx, http.MethodGet, apiPath, nil, &webhook)
+	err := c.do(ctx, http.MethodGet, apiPath, nil, &webhook)
 	if err != nil {
 		statusCode := GetErrorStatusCode(err)
 		if statusCode == http.StatusNotFound {
@@ -165,7 +165,7 @@ func (c *Client) UpdateWebhook(ctx context.Context, req UpdateWebhookRequest) (*
 	) + "/" + req.Name
 
 	var webhook Webhook
-	_, err := c.do(ctx, http.MethodPatch, apiPath, req, &webhook)
+	err := c.do(ctx, http.MethodPatch, apiPath, req, &webhook)
 	if err != nil {
 		return nil, fmt.Errorf("failed to update webhook: %w", err)
 	}
@@ -187,14 +187,7 @@ func (c *Client) DeleteWebhook(
 
 	apiPath := constructAPIPath(orgName, projectName, stackName, environmentName) + "/" + name
 
-	_, err := c.do(ctx, http.MethodDelete, apiPath, nil, nil)
-	if err != nil {
-		if GetErrorStatusCode(err) == http.StatusNotFound {
-			return nil
-		}
-		return fmt.Errorf("failed to delete webhook: %w", err)
-	}
-	return nil
+	return c.deleteIgnoringNotFound(ctx, apiPath, nil, "webhook")
 }
 
 func constructAPIPath(orgName string, projectName, stackName, environmentName *string) string {

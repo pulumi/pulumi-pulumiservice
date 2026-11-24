@@ -49,7 +49,7 @@ func (c *Client) CreateTemplateSource(
 ) (*TemplateSourceResponse, error) {
 	apiPath := path.Join("orgs", organizationName, "templates/sources")
 	var response TemplateSourceResponse
-	_, err := c.do(ctx, http.MethodPost, apiPath, request, &response)
+	err := c.do(ctx, http.MethodPost, apiPath, request, &response)
 	if err != nil {
 		return nil, fmt.Errorf(
 			"failed to create template source in org %s: %+v due to error: %w",
@@ -69,7 +69,7 @@ func (c *Client) UpdateTemplateSource(
 ) (*TemplateSourceResponse, error) {
 	apiPath := path.Join("orgs", organizationName, "templates/sources", templateID)
 	var response TemplateSourceResponse
-	_, err := c.do(ctx, http.MethodPatch, apiPath, request, &response)
+	err := c.do(ctx, http.MethodPatch, apiPath, request, &response)
 	if err != nil {
 		return nil, fmt.Errorf(
 			"failed to update template source in org %s with id %s: %+v due to error: %w",
@@ -93,7 +93,7 @@ func (c *Client) GetTemplateSource(
 
 	apiPath := path.Join("orgs", organizationName, "templates/sources")
 	var templateSources ListResponse
-	_, err := c.do(ctx, http.MethodGet, apiPath, nil, &templateSources)
+	err := c.do(ctx, http.MethodGet, apiPath, nil, &templateSources)
 	if err != nil {
 		return nil, fmt.Errorf(
 			"failed to get template source in org %s with id %s due to error: %w",
@@ -114,17 +114,6 @@ func (c *Client) GetTemplateSource(
 
 func (c *Client) DeleteTemplateSource(ctx context.Context, organizationName string, templateID string) error {
 	apiPath := path.Join("orgs", organizationName, "templates/sources", templateID)
-	_, err := c.do(ctx, http.MethodDelete, apiPath, nil, nil)
-	if err != nil {
-		if GetErrorStatusCode(err) == http.StatusNotFound {
-			return nil
-		}
-		return fmt.Errorf(
-			"failed to delete template source in org %s with id %s due to error: %w",
-			organizationName,
-			templateID,
-			err,
-		)
-	}
-	return nil
+	what := fmt.Sprintf("template source %q in org %q", templateID, organizationName)
+	return c.deleteIgnoringNotFound(ctx, apiPath, nil, what)
 }

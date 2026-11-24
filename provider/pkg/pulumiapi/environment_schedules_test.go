@@ -188,7 +188,7 @@ func TestDeleteEnvironmentSchedule(t *testing.T) {
 		assert.EqualError(
 			t,
 			err,
-			"failed to delete environment schedule with scheduleId test-schedule-id : 401 API error: unauthorized",
+			"failed to delete environment schedule test-schedule-id: 401 API error: unauthorized",
 		)
 	})
 }

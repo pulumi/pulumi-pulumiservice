@@ -94,7 +94,7 @@ func (c *Client) ListPolicyGroups(ctx context.Context, orgName string) ([]Policy
 	apiPath := path.Join("orgs", orgName, "policygroups")
 
 	var response listPolicyGroupsResponse
-	_, err := c.do(ctx, http.MethodGet, apiPath, nil, &response)
+	err := c.do(ctx, http.MethodGet, apiPath, nil, &response)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list policy groups for %q: %w", orgName, err)
 	}
@@ -113,7 +113,7 @@ func (c *Client) GetPolicyGroup(ctx context.Context, orgName string, policyGroup
 	apiPath := path.Join("orgs", orgName, "policygroups", policyGroupName)
 
 	var policyGroup PolicyGroup
-	_, err := c.do(ctx, http.MethodGet, apiPath, nil, &policyGroup)
+	err := c.do(ctx, http.MethodGet, apiPath, nil, &policyGroup)
 	if err != nil {
 		statusCode := GetErrorStatusCode(err)
 		if statusCode == http.StatusNotFound {
@@ -155,7 +155,7 @@ func (c *Client) CreatePolicyGroup(ctx context.Context, orgName, policyGroupName
 		Mode:       mode,
 	}
 
-	_, err := c.do(ctx, http.MethodPost, apiPath, req, nil)
+	err := c.do(ctx, http.MethodPost, apiPath, req, nil)
 	if err != nil {
 		return fmt.Errorf("failed to create policy group %q: %w", policyGroupName, err)
 	}
@@ -184,7 +184,7 @@ func (c *Client) BatchUpdatePolicyGroup(
 
 	apiPath := path.Join("orgs", orgName, "policygroups", policyGroupName, "batch")
 
-	_, err := c.do(ctx, http.MethodPatch, apiPath, reqs, nil)
+	err := c.do(ctx, http.MethodPatch, apiPath, reqs, nil)
 	if err != nil {
 		return fmt.Errorf("failed to batch update policy group %q: %w", policyGroupName, err)
 	}
@@ -203,13 +203,5 @@ func (c *Client) DeletePolicyGroup(ctx context.Context, orgName, policyGroupName
 
 	apiPath := path.Join("orgs", orgName, "policygroups", policyGroupName)
 
-	_, err := c.do(ctx, http.MethodDelete, apiPath, nil, nil)
-	if err != nil {
-		if GetErrorStatusCode(err) == http.StatusNotFound {
-			return nil
-		}
-		return fmt.Errorf("failed to delete policy group %q: %w", policyGroupName, err)
-	}
-
-	return nil
+	return c.deleteIgnoringNotFound(ctx, apiPath, nil, fmt.Sprintf("policy group %q", policyGroupName))
 }

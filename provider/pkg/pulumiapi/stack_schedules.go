@@ -86,7 +86,7 @@ func (c *Client) CreateDeploymentSchedule(
 ) (*string, error) {
 	apiPath := path.Join("stacks", stack.OrgName, stack.ProjectName, stack.StackName, "deployments", "schedules")
 	var scheduleResponse StackScheduleResponse
-	_, err := c.do(ctx, http.MethodPost, apiPath, scheduleReq, &scheduleResponse)
+	err := c.do(ctx, http.MethodPost, apiPath, scheduleReq, &scheduleResponse)
 	if err != nil {
 		var cronString string
 		if scheduleReq.ScheduleCron != nil {
@@ -120,7 +120,7 @@ func (c *Client) CreateDriftSchedule(
 		"schedules",
 	)
 	var scheduleResponse StackScheduleResponse
-	_, err := c.do(ctx, http.MethodPost, apiPath, scheduleReq, &scheduleResponse)
+	err := c.do(ctx, http.MethodPost, apiPath, scheduleReq, &scheduleResponse)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create drift schedule (scheduleCron=%s, autoRemediate=%t): %w",
 			scheduleReq.ScheduleCron, scheduleReq.AutoRemediate, err)
@@ -135,7 +135,7 @@ func (c *Client) CreateTTLSchedule(
 ) (*string, error) {
 	apiPath := path.Join("stacks", stack.OrgName, stack.ProjectName, stack.StackName, "deployments", "ttl", "schedules")
 	var scheduleResponse StackScheduleResponse
-	_, err := c.do(ctx, http.MethodPost, apiPath, scheduleReq, &scheduleResponse)
+	err := c.do(ctx, http.MethodPost, apiPath, scheduleReq, &scheduleResponse)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create ttl schedule (timestamp=%s, deleteAfterDestroy=%t): %w",
 			scheduleReq.Timestamp, scheduleReq.DeleteAfterDestroy, err)
@@ -158,7 +158,7 @@ func (c *Client) GetStackSchedule(
 		scheduleID,
 	)
 	var scheduleResponse StackScheduleResponse
-	_, err := c.do(ctx, http.MethodGet, apiPath, nil, &scheduleResponse)
+	err := c.do(ctx, http.MethodGet, apiPath, nil, &scheduleResponse)
 	if err != nil {
 		if GetErrorStatusCode(err) == http.StatusNotFound {
 			return nil, nil
@@ -184,7 +184,7 @@ func (c *Client) UpdateDeploymentSchedule(
 		scheduleID,
 	)
 	var scheduleResponse StackScheduleResponse
-	_, err := c.do(ctx, http.MethodPost, apiPath, scheduleReq, &scheduleResponse)
+	err := c.do(ctx, http.MethodPost, apiPath, scheduleReq, &scheduleResponse)
 	if err != nil {
 		var cronString string
 		if scheduleReq.ScheduleCron != nil {
@@ -221,7 +221,7 @@ func (c *Client) UpdateDriftSchedule(
 		scheduleID,
 	)
 	var scheduleResponse StackScheduleResponse
-	_, err := c.do(ctx, http.MethodPost, apiPath, scheduleReq, &scheduleResponse)
+	err := c.do(ctx, http.MethodPost, apiPath, scheduleReq, &scheduleResponse)
 	if err != nil {
 		return nil, fmt.Errorf("failed to update drift schedule %s (scheduleCron=%s, autoRemediate=%t): %w",
 			scheduleID, scheduleReq.ScheduleCron, scheduleReq.AutoRemediate, err)
@@ -246,7 +246,7 @@ func (c *Client) UpdateTTLSchedule(
 		scheduleID,
 	)
 	var scheduleResponse StackScheduleResponse
-	_, err := c.do(ctx, http.MethodPost, apiPath, scheduleReq, &scheduleResponse)
+	err := c.do(ctx, http.MethodPost, apiPath, scheduleReq, &scheduleResponse)
 	if err != nil {
 		return nil, fmt.Errorf("failed to update ttl schedule %s (timestamp=%s, deleteAfterDestroy=%t): %w",
 			scheduleID, scheduleReq.Timestamp, scheduleReq.DeleteAfterDestroy, err)
@@ -264,12 +264,5 @@ func (c *Client) DeleteStackSchedule(ctx context.Context, stack StackIdentifier,
 		"schedules",
 		scheduleID,
 	)
-	_, err := c.do(ctx, http.MethodDelete, apiPath, nil, nil)
-	if err != nil {
-		if GetErrorStatusCode(err) == http.StatusNotFound {
-			return nil
-		}
-		return fmt.Errorf("failed to delete stack schedule with scheduleId %s : %w", scheduleID, err)
-	}
-	return nil
+	return c.deleteIgnoringNotFound(ctx, apiPath, nil, "stack schedule "+scheduleID)
 }
