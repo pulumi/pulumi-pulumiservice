@@ -3,7 +3,7 @@ module github.com/pulumi/pulumi-pulumiservice/examples/go-smoke
 go 1.26.0
 
 require (
-	github.com/pulumi/pulumi-pulumiservice/sdk v1.8.0
+	github.com/pulumi/pulumi-pulumiservice/sdk v1.9.0
 	github.com/pulumi/pulumi/sdk/v3 v3.256.0
 )
 
