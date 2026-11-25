@@ -87,7 +87,9 @@ class ServicePrincipal(pulumi.CustomResource):
                  role_ids: pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]] = None,
                  __props__=None):
         """
-        Creates a service principal in a Pulumi Cloud organization. A service principal is a named, non-human member of the organization for automation to authenticate as. It has no access of its own: its access comes from the organization-wide roles in `roleIds` and from entity access granted with `OrganizationMemberEntityAccess`, and it never receives the organization's default role. A stack's deployments can run as it: set `operationContext.servicePrincipal.login` on `DeploymentSettings`.
+        A service principal is a member of a Pulumi Cloud organization that isn't a person. Automation acts as it instead of as a human member, so the automation doesn't depend on anyone's account, and holds only the access it needs. For example, a stack's deployments can run as a service principal: set `operationContext.servicePrincipal.login` on `DeploymentSettings`.
+
+        A service principal starts with no access, and never receives the organization's default role. Grant it organization-wide roles with `roleIds`, and access to individual stacks, environments and Insights accounts with `OrganizationMemberEntityAccess`.
 
         Renaming the service principal or changing its roles updates it in place. Destroying it also deletes its access tokens. Pulumi Cloud refuses to delete a service principal while a stack's deployment settings run as it.
 
@@ -146,7 +148,9 @@ class ServicePrincipal(pulumi.CustomResource):
                  args: ServicePrincipalArgs,
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
-        Creates a service principal in a Pulumi Cloud organization. A service principal is a named, non-human member of the organization for automation to authenticate as. It has no access of its own: its access comes from the organization-wide roles in `roleIds` and from entity access granted with `OrganizationMemberEntityAccess`, and it never receives the organization's default role. A stack's deployments can run as it: set `operationContext.servicePrincipal.login` on `DeploymentSettings`.
+        A service principal is a member of a Pulumi Cloud organization that isn't a person. Automation acts as it instead of as a human member, so the automation doesn't depend on anyone's account, and holds only the access it needs. For example, a stack's deployments can run as a service principal: set `operationContext.servicePrincipal.login` on `DeploymentSettings`.
+
+        A service principal starts with no access, and never receives the organization's default role. Grant it organization-wide roles with `roleIds`, and access to individual stacks, environments and Insights accounts with `OrganizationMemberEntityAccess`.
 
         Renaming the service principal or changing its roles updates it in place. Destroying it also deletes its access tokens. Pulumi Cloud refuses to delete a service principal while a stack's deployment settings run as it.
 
