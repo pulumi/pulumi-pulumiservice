@@ -16,6 +16,54 @@ import (
 //
 // Renaming the service principal or changing its roles updates it in place. Destroying it also deletes its access tokens. Pulumi Cloud refuses to delete a service principal while a stack's deployment settings run as it.
 //
+// ## Example Usage
+// ### A service principal with a role and entity access
+//
+// The service principal holds the built-in Reader role across the organization, and can also open one environment. Its `login` output identifies it to other resources, such as `OrganizationMemberEntityAccess` and `DeploymentSettings`.
+//
+// ```go
+// package main
+//
+// import (
+//
+//	"github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice"
+//	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
+//
+// )
+//
+//	func main() {
+//		pulumi.Run(func(ctx *pulumi.Context) error {
+//			readerRole := pulumiservice.GetOrganizationRoleOutput(ctx, pulumiservice.GetOrganizationRoleOutputArgs{
+//				OrganizationName: pulumi.String("my-org"),
+//				Name:             pulumi.String("Reader"),
+//			}, nil)
+//			deployer, err := pulumiservice.NewServicePrincipal(ctx, "deployer", &pulumiservice.ServicePrincipalArgs{
+//				OrganizationName: pulumi.String("my-org"),
+//				Name:             pulumi.String("deployer"),
+//				RoleIds: pulumi.StringArray{
+//					readerRole.RoleId(),
+//				},
+//			})
+//			if err != nil {
+//				return err
+//			}
+//			_, err = pulumiservice.NewOrganizationMemberEntityAccess(ctx, "deployerEnvironmentAccess", &pulumiservice.OrganizationMemberEntityAccessArgs{
+//				OrganizationName: pulumi.String("my-org"),
+//				Username:         deployer.Login,
+//				EntityType:       pulumi.String("environment"),
+//				EntityName:       pulumi.String("my-project/deploy-config"),
+//				Permission:       pulumi.String("environment-open"),
+//			})
+//			if err != nil {
+//				return err
+//			}
+//			ctx.Export("deployerLogin", deployer.Login)
+//			return nil
+//		})
+//	}
+//
+// ```
+//
 // ## Import
 //
 // This resource can be imported using its `id`, which has the format `{organization}/{login}`, e.g.,

@@ -14,6 +14,51 @@ namespace Pulumi.PulumiService
     /// 
     /// Renaming the service principal or changing its roles updates it in place. Destroying it also deletes its access tokens. Pulumi Cloud refuses to delete a service principal while a stack's deployment settings run as it.
     /// 
+    /// ## Example Usage
+    /// ### A service principal with a role and entity access
+    /// 
+    /// The service principal holds the built-in Reader role across the organization, and can also open one environment. Its `login` output identifies it to other resources, such as `OrganizationMemberEntityAccess` and `DeploymentSettings`.
+    /// 
+    /// ```csharp
+    /// using System.Collections.Generic;
+    /// using System.Linq;
+    /// using Pulumi;
+    /// using PulumiService = Pulumi.PulumiService;
+    /// 
+    /// return await Deployment.RunAsync(() =&gt; 
+    /// {
+    ///     var readerRole = PulumiService.GetOrganizationRole.Invoke(new()
+    ///     {
+    ///         OrganizationName = "my-org",
+    ///         Name = "Reader",
+    ///     });
+    /// 
+    ///     var deployer = new PulumiService.ServicePrincipal("deployer", new()
+    ///     {
+    ///         OrganizationName = "my-org",
+    ///         Name = "deployer",
+    ///         RoleIds = new[]
+    ///         {
+    ///             readerRole.Apply(getOrganizationRoleResult =&gt; getOrganizationRoleResult.RoleId),
+    ///         },
+    ///     });
+    /// 
+    ///     var deployerEnvironmentAccess = new PulumiService.OrganizationMemberEntityAccess("deployerEnvironmentAccess", new()
+    ///     {
+    ///         OrganizationName = "my-org",
+    ///         Username = deployer.Login,
+    ///         EntityType = "environment",
+    ///         EntityName = "my-project/deploy-config",
+    ///         Permission = "environment-open",
+    ///     });
+    /// 
+    ///     return new Dictionary&lt;string, object?&gt;
+    ///     {
+    ///         ["deployerLogin"] = deployer.Login,
+    ///     };
+    /// });
+    /// ```
+    /// 
     /// ## Import
     /// 
     /// This resource can be imported using its `id`, which has the format `{organization}/{login}`, e.g.,

@@ -19,6 +19,62 @@ import javax.annotation.Nullable;
  * 
  * Renaming the service principal or changing its roles updates it in place. Destroying it also deletes its access tokens. Pulumi Cloud refuses to delete a service principal while a stack&#39;s deployment settings run as it.
  * 
+ * ## Example Usage
+ * ### A service principal with a role and entity access
+ * 
+ * The service principal holds the built-in Reader role across the organization, and can also open one environment. Its `login` output identifies it to other resources, such as `OrganizationMemberEntityAccess` and `DeploymentSettings`.
+ * 
+ * <pre>
+ * {@code
+ * package generated_program;
+ * 
+ * import com.pulumi.Context;
+ * import com.pulumi.Pulumi;
+ * import com.pulumi.core.Output;
+ * import com.pulumi.pulumiservice.PulumiserviceFunctions;
+ * import com.pulumi.pulumiservice.inputs.GetOrganizationRoleArgs;
+ * import com.pulumi.pulumiservice.ServicePrincipal;
+ * import com.pulumi.pulumiservice.ServicePrincipalArgs;
+ * import com.pulumi.pulumiservice.OrganizationMemberEntityAccess;
+ * import com.pulumi.pulumiservice.OrganizationMemberEntityAccessArgs;
+ * import java.util.ArrayList;
+ * import java.util.Arrays;
+ * import java.util.Map;
+ * import java.io.File;
+ * import java.nio.file.Files;
+ * import java.nio.file.Paths;
+ * 
+ * public class App {
+ *     public static void main(String[] args) {
+ *         Pulumi.run(App::stack);
+ *     }
+ * 
+ *     public static void stack(Context ctx) {
+ *         final var readerRole = PulumiserviceFunctions.getOrganizationRole(GetOrganizationRoleArgs.builder()
+ *             .organizationName("my-org")
+ *             .name("Reader")
+ *             .build());
+ * 
+ *         var deployer = new ServicePrincipal("deployer", ServicePrincipalArgs.builder()
+ *             .organizationName("my-org")
+ *             .name("deployer")
+ *             .roleIds(readerRole.applyValue(_readerRole -> _readerRole.roleId()))
+ *             .build());
+ * 
+ *         var deployerEnvironmentAccess = new OrganizationMemberEntityAccess("deployerEnvironmentAccess", OrganizationMemberEntityAccessArgs.builder()
+ *             .organizationName("my-org")
+ *             .username(deployer.login())
+ *             .entityType("environment")
+ *             .entityName("my-project/deploy-config")
+ *             .permission("environment-open")
+ *             .build());
+ * 
+ *         ctx.export("deployerLogin", deployer.login());
+ *     }
+ * }
+ * }
+ * </pre>
+ * 
  * ## Import
  * 
  * This resource can be imported using its `id`, which has the format `{organization}/{login}`, e.g.,

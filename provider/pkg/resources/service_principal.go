@@ -20,11 +20,19 @@ import (
 	"slices"
 	"strings"
 
+	_ "embed" // for the //go:embed example file below
+
 	"github.com/pulumi/pulumi-go-provider/infer"
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 )
+
+// Generated from examples/service_principal_examples.yaml; see the
+// //go:generate directive in org_access_token.go.
+//
+//go:embed service_principal_examples.md
+var servicePrincipalExamples string
 
 type ServicePrincipal struct{}
 
@@ -46,7 +54,8 @@ func (*ServicePrincipal) Annotate(a infer.Annotator) {
 			"`DeploymentSettings`.\n\n"+
 			"Renaming the service principal or changing its roles updates it in place. Destroying it also "+
 			"deletes its access tokens. Pulumi Cloud refuses to delete a service principal while a stack's "+
-			"deployment settings run as it."+
+			"deployment settings run as it.\n\n"+
+			strings.TrimSpace(servicePrincipalExamples)+
 			util.ImportDocs("pulumiservice:index:ServicePrincipal", "{organization}/{login}",
 				"my-org/service-principal:d333a711-4aa0-402f-be6d-72af9665fc37",
 				util.APIIDHint("service principal's login", "/api/orgs/my-org/members?type=service-principal",

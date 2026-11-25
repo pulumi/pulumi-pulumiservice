@@ -35,7 +35,10 @@ type ServicePrincipalClient interface {
 	DeleteServicePrincipal(ctx context.Context, orgName, login string) error
 }
 
-// ServicePrincipal is a service principal of an organization.
+// ServicePrincipal is a non-human member of an organization: an identity that
+// automation, such as a stack's deployments, acts as instead of a person's
+// account. It has no access by default. Its access comes only from the
+// organization roles in RoleIDs and the entity access granted to its login.
 type ServicePrincipal struct {
 	// Login identifies the service principal in API paths. Unlike Name, it
 	// doesn't change when the service principal is renamed.

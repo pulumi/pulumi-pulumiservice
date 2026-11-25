@@ -91,6 +91,30 @@ class ServicePrincipal(pulumi.CustomResource):
 
         Renaming the service principal or changing its roles updates it in place. Destroying it also deletes its access tokens. Pulumi Cloud refuses to delete a service principal while a stack's deployment settings run as it.
 
+        ## Example Usage
+        ### A service principal with a role and entity access
+
+        The service principal holds the built-in Reader role across the organization, and can also open one environment. Its `login` output identifies it to other resources, such as `OrganizationMemberEntityAccess` and `DeploymentSettings`.
+
+        ```python
+        import pulumi
+        import pulumi_pulumiservice as pulumiservice
+
+        reader_role = pulumiservice.get_organization_role_output(organization_name="my-org",
+            name="Reader")
+        deployer = pulumiservice.ServicePrincipal("deployer",
+            organization_name="my-org",
+            name="deployer",
+            role_ids=[reader_role.role_id])
+        deployer_environment_access = pulumiservice.OrganizationMemberEntityAccess("deployerEnvironmentAccess",
+            organization_name="my-org",
+            username=deployer.login,
+            entity_type="environment",
+            entity_name="my-project/deploy-config",
+            permission="environment-open")
+        pulumi.export("deployerLogin", deployer.login)
+        ```
+
         ## Import
 
         This resource can be imported using its `id`, which has the format `{organization}/{login}`, e.g.,
@@ -125,6 +149,30 @@ class ServicePrincipal(pulumi.CustomResource):
         Creates a service principal in a Pulumi Cloud organization. A service principal is a named, non-human member of the organization for automation to authenticate as. It has no access of its own: its access comes from the organization-wide roles in `roleIds` and from entity access granted with `OrganizationMemberEntityAccess`, and it never receives the organization's default role. A stack's deployments can run as it: set `operationContext.servicePrincipal.login` on `DeploymentSettings`.
 
         Renaming the service principal or changing its roles updates it in place. Destroying it also deletes its access tokens. Pulumi Cloud refuses to delete a service principal while a stack's deployment settings run as it.
+
+        ## Example Usage
+        ### A service principal with a role and entity access
+
+        The service principal holds the built-in Reader role across the organization, and can also open one environment. Its `login` output identifies it to other resources, such as `OrganizationMemberEntityAccess` and `DeploymentSettings`.
+
+        ```python
+        import pulumi
+        import pulumi_pulumiservice as pulumiservice
+
+        reader_role = pulumiservice.get_organization_role_output(organization_name="my-org",
+            name="Reader")
+        deployer = pulumiservice.ServicePrincipal("deployer",
+            organization_name="my-org",
+            name="deployer",
+            role_ids=[reader_role.role_id])
+        deployer_environment_access = pulumiservice.OrganizationMemberEntityAccess("deployerEnvironmentAccess",
+            organization_name="my-org",
+            username=deployer.login,
+            entity_type="environment",
+            entity_name="my-project/deploy-config",
+            permission="environment-open")
+        pulumi.export("deployerLogin", deployer.login)
+        ```
 
         ## Import
 
