@@ -40,6 +40,7 @@ const (
 	gcOperationContext     = "operationContext"
 	gcEnvironmentVariables = "environmentVariables"
 	gcVcs                  = "vcs"
+	gcGitHub               = "github"
 )
 
 // vcsProviderGitHub is the vcs block's provider for GitHub.

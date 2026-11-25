@@ -1,0 +1,5 @@
+kind: bug-fixes
+body: Fixed `DeploymentSettings` showing a diff when the `paths` or `tagFilters` of `github` or `vcs` are reordered
+time: 2026-11-20T17:27:40.802245-05:00
+custom:
+    Issue: "403"

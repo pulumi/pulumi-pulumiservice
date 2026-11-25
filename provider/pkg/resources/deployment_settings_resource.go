@@ -19,6 +19,7 @@ import (
 	"errors"
 	"fmt"
 	"path"
+	"slices"
 	"strings"
 
 	_ "embed" // for the //go:embed example file below
@@ -195,6 +196,8 @@ func (*DeploymentSettings) Diff(
 	if err != nil {
 		return infer.DiffResponse{}, err
 	}
+	sortFilters(olds)
+	sortFilters(news)
 
 	diff := olds.Diff(news)
 	if diff == nil {
@@ -215,6 +218,30 @@ func (*DeploymentSettings) Diff(
 		// settings have to go before the new ones can be created.
 		DeleteBeforeReplace: true,
 	}, nil
+}
+
+// sortFilters sorts the paths and tagFilters lists of github and vcs in m.
+// Pulumi Cloud applies these filters regardless of their order, so a reordered
+// list isn't a change. Lists that hold unknown values are left as they are.
+func sortFilters(m resource.PropertyMap) {
+	for _, block := range []resource.PropertyKey{gcGitHub, gcVcs} {
+		obj := m[block]
+		if !obj.IsObject() {
+			continue
+		}
+		for _, field := range []resource.PropertyKey{"paths", "tagFilters"} {
+			list := obj.ObjectValue()[field]
+			if !list.IsArray() {
+				continue
+			}
+			arr := list.ArrayValue()
+			if !slices.ContainsFunc(arr, func(v resource.PropertyValue) bool { return !v.IsString() }) {
+				slices.SortFunc(arr, func(a, b resource.PropertyValue) int {
+					return strings.Compare(a.StringValue(), b.StringValue())
+				})
+			}
+		}
+	}
 }
 
 // plainProperties converts m to a property map without secrets or unknowns,

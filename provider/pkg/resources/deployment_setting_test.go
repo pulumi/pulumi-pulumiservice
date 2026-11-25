@@ -807,7 +807,7 @@ func TestDeploymentSettingsPreviewDoesNotCallPulumiCloud(t *testing.T) {
 }
 
 func TestDeploymentSettingsCheckDoesNotFillTrueDefaults(t *testing.T) {
-	for _, block := range []string{"github", gcVcs} {
+	for _, block := range []string{gcGitHub, gcVcs} {
 		t.Run(block+" flags left unset", func(t *testing.T) {
 			settings := map[string]property.Value{"repository": property.New("org/repo")}
 			if block == gcVcs {
@@ -885,6 +885,44 @@ func TestDeploymentSettingsDiff(t *testing.T) {
 		assert.True(t, resp.HasChanges)
 		assert.Equal(t, p.Update, resp.DetailedDiff["operationContext.environmentVariables.A"].Kind)
 	})
+
+	withFilters := func(block, field string, filters ...property.Value) property.Map {
+		settings := map[string]property.Value{field: property.New(filters)}
+		if block == gcVcs {
+			settings["provider"] = property.New("github")
+		}
+		return deploymentSettingsInputs(map[string]property.Value{block: property.New(settings)})
+	}
+	str := func(values ...string) []property.Value {
+		out := make([]property.Value, len(values))
+		for i, v := range values {
+			out[i] = property.New(v)
+		}
+		return out
+	}
+
+	for _, block := range []string{gcGitHub, gcVcs} {
+		for _, field := range []string{"paths", "tagFilters"} {
+			name := block + "." + field
+			t.Run(name+" reordered is not a change", func(t *testing.T) {
+				olds := withFilters(block, field, str("a*", "!b*", "c*")...)
+				news := withFilters(block, field, str("c*", "a*", "!b*")...)
+				assert.False(t, diff(t, olds, news).HasChanges)
+			})
+
+			t.Run(name+" with a new filter is a change", func(t *testing.T) {
+				olds := withFilters(block, field, str("a*")...)
+				news := withFilters(block, field, str("!b*", "a*")...)
+				assert.True(t, diff(t, olds, news).HasChanges)
+			})
+
+			t.Run(name+" with an unknown value is compared in order", func(t *testing.T) {
+				olds := withFilters(block, field, str("a*")...)
+				news := withFilters(block, field, property.New(property.Computed), property.New("a*"))
+				assert.True(t, diff(t, olds, news).HasChanges)
+			})
+		}
+	}
 
 	t.Run("changed stack replaces, deleting first", func(t *testing.T) {
 		news := deploymentSettingsInputs(map[string]property.Value{gcStack: property.New("other-stack")})
