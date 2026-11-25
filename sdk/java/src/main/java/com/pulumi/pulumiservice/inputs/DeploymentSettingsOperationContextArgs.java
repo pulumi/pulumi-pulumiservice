@@ -7,6 +7,7 @@ import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
 import com.pulumi.pulumiservice.inputs.OperationContextOIDCArgs;
 import com.pulumi.pulumiservice.inputs.OperationContextOptionsArgs;
+import com.pulumi.pulumiservice.inputs.OperationContextServicePrincipalArgs;
 import java.lang.String;
 import java.util.List;
 import java.util.Map;
@@ -83,6 +84,36 @@ public final class DeploymentSettingsOperationContextArgs extends com.pulumi.res
         return Optional.ofNullable(this.preRunCommands);
     }
 
+    /**
+     * The ID of the organization role the deployments run with. Use `getOrganizationRole` to look up a role&#39;s ID by its name. Organizations with custom roles can pick any role; others can pick the built-in Reader, Maintainer or Admin role. You need every permission of the role. Conflicts with `servicePrincipal`.
+     * 
+     */
+    @Import(name="roleId")
+    private @Nullable Output<String> roleId;
+
+    /**
+     * @return The ID of the organization role the deployments run with. Use `getOrganizationRole` to look up a role&#39;s ID by its name. Organizations with custom roles can pick any role; others can pick the built-in Reader, Maintainer or Admin role. You need every permission of the role. Conflicts with `servicePrincipal`.
+     * 
+     */
+    public Optional<Output<String>> roleId() {
+        return Optional.ofNullable(this.roleId);
+    }
+
+    /**
+     * The service principal the deployments run as, with the access it holds. Pulumi Cloud requires it to have write access to the stack, and open access to the environments the stack imports, and you need every permission it holds. Conflicts with `roleId`.
+     * 
+     */
+    @Import(name="servicePrincipal")
+    private @Nullable Output<OperationContextServicePrincipalArgs> servicePrincipal;
+
+    /**
+     * @return The service principal the deployments run as, with the access it holds. Pulumi Cloud requires it to have write access to the stack, and open access to the environments the stack imports, and you need every permission it holds. Conflicts with `roleId`.
+     * 
+     */
+    public Optional<Output<OperationContextServicePrincipalArgs>> servicePrincipal() {
+        return Optional.ofNullable(this.servicePrincipal);
+    }
+
     private DeploymentSettingsOperationContextArgs() {}
 
     private DeploymentSettingsOperationContextArgs(DeploymentSettingsOperationContextArgs $) {
@@ -90,6 +121,8 @@ public final class DeploymentSettingsOperationContextArgs extends com.pulumi.res
         this.oidc = $.oidc;
         this.options = $.options;
         this.preRunCommands = $.preRunCommands;
+        this.roleId = $.roleId;
+        this.servicePrincipal = $.servicePrincipal;
     }
 
     public static Builder builder() {
@@ -202,6 +235,48 @@ public final class DeploymentSettingsOperationContextArgs extends com.pulumi.res
          */
         public Builder preRunCommands(String... preRunCommands) {
             return preRunCommands(List.of(preRunCommands));
+        }
+
+        /**
+         * @param roleId The ID of the organization role the deployments run with. Use `getOrganizationRole` to look up a role&#39;s ID by its name. Organizations with custom roles can pick any role; others can pick the built-in Reader, Maintainer or Admin role. You need every permission of the role. Conflicts with `servicePrincipal`.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder roleId(@Nullable Output<String> roleId) {
+            $.roleId = roleId;
+            return this;
+        }
+
+        /**
+         * @param roleId The ID of the organization role the deployments run with. Use `getOrganizationRole` to look up a role&#39;s ID by its name. Organizations with custom roles can pick any role; others can pick the built-in Reader, Maintainer or Admin role. You need every permission of the role. Conflicts with `servicePrincipal`.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder roleId(String roleId) {
+            return roleId(Output.of(roleId));
+        }
+
+        /**
+         * @param servicePrincipal The service principal the deployments run as, with the access it holds. Pulumi Cloud requires it to have write access to the stack, and open access to the environments the stack imports, and you need every permission it holds. Conflicts with `roleId`.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder servicePrincipal(@Nullable Output<OperationContextServicePrincipalArgs> servicePrincipal) {
+            $.servicePrincipal = servicePrincipal;
+            return this;
+        }
+
+        /**
+         * @param servicePrincipal The service principal the deployments run as, with the access it holds. Pulumi Cloud requires it to have write access to the stack, and open access to the environments the stack imports, and you need every permission it holds. Conflicts with `roleId`.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder servicePrincipal(OperationContextServicePrincipalArgs servicePrincipal) {
+            return servicePrincipal(Output.of(servicePrincipal));
         }
 
         public DeploymentSettingsOperationContextArgs build() {

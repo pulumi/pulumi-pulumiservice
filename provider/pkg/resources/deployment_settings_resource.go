@@ -96,6 +96,7 @@ func (*DeploymentSettings) Check(
 		}
 	}
 	failures = append(failures, checkGCPProjectNumber(req.NewInputs)...)
+	failures = append(failures, checkRunIdentity(req.NewInputs)...)
 	return infer.CheckResponse[DeploymentSettingsInput]{Inputs: in, Failures: failures}, nil
 }
 
@@ -148,6 +149,47 @@ func checkGCPProjectNumber(news property.Map) []p.CheckFailure {
 		})
 	}
 	return failures
+}
+
+// checkRunIdentity rejects settings that select more than one identity for the
+// deployments to run as, or a service principal without a login or team. It
+// reads the raw inputs, so a value that is unknown during preview counts as set.
+func checkRunIdentity(news property.Map) []p.CheckFailure {
+	oc := news.Get(gcOperationContext)
+	if !oc.IsMap() {
+		return nil
+	}
+	const prefix = "operationContext."
+	var failures []p.CheckFailure
+	sp := oc.AsMap().Get(gcServicePrincipal)
+	if isSetString(oc.AsMap().Get(gcRoleID)) && (sp.IsMap() || sp.IsComputed()) {
+		failures = append(failures, p.CheckFailure{
+			Property: prefix + gcRoleID,
+			Reason:   "set only one of roleId and servicePrincipal",
+		})
+	}
+	if !sp.IsMap() {
+		return failures
+	}
+	login, team := isSetString(sp.AsMap().Get(gcLogin)), isSetString(sp.AsMap().Get(gcTeamName))
+	switch {
+	case login && team:
+		failures = append(failures, p.CheckFailure{
+			Property: prefix + gcServicePrincipal + "." + gcTeamName,
+			Reason:   "set only one of login and teamName",
+		})
+	case !login && !team:
+		failures = append(failures, p.CheckFailure{
+			Property: prefix + gcServicePrincipal,
+			Reason:   "set login or teamName",
+		})
+	}
+	return failures
+}
+
+// isSetString reports whether v is a non-empty string, or a value not known yet.
+func isSetString(v property.Value) bool {
+	return v.IsComputed() || (v.IsString() && v.AsString() != "")
 }
 
 func isDigits(s string) bool {

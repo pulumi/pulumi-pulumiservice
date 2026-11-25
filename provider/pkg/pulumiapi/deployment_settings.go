@@ -38,6 +38,16 @@ type OperationContextAzureOIDCConfiguration = apitype.OperationContextAzureOIDCC
 
 type OperationContextOptions = apitype.OperationContextOptions
 
+type DeploymentRole = apitype.DeploymentRole
+
+type AssignmentPrincipal = apitype.AssignmentPrincipal
+
+type AssignmentTeam = apitype.AssignmentTeam
+
+// ServicePrincipalUser is the user-defined service principal a stack's
+// deployments run as.
+type ServicePrincipalUser = apitype.UserInfo
+
 type DeploymentSettingsGitHub = apitype.DeploymentSettingsGitHub
 
 type DeploymentSettingsVCS = apitype.DeploymentSettingsVCS
@@ -79,6 +89,44 @@ type SecretValue = apitype.SecretValue
 
 type CacheOptions = apitype.CacheOptions
 
+// deploymentSettingsWrite is the body of a deployment settings write. Pulumi
+// Cloud returns the service principal a stack's deployments run as resolved,
+// but takes it by reference: a user-defined service principal by login, or a
+// team by name.
+type deploymentSettingsWrite struct {
+	DeploymentSettings
+	Operation *operationContextWrite `json:"operationContext,omitempty"`
+}
+
+type operationContextWrite struct {
+	OperationContext
+	ServicePrincipal *servicePrincipalReference `json:"servicePrincipal,omitempty"`
+}
+
+type servicePrincipalReference struct {
+	UserID   string `json:"userId,omitempty"`
+	TeamName string `json:"teamName,omitempty"`
+}
+
+func newDeploymentSettingsWrite(ds DeploymentSettings) deploymentSettingsWrite {
+	out := deploymentSettingsWrite{DeploymentSettings: ds}
+	if ds.Operation == nil {
+		return out
+	}
+	out.Operation = &operationContextWrite{OperationContext: *ds.Operation}
+	if sp := ds.Operation.ServicePrincipal; sp != nil {
+		ref := &servicePrincipalReference{}
+		if sp.User != nil {
+			ref.UserID = sp.User.GitHubLogin
+		}
+		if sp.Team != nil {
+			ref.TeamName = sp.Team.Name
+		}
+		out.Operation.ServicePrincipal = ref
+	}
+	return out
+}
+
 func (c *Client) CreateDeploymentSettings(
 	ctx context.Context,
 	stack StackIdentifier,
@@ -86,7 +134,7 @@ func (c *Client) CreateDeploymentSettings(
 ) (*DeploymentSettings, error) {
 	apiPath := path.Join("stacks", stack.OrgName, stack.ProjectName, stack.StackName, "deployments", "settings")
 	var resultDS = &DeploymentSettings{}
-	err := c.do(ctx, http.MethodPut, apiPath, ds, resultDS)
+	err := c.do(ctx, http.MethodPut, apiPath, newDeploymentSettingsWrite(ds), resultDS)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create deployment settings for stack (%s): %w", stack.String(), err)
 	}
@@ -100,7 +148,7 @@ func (c *Client) UpdateDeploymentSettings(
 ) (*DeploymentSettings, error) {
 	apiPath := path.Join("stacks", stack.OrgName, stack.ProjectName, stack.StackName, "deployments", "settings")
 	var resultDS = &DeploymentSettings{}
-	err := c.do(ctx, http.MethodPut, apiPath, ds, resultDS)
+	err := c.do(ctx, http.MethodPut, apiPath, newDeploymentSettingsWrite(ds), resultDS)
 	if err != nil {
 		return nil, fmt.Errorf("failed to update deployment settings for stack (%s): %w", stack.String(), err)
 	}

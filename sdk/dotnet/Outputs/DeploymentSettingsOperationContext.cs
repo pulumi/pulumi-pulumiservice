@@ -32,6 +32,14 @@ namespace Pulumi.PulumiService.Outputs
         /// Shell commands to run before the Pulumi operation executes.
         /// </summary>
         public readonly ImmutableArray<string> PreRunCommands;
+        /// <summary>
+        /// The ID of the organization role the deployments run with. Use `getOrganizationRole` to look up a role's ID by its name. Organizations with custom roles can pick any role; others can pick the built-in Reader, Maintainer or Admin role. You need every permission of the role. Conflicts with `servicePrincipal`.
+        /// </summary>
+        public readonly string? RoleId;
+        /// <summary>
+        /// The service principal the deployments run as, with the access it holds. Pulumi Cloud requires it to have write access to the stack, and open access to the environments the stack imports, and you need every permission it holds. Conflicts with `roleId`.
+        /// </summary>
+        public readonly Outputs.OperationContextServicePrincipal? ServicePrincipal;
 
         [OutputConstructor]
         private DeploymentSettingsOperationContext(
@@ -41,12 +49,18 @@ namespace Pulumi.PulumiService.Outputs
 
             Outputs.OperationContextOptions? options,
 
-            ImmutableArray<string> preRunCommands)
+            ImmutableArray<string> preRunCommands,
+
+            string? roleId,
+
+            Outputs.OperationContextServicePrincipal? servicePrincipal)
         {
             EnvironmentVariables = environmentVariables;
             Oidc = oidc;
             Options = options;
             PreRunCommands = preRunCommands;
+            RoleId = roleId;
+            ServicePrincipal = servicePrincipal;
         }
     }
 }

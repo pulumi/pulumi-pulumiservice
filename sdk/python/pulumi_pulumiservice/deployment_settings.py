@@ -262,6 +262,39 @@ class DeploymentSettings(pulumi.CustomResource):
                 ],
             })
         ```
+        ### Run deployments as a service principal
+
+        This makes the stack's deployments run as a service principal, with the roles and entity access it holds. Pulumi Cloud requires the service principal to have write access to the stack, so the settings depend on that grant.
+
+        ```python
+        import pulumi
+        import pulumi_pulumiservice as pulumiservice
+
+        deployer = pulumiservice.ServicePrincipal("deployer",
+            organization_name="my-org",
+            name="deployer")
+        deployer_stack_access = pulumiservice.OrganizationMemberEntityAccess("deployerStackAccess",
+            organization_name="my-org",
+            username=deployer.login,
+            entity_type="stack",
+            entity_name="my-project/production",
+            permission="stack-write")
+        settings = pulumiservice.DeploymentSettings("settings",
+            organization="my-org",
+            project="my-project",
+            stack="production",
+            source_context={
+                "git": {
+                    "branch": "refs/heads/main",
+                },
+            },
+            operation_context={
+                "service_principal": {
+                    "login": deployer.login,
+                },
+            },
+            opts = pulumi.ResourceOptions(depends_on=[deployer_stack_access]))
+        ```
 
         ## Import
 
@@ -349,6 +382,39 @@ class DeploymentSettings(pulumi.CustomResource):
                     "!*-rc*",
                 ],
             })
+        ```
+        ### Run deployments as a service principal
+
+        This makes the stack's deployments run as a service principal, with the roles and entity access it holds. Pulumi Cloud requires the service principal to have write access to the stack, so the settings depend on that grant.
+
+        ```python
+        import pulumi
+        import pulumi_pulumiservice as pulumiservice
+
+        deployer = pulumiservice.ServicePrincipal("deployer",
+            organization_name="my-org",
+            name="deployer")
+        deployer_stack_access = pulumiservice.OrganizationMemberEntityAccess("deployerStackAccess",
+            organization_name="my-org",
+            username=deployer.login,
+            entity_type="stack",
+            entity_name="my-project/production",
+            permission="stack-write")
+        settings = pulumiservice.DeploymentSettings("settings",
+            organization="my-org",
+            project="my-project",
+            stack="production",
+            source_context={
+                "git": {
+                    "branch": "refs/heads/main",
+                },
+            },
+            operation_context={
+                "service_principal": {
+                    "login": deployer.login,
+                },
+            },
+            opts = pulumi.ResourceOptions(depends_on=[deployer_stack_access]))
         ```
 
         ## Import

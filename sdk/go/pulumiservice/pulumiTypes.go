@@ -2113,6 +2113,10 @@ type DeploymentSettingsOperationContext struct {
 	Options *OperationContextOptions `pulumi:"options"`
 	// Shell commands to run before the Pulumi operation executes.
 	PreRunCommands []string `pulumi:"preRunCommands"`
+	// The ID of the organization role the deployments run with. Use `getOrganizationRole` to look up a role's ID by its name. Organizations with custom roles can pick any role; others can pick the built-in Reader, Maintainer or Admin role. You need every permission of the role. Conflicts with `servicePrincipal`.
+	RoleId *string `pulumi:"roleId"`
+	// The service principal the deployments run as, with the access it holds. Pulumi Cloud requires it to have write access to the stack, and open access to the environments the stack imports, and you need every permission it holds. Conflicts with `roleId`.
+	ServicePrincipal *OperationContextServicePrincipal `pulumi:"servicePrincipal"`
 }
 
 // DeploymentSettingsOperationContextInput is an input type that accepts DeploymentSettingsOperationContextArgs and DeploymentSettingsOperationContextOutput values.
@@ -2136,6 +2140,10 @@ type DeploymentSettingsOperationContextArgs struct {
 	Options OperationContextOptionsPtrInput `pulumi:"options"`
 	// Shell commands to run before the Pulumi operation executes.
 	PreRunCommands pulumi.StringArrayInput `pulumi:"preRunCommands"`
+	// The ID of the organization role the deployments run with. Use `getOrganizationRole` to look up a role's ID by its name. Organizations with custom roles can pick any role; others can pick the built-in Reader, Maintainer or Admin role. You need every permission of the role. Conflicts with `servicePrincipal`.
+	RoleId pulumi.StringPtrInput `pulumi:"roleId"`
+	// The service principal the deployments run as, with the access it holds. Pulumi Cloud requires it to have write access to the stack, and open access to the environments the stack imports, and you need every permission it holds. Conflicts with `roleId`.
+	ServicePrincipal OperationContextServicePrincipalPtrInput `pulumi:"servicePrincipal"`
 }
 
 func (DeploymentSettingsOperationContextArgs) ElementType() reflect.Type {
@@ -2236,6 +2244,18 @@ func (o DeploymentSettingsOperationContextOutput) PreRunCommands() pulumi.String
 	return o.ApplyT(func(v DeploymentSettingsOperationContext) []string { return v.PreRunCommands }).(pulumi.StringArrayOutput)
 }
 
+// The ID of the organization role the deployments run with. Use `getOrganizationRole` to look up a role's ID by its name. Organizations with custom roles can pick any role; others can pick the built-in Reader, Maintainer or Admin role. You need every permission of the role. Conflicts with `servicePrincipal`.
+func (o DeploymentSettingsOperationContextOutput) RoleId() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v DeploymentSettingsOperationContext) *string { return v.RoleId }).(pulumi.StringPtrOutput)
+}
+
+// The service principal the deployments run as, with the access it holds. Pulumi Cloud requires it to have write access to the stack, and open access to the environments the stack imports, and you need every permission it holds. Conflicts with `roleId`.
+func (o DeploymentSettingsOperationContextOutput) ServicePrincipal() OperationContextServicePrincipalPtrOutput {
+	return o.ApplyT(func(v DeploymentSettingsOperationContext) *OperationContextServicePrincipal {
+		return v.ServicePrincipal
+	}).(OperationContextServicePrincipalPtrOutput)
+}
+
 type DeploymentSettingsOperationContextPtrOutput struct{ *pulumi.OutputState }
 
 func (DeploymentSettingsOperationContextPtrOutput) ElementType() reflect.Type {
@@ -2298,6 +2318,26 @@ func (o DeploymentSettingsOperationContextPtrOutput) PreRunCommands() pulumi.Str
 		}
 		return v.PreRunCommands
 	}).(pulumi.StringArrayOutput)
+}
+
+// The ID of the organization role the deployments run with. Use `getOrganizationRole` to look up a role's ID by its name. Organizations with custom roles can pick any role; others can pick the built-in Reader, Maintainer or Admin role. You need every permission of the role. Conflicts with `servicePrincipal`.
+func (o DeploymentSettingsOperationContextPtrOutput) RoleId() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *DeploymentSettingsOperationContext) *string {
+		if v == nil {
+			return nil
+		}
+		return v.RoleId
+	}).(pulumi.StringPtrOutput)
+}
+
+// The service principal the deployments run as, with the access it holds. Pulumi Cloud requires it to have write access to the stack, and open access to the environments the stack imports, and you need every permission it holds. Conflicts with `roleId`.
+func (o DeploymentSettingsOperationContextPtrOutput) ServicePrincipal() OperationContextServicePrincipalPtrOutput {
+	return o.ApplyT(func(v *DeploymentSettingsOperationContext) *OperationContextServicePrincipal {
+		if v == nil {
+			return nil
+		}
+		return v.ServicePrincipal
+	}).(OperationContextServicePrincipalPtrOutput)
 }
 
 // Settings related to the source of the deployment.
@@ -3746,6 +3786,162 @@ func (o OperationContextOptionsPtrOutput) SkipIntermediateDeployments() pulumi.B
 		}
 		return v.SkipIntermediateDeployments
 	}).(pulumi.BoolPtrOutput)
+}
+
+type OperationContextServicePrincipal struct {
+	// The login of a user-defined service principal, the `login` output of a `ServicePrincipal` resource. Conflicts with `teamName`.
+	Login *string `pulumi:"login"`
+	// The name of a team, to run as the team's service principal with the team's roles. Conflicts with `login`.
+	TeamName *string `pulumi:"teamName"`
+}
+
+// OperationContextServicePrincipalInput is an input type that accepts OperationContextServicePrincipalArgs and OperationContextServicePrincipalOutput values.
+// You can construct a concrete instance of `OperationContextServicePrincipalInput` via:
+//
+//	OperationContextServicePrincipalArgs{...}
+type OperationContextServicePrincipalInput interface {
+	pulumi.Input
+
+	ToOperationContextServicePrincipalOutput() OperationContextServicePrincipalOutput
+	ToOperationContextServicePrincipalOutputWithContext(context.Context) OperationContextServicePrincipalOutput
+}
+
+type OperationContextServicePrincipalArgs struct {
+	// The login of a user-defined service principal, the `login` output of a `ServicePrincipal` resource. Conflicts with `teamName`.
+	Login pulumi.StringPtrInput `pulumi:"login"`
+	// The name of a team, to run as the team's service principal with the team's roles. Conflicts with `login`.
+	TeamName pulumi.StringPtrInput `pulumi:"teamName"`
+}
+
+func (OperationContextServicePrincipalArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*OperationContextServicePrincipal)(nil)).Elem()
+}
+
+func (i OperationContextServicePrincipalArgs) ToOperationContextServicePrincipalOutput() OperationContextServicePrincipalOutput {
+	return i.ToOperationContextServicePrincipalOutputWithContext(context.Background())
+}
+
+func (i OperationContextServicePrincipalArgs) ToOperationContextServicePrincipalOutputWithContext(ctx context.Context) OperationContextServicePrincipalOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(OperationContextServicePrincipalOutput)
+}
+
+func (i OperationContextServicePrincipalArgs) ToOperationContextServicePrincipalPtrOutput() OperationContextServicePrincipalPtrOutput {
+	return i.ToOperationContextServicePrincipalPtrOutputWithContext(context.Background())
+}
+
+func (i OperationContextServicePrincipalArgs) ToOperationContextServicePrincipalPtrOutputWithContext(ctx context.Context) OperationContextServicePrincipalPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(OperationContextServicePrincipalOutput).ToOperationContextServicePrincipalPtrOutputWithContext(ctx)
+}
+
+// OperationContextServicePrincipalPtrInput is an input type that accepts OperationContextServicePrincipalArgs, OperationContextServicePrincipalPtr and OperationContextServicePrincipalPtrOutput values.
+// You can construct a concrete instance of `OperationContextServicePrincipalPtrInput` via:
+//
+//	        OperationContextServicePrincipalArgs{...}
+//
+//	or:
+//
+//	        nil
+type OperationContextServicePrincipalPtrInput interface {
+	pulumi.Input
+
+	ToOperationContextServicePrincipalPtrOutput() OperationContextServicePrincipalPtrOutput
+	ToOperationContextServicePrincipalPtrOutputWithContext(context.Context) OperationContextServicePrincipalPtrOutput
+}
+
+type operationContextServicePrincipalPtrType OperationContextServicePrincipalArgs
+
+func OperationContextServicePrincipalPtr(v *OperationContextServicePrincipalArgs) OperationContextServicePrincipalPtrInput {
+	return (*operationContextServicePrincipalPtrType)(v)
+}
+
+func (*operationContextServicePrincipalPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**OperationContextServicePrincipal)(nil)).Elem()
+}
+
+func (i *operationContextServicePrincipalPtrType) ToOperationContextServicePrincipalPtrOutput() OperationContextServicePrincipalPtrOutput {
+	return i.ToOperationContextServicePrincipalPtrOutputWithContext(context.Background())
+}
+
+func (i *operationContextServicePrincipalPtrType) ToOperationContextServicePrincipalPtrOutputWithContext(ctx context.Context) OperationContextServicePrincipalPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(OperationContextServicePrincipalPtrOutput)
+}
+
+type OperationContextServicePrincipalOutput struct{ *pulumi.OutputState }
+
+func (OperationContextServicePrincipalOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*OperationContextServicePrincipal)(nil)).Elem()
+}
+
+func (o OperationContextServicePrincipalOutput) ToOperationContextServicePrincipalOutput() OperationContextServicePrincipalOutput {
+	return o
+}
+
+func (o OperationContextServicePrincipalOutput) ToOperationContextServicePrincipalOutputWithContext(ctx context.Context) OperationContextServicePrincipalOutput {
+	return o
+}
+
+func (o OperationContextServicePrincipalOutput) ToOperationContextServicePrincipalPtrOutput() OperationContextServicePrincipalPtrOutput {
+	return o.ToOperationContextServicePrincipalPtrOutputWithContext(context.Background())
+}
+
+func (o OperationContextServicePrincipalOutput) ToOperationContextServicePrincipalPtrOutputWithContext(ctx context.Context) OperationContextServicePrincipalPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v OperationContextServicePrincipal) *OperationContextServicePrincipal {
+		return &v
+	}).(OperationContextServicePrincipalPtrOutput)
+}
+
+// The login of a user-defined service principal, the `login` output of a `ServicePrincipal` resource. Conflicts with `teamName`.
+func (o OperationContextServicePrincipalOutput) Login() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v OperationContextServicePrincipal) *string { return v.Login }).(pulumi.StringPtrOutput)
+}
+
+// The name of a team, to run as the team's service principal with the team's roles. Conflicts with `login`.
+func (o OperationContextServicePrincipalOutput) TeamName() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v OperationContextServicePrincipal) *string { return v.TeamName }).(pulumi.StringPtrOutput)
+}
+
+type OperationContextServicePrincipalPtrOutput struct{ *pulumi.OutputState }
+
+func (OperationContextServicePrincipalPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**OperationContextServicePrincipal)(nil)).Elem()
+}
+
+func (o OperationContextServicePrincipalPtrOutput) ToOperationContextServicePrincipalPtrOutput() OperationContextServicePrincipalPtrOutput {
+	return o
+}
+
+func (o OperationContextServicePrincipalPtrOutput) ToOperationContextServicePrincipalPtrOutputWithContext(ctx context.Context) OperationContextServicePrincipalPtrOutput {
+	return o
+}
+
+func (o OperationContextServicePrincipalPtrOutput) Elem() OperationContextServicePrincipalOutput {
+	return o.ApplyT(func(v *OperationContextServicePrincipal) OperationContextServicePrincipal {
+		if v != nil {
+			return *v
+		}
+		var ret OperationContextServicePrincipal
+		return ret
+	}).(OperationContextServicePrincipalOutput)
+}
+
+// The login of a user-defined service principal, the `login` output of a `ServicePrincipal` resource. Conflicts with `teamName`.
+func (o OperationContextServicePrincipalPtrOutput) Login() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *OperationContextServicePrincipal) *string {
+		if v == nil {
+			return nil
+		}
+		return v.Login
+	}).(pulumi.StringPtrOutput)
+}
+
+// The name of a team, to run as the team's service principal with the team's roles. Conflicts with `login`.
+func (o OperationContextServicePrincipalPtrOutput) TeamName() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *OperationContextServicePrincipal) *string {
+		if v == nil {
+			return nil
+		}
+		return v.TeamName
+	}).(pulumi.StringPtrOutput)
 }
 
 type OrganizationMemberInfo struct {
@@ -5588,6 +5784,8 @@ func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*OperationContextOIDCPtrInput)(nil)).Elem(), OperationContextOIDCArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*OperationContextOptionsInput)(nil)).Elem(), OperationContextOptionsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*OperationContextOptionsPtrInput)(nil)).Elem(), OperationContextOptionsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*OperationContextServicePrincipalInput)(nil)).Elem(), OperationContextServicePrincipalArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*OperationContextServicePrincipalPtrInput)(nil)).Elem(), OperationContextServicePrincipalArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*PolicyGroupMatchRuleInput)(nil)).Elem(), PolicyGroupMatchRuleArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*PolicyGroupMatchRuleArrayInput)(nil)).Elem(), PolicyGroupMatchRuleArray{})
 	pulumi.RegisterInputType(reflect.TypeOf((*PolicyGroupPolicyPackReferenceInputTypeInput)(nil)).Elem(), PolicyGroupPolicyPackReferenceInputTypeArgs{})
@@ -5650,6 +5848,8 @@ func init() {
 	pulumi.RegisterOutputType(OperationContextOIDCPtrOutput{})
 	pulumi.RegisterOutputType(OperationContextOptionsOutput{})
 	pulumi.RegisterOutputType(OperationContextOptionsPtrOutput{})
+	pulumi.RegisterOutputType(OperationContextServicePrincipalOutput{})
+	pulumi.RegisterOutputType(OperationContextServicePrincipalPtrOutput{})
 	pulumi.RegisterOutputType(OrganizationMemberInfoOutput{})
 	pulumi.RegisterOutputType(OrganizationMemberInfoArrayOutput{})
 	pulumi.RegisterOutputType(OrganizationRoleInfoOutput{})

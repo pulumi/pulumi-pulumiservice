@@ -92,6 +92,62 @@ namespace Pulumi.PulumiService
     /// 
     /// });
     /// ```
+    /// ### Run deployments as a service principal
+    /// 
+    /// This makes the stack's deployments run as a service principal, with the roles and entity access it holds. Pulumi Cloud requires the service principal to have write access to the stack, so the settings depend on that grant.
+    /// 
+    /// ```csharp
+    /// using System.Collections.Generic;
+    /// using System.Linq;
+    /// using Pulumi;
+    /// using PulumiService = Pulumi.PulumiService;
+    /// 
+    /// return await Deployment.RunAsync(() =&gt; 
+    /// {
+    ///     var deployer = new PulumiService.ServicePrincipal("deployer", new()
+    ///     {
+    ///         OrganizationName = "my-org",
+    ///         Name = "deployer",
+    ///     });
+    /// 
+    ///     var deployerStackAccess = new PulumiService.OrganizationMemberEntityAccess("deployerStackAccess", new()
+    ///     {
+    ///         OrganizationName = "my-org",
+    ///         Username = deployer.Login,
+    ///         EntityType = "stack",
+    ///         EntityName = "my-project/production",
+    ///         Permission = "stack-write",
+    ///     });
+    /// 
+    ///     var settings = new PulumiService.DeploymentSettings("settings", new()
+    ///     {
+    ///         Organization = "my-org",
+    ///         Project = "my-project",
+    ///         Stack = "production",
+    ///         SourceContext = new PulumiService.Inputs.DeploymentSettingsSourceContextArgs
+    ///         {
+    ///             Git = new PulumiService.Inputs.DeploymentSettingsGitSourceArgs
+    ///             {
+    ///                 Branch = "refs/heads/main",
+    ///             },
+    ///         },
+    ///         OperationContext = new PulumiService.Inputs.DeploymentSettingsOperationContextArgs
+    ///         {
+    ///             ServicePrincipal = new PulumiService.Inputs.OperationContextServicePrincipalArgs
+    ///             {
+    ///                 Login = deployer.Login,
+    ///             },
+    ///         },
+    ///     }, new CustomResourceOptions
+    ///     {
+    ///         DependsOn =
+    ///         {
+    ///             deployerStackAccess,
+    ///         },
+    ///     });
+    /// 
+    /// });
+    /// ```
     /// 
     /// ## Import
     /// 

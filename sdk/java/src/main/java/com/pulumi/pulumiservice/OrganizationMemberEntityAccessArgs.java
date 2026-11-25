@@ -92,14 +92,14 @@ public final class OrganizationMemberEntityAccessArgs extends com.pulumi.resourc
     }
 
     /**
-     * The Pulumi Cloud username of the organization member.
+     * The Pulumi Cloud username of the organization member. For a service principal, use its login, the `login` output of a `ServicePrincipal` resource.
      * 
      */
     @Import(name="username", required=true)
     private Output<String> username;
 
     /**
-     * @return The Pulumi Cloud username of the organization member.
+     * @return The Pulumi Cloud username of the organization member. For a service principal, use its login, the `login` output of a `ServicePrincipal` resource.
      * 
      */
     public Output<String> username() {
@@ -241,7 +241,7 @@ public final class OrganizationMemberEntityAccessArgs extends com.pulumi.resourc
         }
 
         /**
-         * @param username The Pulumi Cloud username of the organization member.
+         * @param username The Pulumi Cloud username of the organization member. For a service principal, use its login, the `login` output of a `ServicePrincipal` resource.
          * 
          * @return builder
          * 
@@ -252,7 +252,7 @@ public final class OrganizationMemberEntityAccessArgs extends com.pulumi.resourc
         }
 
         /**
-         * @param username The Pulumi Cloud username of the organization member.
+         * @param username The Pulumi Cloud username of the organization member. For a service principal, use its login, the `login` output of a `ServicePrincipal` resource.
          * 
          * @return builder
          * 

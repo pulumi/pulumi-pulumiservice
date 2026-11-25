@@ -261,10 +261,12 @@ func (v *DeploymentSettingsVcs) Annotate(a infer.Annotator) {
 }
 
 type DeploymentSettingsOperationContext struct {
-	PreRunCommands       []string                 `pulumi:"preRunCommands,optional"`
-	EnvironmentVariables map[string]string        `pulumi:"environmentVariables,optional"`
-	Options              *OperationContextOptions `pulumi:"options,optional"`
-	OIDC                 *OperationContextOIDC    `pulumi:"oidc,optional"`
+	PreRunCommands       []string                          `pulumi:"preRunCommands,optional"`
+	EnvironmentVariables map[string]string                 `pulumi:"environmentVariables,optional"`
+	Options              *OperationContextOptions          `pulumi:"options,optional"`
+	OIDC                 *OperationContextOIDC             `pulumi:"oidc,optional"`
+	RoleID               string                            `pulumi:"roleId,optional"`
+	ServicePrincipal     *OperationContextServicePrincipal `pulumi:"servicePrincipal,optional"`
 }
 
 func (oc *DeploymentSettingsOperationContext) Annotate(a infer.Annotator) {
@@ -276,7 +278,27 @@ func (oc *DeploymentSettingsOperationContext) Annotate(a infer.Annotator) {
 		"deployment. "+escRecommendation+" Deployments OIDC still fits when a customer-managed runner can't "+
 		"reach Pulumi Cloud to use ESC, or when pre-run commands need credentials and aren't wrapped in "+
 		"`pulumi env run`. See "+cloudCredentialsGuide+".")
+	a.Describe(&oc.RoleID, "The ID of the organization role the deployments run with. Use "+
+		"`getOrganizationRole` to look up a role's ID by its name. Organizations with custom roles can pick "+
+		"any role; others can pick the built-in Reader, Maintainer or Admin role. You need every permission "+
+		"of the role. Conflicts with `servicePrincipal`.")
+	a.Describe(&oc.ServicePrincipal, "The service principal the deployments run as, with the access it holds. "+
+		"Pulumi Cloud requires it to have write access to the stack, and open access to the environments "+
+		"the stack imports, and you need every permission it holds. Conflicts with `roleId`.")
 	a.SetToken("index", "DeploymentSettingsOperationContext")
+}
+
+type OperationContextServicePrincipal struct {
+	Login    string `pulumi:"login,optional"`
+	TeamName string `pulumi:"teamName,optional"`
+}
+
+func (sp *OperationContextServicePrincipal) Annotate(a infer.Annotator) {
+	a.Describe(&sp.Login, "The login of a user-defined service principal, the `login` output of a "+
+		"`ServicePrincipal` resource. Conflicts with `teamName`.")
+	a.Describe(&sp.TeamName, "The name of a team, to run as the team's service principal with the team's "+
+		"roles. Conflicts with `login`.")
+	a.SetToken("index", "OperationContextServicePrincipal")
 }
 
 type OperationContextOptions struct {
@@ -641,6 +663,18 @@ func (oc *DeploymentSettingsOperationContext) toAPI(secretEnvVars map[string]boo
 				ClientID:       azure.ClientID,
 				SubscriptionID: azure.SubscriptionID,
 			}
+		}
+	}
+	if oc.RoleID != "" {
+		out.Role = &pulumiapi.DeploymentRole{ID: oc.RoleID}
+	}
+	if sp := oc.ServicePrincipal; sp != nil {
+		out.ServicePrincipal = &pulumiapi.AssignmentPrincipal{}
+		if sp.Login != "" {
+			out.ServicePrincipal.User = &pulumiapi.ServicePrincipalUser{GitHubLogin: sp.Login}
+		}
+		if sp.TeamName != "" {
+			out.ServicePrincipal.Team = &pulumiapi.AssignmentTeam{Name: sp.TeamName}
 		}
 	}
 	return &out

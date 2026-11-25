@@ -6,6 +6,7 @@ package com.pulumi.pulumiservice.outputs;
 import com.pulumi.core.annotations.CustomType;
 import com.pulumi.pulumiservice.outputs.OperationContextOIDC;
 import com.pulumi.pulumiservice.outputs.OperationContextOptions;
+import com.pulumi.pulumiservice.outputs.OperationContextServicePrincipal;
 import java.lang.String;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +36,16 @@ public final class DeploymentSettingsOperationContext {
      * 
      */
     private @Nullable List<String> preRunCommands;
+    /**
+     * @return The ID of the organization role the deployments run with. Use `getOrganizationRole` to look up a role&#39;s ID by its name. Organizations with custom roles can pick any role; others can pick the built-in Reader, Maintainer or Admin role. You need every permission of the role. Conflicts with `servicePrincipal`.
+     * 
+     */
+    private @Nullable String roleId;
+    /**
+     * @return The service principal the deployments run as, with the access it holds. Pulumi Cloud requires it to have write access to the stack, and open access to the environments the stack imports, and you need every permission it holds. Conflicts with `roleId`.
+     * 
+     */
+    private @Nullable OperationContextServicePrincipal servicePrincipal;
 
     private DeploymentSettingsOperationContext() {}
     /**
@@ -65,6 +76,20 @@ public final class DeploymentSettingsOperationContext {
     public List<String> preRunCommands() {
         return this.preRunCommands == null ? List.of() : this.preRunCommands;
     }
+    /**
+     * @return The ID of the organization role the deployments run with. Use `getOrganizationRole` to look up a role&#39;s ID by its name. Organizations with custom roles can pick any role; others can pick the built-in Reader, Maintainer or Admin role. You need every permission of the role. Conflicts with `servicePrincipal`.
+     * 
+     */
+    public Optional<String> roleId() {
+        return Optional.ofNullable(this.roleId);
+    }
+    /**
+     * @return The service principal the deployments run as, with the access it holds. Pulumi Cloud requires it to have write access to the stack, and open access to the environments the stack imports, and you need every permission it holds. Conflicts with `roleId`.
+     * 
+     */
+    public Optional<OperationContextServicePrincipal> servicePrincipal() {
+        return Optional.ofNullable(this.servicePrincipal);
+    }
 
     public static Builder builder() {
         return new Builder();
@@ -79,6 +104,8 @@ public final class DeploymentSettingsOperationContext {
         private @Nullable OperationContextOIDC oidc;
         private @Nullable OperationContextOptions options;
         private @Nullable List<String> preRunCommands;
+        private @Nullable String roleId;
+        private @Nullable OperationContextServicePrincipal servicePrincipal;
         public Builder() {}
         public Builder(DeploymentSettingsOperationContext defaults) {
     	      Objects.requireNonNull(defaults);
@@ -86,6 +113,8 @@ public final class DeploymentSettingsOperationContext {
     	      this.oidc = defaults.oidc;
     	      this.options = defaults.options;
     	      this.preRunCommands = defaults.preRunCommands;
+    	      this.roleId = defaults.roleId;
+    	      this.servicePrincipal = defaults.servicePrincipal;
         }
 
         @CustomType.Setter
@@ -115,12 +144,26 @@ public final class DeploymentSettingsOperationContext {
         public Builder preRunCommands(String... preRunCommands) {
             return preRunCommands(List.of(preRunCommands));
         }
+        @CustomType.Setter
+        public Builder roleId(@Nullable String roleId) {
+
+            this.roleId = roleId;
+            return this;
+        }
+        @CustomType.Setter
+        public Builder servicePrincipal(@Nullable OperationContextServicePrincipal servicePrincipal) {
+
+            this.servicePrincipal = servicePrincipal;
+            return this;
+        }
         public DeploymentSettingsOperationContext build() {
             final var _resultValue = new DeploymentSettingsOperationContext();
             _resultValue.environmentVariables = environmentVariables;
             _resultValue.oidc = oidc;
             _resultValue.options = options;
             _resultValue.preRunCommands = preRunCommands;
+            _resultValue.roleId = roleId;
+            _resultValue.servicePrincipal = servicePrincipal;
             return _resultValue;
         }
     }

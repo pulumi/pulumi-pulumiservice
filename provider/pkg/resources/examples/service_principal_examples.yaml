@@ -1,0 +1,29 @@
+description: |-
+  A service principal with a role and entity access
+
+  The service principal holds the built-in Reader role across the organization, and can also open one environment. Its `login` output identifies it to other resources, such as `OrganizationMemberEntityAccess` and `DeploymentSettings`.
+variables:
+  readerRole:
+    fn::invoke:
+      function: pulumiservice:getOrganizationRole
+      arguments:
+        organizationName: my-org
+        name: Reader
+resources:
+  deployer:
+    type: pulumiservice:ServicePrincipal
+    properties:
+      organizationName: my-org
+      name: deployer
+      roleIds:
+        - ${readerRole.roleId}
+  deployerEnvironmentAccess:
+    type: pulumiservice:OrganizationMemberEntityAccess
+    properties:
+      organizationName: my-org
+      username: ${deployer.login}
+      entityType: environment
+      entityName: my-project/deploy-config
+      permission: environment-open
+outputs:
+  deployerLogin: ${deployer.login}

@@ -311,6 +311,12 @@ func TestYamlOrgAccessTokenExample(t *testing.T) {
 	runPulumiTest(t, test)
 }
 
+func TestYamlServicePrincipalsExample(t *testing.T) {
+	test := newExampleTest(t, "yaml-service-principals")
+	setConfig(t, test, map[string]string{"organizationName": getOrgName(), "digits": generateRandomFiveDigits()})
+	runPulumiTest(t, test)
+}
+
 func TestYamlTeamStackPermissionsExample(t *testing.T) {
 	test := newExampleTest(t, "yaml-team-stack-permissions")
 	test.SetConfig(t, "organizationName", getOrgName())

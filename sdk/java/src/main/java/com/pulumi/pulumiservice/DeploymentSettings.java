@@ -127,6 +127,76 @@ import javax.annotation.Nullable;
  * }
  * }
  * </pre>
+ * ### Run deployments as a service principal
+ * 
+ * This makes the stack&#39;s deployments run as a service principal, with the roles and entity access it holds. Pulumi Cloud requires the service principal to have write access to the stack, so the settings depend on that grant.
+ * 
+ * <pre>
+ * {@code
+ * package generated_program;
+ * 
+ * import com.pulumi.Context;
+ * import com.pulumi.Pulumi;
+ * import com.pulumi.core.Output;
+ * import com.pulumi.pulumiservice.ServicePrincipal;
+ * import com.pulumi.pulumiservice.ServicePrincipalArgs;
+ * import com.pulumi.pulumiservice.OrganizationMemberEntityAccess;
+ * import com.pulumi.pulumiservice.OrganizationMemberEntityAccessArgs;
+ * import com.pulumi.pulumiservice.DeploymentSettings;
+ * import com.pulumi.pulumiservice.DeploymentSettingsArgs;
+ * import com.pulumi.pulumiservice.inputs.DeploymentSettingsSourceContextArgs;
+ * import com.pulumi.pulumiservice.inputs.DeploymentSettingsGitSourceArgs;
+ * import com.pulumi.pulumiservice.inputs.DeploymentSettingsOperationContextArgs;
+ * import com.pulumi.pulumiservice.inputs.OperationContextServicePrincipalArgs;
+ * import com.pulumi.resources.CustomResourceOptions;
+ * import java.util.ArrayList;
+ * import java.util.Arrays;
+ * import java.util.Map;
+ * import java.io.File;
+ * import java.nio.file.Files;
+ * import java.nio.file.Paths;
+ * 
+ * public class App {
+ *     public static void main(String[] args) {
+ *         Pulumi.run(App::stack);
+ *     }
+ * 
+ *     public static void stack(Context ctx) {
+ *         var deployer = new ServicePrincipal("deployer", ServicePrincipalArgs.builder()
+ *             .organizationName("my-org")
+ *             .name("deployer")
+ *             .build());
+ * 
+ *         var deployerStackAccess = new OrganizationMemberEntityAccess("deployerStackAccess", OrganizationMemberEntityAccessArgs.builder()
+ *             .organizationName("my-org")
+ *             .username(deployer.login())
+ *             .entityType("stack")
+ *             .entityName("my-project/production")
+ *             .permission("stack-write")
+ *             .build());
+ * 
+ *         var settings = new DeploymentSettings("settings", DeploymentSettingsArgs.builder()
+ *             .organization("my-org")
+ *             .project("my-project")
+ *             .stack("production")
+ *             .sourceContext(DeploymentSettingsSourceContextArgs.builder()
+ *                 .git(DeploymentSettingsGitSourceArgs.builder()
+ *                     .branch("refs/heads/main")
+ *                     .build())
+ *                 .build())
+ *             .operationContext(DeploymentSettingsOperationContextArgs.builder()
+ *                 .servicePrincipal(OperationContextServicePrincipalArgs.builder()
+ *                     .login(deployer.login())
+ *                     .build())
+ *                 .build())
+ *             .build(), CustomResourceOptions.builder()
+ *                 .dependsOn(deployerStackAccess)
+ *                 .build());
+ * 
+ *     }
+ * }
+ * }
+ * </pre>
  * 
  * ## Import
  * 

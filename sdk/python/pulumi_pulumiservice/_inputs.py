@@ -56,6 +56,8 @@ __all__ = [
     'OperationContextOIDCArgsDict',
     'OperationContextOptionsArgs',
     'OperationContextOptionsArgsDict',
+    'OperationContextServicePrincipalArgs',
+    'OperationContextServicePrincipalArgsDict',
     'PolicyGroupMatchRule',
     'PolicyGroupMatchRuleDict',
     'PolicyGroupPolicyPackReferenceInputArgs',
@@ -1090,6 +1092,14 @@ class DeploymentSettingsOperationContextArgsDict(TypedDict):
     """
     Shell commands to run before the Pulumi operation executes.
     """
+    role_id: NotRequired[pulumi.Input[Optional[_builtins.str]]]
+    """
+    The ID of the organization role the deployments run with. Use `getOrganizationRole` to look up a role's ID by its name. Organizations with custom roles can pick any role; others can pick the built-in Reader, Maintainer or Admin role. You need every permission of the role. Conflicts with `servicePrincipal`.
+    """
+    service_principal: NotRequired[pulumi.Input[Optional['OperationContextServicePrincipalArgsDict']]]
+    """
+    The service principal the deployments run as, with the access it holds. Pulumi Cloud requires it to have write access to the stack, and open access to the environments the stack imports, and you need every permission it holds. Conflicts with `roleId`.
+    """
 
 @pulumi.input_type
 class DeploymentSettingsOperationContextArgs:
@@ -1097,7 +1107,9 @@ class DeploymentSettingsOperationContextArgs:
                  environment_variables: pulumi.Input[Optional[Mapping[str, pulumi.Input[_builtins.str]]]] = None,
                  oidc: pulumi.Input[Optional['OperationContextOIDCArgs']] = None,
                  options: pulumi.Input[Optional['OperationContextOptionsArgs']] = None,
-                 pre_run_commands: pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]] = None):
+                 pre_run_commands: pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]] = None,
+                 role_id: pulumi.Input[Optional[_builtins.str]] = None,
+                 service_principal: pulumi.Input[Optional['OperationContextServicePrincipalArgs']] = None):
         """
         Settings related to the Pulumi operation environment during the deployment.
 
@@ -1105,6 +1117,8 @@ class DeploymentSettingsOperationContextArgs:
         :param pulumi.Input['OperationContextOIDCArgs'] oidc: Deployments OIDC configuration for obtaining cloud credentials during the deployment. Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. Deployments OIDC still fits when a customer-managed runner can't reach Pulumi Cloud to use ESC, or when pre-run commands need credentials and aren't wrapped in `pulumi env run`. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
         :param pulumi.Input['OperationContextOptionsArgs'] options: Options to override default behavior during the deployment.
         :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] pre_run_commands: Shell commands to run before the Pulumi operation executes.
+        :param pulumi.Input[_builtins.str] role_id: The ID of the organization role the deployments run with. Use `getOrganizationRole` to look up a role's ID by its name. Organizations with custom roles can pick any role; others can pick the built-in Reader, Maintainer or Admin role. You need every permission of the role. Conflicts with `servicePrincipal`.
+        :param pulumi.Input['OperationContextServicePrincipalArgs'] service_principal: The service principal the deployments run as, with the access it holds. Pulumi Cloud requires it to have write access to the stack, and open access to the environments the stack imports, and you need every permission it holds. Conflicts with `roleId`.
         """
         if environment_variables is not None:
             pulumi.set(__self__, "environment_variables", environment_variables)
@@ -1114,6 +1128,10 @@ class DeploymentSettingsOperationContextArgs:
             pulumi.set(__self__, "options", options)
         if pre_run_commands is not None:
             pulumi.set(__self__, "pre_run_commands", pre_run_commands)
+        if role_id is not None:
+            pulumi.set(__self__, "role_id", role_id)
+        if service_principal is not None:
+            pulumi.set(__self__, "service_principal", service_principal)
 
     @_builtins.property
     @pulumi.getter(name="environmentVariables")
@@ -1162,6 +1180,30 @@ class DeploymentSettingsOperationContextArgs:
     @pre_run_commands.setter
     def pre_run_commands(self, value: pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]]):
         pulumi.set(self, "pre_run_commands", value)
+
+    @_builtins.property
+    @pulumi.getter(name="roleId")
+    def role_id(self) -> pulumi.Input[Optional[_builtins.str]]:
+        """
+        The ID of the organization role the deployments run with. Use `getOrganizationRole` to look up a role's ID by its name. Organizations with custom roles can pick any role; others can pick the built-in Reader, Maintainer or Admin role. You need every permission of the role. Conflicts with `servicePrincipal`.
+        """
+        return pulumi.get(self, "role_id")
+
+    @role_id.setter
+    def role_id(self, value: pulumi.Input[Optional[_builtins.str]]):
+        pulumi.set(self, "role_id", value)
+
+    @_builtins.property
+    @pulumi.getter(name="servicePrincipal")
+    def service_principal(self) -> pulumi.Input[Optional['OperationContextServicePrincipalArgs']]:
+        """
+        The service principal the deployments run as, with the access it holds. Pulumi Cloud requires it to have write access to the stack, and open access to the environments the stack imports, and you need every permission it holds. Conflicts with `roleId`.
+        """
+        return pulumi.get(self, "service_principal")
+
+    @service_principal.setter
+    def service_principal(self, value: pulumi.Input[Optional['OperationContextServicePrincipalArgs']]):
+        pulumi.set(self, "service_principal", value)
 
 
 class DeploymentSettingsSourceContextArgsDict(TypedDict):
@@ -1884,6 +1926,55 @@ class OperationContextOptionsArgs:
     @skip_intermediate_deployments.setter
     def skip_intermediate_deployments(self, value: pulumi.Input[Optional[_builtins.bool]]):
         pulumi.set(self, "skip_intermediate_deployments", value)
+
+
+class OperationContextServicePrincipalArgsDict(TypedDict):
+    login: NotRequired[pulumi.Input[Optional[_builtins.str]]]
+    """
+    The login of a user-defined service principal, the `login` output of a `ServicePrincipal` resource. Conflicts with `teamName`.
+    """
+    team_name: NotRequired[pulumi.Input[Optional[_builtins.str]]]
+    """
+    The name of a team, to run as the team's service principal with the team's roles. Conflicts with `login`.
+    """
+
+@pulumi.input_type
+class OperationContextServicePrincipalArgs:
+    def __init__(__self__, *,
+                 login: pulumi.Input[Optional[_builtins.str]] = None,
+                 team_name: pulumi.Input[Optional[_builtins.str]] = None):
+        """
+        :param pulumi.Input[_builtins.str] login: The login of a user-defined service principal, the `login` output of a `ServicePrincipal` resource. Conflicts with `teamName`.
+        :param pulumi.Input[_builtins.str] team_name: The name of a team, to run as the team's service principal with the team's roles. Conflicts with `login`.
+        """
+        if login is not None:
+            pulumi.set(__self__, "login", login)
+        if team_name is not None:
+            pulumi.set(__self__, "team_name", team_name)
+
+    @_builtins.property
+    @pulumi.getter
+    def login(self) -> pulumi.Input[Optional[_builtins.str]]:
+        """
+        The login of a user-defined service principal, the `login` output of a `ServicePrincipal` resource. Conflicts with `teamName`.
+        """
+        return pulumi.get(self, "login")
+
+    @login.setter
+    def login(self, value: pulumi.Input[Optional[_builtins.str]]):
+        pulumi.set(self, "login", value)
+
+    @_builtins.property
+    @pulumi.getter(name="teamName")
+    def team_name(self) -> pulumi.Input[Optional[_builtins.str]]:
+        """
+        The name of a team, to run as the team's service principal with the team's roles. Conflicts with `login`.
+        """
+        return pulumi.get(self, "team_name")
+
+    @team_name.setter
+    def team_name(self, value: pulumi.Input[Optional[_builtins.str]]):
+        pulumi.set(self, "team_name", value)
 
 
 class PolicyGroupMatchRuleDict(TypedDict):

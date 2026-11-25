@@ -73,6 +73,9 @@ func TestDelete(t *testing.T) {
 		"DeletePolicyPackVersion": func(ctx context.Context, c *Client) error {
 			return c.DeletePolicyPackVersion(ctx, org, "a-policy-pack", "1.0.0")
 		},
+		"DeleteServicePrincipal": func(ctx context.Context, c *Client) error {
+			return c.DeleteServicePrincipal(ctx, org, "service-principal:an-id")
+		},
 		"DeleteStack": func(ctx context.Context, c *Client) error {
 			return c.DeleteStack(ctx, stack, false)
 		},

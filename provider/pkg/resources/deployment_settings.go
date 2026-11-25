@@ -40,6 +40,8 @@ const (
 	gcOperationContext     = "operationContext"
 	gcEnvironmentVariables = "environmentVariables"
 	gcVcs                  = "vcs"
+	gcServicePrincipal     = "servicePrincipal"
+	gcLogin                = "login"
 )
 
 // vcsProviderGitHub is the vcs block's provider for GitHub.
@@ -339,6 +341,19 @@ func (ds *PulumiServiceDeploymentSettingsInput) ToPropertyMap(
 				}
 				ocMap["oidc"] = resource.PropertyValue{V: oidcMap}
 			}
+		}
+		if ds.Operation.Role != nil && ds.Operation.Role.ID != "" {
+			ocMap[gcRoleID] = resource.NewPropertyValue(ds.Operation.Role.ID)
+		}
+		if sp := ds.Operation.ServicePrincipal; sp != nil && (sp.User != nil || sp.Team != nil) {
+			spMap := resource.PropertyMap{}
+			if sp.User != nil {
+				spMap[gcLogin] = resource.NewPropertyValue(sp.User.GitHubLogin)
+			}
+			if sp.Team != nil {
+				spMap[gcTeamName] = resource.NewPropertyValue(sp.Team.Name)
+			}
+			ocMap[gcServicePrincipal] = resource.PropertyValue{V: spMap}
 		}
 		pm["operationContext"] = resource.PropertyValue{V: ocMap}
 	}
