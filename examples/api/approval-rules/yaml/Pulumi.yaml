@@ -1,9 +1,0 @@
-name: pulumicloud-api-approval-rules
-runtime: yaml
-config:
-  organizationName:
-    type: string
-    default: service-provider-test-org
-  groupName:
-    type: string
-    default: api-approvers
