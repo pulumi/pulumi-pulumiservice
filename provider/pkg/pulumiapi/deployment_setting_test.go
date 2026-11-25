@@ -13,6 +13,7 @@ const (
 	testDeploymentSettingsOrgName     = "an-organization"
 	testDeploymentSettingsProjectName = "a-project"
 	testDeploymentSettingsStackName   = "a-stack"
+	testRunAsTeamName                 = "platform"
 )
 
 func TestGetDeploymentSettings(t *testing.T) {
@@ -239,9 +240,9 @@ func TestDeploymentSettingsRunIdentityWireFormat(t *testing.T) {
 		{
 			name: "team",
 			operation: OperationContext{ServicePrincipal: &AssignmentPrincipal{
-				Team: &AssignmentTeam{Name: "platform"},
+				Team: &AssignmentTeam{Name: testRunAsTeamName},
 			}},
-			body: `{"operationContext": {"servicePrincipal": {"teamName": "platform"}}}`,
+			body: `{"operationContext": {"servicePrincipal": {"teamName": "` + testRunAsTeamName + `"}}}`,
 		},
 		{
 			name:      "role",
@@ -255,10 +256,10 @@ func TestDeploymentSettingsRunIdentityWireFormat(t *testing.T) {
 				name string
 				call func(*Client) (*DeploymentSettings, error)
 			}{
-				{"create", func(c *Client) (*DeploymentSettings, error) {
+				{"CreateDeploymentSettings", func(c *Client) (*DeploymentSettings, error) {
 					return c.CreateDeploymentSettings(t.Context(), stack, settings)
 				}},
-				{"update", func(c *Client) (*DeploymentSettings, error) {
+				{"UpdateDeploymentSettings", func(c *Client) (*DeploymentSettings, error) {
 					return c.UpdateDeploymentSettings(t.Context(), stack, settings)
 				}},
 			} {
