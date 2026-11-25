@@ -7867,7 +7867,7 @@
         },
         "name": {
           "type": "string",
-          "description": "The service principal's display name, unique among the organization's service principals. Up to 64 characters: letters, digits, spaces, hyphens, underscores and periods. Changing it renames the service principal in place.\n\nIf omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming)."
+          "description": "The service principal's display name, unique (ignoring case) among the organization's service principals. Up to 255 characters: ASCII letters, digits, spaces, hyphens, underscores and periods, starting with a letter or digit. Changing it renames the service principal in place.\n\nIf omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming)."
         },
         "organizationName": {
           "type": "string",
@@ -7890,7 +7890,7 @@
       "inputProperties": {
         "name": {
           "type": "string",
-          "description": "The service principal's display name, unique among the organization's service principals. Up to 64 characters: letters, digits, spaces, hyphens, underscores and periods. Changing it renames the service principal in place.\n\nIf omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming)."
+          "description": "The service principal's display name, unique (ignoring case) among the organization's service principals. Up to 255 characters: ASCII letters, digits, spaces, hyphens, underscores and periods, starting with a letter or digit. Changing it renames the service principal in place.\n\nIf omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming)."
         },
         "organizationName": {
           "type": "string",

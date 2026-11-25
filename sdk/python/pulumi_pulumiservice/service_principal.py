@@ -26,7 +26,7 @@ class ServicePrincipalArgs:
         The set of arguments for constructing a ServicePrincipal resource.
 
         :param pulumi.Input[_builtins.str] organization_name: The organization's name.
-        :param pulumi.Input[_builtins.str] name: The service principal's display name, unique among the organization's service principals. Up to 64 characters: letters, digits, spaces, hyphens, underscores and periods. Changing it renames the service principal in place.
+        :param pulumi.Input[_builtins.str] name: The service principal's display name, unique (ignoring case) among the organization's service principals. Up to 255 characters: ASCII letters, digits, spaces, hyphens, underscores and periods, starting with a letter or digit. Changing it renames the service principal in place.
                
                If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
         :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] role_ids: The IDs of the organization-wide roles the service principal holds. Use `getOrganizationRole` to look up a role's ID by its name. Organizations with custom roles can assign any number of custom roles and the built-in Admin, Maintainer, Builder and Reader roles. Without custom roles, a service principal holds at most one of the Reader, Maintainer and Admin roles. Omit it, or leave it empty, for a service principal whose only access is its entity access.
@@ -53,7 +53,7 @@ class ServicePrincipalArgs:
     @pulumi.getter
     def name(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
-        The service principal's display name, unique among the organization's service principals. Up to 64 characters: letters, digits, spaces, hyphens, underscores and periods. Changing it renames the service principal in place.
+        The service principal's display name, unique (ignoring case) among the organization's service principals. Up to 255 characters: ASCII letters, digits, spaces, hyphens, underscores and periods, starting with a letter or digit. Changing it renames the service principal in place.
 
         If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
         """
@@ -109,7 +109,7 @@ class ServicePrincipal(pulumi.CustomResource):
 
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
-        :param pulumi.Input[_builtins.str] name: The service principal's display name, unique among the organization's service principals. Up to 64 characters: letters, digits, spaces, hyphens, underscores and periods. Changing it renames the service principal in place.
+        :param pulumi.Input[_builtins.str] name: The service principal's display name, unique (ignoring case) among the organization's service principals. Up to 255 characters: ASCII letters, digits, spaces, hyphens, underscores and periods, starting with a letter or digit. Changing it renames the service principal in place.
                
                If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
         :param pulumi.Input[_builtins.str] organization_name: The organization's name.
@@ -217,7 +217,7 @@ class ServicePrincipal(pulumi.CustomResource):
     @pulumi.getter
     def name(self) -> pulumi.Output[_builtins.str]:
         """
-        The service principal's display name, unique among the organization's service principals. Up to 64 characters: letters, digits, spaces, hyphens, underscores and periods. Changing it renames the service principal in place.
+        The service principal's display name, unique (ignoring case) among the organization's service principals. Up to 255 characters: ASCII letters, digits, spaces, hyphens, underscores and periods, starting with a letter or digit. Changing it renames the service principal in place.
 
         If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
         """

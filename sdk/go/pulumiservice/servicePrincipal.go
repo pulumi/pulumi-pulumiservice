@@ -39,7 +39,7 @@ type ServicePrincipal struct {
 
 	// The service principal's login, such as `service-principal:d333a711-4aa0-402f-be6d-72af9665fc37`. It doesn't change when the service principal is renamed. Pass it as the `username` of `OrganizationMemberEntityAccess`, or as `operationContext.servicePrincipal.login` of `DeploymentSettings`.
 	Login pulumi.StringOutput `pulumi:"login"`
-	// The service principal's display name, unique among the organization's service principals. Up to 64 characters: letters, digits, spaces, hyphens, underscores and periods. Changing it renames the service principal in place.
+	// The service principal's display name, unique (ignoring case) among the organization's service principals. Up to 255 characters: ASCII letters, digits, spaces, hyphens, underscores and periods, starting with a letter or digit. Changing it renames the service principal in place.
 	//
 	// If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
 	Name pulumi.StringOutput `pulumi:"name"`
@@ -96,7 +96,7 @@ func (ServicePrincipalState) ElementType() reflect.Type {
 }
 
 type servicePrincipalArgs struct {
-	// The service principal's display name, unique among the organization's service principals. Up to 64 characters: letters, digits, spaces, hyphens, underscores and periods. Changing it renames the service principal in place.
+	// The service principal's display name, unique (ignoring case) among the organization's service principals. Up to 255 characters: ASCII letters, digits, spaces, hyphens, underscores and periods, starting with a letter or digit. Changing it renames the service principal in place.
 	//
 	// If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
 	Name *string `pulumi:"name"`
@@ -108,7 +108,7 @@ type servicePrincipalArgs struct {
 
 // The set of arguments for constructing a ServicePrincipal resource.
 type ServicePrincipalArgs struct {
-	// The service principal's display name, unique among the organization's service principals. Up to 64 characters: letters, digits, spaces, hyphens, underscores and periods. Changing it renames the service principal in place.
+	// The service principal's display name, unique (ignoring case) among the organization's service principals. Up to 255 characters: ASCII letters, digits, spaces, hyphens, underscores and periods, starting with a letter or digit. Changing it renames the service principal in place.
 	//
 	// If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
 	Name pulumi.StringPtrInput
@@ -210,7 +210,7 @@ func (o ServicePrincipalOutput) Login() pulumi.StringOutput {
 	return o.ApplyT(func(v *ServicePrincipal) pulumi.StringOutput { return v.Login }).(pulumi.StringOutput)
 }
 
-// The service principal's display name, unique among the organization's service principals. Up to 64 characters: letters, digits, spaces, hyphens, underscores and periods. Changing it renames the service principal in place.
+// The service principal's display name, unique (ignoring case) among the organization's service principals. Up to 255 characters: ASCII letters, digits, spaces, hyphens, underscores and periods, starting with a letter or digit. Changing it renames the service principal in place.
 //
 // If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
 func (o ServicePrincipalOutput) Name() pulumi.StringOutput {

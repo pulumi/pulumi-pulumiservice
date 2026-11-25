@@ -64,9 +64,10 @@ func (i *ServicePrincipalInput) Annotate(a infer.Annotator) {
 	a.Describe(&i.OrganizationName, "The organization's name.")
 	a.Describe(
 		&i.Name,
-		"The service principal's display name, unique among the organization's service principals. Up to 64 "+
-			"characters: letters, digits, spaces, hyphens, underscores and periods. Changing it renames the "+
-			"service principal in place.\n\n"+autoNamedDescription,
+		"The service principal's display name, unique (ignoring case) among the organization's service "+
+			"principals. Up to 255 characters: ASCII letters, digits, spaces, hyphens, underscores and periods, "+
+			"starting with a letter or digit. Changing it renames the service principal in place.\n\n"+
+			autoNamedDescription,
 	)
 	a.Describe(
 		&i.RoleIDs,
@@ -84,7 +85,7 @@ func (i *ServicePrincipalInput) AutoName(autoname infer.SetAutoName) {
 
 // servicePrincipalNameMaxLen is the longest service principal name Pulumi
 // Cloud accepts. Names allow the same characters as agent pool names.
-const servicePrincipalNameMaxLen = 64
+const servicePrincipalNameMaxLen = 255
 
 type ServicePrincipalState struct {
 	ServicePrincipalInput

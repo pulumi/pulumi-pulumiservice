@@ -66,7 +66,7 @@ export class ServicePrincipal extends pulumi.CustomResource {
      */
     declare public /*out*/ readonly login: pulumi.Output<string>;
     /**
-     * The service principal's display name, unique among the organization's service principals. Up to 64 characters: letters, digits, spaces, hyphens, underscores and periods. Changing it renames the service principal in place.
+     * The service principal's display name, unique (ignoring case) among the organization's service principals. Up to 255 characters: ASCII letters, digits, spaces, hyphens, underscores and periods, starting with a letter or digit. Changing it renames the service principal in place.
      *
      * If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
      */
@@ -116,7 +116,7 @@ export class ServicePrincipal extends pulumi.CustomResource {
  */
 export interface ServicePrincipalArgs {
     /**
-     * The service principal's display name, unique among the organization's service principals. Up to 64 characters: letters, digits, spaces, hyphens, underscores and periods. Changing it renames the service principal in place.
+     * The service principal's display name, unique (ignoring case) among the organization's service principals. Up to 255 characters: ASCII letters, digits, spaces, hyphens, underscores and periods, starting with a letter or digit. Changing it renames the service principal in place.
      *
      * If omitted, Pulumi generates a name from the resource's logical name plus a random suffix, or follows the stack's [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
      */

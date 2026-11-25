@@ -18,7 +18,7 @@ public final class ServicePrincipalArgs extends com.pulumi.resources.ResourceArg
     public static final ServicePrincipalArgs Empty = new ServicePrincipalArgs();
 
     /**
-     * The service principal&#39;s display name, unique among the organization&#39;s service principals. Up to 64 characters: letters, digits, spaces, hyphens, underscores and periods. Changing it renames the service principal in place.
+     * The service principal&#39;s display name, unique (ignoring case) among the organization&#39;s service principals. Up to 255 characters: ASCII letters, digits, spaces, hyphens, underscores and periods, starting with a letter or digit. Changing it renames the service principal in place.
      * 
      * If omitted, Pulumi generates a name from the resource&#39;s logical name plus a random suffix, or follows the stack&#39;s [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
      * 
@@ -27,7 +27,7 @@ public final class ServicePrincipalArgs extends com.pulumi.resources.ResourceArg
     private @Nullable Output<String> name;
 
     /**
-     * @return The service principal&#39;s display name, unique among the organization&#39;s service principals. Up to 64 characters: letters, digits, spaces, hyphens, underscores and periods. Changing it renames the service principal in place.
+     * @return The service principal&#39;s display name, unique (ignoring case) among the organization&#39;s service principals. Up to 255 characters: ASCII letters, digits, spaces, hyphens, underscores and periods, starting with a letter or digit. Changing it renames the service principal in place.
      * 
      * If omitted, Pulumi generates a name from the resource&#39;s logical name plus a random suffix, or follows the stack&#39;s [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
      * 
@@ -93,7 +93,7 @@ public final class ServicePrincipalArgs extends com.pulumi.resources.ResourceArg
         }
 
         /**
-         * @param name The service principal&#39;s display name, unique among the organization&#39;s service principals. Up to 64 characters: letters, digits, spaces, hyphens, underscores and periods. Changing it renames the service principal in place.
+         * @param name The service principal&#39;s display name, unique (ignoring case) among the organization&#39;s service principals. Up to 255 characters: ASCII letters, digits, spaces, hyphens, underscores and periods, starting with a letter or digit. Changing it renames the service principal in place.
          * 
          * If omitted, Pulumi generates a name from the resource&#39;s logical name plus a random suffix, or follows the stack&#39;s [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
          * 
@@ -106,7 +106,7 @@ public final class ServicePrincipalArgs extends com.pulumi.resources.ResourceArg
         }
 
         /**
-         * @param name The service principal&#39;s display name, unique among the organization&#39;s service principals. Up to 64 characters: letters, digits, spaces, hyphens, underscores and periods. Changing it renames the service principal in place.
+         * @param name The service principal&#39;s display name, unique (ignoring case) among the organization&#39;s service principals. Up to 255 characters: ASCII letters, digits, spaces, hyphens, underscores and periods, starting with a letter or digit. Changing it renames the service principal in place.
          * 
          * If omitted, Pulumi generates a name from the resource&#39;s logical name plus a random suffix, or follows the stack&#39;s [autonaming configuration](https://www.pulumi.com/docs/iac/concepts/resources/names/#autonaming).
          * 
