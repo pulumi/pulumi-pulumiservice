@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 1.10.0
+
+### Improvements
+
+- Added the `ServicePrincipal` resource for managing service principals and their organization roles. A service principal can be granted entity access with `OrganizationMemberEntityAccess`, using its `login` as the username [#1475](https://github.com/pulumi/pulumi-pulumiservice/issues/1475)
+- Added `operationContext.servicePrincipal` and `operationContext.roleId` to `DeploymentSettings`, to run a stack's deployments as a service principal or with an organization role [#1475](https://github.com/pulumi/pulumi-pulumiservice/issues/1475)
+
 ## 1.9.0
 
 ### Bug Fixes
