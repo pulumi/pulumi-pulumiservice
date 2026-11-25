@@ -283,6 +283,14 @@ export interface DeploymentSettingsOperationContext {
      * Shell commands to run before the Pulumi operation executes.
      */
     preRunCommands?: string[];
+    /**
+     * The ID of the organization role the deployments run with. Use `getOrganizationRole` to look up a role's ID by its name. Organizations with custom roles can pick any role; others can pick the built-in Reader, Maintainer or Admin role. You need every permission of the role. Conflicts with `servicePrincipal`.
+     */
+    roleId?: string;
+    /**
+     * The service principal the deployments run as, with the access it holds. Pulumi Cloud requires it to have write access to the stack, and open access to the environments the stack imports, and you need every permission it holds. Conflicts with `roleId`.
+     */
+    servicePrincipal?: outputs.OperationContextServicePrincipal;
 }
 
 /**
@@ -509,6 +517,17 @@ export interface OperationContextOptions {
      * Skip intermediate deployments (Consolidate multiple deployments of the same type into one deployment)
      */
     skipIntermediateDeployments?: boolean;
+}
+
+export interface OperationContextServicePrincipal {
+    /**
+     * The login of a user-defined service principal, the `login` output of a `ServicePrincipal` resource. Conflicts with `teamName`.
+     */
+    login?: string;
+    /**
+     * The name of a team, to run as the team's service principal with the team's roles. Conflicts with `login`.
+     */
+    teamName?: string;
 }
 
 export interface OrganizationMemberInfo {

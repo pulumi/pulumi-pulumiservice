@@ -212,3 +212,69 @@ func TestCreateDeploymentSettings(t *testing.T) {
 		assert.Nil(t, err)
 	})
 }
+
+// Pulumi Cloud returns the identity deployments run as resolved, but takes a
+// service principal by reference. The writes must send the reference form.
+func TestDeploymentSettingsRunIdentityWireFormat(t *testing.T) {
+	stack := StackIdentifier{
+		OrgName:     testDeploymentSettingsOrgName,
+		ProjectName: testDeploymentSettingsProjectName,
+		StackName:   testDeploymentSettingsStackName,
+	}
+	settingsPath := "/" + path.Join("api", "stacks", stack.OrgName, stack.ProjectName, stack.StackName,
+		"deployments", "settings")
+
+	for _, tc := range []struct {
+		name      string
+		operation OperationContext
+		body      string
+	}{
+		{
+			name: "user-defined service principal",
+			operation: OperationContext{ServicePrincipal: &AssignmentPrincipal{
+				User: &ServicePrincipalUser{GitHubLogin: "service-principal:d333a711"},
+			}},
+			body: `{"operationContext": {"servicePrincipal": {"userId": "service-principal:d333a711"}}}`,
+		},
+		{
+			name: "team",
+			operation: OperationContext{ServicePrincipal: &AssignmentPrincipal{
+				Team: &AssignmentTeam{Name: "platform"},
+			}},
+			body: `{"operationContext": {"servicePrincipal": {"teamName": "platform"}}}`,
+		},
+		{
+			name:      "role",
+			operation: OperationContext{Role: &DeploymentRole{ID: "role-id"}},
+			body:      `{"operationContext": {"role": {"id": "role-id"}}}`,
+		},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			settings := DeploymentSettings{Operation: &tc.operation}
+			for _, write := range []struct {
+				name string
+				call func(*Client) (*DeploymentSettings, error)
+			}{
+				{"create", func(c *Client) (*DeploymentSettings, error) {
+					return c.CreateDeploymentSettings(t.Context(), stack, settings)
+				}},
+				{"update", func(c *Client) (*DeploymentSettings, error) {
+					return c.UpdateDeploymentSettings(t.Context(), stack, settings)
+				}},
+			} {
+				t.Run(write.name, func(t *testing.T) {
+					c := startTestServer(t, testServerConfig{
+						ExpectedReqMethod: http.MethodPut,
+						ExpectedReqPath:   settingsPath,
+						ExpectedReqBody:   json.RawMessage(tc.body),
+						ResponseCode:      http.StatusOK,
+						ResponseBody:      settings,
+					})
+					got, err := write.call(c)
+					assert.NoError(t, err)
+					assert.Equal(t, &settings, got)
+				})
+			}
+		})
+	}
+}

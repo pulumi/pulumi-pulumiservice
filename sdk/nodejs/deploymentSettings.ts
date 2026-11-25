@@ -66,6 +66,43 @@ import * as utilities from "./utilities";
  *     },
  * });
  * ```
+ * ### Run deployments as a service principal
+ *
+ * This makes the stack's deployments run as a service principal, with the roles and entity access it holds. Pulumi Cloud requires the service principal to have write access to the stack, so the settings depend on that grant.
+ *
+ * ```typescript
+ * import * as pulumi from "@pulumi/pulumi";
+ * import * as pulumiservice from "@pulumi/pulumiservice";
+ *
+ * const deployer = new pulumiservice.ServicePrincipal("deployer", {
+ *     organizationName: "my-org",
+ *     name: "deployer",
+ * });
+ * const deployerStackAccess = new pulumiservice.OrganizationMemberEntityAccess("deployerStackAccess", {
+ *     organizationName: "my-org",
+ *     username: deployer.login,
+ *     entityType: "stack",
+ *     entityName: "my-project/production",
+ *     permission: "stack-write",
+ * });
+ * const settings = new pulumiservice.DeploymentSettings("settings", {
+ *     organization: "my-org",
+ *     project: "my-project",
+ *     stack: "production",
+ *     sourceContext: {
+ *         git: {
+ *             branch: "refs/heads/main",
+ *         },
+ *     },
+ *     operationContext: {
+ *         servicePrincipal: {
+ *             login: deployer.login,
+ *         },
+ *     },
+ * }, {
+ *     dependsOn: [deployerStackAccess],
+ * });
+ * ```
  *
  * ## Import
  *

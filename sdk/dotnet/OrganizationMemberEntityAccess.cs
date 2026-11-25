@@ -68,7 +68,7 @@ namespace Pulumi.PulumiService
         public Output<string> PermissionSetName { get; private set; } = null!;
 
         /// <summary>
-        /// The Pulumi Cloud username of the organization member.
+        /// The Pulumi Cloud username of the organization member. For a service principal, use its login, the `login` output of a `ServicePrincipal` resource.
         /// </summary>
         [Output("username")]
         public Output<string> Username { get; private set; } = null!;
@@ -156,7 +156,7 @@ namespace Pulumi.PulumiService
         public Input<string>? PermissionSetId { get; set; }
 
         /// <summary>
-        /// The Pulumi Cloud username of the organization member.
+        /// The Pulumi Cloud username of the organization member. For a service principal, use its login, the `login` output of a `ServicePrincipal` resource.
         /// </summary>
         [Input("username", required: true)]
         public Input<string> Username { get; set; } = null!;

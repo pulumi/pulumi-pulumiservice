@@ -195,6 +195,11 @@ export type Provider = import("./provider").Provider;
 export const Provider: typeof import("./provider").Provider = null as any;
 utilities.lazyLoad(exports, ["Provider"], () => require("./provider"));
 
+export { ServicePrincipalArgs } from "./servicePrincipal";
+export type ServicePrincipal = import("./servicePrincipal").ServicePrincipal;
+export const ServicePrincipal: typeof import("./servicePrincipal").ServicePrincipal = null as any;
+utilities.lazyLoad(exports, ["ServicePrincipal"], () => require("./servicePrincipal"));
+
 export { StackArgs } from "./stack";
 export type Stack = import("./stack").Stack;
 export const Stack: typeof import("./stack").Stack = null as any;
@@ -305,6 +310,8 @@ const _module = {
                 return new PolicyGroup(name, <any>undefined, { urn })
             case "pulumiservice:index:PolicyPack":
                 return new PolicyPack(name, <any>undefined, { urn })
+            case "pulumiservice:index:ServicePrincipal":
+                return new ServicePrincipal(name, <any>undefined, { urn })
             case "pulumiservice:index:Stack":
                 return new Stack(name, <any>undefined, { urn })
             case "pulumiservice:index:StackTag":

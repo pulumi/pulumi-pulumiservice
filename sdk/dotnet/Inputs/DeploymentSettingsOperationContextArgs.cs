@@ -51,6 +51,18 @@ namespace Pulumi.PulumiService.Inputs
             set => _preRunCommands = value;
         }
 
+        /// <summary>
+        /// The ID of the organization role the deployments run with. Use `getOrganizationRole` to look up a role's ID by its name. Organizations with custom roles can pick any role; others can pick the built-in Reader, Maintainer or Admin role. You need every permission of the role. Conflicts with `servicePrincipal`.
+        /// </summary>
+        [Input("roleId")]
+        public Input<string>? RoleId { get; set; }
+
+        /// <summary>
+        /// The service principal the deployments run as, with the access it holds. Pulumi Cloud requires it to have write access to the stack, and open access to the environments the stack imports, and you need every permission it holds. Conflicts with `roleId`.
+        /// </summary>
+        [Input("servicePrincipal")]
+        public Input<Inputs.OperationContextServicePrincipalArgs>? ServicePrincipal { get; set; }
+
         public DeploymentSettingsOperationContextArgs()
         {
         }

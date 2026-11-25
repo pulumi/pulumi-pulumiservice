@@ -102,6 +102,64 @@ import (
 //	}
 //
 // ```
+// ### Run deployments as a service principal
+//
+// This makes the stack's deployments run as a service principal, with the roles and entity access it holds. Pulumi Cloud requires the service principal to have write access to the stack, so the settings depend on that grant.
+//
+// ```go
+// package main
+//
+// import (
+//
+//	"github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice"
+//	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
+//
+// )
+//
+//	func main() {
+//		pulumi.Run(func(ctx *pulumi.Context) error {
+//			deployer, err := pulumiservice.NewServicePrincipal(ctx, "deployer", &pulumiservice.ServicePrincipalArgs{
+//				OrganizationName: pulumi.String("my-org"),
+//				Name:             pulumi.String("deployer"),
+//			})
+//			if err != nil {
+//				return err
+//			}
+//			deployerStackAccess, err := pulumiservice.NewOrganizationMemberEntityAccess(ctx, "deployerStackAccess", &pulumiservice.OrganizationMemberEntityAccessArgs{
+//				OrganizationName: pulumi.String("my-org"),
+//				Username:         deployer.Login,
+//				EntityType:       pulumi.String("stack"),
+//				EntityName:       pulumi.String("my-project/production"),
+//				Permission:       pulumi.String("stack-write"),
+//			})
+//			if err != nil {
+//				return err
+//			}
+//			_, err = pulumiservice.NewDeploymentSettings(ctx, "settings", &pulumiservice.DeploymentSettingsArgs{
+//				Organization: pulumi.String("my-org"),
+//				Project:      pulumi.String("my-project"),
+//				Stack:        pulumi.String("production"),
+//				SourceContext: &pulumiservice.DeploymentSettingsSourceContextArgs{
+//					Git: &pulumiservice.DeploymentSettingsGitSourceArgs{
+//						Branch: pulumi.String("refs/heads/main"),
+//					},
+//				},
+//				OperationContext: &pulumiservice.DeploymentSettingsOperationContextArgs{
+//					ServicePrincipal: &pulumiservice.OperationContextServicePrincipalArgs{
+//						Login: deployer.Login,
+//					},
+//				},
+//			}, pulumi.DependsOn([]pulumi.Resource{
+//				deployerStackAccess,
+//			}))
+//			if err != nil {
+//				return err
+//			}
+//			return nil
+//		})
+//	}
+//
+// ```
 //
 // ## Import
 //

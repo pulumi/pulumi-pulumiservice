@@ -38,6 +38,7 @@ __all__ = [
     'InsightsAccountState',
     'OperationContextOIDC',
     'OperationContextOptions',
+    'OperationContextServicePrincipal',
     'OrganizationMemberInfo',
     'OrganizationRoleInfo',
     'PolicyGroupPolicyPackReference',
@@ -882,6 +883,10 @@ class DeploymentSettingsOperationContext(dict):
             suggest = "environment_variables"
         elif key == "preRunCommands":
             suggest = "pre_run_commands"
+        elif key == "roleId":
+            suggest = "role_id"
+        elif key == "servicePrincipal":
+            suggest = "service_principal"
 
         if suggest:
             pulumi.log.warn(f"Key '{key}' not found in DeploymentSettingsOperationContext. Access the value via the '{suggest}' property getter instead.")
@@ -898,7 +903,9 @@ class DeploymentSettingsOperationContext(dict):
                  environment_variables: Optional[Mapping[str, _builtins.str]] = None,
                  oidc: Optional['outputs.OperationContextOIDC'] = None,
                  options: Optional['outputs.OperationContextOptions'] = None,
-                 pre_run_commands: Optional[Sequence[_builtins.str]] = None):
+                 pre_run_commands: Optional[Sequence[_builtins.str]] = None,
+                 role_id: Optional[_builtins.str] = None,
+                 service_principal: Optional['outputs.OperationContextServicePrincipal'] = None):
         """
         Settings related to the Pulumi operation environment during the deployment.
 
@@ -906,6 +913,8 @@ class DeploymentSettingsOperationContext(dict):
         :param 'OperationContextOIDC' oidc: Deployments OIDC configuration for obtaining cloud credentials during the deployment. Pulumi ESC is the recommended way to supply cloud credentials to Pulumi Deployments. Deployments OIDC still fits when a customer-managed runner can't reach Pulumi Cloud to use ESC, or when pre-run commands need credentials and aren't wrapped in `pulumi env run`. See [Supplying Cloud Credentials to Pulumi Deployments](https://www.pulumi.com/docs/deployments/guides/cloud-credentials/).
         :param 'OperationContextOptions' options: Options to override default behavior during the deployment.
         :param Sequence[_builtins.str] pre_run_commands: Shell commands to run before the Pulumi operation executes.
+        :param _builtins.str role_id: The ID of the organization role the deployments run with. Use `getOrganizationRole` to look up a role's ID by its name. Organizations with custom roles can pick any role; others can pick the built-in Reader, Maintainer or Admin role. You need every permission of the role. Conflicts with `servicePrincipal`.
+        :param 'OperationContextServicePrincipal' service_principal: The service principal the deployments run as, with the access it holds. Pulumi Cloud requires it to have write access to the stack, and open access to the environments the stack imports, and you need every permission it holds. Conflicts with `roleId`.
         """
         if environment_variables is not None:
             pulumi.set(__self__, "environment_variables", environment_variables)
@@ -915,6 +924,10 @@ class DeploymentSettingsOperationContext(dict):
             pulumi.set(__self__, "options", options)
         if pre_run_commands is not None:
             pulumi.set(__self__, "pre_run_commands", pre_run_commands)
+        if role_id is not None:
+            pulumi.set(__self__, "role_id", role_id)
+        if service_principal is not None:
+            pulumi.set(__self__, "service_principal", service_principal)
 
     @_builtins.property
     @pulumi.getter(name="environmentVariables")
@@ -947,6 +960,22 @@ class DeploymentSettingsOperationContext(dict):
         Shell commands to run before the Pulumi operation executes.
         """
         return pulumi.get(self, "pre_run_commands")
+
+    @_builtins.property
+    @pulumi.getter(name="roleId")
+    def role_id(self) -> Optional[_builtins.str]:
+        """
+        The ID of the organization role the deployments run with. Use `getOrganizationRole` to look up a role's ID by its name. Organizations with custom roles can pick any role; others can pick the built-in Reader, Maintainer or Admin role. You need every permission of the role. Conflicts with `servicePrincipal`.
+        """
+        return pulumi.get(self, "role_id")
+
+    @_builtins.property
+    @pulumi.getter(name="servicePrincipal")
+    def service_principal(self) -> Optional['outputs.OperationContextServicePrincipal']:
+        """
+        The service principal the deployments run as, with the access it holds. Pulumi Cloud requires it to have write access to the stack, and open access to the environments the stack imports, and you need every permission it holds. Conflicts with `roleId`.
+        """
+        return pulumi.get(self, "service_principal")
 
 
 @pulumi.output_type
@@ -1610,6 +1639,54 @@ class OperationContextOptions(dict):
         Skip intermediate deployments (Consolidate multiple deployments of the same type into one deployment)
         """
         return pulumi.get(self, "skip_intermediate_deployments")
+
+
+@pulumi.output_type
+class OperationContextServicePrincipal(dict):
+    @staticmethod
+    def __key_warning(key: str):
+        suggest = None
+        if key == "teamName":
+            suggest = "team_name"
+
+        if suggest:
+            pulumi.log.warn(f"Key '{key}' not found in OperationContextServicePrincipal. Access the value via the '{suggest}' property getter instead.")
+
+    def __getitem__(self, key: str) -> Any:
+        OperationContextServicePrincipal.__key_warning(key)
+        return super().__getitem__(key)
+
+    def get(self, key: str, default = None) -> Any:
+        OperationContextServicePrincipal.__key_warning(key)
+        return super().get(key, default)
+
+    def __init__(__self__, *,
+                 login: Optional[_builtins.str] = None,
+                 team_name: Optional[_builtins.str] = None):
+        """
+        :param _builtins.str login: The login of a user-defined service principal, the `login` output of a `ServicePrincipal` resource. Conflicts with `teamName`.
+        :param _builtins.str team_name: The name of a team, to run as the team's service principal with the team's roles. Conflicts with `login`.
+        """
+        if login is not None:
+            pulumi.set(__self__, "login", login)
+        if team_name is not None:
+            pulumi.set(__self__, "team_name", team_name)
+
+    @_builtins.property
+    @pulumi.getter
+    def login(self) -> Optional[_builtins.str]:
+        """
+        The login of a user-defined service principal, the `login` output of a `ServicePrincipal` resource. Conflicts with `teamName`.
+        """
+        return pulumi.get(self, "login")
+
+    @_builtins.property
+    @pulumi.getter(name="teamName")
+    def team_name(self) -> Optional[_builtins.str]:
+        """
+        The name of a team, to run as the team's service principal with the team's roles. Conflicts with `login`.
+        """
+        return pulumi.get(self, "team_name")
 
 
 @pulumi.output_type

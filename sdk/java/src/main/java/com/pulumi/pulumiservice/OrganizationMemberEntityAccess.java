@@ -129,14 +129,14 @@ public class OrganizationMemberEntityAccess extends com.pulumi.resources.CustomR
         return this.permissionSetName;
     }
     /**
-     * The Pulumi Cloud username of the organization member.
+     * The Pulumi Cloud username of the organization member. For a service principal, use its login, the `login` output of a `ServicePrincipal` resource.
      * 
      */
     @Export(name="username", refs={String.class}, tree="[0]")
     private Output<String> username;
 
     /**
-     * @return The Pulumi Cloud username of the organization member.
+     * @return The Pulumi Cloud username of the organization member. For a service principal, use its login, the `login` output of a `ServicePrincipal` resource.
      * 
      */
     public Output<String> username() {
