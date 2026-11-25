@@ -13243,6 +13243,54 @@
         },
         "type": "object"
       },
+      "CreateServicePrincipalRequest": {
+        "description": "The request body for creating a user-defined service principal.",
+        "properties": {
+          "name": {
+            "description": "The display name of the service principal, unique (ignoring case) among the organization's user-defined service principals. 1 to 255 characters: ASCII letters, digits, spaces, hyphens, underscores and periods, starting with an ASCII letter or digit.",
+            "type": "string",
+            "x-order": 1
+          },
+          "roleIds": {
+            "description": "The IDs of the organization-wide roles the service principal holds, if any. On plans with custom roles, any number of custom roles and the built-in Admin, Maintainer, Builder and Reader roles; on other plans, at most one of the built-in Reader (read), Maintainer (write) or Admin roles. A service principal gets its access only from these roles and its entity access, never from the organization's default role: without roles, it can do only what its entity access allows.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "x-order": 2
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "type": "object"
+      },
+      "CreateServicePrincipalTokenRequest": {
+        "description": "The request body for creating an access token that authenticates as a user-defined service principal.",
+        "properties": {
+          "description": {
+            "description": "What the token is for. May be empty; at most 255 characters.",
+            "type": "string",
+            "x-order": 2
+          },
+          "expires": {
+            "description": "When the token expires: a time in the future, at most two years from now. Without it, the token does not expire, unless the organization sets a maximum token lifetime: then it is required and must fall within that limit.",
+            "format": "date-time",
+            "type": "string",
+            "x-order": 3
+          },
+          "name": {
+            "description": "The name of the token, unique among the service principal's tokens, including deleted ones. At most 40 characters.",
+            "type": "string",
+            "x-order": 1
+          }
+        },
+        "required": [
+          "description",
+          "name"
+        ],
+        "type": "object"
+      },
       "CreateServiceRequest": {
         "description": "Request for creating a new service with an optional list\nof items to populate the service with after creation.",
         "properties": {
@@ -24958,6 +25006,23 @@
         },
         "required": [
           "schedules"
+        ],
+        "type": "object"
+      },
+      "ListServicePrincipalRolesResponse": {
+        "description": "The organization-wide roles of a user-defined service principal.",
+        "properties": {
+          "roles": {
+            "description": "The custom and built-in roles the service principal holds across the organization. Empty when it has only entity access.",
+            "items": {
+              "$ref": "#/components/schemas/PermissionDescriptorRecord"
+            },
+            "type": "array",
+            "x-order": 1
+          }
+        },
+        "required": [
+          "roles"
         ],
         "type": "object"
       },
@@ -37336,6 +37401,23 @@
         },
         "type": "object"
       },
+      "UpdateServicePrincipalRolesRequest": {
+        "description": "Sets the roles of a user-defined service principal.",
+        "properties": {
+          "roleIds": {
+            "description": "The IDs of the organization-wide roles the service principal should hold. Roles it holds that are not listed are removed, so an empty list removes them all and leaves it only its entity access. On plans with custom roles, any number of custom roles and the built-in Admin, Maintainer, Builder and Reader roles; on other plans, at most one of the built-in Reader (read), Maintainer (write) or Admin roles.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "x-order": 1
+          }
+        },
+        "required": [
+          "roleIds"
+        ],
+        "type": "object"
+      },
       "UpdateStackNotificationSettingsRequest": {
         "description": "UpdateStackNotificationsRequest is the request object to adjust a stack's notification settings.",
         "properties": {
@@ -37960,7 +38042,13 @@
             "type": "string",
             "x-order": 5,
             "x-pulumi-model-property": {
-              "enumComments": "The type of service principal, a system-managed user",
+              "enumComments": "The kind of a service principal, a non-human identity of an organization",
+              "enumFieldComments": [
+                "The service principal of a team, which the team's access tokens authenticate as.",
+                "A service principal created by a member of the organization, with its own roles, entity access and access tokens.",
+                "The service principal of a custom Neo agent, which gets its access from the agent's settings.",
+                "The service principal Pulumi Delivery creates for a pipeline that names no identity of its own."
+              ],
               "enumFieldNames": [
                 "Team",
                 "UserDefined",
@@ -51710,7 +51798,7 @@
     },
     "/api/orgs/{orgName}/members": {
       "get": {
-        "description": "ListOrganizationMembers lists the members of an organization. This API unfortunately has two different\n\"modes\", returning either the organization's \"frontend members\" or \"backend members\".\n\n  - A \"frontend member\" is data stored in the Pulumi Service's database. For organizations billed\n    per-member, this is the set of members that are counted against the organization's seat cap.\n  - A \"backend member\" is data stored in the organization's backend. (e.g. GitHub, GitLab, or for SAML\n    orgs, also the Pulumi Service database.)\n\nThis isn't ideal, but is required so that the APIs can be paginated correctly while not returning any\nusers twice. (Which would be impossible in some cases.)\n\nWith type `service-principal`, lists the organization's service principals instead, each with its\n`servicePrincipal` field set. Service principals that act for a team are not included.",
+        "description": "ListOrganizationMembers lists the members of an organization. This API unfortunately has two different\n\"modes\", returning either the organization's \"frontend members\" or \"backend members\".\n\n  - A \"frontend member\" is data stored in the Pulumi Service's database. For organizations billed\n    per-member, this is the set of members that are counted against the organization's seat cap.\n  - A \"backend member\" is data stored in the organization's backend. (e.g. GitHub, GitLab, or for SAML\n    orgs, also the Pulumi Service database.)\n\nThis isn't ideal, but is required so that the APIs can be paginated correctly while not returning any\nusers twice. (Which would be impossible in some cases.)\n\nWith type `service-principal`, lists the organization's user-defined service principals and the ones\nPulumi Delivery creates for its pipelines instead, each with its `user.servicePrincipalKind` field set\n(`user-defined` or `delivery`). The service principals of teams and of Neo agents are not included.",
         "operationId": "ListOrganizationMembers",
         "parameters": [
           {
@@ -51789,7 +51877,7 @@
     },
     "/api/orgs/{orgName}/members/{userLogin}": {
       "delete": {
-        "description": "Removes a user from an organization. The removed user loses access to all organization resources including stacks, teams, and projects. The caller cannot remove themselves from the organization. The user is also removed from all teams they belong to within the organization. Removing a custom service principal deletes it together with its access tokens.",
+        "description": "Removes a user from an organization. The removed user loses access to all organization resources including stacks, teams, and projects. The caller cannot remove themselves from the organization. The user is also removed from all teams they belong to within the organization. Removing a user-defined service principal deletes it together with its roles, entity access and access tokens; the updates and deployments it started are kept. A service principal that a stack's deployment settings run deployments as cannot be removed (400) until those settings select another identity. The service principal of a Pulumi Delivery pipeline cannot be removed either (400): it is deleted with its pipeline.",
         "operationId": "DeleteOrganizationMember",
         "parameters": [
           {
@@ -51816,7 +51904,7 @@
             "description": "No Content"
           },
           "400": {
-            "description": "You cannot remove yourself from the organization."
+            "description": "You cannot remove yourself from the organization, a stack's deployment settings run deployments as the service principal, or the service principal belongs to a Delivery pipeline"
           },
           "404": {
             "description": "User"
@@ -51828,7 +51916,7 @@
         ]
       },
       "patch": {
-        "description": "Modifies a user's role within an organization. Set `role` to assign a built-in role (`member`, `admin`, or `billingManager`), or set `fgaRoleId` to assign a custom role. If both are provided, `fgaRoleId` takes precedence. Set `name` to rename a user-defined service principal; returns 409 if another service principal of the organization has that name.",
+        "description": "Modifies a user's role within an organization. Set `role` to assign a built-in role (`member`, `admin`, or `billingManager`), or set `fgaRoleId` to assign a custom role. If both are provided, `fgaRoleId` takes precedence. Set `name` to rename a user-defined service principal; returns 409 if another service principal of the organization has that name. A user-defined service principal's roles cannot be set here (400): use UpdateServicePrincipalRoles. The service principal of a Pulumi Delivery pipeline is managed by Delivery and cannot be updated or renamed (400).",
         "operationId": "UpdateOrganizationMember",
         "parameters": [
           {
@@ -51865,7 +51953,7 @@
             "description": "No Content"
           },
           "400": {
-            "description": "Invalid parameter 'roleID'."
+            "description": "Invalid parameter 'roleID', a role set on a user-defined service principal, a rename of a member that is not a user-defined service principal, or a Delivery pipeline's service principal"
           },
           "404": {
             "description": "User"
@@ -56346,6 +56434,462 @@
         "tags": [
           "Organizations"
         ]
+      }
+    },
+    "/api/orgs/{orgName}/service-principals/create": {
+      "post": {
+        "description": "Creates a user-defined service principal: a non-human member of the organization that automation authenticates as, with access tokens created by CreateServicePrincipalToken. A service principal never receives the organization's default role. Its access comes only from the organization-wide roles listed in `roleIds` and the access granted to it on individual stacks, environments and cloud accounts (entity access), so a service principal created without roles can do only what its entity access allows.\n\nOn plans with custom roles, a service principal can hold any number of custom roles and the built-in Admin, Maintainer, Builder and Reader roles. On other plans, it holds at most one of the built-in Reader (read), Maintainer (write) or Admin roles. For each listed role, the caller must hold the `role:update` permission across the organization, hold the role itself, or hold every permission the role grants across the organization. Service principals are not available on the Free plan.\n\nThe response's `user.githubLogin` is the service principal's login (`service-principal:<ID>`), which does not change when it is renamed; the service principal routes accept it or the ID. List service principals with ListOrganizationMembers (`type=service-principal`), rename them with UpdateOrganizationMember and delete them with DeleteOrganizationMember. Manage their roles with ListServicePrincipalRoles and UpdateServicePrincipalRoles, and their tokens with ListServicePrincipalTokens, CreateServicePrincipalToken and DeleteServicePrincipalToken.\n\nRequires the `service_principal:create` permission, which the built-in Admin, Maintainer and Builder roles grant.\n\nReturns 409 when service principals are not enabled for the organization.",
+        "operationId": "CreateServicePrincipal",
+        "parameters": [
+          {
+            "description": "The organization name",
+            "in": "path",
+            "name": "orgName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": {
+                "name": "website-deployments",
+                "roleIds": [
+                  "d333a711-4aa0-402f-be6d-72af9665fc37"
+                ]
+              },
+              "schema": {
+                "$ref": "#/components/schemas/CreateServicePrincipalRequest"
+              }
+            }
+          },
+          "x-originalParamName": "body"
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationMember"
+                }
+              }
+            },
+            "description": "Created"
+          },
+          "400": {
+            "description": "Invalid name, a role a service principal cannot hold, or more than one role on a plan without custom roles"
+          },
+          "402": {
+            "description": "The organization is on the Free plan"
+          },
+          "403": {
+            "description": "The caller lacks the service_principal:create permission, or a listed role grants permissions the caller does not hold"
+          },
+          "404": {
+            "description": "Role not found"
+          },
+          "409": {
+            "description": "A service principal with this name already exists, or service principals are not enabled for the organization"
+          }
+        },
+        "summary": "CreateServicePrincipal",
+        "tags": [
+          "Organizations"
+        ],
+        "x-pulumi-route-property": {
+          "Visibility": "Preview"
+        }
+      }
+    },
+    "/api/orgs/{orgName}/service-principals/{userLogin}/roles": {
+      "get": {
+        "description": "Lists the organization-wide roles of a user-defined service principal: the custom roles and built-in roles it holds. Access granted to it on individual stacks, environments and cloud accounts (entity access) is not included.\n\nThe service principal is named by its login (`service-principal:<ID>`) or its ID. Only user-defined service principals are found: people, the service principals of teams and Neo agents, and the ones Pulumi Delivery creates for its pipelines return 404. Requires the `org_member:read` permission.\n\nReturns 409 when service principals are not enabled for the organization.",
+        "operationId": "ListServicePrincipalRoles",
+        "parameters": [
+          {
+            "description": "The organization name",
+            "in": "path",
+            "name": "orgName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The service principal's login (`service-principal:<ID>`), or its ID",
+            "in": "path",
+            "name": "userLogin",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListServicePrincipalRolesResponse"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "403": {
+            "description": "The caller lacks the org_member:read permission"
+          },
+          "404": {
+            "description": "Service principal not found"
+          },
+          "409": {
+            "description": "Service principals are not enabled for the organization"
+          }
+        },
+        "summary": "ListServicePrincipalRoles",
+        "tags": [
+          "Organizations"
+        ],
+        "x-pulumi-route-property": {
+          "Visibility": "Preview"
+        }
+      },
+      "put": {
+        "description": "Sets the organization-wide roles of a user-defined service principal, named by its login or ID, and returns them. Roles it holds that the request does not list are removed and listed roles it does not hold are added, so that it holds exactly the listed roles. An empty list removes them all and leaves the service principal only its entity access, because a service principal never receives the organization's default role. Entity access is not changed.\n\nOn plans with custom roles, a service principal can hold any number of custom roles and the built-in Admin, Maintainer, Builder and Reader roles. On other plans, it holds at most one of the built-in Reader (read), Maintainer (write) or Admin roles.\n\nTo add a role, the caller must hold the `role:update` permission across the organization, hold the role itself, or hold every permission the role grants across the organization. Removing a role needs no such check. Requires the `org_member:update` permission.\n\nReturns 409 when service principals are not enabled for the organization.",
+        "operationId": "UpdateServicePrincipalRoles",
+        "parameters": [
+          {
+            "description": "The organization name",
+            "in": "path",
+            "name": "orgName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The service principal's login (`service-principal:<ID>`), or its ID",
+            "in": "path",
+            "name": "userLogin",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": {
+                "roleIds": [
+                  "d333a711-4aa0-402f-be6d-72af9665fc37"
+                ]
+              },
+              "schema": {
+                "$ref": "#/components/schemas/UpdateServicePrincipalRolesRequest"
+              }
+            }
+          },
+          "x-originalParamName": "body"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListServicePrincipalRolesResponse"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "description": "A role a service principal cannot hold, or more than one role on a plan without custom roles"
+          },
+          "403": {
+            "description": "The caller lacks the org_member:update permission, or an added role grants permissions the caller does not hold"
+          },
+          "404": {
+            "description": "Service principal or role not found"
+          },
+          "409": {
+            "description": "Service principals are not enabled for the organization"
+          }
+        },
+        "summary": "UpdateServicePrincipalRoles",
+        "tags": [
+          "Organizations"
+        ],
+        "x-pulumi-route-property": {
+          "Visibility": "Preview"
+        }
+      }
+    },
+    "/api/orgs/{orgName}/service-principals/{userLogin}/tokens": {
+      "get": {
+        "description": "Lists the access tokens of a user-defined service principal, named by its login or ID. Token values are never returned after creation.\n\nBy default only active tokens are listed; set `filter` to `expired` or `all` to include others, and `search` to match a token's name or description, or a prefix of its ID. Without `maxResults` or `continuationToken`, all matching tokens are returned in one response. To page through them, pass `maxResults`, then pass the `continuationToken` of each response to fetch the next page. Tokens are listed newest first by creation time unless `sortBy` and `sortDirection` say otherwise. Requires the `org_token:read` permission.\n\nReturns 409 when service principals are not enabled for the organization.",
+        "operationId": "ListServicePrincipalTokens",
+        "parameters": [
+          {
+            "description": "The organization name",
+            "in": "path",
+            "name": "orgName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The service principal's login (`service-principal:<ID>`), or its ID",
+            "in": "path",
+            "name": "userLogin",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Opaque token for fetching the next page of results.",
+            "in": "query",
+            "name": "continuationToken",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Filter tokens by status (active, expired, or all). Defaults to active.",
+            "in": "query",
+            "name": "filter",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Maximum number of tokens per page, from 1 to 1000. Without it, all matching tokens are returned in one response, or 100 per page when a continuationToken is passed.",
+            "in": "query",
+            "name": "maxResults",
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Case-insensitive substring match on token name or description, or a prefix of the token ID",
+            "in": "query",
+            "name": "search",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Field to sort the results by. Defaults to created.",
+            "in": "query",
+            "name": "sortBy",
+            "schema": {
+              "enum": [
+                "name",
+                "created",
+                "lastUsed",
+                "expires"
+              ],
+              "type": "string",
+              "x-pulumi-model-property": {
+                "enumComments": "The field used to sort access tokens in list results.",
+                "enumFieldComments": [
+                  "Sort by token name. Tokens with no name sort as if named with the empty string.",
+                  "Sort by when the token was created.",
+                  "Sort by when the token was last used. Tokens never used are treated as the epoch.",
+                  "Sort by when the token expires. Tokens that never expire are treated as the epoch."
+                ],
+                "enumTypeName": "AccessTokenSortField"
+              }
+            }
+          },
+          {
+            "description": "Direction to sort the results in. Defaults to desc.",
+            "in": "query",
+            "name": "sortDirection",
+            "schema": {
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "type": "string",
+              "x-pulumi-model-property": {
+                "enumComments": "The direction used when sorting results.",
+                "enumFieldComments": [
+                  "Sort in ascending order.",
+                  "Sort in descending order."
+                ],
+                "enumTypeName": "SortDirection"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListAccessTokensResponse"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid continuationToken or maxResults value"
+          },
+          "403": {
+            "description": "The caller lacks the org_token:read permission"
+          },
+          "404": {
+            "description": "Service principal not found"
+          },
+          "409": {
+            "description": "Service principals are not enabled for the organization"
+          }
+        },
+        "summary": "ListServicePrincipalTokens",
+        "tags": [
+          "Organizations",
+          "AccessTokens"
+        ],
+        "x-pulumi-route-property": {
+          "Visibility": "Preview"
+        }
+      },
+      "post": {
+        "description": "Creates an access token that authenticates as a user-defined service principal, named by its login or ID. Requests made with the token act as the service principal, with exactly its organization-wide roles and entity access, and audit logs attribute them to it.\n\nService principal tokens require a plan with teams and machine tokens. The request returns 402 on a plan without teams. It returns 403 when the organization has no subscription, its subscription is canceled or its trial has expired, its plan has no machine tokens, or service principal tokens are not enabled for it. It returns 409 when service principals are not enabled for the organization.\n\nThe `name` field must be unique among the service principal's tokens (including deleted tokens) and cannot exceed 40 characters; the `description` may be empty and cannot exceed 255 characters. The optional `expires` field is a time in the future, at most two years from now. Without it the token does not expire, unless the organization sets a maximum token lifetime: then `expires` is required and must fall within that limit.\n\nRequires the `org_token:create` permission. Delegated credentials, such as Neo agent tokens and tokens obtained through OIDC token exchange, cannot create tokens, so that a token cannot be used to mint further long-lived tokens.\n\n**Important:** The token value in the response is only returned once at creation time and cannot be retrieved later.",
+        "operationId": "CreateServicePrincipalToken",
+        "parameters": [
+          {
+            "description": "The organization name",
+            "in": "path",
+            "name": "orgName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The service principal's login (`service-principal:<ID>`), or its ID",
+            "in": "path",
+            "name": "userLogin",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": {
+                "description": "Deploys acme-corp/website/production from CI",
+                "name": "website-deployments"
+              },
+              "schema": {
+                "$ref": "#/components/schemas/CreateServicePrincipalTokenRequest"
+              }
+            }
+          },
+          "x-originalParamName": "body"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateAccessTokenResponse"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid name, description or expiry, or an expiry outside the organization's maximum token lifetime"
+          },
+          "402": {
+            "description": "The organization's plan does not include teams"
+          },
+          "403": {
+            "description": "The caller lacks the org_token:create permission or authenticated with delegated credentials; the organization has no subscription, a canceled subscription or an expired trial, or a plan without machine tokens; or service principal tokens are not enabled for the organization"
+          },
+          "404": {
+            "description": "Service principal not found"
+          },
+          "409": {
+            "description": "A token with this name already exists, or service principals are not enabled for the organization"
+          }
+        },
+        "summary": "CreateServicePrincipalToken",
+        "tags": [
+          "Organizations",
+          "AccessTokens"
+        ],
+        "x-pulumi-route-property": {
+          "Visibility": "Preview"
+        }
+      }
+    },
+    "/api/orgs/{orgName}/service-principals/{userLogin}/tokens/{tokenId}": {
+      "delete": {
+        "description": "Permanently revokes and deletes an access token of a user-defined service principal, named by its login or ID. Automation using the token loses access immediately. Deleting the service principal itself, with DeleteOrganizationMember, deletes all its tokens.\n\nRequires the `org_token:delete` permission. Delegated credentials, such as Neo agent tokens and tokens obtained through OIDC token exchange, cannot delete tokens.\n\nReturns 409 when service principals are not enabled for the organization.",
+        "operationId": "DeleteServicePrincipalToken",
+        "parameters": [
+          {
+            "description": "The organization name",
+            "in": "path",
+            "name": "orgName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The service principal's login (`service-principal:<ID>`), or its ID",
+            "in": "path",
+            "name": "userLogin",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The ID of the token to delete",
+            "in": "path",
+            "name": "tokenId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "403": {
+            "description": "The caller lacks the org_token:delete permission or authenticated with delegated credentials"
+          },
+          "404": {
+            "description": "Service principal or token not found"
+          },
+          "409": {
+            "description": "Service principals are not enabled for the organization"
+          }
+        },
+        "summary": "DeleteServicePrincipalToken",
+        "tags": [
+          "Organizations",
+          "AccessTokens"
+        ],
+        "x-pulumi-route-property": {
+          "Visibility": "Preview"
+        }
       }
     },
     "/api/orgs/{orgName}/services": {

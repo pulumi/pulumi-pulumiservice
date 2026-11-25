@@ -11,6 +11,7 @@
     "pulumiservice:api:PolicyIssue",
     "pulumiservice:api:PolicyPack",
     "pulumiservice:api:RevisionTag_preview_environments",
+    "pulumiservice:api:ServicePrincipalToken",
     "pulumiservice:api:Webhook_preview_environments"
   ],
   "resources": {
