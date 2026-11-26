@@ -109,6 +109,8 @@
         "getPolicyPack.ts",
         "getPolicyPacks.ts",
         "getStack.ts",
+        "getTeam.ts",
+        "getTeams.ts",
         "index.ts",
         "insightsAccount.ts",
         "oidcIssuer.ts",
