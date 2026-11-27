@@ -562,6 +562,689 @@ func (in *authPolicyTokenTypePtr) ToAuthPolicyTokenTypePtrOutputWithContext(ctx 
 	return pulumi.ToOutputWithContext(ctx, in).(AuthPolicyTokenTypePtrOutput)
 }
 
+type BuiltInAccountPermissionSet string
+
+const (
+	// Account Admin: Admin access to insights accounts.
+	BuiltInAccountPermissionSetAdmin = BuiltInAccountPermissionSet("insights-account-admin")
+	// Account Read: Read access to insights accounts.
+	BuiltInAccountPermissionSetRead = BuiltInAccountPermissionSet("insights-account-read")
+	// Account Write: Read/write access to insights accounts.
+	BuiltInAccountPermissionSetWrite = BuiltInAccountPermissionSet("insights-account-write")
+)
+
+func (BuiltInAccountPermissionSet) ElementType() reflect.Type {
+	return reflect.TypeOf((*BuiltInAccountPermissionSet)(nil)).Elem()
+}
+
+func (e BuiltInAccountPermissionSet) ToBuiltInAccountPermissionSetOutput() BuiltInAccountPermissionSetOutput {
+	return pulumi.ToOutput(e).(BuiltInAccountPermissionSetOutput)
+}
+
+func (e BuiltInAccountPermissionSet) ToBuiltInAccountPermissionSetOutputWithContext(ctx context.Context) BuiltInAccountPermissionSetOutput {
+	return pulumi.ToOutputWithContext(ctx, e).(BuiltInAccountPermissionSetOutput)
+}
+
+func (e BuiltInAccountPermissionSet) ToBuiltInAccountPermissionSetPtrOutput() BuiltInAccountPermissionSetPtrOutput {
+	return e.ToBuiltInAccountPermissionSetPtrOutputWithContext(context.Background())
+}
+
+func (e BuiltInAccountPermissionSet) ToBuiltInAccountPermissionSetPtrOutputWithContext(ctx context.Context) BuiltInAccountPermissionSetPtrOutput {
+	return BuiltInAccountPermissionSet(e).ToBuiltInAccountPermissionSetOutputWithContext(ctx).ToBuiltInAccountPermissionSetPtrOutputWithContext(ctx)
+}
+
+func (e BuiltInAccountPermissionSet) ToStringOutput() pulumi.StringOutput {
+	return pulumi.ToOutput(pulumi.String(e)).(pulumi.StringOutput)
+}
+
+func (e BuiltInAccountPermissionSet) ToStringOutputWithContext(ctx context.Context) pulumi.StringOutput {
+	return pulumi.ToOutputWithContext(ctx, pulumi.String(e)).(pulumi.StringOutput)
+}
+
+func (e BuiltInAccountPermissionSet) ToStringPtrOutput() pulumi.StringPtrOutput {
+	return pulumi.String(e).ToStringPtrOutputWithContext(context.Background())
+}
+
+func (e BuiltInAccountPermissionSet) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
+	return pulumi.String(e).ToStringOutputWithContext(ctx).ToStringPtrOutputWithContext(ctx)
+}
+
+type BuiltInAccountPermissionSetOutput struct{ *pulumi.OutputState }
+
+func (BuiltInAccountPermissionSetOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*BuiltInAccountPermissionSet)(nil)).Elem()
+}
+
+func (o BuiltInAccountPermissionSetOutput) ToBuiltInAccountPermissionSetOutput() BuiltInAccountPermissionSetOutput {
+	return o
+}
+
+func (o BuiltInAccountPermissionSetOutput) ToBuiltInAccountPermissionSetOutputWithContext(ctx context.Context) BuiltInAccountPermissionSetOutput {
+	return o
+}
+
+func (o BuiltInAccountPermissionSetOutput) ToBuiltInAccountPermissionSetPtrOutput() BuiltInAccountPermissionSetPtrOutput {
+	return o.ToBuiltInAccountPermissionSetPtrOutputWithContext(context.Background())
+}
+
+func (o BuiltInAccountPermissionSetOutput) ToBuiltInAccountPermissionSetPtrOutputWithContext(ctx context.Context) BuiltInAccountPermissionSetPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v BuiltInAccountPermissionSet) *BuiltInAccountPermissionSet {
+		return &v
+	}).(BuiltInAccountPermissionSetPtrOutput)
+}
+
+func (o BuiltInAccountPermissionSetOutput) ToStringOutput() pulumi.StringOutput {
+	return o.ToStringOutputWithContext(context.Background())
+}
+
+func (o BuiltInAccountPermissionSetOutput) ToStringOutputWithContext(ctx context.Context) pulumi.StringOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e BuiltInAccountPermissionSet) string {
+		return string(e)
+	}).(pulumi.StringOutput)
+}
+
+func (o BuiltInAccountPermissionSetOutput) ToStringPtrOutput() pulumi.StringPtrOutput {
+	return o.ToStringPtrOutputWithContext(context.Background())
+}
+
+func (o BuiltInAccountPermissionSetOutput) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e BuiltInAccountPermissionSet) *string {
+		v := string(e)
+		return &v
+	}).(pulumi.StringPtrOutput)
+}
+
+type BuiltInAccountPermissionSetPtrOutput struct{ *pulumi.OutputState }
+
+func (BuiltInAccountPermissionSetPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**BuiltInAccountPermissionSet)(nil)).Elem()
+}
+
+func (o BuiltInAccountPermissionSetPtrOutput) ToBuiltInAccountPermissionSetPtrOutput() BuiltInAccountPermissionSetPtrOutput {
+	return o
+}
+
+func (o BuiltInAccountPermissionSetPtrOutput) ToBuiltInAccountPermissionSetPtrOutputWithContext(ctx context.Context) BuiltInAccountPermissionSetPtrOutput {
+	return o
+}
+
+func (o BuiltInAccountPermissionSetPtrOutput) Elem() BuiltInAccountPermissionSetOutput {
+	return o.ApplyT(func(v *BuiltInAccountPermissionSet) BuiltInAccountPermissionSet {
+		if v != nil {
+			return *v
+		}
+		var ret BuiltInAccountPermissionSet
+		return ret
+	}).(BuiltInAccountPermissionSetOutput)
+}
+
+func (o BuiltInAccountPermissionSetPtrOutput) ToStringPtrOutput() pulumi.StringPtrOutput {
+	return o.ToStringPtrOutputWithContext(context.Background())
+}
+
+func (o BuiltInAccountPermissionSetPtrOutput) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e *BuiltInAccountPermissionSet) *string {
+		if e == nil {
+			return nil
+		}
+		v := string(*e)
+		return &v
+	}).(pulumi.StringPtrOutput)
+}
+
+// BuiltInAccountPermissionSetInput is an input type that accepts values of the BuiltInAccountPermissionSet enum
+// A concrete instance of `BuiltInAccountPermissionSetInput` can be one of the following:
+//
+//	BuiltInAccountPermissionSetAdmin
+//	BuiltInAccountPermissionSetRead
+//	BuiltInAccountPermissionSetWrite
+type BuiltInAccountPermissionSetInput interface {
+	pulumi.Input
+
+	ToBuiltInAccountPermissionSetOutput() BuiltInAccountPermissionSetOutput
+	ToBuiltInAccountPermissionSetOutputWithContext(context.Context) BuiltInAccountPermissionSetOutput
+}
+
+var builtInAccountPermissionSetPtrType = reflect.TypeOf((**BuiltInAccountPermissionSet)(nil)).Elem()
+
+type BuiltInAccountPermissionSetPtrInput interface {
+	pulumi.Input
+
+	ToBuiltInAccountPermissionSetPtrOutput() BuiltInAccountPermissionSetPtrOutput
+	ToBuiltInAccountPermissionSetPtrOutputWithContext(context.Context) BuiltInAccountPermissionSetPtrOutput
+}
+
+type builtInAccountPermissionSetPtr string
+
+func BuiltInAccountPermissionSetPtr(v string) BuiltInAccountPermissionSetPtrInput {
+	return (*builtInAccountPermissionSetPtr)(&v)
+}
+
+func (*builtInAccountPermissionSetPtr) ElementType() reflect.Type {
+	return builtInAccountPermissionSetPtrType
+}
+
+func (in *builtInAccountPermissionSetPtr) ToBuiltInAccountPermissionSetPtrOutput() BuiltInAccountPermissionSetPtrOutput {
+	return pulumi.ToOutput(in).(BuiltInAccountPermissionSetPtrOutput)
+}
+
+func (in *builtInAccountPermissionSetPtr) ToBuiltInAccountPermissionSetPtrOutputWithContext(ctx context.Context) BuiltInAccountPermissionSetPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, in).(BuiltInAccountPermissionSetPtrOutput)
+}
+
+type BuiltInEnvironmentPermissionSet string
+
+const (
+	// Environment Admin: Admin access to environments.
+	BuiltInEnvironmentPermissionSetAdmin = BuiltInEnvironmentPermissionSet("environment-admin")
+	// Environment Open: Read/open access to environments.
+	BuiltInEnvironmentPermissionSetOpen = BuiltInEnvironmentPermissionSet("environment-open")
+	// Environment Read: Read access to environments.
+	BuiltInEnvironmentPermissionSetRead = BuiltInEnvironmentPermissionSet("environment-read")
+	// Environment Write: Read/open/write access to environments.
+	BuiltInEnvironmentPermissionSetWrite = BuiltInEnvironmentPermissionSet("environment-write")
+)
+
+func (BuiltInEnvironmentPermissionSet) ElementType() reflect.Type {
+	return reflect.TypeOf((*BuiltInEnvironmentPermissionSet)(nil)).Elem()
+}
+
+func (e BuiltInEnvironmentPermissionSet) ToBuiltInEnvironmentPermissionSetOutput() BuiltInEnvironmentPermissionSetOutput {
+	return pulumi.ToOutput(e).(BuiltInEnvironmentPermissionSetOutput)
+}
+
+func (e BuiltInEnvironmentPermissionSet) ToBuiltInEnvironmentPermissionSetOutputWithContext(ctx context.Context) BuiltInEnvironmentPermissionSetOutput {
+	return pulumi.ToOutputWithContext(ctx, e).(BuiltInEnvironmentPermissionSetOutput)
+}
+
+func (e BuiltInEnvironmentPermissionSet) ToBuiltInEnvironmentPermissionSetPtrOutput() BuiltInEnvironmentPermissionSetPtrOutput {
+	return e.ToBuiltInEnvironmentPermissionSetPtrOutputWithContext(context.Background())
+}
+
+func (e BuiltInEnvironmentPermissionSet) ToBuiltInEnvironmentPermissionSetPtrOutputWithContext(ctx context.Context) BuiltInEnvironmentPermissionSetPtrOutput {
+	return BuiltInEnvironmentPermissionSet(e).ToBuiltInEnvironmentPermissionSetOutputWithContext(ctx).ToBuiltInEnvironmentPermissionSetPtrOutputWithContext(ctx)
+}
+
+func (e BuiltInEnvironmentPermissionSet) ToStringOutput() pulumi.StringOutput {
+	return pulumi.ToOutput(pulumi.String(e)).(pulumi.StringOutput)
+}
+
+func (e BuiltInEnvironmentPermissionSet) ToStringOutputWithContext(ctx context.Context) pulumi.StringOutput {
+	return pulumi.ToOutputWithContext(ctx, pulumi.String(e)).(pulumi.StringOutput)
+}
+
+func (e BuiltInEnvironmentPermissionSet) ToStringPtrOutput() pulumi.StringPtrOutput {
+	return pulumi.String(e).ToStringPtrOutputWithContext(context.Background())
+}
+
+func (e BuiltInEnvironmentPermissionSet) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
+	return pulumi.String(e).ToStringOutputWithContext(ctx).ToStringPtrOutputWithContext(ctx)
+}
+
+type BuiltInEnvironmentPermissionSetOutput struct{ *pulumi.OutputState }
+
+func (BuiltInEnvironmentPermissionSetOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*BuiltInEnvironmentPermissionSet)(nil)).Elem()
+}
+
+func (o BuiltInEnvironmentPermissionSetOutput) ToBuiltInEnvironmentPermissionSetOutput() BuiltInEnvironmentPermissionSetOutput {
+	return o
+}
+
+func (o BuiltInEnvironmentPermissionSetOutput) ToBuiltInEnvironmentPermissionSetOutputWithContext(ctx context.Context) BuiltInEnvironmentPermissionSetOutput {
+	return o
+}
+
+func (o BuiltInEnvironmentPermissionSetOutput) ToBuiltInEnvironmentPermissionSetPtrOutput() BuiltInEnvironmentPermissionSetPtrOutput {
+	return o.ToBuiltInEnvironmentPermissionSetPtrOutputWithContext(context.Background())
+}
+
+func (o BuiltInEnvironmentPermissionSetOutput) ToBuiltInEnvironmentPermissionSetPtrOutputWithContext(ctx context.Context) BuiltInEnvironmentPermissionSetPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v BuiltInEnvironmentPermissionSet) *BuiltInEnvironmentPermissionSet {
+		return &v
+	}).(BuiltInEnvironmentPermissionSetPtrOutput)
+}
+
+func (o BuiltInEnvironmentPermissionSetOutput) ToStringOutput() pulumi.StringOutput {
+	return o.ToStringOutputWithContext(context.Background())
+}
+
+func (o BuiltInEnvironmentPermissionSetOutput) ToStringOutputWithContext(ctx context.Context) pulumi.StringOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e BuiltInEnvironmentPermissionSet) string {
+		return string(e)
+	}).(pulumi.StringOutput)
+}
+
+func (o BuiltInEnvironmentPermissionSetOutput) ToStringPtrOutput() pulumi.StringPtrOutput {
+	return o.ToStringPtrOutputWithContext(context.Background())
+}
+
+func (o BuiltInEnvironmentPermissionSetOutput) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e BuiltInEnvironmentPermissionSet) *string {
+		v := string(e)
+		return &v
+	}).(pulumi.StringPtrOutput)
+}
+
+type BuiltInEnvironmentPermissionSetPtrOutput struct{ *pulumi.OutputState }
+
+func (BuiltInEnvironmentPermissionSetPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**BuiltInEnvironmentPermissionSet)(nil)).Elem()
+}
+
+func (o BuiltInEnvironmentPermissionSetPtrOutput) ToBuiltInEnvironmentPermissionSetPtrOutput() BuiltInEnvironmentPermissionSetPtrOutput {
+	return o
+}
+
+func (o BuiltInEnvironmentPermissionSetPtrOutput) ToBuiltInEnvironmentPermissionSetPtrOutputWithContext(ctx context.Context) BuiltInEnvironmentPermissionSetPtrOutput {
+	return o
+}
+
+func (o BuiltInEnvironmentPermissionSetPtrOutput) Elem() BuiltInEnvironmentPermissionSetOutput {
+	return o.ApplyT(func(v *BuiltInEnvironmentPermissionSet) BuiltInEnvironmentPermissionSet {
+		if v != nil {
+			return *v
+		}
+		var ret BuiltInEnvironmentPermissionSet
+		return ret
+	}).(BuiltInEnvironmentPermissionSetOutput)
+}
+
+func (o BuiltInEnvironmentPermissionSetPtrOutput) ToStringPtrOutput() pulumi.StringPtrOutput {
+	return o.ToStringPtrOutputWithContext(context.Background())
+}
+
+func (o BuiltInEnvironmentPermissionSetPtrOutput) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e *BuiltInEnvironmentPermissionSet) *string {
+		if e == nil {
+			return nil
+		}
+		v := string(*e)
+		return &v
+	}).(pulumi.StringPtrOutput)
+}
+
+// BuiltInEnvironmentPermissionSetInput is an input type that accepts values of the BuiltInEnvironmentPermissionSet enum
+// A concrete instance of `BuiltInEnvironmentPermissionSetInput` can be one of the following:
+//
+//	BuiltInEnvironmentPermissionSetAdmin
+//	BuiltInEnvironmentPermissionSetOpen
+//	BuiltInEnvironmentPermissionSetRead
+//	BuiltInEnvironmentPermissionSetWrite
+type BuiltInEnvironmentPermissionSetInput interface {
+	pulumi.Input
+
+	ToBuiltInEnvironmentPermissionSetOutput() BuiltInEnvironmentPermissionSetOutput
+	ToBuiltInEnvironmentPermissionSetOutputWithContext(context.Context) BuiltInEnvironmentPermissionSetOutput
+}
+
+var builtInEnvironmentPermissionSetPtrType = reflect.TypeOf((**BuiltInEnvironmentPermissionSet)(nil)).Elem()
+
+type BuiltInEnvironmentPermissionSetPtrInput interface {
+	pulumi.Input
+
+	ToBuiltInEnvironmentPermissionSetPtrOutput() BuiltInEnvironmentPermissionSetPtrOutput
+	ToBuiltInEnvironmentPermissionSetPtrOutputWithContext(context.Context) BuiltInEnvironmentPermissionSetPtrOutput
+}
+
+type builtInEnvironmentPermissionSetPtr string
+
+func BuiltInEnvironmentPermissionSetPtr(v string) BuiltInEnvironmentPermissionSetPtrInput {
+	return (*builtInEnvironmentPermissionSetPtr)(&v)
+}
+
+func (*builtInEnvironmentPermissionSetPtr) ElementType() reflect.Type {
+	return builtInEnvironmentPermissionSetPtrType
+}
+
+func (in *builtInEnvironmentPermissionSetPtr) ToBuiltInEnvironmentPermissionSetPtrOutput() BuiltInEnvironmentPermissionSetPtrOutput {
+	return pulumi.ToOutput(in).(BuiltInEnvironmentPermissionSetPtrOutput)
+}
+
+func (in *builtInEnvironmentPermissionSetPtr) ToBuiltInEnvironmentPermissionSetPtrOutputWithContext(ctx context.Context) BuiltInEnvironmentPermissionSetPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, in).(BuiltInEnvironmentPermissionSetPtrOutput)
+}
+
+type BuiltInOrganizationPermissionSet string
+
+const (
+	// Organization Settings Billing: Billing access.
+	BuiltInOrganizationPermissionSetBilling = BuiltInOrganizationPermissionSet("org-settings-billing")
+	// Read Only: View-only org access: usage, members, stacks, environments, teams, Insights accounts; read deployments, integrations, services, templates, and resources. No create/update/delete.
+	BuiltInOrganizationPermissionSetReadOnly = BuiltInOrganizationPermissionSet("org-settings-read-only")
+	// Standard: View org usage and members; list stacks, environments, teams, and Insights accounts; use deployments, integrations, services, and resources; create resources (stacks, environments, teams, Insights accounts). Excludes billing and member or org admin settings.
+	BuiltInOrganizationPermissionSetStandard = BuiltInOrganizationPermissionSet("org-settings-standard")
+)
+
+func (BuiltInOrganizationPermissionSet) ElementType() reflect.Type {
+	return reflect.TypeOf((*BuiltInOrganizationPermissionSet)(nil)).Elem()
+}
+
+func (e BuiltInOrganizationPermissionSet) ToBuiltInOrganizationPermissionSetOutput() BuiltInOrganizationPermissionSetOutput {
+	return pulumi.ToOutput(e).(BuiltInOrganizationPermissionSetOutput)
+}
+
+func (e BuiltInOrganizationPermissionSet) ToBuiltInOrganizationPermissionSetOutputWithContext(ctx context.Context) BuiltInOrganizationPermissionSetOutput {
+	return pulumi.ToOutputWithContext(ctx, e).(BuiltInOrganizationPermissionSetOutput)
+}
+
+func (e BuiltInOrganizationPermissionSet) ToBuiltInOrganizationPermissionSetPtrOutput() BuiltInOrganizationPermissionSetPtrOutput {
+	return e.ToBuiltInOrganizationPermissionSetPtrOutputWithContext(context.Background())
+}
+
+func (e BuiltInOrganizationPermissionSet) ToBuiltInOrganizationPermissionSetPtrOutputWithContext(ctx context.Context) BuiltInOrganizationPermissionSetPtrOutput {
+	return BuiltInOrganizationPermissionSet(e).ToBuiltInOrganizationPermissionSetOutputWithContext(ctx).ToBuiltInOrganizationPermissionSetPtrOutputWithContext(ctx)
+}
+
+func (e BuiltInOrganizationPermissionSet) ToStringOutput() pulumi.StringOutput {
+	return pulumi.ToOutput(pulumi.String(e)).(pulumi.StringOutput)
+}
+
+func (e BuiltInOrganizationPermissionSet) ToStringOutputWithContext(ctx context.Context) pulumi.StringOutput {
+	return pulumi.ToOutputWithContext(ctx, pulumi.String(e)).(pulumi.StringOutput)
+}
+
+func (e BuiltInOrganizationPermissionSet) ToStringPtrOutput() pulumi.StringPtrOutput {
+	return pulumi.String(e).ToStringPtrOutputWithContext(context.Background())
+}
+
+func (e BuiltInOrganizationPermissionSet) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
+	return pulumi.String(e).ToStringOutputWithContext(ctx).ToStringPtrOutputWithContext(ctx)
+}
+
+type BuiltInOrganizationPermissionSetOutput struct{ *pulumi.OutputState }
+
+func (BuiltInOrganizationPermissionSetOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*BuiltInOrganizationPermissionSet)(nil)).Elem()
+}
+
+func (o BuiltInOrganizationPermissionSetOutput) ToBuiltInOrganizationPermissionSetOutput() BuiltInOrganizationPermissionSetOutput {
+	return o
+}
+
+func (o BuiltInOrganizationPermissionSetOutput) ToBuiltInOrganizationPermissionSetOutputWithContext(ctx context.Context) BuiltInOrganizationPermissionSetOutput {
+	return o
+}
+
+func (o BuiltInOrganizationPermissionSetOutput) ToBuiltInOrganizationPermissionSetPtrOutput() BuiltInOrganizationPermissionSetPtrOutput {
+	return o.ToBuiltInOrganizationPermissionSetPtrOutputWithContext(context.Background())
+}
+
+func (o BuiltInOrganizationPermissionSetOutput) ToBuiltInOrganizationPermissionSetPtrOutputWithContext(ctx context.Context) BuiltInOrganizationPermissionSetPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v BuiltInOrganizationPermissionSet) *BuiltInOrganizationPermissionSet {
+		return &v
+	}).(BuiltInOrganizationPermissionSetPtrOutput)
+}
+
+func (o BuiltInOrganizationPermissionSetOutput) ToStringOutput() pulumi.StringOutput {
+	return o.ToStringOutputWithContext(context.Background())
+}
+
+func (o BuiltInOrganizationPermissionSetOutput) ToStringOutputWithContext(ctx context.Context) pulumi.StringOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e BuiltInOrganizationPermissionSet) string {
+		return string(e)
+	}).(pulumi.StringOutput)
+}
+
+func (o BuiltInOrganizationPermissionSetOutput) ToStringPtrOutput() pulumi.StringPtrOutput {
+	return o.ToStringPtrOutputWithContext(context.Background())
+}
+
+func (o BuiltInOrganizationPermissionSetOutput) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e BuiltInOrganizationPermissionSet) *string {
+		v := string(e)
+		return &v
+	}).(pulumi.StringPtrOutput)
+}
+
+type BuiltInOrganizationPermissionSetPtrOutput struct{ *pulumi.OutputState }
+
+func (BuiltInOrganizationPermissionSetPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**BuiltInOrganizationPermissionSet)(nil)).Elem()
+}
+
+func (o BuiltInOrganizationPermissionSetPtrOutput) ToBuiltInOrganizationPermissionSetPtrOutput() BuiltInOrganizationPermissionSetPtrOutput {
+	return o
+}
+
+func (o BuiltInOrganizationPermissionSetPtrOutput) ToBuiltInOrganizationPermissionSetPtrOutputWithContext(ctx context.Context) BuiltInOrganizationPermissionSetPtrOutput {
+	return o
+}
+
+func (o BuiltInOrganizationPermissionSetPtrOutput) Elem() BuiltInOrganizationPermissionSetOutput {
+	return o.ApplyT(func(v *BuiltInOrganizationPermissionSet) BuiltInOrganizationPermissionSet {
+		if v != nil {
+			return *v
+		}
+		var ret BuiltInOrganizationPermissionSet
+		return ret
+	}).(BuiltInOrganizationPermissionSetOutput)
+}
+
+func (o BuiltInOrganizationPermissionSetPtrOutput) ToStringPtrOutput() pulumi.StringPtrOutput {
+	return o.ToStringPtrOutputWithContext(context.Background())
+}
+
+func (o BuiltInOrganizationPermissionSetPtrOutput) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e *BuiltInOrganizationPermissionSet) *string {
+		if e == nil {
+			return nil
+		}
+		v := string(*e)
+		return &v
+	}).(pulumi.StringPtrOutput)
+}
+
+// BuiltInOrganizationPermissionSetInput is an input type that accepts values of the BuiltInOrganizationPermissionSet enum
+// A concrete instance of `BuiltInOrganizationPermissionSetInput` can be one of the following:
+//
+//	BuiltInOrganizationPermissionSetBilling
+//	BuiltInOrganizationPermissionSetReadOnly
+//	BuiltInOrganizationPermissionSetStandard
+type BuiltInOrganizationPermissionSetInput interface {
+	pulumi.Input
+
+	ToBuiltInOrganizationPermissionSetOutput() BuiltInOrganizationPermissionSetOutput
+	ToBuiltInOrganizationPermissionSetOutputWithContext(context.Context) BuiltInOrganizationPermissionSetOutput
+}
+
+var builtInOrganizationPermissionSetPtrType = reflect.TypeOf((**BuiltInOrganizationPermissionSet)(nil)).Elem()
+
+type BuiltInOrganizationPermissionSetPtrInput interface {
+	pulumi.Input
+
+	ToBuiltInOrganizationPermissionSetPtrOutput() BuiltInOrganizationPermissionSetPtrOutput
+	ToBuiltInOrganizationPermissionSetPtrOutputWithContext(context.Context) BuiltInOrganizationPermissionSetPtrOutput
+}
+
+type builtInOrganizationPermissionSetPtr string
+
+func BuiltInOrganizationPermissionSetPtr(v string) BuiltInOrganizationPermissionSetPtrInput {
+	return (*builtInOrganizationPermissionSetPtr)(&v)
+}
+
+func (*builtInOrganizationPermissionSetPtr) ElementType() reflect.Type {
+	return builtInOrganizationPermissionSetPtrType
+}
+
+func (in *builtInOrganizationPermissionSetPtr) ToBuiltInOrganizationPermissionSetPtrOutput() BuiltInOrganizationPermissionSetPtrOutput {
+	return pulumi.ToOutput(in).(BuiltInOrganizationPermissionSetPtrOutput)
+}
+
+func (in *builtInOrganizationPermissionSetPtr) ToBuiltInOrganizationPermissionSetPtrOutputWithContext(ctx context.Context) BuiltInOrganizationPermissionSetPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, in).(BuiltInOrganizationPermissionSetPtrOutput)
+}
+
+type BuiltInStackPermissionSet string
+
+const (
+	// Stack Admin: Admin access to stacks, including deployment settings.
+	BuiltInStackPermissionSetAdmin = BuiltInStackPermissionSet("stack-admin")
+	// Stack Read: Read access to stacks, including deployment settings.
+	BuiltInStackPermissionSetRead = BuiltInStackPermissionSet("stack-read")
+	// Stack Write: Read/write access to stacks, including deployment settings.
+	BuiltInStackPermissionSetWrite = BuiltInStackPermissionSet("stack-write")
+)
+
+func (BuiltInStackPermissionSet) ElementType() reflect.Type {
+	return reflect.TypeOf((*BuiltInStackPermissionSet)(nil)).Elem()
+}
+
+func (e BuiltInStackPermissionSet) ToBuiltInStackPermissionSetOutput() BuiltInStackPermissionSetOutput {
+	return pulumi.ToOutput(e).(BuiltInStackPermissionSetOutput)
+}
+
+func (e BuiltInStackPermissionSet) ToBuiltInStackPermissionSetOutputWithContext(ctx context.Context) BuiltInStackPermissionSetOutput {
+	return pulumi.ToOutputWithContext(ctx, e).(BuiltInStackPermissionSetOutput)
+}
+
+func (e BuiltInStackPermissionSet) ToBuiltInStackPermissionSetPtrOutput() BuiltInStackPermissionSetPtrOutput {
+	return e.ToBuiltInStackPermissionSetPtrOutputWithContext(context.Background())
+}
+
+func (e BuiltInStackPermissionSet) ToBuiltInStackPermissionSetPtrOutputWithContext(ctx context.Context) BuiltInStackPermissionSetPtrOutput {
+	return BuiltInStackPermissionSet(e).ToBuiltInStackPermissionSetOutputWithContext(ctx).ToBuiltInStackPermissionSetPtrOutputWithContext(ctx)
+}
+
+func (e BuiltInStackPermissionSet) ToStringOutput() pulumi.StringOutput {
+	return pulumi.ToOutput(pulumi.String(e)).(pulumi.StringOutput)
+}
+
+func (e BuiltInStackPermissionSet) ToStringOutputWithContext(ctx context.Context) pulumi.StringOutput {
+	return pulumi.ToOutputWithContext(ctx, pulumi.String(e)).(pulumi.StringOutput)
+}
+
+func (e BuiltInStackPermissionSet) ToStringPtrOutput() pulumi.StringPtrOutput {
+	return pulumi.String(e).ToStringPtrOutputWithContext(context.Background())
+}
+
+func (e BuiltInStackPermissionSet) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
+	return pulumi.String(e).ToStringOutputWithContext(ctx).ToStringPtrOutputWithContext(ctx)
+}
+
+type BuiltInStackPermissionSetOutput struct{ *pulumi.OutputState }
+
+func (BuiltInStackPermissionSetOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*BuiltInStackPermissionSet)(nil)).Elem()
+}
+
+func (o BuiltInStackPermissionSetOutput) ToBuiltInStackPermissionSetOutput() BuiltInStackPermissionSetOutput {
+	return o
+}
+
+func (o BuiltInStackPermissionSetOutput) ToBuiltInStackPermissionSetOutputWithContext(ctx context.Context) BuiltInStackPermissionSetOutput {
+	return o
+}
+
+func (o BuiltInStackPermissionSetOutput) ToBuiltInStackPermissionSetPtrOutput() BuiltInStackPermissionSetPtrOutput {
+	return o.ToBuiltInStackPermissionSetPtrOutputWithContext(context.Background())
+}
+
+func (o BuiltInStackPermissionSetOutput) ToBuiltInStackPermissionSetPtrOutputWithContext(ctx context.Context) BuiltInStackPermissionSetPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v BuiltInStackPermissionSet) *BuiltInStackPermissionSet {
+		return &v
+	}).(BuiltInStackPermissionSetPtrOutput)
+}
+
+func (o BuiltInStackPermissionSetOutput) ToStringOutput() pulumi.StringOutput {
+	return o.ToStringOutputWithContext(context.Background())
+}
+
+func (o BuiltInStackPermissionSetOutput) ToStringOutputWithContext(ctx context.Context) pulumi.StringOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e BuiltInStackPermissionSet) string {
+		return string(e)
+	}).(pulumi.StringOutput)
+}
+
+func (o BuiltInStackPermissionSetOutput) ToStringPtrOutput() pulumi.StringPtrOutput {
+	return o.ToStringPtrOutputWithContext(context.Background())
+}
+
+func (o BuiltInStackPermissionSetOutput) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e BuiltInStackPermissionSet) *string {
+		v := string(e)
+		return &v
+	}).(pulumi.StringPtrOutput)
+}
+
+type BuiltInStackPermissionSetPtrOutput struct{ *pulumi.OutputState }
+
+func (BuiltInStackPermissionSetPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**BuiltInStackPermissionSet)(nil)).Elem()
+}
+
+func (o BuiltInStackPermissionSetPtrOutput) ToBuiltInStackPermissionSetPtrOutput() BuiltInStackPermissionSetPtrOutput {
+	return o
+}
+
+func (o BuiltInStackPermissionSetPtrOutput) ToBuiltInStackPermissionSetPtrOutputWithContext(ctx context.Context) BuiltInStackPermissionSetPtrOutput {
+	return o
+}
+
+func (o BuiltInStackPermissionSetPtrOutput) Elem() BuiltInStackPermissionSetOutput {
+	return o.ApplyT(func(v *BuiltInStackPermissionSet) BuiltInStackPermissionSet {
+		if v != nil {
+			return *v
+		}
+		var ret BuiltInStackPermissionSet
+		return ret
+	}).(BuiltInStackPermissionSetOutput)
+}
+
+func (o BuiltInStackPermissionSetPtrOutput) ToStringPtrOutput() pulumi.StringPtrOutput {
+	return o.ToStringPtrOutputWithContext(context.Background())
+}
+
+func (o BuiltInStackPermissionSetPtrOutput) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e *BuiltInStackPermissionSet) *string {
+		if e == nil {
+			return nil
+		}
+		v := string(*e)
+		return &v
+	}).(pulumi.StringPtrOutput)
+}
+
+// BuiltInStackPermissionSetInput is an input type that accepts values of the BuiltInStackPermissionSet enum
+// A concrete instance of `BuiltInStackPermissionSetInput` can be one of the following:
+//
+//	BuiltInStackPermissionSetAdmin
+//	BuiltInStackPermissionSetRead
+//	BuiltInStackPermissionSetWrite
+type BuiltInStackPermissionSetInput interface {
+	pulumi.Input
+
+	ToBuiltInStackPermissionSetOutput() BuiltInStackPermissionSetOutput
+	ToBuiltInStackPermissionSetOutputWithContext(context.Context) BuiltInStackPermissionSetOutput
+}
+
+var builtInStackPermissionSetPtrType = reflect.TypeOf((**BuiltInStackPermissionSet)(nil)).Elem()
+
+type BuiltInStackPermissionSetPtrInput interface {
+	pulumi.Input
+
+	ToBuiltInStackPermissionSetPtrOutput() BuiltInStackPermissionSetPtrOutput
+	ToBuiltInStackPermissionSetPtrOutputWithContext(context.Context) BuiltInStackPermissionSetPtrOutput
+}
+
+type builtInStackPermissionSetPtr string
+
+func BuiltInStackPermissionSetPtr(v string) BuiltInStackPermissionSetPtrInput {
+	return (*builtInStackPermissionSetPtr)(&v)
+}
+
+func (*builtInStackPermissionSetPtr) ElementType() reflect.Type {
+	return builtInStackPermissionSetPtrType
+}
+
+func (in *builtInStackPermissionSetPtr) ToBuiltInStackPermissionSetPtrOutput() BuiltInStackPermissionSetPtrOutput {
+	return pulumi.ToOutput(in).(BuiltInStackPermissionSetPtrOutput)
+}
+
+func (in *builtInStackPermissionSetPtr) ToBuiltInStackPermissionSetPtrOutputWithContext(ctx context.Context) BuiltInStackPermissionSetPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, in).(BuiltInStackPermissionSetPtrOutput)
+}
+
 type CloudProvider string
 
 const (
@@ -4217,6 +4900,14 @@ func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*AuthPolicyPermissionLevelArrayInput)(nil)).Elem(), AuthPolicyPermissionLevelArray{})
 	pulumi.RegisterInputType(reflect.TypeOf((*AuthPolicyTokenTypeInput)(nil)).Elem(), AuthPolicyTokenType("personal"))
 	pulumi.RegisterInputType(reflect.TypeOf((*AuthPolicyTokenTypePtrInput)(nil)).Elem(), AuthPolicyTokenType("personal"))
+	pulumi.RegisterInputType(reflect.TypeOf((*BuiltInAccountPermissionSetInput)(nil)).Elem(), BuiltInAccountPermissionSet("insights-account-admin"))
+	pulumi.RegisterInputType(reflect.TypeOf((*BuiltInAccountPermissionSetPtrInput)(nil)).Elem(), BuiltInAccountPermissionSet("insights-account-admin"))
+	pulumi.RegisterInputType(reflect.TypeOf((*BuiltInEnvironmentPermissionSetInput)(nil)).Elem(), BuiltInEnvironmentPermissionSet("environment-admin"))
+	pulumi.RegisterInputType(reflect.TypeOf((*BuiltInEnvironmentPermissionSetPtrInput)(nil)).Elem(), BuiltInEnvironmentPermissionSet("environment-admin"))
+	pulumi.RegisterInputType(reflect.TypeOf((*BuiltInOrganizationPermissionSetInput)(nil)).Elem(), BuiltInOrganizationPermissionSet("org-settings-billing"))
+	pulumi.RegisterInputType(reflect.TypeOf((*BuiltInOrganizationPermissionSetPtrInput)(nil)).Elem(), BuiltInOrganizationPermissionSet("org-settings-billing"))
+	pulumi.RegisterInputType(reflect.TypeOf((*BuiltInStackPermissionSetInput)(nil)).Elem(), BuiltInStackPermissionSet("stack-admin"))
+	pulumi.RegisterInputType(reflect.TypeOf((*BuiltInStackPermissionSetPtrInput)(nil)).Elem(), BuiltInStackPermissionSet("stack-admin"))
 	pulumi.RegisterInputType(reflect.TypeOf((*CloudProviderInput)(nil)).Elem(), CloudProvider("aws"))
 	pulumi.RegisterInputType(reflect.TypeOf((*CloudProviderPtrInput)(nil)).Elem(), CloudProvider("aws"))
 	pulumi.RegisterInputType(reflect.TypeOf((*EnvironmentPermissionInput)(nil)).Elem(), EnvironmentPermission("none"))
@@ -4263,6 +4954,14 @@ func init() {
 	pulumi.RegisterOutputType(AuthPolicyPermissionLevelArrayOutput{})
 	pulumi.RegisterOutputType(AuthPolicyTokenTypeOutput{})
 	pulumi.RegisterOutputType(AuthPolicyTokenTypePtrOutput{})
+	pulumi.RegisterOutputType(BuiltInAccountPermissionSetOutput{})
+	pulumi.RegisterOutputType(BuiltInAccountPermissionSetPtrOutput{})
+	pulumi.RegisterOutputType(BuiltInEnvironmentPermissionSetOutput{})
+	pulumi.RegisterOutputType(BuiltInEnvironmentPermissionSetPtrOutput{})
+	pulumi.RegisterOutputType(BuiltInOrganizationPermissionSetOutput{})
+	pulumi.RegisterOutputType(BuiltInOrganizationPermissionSetPtrOutput{})
+	pulumi.RegisterOutputType(BuiltInStackPermissionSetOutput{})
+	pulumi.RegisterOutputType(BuiltInStackPermissionSetPtrOutput{})
 	pulumi.RegisterOutputType(CloudProviderOutput{})
 	pulumi.RegisterOutputType(CloudProviderPtrOutput{})
 	pulumi.RegisterOutputType(EnvironmentPermissionOutput{})

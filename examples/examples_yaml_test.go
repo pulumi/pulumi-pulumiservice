@@ -698,6 +698,22 @@ func TestYamlOrganizationRoleExample(t *testing.T) {
 	test.Destroy(t)
 }
 
+// Requires the Custom Roles feature on the test organization.
+func TestYamlOrganizationRolePermissionSetsExample(t *testing.T) {
+	test := newExampleTest(t, "yaml-organization-role-permission-sets")
+	setConfig(t, test, map[string]string{"digits": generateRandomFiveDigits(), "organizationName": getOrgName()})
+
+	up := test.Up(t)
+	assert.NotEmpty(t, up.Outputs["roleId"].Value)
+	assert.Contains(t, up.Outputs["stackWriteScopes"].Value, "stack:write",
+		"getStackPermissionSet should return Stack Write's scopes")
+	preview := test.Preview(t)
+	assertpreview.HasNoChanges(t, preview)
+	refresh := test.Refresh(t)
+	assertrefresh.HasNoChanges(t, refresh)
+	test.Destroy(t)
+}
+
 // TestYamlRbacComposeImport pins the headline regression: a Pulumi
 // Cloud role authored with `PermissionDescriptorCompose` (the variant
 // an earlier structural translator rejected with "unknown __type")

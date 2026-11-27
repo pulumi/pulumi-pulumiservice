@@ -1,0 +1,82 @@
+name: yaml-organization-role-permission-sets
+runtime: yaml
+description: >-
+  End-to-end test of granting built-in permission sets with buildRolePermissions,
+  using the lookup for each entity type.
+
+config:
+  organizationName:
+    type: string
+    default: service-provider-test-org
+  digits:
+    type: string
+
+variables:
+  stackWrite:
+    fn::invoke:
+      function: pulumiservice:getStackPermissionSet
+      arguments:
+        organizationName: ${organizationName}
+        builtIn: stack-write
+  environmentRead:
+    fn::invoke:
+      function: pulumiservice:getEnvironmentPermissionSet
+      arguments:
+        organizationName: ${organizationName}
+        builtIn: environment-read
+  accountRead:
+    fn::invoke:
+      function: pulumiservice:getAccountPermissionSet
+      arguments:
+        organizationName: ${organizationName}
+        builtIn: insights-account-read
+  readOnly:
+    fn::invoke:
+      function: pulumiservice:getOrganizationPermissionSet
+      arguments:
+        organizationName: ${organizationName}
+        builtIn: org-settings-read-only
+  prod:
+    fn::invoke:
+      function: pulumiservice:getStack
+      arguments:
+        organizationName: ${organizationName}
+        projectName: ${prodStack.projectName}
+        stackName: ${prodStack.stackName}
+  permissions:
+    fn::invoke:
+      function: pulumiservice:buildRolePermissions
+      arguments:
+        organizationPermissionSetScopes: ${readOnly.scopes}
+        stackRules:
+          - id: ${prod.stackId}
+            permissionSetScopes: ${stackWrite.scopes}
+            scopes: [stack_deployment:create]
+        environmentRules:
+          - all: true
+            permissionSetScopes: ${environmentRead.scopes}
+        accountRules:
+          - tags:
+              - key: team
+                value: platform
+            permissionSetScopes: ${accountRead.scopes}
+
+resources:
+  prodStack:
+    type: pulumiservice:Stack
+    properties:
+      organizationName: ${organizationName}
+      projectName: test-rbac-sets-${digits}
+      stackName: prod
+
+  role:
+    type: pulumiservice:OrganizationRole
+    properties:
+      organizationName: ${organizationName}
+      name: test-permission-sets-${digits}
+      description: Built-in permission sets for every entity type.
+      permissions: ${permissions.permissions}
+
+outputs:
+  roleId: ${role.roleId}
+  stackWriteScopes: ${stackWrite.scopes}

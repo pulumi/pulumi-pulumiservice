@@ -2522,6 +2522,10 @@ class RoleAccountRuleDict(TypedDict):
     """
     Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
     """
+    permission_set_scopes: NotRequired[Sequence[_builtins.str]]
+    """
+    The scopes of a cloud account permission set to grant on the selected accounts: the `scopes` output of `getAccountPermissionSet`. The role gets a copy of the set's scopes, not a link to the set.
+    """
     scopes: NotRequired[Sequence['RbacAccountScope']]
     """
     Cloud account scopes to grant on the selected accounts.
@@ -2536,11 +2540,13 @@ class RoleAccountRule:
     def __init__(__self__, *,
                  all: Optional[_builtins.bool] = None,
                  id: Optional[_builtins.str] = None,
+                 permission_set_scopes: Optional[Sequence[_builtins.str]] = None,
                  scopes: Optional[Sequence['RbacAccountScope']] = None,
                  tags: Optional[Sequence['TagCondition']] = None):
         """
         :param _builtins.bool all: Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
         :param _builtins.str id: Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
+        :param Sequence[_builtins.str] permission_set_scopes: The scopes of a cloud account permission set to grant on the selected accounts: the `scopes` output of `getAccountPermissionSet`. The role gets a copy of the set's scopes, not a link to the set.
         :param Sequence['RbacAccountScope'] scopes: Cloud account scopes to grant on the selected accounts.
         :param Sequence['TagCondition'] tags: Apply to entities whose tags match every condition.
         """
@@ -2548,6 +2554,8 @@ class RoleAccountRule:
             pulumi.set(__self__, "all", all)
         if id is not None:
             pulumi.set(__self__, "id", id)
+        if permission_set_scopes is not None:
+            pulumi.set(__self__, "permission_set_scopes", permission_set_scopes)
         if scopes is not None:
             pulumi.set(__self__, "scopes", scopes)
         if tags is not None:
@@ -2576,6 +2584,18 @@ class RoleAccountRule:
     @id.setter
     def id(self, value: Optional[_builtins.str]):
         pulumi.set(self, "id", value)
+
+    @_builtins.property
+    @pulumi.getter(name="permissionSetScopes")
+    def permission_set_scopes(self) -> Optional[Sequence[_builtins.str]]:
+        """
+        The scopes of a cloud account permission set to grant on the selected accounts: the `scopes` output of `getAccountPermissionSet`. The role gets a copy of the set's scopes, not a link to the set.
+        """
+        return pulumi.get(self, "permission_set_scopes")
+
+    @permission_set_scopes.setter
+    def permission_set_scopes(self, value: Optional[Sequence[_builtins.str]]):
+        pulumi.set(self, "permission_set_scopes", value)
 
     @_builtins.property
     @pulumi.getter
@@ -2611,6 +2631,10 @@ class RoleEnvironmentRuleDict(TypedDict):
     """
     Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
     """
+    permission_set_scopes: NotRequired[Sequence[_builtins.str]]
+    """
+    The scopes of a environment permission set to grant on the selected environments: the `scopes` output of `getEnvironmentPermissionSet`. The role gets a copy of the set's scopes, not a link to the set.
+    """
     scopes: NotRequired[Sequence['RbacEnvironmentScope']]
     """
     Environment scopes to grant on the selected environments.
@@ -2625,11 +2649,13 @@ class RoleEnvironmentRule:
     def __init__(__self__, *,
                  all: Optional[_builtins.bool] = None,
                  id: Optional[_builtins.str] = None,
+                 permission_set_scopes: Optional[Sequence[_builtins.str]] = None,
                  scopes: Optional[Sequence['RbacEnvironmentScope']] = None,
                  tags: Optional[Sequence['TagCondition']] = None):
         """
         :param _builtins.bool all: Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
         :param _builtins.str id: Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
+        :param Sequence[_builtins.str] permission_set_scopes: The scopes of a environment permission set to grant on the selected environments: the `scopes` output of `getEnvironmentPermissionSet`. The role gets a copy of the set's scopes, not a link to the set.
         :param Sequence['RbacEnvironmentScope'] scopes: Environment scopes to grant on the selected environments.
         :param Sequence['TagCondition'] tags: Apply to entities whose tags match every condition.
         """
@@ -2637,6 +2663,8 @@ class RoleEnvironmentRule:
             pulumi.set(__self__, "all", all)
         if id is not None:
             pulumi.set(__self__, "id", id)
+        if permission_set_scopes is not None:
+            pulumi.set(__self__, "permission_set_scopes", permission_set_scopes)
         if scopes is not None:
             pulumi.set(__self__, "scopes", scopes)
         if tags is not None:
@@ -2665,6 +2693,18 @@ class RoleEnvironmentRule:
     @id.setter
     def id(self, value: Optional[_builtins.str]):
         pulumi.set(self, "id", value)
+
+    @_builtins.property
+    @pulumi.getter(name="permissionSetScopes")
+    def permission_set_scopes(self) -> Optional[Sequence[_builtins.str]]:
+        """
+        The scopes of a environment permission set to grant on the selected environments: the `scopes` output of `getEnvironmentPermissionSet`. The role gets a copy of the set's scopes, not a link to the set.
+        """
+        return pulumi.get(self, "permission_set_scopes")
+
+    @permission_set_scopes.setter
+    def permission_set_scopes(self, value: Optional[Sequence[_builtins.str]]):
+        pulumi.set(self, "permission_set_scopes", value)
 
     @_builtins.property
     @pulumi.getter
@@ -2700,6 +2740,10 @@ class RoleStackRuleDict(TypedDict):
     """
     Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
     """
+    permission_set_scopes: NotRequired[Sequence[_builtins.str]]
+    """
+    The scopes of a stack permission set to grant on the selected stacks: the `scopes` output of `getStackPermissionSet`. The role gets a copy of the set's scopes, not a link to the set.
+    """
     scopes: NotRequired[Sequence['RbacStackScope']]
     """
     Stack scopes to grant on the selected stacks.
@@ -2714,11 +2758,13 @@ class RoleStackRule:
     def __init__(__self__, *,
                  all: Optional[_builtins.bool] = None,
                  id: Optional[_builtins.str] = None,
+                 permission_set_scopes: Optional[Sequence[_builtins.str]] = None,
                  scopes: Optional[Sequence['RbacStackScope']] = None,
                  tags: Optional[Sequence['TagCondition']] = None):
         """
         :param _builtins.bool all: Apply to every entity of this type in the organization. Exactly one of `all`, `id`, or `tags` must be set.
         :param _builtins.str id: Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
+        :param Sequence[_builtins.str] permission_set_scopes: The scopes of a stack permission set to grant on the selected stacks: the `scopes` output of `getStackPermissionSet`. The role gets a copy of the set's scopes, not a link to the set.
         :param Sequence['RbacStackScope'] scopes: Stack scopes to grant on the selected stacks.
         :param Sequence['TagCondition'] tags: Apply to entities whose tags match every condition.
         """
@@ -2726,6 +2772,8 @@ class RoleStackRule:
             pulumi.set(__self__, "all", all)
         if id is not None:
             pulumi.set(__self__, "id", id)
+        if permission_set_scopes is not None:
+            pulumi.set(__self__, "permission_set_scopes", permission_set_scopes)
         if scopes is not None:
             pulumi.set(__self__, "scopes", scopes)
         if tags is not None:
@@ -2754,6 +2802,18 @@ class RoleStackRule:
     @id.setter
     def id(self, value: Optional[_builtins.str]):
         pulumi.set(self, "id", value)
+
+    @_builtins.property
+    @pulumi.getter(name="permissionSetScopes")
+    def permission_set_scopes(self) -> Optional[Sequence[_builtins.str]]:
+        """
+        The scopes of a stack permission set to grant on the selected stacks: the `scopes` output of `getStackPermissionSet`. The role gets a copy of the set's scopes, not a link to the set.
+        """
+        return pulumi.get(self, "permission_set_scopes")
+
+    @permission_set_scopes.setter
+    def permission_set_scopes(self, value: Optional[Sequence[_builtins.str]]):
+        pulumi.set(self, "permission_set_scopes", value)
 
     @_builtins.property
     @pulumi.getter

@@ -29,6 +29,8 @@ const (
 	testTagKeyTeam = "team"
 	testTagKeyCost = "cost-center"
 	testUnknownOp  = "unknown operator"
+
+	permStackAnnotationsUpdate = "stack_annotations:update"
 )
 
 func group(entries ...apitype.PermissionDescriptor) apitype.PermissionDescriptor {
@@ -197,6 +199,35 @@ func TestBuildRolePermissions(t *testing.T) {
 			),
 		},
 		{
+			name: "permission set scopes merge with the rule's scopes, deduplicated",
+			in: BuildRolePermissionsInput{
+				StackRules: []RoleStackRule{{
+					RoleRuleSelector:    RoleRuleSelector{Id: new("stack-1")},
+					Scopes:              []RbacStackScope{RbacStackScopeStackRead, RbacStackScopeStackDeploymentCreate},
+					PermissionSetScopes: []string{permStackRead, permStackAnnotationsUpdate, "policy_results:update"},
+				}},
+			},
+			expected: group(condition(
+				apitype.PermissionExpressionEqualBuilder{
+					Left:  apitype.PermissionExpressionStackBuilder{}.Build(),
+					Right: apitype.PermissionLiteralExpressionStackBuilder{Identity: "stack-1"}.Build(),
+				}.Build(),
+				allow(permStackRead, "stack_deployment:create", permStackAnnotationsUpdate, "policy_results:update"),
+			)),
+		},
+		{
+			name: "permission set scopes on all-entity rules and the organization fold into the unconditional entries",
+			in: BuildRolePermissionsInput{
+				OrganizationScopes:              []RbacOrganizationScope{RbacOrganizationScopeTeamRead},
+				OrganizationPermissionSetScopes: []string{"team:read", "org_member:read"},
+				EnvironmentRules: []RoleEnvironmentRule{{
+					RoleRuleSelector:    RoleRuleSelector{All: new(true)},
+					PermissionSetScopes: []string{permEnvironmentRead},
+				}},
+			},
+			expected: group(allow("team:read", "org_member:read", permEnvironmentRead)),
+		},
+		{
 			name: "additional entries from other helpers are appended",
 			in: BuildRolePermissionsInput{
 				OrganizationScopes: []RbacOrganizationScope{RbacOrganizationScopeTeamRead},
@@ -235,7 +266,17 @@ func TestBuildRolePermissionsErrors(t *testing.T) {
 		{"empty input", BuildRolePermissionsInput{}, "at least one of"},
 		{"rule without grants", BuildRolePermissionsInput{
 			StackRules: []RoleStackRule{{RoleRuleSelector: all}},
-		}, "stackRules[0]: `scopes` must not be empty"},
+		}, "stackRules[0]: at least one of `scopes` or `permissionSetScopes` must be set"},
+		{"environment permission set in a stack rule", BuildRolePermissionsInput{
+			StackRules: []RoleStackRule{{RoleRuleSelector: all, PermissionSetScopes: []string{permEnvironmentRead}}},
+		}, "stackRules[0].permissionSetScopes: `environment:read` is an environment scope; each rule list accepts " +
+			"only permission sets for its own entity type, so look this set up with `getEnvironmentPermissionSet`"},
+		{"stack permission set at organization level", BuildRolePermissionsInput{
+			OrganizationPermissionSetScopes: []string{permStackRead},
+		}, "organizationPermissionSetScopes: `stack:read` is a stack scope"},
+		{"permission set scope that isn't a scope", BuildRolePermissionsInput{
+			StackRules: []RoleStackRule{{RoleRuleSelector: all, PermissionSetScopes: []string{"stack:fly"}}},
+		}, "stackRules[0].permissionSetScopes: \"stack:fly\" is not a valid permission scope"},
 		{"empty selector", BuildRolePermissionsInput{
 			StackRules: []RoleStackRule{{Scopes: []RbacStackScope{RbacStackScopeStackRead}}},
 		}, "stackRules[0]: exactly one of `all`, `id`, or `tags`"},

@@ -23,9 +23,13 @@ import com.pulumi.pulumiservice.inputs.BuildStackMatchRuleArgs;
 import com.pulumi.pulumiservice.inputs.BuildStackMatchRulePlainArgs;
 import com.pulumi.pulumiservice.inputs.BuildStackScopedPermissionsArgs;
 import com.pulumi.pulumiservice.inputs.BuildStackScopedPermissionsPlainArgs;
+import com.pulumi.pulumiservice.inputs.GetAccountPermissionSetArgs;
+import com.pulumi.pulumiservice.inputs.GetAccountPermissionSetPlainArgs;
 import com.pulumi.pulumiservice.inputs.GetCurrentUserArgs;
 import com.pulumi.pulumiservice.inputs.GetCurrentUserPlainArgs;
 import com.pulumi.pulumiservice.inputs.GetEnvironmentArgs;
+import com.pulumi.pulumiservice.inputs.GetEnvironmentPermissionSetArgs;
+import com.pulumi.pulumiservice.inputs.GetEnvironmentPermissionSetPlainArgs;
 import com.pulumi.pulumiservice.inputs.GetEnvironmentPlainArgs;
 import com.pulumi.pulumiservice.inputs.GetInsightsAccountArgs;
 import com.pulumi.pulumiservice.inputs.GetInsightsAccountPlainArgs;
@@ -35,6 +39,8 @@ import com.pulumi.pulumiservice.inputs.GetOrganizationMemberArgs;
 import com.pulumi.pulumiservice.inputs.GetOrganizationMemberPlainArgs;
 import com.pulumi.pulumiservice.inputs.GetOrganizationMembersArgs;
 import com.pulumi.pulumiservice.inputs.GetOrganizationMembersPlainArgs;
+import com.pulumi.pulumiservice.inputs.GetOrganizationPermissionSetArgs;
+import com.pulumi.pulumiservice.inputs.GetOrganizationPermissionSetPlainArgs;
 import com.pulumi.pulumiservice.inputs.GetOrganizationRoleArgs;
 import com.pulumi.pulumiservice.inputs.GetOrganizationRolePlainArgs;
 import com.pulumi.pulumiservice.inputs.GetOrganizationRoleScopesArgs;
@@ -46,6 +52,8 @@ import com.pulumi.pulumiservice.inputs.GetPolicyPackPlainArgs;
 import com.pulumi.pulumiservice.inputs.GetPolicyPacksArgs;
 import com.pulumi.pulumiservice.inputs.GetPolicyPacksPlainArgs;
 import com.pulumi.pulumiservice.inputs.GetStackArgs;
+import com.pulumi.pulumiservice.inputs.GetStackPermissionSetArgs;
+import com.pulumi.pulumiservice.inputs.GetStackPermissionSetPlainArgs;
 import com.pulumi.pulumiservice.inputs.GetStackPlainArgs;
 import com.pulumi.pulumiservice.outputs.BuildAccountMatchRuleResult;
 import com.pulumi.pulumiservice.outputs.BuildAllowPermissionsResult;
@@ -54,17 +62,21 @@ import com.pulumi.pulumiservice.outputs.BuildInsightsAccountScopedPermissionsRes
 import com.pulumi.pulumiservice.outputs.BuildRolePermissionsResult;
 import com.pulumi.pulumiservice.outputs.BuildStackMatchRuleResult;
 import com.pulumi.pulumiservice.outputs.BuildStackScopedPermissionsResult;
+import com.pulumi.pulumiservice.outputs.GetAccountPermissionSetResult;
 import com.pulumi.pulumiservice.outputs.GetCurrentUserResult;
+import com.pulumi.pulumiservice.outputs.GetEnvironmentPermissionSetResult;
 import com.pulumi.pulumiservice.outputs.GetEnvironmentResult;
 import com.pulumi.pulumiservice.outputs.GetInsightsAccountResult;
 import com.pulumi.pulumiservice.outputs.GetInsightsAccountsResult;
 import com.pulumi.pulumiservice.outputs.GetOrganizationMemberResult;
 import com.pulumi.pulumiservice.outputs.GetOrganizationMembersResult;
+import com.pulumi.pulumiservice.outputs.GetOrganizationPermissionSetResult;
 import com.pulumi.pulumiservice.outputs.GetOrganizationRoleResult;
 import com.pulumi.pulumiservice.outputs.GetOrganizationRoleScopesResult;
 import com.pulumi.pulumiservice.outputs.GetOrganizationRolesResult;
 import com.pulumi.pulumiservice.outputs.GetPolicyPackResult;
 import com.pulumi.pulumiservice.outputs.GetPolicyPacksResult;
+import com.pulumi.pulumiservice.outputs.GetStackPermissionSetResult;
 import com.pulumi.pulumiservice.outputs.GetStackResult;
 import java.util.concurrent.CompletableFuture;
 
@@ -255,49 +267,49 @@ public final class PulumiserviceFunctions {
         return Deployment.getInstance().invokeAsync("pulumiservice:index:buildInsightsAccountScopedPermissions", TypeShape.of(BuildInsightsAccountScopedPermissionsResult.class), args, Utilities.withVersion(options));
     }
     /**
-     * Builds a complete `OrganizationRole.permissions` descriptor from organization-level access and rules for stacks, environments, and cloud accounts (Discovery; `InsightsAccount` in the API and this provider), the same model as the role editor in the Pulumi Cloud console. Each rule grants scopes on every entity of its type, on one specific entity, or on entities matching tag conditions. Each rule list accepts only scopes for its own entity type. The result is directly assignable to `OrganizationRole.permissions`.
+     * Builds a complete `OrganizationRole.permissions` descriptor from organization-level access and rules for stacks, environments, and cloud accounts (Discovery; `InsightsAccount` in the API and this provider), the same model as the role editor in the Pulumi Cloud console. Each rule grants scopes on every entity of its type, on one specific entity, or on entities matching tag conditions. A rule grants scopes, a permission set&#39;s scopes from the matching lookup (such as `getStackPermissionSet`), or both. Each rule list accepts only scopes for its own entity type. The result is directly assignable to `OrganizationRole.permissions`.
      * 
      */
     public static Output<BuildRolePermissionsResult> buildRolePermissions() {
         return buildRolePermissions(BuildRolePermissionsArgs.Empty, InvokeOptions.Empty);
     }
     /**
-     * Builds a complete `OrganizationRole.permissions` descriptor from organization-level access and rules for stacks, environments, and cloud accounts (Discovery; `InsightsAccount` in the API and this provider), the same model as the role editor in the Pulumi Cloud console. Each rule grants scopes on every entity of its type, on one specific entity, or on entities matching tag conditions. Each rule list accepts only scopes for its own entity type. The result is directly assignable to `OrganizationRole.permissions`.
+     * Builds a complete `OrganizationRole.permissions` descriptor from organization-level access and rules for stacks, environments, and cloud accounts (Discovery; `InsightsAccount` in the API and this provider), the same model as the role editor in the Pulumi Cloud console. Each rule grants scopes on every entity of its type, on one specific entity, or on entities matching tag conditions. A rule grants scopes, a permission set&#39;s scopes from the matching lookup (such as `getStackPermissionSet`), or both. Each rule list accepts only scopes for its own entity type. The result is directly assignable to `OrganizationRole.permissions`.
      * 
      */
     public static CompletableFuture<BuildRolePermissionsResult> buildRolePermissionsPlain() {
         return buildRolePermissionsPlain(BuildRolePermissionsPlainArgs.Empty, InvokeOptions.Empty);
     }
     /**
-     * Builds a complete `OrganizationRole.permissions` descriptor from organization-level access and rules for stacks, environments, and cloud accounts (Discovery; `InsightsAccount` in the API and this provider), the same model as the role editor in the Pulumi Cloud console. Each rule grants scopes on every entity of its type, on one specific entity, or on entities matching tag conditions. Each rule list accepts only scopes for its own entity type. The result is directly assignable to `OrganizationRole.permissions`.
+     * Builds a complete `OrganizationRole.permissions` descriptor from organization-level access and rules for stacks, environments, and cloud accounts (Discovery; `InsightsAccount` in the API and this provider), the same model as the role editor in the Pulumi Cloud console. Each rule grants scopes on every entity of its type, on one specific entity, or on entities matching tag conditions. A rule grants scopes, a permission set&#39;s scopes from the matching lookup (such as `getStackPermissionSet`), or both. Each rule list accepts only scopes for its own entity type. The result is directly assignable to `OrganizationRole.permissions`.
      * 
      */
     public static Output<BuildRolePermissionsResult> buildRolePermissions(BuildRolePermissionsArgs args) {
         return buildRolePermissions(args, InvokeOptions.Empty);
     }
     /**
-     * Builds a complete `OrganizationRole.permissions` descriptor from organization-level access and rules for stacks, environments, and cloud accounts (Discovery; `InsightsAccount` in the API and this provider), the same model as the role editor in the Pulumi Cloud console. Each rule grants scopes on every entity of its type, on one specific entity, or on entities matching tag conditions. Each rule list accepts only scopes for its own entity type. The result is directly assignable to `OrganizationRole.permissions`.
+     * Builds a complete `OrganizationRole.permissions` descriptor from organization-level access and rules for stacks, environments, and cloud accounts (Discovery; `InsightsAccount` in the API and this provider), the same model as the role editor in the Pulumi Cloud console. Each rule grants scopes on every entity of its type, on one specific entity, or on entities matching tag conditions. A rule grants scopes, a permission set&#39;s scopes from the matching lookup (such as `getStackPermissionSet`), or both. Each rule list accepts only scopes for its own entity type. The result is directly assignable to `OrganizationRole.permissions`.
      * 
      */
     public static CompletableFuture<BuildRolePermissionsResult> buildRolePermissionsPlain(BuildRolePermissionsPlainArgs args) {
         return buildRolePermissionsPlain(args, InvokeOptions.Empty);
     }
     /**
-     * Builds a complete `OrganizationRole.permissions` descriptor from organization-level access and rules for stacks, environments, and cloud accounts (Discovery; `InsightsAccount` in the API and this provider), the same model as the role editor in the Pulumi Cloud console. Each rule grants scopes on every entity of its type, on one specific entity, or on entities matching tag conditions. Each rule list accepts only scopes for its own entity type. The result is directly assignable to `OrganizationRole.permissions`.
+     * Builds a complete `OrganizationRole.permissions` descriptor from organization-level access and rules for stacks, environments, and cloud accounts (Discovery; `InsightsAccount` in the API and this provider), the same model as the role editor in the Pulumi Cloud console. Each rule grants scopes on every entity of its type, on one specific entity, or on entities matching tag conditions. A rule grants scopes, a permission set&#39;s scopes from the matching lookup (such as `getStackPermissionSet`), or both. Each rule list accepts only scopes for its own entity type. The result is directly assignable to `OrganizationRole.permissions`.
      * 
      */
     public static Output<BuildRolePermissionsResult> buildRolePermissions(BuildRolePermissionsArgs args, InvokeOptions options) {
         return Deployment.getInstance().invoke("pulumiservice:index:buildRolePermissions", TypeShape.of(BuildRolePermissionsResult.class), args, Utilities.withVersion(options));
     }
     /**
-     * Builds a complete `OrganizationRole.permissions` descriptor from organization-level access and rules for stacks, environments, and cloud accounts (Discovery; `InsightsAccount` in the API and this provider), the same model as the role editor in the Pulumi Cloud console. Each rule grants scopes on every entity of its type, on one specific entity, or on entities matching tag conditions. Each rule list accepts only scopes for its own entity type. The result is directly assignable to `OrganizationRole.permissions`.
+     * Builds a complete `OrganizationRole.permissions` descriptor from organization-level access and rules for stacks, environments, and cloud accounts (Discovery; `InsightsAccount` in the API and this provider), the same model as the role editor in the Pulumi Cloud console. Each rule grants scopes on every entity of its type, on one specific entity, or on entities matching tag conditions. A rule grants scopes, a permission set&#39;s scopes from the matching lookup (such as `getStackPermissionSet`), or both. Each rule list accepts only scopes for its own entity type. The result is directly assignable to `OrganizationRole.permissions`.
      * 
      */
     public static Output<BuildRolePermissionsResult> buildRolePermissions(BuildRolePermissionsArgs args, InvokeOutputOptions options) {
         return Deployment.getInstance().invoke("pulumiservice:index:buildRolePermissions", TypeShape.of(BuildRolePermissionsResult.class), args, Utilities.withVersion(options));
     }
     /**
-     * Builds a complete `OrganizationRole.permissions` descriptor from organization-level access and rules for stacks, environments, and cloud accounts (Discovery; `InsightsAccount` in the API and this provider), the same model as the role editor in the Pulumi Cloud console. Each rule grants scopes on every entity of its type, on one specific entity, or on entities matching tag conditions. Each rule list accepts only scopes for its own entity type. The result is directly assignable to `OrganizationRole.permissions`.
+     * Builds a complete `OrganizationRole.permissions` descriptor from organization-level access and rules for stacks, environments, and cloud accounts (Discovery; `InsightsAccount` in the API and this provider), the same model as the role editor in the Pulumi Cloud console. Each rule grants scopes on every entity of its type, on one specific entity, or on entities matching tag conditions. A rule grants scopes, a permission set&#39;s scopes from the matching lookup (such as `getStackPermissionSet`), or both. Each rule list accepts only scopes for its own entity type. The result is directly assignable to `OrganizationRole.permissions`.
      * 
      */
     public static CompletableFuture<BuildRolePermissionsResult> buildRolePermissionsPlain(BuildRolePermissionsPlainArgs args, InvokeOptions options) {
@@ -389,6 +401,316 @@ public final class PulumiserviceFunctions {
         return Deployment.getInstance().invokeAsync("pulumiservice:index:buildStackScopedPermissions", TypeShape.of(BuildStackScopedPermissionsResult.class), args, Utilities.withVersion(options));
     }
     /**
+     * Looks up a cloud account permission set in a Pulumi Cloud organization, built-in (such as Account Read) or custom, and returns the scopes it grants. Pass `scopes` to `permissionSetScopes` in `accountRules` of `buildRolePermissions` to grant the set, the way access levels do in the Pulumi Cloud console. Exactly one of `builtIn` or `name` must be set.
+     * 
+     * The role gets a copy of the set&#39;s scopes, not a link to the set. If the set changes in Pulumi Cloud, the next `pulumi up` updates the role to match. If the set contains scopes this version of the provider doesn&#39;t recognize, the lookup leaves them out and warns; upgrade the provider to grant them.
+     * 
+     * ## Example Usage
+     * ### Grant a built-in cloud account permission set
+     * 
+     * <pre>
+     * {@code
+     * package generated_program;
+     * 
+     * import com.pulumi.pulumiservice.enums.BuiltInAccountPermissionSet;
+     * import com.pulumi.Context;
+     * import com.pulumi.Pulumi;
+     * import com.pulumi.core.Output;
+     * import com.pulumi.pulumiservice.PulumiserviceFunctions;
+     * import com.pulumi.pulumiservice.inputs.GetAccountPermissionSetArgs;
+     * import com.pulumi.pulumiservice.inputs.BuildRolePermissionsArgs;
+     * import com.pulumi.pulumiservice.inputs.RoleAccountRuleArgs;
+     * import com.pulumi.pulumiservice.OrganizationRole;
+     * import com.pulumi.pulumiservice.OrganizationRoleArgs;
+     * import java.util.ArrayList;
+     * import java.util.Arrays;
+     * import java.util.Map;
+     * import java.io.File;
+     * import java.nio.file.Files;
+     * import java.nio.file.Paths;
+     * 
+     * public class App {
+     *     public static void main(String[] args) {
+     *         Pulumi.run(App::stack);
+     *     }
+     * 
+     *     public static void stack(Context ctx) {
+     *         final var accountRead = PulumiserviceFunctions.getAccountPermissionSet(GetAccountPermissionSetArgs.builder()
+     *             .organizationName("my-org")
+     *             .builtIn(BuiltInAccountPermissionSet.Read)
+     *             .build());
+     * 
+     *         final var permissions = PulumiserviceFunctions.buildRolePermissions(BuildRolePermissionsArgs.builder()
+     *             .accountRules(RoleAccountRuleArgs.builder()
+     *                 .all(true)
+     *                 .permissionSetScopes(accountRead.applyValue(_accountRead -> _accountRead.scopes()))
+     *                 .build())
+     *             .build());
+     * 
+     *         var accountReaderRole = new OrganizationRole("accountReaderRole", OrganizationRoleArgs.builder()
+     *             .organizationName("my-org")
+     *             .name("Account Readers")
+     *             .permissions(permissions.applyValue(_permissions -> _permissions.permissions()))
+     *             .build());
+     * 
+     *     }
+     * }
+     * }
+     * </pre>
+     * 
+     */
+    public static Output<GetAccountPermissionSetResult> getAccountPermissionSet(GetAccountPermissionSetArgs args) {
+        return getAccountPermissionSet(args, InvokeOptions.Empty);
+    }
+    /**
+     * Looks up a cloud account permission set in a Pulumi Cloud organization, built-in (such as Account Read) or custom, and returns the scopes it grants. Pass `scopes` to `permissionSetScopes` in `accountRules` of `buildRolePermissions` to grant the set, the way access levels do in the Pulumi Cloud console. Exactly one of `builtIn` or `name` must be set.
+     * 
+     * The role gets a copy of the set&#39;s scopes, not a link to the set. If the set changes in Pulumi Cloud, the next `pulumi up` updates the role to match. If the set contains scopes this version of the provider doesn&#39;t recognize, the lookup leaves them out and warns; upgrade the provider to grant them.
+     * 
+     * ## Example Usage
+     * ### Grant a built-in cloud account permission set
+     * 
+     * <pre>
+     * {@code
+     * package generated_program;
+     * 
+     * import com.pulumi.pulumiservice.enums.BuiltInAccountPermissionSet;
+     * import com.pulumi.Context;
+     * import com.pulumi.Pulumi;
+     * import com.pulumi.core.Output;
+     * import com.pulumi.pulumiservice.PulumiserviceFunctions;
+     * import com.pulumi.pulumiservice.inputs.GetAccountPermissionSetArgs;
+     * import com.pulumi.pulumiservice.inputs.BuildRolePermissionsArgs;
+     * import com.pulumi.pulumiservice.inputs.RoleAccountRuleArgs;
+     * import com.pulumi.pulumiservice.OrganizationRole;
+     * import com.pulumi.pulumiservice.OrganizationRoleArgs;
+     * import java.util.ArrayList;
+     * import java.util.Arrays;
+     * import java.util.Map;
+     * import java.io.File;
+     * import java.nio.file.Files;
+     * import java.nio.file.Paths;
+     * 
+     * public class App {
+     *     public static void main(String[] args) {
+     *         Pulumi.run(App::stack);
+     *     }
+     * 
+     *     public static void stack(Context ctx) {
+     *         final var accountRead = PulumiserviceFunctions.getAccountPermissionSet(GetAccountPermissionSetArgs.builder()
+     *             .organizationName("my-org")
+     *             .builtIn(BuiltInAccountPermissionSet.Read)
+     *             .build());
+     * 
+     *         final var permissions = PulumiserviceFunctions.buildRolePermissions(BuildRolePermissionsArgs.builder()
+     *             .accountRules(RoleAccountRuleArgs.builder()
+     *                 .all(true)
+     *                 .permissionSetScopes(accountRead.applyValue(_accountRead -> _accountRead.scopes()))
+     *                 .build())
+     *             .build());
+     * 
+     *         var accountReaderRole = new OrganizationRole("accountReaderRole", OrganizationRoleArgs.builder()
+     *             .organizationName("my-org")
+     *             .name("Account Readers")
+     *             .permissions(permissions.applyValue(_permissions -> _permissions.permissions()))
+     *             .build());
+     * 
+     *     }
+     * }
+     * }
+     * </pre>
+     * 
+     */
+    public static CompletableFuture<GetAccountPermissionSetResult> getAccountPermissionSetPlain(GetAccountPermissionSetPlainArgs args) {
+        return getAccountPermissionSetPlain(args, InvokeOptions.Empty);
+    }
+    /**
+     * Looks up a cloud account permission set in a Pulumi Cloud organization, built-in (such as Account Read) or custom, and returns the scopes it grants. Pass `scopes` to `permissionSetScopes` in `accountRules` of `buildRolePermissions` to grant the set, the way access levels do in the Pulumi Cloud console. Exactly one of `builtIn` or `name` must be set.
+     * 
+     * The role gets a copy of the set&#39;s scopes, not a link to the set. If the set changes in Pulumi Cloud, the next `pulumi up` updates the role to match. If the set contains scopes this version of the provider doesn&#39;t recognize, the lookup leaves them out and warns; upgrade the provider to grant them.
+     * 
+     * ## Example Usage
+     * ### Grant a built-in cloud account permission set
+     * 
+     * <pre>
+     * {@code
+     * package generated_program;
+     * 
+     * import com.pulumi.pulumiservice.enums.BuiltInAccountPermissionSet;
+     * import com.pulumi.Context;
+     * import com.pulumi.Pulumi;
+     * import com.pulumi.core.Output;
+     * import com.pulumi.pulumiservice.PulumiserviceFunctions;
+     * import com.pulumi.pulumiservice.inputs.GetAccountPermissionSetArgs;
+     * import com.pulumi.pulumiservice.inputs.BuildRolePermissionsArgs;
+     * import com.pulumi.pulumiservice.inputs.RoleAccountRuleArgs;
+     * import com.pulumi.pulumiservice.OrganizationRole;
+     * import com.pulumi.pulumiservice.OrganizationRoleArgs;
+     * import java.util.ArrayList;
+     * import java.util.Arrays;
+     * import java.util.Map;
+     * import java.io.File;
+     * import java.nio.file.Files;
+     * import java.nio.file.Paths;
+     * 
+     * public class App {
+     *     public static void main(String[] args) {
+     *         Pulumi.run(App::stack);
+     *     }
+     * 
+     *     public static void stack(Context ctx) {
+     *         final var accountRead = PulumiserviceFunctions.getAccountPermissionSet(GetAccountPermissionSetArgs.builder()
+     *             .organizationName("my-org")
+     *             .builtIn(BuiltInAccountPermissionSet.Read)
+     *             .build());
+     * 
+     *         final var permissions = PulumiserviceFunctions.buildRolePermissions(BuildRolePermissionsArgs.builder()
+     *             .accountRules(RoleAccountRuleArgs.builder()
+     *                 .all(true)
+     *                 .permissionSetScopes(accountRead.applyValue(_accountRead -> _accountRead.scopes()))
+     *                 .build())
+     *             .build());
+     * 
+     *         var accountReaderRole = new OrganizationRole("accountReaderRole", OrganizationRoleArgs.builder()
+     *             .organizationName("my-org")
+     *             .name("Account Readers")
+     *             .permissions(permissions.applyValue(_permissions -> _permissions.permissions()))
+     *             .build());
+     * 
+     *     }
+     * }
+     * }
+     * </pre>
+     * 
+     */
+    public static Output<GetAccountPermissionSetResult> getAccountPermissionSet(GetAccountPermissionSetArgs args, InvokeOptions options) {
+        return Deployment.getInstance().invoke("pulumiservice:index:getAccountPermissionSet", TypeShape.of(GetAccountPermissionSetResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Looks up a cloud account permission set in a Pulumi Cloud organization, built-in (such as Account Read) or custom, and returns the scopes it grants. Pass `scopes` to `permissionSetScopes` in `accountRules` of `buildRolePermissions` to grant the set, the way access levels do in the Pulumi Cloud console. Exactly one of `builtIn` or `name` must be set.
+     * 
+     * The role gets a copy of the set&#39;s scopes, not a link to the set. If the set changes in Pulumi Cloud, the next `pulumi up` updates the role to match. If the set contains scopes this version of the provider doesn&#39;t recognize, the lookup leaves them out and warns; upgrade the provider to grant them.
+     * 
+     * ## Example Usage
+     * ### Grant a built-in cloud account permission set
+     * 
+     * <pre>
+     * {@code
+     * package generated_program;
+     * 
+     * import com.pulumi.pulumiservice.enums.BuiltInAccountPermissionSet;
+     * import com.pulumi.Context;
+     * import com.pulumi.Pulumi;
+     * import com.pulumi.core.Output;
+     * import com.pulumi.pulumiservice.PulumiserviceFunctions;
+     * import com.pulumi.pulumiservice.inputs.GetAccountPermissionSetArgs;
+     * import com.pulumi.pulumiservice.inputs.BuildRolePermissionsArgs;
+     * import com.pulumi.pulumiservice.inputs.RoleAccountRuleArgs;
+     * import com.pulumi.pulumiservice.OrganizationRole;
+     * import com.pulumi.pulumiservice.OrganizationRoleArgs;
+     * import java.util.ArrayList;
+     * import java.util.Arrays;
+     * import java.util.Map;
+     * import java.io.File;
+     * import java.nio.file.Files;
+     * import java.nio.file.Paths;
+     * 
+     * public class App {
+     *     public static void main(String[] args) {
+     *         Pulumi.run(App::stack);
+     *     }
+     * 
+     *     public static void stack(Context ctx) {
+     *         final var accountRead = PulumiserviceFunctions.getAccountPermissionSet(GetAccountPermissionSetArgs.builder()
+     *             .organizationName("my-org")
+     *             .builtIn(BuiltInAccountPermissionSet.Read)
+     *             .build());
+     * 
+     *         final var permissions = PulumiserviceFunctions.buildRolePermissions(BuildRolePermissionsArgs.builder()
+     *             .accountRules(RoleAccountRuleArgs.builder()
+     *                 .all(true)
+     *                 .permissionSetScopes(accountRead.applyValue(_accountRead -> _accountRead.scopes()))
+     *                 .build())
+     *             .build());
+     * 
+     *         var accountReaderRole = new OrganizationRole("accountReaderRole", OrganizationRoleArgs.builder()
+     *             .organizationName("my-org")
+     *             .name("Account Readers")
+     *             .permissions(permissions.applyValue(_permissions -> _permissions.permissions()))
+     *             .build());
+     * 
+     *     }
+     * }
+     * }
+     * </pre>
+     * 
+     */
+    public static Output<GetAccountPermissionSetResult> getAccountPermissionSet(GetAccountPermissionSetArgs args, InvokeOutputOptions options) {
+        return Deployment.getInstance().invoke("pulumiservice:index:getAccountPermissionSet", TypeShape.of(GetAccountPermissionSetResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Looks up a cloud account permission set in a Pulumi Cloud organization, built-in (such as Account Read) or custom, and returns the scopes it grants. Pass `scopes` to `permissionSetScopes` in `accountRules` of `buildRolePermissions` to grant the set, the way access levels do in the Pulumi Cloud console. Exactly one of `builtIn` or `name` must be set.
+     * 
+     * The role gets a copy of the set&#39;s scopes, not a link to the set. If the set changes in Pulumi Cloud, the next `pulumi up` updates the role to match. If the set contains scopes this version of the provider doesn&#39;t recognize, the lookup leaves them out and warns; upgrade the provider to grant them.
+     * 
+     * ## Example Usage
+     * ### Grant a built-in cloud account permission set
+     * 
+     * <pre>
+     * {@code
+     * package generated_program;
+     * 
+     * import com.pulumi.pulumiservice.enums.BuiltInAccountPermissionSet;
+     * import com.pulumi.Context;
+     * import com.pulumi.Pulumi;
+     * import com.pulumi.core.Output;
+     * import com.pulumi.pulumiservice.PulumiserviceFunctions;
+     * import com.pulumi.pulumiservice.inputs.GetAccountPermissionSetArgs;
+     * import com.pulumi.pulumiservice.inputs.BuildRolePermissionsArgs;
+     * import com.pulumi.pulumiservice.inputs.RoleAccountRuleArgs;
+     * import com.pulumi.pulumiservice.OrganizationRole;
+     * import com.pulumi.pulumiservice.OrganizationRoleArgs;
+     * import java.util.ArrayList;
+     * import java.util.Arrays;
+     * import java.util.Map;
+     * import java.io.File;
+     * import java.nio.file.Files;
+     * import java.nio.file.Paths;
+     * 
+     * public class App {
+     *     public static void main(String[] args) {
+     *         Pulumi.run(App::stack);
+     *     }
+     * 
+     *     public static void stack(Context ctx) {
+     *         final var accountRead = PulumiserviceFunctions.getAccountPermissionSet(GetAccountPermissionSetArgs.builder()
+     *             .organizationName("my-org")
+     *             .builtIn(BuiltInAccountPermissionSet.Read)
+     *             .build());
+     * 
+     *         final var permissions = PulumiserviceFunctions.buildRolePermissions(BuildRolePermissionsArgs.builder()
+     *             .accountRules(RoleAccountRuleArgs.builder()
+     *                 .all(true)
+     *                 .permissionSetScopes(accountRead.applyValue(_accountRead -> _accountRead.scopes()))
+     *                 .build())
+     *             .build());
+     * 
+     *         var accountReaderRole = new OrganizationRole("accountReaderRole", OrganizationRoleArgs.builder()
+     *             .organizationName("my-org")
+     *             .name("Account Readers")
+     *             .permissions(permissions.applyValue(_permissions -> _permissions.permissions()))
+     *             .build());
+     * 
+     *     }
+     * }
+     * }
+     * </pre>
+     * 
+     */
+    public static CompletableFuture<GetAccountPermissionSetResult> getAccountPermissionSetPlain(GetAccountPermissionSetPlainArgs args, InvokeOptions options) {
+        return Deployment.getInstance().invokeAsync("pulumiservice:index:getAccountPermissionSet", TypeShape.of(GetAccountPermissionSetResult.class), args, Utilities.withVersion(options));
+    }
+    /**
      * Returns the Pulumi Cloud user that the provider&#39;s access token belongs to. Useful for seeding a newly-created `Team` with the creator as a member, since Pulumi Cloud auto-adds the creator. Omitting this user from the team will result in a refresh drift.
      * 
      */
@@ -471,6 +793,316 @@ public final class PulumiserviceFunctions {
      */
     public static CompletableFuture<GetEnvironmentResult> getEnvironmentPlain(GetEnvironmentPlainArgs args, InvokeOptions options) {
         return Deployment.getInstance().invokeAsync("pulumiservice:index:getEnvironment", TypeShape.of(GetEnvironmentResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Looks up a environment permission set in a Pulumi Cloud organization, built-in (such as Environment Open) or custom, and returns the scopes it grants. Pass `scopes` to `permissionSetScopes` in `environmentRules` of `buildRolePermissions` to grant the set, the way access levels do in the Pulumi Cloud console. Exactly one of `builtIn` or `name` must be set.
+     * 
+     * The role gets a copy of the set&#39;s scopes, not a link to the set. If the set changes in Pulumi Cloud, the next `pulumi up` updates the role to match. If the set contains scopes this version of the provider doesn&#39;t recognize, the lookup leaves them out and warns; upgrade the provider to grant them.
+     * 
+     * ## Example Usage
+     * ### Grant a built-in environment permission set
+     * 
+     * <pre>
+     * {@code
+     * package generated_program;
+     * 
+     * import com.pulumi.pulumiservice.enums.BuiltInEnvironmentPermissionSet;
+     * import com.pulumi.Context;
+     * import com.pulumi.Pulumi;
+     * import com.pulumi.core.Output;
+     * import com.pulumi.pulumiservice.PulumiserviceFunctions;
+     * import com.pulumi.pulumiservice.inputs.GetEnvironmentPermissionSetArgs;
+     * import com.pulumi.pulumiservice.inputs.BuildRolePermissionsArgs;
+     * import com.pulumi.pulumiservice.inputs.RoleEnvironmentRuleArgs;
+     * import com.pulumi.pulumiservice.OrganizationRole;
+     * import com.pulumi.pulumiservice.OrganizationRoleArgs;
+     * import java.util.ArrayList;
+     * import java.util.Arrays;
+     * import java.util.Map;
+     * import java.io.File;
+     * import java.nio.file.Files;
+     * import java.nio.file.Paths;
+     * 
+     * public class App {
+     *     public static void main(String[] args) {
+     *         Pulumi.run(App::stack);
+     *     }
+     * 
+     *     public static void stack(Context ctx) {
+     *         final var environmentOpen = PulumiserviceFunctions.getEnvironmentPermissionSet(GetEnvironmentPermissionSetArgs.builder()
+     *             .organizationName("my-org")
+     *             .builtIn(BuiltInEnvironmentPermissionSet.Open)
+     *             .build());
+     * 
+     *         final var permissions = PulumiserviceFunctions.buildRolePermissions(BuildRolePermissionsArgs.builder()
+     *             .environmentRules(RoleEnvironmentRuleArgs.builder()
+     *                 .all(true)
+     *                 .permissionSetScopes(environmentOpen.applyValue(_environmentOpen -> _environmentOpen.scopes()))
+     *                 .build())
+     *             .build());
+     * 
+     *         var environmentOpenerRole = new OrganizationRole("environmentOpenerRole", OrganizationRoleArgs.builder()
+     *             .organizationName("my-org")
+     *             .name("Environment Openers")
+     *             .permissions(permissions.applyValue(_permissions -> _permissions.permissions()))
+     *             .build());
+     * 
+     *     }
+     * }
+     * }
+     * </pre>
+     * 
+     */
+    public static Output<GetEnvironmentPermissionSetResult> getEnvironmentPermissionSet(GetEnvironmentPermissionSetArgs args) {
+        return getEnvironmentPermissionSet(args, InvokeOptions.Empty);
+    }
+    /**
+     * Looks up a environment permission set in a Pulumi Cloud organization, built-in (such as Environment Open) or custom, and returns the scopes it grants. Pass `scopes` to `permissionSetScopes` in `environmentRules` of `buildRolePermissions` to grant the set, the way access levels do in the Pulumi Cloud console. Exactly one of `builtIn` or `name` must be set.
+     * 
+     * The role gets a copy of the set&#39;s scopes, not a link to the set. If the set changes in Pulumi Cloud, the next `pulumi up` updates the role to match. If the set contains scopes this version of the provider doesn&#39;t recognize, the lookup leaves them out and warns; upgrade the provider to grant them.
+     * 
+     * ## Example Usage
+     * ### Grant a built-in environment permission set
+     * 
+     * <pre>
+     * {@code
+     * package generated_program;
+     * 
+     * import com.pulumi.pulumiservice.enums.BuiltInEnvironmentPermissionSet;
+     * import com.pulumi.Context;
+     * import com.pulumi.Pulumi;
+     * import com.pulumi.core.Output;
+     * import com.pulumi.pulumiservice.PulumiserviceFunctions;
+     * import com.pulumi.pulumiservice.inputs.GetEnvironmentPermissionSetArgs;
+     * import com.pulumi.pulumiservice.inputs.BuildRolePermissionsArgs;
+     * import com.pulumi.pulumiservice.inputs.RoleEnvironmentRuleArgs;
+     * import com.pulumi.pulumiservice.OrganizationRole;
+     * import com.pulumi.pulumiservice.OrganizationRoleArgs;
+     * import java.util.ArrayList;
+     * import java.util.Arrays;
+     * import java.util.Map;
+     * import java.io.File;
+     * import java.nio.file.Files;
+     * import java.nio.file.Paths;
+     * 
+     * public class App {
+     *     public static void main(String[] args) {
+     *         Pulumi.run(App::stack);
+     *     }
+     * 
+     *     public static void stack(Context ctx) {
+     *         final var environmentOpen = PulumiserviceFunctions.getEnvironmentPermissionSet(GetEnvironmentPermissionSetArgs.builder()
+     *             .organizationName("my-org")
+     *             .builtIn(BuiltInEnvironmentPermissionSet.Open)
+     *             .build());
+     * 
+     *         final var permissions = PulumiserviceFunctions.buildRolePermissions(BuildRolePermissionsArgs.builder()
+     *             .environmentRules(RoleEnvironmentRuleArgs.builder()
+     *                 .all(true)
+     *                 .permissionSetScopes(environmentOpen.applyValue(_environmentOpen -> _environmentOpen.scopes()))
+     *                 .build())
+     *             .build());
+     * 
+     *         var environmentOpenerRole = new OrganizationRole("environmentOpenerRole", OrganizationRoleArgs.builder()
+     *             .organizationName("my-org")
+     *             .name("Environment Openers")
+     *             .permissions(permissions.applyValue(_permissions -> _permissions.permissions()))
+     *             .build());
+     * 
+     *     }
+     * }
+     * }
+     * </pre>
+     * 
+     */
+    public static CompletableFuture<GetEnvironmentPermissionSetResult> getEnvironmentPermissionSetPlain(GetEnvironmentPermissionSetPlainArgs args) {
+        return getEnvironmentPermissionSetPlain(args, InvokeOptions.Empty);
+    }
+    /**
+     * Looks up a environment permission set in a Pulumi Cloud organization, built-in (such as Environment Open) or custom, and returns the scopes it grants. Pass `scopes` to `permissionSetScopes` in `environmentRules` of `buildRolePermissions` to grant the set, the way access levels do in the Pulumi Cloud console. Exactly one of `builtIn` or `name` must be set.
+     * 
+     * The role gets a copy of the set&#39;s scopes, not a link to the set. If the set changes in Pulumi Cloud, the next `pulumi up` updates the role to match. If the set contains scopes this version of the provider doesn&#39;t recognize, the lookup leaves them out and warns; upgrade the provider to grant them.
+     * 
+     * ## Example Usage
+     * ### Grant a built-in environment permission set
+     * 
+     * <pre>
+     * {@code
+     * package generated_program;
+     * 
+     * import com.pulumi.pulumiservice.enums.BuiltInEnvironmentPermissionSet;
+     * import com.pulumi.Context;
+     * import com.pulumi.Pulumi;
+     * import com.pulumi.core.Output;
+     * import com.pulumi.pulumiservice.PulumiserviceFunctions;
+     * import com.pulumi.pulumiservice.inputs.GetEnvironmentPermissionSetArgs;
+     * import com.pulumi.pulumiservice.inputs.BuildRolePermissionsArgs;
+     * import com.pulumi.pulumiservice.inputs.RoleEnvironmentRuleArgs;
+     * import com.pulumi.pulumiservice.OrganizationRole;
+     * import com.pulumi.pulumiservice.OrganizationRoleArgs;
+     * import java.util.ArrayList;
+     * import java.util.Arrays;
+     * import java.util.Map;
+     * import java.io.File;
+     * import java.nio.file.Files;
+     * import java.nio.file.Paths;
+     * 
+     * public class App {
+     *     public static void main(String[] args) {
+     *         Pulumi.run(App::stack);
+     *     }
+     * 
+     *     public static void stack(Context ctx) {
+     *         final var environmentOpen = PulumiserviceFunctions.getEnvironmentPermissionSet(GetEnvironmentPermissionSetArgs.builder()
+     *             .organizationName("my-org")
+     *             .builtIn(BuiltInEnvironmentPermissionSet.Open)
+     *             .build());
+     * 
+     *         final var permissions = PulumiserviceFunctions.buildRolePermissions(BuildRolePermissionsArgs.builder()
+     *             .environmentRules(RoleEnvironmentRuleArgs.builder()
+     *                 .all(true)
+     *                 .permissionSetScopes(environmentOpen.applyValue(_environmentOpen -> _environmentOpen.scopes()))
+     *                 .build())
+     *             .build());
+     * 
+     *         var environmentOpenerRole = new OrganizationRole("environmentOpenerRole", OrganizationRoleArgs.builder()
+     *             .organizationName("my-org")
+     *             .name("Environment Openers")
+     *             .permissions(permissions.applyValue(_permissions -> _permissions.permissions()))
+     *             .build());
+     * 
+     *     }
+     * }
+     * }
+     * </pre>
+     * 
+     */
+    public static Output<GetEnvironmentPermissionSetResult> getEnvironmentPermissionSet(GetEnvironmentPermissionSetArgs args, InvokeOptions options) {
+        return Deployment.getInstance().invoke("pulumiservice:index:getEnvironmentPermissionSet", TypeShape.of(GetEnvironmentPermissionSetResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Looks up a environment permission set in a Pulumi Cloud organization, built-in (such as Environment Open) or custom, and returns the scopes it grants. Pass `scopes` to `permissionSetScopes` in `environmentRules` of `buildRolePermissions` to grant the set, the way access levels do in the Pulumi Cloud console. Exactly one of `builtIn` or `name` must be set.
+     * 
+     * The role gets a copy of the set&#39;s scopes, not a link to the set. If the set changes in Pulumi Cloud, the next `pulumi up` updates the role to match. If the set contains scopes this version of the provider doesn&#39;t recognize, the lookup leaves them out and warns; upgrade the provider to grant them.
+     * 
+     * ## Example Usage
+     * ### Grant a built-in environment permission set
+     * 
+     * <pre>
+     * {@code
+     * package generated_program;
+     * 
+     * import com.pulumi.pulumiservice.enums.BuiltInEnvironmentPermissionSet;
+     * import com.pulumi.Context;
+     * import com.pulumi.Pulumi;
+     * import com.pulumi.core.Output;
+     * import com.pulumi.pulumiservice.PulumiserviceFunctions;
+     * import com.pulumi.pulumiservice.inputs.GetEnvironmentPermissionSetArgs;
+     * import com.pulumi.pulumiservice.inputs.BuildRolePermissionsArgs;
+     * import com.pulumi.pulumiservice.inputs.RoleEnvironmentRuleArgs;
+     * import com.pulumi.pulumiservice.OrganizationRole;
+     * import com.pulumi.pulumiservice.OrganizationRoleArgs;
+     * import java.util.ArrayList;
+     * import java.util.Arrays;
+     * import java.util.Map;
+     * import java.io.File;
+     * import java.nio.file.Files;
+     * import java.nio.file.Paths;
+     * 
+     * public class App {
+     *     public static void main(String[] args) {
+     *         Pulumi.run(App::stack);
+     *     }
+     * 
+     *     public static void stack(Context ctx) {
+     *         final var environmentOpen = PulumiserviceFunctions.getEnvironmentPermissionSet(GetEnvironmentPermissionSetArgs.builder()
+     *             .organizationName("my-org")
+     *             .builtIn(BuiltInEnvironmentPermissionSet.Open)
+     *             .build());
+     * 
+     *         final var permissions = PulumiserviceFunctions.buildRolePermissions(BuildRolePermissionsArgs.builder()
+     *             .environmentRules(RoleEnvironmentRuleArgs.builder()
+     *                 .all(true)
+     *                 .permissionSetScopes(environmentOpen.applyValue(_environmentOpen -> _environmentOpen.scopes()))
+     *                 .build())
+     *             .build());
+     * 
+     *         var environmentOpenerRole = new OrganizationRole("environmentOpenerRole", OrganizationRoleArgs.builder()
+     *             .organizationName("my-org")
+     *             .name("Environment Openers")
+     *             .permissions(permissions.applyValue(_permissions -> _permissions.permissions()))
+     *             .build());
+     * 
+     *     }
+     * }
+     * }
+     * </pre>
+     * 
+     */
+    public static Output<GetEnvironmentPermissionSetResult> getEnvironmentPermissionSet(GetEnvironmentPermissionSetArgs args, InvokeOutputOptions options) {
+        return Deployment.getInstance().invoke("pulumiservice:index:getEnvironmentPermissionSet", TypeShape.of(GetEnvironmentPermissionSetResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Looks up a environment permission set in a Pulumi Cloud organization, built-in (such as Environment Open) or custom, and returns the scopes it grants. Pass `scopes` to `permissionSetScopes` in `environmentRules` of `buildRolePermissions` to grant the set, the way access levels do in the Pulumi Cloud console. Exactly one of `builtIn` or `name` must be set.
+     * 
+     * The role gets a copy of the set&#39;s scopes, not a link to the set. If the set changes in Pulumi Cloud, the next `pulumi up` updates the role to match. If the set contains scopes this version of the provider doesn&#39;t recognize, the lookup leaves them out and warns; upgrade the provider to grant them.
+     * 
+     * ## Example Usage
+     * ### Grant a built-in environment permission set
+     * 
+     * <pre>
+     * {@code
+     * package generated_program;
+     * 
+     * import com.pulumi.pulumiservice.enums.BuiltInEnvironmentPermissionSet;
+     * import com.pulumi.Context;
+     * import com.pulumi.Pulumi;
+     * import com.pulumi.core.Output;
+     * import com.pulumi.pulumiservice.PulumiserviceFunctions;
+     * import com.pulumi.pulumiservice.inputs.GetEnvironmentPermissionSetArgs;
+     * import com.pulumi.pulumiservice.inputs.BuildRolePermissionsArgs;
+     * import com.pulumi.pulumiservice.inputs.RoleEnvironmentRuleArgs;
+     * import com.pulumi.pulumiservice.OrganizationRole;
+     * import com.pulumi.pulumiservice.OrganizationRoleArgs;
+     * import java.util.ArrayList;
+     * import java.util.Arrays;
+     * import java.util.Map;
+     * import java.io.File;
+     * import java.nio.file.Files;
+     * import java.nio.file.Paths;
+     * 
+     * public class App {
+     *     public static void main(String[] args) {
+     *         Pulumi.run(App::stack);
+     *     }
+     * 
+     *     public static void stack(Context ctx) {
+     *         final var environmentOpen = PulumiserviceFunctions.getEnvironmentPermissionSet(GetEnvironmentPermissionSetArgs.builder()
+     *             .organizationName("my-org")
+     *             .builtIn(BuiltInEnvironmentPermissionSet.Open)
+     *             .build());
+     * 
+     *         final var permissions = PulumiserviceFunctions.buildRolePermissions(BuildRolePermissionsArgs.builder()
+     *             .environmentRules(RoleEnvironmentRuleArgs.builder()
+     *                 .all(true)
+     *                 .permissionSetScopes(environmentOpen.applyValue(_environmentOpen -> _environmentOpen.scopes()))
+     *                 .build())
+     *             .build());
+     * 
+     *         var environmentOpenerRole = new OrganizationRole("environmentOpenerRole", OrganizationRoleArgs.builder()
+     *             .organizationName("my-org")
+     *             .name("Environment Openers")
+     *             .permissions(permissions.applyValue(_permissions -> _permissions.permissions()))
+     *             .build());
+     * 
+     *     }
+     * }
+     * }
+     * </pre>
+     * 
+     */
+    public static CompletableFuture<GetEnvironmentPermissionSetResult> getEnvironmentPermissionSetPlain(GetEnvironmentPermissionSetPlainArgs args, InvokeOptions options) {
+        return Deployment.getInstance().invokeAsync("pulumiservice:index:getEnvironmentPermissionSet", TypeShape.of(GetEnvironmentPermissionSetResult.class), args, Utilities.withVersion(options));
     }
     /**
      * Get details about a specific Insights account.
@@ -611,6 +1243,296 @@ public final class PulumiserviceFunctions {
      */
     public static CompletableFuture<GetOrganizationMembersResult> getOrganizationMembersPlain(GetOrganizationMembersPlainArgs args, InvokeOptions options) {
         return Deployment.getInstance().invokeAsync("pulumiservice:index:getOrganizationMembers", TypeShape.of(GetOrganizationMembersResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Looks up a organization-level permission set in a Pulumi Cloud organization, built-in (such as Read Only) or custom, and returns the scopes it grants. Pass `scopes` to `organizationPermissionSetScopes` of `buildRolePermissions` to grant the set, the way access levels do in the Pulumi Cloud console. Exactly one of `builtIn` or `name` must be set.
+     * 
+     * The role gets a copy of the set&#39;s scopes, not a link to the set. If the set changes in Pulumi Cloud, the next `pulumi up` updates the role to match. If the set contains scopes this version of the provider doesn&#39;t recognize, the lookup leaves them out and warns; upgrade the provider to grant them.
+     * 
+     * ## Example Usage
+     * ### Grant a built-in organization-level permission set
+     * 
+     * <pre>
+     * {@code
+     * package generated_program;
+     * 
+     * import com.pulumi.pulumiservice.enums.BuiltInOrganizationPermissionSet;
+     * import com.pulumi.Context;
+     * import com.pulumi.Pulumi;
+     * import com.pulumi.core.Output;
+     * import com.pulumi.pulumiservice.PulumiserviceFunctions;
+     * import com.pulumi.pulumiservice.inputs.GetOrganizationPermissionSetArgs;
+     * import com.pulumi.pulumiservice.inputs.BuildRolePermissionsArgs;
+     * import com.pulumi.pulumiservice.OrganizationRole;
+     * import com.pulumi.pulumiservice.OrganizationRoleArgs;
+     * import java.util.ArrayList;
+     * import java.util.Arrays;
+     * import java.util.Map;
+     * import java.io.File;
+     * import java.nio.file.Files;
+     * import java.nio.file.Paths;
+     * 
+     * public class App {
+     *     public static void main(String[] args) {
+     *         Pulumi.run(App::stack);
+     *     }
+     * 
+     *     public static void stack(Context ctx) {
+     *         final var readOnly = PulumiserviceFunctions.getOrganizationPermissionSet(GetOrganizationPermissionSetArgs.builder()
+     *             .organizationName("my-org")
+     *             .builtIn(BuiltInOrganizationPermissionSet.ReadOnly)
+     *             .build());
+     * 
+     *         final var permissions = PulumiserviceFunctions.buildRolePermissions(BuildRolePermissionsArgs.builder()
+     *             .organizationPermissionSetScopes(readOnly.applyValue(_readOnly -> _readOnly.scopes()))
+     *             .build());
+     * 
+     *         var readOnlyRole = new OrganizationRole("readOnlyRole", OrganizationRoleArgs.builder()
+     *             .organizationName("my-org")
+     *             .name("Org Readers")
+     *             .permissions(permissions.applyValue(_permissions -> _permissions.permissions()))
+     *             .build());
+     * 
+     *     }
+     * }
+     * }
+     * </pre>
+     * 
+     */
+    public static Output<GetOrganizationPermissionSetResult> getOrganizationPermissionSet(GetOrganizationPermissionSetArgs args) {
+        return getOrganizationPermissionSet(args, InvokeOptions.Empty);
+    }
+    /**
+     * Looks up a organization-level permission set in a Pulumi Cloud organization, built-in (such as Read Only) or custom, and returns the scopes it grants. Pass `scopes` to `organizationPermissionSetScopes` of `buildRolePermissions` to grant the set, the way access levels do in the Pulumi Cloud console. Exactly one of `builtIn` or `name` must be set.
+     * 
+     * The role gets a copy of the set&#39;s scopes, not a link to the set. If the set changes in Pulumi Cloud, the next `pulumi up` updates the role to match. If the set contains scopes this version of the provider doesn&#39;t recognize, the lookup leaves them out and warns; upgrade the provider to grant them.
+     * 
+     * ## Example Usage
+     * ### Grant a built-in organization-level permission set
+     * 
+     * <pre>
+     * {@code
+     * package generated_program;
+     * 
+     * import com.pulumi.pulumiservice.enums.BuiltInOrganizationPermissionSet;
+     * import com.pulumi.Context;
+     * import com.pulumi.Pulumi;
+     * import com.pulumi.core.Output;
+     * import com.pulumi.pulumiservice.PulumiserviceFunctions;
+     * import com.pulumi.pulumiservice.inputs.GetOrganizationPermissionSetArgs;
+     * import com.pulumi.pulumiservice.inputs.BuildRolePermissionsArgs;
+     * import com.pulumi.pulumiservice.OrganizationRole;
+     * import com.pulumi.pulumiservice.OrganizationRoleArgs;
+     * import java.util.ArrayList;
+     * import java.util.Arrays;
+     * import java.util.Map;
+     * import java.io.File;
+     * import java.nio.file.Files;
+     * import java.nio.file.Paths;
+     * 
+     * public class App {
+     *     public static void main(String[] args) {
+     *         Pulumi.run(App::stack);
+     *     }
+     * 
+     *     public static void stack(Context ctx) {
+     *         final var readOnly = PulumiserviceFunctions.getOrganizationPermissionSet(GetOrganizationPermissionSetArgs.builder()
+     *             .organizationName("my-org")
+     *             .builtIn(BuiltInOrganizationPermissionSet.ReadOnly)
+     *             .build());
+     * 
+     *         final var permissions = PulumiserviceFunctions.buildRolePermissions(BuildRolePermissionsArgs.builder()
+     *             .organizationPermissionSetScopes(readOnly.applyValue(_readOnly -> _readOnly.scopes()))
+     *             .build());
+     * 
+     *         var readOnlyRole = new OrganizationRole("readOnlyRole", OrganizationRoleArgs.builder()
+     *             .organizationName("my-org")
+     *             .name("Org Readers")
+     *             .permissions(permissions.applyValue(_permissions -> _permissions.permissions()))
+     *             .build());
+     * 
+     *     }
+     * }
+     * }
+     * </pre>
+     * 
+     */
+    public static CompletableFuture<GetOrganizationPermissionSetResult> getOrganizationPermissionSetPlain(GetOrganizationPermissionSetPlainArgs args) {
+        return getOrganizationPermissionSetPlain(args, InvokeOptions.Empty);
+    }
+    /**
+     * Looks up a organization-level permission set in a Pulumi Cloud organization, built-in (such as Read Only) or custom, and returns the scopes it grants. Pass `scopes` to `organizationPermissionSetScopes` of `buildRolePermissions` to grant the set, the way access levels do in the Pulumi Cloud console. Exactly one of `builtIn` or `name` must be set.
+     * 
+     * The role gets a copy of the set&#39;s scopes, not a link to the set. If the set changes in Pulumi Cloud, the next `pulumi up` updates the role to match. If the set contains scopes this version of the provider doesn&#39;t recognize, the lookup leaves them out and warns; upgrade the provider to grant them.
+     * 
+     * ## Example Usage
+     * ### Grant a built-in organization-level permission set
+     * 
+     * <pre>
+     * {@code
+     * package generated_program;
+     * 
+     * import com.pulumi.pulumiservice.enums.BuiltInOrganizationPermissionSet;
+     * import com.pulumi.Context;
+     * import com.pulumi.Pulumi;
+     * import com.pulumi.core.Output;
+     * import com.pulumi.pulumiservice.PulumiserviceFunctions;
+     * import com.pulumi.pulumiservice.inputs.GetOrganizationPermissionSetArgs;
+     * import com.pulumi.pulumiservice.inputs.BuildRolePermissionsArgs;
+     * import com.pulumi.pulumiservice.OrganizationRole;
+     * import com.pulumi.pulumiservice.OrganizationRoleArgs;
+     * import java.util.ArrayList;
+     * import java.util.Arrays;
+     * import java.util.Map;
+     * import java.io.File;
+     * import java.nio.file.Files;
+     * import java.nio.file.Paths;
+     * 
+     * public class App {
+     *     public static void main(String[] args) {
+     *         Pulumi.run(App::stack);
+     *     }
+     * 
+     *     public static void stack(Context ctx) {
+     *         final var readOnly = PulumiserviceFunctions.getOrganizationPermissionSet(GetOrganizationPermissionSetArgs.builder()
+     *             .organizationName("my-org")
+     *             .builtIn(BuiltInOrganizationPermissionSet.ReadOnly)
+     *             .build());
+     * 
+     *         final var permissions = PulumiserviceFunctions.buildRolePermissions(BuildRolePermissionsArgs.builder()
+     *             .organizationPermissionSetScopes(readOnly.applyValue(_readOnly -> _readOnly.scopes()))
+     *             .build());
+     * 
+     *         var readOnlyRole = new OrganizationRole("readOnlyRole", OrganizationRoleArgs.builder()
+     *             .organizationName("my-org")
+     *             .name("Org Readers")
+     *             .permissions(permissions.applyValue(_permissions -> _permissions.permissions()))
+     *             .build());
+     * 
+     *     }
+     * }
+     * }
+     * </pre>
+     * 
+     */
+    public static Output<GetOrganizationPermissionSetResult> getOrganizationPermissionSet(GetOrganizationPermissionSetArgs args, InvokeOptions options) {
+        return Deployment.getInstance().invoke("pulumiservice:index:getOrganizationPermissionSet", TypeShape.of(GetOrganizationPermissionSetResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Looks up a organization-level permission set in a Pulumi Cloud organization, built-in (such as Read Only) or custom, and returns the scopes it grants. Pass `scopes` to `organizationPermissionSetScopes` of `buildRolePermissions` to grant the set, the way access levels do in the Pulumi Cloud console. Exactly one of `builtIn` or `name` must be set.
+     * 
+     * The role gets a copy of the set&#39;s scopes, not a link to the set. If the set changes in Pulumi Cloud, the next `pulumi up` updates the role to match. If the set contains scopes this version of the provider doesn&#39;t recognize, the lookup leaves them out and warns; upgrade the provider to grant them.
+     * 
+     * ## Example Usage
+     * ### Grant a built-in organization-level permission set
+     * 
+     * <pre>
+     * {@code
+     * package generated_program;
+     * 
+     * import com.pulumi.pulumiservice.enums.BuiltInOrganizationPermissionSet;
+     * import com.pulumi.Context;
+     * import com.pulumi.Pulumi;
+     * import com.pulumi.core.Output;
+     * import com.pulumi.pulumiservice.PulumiserviceFunctions;
+     * import com.pulumi.pulumiservice.inputs.GetOrganizationPermissionSetArgs;
+     * import com.pulumi.pulumiservice.inputs.BuildRolePermissionsArgs;
+     * import com.pulumi.pulumiservice.OrganizationRole;
+     * import com.pulumi.pulumiservice.OrganizationRoleArgs;
+     * import java.util.ArrayList;
+     * import java.util.Arrays;
+     * import java.util.Map;
+     * import java.io.File;
+     * import java.nio.file.Files;
+     * import java.nio.file.Paths;
+     * 
+     * public class App {
+     *     public static void main(String[] args) {
+     *         Pulumi.run(App::stack);
+     *     }
+     * 
+     *     public static void stack(Context ctx) {
+     *         final var readOnly = PulumiserviceFunctions.getOrganizationPermissionSet(GetOrganizationPermissionSetArgs.builder()
+     *             .organizationName("my-org")
+     *             .builtIn(BuiltInOrganizationPermissionSet.ReadOnly)
+     *             .build());
+     * 
+     *         final var permissions = PulumiserviceFunctions.buildRolePermissions(BuildRolePermissionsArgs.builder()
+     *             .organizationPermissionSetScopes(readOnly.applyValue(_readOnly -> _readOnly.scopes()))
+     *             .build());
+     * 
+     *         var readOnlyRole = new OrganizationRole("readOnlyRole", OrganizationRoleArgs.builder()
+     *             .organizationName("my-org")
+     *             .name("Org Readers")
+     *             .permissions(permissions.applyValue(_permissions -> _permissions.permissions()))
+     *             .build());
+     * 
+     *     }
+     * }
+     * }
+     * </pre>
+     * 
+     */
+    public static Output<GetOrganizationPermissionSetResult> getOrganizationPermissionSet(GetOrganizationPermissionSetArgs args, InvokeOutputOptions options) {
+        return Deployment.getInstance().invoke("pulumiservice:index:getOrganizationPermissionSet", TypeShape.of(GetOrganizationPermissionSetResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Looks up a organization-level permission set in a Pulumi Cloud organization, built-in (such as Read Only) or custom, and returns the scopes it grants. Pass `scopes` to `organizationPermissionSetScopes` of `buildRolePermissions` to grant the set, the way access levels do in the Pulumi Cloud console. Exactly one of `builtIn` or `name` must be set.
+     * 
+     * The role gets a copy of the set&#39;s scopes, not a link to the set. If the set changes in Pulumi Cloud, the next `pulumi up` updates the role to match. If the set contains scopes this version of the provider doesn&#39;t recognize, the lookup leaves them out and warns; upgrade the provider to grant them.
+     * 
+     * ## Example Usage
+     * ### Grant a built-in organization-level permission set
+     * 
+     * <pre>
+     * {@code
+     * package generated_program;
+     * 
+     * import com.pulumi.pulumiservice.enums.BuiltInOrganizationPermissionSet;
+     * import com.pulumi.Context;
+     * import com.pulumi.Pulumi;
+     * import com.pulumi.core.Output;
+     * import com.pulumi.pulumiservice.PulumiserviceFunctions;
+     * import com.pulumi.pulumiservice.inputs.GetOrganizationPermissionSetArgs;
+     * import com.pulumi.pulumiservice.inputs.BuildRolePermissionsArgs;
+     * import com.pulumi.pulumiservice.OrganizationRole;
+     * import com.pulumi.pulumiservice.OrganizationRoleArgs;
+     * import java.util.ArrayList;
+     * import java.util.Arrays;
+     * import java.util.Map;
+     * import java.io.File;
+     * import java.nio.file.Files;
+     * import java.nio.file.Paths;
+     * 
+     * public class App {
+     *     public static void main(String[] args) {
+     *         Pulumi.run(App::stack);
+     *     }
+     * 
+     *     public static void stack(Context ctx) {
+     *         final var readOnly = PulumiserviceFunctions.getOrganizationPermissionSet(GetOrganizationPermissionSetArgs.builder()
+     *             .organizationName("my-org")
+     *             .builtIn(BuiltInOrganizationPermissionSet.ReadOnly)
+     *             .build());
+     * 
+     *         final var permissions = PulumiserviceFunctions.buildRolePermissions(BuildRolePermissionsArgs.builder()
+     *             .organizationPermissionSetScopes(readOnly.applyValue(_readOnly -> _readOnly.scopes()))
+     *             .build());
+     * 
+     *         var readOnlyRole = new OrganizationRole("readOnlyRole", OrganizationRoleArgs.builder()
+     *             .organizationName("my-org")
+     *             .name("Org Readers")
+     *             .permissions(permissions.applyValue(_permissions -> _permissions.permissions()))
+     *             .build());
+     * 
+     *     }
+     * }
+     * }
+     * </pre>
+     * 
+     */
+    public static CompletableFuture<GetOrganizationPermissionSetResult> getOrganizationPermissionSetPlain(GetOrganizationPermissionSetPlainArgs args, InvokeOptions options) {
+        return Deployment.getInstance().invokeAsync("pulumiservice:index:getOrganizationPermissionSet", TypeShape.of(GetOrganizationPermissionSetResult.class), args, Utilities.withVersion(options));
     }
     /**
      * Looks up a role in a Pulumi Cloud organization by the name shown in the Pulumi Cloud console. Finds both built-in and custom roles. Use the returned `roleId` for inputs that take a role ID, such as `TeamRoleAssignment.roleId` and `OrganizationMember.roleId`, instead of hardcoding the ID. Returns an error when no role has the given name.
@@ -1381,5 +2303,585 @@ public final class PulumiserviceFunctions {
      */
     public static CompletableFuture<GetStackResult> getStackPlain(GetStackPlainArgs args, InvokeOptions options) {
         return Deployment.getInstance().invokeAsync("pulumiservice:index:getStack", TypeShape.of(GetStackResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Looks up a stack permission set in a Pulumi Cloud organization, built-in (such as Stack Write) or custom, and returns the scopes it grants. Pass `scopes` to `permissionSetScopes` in `stackRules` of `buildRolePermissions` to grant the set, the way access levels do in the Pulumi Cloud console. Exactly one of `builtIn` or `name` must be set.
+     * 
+     * The role gets a copy of the set&#39;s scopes, not a link to the set. If the set changes in Pulumi Cloud, the next `pulumi up` updates the role to match. If the set contains scopes this version of the provider doesn&#39;t recognize, the lookup leaves them out and warns; upgrade the provider to grant them.
+     * 
+     * ## Example Usage
+     * ### Grant a built-in stack permission set
+     * 
+     * Built-in permission sets, such as Stack Write, are the access levels every organization has. Pass the set&#39;s `scopes` to a stack rule&#39;s `permissionSetScopes`.
+     * 
+     * <pre>
+     * {@code
+     * package generated_program;
+     * 
+     * import com.pulumi.pulumiservice.enums.BuiltInStackPermissionSet;
+     * import com.pulumi.Context;
+     * import com.pulumi.Pulumi;
+     * import com.pulumi.core.Output;
+     * import com.pulumi.pulumiservice.PulumiserviceFunctions;
+     * import com.pulumi.pulumiservice.inputs.GetStackPermissionSetArgs;
+     * import com.pulumi.pulumiservice.inputs.BuildRolePermissionsArgs;
+     * import com.pulumi.pulumiservice.inputs.RoleStackRuleArgs;
+     * import com.pulumi.pulumiservice.OrganizationRole;
+     * import com.pulumi.pulumiservice.OrganizationRoleArgs;
+     * import java.util.ArrayList;
+     * import java.util.Arrays;
+     * import java.util.Map;
+     * import java.io.File;
+     * import java.nio.file.Files;
+     * import java.nio.file.Paths;
+     * 
+     * public class App {
+     *     public static void main(String[] args) {
+     *         Pulumi.run(App::stack);
+     *     }
+     * 
+     *     public static void stack(Context ctx) {
+     *         final var stackWrite = PulumiserviceFunctions.getStackPermissionSet(GetStackPermissionSetArgs.builder()
+     *             .organizationName("my-org")
+     *             .builtIn(BuiltInStackPermissionSet.Write)
+     *             .build());
+     * 
+     *         final var permissions = PulumiserviceFunctions.buildRolePermissions(BuildRolePermissionsArgs.builder()
+     *             .stackRules(RoleStackRuleArgs.builder()
+     *                 .all(true)
+     *                 .permissionSetScopes(stackWrite.applyValue(_stackWrite -> _stackWrite.scopes()))
+     *                 .build())
+     *             .build());
+     * 
+     *         var stackWriterRole = new OrganizationRole("stackWriterRole", OrganizationRoleArgs.builder()
+     *             .organizationName("my-org")
+     *             .name("Stack Writers")
+     *             .permissions(permissions.applyValue(_permissions -> _permissions.permissions()))
+     *             .build());
+     * 
+     *     }
+     * }
+     * }
+     * </pre>
+     * ### Grant a custom stack permission set
+     * 
+     * A custom permission set is looked up by the name shown in the Pulumi Cloud console.
+     * 
+     * <pre>
+     * {@code
+     * package generated_program;
+     * 
+     * import com.pulumi.Context;
+     * import com.pulumi.Pulumi;
+     * import com.pulumi.core.Output;
+     * import com.pulumi.pulumiservice.PulumiserviceFunctions;
+     * import com.pulumi.pulumiservice.inputs.GetStackPermissionSetArgs;
+     * import com.pulumi.pulumiservice.inputs.BuildRolePermissionsArgs;
+     * import com.pulumi.pulumiservice.inputs.RoleStackRuleArgs;
+     * import com.pulumi.pulumiservice.OrganizationRole;
+     * import com.pulumi.pulumiservice.OrganizationRoleArgs;
+     * import java.util.ArrayList;
+     * import java.util.Arrays;
+     * import java.util.Map;
+     * import java.io.File;
+     * import java.nio.file.Files;
+     * import java.nio.file.Paths;
+     * 
+     * public class App {
+     *     public static void main(String[] args) {
+     *         Pulumi.run(App::stack);
+     *     }
+     * 
+     *     public static void stack(Context ctx) {
+     *         final var deployers = PulumiserviceFunctions.getStackPermissionSet(GetStackPermissionSetArgs.builder()
+     *             .organizationName("my-org")
+     *             .name("Deployers")
+     *             .build());
+     * 
+     *         final var permissions = PulumiserviceFunctions.buildRolePermissions(BuildRolePermissionsArgs.builder()
+     *             .stackRules(RoleStackRuleArgs.builder()
+     *                 .all(true)
+     *                 .permissionSetScopes(deployers.applyValue(_deployers -> _deployers.scopes()))
+     *                 .build())
+     *             .build());
+     * 
+     *         var deployerRole = new OrganizationRole("deployerRole", OrganizationRoleArgs.builder()
+     *             .organizationName("my-org")
+     *             .name("Deployers")
+     *             .permissions(permissions.applyValue(_permissions -> _permissions.permissions()))
+     *             .build());
+     * 
+     *     }
+     * }
+     * }
+     * </pre>
+     * 
+     */
+    public static Output<GetStackPermissionSetResult> getStackPermissionSet(GetStackPermissionSetArgs args) {
+        return getStackPermissionSet(args, InvokeOptions.Empty);
+    }
+    /**
+     * Looks up a stack permission set in a Pulumi Cloud organization, built-in (such as Stack Write) or custom, and returns the scopes it grants. Pass `scopes` to `permissionSetScopes` in `stackRules` of `buildRolePermissions` to grant the set, the way access levels do in the Pulumi Cloud console. Exactly one of `builtIn` or `name` must be set.
+     * 
+     * The role gets a copy of the set&#39;s scopes, not a link to the set. If the set changes in Pulumi Cloud, the next `pulumi up` updates the role to match. If the set contains scopes this version of the provider doesn&#39;t recognize, the lookup leaves them out and warns; upgrade the provider to grant them.
+     * 
+     * ## Example Usage
+     * ### Grant a built-in stack permission set
+     * 
+     * Built-in permission sets, such as Stack Write, are the access levels every organization has. Pass the set&#39;s `scopes` to a stack rule&#39;s `permissionSetScopes`.
+     * 
+     * <pre>
+     * {@code
+     * package generated_program;
+     * 
+     * import com.pulumi.pulumiservice.enums.BuiltInStackPermissionSet;
+     * import com.pulumi.Context;
+     * import com.pulumi.Pulumi;
+     * import com.pulumi.core.Output;
+     * import com.pulumi.pulumiservice.PulumiserviceFunctions;
+     * import com.pulumi.pulumiservice.inputs.GetStackPermissionSetArgs;
+     * import com.pulumi.pulumiservice.inputs.BuildRolePermissionsArgs;
+     * import com.pulumi.pulumiservice.inputs.RoleStackRuleArgs;
+     * import com.pulumi.pulumiservice.OrganizationRole;
+     * import com.pulumi.pulumiservice.OrganizationRoleArgs;
+     * import java.util.ArrayList;
+     * import java.util.Arrays;
+     * import java.util.Map;
+     * import java.io.File;
+     * import java.nio.file.Files;
+     * import java.nio.file.Paths;
+     * 
+     * public class App {
+     *     public static void main(String[] args) {
+     *         Pulumi.run(App::stack);
+     *     }
+     * 
+     *     public static void stack(Context ctx) {
+     *         final var stackWrite = PulumiserviceFunctions.getStackPermissionSet(GetStackPermissionSetArgs.builder()
+     *             .organizationName("my-org")
+     *             .builtIn(BuiltInStackPermissionSet.Write)
+     *             .build());
+     * 
+     *         final var permissions = PulumiserviceFunctions.buildRolePermissions(BuildRolePermissionsArgs.builder()
+     *             .stackRules(RoleStackRuleArgs.builder()
+     *                 .all(true)
+     *                 .permissionSetScopes(stackWrite.applyValue(_stackWrite -> _stackWrite.scopes()))
+     *                 .build())
+     *             .build());
+     * 
+     *         var stackWriterRole = new OrganizationRole("stackWriterRole", OrganizationRoleArgs.builder()
+     *             .organizationName("my-org")
+     *             .name("Stack Writers")
+     *             .permissions(permissions.applyValue(_permissions -> _permissions.permissions()))
+     *             .build());
+     * 
+     *     }
+     * }
+     * }
+     * </pre>
+     * ### Grant a custom stack permission set
+     * 
+     * A custom permission set is looked up by the name shown in the Pulumi Cloud console.
+     * 
+     * <pre>
+     * {@code
+     * package generated_program;
+     * 
+     * import com.pulumi.Context;
+     * import com.pulumi.Pulumi;
+     * import com.pulumi.core.Output;
+     * import com.pulumi.pulumiservice.PulumiserviceFunctions;
+     * import com.pulumi.pulumiservice.inputs.GetStackPermissionSetArgs;
+     * import com.pulumi.pulumiservice.inputs.BuildRolePermissionsArgs;
+     * import com.pulumi.pulumiservice.inputs.RoleStackRuleArgs;
+     * import com.pulumi.pulumiservice.OrganizationRole;
+     * import com.pulumi.pulumiservice.OrganizationRoleArgs;
+     * import java.util.ArrayList;
+     * import java.util.Arrays;
+     * import java.util.Map;
+     * import java.io.File;
+     * import java.nio.file.Files;
+     * import java.nio.file.Paths;
+     * 
+     * public class App {
+     *     public static void main(String[] args) {
+     *         Pulumi.run(App::stack);
+     *     }
+     * 
+     *     public static void stack(Context ctx) {
+     *         final var deployers = PulumiserviceFunctions.getStackPermissionSet(GetStackPermissionSetArgs.builder()
+     *             .organizationName("my-org")
+     *             .name("Deployers")
+     *             .build());
+     * 
+     *         final var permissions = PulumiserviceFunctions.buildRolePermissions(BuildRolePermissionsArgs.builder()
+     *             .stackRules(RoleStackRuleArgs.builder()
+     *                 .all(true)
+     *                 .permissionSetScopes(deployers.applyValue(_deployers -> _deployers.scopes()))
+     *                 .build())
+     *             .build());
+     * 
+     *         var deployerRole = new OrganizationRole("deployerRole", OrganizationRoleArgs.builder()
+     *             .organizationName("my-org")
+     *             .name("Deployers")
+     *             .permissions(permissions.applyValue(_permissions -> _permissions.permissions()))
+     *             .build());
+     * 
+     *     }
+     * }
+     * }
+     * </pre>
+     * 
+     */
+    public static CompletableFuture<GetStackPermissionSetResult> getStackPermissionSetPlain(GetStackPermissionSetPlainArgs args) {
+        return getStackPermissionSetPlain(args, InvokeOptions.Empty);
+    }
+    /**
+     * Looks up a stack permission set in a Pulumi Cloud organization, built-in (such as Stack Write) or custom, and returns the scopes it grants. Pass `scopes` to `permissionSetScopes` in `stackRules` of `buildRolePermissions` to grant the set, the way access levels do in the Pulumi Cloud console. Exactly one of `builtIn` or `name` must be set.
+     * 
+     * The role gets a copy of the set&#39;s scopes, not a link to the set. If the set changes in Pulumi Cloud, the next `pulumi up` updates the role to match. If the set contains scopes this version of the provider doesn&#39;t recognize, the lookup leaves them out and warns; upgrade the provider to grant them.
+     * 
+     * ## Example Usage
+     * ### Grant a built-in stack permission set
+     * 
+     * Built-in permission sets, such as Stack Write, are the access levels every organization has. Pass the set&#39;s `scopes` to a stack rule&#39;s `permissionSetScopes`.
+     * 
+     * <pre>
+     * {@code
+     * package generated_program;
+     * 
+     * import com.pulumi.pulumiservice.enums.BuiltInStackPermissionSet;
+     * import com.pulumi.Context;
+     * import com.pulumi.Pulumi;
+     * import com.pulumi.core.Output;
+     * import com.pulumi.pulumiservice.PulumiserviceFunctions;
+     * import com.pulumi.pulumiservice.inputs.GetStackPermissionSetArgs;
+     * import com.pulumi.pulumiservice.inputs.BuildRolePermissionsArgs;
+     * import com.pulumi.pulumiservice.inputs.RoleStackRuleArgs;
+     * import com.pulumi.pulumiservice.OrganizationRole;
+     * import com.pulumi.pulumiservice.OrganizationRoleArgs;
+     * import java.util.ArrayList;
+     * import java.util.Arrays;
+     * import java.util.Map;
+     * import java.io.File;
+     * import java.nio.file.Files;
+     * import java.nio.file.Paths;
+     * 
+     * public class App {
+     *     public static void main(String[] args) {
+     *         Pulumi.run(App::stack);
+     *     }
+     * 
+     *     public static void stack(Context ctx) {
+     *         final var stackWrite = PulumiserviceFunctions.getStackPermissionSet(GetStackPermissionSetArgs.builder()
+     *             .organizationName("my-org")
+     *             .builtIn(BuiltInStackPermissionSet.Write)
+     *             .build());
+     * 
+     *         final var permissions = PulumiserviceFunctions.buildRolePermissions(BuildRolePermissionsArgs.builder()
+     *             .stackRules(RoleStackRuleArgs.builder()
+     *                 .all(true)
+     *                 .permissionSetScopes(stackWrite.applyValue(_stackWrite -> _stackWrite.scopes()))
+     *                 .build())
+     *             .build());
+     * 
+     *         var stackWriterRole = new OrganizationRole("stackWriterRole", OrganizationRoleArgs.builder()
+     *             .organizationName("my-org")
+     *             .name("Stack Writers")
+     *             .permissions(permissions.applyValue(_permissions -> _permissions.permissions()))
+     *             .build());
+     * 
+     *     }
+     * }
+     * }
+     * </pre>
+     * ### Grant a custom stack permission set
+     * 
+     * A custom permission set is looked up by the name shown in the Pulumi Cloud console.
+     * 
+     * <pre>
+     * {@code
+     * package generated_program;
+     * 
+     * import com.pulumi.Context;
+     * import com.pulumi.Pulumi;
+     * import com.pulumi.core.Output;
+     * import com.pulumi.pulumiservice.PulumiserviceFunctions;
+     * import com.pulumi.pulumiservice.inputs.GetStackPermissionSetArgs;
+     * import com.pulumi.pulumiservice.inputs.BuildRolePermissionsArgs;
+     * import com.pulumi.pulumiservice.inputs.RoleStackRuleArgs;
+     * import com.pulumi.pulumiservice.OrganizationRole;
+     * import com.pulumi.pulumiservice.OrganizationRoleArgs;
+     * import java.util.ArrayList;
+     * import java.util.Arrays;
+     * import java.util.Map;
+     * import java.io.File;
+     * import java.nio.file.Files;
+     * import java.nio.file.Paths;
+     * 
+     * public class App {
+     *     public static void main(String[] args) {
+     *         Pulumi.run(App::stack);
+     *     }
+     * 
+     *     public static void stack(Context ctx) {
+     *         final var deployers = PulumiserviceFunctions.getStackPermissionSet(GetStackPermissionSetArgs.builder()
+     *             .organizationName("my-org")
+     *             .name("Deployers")
+     *             .build());
+     * 
+     *         final var permissions = PulumiserviceFunctions.buildRolePermissions(BuildRolePermissionsArgs.builder()
+     *             .stackRules(RoleStackRuleArgs.builder()
+     *                 .all(true)
+     *                 .permissionSetScopes(deployers.applyValue(_deployers -> _deployers.scopes()))
+     *                 .build())
+     *             .build());
+     * 
+     *         var deployerRole = new OrganizationRole("deployerRole", OrganizationRoleArgs.builder()
+     *             .organizationName("my-org")
+     *             .name("Deployers")
+     *             .permissions(permissions.applyValue(_permissions -> _permissions.permissions()))
+     *             .build());
+     * 
+     *     }
+     * }
+     * }
+     * </pre>
+     * 
+     */
+    public static Output<GetStackPermissionSetResult> getStackPermissionSet(GetStackPermissionSetArgs args, InvokeOptions options) {
+        return Deployment.getInstance().invoke("pulumiservice:index:getStackPermissionSet", TypeShape.of(GetStackPermissionSetResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Looks up a stack permission set in a Pulumi Cloud organization, built-in (such as Stack Write) or custom, and returns the scopes it grants. Pass `scopes` to `permissionSetScopes` in `stackRules` of `buildRolePermissions` to grant the set, the way access levels do in the Pulumi Cloud console. Exactly one of `builtIn` or `name` must be set.
+     * 
+     * The role gets a copy of the set&#39;s scopes, not a link to the set. If the set changes in Pulumi Cloud, the next `pulumi up` updates the role to match. If the set contains scopes this version of the provider doesn&#39;t recognize, the lookup leaves them out and warns; upgrade the provider to grant them.
+     * 
+     * ## Example Usage
+     * ### Grant a built-in stack permission set
+     * 
+     * Built-in permission sets, such as Stack Write, are the access levels every organization has. Pass the set&#39;s `scopes` to a stack rule&#39;s `permissionSetScopes`.
+     * 
+     * <pre>
+     * {@code
+     * package generated_program;
+     * 
+     * import com.pulumi.pulumiservice.enums.BuiltInStackPermissionSet;
+     * import com.pulumi.Context;
+     * import com.pulumi.Pulumi;
+     * import com.pulumi.core.Output;
+     * import com.pulumi.pulumiservice.PulumiserviceFunctions;
+     * import com.pulumi.pulumiservice.inputs.GetStackPermissionSetArgs;
+     * import com.pulumi.pulumiservice.inputs.BuildRolePermissionsArgs;
+     * import com.pulumi.pulumiservice.inputs.RoleStackRuleArgs;
+     * import com.pulumi.pulumiservice.OrganizationRole;
+     * import com.pulumi.pulumiservice.OrganizationRoleArgs;
+     * import java.util.ArrayList;
+     * import java.util.Arrays;
+     * import java.util.Map;
+     * import java.io.File;
+     * import java.nio.file.Files;
+     * import java.nio.file.Paths;
+     * 
+     * public class App {
+     *     public static void main(String[] args) {
+     *         Pulumi.run(App::stack);
+     *     }
+     * 
+     *     public static void stack(Context ctx) {
+     *         final var stackWrite = PulumiserviceFunctions.getStackPermissionSet(GetStackPermissionSetArgs.builder()
+     *             .organizationName("my-org")
+     *             .builtIn(BuiltInStackPermissionSet.Write)
+     *             .build());
+     * 
+     *         final var permissions = PulumiserviceFunctions.buildRolePermissions(BuildRolePermissionsArgs.builder()
+     *             .stackRules(RoleStackRuleArgs.builder()
+     *                 .all(true)
+     *                 .permissionSetScopes(stackWrite.applyValue(_stackWrite -> _stackWrite.scopes()))
+     *                 .build())
+     *             .build());
+     * 
+     *         var stackWriterRole = new OrganizationRole("stackWriterRole", OrganizationRoleArgs.builder()
+     *             .organizationName("my-org")
+     *             .name("Stack Writers")
+     *             .permissions(permissions.applyValue(_permissions -> _permissions.permissions()))
+     *             .build());
+     * 
+     *     }
+     * }
+     * }
+     * </pre>
+     * ### Grant a custom stack permission set
+     * 
+     * A custom permission set is looked up by the name shown in the Pulumi Cloud console.
+     * 
+     * <pre>
+     * {@code
+     * package generated_program;
+     * 
+     * import com.pulumi.Context;
+     * import com.pulumi.Pulumi;
+     * import com.pulumi.core.Output;
+     * import com.pulumi.pulumiservice.PulumiserviceFunctions;
+     * import com.pulumi.pulumiservice.inputs.GetStackPermissionSetArgs;
+     * import com.pulumi.pulumiservice.inputs.BuildRolePermissionsArgs;
+     * import com.pulumi.pulumiservice.inputs.RoleStackRuleArgs;
+     * import com.pulumi.pulumiservice.OrganizationRole;
+     * import com.pulumi.pulumiservice.OrganizationRoleArgs;
+     * import java.util.ArrayList;
+     * import java.util.Arrays;
+     * import java.util.Map;
+     * import java.io.File;
+     * import java.nio.file.Files;
+     * import java.nio.file.Paths;
+     * 
+     * public class App {
+     *     public static void main(String[] args) {
+     *         Pulumi.run(App::stack);
+     *     }
+     * 
+     *     public static void stack(Context ctx) {
+     *         final var deployers = PulumiserviceFunctions.getStackPermissionSet(GetStackPermissionSetArgs.builder()
+     *             .organizationName("my-org")
+     *             .name("Deployers")
+     *             .build());
+     * 
+     *         final var permissions = PulumiserviceFunctions.buildRolePermissions(BuildRolePermissionsArgs.builder()
+     *             .stackRules(RoleStackRuleArgs.builder()
+     *                 .all(true)
+     *                 .permissionSetScopes(deployers.applyValue(_deployers -> _deployers.scopes()))
+     *                 .build())
+     *             .build());
+     * 
+     *         var deployerRole = new OrganizationRole("deployerRole", OrganizationRoleArgs.builder()
+     *             .organizationName("my-org")
+     *             .name("Deployers")
+     *             .permissions(permissions.applyValue(_permissions -> _permissions.permissions()))
+     *             .build());
+     * 
+     *     }
+     * }
+     * }
+     * </pre>
+     * 
+     */
+    public static Output<GetStackPermissionSetResult> getStackPermissionSet(GetStackPermissionSetArgs args, InvokeOutputOptions options) {
+        return Deployment.getInstance().invoke("pulumiservice:index:getStackPermissionSet", TypeShape.of(GetStackPermissionSetResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Looks up a stack permission set in a Pulumi Cloud organization, built-in (such as Stack Write) or custom, and returns the scopes it grants. Pass `scopes` to `permissionSetScopes` in `stackRules` of `buildRolePermissions` to grant the set, the way access levels do in the Pulumi Cloud console. Exactly one of `builtIn` or `name` must be set.
+     * 
+     * The role gets a copy of the set&#39;s scopes, not a link to the set. If the set changes in Pulumi Cloud, the next `pulumi up` updates the role to match. If the set contains scopes this version of the provider doesn&#39;t recognize, the lookup leaves them out and warns; upgrade the provider to grant them.
+     * 
+     * ## Example Usage
+     * ### Grant a built-in stack permission set
+     * 
+     * Built-in permission sets, such as Stack Write, are the access levels every organization has. Pass the set&#39;s `scopes` to a stack rule&#39;s `permissionSetScopes`.
+     * 
+     * <pre>
+     * {@code
+     * package generated_program;
+     * 
+     * import com.pulumi.pulumiservice.enums.BuiltInStackPermissionSet;
+     * import com.pulumi.Context;
+     * import com.pulumi.Pulumi;
+     * import com.pulumi.core.Output;
+     * import com.pulumi.pulumiservice.PulumiserviceFunctions;
+     * import com.pulumi.pulumiservice.inputs.GetStackPermissionSetArgs;
+     * import com.pulumi.pulumiservice.inputs.BuildRolePermissionsArgs;
+     * import com.pulumi.pulumiservice.inputs.RoleStackRuleArgs;
+     * import com.pulumi.pulumiservice.OrganizationRole;
+     * import com.pulumi.pulumiservice.OrganizationRoleArgs;
+     * import java.util.ArrayList;
+     * import java.util.Arrays;
+     * import java.util.Map;
+     * import java.io.File;
+     * import java.nio.file.Files;
+     * import java.nio.file.Paths;
+     * 
+     * public class App {
+     *     public static void main(String[] args) {
+     *         Pulumi.run(App::stack);
+     *     }
+     * 
+     *     public static void stack(Context ctx) {
+     *         final var stackWrite = PulumiserviceFunctions.getStackPermissionSet(GetStackPermissionSetArgs.builder()
+     *             .organizationName("my-org")
+     *             .builtIn(BuiltInStackPermissionSet.Write)
+     *             .build());
+     * 
+     *         final var permissions = PulumiserviceFunctions.buildRolePermissions(BuildRolePermissionsArgs.builder()
+     *             .stackRules(RoleStackRuleArgs.builder()
+     *                 .all(true)
+     *                 .permissionSetScopes(stackWrite.applyValue(_stackWrite -> _stackWrite.scopes()))
+     *                 .build())
+     *             .build());
+     * 
+     *         var stackWriterRole = new OrganizationRole("stackWriterRole", OrganizationRoleArgs.builder()
+     *             .organizationName("my-org")
+     *             .name("Stack Writers")
+     *             .permissions(permissions.applyValue(_permissions -> _permissions.permissions()))
+     *             .build());
+     * 
+     *     }
+     * }
+     * }
+     * </pre>
+     * ### Grant a custom stack permission set
+     * 
+     * A custom permission set is looked up by the name shown in the Pulumi Cloud console.
+     * 
+     * <pre>
+     * {@code
+     * package generated_program;
+     * 
+     * import com.pulumi.Context;
+     * import com.pulumi.Pulumi;
+     * import com.pulumi.core.Output;
+     * import com.pulumi.pulumiservice.PulumiserviceFunctions;
+     * import com.pulumi.pulumiservice.inputs.GetStackPermissionSetArgs;
+     * import com.pulumi.pulumiservice.inputs.BuildRolePermissionsArgs;
+     * import com.pulumi.pulumiservice.inputs.RoleStackRuleArgs;
+     * import com.pulumi.pulumiservice.OrganizationRole;
+     * import com.pulumi.pulumiservice.OrganizationRoleArgs;
+     * import java.util.ArrayList;
+     * import java.util.Arrays;
+     * import java.util.Map;
+     * import java.io.File;
+     * import java.nio.file.Files;
+     * import java.nio.file.Paths;
+     * 
+     * public class App {
+     *     public static void main(String[] args) {
+     *         Pulumi.run(App::stack);
+     *     }
+     * 
+     *     public static void stack(Context ctx) {
+     *         final var deployers = PulumiserviceFunctions.getStackPermissionSet(GetStackPermissionSetArgs.builder()
+     *             .organizationName("my-org")
+     *             .name("Deployers")
+     *             .build());
+     * 
+     *         final var permissions = PulumiserviceFunctions.buildRolePermissions(BuildRolePermissionsArgs.builder()
+     *             .stackRules(RoleStackRuleArgs.builder()
+     *                 .all(true)
+     *                 .permissionSetScopes(deployers.applyValue(_deployers -> _deployers.scopes()))
+     *                 .build())
+     *             .build());
+     * 
+     *         var deployerRole = new OrganizationRole("deployerRole", OrganizationRoleArgs.builder()
+     *             .organizationName("my-org")
+     *             .name("Deployers")
+     *             .permissions(permissions.applyValue(_permissions -> _permissions.permissions()))
+     *             .build());
+     * 
+     *     }
+     * }
+     * }
+     * </pre>
+     * 
+     */
+    public static CompletableFuture<GetStackPermissionSetResult> getStackPermissionSetPlain(GetStackPermissionSetPlainArgs args, InvokeOptions options) {
+        return Deployment.getInstance().invokeAsync("pulumiservice:index:getStackPermissionSet", TypeShape.of(GetStackPermissionSetResult.class), args, Utilities.withVersion(options));
     }
 }

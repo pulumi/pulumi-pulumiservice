@@ -67,6 +67,21 @@ public final class BuildRolePermissionsPlainArgs extends com.pulumi.resources.In
     }
 
     /**
+     * The scopes of an organization-level permission set to grant: the `scopes` output of `getOrganizationPermissionSet`. The role gets a copy of the set&#39;s scopes, not a link to the set.
+     * 
+     */
+    @Import(name="organizationPermissionSetScopes")
+    private @Nullable List<String> organizationPermissionSetScopes;
+
+    /**
+     * @return The scopes of an organization-level permission set to grant: the `scopes` output of `getOrganizationPermissionSet`. The role gets a copy of the set&#39;s scopes, not a link to the set.
+     * 
+     */
+    public Optional<List<String>> organizationPermissionSetScopes() {
+        return Optional.ofNullable(this.organizationPermissionSetScopes);
+    }
+
+    /**
      * Organization-level scopes to grant (e.g. `team:read`).
      * 
      */
@@ -102,6 +117,7 @@ public final class BuildRolePermissionsPlainArgs extends com.pulumi.resources.In
         this.accountRules = $.accountRules;
         this.additionalEntries = $.additionalEntries;
         this.environmentRules = $.environmentRules;
+        this.organizationPermissionSetScopes = $.organizationPermissionSetScopes;
         this.organizationScopes = $.organizationScopes;
         this.stackRules = $.stackRules;
     }
@@ -185,6 +201,27 @@ public final class BuildRolePermissionsPlainArgs extends com.pulumi.resources.In
          */
         public Builder environmentRules(RoleEnvironmentRule... environmentRules) {
             return environmentRules(List.of(environmentRules));
+        }
+
+        /**
+         * @param organizationPermissionSetScopes The scopes of an organization-level permission set to grant: the `scopes` output of `getOrganizationPermissionSet`. The role gets a copy of the set&#39;s scopes, not a link to the set.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder organizationPermissionSetScopes(@Nullable List<String> organizationPermissionSetScopes) {
+            $.organizationPermissionSetScopes = organizationPermissionSetScopes;
+            return this;
+        }
+
+        /**
+         * @param organizationPermissionSetScopes The scopes of an organization-level permission set to grant: the `scopes` output of `getOrganizationPermissionSet`. The role gets a copy of the set&#39;s scopes, not a link to the set.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder organizationPermissionSetScopes(String... organizationPermissionSetScopes) {
+            return organizationPermissionSetScopes(List.of(organizationPermissionSetScopes));
         }
 
         /**

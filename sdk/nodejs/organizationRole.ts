@@ -193,6 +193,80 @@ import * as utilities from "./utilities";
  *     permissions: permissions.permissions,
  * });
  * ```
+ * ### Grant permission sets
+ *
+ * A rule's `permissionSetScopes` grants a permission set, built-in or custom, like an access level in the Pulumi Cloud console. Look the set up with the function for the rule's entity type, here `getStackPermissionSet`, and pass its `scopes`. A rule can combine a permission set with `scopes`. The role gets a copy of the set's scopes, so if the set changes in Pulumi Cloud, the next `pulumi up` updates the role.
+ *
+ * ```typescript
+ * import * as pulumi from "@pulumi/pulumi";
+ * import * as pulumiservice from "@pulumi/pulumiservice";
+ *
+ * const stackWrite = pulumiservice.getStackPermissionSetOutput({
+ *     organizationName: "my-org",
+ *     builtIn: pulumiservice.BuiltInStackPermissionSet.Write,
+ * });
+ * const deployers = pulumiservice.getStackPermissionSetOutput({
+ *     organizationName: "my-org",
+ *     name: "Deployers",
+ * });
+ * const prodStack = pulumiservice.getStackOutput({
+ *     organizationName: "my-org",
+ *     projectName: "networking",
+ *     stackName: "prod",
+ * });
+ * const permissions = pulumiservice.buildRolePermissionsOutput({
+ *     stackRules: [
+ *         {
+ *             all: true,
+ *             permissionSetScopes: deployers.scopes,
+ *         },
+ *         {
+ *             id: prodStack.stackId,
+ *             permissionSetScopes: stackWrite.scopes,
+ *             scopes: [pulumiservice.RbacStackScope.StackDeploymentCreate],
+ *         },
+ *     ],
+ * });
+ * const prodDeployerRole = new pulumiservice.OrganizationRole("prodDeployerRole", {
+ *     organizationName: "my-org",
+ *     name: "Prod Deployers",
+ *     description: "Deploy every stack; full write on networking/prod.",
+ *     permissions: permissions.permissions,
+ * });
+ * ```
+ * ### Grant environment and organization-level permission sets
+ *
+ * Each entity type has its own lookup: `getEnvironmentPermissionSet` for `environmentRules`, `getAccountPermissionSet` for `accountRules`, and `getOrganizationPermissionSet` for `organizationPermissionSetScopes`.
+ *
+ * ```typescript
+ * import * as pulumi from "@pulumi/pulumi";
+ * import * as pulumiservice from "@pulumi/pulumiservice";
+ *
+ * const readOnly = pulumiservice.getOrganizationPermissionSetOutput({
+ *     organizationName: "my-org",
+ *     builtIn: pulumiservice.BuiltInOrganizationPermissionSet.ReadOnly,
+ * });
+ * const environmentOpen = pulumiservice.getEnvironmentPermissionSetOutput({
+ *     organizationName: "my-org",
+ *     builtIn: pulumiservice.BuiltInEnvironmentPermissionSet.Open,
+ * });
+ * const permissions = pulumiservice.buildRolePermissionsOutput({
+ *     organizationPermissionSetScopes: readOnly.scopes,
+ *     environmentRules: [{
+ *         tags: [{
+ *             key: "team",
+ *             value: "platform",
+ *         }],
+ *         permissionSetScopes: environmentOpen.scopes,
+ *     }],
+ * });
+ * const platformViewerRole = new pulumiservice.OrganizationRole("platformViewerRole", {
+ *     organizationName: "my-org",
+ *     name: "Platform Viewers",
+ *     description: "View the organization and open platform environments.",
+ *     permissions: permissions.permissions,
+ * });
+ * ```
  *
  * ## Import
  *

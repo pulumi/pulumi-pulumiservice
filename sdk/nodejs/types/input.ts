@@ -629,6 +629,10 @@ export interface RoleAccountRule {
      */
     id?: string;
     /**
+     * The scopes of a cloud account permission set to grant on the selected accounts: the `scopes` output of `getAccountPermissionSet`. The role gets a copy of the set's scopes, not a link to the set.
+     */
+    permissionSetScopes?: string[];
+    /**
      * Cloud account scopes to grant on the selected accounts.
      */
     scopes?: enums.RbacAccountScope[];
@@ -647,6 +651,10 @@ export interface RoleAccountRuleArgs {
      * Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
      */
     id?: pulumi.Input<string | undefined>;
+    /**
+     * The scopes of a cloud account permission set to grant on the selected accounts: the `scopes` output of `getAccountPermissionSet`. The role gets a copy of the set's scopes, not a link to the set.
+     */
+    permissionSetScopes?: pulumi.Input<pulumi.Input<string>[] | undefined>;
     /**
      * Cloud account scopes to grant on the selected accounts.
      */
@@ -667,6 +675,10 @@ export interface RoleEnvironmentRule {
      */
     id?: string;
     /**
+     * The scopes of a environment permission set to grant on the selected environments: the `scopes` output of `getEnvironmentPermissionSet`. The role gets a copy of the set's scopes, not a link to the set.
+     */
+    permissionSetScopes?: string[];
+    /**
      * Environment scopes to grant on the selected environments.
      */
     scopes?: enums.RbacEnvironmentScope[];
@@ -685,6 +697,10 @@ export interface RoleEnvironmentRuleArgs {
      * Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
      */
     id?: pulumi.Input<string | undefined>;
+    /**
+     * The scopes of a environment permission set to grant on the selected environments: the `scopes` output of `getEnvironmentPermissionSet`. The role gets a copy of the set's scopes, not a link to the set.
+     */
+    permissionSetScopes?: pulumi.Input<pulumi.Input<string>[] | undefined>;
     /**
      * Environment scopes to grant on the selected environments.
      */
@@ -705,6 +721,10 @@ export interface RoleStackRule {
      */
     id?: string;
     /**
+     * The scopes of a stack permission set to grant on the selected stacks: the `scopes` output of `getStackPermissionSet`. The role gets a copy of the set's scopes, not a link to the set.
+     */
+    permissionSetScopes?: string[];
+    /**
      * Stack scopes to grant on the selected stacks.
      */
     scopes?: enums.RbacStackScope[];
@@ -723,6 +743,10 @@ export interface RoleStackRuleArgs {
      * Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
      */
     id?: pulumi.Input<string | undefined>;
+    /**
+     * The scopes of a stack permission set to grant on the selected stacks: the `scopes` output of `getStackPermissionSet`. The role gets a copy of the set's scopes, not a link to the set.
+     */
+    permissionSetScopes?: pulumi.Input<pulumi.Input<string>[] | undefined>;
     /**
      * Stack scopes to grant on the selected stacks.
      */

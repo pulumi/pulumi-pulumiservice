@@ -5061,6 +5061,8 @@ type RoleAccountRule struct {
 	All *bool `pulumi:"all"`
 	// Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
 	Id *string `pulumi:"id"`
+	// The scopes of a cloud account permission set to grant on the selected accounts: the `scopes` output of `getAccountPermissionSet`. The role gets a copy of the set's scopes, not a link to the set.
+	PermissionSetScopes []string `pulumi:"permissionSetScopes"`
 	// Cloud account scopes to grant on the selected accounts.
 	Scopes []RbacAccountScope `pulumi:"scopes"`
 	// Apply to entities whose tags match every condition.
@@ -5083,6 +5085,8 @@ type RoleAccountRuleArgs struct {
 	All pulumi.BoolPtrInput `pulumi:"all"`
 	// Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
 	Id pulumi.StringPtrInput `pulumi:"id"`
+	// The scopes of a cloud account permission set to grant on the selected accounts: the `scopes` output of `getAccountPermissionSet`. The role gets a copy of the set's scopes, not a link to the set.
+	PermissionSetScopes pulumi.StringArrayInput `pulumi:"permissionSetScopes"`
 	// Cloud account scopes to grant on the selected accounts.
 	Scopes RbacAccountScopeArrayInput `pulumi:"scopes"`
 	// Apply to entities whose tags match every condition.
@@ -5150,6 +5154,11 @@ func (o RoleAccountRuleOutput) Id() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v RoleAccountRule) *string { return v.Id }).(pulumi.StringPtrOutput)
 }
 
+// The scopes of a cloud account permission set to grant on the selected accounts: the `scopes` output of `getAccountPermissionSet`. The role gets a copy of the set's scopes, not a link to the set.
+func (o RoleAccountRuleOutput) PermissionSetScopes() pulumi.StringArrayOutput {
+	return o.ApplyT(func(v RoleAccountRule) []string { return v.PermissionSetScopes }).(pulumi.StringArrayOutput)
+}
+
 // Cloud account scopes to grant on the selected accounts.
 func (o RoleAccountRuleOutput) Scopes() RbacAccountScopeArrayOutput {
 	return o.ApplyT(func(v RoleAccountRule) []RbacAccountScope { return v.Scopes }).(RbacAccountScopeArrayOutput)
@@ -5185,6 +5194,8 @@ type RoleEnvironmentRule struct {
 	All *bool `pulumi:"all"`
 	// Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
 	Id *string `pulumi:"id"`
+	// The scopes of a environment permission set to grant on the selected environments: the `scopes` output of `getEnvironmentPermissionSet`. The role gets a copy of the set's scopes, not a link to the set.
+	PermissionSetScopes []string `pulumi:"permissionSetScopes"`
 	// Environment scopes to grant on the selected environments.
 	Scopes []RbacEnvironmentScope `pulumi:"scopes"`
 	// Apply to entities whose tags match every condition.
@@ -5207,6 +5218,8 @@ type RoleEnvironmentRuleArgs struct {
 	All pulumi.BoolPtrInput `pulumi:"all"`
 	// Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
 	Id pulumi.StringPtrInput `pulumi:"id"`
+	// The scopes of a environment permission set to grant on the selected environments: the `scopes` output of `getEnvironmentPermissionSet`. The role gets a copy of the set's scopes, not a link to the set.
+	PermissionSetScopes pulumi.StringArrayInput `pulumi:"permissionSetScopes"`
 	// Environment scopes to grant on the selected environments.
 	Scopes RbacEnvironmentScopeArrayInput `pulumi:"scopes"`
 	// Apply to entities whose tags match every condition.
@@ -5272,6 +5285,11 @@ func (o RoleEnvironmentRuleOutput) All() pulumi.BoolPtrOutput {
 // Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
 func (o RoleEnvironmentRuleOutput) Id() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v RoleEnvironmentRule) *string { return v.Id }).(pulumi.StringPtrOutput)
+}
+
+// The scopes of a environment permission set to grant on the selected environments: the `scopes` output of `getEnvironmentPermissionSet`. The role gets a copy of the set's scopes, not a link to the set.
+func (o RoleEnvironmentRuleOutput) PermissionSetScopes() pulumi.StringArrayOutput {
+	return o.ApplyT(func(v RoleEnvironmentRule) []string { return v.PermissionSetScopes }).(pulumi.StringArrayOutput)
 }
 
 // Environment scopes to grant on the selected environments.
@@ -5374,6 +5392,8 @@ type RoleStackRule struct {
 	All *bool `pulumi:"all"`
 	// Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
 	Id *string `pulumi:"id"`
+	// The scopes of a stack permission set to grant on the selected stacks: the `scopes` output of `getStackPermissionSet`. The role gets a copy of the set's scopes, not a link to the set.
+	PermissionSetScopes []string `pulumi:"permissionSetScopes"`
 	// Stack scopes to grant on the selected stacks.
 	Scopes []RbacStackScope `pulumi:"scopes"`
 	// Apply to entities whose tags match every condition.
@@ -5396,6 +5416,8 @@ type RoleStackRuleArgs struct {
 	All pulumi.BoolPtrInput `pulumi:"all"`
 	// Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
 	Id pulumi.StringPtrInput `pulumi:"id"`
+	// The scopes of a stack permission set to grant on the selected stacks: the `scopes` output of `getStackPermissionSet`. The role gets a copy of the set's scopes, not a link to the set.
+	PermissionSetScopes pulumi.StringArrayInput `pulumi:"permissionSetScopes"`
 	// Stack scopes to grant on the selected stacks.
 	Scopes RbacStackScopeArrayInput `pulumi:"scopes"`
 	// Apply to entities whose tags match every condition.
@@ -5461,6 +5483,11 @@ func (o RoleStackRuleOutput) All() pulumi.BoolPtrOutput {
 // Apply to a single entity: a stack's `stackId` (from `getStack`), an environment's `environmentId`, or a cloud account's `insightsAccountId`.
 func (o RoleStackRuleOutput) Id() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v RoleStackRule) *string { return v.Id }).(pulumi.StringPtrOutput)
+}
+
+// The scopes of a stack permission set to grant on the selected stacks: the `scopes` output of `getStackPermissionSet`. The role gets a copy of the set's scopes, not a link to the set.
+func (o RoleStackRuleOutput) PermissionSetScopes() pulumi.StringArrayOutput {
+	return o.ApplyT(func(v RoleStackRule) []string { return v.PermissionSetScopes }).(pulumi.StringArrayOutput)
 }
 
 // Stack scopes to grant on the selected stacks.

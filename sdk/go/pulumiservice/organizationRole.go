@@ -288,6 +288,116 @@ import (
 //	}
 //
 // ```
+// ### Grant permission sets
+//
+// A rule's `permissionSetScopes` grants a permission set, built-in or custom, like an access level in the Pulumi Cloud console. Look the set up with the function for the rule's entity type, here `getStackPermissionSet`, and pass its `scopes`. A rule can combine a permission set with `scopes`. The role gets a copy of the set's scopes, so if the set changes in Pulumi Cloud, the next `pulumi up` updates the role.
+//
+// ```go
+// package main
+//
+// import (
+//
+//	"github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice"
+//	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
+//
+// )
+//
+//	func main() {
+//		pulumi.Run(func(ctx *pulumi.Context) error {
+//			stackWrite := pulumiservice.GetStackPermissionSetOutput(ctx, pulumiservice.GetStackPermissionSetOutputArgs{
+//				OrganizationName: pulumi.String("my-org"),
+//				BuiltIn:          pulumiservice.BuiltInStackPermissionSetWrite,
+//			}, nil)
+//			deployers := pulumiservice.GetStackPermissionSetOutput(ctx, pulumiservice.GetStackPermissionSetOutputArgs{
+//				OrganizationName: pulumi.String("my-org"),
+//				Name:             pulumi.String("Deployers"),
+//			}, nil)
+//			prodStack := pulumiservice.GetStackOutput(ctx, pulumiservice.GetStackOutputArgs{
+//				OrganizationName: pulumi.String("my-org"),
+//				ProjectName:      pulumi.String("networking"),
+//				StackName:        pulumi.String("prod"),
+//			}, nil)
+//			permissions := pulumiservice.BuildRolePermissionsOutput(ctx, pulumiservice.BuildRolePermissionsOutputArgs{
+//				StackRules: pulumiservice.RoleStackRuleArray{
+//					&pulumiservice.RoleStackRuleArgs{
+//						All:                 pulumi.Bool(true),
+//						PermissionSetScopes: deployers.Scopes(),
+//					},
+//					&pulumiservice.RoleStackRuleArgs{
+//						Id:                  prodStack.StackId(),
+//						PermissionSetScopes: stackWrite.Scopes(),
+//						Scopes: pulumiservice.RbacStackScopeArray{
+//							pulumiservice.RbacStackScopeStackDeploymentCreate,
+//						},
+//					},
+//				},
+//			}, nil)
+//			_, err := pulumiservice.NewOrganizationRole(ctx, "prodDeployerRole", &pulumiservice.OrganizationRoleArgs{
+//				OrganizationName: pulumi.String("my-org"),
+//				Name:             pulumi.String("Prod Deployers"),
+//				Description:      pulumi.String("Deploy every stack; full write on networking/prod."),
+//				Permissions:      permissions.Permissions(),
+//			})
+//			if err != nil {
+//				return err
+//			}
+//			return nil
+//		})
+//	}
+//
+// ```
+// ### Grant environment and organization-level permission sets
+//
+// Each entity type has its own lookup: `getEnvironmentPermissionSet` for `environmentRules`, `getAccountPermissionSet` for `accountRules`, and `getOrganizationPermissionSet` for `organizationPermissionSetScopes`.
+//
+// ```go
+// package main
+//
+// import (
+//
+//	"github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice"
+//	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
+//
+// )
+//
+//	func main() {
+//		pulumi.Run(func(ctx *pulumi.Context) error {
+//			readOnly := pulumiservice.GetOrganizationPermissionSetOutput(ctx, pulumiservice.GetOrganizationPermissionSetOutputArgs{
+//				OrganizationName: pulumi.String("my-org"),
+//				BuiltIn:          pulumiservice.BuiltInOrganizationPermissionSetReadOnly,
+//			}, nil)
+//			environmentOpen := pulumiservice.GetEnvironmentPermissionSetOutput(ctx, pulumiservice.GetEnvironmentPermissionSetOutputArgs{
+//				OrganizationName: pulumi.String("my-org"),
+//				BuiltIn:          pulumiservice.BuiltInEnvironmentPermissionSetOpen,
+//			}, nil)
+//			permissions := pulumiservice.BuildRolePermissionsOutput(ctx, pulumiservice.BuildRolePermissionsOutputArgs{
+//				OrganizationPermissionSetScopes: readOnly.Scopes(),
+//				EnvironmentRules: pulumiservice.RoleEnvironmentRuleArray{
+//					&pulumiservice.RoleEnvironmentRuleArgs{
+//						Tags: pulumiservice.TagConditionArray{
+//							&pulumiservice.TagConditionArgs{
+//								Key:   pulumi.String("team"),
+//								Value: pulumi.String("platform"),
+//							},
+//						},
+//						PermissionSetScopes: environmentOpen.Scopes(),
+//					},
+//				},
+//			}, nil)
+//			_, err := pulumiservice.NewOrganizationRole(ctx, "platformViewerRole", &pulumiservice.OrganizationRoleArgs{
+//				OrganizationName: pulumi.String("my-org"),
+//				Name:             pulumi.String("Platform Viewers"),
+//				Description:      pulumi.String("View the organization and open platform environments."),
+//				Permissions:      permissions.Permissions(),
+//			})
+//			if err != nil {
+//				return err
+//			}
+//			return nil
+//		})
+//	}
+//
+// ```
 //
 // ## Import
 //

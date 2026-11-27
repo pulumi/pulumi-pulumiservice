@@ -147,3 +147,81 @@ resources:
       name: Infrastructure Operators
       description: Read environments and cloud accounts, and operate the shared ones.
       permissions: ${permissions.permissions}
+---
+description: |
+  Grant permission sets
+  A rule's `permissionSetScopes` grants a permission set, built-in or custom, like an access level in the Pulumi Cloud console. Look the set up with the function for the rule's entity type, here `getStackPermissionSet`, and pass its `scopes`. A rule can combine a permission set with `scopes`. The role gets a copy of the set's scopes, so if the set changes in Pulumi Cloud, the next `pulumi up` updates the role.
+variables:
+  stackWrite:
+    fn::invoke:
+      function: pulumiservice:getStackPermissionSet
+      arguments:
+        organizationName: my-org
+        builtIn: stack-write
+  deployers:
+    fn::invoke:
+      function: pulumiservice:getStackPermissionSet
+      arguments:
+        organizationName: my-org
+        name: Deployers
+  prodStack:
+    fn::invoke:
+      function: pulumiservice:getStack
+      arguments:
+        organizationName: my-org
+        projectName: networking
+        stackName: prod
+  permissions:
+    fn::invoke:
+      function: pulumiservice:buildRolePermissions
+      arguments:
+        stackRules:
+          - all: true
+            permissionSetScopes: ${deployers.scopes}
+          - id: ${prodStack.stackId}
+            permissionSetScopes: ${stackWrite.scopes}
+            scopes:
+              - stack_deployment:create
+resources:
+  prodDeployerRole:
+    type: pulumiservice:OrganizationRole
+    properties:
+      organizationName: my-org
+      name: Prod Deployers
+      description: Deploy every stack; full write on networking/prod.
+      permissions: ${permissions.permissions}
+---
+description: |
+  Grant environment and organization-level permission sets
+  Each entity type has its own lookup: `getEnvironmentPermissionSet` for `environmentRules`, `getAccountPermissionSet` for `accountRules`, and `getOrganizationPermissionSet` for `organizationPermissionSetScopes`.
+variables:
+  readOnly:
+    fn::invoke:
+      function: pulumiservice:getOrganizationPermissionSet
+      arguments:
+        organizationName: my-org
+        builtIn: org-settings-read-only
+  environmentOpen:
+    fn::invoke:
+      function: pulumiservice:getEnvironmentPermissionSet
+      arguments:
+        organizationName: my-org
+        builtIn: environment-open
+  permissions:
+    fn::invoke:
+      function: pulumiservice:buildRolePermissions
+      arguments:
+        organizationPermissionSetScopes: ${readOnly.scopes}
+        environmentRules:
+          - tags:
+              - key: team
+                value: platform
+            permissionSetScopes: ${environmentOpen.scopes}
+resources:
+  platformViewerRole:
+    type: pulumiservice:OrganizationRole
+    properties:
+      organizationName: my-org
+      name: Platform Viewers
+      description: View the organization and open platform environments.
+      permissions: ${permissions.permissions}
