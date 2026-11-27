@@ -18,6 +18,8 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"os"
+	"regexp"
 	"strings"
 	"testing"
 
@@ -333,5 +335,19 @@ func TestProvider_EveryIndexResourceIsDescribed(t *testing.T) {
 		for name, prop := range rs.Properties {
 			assert.NotEmpty(t, prop.Description, "%s: output %q has no description", token, name)
 		}
+	}
+}
+
+// The Java SDK must publish as com.pulumi:pulumiservice. Java codegen copies the
+// schema's java.basePackage into the Gradle group, and when that is empty it uses
+// "com.pulumi." from the namespace instead, which Maven Central rejects (#1416).
+func TestProvider_JavaSDKGroupID(t *testing.T) {
+	buildGradle, err := os.ReadFile("../../../sdk/java/build.gradle")
+	require.NoError(t, err)
+
+	groups := regexp.MustCompile(`(?m)^\s*(?:group|groupId) = "([^"]*)"`).FindAllStringSubmatch(string(buildGradle), -1)
+	require.Len(t, groups, 2, "sdk/java/build.gradle should set group and groupId")
+	for _, group := range groups {
+		assert.Equal(t, "com.pulumi", group[1])
 	}
 }

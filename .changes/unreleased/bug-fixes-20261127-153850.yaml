@@ -1,0 +1,5 @@
+kind: bug-fixes
+body: 'Fixed the Java SDK not being published to Maven Central since v1.4.0: its Gradle group was `com.pulumi.` instead of `com.pulumi`, which Maven Central rejects'
+time: 2026-11-27T15:38:50.093109+01:00
+custom:
+    Issue: "1416"
