@@ -29,7 +29,7 @@
       "respectSchemaVersion": true
     },
     "java": {
-      "basePackage": "",
+      "basePackage": "com.pulumi",
       "buildFiles": "gradle",
       "dependencies": {
         "com.google.code.findbugs:jsr305": "3.0.2",

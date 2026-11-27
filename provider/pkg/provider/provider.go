@@ -154,7 +154,9 @@ func MakeProvider(host *provider.HostClient, name, version string) (pulumirpc.Re
 				respectSchemaVersionKey:          true,
 			},
 			"java": map[string]any{
-				"basePackage": "",
+				// Left empty, Java codegen derives "com.pulumi." from the schema namespace
+				// and publishes under that group, which Maven Central rejects.
+				"basePackage": "com.pulumi",
 				"buildFiles":  "gradle",
 				"dependencies": map[string]any{
 					"com.google.code.findbugs:jsr305": "3.0.2",
